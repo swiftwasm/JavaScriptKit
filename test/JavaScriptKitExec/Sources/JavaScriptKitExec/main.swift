@@ -9,12 +9,14 @@ Literal_Conversion: do {
         .number(0),
         .number(.max),
         .number(.min),
+        .null,
+        .undefined,
     ]
     for (index, input) in inputs.enumerated() {
         let prop = "prop_\(index)"
         setJSValue(this: global, name: prop, value: input)
         let got = getJSValue(this: global, name: prop)
-        try expectEqual(input, got)
+        try expectEqual(got, input)
     }
 } catch {
     print(error)

@@ -16,8 +16,8 @@ enum JavaScriptValueKind {
     String = 1,
     Number = 2,
     Object = 3,
-    Array = 4,
-    Null = 5,
+    Null = 4,
+    Undefined = 5,
     Function = 6,
 }
 
@@ -101,12 +101,25 @@ export class SwiftRuntime {
                 case JavaScriptValueKind.Object: {
                     return this._heapValues[payload1]
                 }
+                case JavaScriptValueKind.Null: {
+                    return null
+                }
+                case JavaScriptValueKind.Undefined: {
+                    return undefined
+                }
                 default:
                     throw new Error(`Type kind "${kind}" is not supported`)
             }
         }
 
         const encodeValue = (value: any) => {
+            if (value === null) {
+                return {
+                    kind: JavaScriptValueKind.Null,
+                    payload1: 0,
+                    payload2: 0,
+                }
+            }
             switch (typeof value) {
                 case "boolean": {
                     return {
@@ -127,6 +140,13 @@ export class SwiftRuntime {
                         kind: JavaScriptValueKind.String,
                         payload1: allocValue(value),
                         payload2: value.length,
+                    }
+                }
+                case "undefined": {
+                    return {
+                        kind: JavaScriptValueKind.Undefined,
+                        payload1: 0,
+                        payload2: 0,
                     }
                 }
                 case "object": {

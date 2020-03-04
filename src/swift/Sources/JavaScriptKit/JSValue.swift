@@ -21,6 +21,8 @@ public enum JSValue: Equatable {
     case string(String)
     case number(Int32)
     case object(JSObjectRef)
+    case null
+    case undefined
 }
 
 protocol JSValueConvertible {
@@ -60,6 +62,10 @@ extension RawJSValue: JSValueConvertible {
             return .string(string)
         case JavaScriptValueKind_Object:
             return .object(JSObjectRef(id: payload1))
+        case JavaScriptValueKind_Null:
+            return .null
+        case JavaScriptValueKind_Undefined:
+            return .undefined
         default:
             fatalError("unreachable")
         }
@@ -90,6 +96,14 @@ extension JSValue {
         case let .object(ref):
             kind = JavaScriptValueKind_Object
             payload1 = ref.id
+            payload2 = 0
+        case .null:
+            kind = JavaScriptValueKind_Null
+            payload1 = 0
+            payload2 = 0
+        case .undefined:
+            kind = JavaScriptValueKind_Undefined
+            payload1 = 0
             payload2 = 0
         }
         let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)

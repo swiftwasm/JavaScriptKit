@@ -6,13 +6,14 @@
 typedef unsigned int JavaScriptValueId;
 
 typedef enum {
-    JavaScriptValueKind_Invalid  = -1,
-    JavaScriptValueKind_Boolean  = 0,
-    JavaScriptValueKind_String   = 1,
-    JavaScriptValueKind_Number   = 2,
-    JavaScriptValueKind_Object   = 3,
-    JavaScriptValueKind_Null     = 4,
-    JavaScriptValueKind_Function = 5,
+    JavaScriptValueKind_Invalid   = -1,
+    JavaScriptValueKind_Boolean   = 0,
+    JavaScriptValueKind_String    = 1,
+    JavaScriptValueKind_Number    = 2,
+    JavaScriptValueKind_Object    = 3,
+    JavaScriptValueKind_Null      = 4,
+    JavaScriptValueKind_Undefined = 5,
+    JavaScriptValueKind_Function  = 6,
 } JavaScriptValueKind;
 
 typedef unsigned JavaScriptPayload;
