@@ -6,6 +6,7 @@ build: .wasi-sdk/dummy
 	swift build --triple wasm32-unknown-wasi \
 		-Xswiftc -Xclang-linker \
 		-Xswiftc --sysroot=$(WASI_SDK_DIR)/share/wasi-sysroot \
+		-Xcc --sysroot=$(WASI_SDK_DIR)/share/wasi-sysroot \
 		-Xlinker --allow-undefined
 .wasi-sdk/dummy:
 	./script/install-wasi-sdk.sh $(WASI_SDK_DIR)
