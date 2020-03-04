@@ -96,6 +96,7 @@ export class SwiftRuntime {
                     return readString(payload1, payload2)
                 }
                 case JavaScriptValueKind.Object: {
+                    return this._heapValues[payload1]
                 }
                 default:
                     throw new Error(`Type kind "${kind}" is not supported`)
@@ -115,6 +116,13 @@ export class SwiftRuntime {
                         kind: JavaScriptValueKind.String,
                         payload1: allocValue(value),
                         payload2: value.length,
+                    }
+                }
+                case "object": {
+                    return {
+                        kind: JavaScriptValueKind.Object,
+                        payload1: allocValue(value),
+                        payload2: 0,
                     }
                 }
                 default:

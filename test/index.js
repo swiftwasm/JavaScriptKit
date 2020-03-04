@@ -18,6 +18,14 @@ let wasi = new WASI({
   }
 });
 
+global.globalObject1 = {
+  "prop_1": {
+    "nested_prop": 1,
+  },
+  "prop_2": 2,
+  "prop_3": true,
+}
+
 const startWasiTask = async () => {
   // Fetch our Wasm File
   const wasmBinary = await readFile("./dist/JavaScriptKitExec.wasm");

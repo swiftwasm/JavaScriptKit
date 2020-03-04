@@ -19,6 +19,7 @@ public class JSRef: Equatable {
 public enum JSValue: Equatable {
     case boolean(Bool)
     case string(String)
+    case object(JSRef)
 }
 
 protocol JSValueConvertible {
@@ -48,6 +49,8 @@ public func getJSValue(this: JSRef, name: String) -> JSValue {
         _load_string(payload1 as JavaScriptValueId, buffer)
         let string = String(decodingCString: UnsafePointer(buffer), as: UTF8.self)
         return .string(string)
+    case JavaScriptValueKind_Object:
+        return .object(JSRef(id: payload1))
     default:
         fatalError("unreachable")
     }
@@ -73,6 +76,10 @@ public func setJSValue(this: JSRef, name: String, value: JSValue) {
             )
         }
         return
+    case let .object(ref):
+        kind = JavaScriptValueKind_Object
+        payload1 = ref.id
+        payload2 = 0
     }
     _set_js_value(this.id, name, Int32(name.count), kind, payload1, payload2)
 }

@@ -1,13 +1,36 @@
 import JavaScriptKit
 
-func expectEqual<T: Equatable>(_ lhs: T, _ rhs: T) {
-    if lhs != rhs {
-        print("[ERROR] Expect to be equal \"\(lhs)\" and \"\(rhs)\"")
+struct MessageError: Error {
+    let message: String
+    init(_ message: String) {
+        self.message = message
     }
 }
 
-let global = JSRef.global()
-do {
+func expectEqual<T: Equatable>(_ lhs: T, _ rhs: T) throws {
+    if lhs != rhs {
+        throw MessageError("Expect to be equal \"\(lhs)\" and \"\(rhs)\"")
+    }
+}
+
+func expectObject(_ value: JSValue) throws -> JSRef {
+    switch value {
+    case .object(let ref): return ref
+    default:
+        throw MessageError("Type of \(value) should be \"object\"")
+    }
+}
+
+func expectBoolean(_ value: JSValue) throws -> Bool {
+    switch value {
+    case .boolean(let bool): return bool
+    default:
+        throw MessageError("Type of \(value) should be \"boolean\"")
+    }
+}
+
+Literal_Conversion: do {
+    let global = JSRef.global()
     let inputs: [JSValue] = [
         .boolean(true),
         .boolean(false),
@@ -17,6 +40,31 @@ do {
         let prop = "prop_\(index)"
         setJSValue(this: global, name: prop, value: input)
         let got = getJSValue(this: global, name: prop)
-        expectEqual(input, got)
+        try expectEqual(input, got)
     }
+} catch {
+    print(error)
+}
+
+Object_Conversion: do {
+    // Notes: globalObject1 is defined in JavaScript environment
+    //
+    // ```js
+    // global.globalObject1 = {
+    //   "prop_1": {
+    //     "nested_prop": 1,
+    //   },
+    //   "prop_2": 2,
+    //   "prop_3": true,
+    // }
+    // ```
+    //
+
+    let globalObject1 = getJSValue(this: .global(), name: "globalObject1")
+    let globalObject1Ref = try expectObject(globalObject1)
+    _ = try expectObject(getJSValue(this: globalObject1Ref, name: "prop_1"))
+    let prop_3 = getJSValue(this: globalObject1Ref, name: "prop_3")
+    try expectEqual(prop_3, .boolean(true))
+} catch {
+    print(error)
 }
