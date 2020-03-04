@@ -33,4 +33,10 @@ func _get_subscript(
 func _load_string(
     _ ref: JavaScriptValueId,
     _ buffer: UnsafeMutablePointer<UInt8>!) { fatalError() }
+func _call_function(
+    _ ref: JavaScriptValueId,
+    _ args: UnsafePointer<RawJSValue>!, _ length: Int32,
+    _ result_kind: UnsafeMutablePointer<JavaScriptValueKind>!,
+    _ result_payload1: UnsafeMutablePointer<JavaScriptPayload>!,
+    _ result_payload2: UnsafeMutablePointer<JavaScriptPayload>!) { fatalError() }
 #endif

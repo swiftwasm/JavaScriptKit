@@ -10,12 +10,6 @@ extension Bool: JSValueConvertible {
     }
 }
 
-struct RawJSValue {
-    var kind: JavaScriptValueKind = JavaScriptValueKind_Invalid
-    var payload1: JavaScriptPayload = 0
-    var payload2: JavaScriptPayload = 0
-}
-
 extension RawJSValue: JSValueConvertible {
     func jsValue() -> JSValue {
         switch kind {
@@ -87,5 +81,21 @@ extension JSValue {
         }
         let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
         return body(rawValue)
+    }
+}
+
+extension Array where Element == JSValue {
+    func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
+        func _withCollectedRawJSValue<T>(
+            _ values: [JSValue], _ index: Int,
+            _ results: inout [RawJSValue], _ body: ([RawJSValue]) -> T) -> T {
+            if index == values.count { return body(results) }
+            return values[index].withRawJSValue { (rawValue) -> T in
+                results.append(rawValue)
+                return _withCollectedRawJSValue(values, index + 1, &results, body)
+            }
+        }
+        var _results = [RawJSValue]()
+        return _withCollectedRawJSValue(self, 0, &_results, body)
     }
 }

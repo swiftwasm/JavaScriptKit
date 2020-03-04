@@ -27,7 +27,16 @@ global.globalObject1 = {
   "prop_4": [
     3, 4, "str_elm_1", 5,
   ],
-  "prop_5": function () {},
+  "prop_5": {
+    "func1": function () { return },
+    "func2": function () { return 1 },
+    "func3": function (n) { return n * 2},
+    "func4": function (a, b, c) { return a + b + c },
+    "func5": function (x) { return "Hello, " + x },
+    "func6": function (c, a, b) {
+      if (c) { return a } else { return b }
+    },
+  }
 }
 
 const startWasiTask = async () => {

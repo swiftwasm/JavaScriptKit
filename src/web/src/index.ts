@@ -73,6 +73,14 @@ export class SwiftRuntime {
             uint8Memory[ptr]
         }
 
+        const readUInt32 = (ptr: pointer) => {
+            const uint8Memory = new Uint8Array(memory().buffer);
+            return uint8Memory[ptr + 0]
+                 + (uint8Memory[ptr + 1] << 8)
+                 + (uint8Memory[ptr + 2] << 16)
+                 + (uint8Memory[ptr + 3] << 24)
+        }
+
         const writeUint32 = (ptr: pointer, value: number) => {
             const uint8Memory = new Uint8Array(memory().buffer);
             uint8Memory[ptr + 0] = (value & 0x000000ff) >> 0
@@ -171,6 +179,21 @@ export class SwiftRuntime {
             }
         }
 
+        // Note:
+        // `decodeValues` assumes that the size of RawJSValue is 12
+        // and the alignment of it is 4
+        const decodeValues = (ptr: pointer, length: number) => {
+            let result = []
+            for (let index = 0; index < length; index++) {
+                const base = ptr + 12 * index
+                const kind = readUInt32(base)
+                const payload1 = readUInt32(base + 4)
+                const payload2 = readUInt32(base + 8)
+                result.push(decodeValue(kind, payload1, payload2))
+            }
+            return result
+        }
+
         return {
             swjs_set_prop: (
                 ref: ref, name: pointer, length: number,
@@ -215,6 +238,18 @@ export class SwiftRuntime {
             swjs_load_string: (ref: ref, buffer: pointer) => {
                 const string = this._heapValues[ref];
                 writeString(buffer, string);
+            },
+            swjs_call_function: (
+                ref: ref, argv: pointer, argc: number,
+                kind_ptr: pointer,
+                payload1_ptr: pointer, payload2_ptr: pointer
+            ) => {
+                const func = this._heapValues[ref]
+                const result = Reflect.apply(func, undefined, decodeValues(argv, argc))
+                const { kind, payload1, payload2 } = encodeValue(result);
+                writeUint32(kind_ptr, kind);
+                writeUint32(payload1_ptr, payload1);
+                writeUint32(payload2_ptr, payload2);
             }
         }
     }

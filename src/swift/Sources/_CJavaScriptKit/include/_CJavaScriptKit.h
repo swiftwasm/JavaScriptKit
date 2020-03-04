@@ -18,6 +18,12 @@ typedef enum {
 
 typedef unsigned JavaScriptPayload;
 
+typedef struct {
+    JavaScriptValueKind kind;
+    JavaScriptPayload payload1;
+    JavaScriptPayload payload2;
+} RawJSValue;
+
 
 const unsigned int _JS_Predef_Value_Global = 0;
 
@@ -78,6 +84,18 @@ __attribute__((
 extern void _load_string(
     const JavaScriptValueId ref,
     unsigned char *buffer
+);
+
+__attribute__((
+    __import_module__("javascript_kit"),
+    __import_name__("swjs_call_function")
+))
+extern void _call_function(
+    const JavaScriptValueId ref,
+    const RawJSValue *args, const int length,
+    JavaScriptValueKind *result_kind,
+    JavaScriptPayload *result_payload1,
+    JavaScriptPayload *result_payload2
 );
 
 #endif /* _CJavaScriptKit_h */

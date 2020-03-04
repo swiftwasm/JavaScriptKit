@@ -18,17 +18,6 @@ public class JSObjectRef: Equatable {
     }
 }
 
-public class JSFunctionRef: Equatable {
-    let id: UInt32
-
-    init(id: UInt32) {
-        self.id = id
-    }
-
-    public static func == (lhs: JSFunctionRef, rhs: JSFunctionRef) -> Bool {
-        return lhs.id == rhs.id
-    }
-}
 
 public enum JSValue: Equatable {
     case boolean(Bool)
