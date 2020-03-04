@@ -1,0 +1,25 @@
+{
+  "name": "javascript-kit-swift",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "run-s build:clean build:ts",
+    "build:clean": "rm -rf lib",
+    "build:ts": "tsc -b",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [],
+  "author": "kateinoigakukun",
+  "license": "MIT",
+  "dependencies": {
+    "tslib": "^1.11.1"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "typescript": "^3.8.3"
+  }
+}
