@@ -142,7 +142,7 @@ export class SwiftRuntime {
         }
 
         return {
-            swjs_set_js_value: (
+            swjs_set_prop: (
                 ref: ref, name: pointer, length: number,
                 kind: JavaScriptValueKind,
                 payload1: number, payload2: number
@@ -150,13 +150,33 @@ export class SwiftRuntime {
                 const obj = this._heapValues[ref];
                 Reflect.set(obj, readString(name, length), decodeValue(kind, payload1, payload2))
             },
-            swjs_get_js_value: (
+            swjs_get_prop: (
                 ref: ref, name: pointer, length: number,
                 kind_ptr: pointer,
                 payload1_ptr: pointer, payload2_ptr: pointer
             ) => {
                 const obj = this._heapValues[ref];
                 const result = Reflect.get(obj, readString(name, length));
+                const { kind, payload1, payload2 } = encodeValue(result);
+                writeUint32(kind_ptr, kind);
+                writeUint32(payload1_ptr, payload1);
+                writeUint32(payload2_ptr, payload2);
+            },
+            swjs_set_subscript: (
+                ref: ref, index: number,
+                kind: JavaScriptValueKind,
+                payload1: number, payload2: number
+            ) => {
+                const obj = this._heapValues[ref];
+                Reflect.set(obj, index, decodeValue(kind, payload1, payload2))
+            },
+            swjs_get_subscript: (
+                ref: ref, index: number,
+                kind_ptr: pointer,
+                payload1_ptr: pointer, payload2_ptr: pointer
+            ) => {
+                const obj = this._heapValues[ref];
+                const result = Reflect.get(obj, index);
                 const { kind, payload1, payload2 } = encodeValue(result);
                 writeUint32(kind_ptr, kind);
                 writeUint32(payload1_ptr, payload1);

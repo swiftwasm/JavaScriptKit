@@ -11,9 +11,8 @@ typedef enum {
     JavaScriptValueKind_String   = 1,
     JavaScriptValueKind_Number   = 2,
     JavaScriptValueKind_Object   = 3,
-    JavaScriptValueKind_Array    = 4,
-    JavaScriptValueKind_Null     = 5,
-    JavaScriptValueKind_Function = 6,
+    JavaScriptValueKind_Null     = 4,
+    JavaScriptValueKind_Function = 5,
 } JavaScriptValueKind;
 
 typedef unsigned JavaScriptPayload;
@@ -23,9 +22,9 @@ const unsigned int _JS_Predef_Value_Global = 0;
 
 __attribute__((
     __import_module__("javascript_kit"),
-    __import_name__("swjs_set_js_value")
+    __import_name__("swjs_set_prop")
 ))
-extern void _set_js_value(
+extern void _set_prop(
     const JavaScriptValueId _this,
     const char *prop,
     const int length,
@@ -36,11 +35,35 @@ extern void _set_js_value(
 
 __attribute__((
     __import_module__("javascript_kit"),
-    __import_name__("swjs_get_js_value")
+    __import_name__("swjs_get_prop")
 ))
-extern void _get_js_value(
+extern void _get_prop(
     const JavaScriptValueId _this,
     const char *prop,
+    const int length,
+    JavaScriptValueKind *kind,
+    JavaScriptPayload *payload1,
+    JavaScriptPayload *payload2
+);
+
+__attribute__((
+    __import_module__("javascript_kit"),
+    __import_name__("swjs_set_subscript")
+))
+extern void _set_subscript(
+    const JavaScriptValueId _this,
+    const int length,
+    const JavaScriptValueKind kind,
+    const JavaScriptPayload payload1,
+    const JavaScriptPayload payload2
+);
+
+__attribute__((
+    __import_module__("javascript_kit"),
+    __import_name__("swjs_get_subscript")
+))
+extern void _get_subscript(
+    const JavaScriptValueId _this,
     const int length,
     JavaScriptValueKind *kind,
     JavaScriptPayload *payload1,

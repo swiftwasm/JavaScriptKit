@@ -13,7 +13,7 @@ func expectEqual<T: Equatable>(_ lhs: T, _ rhs: T) throws {
     }
 }
 
-func expectObject(_ value: JSValue) throws -> JSRef {
+func expectObject(_ value: JSValue) throws -> JSObjectRef {
     switch value {
     case .object(let ref): return ref
     default:
@@ -33,6 +33,6 @@ func expectNumber(_ value: JSValue) throws -> Int32 {
     switch value {
     case .number(let number): return number
     default:
-        throw MessageError("Type of \(value) should be \"boolean\"")
+        throw MessageError("Type of \(value) should be \"number\"")
     }
 }

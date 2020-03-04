@@ -1,7 +1,7 @@
 import JavaScriptKit
 
 Literal_Conversion: do {
-    let global = JSRef.global()
+    let global = JSObjectRef.global()
     let inputs: [JSValue] = [
         .boolean(true),
         .boolean(false),
@@ -30,6 +30,9 @@ Object_Conversion: do {
     //   },
     //   "prop_2": 2,
     //   "prop_3": true,
+    //   "prop_4": [
+    //     3, 4, "str_elm_1", 5,
+    //   ],
     // }
     // ```
     //
@@ -44,6 +47,15 @@ Object_Conversion: do {
     try expectEqual(prop_2, .number(2))
     let prop_3 = getJSValue(this: globalObject1Ref, name: "prop_3")
     try expectEqual(prop_3, .boolean(true))
+    let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
+    let prop_4Array = try expectObject(prop_4)
+    let expectedProp_4: [JSValue] = [
+        .number(3), .number(4), .string("str_elm_1"), .number(5)
+    ]
+    for (index, expectedElement) in expectedProp_4.enumerated() {
+        let actualElement = getJSValue(this: prop_4Array, index: Int32(index))
+        try expectEqual(actualElement, expectedElement)
+    }
 } catch {
     print(error)
 }
