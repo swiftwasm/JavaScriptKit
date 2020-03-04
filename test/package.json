@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "javascript-kit-swift": "file:../src/web",
+    "@wasmer/wasi": "^0.9.1",
+    "@wasmer/wasmfs": "^0.9.1"
+  }
+}

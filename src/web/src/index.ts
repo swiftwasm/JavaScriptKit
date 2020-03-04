@@ -5,14 +5,24 @@ interface ExportedMemory {
 type ref = number;
 type pointer = number;
 
+interface GlobalVariable {}
+declare const window: GlobalVariable;
+declare const global: GlobalVariable;
+
 export class SwiftRuntime {
     private instance: WebAssembly.Instance | null;
     private _heapValues: any[]
 
     constructor() {
         this.instance = null;
+        let _global: any;
+        if (typeof window !== "undefined") {
+            _global = window
+        } else if (typeof global !== "undefined") {
+            _global = global
+        }
         this._heapValues = [
-            window,
+            _global,
         ]
     }
 
@@ -75,8 +85,6 @@ export class SwiftRuntime {
         return {
             swjs_set_js_value: (ref: ref, name: number, length: number, kind: number, payload: number) => {
                 const obj = this._heapValues[ref];
-                console.log(`obj = ${obj}, name = ${name}, length = ${length}, kind = ${kind}, value = ${payload}`)
-                console.log(`name is decoded as "${readString(name, length)}"`)
                 Reflect.set(obj, readString(name, length), decodeValue(kind, payload))
             },
             swjs_get_js_value: (ref: ref, name: number, length: number, kind_ptr: pointer, payload_ptr: pointer) => {

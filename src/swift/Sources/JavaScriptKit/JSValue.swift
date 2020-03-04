@@ -12,7 +12,7 @@ public class JSRef {
     }
 }
 
-public enum JSValue {
+public enum JSValue: Equatable {
     case boolean(Bool)
     case string(String)
 }
@@ -62,8 +62,6 @@ public func setJSValue(this: JSRef, name: String, value: JSValue) {
         }
         return
     }
-
-    print("\(#function) with prop name \"\(name)\" (length: \(name.count))")
     _set_js_value(this.id, name, Int32(name.count), kind, payload)
 }
 

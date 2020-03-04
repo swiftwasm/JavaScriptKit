@@ -4,6 +4,9 @@ import PackageDescription
 
 let package = Package(
     name: "JavaScriptKit",
+    products: [
+        .library(name: "JavaScriptKit", targets: ["JavaScriptKit"])
+    ],
     targets: [
         .target(
             name: "JavaScriptKitExample",
