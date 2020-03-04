@@ -75,10 +75,10 @@ export class SwiftRuntime {
 
         const writeUint32 = (ptr: pointer, value: number) => {
             const uint8Memory = new Uint8Array(memory().buffer);
-            uint8Memory[ptr + 0] = value & 0x000000ff
-            uint8Memory[ptr + 1] = value & 0x0000ff00
-            uint8Memory[ptr + 2] = value & 0x00ff0000
-            uint8Memory[ptr + 3] = value & 0xff000000
+            uint8Memory[ptr + 0] = (value & 0x000000ff) >> 0
+            uint8Memory[ptr + 1] = (value & 0x0000ff00) >> 8
+            uint8Memory[ptr + 2] = (value & 0x00ff0000) >> 16
+            uint8Memory[ptr + 3] = (value & 0xff000000) >> 24
         }
 
         const decodeValue = (
@@ -91,6 +91,9 @@ export class SwiftRuntime {
                         case 0: return false
                         case 1: return true
                     }
+                }
+                case JavaScriptValueKind.Number: {
+                    return payload1
                 }
                 case JavaScriptValueKind.String: {
                     return readString(payload1, payload2)
@@ -105,12 +108,20 @@ export class SwiftRuntime {
 
         const encodeValue = (value: any) => {
             switch (typeof value) {
-                case "boolean":
+                case "boolean": {
                     return {
                         kind: JavaScriptValueKind.Boolean,
                         payload1: value ? 1 : 0,
                         payload2: 0,
                     }
+                }
+                case "number": {
+                    return {
+                        kind: JavaScriptValueKind.Number,
+                        payload1: value,
+                        payload2: 0,
+                    }
+                }
                 case "string": {
                     return {
                         kind: JavaScriptValueKind.String,

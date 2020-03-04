@@ -1,40 +1,14 @@
 import JavaScriptKit
 
-struct MessageError: Error {
-    let message: String
-    init(_ message: String) {
-        self.message = message
-    }
-}
-
-func expectEqual<T: Equatable>(_ lhs: T, _ rhs: T) throws {
-    if lhs != rhs {
-        throw MessageError("Expect to be equal \"\(lhs)\" and \"\(rhs)\"")
-    }
-}
-
-func expectObject(_ value: JSValue) throws -> JSRef {
-    switch value {
-    case .object(let ref): return ref
-    default:
-        throw MessageError("Type of \(value) should be \"object\"")
-    }
-}
-
-func expectBoolean(_ value: JSValue) throws -> Bool {
-    switch value {
-    case .boolean(let bool): return bool
-    default:
-        throw MessageError("Type of \(value) should be \"boolean\"")
-    }
-}
-
 Literal_Conversion: do {
     let global = JSRef.global()
     let inputs: [JSValue] = [
         .boolean(true),
         .boolean(false),
         .string("foobar"),
+        .number(0),
+        .number(.max),
+        .number(.min),
     ]
     for (index, input) in inputs.enumerated() {
         let prop = "prop_\(index)"
@@ -62,7 +36,12 @@ Object_Conversion: do {
 
     let globalObject1 = getJSValue(this: .global(), name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
-    _ = try expectObject(getJSValue(this: globalObject1Ref, name: "prop_1"))
+    let prop_1 = getJSValue(this: globalObject1Ref, name: "prop_1")
+    let prop_1Ref = try expectObject(prop_1)
+    let nested_prop = getJSValue(this: prop_1Ref, name: "nested_prop")
+    try expectEqual(nested_prop, .number(1))
+    let prop_2 = getJSValue(this: globalObject1Ref, name: "prop_2")
+    try expectEqual(prop_2, .number(2))
     let prop_3 = getJSValue(this: globalObject1Ref, name: "prop_3")
     try expectEqual(prop_3, .boolean(true))
 } catch {

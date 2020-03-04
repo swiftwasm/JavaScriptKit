@@ -19,6 +19,7 @@ public class JSRef: Equatable {
 public enum JSValue: Equatable {
     case boolean(Bool)
     case string(String)
+    case number(Int32)
     case object(JSRef)
 }
 
@@ -44,6 +45,8 @@ public func getJSValue(this: JSRef, name: String) -> JSValue {
         fatalError()
     case JavaScriptValueKind_Boolean:
         return .boolean(payload1 != 0)
+    case JavaScriptValueKind_Number:
+        return .number(Int32(bitPattern: payload1))
     case JavaScriptValueKind_String:
         let buffer = malloc(Int(payload2))!.assumingMemoryBound(to: UInt8.self)
         _load_string(payload1 as JavaScriptValueId, buffer)
@@ -65,6 +68,10 @@ public func setJSValue(this: JSRef, name: String, value: JSValue) {
     case let .boolean(boolValue):
         kind = JavaScriptValueKind_Boolean
         payload1 = boolValue ? 1 : 0
+        payload2 = 0
+    case let .number(numberValue):
+        kind = JavaScriptValueKind_Number
+        payload1 = JavaScriptPayload(bitPattern: numberValue)
         payload2 = 0
     case var .string(stringValue):
         kind = JavaScriptValueKind_String
