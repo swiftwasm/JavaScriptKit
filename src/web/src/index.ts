@@ -107,6 +107,9 @@ export class SwiftRuntime {
                 case JavaScriptValueKind.Undefined: {
                     return undefined
                 }
+                case JavaScriptValueKind.Function: {
+                    return this._heapValues[payload1]
+                }
                 default:
                     throw new Error(`Type kind "${kind}" is not supported`)
             }
@@ -152,6 +155,13 @@ export class SwiftRuntime {
                 case "object": {
                     return {
                         kind: JavaScriptValueKind.Object,
+                        payload1: allocValue(value),
+                        payload2: 0,
+                    }
+                }
+                case "function": {
+                    return {
+                        kind: JavaScriptValueKind.Function,
                         payload1: allocValue(value),
                         payload2: 0,
                     }

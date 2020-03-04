@@ -16,6 +16,18 @@ public class JSObjectRef: Equatable {
     }
 }
 
+public class JSFunctionRef: Equatable {
+    let id: UInt32
+
+    fileprivate init(id: UInt32) {
+        self.id = id
+    }
+
+    public static func == (lhs: JSFunctionRef, rhs: JSFunctionRef) -> Bool {
+        return lhs.id == rhs.id
+    }
+}
+
 public enum JSValue: Equatable {
     case boolean(Bool)
     case string(String)
@@ -23,6 +35,7 @@ public enum JSValue: Equatable {
     case object(JSObjectRef)
     case null
     case undefined
+    case function(JSFunctionRef)
 }
 
 protocol JSValueConvertible {
@@ -66,6 +79,8 @@ extension RawJSValue: JSValueConvertible {
             return .null
         case JavaScriptValueKind_Undefined:
             return .undefined
+        case JavaScriptValueKind_Function:
+            return .function(JSFunctionRef(id: payload1))
         default:
             fatalError("unreachable")
         }
@@ -104,6 +119,10 @@ extension JSValue {
         case .undefined:
             kind = JavaScriptValueKind_Undefined
             payload1 = 0
+            payload2 = 0
+        case let .function(functionRef):
+            kind = JavaScriptValueKind_Function
+            payload1 = functionRef.id
             payload2 = 0
         }
         let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)

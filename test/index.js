@@ -27,6 +27,7 @@ global.globalObject1 = {
   "prop_4": [
     3, 4, "str_elm_1", 5,
   ],
+  "prop_5": function () {},
 }
 
 const startWasiTask = async () => {

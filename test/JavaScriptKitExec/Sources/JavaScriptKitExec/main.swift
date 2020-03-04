@@ -35,6 +35,7 @@ Object_Conversion: do {
     //   "prop_4": [
     //     3, 4, "str_elm_1", 5,
     //   ],
+    //   "prop_5": function () {},
     // }
     // ```
     //
@@ -58,6 +59,10 @@ Object_Conversion: do {
         let actualElement = getJSValue(this: prop_4Array, index: Int32(index))
         try expectEqual(actualElement, expectedElement)
     }
+
+    let prop_5 = getJSValue(this: globalObject1Ref, name: "prop_5")
+    _ = try expectFunction(prop_5)
+
 } catch {
     print(error)
 }

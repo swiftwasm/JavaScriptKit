@@ -21,6 +21,14 @@ func expectObject(_ value: JSValue) throws -> JSObjectRef {
     }
 }
 
+func expectFunction(_ value: JSValue) throws -> JSFunctionRef {
+    switch value {
+    case .function(let ref): return ref
+    default:
+        throw MessageError("Type of \(value) should be \"function\"")
+    }
+}
+
 func expectBoolean(_ value: JSValue) throws -> Bool {
     switch value {
     case .boolean(let bool): return bool
