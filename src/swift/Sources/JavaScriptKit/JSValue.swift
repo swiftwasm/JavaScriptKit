@@ -56,20 +56,25 @@ public func getJSValue(this: JSRef, name: String) -> JSValue {
 public func setJSValue(this: JSRef, name: String, value: JSValue) {
 
     let kind: JavaScriptValueKind
-    let payload: JavaScriptPayload
+    let payload1: JavaScriptPayload
+    let payload2: JavaScriptPayload
     switch value {
     case let .boolean(boolValue):
         kind = JavaScriptValueKind_Boolean
-        payload = boolValue ? 1 : 0
+        payload1 = boolValue ? 1 : 0
+        payload2 = 0
     case var .string(stringValue):
         kind = JavaScriptValueKind_String
         stringValue.withUTF8 { bufferPtr in
             let ptrValue = UInt32(UInt(bitPattern: bufferPtr.baseAddress!))
-            _set_js_value(this.id, name, Int32(name.count), kind, ptrValue, 0)
+            _set_js_value(
+                this.id, name, Int32(name.count),
+                kind, ptrValue, JavaScriptPayload(bufferPtr.count)
+            )
         }
         return
     }
-    _set_js_value(this.id, name, Int32(name.count), kind, payload, 0)
+    _set_js_value(this.id, name, Int32(name.count), kind, payload1, payload2)
 }
 
 
@@ -86,5 +91,7 @@ func _get_js_value(
     _ kind: UnsafeMutablePointer<JavaScriptValueKind>!,
     _ payload1: UnsafeMutablePointer<JavaScriptPayload>!,
     _ payload2: UnsafeMutablePointer<JavaScriptPayload>!) { fatalError() }
-func _load_string(_ ref: JavaScriptValueId, _ buffer: UnsafeMutablePointer<UInt8>!) { fatalError() }
+func _load_string(
+    _ ref: JavaScriptValueId,
+    _ buffer: UnsafeMutablePointer<UInt8>!) { fatalError() }
 #endif

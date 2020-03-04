@@ -64,11 +64,6 @@ export class SwiftRuntime {
             return textDecoder.decode(uint8Memory.subarray(ptr, ptr + len));
         }
 
-        const readStringUntilNull = (ptr: pointer) => {
-            const uint8Memory = new Uint8Array(memory().buffer);
-            return textDecoder.decode(uint8Memory.slice(ptr));
-        }
-
         const writeString = (ptr: pointer, value: string) => {
             const bytes = textEncoder.encode(value);
             const uint8Memory = new Uint8Array(memory().buffer);
@@ -86,16 +81,19 @@ export class SwiftRuntime {
             uint8Memory[ptr + 3] = value & 0xff000000
         }
 
-        const decodeValue = (kind: JavaScriptValueKind, payload: number) => {
+        const decodeValue = (
+            kind: JavaScriptValueKind,
+            payload1: number, payload2: number
+        ) => {
             switch (kind) {
                 case JavaScriptValueKind.Boolean: {
-                    switch (payload) {
+                    switch (payload1) {
                         case 0: return false
                         case 1: return true
                     }
                 }
                 case JavaScriptValueKind.String: {
-                    return readStringUntilNull(payload)
+                    return readString(payload1, payload2)
                 }
                 case JavaScriptValueKind.Object: {
                 }
@@ -108,13 +106,15 @@ export class SwiftRuntime {
             switch (typeof value) {
                 case "boolean":
                     return {
-                        kind: 0,
-                        payload: value ? 1 : 0,
+                        kind: JavaScriptValueKind.Boolean,
+                        payload1: value ? 1 : 0,
+                        payload2: 0,
                     }
                 case "string": {
                     return {
                         kind: JavaScriptValueKind.String,
-                        payload: allocValue(value),
+                        payload1: allocValue(value),
+                        payload2: value.length,
                     }
                 }
                 default:
@@ -123,16 +123,25 @@ export class SwiftRuntime {
         }
 
         return {
-            swjs_set_js_value: (ref: ref, name: pointer, length: number, kind: JavaScriptValueKind, payload: number) => {
+            swjs_set_js_value: (
+                ref: ref, name: pointer, length: number,
+                kind: JavaScriptValueKind,
+                payload1: number, payload2: number
+            ) => {
                 const obj = this._heapValues[ref];
-                Reflect.set(obj, readString(name, length), decodeValue(kind, payload))
+                Reflect.set(obj, readString(name, length), decodeValue(kind, payload1, payload2))
             },
-            swjs_get_js_value: (ref: ref, name: pointer, length: number, kind_ptr: pointer, payload_ptr: pointer) => {
+            swjs_get_js_value: (
+                ref: ref, name: pointer, length: number,
+                kind_ptr: pointer,
+                payload1_ptr: pointer, payload2_ptr: pointer
+            ) => {
                 const obj = this._heapValues[ref];
                 const result = Reflect.get(obj, readString(name, length));
-                const { kind, payload } = encodeValue(result);
+                const { kind, payload1, payload2 } = encodeValue(result);
                 writeUint32(kind_ptr, kind);
-                writeUint32(payload_ptr, payload);
+                writeUint32(payload1_ptr, payload1);
+                writeUint32(payload2_ptr, payload2);
             },
             swjs_load_string: (ref: ref, buffer: pointer) => {
                 const string = this._heapValues[ref];
