@@ -290,6 +290,16 @@ export class SwiftRuntime {
                 })
                 writeUint32(func_ref_ptr, func_ref)
             },
+            swjs_call_new: (
+                ref: ref, argv: pointer, argc: number,
+                result_obj: pointer
+            ) => {
+                const obj = this._heapValues[ref]
+                const result = Reflect.construct(obj, decodeValues(argv, argc))
+                if (typeof result != "object")
+                    throw Error(`Invalid result type of object constructor of "${obj}": "${result}"`)
+                writeUint32(result_obj, allocValue(result));
+            },
         }
     }
 }

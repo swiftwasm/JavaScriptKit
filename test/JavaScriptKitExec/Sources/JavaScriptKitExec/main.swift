@@ -60,6 +60,8 @@ Object_Conversion: do {
         try expectEqual(actualElement, expectedElement)
     }
 
+    try expectEqual(getJSValue(this: globalObject1Ref, name: "undefined_prop"), .undefined)
+
 } catch {
     print(error)
 }
@@ -152,6 +154,31 @@ Host_Function_Registration: do {
 
     try expectEqual(hostFunc2(.number(3)), .number(6))
     _ = try expectString(hostFunc2(.boolean(true)))
+} catch {
+    print(error)
+}
+
+New_Object_Construction: do {
+
+    // ```js
+    // global.Animal = function(name, age, isCat) {
+    //   this.name = name
+    //   this.age = age
+    //   this.bark = () => {
+    //     return isCat ? "nyan" : "wan"
+    //   }
+    // }
+    // ```
+    let objectConstructor = try expectFunction(getJSValue(this: .global(), name: "Animal"))
+    let cat1 = objectConstructor.new([.string("Tama"), .number(3), .boolean(true)])
+    try expectEqual(getJSValue(this: cat1, name: "name"), .string("Tama"))
+    try expectEqual(getJSValue(this: cat1, name: "age"), .number(3))
+    let cat1Bark = try expectFunction(getJSValue(this: cat1, name: "bark"))
+    try expectEqual(cat1Bark(), .string("nyan"))
+
+    let dog1 = objectConstructor.new([.string("Pochi"), .number(3), .boolean(false)])
+    let dog1Bark = try expectFunction(getJSValue(this: dog1, name: "bark"))
+    try expectEqual(dog1Bark(), .string("wan"))
 } catch {
     print(error)
 }

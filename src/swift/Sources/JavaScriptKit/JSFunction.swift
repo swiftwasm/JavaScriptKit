@@ -28,6 +28,21 @@ public class JSFunctionRef: Equatable {
         return result.jsValue()
     }
 
+    public func new(_ arguments: [JSValue]) -> JSObjectRef {
+        return arguments.withRawJSValues { rawValues in
+            rawValues.withUnsafeBufferPointer { bufferPointer in
+                let argv = bufferPointer.baseAddress
+                let argc = bufferPointer.count
+                var resultObj = JavaScriptPayload()
+                _call_new(
+                    self.id, argv, Int32(argc),
+                    &resultObj
+                )
+                return JSObjectRef(id: resultObj)
+            }
+        }
+    }
+
     static var sharedFunctions: [([JSValue]) -> JSValue] = []
     public static func from(_ body: @escaping ([JSValue]) -> JSValue) -> JSFunctionRef {
         let id = JavaScriptHostFuncRef(sharedFunctions.count)

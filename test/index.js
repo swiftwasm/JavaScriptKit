@@ -44,6 +44,14 @@ global.globalObject1 = {
   }
 }
 
+global.Animal = function(name, age, isCat) {
+  this.name = name
+  this.age = age
+  this.bark = () => {
+    return isCat ? "nyan" : "wan"
+  }
+}
+
 const startWasiTask = async () => {
   // Fetch our Wasm File
   const wasmBinary = await readFile("./dist/JavaScriptKitExec.wasm");

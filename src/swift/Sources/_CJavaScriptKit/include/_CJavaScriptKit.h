@@ -101,6 +101,16 @@ extern void _call_function(
 
 __attribute__((
     __import_module__("javascript_kit"),
+    __import_name__("swjs_call_new")
+))
+extern void _call_new(
+    const JavaScriptObjectRef ref,
+    const RawJSValue *argv, const int argc,
+    JavaScriptPayload *result_obj
+);
+
+__attribute__((
+    __import_module__("javascript_kit"),
     __import_name__("swjs_create_function")
 ))
 extern void _create_function(

@@ -39,5 +39,11 @@ func _call_function(
     _ result_kind: UnsafeMutablePointer<JavaScriptValueKind>!,
     _ result_payload1: UnsafeMutablePointer<JavaScriptPayload>!,
     _ result_payload2: UnsafeMutablePointer<JavaScriptPayload>!) { fatalError() }
-func _create_function(_ host_func_id: JavaScriptHostFuncRef, _ func_ref_ptr: UnsafePointer<JavaScriptObjectRef>!) {}
+func _call_new(
+    _ ref: JavaScriptObjectRef,
+    _ argv: UnsafePointer<RawJSValue>!, _ argc: Int32,
+    _ result_obj: UnsafeMutablePointer<JavaScriptPayload>!) { fatalError() }
+func _create_function(
+    _ host_func_id: JavaScriptHostFuncRef,
+    _ func_ref_ptr: UnsafePointer<JavaScriptObjectRef>!) { fatalError() }
 #endif
