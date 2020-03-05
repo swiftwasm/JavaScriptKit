@@ -7,8 +7,13 @@ public class JSObjectRef: Equatable {
         self.id = id
     }
 
-    public subscript(dynamicMember name: String) -> JSFunctionRef? {
-        get { self[dynamicMember: name].function }
+    public subscript(dynamicMember name: String) -> ((JSValueConvertible...) -> JSValue)? {
+        get {
+            guard let function = self[dynamicMember: name].function else { return nil }
+            return { (arguments: JSValueConvertible...) in
+                function.apply(this: self, argumentList: arguments)
+            }
+        }
     }
 
     public subscript(dynamicMember name: String) -> JSValue {

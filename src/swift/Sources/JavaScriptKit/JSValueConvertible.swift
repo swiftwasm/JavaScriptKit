@@ -20,9 +20,23 @@ extension String: JSValueConvertible {
     public func jsValue() -> JSValue { .string(self) }
 }
 
+extension JSObjectRef: JSValueConvertible {
+    public func jsValue() -> JSValue { .object(self) }
+}
+
+extension JSFunctionRef: JSValueConvertible {
+    public func jsValue() -> JSValue { .function(self) }
+}
+
 private let Object = JSObjectRef.global().Object.function!
 
-extension Dictionary: JSValueConvertible where Value: JSValueConvertible, Key == String {
+extension Dictionary where Value: JSValueConvertible, Key == String {
+    public func jsValue() -> JSValue {
+        Swift.Dictionary<Key, JSValueConvertible>.jsValue(self)()
+    }
+}
+
+extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key == String {
     public func jsValue() -> JSValue {
         let object = Object.new()
         for (key, value) in self {
@@ -34,11 +48,17 @@ extension Dictionary: JSValueConvertible where Value: JSValueConvertible, Key ==
 
 private let Array = JSObjectRef.global().Array.function!
 
-extension Array: JSValueConvertible where Element: JSValueConvertible {
+extension Array where Element: JSValueConvertible {
+    public func jsValue() -> JSValue {
+        Swift.Array<JSValueConvertible>.jsValue(self)()
+    }
+}
+
+extension Array: JSValueConvertible where Element == JSValueConvertible {
     public func jsValue() -> JSValue {
         let array = Array.new(count)
-        for element in self {
-            array.push!(element)
+        for (index, element) in self.enumerated() {
+            array[index] = element.jsValue()
         }
         return .object(array)
     }

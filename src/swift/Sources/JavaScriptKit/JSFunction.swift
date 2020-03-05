@@ -30,7 +30,10 @@ public class JSFunctionRef: Equatable {
     }
 
     public func apply(this: JSObjectRef, arguments: JSValueConvertible...) -> JSValue {
-        let result = arguments.withRawJSValues { rawValues in
+        apply(this: this, argumentList: arguments)
+    }
+    public func apply(this: JSObjectRef, argumentList: [JSValueConvertible]) -> JSValue {
+        let result = argumentList.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count

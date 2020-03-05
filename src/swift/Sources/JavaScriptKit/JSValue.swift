@@ -9,34 +9,34 @@ public enum JSValue: Equatable {
     case undefined
     case function(JSFunctionRef)
 
-    var boolean: Bool? {
+    public var boolean: Bool? {
         switch self {
         case let .boolean(boolean): return boolean
         default: return nil
         }
     }
 
-    var string: String? {
+    public var string: String? {
         switch self {
         case let .string(string): return string
         default: return nil
         }
     }
-    var number: Int32? {
+    public var number: Int32? {
         switch self {
         case let .number(number): return number
         default: return nil
         }
     }
-    var object: JSObjectRef? {
+    public var object: JSObjectRef? {
         switch self {
         case let .object(object): return object
         default: return nil
         }
     }
-    var isNull: Bool { return self == .null }
-    var isUndefined: Bool { return self == .undefined }
-    var function: JSFunctionRef? {
+    public var isNull: Bool { return self == .null }
+    public var isUndefined: Bool { return self == .undefined }
+    public var function: JSFunctionRef? {
         switch self {
         case let .function(function): return function
         default: return nil
