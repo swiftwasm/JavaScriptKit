@@ -129,4 +129,12 @@ extern void _create_function(
     const JavaScriptObjectRef *func_ref_ptr
 );
 
+__attribute__((
+    __import_module__("javascript_kit"),
+    __import_name__("swjs_destroy_ref")
+))
+extern void _destroy_ref(
+    const JavaScriptObjectRef ref
+);
+
 #endif /* _CJavaScriptKit_h */

@@ -28,7 +28,7 @@ extension JSFunctionRef: JSValueConvertible {
     public func jsValue() -> JSValue { .function(self) }
 }
 
-private let Object = JSObjectRef.global().Object.function!
+private let Object = JSObjectRef.global.Object.function!
 
 extension Dictionary where Value: JSValueConvertible, Key == String {
     public func jsValue() -> JSValue {
@@ -46,7 +46,7 @@ extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key 
     }
 }
 
-private let Array = JSObjectRef.global().Array.function!
+private let Array = JSObjectRef.global.Array.function!
 
 extension Array where Element: JSValueConvertible {
     public func jsValue() -> JSValue {

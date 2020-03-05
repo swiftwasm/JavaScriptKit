@@ -53,4 +53,5 @@ func _call_new(
 func _create_function(
     _ host_func_id: JavaScriptHostFuncRef,
     _ func_ref_ptr: UnsafePointer<JavaScriptObjectRef>!) { fatalError() }
+func _destroy_ref(_ ref: JavaScriptObjectRef) { fatalError() }
 #endif

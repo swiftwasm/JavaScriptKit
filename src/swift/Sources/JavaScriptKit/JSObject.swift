@@ -42,13 +42,9 @@ public class JSObjectRef: Equatable {
         setJSValue(this: self, index: Int32(index), value: value)
     }
 
-    public static func global() -> JSObjectRef {
-        .init(id: _JS_Predef_Value_Global)
-    }
+    public static let global = JSObjectRef(id: _JS_Predef_Value_Global)
 
-    deinit {
-
-    }
+    deinit { _destroy_ref(id) }
 
     public static func == (lhs: JSObjectRef, rhs: JSObjectRef) -> Bool {
         return lhs.id == rhs.id

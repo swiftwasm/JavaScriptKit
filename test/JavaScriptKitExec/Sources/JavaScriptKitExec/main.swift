@@ -1,7 +1,7 @@
 import JavaScriptKit
 
 Literal_Conversion: do {
-    let global = JSObjectRef.global()
+    let global = JSObjectRef.global
     let inputs: [JSValue] = [
         .boolean(true),
         .boolean(false),
@@ -40,7 +40,7 @@ Object_Conversion: do {
     // ```
     //
 
-    let globalObject1 = getJSValue(this: .global(), name: "globalObject1")
+    let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_1 = getJSValue(this: globalObject1Ref, name: "prop_1")
     let prop_1Ref = try expectObject(prop_1)
@@ -88,7 +88,7 @@ Function_Call: do {
     //
 
     // Notes: If the size of `RawJSValue` is updated, these test suites will fail.
-    let globalObject1 = getJSValue(this: .global(), name: "globalObject1")
+    let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_5 = getJSValue(this: globalObject1Ref, name: "prop_5")
     let prop_5Ref = try expectObject(prop_5)
@@ -125,7 +125,7 @@ Host_Function_Registration: do {
     //   }
     // }
     // ```
-    let globalObject1 = getJSValue(this: .global(), name: "globalObject1")
+    let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_6 = getJSValue(this: globalObject1Ref, name: "prop_6")
     let prop_6Ref = try expectObject(prop_6)
@@ -169,7 +169,7 @@ New_Object_Construction: do {
     //   }
     // }
     // ```
-    let objectConstructor = try expectFunction(getJSValue(this: .global(), name: "Animal"))
+    let objectConstructor = try expectFunction(getJSValue(this: .global, name: "Animal"))
     let cat1 = objectConstructor.new("Tama", 3, true)
     try expectEqual(getJSValue(this: cat1, name: "name"), .string("Tama"))
     try expectEqual(getJSValue(this: cat1, name: "age"), .number(3))
@@ -198,7 +198,7 @@ Call_Function_With_This: do {
     //   }
     // }
     // ```
-    let objectConstructor = try expectFunction(getJSValue(this: .global(), name: "Animal"))
+    let objectConstructor = try expectFunction(getJSValue(this: .global, name: "Animal"))
     let cat1 = objectConstructor.new("Tama", 3, true)
     let getIsCat = try expectFunction(getJSValue(this: cat1, name: "getIsCat"))
 
