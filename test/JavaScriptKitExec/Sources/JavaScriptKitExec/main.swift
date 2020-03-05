@@ -182,3 +182,33 @@ New_Object_Construction: do {
 } catch {
     print(error)
 }
+
+Call_Function_With_This: do {
+
+    // ```js
+    // global.Animal = function(name, age, isCat) {
+    //   this.name = name
+    //   this.age = age
+    //   this.bark = () => {
+    //     return isCat ? "nyan" : "wan"
+    //   }
+    //   this.isCat = isCat
+    //   this.getIsCat = function() {
+    //     return this.isCat
+    //   }
+    // }
+    // ```
+    let objectConstructor = try expectFunction(getJSValue(this: .global(), name: "Animal"))
+    let cat1 = objectConstructor.new([.string("Tama"), .number(3), .boolean(true)])
+    let getIsCat = try expectFunction(getJSValue(this: cat1, name: "getIsCat"))
+
+    // Direct call without this
+    try expectEqual(getIsCat(), .undefined)
+
+    // Call with this
+    let gotIsCat = getIsCat.apply(this: cat1, arguments: [])
+    try expectEqual(gotIsCat, .boolean(true))
+
+} catch {
+    print(error)
+}

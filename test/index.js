@@ -50,6 +50,10 @@ global.Animal = function(name, age, isCat) {
   this.bark = () => {
     return isCat ? "nyan" : "wan"
   }
+  this.isCat = isCat
+  this.getIsCat = function() {
+    return this.isCat
+  }
 }
 
 const startWasiTask = async () => {

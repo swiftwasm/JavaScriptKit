@@ -39,6 +39,13 @@ func _call_function(
     _ result_kind: UnsafeMutablePointer<JavaScriptValueKind>!,
     _ result_payload1: UnsafeMutablePointer<JavaScriptPayload>!,
     _ result_payload2: UnsafeMutablePointer<JavaScriptPayload>!) { fatalError() }
+func _call_function_with_this(
+    _ _this: JavaScriptObjectRef,
+    _ func_ref: JavaScriptObjectRef,
+    _ argv: UnsafePointer<RawJSValue>!, _ argc: Int32,
+    _ result_kind: UnsafeMutablePointer<JavaScriptValueKind>!,
+    _ result_payload1: UnsafeMutablePointer<JavaScriptPayload>!,
+    _ result_payload2: UnsafeMutablePointer<JavaScriptPayload>!) { fatalError() }
 func _call_new(
     _ ref: JavaScriptObjectRef,
     _ argv: UnsafePointer<RawJSValue>!, _ argc: Int32,

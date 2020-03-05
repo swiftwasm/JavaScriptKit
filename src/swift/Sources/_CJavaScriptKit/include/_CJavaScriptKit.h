@@ -34,8 +34,7 @@ __attribute__((
 ))
 extern void _set_prop(
     const JavaScriptObjectRef _this,
-    const char *prop,
-    const int length,
+    const char *prop, const int length,
     const JavaScriptValueKind kind,
     const JavaScriptPayload payload1,
     const JavaScriptPayload payload2
@@ -47,8 +46,7 @@ __attribute__((
 ))
 extern void _get_prop(
     const JavaScriptObjectRef _this,
-    const char *prop,
-    const int length,
+    const char *prop, const int length,
     JavaScriptValueKind *kind,
     JavaScriptPayload *payload1,
     JavaScriptPayload *payload2
@@ -93,6 +91,19 @@ __attribute__((
 ))
 extern void _call_function(
     const JavaScriptObjectRef ref,
+    const RawJSValue *argv, const int argc,
+    JavaScriptValueKind *result_kind,
+    JavaScriptPayload *result_payload1,
+    JavaScriptPayload *result_payload2
+);
+
+__attribute__((
+    __import_module__("javascript_kit"),
+    __import_name__("swjs_call_function_with_this")
+))
+extern void _call_function_with_this(
+    const JavaScriptObjectRef _this,
+    const JavaScriptObjectRef func_ref,
     const RawJSValue *argv, const int argc,
     JavaScriptValueKind *result_kind,
     JavaScriptPayload *result_payload1,

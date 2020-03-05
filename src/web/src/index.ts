@@ -281,6 +281,20 @@ export class SwiftRuntime {
                 writeUint32(payload1_ptr, payload1);
                 writeUint32(payload2_ptr, payload2);
             },
+            swjs_call_function_with_this: (
+                obj_ref: ref, func_ref: ref,
+                argv: pointer, argc: number,
+                kind_ptr: pointer,
+                payload1_ptr: pointer, payload2_ptr: pointer
+            ) => {
+                const obj = this._heapValues[obj_ref]
+                const func = this._heapValues[func_ref]
+                const result = Reflect.apply(func, obj, decodeValues(argv, argc))
+                const { kind, payload1, payload2 } = encodeValue(result);
+                writeUint32(kind_ptr, kind);
+                writeUint32(payload1_ptr, payload1);
+                writeUint32(payload2_ptr, payload2);
+            },
             swjs_create_function: (
                 host_func_id: number,
                 func_ref_ptr: pointer,

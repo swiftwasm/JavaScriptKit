@@ -28,6 +28,22 @@ public class JSFunctionRef: Equatable {
         return result.jsValue()
     }
 
+    public func apply(this: JSObjectRef, arguments: [JSValue]) -> JSValue {
+        let result = arguments.withRawJSValues { rawValues in
+            rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
+                let argv = bufferPointer.baseAddress
+                let argc = bufferPointer.count
+                var result = RawJSValue()
+                _call_function_with_this(this.id,
+                    self.id, argv, Int32(argc),
+                    &result.kind, &result.payload1, &result.payload2
+                )
+                return result
+            }
+        }
+        return result.jsValue()
+    }
+
     public func new(_ arguments: [JSValue]) -> JSObjectRef {
         return arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
