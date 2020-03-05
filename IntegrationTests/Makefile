@@ -8,7 +8,9 @@ dist/JavaScriptKitExec.wasm: JavaScriptKitExec
 	mkdir -p dist
 	cp ./JavaScriptKitExec/.build/debug/JavaScriptKitExec $@
 
-build: dist/JavaScriptKitExec.wasm
+node_modules:
+	npm install
+build: node_modules dist/JavaScriptKitExec.wasm
 	cd ../Runtime && npm run build
 test: build
 	node index.js

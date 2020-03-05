@@ -8,6 +8,8 @@ dist/JavaScriptKitExample.wasm: JavaScriptKitExample
 	mkdir -p dist
 	cp ./JavaScriptKitExample/.build/debug/JavaScriptKitExample $@
 
-build: dist/JavaScriptKitExample.wasm
+node_modules:
+	npm install
+build: node_modules dist/JavaScriptKitExample.wasm
 	cd ../Runtime && npm run build
 	npm run build
