@@ -44,3 +44,11 @@ func expectNumber(_ value: JSValue) throws -> Int32 {
         throw MessageError("Type of \(value) should be \"number\"")
     }
 }
+
+func expectString(_ value: JSValue) throws -> String {
+    switch value {
+    case .string(let string): return string
+    default:
+        throw MessageError("Type of \(value) should be \"string\"")
+    }
+}

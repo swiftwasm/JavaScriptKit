@@ -7,36 +7,37 @@ import _CJavaScriptKit
 /// When running with JavaScript runtime library, they are ignored completely.
 #if Xcode
 func _set_prop(
-    _ _this: JavaScriptValueId,
+    _ _this: JavaScriptObjectRef,
     _ prop: UnsafePointer<Int8>!, _ length: Int32,
     _ kind: JavaScriptValueKind,
     _ payload1: JavaScriptPayload,
     _ payload2: JavaScriptPayload) { fatalError() }
 func _get_prop(
-    _ _this: JavaScriptValueId,
+    _ _this: JavaScriptObjectRef,
     _ prop: UnsafePointer<Int8>!, _ length: Int32,
     _ kind: UnsafeMutablePointer<JavaScriptValueKind>!,
     _ payload1: UnsafeMutablePointer<JavaScriptPayload>!,
     _ payload2: UnsafeMutablePointer<JavaScriptPayload>!) { fatalError() }
 func _set_subscript(
-    _ _this: JavaScriptValueId,
+    _ _this: JavaScriptObjectRef,
     _ index: Int32,
     _ kind: JavaScriptValueKind,
     _ payload1: JavaScriptPayload,
     _ payload2: JavaScriptPayload) { fatalError() }
 func _get_subscript(
-    _ _this: JavaScriptValueId,
+    _ _this: JavaScriptObjectRef,
     _ index: Int32,
     _ kind: UnsafeMutablePointer<JavaScriptValueKind>!,
     _ payload1: UnsafeMutablePointer<JavaScriptPayload>!,
     _ payload2: UnsafeMutablePointer<JavaScriptPayload>!) { fatalError() }
 func _load_string(
-    _ ref: JavaScriptValueId,
+    _ ref: JavaScriptObjectRef,
     _ buffer: UnsafeMutablePointer<UInt8>!) { fatalError() }
 func _call_function(
-    _ ref: JavaScriptValueId,
-    _ args: UnsafePointer<RawJSValue>!, _ length: Int32,
+    _ ref: JavaScriptObjectRef,
+    _ argv: UnsafePointer<RawJSValue>!, _ argc: Int32,
     _ result_kind: UnsafeMutablePointer<JavaScriptValueKind>!,
     _ result_payload1: UnsafeMutablePointer<JavaScriptPayload>!,
     _ result_payload2: UnsafeMutablePointer<JavaScriptPayload>!) { fatalError() }
+func _create_function(_ host_func_id: JavaScriptHostFuncRef, _ func_ref_ptr: UnsafePointer<JavaScriptObjectRef>!) {}
 #endif

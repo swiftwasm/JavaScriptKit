@@ -27,4 +27,35 @@ public class JSFunctionRef: Equatable {
         }
         return result.jsValue()
     }
+
+    static var sharedFunctions: [([JSValue]) -> JSValue] = []
+    public static func from(_ body: @escaping ([JSValue]) -> JSValue) -> JSFunctionRef {
+        let id = JavaScriptHostFuncRef(sharedFunctions.count)
+        sharedFunctions.append(body)
+        var funcRef: JavaScriptObjectRef = 0
+        _create_function(id, &funcRef)
+
+        return JSFunctionRef(id: funcRef)
+    }
+}
+
+
+@_cdecl("swjs_prepare_host_function_call")
+public func _prepare_host_function_call(_ argc: Int32) -> UnsafeMutableRawPointer {
+    let argumentSize = MemoryLayout<RawJSValue>.size * Int(argc)
+    return malloc(Int(argumentSize))!
+}
+
+@_cdecl("swjs_call_host_function")
+public func _call_host_function(
+    _ hostFuncRef: JavaScriptHostFuncRef,
+    _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
+    _ callbackFuncRef: JavaScriptPayload) {
+    let hostFunc = JSFunctionRef.sharedFunctions[Int(hostFuncRef)]
+    let args = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
+        $0.jsValue()
+    }
+    let result = hostFunc(args)
+    let callbackFuncRef = JSFunctionRef(id: callbackFuncRef)
+    _ = callbackFuncRef(result)
 }

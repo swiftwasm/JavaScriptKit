@@ -9,6 +9,14 @@ interface GlobalVariable { }
 declare const window: GlobalVariable;
 declare const global: GlobalVariable;
 
+interface SwiftRuntimeExportedFunctions {
+    swjs_prepare_host_function_call(size: number): pointer;
+    swjs_call_host_function(
+        host_func_id: number,
+        argv: pointer, argc: number,
+        callback_func_ref: ref
+    ): void;
+}
 
 enum JavaScriptValueKind {
     Invalid = -1,
@@ -54,6 +62,28 @@ export class SwiftRuntime {
             const id = this._heapValues.length
             this._heapValues.push(value)
             return id
+        }
+
+        const callHostFunction = (host_func_id: number, args: any[]) => {
+            if (!this.instance)
+                throw new Error("WebAssembly instance is not set yet");
+            const exports = this.instance.exports as any as SwiftRuntimeExportedFunctions;
+            const argc = args.length
+            const argv = exports.swjs_prepare_host_function_call(argc)
+            for (let index = 0; index < args.length; index++) {
+                const argument = args[index]
+                const value = encodeValue(argument)
+                const base = argv + 12 * index
+                writeUint32(base, value.kind)
+                writeUint32(base + 4, value.payload1)
+                writeUint32(base + 8, value.payload2)
+            }
+            let output: any;
+            const callback_func_ref = allocValue(function(result: any) {
+                output = result
+            })
+            exports.swjs_call_host_function(host_func_id, argv, argc, callback_func_ref)
+            return output
         }
 
         const textDecoder = new TextDecoder('utf-8');
@@ -250,7 +280,16 @@ export class SwiftRuntime {
                 writeUint32(kind_ptr, kind);
                 writeUint32(payload1_ptr, payload1);
                 writeUint32(payload2_ptr, payload2);
-            }
+            },
+            swjs_create_function: (
+                host_func_id: number,
+                func_ref_ptr: pointer,
+            ) => {
+                const func_ref = allocValue(function() {
+                    return callHostFunction(host_func_id, Array.prototype.slice.call(arguments))
+                })
+                writeUint32(func_ref_ptr, func_ref)
+            },
         }
     }
 }

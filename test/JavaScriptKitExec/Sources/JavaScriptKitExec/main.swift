@@ -80,6 +80,7 @@ Function_Call: do {
     //       if (c) { return a } else { return b }
     //     },
     //   }
+    //   ...
     // }
     // ```
     //
@@ -106,6 +107,51 @@ Function_Call: do {
     try expectEqual(func6(.boolean(false), .number(1), .number(2)), .number(2))
     try expectEqual(func6(.boolean(true), .string("OK"), .number(2)), .string("OK"))
 
+} catch {
+    print(error)
+}
+
+Host_Function_Registration: do {
+
+    // ```js
+    // global.globalObject1 = {
+    //   ...
+    //   "prop_6": {
+    //     "call_host_1": function() {
+    //       return global.globalObject1.prop_6.host_func_1()
+    //     }
+    //   }
+    // }
+    // ```
+    let globalObject1 = getJSValue(this: .global(), name: "globalObject1")
+    let globalObject1Ref = try expectObject(globalObject1)
+    let prop_6 = getJSValue(this: globalObject1Ref, name: "prop_6")
+    let prop_6Ref = try expectObject(prop_6)
+
+    var isHostFunc1Called = false
+    let hostFunc1 = JSFunctionRef.from { (arguments) -> JSValue in
+        isHostFunc1Called = true
+        return .number(1)
+    }
+
+    setJSValue(this: prop_6Ref, name: "host_func_1", value: .function(hostFunc1))
+
+    let call_host_1 = getJSValue(this: prop_6Ref, name: "call_host_1")
+    let call_host_1Func = try expectFunction(call_host_1)
+    try expectEqual(call_host_1Func(), .number(1))
+    try expectEqual(isHostFunc1Called, true)
+
+    let hostFunc2 = JSFunctionRef.from { (arguments) -> JSValue in
+        do {
+            let input = try expectNumber(arguments[0])
+            return .number(input * 2)
+        } catch {
+            return .string(String(describing: error))
+        }
+    }
+
+    try expectEqual(hostFunc2(.number(3)), .number(6))
+    _ = try expectString(hostFunc2(.boolean(true)))
 } catch {
     print(error)
 }

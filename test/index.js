@@ -36,6 +36,11 @@ global.globalObject1 = {
     "func6": function (c, a, b) {
       if (c) { return a } else { return b }
     },
+  },
+  "prop_6": {
+    "call_host_1": () => {
+      return global.globalObject1.prop_6.host_func_1()
+    }
   }
 }
 

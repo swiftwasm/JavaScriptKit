@@ -3,7 +3,8 @@
 
 #include <stdlib.h>
 
-typedef unsigned int JavaScriptValueId;
+typedef unsigned int JavaScriptObjectRef;
+typedef unsigned int JavaScriptHostFuncRef;
 
 typedef enum {
     JavaScriptValueKind_Invalid   = -1,
@@ -32,7 +33,7 @@ __attribute__((
     __import_name__("swjs_set_prop")
 ))
 extern void _set_prop(
-    const JavaScriptValueId _this,
+    const JavaScriptObjectRef _this,
     const char *prop,
     const int length,
     const JavaScriptValueKind kind,
@@ -45,7 +46,7 @@ __attribute__((
     __import_name__("swjs_get_prop")
 ))
 extern void _get_prop(
-    const JavaScriptValueId _this,
+    const JavaScriptObjectRef _this,
     const char *prop,
     const int length,
     JavaScriptValueKind *kind,
@@ -58,7 +59,7 @@ __attribute__((
     __import_name__("swjs_set_subscript")
 ))
 extern void _set_subscript(
-    const JavaScriptValueId _this,
+    const JavaScriptObjectRef _this,
     const int length,
     const JavaScriptValueKind kind,
     const JavaScriptPayload payload1,
@@ -70,7 +71,7 @@ __attribute__((
     __import_name__("swjs_get_subscript")
 ))
 extern void _get_subscript(
-    const JavaScriptValueId _this,
+    const JavaScriptObjectRef _this,
     const int length,
     JavaScriptValueKind *kind,
     JavaScriptPayload *payload1,
@@ -82,7 +83,7 @@ __attribute__((
     __import_name__("swjs_load_string")
 ))
 extern void _load_string(
-    const JavaScriptValueId ref,
+    const JavaScriptObjectRef ref,
     unsigned char *buffer
 );
 
@@ -91,11 +92,20 @@ __attribute__((
     __import_name__("swjs_call_function")
 ))
 extern void _call_function(
-    const JavaScriptValueId ref,
-    const RawJSValue *args, const int length,
+    const JavaScriptObjectRef ref,
+    const RawJSValue *argv, const int argc,
     JavaScriptValueKind *result_kind,
     JavaScriptPayload *result_payload1,
     JavaScriptPayload *result_payload2
+);
+
+__attribute__((
+    __import_module__("javascript_kit"),
+    __import_name__("swjs_create_function")
+))
+extern void _create_function(
+    const JavaScriptHostFuncRef host_func_id,
+    const JavaScriptObjectRef *func_ref_ptr
 );
 
 #endif /* _CJavaScriptKit_h */

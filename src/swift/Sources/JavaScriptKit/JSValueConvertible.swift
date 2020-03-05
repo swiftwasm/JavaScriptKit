@@ -23,7 +23,7 @@ extension RawJSValue: JSValueConvertible {
             // +1 for null terminator
             let buffer = malloc(Int(payload2 + 1))!.assumingMemoryBound(to: UInt8.self)
             defer { free(buffer) }
-            _load_string(payload1 as JavaScriptValueId, buffer)
+            _load_string(payload1 as JavaScriptObjectRef, buffer)
             buffer[Int(payload2)] = 0
             let string = String(decodingCString: UnsafePointer(buffer), as: UTF8.self)
             return .string(string)
