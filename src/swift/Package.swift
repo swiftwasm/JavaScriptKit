@@ -9,9 +9,6 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "JavaScriptKitExample",
-            dependencies: ["JavaScriptKit"]),
-        .target(
             name: "JavaScriptKit",
             dependencies: ["_CJavaScriptKit"]),
         .target(

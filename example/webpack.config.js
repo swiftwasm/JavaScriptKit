@@ -8,4 +8,7 @@ module.exports = {
     filename: 'main.js',
     path: outputPath,
   },
+  devServer: {
+    hot: true
+  }
 };

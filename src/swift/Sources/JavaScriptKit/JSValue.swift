@@ -44,6 +44,18 @@ public enum JSValue: Equatable {
     }
 }
 
+extension JSValue: ExpressibleByStringLiteral {
+    public init(stringLiteral value: String) {
+        self = .string(value)
+    }
+}
+
+extension JSValue: ExpressibleByIntegerLiteral {
+    public init(integerLiteral value: Int32) {
+        self = .number(value)
+    }
+}
+
 public func getJSValue(this: JSObjectRef, name: String) -> JSValue {
     var rawValue = RawJSValue()
     _get_prop(this.id, name, Int32(name.count),

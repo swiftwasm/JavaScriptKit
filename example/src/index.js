@@ -17,7 +17,7 @@ let wasi = new WASI({
 
 const startWasiTask = async () => {
   // Fetch our Wasm File
-  const response = await fetch("./assets/JavaScriptKitExample.wasm");
+  const response = await fetch("./dist/JavaScriptKitExample.wasm");
   const responseArrayBuffer = await response.arrayBuffer();
 
   // Instantiate the WebAssembly file
@@ -34,7 +34,5 @@ const startWasiTask = async () => {
   // Output what's inside of /dev/stdout!
   const stdout = await wasmFs.getStdOut();
   console.log(stdout);
-
-  console.log(`Print window.foobar = ${foobar}`);
 };
 startWasiTask();
