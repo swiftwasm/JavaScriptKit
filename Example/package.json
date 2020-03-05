@@ -1,0 +1,22 @@
+{
+  "name": "javascript-kit-example",
+  "version": "1.0.0",
+  "description": "An example use of JavaScriptKit",
+  "private": true,
+  "dependencies": {
+    "@wasmer/wasi": "^0.9.1",
+    "@wasmer/wasmfs": "^0.9.1",
+    "javascript-kit-swift": "file:../Runtime"
+  },
+  "devDependencies": {
+    "webpack": "^4.42.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  },
+  "scripts": {
+    "build": "webpack",
+    "start": "webpack-dev-server"
+  },
+  "author": "kateinoigakukun",
+  "license": "MIT"
+}
