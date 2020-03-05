@@ -231,8 +231,7 @@ Object_Conversion: do {
     try expectEqual(jsArray2.length, .number(4))
     _ = jsArray2.push!(jsArray1)
 
-    // TODO: Object identity
-    // try expectEqual(jsArray2[4], .object(jsArray1))
+    try expectEqual(jsArray2[4], .object(jsArray1))
 
     let dict1: [String: JSValueConvertible] = [
         "prop1": 1,
