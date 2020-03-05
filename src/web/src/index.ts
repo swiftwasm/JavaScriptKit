@@ -29,13 +29,11 @@ enum JavaScriptValueKind {
     Function = 6,
 }
 
-export class SwiftRuntime {
-    private instance: WebAssembly.Instance | null;
+class SwiftRuntimeHeap {
     private _heapValues: Map<number, any>;
     private _heapNextKey: number;
 
     constructor() {
-        this.instance = null;
         let _global: any;
         if (typeof window !== "undefined") {
             _global = window
@@ -46,6 +44,41 @@ export class SwiftRuntime {
         this._heapValues.set(0, _global);
         // Note: 0 is preserved for global
         this._heapNextKey = 1;
+    }
+
+    allocHeap(value: any) {
+        const isObject = typeof value == "object"
+        if (isObject && value.swjs_heap_id) {
+            return value.swjs_heap_id
+        }
+        const id = this._heapNextKey++;
+        this._heapValues.set(id, value)
+        if (isObject)
+            Reflect.set(value, "swjs_heap_id", id);
+        return id
+    }
+
+    freeHeap(ref: ref) {
+        const value = this._heapValues.get(ref);
+        const isObject = typeof value == "object"
+        if (isObject && value.swjs_heap_id) {
+            delete value.swjs_heap_id;
+        }
+        this._heapValues.delete(ref)
+    }
+
+    referenceHeap(ref: ref) {
+        return this._heapValues.get(ref)
+    }
+}
+
+export class SwiftRuntime {
+    private instance: WebAssembly.Instance | null;
+    private heap: SwiftRuntimeHeap
+
+    constructor() {
+        this.instance = null;
+        this.heap = new SwiftRuntimeHeap();
     }
 
     setInsance(instance: WebAssembly.Instance) {
@@ -59,30 +92,6 @@ export class SwiftRuntime {
             throw new Error("WebAssembly instance is not set yet");
         }
 
-        const allocHeap = (value: any) => {
-            const isObject = typeof value == "object"
-            if (isObject && value.swjs_heap_id) {
-                return value.swjs_heap_id
-            }
-            const id = this._heapNextKey++;
-            this._heapValues.set(id, value)
-            if (isObject)
-                Reflect.set(value, "swjs_heap_id", id);
-            return id
-        }
-
-        const freeHeap = (ref: ref) => {
-            const value = this._heapValues.get(ref);
-            const isObject = typeof value == "object"
-            if (isObject && value.swjs_heap_id) {
-                delete value.swjs_heap_id;
-            }
-            this._heapValues.delete(ref)
-        }
-
-        const referenceHeap = (ref: ref) => {
-            return this._heapValues.get(ref)
-        }
 
         const callHostFunction = (host_func_id: number, args: any[]) => {
             if (!this.instance)
@@ -99,7 +108,7 @@ export class SwiftRuntime {
                 writeUint32(base + 8, value.payload2)
             }
             let output: any;
-            const callback_func_ref = allocHeap(function(result: any) {
+            const callback_func_ref = this.heap.allocHeap(function (result: any) {
                 output = result
             })
             exports.swjs_call_host_function(host_func_id, argv, argc, callback_func_ref)
@@ -126,9 +135,9 @@ export class SwiftRuntime {
         const readUInt32 = (ptr: pointer) => {
             const uint8Memory = new Uint8Array(memory().buffer);
             return uint8Memory[ptr + 0]
-                 + (uint8Memory[ptr + 1] << 8)
-                 + (uint8Memory[ptr + 2] << 16)
-                 + (uint8Memory[ptr + 3] << 24)
+                + (uint8Memory[ptr + 1] << 8)
+                + (uint8Memory[ptr + 2] << 16)
+                + (uint8Memory[ptr + 3] << 24)
         }
 
         const writeUint32 = (ptr: pointer, value: number) => {
@@ -157,7 +166,7 @@ export class SwiftRuntime {
                     return readString(payload1, payload2)
                 }
                 case JavaScriptValueKind.Object: {
-                    return referenceHeap(payload1)
+                    return this.heap.referenceHeap(payload1)
                 }
                 case JavaScriptValueKind.Null: {
                     return null
@@ -166,7 +175,7 @@ export class SwiftRuntime {
                     return undefined
                 }
                 case JavaScriptValueKind.Function: {
-                    return referenceHeap(payload1)
+                    return this.heap.referenceHeap(payload1)
                 }
                 default:
                     throw new Error(`Type kind "${kind}" is not supported`)
@@ -199,7 +208,7 @@ export class SwiftRuntime {
                 case "string": {
                     return {
                         kind: JavaScriptValueKind.String,
-                        payload1: allocHeap(value),
+                        payload1: this.heap.allocHeap(value),
                         payload2: value.length,
                     }
                 }
@@ -213,14 +222,14 @@ export class SwiftRuntime {
                 case "object": {
                     return {
                         kind: JavaScriptValueKind.Object,
-                        payload1: allocHeap(value),
+                        payload1: this.heap.allocHeap(value),
                         payload2: 0,
                     }
                 }
                 case "function": {
                     return {
                         kind: JavaScriptValueKind.Function,
-                        payload1: allocHeap(value),
+                        payload1: this.heap.allocHeap(value),
                         payload2: 0,
                     }
                 }
@@ -250,7 +259,7 @@ export class SwiftRuntime {
                 kind: JavaScriptValueKind,
                 payload1: number, payload2: number
             ) => {
-                const obj = referenceHeap(ref);
+                const obj = this.heap.referenceHeap(ref);
                 Reflect.set(obj, readString(name, length), decodeValue(kind, payload1, payload2))
             },
             swjs_get_prop: (
@@ -258,7 +267,7 @@ export class SwiftRuntime {
                 kind_ptr: pointer,
                 payload1_ptr: pointer, payload2_ptr: pointer
             ) => {
-                const obj = referenceHeap(ref);
+                const obj = this.heap.referenceHeap(ref);
                 const result = Reflect.get(obj, readString(name, length));
                 const { kind, payload1, payload2 } = encodeValue(result);
                 writeUint32(kind_ptr, kind);
@@ -270,7 +279,7 @@ export class SwiftRuntime {
                 kind: JavaScriptValueKind,
                 payload1: number, payload2: number
             ) => {
-                const obj = referenceHeap(ref);
+                const obj = this.heap.referenceHeap(ref);
                 Reflect.set(obj, index, decodeValue(kind, payload1, payload2))
             },
             swjs_get_subscript: (
@@ -278,7 +287,7 @@ export class SwiftRuntime {
                 kind_ptr: pointer,
                 payload1_ptr: pointer, payload2_ptr: pointer
             ) => {
-                const obj = referenceHeap(ref);
+                const obj = this.heap.referenceHeap(ref);
                 const result = Reflect.get(obj, index);
                 const { kind, payload1, payload2 } = encodeValue(result);
                 writeUint32(kind_ptr, kind);
@@ -286,7 +295,7 @@ export class SwiftRuntime {
                 writeUint32(payload2_ptr, payload2);
             },
             swjs_load_string: (ref: ref, buffer: pointer) => {
-                const string = referenceHeap(ref);
+                const string = this.heap.referenceHeap(ref);
                 writeString(buffer, string);
             },
             swjs_call_function: (
@@ -294,7 +303,7 @@ export class SwiftRuntime {
                 kind_ptr: pointer,
                 payload1_ptr: pointer, payload2_ptr: pointer
             ) => {
-                const func = referenceHeap(ref)
+                const func = this.heap.referenceHeap(ref)
                 const result = Reflect.apply(func, undefined, decodeValues(argv, argc))
                 const { kind, payload1, payload2 } = encodeValue(result);
                 writeUint32(kind_ptr, kind);
@@ -307,8 +316,8 @@ export class SwiftRuntime {
                 kind_ptr: pointer,
                 payload1_ptr: pointer, payload2_ptr: pointer
             ) => {
-                const obj = referenceHeap(obj_ref)
-                const func = referenceHeap(func_ref)
+                const obj = this.heap.referenceHeap(obj_ref)
+                const func = this.heap.referenceHeap(func_ref)
                 const result = Reflect.apply(func, obj, decodeValues(argv, argc))
                 const { kind, payload1, payload2 } = encodeValue(result);
                 writeUint32(kind_ptr, kind);
@@ -319,7 +328,7 @@ export class SwiftRuntime {
                 host_func_id: number,
                 func_ref_ptr: pointer,
             ) => {
-                const func_ref = allocHeap(function() {
+                const func_ref = this.heap.allocHeap(function () {
                     return callHostFunction(host_func_id, Array.prototype.slice.call(arguments))
                 })
                 writeUint32(func_ref_ptr, func_ref)
@@ -328,14 +337,14 @@ export class SwiftRuntime {
                 ref: ref, argv: pointer, argc: number,
                 result_obj: pointer
             ) => {
-                const obj = referenceHeap(ref)
+                const obj = this.heap.referenceHeap(ref)
                 const result = Reflect.construct(obj, decodeValues(argv, argc))
                 if (typeof result != "object")
                     throw Error(`Invalid result type of object constructor of "${obj}": "${result}"`)
-                writeUint32(result_obj, allocHeap(result));
+                writeUint32(result_obj, this.heap.allocHeap(result));
             },
             swjs_destroy_ref: (ref: ref) => {
-                freeHeap(ref)
+                this.heap.freeHeap(ref)
             }
         }
     }
