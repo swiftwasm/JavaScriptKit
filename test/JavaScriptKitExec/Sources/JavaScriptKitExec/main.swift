@@ -98,16 +98,16 @@ Function_Call: do {
     let func2 = try expectFunction(getJSValue(this: prop_5Ref, name: "func2"))
     try expectEqual(func2(), .number(1))
     let func3 = try expectFunction(getJSValue(this: prop_5Ref, name: "func3"))
-    try expectEqual(func3(.number(2)), .number(4))
+    try expectEqual(func3(2), .number(4))
     let func4 = try expectFunction(getJSValue(this: prop_5Ref, name: "func4"))
-    try expectEqual(func4(.number(2), .number(3), .number(4)), .number(9))
-    try expectEqual(func4(.number(2), .number(3), .number(4), .number(5)), .number(9))
+    try expectEqual(func4(2, 3, 4), .number(9))
+    try expectEqual(func4(2, 3, 4, 5), .number(9))
     let func5 = try expectFunction(getJSValue(this: prop_5Ref, name: "func5"))
-    try expectEqual(func5(.string("World!")), .string("Hello, World!"))
+    try expectEqual(func5("World!"), .string("Hello, World!"))
     let func6 = try expectFunction(getJSValue(this: prop_5Ref, name: "func6"))
-    try expectEqual(func6(.boolean(true), .number(1), .number(2)), .number(1))
-    try expectEqual(func6(.boolean(false), .number(1), .number(2)), .number(2))
-    try expectEqual(func6(.boolean(true), .string("OK"), .number(2)), .string("OK"))
+    try expectEqual(func6(true, 1, 2), .number(1))
+    try expectEqual(func6(false, 1, 2), .number(2))
+    try expectEqual(func6(true, "OK", 2), .string("OK"))
 
 } catch {
     print(error)
@@ -152,8 +152,8 @@ Host_Function_Registration: do {
         }
     }
 
-    try expectEqual(hostFunc2(.number(3)), .number(6))
-    _ = try expectString(hostFunc2(.boolean(true)))
+    try expectEqual(hostFunc2(3), .number(6))
+    _ = try expectString(hostFunc2(true))
 } catch {
     print(error)
 }
@@ -170,13 +170,13 @@ New_Object_Construction: do {
     // }
     // ```
     let objectConstructor = try expectFunction(getJSValue(this: .global(), name: "Animal"))
-    let cat1 = objectConstructor.new([.string("Tama"), .number(3), .boolean(true)])
+    let cat1 = objectConstructor.new("Tama", 3, true)
     try expectEqual(getJSValue(this: cat1, name: "name"), .string("Tama"))
     try expectEqual(getJSValue(this: cat1, name: "age"), .number(3))
     let cat1Bark = try expectFunction(getJSValue(this: cat1, name: "bark"))
     try expectEqual(cat1Bark(), .string("nyan"))
 
-    let dog1 = objectConstructor.new([.string("Pochi"), .number(3), .boolean(false)])
+    let dog1 = objectConstructor.new("Pochi", 3, false)
     let dog1Bark = try expectFunction(getJSValue(this: dog1, name: "bark"))
     try expectEqual(dog1Bark(), .string("wan"))
 } catch {
@@ -199,14 +199,14 @@ Call_Function_With_This: do {
     // }
     // ```
     let objectConstructor = try expectFunction(getJSValue(this: .global(), name: "Animal"))
-    let cat1 = objectConstructor.new([.string("Tama"), .number(3), .boolean(true)])
+    let cat1 = objectConstructor.new("Tama", 3, true)
     let getIsCat = try expectFunction(getJSValue(this: cat1, name: "getIsCat"))
 
     // Direct call without this
     try expectEqual(getIsCat(), .undefined)
 
     // Call with this
-    let gotIsCat = getIsCat.apply(this: cat1, arguments: [])
+    let gotIsCat = getIsCat.apply(this: cat1)
     try expectEqual(gotIsCat, .boolean(true))
 
 } catch {

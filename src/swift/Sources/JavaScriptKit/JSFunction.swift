@@ -12,7 +12,8 @@ public class JSFunctionRef: Equatable {
         return lhs.id == rhs.id
     }
 
-    public func dynamicallyCall(withArguments arguments: [JSValue]) -> JSValue {
+    @discardableResult
+    public func dynamicallyCall(withArguments arguments: [JSValueConvertible]) -> JSValue {
         let result = arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
                 let argv = bufferPointer.baseAddress
@@ -28,7 +29,7 @@ public class JSFunctionRef: Equatable {
         return result.jsValue()
     }
 
-    public func apply(this: JSObjectRef, arguments: [JSValue]) -> JSValue {
+    public func apply(this: JSObjectRef, arguments: JSValueConvertible...) -> JSValue {
         let result = arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
                 let argv = bufferPointer.baseAddress
@@ -44,7 +45,7 @@ public class JSFunctionRef: Equatable {
         return result.jsValue()
     }
 
-    public func new(_ arguments: [JSValue]) -> JSObjectRef {
+    public func new(_ arguments: JSValueConvertible...) -> JSObjectRef {
         return arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress

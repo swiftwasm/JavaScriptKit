@@ -1,17 +1,51 @@
 import _CJavaScriptKit
 
-protocol JSValueConvertible {
+public protocol JSValueConvertible {
     func jsValue() -> JSValue
 }
 
+extension JSValue: JSValueConvertible {
+    public func jsValue() -> JSValue { self }
+}
+
 extension Bool: JSValueConvertible {
-    func jsValue() -> JSValue {
-        .boolean(self)
+    public func jsValue() -> JSValue { .boolean(self) }
+}
+
+extension Int: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Int32(self)) }
+}
+
+extension String: JSValueConvertible {
+    public func jsValue() -> JSValue { .string(self) }
+}
+
+private let Object = JSObjectRef.global().Object.function!
+
+extension Dictionary: JSValueConvertible where Value: JSValueConvertible, Key == String {
+    public func jsValue() -> JSValue {
+        let object = Object.new()
+        for (key, value) in self {
+            object.set(key, value.jsValue())
+        }
+        return .object(object)
+    }
+}
+
+private let Array = JSObjectRef.global().Array.function!
+
+extension Array: JSValueConvertible where Element: JSValueConvertible {
+    public func jsValue() -> JSValue {
+        let array = Array.new(count)
+        for element in self {
+            array.push!(element)
+        }
+        return .object(array)
     }
 }
 
 extension RawJSValue: JSValueConvertible {
-    func jsValue() -> JSValue {
+    public func jsValue() -> JSValue {
         switch kind {
         case JavaScriptValueKind_Invalid:
             fatalError()
@@ -84,18 +118,29 @@ extension JSValue {
     }
 }
 
-extension Array where Element == JSValue {
-    func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
-        func _withCollectedRawJSValue<T>(
-            _ values: [JSValue], _ index: Int,
-            _ results: inout [RawJSValue], _ body: ([RawJSValue]) -> T) -> T {
-            if index == values.count { return body(results) }
-            return values[index].withRawJSValue { (rawValue) -> T in
-                results.append(rawValue)
-                return _withCollectedRawJSValue(values, index + 1, &results, body)
-            }
+
+private func withRawJSValues<T>(_ this: [JSValueConvertible], _ body: ([RawJSValue]) -> T) -> T {
+    func _withRawJSValues<T>(
+        _ values: [JSValueConvertible], _ index: Int,
+        _ results: inout [RawJSValue], _ body: ([RawJSValue]) -> T) -> T {
+        if index == values.count { return body(results) }
+        return values[index].jsValue().withRawJSValue { (rawValue) -> T in
+            results.append(rawValue)
+            return _withRawJSValues(values, index + 1, &results, body)
         }
-        var _results = [RawJSValue]()
-        return _withCollectedRawJSValue(self, 0, &_results, body)
+    }
+    var _results = [RawJSValue]()
+    return _withRawJSValues(this, 0, &_results, body)
+}
+
+extension Array where Element == JSValueConvertible {
+    func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
+        JavaScriptKit.withRawJSValues(self, body)
+    }
+}
+
+extension Array where Element: JSValueConvertible {
+    func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
+        JavaScriptKit.withRawJSValues(self, body)
     }
 }

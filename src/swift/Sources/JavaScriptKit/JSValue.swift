@@ -8,6 +8,40 @@ public enum JSValue: Equatable {
     case null
     case undefined
     case function(JSFunctionRef)
+
+    var boolean: Bool? {
+        switch self {
+        case let .boolean(boolean): return boolean
+        default: return nil
+        }
+    }
+
+    var string: String? {
+        switch self {
+        case let .string(string): return string
+        default: return nil
+        }
+    }
+    var number: Int32? {
+        switch self {
+        case let .number(number): return number
+        default: return nil
+        }
+    }
+    var object: JSObjectRef? {
+        switch self {
+        case let .object(object): return object
+        default: return nil
+        }
+    }
+    var isNull: Bool { return self == .null }
+    var isUndefined: Bool { return self == .undefined }
+    var function: JSFunctionRef? {
+        switch self {
+        case let .function(function): return function
+        default: return nil
+        }
+    }
 }
 
 public func getJSValue(this: JSObjectRef, name: String) -> JSValue {
