@@ -9,6 +9,6 @@ let package = Package(
             name: "JavaScriptKitExec", targets: ["JavaScriptKitExec"]
         ),
     ],
-    dependencies: [.package(name: "JavaScriptKit", path: "../../src/swift")],
+    dependencies: [.package(name: "JavaScriptKit", path: "../../")],
     targets: [.target(name: "JavaScriptKitExec", dependencies: ["JavaScriptKit"])]
 )

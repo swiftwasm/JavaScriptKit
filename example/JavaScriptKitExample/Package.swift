@@ -9,6 +9,6 @@ let package = Package(
             name: "JavaScriptKitExample", targets: ["JavaScriptKitExample"]
         ),
     ],
-    dependencies: [.package(name: "JavaScriptKit", path: "../../src/swift")],
+    dependencies: [.package(name: "JavaScriptKit", path: "../../")],
     targets: [.target(name: "JavaScriptKitExample", dependencies: ["JavaScriptKit"])]
 )

@@ -1,5 +1,4 @@
 MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
-SWIFT_LIB_DIR ?= $(MAKEFILE_DIR)/../src/swift
 
 .PHONY: JavaScriptKitExample
 JavaScriptKitExample:
@@ -10,5 +9,5 @@ dist/JavaScriptKitExample.wasm: JavaScriptKitExample
 	cp ./JavaScriptKitExample/.build/debug/JavaScriptKitExample $@
 
 build: dist/JavaScriptKitExample.wasm
-	cd ../src/web && npm run build
+	cd ../Runtime && npm run build
 	npm run build

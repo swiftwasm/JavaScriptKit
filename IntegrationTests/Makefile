@@ -1,5 +1,4 @@
 MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
-SWIFT_LIB_DIR ?= $(MAKEFILE_DIR)/../src/swift
 
 .PHONY: JavaScriptKitExec
 JavaScriptKitExec:
@@ -10,6 +9,6 @@ dist/JavaScriptKitExec.wasm: JavaScriptKitExec
 	cp ./JavaScriptKitExec/.build/debug/JavaScriptKitExec $@
 
 build: dist/JavaScriptKitExec.wasm
-	cd ../src/web && npm run build
+	cd ../Runtime && npm run build
 test: build
 	node index.js
