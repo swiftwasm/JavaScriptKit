@@ -1,3 +1,5 @@
 # JavaScriptKit
 
-A description of this package.
+WIP
+
+Swift framework to interact with JavaScript through WebAssembly.
