@@ -7,5 +7,4 @@ swift build --triple wasm32-unknown-wasi \
 	-Xcc --sysroot=$WASI_SYSROOT \
 	-Xlinker --allow-undefined \
 	-Xlinker --export=swjs_call_host_function \
-	-Xlinker --export=swjs_prepare_host_function_call \
-	"$@"
+	-Xlinker --export=swjs_prepare_host_function_call
