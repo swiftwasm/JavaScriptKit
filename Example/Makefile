@@ -2,7 +2,8 @@ MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
 .PHONY: JavaScriptKitExample
 JavaScriptKitExample:
-	cd JavaScriptKitExample && make build
+	cd JavaScriptKitExample && \
+	    swift build --triple wasm32-unknown-wasi
 
 dist/JavaScriptKitExample.wasm: JavaScriptKitExample
 	mkdir -p dist
