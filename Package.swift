@@ -10,9 +10,23 @@ let package = Package(
     targets: [
         .target(
             name: "JavaScriptKit",
-            dependencies: ["_CJavaScriptKit"]),
+            dependencies: ["_CJavaScriptKit"],
+            linkerSettings: [
+              .unsafeFlags([
+                "-Xlinker",
+                "--export=swjs_call_host_function",
+                "-Xlinker",
+                "--export=swjs_prepare_host_function_call"
+              ])
+            ]),
         .target(
-            name: "_CJavaScriptKit"),
+            name: "_CJavaScriptKit",
+            linkerSettings: [
+              .unsafeFlags([
+                "-Xlinker",
+                "--allow-undefined",
+              ])
+            ]),
         .testTarget(
             name: "JavaScriptKitTests",
             dependencies: ["JavaScriptKit"]),

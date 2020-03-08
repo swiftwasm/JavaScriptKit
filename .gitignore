@@ -1,6 +1,5 @@
 dist
 node_modules
-.wasi-sdk
 .DS_Store
 /.build
 /Packages

@@ -2,7 +2,8 @@ MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
 .PHONY: JavaScriptKitExec
 JavaScriptKitExec:
-	cd JavaScriptKitExec && make build
+	cd JavaScriptKitExec &&  \
+	    swift build --triple wasm32-unknown-wasi
 
 dist/JavaScriptKitExec.wasm: JavaScriptKitExec
 	mkdir -p dist
