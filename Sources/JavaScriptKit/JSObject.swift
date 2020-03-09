@@ -49,4 +49,8 @@ public class JSObjectRef: Equatable {
     public static func == (lhs: JSObjectRef, rhs: JSObjectRef) -> Bool {
         return lhs.id == rhs.id
     }
+
+    public func jsValue() -> JSValue {
+        .object(self)
+    }
 }

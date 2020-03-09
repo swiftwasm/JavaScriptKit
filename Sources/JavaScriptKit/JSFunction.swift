@@ -1,16 +1,7 @@
 import _CJavaScriptKit
 
 @dynamicCallable
-public class JSFunctionRef: Equatable {
-    let id: UInt32
-
-    init(id: UInt32) {
-        self.id = id
-    }
-
-    public static func == (lhs: JSFunctionRef, rhs: JSFunctionRef) -> Bool {
-        return lhs.id == rhs.id
-    }
+public class JSFunctionRef: JSObjectRef {
 
     @discardableResult
     public func dynamicallyCall(withArguments arguments: [JSValueConvertible]) -> JSValue {
@@ -71,6 +62,10 @@ public class JSFunctionRef: Equatable {
         _create_function(id, &funcRef)
 
         return JSFunctionRef(id: funcRef)
+    }
+
+    public override func jsValue() -> JSValue {
+        .function(self)
     }
 }
 

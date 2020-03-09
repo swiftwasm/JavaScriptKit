@@ -21,11 +21,8 @@ extension String: JSValueConvertible {
 }
 
 extension JSObjectRef: JSValueConvertible {
-    public func jsValue() -> JSValue { .object(self) }
-}
-
-extension JSFunctionRef: JSValueConvertible {
-    public func jsValue() -> JSValue { .function(self) }
+    // `JSObjectRef.jsValue` is defined in JSObjectRef.swift to be able to overridden
+    // from `JSFunctionRef`
 }
 
 private let Object = JSObjectRef.global.Object.function!
