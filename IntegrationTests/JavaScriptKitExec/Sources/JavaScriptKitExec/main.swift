@@ -6,6 +6,7 @@ Literal_Conversion: do {
         .boolean(true),
         .boolean(false),
         .string("foobar"),
+        .string("👨‍👩‍👧‍👧 Family Emoji"),
         .number(0),
         .number(.max),
         .number(.min),

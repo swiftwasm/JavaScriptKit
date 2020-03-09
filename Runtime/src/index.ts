@@ -206,10 +206,11 @@ export class SwiftRuntime {
                     }
                 }
                 case "string": {
+                    const bytes = textEncoder.encode(value);
                     return {
                         kind: JavaScriptValueKind.String,
                         payload1: this.heap.allocHeap(value),
-                        payload2: value.length,
+                        payload2: bytes.length,
                     }
                 }
                 case "undefined": {
