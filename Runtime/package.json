@@ -1,7 +1,7 @@
 {
   "name": "javascript-kit-swift",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.1.0",
+  "description": "A runtime library of JavaScriptKit which is Swift framework to interact with JavaScript through WebAssembly.",
   "main": "lib/index.js",
   "files": [
     "lib"
@@ -12,7 +12,20 @@
     "build:ts": "tsc -b",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [],
+  "keywords": [
+    "Swift", "WebAssembly", "wasm"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kateinoigakukun/JavaScriptKit.git"
+  },
+  "homepage": "https://github.com/kateinoigakukun/JavaScriptKit",
+  "bugs": {
+    "url": "https://github.com/kateinoigakukun/JavaScriptKit/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "kateinoigakukun",
   "license": "MIT",
   "dependencies": {
