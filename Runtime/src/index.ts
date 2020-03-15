@@ -11,6 +11,7 @@ declare const global: GlobalVariable;
 
 interface SwiftRuntimeExportedFunctions {
     swjs_prepare_host_function_call(size: number): pointer;
+    swjs_cleanup_host_function_call(argv: pointer): void;
     swjs_call_host_function(
         host_func_id: number,
         argv: pointer, argc: number,
@@ -112,6 +113,7 @@ export class SwiftRuntime {
                 output = result
             })
             exports.swjs_call_host_function(host_func_id, argv, argc, callback_func_ref)
+            exports.swjs_cleanup_host_function_call(argv)
             return output
         }
 
