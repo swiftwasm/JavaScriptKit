@@ -76,6 +76,11 @@ public func _prepare_host_function_call(_ argc: Int32) -> UnsafeMutableRawPointe
     return malloc(Int(argumentSize))!
 }
 
+@_cdecl("swjs_cleanup_host_function_call")
+public func _cleanup_host_function_call(_ pointer: UnsafeMutableRawPointer) {
+    free(pointer)
+}
+
 @_cdecl("swjs_call_host_function")
 public func _call_host_function(
     _ hostFuncRef: JavaScriptHostFuncRef,
