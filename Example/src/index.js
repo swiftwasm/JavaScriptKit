@@ -17,7 +17,7 @@ let wasi = new WASI({
 
 const startWasiTask = async () => {
   // Fetch our Wasm File
-  const response = await fetch("./dist/JavaScriptKitExample.wasm");
+  const response = await fetch("JavaScriptKitExample.wasm");
   const responseArrayBuffer = await response.arrayBuffer();
 
   // Instantiate the WebAssembly file
