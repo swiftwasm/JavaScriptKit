@@ -89,6 +89,25 @@ Value_Construction: do {
     print(error)
 }
 
+Value_Decoder: do {
+    struct GlobalObject1: Codable {
+        struct Prop1: Codable {
+            let nested_prop: Int
+        }
+        let prop_1: Prop1
+        let prop_2: Int
+        let prop_3: Bool
+        let prop_7: Float
+    }
+    let decoder = JSValueDecoder()
+    let rawGlobalObject1 = getJSValue(this: .global, name: "globalObject1")
+    let globalObject1 = try decoder.decode(GlobalObject1.self, from: rawGlobalObject1)
+    try expectEqual(globalObject1.prop_1.nested_prop, 1)
+    try expectEqual(globalObject1.prop_2, 2)
+    try expectEqual(globalObject1.prop_3, true)
+    try expectEqual(globalObject1.prop_7, 3.14)
+}
+
 Function_Call: do {
     // Notes: globalObject1 is defined in JavaScript environment
     //
