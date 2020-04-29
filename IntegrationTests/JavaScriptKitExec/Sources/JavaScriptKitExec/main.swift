@@ -176,10 +176,8 @@ Host_Function_Registration: do {
     }
 
     try expectEqual(hostFunc2(3), .number(6))
-    // FIXME: Crash with latest toolchain
-/*
     _ = try expectString(hostFunc2(true))
-*/
+
 } catch {
     print(error)
 }
