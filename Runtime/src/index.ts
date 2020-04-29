@@ -159,23 +159,23 @@ export class SwiftRuntime {
 
         const decodeValue = (
             kind: JavaScriptValueKind,
-            payload1_ptr: pointer, payload2_ptr: pointer, payload3_ptr: pointer
+            payload1: number, payload2: number, payload3: number
         ) => {
             switch (kind) {
                 case JavaScriptValueKind.Boolean: {
-                    switch (readUInt32(payload1_ptr)) {
+                    switch (payload1) {
                         case 0: return false
                         case 1: return true
                     }
                 }
                 case JavaScriptValueKind.Number: {
-                    return readFloat64(payload3_ptr);
+                    return payload3;
                 }
                 case JavaScriptValueKind.String: {
-                    return readString(readUInt32(payload1_ptr), readUInt32(payload2_ptr))
+                    return readString(payload1, payload2)
                 }
                 case JavaScriptValueKind.Object: {
-                    return this.heap.referenceHeap(readUInt32(payload1_ptr))
+                    return this.heap.referenceHeap(payload1)
                 }
                 case JavaScriptValueKind.Null: {
                     return null
@@ -184,7 +184,11 @@ export class SwiftRuntime {
                     return undefined
                 }
                 case JavaScriptValueKind.Function: {
-                    return this.heap.referenceHeap(readUInt32(payload1_ptr))
+                    // console.log("decoding function:")
+                    // console.log("  payload1: " + payload1)
+                    // console.log("Heap Contents:")
+                    // console.log(this.heap)
+                    return this.heap.referenceHeap(payload1)
                 }
                 default:
                     throw new Error(`Type kind "${kind}" is not supported`)
@@ -268,6 +272,13 @@ export class SwiftRuntime {
                 payload1: number, payload2: number, payload3: number
             ) => {
                 const obj = this.heap.referenceHeap(ref);
+                // console.log("swjs_set_prop");
+                // console.log("  name: " + readString(name, length));
+                // console.log("  kind: " + kind)
+                // console.log("  payload1: " + payload1)
+                // console.log("  payload2: " + payload2)
+                // console.log("  payload3: " + payload3)
+                // console.log("  value: " + decodeValue(kind, payload1, payload2, payload3))
                 Reflect.set(obj, readString(name, length), decodeValue(kind, payload1, payload2, payload3))
             },
             swjs_get_prop: (

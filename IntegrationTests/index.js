@@ -39,6 +39,7 @@ global.globalObject1 = {
   },
   "prop_6": {
     "call_host_1": () => {
+      console.log(global.globalObject1.prop_6)
       return global.globalObject1.prop_6.host_func_1()
     }
   },
