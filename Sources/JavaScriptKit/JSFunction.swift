@@ -5,14 +5,14 @@ public class JSFunctionRef: JSObjectRef {
 
     @discardableResult
     public func dynamicallyCall(withArguments arguments: [JSValueConvertible]) -> JSValue {
-        let result = arguments.withRawJSValues { rawValues in
-            rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
+        let result = arguments.withRawJSValues { rawValues -> RawJSValue in
+            return rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
                 var result = RawJSValue()
                 _call_function(
                     self.id, argv, Int32(argc),
-                    &result.kind, &result.payload1, &result.payload2
+                    &result.kind, &result.payload1, &result.payload2, &result.payload3
                 )
                 return result
             }
@@ -31,7 +31,7 @@ public class JSFunctionRef: JSObjectRef {
                 var result = RawJSValue()
                 _call_function_with_this(this.id,
                     self.id, argv, Int32(argc),
-                    &result.kind, &result.payload1, &result.payload2
+                    &result.kind, &result.payload1, &result.payload2, &result.payload3
                 )
                 return result
             }
@@ -44,7 +44,7 @@ public class JSFunctionRef: JSObjectRef {
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
-                var resultObj = JavaScriptPayload()
+                var resultObj = JavaScriptObjectRef()
                 _call_new(
                     self.id, argv, Int32(argc),
                     &resultObj
@@ -85,7 +85,7 @@ public func _cleanup_host_function_call(_ pointer: UnsafeMutableRawPointer) {
 public func _call_host_function(
     _ hostFuncRef: JavaScriptHostFuncRef,
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
-    _ callbackFuncRef: JavaScriptPayload) {
+    _ callbackFuncRef: JavaScriptObjectRef) {
     let hostFunc = JSFunctionRef.sharedFunctions[Int(hostFuncRef)]
     let args = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
         $0.jsValue()

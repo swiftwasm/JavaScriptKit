@@ -3,7 +3,7 @@ import _CJavaScriptKit
 public enum JSValue: Equatable {
     case boolean(Bool)
     case string(String)
-    case number(Int32)
+    case number(Double)
     case object(JSObjectRef)
     case null
     case undefined
@@ -22,7 +22,7 @@ public enum JSValue: Equatable {
         default: return nil
         }
     }
-    public var number: Int32? {
+    public var number: Double? {
         switch self {
         case let .number(number): return number
         default: return nil
@@ -33,6 +33,9 @@ public enum JSValue: Equatable {
         case let .object(object): return object
         default: return nil
         }
+    }
+    public var array: JSArrayRef? {
+        object.flatMap { JSArrayRef($0) }
     }
     public var isNull: Bool { return self == .null }
     public var isUndefined: Bool { return self == .undefined }
@@ -57,7 +60,7 @@ extension JSValue: ExpressibleByStringLiteral {
 }
 
 extension JSValue: ExpressibleByIntegerLiteral {
-    public init(integerLiteral value: Int32) {
+    public init(integerLiteral value: Double) {
         self = .number(value)
     }
 }
@@ -66,13 +69,13 @@ public func getJSValue(this: JSObjectRef, name: String) -> JSValue {
     var rawValue = RawJSValue()
     _get_prop(this.id, name, Int32(name.count),
                   &rawValue.kind,
-                  &rawValue.payload1, &rawValue.payload2)
+                  &rawValue.payload1, &rawValue.payload2, &rawValue.payload3)
     return rawValue.jsValue()
 }
 
 public func setJSValue(this: JSObjectRef, name: String, value: JSValue) {
     value.withRawJSValue { rawValue in
-        _set_prop(this.id, name, Int32(name.count), rawValue.kind, rawValue.payload1, rawValue.payload2)
+        _set_prop(this.id, name, Int32(name.count), rawValue.kind, rawValue.payload1, rawValue.payload2, rawValue.payload3)
     }
 }
 
@@ -81,7 +84,7 @@ public func getJSValue(this: JSObjectRef, index: Int32) -> JSValue {
     var rawValue = RawJSValue()
     _get_subscript(this.id, index,
                    &rawValue.kind,
-                   &rawValue.payload1, &rawValue.payload2)
+                   &rawValue.payload1, &rawValue.payload2, &rawValue.payload3)
     return rawValue.jsValue()
 }
 
@@ -90,7 +93,7 @@ public func setJSValue(this: JSObjectRef, index: Int32, value: JSValue) {
     value.withRawJSValue { rawValue in
         _set_subscript(this.id, index,
                        rawValue.kind,
-                       rawValue.payload1, rawValue.payload2)
+                       rawValue.payload1, rawValue.payload2, rawValue.payload3)
     }
 }
 

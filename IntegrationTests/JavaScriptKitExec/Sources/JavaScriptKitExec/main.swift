@@ -8,8 +8,10 @@ Literal_Conversion: do {
         .string("foobar"),
         .string("👨‍👩‍👧‍👧 Family Emoji"),
         .number(0),
-        .number(.max),
-        .number(.min),
+        .number(Double(Int32.max)),
+        .number(Double(Int32.min)),
+        .number(Double.infinity),
+        .number(Double.nan),
         .null,
         .undefined,
     ]
@@ -17,7 +19,13 @@ Literal_Conversion: do {
         let prop = "prop_\(index)"
         setJSValue(this: global, name: prop, value: input)
         let got = getJSValue(this: global, name: prop)
-        try expectEqual(got, input)
+        switch (got, input) {
+        case let (.number(lhs), .number(rhs)):
+            // Compare bitPattern because nan == nan is always false
+            try expectEqual(lhs.bitPattern, rhs.bitPattern)
+        default:
+            try expectEqual(got, input)
+        }
     }
 } catch {
     print(error)
@@ -65,6 +73,50 @@ Object_Conversion: do {
 
 } catch {
     print(error)
+}
+
+Value_Construction: do {
+    let globalObject1 = getJSValue(this: .global, name: "globalObject1")
+    let globalObject1Ref = try expectObject(globalObject1)
+    let prop_2 = getJSValue(this: globalObject1Ref, name: "prop_2")
+    try expectEqual(Int.construct(from: prop_2), 2)
+    let prop_3 = getJSValue(this: globalObject1Ref, name: "prop_3")
+    try expectEqual(Bool.construct(from: prop_3), true)
+    let prop_7 = getJSValue(this: globalObject1Ref, name: "prop_7")
+    try expectEqual(Double.construct(from: prop_7), 3.14)
+    try expectEqual(Float.construct(from: prop_7), 3.14)
+} catch {
+    print(error)
+}
+
+Array_Iterator: do {
+    let globalObject1 = getJSValue(this: .global, name: "globalObject1")
+    let globalObject1Ref = try expectObject(globalObject1)
+    let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
+    let array = try expectArray(prop_4)
+    let expectedProp_4: [JSValue] = [
+        .number(3), .number(4), .string("str_elm_1"), .number(5)
+    ]
+    try expectEqual(Array(array), expectedProp_4)
+}
+
+Value_Decoder: do {
+    struct GlobalObject1: Codable {
+        struct Prop1: Codable {
+            let nested_prop: Int
+        }
+        let prop_1: Prop1
+        let prop_2: Int
+        let prop_3: Bool
+        let prop_7: Float
+    }
+    let decoder = JSValueDecoder()
+    let rawGlobalObject1 = getJSValue(this: .global, name: "globalObject1")
+    let globalObject1 = try decoder.decode(GlobalObject1.self, from: rawGlobalObject1)
+    try expectEqual(globalObject1.prop_1.nested_prop, 1)
+    try expectEqual(globalObject1.prop_2, 2)
+    try expectEqual(globalObject1.prop_3, true)
+    try expectEqual(globalObject1.prop_7, 3.14)
 }
 
 Function_Call: do {
@@ -154,10 +206,8 @@ Host_Function_Registration: do {
     }
 
     try expectEqual(hostFunc2(3), .number(6))
-    // FIXME: Crash with latest toolchain
-/*
     _ = try expectString(hostFunc2(true))
-*/
+
 } catch {
     print(error)
 }

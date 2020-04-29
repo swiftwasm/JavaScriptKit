@@ -30,6 +30,13 @@ func expectObject(_ value: JSValue, file: StaticString = #file, line: UInt = #li
     }
 }
 
+func expectArray(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSArrayRef {
+    guard let array = value.array else {
+        throw MessageError("Type of \(value) should be \"object\"", file: file, line: line, column: column)
+    }
+    return array
+}
+
 func expectFunction(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSFunctionRef {
     switch value {
     case .function(let ref): return ref
@@ -46,7 +53,7 @@ func expectBoolean(_ value: JSValue, file: StaticString = #file, line: UInt = #l
     }
 }
 
-func expectNumber(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> Int32 {
+func expectNumber(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> Double {
     switch value {
     case .number(let number): return number
     default:

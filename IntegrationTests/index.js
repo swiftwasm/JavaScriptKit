@@ -9,6 +9,20 @@ const readFile = promisify(fs.readFile);
 const swift = new SwiftRuntime();
 // Instantiate a new WASI Instance
 const wasmFs = new WasmFs();
+// Output stdout and stderr to console
+const originalWriteSync = wasmFs.fs.writeSync;
+wasmFs.fs.writeSync = (fd, buffer, offset, length, position) => {
+  const text = new TextDecoder("utf-8").decode(buffer);
+  switch (fd) {
+  case 1:
+    console.log(text);
+    break;
+  case 2:
+    console.error(text);
+    break;
+  }
+  return originalWriteSync(fd, buffer, offset, length, position);
+};
 let wasi = new WASI({
   args: [],
   env: {},
@@ -41,7 +55,8 @@ global.globalObject1 = {
     "call_host_1": () => {
       return global.globalObject1.prop_6.host_func_1()
     }
-  }
+  },
+  "prop_7": 3.14,
 }
 
 global.Animal = function(name, age, isCat) {
@@ -69,10 +84,6 @@ const startWasiTask = async () => {
   swift.setInsance(instance);
   // Start the WebAssembly WASI instance!
   wasi.start(instance);
-
-  // Output what's inside of /dev/stdout!
-  const stdout = await wasmFs.getStdOut();
-  console.log(stdout);
 };
 startWasiTask().catch(err => {
   console.log(err)
