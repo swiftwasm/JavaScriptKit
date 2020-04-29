@@ -1,7 +1,7 @@
 
-public class JSArray {
+public class JSArrayRef {
 
-    static let classObject = JSObjectRef.global.Array.object!
+    static let classObject = JSObjectRef.global.Array.function!
 
     static func isArray(_ object: JSObjectRef) -> Bool {
         classObject.isArray.function!(object).boolean!
@@ -16,7 +16,7 @@ public class JSArray {
 }
 
 
-extension JSArray: Sequence {
+extension JSArrayRef: Sequence {
     public typealias Element = JSValue
 
     public func makeIterator() -> Iterator {
