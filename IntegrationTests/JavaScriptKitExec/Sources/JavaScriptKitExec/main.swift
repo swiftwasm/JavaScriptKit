@@ -67,6 +67,17 @@ Object_Conversion: do {
     print(error)
 }
 
+Value_Construction: do {
+    let globalObject1 = getJSValue(this: .global, name: "globalObject1")
+    let globalObject1Ref = try expectObject(globalObject1)
+    let prop_7 = getJSValue(this: globalObject1Ref, name: "prop_7")
+    print(prop_7)
+    try expectEqual(Double.construct(from: prop_7), 3.14)
+    try expectEqual(Float.construct(from: prop_7), 3.14)
+} catch {
+    print(error)
+}
+
 Function_Call: do {
     // Notes: globalObject1 is defined in JavaScript environment
     //

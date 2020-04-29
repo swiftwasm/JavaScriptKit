@@ -69,23 +69,24 @@ extension RawJSValue: JSValueConvertible {
         case JavaScriptValueKind_Boolean:
             return .boolean(payload1 != 0)
         case JavaScriptValueKind_Number:
-            return .number(Int32(bitPattern: payload1))
+            fatalError("unimplemented yet")
+//            return .number(Int32(bitPattern: payload1))
         case JavaScriptValueKind_String:
             // +1 for null terminator
             let buffer = malloc(Int(payload2 + 1))!.assumingMemoryBound(to: UInt8.self)
             defer { free(buffer) }
-            _load_string(payload1 as JavaScriptObjectRef, buffer)
+            _load_string(JavaScriptObjectRef(payload1), buffer)
             buffer[Int(payload2)] = 0
             let string = String(decodingCString: UnsafePointer(buffer), as: UTF8.self)
             return .string(string)
         case JavaScriptValueKind_Object:
-            return .object(JSObjectRef(id: payload1))
+            return .object(JSObjectRef(id: UInt32(payload1)))
         case JavaScriptValueKind_Null:
             return .null
         case JavaScriptValueKind_Undefined:
             return .undefined
         case JavaScriptValueKind_Function:
-            return .function(JSFunctionRef(id: payload1))
+            return .function(JSFunctionRef(id: UInt32(payload1)))
         default:
             fatalError("unreachable")
         }
@@ -95,27 +96,28 @@ extension RawJSValue: JSValueConvertible {
 extension JSValue {
     func withRawJSValue<T>(_ body: (RawJSValue) -> T) -> T {
         let kind: JavaScriptValueKind
-        let payload1: JavaScriptPayload
-        let payload2: JavaScriptPayload
+        let payload1: JavaScriptPayload1
+        let payload2: JavaScriptPayload2
         switch self {
         case let .boolean(boolValue):
             kind = JavaScriptValueKind_Boolean
             payload1 = boolValue ? 1 : 0
             payload2 = 0
         case let .number(numberValue):
-            kind = JavaScriptValueKind_Number
-            payload1 = JavaScriptPayload(bitPattern: numberValue)
-            payload2 = 0
+            fatalError("unimplemented yet")
+//            kind = JavaScriptValueKind_Number
+//            payload1 = JavaScriptPayload1(bitPattern: numberValue)
+//            payload2 = 0
         case var .string(stringValue):
             kind = JavaScriptValueKind_String
             return stringValue.withUTF8 { bufferPtr in
                 let ptrValue = UInt32(UInt(bitPattern: bufferPtr.baseAddress!))
-                let rawValue = RawJSValue(kind: kind, payload1: ptrValue, payload2: JavaScriptPayload(bufferPtr.count))
+                let rawValue = RawJSValue(kind: kind, payload1: JavaScriptPayload1(ptrValue), payload2: JavaScriptPayload2(bufferPtr.count))
                 return body(rawValue)
             }
         case let .object(ref):
             kind = JavaScriptValueKind_Object
-            payload1 = ref.id
+            payload1 = JavaScriptPayload1(ref.id)
             payload2 = 0
         case .null:
             kind = JavaScriptValueKind_Null
@@ -127,7 +129,7 @@ extension JSValue {
             payload2 = 0
         case let .function(functionRef):
             kind = JavaScriptValueKind_Function
-            payload1 = functionRef.id
+            payload1 = JavaScriptPayload1(functionRef.id)
             payload2 = 0
         }
         let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)

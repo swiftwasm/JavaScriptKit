@@ -41,7 +41,8 @@ global.globalObject1 = {
     "call_host_1": () => {
       return global.globalObject1.prop_6.host_func_1()
     }
-  }
+  },
+  "prop_7": 3.14,
 }
 
 global.Animal = function(name, age, isCat) {

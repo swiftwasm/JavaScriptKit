@@ -44,7 +44,7 @@ public class JSFunctionRef: JSObjectRef {
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
-                var resultObj = JavaScriptPayload()
+                var resultObj = JavaScriptObjectRef()
                 _call_new(
                     self.id, argv, Int32(argc),
                     &resultObj
@@ -85,7 +85,7 @@ public func _cleanup_host_function_call(_ pointer: UnsafeMutableRawPointer) {
 public func _call_host_function(
     _ hostFuncRef: JavaScriptHostFuncRef,
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
-    _ callbackFuncRef: JavaScriptPayload) {
+    _ callbackFuncRef: JavaScriptObjectRef) {
     let hostFunc = JSFunctionRef.sharedFunctions[Int(hostFuncRef)]
     let args = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
         $0.jsValue()

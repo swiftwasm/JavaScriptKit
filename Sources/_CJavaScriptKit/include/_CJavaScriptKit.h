@@ -17,12 +17,13 @@ typedef enum {
     JavaScriptValueKind_Function  = 6,
 } JavaScriptValueKind;
 
-typedef unsigned JavaScriptPayload;
+typedef unsigned long JavaScriptPayload1;
+typedef unsigned JavaScriptPayload2;
 
 typedef struct {
     JavaScriptValueKind kind;
-    JavaScriptPayload payload1;
-    JavaScriptPayload payload2;
+    JavaScriptPayload1 payload1;
+    JavaScriptPayload2 payload2;
 } RawJSValue;
 
 
@@ -36,8 +37,8 @@ extern void _set_prop(
     const JavaScriptObjectRef _this,
     const char *prop, const int length,
     const JavaScriptValueKind kind,
-    const JavaScriptPayload payload1,
-    const JavaScriptPayload payload2
+    const JavaScriptPayload1 payload1,
+    const JavaScriptPayload2 payload2
 );
 
 __attribute__((
@@ -48,8 +49,8 @@ extern void _get_prop(
     const JavaScriptObjectRef _this,
     const char *prop, const int length,
     JavaScriptValueKind *kind,
-    JavaScriptPayload *payload1,
-    JavaScriptPayload *payload2
+    JavaScriptPayload1 *payload1,
+    JavaScriptPayload2 *payload2
 );
 
 __attribute__((
@@ -60,8 +61,8 @@ extern void _set_subscript(
     const JavaScriptObjectRef _this,
     const int length,
     const JavaScriptValueKind kind,
-    const JavaScriptPayload payload1,
-    const JavaScriptPayload payload2
+    const JavaScriptPayload1 payload1,
+    const JavaScriptPayload2 payload2
 );
 
 __attribute__((
@@ -72,8 +73,8 @@ extern void _get_subscript(
     const JavaScriptObjectRef _this,
     const int length,
     JavaScriptValueKind *kind,
-    JavaScriptPayload *payload1,
-    JavaScriptPayload *payload2
+    JavaScriptPayload1 *payload1,
+    JavaScriptPayload2 *payload2
 );
 
 __attribute__((
@@ -93,8 +94,8 @@ extern void _call_function(
     const JavaScriptObjectRef ref,
     const RawJSValue *argv, const int argc,
     JavaScriptValueKind *result_kind,
-    JavaScriptPayload *result_payload1,
-    JavaScriptPayload *result_payload2
+    JavaScriptPayload1 *result_payload1,
+    JavaScriptPayload2 *result_payload2
 );
 
 __attribute__((
@@ -106,8 +107,8 @@ extern void _call_function_with_this(
     const JavaScriptObjectRef func_ref,
     const RawJSValue *argv, const int argc,
     JavaScriptValueKind *result_kind,
-    JavaScriptPayload *result_payload1,
-    JavaScriptPayload *result_payload2
+    JavaScriptPayload1 *result_payload1,
+    JavaScriptPayload2 *result_payload2
 );
 
 __attribute__((
@@ -117,7 +118,7 @@ __attribute__((
 extern void _call_new(
     const JavaScriptObjectRef ref,
     const RawJSValue *argv, const int argc,
-    JavaScriptPayload *result_obj
+    JavaScriptObjectRef *result_obj
 );
 
 __attribute__((
