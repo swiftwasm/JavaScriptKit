@@ -10,6 +10,8 @@ Literal_Conversion: do {
         .number(0),
         .number(Double(Int32.max)),
         .number(Double(Int32.min)),
+        .number(Double.infinity),
+        .number(Double.nan),
         .null,
         .undefined,
     ]
@@ -17,7 +19,13 @@ Literal_Conversion: do {
         let prop = "prop_\(index)"
         setJSValue(this: global, name: prop, value: input)
         let got = getJSValue(this: global, name: prop)
-        try expectEqual(got, input)
+        switch (got, input) {
+        case let (.number(lhs), .number(rhs)):
+            // Compare bitPattern because nan == nan is always false
+            try expectEqual(lhs.bitPattern, rhs.bitPattern)
+        default:
+            try expectEqual(got, input)
+        }
     }
 } catch {
     print(error)
@@ -70,6 +78,10 @@ Object_Conversion: do {
 Value_Construction: do {
     let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
+    let prop_2 = getJSValue(this: globalObject1Ref, name: "prop_2")
+    try expectEqual(Int.construct(from: prop_2), 2)
+    let prop_3 = getJSValue(this: globalObject1Ref, name: "prop_3")
+    try expectEqual(Bool.construct(from: prop_3), true)
     let prop_7 = getJSValue(this: globalObject1Ref, name: "prop_7")
     try expectEqual(Double.construct(from: prop_7), 3.14)
     try expectEqual(Float.construct(from: prop_7), 3.14)
