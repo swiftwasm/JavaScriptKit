@@ -102,8 +102,8 @@ export class SwiftRuntime {
             const argv = exports.swjs_prepare_host_function_call(argc)
             for (let index = 0; index < args.length; index++) {
                 const argument = args[index]
-                const base = argv + 20 * index
-                writeValue(argument, base, base + 4, base + 8, base + 12)
+                const base = argv + 24 * index
+                writeValue(argument, base, base + 4, base + 8, base + 16)
             }
             let output: any;
             const callback_func_ref = this.heap.allocHeap(function (result: any) {
@@ -184,10 +184,6 @@ export class SwiftRuntime {
                     return undefined
                 }
                 case JavaScriptValueKind.Function: {
-                    // console.log("decoding function:")
-                    // console.log("  payload1: " + payload1)
-                    // console.log("Heap Contents:")
-                    // console.log(this.heap)
                     return this.heap.referenceHeap(payload1)
                 }
                 default:
@@ -203,6 +199,7 @@ export class SwiftRuntime {
                 writeUint32(kind_ptr, JavaScriptValueKind.Null);
                 writeUint32(payload1_ptr, 0);
                 writeUint32(payload2_ptr, 0);
+                return;
             }
             switch (typeof value) {
                 case "boolean": {
@@ -250,16 +247,16 @@ export class SwiftRuntime {
         }
 
         // Note:
-        // `decodeValues` assumes that the size of RawJSValue is 16
-        // and the alignment of it is 4
+        // `decodeValues` assumes that the size of RawJSValue is 24
+        // and the alignment of it is 8
         const decodeValues = (ptr: pointer, length: number) => {
             let result = []
             for (let index = 0; index < length; index++) {
-                const base = ptr + 16 * index
+                const base = ptr + 24 * index
                 const kind = readUInt32(base)
-                const payload1 = readFloat64(base + 4)
+                const payload1 = readUInt32(base + 4)
                 const payload2 = readUInt32(base + 8)
-                const payload3 = readUInt32(base + 12)
+                const payload3 = readFloat64(base + 16)
                 result.push(decodeValue(kind, payload1, payload2, payload3))
             }
             return result
@@ -272,13 +269,6 @@ export class SwiftRuntime {
                 payload1: number, payload2: number, payload3: number
             ) => {
                 const obj = this.heap.referenceHeap(ref);
-                // console.log("swjs_set_prop");
-                // console.log("  name: " + readString(name, length));
-                // console.log("  kind: " + kind)
-                // console.log("  payload1: " + payload1)
-                // console.log("  payload2: " + payload2)
-                // console.log("  payload3: " + payload3)
-                // console.log("  value: " + decodeValue(kind, payload1, payload2, payload3))
                 Reflect.set(obj, readString(name, length), decodeValue(kind, payload1, payload2, payload3))
             },
             swjs_get_prop: (

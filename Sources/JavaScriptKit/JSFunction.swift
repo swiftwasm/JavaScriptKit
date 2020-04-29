@@ -5,8 +5,8 @@ public class JSFunctionRef: JSObjectRef {
 
     @discardableResult
     public func dynamicallyCall(withArguments arguments: [JSValueConvertible]) -> JSValue {
-        let result = arguments.withRawJSValues { rawValues in
-            rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
+        let result = arguments.withRawJSValues { rawValues -> RawJSValue in
+            return rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
                 var result = RawJSValue()
