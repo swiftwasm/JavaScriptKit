@@ -16,15 +16,13 @@ extension String: JSValueConstructible {
 
 extension Double: JSValueConstructible {
     public static func construct(from value: JSValue) -> Double? {
-        guard let rawNumber: Int32 = value.number else { return nil }
-        return Double(bitPattern: UInt64(bitPattern: Int64(rawNumber)))
+        return value.number
     }
 }
 
 extension Float: JSValueConstructible {
     public static func construct(from value: JSValue) -> Float? {
-        guard let rawNumber: Int32 = value.number else { return nil }
-        return Float(bitPattern: UInt32(bitPattern: rawNumber))
+        return value.number.map(Float.init)
     }
 }
 
@@ -48,7 +46,7 @@ extension Int16: JSValueConstructible {
 
 extension Int32: JSValueConstructible {
     public static func construct(from value: JSValue) -> Self? {
-        value.number
+        value.number.map(Self.init)
     }
 }
 

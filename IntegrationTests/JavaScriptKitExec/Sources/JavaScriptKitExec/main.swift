@@ -8,8 +8,8 @@ Literal_Conversion: do {
         .string("foobar"),
         .string("👨‍👩‍👧‍👧 Family Emoji"),
         .number(0),
-        .number(.max),
-        .number(.min),
+        .number(Double(Int32.max)),
+        .number(Double(Int32.min)),
         .null,
         .undefined,
     ]

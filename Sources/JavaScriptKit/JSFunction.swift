@@ -12,7 +12,7 @@ public class JSFunctionRef: JSObjectRef {
                 var result = RawJSValue()
                 _call_function(
                     self.id, argv, Int32(argc),
-                    &result.kind, &result.payload1, &result.payload2
+                    &result.kind, &result.payload1, &result.payload2, &result.payload3
                 )
                 return result
             }
@@ -31,7 +31,7 @@ public class JSFunctionRef: JSObjectRef {
                 var result = RawJSValue()
                 _call_function_with_this(this.id,
                     self.id, argv, Int32(argc),
-                    &result.kind, &result.payload1, &result.payload2
+                    &result.kind, &result.payload1, &result.payload2, &result.payload3
                 )
                 return result
             }

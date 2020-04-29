@@ -17,13 +17,15 @@ typedef enum {
     JavaScriptValueKind_Function  = 6,
 } JavaScriptValueKind;
 
-typedef unsigned long JavaScriptPayload1;
+typedef unsigned JavaScriptPayload1;
 typedef unsigned JavaScriptPayload2;
+typedef double   JavaScriptPayload3;
 
 typedef struct {
     JavaScriptValueKind kind;
     JavaScriptPayload1 payload1;
     JavaScriptPayload2 payload2;
+    JavaScriptPayload3 payload3;
 } RawJSValue;
 
 
@@ -38,7 +40,8 @@ extern void _set_prop(
     const char *prop, const int length,
     const JavaScriptValueKind kind,
     const JavaScriptPayload1 payload1,
-    const JavaScriptPayload2 payload2
+    const JavaScriptPayload2 payload2,
+    const JavaScriptPayload3 payload3
 );
 
 __attribute__((
@@ -50,7 +53,8 @@ extern void _get_prop(
     const char *prop, const int length,
     JavaScriptValueKind *kind,
     JavaScriptPayload1 *payload1,
-    JavaScriptPayload2 *payload2
+    JavaScriptPayload2 *payload2,
+    JavaScriptPayload3 *payload3
 );
 
 __attribute__((
@@ -62,7 +66,8 @@ extern void _set_subscript(
     const int length,
     const JavaScriptValueKind kind,
     const JavaScriptPayload1 payload1,
-    const JavaScriptPayload2 payload2
+    const JavaScriptPayload2 payload2,
+    const JavaScriptPayload3 payload3
 );
 
 __attribute__((
@@ -74,7 +79,8 @@ extern void _get_subscript(
     const int length,
     JavaScriptValueKind *kind,
     JavaScriptPayload1 *payload1,
-    JavaScriptPayload2 *payload2
+    JavaScriptPayload2 *payload2,
+    JavaScriptPayload3 *payload3
 );
 
 __attribute__((
@@ -95,7 +101,8 @@ extern void _call_function(
     const RawJSValue *argv, const int argc,
     JavaScriptValueKind *result_kind,
     JavaScriptPayload1 *result_payload1,
-    JavaScriptPayload2 *result_payload2
+    JavaScriptPayload2 *result_payload2,
+    JavaScriptPayload3 *result_payload3
 );
 
 __attribute__((
@@ -108,7 +115,8 @@ extern void _call_function_with_this(
     const RawJSValue *argv, const int argc,
     JavaScriptValueKind *result_kind,
     JavaScriptPayload1 *result_payload1,
-    JavaScriptPayload2 *result_payload2
+    JavaScriptPayload2 *result_payload2,
+    JavaScriptPayload3 *result_payload3
 );
 
 __attribute__((

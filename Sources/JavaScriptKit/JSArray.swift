@@ -31,7 +31,7 @@ extension JSArray: Sequence {
         }
         public func next() -> Element? {
             defer { index += 1 }
-            guard index < ref.length.number! else {
+            guard index < Int(ref.length.number!) else {
                 return nil
             }
             let value = ref.get(index)

@@ -13,7 +13,7 @@ extension Bool: JSValueConvertible {
 }
 
 extension Int: JSValueConvertible {
-    public func jsValue() -> JSValue { .number(Int32(self)) }
+    public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
 extension String: JSValueConvertible {
@@ -69,8 +69,7 @@ extension RawJSValue: JSValueConvertible {
         case JavaScriptValueKind_Boolean:
             return .boolean(payload1 != 0)
         case JavaScriptValueKind_Number:
-            fatalError("unimplemented yet")
-//            return .number(Int32(bitPattern: payload1))
+            return .number(payload3)
         case JavaScriptValueKind_String:
             // +1 for null terminator
             let buffer = malloc(Int(payload2 + 1))!.assumingMemoryBound(to: UInt8.self)
@@ -98,21 +97,22 @@ extension JSValue {
         let kind: JavaScriptValueKind
         let payload1: JavaScriptPayload1
         let payload2: JavaScriptPayload2
+        var payload3: JavaScriptPayload3 = 0
         switch self {
         case let .boolean(boolValue):
             kind = JavaScriptValueKind_Boolean
             payload1 = boolValue ? 1 : 0
             payload2 = 0
         case let .number(numberValue):
-            fatalError("unimplemented yet")
-//            kind = JavaScriptValueKind_Number
-//            payload1 = JavaScriptPayload1(bitPattern: numberValue)
-//            payload2 = 0
+            kind = JavaScriptValueKind_Number
+            payload1 = 0
+            payload2 = 0
+            payload3 = numberValue
         case var .string(stringValue):
             kind = JavaScriptValueKind_String
             return stringValue.withUTF8 { bufferPtr in
                 let ptrValue = UInt32(UInt(bitPattern: bufferPtr.baseAddress!))
-                let rawValue = RawJSValue(kind: kind, payload1: JavaScriptPayload1(ptrValue), payload2: JavaScriptPayload2(bufferPtr.count))
+                let rawValue = RawJSValue(kind: kind, payload1: JavaScriptPayload1(ptrValue), payload2: JavaScriptPayload2(bufferPtr.count), payload3: 0)
                 return body(rawValue)
             }
         case let .object(ref):
@@ -132,7 +132,7 @@ extension JSValue {
             payload1 = JavaScriptPayload1(functionRef.id)
             payload2 = 0
         }
-        let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
+        let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2, payload3: payload3)
         return body(rawValue)
     }
 }

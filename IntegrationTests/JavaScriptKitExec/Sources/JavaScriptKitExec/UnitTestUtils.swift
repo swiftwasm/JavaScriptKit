@@ -46,7 +46,7 @@ func expectBoolean(_ value: JSValue, file: StaticString = #file, line: UInt = #l
     }
 }
 
-func expectNumber(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> Int32 {
+func expectNumber(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> Double {
     switch value {
     case .number(let number): return number
     default:
