@@ -34,6 +34,9 @@ public enum JSValue: Equatable {
         default: return nil
         }
     }
+    public var array: JSArray? {
+        object.flatMap { JSArray($0) }
+    }
     public var isNull: Bool { return self == .null }
     public var isUndefined: Bool { return self == .undefined }
     public var function: JSFunctionRef? {
