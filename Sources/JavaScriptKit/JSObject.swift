@@ -42,6 +42,7 @@ public class JSObjectRef: Equatable {
         setJSValue(this: self, index: Int32(index), value: value)
     }
 
+    static let _JS_Predef_Value_Global: UInt32 = 0
     public static let global = JSObjectRef(id: _JS_Predef_Value_Global)
 
     deinit { _destroy_ref(id) }

@@ -1,13 +1,15 @@
 MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+CONFIGURATION ?= debug
 
 .PHONY: JavaScriptKitExec
 JavaScriptKitExec:
 	cd JavaScriptKitExec &&  \
-	    swift build --triple wasm32-unknown-wasi
+	    swift build --triple wasm32-unknown-wasi \
+	                --configuration $(CONFIGURATION)
 
 dist/JavaScriptKitExec.wasm: JavaScriptKitExec
 	mkdir -p dist
-	cp ./JavaScriptKitExec/.build/debug/JavaScriptKitExec $@
+	cp ./JavaScriptKitExec/.build/$(CONFIGURATION)/JavaScriptKitExec $@
 
 node_modules:
 	npm install

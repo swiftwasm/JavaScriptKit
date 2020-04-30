@@ -28,9 +28,6 @@ typedef struct {
     JavaScriptPayload3 payload3;
 } RawJSValue;
 
-
-const unsigned int _JS_Predef_Value_Global = 0;
-
 __attribute__((
     __import_module__("javascript_kit"),
     __import_name__("swjs_set_prop")
