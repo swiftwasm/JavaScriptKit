@@ -16,6 +16,38 @@ extension Int: JSValueConvertible {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
+extension Int8: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension Int16: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension Int32: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension UInt: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension UInt8: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension UInt16: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension Float: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension Double: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(self) }
+}
+
 extension String: JSValueConvertible {
     public func jsValue() -> JSValue { .string(self) }
 }
