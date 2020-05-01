@@ -7,6 +7,7 @@ public class JSObjectRef: Equatable {
         self.id = id
     }
 
+    @_disfavoredOverload
     public subscript(dynamicMember name: String) -> ((JSValueConvertible...) -> JSValue)? {
         get {
             guard let function = self[dynamicMember: name].function else { return nil }
