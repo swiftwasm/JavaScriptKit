@@ -32,6 +32,13 @@ divElement.innerText = "Hello, world"
 const body = document.body
 body.appendChild(divElement)
 
+const pet = {
+  age: 3,
+  owner: {
+    name: "Mike",
+  },
+}
+
 alert("JavaScript is running on browser!")
 ```
 
@@ -47,6 +54,18 @@ let divElement = document.createElement!("div").object!
 divElement.innerText = "Hello, world"
 let body = document.body.object!
 _ = body.appendChild!(divElement)
+
+struct Owner: Codable {
+  let name: String
+}
+
+struct Pet: Codable {
+  let age: Int
+  let owner: Owner
+}
+
+let jsPet = JSObjectRef.global.pet
+let swiftPet: Pet = JSValueDecoder().decode(from: jsPet)
 
 alert("Swift is running on browser!")
 ```
