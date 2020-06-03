@@ -57,8 +57,6 @@ extension JSObjectRef: JSValueConvertible {
     // from `JSFunctionRef`
 }
 
-private let Object = JSObjectRef.global.Object.function!
-
 extension Dictionary where Value: JSValueConvertible, Key == String {
     public func jsValue() -> JSValue {
         Swift.Dictionary<Key, JSValueConvertible>.jsValue(self)()
@@ -67,15 +65,11 @@ extension Dictionary where Value: JSValueConvertible, Key == String {
 
 extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key == String {
     public func jsValue() -> JSValue {
-        let object = Object.new()
-        for (key, value) in self {
-            object.set(key, value.jsValue())
-        }
-        return .object(object)
+        let object = JSObject()
+        self.forEach { object[$0.key] = $0.value.jsValue() }
+        return .object(object.jsObject)
     }
 }
-
-private let Array = JSObjectRef.global.Array.function!
 
 extension Array where Element: JSValueConvertible {
     public func jsValue() -> JSValue {
@@ -85,24 +79,20 @@ extension Array where Element: JSValueConvertible {
 
 extension Array: JSValueConvertible where Element == JSValueConvertible {
     public func jsValue() -> JSValue {
-        let array = Array.new(count)
-        for (index, element) in self.enumerated() {
-            array[index] = element.jsValue()
-        }
-        return .object(array)
+        return .object(JSArray(self).jsObject)
     }
 }
 
 extension RawJSValue: JSValueConvertible {
     public func jsValue() -> JSValue {
         switch kind {
-        case JavaScriptValueKind_Invalid:
+        case .invalid:
             fatalError()
-        case JavaScriptValueKind_Boolean:
+        case .boolean:
             return .boolean(payload1 != 0)
-        case JavaScriptValueKind_Number:
+        case .number:
             return .number(payload3)
-        case JavaScriptValueKind_String:
+        case .string:
             // +1 for null terminator
             let buffer = malloc(Int(payload2 + 1))!.assumingMemoryBound(to: UInt8.self)
             defer { free(buffer) }
@@ -110,16 +100,16 @@ extension RawJSValue: JSValueConvertible {
             buffer[Int(payload2)] = 0
             let string = String(decodingCString: UnsafePointer(buffer), as: UTF8.self)
             return .string(string)
-        case JavaScriptValueKind_Object:
+        case .object:
             return .object(JSObjectRef(id: UInt32(payload1)))
-        case JavaScriptValueKind_Null:
+        case .null:
             return .null
-        case JavaScriptValueKind_Undefined:
+        case .undefined:
             return .undefined
-        case JavaScriptValueKind_Function:
+        case .function:
             return .function(JSFunctionRef(id: UInt32(payload1)))
-        default:
-            fatalError("unreachable")
+        @unknown default:
+            fatalError("Unreachable")
         }
     }
 }
@@ -132,35 +122,35 @@ extension JSValue {
         var payload3: JavaScriptPayload3 = 0
         switch self {
         case let .boolean(boolValue):
-            kind = JavaScriptValueKind_Boolean
+            kind = .boolean
             payload1 = boolValue ? 1 : 0
             payload2 = 0
         case let .number(numberValue):
-            kind = JavaScriptValueKind_Number
+            kind = .number
             payload1 = 0
             payload2 = 0
             payload3 = numberValue
         case var .string(stringValue):
-            kind = JavaScriptValueKind_String
+            kind = .string
             return stringValue.withUTF8 { bufferPtr in
                 let ptrValue = UInt32(UInt(bitPattern: bufferPtr.baseAddress!))
                 let rawValue = RawJSValue(kind: kind, payload1: JavaScriptPayload1(ptrValue), payload2: JavaScriptPayload2(bufferPtr.count), payload3: 0)
                 return body(rawValue)
             }
         case let .object(ref):
-            kind = JavaScriptValueKind_Object
+            kind = .object
             payload1 = JavaScriptPayload1(ref.id)
             payload2 = 0
         case .null:
-            kind = JavaScriptValueKind_Null
+            kind = .null
             payload1 = 0
             payload2 = 0
         case .undefined:
-            kind = JavaScriptValueKind_Undefined
+            kind = .undefined
             payload1 = 0
             payload2 = 0
         case let .function(functionRef):
-            kind = JavaScriptValueKind_Function
+            kind = .function
             payload1 = JavaScriptPayload1(functionRef.id)
             payload2 = 0
         }

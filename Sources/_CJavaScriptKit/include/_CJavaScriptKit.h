@@ -6,15 +6,15 @@
 typedef unsigned int JavaScriptObjectRef;
 typedef unsigned int JavaScriptHostFuncRef;
 
-typedef enum {
-    JavaScriptValueKind_Invalid   = -1,
-    JavaScriptValueKind_Boolean   = 0,
-    JavaScriptValueKind_String    = 1,
-    JavaScriptValueKind_Number    = 2,
-    JavaScriptValueKind_Object    = 3,
-    JavaScriptValueKind_Null      = 4,
-    JavaScriptValueKind_Undefined = 5,
-    JavaScriptValueKind_Function  = 6,
+typedef enum __attribute__((enum_extensibility(closed))) {
+    JavaScriptValueKindInvalid   = -1,
+    JavaScriptValueKindBoolean   = 0,
+    JavaScriptValueKindString    = 1,
+    JavaScriptValueKindNumber    = 2,
+    JavaScriptValueKindObject    = 3,
+    JavaScriptValueKindNull      = 4,
+    JavaScriptValueKindUndefined = 5,
+    JavaScriptValueKindFunction  = 6,
 } JavaScriptValueKind;
 
 typedef unsigned JavaScriptPayload1;

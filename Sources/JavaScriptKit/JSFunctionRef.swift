@@ -55,6 +55,7 @@ public class JSFunctionRef: JSObjectRef {
     }
 
     static var sharedFunctions: [([JSValue]) -> JSValue] = []
+    
     public static func from(_ body: @escaping ([JSValue]) -> JSValue) -> JSFunctionRef {
         let id = JavaScriptHostFuncRef(sharedFunctions.count)
         sharedFunctions.append(body)
@@ -63,26 +64,29 @@ public class JSFunctionRef: JSObjectRef {
 
         return JSFunctionRef(id: funcRef)
     }
+    
+    // MARK: - JSValueConvertible
 
     public override func jsValue() -> JSValue {
         .function(self)
     }
 }
 
+// MARK: - C Functions
 
 @_cdecl("swjs_prepare_host_function_call")
-public func _prepare_host_function_call(_ argc: Int32) -> UnsafeMutableRawPointer {
+internal func _prepare_host_function_call(_ argc: Int32) -> UnsafeMutableRawPointer {
     let argumentSize = MemoryLayout<RawJSValue>.size * Int(argc)
     return malloc(Int(argumentSize))!
 }
 
 @_cdecl("swjs_cleanup_host_function_call")
-public func _cleanup_host_function_call(_ pointer: UnsafeMutableRawPointer) {
+internal func _cleanup_host_function_call(_ pointer: UnsafeMutableRawPointer) {
     free(pointer)
 }
 
 @_cdecl("swjs_call_host_function")
-public func _call_host_function(
+internal func _call_host_function(
     _ hostFuncRef: JavaScriptHostFuncRef,
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef) {

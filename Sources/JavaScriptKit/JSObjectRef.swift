@@ -1,11 +1,23 @@
 import _CJavaScriptKit
 
 @dynamicMemberLookup
-public class JSObjectRef: Equatable {
-    let id: UInt32
-    init(id: UInt32) {
+public class JSObjectRef {
+    
+    public typealias ID = UInt32
+    
+    // MARK: - Properties
+    
+    public let id: ID
+    
+    // MARK: - Initialization
+    
+    deinit { _destroy_ref(id) }
+
+    public init(id: ID) {
         self.id = id
     }
+    
+    // MARK: - Methods
 
     @_disfavoredOverload
     public subscript(dynamicMember name: String) -> ((JSValueConvertible...) -> JSValue)? {
@@ -43,16 +55,29 @@ public class JSObjectRef: Equatable {
         setJSValue(this: self, index: Int32(index), value: value)
     }
 
-    static let _JS_Predef_Value_Global: UInt32 = 0
-    public static let global = JSObjectRef(id: _JS_Predef_Value_Global)
-
-    deinit { _destroy_ref(id) }
-
-    public static func == (lhs: JSObjectRef, rhs: JSObjectRef) -> Bool {
-        return lhs.id == rhs.id
-    }
-
     public func jsValue() -> JSValue {
         .object(self)
     }
 }
+
+// MARK: - Constants
+
+public extension JSObjectRef {
+    
+    internal static let _JS_Predef_Value_Global: UInt32 = 0
+    
+    static let global = JSObjectRef(id: _JS_Predef_Value_Global)
+}
+
+// MARK: - Equatable
+
+extension JSObjectRef: Equatable {
+    
+    public static func == (lhs: JSObjectRef, rhs: JSObjectRef) -> Bool {
+        return lhs.id == rhs.id
+    }
+}
+
+// MARK: - Identifiable
+
+extension JSObjectRef: Identifiable { }
