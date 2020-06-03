@@ -22,7 +22,7 @@ public final class JSObject: JSType {
     
     public init() {
         self.jsObject = Self.classObject.new()
-        assert(Self.isObject(jsObject))
+        //assert(Self.isObject(jsObject))
     }
     
     public convenience init(_ elements: [(key: String, value: JSValue)]) {

@@ -33,7 +33,7 @@ public final class JSPromise<Success: JSType>: JSType {
             let resolutionFunc = arguments[0].function
             let rejectionFunc = arguments[1].function
             block({ resolutionFunc?($0.jsValue()) }, { rejectionFunc?(JSValue(error: $0)) })
-            return .undefined
+            return .null
         }
         self.jsObject = JSPromiseClassObject.new(executor)
     }
@@ -56,7 +56,7 @@ public final class JSPromise<Success: JSType>: JSType {
         }
     }
     
-    // MARK: - Properties
+    // MARK: - Accessors
     
     /// Promise State
     public var state: State {
@@ -72,18 +72,49 @@ public final class JSPromise<Success: JSType>: JSType {
     
     // MARK: - Methods
     
-    public func then(_ completion: (Success) -> ()) {
+    /**
+     The `then()` method returns a Promise. It takes up to two arguments: callback functions for the success and failure cases of the Promise.
+     
+     - Parameter onFulfilled: A Function called if the Promise is fulfilled. This function has one argument, the fulfillment value. If it is not a function, it is internally replaced with an "Identity" function (it returns the received argument).
+     
+     - Parameter onRejected: A Function called if the Promise is rejected. This function has one argument, the rejection reason. If it is not a function, it is internally replaced with a "Thrower" function (it throws an error it received as argument).
+     
+     - Returns: Once a Promise is fulfilled or rejected, the respective handler function (onFulfilled or onRejected) will be called asynchronously (scheduled in the current thread loop). The behaviour of the handler function follows a specific set of rules.
+     
+     - Note: If a handler function:
+     - returns a value, the promise returned by then gets resolved with the returned value as its value.
+     - doesn't return anything, the promise returned by then gets resolved with an undefined value.
+     - throws an error, the promise returned by then gets rejected with the thrown error as its value.
+     - returns an already fulfilled promise, the promise returned by then gets fulfilled with that promise's value as its value.
+     - returns an already rejected promise, the promise returned by then gets rejected with that promise's value as its value.
+     - returns another pending promise object, the resolution/rejection of the promise returned by then will be subsequent to the resolution/rejection of  the promise returned by the handler. Also, the resolved value of the promise returned by then will be the same as the resolved value of the promise returned by the handler.
+     */
+    public func then/*<T: JSType>*/(onFulfilled: @escaping (Success) -> () /* onRejected: ((Error) -> ())? */) /* -> JSPromise<T> */ {
         
+        let success = JSFunctionRef.from { (arguments) in
+            if let value = arguments.first.flatMap({ Success.construct(from: $0) }) {
+                onFulfilled(value)
+            }
+            return .null
+        }
+        /*
+        let errorFunction = onRejected.flatMap { (onRejected) in
+            JSFunctionRef.from { (arguments) in
+                // TODO: Initialize error
+                return .undefined
+            }
+        }*/
+        let result = jsObject.then.function?(success, JSValue.null) //, errorFunction)
     }
     
     public func `catch`(_ completion: (Error) -> ()) {
         
-        
+        jsObject.catch.function?()
     }
     
     public func finally() {
         
-        
+        jsObject.finally.function?()
     }
 }
 

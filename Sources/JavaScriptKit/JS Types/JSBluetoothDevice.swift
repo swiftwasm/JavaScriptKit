@@ -18,5 +18,15 @@ public final class JSBluetoothDevice: JSType {
         self.jsObject = jsObject
     }
     
+    // MARK: - Accessors
+    
+    public lazy var id: String = self.jsObject.get("id").string!
+    
+    public lazy var name: String = self.jsObject.name.string!
+    
     
 }
+
+// MARK: - Identifiable
+
+extension JSBluetoothDevice: Identifiable { }

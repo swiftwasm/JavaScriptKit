@@ -57,6 +57,18 @@ extension JSObjectRef: JSValueConvertible {
     // from `JSFunctionRef`
 }
 
+extension Optional: JSValueConvertible where Wrapped: JSValueConvertible {
+    
+    public func jsValue() -> JSValue {
+        switch self {
+        case .none:
+            return .null
+        case let .some(value):
+            return value.jsValue()
+        }
+    }
+}
+
 extension Dictionary where Value: JSValueConvertible, Key == String {
     public func jsValue() -> JSValue {
         Swift.Dictionary<Key, JSValueConvertible>.jsValue(self)()
@@ -108,8 +120,6 @@ extension RawJSValue: JSValueConvertible {
             return .undefined
         case .function:
             return .function(JSFunctionRef(id: UInt32(payload1)))
-        @unknown default:
-            fatalError("Unreachable")
         }
     }
 }

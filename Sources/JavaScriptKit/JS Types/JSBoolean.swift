@@ -18,7 +18,7 @@ public final class JSBoolean: JSType {
         self.jsObject = jsObject
     }
     
-    public init(value: Bool) {
+    public init(_ value: Bool) {
         self.jsObject = Self.classObject.new(value.jsValue())
     }
 }
@@ -27,3 +27,4 @@ internal extension JSBoolean {
     
     static let classObject = JSObjectRef.global.Boolean.function!
 }
+
