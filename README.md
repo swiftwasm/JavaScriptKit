@@ -65,7 +65,7 @@ struct Pet: Codable {
 }
 
 let jsPet = JSObjectRef.global.pet
-let swiftPet: Pet = JSValueDecoder().decode(from: jsPet)
+let swiftPet: Pet = try JSValueDecoder().decode(from: jsPet)
 
 alert("Swift is running on browser!")
 ```
