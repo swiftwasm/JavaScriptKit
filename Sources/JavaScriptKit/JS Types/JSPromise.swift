@@ -18,4 +18,12 @@ public final class JSPromise: JSType {
         // validate if promise type
     }
     
+    public init() {
+        self.jsObject = Self.classObject.new()
+    }
+}
+
+internal extension JSPromise {
+    
+    static let classObject = JSObjectRef.global.Promise.function!
 }

@@ -24,7 +24,7 @@ public final class JSArray: JSType {
     }
     
     public convenience init<C>(_ collection: C) where C: Collection, C.Element == JSValueConvertible {
-        self.init(collection.lazy.map({ $0.jsValue() }))
+        self.init(collection.map({ $0.jsValue() }))
     }
 }
 

@@ -27,7 +27,9 @@ public final class JSBluetooth: JSType {
         guard let function = jsObject.requestDevice.function
             else { assertionFailure("Nil \(#function)"); return }
         
-        let result = function()
+        let promise = JSPromise()
+        
+        let result = function(promise)
         
         
     }
