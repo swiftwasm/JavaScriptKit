@@ -51,15 +51,6 @@ extension JSArray: ExpressibleByArrayLiteral {
     }
 }
 
-// MARK: - CustomStringConvertible
-
-extension JSArray: CustomStringConvertible {
-    
-    public var description: String {
-        return toString() ?? ""
-    }
-}
-
 // MARK: - Sequence
 
 extension JSArray: Sequence {

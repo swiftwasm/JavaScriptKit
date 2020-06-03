@@ -56,12 +56,3 @@ extension JSObject: ExpressibleByDictionaryLiteral {
         self.init(elements)
     }
 }
-
-// MARK: - CustomStringConvertible
-
-extension JSObject: CustomStringConvertible {
-    
-    public var description: String {
-        return toString() ?? ""
-    }
-}

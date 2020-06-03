@@ -6,23 +6,31 @@
 //
 
 /// JavaScript Type (Class)
-public protocol JSType: JSValueConvertible {
+public protocol JSType: JSValueConvertible, JSValueConstructible, CustomStringConvertible {
     
     init?(_ jsObject: JSObjectRef)
     
     var jsObject: JSObjectRef { get }
 }
 
-public extension JSType {
+internal extension JSType {
     
     func toString() -> String? {
         return jsObject.toString.function?().string
     }
 }
 
-// MARK: - JSValueConvertible
-
 public extension JSType {
     
-    func jsValue() -> JSValue { return .object(jsObject) }
+    static func construct(from value: JSValue) -> Self? {
+        return value.object.flatMap { Self.init($0) }
+    }
+    
+    func jsValue() -> JSValue {
+        return .object(jsObject)
+    }
+    
+    var description: String {
+        return toString() ?? ""
+    }
 }
