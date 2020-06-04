@@ -36,7 +36,7 @@ extension JSBoolean: CustomStringConvertible { }
 
 extension JSBoolean: ExpressibleByBooleanLiteral {
     
-    public init(booleanLiteral value: Bool) {
+    public convenience init(booleanLiteral value: Bool) {
         self.init(value)
     }
 }

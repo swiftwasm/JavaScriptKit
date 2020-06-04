@@ -17,7 +17,7 @@ public class JSError: JSType, Error {
     
     // MARK: - Initialization
 
-    public init(_ jsObject: JSObjectRef) {
+    public required init?(_ jsObject: JSObjectRef) {
         self.jsObject = jsObject
     }
     
