@@ -14,7 +14,7 @@ public final class JSBluetoothDevice: JSType {
     
     // MARK: - Initialization
 
-    public init(_ jsObject: JSObjectRef) {
+    public init?(_ jsObject: JSObjectRef) {
         self.jsObject = jsObject
     }
     
@@ -24,7 +24,9 @@ public final class JSBluetoothDevice: JSType {
     public lazy var id: String = self.jsObject.get("id").string!
     
     /// A string that provices a human-readable name for the device.
-    public lazy var name: String? = self.jsObject.name.string
+    public var name: String? {
+        return self.jsObject.name.string
+    }
     
     /// Interface of the Web Bluetooth API represents a GATT Server on a remote device.
     public lazy var gatt = self.jsObject.gatt.object.flatMap({ JSBluetoothRemoteGATTServer($0) })!

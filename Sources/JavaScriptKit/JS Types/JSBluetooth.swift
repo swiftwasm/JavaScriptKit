@@ -16,7 +16,7 @@ public final class JSBluetooth: JSType {
     
     // MARK: - Initialization
 
-    public init(_ jsObject: JSObjectRef) {
+    public init?(_ jsObject: JSObjectRef) {
         self.jsObject = jsObject
     }
     
@@ -42,7 +42,7 @@ public final class JSBluetooth: JSType {
         // .then(function(bluetoothDevice) { ... })
         
         guard let function = jsObject.requestDevice.function
-            else { fatalError("Invalid function \(jsObject.requestDevice)") }
+            else { fatalError("Invalid function \(#function)") }
         
         // FIXME: Improve, support all options
         let options = JSObject()
@@ -55,4 +55,9 @@ public final class JSBluetooth: JSType {
         
         return promise
     }
+}
+
+internal extension JSBluetooth {
+    
+    static let classObject = JSObjectRef.global.Bluetooth.function!
 }

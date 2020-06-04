@@ -53,6 +53,13 @@ public final class JSConsole: JSType {
     public static func assert(_ condition: @autoclosure () -> (Bool), _ arguments: JSValueConvertible...) {
         assertFunction.dynamicallyCall(withArguments: [condition()] + arguments.map(print))
     }
+    
+    /**
+     The `console.assert()` method writes an error message to the console if the assertion is false. If the assertion is true, nothing happens.
+     */
+    public static func assert(_ condition: @autoclosure () -> (JSBoolean), _ arguments: JSValueConvertible...) {
+        assert(condition().rawValue, arguments)
+    }
 }
 
 internal extension JSConsole {

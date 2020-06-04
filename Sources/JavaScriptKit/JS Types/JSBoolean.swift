@@ -23,6 +23,23 @@ public final class JSBoolean: JSType {
     }
 }
 
+// MARK: - RawRepresentable
+
+extension JSBoolean: RawRepresentable {
+        
+    public convenience init(rawValue: Bool) {
+        self.init(rawValue)
+    }
+    
+    public var rawValue: Bool {
+        guard let function = jsObject.valueOf.function
+            else { fatalError("Invalid function \(#function)") }
+        return function.apply(this: jsObject).boolean ?? false
+    }
+}
+
+// MARK: - Constants
+
 internal extension JSBoolean {
     
     static let classObject = JSObjectRef.global.Boolean.function!
