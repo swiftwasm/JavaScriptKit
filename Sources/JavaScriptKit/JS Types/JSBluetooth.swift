@@ -22,6 +22,17 @@ public final class JSBluetooth: JSType {
     
     public static var shared: JSBluetooth? { return JSNavigator.shared?.bluetooth }
     
+    // MARK: - Accessors
+    
+    public var isAvailable: JSPromise<Bool> {
+        guard let function = jsObject.getAvailability.function
+            else { fatalError("Invalid function \(#function)") }
+        let result = function.apply(this: jsObject)
+        guard let promise = result.object.flatMap({ JSPromise<Bool>($0) })
+            else { fatalError("Invalid object \(result)") }
+        return promise
+    }
+    
     // MARK: - Methods
     
     /// Returns a Promise to a BluetoothDevice object with the specified options.
@@ -46,7 +57,8 @@ public final class JSBluetooth: JSType {
         
         // FIXME: Improve, support all options
         let options = JSObject()
-        options[Option.acceptAllDevices.rawValue] = JSBoolean(acceptAllDevices).jsValue()
+        options[Option.acceptAllDevices.rawValue] = acceptAllDevices.jsValue()
+        options[Option.optionalServices.rawValue] = ["device_information"].jsValue()
         
         let result = function.apply(this: jsObject, arguments: options)
         
@@ -55,9 +67,4 @@ public final class JSBluetooth: JSType {
         
         return promise
     }
-}
-
-internal extension JSBluetooth {
-    
-    static let classObject = JSObjectRef.global.Bluetooth.function!
 }
