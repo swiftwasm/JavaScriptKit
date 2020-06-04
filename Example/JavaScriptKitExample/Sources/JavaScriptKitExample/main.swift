@@ -12,13 +12,14 @@ _ = body.appendChild!(divElement)
 let buttonElement = document.createElement!("button").object!
 buttonElement.innerText = "Click me!"
 buttonElement.onclick = .function { _ in
-    JSObjectRef.global.console.object?.log.function?("\(#file) \(#function) \(#line)")
+    JSConsole.debug("\(#file) \(#function) \(#line)")
     alert("Swift is running on browser!")
+    JSConsole.log("Requesting device")
     bluetooth.requestDevice().then {
-        JSObjectRef.global.console.object?.log.function?("\($0)")
+        JSConsole.info("\($0)")
         alert("Got device \($0)")
     }
-    JSObjectRef.global.console.object?.log.function?("\(#file) \(#function) \(#line)")
+    JSConsole.debug("\(#file) \(#function) \(#line)")
     return .undefined
 }
 
