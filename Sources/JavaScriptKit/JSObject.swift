@@ -2,7 +2,7 @@ import _CJavaScriptKit
 
 @dynamicMemberLookup
 public class JSObjectRef: Equatable {
-    let id: UInt32
+    internal var id: UInt32
     init(id: UInt32) {
         self.id = id
     }

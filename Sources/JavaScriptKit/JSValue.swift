@@ -49,7 +49,7 @@ public enum JSValue: Equatable {
 
 extension JSValue {
     public static func function(_ body: @escaping ([JSValue]) -> JSValue) -> JSValue {
-        .function(JSFunctionRef.from(body))
+        .function(JSClosure(body))
     }
 }
 
