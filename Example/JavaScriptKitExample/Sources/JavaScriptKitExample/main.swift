@@ -16,16 +16,18 @@ buttonElement.onclick = .function { _ in
     JSConsole.debug("\(#file) \(#function) \(#line)")
     alert("Swift is running on browser!")
     JSConsole.log("Requesting any Bluetooth Device...")
-    bluetooth.requestDevice().then {
-        JSConsole.info($0)
-        JSConsole.debug("\(#file) \(#function) \(#line)")
-        alert("Got device \($0)")
+    bluetooth.requestDevice().then { (device: JSBluetoothDevice) -> (JSPromise<JSBluetoothRemoteGATTServer>) in
+        JSConsole.info(device)
+        JSConsole.debug("\(#file) \(#function) \(#line) \(device)")
+        alert("Got device \(device)")
         JSConsole.log("Connecting to GATT Server...")
-        $0.gatt.connect()
-    }.then {
-        JSConsole.info($0)
-        JSConsole.debug("\(#file) \(#function) \(#line)")
+        return device.gatt.connect()
+    }.then { (server: JSBluetoothRemoteGATTServer) -> () in
+        JSConsole.info(server)
+        JSConsole.debug("\(#file) \(#function) \(#line) \(server)")
         alert("Connected")
+    }.catch { (error: JSError) in
+        alert("Error: \(error)")
     }
     JSConsole.debug("\(#file) \(#function) \(#line)")
     return .undefined
