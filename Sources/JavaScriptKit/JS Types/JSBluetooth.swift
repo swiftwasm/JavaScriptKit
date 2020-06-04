@@ -5,7 +5,9 @@
 //  Created by Alsey Coleman Miller on 6/3/20.
 //
 
-/// JavaScript Bluetooth object
+/// JavaScript Bluetooth interface
+/// 
+/// - SeeAlso: [Web Bluetooth API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API)
 public final class JSBluetooth: JSType {
     
     // MARK: - Properties
