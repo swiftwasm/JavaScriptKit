@@ -37,6 +37,6 @@ public final class JSBluetoothRemoteGATTServer: JSType {
     }
     
     public func disconnect() {
-        jsObject.disconnect.function?.apply(this: jsObject)
+        let _ = jsObject.disconnect.function?.apply(this: jsObject)
     }
 }
