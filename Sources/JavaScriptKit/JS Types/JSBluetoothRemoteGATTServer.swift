@@ -15,7 +15,7 @@ public final class JSBluetoothRemoteGATTServer: JSType {
     
     // MARK: - Initialization
 
-    public init(_ jsObject: JSObjectRef) {
+    public init?(_ jsObject: JSObjectRef) {
         self.jsObject = jsObject
     }
     
@@ -27,6 +27,7 @@ public final class JSBluetoothRemoteGATTServer: JSType {
     
     // MARK: - Methods
     
+    /// Causes the script execution environment to connect to this device.
     public func connect() -> JSPromise<JSBluetoothRemoteGATTServer> {
         guard let function = jsObject.connect.function
             else { fatalError("Missing function \(#function)") }
@@ -36,7 +37,22 @@ public final class JSBluetoothRemoteGATTServer: JSType {
         return promise
     }
     
+    /// Causes the script execution environment to disconnect from this device.
     public func disconnect() {
-        let _ = jsObject.disconnect.function?.apply(this: jsObject)
+        guard let function = jsObject.disconnect.function
+            else { fatalError("Missing function \(#function)") }
+        function.apply(this: jsObject)
+    }
+    
+    /// Returns a promise to the primary BluetoothGATTService offered by the bluetooth device for a specified BluetoothServiceUUID.
+    ///
+    /// - Parameter uuid: A Bluetooth service universally unique identifier for a specified device.
+    public func getPrimaryService(_ uuid: String) -> JSPromise<JSBluetoothRemoteGATTService> {
+        guard let function = jsObject.getPrimaryService.function
+            else { fatalError("Missing function \(#function)") }
+        let result = function.apply(this: jsObject, arguments: uuid)
+        guard let value = result.object.flatMap({ JSPromise<JSBluetoothRemoteGATTService>($0) })
+            else { fatalError("Invalid object \(result)") }
+        return value
     }
 }
