@@ -94,13 +94,13 @@ public final class JSPromise<Success: JSType>: JSType {
                         onRejected: @escaping (JSError) -> () = defaultRejected) -> JSValue {
         
         guard let function = jsObject.then.function
-            else { fatalError("Invalid function \(jsObject.requestDevice)") }
+            else { fatalError("Invalid function \(#function)") }
         
         let success = JSFunctionRef.from { (arguments) in
             if let value = arguments.first.flatMap({ Success.construct(from: $0) }) {
                 return onFulfilled(value)
             } else {
-                JSConsole.error("Unable to load success type \(String(reflecting: Success.self)) from ", arguments.first)
+                JSConsole.error("Unable to load success type \(String(reflecting: Success.self)) from ", arguments.first ?? "nil")
                 return .undefined
             }
         }
@@ -109,7 +109,7 @@ public final class JSPromise<Success: JSType>: JSType {
             if let value = arguments.first.flatMap({ JSError.construct(from: $0) }) {
                 onRejected(value)
             } else {
-                JSConsole.error("Unable to load error from ", arguments.first)
+                JSConsole.error("Unable to load error from ", arguments.first ?? "nil")
             }
             return .undefined
         }
@@ -227,12 +227,24 @@ public final class JSPromise<Success: JSType>: JSType {
         return promise
     }
     
-    public func `catch`(_ completion: (JSError) -> ()) {
-        jsObject.catch.function?()
+    public func `catch`(_ completion: @escaping (JSError) -> ()) {
+        guard let function = jsObject.catch.function
+            else { fatalError("Invalid function \(#function)") }
+        let errorFunction = JSFunctionRef.from { (arguments) in
+            if let value = arguments.first.flatMap({ JSError.construct(from: $0) }) {
+                completion(value)
+            } else {
+                JSConsole.error("Unable to load error from ", arguments.first ?? "nil")
+            }
+            return .undefined
+        }
+        function.apply(this: jsObject, arguments: errorFunction)
     }
     
     public func finally() {
-        jsObject.finally.function?()
+        guard let function = jsObject.finally.function
+            else { fatalError("Invalid function \(#function)") }
+        function.apply(this: jsObject)
     }
 }
 
