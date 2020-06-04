@@ -1,3 +1,22 @@
+/// JavaScript Decoder
+public struct JSDecoder {
+    
+    // MARK: - Properties
+    
+    public var userInfo: [CodingUserInfoKey: Any] = [:]
+    
+    // MARK: - Initialization
+    
+    public init() { }
+    
+    // MARK: - Methods
+    
+    public func decode<T>(_ type: T.Type = T.self, from value: JSValue) throws -> T where T: Decodable {
+        let decoder = _Decoder(referencing: value, userInfo: userInfo)
+        return try T(from: decoder)
+    }
+}
+
 private struct _Decoder: Decoder {
     
     fileprivate let node: JSValue
@@ -230,19 +249,5 @@ extension _Decoder: SingleValueDecodingContainer {
             return constructibleType.construct(from: node) as? T
         }
         return try primitive(node) ?? type.init(from: self)
-    }
-}
-
-public class JSValueDecoder {
-    
-    public init() {}
-    
-    public func decode<T>(
-        _ type: T.Type = T.self,
-        from value: JSValue,
-        userInfo: [CodingUserInfoKey: Any] = [:]
-    ) throws -> T where T: Decodable {
-        let decoder = _Decoder(referencing: value, userInfo: userInfo)
-        return try T(from: decoder)
     }
 }
