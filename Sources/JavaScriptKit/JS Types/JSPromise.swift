@@ -91,7 +91,7 @@ public final class JSPromise<Success: JSType>: JSType {
      */
     @discardableResult
     internal func _then(onFulfilled: @escaping (Success) -> (JSValue),
-                        onRejected: @escaping (JSError) -> () = defaultRejected) -> JSValue {
+                        onRejected: @escaping (JSError) -> ()) -> JSValue {
         
         guard let function = jsObject.then.function
             else { fatalError("Invalid function \(#function)") }
@@ -117,6 +117,24 @@ public final class JSPromise<Success: JSType>: JSType {
         return function.apply(this: jsObject, argumentList: [success.jsValue(), errorFunction.jsValue()])
     }
     
+    @discardableResult
+    internal func _then(onFulfilled: @escaping (Success) -> (JSValue)) -> JSValue {
+        
+        guard let function = jsObject.then.function
+            else { fatalError("Invalid function \(#function)") }
+        
+        let success = JSFunctionRef.from { (arguments) in
+            if let value = arguments.first.flatMap({ Success.construct(from: $0) }) {
+                return onFulfilled(value)
+            } else {
+                JSConsole.error("Unable to load success type \(String(reflecting: Success.self)) from ", arguments.first ?? "nil")
+                return .undefined
+            }
+        }
+        
+        return function.apply(this: jsObject, argumentList: [success.jsValue()])
+    }
+    
     /**
     The `then()` method returns a Promise. It takes up to two arguments: callback functions for the success and failure cases of the Promise.
     
@@ -138,7 +156,7 @@ public final class JSPromise<Success: JSType>: JSType {
                      onRejected: @escaping (JSError) -> ()) -> JSPromise<Success> {
         let result = _then(onFulfilled: {
             onFulfilled($0)
-            return .undefined
+            return .null
         }, onRejected: onRejected)
         guard let promise = result.object.flatMap({ JSPromise<Success>($0) })
             else { fatalError("Invalid object \(result)") }
@@ -193,7 +211,7 @@ public final class JSPromise<Success: JSType>: JSType {
     public func then(onFulfilled: @escaping (Success) -> ()) -> JSPromise<Success> {
         let result = _then(onFulfilled: {
             onFulfilled($0)
-            return .undefined
+            return .null
         })
         guard let promise = result.object.flatMap({ JSPromise<Success>($0) })
             else { fatalError("Invalid object \(result)") }
@@ -249,8 +267,6 @@ public final class JSPromise<Success: JSType>: JSType {
 }
 
 private let JSPromiseClassObject = JSObjectRef.global.Promise.function!
-
-internal let defaultRejected: (JSError) -> () = { JSConsole.error("Uncaught promise error ", $0) }
 
 // MARK: - Supporting Types
 
