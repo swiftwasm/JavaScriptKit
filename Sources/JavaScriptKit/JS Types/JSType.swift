@@ -16,7 +16,7 @@ public protocol JSType: JSValueConvertible, JSValueConstructible {
 internal extension JSType {
     
     func toString() -> String? {
-        return jsObject.toString.function?().string
+        return jsObject.toString.function?.apply(this: jsObject).string
     }
 }
 
