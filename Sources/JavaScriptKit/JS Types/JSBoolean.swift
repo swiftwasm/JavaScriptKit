@@ -28,3 +28,15 @@ internal extension JSBoolean {
     static let classObject = JSObjectRef.global.Boolean.function!
 }
 
+// MARK: - CustomStringConvertible
+
+extension JSBoolean: CustomStringConvertible { }
+
+// MARK: - ExpressibleByBooleanLiteral
+
+extension JSBoolean: ExpressibleByBooleanLiteral {
+    
+    public init(booleanLiteral value: Bool) {
+        self.init(value)
+    }
+}

@@ -42,6 +42,10 @@ internal extension JSArray {
 @available(*, renamed: "JSArray")
 public typealias JSArrayRef = JSArray
 
+// MARK: - CustomStringConvertible
+
+extension JSArray: CustomStringConvertible { }
+
 // MARK: - ExpressibleByArrayLiteral
 
 extension JSArray: ExpressibleByArrayLiteral {

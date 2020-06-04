@@ -6,7 +6,7 @@
 //
 
 /// JavaScript Type (Class)
-public protocol JSType: JSValueConvertible, JSValueConstructible, CustomStringConvertible {
+public protocol JSType: JSValueConvertible, JSValueConstructible {
     
     init?(_ jsObject: JSObjectRef)
     
@@ -29,6 +29,9 @@ public extension JSType {
     func jsValue() -> JSValue {
         return .object(jsObject)
     }
+}
+
+public extension JSType where Self: CustomStringConvertible {
     
     var description: String {
         return toString() ?? ""

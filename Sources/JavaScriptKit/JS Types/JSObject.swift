@@ -48,6 +48,10 @@ public extension JSObject {
     }
 }
 
+// MARK: - CustomStringConvertible
+
+extension JSObject: CustomStringConvertible { }
+
 // MARK: - ExpressibleByDictionaryLiteral
 
 extension JSObject: ExpressibleByDictionaryLiteral {
