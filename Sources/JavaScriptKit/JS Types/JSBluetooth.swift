@@ -30,8 +30,6 @@ public final class JSBluetooth: JSType {
                               //services: [] = [],
                               acceptAllDevices: Bool = true) -> JSPromise<JSBluetoothDevice> {
         
-        JSObjectRef.global.console.object?.log.function?("\(#file) \(String(reflecting: type(of: self))) \(#function) \(#line)")
-        
         enum Option: String {
             case filters
             case optionalServices
@@ -47,14 +45,12 @@ public final class JSBluetooth: JSType {
         // FIXME: Improve, support all options
         let options = JSObject()
         options[Option.acceptAllDevices.rawValue] = JSBoolean(acceptAllDevices).jsValue()
-        options[Option.optionalServices.rawValue] = ["device_information"].jsValue()
         
-        let result = function(options.jsValue())
-        JSObjectRef.global.console.object?.log.function?("\(#file) \(String(reflecting: type(of: self))) \(#function) \(#line)")
+        let result = function.apply(this: jsObject, arguments: options)
         
         guard let promise = result.object.flatMap({ JSPromise<JSBluetoothDevice>($0) })
             else { fatalError("Invalid object \(result)") }
-        JSObjectRef.global.console.object?.log.function?("\(#file) \(String(reflecting: type(of: self))) \(#function) \(#line)")
+        
         return promise
     }
 }

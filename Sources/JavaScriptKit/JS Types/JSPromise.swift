@@ -91,11 +91,14 @@ public final class JSPromise<Success: JSType>: JSType {
      */
     public func then/*<T: JSType>*/(onFulfilled: @escaping (Success) -> () /* onRejected: ((Error) -> ())? */) /* -> JSPromise<T> */ {
         
+        guard let function = jsObject.then.function
+            else { fatalError("Invalid function \(jsObject.requestDevice)") }
+        
         let success = JSFunctionRef.from { (arguments) in
             if let value = arguments.first.flatMap({ Success.construct(from: $0) }) {
                 onFulfilled(value)
             }
-            return .null
+            return .undefined
         }
         /*
         let errorFunction = onRejected.flatMap { (onRejected) in
@@ -104,7 +107,7 @@ public final class JSPromise<Success: JSType>: JSType {
                 return .undefined
             }
         }*/
-        let result = jsObject.then.function?(success, JSValue.null) //, errorFunction)
+        let result = function.apply(this: jsObject, argumentList: [success.jsValue()])
     }
     
     public func `catch`(_ completion: (Error) -> ()) {
