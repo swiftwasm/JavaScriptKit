@@ -22,9 +22,16 @@ public final class JSBluetoothDevice: JSType {
     
     public lazy var id: String = self.jsObject.get("id").string!
     
-    public lazy var name: String = self.jsObject.name.string!
+    public lazy var name: String? = self.jsObject.name.string
+}
+
+// MARK: - CustomStringConvertible
+
+extension JSBluetoothDevice: CustomStringConvertible {
     
-    
+    public var description: String {
+        return "JSBluetoothDevice(id: \(id), name: \(name ?? "nil"))"
+    }
 }
 
 // MARK: - Identifiable
