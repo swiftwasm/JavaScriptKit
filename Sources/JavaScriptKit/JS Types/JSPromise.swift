@@ -28,11 +28,11 @@ public final class JSPromise<Success>: JSType where Success: JSValueConvertible,
      
      - parameter executor: A function to be executed by the Promise.  The executor is custom code that ties an outcome to a promise. You, the programmer, write the executor.
      */
-    public init(executor block: @escaping ((Success) -> (), (Error) -> ()) -> ()) {
+    public init(executor block: @escaping ((Success) -> (), (JSError) -> ()) -> ()) {
         let executor = JSFunctionRef.from { (arguments) in
             let resolutionFunc = arguments[0].function
             let rejectionFunc = arguments[1].function
-            block({ resolutionFunc?($0.jsValue()) }, { rejectionFunc?(JSValue(error: $0)) })
+            block({ resolutionFunc?($0.jsValue()) }, { rejectionFunc?($0.jsValue()) })
             return .null
         }
         self.jsObject = JSPromiseClassObject.new(executor)
@@ -43,7 +43,7 @@ public final class JSPromise<Success>: JSType where Success: JSValueConvertible,
      
      - parameter executor: A function to be executed by the Promise.  The executor is custom code that ties an outcome to a promise. You, the programmer, write the executor.
      */
-    public convenience init(executor block: @escaping ((Result<Success, Swift.Error>) -> ()) -> ()) {
+    public convenience init(executor block: @escaping ((Result<Success, JSError>) -> ()) -> ()) {
         self.init { (resolution, rejection) in
             block({
                 switch $0 {
