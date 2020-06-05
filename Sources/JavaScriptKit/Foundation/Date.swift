@@ -108,7 +108,8 @@ public extension SwiftFoundation.Date {
 extension SwiftFoundation.Date: JSValueConvertible {
     
     public func jsValue() -> JSValue {
-        let date = JSDate()
+        let date = JSDate(self)
+        assert(date.rawValue == timeIntervalSince1970)
         return date.jsValue()
     }
 }
