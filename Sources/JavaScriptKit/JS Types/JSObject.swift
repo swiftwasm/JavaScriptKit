@@ -29,6 +29,17 @@ public final class JSObject: JSType {
         self.init()
         elements.forEach { self[$0.key] = $0.value }
     }
+    
+    // MARK: - Accessors
+    
+    public subscript (key: String) -> JSValue {
+        get { jsObject.get(key) }
+        set { jsObject.set(key, newValue) }
+    }
+    
+    public var keys: Set<String> {
+        return Set(jsObject.keys.function?.apply(this: jsObject).array.flatMap { $0.compactMap { $0.string } } ?? [])
+    }
 }
 
 internal extension JSObject {
@@ -37,14 +48,6 @@ internal extension JSObject {
 
     static func isObject(_ object: JSObjectRef) -> Bool {
         classObject.isObject.function?(object).boolean ?? false
-    }
-}
-
-public extension JSObject {
-    
-    subscript (key: String) -> JSValue {
-        get { jsObject.get(key) }
-        set { jsObject.set(key, newValue) }
     }
 }
 
