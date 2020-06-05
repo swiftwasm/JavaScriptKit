@@ -7,10 +7,16 @@ let package = Package(
     products: [
         .library(name: "JavaScriptKit", targets: ["JavaScriptKit"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/PureSwift/SwiftFoundation.git", .branch("feature/swift5"))
+    ],
     targets: [
         .target(
             name: "JavaScriptKit",
-            dependencies: ["_CJavaScriptKit"],
+            dependencies: [
+                "_CJavaScriptKit",
+                "SwiftFoundation"
+            ],
             linkerSettings: [
                 .unsafeFlags(
                     [

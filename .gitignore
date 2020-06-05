@@ -5,3 +5,6 @@ node_modules
 /Packages
 /*.xcodeproj
 xcuserdata/
+
+*.resolved
+.swiftpm
