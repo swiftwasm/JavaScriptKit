@@ -32,9 +32,8 @@ extension JSBoolean: RawRepresentable {
     }
     
     public var rawValue: Bool {
-        guard let function = jsObject.valueOf.function
-            else { fatalError("Invalid function \(#function)") }
-        return function.apply(this: jsObject).boolean ?? false
+        let function = jsObject.valueOf.function.assert("Invalid function \(#function)")
+        return function.apply(this: jsObject).boolean.assert()
     }
 }
 

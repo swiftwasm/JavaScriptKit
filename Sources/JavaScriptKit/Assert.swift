@@ -1,5 +1,5 @@
 //
-//  Utilities.swift
+//  Assert.swift
 //  
 //
 //  Created by Alsey Coleman Miller on 6/4/20.
@@ -23,4 +23,16 @@ internal func assert(_ condition: @autoclosure () -> Bool, _ message: @autoclosu
 /// Performs a traditional C-style assert with an optional message.
 internal func assert(_ condition: @autoclosure () -> JSBoolean, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
     assert(condition().rawValue, message(), file: file, line: line)
+}
+
+internal extension Optional {
+    
+    func assert(_ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) -> Wrapped {
+        switch self {
+        case .none:
+            fatalError(message(), file: file, line: line)
+        case let .some(value):
+            return value
+        }
+    }
 }
