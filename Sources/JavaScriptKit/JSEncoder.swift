@@ -5,11 +5,7 @@
 //  Created by Alsey Coleman Miller on 6/4/20.
 //
 
-#if arch(wasm32)
 import SwiftFoundation
-#else
-import Foundation
-#endif
 
 /// JavaScript Encoder
 public struct JSEncoder {
@@ -28,26 +24,21 @@ public struct JSEncoder {
     
     // MARK: - Methods
     
-    public func encode<T: Encodable>(_ encodable: T) throws -> JSValue {
+    public func encode<T: Encodable>(_ value: T) throws -> JSValue {
         
         log?("Will encode \(T.self)")
         
-        if let value = encodable as? JSValueConvertible {
-            return value.jsValue()
-        } else {
-            /*
-            let encoder = Encoder(
-                userInfo: userInfo,
-                log: log
-            )
-            try encodable.encode(to: encoder)
-            return encoder.object.jsValue()
-            */
-            fatalError()
-        }
+        let encoder = Encoder(
+            userInfo: userInfo,
+            log: log
+        )
+        
+        try value.encode(to: encoder)
+        assert(encoder.stack.containers.count == 1)
+        return encoder.stack.root.jsValue
     }
 }
-/*
+
 // MARK: - Encoder
 
 internal extension JSEncoder {
@@ -65,8 +56,7 @@ internal extension JSEncoder {
         /// Logger
         let log: ((String) -> ())?
         
-        /// Output
-        internal let object = JSObject()
+        private(set) var stack: Stack
         
         // MARK: - Initialization
         
@@ -74,6 +64,7 @@ internal extension JSEncoder {
                          userInfo: [CodingUserInfoKey : Any],
                          log: ((String) -> ())?) {
             
+            self.stack = Stack()
             self.codingPath = codingPath
             self.userInfo = userInfo
             self.log = log
@@ -84,23 +75,30 @@ internal extension JSEncoder {
         func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key : CodingKey {
             
             log?("Requested container keyed by \(type.sanitizedName) for path \"\(codingPath.path)\"")
-            let keyedContainer = JSKeyedEncodingContainer<Key>(referencing: self)
+            let object = JSObject()
+            self.stack.push(object)
+            let keyedContainer = JSKeyedEncodingContainer<Key>(referencing: self, wrapping: object.jsObject)
             return KeyedEncodingContainer(keyedContainer)
         }
         
         func unkeyedContainer() -> UnkeyedEncodingContainer {
             
             log?("Requested unkeyed container for path \"\(codingPath.path)\"")
-            return JSUnkeyedEncodingContainer(referencing: self)
+            let array = JSArray()
+            self.stack.push(array)
+            return JSUnkeyedEncodingContainer(referencing: self, wrapping: array.jsObject)
         }
         
         func singleValueContainer() -> SingleValueEncodingContainer {
             
             log?("Requested single value container for path \"\(codingPath.path)\"")
-            return JSSingleValueEncodingContainer(referencing: self)
+            let container = Container(.undefined)
+            return JSSingleValueEncodingContainer(referencing: self, wrapping: container)
         }
     }
 }
+
+// MARK: - Boxing Values
 
 internal extension JSEncoder.Encoder {
 
@@ -112,18 +110,18 @@ internal extension JSEncoder.Encoder {
     func boxEncodable <T: Encodable> (_ value: T) throws -> JSValue {
         
         if let data = value as? Data {
-            return data
-        } else if let uuid = value as? UUID {
-            return boxUUID(uuid)
+            return boxData(data)
         } else if let date = value as? Date {
             return boxDate(date)
+        } else if let uuid = value as? UUID {
+            return boxUUID(uuid)
         } else if let tlvEncodable = value as? JSValueConvertible {
             return tlvEncodable.jsValue()
         } else {
             // encode using Encodable, should push new container.
             try value.encode(to: self)
             let nestedContainer = stack.pop()
-            return nestedContainer.data
+            return nestedContainer.jsValue
         }
     }
 }
@@ -131,15 +129,18 @@ internal extension JSEncoder.Encoder {
 private extension JSEncoder.Encoder {
     
     func boxData(_ data: Data) -> JSValue {
-        return uuid.uuidString
+        // TODO: Support different Data formatting
+        //return JSArray(data).jsValue()
+        return data.base64EncodedString().jsValue()
     }
     
     func boxUUID(_ uuid: UUID) -> JSValue {
-        return uuid.uuidString
+        // TODO: Support different UUID formatting
+        return uuid.uuidString.jsValue()
     }
     
-    func boxDate(_ date: Date) -> Data {
-        
+    func boxDate(_ date: Date) -> JSValue {
+        /*
         switch options.dateFormatting {
         case .secondsSince1970:
             return boxDouble(date.timeIntervalSince1970)
@@ -148,14 +149,64 @@ private extension JSEncoder.Encoder {
         case .iso8601:
             guard #available(macOS 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *)
                 else { fatalError("ISO8601DateFormatter is unavailable on this platform.") }
-            return boxDate(date, using: TLVDateFormatting.iso8601Formatter)
+            return boxDate(date, using: JSDateFormatting.iso8601Formatter)
         case let .formatted(formatter):
             return boxDate(date, using: formatter)
-        }
+        }*/
+        return JSDate(date).jsValue()
     }
-    
+    /*
     func boxDate <T: DateFormatterProtocol> (_ date: Date, using formatter: T) -> Data {
         return box(formatter.string(from: date))
+    }*/
+}
+
+// MARK: - Stack
+
+internal extension JSEncoder.Encoder {
+    
+    struct Stack {
+                
+        private(set) var containers = [Container]()
+        
+        fileprivate init() { }
+        
+        var top: Container {
+            guard let container = containers.last
+                else { fatalError("Empty container stack.") }
+            return container
+        }
+        
+        var root: Container {
+            guard let container = containers.first
+                else { fatalError("Empty container stack.") }
+            return container
+        }
+        
+        mutating func push(_ container: Container) {
+            containers.append(container)
+        }
+        
+        mutating func push(_ value: JSValueConvertible) {
+            containers.append(.init(value.jsValue()))
+        }
+        
+        @discardableResult
+        mutating func pop() -> Container {
+            guard let container = containers.popLast()
+                else { fatalError("Empty container stack.") }
+            return container
+        }
+    }
+}
+
+internal extension JSEncoder.Encoder {
+    
+    final class Container {
+        fileprivate(set) var jsValue: JSValue
+        fileprivate init(_ jsValue: JSValue) {
+            self.jsValue = jsValue
+        }
     }
 }
 
@@ -173,18 +224,25 @@ internal struct JSKeyedEncodingContainer <K : CodingKey> : KeyedEncodingContaine
     /// The path of coding keys taken to get to this point in encoding.
     let codingPath: [CodingKey]
     
+    /// A reference to the container we're writing to.
+    let container: JSObjectRef
+    
     // MARK: - Initialization
     
-    init(referencing encoder: JSEncoder.Encoder) {
+    init(referencing encoder: JSEncoder.Encoder,
+        wrapping container: JSObjectRef) {
         
         self.encoder = encoder
         self.codingPath = encoder.codingPath
+        self.container = container
     }
     
     // MARK: - Methods
     
     func encodeNil(forKey key: K) throws {
-        // do nothing
+        self.encoder.codingPath.append(key)
+        defer { self.encoder.codingPath.removeLast() }
+        try setValue(.null, Any?.self, for: key)
     }
     
     func encode(_ value: Bool, forKey key: K) throws {
@@ -240,18 +298,15 @@ internal struct JSKeyedEncodingContainer <K : CodingKey> : KeyedEncodingContaine
     }
     
     func encode(_ value: String, forKey key: K) throws {
-        self.encoder.codingPath.append(key)
-        defer { self.encoder.codingPath.removeLast() }
-        let data = try encoder.boxString(value)
-        try setValue(value, data: data, for: key)
+        try encodeRaw(value, forKey: key)
     }
     
     func encode <T: Encodable> (_ value: T, forKey key: K) throws {
         
         self.encoder.codingPath.append(key)
         defer { self.encoder.codingPath.removeLast() }
-        encoder.log?("Will encode \(T.self) at path \"\(encoder.codingPath.path)\"")
-        try encoder.writeEncodable(value)
+        let encodedValue = try encoder.boxEncodable(value)
+        try setValue(encodedValue, T.self, for: key)
     }
     
     func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: K) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
@@ -276,12 +331,13 @@ internal struct JSKeyedEncodingContainer <K : CodingKey> : KeyedEncodingContaine
         
         self.encoder.codingPath.append(key)
         defer { self.encoder.codingPath.removeLast() }
-        try setValue(value, value.jsValue(), for: key)
+        let encodedValue = encoder.box(value)
+        try setValue(encodedValue, T.self, for: key)
     }
     
-    private func setValue <T> (_ value: T, _ encodedValue: JSValue, for key: Key) throws {
-        encoder.log?("Will encode \(T.self) at path \"\(encoder.codingPath.path)\"")
-        self.encoder.write(data)
+    private func setValue <T> (_ encodedValue: JSValue, _ type: T.Type, for key: Key) throws {
+        encoder.log?("Will encode \(type) at path \"\(encoder.codingPath.path)\"")
+        container.set(key.stringValue, encodedValue)
     }
 }
 
@@ -297,63 +353,66 @@ internal final class JSSingleValueEncodingContainer: SingleValueEncodingContaine
     /// The path of coding keys taken to get to this point in encoding.
     let codingPath: [CodingKey]
     
+    /// A reference to the container we're writing to.
+    let container: JSEncoder.Encoder.Container
+    
     /// Whether the data has been written
     private var didWrite = false
     
     // MARK: - Initialization
     
-    init(referencing encoder: JSEncoder.Encoder) {
+    init(referencing encoder: JSEncoder.Encoder,
+         wrapping container: JSEncoder.Encoder.Container) {
         
         self.encoder = encoder
         self.codingPath = encoder.codingPath
+        self.container = container
     }
     
     // MARK: - Methods
     
     func encodeNil() throws {
-        // do nothing
+        write(.null)
     }
     
     func encode(_ value: Bool) throws { write(encoder.box(value)) }
     
-    func encode(_ value: String) throws { try write(encoder.boxString(value)) }
+    func encode(_ value: String) throws { write(encoder.box(value)) }
     
-    func encode(_ value: Double) throws { write(encoder.boxDouble(value)) }
+    func encode(_ value: Double) throws { write(encoder.box(value)) }
     
-    func encode(_ value: Float) throws { write(encoder.boxFloat(value)) }
+    func encode(_ value: Float) throws { write(encoder.box(value)) }
     
-    func encode(_ value: Int) throws { write(encoder.boxNumeric(Int32(value))) }
+    func encode(_ value: Int) throws { write(encoder.box(value)) }
     
     func encode(_ value: Int8) throws { write(encoder.box(value)) }
     
-    func encode(_ value: Int16) throws { write(encoder.boxNumeric(value)) }
+    func encode(_ value: Int16) throws { write(encoder.box(value)) }
     
-    func encode(_ value: Int32) throws { write(encoder.boxNumeric(value)) }
+    func encode(_ value: Int32) throws { write(encoder.box(value)) }
     
-    func encode(_ value: Int64) throws { write(encoder.boxNumeric(value)) }
+    func encode(_ value: Int64) throws { write(encoder.box(value)) }
     
-    func encode(_ value: UInt) throws { write(encoder.boxNumeric(UInt32(value))) }
+    func encode(_ value: UInt) throws { write(encoder.box(value)) }
     
     func encode(_ value: UInt8) throws { write(encoder.box(value)) }
     
-    func encode(_ value: UInt16) throws { write(encoder.boxNumeric(value)) }
+    func encode(_ value: UInt16) throws { write(encoder.box(value)) }
     
-    func encode(_ value: UInt32) throws { write(encoder.boxNumeric(value)) }
+    func encode(_ value: UInt32) throws { write(encoder.box(value)) }
     
-    func encode(_ value: UInt64) throws { write(encoder.boxNumeric(value)) }
+    func encode(_ value: UInt64) throws { write(encoder.box(value)) }
     
     func encode <T: Encodable> (_ value: T) throws {
-        precondition(didWrite == false, "Data already written")
-        try encoder.writeEncodable(value)
-        self.didWrite = true
+        write(try encoder.boxEncodable(value))
     }
     
     // MARK: - Private Methods
     
-    private func write(_ data: Data) {
+    private func write(_ value: JSValue) {
         
         precondition(didWrite == false, "Data already written")
-        self.encoder.write(data)
+        self.container.jsValue = value
         self.didWrite = true
     }
 }
@@ -369,71 +428,59 @@ internal final class JSUnkeyedEncodingContainer: UnkeyedEncodingContainer {
     
     /// The path of coding keys taken to get to this point in encoding.
     let codingPath: [CodingKey]
-        
-    private var countOffset: Int?
-        
-    /// The number of elements encoded into the container.
-    private(set) var count: Int = 0
+    
+    /// A reference to the container we're writing to.
+    let container: JSObjectRef
     
     // MARK: - Initialization
     
-    deinit {
-        // update count byte
-        self.countOffset.flatMap { self.encoder.data[$0] = UInt8(self.count) }
-    }
-    
-    init(referencing encoder: JSEncoder.Encoder) {
+    init(referencing encoder: JSEncoder.Encoder,
+         wrapping container: JSObjectRef) {
+        
         self.encoder = encoder
         self.codingPath = encoder.codingPath
-        let formatting = encoder.formatting.array
-        switch formatting {
-        case .lengthPrefix:
-            // write count byte
-            self.countOffset = self.encoder.data.count
-            self.encoder.write(Data([0]))
-        case .remainder:
-            self.countOffset = nil
-        }
+        self.container = container
     }
     
     // MARK: - Methods
     
+    /// The number of elements encoded into the container.
+    private(set) var count: Int = 0
+    
     func encodeNil() throws {
-        throw EncodingError.invalidValue(Optional<Any>.self, EncodingError.Context(codingPath: self.codingPath, debugDescription: "Cannot encode nil in an array"))
+        append(.null)
     }
     
     func encode(_ value: Bool) throws { append(encoder.box(value)) }
     
-    func encode(_ value: String) throws { try append(encoder.boxString(value)) }
+    func encode(_ value: String) throws { append(encoder.box(value)) }
     
-    func encode(_ value: Double) throws { append(encoder.boxNumeric(value.bitPattern)) }
+    func encode(_ value: Double) throws { append(encoder.box(value)) }
     
-    func encode(_ value: Float) throws { append(encoder.boxNumeric(value.bitPattern)) }
+    func encode(_ value: Float) throws { append(encoder.box(value.bitPattern)) }
     
-    func encode(_ value: Int) throws { append(encoder.boxNumeric(Int32(value))) }
+    func encode(_ value: Int) throws { append(encoder.box(value)) }
     
     func encode(_ value: Int8) throws { append(encoder.box(value)) }
     
-    func encode(_ value: Int16) throws { append(encoder.boxNumeric(value)) }
+    func encode(_ value: Int16) throws { append(encoder.box(value)) }
     
-    func encode(_ value: Int32) throws { append(encoder.boxNumeric(value)) }
+    func encode(_ value: Int32) throws { append(encoder.box(value)) }
     
-    func encode(_ value: Int64) throws { append(encoder.boxNumeric(value)) }
+    func encode(_ value: Int64) throws { append(encoder.box(value)) }
     
-    func encode(_ value: UInt) throws { append(encoder.boxNumeric(UInt32(value))) }
+    func encode(_ value: UInt) throws { append(encoder.box(value)) }
     
     func encode(_ value: UInt8) throws { append(encoder.box(value)) }
     
-    func encode(_ value: UInt16) throws { append(encoder.boxNumeric(value)) }
+    func encode(_ value: UInt16) throws { append(encoder.box(value)) }
     
-    func encode(_ value: UInt32) throws { append(encoder.boxNumeric(value)) }
+    func encode(_ value: UInt32) throws { append(encoder.box(value)) }
     
-    func encode(_ value: UInt64) throws { append(encoder.boxNumeric(value)) }
+    func encode(_ value: UInt64) throws { append(encoder.box(value)) }
     
     func encode <T: Encodable> (_ value: T) throws {
-        assert(count < Int(UInt8.max), "Cannot encode more than \(UInt8.max) elements")
-        try encoder.writeEncodable(value)
-        count += 1
+        append(try encoder.boxEncodable(value))
     }
     
     func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
@@ -450,11 +497,11 @@ internal final class JSUnkeyedEncodingContainer: UnkeyedEncodingContainer {
     
     // MARK: - Private Methods
     
-    private func append(_ data: Data) {
-        assert(count < Int(UInt8.max), "Cannot encode more than \(UInt8.max) elements")
-        // write element data
-        encoder.write(data)
-        count += 1
+    private func append(_ value: JSValue) {
+        
+        // write
+        let index = self.count
+        defer { self.count += 1 }
+        self.container.set(index, value)
     }
 }
-*/

@@ -18,11 +18,6 @@ public final class JSArray: JSType {
         assert(Self.isArray(jsObject))
     }
     
-    public convenience init<C>(_ collection: C) where C: Collection, C.Element == JSValue {
-        self.init(count: collection.count)
-        collection.enumerated().forEach { self[$0.offset] = $0.element }
-    }
-    
     public convenience init<C>(_ collection: C) where C: Collection, C.Element == JSValueConvertible {
         self.init(collection.map({ $0.jsValue() }))
     }
@@ -33,7 +28,8 @@ internal extension JSArray {
     static let classObject = JSObjectRef.global.Array.function!
 
     static func isArray(_ object: JSObjectRef) -> Bool {
-        classObject.isArray.function?(object).boolean ?? false
+        let function = classObject.isArray.function.assert()
+        return function(object).boolean.assert()
     }
 }
 

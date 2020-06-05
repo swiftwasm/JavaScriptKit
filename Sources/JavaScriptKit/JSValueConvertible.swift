@@ -28,6 +28,10 @@ extension Int32: JSValueConvertible {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
+extension Int64: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
 extension UInt: JSValueConvertible {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
@@ -37,6 +41,14 @@ extension UInt8: JSValueConvertible {
 }
 
 extension UInt16: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension UInt32: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension UInt64: JSValueConvertible {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 

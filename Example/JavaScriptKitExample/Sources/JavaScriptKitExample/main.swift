@@ -16,6 +16,9 @@ JSConsole.log(date.description)
 if let bluetooth = JSBluetooth.shared {
     bluetooth.isAvailable.then {
         JSConsole.assert($0, "Bluetooth not available")
+    }.catch { (error: JSError) in
+        JSConsole.debug(#file, #function, #line)
+        JSConsole.error(error)
     }
     let buttonElement = document.createElement!("button").object!
     buttonElement.innerText = "Scan for Bluetooth devices"
