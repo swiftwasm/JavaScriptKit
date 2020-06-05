@@ -3,7 +3,11 @@ public struct JSDecoder {
     
     // MARK: - Properties
     
-    public var userInfo: [CodingUserInfoKey: Any] = [:]
+    /// Any contextual information set by the user for encoding.
+    public var userInfo = [CodingUserInfoKey : Any]()
+    
+    /// Logging handler
+    public var log: ((String) -> ())?
     
     // MARK: - Initialization
     

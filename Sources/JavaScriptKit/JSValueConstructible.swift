@@ -85,3 +85,10 @@ extension UInt64: JSValueConstructible {
         value.number.map(Self.init)
     }
 }
+
+extension Array: JSValueConstructible where Element: JSValueConstructible {
+    
+    public static func construct(from value: JSValue) -> Self? {
+        return value.array?.compactMap { Element.construct(from: $0) }
+    }
+}

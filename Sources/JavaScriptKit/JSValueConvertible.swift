@@ -83,13 +83,7 @@ extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key 
     }
 }
 
-extension Array where Element: JSValueConvertible {
-    public func jsValue() -> JSValue {
-        Swift.Array<JSValueConvertible>.jsValue(self)()
-    }
-}
-
-extension Array: JSValueConvertible where Element == JSValueConvertible {
+extension Array: JSValueConvertible where Element: JSValueConvertible {
     public func jsValue() -> JSValue {
         return .object(JSArray(self).jsObject)
     }
@@ -190,5 +184,17 @@ extension Array where Element == JSValueConvertible {
 extension Array where Element: JSValueConvertible {
     func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
         Swift.Array<JSValueConvertible>.withRawJSValues(self)(body)
+    }
+}
+
+extension JSValueConvertible where Self: Encodable {
+    
+    func jsValue() -> JSValue {
+        let encoder = JSEncoder()
+        do { return try encoder.encode(self) }
+        catch {
+            JSConsole.error(error)
+            return .undefined
+        }
     }
 }
