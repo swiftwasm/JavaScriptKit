@@ -5,6 +5,7 @@
 //  Created by Alsey Coleman Miller on 6/3/20.
 //
 
+/// JavaScript Console
 public final class JSConsole: JSType {
     
     // MARK: - Properties
@@ -13,7 +14,7 @@ public final class JSConsole: JSType {
     
     // MARK: - Initialization
 
-    public init(_ jsObject: JSObjectRef) {
+    public init?(_ jsObject: JSObjectRef) {
         self.jsObject = jsObject
     }
     

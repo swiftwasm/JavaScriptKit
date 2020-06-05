@@ -1,3 +1,4 @@
+import SwiftFoundation
 import JavaScriptKit
 
 let alert = JSObjectRef.global.alert.function!
@@ -7,6 +8,8 @@ let divElement = document.createElement!("div").object!
 divElement.innerText = "Swift Bluetooth Web App"
 let body = document.body.object!
 _ = body.appendChild!(divElement)
+
+JSConsole.log("Date:", Date())
 
 if let bluetooth = JSBluetooth.shared {
     bluetooth.isAvailable.then {

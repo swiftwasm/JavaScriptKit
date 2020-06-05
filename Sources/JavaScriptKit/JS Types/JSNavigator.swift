@@ -14,7 +14,7 @@ public final class JSNavigator: JSType {
     
     // MARK: - Initialization
 
-    public init(_ jsObject: JSObjectRef) {
+    public init?(_ jsObject: JSObjectRef) {
         self.jsObject = jsObject
         // TODO: validate JS class
     }
