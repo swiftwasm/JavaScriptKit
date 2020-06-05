@@ -8,7 +8,7 @@ jobs:
         os: [macOS-10.15]
         include:
           - os: macOS-10.15
-            toolchain: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-05-10-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-05-10-a-osx.tar.gz
+            toolchain: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-06-03-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-06-03-a-osx.tar.gz
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout

@@ -13,7 +13,7 @@ The toolchains can be installed via [`swiftenv`](https://github.com/kylef/swifte
 e.g.
 ```sh
 
-$ swiftenv install https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-05-10-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-05-10-a-osx.tar.gz
+$ swiftenv install https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-06-03-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-06-03-a-osx.tar.gz
 $ swift --version
 Swift version 5.3-dev (LLVM 47c28180d7, Swift 5f96d487e0)
 Target: x86_64-apple-darwin19.3.0
@@ -65,7 +65,7 @@ struct Pet: Codable {
 }
 
 let jsPet = JSObjectRef.global.pet
-let swiftPet: Pet = JSValueDecoder().decode(from: jsPet)
+let swiftPet: Pet = try JSValueDecoder().decode(from: jsPet)
 
 alert("Swift is running on browser!")
 ```

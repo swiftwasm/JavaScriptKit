@@ -7,7 +7,7 @@ public class JSObjectRef {
     
     // MARK: - Properties
     
-    public let id: ID
+    public internal(set) var id: ID
     
     // MARK: - Initialization
     

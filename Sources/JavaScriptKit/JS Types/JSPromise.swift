@@ -29,7 +29,7 @@ public final class JSPromise<Success>: JSType where Success: JSValueConvertible,
      - parameter executor: A function to be executed by the Promise.  The executor is custom code that ties an outcome to a promise. You, the programmer, write the executor.
      */
     public init(executor block: @escaping ((Success) -> (), (JSError) -> ()) -> ()) {
-        let executor = JSFunctionRef.from { (arguments) in
+        let executor = JSClosure { (arguments) in
             let resolutionFunc = arguments[0].function
             let rejectionFunc = arguments[1].function
             block({ resolutionFunc?($0.jsValue()) }, { rejectionFunc?($0.jsValue()) })
@@ -96,7 +96,7 @@ public final class JSPromise<Success>: JSType where Success: JSValueConvertible,
         guard let function = jsObject.then.function
             else { fatalError("Invalid function \(#function)") }
         
-        let success = JSFunctionRef.from { (arguments) in
+        let success = JSClosure { (arguments) in
             if let value = arguments.first.flatMap({ Success.construct(from: $0) }) {
                 return onFulfilled(value)
             } else {
@@ -105,7 +105,7 @@ public final class JSPromise<Success>: JSType where Success: JSValueConvertible,
             }
         }
         
-        let errorFunction = JSFunctionRef.from { (arguments) in
+        let errorFunction = JSClosure { (arguments) in
             if let value = arguments.first.flatMap({ JSError.construct(from: $0) }) {
                 onRejected(value)
             } else {
@@ -123,7 +123,7 @@ public final class JSPromise<Success>: JSType where Success: JSValueConvertible,
         guard let function = jsObject.then.function
             else { fatalError("Invalid function \(#function)") }
         
-        let success = JSFunctionRef.from { (arguments) in
+        let success = JSClosure { (arguments) in
             if let value = arguments.first.flatMap({ Success.construct(from: $0) }) {
                 return onFulfilled(value)
             } else {
@@ -248,7 +248,7 @@ public final class JSPromise<Success>: JSType where Success: JSValueConvertible,
     public func `catch`(_ completion: @escaping (JSError) -> ()) {
         guard let function = jsObject.catch.function
             else { fatalError("Invalid function \(#function)") }
-        let errorFunction = JSFunctionRef.from { (arguments) in
+        let errorFunction = JSClosure { (arguments) in
             if let value = arguments.first.flatMap({ JSError.construct(from: $0) }) {
                 completion(value)
             } else {

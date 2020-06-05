@@ -184,7 +184,7 @@ Host_Function_Registration: do {
     let prop_6Ref = try expectObject(prop_6)
 
     var isHostFunc1Called = false
-    let hostFunc1 = JSFunctionRef.from { (arguments) -> JSValue in
+    let hostFunc1 = JSClosure { (arguments) -> JSValue in
         isHostFunc1Called = true
         return .number(1)
     }
@@ -196,7 +196,9 @@ Host_Function_Registration: do {
     try expectEqual(call_host_1Func(), .number(1))
     try expectEqual(isHostFunc1Called, true)
 
-    let hostFunc2 = JSFunctionRef.from { (arguments) -> JSValue in
+    hostFunc1.release()
+
+    let hostFunc2 = JSClosure { (arguments) -> JSValue in
         do {
             let input = try expectNumber(arguments[0])
             return .number(input * 2)
@@ -207,7 +209,7 @@ Host_Function_Registration: do {
 
     try expectEqual(hostFunc2(3), .number(6))
     _ = try expectString(hostFunc2(true))
-
+    hostFunc2.release()
 } catch {
     print(error)
 }

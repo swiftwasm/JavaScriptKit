@@ -56,16 +56,10 @@ public class JSFunctionRef: JSObjectRef {
             }
         }
     }
-
-    static var sharedFunctions: [([JSValue]) -> JSValue] = []
     
+    @available(*, unavailable, message: "Please use JSClosure instead")
     public static func from(_ body: @escaping ([JSValue]) -> JSValue) -> JSFunctionRef {
-        let id = JavaScriptHostFuncRef(sharedFunctions.count)
-        sharedFunctions.append(body)
-        var funcRef: JavaScriptObjectRef = 0
-        _create_function(id, &funcRef)
-
-        return JSFunctionRef(id: funcRef)
+        fatalError("unavailable")
     }
     
     // MARK: - JSValueConvertible
@@ -75,7 +69,29 @@ public class JSFunctionRef: JSObjectRef {
     }
 }
 
-// MARK: - C Functions
+public class JSClosure: JSFunctionRef {
+
+    static var sharedFunctions: [JavaScriptHostFuncRef: ([JSValue]) -> JSValue] = [:]
+
+    private var hostFuncRef: JavaScriptHostFuncRef = 0
+
+    public init(_ body: @escaping ([JSValue]) -> JSValue) {
+        super.init(id: 0)
+        let objectId = ObjectIdentifier(self)
+        let funcRef = JavaScriptHostFuncRef(bitPattern: Int32(objectId.hashValue))
+        Self.sharedFunctions[funcRef] = body
+
+        var objectRef: JavaScriptObjectRef = 0
+        _create_function(funcRef, &objectRef)
+
+        self.hostFuncRef = funcRef
+        self.id = objectRef
+    }
+
+    public func release() {
+        Self.sharedFunctions[hostFuncRef] = nil
+    }
+}
 
 @_cdecl("swjs_prepare_host_function_call")
 internal func _prepare_host_function_call(_ argc: Int32) -> UnsafeMutableRawPointer {
@@ -93,7 +109,9 @@ internal func _call_host_function(
     _ hostFuncRef: JavaScriptHostFuncRef,
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef) {
-    let hostFunc = JSFunctionRef.sharedFunctions[Int(hostFuncRef)]
+    guard let hostFunc = JSClosure.sharedFunctions[hostFuncRef] else {
+        fatalError("The function was already released")
+    }
     let args = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
         $0.jsValue()
     }
