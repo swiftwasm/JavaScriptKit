@@ -93,6 +93,8 @@ internal extension JSEncoder {
             
             log?("Requested single value container for path \"\(codingPath.path)\"")
             let container = Container(.undefined)
+            self.stack.push(container)
+            defer { assert(container.jsValue != .undefined, "Did not set value") }
             return JSSingleValueEncodingContainer(referencing: self, wrapping: container)
         }
     }
@@ -115,8 +117,8 @@ internal extension JSEncoder.Encoder {
             return boxDate(date)
         } else if let uuid = value as? UUID {
             return boxUUID(uuid)
-        } else if let tlvEncodable = value as? JSValueConvertible {
-            return tlvEncodable.jsValue()
+        } else if let jsEncodable = value as? JSValueConvertible {
+            return jsEncodable.jsValue()
         } else {
             // encode using Encodable, should push new container.
             try value.encode(to: self)
@@ -140,6 +142,7 @@ private extension JSEncoder.Encoder {
     }
     
     func boxDate(_ date: Date) -> JSValue {
+        // TODO: Support different Date formatting
         /*
         switch options.dateFormatting {
         case .secondsSince1970:
@@ -457,7 +460,7 @@ internal final class JSUnkeyedEncodingContainer: UnkeyedEncodingContainer {
     
     func encode(_ value: Double) throws { append(encoder.box(value)) }
     
-    func encode(_ value: Float) throws { append(encoder.box(value.bitPattern)) }
+    func encode(_ value: Float) throws { append(encoder.box(value)) }
     
     func encode(_ value: Int) throws { append(encoder.box(value)) }
     
