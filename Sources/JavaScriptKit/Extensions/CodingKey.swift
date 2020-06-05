@@ -22,8 +22,7 @@ internal extension CodingKey {
         guard elements.count > 2
             else { return rawName }
         elements.removeFirst()
-        // FIXME: Needs Foundation for String extensions
-        //elements.removeAll { $0.contains("(unknown context") }
+        elements.removeAll { $0.hasPrefix("(unknown context") }
         return elements.reduce("", { $0 + ($0.isEmpty ? "" : ".") + $1 })
     }
 }
