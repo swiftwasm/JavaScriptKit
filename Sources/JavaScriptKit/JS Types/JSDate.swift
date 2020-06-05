@@ -53,16 +53,50 @@ public final class JSDate: JSType {
     ///
     /// - Returns: A Number representing the milliseconds elapsed since the UNIX epoch.
     public static var now: Double {
-        guard let function = classObject.now.function,
-            let timeInterval = function().number
-            else { fatalError() }
-        return timeInterval
+        let function = classObject.now.function.assert()
+        return function().number.assert()
+    }
+    
+    // MARK: - Accessors
+    
+    /// Converts a date to a string following the ISO 8601 Extended Format.
+    public func toISOString() -> String {
+        let function = jsObject.toISOString.function.assert()
+        return function.apply(this: jsObject).string.assert()
+    }
+    
+    /// Returns a string representing the Date using `toISOString()`. Intended for use by JSON.stringify().
+    public func toJSON() -> String {
+        let function = jsObject.toJSON.function.assert()
+        return function.apply(this: jsObject).string.assert()
+    }
+    
+    /// Converts a date to a string using the UTC timezone.
+    public func toUTCString() -> String {
+        let function = jsObject.toUTCString.function.assert()
+        return function.apply(this: jsObject).string.assert()
     }
 }
+
+// MARK: - Constants
 
 internal extension JSDate {
     
     static let classObject = JSObjectRef.global.Date.function!
+}
+
+// MARK: - RawRepresentable
+
+extension JSDate: RawRepresentable {
+        
+    public convenience init(rawValue: Double) {
+        self.init(timeInterval: rawValue)
+    }
+    
+    public var rawValue: Double {
+        let function = jsObject.valueOf.function.assert("Invalid function \(#function)")
+        return function.apply(this: jsObject).number.assert()
+    }
 }
 
 // MARK: - CustomStringConvertible

@@ -72,7 +72,7 @@ public extension SwiftFoundation.Date {
 extension SwiftFoundation.Date: CustomStringConvertible {
     
     public var description: String {
-        return JSDate(self).description
+        return JSDate(self).toUTCString()
     }
 }
 
@@ -96,10 +96,31 @@ public extension JSDate {
     }
 }
 
+public extension SwiftFoundation.Date {
+    
+    init(_ date: JSDate) {
+        self.init(timeIntervalSince1970: date.rawValue)
+    }
+}
+
+// MARK: - JSValueConvertible
+
 extension SwiftFoundation.Date: JSValueConvertible {
     
     public func jsValue() -> JSValue {
         let date = JSDate()
         return date.jsValue()
+    }
+}
+
+// MARK: - JSValueConstructible
+
+extension SwiftFoundation.Date: JSValueConstructible {
+    
+    public static func construct(from value: JSValue) -> Date? {
+        return value.object
+            .flatMap { JSDate($0) }
+            .flatMap { Date($0) }
+            ?? value.number.flatMap { Date(timeIntervalSince1970: $0) }
     }
 }
