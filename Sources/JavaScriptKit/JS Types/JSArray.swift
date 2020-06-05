@@ -19,7 +19,8 @@ public final class JSArray: JSType {
     }
     
     public convenience init<C>(_ collection: C) where C: Collection, C.Element == JSValueConvertible {
-        self.init(collection.map({ $0.jsValue() }))
+        self.init(count: collection.count)
+        collection.enumerated().forEach { self[$0.offset] = $0.element.jsValue() }
     }
 }
 
