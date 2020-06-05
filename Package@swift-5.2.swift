@@ -8,7 +8,7 @@ let package = Package(
         .library(name: "JavaScriptKit", targets: ["JavaScriptKit"])
     ],
     dependencies: [
-        .package(url: "https://github.com/PureSwift/SwiftFoundation.git", .branch("feature/swift5"))
+        .package(url: "https://github.com/PureSwift/SwiftFoundation.git", .branch("develop"))
     ],
     targets: [
         .target(
