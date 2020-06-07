@@ -28,19 +28,58 @@ public enum JSValue: Equatable {
         default: return nil
         }
     }
+    
     public var object: JSObjectRef? {
         switch self {
         case let .object(object): return object
         default: return nil
         }
     }
-    public var isNull: Bool { return self == .null }
-    public var isUndefined: Bool { return self == .undefined }
+
     public var function: JSFunctionRef? {
         switch self {
         case let .function(function): return function
         default: return nil
         }
+    }
+
+    public var isBoolean: Bool {
+        guard case .boolean = self else { return false }
+        return true
+    }
+
+    public var isString: Bool {
+        guard case .string = self else { return false }
+        return true
+    }
+
+    public var isNumber: Bool {
+        guard case .number = self else { return false }
+        return true
+    }
+
+    public var isObject: Bool {
+        guard case .object = self else { return false }
+        return true
+    }
+
+    public var isNull: Bool {
+        return self == .null
+    }
+
+    public var isUndefined: Bool {
+        return self == .undefined
+    }
+
+    public var isFunction: Bool {
+        guard case .function = self else { return false }
+        return true
+    }
+}
+
+extension JSValue {
+    public func fromJSValue<Type>() -> Type where Type: JSValueDecodable {
+        return Type(jsValue: self)
     }
 }
 
@@ -52,6 +91,12 @@ extension JSValue: ExpressibleByStringLiteral {
 
 extension JSValue: ExpressibleByIntegerLiteral {
     public init(integerLiteral value: Int32) {
+        self = .number(Double(value))
+    }
+}
+
+extension JSValue: ExpressibleByFloatLiteral {
+    public init(floatLiteral value: Double) {
         self = .number(value)
     }
 }
@@ -80,6 +125,27 @@ public func setJSValue(this: JSObjectRef, index: Int32, value: JSValue) {
         _set_subscript(this._id, index, &rawValue)
     }
 }
+
+extension JSValue {
+
+    public func instanceOf(_ constructor: String) -> Bool {
+        
+        switch self {
+        case .boolean:
+            return  constructor == "Bool"
+        case .string:
+            return constructor == "String"
+        case .number:
+            fatalError()
+        case .object(let ref):
+            return ref.instanceOf(constructor)
+        case .null:
+            fatalError()
+        case .undefined:
+            fatalError()
+        case .function(_):
+            fatalError()
+        }
     }
 }
 

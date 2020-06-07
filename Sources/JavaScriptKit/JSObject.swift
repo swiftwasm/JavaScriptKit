@@ -2,15 +2,29 @@ import _CJavaScriptKit
 
 @dynamicMemberLookup
 public class JSObjectRef: Equatable {
+
+    public class func canDecode(from jsValue: JSValue) -> Bool {
+        return jsValue.isObject
+    }
+
+    private var functionCache = [String : JSFunctionRef]()
     public let _id: UInt32
     public init(id: UInt32) {
         self._id = id
     }
 
-    public subscript(dynamicMember name: String) -> ((JSValueConvertible...) -> JSValue)? {
+    public subscript(dynamicMember name: String) -> ((JSValueEncodable...) -> JSValue)? {
         get {
-            guard let function = self[dynamicMember: name].function else { return nil }
-            return { (arguments: JSValueConvertible...) in
+            let function: JSFunctionRef
+            if let f = functionCache[name] {
+                function = f
+            } else if let f = self[dynamicMember: name].function {
+                functionCache[name] = f
+                function = f
+            } else {
+                return nil
+            }
+            return { (arguments: JSValueEncodable...) in
                 function.apply(this: self, argumentList: arguments)
             }
         }
@@ -61,6 +75,14 @@ public class JSObjectRef: Equatable {
     public static func == (lhs: JSObjectRef, rhs: JSObjectRef) -> Bool {
         return lhs._id == rhs._id
     }
+
+    public convenience required init(jsValue: JSValue) {
+        switch jsValue {
+        case .object(let value):
+            self.init(id: value._id)
+        default:
+            fatalError()
+        }
     }
 
     public func jsValue() -> JSValue {
