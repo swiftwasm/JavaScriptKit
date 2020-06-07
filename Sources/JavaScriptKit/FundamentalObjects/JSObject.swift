@@ -43,6 +43,10 @@ public class JSObject: Equatable {
         return lhs.id == rhs.id
     }
 
+    public class func construct(from value: JSValue) -> Self? {
+        return value.object as? Self
+    }
+
     public func jsValue() -> JSValue {
         .object(self)
     }

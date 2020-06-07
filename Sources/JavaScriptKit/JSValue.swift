@@ -37,13 +37,50 @@ public enum JSValue: Equatable {
         }
     }
 
-    public var isNull: Bool { return self == .null }
-    public var isUndefined: Bool { return self == .undefined }
     public var function: JSFunction? {
         switch self {
         case let .function(function): return function
         default: return nil
         }
+    }
+
+    public var isBoolean: Bool {
+        guard case .boolean = self else { return false }
+        return true
+    }
+
+    public var isString: Bool {
+        guard case .string = self else { return false }
+        return true
+    }
+
+    public var isNumber: Bool {
+        guard case .number = self else { return false }
+        return true
+    }
+
+    public var isObject: Bool {
+        guard case .object = self else { return false }
+        return true
+    }
+
+    public var isNull: Bool {
+        return self == .null
+    }
+
+    public var isUndefined: Bool {
+        return self == .undefined
+    }
+
+    public var isFunction: Bool {
+        guard case .function = self else { return false }
+        return true
+    }
+}
+
+extension JSValue {
+    public func fromJSValue<Type>() -> Type? where Type: JSValueConstructible {
+        return Type.construct(from: self)
     }
 }
 
@@ -60,7 +97,13 @@ extension JSValue: ExpressibleByStringLiteral {
 }
 
 extension JSValue: ExpressibleByIntegerLiteral {
-    public init(integerLiteral value: Double) {
+    public init(integerLiteral value: Int32) {
+        self = .number(Double(value))
+    }
+}
+
+extension JSValue: ExpressibleByFloatLiteral {
+    public init(floatLiteral value: Double) {
         self = .number(value)
     }
 }
@@ -92,5 +135,20 @@ public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
         _set_subscript(this.id, index,
                        rawValue.kind,
                        rawValue.payload1, rawValue.payload2, rawValue.payload3)
+    }
+}
+
+extension JSValue {
+    public func isInstanceOf(_ constructor: JSFunction) -> Bool {
+        switch self {
+        case .boolean, .string, .number:
+            return false
+        case let .object(ref):
+            return ref.isInstanceOf(constructor)
+        case let .function(ref):
+            return ref.isInstanceOf(constructor)
+        case .null, .undefined:
+            fatalError()
+        }
     }
 }

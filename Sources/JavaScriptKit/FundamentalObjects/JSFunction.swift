@@ -43,10 +43,7 @@ public class JSFunction: JSObject {
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
                 var resultObj = JavaScriptObjectRef()
-                _call_new(
-                    self.id, argv, Int32(argc),
-                    &resultObj
-                )
+                _call_new(self.id, argv, Int32(argc), &resultObj)
                 return JSObject(id: resultObj)
             }
         }
@@ -55,6 +52,10 @@ public class JSFunction: JSObject {
     @available(*, unavailable, message: "Please use JSClosure instead")
     public static func from(_: @escaping ([JSValue]) -> JSValue) -> JSFunction {
         fatalError("unavailable")
+    }
+
+    public override class func construct(from value: JSValue) -> Self? {
+        return value.function as? Self
     }
 
     override public func jsValue() -> JSValue {
@@ -86,6 +87,15 @@ public class JSClosure: JSFunction {
         self.init { (arguments: [JSValue]) -> JSValue in
             body(arguments)
             return .undefined
+        }
+    }
+
+    public required convenience init(jsValue: JSValue) {
+        switch jsValue {
+        case let .function(fun):
+            self.init { fun(arguments: $0) }
+        default:
+            fatalError()
         }
     }
 
