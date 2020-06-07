@@ -11,8 +11,8 @@ public class JSFunctionRef: JSObjectRef {
                 let argc = bufferPointer.count
                 var result = RawJSValue()
                 _call_function(
-                    self.id, argv, Int32(argc),
-                    &result.kind, &result.payload1, &result.payload2
+                    self._id, argv, Int32(argc),
+                    &result
                 )
                 return result
             }
@@ -29,9 +29,9 @@ public class JSFunctionRef: JSObjectRef {
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
                 var result = RawJSValue()
-                _call_function_with_this(this.id,
-                    self.id, argv, Int32(argc),
-                    &result.kind, &result.payload1, &result.payload2
+                _call_function_with_this(this._id,
+                    self._id, argv, Int32(argc),
+                    &result
                 )
                 return result
             }
@@ -46,7 +46,7 @@ public class JSFunctionRef: JSObjectRef {
                 let argc = bufferPointer.count
                 var resultObj = JavaScriptPayload()
                 _call_new(
-                    self.id, argv, Int32(argc),
+                    self._id, argv, Int32(argc),
                     &resultObj
                 )
                 return JSObjectRef(id: resultObj)

@@ -26,7 +26,7 @@ typedef struct {
 } RawJSValue;
 
 
-const unsigned int _JS_Predef_Value_Global = 0;
+extern const unsigned int _JS_Predef_Value_Global;
 
 __attribute__((
     __import_module__("javascript_kit"),
@@ -35,9 +35,7 @@ __attribute__((
 extern void _set_prop(
     const JavaScriptObjectRef _this,
     const char *prop, const int length,
-    const JavaScriptValueKind kind,
-    const JavaScriptPayload payload1,
-    const JavaScriptPayload payload2
+    const RawJSValue *rawJSValue
 );
 
 __attribute__((
@@ -47,9 +45,7 @@ __attribute__((
 extern void _get_prop(
     const JavaScriptObjectRef _this,
     const char *prop, const int length,
-    JavaScriptValueKind *kind,
-    JavaScriptPayload *payload1,
-    JavaScriptPayload *payload2
+    RawJSValue *rawJSValue
 );
 
 __attribute__((
@@ -59,9 +55,7 @@ __attribute__((
 extern void _set_subscript(
     const JavaScriptObjectRef _this,
     const int length,
-    const JavaScriptValueKind kind,
-    const JavaScriptPayload payload1,
-    const JavaScriptPayload payload2
+    const RawJSValue *rawJSValue
 );
 
 __attribute__((
@@ -71,9 +65,7 @@ __attribute__((
 extern void _get_subscript(
     const JavaScriptObjectRef _this,
     const int length,
-    JavaScriptValueKind *kind,
-    JavaScriptPayload *payload1,
-    JavaScriptPayload *payload2
+    RawJSValue *rawJSValue
 );
 
 __attribute__((
@@ -92,9 +84,7 @@ __attribute__((
 extern void _call_function(
     const JavaScriptObjectRef ref,
     const RawJSValue *argv, const int argc,
-    JavaScriptValueKind *result_kind,
-    JavaScriptPayload *result_payload1,
-    JavaScriptPayload *result_payload2
+    RawJSValue *rawJSValue
 );
 
 __attribute__((
@@ -105,9 +95,7 @@ extern void _call_function_with_this(
     const JavaScriptObjectRef _this,
     const JavaScriptObjectRef func_ref,
     const RawJSValue *argv, const int argc,
-    JavaScriptValueKind *result_kind,
-    JavaScriptPayload *result_payload1,
-    JavaScriptPayload *result_payload2
+    RawJSValue *rawJSValue
 );
 
 __attribute__((
@@ -135,6 +123,26 @@ __attribute__((
 ))
 extern void _destroy_ref(
     const JavaScriptObjectRef ref
+);
+
+__attribute__((
+    __import_module__("javascript_kit"),
+    __import_name__("swjs_instance_of")
+))
+extern void _instance_of(
+    const JavaScriptObjectRef _this,
+    const char *constructor, const int length,
+    RawJSValue *rawJSValue
+
+);
+
+__attribute__((
+    __import_module__("javascript_kit"),
+    __import_name__("swjs_copy_typed_array_content")
+))
+extern void _copy_typed_array_content(
+    const JavaScriptObjectRef _this,
+    const void *elementsPtr, const int length
 );
 
 #endif /* _CJavaScriptKit_h */

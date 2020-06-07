@@ -69,7 +69,7 @@ extension RawJSValue: JSValueConvertible {
         case JavaScriptValueKind_Boolean:
             return .boolean(payload1 != 0)
         case JavaScriptValueKind_Number:
-            return .number(Int32(bitPattern: payload1))
+            return .number(Double(bitPattern: UInt64(payload1) | (UInt64(payload2) << 32)))
         case JavaScriptValueKind_String:
             // +1 for null terminator
             let buffer = malloc(Int(payload2 + 1))!.assumingMemoryBound(to: UInt8.self)
@@ -93,7 +93,7 @@ extension RawJSValue: JSValueConvertible {
 }
 
 extension JSValue {
-    func withRawJSValue<T>(_ body: (RawJSValue) -> T) -> T {
+    func withRawJSValue<T>(_ body: (inout RawJSValue) -> T) -> T {
         let kind: JavaScriptValueKind
         let payload1: JavaScriptPayload
         let payload2: JavaScriptPayload
@@ -104,18 +104,18 @@ extension JSValue {
             payload2 = 0
         case let .number(numberValue):
             kind = JavaScriptValueKind_Number
-            payload1 = JavaScriptPayload(bitPattern: numberValue)
-            payload2 = 0
+            payload1 = UInt32(numberValue.bitPattern & 0x00000000ffffffff)
+            payload2 = UInt32((numberValue.bitPattern & 0xffffffff00000000) >> 32)
         case var .string(stringValue):
             kind = JavaScriptValueKind_String
             return stringValue.withUTF8 { bufferPtr in
                 let ptrValue = UInt32(UInt(bitPattern: bufferPtr.baseAddress!))
-                let rawValue = RawJSValue(kind: kind, payload1: ptrValue, payload2: JavaScriptPayload(bufferPtr.count))
-                return body(rawValue)
+                var rawValue = RawJSValue(kind: kind, payload1: ptrValue, payload2: JavaScriptPayload(bufferPtr.count))
+                return body(&rawValue)
             }
         case let .object(ref):
             kind = JavaScriptValueKind_Object
-            payload1 = ref.id
+            payload1 = ref._id
             payload2 = 0
         case .null:
             kind = JavaScriptValueKind_Null
@@ -127,11 +127,11 @@ extension JSValue {
             payload2 = 0
         case let .function(functionRef):
             kind = JavaScriptValueKind_Function
-            payload1 = functionRef.id
+            payload1 = functionRef._id
             payload2 = 0
         }
-        let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
-        return body(rawValue)
+        var rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
+        return body(&rawValue)
     }
 }
 

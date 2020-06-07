@@ -3,7 +3,7 @@ import _CJavaScriptKit
 public enum JSValue: Equatable {
     case boolean(Bool)
     case string(String)
-    case number(Int32)
+    case number(Double)
     case object(JSObjectRef)
     case null
     case undefined
@@ -22,7 +22,7 @@ public enum JSValue: Equatable {
         default: return nil
         }
     }
-    public var number: Int32? {
+    public var number: Double? {
         switch self {
         case let .number(number): return number
         default: return nil
@@ -58,33 +58,28 @@ extension JSValue: ExpressibleByIntegerLiteral {
 
 public func getJSValue(this: JSObjectRef, name: String) -> JSValue {
     var rawValue = RawJSValue()
-    _get_prop(this.id, name, Int32(name.count),
-                  &rawValue.kind,
-                  &rawValue.payload1, &rawValue.payload2)
+    _get_prop(this._id, name, Int32(name.count), &rawValue)
     return rawValue.jsValue()
 }
 
 public func setJSValue(this: JSObjectRef, name: String, value: JSValue) {
     value.withRawJSValue { rawValue in
-        _set_prop(this.id, name, Int32(name.count), rawValue.kind, rawValue.payload1, rawValue.payload2)
+        _set_prop(this._id, name, Int32(name.count), &rawValue)
     }
 }
 
-
 public func getJSValue(this: JSObjectRef, index: Int32) -> JSValue {
     var rawValue = RawJSValue()
-    _get_subscript(this.id, index,
-                   &rawValue.kind,
-                   &rawValue.payload1, &rawValue.payload2)
+    _get_subscript(this._id, index, &rawValue)
     return rawValue.jsValue()
 }
 
 
 public func setJSValue(this: JSObjectRef, index: Int32, value: JSValue) {
     value.withRawJSValue { rawValue in
-        _set_subscript(this.id, index,
-                       rawValue.kind,
-                       rawValue.payload1, rawValue.payload2)
+        _set_subscript(this._id, index, &rawValue)
+    }
+}
     }
 }
 

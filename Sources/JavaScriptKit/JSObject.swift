@@ -2,9 +2,9 @@ import _CJavaScriptKit
 
 @dynamicMemberLookup
 public class JSObjectRef: Equatable {
-    let id: UInt32
-    init(id: UInt32) {
-        self.id = id
+    public let _id: UInt32
+    public init(id: UInt32) {
+        self._id = id
     }
 
     public subscript(dynamicMember name: String) -> ((JSValueConvertible...) -> JSValue)? {
@@ -17,40 +17,63 @@ public class JSObjectRef: Equatable {
     }
 
     public subscript(dynamicMember name: String) -> JSValue {
-        get { get(name) }
-        set { set(name, newValue) }
+        get { js_get(name) }
+        set { js_set(name, newValue) }
     }
 
-    public func get(_ name: String) -> JSValue {
+    public subscript<Type: JSValueEncodable & JSValueDecodable>(dynamicMember name: String) -> Type {
+        get { js_get(name).fromJSValue() }
+        set { js_set(name, newValue.jsValue()) }
+    }
+
+     func js_get(_ name: String) -> JSValue {
         getJSValue(this: self, name: name)
     }
 
-    public func set(_ name: String, _ value: JSValue) {
+     func js_set(_ name: String, _ value: JSValue) {
         setJSValue(this: self, name: name, value: value)
     }
 
-    public func get(_ index: Int) -> JSValue {
+     func js_get(_ index: Int) -> JSValue {
         getJSValue(this: self, index: Int32(index))
     }
 
     public subscript(_ index: Int) -> JSValue {
-        get { get(index) }
-        set { set(index, newValue) }
+        get { js_get(index) }
+        set { js_set(index, newValue) }
     }
 
-    public func set(_ index: Int, _ value: JSValue) {
+    func js_set(_ index: Int, _ value: JSValue) {
         setJSValue(this: self, index: Int32(index), value: value)
+    }
+
+    public func instanceOf(_ constructor: String) -> Bool {
+        var result = RawJSValue()
+        _instance_of(_id, constructor, Int32(constructor.count), &result)
+
+        return result.jsValue().fromJSValue()
     }
 
     public static let global = JSObjectRef(id: _JS_Predef_Value_Global)
 
-    deinit { _destroy_ref(id) }
+    deinit { _destroy_ref(_id) }
 
     public static func == (lhs: JSObjectRef, rhs: JSObjectRef) -> Bool {
-        return lhs.id == rhs.id
+        return lhs._id == rhs._id
+    }
     }
 
     public func jsValue() -> JSValue {
         .object(self)
+    }
+}
+
+extension JSObjectRef {
+
+    public func copyTypedArrayContent<Type>(_ array: [Type]) {
+
+        array.withUnsafeBufferPointer { (ptr)  in
+            _copy_typed_array_content(_id, ptr.baseAddress, Int32(array.count))
+        }
     }
 }
