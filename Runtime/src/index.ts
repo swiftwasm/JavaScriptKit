@@ -82,7 +82,7 @@ export class SwiftRuntime {
         this.heap = new SwiftRuntimeHeap();
     }
 
-    setInsance(instance: WebAssembly.Instance) {
+    setInstance(instance: WebAssembly.Instance) {
         this.instance = instance
     }
 

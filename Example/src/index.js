@@ -27,7 +27,7 @@ const startWasiTask = async () => {
     javascript_kit: swift.importObjects(),
   });
 
-  swift.setInsance(instance);
+  swift.setInstance(instance);
   // Start the WebAssembly WASI instance!
   wasi.start(instance);
 
