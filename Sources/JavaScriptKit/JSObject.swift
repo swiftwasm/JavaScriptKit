@@ -63,7 +63,8 @@ public class JSObjectRef: Equatable {
     public static let global = JSObjectRef(id: _JS_Predef_Value_Global)
 
     deinit {
-      _destroy_ref(id)
+        cache[id] = nil
+        _destroy_ref(id)
     }
 
     public static func == (lhs: JSObjectRef, rhs: JSObjectRef) -> Bool {
