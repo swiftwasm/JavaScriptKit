@@ -1,10 +1,26 @@
 import _CJavaScriptKit
 
+private struct Weak<T: AnyObject> {
+  weak var ref: T?
+}
+
+private var cache = [UInt32: Weak<JSObjectRef>]()
+
 @dynamicMemberLookup
 public class JSObjectRef: Equatable {
     internal var id: UInt32
     init(id: UInt32) {
         self.id = id
+    }
+
+    static func retrieve(id: UInt32) -> JSObjectRef {
+        if id != 0, let ref = cache[id]?.ref {
+            return ref
+        } else {
+            let ref = JSObjectRef(id: id)
+            cache[id] = Weak(ref: ref)
+            return ref
+        }
     }
 
     @_disfavoredOverload
@@ -46,7 +62,9 @@ public class JSObjectRef: Equatable {
     static let _JS_Predef_Value_Global: UInt32 = 0
     public static let global = JSObjectRef(id: _JS_Predef_Value_Global)
 
-    deinit { _destroy_ref(id) }
+    deinit {
+      _destroy_ref(id)
+    }
 
     public static func == (lhs: JSObjectRef, rhs: JSObjectRef) -> Bool {
         return lhs.id == rhs.id
