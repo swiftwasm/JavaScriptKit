@@ -111,7 +111,7 @@ extension RawJSValue: JSValueConvertible {
             let string = String(decodingCString: UnsafePointer(buffer), as: UTF8.self)
             return .string(string)
         case JavaScriptValueKind_Object:
-            return .object(JSObjectRef.retrieve(id: UInt32(payload1)))
+            return .object(JSObjectRef(id: UInt32(payload1)))
         case JavaScriptValueKind_Null:
             return .null
         case JavaScriptValueKind_Undefined:
