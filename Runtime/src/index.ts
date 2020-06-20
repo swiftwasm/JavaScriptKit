@@ -50,22 +50,29 @@ class SwiftRuntimeHeap {
     allocHeap(value: any) {
         const isObject = typeof value == "object"
         if (isObject && value.swjs_heap_id) {
+            value.swjs_heap_rc++;
             return value.swjs_heap_id
         }
         const id = this._heapNextKey++;
         this._heapValues.set(id, value)
-        if (isObject)
+        if (isObject) {
             Reflect.set(value, "swjs_heap_id", id);
+            Reflect.set(value, "swjs_heap_rc", 1);
+        }
         return id
     }
 
     freeHeap(ref: ref) {
         const value = this._heapValues.get(ref);
         const isObject = typeof value == "object"
-        if (isObject && value.swjs_heap_id) {
+        if (isObject) {
+            const rc = --value.swjs_heap_rc;
+            if (rc != 0) return;
             delete value.swjs_heap_id;
+            this._heapValues.delete(ref)
+        } else {
+            this._heapValues.delete(ref)
         }
-        this._heapValues.delete(ref)
     }
 
     referenceHeap(ref: ref) {

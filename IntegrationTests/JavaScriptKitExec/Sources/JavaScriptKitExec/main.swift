@@ -299,3 +299,27 @@ Object_Conversion: do {
 } catch {
     print(error)
 }
+
+ObjectRef_Lifetime: do {
+    // ```js
+    // global.globalObject1 = {
+    //   "prop_1": {
+    //     "nested_prop": 1,
+    //   },
+    //   "prop_2": 2,
+    //   "prop_3": true,
+    //   "prop_4": [
+    //     3, 4, "str_elm_1", 5,
+    //   ],
+    //   ...
+    // }
+    // ```
+
+    let identity = JSClosure { $0[0] }
+    let ref1 = getJSValue(this: .global, name: "globalObject1").object!
+    let ref2 = identity(ref1).object!
+    try expectEqual(ref1.prop_2, .number(2))
+    try expectEqual(ref2.prop_2, .number(2))
+} catch {
+    print(error)
+}
