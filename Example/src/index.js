@@ -27,7 +27,6 @@ wasmFs.fs.writeSync = (fd, buffer, offset, length, position) => {
   return originalWriteSync(fd, buffer, offset, length, position);
 };
 
-
 let wasi = new WASI({
   args: [],
   env: {},
