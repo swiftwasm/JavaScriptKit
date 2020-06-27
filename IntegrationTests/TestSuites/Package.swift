@@ -6,9 +6,15 @@ let package = Package(
     name: "TestSuites",
     products: [
         .executable(
-            name: "TestSuites", targets: ["TestSuites"]
+            name: "PrimaryTests", targets: ["PrimaryTests"]
+        ),
+        .executable(
+            name: "BenchmarkTests", targets: ["BenchmarkTests"]
         ),
     ],
     dependencies: [.package(name: "JavaScriptKit", path: "../../")],
-    targets: [.target(name: "TestSuites", dependencies: ["JavaScriptKit"])]
+    targets: [
+        .target(name: "PrimaryTests", dependencies: ["JavaScriptKit"]),
+        .target(name: "BenchmarkTests", dependencies: ["JavaScriptKit"]),
+    ]
 )

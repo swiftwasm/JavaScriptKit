@@ -6,32 +6,6 @@ const promisify = require("util").promisify;
 const fs = require("fs");
 const readFile = promisify(fs.readFile);
 
-const swift = new SwiftRuntime();
-// Instantiate a new WASI Instance
-const wasmFs = new WasmFs();
-// Output stdout and stderr to console
-const originalWriteSync = wasmFs.fs.writeSync;
-wasmFs.fs.writeSync = (fd, buffer, offset, length, position) => {
-  const text = new TextDecoder("utf-8").decode(buffer);
-  switch (fd) {
-  case 1:
-    console.log(text);
-    break;
-  case 2:
-    console.error(text);
-    break;
-  }
-  return originalWriteSync(fd, buffer, offset, length, position);
-};
-let wasi = new WASI({
-  args: [],
-  env: {},
-  bindings: {
-    ...WASI.defaultBindings,
-    fs: wasmFs.fs
-  }
-});
-
 global.globalObject1 = {
   "prop_1": {
     "nested_prop": 1,
@@ -71,9 +45,35 @@ global.Animal = function(name, age, isCat) {
   }
 }
 
-const startWasiTask = async () => {
+const startWasiTask = async (wasmPath) => {
+  // Instantiate a new WASI Instance
+  const wasmFs = new WasmFs();
+  // Output stdout and stderr to console
+  const originalWriteSync = wasmFs.fs.writeSync;
+  wasmFs.fs.writeSync = (fd, buffer, offset, length, position) => {
+    const text = new TextDecoder("utf-8").decode(buffer);
+    switch (fd) {
+    case 1:
+      console.log(text);
+      break;
+    case 2:
+      console.error(text);
+      break;
+    }
+    return originalWriteSync(fd, buffer, offset, length, position);
+  };
+  let wasi = new WASI({
+    args: [],
+    env: {},
+    bindings: {
+      ...WASI.defaultBindings,
+      fs: wasmFs.fs
+    }
+  });
+
+  const swift = new SwiftRuntime();
   // Fetch our Wasm File
-  const wasmBinary = await readFile("./dist/TestSuites.wasm");
+  const wasmBinary = await readFile(wasmPath);
 
   // Instantiate the WebAssembly file
   let { instance } = await WebAssembly.instantiate(wasmBinary, {
@@ -85,6 +85,21 @@ const startWasiTask = async () => {
   // Start the WebAssembly WASI instance!
   wasi.start(instance);
 };
-startWasiTask().catch(err => {
+
+startWasiTask("./dist/PrimaryTests.wasm").catch(err => {
+  console.log(err)
+});
+
+const { performance } = require('perf_hooks');
+
+global.benchmarkRunner = function(name, body) {
+  console.log(`Running '${name}'...`)
+  const startTime = performance.now();
+  body(5000)
+  const endTime = performance.now();
+  console.log("done " + (endTime - startTime) + " ms");
+}
+
+startWasiTask("./dist/BenchmarkTests.wasm").catch(err => {
   console.log(err)
 });
