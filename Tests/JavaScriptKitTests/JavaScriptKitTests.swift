@@ -1,5 +1,4 @@
-import XCTest
 @testable import JavaScriptKit
+import XCTest
 
-final class JavaScriptKitTests: XCTestCase {
-}
+final class JavaScriptKitTests: XCTestCase {}

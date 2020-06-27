@@ -1,6 +1,5 @@
 
 public class JSArrayRef {
-
     static let classObject = JSObjectRef.global.Array.function!
 
     static func isArray(_ object: JSObjectRef) -> Bool {
@@ -15,7 +14,6 @@ public class JSArrayRef {
     }
 }
 
-
 extension JSArrayRef: Sequence {
     public typealias Element = JSValue
 
@@ -29,6 +27,7 @@ extension JSArrayRef: Sequence {
         init(ref: JSObjectRef) {
             self.ref = ref
         }
+
         public func next() -> Element? {
             defer { index += 1 }
             guard index < Int(ref.length.number!) else {

@@ -22,21 +22,25 @@ public enum JSValue: Equatable {
         default: return nil
         }
     }
+
     public var number: Double? {
         switch self {
         case let .number(number): return number
         default: return nil
         }
     }
+
     public var object: JSObjectRef? {
         switch self {
         case let .object(object): return object
         default: return nil
         }
     }
+
     public var array: JSArrayRef? {
         object.flatMap { JSArrayRef($0) }
     }
+
     public var isNull: Bool { return self == .null }
     public var isUndefined: Bool { return self == .undefined }
     public var function: JSFunctionRef? {
@@ -68,8 +72,8 @@ extension JSValue: ExpressibleByIntegerLiteral {
 public func getJSValue(this: JSObjectRef, name: String) -> JSValue {
     var rawValue = RawJSValue()
     _get_prop(this.id, name, Int32(name.count),
-                  &rawValue.kind,
-                  &rawValue.payload1, &rawValue.payload2, &rawValue.payload3)
+              &rawValue.kind,
+              &rawValue.payload1, &rawValue.payload2, &rawValue.payload3)
     return rawValue.jsValue()
 }
 
@@ -79,7 +83,6 @@ public func setJSValue(this: JSObjectRef, name: String, value: JSValue) {
     }
 }
 
-
 public func getJSValue(this: JSObjectRef, index: Int32) -> JSValue {
     var rawValue = RawJSValue()
     _get_subscript(this.id, index,
@@ -88,7 +91,6 @@ public func getJSValue(this: JSObjectRef, index: Int32) -> JSValue {
     return rawValue.jsValue()
 }
 
-
 public func setJSValue(this: JSObjectRef, index: Int32, value: JSValue) {
     value.withRawJSValue { rawValue in
         _set_subscript(this.id, index,
@@ -96,4 +98,3 @@ public func setJSValue(this: JSObjectRef, index: Int32, value: JSValue) {
                        rawValue.payload1, rawValue.payload2, rawValue.payload3)
     }
 }
-

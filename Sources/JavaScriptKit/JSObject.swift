@@ -9,11 +9,9 @@ public class JSObjectRef: Equatable {
 
     @_disfavoredOverload
     public subscript(dynamicMember name: String) -> ((JSValueConvertible...) -> JSValue)? {
-        get {
-            guard let function = self[dynamicMember: name].function else { return nil }
-            return { (arguments: JSValueConvertible...) in
-                function.apply(this: self, argumentList: arguments)
-            }
+        guard let function = self[dynamicMember: name].function else { return nil }
+        return { (arguments: JSValueConvertible...) in
+            function.apply(this: self, argumentList: arguments)
         }
     }
 

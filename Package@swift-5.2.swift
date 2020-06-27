@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "JavaScriptKit",
     products: [
-        .library(name: "JavaScriptKit", targets: ["JavaScriptKit"])
+        .library(name: "JavaScriptKit", targets: ["JavaScriptKit"]),
     ],
     targets: [
         .target(
@@ -23,8 +23,9 @@ let package = Package(
                         "-Xlinker",
                         "--export=swjs_library_version",
                     ]
-                )
-            ]),
+                ),
+            ]
+        ),
         .target(
             name: "_CJavaScriptKit",
             linkerSettings: [
@@ -33,10 +34,12 @@ let package = Package(
                         "-Xlinker",
                         "--allow-undefined",
                     ]
-                )
-            ]),
+                ),
+            ]
+        ),
         .testTarget(
             name: "JavaScriptKitTests",
-            dependencies: ["JavaScriptKit"]),
+            dependencies: ["JavaScriptKit"]
+        ),
     ]
 )

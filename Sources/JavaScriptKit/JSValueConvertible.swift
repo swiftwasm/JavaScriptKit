@@ -86,7 +86,7 @@ extension Array where Element: JSValueConvertible {
 extension Array: JSValueConvertible where Element == JSValueConvertible {
     public func jsValue() -> JSValue {
         let array = Array.new(count)
-        for (index, element) in self.enumerated() {
+        for (index, element) in enumerated() {
             array[index] = element.jsValue()
         }
         return .object(array)
@@ -169,13 +169,12 @@ extension JSValue {
     }
 }
 
-
-
 extension Array where Element == JSValueConvertible {
     func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
         func _withRawJSValues<T>(
             _ values: [JSValueConvertible], _ index: Int,
-            _ results: inout [RawJSValue], _ body: ([RawJSValue]) -> T) -> T {
+            _ results: inout [RawJSValue], _ body: ([RawJSValue]) -> T
+        ) -> T {
             if index == values.count { return body(results) }
             return values[index].jsValue().withRawJSValue { (rawValue) -> T in
                 results.append(rawValue)

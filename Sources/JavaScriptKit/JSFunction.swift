@@ -2,11 +2,10 @@ import _CJavaScriptKit
 
 @dynamicCallable
 public class JSFunctionRef: JSObjectRef {
-
     @discardableResult
     public func dynamicallyCall(withArguments arguments: [JSValueConvertible]) -> JSValue {
         let result = arguments.withRawJSValues { rawValues -> RawJSValue in
-            return rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
+            rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
                 var result = RawJSValue()
@@ -23,6 +22,7 @@ public class JSFunctionRef: JSObjectRef {
     public func apply(this: JSObjectRef, arguments: JSValueConvertible...) -> JSValue {
         apply(this: this, argumentList: arguments)
     }
+
     public func apply(this: JSObjectRef, argumentList: [JSValueConvertible]) -> JSValue {
         let result = argumentList.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
@@ -30,9 +30,8 @@ public class JSFunctionRef: JSObjectRef {
                 let argc = bufferPointer.count
                 var result = RawJSValue()
                 _call_function_with_this(this.id,
-                    self.id, argv, Int32(argc),
-                    &result.kind, &result.payload1, &result.payload2, &result.payload3
-                )
+                                         self.id, argv, Int32(argc),
+                                         &result.kind, &result.payload1, &result.payload2, &result.payload3)
                 return result
             }
         }
@@ -55,17 +54,16 @@ public class JSFunctionRef: JSObjectRef {
     }
 
     @available(*, unavailable, message: "Please use JSClosure instead")
-    public static func from(_ body: @escaping ([JSValue]) -> JSValue) -> JSFunctionRef {
+    public static func from(_: @escaping ([JSValue]) -> JSValue) -> JSFunctionRef {
         fatalError("unavailable")
     }
 
-    public override func jsValue() -> JSValue {
+    override public func jsValue() -> JSValue {
         .function(self)
     }
 }
 
 public class JSClosure: JSFunctionRef {
-
     static var sharedFunctions: [JavaScriptHostFuncRef: ([JSValue]) -> JSValue] = [:]
 
     private var hostFuncRef: JavaScriptHostFuncRef = 0
@@ -79,15 +77,14 @@ public class JSClosure: JSFunctionRef {
         var objectRef: JavaScriptObjectRef = 0
         _create_function(funcRef, &objectRef)
 
-        self.hostFuncRef = funcRef
-        self.id = objectRef
+        hostFuncRef = funcRef
+        id = objectRef
     }
 
     public func release() {
         Self.sharedFunctions[hostFuncRef] = nil
     }
 }
-
 
 @_cdecl("swjs_prepare_host_function_call")
 public func _prepare_host_function_call(_ argc: Int32) -> UnsafeMutableRawPointer {
@@ -104,7 +101,8 @@ public func _cleanup_host_function_call(_ pointer: UnsafeMutableRawPointer) {
 public func _call_host_function(
     _ hostFuncRef: JavaScriptHostFuncRef,
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
-    _ callbackFuncRef: JavaScriptObjectRef) {
+    _ callbackFuncRef: JavaScriptObjectRef
+) {
     guard let hostFunc = JSClosure.sharedFunctions[hostFuncRef] else {
         fatalError("The function was already released")
     }

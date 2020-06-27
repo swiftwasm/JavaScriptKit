@@ -62,7 +62,7 @@ Object_Conversion: do {
     let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
     let prop_4Array = try expectObject(prop_4)
     let expectedProp_4: [JSValue] = [
-        .number(3), .number(4), .string("str_elm_1"), .number(5)
+        .number(3), .number(4), .string("str_elm_1"), .number(5),
     ]
     for (index, expectedElement) in expectedProp_4.enumerated() {
         let actualElement = getJSValue(this: prop_4Array, index: Int32(index))
@@ -95,7 +95,7 @@ Array_Iterator: do {
     let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
     let array = try expectArray(prop_4)
     let expectedProp_4: [JSValue] = [
-        .number(3), .number(4), .string("str_elm_1"), .number(5)
+        .number(3), .number(4), .string("str_elm_1"), .number(5),
     ]
     try expectEqual(Array(array), expectedProp_4)
 }
@@ -105,6 +105,7 @@ Value_Decoder: do {
         struct Prop1: Codable {
             let nested_prop: Int
         }
+
         let prop_1: Prop1
         let prop_2: Int
         let prop_3: Bool
@@ -167,7 +168,6 @@ Function_Call: do {
 }
 
 Host_Function_Registration: do {
-
     // ```js
     // global.globalObject1 = {
     //   ...
@@ -184,7 +184,7 @@ Host_Function_Registration: do {
     let prop_6Ref = try expectObject(prop_6)
 
     var isHostFunc1Called = false
-    let hostFunc1 = JSClosure { (arguments) -> JSValue in
+    let hostFunc1 = JSClosure { (_) -> JSValue in
         isHostFunc1Called = true
         return .number(1)
     }
@@ -215,7 +215,6 @@ Host_Function_Registration: do {
 }
 
 New_Object_Construction: do {
-
     // ```js
     // global.Animal = function(name, age, isCat) {
     //   this.name = name
@@ -240,7 +239,6 @@ New_Object_Construction: do {
 }
 
 Call_Function_With_This: do {
-
     // ```js
     // global.Animal = function(name, age, isCat) {
     //   this.name = name
