@@ -1,24 +1,13 @@
 CONFIGURATION ?= debug
 
-.PHONY: TestSuites/.build/$(CONFIGURATION)/PrimaryTests
-TestSuites/.build/$(CONFIGURATION)/PrimaryTests:
+FORCE:
+TestSuites/.build/$(CONFIGURATION)/%: FORCE
 	swift build --package-path TestSuites \
-	            --product PrimaryTests \
+	            --product $(notdir $@) \
 	            --triple wasm32-unknown-wasi \
 	            --configuration $(CONFIGURATION)
 
-.PHONY: TestSuites/.build/$(CONFIGURATION)/BenchmarkTests
-TestSuites/.build/$(CONFIGURATION)/BenchmarkTests:
-	swift build --package-path TestSuites \
-	            --product BenchmarkTests \
-	            --triple wasm32-unknown-wasi \
-	            --configuration $(CONFIGURATION)
-
-dist/PrimaryTests.wasm: TestSuites/.build/$(CONFIGURATION)/PrimaryTests
-	mkdir -p dist
-	cp $< $@
-
-dist/BenchmarkTests.wasm: TestSuites/.build/$(CONFIGURATION)/BenchmarkTests
+dist/%.wasm: TestSuites/.build/$(CONFIGURATION)/%
 	mkdir -p dist
 	cp $< $@
 
