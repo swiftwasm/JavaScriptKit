@@ -73,7 +73,7 @@ global.Animal = function(name, age, isCat) {
 
 const startWasiTask = async () => {
   // Fetch our Wasm File
-  const wasmBinary = await readFile("./dist/JavaScriptKitExec.wasm");
+  const wasmBinary = await readFile("./dist/TestSuites.wasm");
 
   // Instantiate the WebAssembly file
   let { instance } = await WebAssembly.instantiate(wasmBinary, {

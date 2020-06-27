@@ -3,12 +3,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "JavaScriptKitExec",
+    name: "TestSuites",
     products: [
         .executable(
-            name: "JavaScriptKitExec", targets: ["JavaScriptKitExec"]
+            name: "TestSuites", targets: ["TestSuites"]
         ),
     ],
     dependencies: [.package(name: "JavaScriptKit", path: "../../")],
-    targets: [.target(name: "JavaScriptKitExec", dependencies: ["JavaScriptKit"])]
+    targets: [.target(name: "TestSuites", dependencies: ["JavaScriptKit"])]
 )
