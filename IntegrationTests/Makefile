@@ -24,7 +24,15 @@ dist/BenchmarkTests.wasm: TestSuites/.build/$(CONFIGURATION)/BenchmarkTests
 
 node_modules: package-lock.json
 	npm install
-build: node_modules dist/PrimaryTests.wasm dist/BenchmarkTests.wasm
+
+.PHONY: build_rt
+build_rt: node_modules
 	cd ../Runtime && npm run build
-test: build
-	node index.js
+
+.PHONY: benchmark
+benchmark: build_rt dist/BenchmarkTests.wasm
+	node bin/benchmark-tests.js
+
+.PHONY: test
+test: build_rt dist/PrimaryTests.wasm
+	node bin/primary-tests.js

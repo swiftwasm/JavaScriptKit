@@ -6,45 +6,6 @@ const promisify = require("util").promisify;
 const fs = require("fs");
 const readFile = promisify(fs.readFile);
 
-global.globalObject1 = {
-  "prop_1": {
-    "nested_prop": 1,
-  },
-  "prop_2": 2,
-  "prop_3": true,
-  "prop_4": [
-    3, 4, "str_elm_1", 5,
-  ],
-  "prop_5": {
-    "func1": function () { return },
-    "func2": function () { return 1 },
-    "func3": function (n) { return n * 2},
-    "func4": function (a, b, c) { return a + b + c },
-    "func5": function (x) { return "Hello, " + x },
-    "func6": function (c, a, b) {
-      if (c) { return a } else { return b }
-    },
-  },
-  "prop_6": {
-    "call_host_1": () => {
-      return global.globalObject1.prop_6.host_func_1()
-    }
-  },
-  "prop_7": 3.14,
-}
-
-global.Animal = function(name, age, isCat) {
-  this.name = name
-  this.age = age
-  this.bark = () => {
-    return isCat ? "nyan" : "wan"
-  }
-  this.isCat = isCat
-  this.getIsCat = function() {
-    return this.isCat
-  }
-}
-
 const startWasiTask = async (wasmPath) => {
   // Instantiate a new WASI Instance
   const wasmFs = new WasmFs();
@@ -86,20 +47,4 @@ const startWasiTask = async (wasmPath) => {
   wasi.start(instance);
 };
 
-startWasiTask("./dist/PrimaryTests.wasm").catch(err => {
-  console.log(err)
-});
-
-const { performance } = require('perf_hooks');
-
-global.benchmarkRunner = function(name, body) {
-  console.log(`Running '${name}'...`)
-  const startTime = performance.now();
-  body(5000)
-  const endTime = performance.now();
-  console.log("done " + (endTime - startTime) + " ms");
-}
-
-startWasiTask("./dist/BenchmarkTests.wasm").catch(err => {
-  console.log(err)
-});
+module.exports = { startWasiTask }
