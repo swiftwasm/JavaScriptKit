@@ -130,8 +130,7 @@ export class SwiftRuntime {
             return textDecoder.decode(uint8Memory.subarray(ptr, ptr + len));
         }
 
-        const writeString = (ptr: pointer, value: string) => {
-            const bytes = textEncoder.encode(value);
+        const writeString = (ptr: pointer, bytes: Uint8Array) => {
             const uint8Memory = new Uint8Array(memory().buffer);
             for (const [index, byte] of bytes.entries()) {
                 uint8Memory[ptr + index] = byte
@@ -224,10 +223,9 @@ export class SwiftRuntime {
                     break;
                 }
                 case "string": {
-                    // FIXME: currently encode twice
                     const bytes = textEncoder.encode(value);
                     writeUint32(kind_ptr, JavaScriptValueKind.String);
-                    writeUint32(payload1_ptr, this.heap.allocHeap(value));
+                    writeUint32(payload1_ptr, this.heap.allocHeap(bytes));
                     writeUint32(payload2_ptr, bytes.length);
                     break;
                 }
@@ -306,8 +304,8 @@ export class SwiftRuntime {
                 writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, payload3_ptr);
             },
             swjs_load_string: (ref: ref, buffer: pointer) => {
-                const string = this.heap.referenceHeap(ref);
-                writeString(buffer, string);
+                const bytes = this.heap.referenceHeap(ref);
+                writeString(buffer, bytes);
             },
             swjs_call_function: (
                 ref: ref, argv: pointer, argc: number,
