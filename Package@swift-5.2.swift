@@ -19,7 +19,9 @@ let package = Package(
                         "-Xlinker",
                         "--export=swjs_prepare_host_function_call",
                         "-Xlinker",
-                        "--export=swjs_cleanup_host_function_call"
+                        "--export=swjs_cleanup_host_function_call",
+                        "-Xlinker",
+                        "--export=swjs_library_version",
                     ]
                 )
             ]),

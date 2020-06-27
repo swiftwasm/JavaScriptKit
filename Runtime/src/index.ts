@@ -10,6 +10,7 @@ declare const window: GlobalVariable;
 declare const global: GlobalVariable;
 
 interface SwiftRuntimeExportedFunctions {
+    swjs_library_version(): number;
     swjs_prepare_host_function_call(size: number): pointer;
     swjs_cleanup_host_function_call(argv: pointer): void;
     swjs_call_host_function(
@@ -84,6 +85,7 @@ class SwiftRuntimeHeap {
 export class SwiftRuntime {
     private instance: WebAssembly.Instance | null;
     private heap: SwiftRuntimeHeap
+    private version: number = 400
 
     constructor() {
         this.instance = null;
@@ -92,6 +94,10 @@ export class SwiftRuntime {
 
     setInstance(instance: WebAssembly.Instance) {
         this.instance = instance
+        const exports = this.instance.exports as any as SwiftRuntimeExportedFunctions;
+        if (exports.swjs_library_version() != this.version) {
+          throw new Error("The versions of JavaScriptKit are incompatible.")
+        }
     }
 
     importObjects() {
