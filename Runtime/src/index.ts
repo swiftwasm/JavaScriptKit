@@ -69,6 +69,7 @@ class SwiftRuntimeHeap {
             const rc = --value.swjs_heap_rc;
             if (rc != 0) return;
             delete value.swjs_heap_id;
+            delete value.swjs_heap_rc;
             this._heapValues.delete(ref)
         } else {
             this._heapValues.delete(ref)
