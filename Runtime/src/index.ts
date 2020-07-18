@@ -31,8 +31,13 @@ enum JavaScriptValueKind {
     Function = 6,
 }
 
+type SwiftRuntimeHeapEntry = {
+    id: number,
+    rc: number,
+}
 class SwiftRuntimeHeap {
-    private _heapValues: Map<number, any>;
+    private _heapValueById: Map<number, any>;
+    private _heapEntryByValue: Map<any, SwiftRuntimeHeapEntry>;
     private _heapNextKey: number;
 
     constructor() {
@@ -42,43 +47,48 @@ class SwiftRuntimeHeap {
         } else if (typeof global !== "undefined") {
             _global = global
         }
-        this._heapValues = new Map();
-        this._heapValues.set(0, _global);
+        this._heapValueById = new Map();
+        this._heapValueById.set(0, _global);
+
+        this._heapEntryByValue = new Map();
+        this._heapEntryByValue.set(_global, { id: 0, rc: 1 });
+
         // Note: 0 is preserved for global
         this._heapNextKey = 1;
     }
 
     allocHeap(value: any) {
-        const isObject = typeof value == "object"
-        if (isObject && value.swjs_heap_id) {
-            value.swjs_heap_rc++;
-            return value.swjs_heap_id
+        const isObject = typeof value == "object";
+        const entry = this._heapEntryByValue.get(value); 
+        if (isObject && entry) {
+            entry.rc++
+            return entry.id
         }
         const id = this._heapNextKey++;
-        this._heapValues.set(id, value)
+        this._heapValueById.set(id, value)
         if (isObject) {
-            Reflect.set(value, "swjs_heap_id", id);
-            Reflect.set(value, "swjs_heap_rc", 1);
+            this._heapEntryByValue.set(value, { id: id, rc: 1 })
         }
         return id
     }
 
     freeHeap(ref: ref) {
-        const value = this._heapValues.get(ref);
+        const value = this._heapValueById.get(ref);
         const isObject = typeof value == "object"
         if (isObject) {
-            const rc = --value.swjs_heap_rc;
-            if (rc != 0) return;
-            delete value.swjs_heap_id;
-            delete value.swjs_heap_rc;
-            this._heapValues.delete(ref)
+            const entry = this._heapEntryByValue.get(value)!;
+            entry.rc--;
+            if (entry.rc != 0) return;
+
+            this._heapEntryByValue.delete(value);
+            this._heapValueById.delete(ref)
         } else {
-            this._heapValues.delete(ref)
+            this._heapValueById.delete(ref)
         }
     }
 
     referenceHeap(ref: ref) {
-        return this._heapValues.get(ref)
+        return this._heapValueById.get(ref)
     }
 }
 
