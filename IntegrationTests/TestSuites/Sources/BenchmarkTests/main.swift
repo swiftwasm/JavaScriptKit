@@ -19,3 +19,15 @@ serialization.testSuite("Swift String to JavaScript") {
         object.set("stringValue\(i)", jsString)
     }
 }
+
+
+let objectHeap = Benchmark("Object heap")
+
+let global = JSObjectRef.global
+let Object = global.Object.function!
+global.objectHeapDummy = .object(Object.new())
+objectHeap.testSuite("Increment and decrement RC") {
+    for _ in 0 ..< 100 {
+        _ = global.objectHeapDummy
+    }
+}
