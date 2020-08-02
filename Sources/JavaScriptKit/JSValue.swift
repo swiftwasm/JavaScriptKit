@@ -71,30 +71,24 @@ extension JSValue: ExpressibleByIntegerLiteral {
 
 public func getJSValue(this: JSObjectRef, name: String) -> JSValue {
     var rawValue = RawJSValue()
-    _get_prop(this.id, name, Int32(name.count),
-              &rawValue.kind,
-              &rawValue.payload1, &rawValue.payload2, &rawValue.payload3)
+    _get_prop(this.id, name, Int32(name.count), &rawValue)
     return rawValue.jsValue()
 }
 
 public func setJSValue(this: JSObjectRef, name: String, value: JSValue) {
     value.withRawJSValue { rawValue in
-        _set_prop(this.id, name, Int32(name.count), rawValue.kind, rawValue.payload1, rawValue.payload2, rawValue.payload3)
+        _set_prop(this.id, name, Int32(name.count), &rawValue)
     }
 }
 
 public func getJSValue(this: JSObjectRef, index: Int32) -> JSValue {
     var rawValue = RawJSValue()
-    _get_subscript(this.id, index,
-                   &rawValue.kind,
-                   &rawValue.payload1, &rawValue.payload2, &rawValue.payload3)
+    _get_subscript(this.id, index, &rawValue)
     return rawValue.jsValue()
 }
 
 public func setJSValue(this: JSObjectRef, index: Int32, value: JSValue) {
     value.withRawJSValue { rawValue in
-        _set_subscript(this.id, index,
-                       rawValue.kind,
-                       rawValue.payload1, rawValue.payload2, rawValue.payload3)
+        _set_subscript(this.id, index, &rawValue)
     }
 }

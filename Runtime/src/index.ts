@@ -59,7 +59,7 @@ class SwiftRuntimeHeap {
 
     allocHeap(value: any) {
         const isObject = typeof value == "object";
-        const entry = this._heapEntryByValue.get(value); 
+        const entry = this._heapEntryByValue.get(value);
         if (isObject && entry) {
             entry.rc++
             return entry.id
@@ -124,10 +124,12 @@ export class SwiftRuntime {
             const exports = this.instance.exports as any as SwiftRuntimeExportedFunctions;
             const argc = args.length
             const argv = exports.swjs_prepare_host_function_call(argc)
+            const uint32Memory = new Uint32Array(memory().buffer, argv, args.length * 3)
             for (let index = 0; index < args.length; index++) {
                 const argument = args[index]
-                const base = argv + 24 * index
-                writeValue(argument, base, base + 4, base + 8, base + 16)
+                const offset = 12 * index
+                const dataView = new DataView(memory().buffer, argv + offset, 12);
+                writeValue(argument, dataView)
             }
             let output: any;
             const callback_func_ref = this.heap.allocHeap(function (result: any) {
@@ -142,24 +144,20 @@ export class SwiftRuntime {
         const textEncoder = new TextEncoder(); // Only support utf-8
 
         const readString = (ptr: pointer, len: number) => {
-            const uint8Memory = new Uint8Array(memory().buffer);
-            return textDecoder.decode(uint8Memory.subarray(ptr, ptr + len));
+            const uint8Memory = new Uint8Array(memory().buffer, ptr, len);
+            return textDecoder.decode(uint8Memory);
         }
 
         const writeString = (ptr: pointer, bytes: Uint8Array) => {
-            const uint8Memory = new Uint8Array(memory().buffer);
+            const uint8Memory = new Uint8Array(memory().buffer, ptr);
             for (const [index, byte] of bytes.entries()) {
-                uint8Memory[ptr + index] = byte
+                uint8Memory[index] = byte
             }
-            uint8Memory[ptr]
         }
 
         const readUInt32 = (ptr: pointer) => {
-            const uint8Memory = new Uint8Array(memory().buffer);
-            return uint8Memory[ptr + 0]
-                + (uint8Memory[ptr + 1] << 8)
-                + (uint8Memory[ptr + 2] << 16)
-                + (uint8Memory[ptr + 3] << 24)
+            const uint32Memory = new Uint32Array(memory().buffer, ptr, 1);
+            return uint32Memory[0];
         }
 
         const readFloat64 = (ptr: pointer) => {
@@ -168,11 +166,8 @@ export class SwiftRuntime {
         }
 
         const writeUint32 = (ptr: pointer, value: number) => {
-            const uint8Memory = new Uint8Array(memory().buffer);
-            uint8Memory[ptr + 0] = (value & 0x000000ff) >> 0
-            uint8Memory[ptr + 1] = (value & 0x0000ff00) >> 8
-            uint8Memory[ptr + 2] = (value & 0x00ff0000) >> 16
-            uint8Memory[ptr + 3] = (value & 0xff000000) >> 24
+            const uint32Memory = new Uint32Array(memory().buffer, ptr);
+            uint32Memory[0] = (value & 0xffffffff);
         }
 
         const writeFloat64 = (ptr: pointer, value: number) => {
@@ -180,25 +175,28 @@ export class SwiftRuntime {
             dataView.setFloat64(ptr, value, true);
         }
 
-        const decodeValue = (
-            kind: JavaScriptValueKind,
-            payload1: number, payload2: number, payload3: number
-        ) => {
+        const decodeValue = (dataView: DataView) => {
+            const kind = dataView.getUint32(0, true);
+            const payload1_ptr = Uint32Array.BYTES_PER_ELEMENT
+            const payload2_ptr = 2 * Uint32Array.BYTES_PER_ELEMENT
             switch (kind) {
                 case JavaScriptValueKind.Boolean: {
-                    switch (payload1) {
+                    switch (dataView.getUint32(payload1_ptr, true)) {
                         case 0: return false
                         case 1: return true
                     }
                 }
                 case JavaScriptValueKind.Number: {
-                    return payload3;
+                    return dataView.getFloat64(payload1_ptr, true);
                 }
                 case JavaScriptValueKind.String: {
-                    return readString(payload1, payload2)
+                    return readString(
+                      dataView.getUint32(payload1_ptr, true),
+                      dataView.getUint32(payload2_ptr, true)
+                    );
                 }
                 case JavaScriptValueKind.Object: {
-                    return this.heap.referenceHeap(payload1)
+                    return this.heap.referenceHeap(dataView.getUint32(payload1_ptr, true))
                 }
                 case JavaScriptValueKind.Null: {
                     return null
@@ -207,60 +205,57 @@ export class SwiftRuntime {
                     return undefined
                 }
                 case JavaScriptValueKind.Function: {
-                    return this.heap.referenceHeap(payload1)
+                    return this.heap.referenceHeap(dataView.getUint32(payload1_ptr, true))
                 }
                 default:
                     throw new Error(`Type kind "${kind}" is not supported`)
             }
         }
 
-        const writeValue = (
-            value: any, kind_ptr: pointer,
-            payload1_ptr: pointer, payload2_ptr: pointer, payload3_ptr: pointer
-        ) => {
+        const writeValue = (value: any, dataView: DataView) => {
+            const payload1_ptr = Uint32Array.BYTES_PER_ELEMENT
+            const payload2_ptr = 2 * Uint32Array.BYTES_PER_ELEMENT
             if (value === null) {
-                writeUint32(kind_ptr, JavaScriptValueKind.Null);
-                writeUint32(payload1_ptr, 0);
-                writeUint32(payload2_ptr, 0);
+                dataView.setUint32(0, JavaScriptValueKind.Null, true);
+                dataView.setUint32(payload1_ptr, 0, true);
+                dataView.setUint32(payload2_ptr, 0, true);
                 return;
             }
             switch (typeof value) {
                 case "boolean": {
-                    writeUint32(kind_ptr, JavaScriptValueKind.Boolean);
-                    writeUint32(payload1_ptr, value ? 1 : 0);
-                    writeUint32(payload2_ptr, 0);
+                    dataView.setUint32(0, JavaScriptValueKind.Boolean, true);
+                    dataView.setUint32(payload1_ptr, value ? 1 : 0, true);
+                    dataView.setUint32(payload2_ptr, 0, true);
                     break;
                 }
                 case "number": {
-                    writeUint32(kind_ptr, JavaScriptValueKind.Number);
-                    writeUint32(payload1_ptr, 0);
-                    writeUint32(payload2_ptr, 0);
-                    writeFloat64(payload3_ptr, value);
+                    dataView.setUint32(0, JavaScriptValueKind.Number, true);
+                    dataView.setFloat64(payload1_ptr, value, true);
                     break;
                 }
                 case "string": {
                     const bytes = textEncoder.encode(value);
-                    writeUint32(kind_ptr, JavaScriptValueKind.String);
-                    writeUint32(payload1_ptr, this.heap.allocHeap(bytes));
-                    writeUint32(payload2_ptr, bytes.length);
+                    dataView.setUint32(0, JavaScriptValueKind.String, true);
+                    dataView.setUint32(payload1_ptr, this.heap.allocHeap(bytes), true);
+                    dataView.setUint32(payload2_ptr, bytes.length, true);
                     break;
                 }
                 case "undefined": {
-                    writeUint32(kind_ptr, JavaScriptValueKind.Undefined);
-                    writeUint32(payload1_ptr, 0);
-                    writeUint32(payload2_ptr, 0);
+                    dataView.setUint32(0, JavaScriptValueKind.Undefined, true);
+                    dataView.setUint32(payload1_ptr, 0, true);
+                    dataView.setUint32(payload2_ptr, 0, true);
                     break;
                 }
                 case "object": {
-                    writeUint32(kind_ptr, JavaScriptValueKind.Object);
-                    writeUint32(payload1_ptr, this.heap.allocHeap(value));
-                    writeUint32(payload2_ptr, 0);
+                    dataView.setUint32(0, JavaScriptValueKind.Object, true);
+                    dataView.setUint32(payload1_ptr, this.heap.allocHeap(value), true);
+                    dataView.setUint32(payload2_ptr, 0, true);
                     break;
                 }
                 case "function": {
-                    writeUint32(kind_ptr, JavaScriptValueKind.Function);
-                    writeUint32(payload1_ptr, this.heap.allocHeap(value));
-                    writeUint32(payload2_ptr, 0);
+                    dataView.setUint32(0, JavaScriptValueKind.Function, true);
+                    dataView.setUint32(payload1_ptr, this.heap.allocHeap(value), true);
+                    dataView.setUint32(payload2_ptr, 0, true);
                     break;
                 }
                 default:
@@ -274,12 +269,9 @@ export class SwiftRuntime {
         const decodeValues = (ptr: pointer, length: number) => {
             let result = []
             for (let index = 0; index < length; index++) {
-                const base = ptr + 24 * index
-                const kind = readUInt32(base)
-                const payload1 = readUInt32(base + 4)
-                const payload2 = readUInt32(base + 8)
-                const payload3 = readFloat64(base + 16)
-                result.push(decodeValue(kind, payload1, payload2, payload3))
+                const offset = 12 * index
+                const dataView = new DataView(memory().buffer, ptr + offset, 12);
+                result.push(decodeValue(dataView))
             }
             return result
         }
@@ -287,37 +279,37 @@ export class SwiftRuntime {
         return {
             swjs_set_prop: (
                 ref: ref, name: pointer, length: number,
-                kind: JavaScriptValueKind,
-                payload1: number, payload2: number, payload3: number
+                rawJSValuePtr: pointer
             ) => {
                 const obj = this.heap.referenceHeap(ref);
-                Reflect.set(obj, readString(name, length), decodeValue(kind, payload1, payload2, payload3))
+                const dataView = new DataView(memory().buffer, rawJSValuePtr, 12);
+                Reflect.set(obj, readString(name, length), decodeValue(dataView))
             },
             swjs_get_prop: (
                 ref: ref, name: pointer, length: number,
-                kind_ptr: pointer,
-                payload1_ptr: pointer, payload2_ptr: pointer, payload3_ptr: number
+                rawJSValuePtr: pointer
             ) => {
                 const obj = this.heap.referenceHeap(ref);
                 const result = Reflect.get(obj, readString(name, length));
-                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, payload3_ptr);
+                const dataView = new DataView(memory().buffer, rawJSValuePtr, 12);
+                writeValue(result, dataView);
             },
             swjs_set_subscript: (
                 ref: ref, index: number,
-                kind: JavaScriptValueKind,
-                payload1: number, payload2: number, payload3: number
+                rawJSValuePtr: pointer
             ) => {
                 const obj = this.heap.referenceHeap(ref);
-                Reflect.set(obj, index, decodeValue(kind, payload1, payload2, payload3))
+                const dataView = new DataView(memory().buffer, rawJSValuePtr, 12);
+                Reflect.set(obj, index, decodeValue(dataView))
             },
             swjs_get_subscript: (
                 ref: ref, index: number,
-                kind_ptr: pointer,
-                payload1_ptr: pointer, payload2_ptr: pointer, payload3_ptr: pointer
+                rawJSValuePtr: pointer
             ) => {
                 const obj = this.heap.referenceHeap(ref);
                 const result = Reflect.get(obj, index);
-                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, payload3_ptr);
+                const dataView = new DataView(memory().buffer, rawJSValuePtr, 12);
+                writeValue(result, dataView);
             },
             swjs_load_string: (ref: ref, buffer: pointer) => {
                 const bytes = this.heap.referenceHeap(ref);
@@ -325,23 +317,23 @@ export class SwiftRuntime {
             },
             swjs_call_function: (
                 ref: ref, argv: pointer, argc: number,
-                kind_ptr: pointer,
-                payload1_ptr: pointer, payload2_ptr: pointer, payload3_ptr: pointer
+                rawJSValuePtr: pointer
             ) => {
                 const func = this.heap.referenceHeap(ref)
                 const result = Reflect.apply(func, undefined, decodeValues(argv, argc))
-                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, payload3_ptr);
+                const dataView = new DataView(memory().buffer, rawJSValuePtr, 12);
+                writeValue(result, dataView);
             },
             swjs_call_function_with_this: (
                 obj_ref: ref, func_ref: ref,
                 argv: pointer, argc: number,
-                kind_ptr: pointer,
-                payload1_ptr: pointer, payload2_ptr: pointer, payload3_ptr: pointer
+                rawJSValuePtr: pointer
             ) => {
                 const obj = this.heap.referenceHeap(obj_ref)
                 const func = this.heap.referenceHeap(func_ref)
                 const result = Reflect.apply(func, obj, decodeValues(argv, argc))
-                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, payload3_ptr);
+                const dataView = new DataView(memory().buffer, rawJSValuePtr, 12);
+                writeValue(result, dataView);
             },
             swjs_create_function: (
                 host_func_id: number,

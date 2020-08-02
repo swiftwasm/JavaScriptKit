@@ -101,7 +101,7 @@ extension RawJSValue: JSValueConvertible {
         case .boolean:
             return .boolean(payload1 != 0)
         case .number:
-            return .number(payload3)
+            return .number(Double(bitPattern: UInt64(payload1) | (UInt64(payload2) << 32)))
         case .string:
             // +1 for null terminator
             let buffer = malloc(Int(payload2 + 1))!.assumingMemoryBound(to: UInt8.self)
@@ -125,11 +125,10 @@ extension RawJSValue: JSValueConvertible {
 }
 
 extension JSValue {
-    func withRawJSValue<T>(_ body: (RawJSValue) -> T) -> T {
+    func withRawJSValue<T>(_ body: (inout RawJSValue) -> T) -> T {
         let kind: JavaScriptValueKind
         let payload1: JavaScriptPayload1
         let payload2: JavaScriptPayload2
-        var payload3: JavaScriptPayload3 = 0
         switch self {
         case let .boolean(boolValue):
             kind = .boolean
@@ -137,15 +136,14 @@ extension JSValue {
             payload2 = 0
         case let .number(numberValue):
             kind = .number
-            payload1 = 0
-            payload2 = 0
-            payload3 = numberValue
+            payload1 = UInt32(numberValue.bitPattern & 0x00000000ffffffff)
+            payload2 = UInt32((numberValue.bitPattern & 0xffffffff00000000) >> 32)
         case var .string(stringValue):
             kind = .string
             return stringValue.withUTF8 { bufferPtr in
                 let ptrValue = UInt32(UInt(bitPattern: bufferPtr.baseAddress!))
-                let rawValue = RawJSValue(kind: kind, payload1: JavaScriptPayload1(ptrValue), payload2: JavaScriptPayload2(bufferPtr.count), payload3: 0)
-                return body(rawValue)
+                var rawValue = RawJSValue(kind: kind, payload1: JavaScriptPayload1(ptrValue), payload2: JavaScriptPayload2(bufferPtr.count))
+                return body(&rawValue)
             }
         case let .object(ref):
             kind = .object
@@ -164,8 +162,8 @@ extension JSValue {
             payload1 = JavaScriptPayload1(functionRef.id)
             payload2 = 0
         }
-        let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2, payload3: payload3)
-        return body(rawValue)
+        var rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
+        return body(&rawValue)
     }
 }
 
