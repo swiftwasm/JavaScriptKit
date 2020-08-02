@@ -24,15 +24,22 @@ func expectEqual<T: Equatable>(
 
 func expectObject(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSObjectRef {
     switch value {
-    case .object(let ref): return ref
+    case let .object(ref): return ref
     default:
         throw MessageError("Type of \(value) should be \"object\"", file: file, line: line, column: column)
     }
 }
 
+func expectArray(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSArrayRef {
+    guard let array = value.array else {
+        throw MessageError("Type of \(value) should be \"object\"", file: file, line: line, column: column)
+    }
+    return array
+}
+
 func expectFunction(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSFunctionRef {
     switch value {
-    case .function(let ref): return ref
+    case let .function(ref): return ref
     default:
         throw MessageError("Type of \(value) should be \"function\"", file: file, line: line, column: column)
     }
@@ -40,15 +47,15 @@ func expectFunction(_ value: JSValue, file: StaticString = #file, line: UInt = #
 
 func expectBoolean(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> Bool {
     switch value {
-    case .boolean(let bool): return bool
+    case let .boolean(bool): return bool
     default:
         throw MessageError("Type of \(value) should be \"boolean\"", file: file, line: line, column: column)
     }
 }
 
-func expectNumber(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> Int32 {
+func expectNumber(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> Double {
     switch value {
-    case .number(let number): return number
+    case let .number(number): return number
     default:
         throw MessageError("Type of \(value) should be \"number\"", file: file, line: line, column: column)
     }
@@ -56,7 +63,7 @@ func expectNumber(_ value: JSValue, file: StaticString = #file, line: UInt = #li
 
 func expectString(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> String {
     switch value {
-    case .string(let string): return string
+    case let .string(string): return string
     default:
         throw MessageError("Type of \(value) should be \"string\"", file: file, line: line, column: column)
     }

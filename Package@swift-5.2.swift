@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.2
 
 import PackageDescription
 
@@ -22,8 +22,7 @@ let package = Package(
                         "--export=swjs_cleanup_host_function_call",
                         "-Xlinker",
                         "--export=swjs_library_version",
-                    ],
-                    .when(platforms: [.wasi])
+                    ]
                 ),
             ]
         ),
@@ -34,8 +33,7 @@ let package = Package(
                     [
                         "-Xlinker",
                         "--allow-undefined",
-                    ],
-                    .when(platforms: [.wasi])
+                    ]
                 ),
             ]
         ),

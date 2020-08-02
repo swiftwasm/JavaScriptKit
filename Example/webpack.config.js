@@ -9,6 +9,11 @@ module.exports = {
     path: outputPath,
   },
   devServer: {
-    hot: true
-  }
+    inline: true,
+    watchContentBase: true,
+    contentBase: [
+      path.join(__dirname, 'public'),
+      path.join(__dirname, 'dist'),
+    ],
+  },
 };

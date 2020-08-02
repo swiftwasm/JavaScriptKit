@@ -1,17 +1,27 @@
-MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+CONFIGURATION ?= debug
 
-.PHONY: JavaScriptKitExec
-JavaScriptKitExec:
-	cd JavaScriptKitExec &&  \
-	    swift build --triple wasm32-unknown-wasi
+FORCE:
+TestSuites/.build/$(CONFIGURATION)/%: FORCE
+	swift build --package-path TestSuites \
+	            --product $(notdir $@) \
+	            --triple wasm32-unknown-wasi \
+	            --configuration $(CONFIGURATION)
 
-dist/JavaScriptKitExec.wasm: JavaScriptKitExec
+dist/%.wasm: TestSuites/.build/$(CONFIGURATION)/%
 	mkdir -p dist
-	cp ./JavaScriptKitExec/.build/debug/JavaScriptKitExec $@
+	cp $< $@
 
-node_modules:
+node_modules: package-lock.json
 	npm install
-build: node_modules dist/JavaScriptKitExec.wasm
+
+.PHONY: build_rt
+build_rt: node_modules
 	cd ../Runtime && npm run build
-test: build
-	node index.js
+
+.PHONY: benchmark
+benchmark: build_rt dist/BenchmarkTests.wasm
+	node bin/benchmark-tests.js
+
+.PHONY: test
+test: build_rt dist/PrimaryTests.wasm
+	node bin/primary-tests.js

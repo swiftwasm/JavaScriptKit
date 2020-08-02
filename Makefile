@@ -11,5 +11,7 @@ build:
 
 .PHONY: test
 test:
-	cd IntegrationTests && make test
+	cd IntegrationTests && \
+	    CONFIGURATION=debug make test && \
+	    CONFIGURATION=release make test
 

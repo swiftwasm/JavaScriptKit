@@ -10,6 +10,7 @@ declare const window: GlobalVariable;
 declare const global: GlobalVariable;
 
 interface SwiftRuntimeExportedFunctions {
+    swjs_library_version(): number;
     swjs_prepare_host_function_call(size: number): pointer;
     swjs_cleanup_host_function_call(argv: pointer): void;
     swjs_call_host_function(
@@ -30,8 +31,13 @@ enum JavaScriptValueKind {
     Function = 6,
 }
 
+type SwiftRuntimeHeapEntry = {
+    id: number,
+    rc: number,
+}
 class SwiftRuntimeHeap {
-    private _heapValues: Map<number, any>;
+    private _heapValueById: Map<number, any>;
+    private _heapEntryByValue: Map<any, SwiftRuntimeHeapEntry>;
     private _heapNextKey: number;
 
     constructor() {
@@ -41,49 +47,67 @@ class SwiftRuntimeHeap {
         } else if (typeof global !== "undefined") {
             _global = global
         }
-        this._heapValues = new Map();
-        this._heapValues.set(0, _global);
+        this._heapValueById = new Map();
+        this._heapValueById.set(0, _global);
+
+        this._heapEntryByValue = new Map();
+        this._heapEntryByValue.set(_global, { id: 0, rc: 1 });
+
         // Note: 0 is preserved for global
         this._heapNextKey = 1;
     }
 
     allocHeap(value: any) {
-        const isObject = typeof value == "object"
-        if (isObject && value.swjs_heap_id) {
-            return value.swjs_heap_id
+        const isObject = typeof value == "object";
+        const entry = this._heapEntryByValue.get(value);
+        if (isObject && entry) {
+            entry.rc++
+            return entry.id
         }
         const id = this._heapNextKey++;
-        this._heapValues.set(id, value)
-        if (isObject)
-            Reflect.set(value, "swjs_heap_id", id);
+        this._heapValueById.set(id, value)
+        if (isObject) {
+            this._heapEntryByValue.set(value, { id: id, rc: 1 })
+        }
         return id
     }
 
     freeHeap(ref: ref) {
-        const value = this._heapValues.get(ref);
+        const value = this._heapValueById.get(ref);
         const isObject = typeof value == "object"
-        if (isObject && value.swjs_heap_id) {
-            delete value.swjs_heap_id;
+        if (isObject) {
+            const entry = this._heapEntryByValue.get(value)!;
+            entry.rc--;
+            if (entry.rc != 0) return;
+
+            this._heapEntryByValue.delete(value);
+            this._heapValueById.delete(ref)
+        } else {
+            this._heapValueById.delete(ref)
         }
-        this._heapValues.delete(ref)
     }
 
     referenceHeap(ref: ref) {
-        return this._heapValues.get(ref)
+        return this._heapValueById.get(ref)
     }
 }
 
 export class SwiftRuntime {
     private instance: WebAssembly.Instance | null;
     private heap: SwiftRuntimeHeap
+    private version: number = 400
 
     constructor() {
         this.instance = null;
         this.heap = new SwiftRuntimeHeap();
     }
 
-    setInsance(instance: WebAssembly.Instance) {
+    setInstance(instance: WebAssembly.Instance) {
         this.instance = instance
+        const exports = this.instance.exports as any as SwiftRuntimeExportedFunctions;
+        if (exports.swjs_library_version() != this.version) {
+          throw new Error("The versions of JavaScriptKit are incompatible.")
+        }
     }
 
     importObjects() {
@@ -124,8 +148,7 @@ export class SwiftRuntime {
             return textDecoder.decode(uint8Memory);
         }
 
-        const writeString = (ptr: pointer, value: string) => {
-            const bytes = textEncoder.encode(value);
+        const writeString = (ptr: pointer, bytes: Uint8Array) => {
             const uint8Memory = new Uint8Array(memory().buffer, ptr);
             for (const [index, byte] of bytes.entries()) {
                 uint8Memory[index] = byte
@@ -137,9 +160,19 @@ export class SwiftRuntime {
             return uint32Memory[0];
         }
 
+        const readFloat64 = (ptr: pointer) => {
+            const dataView = new DataView(memory().buffer);
+            return dataView.getFloat64(ptr, true);
+        }
+
         const writeUint32 = (ptr: pointer, value: number) => {
             const uint32Memory = new Uint32Array(memory().buffer, ptr);
             uint32Memory[0] = (value & 0xffffffff);
+        }
+
+        const writeFloat64 = (ptr: pointer, value: number) => {
+            const dataView = new DataView(memory().buffer);
+            dataView.setFloat64(ptr, value, true);
         }
 
         const decodeValue = (
@@ -229,7 +262,7 @@ export class SwiftRuntime {
 
         // Note:
         // `decodeValues` assumes that the size of RawJSValue is 12
-        // and the alignment of it is 4
+        // and the alignment of it is 8
         const decodeValues = (ptr: pointer, length: number) => {
             let result = []
             for (let index = 0; index < length; index++) {
@@ -276,8 +309,8 @@ export class SwiftRuntime {
                 encodeValue(result, dataView);
             },
             swjs_load_string: (ref: ref, buffer: pointer) => {
-                const string = this.heap.referenceHeap(ref);
-                writeString(buffer, string);
+                const bytes = this.heap.referenceHeap(ref);
+                writeString(buffer, bytes);
             },
             swjs_call_function: (
                 ref: ref, argv: pointer, argc: number,

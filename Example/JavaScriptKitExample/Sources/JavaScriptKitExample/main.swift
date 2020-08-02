@@ -8,4 +8,10 @@ divElement.innerText = "Hello, world"
 let body = document.body.object!
 _ = body.appendChild!(divElement)
 
-alert("Swift is running on browser!")
+let buttonElement = document.createElement!("button").object!
+buttonElement.innerText = "Click me!"
+buttonElement.onclick = .function { _ in
+    alert("Swift is running on browser!")
+}
+
+_ = body.appendChild!(buttonElement)

@@ -22,18 +22,23 @@ public enum JSValue: Equatable {
         default: return nil
         }
     }
+
     public var number: Double? {
         switch self {
         case let .number(number): return number
         default: return nil
         }
     }
-    
+
     public var object: JSObjectRef? {
         switch self {
         case let .object(object): return object
         default: return nil
         }
+    }
+
+    public var array: JSArrayRef? {
+        object.flatMap { JSArrayRef($0) }
     }
 
     public var function: JSFunctionRef? {
@@ -42,6 +47,9 @@ public enum JSValue: Equatable {
         default: return nil
         }
     }
+
+    public var isNull: Bool { return self == .null }
+    public var isUndefined: Bool { return self == .undefined }
 
     public var isBoolean: Bool {
         guard case .boolean = self else { return false }
@@ -83,6 +91,12 @@ extension JSValue {
     }
 }
 
+extension JSValue {
+    public static func function(_ body: @escaping ([JSValue]) -> JSValue) -> JSValue {
+        .function(JSClosure(body))
+    }
+}
+
 extension JSValue: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         self = .string(value)
@@ -119,7 +133,6 @@ public func getJSValue(this: JSObjectRef, index: Int32) -> JSValue {
     return rawValue.jsValue()
 }
 
-
 public func setJSValue(this: JSObjectRef, index: Int32, value: JSValue) {
     value.withRawJSValue { rawValue in
         _set_subscript(this._id, index, &rawValue)
@@ -129,10 +142,10 @@ public func setJSValue(this: JSObjectRef, index: Int32, value: JSValue) {
 extension JSValue {
 
     public func instanceOf(_ constructor: String) -> Bool {
-        
+
         switch self {
         case .boolean:
-            return  constructor == "Bool"
+            return constructor == "Bool"
         case .string:
             return constructor == "String"
         case .number:
@@ -148,4 +161,3 @@ extension JSValue {
         }
     }
 }
-

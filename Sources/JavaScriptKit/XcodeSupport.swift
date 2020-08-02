@@ -5,7 +5,7 @@ import _CJavaScriptKit
 /// SwiftPM doesn't support WebAssembly target yet, so we need to define them to
 /// avoid link failure.
 /// When running with JavaScript runtime library, they are ignored completely.
-#if Xcode
+#if !arch(wasm32)
 func _set_prop(
     _ _this: JavaScriptObjectRef,
     _ prop: UnsafePointer<Int8>!, _ length: Int32,

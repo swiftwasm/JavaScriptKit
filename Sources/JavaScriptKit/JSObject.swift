@@ -13,6 +13,7 @@ public class JSObjectRef: Equatable {
         self._id = id
     }
 
+    @_disfavoredOverload
     public subscript(dynamicMember name: String) -> ((JSValueEncodable...) -> JSValue)? {
         get {
             let function: JSFunctionRef

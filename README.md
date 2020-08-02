@@ -13,9 +13,9 @@ The toolchains can be installed via [`swiftenv`](https://github.com/kylef/swifte
 e.g.
 ```sh
 
-$ swiftenv install https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-03-08-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-03-08-a-osx.tar.gz
+$ swiftenv install https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-06-03-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-06-03-a-osx.tar.gz
 $ swift --version
-Swift version 5.2-dev (LLVM 7fc8796bc1, Swift 5be35e7aee)
+Swift version 5.3-dev (LLVM 47c28180d7, Swift 5f96d487e0)
 Target: x86_64-apple-darwin19.3.0
 ```
 
@@ -32,6 +32,13 @@ divElement.innerText = "Hello, world"
 const body = document.body
 body.appendChild(divElement)
 
+const pet = {
+  age: 3,
+  owner: {
+    name: "Mike",
+  },
+}
+
 alert("JavaScript is running on browser!")
 ```
 
@@ -47,6 +54,18 @@ let divElement = document.createElement!("div").object!
 divElement.innerText = "Hello, world"
 let body = document.body.object!
 _ = body.appendChild!(divElement)
+
+struct Owner: Codable {
+  let name: String
+}
+
+struct Pet: Codable {
+  let age: Int
+  let owner: Owner
+}
+
+let jsPet = JSObjectRef.global.pet
+let swiftPet: Pet = try JSValueDecoder().decode(from: jsPet)
 
 alert("Swift is running on browser!")
 ```
