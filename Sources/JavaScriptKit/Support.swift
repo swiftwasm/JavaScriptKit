@@ -50,7 +50,7 @@ public func staticCast<Type: JSBridgedType>(_ ref: JSBridgedType) -> Type {
 }
 
 public func dynamicCast<Type: JSBridgedType>(_ ref: JSBridgedType) -> Type? {
-    guard let constructor = Type.constructor, ref.objectRef.isInstanceOf(constructor) else {
+    guard ref.objectRef.isInstanceOf(Type.classRef) else {
         return nil
     }
     return staticCast(ref)

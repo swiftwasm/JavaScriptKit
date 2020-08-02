@@ -1,7 +1,7 @@
 import _CJavaScriptKit
 
 public protocol JSBridgedType: JSValueCodable, CustomStringConvertible {
-    static var constructor: JSFunction? { get }
+    static var classRef: JSFunction { get }
 
     var objectRef: JSObject { get }
     init(objectRef: JSObject)
@@ -21,11 +21,7 @@ public typealias JSValueCodable = JSValueConvertible & JSValueConstructible
 
 extension JSBridgedType {
     public static func canDecode(from jsValue: JSValue) -> Bool {
-        if let constructor = Self.constructor {
-            return jsValue.isInstanceOf(constructor)
-        } else {
-            return jsValue.isObject
-        }
+        jsValue.isInstanceOf(Self.classRef)
     }
 
     public init(jsValue: JSValue) {
