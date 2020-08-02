@@ -180,7 +180,8 @@ export class SwiftRuntime {
                       dataView.getUint32(payload2_ptr, true)
                     );
                 }
-                case JavaScriptValueKind.Object: {
+                case JavaScriptValueKind.Object:
+                case JavaScriptValueKind.Function: {
                     return this.heap.referenceHeap(dataView.getUint32(payload1_ptr, true))
                 }
                 case JavaScriptValueKind.Null: {
@@ -188,9 +189,6 @@ export class SwiftRuntime {
                 }
                 case JavaScriptValueKind.Undefined: {
                     return undefined
-                }
-                case JavaScriptValueKind.Function: {
-                    return this.heap.referenceHeap(dataView.getUint32(payload1_ptr, true))
                 }
                 default:
                     throw new Error(`Type kind "${kind}" is not supported`)
