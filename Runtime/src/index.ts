@@ -247,8 +247,7 @@ export class SwiftRuntime {
         }
 
         // Note:
-        // `decodeValues` assumes that the size of RawJSValue is 24
-        // and the alignment of it is 8
+        // `decodeValues` assumes that the size of RawJSValue is 12
         const decodeValues = (ptr: pointer, length: number) => {
             let result = []
             for (let index = 0; index < length; index++) {
