@@ -155,24 +155,9 @@ export class SwiftRuntime {
             }
         }
 
-        const readUInt32 = (ptr: pointer) => {
-            const uint32Memory = new Uint32Array(memory().buffer, ptr, 1);
-            return uint32Memory[0];
-        }
-
-        const readFloat64 = (ptr: pointer) => {
-            const dataView = new DataView(memory().buffer);
-            return dataView.getFloat64(ptr, true);
-        }
-
         const writeUint32 = (ptr: pointer, value: number) => {
             const uint32Memory = new Uint32Array(memory().buffer, ptr);
             uint32Memory[0] = (value & 0xffffffff);
-        }
-
-        const writeFloat64 = (ptr: pointer, value: number) => {
-            const dataView = new DataView(memory().buffer);
-            dataView.setFloat64(ptr, value, true);
         }
 
         const decodeValue = (dataView: DataView) => {
