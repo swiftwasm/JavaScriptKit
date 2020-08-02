@@ -2,6 +2,7 @@
 #define _CJavaScriptKit_h
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef unsigned int JavaScriptObjectRef;
 typedef unsigned int JavaScriptHostFuncRef;
@@ -81,6 +82,12 @@ __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_new"))) extern void
 _call_new(const JavaScriptObjectRef ref, const RawJSValue *argv, const int argc,
           JavaScriptObjectRef *result_obj);
+
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_instanceof"))) extern void
+_instanceof(const JavaScriptObjectRef obj,
+            const JavaScriptObjectRef constructor,
+            bool *result);
 
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_create_function"))) extern void

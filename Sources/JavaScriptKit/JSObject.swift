@@ -32,6 +32,16 @@ public class JSObjectRef: Equatable {
         getJSValue(this: self, index: Int32(index))
     }
 
+    public func instanceof(_ constructor: JSValue) -> Bool {
+        instanceof(constructor.function!)
+    }
+
+    public func instanceof(_ constructor: JSFunctionRef) -> Bool {
+      var result: Bool = false
+      _instanceof(self.id, constructor.id, &result)
+      return result
+    }
+
     public subscript(_ index: Int) -> JSValue {
         get { get(index) }
         set { set(index, newValue) }

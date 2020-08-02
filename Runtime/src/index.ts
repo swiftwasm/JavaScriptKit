@@ -362,6 +362,15 @@ export class SwiftRuntime {
                     throw Error(`Invalid result type of object constructor of "${obj}": "${result}"`)
                 writeUint32(result_obj, this.heap.allocHeap(result));
             },
+            swjs_instanceof: (
+                obj_ref: ref, constructor_ref: ref,
+                result_ptr: pointer
+            ) => {
+              const obj = this.heap.referenceHeap(obj_ref)
+              const constructor = this.heap.referenceHeap(constructor_ref)
+              const result = obj instanceof constructor
+              writeUint32(result_ptr, Number(result))
+            },
             swjs_destroy_ref: (ref: ref) => {
                 this.heap.freeHeap(ref)
             }

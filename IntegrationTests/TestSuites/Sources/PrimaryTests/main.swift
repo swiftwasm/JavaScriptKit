@@ -228,6 +228,8 @@ New_Object_Construction: do {
     let cat1 = objectConstructor.new("Tama", 3, true)
     try expectEqual(getJSValue(this: cat1, name: "name"), .string("Tama"))
     try expectEqual(getJSValue(this: cat1, name: "age"), .number(3))
+    try expectEqual(cat1.instanceof(objectConstructor), true)
+    try expectEqual(cat1.instanceof(try expectFunction(getJSValue(this: .global, name: "Array"))), false)
     let cat1Bark = try expectFunction(getJSValue(this: cat1, name: "bark"))
     try expectEqual(cat1Bark(), .string("nyan"))
 
