@@ -6,8 +6,8 @@ public enum _JSFunctionConstructorSymbol {
 
 public class JSFunctionRef: JSObjectRef {
     @discardableResult
-    public func callAsFunction(this: JSObjectRef? = nil, _ arguments: [JSValueConvertible]) -> JSValue {
-        let result = arguments.withRawJSValues { rawValues in
+    func callAsFunction(this: JSObjectRef? = nil, args: [JSValueConvertible]) -> JSValue {
+        let result = args.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
@@ -29,8 +29,8 @@ public class JSFunctionRef: JSObjectRef {
     }
 
     @discardableResult
-    public func callAsFunction(this: JSObjectRef? = nil, _ arguments: JSValueConvertible...) -> JSValue {
-        self(this: this, arguments)
+    public func callAsFunction(this: JSObjectRef? = nil, _ args: JSValueConvertible...) -> JSValue {
+        self(this: this, args: args)
     }
 
     public func callAsFunction(new arguments: JSValueConvertible...) -> JSObjectRef {
