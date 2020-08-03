@@ -31,6 +31,32 @@ enum JavaScriptValueKind {
     Function = 6,
 }
 
+enum JavaScriptTypedArrayKind {
+    Int8 = 0,
+    Uint8 = 1,
+    Int16 = 2,
+    Uint16 = 3,
+    Int32 = 4,
+    Uint32 = 5,
+    BigInt64 = 6,
+    BigUint64 = 7,
+    Float32 = 8,
+    Float64 = 9,
+}
+
+type TypedArray =
+    | Int8ArrayConstructor
+    | Uint8ArrayConstructor
+    | Int16ArrayConstructor
+    | Uint16ArrayConstructor
+    | Int32ArrayConstructor
+    | Uint32ArrayConstructor
+    // | BigInt64ArrayConstructor
+    // | BigUint64ArrayConstructor
+    | Float32ArrayConstructor
+    | Float64ArrayConstructor
+
+
 type SwiftRuntimeHeapEntry = {
     id: number,
     rc: number,
@@ -369,6 +395,16 @@ export class SwiftRuntime {
               const obj = this.heap.referenceHeap(obj_ref)
               const constructor = this.heap.referenceHeap(constructor_ref)
               return obj instanceof constructor
+            },
+            swjs_copy_typed_array_content: (
+                kind: JavaScriptTypedArrayKind,
+                elementsPtr: pointer, length: number,
+                result_obj: pointer
+            ) => {
+                const ArrayType: TypedArray = this.heap.referenceHeap(0)[JavaScriptTypedArrayKind[kind] + 'Array']
+                const array = new ArrayType(memory().buffer, elementsPtr, length);
+                // Call `.slice()` to copy the memory
+                writeUint32(result_obj, this.heap.allocHeap(array.slice()));
             },
             swjs_destroy_ref: (ref: ref) => {
                 this.heap.freeHeap(ref)
