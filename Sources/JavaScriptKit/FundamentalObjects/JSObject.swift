@@ -8,11 +8,16 @@ public class JSObject: Equatable {
     }
 
     @_disfavoredOverload
-    public subscript(dynamicMember name: String) -> ((JSValueConvertible...) -> JSValue)? {
+    public subscript(_ name: String) -> ((JSValueConvertible...) -> JSValue)? {
         guard let function = self[name].function else { return nil }
         return { (arguments: JSValueConvertible...) in
             function(this: self, arguments: arguments)
         }
+    }
+
+    @_disfavoredOverload
+    public subscript(dynamicMember name: String) -> ((JSValueConvertible...) -> JSValue)? {
+        self[name]
     }
 
     public subscript(dynamicMember name: String) -> JSValue {
