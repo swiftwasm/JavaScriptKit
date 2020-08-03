@@ -30,8 +30,8 @@ public class JSObjectRef: Equatable {
         set { setJSValue(this: self, index: Int32(index), value: newValue) }
     }
 
-    public func instanceof(_ constructor: JSFunctionRef) -> Bool {
-        _instanceof(self.id, constructor.id)
+    public static func instanceof(_ instance: JSObjectRef, constructor: JSFunctionRef) -> Bool {
+        _instanceof(instance.id, constructor.id)
     }
 
     static let _JS_Predef_Value_Global: UInt32 = 0
