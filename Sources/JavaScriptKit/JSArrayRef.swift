@@ -33,7 +33,7 @@ extension JSArrayRef: Sequence {
             guard index < Int(ref.length.number!) else {
                 return nil
             }
-            let value = ref.get(index)
+            let value = ref[index]
             return value.isNull ? nil : value
         }
     }

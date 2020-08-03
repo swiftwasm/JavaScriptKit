@@ -34,7 +34,7 @@ private struct _Decoder: Decoder {
 }
 
 private enum Object {
-    static let ref = JSObjectRef.global.get("Object").object!
+    static let ref = JSObjectRef.global.Object.object!
     static func keys(_ object: JSObjectRef) -> [String] {
         let keys = ref.keys!(object).array!
         return keys.map { $0.string! }
@@ -90,7 +90,7 @@ private struct _KeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContainerPr
     }
 
     func _decode(forKey key: CodingKey) throws -> JSValue {
-        let result = ref.get(key.stringValue)
+        let result = ref[key.stringValue]
         guard !result.isUndefined else {
             throw _keyNotFound(at: codingPath, key)
         }
@@ -106,7 +106,7 @@ private struct _KeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContainerPr
     }
 
     func contains(_ key: Key) -> Bool {
-        !ref.get(key.stringValue).isUndefined
+        !ref[key.stringValue].isUndefined
     }
 
     func decodeNil(forKey key: Key) throws -> Bool {
@@ -162,7 +162,7 @@ private struct _UnkeyedDecodingContainer: UnkeyedDecodingContainer {
 
     mutating func _currentValue() -> JSValue {
         defer { currentIndex += 1 }
-        return ref.get(currentIndex)
+        return ref[currentIndex]
     }
 
     mutating func _throwTypeMismatchIfNil<T>(_ transform: (JSValue) -> T?) throws -> T {

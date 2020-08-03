@@ -9,40 +9,29 @@ public class JSObjectRef: Equatable {
 
     @_disfavoredOverload
     public subscript(dynamicMember name: String) -> ((JSValueConvertible...) -> JSValue)? {
-        guard let function = self[dynamicMember: name].function else { return nil }
+        guard let function = self[name].function else { return nil }
         return { (arguments: JSValueConvertible...) in
             function.apply(this: self, argumentList: arguments)
         }
     }
 
     public subscript(dynamicMember name: String) -> JSValue {
-        get { get(name) }
-        set { set(name, newValue) }
+        get { self[name] }
+        set { self[name] = newValue }
     }
 
-    public func get(_ name: String) -> JSValue {
-        getJSValue(this: self, name: name)
+    public subscript(_ name: String) -> JSValue {
+        get { getJSValue(this: self, name: name) }
+        set { setJSValue(this: self, name: name, value: newValue) }
     }
 
-    public func set(_ name: String, _ value: JSValue) {
-        setJSValue(this: self, name: name, value: value)
-    }
-
-    public func get(_ index: Int) -> JSValue {
-        getJSValue(this: self, index: Int32(index))
+    public subscript(_ index: Int) -> JSValue {
+        get { getJSValue(this: self, index: Int32(index)) }
+        set { setJSValue(this: self, index: Int32(index), value: newValue) }
     }
 
     public func instanceof(_ constructor: JSFunctionRef) -> Bool {
         _instanceof(self.id, constructor.id)
-    }
-
-    public subscript(_ index: Int) -> JSValue {
-        get { get(index) }
-        set { set(index, newValue) }
-    }
-
-    public func set(_ index: Int, _ value: JSValue) {
-        setJSValue(this: self, index: Int32(index), value: value)
     }
 
     static let _JS_Predef_Value_Global: UInt32 = 0
