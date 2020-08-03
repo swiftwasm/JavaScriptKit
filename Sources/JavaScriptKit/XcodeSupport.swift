@@ -64,6 +64,10 @@ import _CJavaScriptKit
         _: UnsafePointer<RawJSValue>!, _: Int32,
         _: UnsafeMutablePointer<JavaScriptObjectRef>!
     ) { fatalError() }
+    func _instanceof(
+        _: JavaScriptObjectRef,
+      _: JavaScriptObjectRef
+    ) -> Bool { fatalError() }
     func _create_function(
         _: JavaScriptHostFuncRef,
         _: UnsafePointer<JavaScriptObjectRef>!

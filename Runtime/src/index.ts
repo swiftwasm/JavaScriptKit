@@ -59,7 +59,7 @@ class SwiftRuntimeHeap {
 
     allocHeap(value: any) {
         const isObject = typeof value == "object";
-        const entry = this._heapEntryByValue.get(value); 
+        const entry = this._heapEntryByValue.get(value);
         if (isObject && entry) {
             entry.rc++
             return entry.id
@@ -361,6 +361,14 @@ export class SwiftRuntime {
                 if (typeof result != "object")
                     throw Error(`Invalid result type of object constructor of "${obj}": "${result}"`)
                 writeUint32(result_obj, this.heap.allocHeap(result));
+            },
+            swjs_instanceof: (
+                obj_ref: ref, constructor_ref: ref,
+                result_ptr: pointer
+            ) => {
+              const obj = this.heap.referenceHeap(obj_ref)
+              const constructor = this.heap.referenceHeap(constructor_ref)
+              return obj instanceof constructor
             },
             swjs_destroy_ref: (ref: ref) => {
                 this.heap.freeHeap(ref)
