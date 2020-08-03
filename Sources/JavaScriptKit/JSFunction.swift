@@ -33,8 +33,12 @@ public class JSFunctionRef: JSObjectRef {
         self(this: this, args: args)
     }
 
-    public func callAsFunction(new arguments: JSValueConvertible...) -> JSObjectRef {
-        arguments.withRawJSValues { rawValues in
+    public func callAsFunction(new args: JSValueConvertible...) -> JSObjectRef {
+        self(.new, args: args)
+    }
+
+    public func callAsFunction(_: _JSFunctionConstructorSymbol, args: [JSValueConvertible] = []) -> JSObjectRef {
+        args.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
@@ -46,11 +50,6 @@ public class JSFunctionRef: JSObjectRef {
                 return JSObjectRef(id: resultObj)
             }
         }
-    }
-    public func callAsFunction(_: _JSFunctionConstructorSymbol) -> JSObjectRef {
-        var resultObj = JavaScriptObjectRef()
-        _call_new(self.id, nil, 0, &resultObj)
-        return JSObjectRef(id: resultObj)
     }
 
     @available(*, unavailable, message: "Please use JSClosure instead")
