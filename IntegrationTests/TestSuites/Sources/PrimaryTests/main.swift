@@ -225,7 +225,7 @@ New_Object_Construction: do {
     // }
     // ```
     let objectConstructor = try expectFunction(getJSValue(this: .global, name: "Animal"))
-    let cat1 = objectConstructor.new("Tama", 3, true)
+    let cat1 = objectConstructor(new: "Tama", 3, true)
     try expectEqual(getJSValue(this: cat1, name: "name"), .string("Tama"))
     try expectEqual(getJSValue(this: cat1, name: "age"), .number(3))
     try expectEqual(JSObjectRef.instanceof(cat1, constructor: objectConstructor), true)
@@ -233,7 +233,7 @@ New_Object_Construction: do {
     let cat1Bark = try expectFunction(getJSValue(this: cat1, name: "bark"))
     try expectEqual(cat1Bark(), .string("nyan"))
 
-    let dog1 = objectConstructor.new("Pochi", 3, false)
+    let dog1 = objectConstructor(new: "Pochi", 3, false)
     let dog1Bark = try expectFunction(getJSValue(this: dog1, name: "bark"))
     try expectEqual(dog1Bark(), .string("wan"))
 } catch {
@@ -255,14 +255,14 @@ Call_Function_With_This: do {
     // }
     // ```
     let objectConstructor = try expectFunction(getJSValue(this: .global, name: "Animal"))
-    let cat1 = objectConstructor.new("Tama", 3, true)
+    let cat1 = objectConstructor(new: "Tama", 3, true)
     let getIsCat = try expectFunction(getJSValue(this: cat1, name: "getIsCat"))
 
     // Direct call without this
     try expectEqual(getIsCat(), .undefined)
 
     // Call with this
-    let gotIsCat = getIsCat.apply(this: cat1)
+    let gotIsCat = getIsCat(this: cat1)
     try expectEqual(gotIsCat, .boolean(true))
 
 } catch {

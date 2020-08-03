@@ -11,7 +11,7 @@ public class JSObjectRef: Equatable {
     public subscript(dynamicMember name: String) -> ((JSValueConvertible...) -> JSValue)? {
         guard let function = self[name].function else { return nil }
         return { (arguments: JSValueConvertible...) in
-            function.apply(this: self, argumentList: arguments)
+            function(this: self, arguments)
         }
     }
 

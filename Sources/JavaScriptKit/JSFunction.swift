@@ -1,45 +1,40 @@
 import _CJavaScriptKit
 
-@dynamicCallable
+public enum _JSFunctionConstructorSymbol {
+    case new
+}
+
 public class JSFunctionRef: JSObjectRef {
     @discardableResult
-    public func dynamicallyCall(withArguments arguments: [JSValueConvertible]) -> JSValue {
-        let result = arguments.withRawJSValues { rawValues -> RawJSValue in
+    public func callAsFunction(this: JSObjectRef? = nil, _ arguments: [JSValueConvertible]) -> JSValue {
+        let result = arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
                 var result = RawJSValue()
-                _call_function(
-                    self.id, argv, Int32(argc),
-                    &result.kind, &result.payload1, &result.payload2, &result.payload3
-                )
+                if let thisId = this?.id {
+                    _call_function_with_this(thisId,
+                                             self.id, argv, Int32(argc),
+                                             &result.kind, &result.payload1, &result.payload2, &result.payload3)
+                } else {
+                    _call_function(
+                        self.id, argv, Int32(argc),
+                        &result.kind, &result.payload1, &result.payload2, &result.payload3
+                    )
+                }
                 return result
             }
         }
         return JSValue(from: result)
     }
 
-    public func apply(this: JSObjectRef, arguments: JSValueConvertible...) -> JSValue {
-        apply(this: this, argumentList: arguments)
+    @discardableResult
+    public func callAsFunction(this: JSObjectRef? = nil, _ arguments: JSValueConvertible...) -> JSValue {
+        self(this: this, arguments)
     }
 
-    public func apply(this: JSObjectRef, argumentList: [JSValueConvertible]) -> JSValue {
-        let result = argumentList.withRawJSValues { rawValues in
-            rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
-                let argv = bufferPointer.baseAddress
-                let argc = bufferPointer.count
-                var result = RawJSValue()
-                _call_function_with_this(this.id,
-                                         self.id, argv, Int32(argc),
-                                         &result.kind, &result.payload1, &result.payload2, &result.payload3)
-                return result
-            }
-        }
-        return JSValue(from: result)
-    }
-
-    public func new(_ arguments: JSValueConvertible...) -> JSObjectRef {
-        return arguments.withRawJSValues { rawValues in
+    public func callAsFunction(new arguments: JSValueConvertible...) -> JSObjectRef {
+        arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
@@ -51,6 +46,11 @@ public class JSFunctionRef: JSObjectRef {
                 return JSObjectRef(id: resultObj)
             }
         }
+    }
+    public func callAsFunction(_: _JSFunctionConstructorSymbol) -> JSObjectRef {
+        var resultObj = JavaScriptObjectRef()
+        _call_new(self.id, nil, 0, &resultObj)
+        return JSObjectRef(id: resultObj)
     }
 
     @available(*, unavailable, message: "Please use JSClosure instead")
