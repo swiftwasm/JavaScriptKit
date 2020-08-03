@@ -3,7 +3,7 @@ public class JSArrayRef {
     static let classObject = JSObjectRef.global.Array.function!
 
     static func isArray(_ object: JSObjectRef) -> Bool {
-        classObject.isArray.function!(object).boolean!
+        classObject.isArray!(object).boolean!
     }
 
     let ref: JSObjectRef
