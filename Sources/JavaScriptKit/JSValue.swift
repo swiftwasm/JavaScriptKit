@@ -74,7 +74,7 @@ public func getJSValue(this: JSObjectRef, name: String) -> JSValue {
     _get_prop(this.id, name, Int32(name.count),
               &rawValue.kind,
               &rawValue.payload1, &rawValue.payload2, &rawValue.payload3)
-    return rawValue.jsValue()
+    return JSValue(from: rawValue)
 }
 
 public func setJSValue(this: JSObjectRef, name: String, value: JSValue) {
@@ -88,7 +88,7 @@ public func getJSValue(this: JSObjectRef, index: Int32) -> JSValue {
     _get_subscript(this.id, index,
                    &rawValue.kind,
                    &rawValue.payload1, &rawValue.payload2, &rawValue.payload3)
-    return rawValue.jsValue()
+    return JSValue(from: rawValue)
 }
 
 public func setJSValue(this: JSObjectRef, index: Int32, value: JSValue) {

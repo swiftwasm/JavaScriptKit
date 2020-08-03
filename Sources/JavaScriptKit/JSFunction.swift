@@ -16,7 +16,7 @@ public class JSFunctionRef: JSObjectRef {
                 return result
             }
         }
-        return result.jsValue()
+        return JSValue(from: result)
     }
 
     public func apply(this: JSObjectRef, arguments: JSValueConvertible...) -> JSValue {
@@ -35,7 +35,7 @@ public class JSFunctionRef: JSObjectRef {
                 return result
             }
         }
-        return result.jsValue()
+        return JSValue(from: result)
     }
 
     public func new(_ arguments: JSValueConvertible...) -> JSObjectRef {
@@ -58,7 +58,7 @@ public class JSFunctionRef: JSObjectRef {
         fatalError("unavailable")
     }
 
-    override public func jsValue() -> JSValue {
+    public override subscript(jsValue _: ()) -> JSValue {
         .function(self)
     }
 }
@@ -106,9 +106,7 @@ public func _call_host_function(
     guard let hostFunc = JSClosure.sharedFunctions[hostFuncRef] else {
         fatalError("The function was already released")
     }
-    let args = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
-        $0.jsValue()
-    }
+    let args = UnsafeBufferPointer(start: argv, count: Int(argc)).map(JSValue.init(from:))
     let result = hostFunc(args)
     let callbackFuncRef = JSFunctionRef(id: callbackFuncRef)
     _ = callbackFuncRef(result)
