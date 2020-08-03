@@ -32,11 +32,6 @@ public class JSObjectRef: Equatable {
         getJSValue(this: self, index: Int32(index))
     }
 
-    public func instanceof(_ constructor: JSValue) -> Bool {
-        guard let `func` = constructor.function else { return false }
-        return instanceof(`func`)
-    }
-
     public func instanceof(_ constructor: JSFunctionRef) -> Bool {
         _instanceof(self.id, constructor.id)
     }
