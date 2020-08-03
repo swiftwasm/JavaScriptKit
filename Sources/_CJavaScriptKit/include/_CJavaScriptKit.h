@@ -84,10 +84,9 @@ _call_new(const JavaScriptObjectRef ref, const RawJSValue *argv, const int argc,
           JavaScriptObjectRef *result_obj);
 
 __attribute__((__import_module__("javascript_kit"),
-               __import_name__("swjs_instanceof"))) extern void
+               __import_name__("swjs_instanceof"))) extern bool
 _instanceof(const JavaScriptObjectRef obj,
-            const JavaScriptObjectRef constructor,
-            bool *result);
+            const JavaScriptObjectRef constructor);
 
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_create_function"))) extern void

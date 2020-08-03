@@ -38,9 +38,7 @@ public class JSObjectRef: Equatable {
     }
 
     public func instanceof(_ constructor: JSFunctionRef) -> Bool {
-      var result: Bool = false
-      _instanceof(self.id, constructor.id, &result)
-      return result
+        _instanceof(self.id, constructor.id)
     }
 
     public subscript(_ index: Int) -> JSValue {
