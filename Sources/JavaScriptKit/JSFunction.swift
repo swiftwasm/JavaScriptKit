@@ -81,7 +81,7 @@ public class JSClosure: JSFunctionRef {
         id = objectRef
     }
 
-    public func release() {
+    deinit {
         Self.sharedFunctions[hostFuncRef] = nil
     }
 }

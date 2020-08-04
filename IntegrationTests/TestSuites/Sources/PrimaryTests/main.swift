@@ -207,8 +207,6 @@ Host_Function_Registration: do {
     try expectEqual(call_host_1Func(), .number(1))
     try expectEqual(isHostFunc1Called, true)
 
-    hostFunc1.release()
-
     let hostFunc2 = JSClosure { (arguments) -> JSValue in
         do {
             let input = try expectNumber(arguments[0])
@@ -220,7 +218,6 @@ Host_Function_Registration: do {
 
     try expectEqual(hostFunc2(3), .number(6))
     _ = try expectString(hostFunc2(true))
-    hostFunc2.release()
 } catch {
     print(error)
 }
@@ -331,6 +328,19 @@ ObjectRef_Lifetime: do {
     let ref2 = identity(ref1).object!
     try expectEqual(ref1.prop_2, .number(2))
     try expectEqual(ref2.prop_2, .number(2))
+} catch {
+    print(error)
+}
+
+func closureScope() -> ObjectIdentifier {
+    let closure = JSClosure { _ in .undefined }
+    return ObjectIdentifier(closure)
+}
+
+Closure_References: do {
+    let oid1 = closureScope()
+    let oid2 = closureScope()
+    try expectEqual(oid1, oid2)
 } catch {
     print(error)
 }
