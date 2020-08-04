@@ -70,7 +70,7 @@ extension Dictionary where Value: JSValueConvertible, Key == String {
 
 extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key == String {
     public subscript(jsValue _: ()) -> JSValue {
-        let object = Object(.new)
+        let object = Object.new()
         for (key, value) in self {
             object[key] = JSValue(from: value)
         }
@@ -88,7 +88,7 @@ extension Array where Element: JSValueConvertible {
 
 extension Array: JSValueConvertible where Element == JSValueConvertible {
     public subscript(jsValue _: ()) -> JSValue {
-        let array = Array(new: count)
+        let array = Array.new(count)
         for (index, element) in enumerated() {
             array[index] = JSValue(from: element)
         }

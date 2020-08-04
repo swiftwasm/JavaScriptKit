@@ -1,9 +1,5 @@
 import _CJavaScriptKit
 
-public enum _JSFunctionConstructorSymbol {
-    case new
-}
-
 public class JSFunctionRef: JSObjectRef {
     @discardableResult
     func callAsFunction(this: JSObjectRef? = nil, args: [JSValueConvertible]) -> JSValue {
@@ -33,11 +29,15 @@ public class JSFunctionRef: JSObjectRef {
         self(this: this, args: args)
     }
 
-    public func callAsFunction(new args: JSValueConvertible...) -> JSObjectRef {
-        self(.new, args: args)
+    public func new(_ args: JSValueConvertible...) -> JSObjectRef {
+        self.new(args: args)
     }
 
-    public func callAsFunction(_: _JSFunctionConstructorSymbol, args: [JSValueConvertible] = []) -> JSObjectRef {
+    // Guaranteed to return an object because either:
+    // a) the constructor explicitly returns an object, or
+    // b) the constructor returns nothing, which causes JS to return the `this` value, or
+    // c) the constructor returns undefined, null or a non-object, in which case JS also returns `this`.
+    public func new(args: [JSValueConvertible]) -> JSObjectRef {
         args.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
