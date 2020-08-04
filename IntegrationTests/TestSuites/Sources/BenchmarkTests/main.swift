@@ -20,7 +20,6 @@ serialization.testSuite("Swift String to JavaScript") {
     }
 }
 
-
 let objectHeap = Benchmark("Object heap")
 
 let global = JSObjectRef.global

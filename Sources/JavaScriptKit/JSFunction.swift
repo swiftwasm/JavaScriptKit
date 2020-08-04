@@ -30,7 +30,7 @@ public class JSFunctionRef: JSObjectRef {
     }
 
     public func new(_ args: JSValueConvertible...) -> JSObjectRef {
-        self.new(args: args)
+        new(args: args)
     }
 
     // Guaranteed to return an object because either:
