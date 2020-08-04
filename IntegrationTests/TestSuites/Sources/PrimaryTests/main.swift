@@ -337,7 +337,7 @@ func closureScope() -> ObjectIdentifier {
     return ObjectIdentifier(closure)
 }
 
-Closure_References: do {
+Closure_Identifiers: do {
     let oid1 = closureScope()
     let oid2 = closureScope()
     try expectEqual(oid1, oid2)
