@@ -21,7 +21,7 @@ public class JSFunctionRef: JSObjectRef {
                 return result
             }
         }
-        return JSValue(from: result)
+        return result.jsValue()
     }
 
     @discardableResult
@@ -57,7 +57,7 @@ public class JSFunctionRef: JSObjectRef {
         fatalError("unavailable")
     }
 
-    public override subscript(jsValue _: ()) -> JSValue {
+    override public func jsValue() -> JSValue {
         .function(self)
     }
 }
@@ -105,7 +105,9 @@ public func _call_host_function(
     guard let hostFunc = JSClosure.sharedFunctions[hostFuncRef] else {
         fatalError("The function was already released")
     }
-    let args = UnsafeBufferPointer(start: argv, count: Int(argc)).map(JSValue.init(from:))
+    let args = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
+        $0.jsValue()
+    }
     let result = hostFunc(args)
     let callbackFuncRef = JSFunctionRef(id: callbackFuncRef)
     _ = callbackFuncRef(result)

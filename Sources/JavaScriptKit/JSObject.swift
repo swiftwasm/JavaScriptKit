@@ -43,7 +43,7 @@ public class JSObjectRef: Equatable {
         return lhs.id == rhs.id
     }
 
-    public subscript(jsValue _: ()) -> JSValue {
+    public func jsValue() -> JSValue {
         .object(self)
     }
 }
