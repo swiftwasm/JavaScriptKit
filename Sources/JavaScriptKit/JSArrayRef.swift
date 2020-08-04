@@ -14,7 +14,7 @@ public class JSArrayRef {
     }
 }
 
-extension JSArrayRef: Sequence {
+extension JSArrayRef: RandomAccessCollection {
     public typealias Element = JSValue
 
     public func makeIterator() -> Iterator {
@@ -37,4 +37,12 @@ extension JSArrayRef: Sequence {
             return value.isNull ? nil : value
         }
     }
+
+    public subscript(position: Int) -> JSValue {
+        ref.get(position)
+    }
+
+    public var startIndex: Int { 0 }
+
+    public var endIndex: Int { ref.length.number.map(Int.init) ?? 0 }
 }
