@@ -39,7 +39,7 @@ extension JSArrayRef: RandomAccessCollection {
     }
 
     public subscript(position: Int) -> JSValue {
-        ref.get(position)
+        ref[position]
     }
 
     public var startIndex: Int { 0 }
