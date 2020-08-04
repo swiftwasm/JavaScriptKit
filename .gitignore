@@ -1,7 +1,7 @@
 dist
 node_modules
 .DS_Store
-/.build
+.build
 /Packages
 /*.xcodeproj
 xcuserdata/

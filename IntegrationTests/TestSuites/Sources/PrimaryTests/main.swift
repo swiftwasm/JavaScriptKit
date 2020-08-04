@@ -100,6 +100,17 @@ Array_Iterator: do {
     try expectEqual(Array(array), expectedProp_4)
 }
 
+Array_RandomAccessCollection: do {
+    let globalObject1 = getJSValue(this: .global, name: "globalObject1")
+    let globalObject1Ref = try expectObject(globalObject1)
+    let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
+    let array = try expectArray(prop_4)
+    let expectedProp_4: [JSValue] = [
+        .number(3), .number(4), .string("str_elm_1"), .number(5),
+    ]
+    try expectEqual([array[0], array[1], array[2], array[3]], expectedProp_4)
+}
+
 Value_Decoder: do {
     struct GlobalObject1: Codable {
         struct Prop1: Codable {
