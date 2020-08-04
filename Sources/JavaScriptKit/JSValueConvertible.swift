@@ -23,17 +23,19 @@ public protocol JSValueConvertible {
 
 public typealias JSValueCodable = JSValueConvertible & JSValueConstructible
 
-extension JSBridgedType {
-    public static func canDecode(from jsValue: JSValue) -> Bool {
-        jsValue.isInstanceOf(Self.classRef)
-    }
-
+extension JSAbstractBridgedType {
     public init(jsValue: JSValue) {
         self.init(objectRef: jsValue.object!)
     }
 
     public func jsValue() -> JSValue {
-        return JSValue.object(objectRef)
+        .object(objectRef)
+    }
+}
+
+extension JSBridgedType {
+    public static func canDecode(from jsValue: JSValue) -> Bool {
+        jsValue.isInstanceOf(Self.classRef)
     }
 }
 

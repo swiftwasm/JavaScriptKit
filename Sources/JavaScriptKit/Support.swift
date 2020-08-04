@@ -45,7 +45,7 @@ public struct AnyJSValueCodable: JSValueCodable, ExpressibleByNilLiteral {
     }
 }
 
-public func staticCast<Type: JSBridgedType>(_ ref: JSBridgedType) -> Type {
+public func staticCast<Type: JSAbstractBridgedType>(_ ref: JSAbstractBridgedType) -> Type {
     return Type(objectRef: ref.objectRef)
 }
 
