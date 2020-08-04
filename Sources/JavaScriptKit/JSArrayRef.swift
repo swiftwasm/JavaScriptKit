@@ -16,7 +16,6 @@ public class JSArrayRef {
 
 extension JSArrayRef: RandomAccessCollection {
     public typealias Element = JSValue
-    public typealias Index = Int
 
     public func makeIterator() -> Iterator {
         Iterator(ref: ref)
