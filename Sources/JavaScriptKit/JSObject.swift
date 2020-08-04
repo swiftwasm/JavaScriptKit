@@ -104,7 +104,7 @@ public class JSObjectRef: Equatable {
         }
         var resultObj = JavaScriptObjectRef()
         array.withUnsafeBufferPointer { ptr in
-            _copy_typed_array_content(type, ptr.baseAddress!, Int32(array.count), &resultObj)
+            _create_typed_array(type, ptr.baseAddress!, Int32(array.count), &resultObj)
         }
         return JSObjectRef(id: resultObj)
     }

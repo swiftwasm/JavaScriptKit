@@ -73,7 +73,7 @@ import _CJavaScriptKit
         _: UnsafePointer<JavaScriptObjectRef>!
     ) { fatalError() }
     func _destroy_ref(_: JavaScriptObjectRef) { fatalError() }
-    func _copy_typed_array_content<T: TypedArrayElement>(
+    func _create_typed_array<T: TypedArrayElement>(
         _: JavaScriptTypedArrayKind,
         _: UnsafePointer<T>,
         _: Int32,

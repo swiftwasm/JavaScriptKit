@@ -113,9 +113,9 @@ _destroy_ref(const JavaScriptObjectRef ref);
 
 __attribute__((
                __import_module__("javascript_kit"),
-               __import_name__("swjs_copy_typed_array_content")
+               __import_name__("swjs_create_typed_array")
                ))
-extern void _copy_typed_array_content(const JavaScriptTypedArrayKind kind,
+extern void _create_typed_array(const JavaScriptTypedArrayKind kind,
                                       const void *elementsPtr, const int length,
                                       JavaScriptObjectRef *result_obj);
 

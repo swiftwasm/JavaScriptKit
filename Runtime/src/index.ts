@@ -396,7 +396,7 @@ export class SwiftRuntime {
               const constructor = this.heap.referenceHeap(constructor_ref)
               return obj instanceof constructor
             },
-            swjs_copy_typed_array_content: (
+            swjs_create_typed_array: (
                 kind: JavaScriptTypedArrayKind,
                 elementsPtr: pointer, length: number,
                 result_obj: pointer
