@@ -281,12 +281,12 @@ Call_Function_With_This: do {
 }
 
 Object_Conversion: do {
-//    let array1 = [1, 2, 3]
-//    let jsArray1 = array1.jsValue().object!
-//    try expectEqual(jsArray1.length, .number(3))
-//    try expectEqual(jsArray1[0], .number(1))
-//    try expectEqual(jsArray1[1], .number(2))
-//    try expectEqual(jsArray1[2], .number(3))
+   let array1 = [1, 2, 3]
+   let jsArray1 = array1.jsValue().object!
+   try expectEqual(jsArray1.length, .number(3))
+   try expectEqual(jsArray1[0], .number(1))
+   try expectEqual(jsArray1[1], .number(2))
+   try expectEqual(jsArray1[2], .number(3))
 
     let array2: [JSValueConvertible] = [1, "str", false]
     let jsArray2 = array2.jsValue().object!
@@ -296,9 +296,9 @@ Object_Conversion: do {
     try expectEqual(jsArray2[2], .boolean(false))
     _ = jsArray2.push!(5)
     try expectEqual(jsArray2.length, .number(4))
-//    _ = jsArray2.push!(jsArray1)
+   _ = jsArray2.push!(jsArray1)
 
-//    try expectEqual(jsArray2[4], .object(jsArray1))
+   try expectEqual(jsArray2[4], .object(jsArray1))
 
     let dict1: [String: JSValueConvertible] = [
         "prop1": 1,
