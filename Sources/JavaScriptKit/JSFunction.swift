@@ -2,7 +2,7 @@ import _CJavaScriptKit
 
 public class JSFunctionRef: JSObjectRef {
     @discardableResult
-    func callAsFunction(this: JSObjectRef? = nil, arguments: [JSValueConvertible]) -> JSValue {
+    public func callAsFunction(this: JSObjectRef? = nil, arguments: [JSValueConvertible]) -> JSValue {
         let result = arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
                 let argv = bufferPointer.baseAddress
