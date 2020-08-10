@@ -2,8 +2,8 @@ import _CJavaScriptKit
 
 public class JSFunctionRef: JSObjectRef {
     @discardableResult
-    func callAsFunction(this: JSObjectRef? = nil, args: [JSValueConvertible]) -> JSValue {
-        let result = args.withRawJSValues { rawValues in
+    func callAsFunction(this: JSObjectRef? = nil, arguments: [JSValueConvertible]) -> JSValue {
+        let result = arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
@@ -25,20 +25,20 @@ public class JSFunctionRef: JSObjectRef {
     }
 
     @discardableResult
-    public func callAsFunction(this: JSObjectRef? = nil, _ args: JSValueConvertible...) -> JSValue {
-        self(this: this, args: args)
+    public func callAsFunction(this: JSObjectRef? = nil, _ arguments: JSValueConvertible...) -> JSValue {
+        self(this: this, arguments: arguments)
     }
 
-    public func new(_ args: JSValueConvertible...) -> JSObjectRef {
-        new(args: args)
+    public func new(_ arguments: JSValueConvertible...) -> JSObjectRef {
+        new(arguments: arguments)
     }
 
     // Guaranteed to return an object because either:
     // a) the constructor explicitly returns an object, or
     // b) the constructor returns nothing, which causes JS to return the `this` value, or
     // c) the constructor returns undefined, null or a non-object, in which case JS also returns `this`.
-    public func new(args: [JSValueConvertible]) -> JSObjectRef {
-        args.withRawJSValues { rawValues in
+    public func new(arguments: [JSValueConvertible]) -> JSObjectRef {
+        arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
@@ -105,10 +105,10 @@ public func _call_host_function(
     guard let hostFunc = JSClosure.sharedFunctions[hostFuncRef] else {
         fatalError("The function was already released")
     }
-    let args = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
+    let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
         $0.jsValue()
     }
-    let result = hostFunc(args)
+    let result = hostFunc(arguments)
     let callbackFuncRef = JSFunctionRef(id: callbackFuncRef)
     _ = callbackFuncRef(result)
 }
