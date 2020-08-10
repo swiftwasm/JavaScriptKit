@@ -1,45 +1,44 @@
 import _CJavaScriptKit
 
-@dynamicCallable
 public class JSFunctionRef: JSObjectRef {
     @discardableResult
-    public func dynamicallyCall(withArguments arguments: [JSValueConvertible]) -> JSValue {
-        let result = arguments.withRawJSValues { rawValues -> RawJSValue in
+    public func callAsFunction(this: JSObjectRef? = nil, arguments: [JSValueConvertible]) -> JSValue {
+        let result = arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
                 var result = RawJSValue()
-                _call_function(
-                    self.id, argv, Int32(argc),
-                    &result.kind, &result.payload1, &result.payload2, &result.payload3
-                )
+                if let thisId = this?.id {
+                    _call_function_with_this(thisId,
+                                             self.id, argv, Int32(argc),
+                                             &result.kind, &result.payload1, &result.payload2, &result.payload3)
+                } else {
+                    _call_function(
+                        self.id, argv, Int32(argc),
+                        &result.kind, &result.payload1, &result.payload2, &result.payload3
+                    )
+                }
                 return result
             }
         }
         return result.jsValue()
     }
 
-    public func apply(this: JSObjectRef, arguments: JSValueConvertible...) -> JSValue {
-        apply(this: this, argumentList: arguments)
-    }
-
-    public func apply(this: JSObjectRef, argumentList: [JSValueConvertible]) -> JSValue {
-        let result = argumentList.withRawJSValues { rawValues in
-            rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
-                let argv = bufferPointer.baseAddress
-                let argc = bufferPointer.count
-                var result = RawJSValue()
-                _call_function_with_this(this.id,
-                                         self.id, argv, Int32(argc),
-                                         &result.kind, &result.payload1, &result.payload2, &result.payload3)
-                return result
-            }
-        }
-        return result.jsValue()
+    @discardableResult
+    public func callAsFunction(this: JSObjectRef? = nil, _ arguments: JSValueConvertible...) -> JSValue {
+        self(this: this, arguments: arguments)
     }
 
     public func new(_ arguments: JSValueConvertible...) -> JSObjectRef {
-        return arguments.withRawJSValues { rawValues in
+        new(arguments: arguments)
+    }
+
+    // Guaranteed to return an object because either:
+    // a) the constructor explicitly returns an object, or
+    // b) the constructor returns nothing, which causes JS to return the `this` value, or
+    // c) the constructor returns undefined, null or a non-object, in which case JS also returns `this`.
+    public func new(arguments: [JSValueConvertible]) -> JSObjectRef {
+        arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
@@ -106,10 +105,10 @@ public func _call_host_function(
     guard let hostFunc = JSClosure.sharedFunctions[hostFuncRef] else {
         fatalError("The function was already released")
     }
-    let args = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
+    let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
         $0.jsValue()
     }
-    let result = hostFunc(args)
+    let result = hostFunc(arguments)
     let callbackFuncRef = JSFunctionRef(id: callbackFuncRef)
     _ = callbackFuncRef(result)
 }

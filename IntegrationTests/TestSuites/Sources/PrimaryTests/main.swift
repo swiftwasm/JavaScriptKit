@@ -239,8 +239,8 @@ New_Object_Construction: do {
     let cat1 = objectConstructor.new("Tama", 3, true)
     try expectEqual(getJSValue(this: cat1, name: "name"), .string("Tama"))
     try expectEqual(getJSValue(this: cat1, name: "age"), .number(3))
-    try expectEqual(cat1.instanceof(objectConstructor), true)
-    try expectEqual(cat1.instanceof(try expectFunction(getJSValue(this: .global, name: "Array"))), false)
+    try expectEqual(cat1.isInstanceOf(objectConstructor), true)
+    try expectEqual(cat1.isInstanceOf(try expectFunction(getJSValue(this: .global, name: "Array"))), false)
     let cat1Bark = try expectFunction(getJSValue(this: cat1, name: "bark"))
     try expectEqual(cat1Bark(), .string("nyan"))
 
@@ -273,7 +273,7 @@ Call_Function_With_This: do {
     try expectEqual(getIsCat(), .undefined)
 
     // Call with this
-    let gotIsCat = getIsCat.apply(this: cat1)
+    let gotIsCat = getIsCat(this: cat1)
     try expectEqual(gotIsCat, .boolean(true))
 
 } catch {
@@ -281,12 +281,12 @@ Call_Function_With_This: do {
 }
 
 Object_Conversion: do {
-    let array1 = [1, 2, 3]
-    let jsArray1 = array1.jsValue().object!
-    try expectEqual(jsArray1.length, .number(3))
-    try expectEqual(jsArray1[0], .number(1))
-    try expectEqual(jsArray1[1], .number(2))
-    try expectEqual(jsArray1[2], .number(3))
+   let array1 = [1, 2, 3]
+   let jsArray1 = array1.jsValue().object!
+   try expectEqual(jsArray1.length, .number(3))
+   try expectEqual(jsArray1[0], .number(1))
+   try expectEqual(jsArray1[1], .number(2))
+   try expectEqual(jsArray1[2], .number(3))
 
     let array2: [JSValueConvertible] = [1, "str", false]
     let jsArray2 = array2.jsValue().object!
@@ -296,9 +296,9 @@ Object_Conversion: do {
     try expectEqual(jsArray2[2], .boolean(false))
     _ = jsArray2.push!(5)
     try expectEqual(jsArray2.length, .number(4))
-    _ = jsArray2.push!(jsArray1)
+   _ = jsArray2.push!(jsArray1)
 
-    try expectEqual(jsArray2[4], .object(jsArray1))
+   try expectEqual(jsArray2[4], .object(jsArray1))
 
     let dict1: [String: JSValueConvertible] = [
         "prop1": 1,
