@@ -68,6 +68,8 @@ public class JSClosure: JSFunctionRef {
 
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 
+    private var isReleased = false
+
     public init(_ body: @escaping ([JSValue]) -> JSValue) {
         super.init(id: 0)
         let objectId = ObjectIdentifier(self)
@@ -81,8 +83,18 @@ public class JSClosure: JSFunctionRef {
         id = objectRef
     }
 
-    deinit {
+    public func release() {
         Self.sharedFunctions[hostFuncRef] = nil
+        isReleased = true
+    }
+
+    deinit {
+        guard isReleased else {
+            fatalError("""
+            release() must be called on closures manually before deallocating.
+            This is caused by the lack of support for the `FinalizationRegistry` API in Safari.
+            """)
+        }
     }
 }
 
