@@ -82,6 +82,13 @@ public class JSClosure: JSFunctionRef {
         id = objectRef
     }
 
+    convenience public init(_ body: @escaping ([JSValue]) -> ()) {
+        self.init { (arguments: [JSValue]) -> JSValue in
+            body(arguments)
+            return .undefined
+        }
+    }
+
     public func release() {
         Self.sharedFunctions[hostFuncRef] = nil
         isReleased = true
