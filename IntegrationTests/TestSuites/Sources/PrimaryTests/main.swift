@@ -331,6 +331,22 @@ ObjectRef_Lifetime: do {
     let ref2 = identity(ref1).object!
     try expectEqual(ref1.prop_2, .number(2))
     try expectEqual(ref2.prop_2, .number(2))
+    identity.release()
+} catch {
+    print(error)
+}
+
+func closureScope() -> ObjectIdentifier {
+    let closure = JSClosure { _ in .undefined }
+    let result = ObjectIdentifier(closure)
+    closure.release()
+    return result
+}
+
+Closure_Identifiers: do {
+    let oid1 = closureScope()
+    let oid2 = closureScope()
+    try expectEqual(oid1, oid2)
 } catch {
     print(error)
 }
