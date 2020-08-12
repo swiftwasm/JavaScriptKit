@@ -7,7 +7,7 @@ serialization.testSuite("Swift Int to JavaScript") {
     let jsNumber = JSValue.number(swiftInt)
     let object = JSObjectRef.global
     for i in 0 ..< 100 {
-        object.set("numberValue\(i)", jsNumber)
+        object["numberValue\(i)"] = jsNumber
     }
 }
 
@@ -16,10 +16,9 @@ serialization.testSuite("Swift String to JavaScript") {
     let jsString = JSValue.string(swiftString)
     let object = JSObjectRef.global
     for i in 0 ..< 100 {
-        object.set("stringValue\(i)", jsString)
+        object["stringValue\(i)"] = jsString
     }
 }
-
 
 let objectHeap = Benchmark("Object heap")
 

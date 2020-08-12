@@ -3,7 +3,7 @@ public class JSArrayRef {
     static let classObject = JSObjectRef.global.Array.function!
 
     static func isArray(_ object: JSObjectRef) -> Bool {
-        classObject.isArray.function!(object).boolean!
+        classObject.isArray!(object).boolean!
     }
 
     let ref: JSObjectRef
@@ -33,13 +33,13 @@ extension JSArrayRef: RandomAccessCollection {
             guard index < Int(ref.length.number!) else {
                 return nil
             }
-            let value = ref.get(index)
+            let value = ref[index]
             return value.isNull ? nil : value
         }
     }
 
     public subscript(position: Int) -> JSValue {
-        ref.get(position)
+        ref[position]
     }
 
     public var startIndex: Int { 0 }

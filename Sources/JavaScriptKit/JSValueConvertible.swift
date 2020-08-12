@@ -69,7 +69,7 @@ extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key 
     public func jsValue() -> JSValue {
         let object = Object.new()
         for (key, value) in self {
-            object.set(key, value.jsValue())
+            object[key] = value.jsValue()
         }
         return .object(object)
     }
