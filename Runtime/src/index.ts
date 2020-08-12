@@ -8,6 +8,17 @@ type pointer = number;
 interface GlobalVariable { }
 declare const window: GlobalVariable;
 declare const global: GlobalVariable;
+let globalVariable: any;
+if (typeof globalThis !== "undefined") {
+    globalVariable = globalThis
+} else if (typeof window !== "undefined") {
+    globalVariable = window
+} else if (typeof global !== "undefined") {
+    globalVariable = global
+} else if (typeof self !== "undefined") {
+    globalVariable = self
+}
+
 
 interface SwiftRuntimeExportedFunctions {
     swjs_library_version(): number;
@@ -67,17 +78,11 @@ class SwiftRuntimeHeap {
     private _heapNextKey: number;
 
     constructor() {
-        let _global: any;
-        if (typeof window !== "undefined") {
-            _global = window
-        } else if (typeof global !== "undefined") {
-            _global = global
-        }
         this._heapValueById = new Map();
-        this._heapValueById.set(0, _global);
+        this._heapValueById.set(0, globalVariable);
 
         this._heapEntryByValue = new Map();
-        this._heapEntryByValue.set(_global, { id: 0, rc: 1 });
+        this._heapEntryByValue.set(globalVariable, { id: 0, rc: 1 });
 
         // Note: 0 is preserved for global
         this._heapNextKey = 1;
@@ -401,7 +406,7 @@ export class SwiftRuntime {
                 elementsPtr: pointer, length: number,
                 result_obj: pointer
             ) => {
-                const ArrayType: TypedArray = this.heap.referenceHeap(0)[JavaScriptTypedArrayKind[kind] + 'Array']
+                const ArrayType: TypedArray = globalVariable[JavaScriptTypedArrayKind[kind] + 'Array']
                 const array = new ArrayType(memory().buffer, elementsPtr, length);
                 // Call `.slice()` to copy the memory
                 writeUint32(result_obj, this.heap.allocHeap(array.slice()));
