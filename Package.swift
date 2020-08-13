@@ -38,10 +38,6 @@ let package = Package(
                     .when(platforms: [.wasi])
                 ),
             ]
-        ),
-        .testTarget(
-            name: "JavaScriptKitTests",
-            dependencies: ["JavaScriptKit"]
-        ),
+        )
     ]
 )
