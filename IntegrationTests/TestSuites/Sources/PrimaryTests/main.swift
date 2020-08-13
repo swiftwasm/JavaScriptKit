@@ -397,5 +397,5 @@ TypedArray_Mutation: do {
     for i in 0..<100 {
         try expectEqual(i, array[i])
     }
-    try expectEqual(array.toString!(), jsStringify(0..<100))
+    try expectEqual(array.toString!(), .string(jsStringify(Array(0..<100))))
 }
