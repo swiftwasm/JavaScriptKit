@@ -353,7 +353,7 @@ Closure_Identifiers: do {
 
 TypedArray: do {
     let numbers = [UInt8](0 ... 255)
-    let typedArray = JSObjectRef.createTypedArray(numbers)
+    let typedArray = JSTypedArray(numbers)
     try expectEqual(typedArray[12], .number(12))
     try expectEqual(typedArray.toString!(), .string(numbers.map(String.init).joined(separator: ",")))
 }
