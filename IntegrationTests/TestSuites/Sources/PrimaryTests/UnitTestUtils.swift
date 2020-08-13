@@ -1,5 +1,17 @@
 import JavaScriptKit
 
+let printTestNames = false
+
+func test(_ name: String, testBlock: () throws -> Void) {
+    if printTestNames { print(name) }
+    do {
+        try testBlock()
+    } catch {
+        print("Error in \(name)")
+        print(error)
+    }
+}
+
 struct MessageError: Error {
     let message: String
     let file: StaticString
