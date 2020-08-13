@@ -411,7 +411,7 @@ export class SwiftRuntime {
                 // Call `.slice()` to copy the memory
                 writeUint32(result_obj, this.heap.retain(array.slice()));
             },
-            swjs_destroy_ref: (ref: ref) => {
+            swjs_release: (ref: ref) => {
                 this.heap.release(ref)
             }
         }
