@@ -31,7 +31,6 @@ typedef enum __attribute__((enum_extensibility(closed))) {
     JavaScriptTypedArrayKindFloat64 = 9,
 } JavaScriptTypedArrayKind;
 
-
 typedef unsigned JavaScriptPayload1;
 typedef unsigned JavaScriptPayload2;
 typedef double JavaScriptPayload3;
