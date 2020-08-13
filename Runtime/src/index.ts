@@ -119,7 +119,11 @@ class SwiftRuntimeHeap {
     }
 
     referenceHeap(ref: ref) {
-        return this._heapValueById.get(ref)
+        const value = this._heapValueById.get(ref)
+        if (value === undefined) {
+            throw new ReferenceError("Attempted to read invalid reference " + ref)
+        }
+        return value
     }
 }
 
