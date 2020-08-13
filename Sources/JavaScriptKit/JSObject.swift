@@ -34,7 +34,7 @@ public class JSObjectRef: Equatable {
         _instanceof(id, constructor.id)
     }
 
-    static let _JS_Predef_Value_Global: UInt32 = 0
+    static let _JS_Predef_Value_Global: JavaScriptObjectRef = 0
     public static let global = JSObjectRef(id: _JS_Predef_Value_Global)
 
     deinit { _destroy_ref(id) }

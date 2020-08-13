@@ -32,7 +32,7 @@ public class JSTypedArray<Element>: JSObjectRef, ExpressibleByArrayLiteral where
         array.withUnsafeBufferPointer { ptr in
             _create_typed_array(Element.typedArrayKind, ptr.baseAddress!, Int32(array.count), &resultObj)
         }
-        super.init(id: UInt32(resultObj))
+        super.init(id: resultObj)
     }
 
     public convenience init(_ stride: StrideTo<Element>) where Element: Strideable {
