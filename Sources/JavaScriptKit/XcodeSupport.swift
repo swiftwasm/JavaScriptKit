@@ -72,6 +72,7 @@ import _CJavaScriptKit
         _: JavaScriptHostFuncRef,
         _: UnsafePointer<JavaScriptObjectRef>!
     ) { fatalError() }
+    func _retain(_: JavaScriptObjectRef) { fatalError() }
     func _release(_: JavaScriptObjectRef) { fatalError() }
     func _create_typed_array<T: TypedArrayElement>(
         _: JavaScriptTypedArrayKind,

@@ -107,6 +107,10 @@ _create_function(const JavaScriptHostFuncRef host_func_id,
                  const JavaScriptObjectRef *func_ref_ptr);
 
 __attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_retain"))) extern void
+_retain(const JavaScriptObjectRef ref);
+
+__attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_release"))) extern void
 _release(const JavaScriptObjectRef ref);
 
