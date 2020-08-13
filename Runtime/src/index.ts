@@ -88,7 +88,7 @@ class SwiftRuntimeHeap {
         this._heapNextKey = 1;
     }
 
-    allocHeap(value: any) {
+    retain(value: any) {
         const isObject = typeof value == "object";
         const entry = this._heapEntryByValue.get(value);
         if (isObject && entry) {
@@ -103,7 +103,7 @@ class SwiftRuntimeHeap {
         return id
     }
 
-    freeHeap(ref: ref) {
+    release(ref: ref) {
         const value = this._heapValueById.get(ref);
         const isObject = typeof value == "object"
         if (isObject) {
@@ -161,7 +161,7 @@ export class SwiftRuntime {
                 writeValue(argument, base, base + 4, base + 8, base + 16)
             }
             let output: any;
-            const callback_func_ref = this.heap.allocHeap(function (result: any) {
+            const callback_func_ref = this.heap.retain(function (result: any) {
                 output = result
             })
             exports.swjs_call_host_function(host_func_id, argv, argc, callback_func_ref)
@@ -272,7 +272,7 @@ export class SwiftRuntime {
                 case "string": {
                     const bytes = textEncoder.encode(value);
                     writeUint32(kind_ptr, JavaScriptValueKind.String);
-                    writeUint32(payload1_ptr, this.heap.allocHeap(bytes));
+                    writeUint32(payload1_ptr, this.heap.retain(bytes));
                     writeUint32(payload2_ptr, bytes.length);
                     break;
                 }
@@ -284,13 +284,13 @@ export class SwiftRuntime {
                 }
                 case "object": {
                     writeUint32(kind_ptr, JavaScriptValueKind.Object);
-                    writeUint32(payload1_ptr, this.heap.allocHeap(value));
+                    writeUint32(payload1_ptr, this.heap.retain(value));
                     writeUint32(payload2_ptr, 0);
                     break;
                 }
                 case "function": {
                     writeUint32(kind_ptr, JavaScriptValueKind.Function);
-                    writeUint32(payload1_ptr, this.heap.allocHeap(value));
+                    writeUint32(payload1_ptr, this.heap.retain(value));
                     writeUint32(payload2_ptr, 0);
                     break;
                 }
@@ -378,7 +378,7 @@ export class SwiftRuntime {
                 host_func_id: number,
                 func_ref_ptr: pointer,
             ) => {
-                const func_ref = this.heap.allocHeap(function () {
+                const func_ref = this.heap.retain(function () {
                     return callHostFunction(host_func_id, Array.prototype.slice.call(arguments))
                 })
                 writeUint32(func_ref_ptr, func_ref)
@@ -391,7 +391,7 @@ export class SwiftRuntime {
                 const result = Reflect.construct(obj, decodeValues(argv, argc))
                 if (typeof result != "object")
                     throw Error(`Invalid result type of object constructor of "${obj}": "${result}"`)
-                writeUint32(result_obj, this.heap.allocHeap(result));
+                writeUint32(result_obj, this.heap.retain(result));
             },
             swjs_instanceof: (
                 obj_ref: ref, constructor_ref: ref,
@@ -409,10 +409,10 @@ export class SwiftRuntime {
                 const ArrayType: TypedArray = globalVariable[JavaScriptTypedArrayKind[kind] + 'Array']
                 const array = new ArrayType(memory().buffer, elementsPtr, length);
                 // Call `.slice()` to copy the memory
-                writeUint32(result_obj, this.heap.allocHeap(array.slice()));
+                writeUint32(result_obj, this.heap.retain(array.slice()));
             },
             swjs_destroy_ref: (ref: ref) => {
-                this.heap.freeHeap(ref)
+                this.heap.release(ref)
             }
         }
     }
