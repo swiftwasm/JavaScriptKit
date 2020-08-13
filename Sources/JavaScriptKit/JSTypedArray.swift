@@ -20,8 +20,9 @@ public class JSTypedArray<Element>: JSObjectRef, ExpressibleByArrayLiteral where
     }
 
     public init(length: Int) {
-        super.init(id: Element.typedArrayClass.new(length).id)
-        _retain(id)
+        let jsObject = Element.typedArrayClass.new(length)
+        _retain(jsObject.id)
+        super.init(id: jsObject.id)
     }
 
     required public convenience init(arrayLiteral elements: Element...) {
