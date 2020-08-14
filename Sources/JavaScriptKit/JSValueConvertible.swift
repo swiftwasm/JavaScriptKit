@@ -1,43 +1,10 @@
 import _CJavaScriptKit
 
-// Use this protocol when your type has no single JavaScript class.
-// For example, a union type of multiple classes.
-public protocol JSAbstractBridgedType: JSValueCodable, CustomStringConvertible {
-    var objectRef: JSObject { get }
-    init(objectRef: JSObject)
-}
-
-extension JSAbstractBridgedType {
-    public var description: String {
-        return objectRef.toString!().fromJSValue()!
-    }
-}
-
-public protocol JSBridgedType: JSAbstractBridgedType {
-    static var classRef: JSFunction { get }
-}
-
 public protocol JSValueConvertible {
     func jsValue() -> JSValue
 }
 
 public typealias JSValueCodable = JSValueConvertible & JSValueConstructible
-
-extension JSAbstractBridgedType {
-    public init(jsValue: JSValue) {
-        self.init(objectRef: jsValue.object!)
-    }
-
-    public func jsValue() -> JSValue {
-        .object(objectRef)
-    }
-}
-
-extension JSBridgedType {
-    public static func canDecode(from jsValue: JSValue) -> Bool {
-        jsValue.isInstanceOf(Self.classRef)
-    }
-}
 
 extension JSValue: JSValueCodable {
     public static func construct(from value: JSValue) -> Self? {
