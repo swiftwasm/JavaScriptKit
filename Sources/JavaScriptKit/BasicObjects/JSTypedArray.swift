@@ -39,6 +39,11 @@ public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLitera
         self.init(unsafe: jsObject)
     }
 
+    public init(wrapping jsObject: JSObjectRef) {
+        _retain(jsObject.id)
+        super.init(id: jsObject.id)
+    }
+
     required public convenience init(arrayLiteral elements: Element...) {
         self.init(elements)
     }
