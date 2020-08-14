@@ -152,3 +152,22 @@ extension JSValue {
         }
     }
 }
+
+extension JSValue: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case let .boolean(boolean):
+            return boolean.description
+        case .string(let string):
+            return string
+        case .number(let number):
+            return number.description
+        case .object(let object), .function(let object as JSObject):
+            return object.toString!().fromJSValue()!
+        case .null:
+            return "null"
+        case .undefined:
+            return "undefined"
+        }
+    }
+}

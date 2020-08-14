@@ -44,3 +44,14 @@ public struct AnyJSValueCodable: JSValueCodable, ExpressibleByNilLiteral {
         self.jsValue().fromJSValue()
     }
 }
+
+public func staticCast<Type: JSBridgedType>(_ ref: JSBridgedType) -> Type? {
+    return Type(from: ref.value)
+}
+
+public func dynamicCast<Type: JSBridgedClass>(_ ref: JSBridgedClass) -> Type? {
+    guard ref.objectRef.isInstanceOf(Type.classRef) else {
+        return nil
+    }
+    return staticCast(ref)
+}
