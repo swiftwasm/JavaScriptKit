@@ -39,7 +39,8 @@ public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLitera
         self.init(unsafe: jsObject)
     }
 
-    public init(objectRef jsObject: JSObjectRef) {
+    public init?(objectRef jsObject: JSObjectRef) {
+        guard jsObject.isInstanceOf(Element.typedArrayClass) else { return nil }
         _retain(jsObject.id)
         super.init(id: jsObject.id)
     }
