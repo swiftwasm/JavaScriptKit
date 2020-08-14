@@ -21,6 +21,11 @@ public class JSTypedArray<Element>: JSObjectRef, ExpressibleByArrayLiteral where
 
     public init(length: Int) {
         let jsObject = Element.typedArrayClass.new(length)
+        // _retain is necessary here because the JSObjectRef we used to create the array
+        // goes out of scope and is deinitialized when this init() returns, causing
+        // the JS side to decrement the object's reference count. JSTypedArray will also
+        // call _release() when deinitialized because it inherits from JSObjectRef, so this
+        // will not leak memory.
         _retain(jsObject.id)
         super.init(id: jsObject.id)
     }
