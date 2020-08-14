@@ -114,13 +114,11 @@ __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_release"))) extern void
 _release(const JavaScriptObjectRef ref);
 
-__attribute__((
-               __import_module__("javascript_kit"),
-               __import_name__("swjs_create_typed_array")
-               ))
-extern void _create_typed_array(const JavaScriptTypedArrayKind kind,
-                                      const void *elementsPtr, const int length,
-                                      JavaScriptObjectRef *result_obj);
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_create_typed_array"))) extern void
+_create_typed_array(const JavaScriptTypedArrayKind kind,
+                    const void *elementsPtr, const int length,
+                    JavaScriptObjectRef *result_obj);
 
 #endif
 
