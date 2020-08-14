@@ -3,14 +3,11 @@
 public protocol JSBridgedType: JSValueCodable, CustomStringConvertible {
     var objectRef: JSObject { get }
     init?(objectRef: JSObject)
-    static func canDecode(_ object: JSObject) -> Bool
 }
 
 extension JSBridgedType {
     public static func construct(from value: JSValue) -> Self? {
-        guard let object = value.object, canDecode(object) else {
-            return nil
-        }
+        guard let object = value.object else { return nil }
         return Self.init(objectRef: object)
     }
 
@@ -26,11 +23,13 @@ extension JSBridgedType {
 
 public protocol JSBridgedClass: JSBridgedType {
     static var classRef: JSFunction { get }
+    init(withCompatibleObject objectRef: JSObject)
 }
 
 extension JSBridgedClass {
-    public static func canDecode(from jsValue: JSValue) -> Bool {
-        jsValue.isInstanceOf(Self.classRef)
+    public init?(objectRef: JSObject) {
+        guard objectRef.isInstanceOf(Self.classRef) else { return nil }
+        self.init(withCompatibleObject: objectRef)
     }
 }
 
