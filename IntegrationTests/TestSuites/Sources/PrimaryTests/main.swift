@@ -1,6 +1,6 @@
 import JavaScriptKit
 
-Literal_Conversion: do {
+test("Literal Conversion") {
     let global = JSObjectRef.global
     let inputs: [JSValue] = [
         .boolean(true),
@@ -27,11 +27,9 @@ Literal_Conversion: do {
             try expectEqual(got, input)
         }
     }
-} catch {
-    print(error)
 }
 
-Object_Conversion: do {
+test("Object Conversion") {
     // Notes: globalObject1 is defined in JavaScript environment
     //
     // ```js
@@ -70,12 +68,9 @@ Object_Conversion: do {
     }
 
     try expectEqual(getJSValue(this: globalObject1Ref, name: "undefined_prop"), .undefined)
-
-} catch {
-    print(error)
 }
 
-Value_Construction: do {
+test("Value Construction") {
     let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_2 = getJSValue(this: globalObject1Ref, name: "prop_2")
@@ -85,11 +80,9 @@ Value_Construction: do {
     let prop_7 = getJSValue(this: globalObject1Ref, name: "prop_7")
     try expectEqual(Double.construct(from: prop_7), 3.14)
     try expectEqual(Float.construct(from: prop_7), 3.14)
-} catch {
-    print(error)
 }
 
-Array_Iterator: do {
+test("Array Iterator") {
     let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
@@ -100,7 +93,7 @@ Array_Iterator: do {
     try expectEqual(Array(array), expectedProp_4)
 }
 
-Array_RandomAccessCollection: do {
+test("Array RandomAccessCollection") {
     let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
@@ -111,7 +104,7 @@ Array_RandomAccessCollection: do {
     try expectEqual([array[0], array[1], array[2], array[3]], expectedProp_4)
 }
 
-Value_Decoder: do {
+test("Value Decoder") {
     struct GlobalObject1: Codable {
         struct Prop1: Codable {
             let nested_prop: Int
@@ -131,7 +124,7 @@ Value_Decoder: do {
     try expectEqual(globalObject1.prop_7, 3.14)
 }
 
-Function_Call: do {
+test("Function Call") {
     // Notes: globalObject1 is defined in JavaScript environment
     //
     // ```js
@@ -173,12 +166,9 @@ Function_Call: do {
     try expectEqual(func6(true, 1, 2), .number(1))
     try expectEqual(func6(false, 1, 2), .number(2))
     try expectEqual(func6(true, "OK", 2), .string("OK"))
-
-} catch {
-    print(error)
 }
 
-Host_Function_Registration: do {
+test("Host Function Registration") {
     // ```js
     // global.globalObject1 = {
     //   ...
@@ -221,11 +211,9 @@ Host_Function_Registration: do {
     try expectEqual(hostFunc2(3), .number(6))
     _ = try expectString(hostFunc2(true))
     hostFunc2.release()
-} catch {
-    print(error)
 }
 
-New_Object_Construction: do {
+test("New Object Construction") {
     // ```js
     // global.Animal = function(name, age, isCat) {
     //   this.name = name
@@ -247,11 +235,9 @@ New_Object_Construction: do {
     let dog1 = objectConstructor.new("Pochi", 3, false)
     let dog1Bark = try expectFunction(getJSValue(this: dog1, name: "bark"))
     try expectEqual(dog1Bark(), .string("wan"))
-} catch {
-    print(error)
 }
 
-Call_Function_With_This: do {
+test("Call Function With This") {
     // ```js
     // global.Animal = function(name, age, isCat) {
     //   this.name = name
@@ -275,18 +261,15 @@ Call_Function_With_This: do {
     // Call with this
     let gotIsCat = getIsCat(this: cat1)
     try expectEqual(gotIsCat, .boolean(true))
-
-} catch {
-    print(error)
 }
 
-Object_Conversion: do {
-   let array1 = [1, 2, 3]
-   let jsArray1 = array1.jsValue().object!
-   try expectEqual(jsArray1.length, .number(3))
-   try expectEqual(jsArray1[0], .number(1))
-   try expectEqual(jsArray1[1], .number(2))
-   try expectEqual(jsArray1[2], .number(3))
+test("Object Conversion") {
+    let array1 = [1, 2, 3]
+    let jsArray1 = array1.jsValue().object!
+    try expectEqual(jsArray1.length, .number(3))
+    try expectEqual(jsArray1[0], .number(1))
+    try expectEqual(jsArray1[1], .number(2))
+    try expectEqual(jsArray1[2], .number(3))
 
     let array2: [JSValueConvertible] = [1, "str", false]
     let jsArray2 = array2.jsValue().object!
@@ -296,9 +279,9 @@ Object_Conversion: do {
     try expectEqual(jsArray2[2], .boolean(false))
     _ = jsArray2.push!(5)
     try expectEqual(jsArray2.length, .number(4))
-   _ = jsArray2.push!(jsArray1)
+    _ = jsArray2.push!(jsArray1)
 
-   try expectEqual(jsArray2[4], .object(jsArray1))
+    try expectEqual(jsArray2[4], .object(jsArray1))
 
     let dict1: [String: JSValueConvertible] = [
         "prop1": 1,
@@ -307,11 +290,9 @@ Object_Conversion: do {
     let jsDict1 = dict1.jsValue().object!
     try expectEqual(jsDict1.prop1, .number(1))
     try expectEqual(jsDict1.prop2, .string("foo"))
-} catch {
-    print(error)
 }
 
-ObjectRef_Lifetime: do {
+test("ObjectRef Lifetime") {
     // ```js
     // global.globalObject1 = {
     //   "prop_1": {
@@ -332,8 +313,6 @@ ObjectRef_Lifetime: do {
     try expectEqual(ref1.prop_2, .number(2))
     try expectEqual(ref2.prop_2, .number(2))
     identity.release()
-} catch {
-    print(error)
 }
 
 func closureScope() -> ObjectIdentifier {
@@ -343,10 +322,8 @@ func closureScope() -> ObjectIdentifier {
     return result
 }
 
-Closure_Identifiers: do {
+test("Closure Identifiers") {
     let oid1 = closureScope()
     let oid2 = closureScope()
     try expectEqual(oid1, oid2)
-} catch {
-    print(error)
 }
