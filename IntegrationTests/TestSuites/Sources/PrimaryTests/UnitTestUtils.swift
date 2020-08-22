@@ -1,6 +1,9 @@
 import JavaScriptKit
 
-let printTestNames = false
+var printTestNames = false
+// Uncomment the next line to print the name of each test suite before running it.
+// This will make it easier to debug any errors that occur on the JS side.
+//printTestNames = true
 
 func test(_ name: String, testBlock: () throws -> Void) {
     if printTestNames { print(name) }

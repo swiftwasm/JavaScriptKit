@@ -38,6 +38,6 @@ let package = Package(
                     .when(platforms: [.wasi])
                 ),
             ]
-        )
+        ),
     ]
 )
