@@ -34,7 +34,7 @@ extension JSArrayRef: RandomAccessCollection {
                 return nil
             }
             let value = ref[index]
-            return value.isNull ? nil : value
+            return value
         }
     }
 
