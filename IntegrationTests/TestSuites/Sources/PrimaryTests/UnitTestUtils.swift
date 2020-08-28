@@ -5,13 +5,14 @@ var printTestNames = false
 // This will make it easier to debug any errors that occur on the JS side.
 //printTestNames = true
 
-func test(_ name: String, testBlock: () throws -> Void) {
+func test(_ name: String, testBlock: () throws -> Void) throws {
     if printTestNames { print(name) }
     do {
         try testBlock()
     } catch {
         print("Error in \(name)")
         print(error)
+        throw error
     }
 }
 

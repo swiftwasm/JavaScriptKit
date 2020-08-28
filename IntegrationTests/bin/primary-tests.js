@@ -41,4 +41,5 @@ const { startWasiTask } = require("../lib")
 
 startWasiTask("./dist/PrimaryTests.wasm").catch(err => {
   console.log(err)
+  process.exit(1)
 });

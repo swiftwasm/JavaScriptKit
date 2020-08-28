@@ -1,6 +1,6 @@
 import JavaScriptKit
 
-test("Literal Conversion") {
+try test("Literal Conversion") {
     let global = JSObject.global
     let inputs: [JSValue] = [
         .boolean(true),
@@ -29,7 +29,7 @@ test("Literal Conversion") {
     }
 }
 
-test("Object Conversion") {
+try test("Object Conversion") {
     // Notes: globalObject1 is defined in JavaScript environment
     //
     // ```js
@@ -70,7 +70,7 @@ test("Object Conversion") {
     try expectEqual(getJSValue(this: globalObject1Ref, name: "undefined_prop"), .undefined)
 }
 
-test("Value Construction") {
+try test("Value Construction") {
     let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_2 = getJSValue(this: globalObject1Ref, name: "prop_2")
@@ -82,7 +82,7 @@ test("Value Construction") {
     try expectEqual(Float.construct(from: prop_7), 3.14)
 }
 
-test("Array Iterator") {
+try test("Array Iterator") {
     let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
@@ -93,7 +93,7 @@ test("Array Iterator") {
     try expectEqual(Array(array), expectedProp_4)
 }
 
-test("Array RandomAccessCollection") {
+try test("Array RandomAccessCollection") {
     let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
@@ -104,7 +104,7 @@ test("Array RandomAccessCollection") {
     try expectEqual([array[0], array[1], array[2], array[3]], expectedProp_4)
 }
 
-test("Value Decoder") {
+try test("Value Decoder") {
     struct GlobalObject1: Codable {
         struct Prop1: Codable {
             let nested_prop: Int
@@ -124,7 +124,7 @@ test("Value Decoder") {
     try expectEqual(globalObject1.prop_7, 3.14)
 }
 
-test("Function Call") {
+try test("Function Call") {
     // Notes: globalObject1 is defined in JavaScript environment
     //
     // ```js
@@ -168,7 +168,7 @@ test("Function Call") {
     try expectEqual(func6(true, "OK", 2), .string("OK"))
 }
 
-test("Host Function Registration") {
+try test("Host Function Registration") {
     // ```js
     // global.globalObject1 = {
     //   ...
@@ -213,7 +213,7 @@ test("Host Function Registration") {
     hostFunc2.release()
 }
 
-test("New Object Construction") {
+try test("New Object Construction") {
     // ```js
     // global.Animal = function(name, age, isCat) {
     //   this.name = name
@@ -237,7 +237,7 @@ test("New Object Construction") {
     try expectEqual(dog1Bark(), .string("wan"))
 }
 
-test("Call Function With This") {
+try test("Call Function With This") {
     // ```js
     // global.Animal = function(name, age, isCat) {
     //   this.name = name
@@ -263,7 +263,7 @@ test("Call Function With This") {
     try expectEqual(gotIsCat, .boolean(true))
 }
 
-test("Object Conversion") {
+try test("Object Conversion") {
     let array1 = [1, 2, 3]
     let jsArray1 = array1.jsValue().object!
     try expectEqual(jsArray1.length, .number(3))
@@ -292,7 +292,7 @@ test("Object Conversion") {
     try expectEqual(jsDict1.prop2, .string("foo"))
 }
 
-test("ObjectRef Lifetime") {
+try test("ObjectRef Lifetime") {
     // ```js
     // global.globalObject1 = {
     //   "prop_1": {
@@ -322,7 +322,7 @@ func closureScope() -> ObjectIdentifier {
     return result
 }
 
-test("Closure Identifiers") {
+try test("Closure Identifiers") {
     let oid1 = closureScope()
     let oid2 = closureScope()
     try expectEqual(oid1, oid2)
