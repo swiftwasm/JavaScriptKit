@@ -47,7 +47,7 @@ extension JSArray: RandomAccessCollection {
 
     public var startIndex: Int { 0 }
 
-    public var endIndex: Int { ref.length.number.map(Int.init) ?? 0 }
+    public var endIndex: Int { count }
 
     /// The number of elements in that array including empty hole.
     /// Note that `length` respects JavaScript's `Array.prototype.length`
@@ -73,9 +73,9 @@ extension JSArray: RandomAccessCollection {
     }
 }
 
+private let alwaysTrue = JSClosure { _ in .boolean(true) }
 private func getObjectValuesLength(_ object: JSObject) -> Int {
-    let objectClass = JSObject.global.Object.function!
-    let values = objectClass.values!(object).object!
+    let values = object.filter!(alwaysTrue).object!
     return Int(values.length.number!)
 }
 
