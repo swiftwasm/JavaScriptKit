@@ -30,7 +30,7 @@ public class JSObject: Equatable {
         set { setJSValue(this: self, index: Int32(index), value: newValue) }
     }
 
-    public func isInstanceOf(_ constructor: JSFunctionRef) -> Bool {
+    public func isInstanceOf(_ constructor: JSFunction) -> Bool {
         _instanceof(id, constructor.id)
     }
 

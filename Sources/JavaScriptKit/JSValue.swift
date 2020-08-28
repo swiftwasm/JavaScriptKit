@@ -7,7 +7,7 @@ public enum JSValue: Equatable {
     case object(JSObject)
     case null
     case undefined
-    case function(JSFunctionRef)
+    case function(JSFunction)
 
     public var boolean: Bool? {
         switch self {
@@ -39,7 +39,7 @@ public enum JSValue: Equatable {
 
     public var isNull: Bool { return self == .null }
     public var isUndefined: Bool { return self == .undefined }
-    public var function: JSFunctionRef? {
+    public var function: JSFunction? {
         switch self {
         case let .function(function): return function
         default: return nil

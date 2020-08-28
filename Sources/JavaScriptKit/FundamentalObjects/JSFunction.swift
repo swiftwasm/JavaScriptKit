@@ -1,6 +1,6 @@
 import _CJavaScriptKit
 
-public class JSFunctionRef: JSObject {
+public class JSFunction: JSObject {
     @discardableResult
     public func callAsFunction(this: JSObject? = nil, arguments: [JSValueConvertible]) -> JSValue {
         let result = arguments.withRawJSValues { rawValues in
@@ -53,7 +53,7 @@ public class JSFunctionRef: JSObject {
     }
 
     @available(*, unavailable, message: "Please use JSClosure instead")
-    public static func from(_: @escaping ([JSValue]) -> JSValue) -> JSFunctionRef {
+    public static func from(_: @escaping ([JSValue]) -> JSValue) -> JSFunction {
         fatalError("unavailable")
     }
 
@@ -62,7 +62,7 @@ public class JSFunctionRef: JSObject {
     }
 }
 
-public class JSClosure: JSFunctionRef {
+public class JSClosure: JSFunction {
     static var sharedFunctions: [JavaScriptHostFuncRef: ([JSValue]) -> JSValue] = [:]
 
     private var hostFuncRef: JavaScriptHostFuncRef = 0
@@ -128,6 +128,6 @@ public func _call_host_function(
         $0.jsValue()
     }
     let result = hostFunc(arguments)
-    let callbackFuncRef = JSFunctionRef(id: callbackFuncRef)
+    let callbackFuncRef = JSFunction(id: callbackFuncRef)
     _ = callbackFuncRef(result)
 }

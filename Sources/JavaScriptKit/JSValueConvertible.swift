@@ -54,7 +54,7 @@ extension String: JSValueConvertible {
 
 extension JSObject: JSValueConvertible {
     // `JSObject.jsValue` is defined in JSObject.swift to be able to overridden
-    // from `JSFunctionRef`
+    // from `JSFunction`
 }
 
 private let Object = JSObject.global.Object.function!
@@ -117,7 +117,7 @@ extension RawJSValue: JSValueConvertible {
         case .undefined:
             return .undefined
         case .function:
-            return .function(JSFunctionRef(id: UInt32(payload1)))
+            return .function(JSFunction(id: UInt32(payload1)))
         default:
             fatalError("unreachable")
         }
