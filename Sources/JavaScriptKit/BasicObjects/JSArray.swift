@@ -47,7 +47,7 @@ extension JSArray: RandomAccessCollection {
 
     public var startIndex: Int { 0 }
 
-    public var endIndex: Int { count }
+    public var endIndex: Int { length }
 
     /// The number of elements in that array including empty hole.
     /// Note that `length` respects JavaScript's `Array.prototype.length`
