@@ -47,8 +47,8 @@ Can be written in Swift using JavaScriptKit
 ```swift
 import JavaScriptKit
 
-let alert = JSObjectRef.global.alert.function!
-let document = JSObjectRef.global.document.object!
+let alert = JSObject.global.alert.function!
+let document = JSObject.global.document.object!
 
 let divElement = document.createElement!("div").object!
 divElement.innerText = "Hello, world"
@@ -64,7 +64,7 @@ struct Pet: Codable {
   let owner: Owner
 }
 
-let jsPet = JSObjectRef.global.pet
+let jsPet = JSObject.global.pet
 let swiftPet: Pet = try JSValueDecoder().decode(from: jsPet)
 
 alert("Swift is running on browser!")

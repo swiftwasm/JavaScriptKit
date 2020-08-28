@@ -4,7 +4,7 @@ public enum JSValue: Equatable {
     case boolean(Bool)
     case string(String)
     case number(Double)
-    case object(JSObjectRef)
+    case object(JSObject)
     case null
     case undefined
     case function(JSFunctionRef)
@@ -30,15 +30,11 @@ public enum JSValue: Equatable {
         }
     }
 
-    public var object: JSObjectRef? {
+    public var object: JSObject? {
         switch self {
         case let .object(object): return object
         default: return nil
         }
-    }
-
-    public var array: JSArrayRef? {
-        object.flatMap { JSArrayRef($0) }
     }
 
     public var isNull: Bool { return self == .null }
@@ -69,7 +65,7 @@ extension JSValue: ExpressibleByIntegerLiteral {
     }
 }
 
-public func getJSValue(this: JSObjectRef, name: String) -> JSValue {
+public func getJSValue(this: JSObject, name: String) -> JSValue {
     var rawValue = RawJSValue()
     _get_prop(this.id, name, Int32(name.count),
               &rawValue.kind,
@@ -77,13 +73,13 @@ public func getJSValue(this: JSObjectRef, name: String) -> JSValue {
     return rawValue.jsValue()
 }
 
-public func setJSValue(this: JSObjectRef, name: String, value: JSValue) {
+public func setJSValue(this: JSObject, name: String, value: JSValue) {
     value.withRawJSValue { rawValue in
         _set_prop(this.id, name, Int32(name.count), rawValue.kind, rawValue.payload1, rawValue.payload2, rawValue.payload3)
     }
 }
 
-public func getJSValue(this: JSObjectRef, index: Int32) -> JSValue {
+public func getJSValue(this: JSObject, index: Int32) -> JSValue {
     var rawValue = RawJSValue()
     _get_subscript(this.id, index,
                    &rawValue.kind,
@@ -91,7 +87,7 @@ public func getJSValue(this: JSObjectRef, index: Int32) -> JSValue {
     return rawValue.jsValue()
 }
 
-public func setJSValue(this: JSObjectRef, index: Int32, value: JSValue) {
+public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
     value.withRawJSValue { rawValue in
         _set_subscript(this.id, index,
                        rawValue.kind,
