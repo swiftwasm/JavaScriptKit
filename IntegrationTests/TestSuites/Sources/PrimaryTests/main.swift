@@ -60,7 +60,7 @@ try test("Object Conversion") {
     let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
     let prop_4Array = try expectObject(prop_4)
     let expectedProp_4: [JSValue] = [
-        .number(3), .number(4), .string("str_elm_1"), .number(5),
+        .number(3), .number(4), .string("str_elm_1"), .null, .undefined, .number(5),
     ]
     for (index, expectedElement) in expectedProp_4.enumerated() {
         let actualElement = getJSValue(this: prop_4Array, index: Int32(index))
@@ -99,9 +99,9 @@ try test("Array RandomAccessCollection") {
     let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
     let array = try expectArray(prop_4)
     let expectedProp_4: [JSValue] = [
-        .number(3), .number(4), .string("str_elm_1"), .number(5),
+        .number(3), .number(4), .string("str_elm_1"), .null, .undefined, .number(5),
     ]
-    try expectEqual([array[0], array[1], array[2], array[3]], expectedProp_4)
+    try expectEqual([array[0], array[1], array[2], array[3], array[4], array[5]], expectedProp_4)
 }
 
 try test("Value Decoder") {
