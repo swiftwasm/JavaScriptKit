@@ -1,7 +1,7 @@
 import JavaScriptKit
 
 test("Literal Conversion") {
-    let global = JSObjectRef.global
+    let global = JSObject.global
     let inputs: [JSValue] = [
         .boolean(true),
         .boolean(false),

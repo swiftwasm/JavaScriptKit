@@ -1,20 +1,19 @@
+public class JSArray {
+    static let classObject = JSObject.global.Array.function!
 
-public class JSArrayRef {
-    static let classObject = JSObjectRef.global.Array.function!
-
-    static func isArray(_ object: JSObjectRef) -> Bool {
+    static func isArray(_ object: JSObject) -> Bool {
         classObject.isArray!(object).boolean!
     }
 
-    let ref: JSObjectRef
+    let ref: JSObject
 
-    public init?(_ ref: JSObjectRef) {
+    public init?(_ ref: JSObject) {
         guard Self.isArray(ref) else { return nil }
         self.ref = ref
     }
 }
 
-extension JSArrayRef: RandomAccessCollection {
+extension JSArray: RandomAccessCollection {
     public typealias Element = JSValue
 
     public func makeIterator() -> Iterator {
@@ -22,9 +21,9 @@ extension JSArrayRef: RandomAccessCollection {
     }
 
     public class Iterator: IteratorProtocol {
-        let ref: JSObjectRef
+        let ref: JSObject
         var index = 0
-        init(ref: JSObjectRef) {
+        init(ref: JSObject) {
             self.ref = ref
         }
 
@@ -45,4 +44,10 @@ extension JSArrayRef: RandomAccessCollection {
     public var startIndex: Int { 0 }
 
     public var endIndex: Int { ref.length.number.map(Int.init) ?? 0 }
+}
+
+extension JSValue {
+    public var array: JSArray? {
+        object.flatMap(JSArray.init)
+    }
 }

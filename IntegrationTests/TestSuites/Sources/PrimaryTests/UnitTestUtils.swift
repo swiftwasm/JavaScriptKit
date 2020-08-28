@@ -37,7 +37,7 @@ func expectEqual<T: Equatable>(
     }
 }
 
-func expectObject(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSObjectRef {
+func expectObject(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSObject {
     switch value {
     case let .object(ref): return ref
     default:
@@ -45,7 +45,7 @@ func expectObject(_ value: JSValue, file: StaticString = #file, line: UInt = #li
     }
 }
 
-func expectArray(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSArrayRef {
+func expectArray(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSArray {
     guard let array = value.array else {
         throw MessageError("Type of \(value) should be \"object\"", file: file, line: line, column: column)
     }
