@@ -86,22 +86,36 @@ try test("Array Iterator") {
     let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
-    let array = try expectArray(prop_4)
+    let array1 = try expectArray(prop_4)
     let expectedProp_4: [JSValue] = [
         .number(3), .number(4), .string("str_elm_1"), .null, .undefined, .number(5),
     ]
-    try expectEqual(Array(array), expectedProp_4)
+    try expectEqual(Array(array1), expectedProp_4)
+
+    // Ensure that iterator skips empty hole as JavaScript does.
+    let prop_8 = getJSValue(this: globalObject1Ref, name: "prop_8")
+    let array2 = try expectArray(prop_8)
+    let expectedProp_8: [JSValue] = [0, 2, 3, 6]
+    try expectEqual(Array(array2), expectedProp_8)
 }
 
 try test("Array RandomAccessCollection") {
     let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
-    let array = try expectArray(prop_4)
+    let array1 = try expectArray(prop_4)
     let expectedProp_4: [JSValue] = [
         .number(3), .number(4), .string("str_elm_1"), .null, .undefined, .number(5),
     ]
-    try expectEqual([array[0], array[1], array[2], array[3], array[4], array[5]], expectedProp_4)
+    try expectEqual([array1[0], array1[1], array1[2], array1[3], array1[4], array1[5]], expectedProp_4)
+
+    // Ensure that subscript can access empty hole
+    let prop_8 = getJSValue(this: globalObject1Ref, name: "prop_8")
+    let array2 = try expectArray(prop_8)
+    let expectedProp_8: [JSValue] = [
+        0, .undefined, 2, 3, .undefined, .undefined, 6
+    ]
+    try expectEqual([array2[0], array2[1], array2[2], array2[3], array2[4], array2[5], array2[6]], expectedProp_8)
 }
 
 try test("Value Decoder") {

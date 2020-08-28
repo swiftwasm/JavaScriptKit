@@ -23,6 +23,7 @@ global.globalObject1 = {
     }
   },
   "prop_7": 3.14,
+  "prop_8": [0, , 2, 3, , , 6],
 }
 
 global.Animal = function(name, age, isCat) {

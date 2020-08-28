@@ -28,11 +28,15 @@ extension JSArray: RandomAccessCollection {
         }
 
         public func next() -> Element? {
-            defer { index += 1 }
-            guard index < Int(ref.length.number!) else {
+            let currentIndex = index
+            guard currentIndex < Int(ref.length.number!) else {
                 return nil
             }
-            let value = ref[index]
+            index += 1
+            guard ref.hasOwnProperty!(currentIndex).boolean! else {
+                return next()
+            }
+            let value = ref[currentIndex]
             return value
         }
     }
@@ -44,6 +48,35 @@ extension JSArray: RandomAccessCollection {
     public var startIndex: Int { 0 }
 
     public var endIndex: Int { ref.length.number.map(Int.init) ?? 0 }
+
+    /// The number of elements in that array including empty hole.
+    /// Note that `length` respects JavaScript's `Array.prototype.length`
+    ///
+    /// e.g.
+    /// ```javascript
+    /// const array = [1, , 3];
+    /// ```
+    /// ```swift
+    /// let array: JSArray = ...
+    /// array.length // 3
+    /// array.count  // 2
+    /// ```
+    public var length: Int {
+        return Int(ref.length.number!)
+    }
+
+    /// The number of elements in that array **not** including empty hole.
+    /// Note that `count` syncs with the number that `Iterator` can iterate.
+    /// See also: `JSArray.length`
+    public var count: Int {
+        return getObjectValuesLength(ref)
+    }
+}
+
+private func getObjectValuesLength(_ object: JSObject) -> Int {
+    let objectClass = JSObject.global.Object.function!
+    let values = objectClass.values!(object).object!
+    return Int(values.length.number!)
 }
 
 extension JSValue {
