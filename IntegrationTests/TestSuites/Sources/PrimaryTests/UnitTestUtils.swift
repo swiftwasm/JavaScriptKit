@@ -53,7 +53,7 @@ func expectArray(_ value: JSValue, file: StaticString = #file, line: UInt = #lin
     return array
 }
 
-func expectFunction(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSFunctionRef {
+func expectFunction(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSFunction {
     switch value {
     case let .function(ref): return ref
     default:
