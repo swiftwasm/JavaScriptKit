@@ -343,14 +343,18 @@ try test("Closure Identifiers") {
 }
 
 func checkArray<T>(_ array: [T]) throws where T: TypedArrayElement {
-    try expectEqual(JSTypedArray(array).toString!(), .string(jsStringify(array)))
+    try expectEqual(toString(JSTypedArray(array).jsValue().object!), jsStringify(array))
+}
+
+func toString<T: JSObject>(_ object: T) -> String {
+    return object.toString!().string!
 }
 
 func jsStringify(_ array: [Any]) -> String {
     array.map({ String(describing: $0) }).joined(separator: ",")
 }
 
-test("TypedArray") {
+try test("TypedArray") {
     let numbers = [UInt8](0 ... 255)
     let typedArray = JSTypedArray(numbers)
     try expectEqual(typedArray[12], 12)
@@ -380,7 +384,7 @@ test("TypedArray") {
     }
 }
 
-test("TypedArray_Mutation") {
+try test("TypedArray_Mutation") {
     let array = JSTypedArray<Int>(length: 100)
     for i in 0..<100 {
         array[i] = i
@@ -388,5 +392,5 @@ test("TypedArray_Mutation") {
     for i in 0..<100 {
         try expectEqual(i, array[i])
     }
-    try expectEqual(array.toString!(), .string(jsStringify(Array(0..<100))))
+    try expectEqual(toString(array.jsValue().object!), jsStringify(Array(0..<100)))
 }
