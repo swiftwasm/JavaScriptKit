@@ -11,12 +11,12 @@ private struct _Decoder: Decoder {
     let userInfo: [CodingUserInfoKey: Any]
 
     func container<Key>(keyedBy _: Key.Type) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
-        guard let ref = node.object else { throw _typeMismatch(at: codingPath, JSObjectRef.self, reality: node) }
+        guard let ref = node.object else { throw _typeMismatch(at: codingPath, JSObject.self, reality: node) }
         return KeyedDecodingContainer(_KeyedDecodingContainer(decoder: self, ref: ref))
     }
 
     func unkeyedContainer() throws -> UnkeyedDecodingContainer {
-        guard let ref = node.object else { throw _typeMismatch(at: codingPath, JSObjectRef.self, reality: node) }
+        guard let ref = node.object else { throw _typeMismatch(at: codingPath, JSObject.self, reality: node) }
         return _UnkeyedDecodingContainer(decoder: self, ref: ref)
     }
 
@@ -34,8 +34,8 @@ private struct _Decoder: Decoder {
 }
 
 private enum Object {
-    static let ref = JSObjectRef.global.Object.object!
-    static func keys(_ object: JSObjectRef) -> [String] {
+    static let ref = JSObject.global.Object.object!
+    static func keys(_ object: JSObject) -> [String] {
         let keys = ref.keys!(object).array!
         return keys.map { $0.string! }
     }
@@ -77,14 +77,14 @@ struct _JSCodingKey: CodingKey {
 
 private struct _KeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContainerProtocol {
     private let decoder: _Decoder
-    private let ref: JSObjectRef
+    private let ref: JSObject
 
     var codingPath: [CodingKey] { return decoder.codingPath }
     var allKeys: [Key] {
         Object.keys(ref).compactMap(Key.init(stringValue:))
     }
 
-    init(decoder: _Decoder, ref: JSObjectRef) {
+    init(decoder: _Decoder, ref: JSObject) {
         self.decoder = decoder
         self.ref = ref
     }
@@ -152,9 +152,9 @@ private struct _UnkeyedDecodingContainer: UnkeyedDecodingContainer {
     private var currentKey: CodingKey { return _JSCodingKey(index: currentIndex) }
 
     let decoder: _Decoder
-    let ref: JSObjectRef
+    let ref: JSObject
 
-    init(decoder: _Decoder, ref: JSObjectRef) {
+    init(decoder: _Decoder, ref: JSObject) {
         self.decoder = decoder
         count = ref.length.number.map(Int.init)
         self.ref = ref

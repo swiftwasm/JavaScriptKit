@@ -56,12 +56,12 @@ extension String: JSValueConvertible {
     public func jsValue() -> JSValue { .string(self) }
 }
 
-extension JSObjectRef: JSValueConvertible {
-    // `JSObjectRef.jsValue` is defined in JSObjectRef.swift to be able to overridden
-    // from `JSFunctionRef`
+extension JSObject: JSValueConvertible {
+    // `JSObject.jsValue` is defined in JSObject.swift to be able to overridden
+    // from `JSFunction`
 }
 
-private let Object = JSObjectRef.global.Object.function!
+private let Object = JSObject.global.Object.function!
 
 extension Dictionary where Value: JSValueConvertible, Key == String {
     public func jsValue() -> JSValue {
@@ -79,7 +79,7 @@ extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key 
     }
 }
 
-private let Array = JSObjectRef.global.Array.function!
+private let Array = JSObject.global.Array.function!
 
 extension Array where Element: JSValueConvertible {
     public func jsValue() -> JSValue {
@@ -115,13 +115,13 @@ extension RawJSValue: JSValueConvertible {
             let string = String(decodingCString: UnsafePointer(buffer), as: UTF8.self)
             return .string(string)
         case .object:
-            return .object(JSObjectRef(id: UInt32(payload1)))
+            return .object(JSObject(id: UInt32(payload1)))
         case .null:
             return .null
         case .undefined:
             return .undefined
         case .function:
-            return .function(JSFunctionRef(id: UInt32(payload1)))
+            return .function(JSFunction(id: UInt32(payload1)))
         default:
             fatalError("unreachable")
         }
