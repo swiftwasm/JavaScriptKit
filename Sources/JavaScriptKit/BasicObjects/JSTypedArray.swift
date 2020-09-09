@@ -9,37 +9,40 @@ public protocol TypedArrayElement: JSValueConvertible, JSValueConstructible {
     static var typedArrayClass: JSFunctionRef { get }
 }
 
-public class JSTypedArray<Element>: JSObjectRef, ExpressibleByArrayLiteral where Element: TypedArrayElement {
-    public subscript(_ index: Int) -> Element {
-        get {
-            return Element.construct(from: getJSValue(this: self, index: Int32(index)))!
-        }
-        set {
-            setJSValue(this: self, index: Int32(index), value: newValue.jsValue())
-        }
+public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLiteral where Element: TypedArrayElement {
+    let ref: JSObject
+    public func jsValue() -> JSValue {
+        .object(ref)
     }
 
-    public init(length: Int) {
+    public subscript(_ index: Int) -> Element {
+        get {
+            return Element.construct(from: getJSValue(this: ref, index: Int32(index)))!
+        }
+        set {
+            setJSValue(this: ref, index: Int32(index), value: newValue.jsValue())
+        }
+    }
+    
+    public init(_ object: JSObject) {
+        self.ref = object
+    }
+
+    public convenience init(length: Int) {
         let jsObject = Element.typedArrayClass.new(length)
-        // _retain is necessary here because the JSObjectRef we used to create the array
-        // goes out of scope and is deinitialized when this init() returns, causing
-        // the JS side to decrement the object's reference count. JSTypedArray will also
-        // call _release() when deinitialized because it inherits from JSObjectRef, so this
-        // will not leak memory.
-        _retain(jsObject.id)
-        super.init(id: jsObject.id)
+        self.init(jsObject)
     }
 
     required public convenience init(arrayLiteral elements: Element...) {
         self.init(elements)
     }
 
-    public init(_ array: [Element]) {
+    public convenience init(_ array: [Element]) {
         var resultObj = JavaScriptObjectRef()
         array.withUnsafeBufferPointer { ptr in
             _create_typed_array(Element.typedArrayKind, ptr.baseAddress!, Int32(array.count), &resultObj)
         }
-        super.init(id: resultObj)
+        self.init(JSObject(id: resultObj))
     }
 
     public convenience init(_ stride: StrideTo<Element>) where Element: Strideable {
