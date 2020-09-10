@@ -1,6 +1,6 @@
 # JavaScriptKit
 
-![Run unit tests](https://github.com/kateinoigakukun/JavaScriptKit/workflows/Run%20unit%20tests/badge.svg?branch=master)
+![Run unit tests](https://github.com/swiftwasm/JavaScriptKit/workflows/Run%20unit%20tests/badge.svg?branch=master)
 
 Swift framework to interact with JavaScript through WebAssembly.
 
@@ -71,4 +71,4 @@ alert("Swift is running on browser!")
 ```
 
 
-Please see [Example](https://github.com/kateinoigakukun/JavaScriptKit/tree/master/Example) directory for more information
+Please see [Example](https://github.com/swiftwasm/JavaScriptKit/tree/master/Example) directory for more information

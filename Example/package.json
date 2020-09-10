@@ -17,6 +17,6 @@
     "build": "webpack",
     "start": "webpack-dev-server"
   },
-  "author": "kateinoigakukun",
+  "author": "swiftwasm",
   "license": "MIT"
 }

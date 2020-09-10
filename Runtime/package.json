@@ -19,16 +19,16 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kateinoigakukun/JavaScriptKit.git"
+    "url": "git+https://github.com/swiftwasm/JavaScriptKit.git"
   },
-  "homepage": "https://github.com/kateinoigakukun/JavaScriptKit",
+  "homepage": "https://github.com/swiftwasm/JavaScriptKit",
   "bugs": {
-    "url": "https://github.com/kateinoigakukun/JavaScriptKit/issues"
+    "url": "https://github.com/swiftwasm/JavaScriptKit/issues"
   },
   "publishConfig": {
     "access": "public"
   },
-  "author": "kateinoigakukun",
+  "author": "swiftwasm",
   "license": "MIT",
   "devDependencies": {
     "typescript": "^3.8.3"
