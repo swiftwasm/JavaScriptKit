@@ -6,7 +6,7 @@ import _CJavaScriptKit
 
 public protocol TypedArrayElement: JSValueConvertible, JSValueConstructible {
     static var typedArrayKind: JavaScriptTypedArrayKind { get }
-    static var typedArrayClass: JSFunctionRef { get }
+    static var typedArrayClass: JSFunction { get }
 }
 
 public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLiteral where Element: TypedArrayElement {
@@ -23,7 +23,7 @@ public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLitera
             setJSValue(this: ref, index: Int32(index), value: newValue.jsValue())
         }
     }
-    
+
     // This private initializer assumes that the passed object is TypedArray
     private init(unsafe object: JSObject) {
         self.ref = object
@@ -70,16 +70,16 @@ func valueForBitWidth<T>(typeName: String, bitWidth: Int, when32: T) -> T {
 }
 
 extension Int: TypedArrayElement {
-    public static var typedArrayClass: JSFunctionRef {
-        valueForBitWidth(typeName: "Int", bitWidth: Int.bitWidth, when32: JSObjectRef.global.Int32Array).function!
+    public static var typedArrayClass: JSFunction {
+        valueForBitWidth(typeName: "Int", bitWidth: Int.bitWidth, when32: JSObject.global.Int32Array).function!
     }
     public static var typedArrayKind: JavaScriptTypedArrayKind {
         valueForBitWidth(typeName: "Int", bitWidth: Int.bitWidth, when32: .int32)
     }
 }
 extension UInt: TypedArrayElement {
-    public static var typedArrayClass: JSFunctionRef {
-        valueForBitWidth(typeName: "UInt", bitWidth: Int.bitWidth, when32: JSObjectRef.global.Uint32Array).function!
+    public static var typedArrayClass: JSFunction {
+        valueForBitWidth(typeName: "UInt", bitWidth: Int.bitWidth, when32: JSObject.global.Uint32Array).function!
     }
     public static var typedArrayKind: JavaScriptTypedArrayKind {
         valueForBitWidth(typeName: "UInt", bitWidth: UInt.bitWidth, when32: .uint32)
@@ -89,30 +89,30 @@ extension UInt: TypedArrayElement {
 // MARK: - Concrete TypedArray classes
 
 extension Int8: TypedArrayElement {
-    public static var typedArrayClass: JSFunctionRef { JSObjectRef.global.Int8Array.function! }
+    public static var typedArrayClass: JSFunction { JSObject.global.Int8Array.function! }
     public static var typedArrayKind: JavaScriptTypedArrayKind { .int8 }
 }
 extension UInt8: TypedArrayElement {
-    public static var typedArrayClass: JSFunctionRef { JSObjectRef.global.Uint8Array.function! }
+    public static var typedArrayClass: JSFunction { JSObject.global.Uint8Array.function! }
     public static var typedArrayKind: JavaScriptTypedArrayKind { .uint8 }
 }
 // TODO: Support Uint8ClampedArray?
 
 extension Int16: TypedArrayElement {
-    public static var typedArrayClass: JSFunctionRef { JSObjectRef.global.Int16Array.function! }
+    public static var typedArrayClass: JSFunction { JSObject.global.Int16Array.function! }
    public static var typedArrayKind: JavaScriptTypedArrayKind { .int16 }
 }
 extension UInt16: TypedArrayElement {
-    public static var typedArrayClass: JSFunctionRef { JSObjectRef.global.Uint16Array.function! }
+    public static var typedArrayClass: JSFunction { JSObject.global.Uint16Array.function! }
     public static var typedArrayKind: JavaScriptTypedArrayKind { .uint16 }
 }
 
 extension Int32: TypedArrayElement {
-    public static var typedArrayClass: JSFunctionRef { JSObjectRef.global.Int32Array.function! }
+    public static var typedArrayClass: JSFunction { JSObject.global.Int32Array.function! }
     public static var typedArrayKind: JavaScriptTypedArrayKind { .int32 }
 }
 extension UInt32: TypedArrayElement {
-    public static var typedArrayClass: JSFunctionRef { JSObjectRef.global.Uint32Array.function! }
+    public static var typedArrayClass: JSFunction { JSObject.global.Uint32Array.function! }
     public static var typedArrayKind: JavaScriptTypedArrayKind { .uint32 }
 }
 
@@ -127,10 +127,10 @@ extension UInt32: TypedArrayElement {
 //}
 
 extension Float32: TypedArrayElement {
-    public static var typedArrayClass: JSFunctionRef { JSObjectRef.global.Float32Array.function! }
+    public static var typedArrayClass: JSFunction { JSObject.global.Float32Array.function! }
     public static var typedArrayKind: JavaScriptTypedArrayKind { .float32 }
 }
 extension Float64: TypedArrayElement {
-    public static var typedArrayClass: JSFunctionRef { JSObjectRef.global.Float64Array.function! }
+    public static var typedArrayClass: JSFunction { JSObject.global.Float64Array.function! }
     public static var typedArrayKind: JavaScriptTypedArrayKind { .float64 }
 }
