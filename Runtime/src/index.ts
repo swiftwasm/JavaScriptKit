@@ -398,8 +398,7 @@ export class SwiftRuntime {
                 writeUint32(result_obj, this.heap.retain(result));
             },
             swjs_instanceof: (
-                obj_ref: ref, constructor_ref: ref,
-                result_ptr: pointer
+                obj_ref: ref, constructor_ref: ref
             ) => {
               const obj = this.heap.referenceHeap(obj_ref)
               const constructor = this.heap.referenceHeap(constructor_ref)
@@ -414,9 +413,6 @@ export class SwiftRuntime {
                 const array = new ArrayType(memory().buffer, elementsPtr, length);
                 // Call `.slice()` to copy the memory
                 writeUint32(result_obj, this.heap.retain(array.slice()));
-            },
-            swjs_retain: (ref: ref) => {
-                this.heap.retain(this.heap.referenceHeap(ref))
             },
             swjs_release: (ref: ref) => {
                 this.heap.release(ref)
