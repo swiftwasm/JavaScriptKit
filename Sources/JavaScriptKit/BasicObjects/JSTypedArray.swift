@@ -24,13 +24,19 @@ public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLitera
         }
     }
     
-    public init(_ object: JSObject) {
+    // This private initializer assumes that the passed object is TypedArray
+    private init(unsafe object: JSObject) {
+        self.ref = object
+    }
+
+    public init?(_ object: JSObject) {
+        guard object.isInstanceOf(Element.typedArrayClass) else { return nil }
         self.ref = object
     }
 
     public convenience init(length: Int) {
         let jsObject = Element.typedArrayClass.new(length)
-        self.init(jsObject)
+        self.init(unsafe: jsObject)
     }
 
     required public convenience init(arrayLiteral elements: Element...) {
@@ -42,7 +48,7 @@ public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLitera
         array.withUnsafeBufferPointer { ptr in
             _create_typed_array(Element.typedArrayKind, ptr.baseAddress!, Int32(array.count), &resultObj)
         }
-        self.init(JSObject(id: resultObj))
+        self.init(unsafe: JSObject(id: resultObj))
     }
 
     public convenience init(_ stride: StrideTo<Element>) where Element: Strideable {
