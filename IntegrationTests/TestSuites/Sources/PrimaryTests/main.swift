@@ -1,7 +1,7 @@
 import JavaScriptKit
 
-test("Literal Conversion") {
-    let global = JSObjectRef.global
+try test("Literal Conversion") {
+    let global = JSObject.global
     let inputs: [JSValue] = [
         .boolean(true),
         .boolean(false),
@@ -29,7 +29,7 @@ test("Literal Conversion") {
     }
 }
 
-test("Object Conversion") {
+try test("Object Conversion") {
     // Notes: globalObject1 is defined in JavaScript environment
     //
     // ```js
@@ -60,7 +60,7 @@ test("Object Conversion") {
     let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
     let prop_4Array = try expectObject(prop_4)
     let expectedProp_4: [JSValue] = [
-        .number(3), .number(4), .string("str_elm_1"), .number(5),
+        .number(3), .number(4), .string("str_elm_1"), .null, .undefined, .number(5),
     ]
     for (index, expectedElement) in expectedProp_4.enumerated() {
         let actualElement = getJSValue(this: prop_4Array, index: Int32(index))
@@ -70,7 +70,7 @@ test("Object Conversion") {
     try expectEqual(getJSValue(this: globalObject1Ref, name: "undefined_prop"), .undefined)
 }
 
-test("Value Construction") {
+try test("Value Construction") {
     let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_2 = getJSValue(this: globalObject1Ref, name: "prop_2")
@@ -82,29 +82,43 @@ test("Value Construction") {
     try expectEqual(Float.construct(from: prop_7), 3.14)
 }
 
-test("Array Iterator") {
+try test("Array Iterator") {
     let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
-    let array = try expectArray(prop_4)
+    let array1 = try expectArray(prop_4)
     let expectedProp_4: [JSValue] = [
-        .number(3), .number(4), .string("str_elm_1"), .number(5),
+        .number(3), .number(4), .string("str_elm_1"), .null, .undefined, .number(5),
     ]
-    try expectEqual(Array(array), expectedProp_4)
+    try expectEqual(Array(array1), expectedProp_4)
+
+    // Ensure that iterator skips empty hole as JavaScript does.
+    let prop_8 = getJSValue(this: globalObject1Ref, name: "prop_8")
+    let array2 = try expectArray(prop_8)
+    let expectedProp_8: [JSValue] = [0, 2, 3, 6]
+    try expectEqual(Array(array2), expectedProp_8)
 }
 
-test("Array RandomAccessCollection") {
+try test("Array RandomAccessCollection") {
     let globalObject1 = getJSValue(this: .global, name: "globalObject1")
     let globalObject1Ref = try expectObject(globalObject1)
     let prop_4 = getJSValue(this: globalObject1Ref, name: "prop_4")
-    let array = try expectArray(prop_4)
+    let array1 = try expectArray(prop_4)
     let expectedProp_4: [JSValue] = [
-        .number(3), .number(4), .string("str_elm_1"), .number(5),
+        .number(3), .number(4), .string("str_elm_1"), .null, .undefined, .number(5),
     ]
-    try expectEqual([array[0], array[1], array[2], array[3]], expectedProp_4)
+    try expectEqual([array1[0], array1[1], array1[2], array1[3], array1[4], array1[5]], expectedProp_4)
+
+    // Ensure that subscript can access empty hole
+    let prop_8 = getJSValue(this: globalObject1Ref, name: "prop_8")
+    let array2 = try expectArray(prop_8)
+    let expectedProp_8: [JSValue] = [
+        0, .undefined, 2, 3, .undefined, .undefined, 6
+    ]
+    try expectEqual([array2[0], array2[1], array2[2], array2[3], array2[4], array2[5], array2[6]], expectedProp_8)
 }
 
-test("Value Decoder") {
+try test("Value Decoder") {
     struct GlobalObject1: Codable {
         struct Prop1: Codable {
             let nested_prop: Int
@@ -124,7 +138,7 @@ test("Value Decoder") {
     try expectEqual(globalObject1.prop_7, 3.14)
 }
 
-test("Function Call") {
+try test("Function Call") {
     // Notes: globalObject1 is defined in JavaScript environment
     //
     // ```js
@@ -168,7 +182,7 @@ test("Function Call") {
     try expectEqual(func6(true, "OK", 2), .string("OK"))
 }
 
-test("Host Function Registration") {
+try test("Host Function Registration") {
     // ```js
     // global.globalObject1 = {
     //   ...
@@ -213,7 +227,7 @@ test("Host Function Registration") {
     hostFunc2.release()
 }
 
-test("New Object Construction") {
+try test("New Object Construction") {
     // ```js
     // global.Animal = function(name, age, isCat) {
     //   this.name = name
@@ -237,7 +251,7 @@ test("New Object Construction") {
     try expectEqual(dog1Bark(), .string("wan"))
 }
 
-test("Call Function With This") {
+try test("Call Function With This") {
     // ```js
     // global.Animal = function(name, age, isCat) {
     //   this.name = name
@@ -263,7 +277,7 @@ test("Call Function With This") {
     try expectEqual(gotIsCat, .boolean(true))
 }
 
-test("Object Conversion") {
+try test("Object Conversion") {
     let array1 = [1, 2, 3]
     let jsArray1 = array1.jsValue().object!
     try expectEqual(jsArray1.length, .number(3))
@@ -292,7 +306,7 @@ test("Object Conversion") {
     try expectEqual(jsDict1.prop2, .string("foo"))
 }
 
-test("ObjectRef Lifetime") {
+try test("ObjectRef Lifetime") {
     // ```js
     // global.globalObject1 = {
     //   "prop_1": {
@@ -322,21 +336,25 @@ func closureScope() -> ObjectIdentifier {
     return result
 }
 
-test("Closure Identifiers") {
+try test("Closure Identifiers") {
     let oid1 = closureScope()
     let oid2 = closureScope()
     try expectEqual(oid1, oid2)
 }
 
 func checkArray<T>(_ array: [T]) throws where T: TypedArrayElement {
-    try expectEqual(JSTypedArray(array).toString!(), .string(jsStringify(array)))
+    try expectEqual(toString(JSTypedArray(array).jsValue().object!), jsStringify(array))
+}
+
+func toString<T: JSObject>(_ object: T) -> String {
+    return object.toString!().string!
 }
 
 func jsStringify(_ array: [Any]) -> String {
     array.map({ String(describing: $0) }).joined(separator: ",")
 }
 
-test("TypedArray") {
+try test("TypedArray") {
     let numbers = [UInt8](0 ... 255)
     let typedArray = JSTypedArray(numbers)
     try expectEqual(typedArray[12], 12)
@@ -366,7 +384,7 @@ test("TypedArray") {
     }
 }
 
-test("TypedArray_Mutation") {
+try test("TypedArray_Mutation") {
     let array = JSTypedArray<Int>(length: 100)
     for i in 0..<100 {
         array[i] = i
@@ -374,5 +392,5 @@ test("TypedArray_Mutation") {
     for i in 0..<100 {
         try expectEqual(i, array[i])
     }
-    try expectEqual(array.toString!(), .string(jsStringify(Array(0..<100))))
+    try expectEqual(toString(array.jsValue().object!), jsStringify(Array(0..<100)))
 }

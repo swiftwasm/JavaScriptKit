@@ -5,7 +5,7 @@ global.globalObject1 = {
   "prop_2": 2,
   "prop_3": true,
   "prop_4": [
-    3, 4, "str_elm_1", 5,
+    3, 4, "str_elm_1", null, undefined, 5,
   ],
   "prop_5": {
     "func1": function () { return },
@@ -23,6 +23,7 @@ global.globalObject1 = {
     }
   },
   "prop_7": 3.14,
+  "prop_8": [0, , 2, 3, , , 6],
 }
 
 global.Animal = function(name, age, isCat) {
@@ -41,4 +42,5 @@ const { startWasiTask } = require("../lib")
 
 startWasiTask("./dist/PrimaryTests.wasm").catch(err => {
   console.log(err)
+  process.exit(1)
 });

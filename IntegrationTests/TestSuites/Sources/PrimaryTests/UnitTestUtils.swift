@@ -5,13 +5,14 @@ var printTestNames = false
 // This will make it easier to debug any errors that occur on the JS side.
 //printTestNames = true
 
-func test(_ name: String, testBlock: () throws -> Void) {
+func test(_ name: String, testBlock: () throws -> Void) throws {
     if printTestNames { print(name) }
     do {
         try testBlock()
     } catch {
         print("Error in \(name)")
         print(error)
+        throw error
     }
 }
 
@@ -37,7 +38,7 @@ func expectEqual<T: Equatable>(
     }
 }
 
-func expectObject(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSObjectRef {
+func expectObject(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSObject {
     switch value {
     case let .object(ref): return ref
     default:
@@ -45,14 +46,14 @@ func expectObject(_ value: JSValue, file: StaticString = #file, line: UInt = #li
     }
 }
 
-func expectArray(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSArrayRef {
+func expectArray(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSArray {
     guard let array = value.array else {
         throw MessageError("Type of \(value) should be \"object\"", file: file, line: line, column: column)
     }
     return array
 }
 
-func expectFunction(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSFunctionRef {
+func expectFunction(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSFunction {
     switch value {
     case let .function(ref): return ref
     default:

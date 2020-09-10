@@ -1,8 +1,8 @@
 import _CJavaScriptKit
 
-public class JSFunctionRef: JSObjectRef {
+public class JSFunction: JSObject {
     @discardableResult
-    public func callAsFunction(this: JSObjectRef? = nil, arguments: [JSValueConvertible]) -> JSValue {
+    public func callAsFunction(this: JSObject? = nil, arguments: [JSValueConvertible]) -> JSValue {
         let result = arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
                 let argv = bufferPointer.baseAddress
@@ -25,11 +25,11 @@ public class JSFunctionRef: JSObjectRef {
     }
 
     @discardableResult
-    public func callAsFunction(this: JSObjectRef? = nil, _ arguments: JSValueConvertible...) -> JSValue {
+    public func callAsFunction(this: JSObject? = nil, _ arguments: JSValueConvertible...) -> JSValue {
         self(this: this, arguments: arguments)
     }
 
-    public func new(_ arguments: JSValueConvertible...) -> JSObjectRef {
+    public func new(_ arguments: JSValueConvertible...) -> JSObject {
         new(arguments: arguments)
     }
 
@@ -37,7 +37,7 @@ public class JSFunctionRef: JSObjectRef {
     // a) the constructor explicitly returns an object, or
     // b) the constructor returns nothing, which causes JS to return the `this` value, or
     // c) the constructor returns undefined, null or a non-object, in which case JS also returns `this`.
-    public func new(arguments: [JSValueConvertible]) -> JSObjectRef {
+    public func new(arguments: [JSValueConvertible]) -> JSObject {
         arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
@@ -47,13 +47,13 @@ public class JSFunctionRef: JSObjectRef {
                     self.id, argv, Int32(argc),
                     &resultObj
                 )
-                return JSObjectRef(id: resultObj)
+                return JSObject(id: resultObj)
             }
         }
     }
 
     @available(*, unavailable, message: "Please use JSClosure instead")
-    public static func from(_: @escaping ([JSValue]) -> JSValue) -> JSFunctionRef {
+    public static func from(_: @escaping ([JSValue]) -> JSValue) -> JSFunction {
         fatalError("unavailable")
     }
 
@@ -62,7 +62,7 @@ public class JSFunctionRef: JSObjectRef {
     }
 }
 
-public class JSClosure: JSFunctionRef {
+public class JSClosure: JSFunction {
     static var sharedFunctions: [JavaScriptHostFuncRef: ([JSValue]) -> JSValue] = [:]
 
     private var hostFuncRef: JavaScriptHostFuncRef = 0
@@ -128,6 +128,6 @@ public func _call_host_function(
         $0.jsValue()
     }
     let result = hostFunc(arguments)
-    let callbackFuncRef = JSFunctionRef(id: callbackFuncRef)
+    let callbackFuncRef = JSFunction(id: callbackFuncRef)
     _ = callbackFuncRef(result)
 }
