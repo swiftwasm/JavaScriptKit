@@ -341,3 +341,56 @@ try test("Closure Identifiers") {
     let oid2 = closureScope()
     try expectEqual(oid1, oid2)
 }
+
+func checkArray<T>(_ array: [T]) throws where T: TypedArrayElement {
+    try expectEqual(toString(JSTypedArray(array).jsValue().object!), jsStringify(array))
+}
+
+func toString<T: JSObject>(_ object: T) -> String {
+    return object.toString!().string!
+}
+
+func jsStringify(_ array: [Any]) -> String {
+    array.map({ String(describing: $0) }).joined(separator: ",")
+}
+
+try test("TypedArray") {
+    let numbers = [UInt8](0 ... 255)
+    let typedArray = JSTypedArray(numbers)
+    try expectEqual(typedArray[12], 12)
+
+    try checkArray([0, .max, 127, 1] as [UInt8])
+    try checkArray([0, 1, .max, .min, -1] as [Int8])
+
+    try checkArray([0, .max, 255, 1] as [UInt16])
+    try checkArray([0, 1, .max, .min, -1] as [Int16])
+
+    try checkArray([0, .max, 255, 1] as [UInt32])
+    try checkArray([0, 1, .max, .min, -1] as [Int32])
+
+    try checkArray([0, .max, 255, 1] as [UInt])
+    try checkArray([0, 1, .max, .min, -1] as [Int])
+
+    let float32Array: [Float32] = [0, 1, .pi, .greatestFiniteMagnitude, .infinity, .leastNonzeroMagnitude, .leastNormalMagnitude, 42]
+    let jsFloat32Array = JSTypedArray(float32Array)
+    for (i, num) in float32Array.enumerated() {
+        try expectEqual(num, jsFloat32Array[i])
+    }
+
+    let float64Array: [Float64] = [0, 1, .pi, .greatestFiniteMagnitude, .infinity, .leastNonzeroMagnitude, .leastNormalMagnitude, 42]
+    let jsFloat64Array = JSTypedArray(float64Array)
+    for (i, num) in float64Array.enumerated() {
+        try expectEqual(num, jsFloat64Array[i])
+    }
+}
+
+try test("TypedArray_Mutation") {
+    let array = JSTypedArray<Int>(length: 100)
+    for i in 0..<100 {
+        array[i] = i
+    }
+    for i in 0..<100 {
+        try expectEqual(i, array[i])
+    }
+    try expectEqual(toString(array.jsValue().object!), jsStringify(Array(0..<100)))
+}

@@ -34,10 +34,10 @@ public class JSObject: Equatable {
         _instanceof(id, constructor.id)
     }
 
-    static let _JS_Predef_Value_Global: UInt32 = 0
+    static let _JS_Predef_Value_Global: JavaScriptObjectRef = 0
     public static let global = JSObject(id: _JS_Predef_Value_Global)
 
-    deinit { _destroy_ref(id) }
+    deinit { _release(id) }
 
     public static func == (lhs: JSObject, rhs: JSObject) -> Bool {
         return lhs.id == rhs.id
@@ -47,3 +47,4 @@ public class JSObject: Equatable {
         .object(self)
     }
 }
+

@@ -40,6 +40,10 @@ extension UInt16: JSValueConvertible {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
+extension UInt32: JSValueConvertible {
+  public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
 extension Float: JSValueConvertible {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
