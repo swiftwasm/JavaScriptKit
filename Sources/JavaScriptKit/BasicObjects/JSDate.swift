@@ -1,8 +1,8 @@
 public final class JSDate {
     private static let constructor = JSObject.global.Date.function!
-    private let ref: JSObject
+    public let ref: JSObject
 
-    public init(millisecondsSinceEpoch: Int? = nil) {
+    public init(millisecondsSinceEpoch: Double? = nil) {
         if let milliseconds = millisecondsSinceEpoch {
             ref = Self.constructor.new(milliseconds)
         } else {
@@ -28,176 +28,183 @@ public final class JSDate {
     /// Year of this date in local time zone.
     public var fullYear: Int {
         get {
-            Int(ref.getFullYear.function!().number!)
+            Int(ref.getFullYear!().number!)
         }
         set {
-            ref.setFullYear.function!(newValue)
+            _ = ref.setFullYear!(newValue)
         }
     }
 
     /// Month of this date in `0–11` range in local time zone
     public var month: Int {
         get {
-            Int(ref.getMonth.function!().number!)
+            Int(ref.getMonth!().number!)
         }
         set {
-            ref.setMonth.function!(newValue)
+            _ = ref.setMonth!(newValue)
         }
     }
 
     /// The day of the month in `1..31` range in local time zone.
     public var date: Int {
         get {
-            Int(ref.getDate.function!().number!)
+            Int(ref.getDate!().number!)
         }
         set {
-            ref.setDate.function!(newValue)
+            _ = ref.setDate!(newValue)
         }
     }
 
     /// The day of the week in `0..6` range in local time zone.
     public var day: Int {
-        Int(ref.getDay.function!().number!)
+        Int(ref.getDay!().number!)
     }
 
     /// The amount of hours in this day from `0..23` range in local time zone.
     public var hours: Int {
         get {
-            Int(ref.getHours.function!().number!)
+            Int(ref.getHours!().number!)
         }
         set {
-            ref.setHours.function!(newValue)
+            _ = ref.setHours!(newValue)
         }
     }
 
     /// The amount of minutes in this hours from `0..59` range in local time zone.
     public var minutes: Int {
         get {
-            Int(ref.getMinutes.function!().number!)
+            Int(ref.getMinutes!().number!)
         }
         set {
-            ref.setMinutes.function!(newValue)
+            _ = ref.setMinutes!(newValue)
         }
     }
 
     /// The amount of seconds in this minute from `0..59` range in local time zone.
     public var seconds: Int {
         get {
-            Int(ref.getSeconds.function!().number!)
+            Int(ref.getSeconds!().number!)
         }
         set {
-            ref.setSeconds.function!(newValue)
+            _ = ref.setSeconds!(newValue)
         }
     }
 
     /// The amount of milliseconds in this second `0..999` range in local time zone.
     public var milliseconds: Int {
         get {
-            Int(ref.getMilliseconds.function!().number!)
+            Int(ref.getMilliseconds!().number!)
         }
         set {
-            ref.setMilliseconds.function!(newValue)
+            _ = ref.setMilliseconds!(newValue)
         }
     }
 
     /// Year of this date in the UTC time zone
     public var utcFullYear: Int {
         get {
-            Int(ref.getFullYear.function!().number!)
+            Int(ref.getFullYear!().number!)
         }
         set {
-            ref.setFullYear.function!(newValue)
+            _ = ref.setFullYear!(newValue)
         }
     }
 
     /// Month of this date in `0–11` range in the UTC time zone
     public var utcMonth: Int {
         get {
-            Int(ref.getMonth.function!().number!)
+            Int(ref.getMonth!().number!)
         }
         set {
-            ref.setMonth.function!(newValue)
+            _ = ref.setMonth!(newValue)
         }
     }
 
     /// The day of the month in `1..31` range in the UTC time zone
     public var utcDate: Int {
         get {
-            Int(ref.getDate.function!().number!)
+            Int(ref.getDate!().number!)
         }
         set {
-            ref.setDate.function!(newValue)
+            _ = ref.setDate!(newValue)
         }
     }
 
     /// The day of the week in `0..6` range in the UTC time zone
     public var utcDay: Int {
-        Int(ref.getDay.function!().number!)
+        Int(ref.getDay!().number!)
     }
 
     /// The amount of hours in this day from `0..23` range in the UTC time zone
     public var utcHours: Int {
         get {
-            Int(ref.getHours.function!().number!)
+            Int(ref.getHours!().number!)
         }
         set {
-            ref.setHours.function!(newValue)
+            _ = ref.setHours!(newValue)
         }
     }
 
     /// The amount of minutes in this hours from `0..59` range in the UTC time zone
     public var utcMinutes: Int {
         get {
-            Int(ref.getMinutes.function!().number!)
+            Int(ref.getMinutes!().number!)
         }
         set {
-            ref.setMinutes.function!(newValue)
+            _ = ref.setMinutes!(newValue)
         }
     }
 
     /// The amount of seconds in this minute from `0..59` range in the UTC time zone
     public var utcSeconds: Int {
         get {
-            Int(ref.getSeconds.function!().number!)
+            Int(ref.getSeconds!().number!)
         }
         set {
-            ref.setSeconds.function!(newValue)
+            _ = ref.setSeconds!(newValue)
         }
     }
 
     /// The amount of milliseconds in this second `0..999` range in the UTC time zone
     public var utcMilliseconds: Int {
         get {
-            Int(ref.getMilliseconds.function!().number!)
+            Int(ref.getMilliseconds!().number!)
         }
         set {
-            ref.setMilliseconds.function!(newValue)
+            _ = ref.setMilliseconds!(newValue)
         }
     }
 
     /// Offset in minutes between the local time zone and UTC
     public var timezoneOffset: Int {
-        Int(ref.getTimezoneOffset.function!().number!)
+        Int(ref.getTimezoneOffset!().number!)
     }
 
     public func toISOString() -> String {
-        ref.toISOString.function!().string!
+        ref.toISOString!().string!
     }
 
     public func toLocaleDateString() -> String {
-        ref.toLocaleDateString.function!().string!
+        ref.toLocaleDateString!().string!
     }
 
     public func toLocaleTimeString() -> String {
-        ref.toLocaleTimeString.function!().string!
+        ref.toLocaleTimeString!().string!
     }
 
     public func toUTCString() -> String {
-        ref.toUTCString.function!().string!
+        ref.toUTCString!().string!
     }
 
-    /// Number of seconds since epoch ignoring leap seconds
-    public func now() -> Int {
-        Int(ref.now.function!().number!)
+    /// Number of seconds since midnight 01 January 1970 UTC to the present moment ignoring leap 
+    /// seconds
+    public static func now() -> Double {
+        constructor.now!().number!
+    }
+
+    /// Number of seconds since midnight 01 January 1970 UTC to the present moment ignoring leap 
+    /// seconds
+    public func valueOf() -> Double {
+        ref.valueOf!().number!
     }
 }

@@ -396,11 +396,11 @@ try test("TypedArray_Mutation") {
 }
 
 try test("Date") {
-    let date1 = JSDate()
-    print(date1.toISOString())
-    let date2 = JSDate(millisecondsSinceEpoch: date1.now())
+    let date1Milliseconds = JSDate.now()
+    let date1 = JSDate(millisecondsSinceEpoch: date1Milliseconds)
+    let date2 = JSDate(millisecondsSinceEpoch: date1.valueOf())
 
-    try expectEqual(date1.now(), date2.now())
+    try expectEqual(date1.valueOf(), date2.valueOf())
     try expectEqual(date1.fullYear, date2.fullYear)
     try expectEqual(date1.month, date2.month)
     try expectEqual(date1.date, date2.date)
