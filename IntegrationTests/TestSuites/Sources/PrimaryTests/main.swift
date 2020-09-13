@@ -417,6 +417,7 @@ try test("Date") {
     try expectEqual(date1.utcMinutes, date2.utcMinutes)
     try expectEqual(date1.utcSeconds, date2.utcSeconds)
     try expectEqual(date1.utcMilliseconds, date2.utcMilliseconds)
+    try expectEqual(date1, date2)
 
     let date3 = JSDate(millisecondsSinceEpoch: 0)
     try expectEqual(date3.valueOf(), 0)
@@ -430,4 +431,6 @@ try test("Date") {
     try expectEqual(date3.utcSeconds, 0)
     try expectEqual(date3.utcMilliseconds, 0)
     try expectEqual(date3.toISOString(), "1970-01-01T00:00:00.000Z")
+
+    try expectEqual(date3 < date1, true)
 }

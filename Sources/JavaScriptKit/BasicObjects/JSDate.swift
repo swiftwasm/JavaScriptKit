@@ -208,3 +208,13 @@ public final class JSDate {
         ref.valueOf!().number!
     }
 }
+
+extension JSDate: Comparable {
+    public static func ==(lhs: JSDate, rhs: JSDate) -> Bool {
+        return lhs.valueOf() == rhs.valueOf()
+    }
+
+    public static func <(lhs: JSDate, rhs: JSDate) -> Bool {
+        return lhs.valueOf() < rhs.valueOf()
+    }
+}
