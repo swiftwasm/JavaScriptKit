@@ -434,3 +434,33 @@ try test("Date") {
 
     try expectEqual(date3 < date1, true)
 }
+
+// make the timers global to prevent early deallocation
+var timeout: JSTimer?
+var interval: JSTimer?
+
+try test("Timer") {
+    let start = JSDate().valueOf()
+    let timeoutMilliseconds = 5.0
+
+    timeout = JSTimer(millisecondsDelay: timeoutMilliseconds, isRepeating: false) {
+        // verify that at least `timeoutMilliseconds` passed since the `timeout` timer started
+        try! expectEqual(start + timeoutMilliseconds <= JSDate().valueOf(), true)
+    }
+
+    var count = 0.0
+    let maxCount = 5.0
+    interval = JSTimer(millisecondsDelay: 5, isRepeating: true) {
+        // verify that at least `timeoutMilliseconds * count` passed since the `timeout` 
+        // timer started
+        try! expectEqual(start + timeoutMilliseconds * count <= JSDate().valueOf(), true)
+
+        guard count < maxCount else {
+            // stop the timer after `maxCount` reached
+            interval = nil
+            return
+        }
+
+        count += 1
+    }
+}
