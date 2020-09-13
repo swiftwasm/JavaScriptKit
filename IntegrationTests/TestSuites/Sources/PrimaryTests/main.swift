@@ -394,3 +394,27 @@ try test("TypedArray_Mutation") {
     }
     try expectEqual(toString(array.jsValue().object!), jsStringify(Array(0..<100)))
 }
+
+try test("Date") {
+    let date1 = JSDate()
+    print(date1.toISOString())
+    let date2 = JSDate(millisecondsSinceEpoch: date1.now())
+
+    try expectEqual(date1.now(), date2.now())
+    try expectEqual(date1.fullYear, date2.fullYear)
+    try expectEqual(date1.month, date2.month)
+    try expectEqual(date1.date, date2.date)
+    try expectEqual(date1.day, date2.day)
+    try expectEqual(date1.hours, date2.hours)
+    try expectEqual(date1.minutes, date2.minutes)
+    try expectEqual(date1.seconds, date2.seconds)
+    try expectEqual(date1.milliseconds, date2.milliseconds)
+    try expectEqual(date1.utcFullYear, date2.utcFullYear)
+    try expectEqual(date1.utcMonth, date2.utcMonth)
+    try expectEqual(date1.utcDate, date2.utcDate)
+    try expectEqual(date1.utcDay, date2.utcDay)
+    try expectEqual(date1.utcHours, date2.utcHours)
+    try expectEqual(date1.utcMinutes, date2.utcMinutes)
+    try expectEqual(date1.utcSeconds, date2.utcSeconds)
+    try expectEqual(date1.utcMilliseconds, date2.utcMilliseconds)
+}
