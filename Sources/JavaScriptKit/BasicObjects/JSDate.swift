@@ -202,7 +202,7 @@ public final class JSDate {
         constructor.now!().number!
     }
 
-    /// Number of seconds since midnight 01 January 1970 UTC to the present moment ignoring leap 
+    /// Number of milliseconds since midnight 01 January 1970 UTC to the present moment ignoring leap 
     /// seconds
     public func valueOf() -> Double {
         ref.valueOf!().number!
