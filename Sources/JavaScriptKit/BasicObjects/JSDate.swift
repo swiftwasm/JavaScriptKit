@@ -103,75 +103,75 @@ public final class JSDate {
     /// Year of this date in the UTC time zone
     public var utcFullYear: Int {
         get {
-            Int(ref.getFullYear!().number!)
+            Int(ref.getUTCFullYear!().number!)
         }
         set {
-            _ = ref.setFullYear!(newValue)
+            _ = ref.setUTCFullYear!(newValue)
         }
     }
 
     /// Month of this date in `0–11` range in the UTC time zone
     public var utcMonth: Int {
         get {
-            Int(ref.getMonth!().number!)
+            Int(ref.getUTCMonth!().number!)
         }
         set {
-            _ = ref.setMonth!(newValue)
+            _ = ref.setUTCMonth!(newValue)
         }
     }
 
     /// The day of the month in `1..31` range in the UTC time zone
     public var utcDate: Int {
         get {
-            Int(ref.getDate!().number!)
+            Int(ref.getUTCDate!().number!)
         }
         set {
-            _ = ref.setDate!(newValue)
+            _ = ref.setUTCDate!(newValue)
         }
     }
 
     /// The day of the week in `0..6` range in the UTC time zone
     public var utcDay: Int {
-        Int(ref.getDay!().number!)
+        Int(ref.getUTCDay!().number!)
     }
 
     /// The amount of hours in this day from `0..23` range in the UTC time zone
     public var utcHours: Int {
         get {
-            Int(ref.getHours!().number!)
+            Int(ref.getUTCHours!().number!)
         }
         set {
-            _ = ref.setHours!(newValue)
+            _ = ref.setUTCHours!(newValue)
         }
     }
 
     /// The amount of minutes in this hours from `0..59` range in the UTC time zone
     public var utcMinutes: Int {
         get {
-            Int(ref.getMinutes!().number!)
+            Int(ref.getUTCMinutes!().number!)
         }
         set {
-            _ = ref.setMinutes!(newValue)
+            _ = ref.setUTCMinutes!(newValue)
         }
     }
 
     /// The amount of seconds in this minute from `0..59` range in the UTC time zone
     public var utcSeconds: Int {
         get {
-            Int(ref.getSeconds!().number!)
+            Int(ref.getUTCSeconds!().number!)
         }
         set {
-            _ = ref.setSeconds!(newValue)
+            _ = ref.setUTCSeconds!(newValue)
         }
     }
 
     /// The amount of milliseconds in this second `0..999` range in the UTC time zone
     public var utcMilliseconds: Int {
         get {
-            Int(ref.getMilliseconds!().number!)
+            Int(ref.getUTCMilliseconds!().number!)
         }
         set {
-            _ = ref.setMilliseconds!(newValue)
+            _ = ref.setUTCMilliseconds!(newValue)
         }
     }
 
