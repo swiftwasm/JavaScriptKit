@@ -196,13 +196,13 @@ public final class JSDate {
         ref.toUTCString!().string!
     }
 
-    /// Number of seconds since midnight 01 January 1970 UTC to the present moment ignoring leap 
+    /// Number of milliseconds since midnight 01 January 1970 UTC to the present moment ignoring leap 
     /// seconds
     public static func now() -> Double {
         constructor.now!().number!
     }
 
-    /// Number of seconds since midnight 01 January 1970 UTC to the present moment ignoring leap 
+    /// Number of milliseconds since midnight 01 January 1970 UTC to the given date ignoring leap 
     /// seconds
     public func valueOf() -> Double {
         ref.valueOf!().number!

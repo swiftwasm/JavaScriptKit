@@ -48,3 +48,6 @@ public class JSObject: Equatable {
     }
 }
 
+extension JSObject: CustomStringConvertible {
+    public var description: String { self.toString!().string! }
+}

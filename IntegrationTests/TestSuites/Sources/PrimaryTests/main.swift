@@ -464,3 +464,11 @@ try test("Timer") {
         count += 1
     }
 }
+
+try test("Error") {
+    let message = "test error"
+    let error = JSError(message: message)
+    try expectEqual(error.name, "Error")
+    try expectEqual(error.message, message)
+    try expectEqual(error.description, "Error: test error")
+}
