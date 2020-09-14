@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScriptKit - JSValue</title>
+    <link rel="stylesheet" type="text/css" href="/JavaScriptKit/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/JavaScriptKit">
+            <strong>
+                JavaScriptKit
+            </strong>
+            <span>Documentation</span>
+        </a>
+        <sup>Beta</sup>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#relationships">Relationships</a><ul><li><a href="#relationships">Conforms To</a></li></ul></li><li><a href="#initializers">Initializers</a><ul><li class="initializer"><a href="#jsvalue.init(stringliteral:)">init(string​Literal:​)</a></li><li class="initializer"><a href="#jsvalue.init(integerliteral:)">init(integer​Literal:​)</a></li></ul></li><li><a href="#enumeration cases">Enumeration Cases</a><ul><li class="case"><a href="#jsvalue.boolean">boolean</a></li><li class="case"><a href="#jsvalue.string">string</a></li><li class="case"><a href="#jsvalue.number">number</a></li><li class="case"><a href="#jsvalue.object">object</a></li><li class="case"><a href="#jsvalue.null">null</a></li><li class="case"><a href="#jsvalue.undefined">undefined</a></li><li class="case"><a href="#jsvalue.function">function</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#jsvalue.array">array</a></li><li class="variable"><a href="#jsvalue.boolean">boolean</a></li><li class="variable"><a href="#jsvalue.string">string</a></li><li class="variable"><a href="#jsvalue.number">number</a></li><li class="variable"><a href="#jsvalue.object">object</a></li><li class="variable"><a href="#jsvalue.isnull">is​Null</a></li><li class="variable"><a href="#jsvalue.isundefined">is​Undefined</a></li><li class="variable"><a href="#jsvalue.function">function</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#jsvalue.function(_:)">function(_:​)</a></li><li class="function"><a href="#jsvalue.jsvalue()">js​Value()</a></li></ul></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+    <small>Enumeration</small>
+    <code class="name">JSValue</code>
+</h1>
+
+<html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">enum</span> <span class="type">JSValue</span></code></pre></body></html>
+<section id="relationships">
+    <h2 hidden>Relationships</h2>
+        <figure>
+    
+
+    <figcaption hidden>Inheritance graph for JSValue.</figcaption>
+</figure>
+        <h3>Conforms To</h3>
+<dl>
+    <dt class="protocol"><code><a href="/JavaScriptKit/JSValueConvertible">JSValueConvertible</a></code></dt>
+<dd></dd>
+<dt class="unknown"><code>Equatable</code></dt>
+<dt class="unknown"><code>ExpressibleByIntegerLiteral</code></dt>
+<dt class="unknown"><code>ExpressibleByStringLiteral</code></dt>
+</dl>
+</section>
+    <section id="initializers">
+        <h2>Initializers</h2>
+
+        <div role="article" class="initializer" id="jsvalue.init(stringliteral:)">
+    <h3>
+        <code>init(string​Literal:​)</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">stringLiteral</span> <span class="variable">value</span>: <span class="type">String</span>)</code></pre></body></html>
+</div>
+<div role="article" class="initializer" id="jsvalue.init(integerliteral:)">
+    <h3>
+        <code>init(integer​Literal:​)</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">integerLiteral</span> <span class="variable">value</span>: <span class="type">Double</span>)</code></pre></body></html>
+</div>
+    </section>
+    <section id="enumeration cases">
+        <h2>Enumeration Cases</h2>
+
+        <div role="article" class="case" id="jsvalue.boolean">
+    <h3>
+        <code>boolean</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">case</span> <span class="variable">boolean</span>(: <span class="type">Bool</span>)</code></pre></body></html>
+</div>
+<div role="article" class="case" id="jsvalue.string">
+    <h3>
+        <code>string</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">case</span> <span class="variable">string</span>(: <span class="type">String</span>)</code></pre></body></html>
+</div>
+<div role="article" class="case" id="jsvalue.number">
+    <h3>
+        <code>number</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">case</span> <span class="variable">number</span>(: <span class="type">Double</span>)</code></pre></body></html>
+</div>
+<div role="article" class="case" id="jsvalue.object">
+    <h3>
+        <code>object</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">case</span> <span class="variable">object</span>(: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a>)</code></pre></body></html>
+</div>
+<div role="article" class="case" id="jsvalue.null">
+    <h3>
+        <code>null</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">case</span> <span class="variable">null</span></code></pre></body></html>
+</div>
+<div role="article" class="case" id="jsvalue.undefined">
+    <h3>
+        <code>undefined</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">case</span> <span class="variable">undefined</span></code></pre></body></html>
+</div>
+<div role="article" class="case" id="jsvalue.function">
+    <h3>
+        <code>function</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">case</span> <span class="variable">function</span>(: <a href="/JavaScriptKit/JSFunction"><span class="type">JSFunction</span></a>)</code></pre></body></html>
+</div>
+    </section>
+    <section id="properties">
+        <h2>Properties</h2>
+
+        <div role="article" class="variable" id="jsvalue.array">
+    <h3>
+        <code>array</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">array</span>: <a href="/JavaScriptKit/JSArray"><span class="type">JSArray</span></a>?</code></pre></body></html>
+</div>
+<div role="article" class="variable" id="jsvalue.boolean">
+    <h3>
+        <code>boolean</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">boolean</span>: <span class="type">Bool</span>?</code></pre></body></html>
+</div>
+<div role="article" class="variable" id="jsvalue.string">
+    <h3>
+        <code>string</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">string</span>: <span class="type">String</span>?</code></pre></body></html>
+</div>
+<div role="article" class="variable" id="jsvalue.number">
+    <h3>
+        <code>number</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">number</span>: <span class="type">Double</span>?</code></pre></body></html>
+</div>
+<div role="article" class="variable" id="jsvalue.object">
+    <h3>
+        <code>object</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">object</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a>?</code></pre></body></html>
+</div>
+<div role="article" class="variable" id="jsvalue.isnull">
+    <h3>
+        <code>is​Null</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">isNull</span>: <span class="type">Bool</span></code></pre></body></html>
+</div>
+<div role="article" class="variable" id="jsvalue.isundefined">
+    <h3>
+        <code>is​Undefined</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">isUndefined</span>: <span class="type">Bool</span></code></pre></body></html>
+</div>
+<div role="article" class="variable" id="jsvalue.function">
+    <h3>
+        <code>function</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">function</span>: <a href="/JavaScriptKit/JSFunction"><span class="type">JSFunction</span></a>?</code></pre></body></html>
+</div>
+    </section>
+    <section id="methods">
+        <h2>Methods</h2>
+
+        <div role="article" class="function" id="jsvalue.function(_:)">
+    <h3>
+        <code>function(_:​)</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">func</span> <span class="function">function</span>(<span class="keyword">_</span> <span class="variable">body</span>: <span class="attribute">@</span><span class="attribute">escaping</span> ([<a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>]) -&gt; <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>) -&gt; <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a></code></pre></body></html>
+</div>
+<div role="article" class="function" id="jsvalue.jsvalue()">
+    <h3>
+        <code>js​Value()</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">jsValue</span>() -&gt; <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a></code></pre></body></html>
+</div>
+    </section>
+
+
+
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2020-09-14T21:05:08+0000">September 14, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
+</p>
+    </footer>
+</body>
+</html>
