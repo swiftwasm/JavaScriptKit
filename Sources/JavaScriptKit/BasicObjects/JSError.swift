@@ -1,4 +1,4 @@
-public final class JSError {
+public final class JSError: Error {
     private let ref: JSObject
     private static let constructor = JSObject.global.Error.function!
 
@@ -12,6 +12,10 @@ public final class JSError {
 
     public var name: String {
         ref.name.string!
+    }
+
+    public var stack: String {
+        ref.stack.string!
     }
 }
 
