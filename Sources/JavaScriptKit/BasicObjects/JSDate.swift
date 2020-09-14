@@ -1,6 +1,6 @@
 public final class JSDate {
     private static let constructor = JSObject.global.Date.function!
-    public let ref: JSObject
+    private let ref: JSObject
 
     public init(millisecondsSinceEpoch: Double? = nil) {
         if let milliseconds = millisecondsSinceEpoch {
