@@ -395,6 +395,46 @@ try test("TypedArray_Mutation") {
     try expectEqual(toString(array.jsValue().object!), jsStringify(Array(0..<100)))
 }
 
+try test("Date") {
+    let date1Milliseconds = JSDate.now()
+    let date1 = JSDate(millisecondsSinceEpoch: date1Milliseconds)
+    let date2 = JSDate(millisecondsSinceEpoch: date1.valueOf())
+
+    try expectEqual(date1.valueOf(), date2.valueOf())
+    try expectEqual(date1.fullYear, date2.fullYear)
+    try expectEqual(date1.month, date2.month)
+    try expectEqual(date1.date, date2.date)
+    try expectEqual(date1.day, date2.day)
+    try expectEqual(date1.hours, date2.hours)
+    try expectEqual(date1.minutes, date2.minutes)
+    try expectEqual(date1.seconds, date2.seconds)
+    try expectEqual(date1.milliseconds, date2.milliseconds)
+    try expectEqual(date1.utcFullYear, date2.utcFullYear)
+    try expectEqual(date1.utcMonth, date2.utcMonth)
+    try expectEqual(date1.utcDate, date2.utcDate)
+    try expectEqual(date1.utcDay, date2.utcDay)
+    try expectEqual(date1.utcHours, date2.utcHours)
+    try expectEqual(date1.utcMinutes, date2.utcMinutes)
+    try expectEqual(date1.utcSeconds, date2.utcSeconds)
+    try expectEqual(date1.utcMilliseconds, date2.utcMilliseconds)
+    try expectEqual(date1, date2)
+
+    let date3 = JSDate(millisecondsSinceEpoch: 0)
+    try expectEqual(date3.valueOf(), 0)
+    try expectEqual(date3.utcFullYear, 1970)
+    try expectEqual(date3.utcMonth, 0)
+    try expectEqual(date3.utcDate, 1)
+    // the epoch date was on Friday
+    try expectEqual(date3.utcDay, 4)
+    try expectEqual(date3.utcHours, 0)
+    try expectEqual(date3.utcMinutes, 0)
+    try expectEqual(date3.utcSeconds, 0)
+    try expectEqual(date3.utcMilliseconds, 0)
+    try expectEqual(date3.toISOString(), "1970-01-01T00:00:00.000Z")
+
+    try expectEqual(date3 < date1, true)
+}
+
 try test("Error") {
     let message = "test error"
     let error = JSError(message: message)
