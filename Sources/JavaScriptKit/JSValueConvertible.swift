@@ -1,6 +1,8 @@
 import _CJavaScriptKit
 
+/// Objects that can be converted to a JavaScript value, preferably in a lossless manner.
 public protocol JSValueConvertible {
+    /// Create a JSValue that represents this object
     func jsValue() -> JSValue
 }
 

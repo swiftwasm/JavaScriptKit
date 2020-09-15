@@ -1,4 +1,6 @@
+/// Objects that can be constructed from a JavaScript value
 public protocol JSValueConstructible {
+    /// Return `nil` if the value is not compatible with the conforming Swift type.
     static func construct(from value: JSValue) -> Self?
 }
 

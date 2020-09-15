@@ -1,5 +1,6 @@
 protocol _AnyJSValueConvertible: JSValueConvertible {}
 
+/// A type-erased wrapper for types conforming to JSValueConvertible
 public struct AnyJSValueConvertible: JSValueCodable, ExpressibleByNilLiteral {
     public static let void = AnyJSValueConvertible.construct(from: .undefined)
 
