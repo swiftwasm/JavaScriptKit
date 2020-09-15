@@ -2,8 +2,13 @@
 / [`clearInterval`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/clearInterval) and 
 [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout)
 / [`clearTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout)
-pairs of calls for you, and also holds a reference to an underlying `JSClosure` instance.
-To invalidate a timer you should deallocate your corresponding `JSTimer` instance.
+pairs of calls for you. It intentionally doesn't match the JavaScript API, as a special care is
+needed to hold a reference to the timer closure and to call `JSClosure.release()` on it when the
+timer is deallocated. As a user, you have to hold a reference to a `JSTimer` instance for it to stay
+valid. The `JSTimer` API is also intentionally trivial, the timer is started right away, and the
+only way to invalidate the timer is to bring the reference count of the `JSTimer` instance to zero, 
+either by storing the timer in an optional property and assigning `nil` to it or by deallocating the
+object that owns it for invalidation.
 */
 public final class JSTimer {
   /// Indicates whether this timer instance calls its callback repeatedly at a given delay.
