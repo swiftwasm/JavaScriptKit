@@ -5,7 +5,7 @@ let serialization = Benchmark("Serialization")
 let swiftInt: Double = 42
 serialization.testSuite("Swift Int to JavaScript") {
     let jsNumber = JSValue.number(swiftInt)
-    let object = JSObjectRef.global
+    let object = JSObject.global
     for i in 0 ..< 100 {
         object["numberValue\(i)"] = jsNumber
     }
@@ -14,7 +14,7 @@ serialization.testSuite("Swift Int to JavaScript") {
 let swiftString = "Hello, world"
 serialization.testSuite("Swift String to JavaScript") {
     let jsString = JSValue.string(swiftString)
-    let object = JSObjectRef.global
+    let object = JSObject.global
     for i in 0 ..< 100 {
         object["stringValue\(i)"] = jsString
     }
@@ -22,7 +22,7 @@ serialization.testSuite("Swift String to JavaScript") {
 
 let objectHeap = Benchmark("Object heap")
 
-let global = JSObjectRef.global
+let global = JSObject.global
 let Object = global.Object.function!
 global.objectHeapDummy = .object(Object.new())
 objectHeap.testSuite("Increment and decrement RC") {

@@ -118,11 +118,11 @@ extension UInt32: TypedArrayElement {
 
 // FIXME: Support passing BigInts across the bridge
 //extension Int64: TypedArrayElement {
-//    public static var typedArrayClass: JSFunctionRef { JSObjectRef.global.BigInt64Array.function! }
+//    public static var typedArrayClass: JSFunction { JSObject.global.BigInt64Array.function! }
 //    public static var type: JavaScriptTypedArrayKind { .bigInt64 }
 //}
 //extension UInt64: TypedArrayElement {
-//    public static var typedArrayClass: JSFunctionRef { JSObjectRef.global.BigUint64Array.function! }
+//    public static var typedArrayClass: JSFunction { JSObject.global.BigUint64Array.function! }
 //    public static var type: JavaScriptTypedArrayKind { .bigUint64 }
 //}
 

@@ -6,7 +6,7 @@ class Benchmark {
     }
 
     let title: String
-    let runner: JSFunctionRef = JSObjectRef.global.benchmarkRunner.function!
+    let runner = JSObject.global.benchmarkRunner.function!
 
     func testSuite(_ name: String, _ body: @escaping () -> Void) {
         let jsBody = JSClosure { arguments -> JSValue in
