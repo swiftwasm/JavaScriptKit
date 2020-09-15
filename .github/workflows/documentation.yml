@@ -1,0 +1,26 @@
+name: Documentation
+
+on: 
+  push:
+    branches: [master]
+
+jobs:
+  swift-doc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Generate Documentation
+        uses: MaxDesiatov/swift-doc@prebuilt-image
+        with:
+          inputs: "Sources"
+          module-name: JavaScriptKit
+          format: html
+          base-url: "/JavaScriptKit"
+          output: ./.build/documentation
+      - run: sudo chmod o+r -R ./.build/documentation
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./.build/documentation

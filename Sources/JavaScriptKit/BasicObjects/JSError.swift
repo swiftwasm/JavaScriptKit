@@ -1,4 +1,4 @@
-/** A wrapper around the [JavaScript Error 
+/** A wrapper around [the JavaScript Error 
 class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) that
 exposes its properties in a type-safe way.
 */
@@ -24,7 +24,7 @@ public final class JSError: Error {
         jsObject.name.string!
     }
 
-    /// The JavaScript call trace that led to the creation of this error object.
+    /// The JavaScript call stack that led to the creation of this error object.
     public var stack: String? {
         jsObject.stack.string
     }

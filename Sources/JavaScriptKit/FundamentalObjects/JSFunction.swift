@@ -105,18 +105,18 @@ public class JSClosure: JSFunction {
 }
 
 @_cdecl("swjs_prepare_host_function_call")
-public func _prepare_host_function_call(_ argc: Int32) -> UnsafeMutableRawPointer {
+func _prepare_host_function_call(_ argc: Int32) -> UnsafeMutableRawPointer {
     let argumentSize = MemoryLayout<RawJSValue>.size * Int(argc)
     return malloc(Int(argumentSize))!
 }
 
 @_cdecl("swjs_cleanup_host_function_call")
-public func _cleanup_host_function_call(_ pointer: UnsafeMutableRawPointer) {
+func _cleanup_host_function_call(_ pointer: UnsafeMutableRawPointer) {
     free(pointer)
 }
 
 @_cdecl("swjs_call_host_function")
-public func _call_host_function(
+func _call_host_function(
     _ hostFuncRef: JavaScriptHostFuncRef,
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
