@@ -4,14 +4,19 @@
 
 import _CJavaScriptKit
 
+/// A protocol that allows a Swift numeric type to be mapped to the JavaScript TypedArray that holds integers of its type
 public protocol TypedArrayElement: JSValueConvertible, JSValueConstructible {
+    /// The kind of typed array that should be created on the JS side
     static var typedArrayKind: JavaScriptTypedArrayKind { get }
+    /// The constructor function for the TypedArray class for this particular kind of number
     static var typedArrayClass: JSFunction { get }
 }
 
+/// A wrapper around all JavaScript [`TypedArray`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) classes that exposes their properties in a type-safe way.
 public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral where Element: TypedArrayElement {
     public static var constructor: JSFunction { Element.typedArrayClass }
     public var jsObject: JSObject
+
     public subscript(_ index: Int) -> Element {
         get {
             return Element.construct(from: jsObject[index])!
@@ -21,6 +26,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         }
     }
 
+    /// Create a TypedArray with the provided number of elements allocated. All the elements will be initialized to zero.
     public init(length: Int) {
         jsObject = Element.typedArrayClass.new(length)
     }
@@ -33,6 +39,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         self.init(elements)
     }
 
+    /// Convert an array of numbers into a JavaScript TypedArray
     public convenience init(_ array: [Element]) {
         var resultObj = JavaScriptObjectRef()
         array.withUnsafeBufferPointer { ptr in
