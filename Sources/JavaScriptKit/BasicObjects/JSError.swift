@@ -3,11 +3,11 @@ class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_
 exposes its properties in a type-safe way.
 */
 public final class JSError: Error {
-    /// The underlying JavaScript `Error` object.
-    public let jsObject: JSObject
-
     /// The constructor function used to create new `Error` objects.
     private static let constructor = JSObject.global.Error.function!
+
+    /// The underlying JavaScript `Error` object.
+    public let jsObject: JSObject
 
     /// Creates a new instance of the JavaScript `Error` class with a given message.
     public init(message: String) {

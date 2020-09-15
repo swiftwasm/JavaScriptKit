@@ -1,12 +1,26 @@
+/** A wrapper around the [JavaScript Date 
+class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) that
+exposes its properties in a type-safe way. This doesn't 100% match the JS API, for example 
+`getMonth`/`setMonth` etc accessor methods are converted to properties, but the rest of it matches
+in the naming. Parts of the JavaScript `Date` API that are not consistent across browsers and JS 
+implementations are not exposed in a type-safe manner, you should access the underlying `jsObject`
+property if you need those.
+*/
 public final class JSDate {
+    /// The constructor function used to create new `Date` objects.
     private static let constructor = JSObject.global.Date.function!
-    public let ref: JSObject
 
+    /// The underlying JavaScript `Date` object.
+    public let jsObject: JSObject
+
+    /** Creates a new instance of the JavaScript `Date` class with a given amount of milliseconds
+    that passed since midnight 01 January 1970 UTC.
+    */
     public init(millisecondsSinceEpoch: Double? = nil) {
         if let milliseconds = millisecondsSinceEpoch {
-            ref = Self.constructor.new(milliseconds)
+            jsObject = Self.constructor.new(milliseconds)
         } else {
-            ref = Self.constructor.new()
+            jsObject = Self.constructor.new()
         }
     }
 
@@ -22,199 +36,210 @@ public final class JSDate {
         seconds: Int = 0,
         milliseconds: Int = 0
     ) {
-        ref = Self.constructor.new(year, monthIndex, day, hours, minutes, seconds, milliseconds)
+        jsObject = Self.constructor.new(year, monthIndex, day, hours, minutes, seconds, milliseconds)
     }
 
     /// Year of this date in local time zone.
     public var fullYear: Int {
         get {
-            Int(ref.getFullYear!().number!)
+            Int(jsObject.getFullYear!().number!)
         }
         set {
-            _ = ref.setFullYear!(newValue)
+            _ = jsObject.setFullYear!(newValue)
         }
     }
 
-    /// Month of this date in `0–11` range in local time zone
+    /// Month of this date in `0–11` range in local time zone.
     public var month: Int {
         get {
-            Int(ref.getMonth!().number!)
+            Int(jsObject.getMonth!().number!)
         }
         set {
-            _ = ref.setMonth!(newValue)
+            _ = jsObject.setMonth!(newValue)
         }
     }
 
     /// The day of the month in `1..31` range in local time zone.
     public var date: Int {
         get {
-            Int(ref.getDate!().number!)
+            Int(jsObject.getDate!().number!)
         }
         set {
-            _ = ref.setDate!(newValue)
+            _ = jsObject.setDate!(newValue)
         }
     }
 
     /// The day of the week in `0..6` range in local time zone.
     public var day: Int {
-        Int(ref.getDay!().number!)
+        Int(jsObject.getDay!().number!)
     }
 
     /// The amount of hours in this day from `0..23` range in local time zone.
     public var hours: Int {
         get {
-            Int(ref.getHours!().number!)
+            Int(jsObject.getHours!().number!)
         }
         set {
-            _ = ref.setHours!(newValue)
+            _ = jsObject.setHours!(newValue)
         }
     }
 
     /// The amount of minutes in this hours from `0..59` range in local time zone.
     public var minutes: Int {
         get {
-            Int(ref.getMinutes!().number!)
+            Int(jsObject.getMinutes!().number!)
         }
         set {
-            _ = ref.setMinutes!(newValue)
+            _ = jsObject.setMinutes!(newValue)
         }
     }
 
     /// The amount of seconds in this minute from `0..59` range in local time zone.
     public var seconds: Int {
         get {
-            Int(ref.getSeconds!().number!)
+            Int(jsObject.getSeconds!().number!)
         }
         set {
-            _ = ref.setSeconds!(newValue)
+            _ = jsObject.setSeconds!(newValue)
         }
     }
 
     /// The amount of milliseconds in this second `0..999` range in local time zone.
     public var milliseconds: Int {
         get {
-            Int(ref.getMilliseconds!().number!)
+            Int(jsObject.getMilliseconds!().number!)
         }
         set {
-            _ = ref.setMilliseconds!(newValue)
+            _ = jsObject.setMilliseconds!(newValue)
         }
     }
 
-    /// Year of this date in the UTC time zone
+    /// Year of this date in the UTC time zone.
     public var utcFullYear: Int {
         get {
-            Int(ref.getUTCFullYear!().number!)
+            Int(jsObject.getUTCFullYear!().number!)
         }
         set {
-            _ = ref.setUTCFullYear!(newValue)
+            _ = jsObject.setUTCFullYear!(newValue)
         }
     }
 
-    /// Month of this date in `0–11` range in the UTC time zone
+    /// Month of this date in `0–11` range in the UTC time zone.
     public var utcMonth: Int {
         get {
-            Int(ref.getUTCMonth!().number!)
+            Int(jsObject.getUTCMonth!().number!)
         }
         set {
-            _ = ref.setUTCMonth!(newValue)
+            _ = jsObject.setUTCMonth!(newValue)
         }
     }
 
-    /// The day of the month in `1..31` range in the UTC time zone
+    /// The day of the month in `1..31` range in the UTC time zone.
     public var utcDate: Int {
         get {
-            Int(ref.getUTCDate!().number!)
+            Int(jsObject.getUTCDate!().number!)
         }
         set {
-            _ = ref.setUTCDate!(newValue)
+            _ = jsObject.setUTCDate!(newValue)
         }
     }
 
-    /// The day of the week in `0..6` range in the UTC time zone
+    /// The day of the week in `0..6` range in the UTC time zone.
     public var utcDay: Int {
-        Int(ref.getUTCDay!().number!)
+        Int(jsObject.getUTCDay!().number!)
     }
 
-    /// The amount of hours in this day from `0..23` range in the UTC time zone
+    /// The amount of hours in this day from `0..23` range in the UTC time zone.
     public var utcHours: Int {
         get {
-            Int(ref.getUTCHours!().number!)
+            Int(jsObject.getUTCHours!().number!)
         }
         set {
-            _ = ref.setUTCHours!(newValue)
+            _ = jsObject.setUTCHours!(newValue)
         }
     }
 
-    /// The amount of minutes in this hours from `0..59` range in the UTC time zone
+    /// The amount of minutes in this hours from `0..59` range in the UTC time zone.
     public var utcMinutes: Int {
         get {
-            Int(ref.getUTCMinutes!().number!)
+            Int(jsObject.getUTCMinutes!().number!)
         }
         set {
-            _ = ref.setUTCMinutes!(newValue)
+            _ = jsObject.setUTCMinutes!(newValue)
         }
     }
 
-    /// The amount of seconds in this minute from `0..59` range in the UTC time zone
+    /// The amount of seconds in this minute from `0..59` range in the UTC time zone.
     public var utcSeconds: Int {
         get {
-            Int(ref.getUTCSeconds!().number!)
+            Int(jsObject.getUTCSeconds!().number!)
         }
         set {
-            _ = ref.setUTCSeconds!(newValue)
+            _ = jsObject.setUTCSeconds!(newValue)
         }
     }
 
-    /// The amount of milliseconds in this second `0..999` range in the UTC time zone
+    /// The amount of milliseconds in this second `0..999` range in the UTC time zone.
     public var utcMilliseconds: Int {
         get {
-            Int(ref.getUTCMilliseconds!().number!)
+            Int(jsObject.getUTCMilliseconds!().number!)
         }
         set {
-            _ = ref.setUTCMilliseconds!(newValue)
+            _ = jsObject.setUTCMilliseconds!(newValue)
         }
     }
 
-    /// Offset in minutes between the local time zone and UTC
+    /// Offset in minutes between the local time zone and UTC.
     public var timezoneOffset: Int {
-        Int(ref.getTimezoneOffset!().number!)
+        Int(jsObject.getTimezoneOffset!().number!)
     }
 
+    /// Returns a string conforming to ISO 8601 that contains date and time, e.g. 
+    /// `"2020-09-15T08:56:54.811Z"`.
     public func toISOString() -> String {
-        ref.toISOString!().string!
+        jsObject.toISOString!().string!
     }
 
+    /// Returns a string with date parts in a format defined by user's locale, e.g. `"9/15/2020"`.
     public func toLocaleDateString() -> String {
-        ref.toLocaleDateString!().string!
+        jsObject.toLocaleDateString!().string!
     }
 
+    /// Returns a string with time parts in a format defined by user's locale, e.g. `"10:04:14"`.
     public func toLocaleTimeString() -> String {
-        ref.toLocaleTimeString!().string!
+        jsObject.toLocaleTimeString!().string!
     }
 
+    /** Returns a string formatted according to 
+    [rfc7231](https://tools.ietf.org/html/rfc7231#section-7.1.1.1) and modified according to 
+    [ecma-262](https://www.ecma-international.org/ecma-262/10.0/index.html#sec-date.prototype.toutcstring),
+    e.g. `Tue, 15 Sep 2020 09:04:40 GMT`.
+    */
     public func toUTCString() -> String {
-        ref.toUTCString!().string!
+        jsObject.toUTCString!().string!
     }
 
-    /// Number of milliseconds since midnight 01 January 1970 UTC to the present moment ignoring leap 
-    /// seconds
+    /** Number of milliseconds since midnight 01 January 1970 UTC to the present moment ignoring 
+    leap seconds.
+    */
     public static func now() -> Double {
         constructor.now!().number!
     }
 
-    /// Number of milliseconds since midnight 01 January 1970 UTC to the given date ignoring leap 
-    /// seconds
+    /** Number of milliseconds since midnight 01 January 1970 UTC to the given date ignoring leap 
+    seconds.
+    */
     public func valueOf() -> Double {
-        ref.valueOf!().number!
+        jsObject.valueOf!().number!
     }
 }
 
 extension JSDate: Comparable {
-    public static func ==(lhs: JSDate, rhs: JSDate) -> Bool {
+    public static func == (lhs: JSDate, rhs: JSDate) -> Bool {
         return lhs.valueOf() == rhs.valueOf()
     }
 
-    public static func <(lhs: JSDate, rhs: JSDate) -> Bool {
+    public static func < (lhs: JSDate, rhs: JSDate) -> Bool {
         return lhs.valueOf() < rhs.valueOf()
     }
 }
