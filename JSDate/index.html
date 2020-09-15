@@ -26,7 +26,7 @@
     <nav>
         <div class="wrapper">
             <h2>On This Page</h2>
-            <ol><li><a href="#relationships">Relationships</a><ul><li><a href="#relationships">Conforms To</a></li></ul></li><li><a href="#initializers">Initializers</a><ul><li class="initializer"><a href="#jsdate.init(millisecondssinceepoch:)">init(milliseconds​Since​Epoch:​)</a></li><li class="initializer"><a href="#jsdate.init(year:monthindex:day:hours:minutes:seconds:milliseconds:)">init(year:​month​Index:​day:​hours:​minutes:​seconds:​milliseconds:​)</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#jsdate.ref">ref</a></li><li class="variable"><a href="#jsdate.fullyear">full​Year</a></li><li class="variable"><a href="#jsdate.month">month</a></li><li class="variable"><a href="#jsdate.date">date</a></li><li class="variable"><a href="#jsdate.day">day</a></li><li class="variable"><a href="#jsdate.hours">hours</a></li><li class="variable"><a href="#jsdate.minutes">minutes</a></li><li class="variable"><a href="#jsdate.seconds">seconds</a></li><li class="variable"><a href="#jsdate.milliseconds">milliseconds</a></li><li class="variable"><a href="#jsdate.utcfullyear">utc​Full​Year</a></li><li class="variable"><a href="#jsdate.utcmonth">utc​Month</a></li><li class="variable"><a href="#jsdate.utcdate">utc​Date</a></li><li class="variable"><a href="#jsdate.utcday">utc​Day</a></li><li class="variable"><a href="#jsdate.utchours">utc​Hours</a></li><li class="variable"><a href="#jsdate.utcminutes">utc​Minutes</a></li><li class="variable"><a href="#jsdate.utcseconds">utc​Seconds</a></li><li class="variable"><a href="#jsdate.utcmilliseconds">utc​Milliseconds</a></li><li class="variable"><a href="#jsdate.timezoneoffset">timezone​Offset</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#jsdate.toisostring()">to​ISOString()</a></li><li class="function"><a href="#jsdate.tolocaledatestring()">to​Locale​Date​String()</a></li><li class="function"><a href="#jsdate.tolocaletimestring()">to​Locale​Time​String()</a></li><li class="function"><a href="#jsdate.toutcstring()">to​UTCString()</a></li><li class="function"><a href="#jsdate.now()">now()</a></li><li class="function"><a href="#jsdate.valueof()">value​Of()</a></li><li class="function"><a href="#jsdate.==(lhs:rhs:)">==(lhs:​rhs:​)</a></li><li class="function"><a href="#jsdate.&lt;(lhs:rhs:)">&lt;(lhs:​rhs:​)</a></li></ul></li></ol>
+            <ol><li><a href="#relationships">Relationships</a><ul><li><a href="#relationships">Conforms To</a></li></ul></li><li><a href="#initializers">Initializers</a><ul><li class="initializer"><a href="#jsdate.init(millisecondssinceepoch:)">init(milliseconds​Since​Epoch:​)</a></li><li class="initializer"><a href="#jsdate.init(year:monthindex:day:hours:minutes:seconds:milliseconds:)">init(year:​month​Index:​day:​hours:​minutes:​seconds:​milliseconds:​)</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#jsdate.jsobject">js​Object</a></li><li class="variable"><a href="#jsdate.fullyear">full​Year</a></li><li class="variable"><a href="#jsdate.month">month</a></li><li class="variable"><a href="#jsdate.date">date</a></li><li class="variable"><a href="#jsdate.day">day</a></li><li class="variable"><a href="#jsdate.hours">hours</a></li><li class="variable"><a href="#jsdate.minutes">minutes</a></li><li class="variable"><a href="#jsdate.seconds">seconds</a></li><li class="variable"><a href="#jsdate.milliseconds">milliseconds</a></li><li class="variable"><a href="#jsdate.utcfullyear">utc​Full​Year</a></li><li class="variable"><a href="#jsdate.utcmonth">utc​Month</a></li><li class="variable"><a href="#jsdate.utcdate">utc​Date</a></li><li class="variable"><a href="#jsdate.utcday">utc​Day</a></li><li class="variable"><a href="#jsdate.utchours">utc​Hours</a></li><li class="variable"><a href="#jsdate.utcminutes">utc​Minutes</a></li><li class="variable"><a href="#jsdate.utcseconds">utc​Seconds</a></li><li class="variable"><a href="#jsdate.utcmilliseconds">utc​Milliseconds</a></li><li class="variable"><a href="#jsdate.timezoneoffset">timezone​Offset</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#jsdate.toisostring()">to​ISOString()</a></li><li class="function"><a href="#jsdate.tolocaledatestring()">to​Locale​Date​String()</a></li><li class="function"><a href="#jsdate.tolocaletimestring()">to​Locale​Time​String()</a></li><li class="function"><a href="#jsdate.toutcstring()">to​UTCString()</a></li><li class="function"><a href="#jsdate.now()">now()</a></li><li class="function"><a href="#jsdate.valueof()">value​Of()</a></li><li class="function"><a href="#jsdate.==(lhs:rhs:)">==(lhs:​rhs:​)</a></li><li class="function"><a href="#jsdate.&lt;(lhs:rhs:)">&lt;(lhs:​rhs:​)</a></li></ul></li></ol>
         </div>
     </nav>
 
@@ -38,6 +38,16 @@
 </h1>
 
 <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">final</span> <span class="keyword">class</span> <span class="type">JSDate</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>A wrapper around the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">JavaScript Date
+class</a> that
+exposes its properties in a type-safe way. This doesn't 100% match the JS API, for example
+<code>getMonth</code>/<code>setMonth</code> etc accessor methods are converted to properties, but the rest of it matches
+in the naming. Parts of the JavaScript <code>Date</code> API that are not consistent across browsers and JS
+implementations are not exposed in a type-safe manner, you should access the underlying <code>jsObject</code>
+property if you need those.</p>
+
+</div>
 <section id="relationships">
     <h2 hidden>Relationships</h2>
         <figure>
@@ -95,6 +105,11 @@
         <code>init(milliseconds​Since​Epoch:​)</code>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">millisecondsSinceEpoch</span>: <span class="type">Double</span>? = <span class="keyword">nil</span>)</code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Creates a new instance of the JavaScript <code>Date</code> class with a given amount of milliseconds
+that passed since midnight 01 January 1970 UTC.</p>
+
+</div>
 </div>
 <div role="article" class="initializer" id="jsdate.init(year:monthindex:day:hours:minutes:seconds:milliseconds:)">
     <h3>
@@ -111,11 +126,15 @@ represents a day of the month starting at <code>1</code>.</p>
     <section id="properties">
         <h2>Properties</h2>
 
-        <div role="article" class="variable" id="jsdate.ref">
+        <div role="article" class="variable" id="jsdate.jsobject">
     <h3>
-        <code>ref</code>
+        <code>js​Object</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">ref</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a></code></pre></body></html>
+    <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">jsObject</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>The underlying JavaScript <code>Date</code> object.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="jsdate.fullyear">
     <h3>
@@ -133,7 +152,7 @@ represents a day of the month starting at <code>1</code>.</p>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">month</span>: <span class="type">Int</span></code></pre></body></html>
 <div class="summary" role="doc-abstract">
-    <p>Month of this date in <code>0–11</code> range in local time zone</p>
+    <p>Month of this date in <code>0–11</code> range in local time zone.</p>
 
 </div>
 </div>
@@ -203,7 +222,7 @@ represents a day of the month starting at <code>1</code>.</p>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">utcFullYear</span>: <span class="type">Int</span></code></pre></body></html>
 <div class="summary" role="doc-abstract">
-    <p>Year of this date in the UTC time zone</p>
+    <p>Year of this date in the UTC time zone.</p>
 
 </div>
 </div>
@@ -213,7 +232,7 @@ represents a day of the month starting at <code>1</code>.</p>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">utcMonth</span>: <span class="type">Int</span></code></pre></body></html>
 <div class="summary" role="doc-abstract">
-    <p>Month of this date in <code>0–11</code> range in the UTC time zone</p>
+    <p>Month of this date in <code>0–11</code> range in the UTC time zone.</p>
 
 </div>
 </div>
@@ -223,7 +242,7 @@ represents a day of the month starting at <code>1</code>.</p>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">utcDate</span>: <span class="type">Int</span></code></pre></body></html>
 <div class="summary" role="doc-abstract">
-    <p>The day of the month in <code>1..31</code> range in the UTC time zone</p>
+    <p>The day of the month in <code>1..31</code> range in the UTC time zone.</p>
 
 </div>
 </div>
@@ -233,7 +252,7 @@ represents a day of the month starting at <code>1</code>.</p>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">utcDay</span>: <span class="type">Int</span></code></pre></body></html>
 <div class="summary" role="doc-abstract">
-    <p>The day of the week in <code>0..6</code> range in the UTC time zone</p>
+    <p>The day of the week in <code>0..6</code> range in the UTC time zone.</p>
 
 </div>
 </div>
@@ -243,7 +262,7 @@ represents a day of the month starting at <code>1</code>.</p>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">utcHours</span>: <span class="type">Int</span></code></pre></body></html>
 <div class="summary" role="doc-abstract">
-    <p>The amount of hours in this day from <code>0..23</code> range in the UTC time zone</p>
+    <p>The amount of hours in this day from <code>0..23</code> range in the UTC time zone.</p>
 
 </div>
 </div>
@@ -253,7 +272,7 @@ represents a day of the month starting at <code>1</code>.</p>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">utcMinutes</span>: <span class="type">Int</span></code></pre></body></html>
 <div class="summary" role="doc-abstract">
-    <p>The amount of minutes in this hours from <code>0..59</code> range in the UTC time zone</p>
+    <p>The amount of minutes in this hours from <code>0..59</code> range in the UTC time zone.</p>
 
 </div>
 </div>
@@ -263,7 +282,7 @@ represents a day of the month starting at <code>1</code>.</p>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">utcSeconds</span>: <span class="type">Int</span></code></pre></body></html>
 <div class="summary" role="doc-abstract">
-    <p>The amount of seconds in this minute from <code>0..59</code> range in the UTC time zone</p>
+    <p>The amount of seconds in this minute from <code>0..59</code> range in the UTC time zone.</p>
 
 </div>
 </div>
@@ -273,7 +292,7 @@ represents a day of the month starting at <code>1</code>.</p>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">utcMilliseconds</span>: <span class="type">Int</span></code></pre></body></html>
 <div class="summary" role="doc-abstract">
-    <p>The amount of milliseconds in this second <code>0..999</code> range in the UTC time zone</p>
+    <p>The amount of milliseconds in this second <code>0..999</code> range in the UTC time zone.</p>
 
 </div>
 </div>
@@ -283,7 +302,7 @@ represents a day of the month starting at <code>1</code>.</p>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">timezoneOffset</span>: <span class="type">Int</span></code></pre></body></html>
 <div class="summary" role="doc-abstract">
-    <p>Offset in minutes between the local time zone and UTC</p>
+    <p>Offset in minutes between the local time zone and UTC.</p>
 
 </div>
 </div>
@@ -296,24 +315,44 @@ represents a day of the month starting at <code>1</code>.</p>
         <code>to​ISOString()</code>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">toISOString</span>() -&gt; <span class="type">String</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Returns a string conforming to ISO 8601 that contains date and time, e.g.
+<code>&quot;2020-09-15T08:56:54.811Z&quot;</code>.</p>
+
+</div>
 </div>
 <div role="article" class="function" id="jsdate.tolocaledatestring()">
     <h3>
         <code>to​Locale​Date​String()</code>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">toLocaleDateString</span>() -&gt; <span class="type">String</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Returns a string with date parts in a format defined by user's locale, e.g. <code>&quot;9/15/2020&quot;</code>.</p>
+
+</div>
 </div>
 <div role="article" class="function" id="jsdate.tolocaletimestring()">
     <h3>
         <code>to​Locale​Time​String()</code>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">toLocaleTimeString</span>() -&gt; <span class="type">String</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Returns a string with time parts in a format defined by user's locale, e.g. <code>&quot;10:04:14&quot;</code>.</p>
+
+</div>
 </div>
 <div role="article" class="function" id="jsdate.toutcstring()">
     <h3>
         <code>to​UTCString()</code>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">toUTCString</span>() -&gt; <span class="type">String</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Returns a string formatted according to
+<a href="https://tools.ietf.org/html/rfc7231#section-7.1.1.1">rfc7231</a> and modified according to
+<a href="https://www.ecma-international.org/ecma-262/10.0/index.html#sec-date.prototype.toutcstring">ecma-262</a>,
+e.g. <code>Tue, 15 Sep 2020 09:04:40 GMT</code>.</p>
+
+</div>
 </div>
 <div role="article" class="function" id="jsdate.now()">
     <h3>
@@ -321,8 +360,8 @@ represents a day of the month starting at <code>1</code>.</p>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">func</span> <span class="function">now</span>() -&gt; <span class="type">Double</span></code></pre></body></html>
 <div class="summary" role="doc-abstract">
-    <p>Number of milliseconds since midnight 01 January 1970 UTC to the present moment ignoring leap
-seconds</p>
+    <p>Number of milliseconds since midnight 01 January 1970 UTC to the present moment ignoring
+leap seconds.</p>
 
 </div>
 </div>
@@ -333,7 +372,7 @@ seconds</p>
     <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">valueOf</span>() -&gt; <span class="type">Double</span></code></pre></body></html>
 <div class="summary" role="doc-abstract">
     <p>Number of milliseconds since midnight 01 January 1970 UTC to the given date ignoring leap
-seconds</p>
+seconds.</p>
 
 </div>
 </div>
@@ -358,7 +397,7 @@ seconds</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2020-09-15T11:42:20+0000">September 15, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
+    Generated on <time datetime="2020-09-15T13:14:22+0000">September 15, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
 </p>
     </footer>
 </body>
