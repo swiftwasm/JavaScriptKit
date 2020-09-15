@@ -1,20 +1,36 @@
-public final class JSError {
-    private let ref: JSObject
+/** A wrapper around the [JavaScript Error 
+class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) that
+exposes its properties in a type-safe way.
+*/
+public final class JSError: Error {
+    /// The underlying JavaScript `Error` object.
+    public let jsObject: JSObject
+
+    /// The constructor function used to create new `Error` objects.
     private static let constructor = JSObject.global.Error.function!
 
+    /// Creates a new instance of the JavaScript `Error` class with a given message.
     public init(message: String) {
-        ref = Self.constructor.new([message])
+        jsObject = Self.constructor.new([message])
     }
 
+    /// The error message of the underlying `Error` object.
     public var message: String {
-        ref.message.string!
+        jsObject.message.string!
     }
 
+    /// The name (usually corresponds to the name of the underlying class) of a given error.
     public var name: String {
-        ref.name.string!
+        jsObject.name.string!
+    }
+
+    /// The JavaScript call trace that led to the creation of this error object.
+    public var stack: String? {
+        jsObject.stack.string
     }
 }
 
 extension JSError: CustomStringConvertible {
-    public var description: String { ref.description }
+    /// The textual representation of this error.
+    public var description: String { jsObject.description }
 }
