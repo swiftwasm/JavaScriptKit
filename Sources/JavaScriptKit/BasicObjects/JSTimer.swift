@@ -1,8 +1,8 @@
-/** This timer type hides [`setInterval`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setInterval)
+/** This timer is an abstraction over [`setInterval`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setInterval)
 / [`clearInterval`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/clearInterval) and 
 [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout)
 / [`clearTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout)
-pairs of calls for you. It intentionally doesn't match the JavaScript API, as a special care is
+JavaScript functions. It intentionally doesn't match the JavaScript API, as a special care is
 needed to hold a reference to the timer closure and to call `JSClosure.release()` on it when the
 timer is deallocated. As a user, you have to hold a reference to a `JSTimer` instance for it to stay
 valid. The `JSTimer` API is also intentionally trivial, the timer is started right away, and the
