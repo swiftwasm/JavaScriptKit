@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScriptKit - JSTimer</title>
+    <link rel="stylesheet" type="text/css" href="/JavaScriptKit/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/JavaScriptKit">
+            <strong>
+                JavaScriptKit
+            </strong>
+            <span>Documentation</span>
+        </a>
+        <sup>Beta</sup>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#initializers">Initializers</a><ul><li class="initializer"><a href="#jstimer.init(millisecondsdelay:isrepeating:callback:)">init(milliseconds​Delay:​is​Repeating:​callback:​)</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#jstimer.isrepeating">is​Repeating</a></li></ul></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+    <small>Class</small>
+    <code class="name">JSTimer</code>
+</h1>
+
+<html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">final</span> <span class="keyword">class</span> <span class="type">JSTimer</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>This timer type hides <a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setInterval"><code>setInterval</code></a>
+/ <a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/clearInterval"><code>clearInterval</code></a> and
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout"><code>setTimeout</code></a>
+/ <a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout"><code>clearTimeout</code></a>
+pairs of calls for you. It intentionally doesn't match the JavaScript API, as a special care is
+needed to hold a reference to the timer closure and to call <code>JSClosure.release()</code> on it when the
+timer is deallocated. As a user, you have to hold a reference to a <code>JSTimer</code> instance for it to stay
+valid. The <code>JSTimer</code> API is also intentionally trivial, the timer is started right away, and the
+only way to invalidate the timer is to bring the reference count of the <code>JSTimer</code> instance to zero,
+either by storing the timer in an optional property and assigning <code>nil</code> to it or by deallocating the
+object that owns it for invalidation.</p>
+
+</div>
+
+    <section id="initializers">
+        <h2>Initializers</h2>
+
+        <div role="article" class="initializer" id="jstimer.init(millisecondsdelay:isrepeating:callback:)">
+    <h3>
+        <code>init(milliseconds​Delay:​is​Repeating:​callback:​)</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">millisecondsDelay</span>: <span class="type">Double</span>, <span class="variable">isRepeating</span>: <span class="type">Bool</span> = <span class="keyword">false</span>, <span class="variable">callback</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; ())</code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Creates a new timer instance that calls <code>setInterval</code> or <code>setTimeout</code> JavaScript functions for you
+under the hood.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>milliseconds​Delay</th>
+    <td><code class="type">Double</code></td>
+    <td><p>the amount of milliseconds before the <code>callback</code> closure is executed.</p>
+</td>
+</tr>
+<tr>
+    <th>is​Repeating</th>
+    <td><code class="type">Bool</code></td>
+    <td><p>when <code>true</code> the <code>callback</code> closure is executed repeatedly at given <code>millisecondsDelay</code> intervals indefinitely until the timer is deallocated.</p>
+</td>
+</tr>
+<tr>
+    <th>callback</th>
+    <td><code class="type">@escaping () -&gt; ()</code></td>
+    <td><p>the closure to be executed after a given <code>millisecondsDelay</code> interval.</p>
+</td>
+</tr>
+  </tbody>
+</table>
+</div>
+    </section>
+    <section id="properties">
+        <h2>Properties</h2>
+
+        <div role="article" class="variable" id="jstimer.isrepeating">
+    <h3>
+        <code>is​Repeating</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">isRepeating</span>: <span class="type">Bool</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Indicates whether this timer instance calls its callback repeatedly at a given delay.</p>
+
+</div>
+</div>
+    </section>
+
+
+
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2020-09-15T11:42:20+0000">September 15, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
+</p>
+    </footer>
+</body>
+</html>

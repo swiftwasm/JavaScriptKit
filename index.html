@@ -71,6 +71,25 @@ exposes its properties in a type-safe way.</p>
 
 </dd>
 <dt class="class">
+    <a href="/JavaScriptKit/JSTimer" title="class - JSTimer">
+        JSTimer
+    </a>
+</dt>
+<dd>
+    <p>This timer type hides <a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setInterval"><code>setInterval</code></a>
+/ <a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/clearInterval"><code>clearInterval</code></a> and
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout"><code>setTimeout</code></a>
+/ <a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout"><code>clearTimeout</code></a>
+pairs of calls for you. It intentionally doesn't match the JavaScript API, as a special care is
+needed to hold a reference to the timer closure and to call <code>JSClosure.release()</code> on it when the
+timer is deallocated. As a user, you have to hold a reference to a <code>JSTimer</code> instance for it to stay
+valid. The <code>JSTimer</code> API is also intentionally trivial, the timer is started right away, and the
+only way to invalidate the timer is to bring the reference count of the <code>JSTimer</code> instance to zero,
+either by storing the timer in an optional property and assigning <code>nil</code> to it or by deallocating the
+object that owns it for invalidation.</p>
+
+</dd>
+<dt class="class">
     <a href="/JavaScriptKit/JSTypedArray" title="class - JSTypedArray">
         JSTyped​Array
     </a>
@@ -225,7 +244,7 @@ exposes its properties in a type-safe way.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2020-09-15T09:16:28+0000">September 15, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
+    Generated on <time datetime="2020-09-15T11:42:20+0000">September 15, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
 </p>
     </footer>
 </body>
