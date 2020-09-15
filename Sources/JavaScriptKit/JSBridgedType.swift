@@ -17,15 +17,15 @@ extension JSBridgedType {
 
 
 public protocol JSBridgedClass: JSBridgedType {
-    static var classRef: JSFunction { get }
-    var objectRef: JSObject { get }
-    init(withCompatibleObject objectRef: JSObject)
+    static var constructor: JSFunction { get }
+    var jsObject: JSObject { get }
+    init(withCompatibleObject jsObject: JSObject)
 }
 
 extension JSBridgedClass {
-    public var value: JSValue { objectRef.jsValue() }
+    public var value: JSValue { jsObject.jsValue() }
     public init?(from value: JSValue) {
-        guard let object = value.object, object.isInstanceOf(Self.classRef) else { return nil }
+        guard let object = value.object, object.isInstanceOf(Self.constructor) else { return nil }
         self.init(withCompatibleObject: object)
     }
 }

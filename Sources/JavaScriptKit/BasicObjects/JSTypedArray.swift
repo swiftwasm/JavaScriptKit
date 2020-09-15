@@ -10,23 +10,23 @@ public protocol TypedArrayElement: JSValueConvertible, JSValueConstructible {
 }
 
 public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral where Element: TypedArrayElement {
-    public static var classRef: JSFunction { Element.typedArrayClass }
-    public var objectRef: JSObject
+    public static var constructor: JSFunction { Element.typedArrayClass }
+    public var jsObject: JSObject
     public subscript(_ index: Int) -> Element {
         get {
-            return Element.construct(from: objectRef[index])!
+            return Element.construct(from: jsObject[index])!
         }
         set {
-            self.objectRef[index] = newValue.jsValue()
+            self.jsObject[index] = newValue.jsValue()
         }
     }
 
     public init(length: Int) {
-        objectRef = Element.typedArrayClass.new(length)
+        jsObject = Element.typedArrayClass.new(length)
     }
 
     required public init(withCompatibleObject jsObject: JSObject) {
-        objectRef = jsObject
+        self.jsObject = jsObject
     }
 
     required public convenience init(arrayLiteral elements: Element...) {
