@@ -1,9 +1,9 @@
-protocol _AnyJSValueCodable: JSValueConvertible {}
+protocol _AnyJSValueConvertible: JSValueConvertible {}
 
-public struct AnyJSValueCodable: JSValueCodable, ExpressibleByNilLiteral {
-    public static let void = AnyJSValueCodable.construct(from: .undefined)
+public struct AnyJSValueConvertible: JSValueCodable, ExpressibleByNilLiteral {
+    public static let void = AnyJSValueConvertible.construct(from: .undefined)
 
-    private struct Box<T: JSValueConvertible>: _AnyJSValueCodable {
+    private struct Box<T: JSValueConvertible>: _AnyJSValueConvertible {
         let value: T
 
         func jsValue() -> JSValue {
@@ -11,7 +11,7 @@ public struct AnyJSValueCodable: JSValueCodable, ExpressibleByNilLiteral {
         }
     }
 
-    private struct ConcreteBox: _AnyJSValueCodable {
+    private struct ConcreteBox: _AnyJSValueConvertible {
         let value: JSValue
 
         func jsValue() -> JSValue {
@@ -19,16 +19,16 @@ public struct AnyJSValueCodable: JSValueCodable, ExpressibleByNilLiteral {
         }
     }
 
-    private let value: _AnyJSValueCodable
+    private let value: _AnyJSValueConvertible
 
     public init<T>(_ value: T) where T: JSValueConvertible {
         self.value = Box(value: value)
     }
-    private init(boxed value: _AnyJSValueCodable) {
+    private init(boxed value: _AnyJSValueConvertible) {
         self.value = value
     }
 
-    public static func construct(from value: JSValue) -> AnyJSValueCodable? {
+    public static func construct(from value: JSValue) -> AnyJSValueConvertible? {
         self.init(boxed: ConcreteBox(value: value))
     }
 
@@ -39,19 +39,4 @@ public struct AnyJSValueCodable: JSValueCodable, ExpressibleByNilLiteral {
     public func jsValue() -> JSValue {
         value.jsValue()
     }
-
-    public func fromJSValue<Type: JSValueConstructible>() -> Type? {
-        self.jsValue().fromJSValue()
-    }
-}
-
-public func staticCast<Type: JSBridgedType>(_ ref: JSBridgedType) -> Type? {
-    return Type(from: ref.value)
-}
-
-public func dynamicCast<Type: JSBridgedClass>(_ ref: JSBridgedClass) -> Type? {
-    guard ref.jsObject.isInstanceOf(Type.constructor) else {
-        return nil
-    }
-    return staticCast(ref)
 }
