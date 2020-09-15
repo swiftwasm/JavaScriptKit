@@ -401,5 +401,5 @@ try test("Error") {
     try expectEqual(error.name, "Error")
     try expectEqual(error.message, message)
     try expectEqual(error.description, "Error: test error")
-    try expectEqual(error.stack.isEmpty, false)
+    try expectEqual(error.stack?.isEmpty, false)
 }
