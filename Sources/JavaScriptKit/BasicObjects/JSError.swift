@@ -24,7 +24,7 @@ public final class JSError: Error {
         jsObject.name.string!
     }
 
-    /// The JavaScript call trace that led to the creation of this error object.
+    /// The JavaScript call stack that led to the creation of this error object.
     public var stack: String? {
         jsObject.stack.string
     }
