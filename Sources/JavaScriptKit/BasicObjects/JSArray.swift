@@ -10,7 +10,7 @@ public class JSArray {
     let ref: JSObject
     
     /// Construct a `JSArray` from Array `JSObject`.
-    /// Return `nil` if the object is not Array.
+    /// Return `nil` if the object is not an Array.
     ///
     /// - Parameter object: A `JSObject` expected to be Array of JavaScript
     public init?(_ ref: JSObject) {
