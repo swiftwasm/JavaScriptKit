@@ -38,6 +38,28 @@
 </h1>
 
 <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="type">JSClosure</span>: <a href="/JavaScriptKit/JSFunction"><span class="type">JSFunction</span></a></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p><code>JSClosure</code> represents a JavaScript function the body of which is written in Swift.
+This type can be passed as a callback handler to JavaScript functions.
+Note that the lifetime of <code>JSClosure</code> should be managed by users manually
+due to GC boundary between Swift and JavaScript.
+For further discussion, see also <a href="https://github.com/swiftwasm/JavaScriptKit/pull/33">swiftwasm/JavaScriptKit #33</a></p>
+
+</div>
+<div class="discussion">
+    <p>e.g.</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">eventListenter</span> = <span class="variable">JSClosure</span> { <span class="keyword">_</span> <span class="keyword">in</span>
+    ...
+    <span class="keyword">return</span> <span class="variable">JSValue</span>.<span class="type">undefined</span>
+}
+
+<span class="variable">button</span>.<span class="type">addEventListener</span>!(<span class="string literal">"</span><span class="string literal">click</span><span class="string literal">"</span>, <span class="variable">JSValue</span>.<span class="type">function</span>(<span class="variable">eventListenter</span>))
+...
+<span class="variable">button</span>.<span class="type">removeEventListener</span>!(<span class="string literal">"</span><span class="string literal">click</span><span class="string literal">"</span>, <span class="variable">JSValue</span>.<span class="type">function</span>(<span class="variable">eventListenter</span>))
+<span class="variable">eventListenter</span>.<span class="type">release</span>()
+</code></pre></body></html>
+</div>
 <section id="relationships">
     <h2 hidden>Relationships</h2>
         <figure>
@@ -85,7 +107,9 @@
         <h3>Superclass</h3>
 <dl>
     <dt class="class"><code><a href="/JavaScriptKit/JSFunction">JSFunction</a></code></dt>
-<dd></dd>
+<dd><p><code>JSFunction</code> represents a function in JavaScript and supports new object instantiation.
+This type can be callable as a function using <code>callAsFunction</code>.</p>
+</dd>
 </dl>
 </section>
     <section id="initializers">
@@ -96,12 +120,39 @@
         <code>init(_:​)</code>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="keyword">_</span> <span class="variable">body</span>: <span class="attribute">@</span><span class="attribute">escaping</span> ([<a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>]) -&gt; <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>)</code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Instantiate a new <code>JSClosure</code> with given function body.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>body</th>
+    <td><code class="type">@escaping ([JSValue]) -&gt; JSValue</code></td>
+    <td><p>The body of this function.</p>
+</td>
+</tr>
+  </tbody>
+</table>
 </div>
 <div role="article" class="initializer" id="jsclosure.init(_:)">
     <h3>
         <code>init(_:​)</code>
     </h3>
     <html><body><pre class="highlight"><code><span class="attribute">convenience</span> <span class="keyword">public</span> <span class="keyword">init</span>(<span class="keyword">_</span> <span class="variable">body</span>: <span class="attribute">@</span><span class="attribute">escaping</span> ([<a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>]) -&gt; ())</code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>A convenience initializer which assumes that the given body function returns <code>JSValue.undefined</code></p>
+
+</div>
 </div>
     </section>
     <section id="methods">
@@ -112,6 +163,11 @@
         <code>release()</code>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">release</span>()</code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Release this function resource.
+After calling <code>release</code>, calling this function from JavaScript will fail.</p>
+
+</div>
 </div>
     </section>
 
@@ -122,7 +178,7 @@
 
     <footer>
         <p>
-    Generated on <time datetime="2020-09-16T07:00:41+0000">September 16, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
+    Generated on <time datetime="2020-09-16T11:29:02+0000">September 16, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
 </p>
     </footer>
 </body>

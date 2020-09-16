@@ -38,6 +38,24 @@
 </h1>
 
 <html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">dynamicMemberLookup</span> <span class="keyword">public</span> <span class="keyword">class</span> <span class="type">JSObject</span>: <span class="type">Equatable</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p><code>JSObject</code> represents an object in JavaScript and supports dynamic member lookup.
+Any member access like <code>object.foo</code> will dynamically request the JavaScript and Swift
+runtime bridge library for a member with the specified name in this object.</p>
+
+</div>
+<div class="discussion">
+    <p>And this object supports to call a member method of the object.</p>
+
+<p>e.g.</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">document</span> = <span class="variable">JSObject</span>.<span class="type">global</span>.<span class="type">document</span>.<span class="type">object</span>!
+<span class="keyword">let</span> <span class="variable">divElement</span> = <span class="variable">document</span>.<span class="type">createElement</span>!(<span class="string literal">"</span><span class="string literal">div</span><span class="string literal">"</span>)
+</code></pre></body></html>
+<p>The lifetime of this object is managed by the JavaScript and Swift runtime bridge library with
+reference counting system.</p>
+
+</div>
 <section id="relationships">
     <h2 hidden>Relationships</h2>
         <figure>
@@ -115,7 +133,9 @@
         <h3>Subclasses</h3>
 <dl>
     <dt class="class"><code><a href="/JavaScriptKit/JSFunction">JSFunction</a></code></dt>
-<dd></dd>
+<dd><p><code>JSFunction</code> represents a function in JavaScript and supports new object instantiation.
+This type can be callable as a function using <code>callAsFunction</code>.</p>
+</dd>
 </dl>
 <h3>Conforms To</h3>
 <dl>
@@ -131,6 +151,11 @@
         <code>global</code>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">global</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>A <code>JSObject</code> of the global scope object.
+This allows access to the global properties and global names by accessing the <code>JSObject</code> returned.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="jsobject.description">
     <h3>
@@ -147,12 +172,67 @@
         <code>is​Instance​Of(_:​)</code>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">isInstanceOf</span>(<span class="keyword">_</span> <span class="variable">constructor</span>: <a href="/JavaScriptKit/JSFunction"><span class="type">JSFunction</span></a>) -&gt; <span class="type">Bool</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Return <code>true</code> if this object is an instance of the <code>constructor</code>. Return <code>false</code>, if not.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>constructor</th>
+    <td><code class="type">JSFunction</code></td>
+    <td><p>The constructor function to check.</p>
+</td>
+</tr>
+  </tbody>
+</table>
+  <h4>Returns</h4>
+  <p>The result of <code>instanceof</code> in JavaScript environment.</p>
+
 </div>
 <div role="article" class="function" id="jsobject.==(lhs:rhs:)">
     <h3>
         <code>==(lhs:​rhs:​)</code>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">func</span> ==(<span class="variable">lhs</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a>, <span class="variable">rhs</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a>) -&gt; <span class="type">Bool</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Returns a Boolean value indicating whether two values point to same objects.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>lhs</th>
+    <td><code class="type">JSObject</code></td>
+    <td><p>A object to compare.</p>
+</td>
+</tr>
+<tr>
+    <th>rhs</th>
+    <td><code class="type">JSObject</code></td>
+    <td><p>Another object to compare.</p>
+</td>
+</tr>
+  </tbody>
+</table>
 </div>
 <div role="article" class="function" id="jsobject.jsvalue()">
     <h3>
@@ -169,7 +249,7 @@
 
     <footer>
         <p>
-    Generated on <time datetime="2020-09-16T07:00:41+0000">September 16, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
+    Generated on <time datetime="2020-09-16T11:29:02+0000">September 16, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
 </p>
     </footer>
 </body>

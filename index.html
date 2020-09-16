@@ -110,7 +110,9 @@ or deallocate the object that owns the timer.</p>
     </a>
 </dt>
 <dd>
-    
+    <p><code>JSFunction</code> represents a function in JavaScript and supports new object instantiation.
+This type can be callable as a function using <code>callAsFunction</code>.</p>
+
 </dd>
 <dt class="class">
     <a href="/JavaScriptKit/JSClosure" title="class - JSClosure">
@@ -118,7 +120,12 @@ or deallocate the object that owns the timer.</p>
     </a>
 </dt>
 <dd>
-    
+    <p><code>JSClosure</code> represents a JavaScript function the body of which is written in Swift.
+This type can be passed as a callback handler to JavaScript functions.
+Note that the lifetime of <code>JSClosure</code> should be managed by users manually
+due to GC boundary between Swift and JavaScript.
+For further discussion, see also <a href="https://github.com/swiftwasm/JavaScriptKit/pull/33">swiftwasm/JavaScriptKit #33</a></p>
+
 </dd>
 <dt class="class">
     <a href="/JavaScriptKit/JSObject" title="class - JSObject">
@@ -126,7 +133,10 @@ or deallocate the object that owns the timer.</p>
     </a>
 </dt>
 <dd>
-    
+    <p><code>JSObject</code> represents an object in JavaScript and supports dynamic member lookup.
+Any member access like <code>object.foo</code> will dynamically request the JavaScript and Swift
+runtime bridge library for a member with the specified name in this object.</p>
+
 </dd>
 <dt class="class">
     <a href="/JavaScriptKit/JSValueDecoder" title="class - JSValueDecoder">
@@ -147,7 +157,8 @@ or deallocate the object that owns the timer.</p>
     </a>
 </dt>
 <dd>
-    
+    <p><code>JSValue</code> represents a value in JavaScript.</p>
+
 </dd>
         </dl>
     </section>
@@ -251,7 +262,7 @@ or deallocate the object that owns the timer.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2020-09-16T07:00:41+0000">September 16, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
+    Generated on <time datetime="2020-09-16T11:29:02+0000">September 16, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
 </p>
     </footer>
 </body>
