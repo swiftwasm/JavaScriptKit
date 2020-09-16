@@ -42,19 +42,6 @@ enum JavaScriptValueKind {
     Function = 6,
 }
 
-enum JavaScriptTypedArrayKind {
-    Int8 = 0,
-    Uint8 = 1,
-    Int16 = 2,
-    Uint16 = 3,
-    Int32 = 4,
-    Uint32 = 5,
-    BigInt64 = 6,
-    BigUint64 = 7,
-    Float32 = 8,
-    Float64 = 9,
-}
-
 type TypedArray =
     | Int8ArrayConstructor
     | Uint8ArrayConstructor
@@ -405,11 +392,11 @@ export class SwiftRuntime {
               return obj instanceof constructor
             },
             swjs_create_typed_array: (
-                kind: JavaScriptTypedArrayKind,
+                constructor_ref: ref,
                 elementsPtr: pointer, length: number,
                 result_obj: pointer
             ) => {
-                const ArrayType: TypedArray = globalVariable[JavaScriptTypedArrayKind[kind] + 'Array']
+                const ArrayType: TypedArray = this.heap.referenceHeap(obj_ref)
                 const array = new ArrayType(memory().buffer, elementsPtr, length);
                 // Call `.slice()` to copy the memory
                 writeUint32(result_obj, this.heap.retain(array.slice()));
