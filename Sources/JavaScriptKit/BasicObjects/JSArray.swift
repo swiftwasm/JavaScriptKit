@@ -1,3 +1,5 @@
+/// A wrapper around [the JavaScript Array class](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Array)
+/// that exposes its properties in a type-safe and Swifty way.
 public class JSArray: JSBridgedClass {
     public static let constructor = JSObject.global.Array.function!
 
@@ -12,10 +14,15 @@ public class JSArray: JSBridgedClass {
         self.init(object)
     }
 
+    /// Construct a `JSArray` from Array `JSObject`.
+    /// Return `nil` if the object is not an Array.
+    ///
+    /// - Parameter object: A `JSObject` expected to be a JavaScript Array
     public convenience init?(_ jsObject: JSObject) {
         guard Self.isArray(jsObject) else { return nil }
         self.init(withCompatibleObject: jsObject)
     }
+
     public required init(withCompatibleObject jsObject: JSObject) {
         self.jsObject = jsObject
     }
