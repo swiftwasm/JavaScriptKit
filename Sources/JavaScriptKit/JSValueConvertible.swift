@@ -98,19 +98,20 @@ extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key 
 private let NativeJSArray = JSObject.global.Array.function!
 extension Dictionary: JSValueConstructible where Value: JSValueConstructible, Key == String {
     public static func construct(from value: JSValue) -> Self? {
-        if let objectRef = value.object,
-           let keys: [String] = Object.keys!(objectRef.jsValue()).fromJSValue() {
-            var entries = [(String, Value)]()
-            entries.reserveCapacity(keys.count)
-            for key in keys {
-                guard let value: Value = objectRef[key].fromJSValue() else {
-                    return nil
-                }
-                entries.append((key, value))
+        guard
+            let objectRef = value.object,
+            let keys: [String] = Object.keys!(objectRef.jsValue()).fromJSValue()
+        else { return nil }
+
+        var entries = [(String, Value)]()
+        entries.reserveCapacity(keys.count)
+        for key in keys {
+            guard let value: Value = objectRef[key].fromJSValue() else {
+                return nil
             }
-            return Dictionary(uniqueKeysWithValues: entries)
+            entries.append((key, value))
         }
-        return nil
+        return Dictionary(uniqueKeysWithValues: entries)
     }
 }
 
@@ -152,20 +153,21 @@ extension Array: JSValueConvertible where Element == JSValueConvertible {
 
 extension Array: JSValueConstructible where Element: JSValueConstructible {
     public static func construct(from value: JSValue) -> [Element]? {
-        if let objectRef = value.object,
-           objectRef.isInstanceOf(JSObject.global.Array.function!) {
-            let count: Int = objectRef.length.fromJSValue()!
-            var array = [Element]()
-            array.reserveCapacity(count)
+        guard
+            let objectRef = value.object,
+            objectRef.isInstanceOf(JSObject.global.Array.function!)
+        else { return nil }
 
-            for i in 0 ..< count {
-                guard let value: Element = objectRef[i].fromJSValue() else { return nil }
-                array.append(value)
-            }
+        let count: Int = objectRef.length.fromJSValue()!
+        var array = [Element]()
+        array.reserveCapacity(count)
 
-            return array
+        for i in 0 ..< count {
+            guard let value: Element = objectRef[i].fromJSValue() else { return nil }
+            array.append(value)
         }
-        return nil
+
+        return array
     }
 }
 

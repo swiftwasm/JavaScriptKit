@@ -90,15 +90,6 @@ public class JSClosure: JSFunction {
         }
     }
 
-    public required convenience init(jsValue: JSValue) {
-        switch jsValue {
-        case let .function(fun):
-            self.init { fun(arguments: $0) }
-        default:
-            fatalError()
-        }
-    }
-
     public func release() {
         Self.sharedFunctions[hostFuncRef] = nil
         isReleased = true
