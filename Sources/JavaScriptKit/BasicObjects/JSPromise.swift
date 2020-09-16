@@ -4,6 +4,10 @@ that exposes its functions in a type-safe and Swifty way. The `JSPromise` API is
 as Combine. If you don't know the exact type of your `Success` value, you should use `JSValue`, e.g.
 `JSPromise<JSValue, JSError>`. In the rare case, where you can't guarantee that the error thrown
 is of actual JavaScript `Error` type, you should use `JSPromise<JSValue, JSValue>`.
+
+This doesn't 100% match the JavaScript API, as `then` overload with two callbacks is not available.
+It's impossible to unify success and failure types from both callbacks in a single returned promise
+without type erasure. You should chain `then` and `catch` in those cases to avoid type erasure.
 */
 public final class JSPromise<Success, Failure>: JSValueConvertible, JSValueConstructible
 where Success: JSValueConstructible, Failure: JSValueConstructible {
