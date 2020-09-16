@@ -396,7 +396,7 @@ export class SwiftRuntime {
                 elementsPtr: pointer, length: number,
                 result_obj: pointer
             ) => {
-                const ArrayType: TypedArray = this.heap.referenceHeap(obj_ref)
+                const ArrayType: TypedArray = this.heap.referenceHeap(constructor_ref);
                 const array = new ArrayType(memory().buffer, elementsPtr, length);
                 // Call `.slice()` to copy the memory
                 writeUint32(result_obj, this.heap.retain(array.slice()));

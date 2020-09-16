@@ -69,51 +69,49 @@ func valueForBitWidth<T>(typeName: String, bitWidth: Int, when32: T) -> T {
 }
 
 extension Int: TypedArrayElement {
-    public static var typedArrayClass: JSFunction {
+    public static var typedArrayClass: JSFunction =
         valueForBitWidth(typeName: "Int", bitWidth: Int.bitWidth, when32: JSObject.global.Int32Array).function!
-    }
 }
 extension UInt: TypedArrayElement {
-    public static var typedArrayClass: JSFunction {
+    public static var typedArrayClass: JSFunction =
         valueForBitWidth(typeName: "UInt", bitWidth: Int.bitWidth, when32: JSObject.global.Uint32Array).function!
-    }
 }
 
 // MARK: - Concrete TypedArray classes
 
 extension Int8: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Int8Array.function! }
+    public static var typedArrayClass = JSObject.global.Int8Array.function!
 }
 extension UInt8: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Uint8Array.function! }
+    public static var typedArrayClass = JSObject.global.Uint8Array.function!
 }
 // TODO: Support Uint8ClampedArray?
 
 extension Int16: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Int16Array.function! }
+    public static var typedArrayClass = JSObject.global.Int16Array.function!
 }
 extension UInt16: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Uint16Array.function! }
+    public static var typedArrayClass = JSObject.global.Uint16Array.function!
 }
 
 extension Int32: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Int32Array.function! }
+    public static var typedArrayClass = JSObject.global.Int32Array.function!
 }
 extension UInt32: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Uint32Array.function! }
+    public static var typedArrayClass = JSObject.global.Uint32Array.function!
 }
 
 // FIXME: Support passing BigInts across the bridge
 //extension Int64: TypedArrayElement {
-//    public static var typedArrayClass: JSFunction { JSObject.global.BigInt64Array.function! }
+//    public static var typedArrayClass = JSObject.global.BigInt64Array.function!
 //}
 //extension UInt64: TypedArrayElement {
-//    public static var typedArrayClass: JSFunction { JSObject.global.BigUint64Array.function! }
+//    public static var typedArrayClass = JSObject.global.BigUint64Array.function!
 //}
 
 extension Float32: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Float32Array.function! }
+    public static var typedArrayClass = JSObject.global.Float32Array.function!
 }
 extension Float64: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Float64Array.function! }
+    public static var typedArrayClass = JSObject.global.Float64Array.function!
 }
