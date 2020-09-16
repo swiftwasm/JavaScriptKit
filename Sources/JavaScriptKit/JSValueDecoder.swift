@@ -232,7 +232,7 @@ extension _Decoder: SingleValueDecodingContainer {
 /// `JSValueDecoder` facilitates the decoding of JavaScript value into semantic `Decodable` types.
 public class JSValueDecoder {
 
-    /// Initializes a new `JSValueDecoder`
+    /// Initializes a new `JSValueDecoder`.
     public init() {}
 
     /// Decodes a top-level value of the given type from the given JavaScript value representation.
