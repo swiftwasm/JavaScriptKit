@@ -18,19 +18,6 @@ typedef enum __attribute__((enum_extensibility(closed))) {
   JavaScriptValueKindFunction = 6,
 } JavaScriptValueKind;
 
-typedef enum __attribute__((enum_extensibility(closed))) {
-    JavaScriptTypedArrayKindInt8 = 0,
-    JavaScriptTypedArrayKindUint8 = 1,
-    JavaScriptTypedArrayKindInt16 = 2,
-    JavaScriptTypedArrayKindUint16 = 3,
-    JavaScriptTypedArrayKindInt32 = 4,
-    JavaScriptTypedArrayKindUint32 = 5,
-    JavaScriptTypedArrayKindBigInt64 = 6,
-    JavaScriptTypedArrayKindBigUint64 = 7,
-    JavaScriptTypedArrayKindFloat32 = 8,
-    JavaScriptTypedArrayKindFloat64 = 9,
-} JavaScriptTypedArrayKind;
-
 typedef unsigned JavaScriptPayload1;
 typedef unsigned JavaScriptPayload2;
 typedef double JavaScriptPayload3;
@@ -112,7 +99,7 @@ _release(const JavaScriptObjectRef ref);
 
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_create_typed_array"))) extern void
-_create_typed_array(const JavaScriptTypedArrayKind kind,
+_create_typed_array(const JavaScriptObjectRef constructor,
                     const void *elementsPtr, const int length,
                     JavaScriptObjectRef *result_obj);
 

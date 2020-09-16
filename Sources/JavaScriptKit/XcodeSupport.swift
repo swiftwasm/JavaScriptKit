@@ -74,7 +74,7 @@ import _CJavaScriptKit
     ) { fatalError() }
     func _release(_: JavaScriptObjectRef) { fatalError() }
     func _create_typed_array<T: TypedArrayElement>(
-        _: JavaScriptTypedArrayKind,
+        _: JavaScriptObjectRef,
         _: UnsafePointer<T>,
         _: Int32,
         _: UnsafeMutablePointer<JavaScriptObjectRef>!
