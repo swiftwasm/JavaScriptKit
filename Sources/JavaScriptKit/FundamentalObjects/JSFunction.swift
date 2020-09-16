@@ -86,7 +86,7 @@ public class JSFunction: JSObject {
     }
 }
 
-/// `JSClosure` represents a JavaScript function whose body is written in Swift.
+/// `JSClosure` represents a JavaScript function the body of which is written in Swift.
 /// This type can be passed as a callback handler to JavaScript functions.
 /// Note that the lifetime of `JSClosure` should be managed by users manually
 /// due to GC boundary between Swift and JavaScript.
