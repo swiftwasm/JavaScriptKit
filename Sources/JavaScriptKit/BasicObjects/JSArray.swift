@@ -12,7 +12,7 @@ public class JSArray {
     /// Construct a `JSArray` from Array `JSObject`.
     /// Return `nil` if the object is not an Array.
     ///
-    /// - Parameter object: A `JSObject` expected to be Array of JavaScript
+    /// - Parameter object: A `JSObject` expected to be a JavaScript Array
     public init?(_ ref: JSObject) {
         guard Self.isArray(ref) else { return nil }
         self.ref = ref
