@@ -40,7 +40,7 @@ public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLitera
         self.ref = object
     }
 
-    /// Initialize a new instance of TypedArray in JavaScript environment with given length zero value
+    /// Initialize a new instance of TypedArray in JavaScript environment with given length zero value.
     ///
     /// - Parameter length: The length of elements that will be allocated.
     public convenience init(length: Int) {
