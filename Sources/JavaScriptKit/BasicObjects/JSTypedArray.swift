@@ -52,7 +52,7 @@ public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLitera
         self.init(elements)
     }
     
-    /// Initialize a new instance of TypedArray in JavaScript environment with given elements
+    /// Initialize a new instance of TypedArray in JavaScript environment with given elements.
     ///
     /// - Parameter array: The array that will be copied to create a new instance of TypedArray
     public convenience init(_ array: [Element]) {
