@@ -9,6 +9,8 @@ public protocol TypedArrayElement: JSValueConvertible, JSValueConstructible {
     static var typedArrayClass: JSFunction { get }
 }
 
+/// A wrapper around [the JavaScript TypedArray class](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
+/// that exposes its properties in a type-safe and Swifty way.
 public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLiteral where Element: TypedArrayElement {
     let ref: JSObject
     public func jsValue() -> JSValue {
@@ -29,11 +31,18 @@ public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLitera
         self.ref = object
     }
 
+    /// Construct a `JSTypedArray` from TypedArray `JSObject`.
+    /// Return `nil` if the object is not TypedArray.
+    ///
+    /// - Parameter object: A `JSObject` expected to be TypedArray
     public init?(_ object: JSObject) {
         guard object.isInstanceOf(Element.typedArrayClass) else { return nil }
         self.ref = object
     }
 
+    /// Initialize a new instance of TypedArray in JavaScript environment with given length zero value
+    ///
+    /// - Parameter length: The length of elements that will be allocated.
     public convenience init(length: Int) {
         let jsObject = Element.typedArrayClass.new(length)
         self.init(unsafe: jsObject)
@@ -42,7 +51,10 @@ public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLitera
     required public convenience init(arrayLiteral elements: Element...) {
         self.init(elements)
     }
-
+    
+    /// Initialize a new instance of TypedArray in JavaScript environment with given elements
+    ///
+    /// - Parameter array: The array that will be copied to create a new instance of TypedArray
     public convenience init(_ array: [Element]) {
         var resultObj = JavaScriptObjectRef()
         array.withUnsafeBufferPointer { ptr in
@@ -50,9 +62,10 @@ public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLitera
         }
         self.init(unsafe: JSObject(id: resultObj))
     }
-
-    public convenience init(_ stride: StrideTo<Element>) where Element: Strideable {
-        self.init(stride.map({ $0 }))
+    
+    /// Convenience initializer for `Sequence`.
+    public convenience init<S: Sequence>(_ sequence: S) {
+        self.init(sequence.map({ $0 }))
     }
 }
 

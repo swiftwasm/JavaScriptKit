@@ -229,9 +229,16 @@ extension _Decoder: SingleValueDecodingContainer {
     }
 }
 
+/// `JSValueDecoder` facilitates the decoding of JavaScript value into semantic `Decodable` types.
 public class JSValueDecoder {
+
+    /// Initializes a new `JSValueDecoder`
     public init() {}
 
+    /// Decodes a top-level value of the given type from the given JavaScript value representation.
+    ///
+    /// - Parameter T: The type of the value to decode.
+    /// - Parameter value: The `JSValue` to decode from.
     public func decode<T>(
         _: T.Type = T.self,
         from value: JSValue,

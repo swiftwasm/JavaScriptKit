@@ -1,3 +1,5 @@
+/// A wrapper around [the JavaScript Array class](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Array)
+/// that exposes its properties in a type-safe and Swifty way.
 public class JSArray {
     static let classObject = JSObject.global.Array.function!
 
@@ -6,7 +8,11 @@ public class JSArray {
     }
 
     let ref: JSObject
-
+    
+    /// Construct a `JSArray` from Array `JSObject`.
+    /// Return `nil` if the object is not Array.
+    ///
+    /// - Parameter object: A `JSObject` expected to be Array of JavaScript
     public init?(_ ref: JSObject) {
         guard Self.isArray(ref) else { return nil }
         self.ref = ref

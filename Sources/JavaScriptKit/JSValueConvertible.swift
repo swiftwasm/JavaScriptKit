@@ -1,6 +1,8 @@
 import _CJavaScriptKit
 
+/// Confirming types are convertible to `JSValue`.
 public protocol JSValueConvertible {
+    /// Convert this object into `JSValue`
     func jsValue() -> JSValue
 }
 

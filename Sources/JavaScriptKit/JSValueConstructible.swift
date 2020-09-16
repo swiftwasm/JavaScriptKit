@@ -1,4 +1,10 @@
+/// Types conforming to this protocol can be constructed from `JSValue`.
 public protocol JSValueConstructible {
+    /// Construct an instance of `Self`, if possible, from the given `JSValue`.
+    /// Return `nil` if fail to construct.
+    ///
+    /// - Parameter value: The `JSValue` to decode
+    /// - Returns: An instance of `Self`, if one was successfully constructed from the value.
     static func construct(from value: JSValue) -> Self?
 }
 
