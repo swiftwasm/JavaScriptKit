@@ -37,9 +37,5 @@ let package = Package(
                 ),
             ]
         ),
-        .testTarget(
-            name: "JavaScriptKitTests",
-            dependencies: ["JavaScriptKit"]
-        ),
     ]
 )
