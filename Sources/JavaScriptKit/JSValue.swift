@@ -55,31 +55,6 @@ public enum JSValue: Equatable {
         }
     }
 
-    public var isBoolean: Bool {
-        guard case .boolean = self else { return false }
-        return true
-    }
-
-    public var isString: Bool {
-        guard case .string = self else { return false }
-        return true
-    }
-
-    public var isNumber: Bool {
-        guard case .number = self else { return false }
-        return true
-    }
-
-    public var isObject: Bool {
-        guard case .object = self else { return false }
-        return true
-    }
-
-    public var isFunction: Bool {
-        guard case .function = self else { return false }
-        return true
-    }
-
     /// Returns the `true` if this JS value is null.
     /// If not, returns `false`.
     public var isNull: Bool {
