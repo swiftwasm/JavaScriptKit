@@ -77,7 +77,7 @@ public class JSObject: Equatable {
 
     deinit { _release(id) }
 
-    /// Returns a Boolean value indicating whether two values points same objects.
+    /// Returns a Boolean value indicating whether two values point to same objects.
     ///
     /// - Parameters:
     ///   - lhs: A object to compare.
