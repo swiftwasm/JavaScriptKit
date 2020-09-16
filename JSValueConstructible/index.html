@@ -38,6 +38,10 @@
 </h1>
 
 <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">protocol</span> <span class="type">JSValueConstructible</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Types conforming to this protocol can be constructed from <code>JSValue</code>.</p>
+
+</div>
 <section id="relationships">
     <h2 hidden>Relationships</h2>
         <figure>
@@ -99,6 +103,33 @@
         <code>construct(from:​)</code>
     </h3>
     <html><body><pre class="highlight"><code><span class="keyword">static</span> <span class="keyword">func</span> <span class="function">construct</span>(<span class="variable">from</span> <span class="variable">value</span>: <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>) -&gt; <span class="keyword">Self</span>?</code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Construct an instance of <code>Self</code>, if possible, from the given <code>JSValue</code>.
+Return <code>nil</code> if fail to construct.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>value</th>
+    <td><code class="type">JSValue</code></td>
+    <td><p>The <code>JSValue</code> to decode</p>
+</td>
+</tr>
+  </tbody>
+</table>
+  <h4>Returns</h4>
+  <p>An instance of <code>Self</code>, if one was successfully constructed from the value.</p>
+
 </div>
     </section>
         </article>
@@ -106,7 +137,7 @@
 
     <footer>
         <p>
-    Generated on <time datetime="2020-09-16T11:29:02+0000">September 16, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
+    Generated on <time datetime="2020-09-16T14:43:08+0000">September 16, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
 </p>
     </footer>
 </body>
