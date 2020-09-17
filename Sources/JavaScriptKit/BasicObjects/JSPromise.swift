@@ -89,7 +89,7 @@ extension JSPromise where Success == (), Failure == Never {
 }
 
 extension JSPromise where Failure: JSValueConvertible {
-    /** Creates a new `JSPromise` instance from a given `executor` closure. `resolver` takes 
+    /** Creates a new `JSPromise` instance from a given `resolver` closure. `resolver` takes 
     two closure that your code should call to either resolve or reject this `JSPromise` instance.
     */
     public convenience init(resolver: @escaping (@escaping (Result<Success, JSError>) -> ()) -> ()) {
@@ -114,7 +114,7 @@ extension JSPromise where Failure: JSValueConvertible {
 }
 
 extension JSPromise where Success: JSValueConvertible, Failure: JSError {
-    /** Creates a new `JSPromise` instance from a given `executor` closure. `executor` takes 
+    /** Creates a new `JSPromise` instance from a given `resolver` closure. `resolver` takes 
     a closure that your code should call to either resolve or reject this `JSPromise` instance.
     */
     public convenience init(resolver: @escaping (@escaping (Result<Success, JSError>) -> ()) -> ()) {
