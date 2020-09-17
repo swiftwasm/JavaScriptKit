@@ -91,9 +91,3 @@ extension UInt64: JSValueConstructible {
         value.number.map(Self.init)
     }
 }
-
-extension Never: JSValueConstructible {
-    public static func construct(from value: JSValue) -> Never? {
-        fatalError()
-    }
-}
