@@ -479,8 +479,7 @@ try test("Promise") {
     }
 
     promise!.then {
-        // verify that at least `timeoutMilliseconds` passed since the `timer` 
-        // timer started
+        // verify that at least `timeoutMilliseconds` passed since the timer started
         try! expectEqual(start + timeoutMilliseconds <= JSDate().valueOf(), true)
     }
 }
