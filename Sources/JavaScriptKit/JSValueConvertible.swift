@@ -77,7 +77,8 @@ extension JSObject: JSValueCodable {
     // from `JSFunction`
 }
 
-private let Object = JSObject.global.Object.function!
+private let objectConstructor = JSObject.global.Object.function!
+private let arrayConstructor = JSObject.global.Array.function!
 
 extension Dictionary where Value: JSValueConvertible, Key == String {
     public func jsValue() -> JSValue {
@@ -87,7 +88,7 @@ extension Dictionary where Value: JSValueConvertible, Key == String {
 
 extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key == String {
     public func jsValue() -> JSValue {
-        let object = Object.new()
+        let object = objectConstructor.new()
         for (key, value) in self {
             object[key] = value.jsValue()
         }
@@ -95,12 +96,11 @@ extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key 
     }
 }
 
-private let NativeJSArray = JSObject.global.Array.function!
 extension Dictionary: JSValueConstructible where Value: JSValueConstructible, Key == String {
     public static func construct(from value: JSValue) -> Self? {
         guard
             let objectRef = value.object,
-            let keys: [String] = Object.keys!(objectRef.jsValue()).fromJSValue()
+            let keys: [String] = objectConstructor.keys!(objectRef.jsValue()).fromJSValue()
         else { return nil }
 
         var entries = [(String, Value)]()
@@ -143,7 +143,7 @@ extension Array where Element: JSValueConvertible {
 
 extension Array: JSValueConvertible where Element == JSValueConvertible {
     public func jsValue() -> JSValue {
-        let array = NativeJSArray.new(count)
+        let array = arrayConstructor.new(count)
         for (index, element) in enumerated() {
             array[index] = element.jsValue()
         }
