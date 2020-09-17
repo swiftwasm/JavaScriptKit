@@ -8,7 +8,7 @@ public protocol TypedArrayElement: JSValueConvertible, JSValueConstructible {
     static var typedArrayClass: JSFunction { get }
 }
 
-/// A wrapper around [the JavaScript TypedArray class](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
+/// A wrapper around [the JavaScript TypedArray class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
 /// that exposes its properties in a type-safe and Swifty way.
 public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLiteral where Element: TypedArrayElement {
     let ref: JSObject

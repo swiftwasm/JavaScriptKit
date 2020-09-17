@@ -465,6 +465,26 @@ try test("Timer") {
     }
 }
 
+var timer: JSTimer?
+var promise: JSPromise<(), Never>?
+
+try test("Promise") {
+    let start = JSDate().valueOf()
+    let timeoutMilliseconds = 5.0
+
+    promise = JSPromise { resolve in
+        timer = JSTimer(millisecondsDelay: timeoutMilliseconds) {
+            resolve()
+        }
+    }
+
+    promise!.then {
+        // verify that at least `timeoutMilliseconds` passed since the `timer` 
+        // timer started
+        try! expectEqual(start + timeoutMilliseconds <= JSDate().valueOf(), true)
+    }
+}
+
 try test("Error") {
     let message = "test error"
     let error = JSError(message: message)

@@ -1,4 +1,4 @@
-/** A wrapper around [the JavaScript `Promise` class](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+/** A wrapper around [the JavaScript `Promise` class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 that exposes its functions in a type-safe and Swifty way. The `JSPromise` API is generic over both
 `Success` and `Failure` types, which improves compatibility with other statically-typed APIs such
 as Combine. If you don't know the exact type of your `Success` value, you should use `JSValue`, e.g.
@@ -8,9 +8,15 @@ is of actual JavaScript `Error` type, you should use `JSPromise<JSValue, JSValue
 This doesn't 100% match the JavaScript API, as `then` overload with two callbacks is not available.
 It's impossible to unify success and failure types from both callbacks in a single returned promise
 without type erasure. You should chain `then` and `catch` in those cases to avoid type erasure.
+
+**IMPORTANT**: instances of this class must have the same lifetime as the actual `Promise` object in
+the JavaScript environment, because callback handlers will be deallocated when `JSPromise.deinit` is
+executed.
+
+If the actual `Promise` object in JavaScript environment lives longer than this `JSPromise`, it may
+attempt to call a deallocated `JSClosure`.
 */
-public final class JSPromise<Success, Failure>: JSValueConvertible, JSValueConstructible
-where Success: JSValueConstructible, Failure: JSValueConstructible {
+public final class JSPromise<Success, Failure>: JSValueConvertible, JSValueConstructible {
     /// The underlying JavaScript `Promise` object.
     public let jsObject: JSObject
 
@@ -45,78 +51,14 @@ where Success: JSValueConstructible, Failure: JSValueConstructible {
 
     /** Schedules the `success` closure to be invoked on sucessful completion of `self`.
     */
-    public func then(success: @escaping (Success) -> ()) {
-        let closure = JSClosure {
-            success(Success.construct(from: $0[0])!)
-        }
+    public func then(
+        success: @escaping () -> (),
+        file: StaticString = #file,
+        line: Int = #line
+    ) {
+        let closure = JSClosure { _ in success() }
         callbacks.append(closure)
-        jsObject.then.function!(closure)
-    }
-
-    /** Returns a new promise created from chaining the current `self` promise with the `success`
-    closure invoked on sucessful completion of `self`. The returned promise will have a new 
-    `Success` type equal to the return type of `success`.
-    */
-    public func then<ResultType: JSValueConvertible>(
-        success: @escaping (Success) -> ResultType
-    ) -> JSPromise<ResultType, Failure> {
-        let closure = JSClosure {
-            success(Success.construct(from: $0[0])!).jsValue()
-        }
-        callbacks.append(closure)
-        return .init(unsafe: jsObject.then.function!(closure).object!)
-    }
-
-    /** Returns a new promise created from chaining the current `self` promise with the `success`
-    closure invoked on sucessful completion of `self`. The returned promise will have a new type
-    equal to the return type of `success`.
-    */
-    public func then<ResultSuccess: JSValueConvertible, ResultFailure: JSValueConstructible>(
-        success: @escaping (Success) -> JSPromise<ResultSuccess, ResultFailure>
-    ) -> JSPromise<ResultSuccess, ResultFailure> {
-        let closure = JSClosure {
-            success(Success.construct(from: $0[0])!).jsValue()
-        }
-        callbacks.append(closure)
-        return .init(unsafe: jsObject.then.function!(closure).object!)
-    }
-
-    /** Schedules the `failure` closure to be invoked on rejected completion of `self`.
-    */
-    public func `catch`(failure: @escaping (Failure) -> ()) {
-        let closure = JSClosure {
-            failure(Failure.construct(from: $0[0])!)
-        }
-        callbacks.append(closure)
-        jsObject.then.function!(JSValue.undefined, closure)
-    }
-
-    /** Returns a new promise created from chaining the current `self` promise with the `failure`
-    closure invoked on rejected completion of `self`. The returned promise will have a new `Success`
-    type equal to the return type of the callback.
-    */
-    public func `catch`<ResultSuccess: JSValueConvertible>(
-        failure: @escaping (Failure) -> ResultSuccess
-    ) -> JSPromise<ResultSuccess, Never> {
-        let closure = JSClosure {
-            failure(Failure.construct(from: $0[0])!).jsValue()
-        }
-        callbacks.append(closure)
-        return .init(unsafe: jsObject.then.function!(JSValue.undefined, closure).object!)
-    }
-
-    /** Returns a new promise created from chaining the current `self` promise with the `failure`
-    closure invoked on rejected completion of `self`.  The returned promise will have a new type
-    equal to the return type of `success`.
-    */
-    public func `catch`<ResultSuccess: JSValueConvertible, ResultFailure: JSValueConstructible>(
-        failure: @escaping (Failure) -> JSPromise<ResultSuccess, ResultFailure>
-    ) -> JSPromise<ResultSuccess, ResultFailure> {
-        let closure = JSClosure {
-            failure(Failure.construct(from: $0[0])!).jsValue()
-        }
-        callbacks.append(closure)
-        return .init(unsafe: jsObject.then.function!(JSValue.undefined, closure).object!)
+        _ = jsObject.then!(closure)
     }
 
     /** Schedules the `failure` closure to be invoked on either successful or rejected completion of 
@@ -127,10 +69,189 @@ where Success: JSValueConstructible, Failure: JSValueConstructible {
             successOrFailure()
         }
         callbacks.append(closure)
-        return .init(unsafe: jsObject.finally.function!(closure).object!)
+        return .init(unsafe: jsObject.finally!(closure).object!)
     }
 
     deinit {
         callbacks.forEach { $0.release() }
+    }
+}
+
+extension JSPromise where Success == (), Failure == Never {
+    /** Creates a new `JSPromise` instance from a given `resolver` closure. `resolver` takes 
+    a closure that your code should call to resolve this `JSPromise` instance.
+    */
+    public convenience init(resolver: @escaping (@escaping () -> ()) -> ()) {
+        let closure = JSClosure { arguments -> () in
+            // The arguments are always coming from the `Promise` constructor, so we should be
+            // safe to assume their type here
+            resolver { arguments[0].function!() }
+        }
+        self.init(unsafe: JSObject.global.Promise.function!.new(closure))
+        callbacks.append(closure)
+    }
+}
+
+extension JSPromise where Failure: JSValueConvertible {
+    /** Creates a new `JSPromise` instance from a given `executor` closure. `resolver` takes 
+    two closure that your code should call to either resolve or reject this `JSPromise` instance.
+    */
+    public convenience init(resolver: @escaping (@escaping (Result<Success, JSError>) -> ()) -> ()) {
+        let closure = JSClosure { arguments -> () in
+            // The arguments are always coming from the `Promise` constructor, so we should be
+            // safe to assume their type here
+            let resolve = arguments[0].function!
+            let reject = arguments[1].function!
+
+            resolver {
+                switch $0 {
+                case .success:
+                    resolve()
+                case let .failure(error):
+                    reject(error.jsValue())
+                }
+            }
+        }
+        self.init(unsafe: JSObject.global.Promise.function!.new(closure))
+        callbacks.append(closure)
+    }
+}
+
+extension JSPromise where Success: JSValueConstructible {
+    /** Schedules the `success` closure to be invoked on sucessful completion of `self`.
+    */
+    public func then(
+        success: @escaping (Success) -> (),
+        file: StaticString = #file,
+        line: Int = #line
+    ) {
+        let closure = JSClosure { arguments -> () in
+            guard let result = Success.construct(from: arguments[0]) else {
+                fatalError("\(file):\(line): failed to unwrap success value for `then` callback")
+            }
+            success(result)
+        }
+        callbacks.append(closure)
+        _ = jsObject.then!(closure)
+    }
+
+    /** Returns a new promise created from chaining the current `self` promise with the `success`
+    closure invoked on sucessful completion of `self`. The returned promise will have a new 
+    `Success` type equal to the return type of `success`.
+    */
+    public func then<ResultType: JSValueConvertible>(
+        success: @escaping (Success) -> ResultType,
+        file: StaticString = #file,
+        line: Int = #line
+    ) -> JSPromise<ResultType, Failure> {
+        let closure = JSClosure { arguments -> JSValue in
+            guard let result = Success.construct(from: arguments[0]) else {
+                fatalError("\(file):\(line): failed to unwrap success value for `then` callback")
+            }
+            return success(result).jsValue()
+        }
+        callbacks.append(closure)
+        return .init(unsafe: jsObject.then!(closure).object!)
+    }
+
+    /** Returns a new promise created from chaining the current `self` promise with the `success`
+    closure invoked on sucessful completion of `self`. The returned promise will have a new type
+    equal to the return type of `success`.
+    */
+    public func then<ResultSuccess: JSValueConvertible, ResultFailure: JSValueConstructible>(
+        success: @escaping (Success) -> JSPromise<ResultSuccess, ResultFailure>,
+        file: StaticString = #file,
+        line: Int = #line
+    ) -> JSPromise<ResultSuccess, ResultFailure> {
+        let closure = JSClosure { arguments -> JSValue in
+            guard let result = Success.construct(from: arguments[0]) else {
+                fatalError("\(file):\(line): failed to unwrap success value for `then` callback")
+            }
+            return success(result).jsValue()
+        }
+        callbacks.append(closure)
+        return .init(unsafe: jsObject.then!(closure).object!)
+    }
+}
+
+extension JSPromise where Failure: JSValueConstructible {
+    /** Returns a new promise created from chaining the current `self` promise with the `failure`
+    closure invoked on rejected completion of `self`. The returned promise will have a new `Success`
+    type equal to the return type of the callback, while the `Failure` type becomes `Never`.
+    */
+    public func `catch`<ResultSuccess: JSValueConvertible>(
+        failure: @escaping (Failure) -> ResultSuccess,
+        file: StaticString = #file,
+        line: Int = #line
+    ) -> JSPromise<ResultSuccess, Never> {
+        let closure = JSClosure { arguments -> JSValue in
+            guard let error = Failure.construct(from: arguments[0]) else {
+                fatalError("\(file):\(line): failed to unwrap error value for `catch` callback")
+            }
+            return failure(error).jsValue()
+        }
+        callbacks.append(closure)
+        return .init(unsafe: jsObject.then!(JSValue.undefined, closure).object!)
+    }
+
+    /** Schedules the `failure` closure to be invoked on rejected completion of `self`.
+    */
+    public func `catch`(
+        failure: @escaping (Failure) -> (),
+        file: StaticString = #file,
+        line: Int = #line
+    ) {
+        let closure = JSClosure { arguments -> () in
+            guard let error = Failure.construct(from: arguments[0]) else {
+                fatalError("\(file):\(line): failed to unwrap error value for `catch` callback")
+            }
+            failure(error)
+        }
+        callbacks.append(closure)
+        _ = jsObject.then!(JSValue.undefined, closure)
+    }
+
+    /** Returns a new promise created from chaining the current `self` promise with the `failure`
+    closure invoked on rejected completion of `self`.  The returned promise will have a new type
+    equal to the return type of `success`.
+    */
+    public func `catch`<ResultSuccess: JSValueConvertible, ResultFailure: JSValueConstructible>(
+        failure: @escaping (Failure) -> JSPromise<ResultSuccess, ResultFailure>,
+        file: StaticString = #file,
+        line: Int = #line
+    ) -> JSPromise<ResultSuccess, ResultFailure> {
+        let closure = JSClosure { arguments -> JSValue in
+            guard let error = Failure.construct(from: arguments[0]) else {
+                fatalError("\(file):\(line): failed to unwrap error value for `catch` callback")
+            }
+            return failure(error).jsValue()
+        }
+        callbacks.append(closure)
+        return .init(unsafe: jsObject.then!(JSValue.undefined, closure).object!)
+    }
+}
+
+extension JSPromise where Success: JSValueConvertible, Failure: JSError {
+    /** Creates a new `JSPromise` instance from a given `executor` closure. `executor` takes 
+    a closure that your code should call to either resolve or reject this `JSPromise` instance.
+    */
+    public convenience init(resolver: @escaping (@escaping (Result<Success, JSError>) -> ()) -> ()) {
+        let closure = JSClosure { arguments -> () in
+            // The arguments are always coming from the `Promise` constructor, so we should be
+            // safe to assume their type here
+            let resolve = arguments[0].function!
+            let reject = arguments[1].function!
+
+            resolver {
+                switch $0 {
+                case let .success(success):
+                    resolve(success.jsValue())
+                case let .failure(error):
+                    reject(error.jsValue())
+                }
+            }
+        }
+        self.init(unsafe: JSObject.global.Promise.function!.new(closure))
+        callbacks.append(closure)
     }
 }
