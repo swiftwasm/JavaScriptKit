@@ -69,9 +69,9 @@ public class JSObject: Equatable {
         set { setJSValue(this: self, index: Int32(index), value: newValue) }
     }
 
-    /// Return `true` if this object is an instance of the `constructor`. Return `false`, if not.
+  /// Return `true` if this value is an instance of the passed `constructor` function.
     /// - Parameter constructor: The constructor function to check.
-    /// - Returns: The result of `instanceof` in JavaScript environment.
+    /// - Returns: The result of `instanceof` in the JavaScript environment.
     public func isInstanceOf(_ constructor: JSFunction) -> Bool {
         _instanceof(id, constructor.id)
     }

@@ -155,16 +155,18 @@ public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
 }
 
 extension JSValue {
+  /// Return `true` if this value is an instance of the passed `constructor` function.
+  /// Returns `false` for everything except objects and functions.
+  /// - Parameter constructor: The constructor function to check.
+  /// - Returns: The result of `instanceof` in the JavaScript environment.
     public func isInstanceOf(_ constructor: JSFunction) -> Bool {
         switch self {
-        case .boolean, .string, .number:
+        case .boolean, .string, .number, .null, .undefined:
             return false
         case let .object(ref):
             return ref.isInstanceOf(constructor)
         case let .function(ref):
             return ref.isInstanceOf(constructor)
-        case .null, .undefined:
-            fatalError()
         }
     }
 }
