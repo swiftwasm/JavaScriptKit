@@ -51,11 +51,7 @@ public final class JSPromise<Success, Failure>: JSValueConvertible, JSValueConst
 
     /** Schedules the `success` closure to be invoked on sucessful completion of `self`.
     */
-    public func then(
-        success: @escaping () -> (),
-        file: StaticString = #file,
-        line: Int = #line
-    ) {
+    public func then(success: @escaping () -> ()) {
         let closure = JSClosure { _ in success() }
         callbacks.append(closure)
         _ = jsObject.then!(closure)
@@ -107,6 +103,31 @@ extension JSPromise where Failure: JSValueConvertible {
                 switch $0 {
                 case .success:
                     resolve()
+                case let .failure(error):
+                    reject(error.jsValue())
+                }
+            }
+        }
+        self.init(unsafe: JSObject.global.Promise.function!.new(closure))
+        callbacks.append(closure)
+    }
+}
+
+extension JSPromise where Success: JSValueConvertible, Failure: JSError {
+    /** Creates a new `JSPromise` instance from a given `executor` closure. `executor` takes 
+    a closure that your code should call to either resolve or reject this `JSPromise` instance.
+    */
+    public convenience init(resolver: @escaping (@escaping (Result<Success, JSError>) -> ()) -> ()) {
+        let closure = JSClosure { arguments -> () in
+            // The arguments are always coming from the `Promise` constructor, so we should be
+            // safe to assume their type here
+            let resolve = arguments[0].function!
+            let reject = arguments[1].function!
+
+            resolver {
+                switch $0 {
+                case let .success(success):
+                    resolve(success.jsValue())
                 case let .failure(error):
                     reject(error.jsValue())
                 }
@@ -228,30 +249,5 @@ extension JSPromise where Failure: JSValueConstructible {
         }
         callbacks.append(closure)
         return .init(unsafe: jsObject.then!(JSValue.undefined, closure).object!)
-    }
-}
-
-extension JSPromise where Success: JSValueConvertible, Failure: JSError {
-    /** Creates a new `JSPromise` instance from a given `executor` closure. `executor` takes 
-    a closure that your code should call to either resolve or reject this `JSPromise` instance.
-    */
-    public convenience init(resolver: @escaping (@escaping (Result<Success, JSError>) -> ()) -> ()) {
-        let closure = JSClosure { arguments -> () in
-            // The arguments are always coming from the `Promise` constructor, so we should be
-            // safe to assume their type here
-            let resolve = arguments[0].function!
-            let reject = arguments[1].function!
-
-            resolver {
-                switch $0 {
-                case let .success(success):
-                    resolve(success.jsValue())
-                case let .failure(error):
-                    reject(error.jsValue())
-                }
-            }
-        }
-        self.init(unsafe: JSObject.global.Promise.function!.new(closure))
-        callbacks.append(closure)
     }
 }
