@@ -14,7 +14,7 @@ public final class JSError: Error, JSBridgedClass {
         jsObject = Self.constructor.new([message])
     }
 
-    public init(withCompatibleObject jsObject: JSObject) {
+    public init(unsafelyWrapping jsObject: JSObject) {
         self.jsObject = jsObject
     }
 

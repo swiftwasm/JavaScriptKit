@@ -29,13 +29,13 @@ public protocol JSBridgedClass: JSBridgedType {
 
     /// Create an instannce wrapping the given JavaScript object.
     /// You may assume that `jsObject instanceof Self.constructor`
-    init(withCompatibleObject jsObject: JSObject)
+    init(unsafelyWrapping jsObject: JSObject)
 }
 
 extension JSBridgedClass {
     public var value: JSValue { jsObject.jsValue() }
     public init?(from value: JSValue) {
         guard let object = value.object, object.isInstanceOf(Self.constructor) else { return nil }
-        self.init(withCompatibleObject: object)
+        self.init(unsafelyWrapping: object)
     }
 }

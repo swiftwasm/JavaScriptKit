@@ -20,10 +20,10 @@ public class JSArray: JSBridgedClass {
     /// - Parameter object: A `JSObject` expected to be a JavaScript Array
     public convenience init?(_ jsObject: JSObject) {
         guard Self.isArray(jsObject) else { return nil }
-        self.init(withCompatibleObject: jsObject)
+        self.init(unsafelyWrapping: jsObject)
     }
 
-    public required init(withCompatibleObject jsObject: JSObject) {
+    public required init(unsafelyWrapping jsObject: JSObject) {
         self.jsObject = jsObject
     }
 }

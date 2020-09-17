@@ -33,7 +33,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         jsObject = Element.typedArrayClass.new(length)
     }
 
-    required public init(withCompatibleObject jsObject: JSObject) {
+    required public init(unsafelyWrapping jsObject: JSObject) {
         self.jsObject = jsObject
     }
 
@@ -48,7 +48,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         array.withUnsafeBufferPointer { ptr in
             _create_typed_array(Element.typedArrayClass.id, ptr.baseAddress!, Int32(array.count), &resultObj)
         }
-        self.init(withCompatibleObject: JSObject(id: resultObj))
+        self.init(unsafelyWrapping: JSObject(id: resultObj))
     }
     
     /// Convenience initializer for `Sequence`.

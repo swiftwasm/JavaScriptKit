@@ -39,7 +39,7 @@ public final class JSDate: JSBridgedClass {
         jsObject = Self.constructor.new(year, monthIndex, day, hours, minutes, seconds, milliseconds)
     }
 
-    public init(withCompatibleObject jsObject: JSObject) {
+    public init(unsafelyWrapping jsObject: JSObject) {
         self.jsObject = jsObject
     }
 
