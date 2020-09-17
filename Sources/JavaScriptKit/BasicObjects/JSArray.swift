@@ -36,8 +36,8 @@ extension JSArray: RandomAccessCollection {
     }
 
     public class Iterator: IteratorProtocol {
-        let jsObject: JSObject
-        var index = 0
+        private let jsObject: JSObject
+        private var index = 0
         init(jsObject: JSObject) {
             self.jsObject = jsObject
         }

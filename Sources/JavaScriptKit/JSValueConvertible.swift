@@ -266,6 +266,6 @@ extension Array where Element == JSValueConvertible {
 
 extension Array where Element: JSValueConvertible {
     func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
-        Array<JSValueConvertible>.withRawJSValues(self)(body)
+        [JSValueConvertible].withRawJSValues(self)(body)
     }
 }

@@ -24,7 +24,7 @@ public protocol JSBridgedClass: JSBridgedType {
     static var constructor: JSFunction { get }
 
     /// The JavaScript object wrapped by this instance.
-    /// You may assume that `jsObject instanceof Self.constructor`
+    /// You may assume that `jsObject instanceof Self.constructor == true`
     var jsObject: JSObject { get }
 
     /// Create an instannce wrapping the given JavaScript object.
