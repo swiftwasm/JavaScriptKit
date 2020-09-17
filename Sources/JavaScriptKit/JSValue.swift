@@ -124,6 +124,12 @@ extension JSValue: ExpressibleByFloatLiteral {
     }
 }
 
+extension JSValue: ExpressibleByNilLiteral {
+    public init(nilLiteral: ()) {
+        self = .null
+    }
+}
+
 public func getJSValue(this: JSObject, name: String) -> JSValue {
     var rawValue = RawJSValue()
     _get_prop(this.id, name, Int32(name.count),
