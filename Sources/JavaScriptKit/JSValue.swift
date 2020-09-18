@@ -3,7 +3,7 @@ import _CJavaScriptKit
 /// `JSValue` represents a value in JavaScript.
 public enum JSValue: Equatable {
     case boolean(Bool)
-    case string(String)
+    case string(JSString)
     case number(Double)
     case object(JSObject)
     case null
@@ -21,7 +21,18 @@ public enum JSValue: Equatable {
 
     /// Returns the `String` value of this JS value if the type is string.
     /// If not, returns `nil`.
+    ///
+    /// Note that this accessor may copy the JS string value into Swift side memory.
+    ///
+    /// To avoid the copying, please consider the `jsString` instead.
     public var string: String? {
+        jsString.map(String.init)
+    }
+
+    /// Returns the `JSString` value of this JS value if the type is string.
+    /// If not, returns `nil`.
+    ///
+    public var jsString: JSString? {
         switch self {
         case let .string(string): return string
         default: return nil
@@ -76,6 +87,10 @@ extension JSValue {
 
 extension JSValue {
 
+    public static func string(_ value: String) -> JSValue {
+        .string(JSString(value))
+    }
+
     /// Deprecated: Please create `JSClosure` directly and manage its lifetime manually.
     ///
     /// Migrate this usage
@@ -108,7 +123,7 @@ extension JSValue {
 
 extension JSValue: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
-        self = .string(value)
+        self = .string(JSString(value))
     }
 }
 
@@ -130,17 +145,17 @@ extension JSValue: ExpressibleByNilLiteral {
     }
 }
 
-public func getJSValue(this: JSObject, name: String) -> JSValue {
+public func getJSValue(this: JSObject, name: JSString) -> JSValue {
     var rawValue = RawJSValue()
-    _get_prop(this.id, name, Int32(name.count),
+    _get_prop(this.id, name.asInternalJSRef(),
               &rawValue.kind,
               &rawValue.payload1, &rawValue.payload2, &rawValue.payload3)
     return rawValue.jsValue()
 }
 
-public func setJSValue(this: JSObject, name: String, value: JSValue) {
+public func setJSValue(this: JSObject, name: JSString, value: JSValue) {
     value.withRawJSValue { rawValue in
-        _set_prop(this.id, name, Int32(name.count), rawValue.kind, rawValue.payload1, rawValue.payload2, rawValue.payload3)
+        _set_prop(this.id, name.asInternalJSRef(), rawValue.kind, rawValue.payload1, rawValue.payload2, rawValue.payload3)
     }
 }
 
@@ -183,7 +198,7 @@ extension JSValue: CustomStringConvertible {
         case let .boolean(boolean):
             return boolean.description
         case .string(let string):
-            return string
+            return string.description
         case .number(let number):
             return number.description
         case .object(let object), .function(let object as JSObject):

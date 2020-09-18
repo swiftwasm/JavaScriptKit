@@ -79,7 +79,7 @@ func expectNumber(_ value: JSValue, file: StaticString = #file, line: UInt = #li
 
 func expectString(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> String {
     switch value {
-    case let .string(string): return string
+    case let .string(string): return String(string)
     default:
         throw MessageError("Type of \(value) should be \"string\"", file: file, line: line, column: column)
     }

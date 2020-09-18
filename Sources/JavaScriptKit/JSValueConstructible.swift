@@ -91,3 +91,9 @@ extension UInt64: JSValueConstructible {
         value.number.map(Self.init)
     }
 }
+
+extension JSString: JSValueConstructible {
+    public static func construct(from value: JSValue) -> JSString? {
+        value.jsString
+    }
+}

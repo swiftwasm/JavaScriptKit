@@ -37,7 +37,7 @@ extension Double: JSValueConvertible {
 }
 
 extension String: JSValueConvertible {
-    public func jsValue() -> JSValue { .string(self) }
+    public func jsValue() -> JSValue { .string(JSString(self)) }
 }
 
 extension UInt8: JSValueConvertible {
@@ -70,6 +70,10 @@ extension Int32: JSValueConvertible {
 
 extension Int64: JSValueConvertible {
     public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension JSString: JSValueConvertible {
+    public func jsValue() -> JSValue { .string(self) }
 }
 
 extension JSObject: JSValueCodable {
@@ -181,13 +185,7 @@ extension RawJSValue: JSValueConvertible {
         case .number:
             return .number(payload3)
         case .string:
-            // +1 for null terminator
-            let buffer = malloc(Int(payload2 + 1))!.assumingMemoryBound(to: UInt8.self)
-            defer { free(buffer) }
-            _load_string(JavaScriptObjectRef(payload1), buffer)
-            buffer[Int(payload2)] = 0
-            let string = String(decodingCString: UnsafePointer(buffer), as: UTF8.self)
-            return .string(string)
+            return .string(JSString(jsRef: payload1))
         case .object:
             return .object(JSObject(id: UInt32(payload1)))
         case .null:
@@ -218,13 +216,8 @@ extension JSValue {
             payload1 = 0
             payload2 = 0
             payload3 = numberValue
-        case var .string(stringValue):
-            kind = .string
-            return stringValue.withUTF8 { bufferPtr in
-                let ptrValue = UInt32(UInt(bitPattern: bufferPtr.baseAddress!))
-                let rawValue = RawJSValue(kind: kind, payload1: JavaScriptPayload1(ptrValue), payload2: JavaScriptPayload2(bufferPtr.count), payload3: 0)
-                return body(rawValue)
-            }
+        case let .string(string):
+            return string.withRawJSValue(body)
         case let .object(ref):
             kind = .object
             payload1 = JavaScriptPayload1(ref.id)

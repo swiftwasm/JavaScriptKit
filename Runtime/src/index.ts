@@ -117,7 +117,7 @@ class SwiftRuntimeHeap {
 export class SwiftRuntime {
     private instance: WebAssembly.Instance | null;
     private heap: SwiftRuntimeHeap
-    private version: number = 610
+    private version: number = 611
 
     constructor() {
         this.instance = null;
@@ -163,9 +163,8 @@ export class SwiftRuntime {
         const textDecoder = new TextDecoder('utf-8');
         const textEncoder = new TextEncoder(); // Only support utf-8
 
-        const readString = (ptr: pointer, len: number) => {
-            const uint8Memory = new Uint8Array(memory().buffer);
-            return textDecoder.decode(uint8Memory.subarray(ptr, ptr + len));
+        const readString = (ref: ref) => {
+            return this.heap.referenceHeap(ref);
         }
 
         const writeString = (ptr: pointer, bytes: Uint8Array) => {
@@ -217,7 +216,7 @@ export class SwiftRuntime {
                     return payload3;
                 }
                 case JavaScriptValueKind.String: {
-                    return readString(payload1, payload2)
+                    return readString(payload1);
                 }
                 case JavaScriptValueKind.Object: {
                     return this.heap.referenceHeap(payload1)
@@ -261,10 +260,9 @@ export class SwiftRuntime {
                     break;
                 }
                 case "string": {
-                    const bytes = textEncoder.encode(value);
                     writeUint32(kind_ptr, JavaScriptValueKind.String);
-                    writeUint32(payload1_ptr, this.heap.retain(bytes));
-                    writeUint32(payload2_ptr, bytes.length);
+                    writeUint32(payload1_ptr, this.heap.retain(value));
+                    writeUint32(payload2_ptr, 0);
                     break;
                 }
                 case "undefined": {
@@ -308,20 +306,20 @@ export class SwiftRuntime {
 
         return {
             swjs_set_prop: (
-                ref: ref, name: pointer, length: number,
+                ref: ref, name: ref,
                 kind: JavaScriptValueKind,
                 payload1: number, payload2: number, payload3: number
             ) => {
                 const obj = this.heap.referenceHeap(ref);
-                Reflect.set(obj, readString(name, length), decodeValue(kind, payload1, payload2, payload3))
+                Reflect.set(obj, readString(name), decodeValue(kind, payload1, payload2, payload3))
             },
             swjs_get_prop: (
-                ref: ref, name: pointer, length: number,
+                ref: ref, name: ref,
                 kind_ptr: pointer,
                 payload1_ptr: pointer, payload2_ptr: pointer, payload3_ptr: number
             ) => {
                 const obj = this.heap.referenceHeap(ref);
-                const result = Reflect.get(obj, readString(name, length));
+                const result = Reflect.get(obj, readString(name));
                 writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, payload3_ptr);
             },
             swjs_set_subscript: (
@@ -340,6 +338,18 @@ export class SwiftRuntime {
                 const obj = this.heap.referenceHeap(ref);
                 const result = Reflect.get(obj, index);
                 writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, payload3_ptr);
+            },
+            swjs_encode_string: (ref: ref, bytes_ptr_result: pointer) => {
+                const bytes = textEncoder.encode(this.heap.referenceHeap(ref));
+                const bytes_ptr = this.heap.retain(bytes);
+                writeUint32(bytes_ptr_result, bytes_ptr);
+                return bytes.length;
+            },
+            swjs_decode_string: (bytes_ptr: pointer, length: number) => {
+                const uint8Memory = new Uint8Array(memory().buffer);
+                const bytes = uint8Memory.subarray(bytes_ptr, bytes_ptr + length);
+                const string = textDecoder.decode(bytes);
+                return this.heap.retain(string);
             },
             swjs_load_string: (ref: ref, buffer: pointer) => {
                 const bytes = this.heap.referenceHeap(ref);

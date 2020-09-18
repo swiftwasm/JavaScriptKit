@@ -8,7 +8,7 @@ import _CJavaScriptKit
 #if !arch(wasm32)
     func _set_prop(
         _: JavaScriptObjectRef,
-        _: UnsafePointer<Int8>!, _: Int32,
+        _: JavaScriptObjectRef,
         _: JavaScriptValueKind,
         _: JavaScriptPayload1,
         _: JavaScriptPayload2,
@@ -16,7 +16,7 @@ import _CJavaScriptKit
     ) { fatalError() }
     func _get_prop(
         _: JavaScriptObjectRef,
-        _: UnsafePointer<Int8>!, _: Int32,
+        _: JavaScriptObjectRef,
         _: UnsafeMutablePointer<JavaScriptValueKind>!,
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!,
@@ -38,6 +38,14 @@ import _CJavaScriptKit
         _: UnsafeMutablePointer<JavaScriptPayload2>!,
         _: UnsafeMutablePointer<JavaScriptPayload3>!
     ) { fatalError() }
+    func _encode_string(
+        _: JavaScriptObjectRef,
+        _: UnsafeMutablePointer<JavaScriptObjectRef>!
+    ) -> Int32 { fatalError() }
+    func _decode_string(
+        _: UnsafePointer<UInt8>!,
+        _: Int32
+    ) -> JavaScriptObjectRef { fatalError() }
     func _load_string(
         _: JavaScriptObjectRef,
         _: UnsafeMutablePointer<UInt8>!
