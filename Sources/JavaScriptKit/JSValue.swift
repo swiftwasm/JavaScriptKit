@@ -3,7 +3,7 @@ import _CJavaScriptKit
 /// `JSValue` represents a value in JavaScript.
 public enum JSValue: Equatable {
     case boolean(Bool)
-    case string(String)
+    case string(JSString)
     case number(Double)
     case object(JSObject)
     case null
@@ -21,7 +21,18 @@ public enum JSValue: Equatable {
 
     /// Returns the `String` value of this JS value if the type is string.
     /// If not, returns `nil`.
+    ///
+    /// Note that this accessor may copy the JS string value into Swift side memory.
+    ///
+    /// To avoid the copying, please consider the `jsString` instead.
     public var string: String? {
+        jsString.map(String.init)
+    }
+
+    /// Returns the `JSString` value of this JS value if the type is string.
+    /// If not, returns `nil`.
+    ///
+    public var jsString: JSString? {
         switch self {
         case let .string(string): return string
         default: return nil
@@ -57,15 +68,28 @@ public enum JSValue: Equatable {
 
     /// Returns the `true` if this JS value is null.
     /// If not, returns `false`.
-    public var isNull: Bool { return self == .null }
+    public var isNull: Bool {
+        return self == .null
+    }
 
     /// Returns the `true` if this JS value is undefined.
     /// If not, returns `false`.
-    public var isUndefined: Bool { return self == .undefined }
-
+    public var isUndefined: Bool {
+        return self == .undefined
+    }
 }
 
 extension JSValue {
+    public func fromJSValue<Type>() -> Type? where Type: JSValueConstructible {
+        return Type.construct(from: self)
+    }
+}
+
+extension JSValue {
+
+    public static func string(_ value: String) -> JSValue {
+        .string(JSString(value))
+    }
 
     /// Deprecated: Please create `JSClosure` directly and manage its lifetime manually.
     ///
@@ -99,12 +123,18 @@ extension JSValue {
 
 extension JSValue: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
-        self = .string(value)
+        self = .string(JSString(value))
     }
 }
 
 extension JSValue: ExpressibleByIntegerLiteral {
-    public init(integerLiteral value: Double) {
+    public init(integerLiteral value: Int32) {
+        self = .number(Double(value))
+    }
+}
+
+extension JSValue: ExpressibleByFloatLiteral {
+    public init(floatLiteral value: Double) {
         self = .number(value)
     }
 }
@@ -115,17 +145,17 @@ extension JSValue: ExpressibleByNilLiteral {
     }
 }
 
-public func getJSValue(this: JSObject, name: String) -> JSValue {
+public func getJSValue(this: JSObject, name: JSString) -> JSValue {
     var rawValue = RawJSValue()
-    _get_prop(this.id, name, Int32(name.count),
+    _get_prop(this.id, name.asInternalJSRef(),
               &rawValue.kind,
               &rawValue.payload1, &rawValue.payload2, &rawValue.payload3)
     return rawValue.jsValue()
 }
 
-public func setJSValue(this: JSObject, name: String, value: JSValue) {
+public func setJSValue(this: JSObject, name: JSString, value: JSValue) {
     value.withRawJSValue { rawValue in
-        _set_prop(this.id, name, Int32(name.count), rawValue.kind, rawValue.payload1, rawValue.payload2, rawValue.payload3)
+        _set_prop(this.id, name.asInternalJSRef(), rawValue.kind, rawValue.payload1, rawValue.payload2, rawValue.payload3)
     }
 }
 
@@ -142,5 +172,41 @@ public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
         _set_subscript(this.id, index,
                        rawValue.kind,
                        rawValue.payload1, rawValue.payload2, rawValue.payload3)
+    }
+}
+
+extension JSValue {
+  /// Return `true` if this value is an instance of the passed `constructor` function.
+  /// Returns `false` for everything except objects and functions.
+  /// - Parameter constructor: The constructor function to check.
+  /// - Returns: The result of `instanceof` in the JavaScript environment.
+    public func isInstanceOf(_ constructor: JSFunction) -> Bool {
+        switch self {
+        case .boolean, .string, .number, .null, .undefined:
+            return false
+        case let .object(ref):
+            return ref.isInstanceOf(constructor)
+        case let .function(ref):
+            return ref.isInstanceOf(constructor)
+        }
+    }
+}
+
+extension JSValue: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case let .boolean(boolean):
+            return boolean.description
+        case .string(let string):
+            return string.description
+        case .number(let number):
+            return number.description
+        case .object(let object), .function(let object as JSObject):
+            return object.toString!().fromJSValue()!
+        case .null:
+            return "null"
+        case .undefined:
+            return "undefined"
+        }
     }
 }

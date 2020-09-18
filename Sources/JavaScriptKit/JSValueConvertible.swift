@@ -1,12 +1,18 @@
 import _CJavaScriptKit
 
-/// Confirming types are convertible to `JSValue`.
+/// Objects that can be converted to a JavaScript value, preferably in a lossless manner.
 public protocol JSValueConvertible {
-    /// Convert this object into a `JSValue`.
+    /// Create a JSValue that represents this object
     func jsValue() -> JSValue
 }
 
-extension JSValue: JSValueConvertible {
+public typealias JSValueCodable = JSValueConvertible & JSValueConstructible
+
+extension JSValue: JSValueCodable {
+    public static func construct(from value: JSValue) -> Self? {
+        return value
+    }
+
     public func jsValue() -> JSValue { self }
 }
 
@@ -15,6 +21,38 @@ extension Bool: JSValueConvertible {
 }
 
 extension Int: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension UInt: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension Float: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension Double: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(self) }
+}
+
+extension String: JSValueConvertible {
+    public func jsValue() -> JSValue { .string(JSString(self)) }
+}
+
+extension UInt8: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension UInt16: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension UInt32: JSValueConvertible {
+    public func jsValue() -> JSValue { .number(Double(self)) }
+}
+
+extension UInt64: JSValueConvertible {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
@@ -30,40 +68,21 @@ extension Int32: JSValueConvertible {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
-extension UInt: JSValueConvertible {
+extension Int64: JSValueConvertible {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
-extension UInt8: JSValueConvertible {
-    public func jsValue() -> JSValue { .number(Double(self)) }
-}
-
-extension UInt16: JSValueConvertible {
-    public func jsValue() -> JSValue { .number(Double(self)) }
-}
-
-extension UInt32: JSValueConvertible {
-  public func jsValue() -> JSValue { .number(Double(self)) }
-}
-
-extension Float: JSValueConvertible {
-    public func jsValue() -> JSValue { .number(Double(self)) }
-}
-
-extension Double: JSValueConvertible {
-    public func jsValue() -> JSValue { .number(self) }
-}
-
-extension String: JSValueConvertible {
+extension JSString: JSValueConvertible {
     public func jsValue() -> JSValue { .string(self) }
 }
 
-extension JSObject: JSValueConvertible {
+extension JSObject: JSValueCodable {
     // `JSObject.jsValue` is defined in JSObject.swift to be able to overridden
     // from `JSFunction`
 }
 
-private let Object = JSObject.global.Object.function!
+private let objectConstructor = JSObject.global.Object.function!
+private let arrayConstructor = JSObject.global.Array.function!
 
 extension Dictionary where Value: JSValueConvertible, Key == String {
     public func jsValue() -> JSValue {
@@ -73,7 +92,7 @@ extension Dictionary where Value: JSValueConvertible, Key == String {
 
 extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key == String {
     public func jsValue() -> JSValue {
-        let object = Object.new()
+        let object = objectConstructor.new()
         for (key, value) in self {
             object[key] = value.jsValue()
         }
@@ -81,21 +100,78 @@ extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key 
     }
 }
 
-private let Array = JSObject.global.Array.function!
+extension Dictionary: JSValueConstructible where Value: JSValueConstructible, Key == String {
+    public static func construct(from value: JSValue) -> Self? {
+        guard
+            let objectRef = value.object,
+            let keys: [String] = objectConstructor.keys!(objectRef.jsValue()).fromJSValue()
+        else { return nil }
+
+        var entries = [(String, Value)]()
+        entries.reserveCapacity(keys.count)
+        for key in keys {
+            guard let value: Value = objectRef[key].fromJSValue() else {
+                return nil
+            }
+            entries.append((key, value))
+        }
+        return Dictionary(uniqueKeysWithValues: entries)
+    }
+}
+
+extension Optional: JSValueConstructible where Wrapped: JSValueConstructible {
+    public static func construct(from value: JSValue) -> Self? {
+        switch value {
+        case .null, .undefined:
+            return nil
+        default:
+            return Wrapped.construct(from: value)
+        }
+    }
+}
+
+extension Optional: JSValueConvertible where Wrapped: JSValueConvertible {
+    public func jsValue() -> JSValue {
+        switch self {
+        case .none: return .null
+        case let .some(wrapped): return wrapped.jsValue()
+        }
+    }
+}
 
 extension Array where Element: JSValueConvertible {
     public func jsValue() -> JSValue {
-        Swift.Array<JSValueConvertible>.jsValue(self)()
+        Array<JSValueConvertible>.jsValue(self)()
     }
 }
 
 extension Array: JSValueConvertible where Element == JSValueConvertible {
     public func jsValue() -> JSValue {
-        let array = Array.new(count)
+        let array = arrayConstructor.new(count)
         for (index, element) in enumerated() {
             array[index] = element.jsValue()
         }
         return .object(array)
+    }
+}
+
+extension Array: JSValueConstructible where Element: JSValueConstructible {
+    public static func construct(from value: JSValue) -> [Element]? {
+        guard
+            let objectRef = value.object,
+            objectRef.isInstanceOf(JSObject.global.Array.function!)
+        else { return nil }
+
+        let count: Int = objectRef.length.fromJSValue()!
+        var array = [Element]()
+        array.reserveCapacity(count)
+
+        for i in 0 ..< count {
+            guard let value: Element = objectRef[i].fromJSValue() else { return nil }
+            array.append(value)
+        }
+
+        return array
     }
 }
 
@@ -109,13 +185,7 @@ extension RawJSValue: JSValueConvertible {
         case .number:
             return .number(payload3)
         case .string:
-            // +1 for null terminator
-            let buffer = malloc(Int(payload2 + 1))!.assumingMemoryBound(to: UInt8.self)
-            defer { free(buffer) }
-            _load_string(JavaScriptObjectRef(payload1), buffer)
-            buffer[Int(payload2)] = 0
-            let string = String(decodingCString: UnsafePointer(buffer), as: UTF8.self)
-            return .string(string)
+            return .string(JSString(jsRef: payload1))
         case .object:
             return .object(JSObject(id: UInt32(payload1)))
         case .null:
@@ -146,13 +216,8 @@ extension JSValue {
             payload1 = 0
             payload2 = 0
             payload3 = numberValue
-        case var .string(stringValue):
-            kind = .string
-            return stringValue.withUTF8 { bufferPtr in
-                let ptrValue = UInt32(UInt(bitPattern: bufferPtr.baseAddress!))
-                let rawValue = RawJSValue(kind: kind, payload1: JavaScriptPayload1(ptrValue), payload2: JavaScriptPayload2(bufferPtr.count), payload3: 0)
-                return body(rawValue)
-            }
+        case let .string(string):
+            return string.withRawJSValue(body)
         case let .object(ref):
             kind = .object
             payload1 = JavaScriptPayload1(ref.id)
@@ -194,6 +259,6 @@ extension Array where Element == JSValueConvertible {
 
 extension Array where Element: JSValueConvertible {
     func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
-        Swift.Array<JSValueConvertible>.withRawJSValues(self)(body)
+        [JSValueConvertible].withRawJSValues(self)(body)
     }
 }

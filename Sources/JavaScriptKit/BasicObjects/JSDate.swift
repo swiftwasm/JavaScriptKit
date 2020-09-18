@@ -6,9 +6,9 @@ in the naming. Parts of the JavaScript `Date` API that are not consistent across
 implementations are not exposed in a type-safe manner, you should access the underlying `jsObject`
 property if you need those.
 */
-public final class JSDate {
+public final class JSDate: JSBridgedClass {
     /// The constructor function used to create new `Date` objects.
-    private static let constructor = JSObject.global.Date.function!
+    public static let constructor = JSObject.global.Date.function!
 
     /// The underlying JavaScript `Date` object.
     public let jsObject: JSObject
@@ -37,6 +37,10 @@ public final class JSDate {
         milliseconds: Int = 0
     ) {
         jsObject = Self.constructor.new(year, monthIndex, day, hours, minutes, seconds, milliseconds)
+    }
+
+    public init(unsafelyWrapping jsObject: JSObject) {
+        self.jsObject = jsObject
     }
 
     /// Year of this date in local time zone.

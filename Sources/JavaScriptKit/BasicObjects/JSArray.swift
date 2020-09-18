@@ -1,21 +1,30 @@
 /// A wrapper around [the JavaScript Array class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)
 /// that exposes its properties in a type-safe and Swifty way.
-public class JSArray {
-    static let classObject = JSObject.global.Array.function!
+public class JSArray: JSBridgedClass {
+    public static let constructor = JSObject.global.Array.function!
 
     static func isArray(_ object: JSObject) -> Bool {
-        classObject.isArray!(object).boolean!
+        constructor.isArray!(object).boolean!
     }
 
-    let ref: JSObject
-    
+    public let jsObject: JSObject
+
+    public required convenience init?(from value: JSValue) {
+        guard let object = value.object else { return nil }
+        self.init(object)
+    }
+
     /// Construct a `JSArray` from Array `JSObject`.
     /// Return `nil` if the object is not an Array.
     ///
     /// - Parameter object: A `JSObject` expected to be a JavaScript Array
-    public init?(_ ref: JSObject) {
-        guard Self.isArray(ref) else { return nil }
-        self.ref = ref
+    public convenience init?(_ jsObject: JSObject) {
+        guard Self.isArray(jsObject) else { return nil }
+        self.init(unsafelyWrapping: jsObject)
+    }
+
+    public required init(unsafelyWrapping jsObject: JSObject) {
+        self.jsObject = jsObject
     }
 }
 
@@ -23,32 +32,32 @@ extension JSArray: RandomAccessCollection {
     public typealias Element = JSValue
 
     public func makeIterator() -> Iterator {
-        Iterator(ref: ref)
+        Iterator(jsObject: jsObject)
     }
 
     public class Iterator: IteratorProtocol {
-        let ref: JSObject
-        var index = 0
-        init(ref: JSObject) {
-            self.ref = ref
+        private let jsObject: JSObject
+        private var index = 0
+        init(jsObject: JSObject) {
+            self.jsObject = jsObject
         }
 
         public func next() -> Element? {
             let currentIndex = index
-            guard currentIndex < Int(ref.length.number!) else {
+            guard currentIndex < Int(jsObject.length.number!) else {
                 return nil
             }
             index += 1
-            guard ref.hasOwnProperty!(currentIndex).boolean! else {
+            guard jsObject.hasOwnProperty!(currentIndex).boolean! else {
                 return next()
             }
-            let value = ref[currentIndex]
+            let value = jsObject[currentIndex]
             return value
         }
     }
 
     public subscript(position: Int) -> JSValue {
-        ref[position]
+        jsObject[position]
     }
 
     public var startIndex: Int { 0 }
@@ -68,14 +77,14 @@ extension JSArray: RandomAccessCollection {
     /// array.count  // 2
     /// ```
     public var length: Int {
-        return Int(ref.length.number!)
+        Int(jsObject.length.number!)
     }
 
     /// The number of elements in that array **not** including empty hole.
     /// Note that `count` syncs with the number that `Iterator` can iterate.
     /// See also: `JSArray.length`
     public var count: Int {
-        return getObjectValuesLength(ref)
+        getObjectValuesLength(jsObject)
     }
 }
 

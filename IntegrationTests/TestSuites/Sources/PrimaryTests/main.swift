@@ -1,5 +1,6 @@
 import JavaScriptKit
 
+
 try test("Literal Conversion") {
     let global = JSObject.global
     let inputs: [JSValue] = [
@@ -16,7 +17,7 @@ try test("Literal Conversion") {
         .undefined,
     ]
     for (index, input) in inputs.enumerated() {
-        let prop = "prop_\(index)"
+        let prop = JSString("prop_\(index)")
         setJSValue(this: global, name: prop, value: input)
         let got = getJSValue(this: global, name: prop)
         switch (got, input) {
