@@ -19,14 +19,12 @@ typedef enum __attribute__((enum_extensibility(closed))) {
 } JavaScriptValueKind;
 
 typedef unsigned JavaScriptPayload1;
-typedef unsigned JavaScriptPayload2;
-typedef double JavaScriptPayload3;
+typedef double JavaScriptPayload2;
 
 typedef struct {
   JavaScriptValueKind kind;
   JavaScriptPayload1 payload1;
   JavaScriptPayload2 payload2;
-  JavaScriptPayload3 payload3;
 } RawJSValue;
 
 #if __wasm32__
@@ -34,27 +32,26 @@ __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_set_prop"))) extern void
 _set_prop(const JavaScriptObjectRef _this, const JavaScriptObjectRef prop,
           const JavaScriptValueKind kind, const JavaScriptPayload1 payload1,
-          const JavaScriptPayload2 payload2, const JavaScriptPayload3 payload3);
+          const JavaScriptPayload2 payload2);
 
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_get_prop"))) extern void
 _get_prop(const JavaScriptObjectRef _this, const JavaScriptObjectRef prop,
           JavaScriptValueKind *kind, JavaScriptPayload1 *payload1,
-          JavaScriptPayload2 *payload2, JavaScriptPayload3 *payload3);
+          JavaScriptPayload2 *payload2);
 
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_set_subscript"))) extern void
 _set_subscript(const JavaScriptObjectRef _this, const int length,
                const JavaScriptValueKind kind,
                const JavaScriptPayload1 payload1,
-               const JavaScriptPayload2 payload2,
-               const JavaScriptPayload3 payload3);
+               const JavaScriptPayload2 payload2);
 
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_get_subscript"))) extern void
 _get_subscript(const JavaScriptObjectRef _this, const int length,
                JavaScriptValueKind *kind, JavaScriptPayload1 *payload1,
-               JavaScriptPayload2 *payload2, JavaScriptPayload3 *payload3);
+               JavaScriptPayload2 *payload2);
 
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_encode_string"))) extern int
@@ -73,8 +70,7 @@ __attribute__((__import_module__("javascript_kit"),
 _call_function(const JavaScriptObjectRef ref, const RawJSValue *argv,
                const int argc, JavaScriptValueKind *result_kind,
                JavaScriptPayload1 *result_payload1,
-               JavaScriptPayload2 *result_payload2,
-               JavaScriptPayload3 *result_payload3);
+               JavaScriptPayload2 *result_payload2);
 
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_function_with_this"))) extern void
@@ -83,8 +79,7 @@ _call_function_with_this(const JavaScriptObjectRef _this,
                          const RawJSValue *argv, const int argc,
                          JavaScriptValueKind *result_kind,
                          JavaScriptPayload1 *result_payload1,
-                         JavaScriptPayload2 *result_payload2,
-                         JavaScriptPayload3 *result_payload3);
+                         JavaScriptPayload2 *result_payload2);
 
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_new"))) extern void

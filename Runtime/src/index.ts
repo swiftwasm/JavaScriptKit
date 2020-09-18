@@ -148,8 +148,8 @@ export class SwiftRuntime {
             const argv = exports.swjs_prepare_host_function_call(argc)
             for (let index = 0; index < args.length; index++) {
                 const argument = args[index]
-                const base = argv + 24 * index
-                writeValue(argument, base, base + 4, base + 8, base + 16)
+                const base = argv + 16 * index
+                writeValue(argument, base, base + 4, base + 8)
             }
             let output: any;
             const callback_func_ref = this.heap.retain(function (result: any) {
@@ -203,7 +203,7 @@ export class SwiftRuntime {
 
         const decodeValue = (
             kind: JavaScriptValueKind,
-            payload1: number, payload2: number, payload3: number
+            payload1: number, payload2: number
         ) => {
             switch (kind) {
                 case JavaScriptValueKind.Boolean: {
@@ -213,7 +213,7 @@ export class SwiftRuntime {
                     }
                 }
                 case JavaScriptValueKind.Number: {
-                    return payload3;
+                    return payload2;
                 }
                 case JavaScriptValueKind.String: {
                     return readString(payload1);
@@ -237,50 +237,40 @@ export class SwiftRuntime {
 
         const writeValue = (
             value: any, kind_ptr: pointer,
-            payload1_ptr: pointer, payload2_ptr: pointer, payload3_ptr: pointer
+            payload1_ptr: pointer, payload2_ptr: pointer
         ) => {
             if (value === null) {
                 writeUint32(kind_ptr, JavaScriptValueKind.Null);
-                writeUint32(payload1_ptr, 0);
-                writeUint32(payload2_ptr, 0);
                 return;
             }
             switch (typeof value) {
                 case "boolean": {
                     writeUint32(kind_ptr, JavaScriptValueKind.Boolean);
                     writeUint32(payload1_ptr, value ? 1 : 0);
-                    writeUint32(payload2_ptr, 0);
                     break;
                 }
                 case "number": {
                     writeUint32(kind_ptr, JavaScriptValueKind.Number);
-                    writeUint32(payload1_ptr, 0);
-                    writeUint32(payload2_ptr, 0);
-                    writeFloat64(payload3_ptr, value);
+                    writeFloat64(payload2_ptr, value);
                     break;
                 }
                 case "string": {
                     writeUint32(kind_ptr, JavaScriptValueKind.String);
                     writeUint32(payload1_ptr, this.heap.retain(value));
-                    writeUint32(payload2_ptr, 0);
                     break;
                 }
                 case "undefined": {
                     writeUint32(kind_ptr, JavaScriptValueKind.Undefined);
-                    writeUint32(payload1_ptr, 0);
-                    writeUint32(payload2_ptr, 0);
                     break;
                 }
                 case "object": {
                     writeUint32(kind_ptr, JavaScriptValueKind.Object);
                     writeUint32(payload1_ptr, this.heap.retain(value));
-                    writeUint32(payload2_ptr, 0);
                     break;
                 }
                 case "function": {
                     writeUint32(kind_ptr, JavaScriptValueKind.Function);
                     writeUint32(payload1_ptr, this.heap.retain(value));
-                    writeUint32(payload2_ptr, 0);
                     break;
                 }
                 default:
@@ -289,17 +279,15 @@ export class SwiftRuntime {
         }
 
         // Note:
-        // `decodeValues` assumes that the size of RawJSValue is 24
-        // and the alignment of it is 8
+        // `decodeValues` assumes that the size of RawJSValue is 16.
         const decodeValues = (ptr: pointer, length: number) => {
             let result = []
             for (let index = 0; index < length; index++) {
-                const base = ptr + 24 * index
+                const base = ptr + 16 * index
                 const kind = readUInt32(base)
                 const payload1 = readUInt32(base + 4)
-                const payload2 = readUInt32(base + 8)
-                const payload3 = readFloat64(base + 16)
-                result.push(decodeValue(kind, payload1, payload2, payload3))
+                const payload2 = readFloat64(base + 8)
+                result.push(decodeValue(kind, payload1, payload2))
             }
             return result
         }
@@ -308,36 +296,36 @@ export class SwiftRuntime {
             swjs_set_prop: (
                 ref: ref, name: ref,
                 kind: JavaScriptValueKind,
-                payload1: number, payload2: number, payload3: number
+                payload1: number, payload2: number
             ) => {
                 const obj = this.heap.referenceHeap(ref);
-                Reflect.set(obj, readString(name), decodeValue(kind, payload1, payload2, payload3))
+                Reflect.set(obj, readString(name), decodeValue(kind, payload1, payload2))
             },
             swjs_get_prop: (
                 ref: ref, name: ref,
                 kind_ptr: pointer,
-                payload1_ptr: pointer, payload2_ptr: pointer, payload3_ptr: number
+                payload1_ptr: pointer, payload2_ptr: pointer
             ) => {
                 const obj = this.heap.referenceHeap(ref);
                 const result = Reflect.get(obj, readString(name));
-                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, payload3_ptr);
+                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr);
             },
             swjs_set_subscript: (
                 ref: ref, index: number,
                 kind: JavaScriptValueKind,
-                payload1: number, payload2: number, payload3: number
+                payload1: number, payload2: number
             ) => {
                 const obj = this.heap.referenceHeap(ref);
-                Reflect.set(obj, index, decodeValue(kind, payload1, payload2, payload3))
+                Reflect.set(obj, index, decodeValue(kind, payload1, payload2))
             },
             swjs_get_subscript: (
                 ref: ref, index: number,
                 kind_ptr: pointer,
-                payload1_ptr: pointer, payload2_ptr: pointer, payload3_ptr: pointer
+                payload1_ptr: pointer, payload2_ptr: pointer
             ) => {
                 const obj = this.heap.referenceHeap(ref);
                 const result = Reflect.get(obj, index);
-                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, payload3_ptr);
+                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr);
             },
             swjs_encode_string: (ref: ref, bytes_ptr_result: pointer) => {
                 const bytes = textEncoder.encode(this.heap.referenceHeap(ref));
@@ -358,22 +346,22 @@ export class SwiftRuntime {
             swjs_call_function: (
                 ref: ref, argv: pointer, argc: number,
                 kind_ptr: pointer,
-                payload1_ptr: pointer, payload2_ptr: pointer, payload3_ptr: pointer
+                payload1_ptr: pointer, payload2_ptr: pointer
             ) => {
                 const func = this.heap.referenceHeap(ref)
                 const result = Reflect.apply(func, undefined, decodeValues(argv, argc))
-                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, payload3_ptr);
+                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr);
             },
             swjs_call_function_with_this: (
                 obj_ref: ref, func_ref: ref,
                 argv: pointer, argc: number,
                 kind_ptr: pointer,
-                payload1_ptr: pointer, payload2_ptr: pointer, payload3_ptr: pointer
+                payload1_ptr: pointer, payload2_ptr: pointer
             ) => {
                 const obj = this.heap.referenceHeap(obj_ref)
                 const func = this.heap.referenceHeap(func_ref)
                 const result = Reflect.apply(func, obj, decodeValues(argv, argc))
-                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, payload3_ptr);
+                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr);
             },
             swjs_create_function: (
                 host_func_id: number,

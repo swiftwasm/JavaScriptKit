@@ -27,11 +27,11 @@ public class JSFunction: JSObject {
                 if let thisId = this?.id {
                     _call_function_with_this(thisId,
                                              self.id, argv, Int32(argc),
-                                             &result.kind, &result.payload1, &result.payload2, &result.payload3)
+                                             &result.kind, &result.payload1, &result.payload2)
                 } else {
                     _call_function(
                         self.id, argv, Int32(argc),
-                        &result.kind, &result.payload1, &result.payload2, &result.payload3
+                        &result.kind, &result.payload1, &result.payload2
                     )
                 }
                 return result
