@@ -32,13 +32,13 @@ typedef struct {
 #if __wasm32__
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_set_prop"))) extern void
-_set_prop(const JavaScriptObjectRef _this, const char *prop, const int length,
+_set_prop(const JavaScriptObjectRef _this, const JavaScriptObjectRef prop,
           const JavaScriptValueKind kind, const JavaScriptPayload1 payload1,
           const JavaScriptPayload2 payload2, const JavaScriptPayload3 payload3);
 
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_get_prop"))) extern void
-_get_prop(const JavaScriptObjectRef _this, const char *prop, const int length,
+_get_prop(const JavaScriptObjectRef _this, const JavaScriptObjectRef prop,
           JavaScriptValueKind *kind, JavaScriptPayload1 *payload1,
           JavaScriptPayload2 *payload2, JavaScriptPayload3 *payload3);
 
@@ -55,6 +55,14 @@ __attribute__((__import_module__("javascript_kit"),
 _get_subscript(const JavaScriptObjectRef _this, const int length,
                JavaScriptValueKind *kind, JavaScriptPayload1 *payload1,
                JavaScriptPayload2 *payload2, JavaScriptPayload3 *payload3);
+
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_encode_string"))) extern int
+_encode_string(const JavaScriptObjectRef str_obj, JavaScriptObjectRef *bytes_ptr_result);
+
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_decode_string"))) extern JavaScriptObjectRef
+_decode_string(const unsigned char *bytes_ptr, const int length);
 
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_load_string"))) extern void

@@ -57,6 +57,14 @@ public class JSObject: Equatable {
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The value of the `name` member of this object.
     public subscript(_ name: String) -> JSValue {
+        get { getJSValue(this: self, name: JSString(name)) }
+        set { setJSValue(this: self, name: JSString(name), value: newValue) }
+    }
+
+    /// Access the `name` member dynamically through JavaScript and Swift runtime bridge library.
+    /// - Parameter name: The name of this object's member to access.
+    /// - Returns: The value of the `name` member of this object.
+    public subscript(_ name: JSString) -> JSValue {
         get { getJSValue(this: self, name: name) }
         set { setJSValue(this: self, name: name, value: newValue) }
     }
