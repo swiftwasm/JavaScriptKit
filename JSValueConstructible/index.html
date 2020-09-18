@@ -89,7 +89,8 @@
         <h3>Types Conforming to <code>JSValue​Constructible</code></h3>
 <dl>
     <dt class="protocol"><code><a href="/JavaScriptKit/TypedArrayElement">TypedArrayElement</a></code></dt>
-<dd></dd>
+<dd><p>A protocol that allows a Swift numeric type to be mapped to the JavaScript TypedArray that holds integers of its type</p>
+</dd>
 </dl>
 </section>
 
@@ -105,7 +106,7 @@
     <html><body><pre class="highlight"><code><span class="keyword">static</span> <span class="keyword">func</span> <span class="function">construct</span>(<span class="variable">from</span> <span class="variable">value</span>: <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>) -&gt; <span class="keyword">Self</span>?</code></pre></body></html>
 <div class="summary" role="doc-abstract">
     <p>Construct an instance of <code>Self</code>, if possible, from the given <code>JSValue</code>.
-Return <code>nil</code> if fail to construct.</p>
+Return <code>nil</code> if the value is not compatible with the conforming Swift type.</p>
 
 </div>
 <h4>Parameters</h4>
@@ -137,7 +138,7 @@ Return <code>nil</code> if fail to construct.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2020-09-16T16:38:59+0000">September 16, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
+    Generated on <time datetime="2020-09-18T03:18:31+0000">September 18, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
 </p>
     </footer>
 </body>
