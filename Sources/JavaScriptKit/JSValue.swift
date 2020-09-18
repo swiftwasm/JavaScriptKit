@@ -57,12 +57,21 @@ public enum JSValue: Equatable {
 
     /// Returns the `true` if this JS value is null.
     /// If not, returns `false`.
-    public var isNull: Bool { return self == .null }
+    public var isNull: Bool {
+        return self == .null
+    }
 
     /// Returns the `true` if this JS value is undefined.
     /// If not, returns `false`.
-    public var isUndefined: Bool { return self == .undefined }
+    public var isUndefined: Bool {
+        return self == .undefined
+    }
+}
 
+extension JSValue {
+    public func fromJSValue<Type>() -> Type? where Type: JSValueConstructible {
+        return Type.construct(from: self)
+    }
 }
 
 extension JSValue {
@@ -104,7 +113,13 @@ extension JSValue: ExpressibleByStringLiteral {
 }
 
 extension JSValue: ExpressibleByIntegerLiteral {
-    public init(integerLiteral value: Double) {
+    public init(integerLiteral value: Int32) {
+        self = .number(Double(value))
+    }
+}
+
+extension JSValue: ExpressibleByFloatLiteral {
+    public init(floatLiteral value: Double) {
         self = .number(value)
     }
 }
@@ -142,5 +157,41 @@ public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
         _set_subscript(this.id, index,
                        rawValue.kind,
                        rawValue.payload1, rawValue.payload2, rawValue.payload3)
+    }
+}
+
+extension JSValue {
+  /// Return `true` if this value is an instance of the passed `constructor` function.
+  /// Returns `false` for everything except objects and functions.
+  /// - Parameter constructor: The constructor function to check.
+  /// - Returns: The result of `instanceof` in the JavaScript environment.
+    public func isInstanceOf(_ constructor: JSFunction) -> Bool {
+        switch self {
+        case .boolean, .string, .number, .null, .undefined:
+            return false
+        case let .object(ref):
+            return ref.isInstanceOf(constructor)
+        case let .function(ref):
+            return ref.isInstanceOf(constructor)
+        }
+    }
+}
+
+extension JSValue: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case let .boolean(boolean):
+            return boolean.description
+        case .string(let string):
+            return string
+        case .number(let number):
+            return number.description
+        case .object(let object), .function(let object as JSObject):
+            return object.toString!().fromJSValue()!
+        case .null:
+            return "null"
+        case .undefined:
+            return "undefined"
+        }
     }
 }

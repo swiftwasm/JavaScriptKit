@@ -4,53 +4,42 @@
 
 import _CJavaScriptKit
 
+/// A protocol that allows a Swift numeric type to be mapped to the JavaScript TypedArray that holds integers of its type
 public protocol TypedArrayElement: JSValueConvertible, JSValueConstructible {
+    /// The constructor function for the TypedArray class for this particular kind of number
     static var typedArrayClass: JSFunction { get }
 }
 
-/// A wrapper around [the JavaScript TypedArray class](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
-/// that exposes its properties in a type-safe and Swifty way.
-public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLiteral where Element: TypedArrayElement {
-    let ref: JSObject
-    public func jsValue() -> JSValue {
-        .object(ref)
-    }
+/// A wrapper around all JavaScript [TypedArray](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) classes that exposes their properties in a type-safe way.
+/// FIXME: the BigInt-based TypedArrays are not supported (https://github.com/swiftwasm/JavaScriptKit/issues/56)
+public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral where Element: TypedArrayElement {
+    public static var constructor: JSFunction { Element.typedArrayClass }
+    public var jsObject: JSObject
 
     public subscript(_ index: Int) -> Element {
         get {
-            return Element.construct(from: getJSValue(this: ref, index: Int32(index)))!
+            return Element.construct(from: jsObject[index])!
         }
         set {
-            setJSValue(this: ref, index: Int32(index), value: newValue.jsValue())
+            self.jsObject[index] = newValue.jsValue()
         }
     }
 
-    // This private initializer assumes that the passed object is TypedArray
-    private init(unsafe object: JSObject) {
-        self.ref = object
+    /// Initialize a new instance of TypedArray in JavaScript environment with given length.
+    ///  All the elements will be initialized to zero.
+    ///
+    /// - Parameter length: The number of elements that will be allocated.
+    public init(length: Int) {
+        jsObject = Element.typedArrayClass.new(length)
     }
 
-    /// Construct a `JSTypedArray` from TypedArray `JSObject`.
-    /// Return `nil` if the object is not TypedArray.
-    ///
-    /// - Parameter object: A `JSObject` expected to be TypedArray
-    public init?(_ object: JSObject) {
-        guard object.isInstanceOf(Element.typedArrayClass) else { return nil }
-        self.ref = object
-    }
-
-    /// Initialize a new instance of TypedArray in JavaScript environment with given length zero value.
-    ///
-    /// - Parameter length: The length of elements that will be allocated.
-    public convenience init(length: Int) {
-        let jsObject = Element.typedArrayClass.new(length)
-        self.init(unsafe: jsObject)
+    required public init(unsafelyWrapping jsObject: JSObject) {
+        self.jsObject = jsObject
     }
 
     required public convenience init(arrayLiteral elements: Element...) {
         self.init(elements)
     }
-    
     /// Initialize a new instance of TypedArray in JavaScript environment with given elements.
     ///
     /// - Parameter array: The array that will be copied to create a new instance of TypedArray
@@ -59,7 +48,7 @@ public class JSTypedArray<Element>: JSValueConvertible, ExpressibleByArrayLitera
         array.withUnsafeBufferPointer { ptr in
             _create_typed_array(Element.typedArrayClass.id, ptr.baseAddress!, Int32(array.count), &resultObj)
         }
-        self.init(unsafe: JSObject(id: resultObj))
+        self.init(unsafelyWrapping: JSObject(id: resultObj))
     }
     
     /// Convenience initializer for `Sequence`.
@@ -89,8 +78,6 @@ extension UInt: TypedArrayElement {
     public static var typedArrayClass: JSFunction =
         valueForBitWidth(typeName: "UInt", bitWidth: Int.bitWidth, when32: JSObject.global.Uint32Array).function!
 }
-
-// MARK: - Concrete TypedArray classes
 
 extension Int8: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Int8Array.function!

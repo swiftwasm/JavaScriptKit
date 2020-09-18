@@ -32,11 +32,18 @@ public class JSObject: Equatable {
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The `name` member method binding this object as `this` context.
     @_disfavoredOverload
-    public subscript(dynamicMember name: String) -> ((JSValueConvertible...) -> JSValue)? {
+    public subscript(_ name: String) -> ((JSValueConvertible...) -> JSValue)? {
         guard let function = self[name].function else { return nil }
         return { (arguments: JSValueConvertible...) in
             function(this: self, arguments: arguments)
         }
+    }
+
+    /// A convenience method of `subscript(_ name: String) -> ((JSValueConvertible...) -> JSValue)?`
+    /// to access the member through Dynamic Member Lookup.
+    @_disfavoredOverload
+    public subscript(dynamicMember name: String) -> ((JSValueConvertible...) -> JSValue)? {
+        self[name]
     }
 
     /// A convenience method of `subscript(_ name: String) -> JSValue`
@@ -62,9 +69,9 @@ public class JSObject: Equatable {
         set { setJSValue(this: self, index: Int32(index), value: newValue) }
     }
 
-    /// Return `true` if this object is an instance of the `constructor`. Return `false`, if not.
+    /// Return `true` if this value is an instance of the passed `constructor` function.
     /// - Parameter constructor: The constructor function to check.
-    /// - Returns: The result of `instanceof` in JavaScript environment.
+    /// - Returns: The result of `instanceof` in the JavaScript environment.
     public func isInstanceOf(_ constructor: JSFunction) -> Bool {
         _instanceof(id, constructor.id)
     }
@@ -84,6 +91,10 @@ public class JSObject: Equatable {
     ///   - rhs: Another object to compare.
     public static func == (lhs: JSObject, rhs: JSObject) -> Bool {
         return lhs.id == rhs.id
+    }
+
+    public class func construct(from value: JSValue) -> Self? {
+        return value.object as? Self
     }
 
     public func jsValue() -> JSValue {
