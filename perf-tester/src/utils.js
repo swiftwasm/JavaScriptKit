@@ -6,7 +6,7 @@ import { exec } from '@actions/exec';
 export const getInput = key => ({
 	'build-script': 'make bootstrap benchmark_setup',
 	benchmark: 'make -s run_benchmark',
-	'minimum-change-threshold': 50,
+	'minimum-change-threshold': 5,
 	'use-check': 'no',
 	'repo-token': process.env.GITHUB_TOKEN
 })[key]
@@ -178,7 +178,7 @@ export function diffTable(tests, { showTotal, collapseUnchanged, omitUnchanged, 
 		totalDelta += delta;
 
 		const difference = ((delta / time) * 100) | 0;
-		const isUnchanged = Math.abs(delta) < minimumChangeThreshold;
+		const isUnchanged = Math.abs(difference) < minimumChangeThreshold;
 
 		if (isUnchanged && omitUnchanged) continue;
 
