@@ -22,3 +22,7 @@ benchmark_setup:
 .PHONY: run_benchmark
 run_benchmark:
 	cd IntegrationTests && make -s run_benchmark
+
+.PHONY: perf-tester
+perf-tester:
+	cd perf-tester && npm install && npm run build
