@@ -15,3 +15,10 @@ test:
 	    CONFIGURATION=debug make test && \
 	    CONFIGURATION=release make test
 
+.PHONY: benchmark_setup
+benchmark_setup:
+	cd IntegrationTests && make benchmark_setup
+
+.PHONY: run_benchmark
+run_benchmark:
+	cd IntegrationTests && make -s run_benchmark

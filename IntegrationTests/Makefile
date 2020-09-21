@@ -18,9 +18,15 @@ node_modules: package-lock.json
 build_rt: node_modules
 	cd ../Runtime && npm run build
 
-.PHONY: benchmark
-benchmark: build_rt dist/BenchmarkTests.wasm
+.PHONY: benchmark_setup
+benchmark_setup: build_rt dist/BenchmarkTests.wasm
+
+.PHONY: run_benchmark
+run_benchmark:
 	node bin/benchmark-tests.js
+
+.PHONY: benchmark
+benchmark: benchmark_setup run_benchmark
 
 .PHONY: test
 test: build_rt dist/PrimaryTests.wasm
