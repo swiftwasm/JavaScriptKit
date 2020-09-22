@@ -4,7 +4,7 @@ import { exec } from '@actions/exec';
 import { getInput, runBenchmark, toDiff, diffTable, toBool } from './utils.js';
 
 async function run(octokit, context, token) {
-	const { owner, repo, number: pull_number } = context.issue;
+	const { number: pull_number } = context.issue;
 
 	const pr = context.payload.pull_request;
 	try {
@@ -22,7 +22,7 @@ async function run(octokit, context, token) {
 	endGroup();
 
 	startGroup(`[current] Running benchmark`);
-	const newBenchmarks = await runBenchmark();
+	const newBenchmarks = await Promise.all([runBenchmark(), runBenchmark()]).then(averageBenchmarks);
 	endGroup();
 
 	startGroup(`[base] Checkout target branch`);
@@ -62,7 +62,7 @@ async function run(octokit, context, token) {
 	endGroup();
 
 	startGroup(`[base] Running benchmark`);
-	const oldBenchmarks = await runBenchmark();
+	const oldBenchmarks = await Promise.all([runBenchmark(), runBenchmark()]).then(averageBenchmarks);
 	endGroup();
 
 	const diff = toDiff(oldBenchmarks, newBenchmarks);

@@ -36,6 +36,14 @@ function parse(benchmarkData) {
 	return benchmarks
 }
 
+export function averageBenchmarks(benchmarks) {
+	const result = Object.create(null)
+	for (const key of Object.keys(benchmarks[0])) {
+		result[key] = benchmarks.reduce((acc, bench) => acc + bench[key], 0) / benchmarks.length
+	}
+	return result
+}
+
 /**
  * @param {{[key: string]: number}} before
  * @param {{[key: string]: number}} after
