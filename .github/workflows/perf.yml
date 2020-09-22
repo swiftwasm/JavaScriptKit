@@ -17,7 +17,7 @@ jobs:
         export PATH="$SWIFTENV_ROOT/bin:$PATH"
         eval "$(swiftenv init -)"
         swiftenv install $TOOLCHAIN_DOWNLOAD
-        node perf-tester/index.js
+        node ci/perf-tester/index.js
       env:
         TOOLCHAIN_DOWNLOAD: https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.3-SNAPSHOT-2020-08-10-a/swift-wasm-5.3-SNAPSHOT-2020-08-10-a-linux.tar.gz
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
