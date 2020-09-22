@@ -155,6 +155,41 @@ public class JSClosure: JSFunction {
     }
 }
 
+
+// MARK: - `JSClosure` mechanism note
+//
+// 1. Create thunk function in JavaScript world, that has a reference
+//    to Swift Closure.
+// ┌─────────────────────┬──────────────────────────┐
+// │     Swift side      │   JavaScript side        │
+// │                     │                          │
+// │                     │                          │
+// │                     │   ┌──[Thunk function]──┐ │
+// │          ┌ ─ ─ ─ ─ ─│─ ─│─ ─ ─ ─ ─ ┐         │ │
+// │          ↓          │   │          │         │ │
+// │  [Swift Closure]    │   │  Host Function ID  │ │
+// │                     │   │                    │ │
+// │                     │   └────────────────────┘ │
+// └─────────────────────┴──────────────────────────┘
+//
+// 2. When thunk function is invoked, it calls Swift Closure via
+//    `_call_host_function` and callback the result through callback func
+// ┌─────────────────────┬──────────────────────────┐
+// │     Swift side      │   JavaScript side        │
+// │                     │                          │
+// │                     │                          │
+// │                   Apply ┌──[Thunk function]──┐ │
+// │          ┌ ─ ─ ─ ─ ─│─ ─│─ ─ ─ ─ ─ ┐         │ │
+// │          ↓          │   │          │         │ │
+// │  [Swift Closure]    │   │  Host Function ID  │ │
+// │          │          │   │                    │ │
+// │          │          │   └────────────────────┘ │
+// │          │          │                    ↑     │
+// │          │        Apply                  │     │
+// │          └─[Result]─┼───>[Callback func]─┘     │
+// │                     │                          │
+// └─────────────────────┴──────────────────────────┘
+
 @_cdecl("swjs_prepare_host_function_call")
 func _prepare_host_function_call(_ argc: Int32) -> UnsafeMutableRawPointer {
     let argumentSize = MemoryLayout<RawJSValue>.size * Int(argc)
