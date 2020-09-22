@@ -1,7 +1,7 @@
 import { setFailed, startGroup, endGroup, debug } from '@actions/core';
 import { GitHub, context } from '@actions/github';
 import { exec } from '@actions/exec';
-import { getInput, runBenchmark, toDiff, diffTable, toBool } from './utils.js';
+import { getInput, runBenchmark, averageBenchmarks, toDiff, diffTable, toBool } from './utils.js';
 
 async function run(octokit, context, token) {
 	const { number: pull_number } = context.issue;
