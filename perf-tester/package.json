@@ -10,29 +10,6 @@
     "@actions/core": "^1.2.2",
     "@actions/exec": "^1.0.3",
     "@actions/github": "^2.0.1",
-    "@babel/core": "^7.9.6",
-    "@babel/preset-env": "^7.9.6",
-    "@types/jest": "^26.0.0",
-    "babel-jest": "^25.5.1",
-    "jest": "^25.5.2",
-    "microbundle": "^0.12.0-next.8",
-    "pretty-bytes": "^5.3.0",
-    "size-plugin-core": "0.0.9"
-  },
-  "jest": {
-    "testEnvironment": "node"
-  },
-  "babel": {
-    "presets": [
-      [
-        "@babel/preset-env",
-        {
-          "targets": {
-            "node": "current"
-          }
-        }
-      ]
-    ]
-  },
-  "dependencies": {}
+    "microbundle": "^0.12.0-next.8"
+  }
 }

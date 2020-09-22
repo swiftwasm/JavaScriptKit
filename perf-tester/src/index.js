@@ -6,7 +6,6 @@ import { getInput, runBenchmark, toDiff, diffTable, toBool } from './utils.js';
 async function run(octokit, context, token) {
 	const { owner, repo, number: pull_number } = context.issue;
 
-	// const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
 	const pr = context.payload.pull_request;
 	try {
 		debug('pr' + JSON.stringify(pr, null, 2));
