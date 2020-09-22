@@ -25,4 +25,4 @@ run_benchmark:
 
 .PHONY: perf-tester
 perf-tester:
-	cd perf-tester && npm install && npm run build
+	cd ci/perf-tester && npm install && npm run build
