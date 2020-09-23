@@ -1,4 +1,5 @@
 {
+  "private": true,
   "dependencies": {
     "javascript-kit-swift": "file:../Runtime",
     "@wasmer/wasi": "^0.12.0",
