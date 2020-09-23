@@ -1,17 +1,18 @@
 /// run `make perf-tester` after updating this or util.js
 
-import fs from 'fs';
-import { exec } from '@actions/exec';
+const fs = require('fs');
+const { exec } = require('@actions/exec');
 
-export const getInput = key => ({
+const getInput = key => ({
 	'build-script': 'make bootstrap benchmark_setup',
 	benchmark: 'make -s run_benchmark',
 	'minimum-change-threshold': 5,
 	'use-check': 'no',
 	'repo-token': process.env.GITHUB_TOKEN
 })[key]
+exports.getInput = getInput
 
-export async function runBenchmark() {
+exports.runBenchmark = async () => {
 	let benchmarkBuffers = []
 	await exec(getInput('benchmark'), [], {
 		listeners: {
@@ -36,7 +37,7 @@ function parse(benchmarkData) {
 	return benchmarks
 }
 
-export function averageBenchmarks(benchmarks) {
+exports.averageBenchmarks = (benchmarks) => {
 	const result = Object.create(null)
 	for (const key of Object.keys(benchmarks[0])) {
 		result[key] = benchmarks.reduce((acc, bench) => acc + bench[key], 0) / benchmarks.length
@@ -49,7 +50,7 @@ export function averageBenchmarks(benchmarks) {
  * @param {{[key: string]: number}} after
  * @return {Diff[]}
  */
-export function toDiff(before, after) {
+exports.toDiff = (before, after) => {
 	const names = [...new Set([...Object.keys(before), ...Object.keys(after)])]
 	return names.map(name => {
 		const timeBefore = before[name] || 0
@@ -61,48 +62,10 @@ export function toDiff(before, after) {
 
 
 /**
- * Check if a given file exists and can be accessed.
- * @param {string} filename
- */
-export async function fileExists(filename) {
-	try {
-		await fs.promises.access(filename, fs.constants.F_OK);
-		return true;
-	} catch (e) {}
-	return false;
-}
-
-/**
- * Remove any matched hash patterns from a filename string.
- * @param {string=} regex
- * @returns {(((fileName: string) => string) | undefined)}
- */
-export function stripHash(regex) {
-	if (regex) {
-		console.log(`Striping hash from build chunks using '${regex}' pattern.`);
-		return function (fileName) {
-			return fileName.replace(new RegExp(regex), (str, ...hashes) => {
-				hashes = hashes.slice(0, -2).filter((c) => c != null);
-				if (hashes.length) {
-					for (let i = 0; i < hashes.length; i++) {
-						const hash = hashes[i] || '';
-						str = str.replace(hash, hash.replace(/./g, '*'));
-					}
-					return str;
-				}
-				return '';
-			});
-		};
-	}
-
-	return undefined;
-}
-
-/**
  * @param {number} delta
  * @param {number} difference
  */
-export function getDeltaText(delta, difference) {
+function getDeltaText(delta, difference) {
 	let deltaText = (delta > 0 ? '+' : '') + delta.toLocaleString('en-US') + 'ms';
 	if (delta && Math.abs(delta) > 1) {
 		deltaText += ` (${Math.abs(difference)}%)`;
@@ -113,7 +76,7 @@ export function getDeltaText(delta, difference) {
 /**
  * @param {number} difference
  */
-export function iconForDifference(difference) {
+function iconForDifference(difference) {
 	let icon = '';
 	if (difference >= 50) icon = '🆘';
 	else if (difference >= 20) icon = '🚨';
@@ -174,7 +137,7 @@ function markdownTable(rows) {
  * @param {boolean} [options.omitUnchanged]
  * @param {number} [options.minimumChangeThreshold]
  */
-export function diffTable(tests, { showTotal, collapseUnchanged, omitUnchanged, minimumChangeThreshold }) {
+exports.diffTable = (tests, { showTotal, collapseUnchanged, omitUnchanged, minimumChangeThreshold }) => {
 	let changedRows = [];
 	let unChangedRows = [];
 
@@ -225,6 +188,4 @@ export function diffTable(tests, { showTotal, collapseUnchanged, omitUnchanged, 
  * Convert a string "true"/"yes"/"1" argument value to a boolean
  * @param {string} v
  */
-export function toBool(v) {
-	return /^(1|true|yes)$/.test(v);
-}
+exports.toBool = v => /^(1|true|yes)$/.test(v);

@@ -1,15 +1,9 @@
 {
   "private": true,
-  "main": "index.js",
-  "scripts": {
-    "build": "microbundle -f cjs --define 'navigator={}' --compress --no-sourcemap --target node src/index.js",
-    "test": "jest"
-  },
-  "license": "MIT",
+  "main": "src/index.js",
   "devDependencies": {
     "@actions/core": "^1.2.2",
     "@actions/exec": "^1.0.3",
-    "@actions/github": "^2.0.1",
-    "microbundle": "^0.12.0-next.8"
+    "@actions/github": "^2.0.1"
   }
 }
