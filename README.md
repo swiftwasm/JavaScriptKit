@@ -11,6 +11,7 @@ This library only supports [`swiftwasm/swift`](https://github.com/swiftwasm/swif
 The toolchains can be installed via [`swiftenv`](https://github.com/kylef/swiftenv) like official nightly toolchain.
 
 e.g.
+
 ```sh
 
 $ swiftenv install https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-06-03-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-06-03-a-osx.tar.gz
@@ -24,22 +25,22 @@ Target: x86_64-apple-darwin19.3.0
 This JavaScript code
 
 ```javascript
-const alert = window.alert
-const document = window.document
+const alert = window.alert;
+const document = window.document;
 
-const divElement = document.createElement("div")
-divElement.innerText = "Hello, world"
-const body = document.body
-body.appendChild(divElement)
+const divElement = document.createElement("div");
+divElement.innerText = "Hello, world";
+const body = document.body;
+body.appendChild(divElement);
 
 const pet = {
   age: 3,
   owner: {
     name: "Mike",
   },
-}
+};
 
-alert("JavaScript is running on browser!")
+alert("JavaScript is running on browser!");
 ```
 
 Can be written in Swift using JavaScriptKit
@@ -69,6 +70,5 @@ let swiftPet: Pet = try JSValueDecoder().decode(from: jsPet)
 
 alert("Swift is running on browser!")
 ```
-
 
 Please see [Example](https://github.com/swiftwasm/JavaScriptKit/tree/master/Example) directory for more information
