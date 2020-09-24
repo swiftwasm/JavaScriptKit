@@ -97,7 +97,7 @@ extension JSString {
 
     func withRawJSValue<T>(_ body: (RawJSValue) -> T) -> T {
         let rawValue = RawJSValue(
-            kind: .string, payload1: guts.jsRef, payload2: 0, payload3: 0
+            kind: .string, payload1: guts.jsRef, payload2: 0
         )
         return body(rawValue)
     }

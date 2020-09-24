@@ -183,7 +183,7 @@ extension RawJSValue: JSValueConvertible {
         case .boolean:
             return .boolean(payload1 != 0)
         case .number:
-            return .number(payload3)
+            return .number(payload2)
         case .string:
             return .string(JSString(jsRef: payload1))
         case .object:
@@ -194,8 +194,6 @@ extension RawJSValue: JSValueConvertible {
             return .undefined
         case .function:
             return .function(JSFunction(id: UInt32(payload1)))
-        default:
-            fatalError("unreachable")
         }
     }
 }
@@ -204,38 +202,31 @@ extension JSValue {
     func withRawJSValue<T>(_ body: (RawJSValue) -> T) -> T {
         let kind: JavaScriptValueKind
         let payload1: JavaScriptPayload1
-        let payload2: JavaScriptPayload2
-        var payload3: JavaScriptPayload3 = 0
+        var payload2: JavaScriptPayload2 = 0
         switch self {
         case let .boolean(boolValue):
             kind = .boolean
             payload1 = boolValue ? 1 : 0
-            payload2 = 0
         case let .number(numberValue):
             kind = .number
             payload1 = 0
-            payload2 = 0
-            payload3 = numberValue
+            payload2 = numberValue
         case let .string(string):
             return string.withRawJSValue(body)
         case let .object(ref):
             kind = .object
             payload1 = JavaScriptPayload1(ref.id)
-            payload2 = 0
         case .null:
             kind = .null
             payload1 = 0
-            payload2 = 0
         case .undefined:
             kind = .undefined
             payload1 = 0
-            payload2 = 0
         case let .function(functionRef):
             kind = .function
             payload1 = JavaScriptPayload1(functionRef.id)
-            payload2 = 0
         }
-        let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2, payload3: payload3)
+        let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
         return body(rawValue)
     }
 }
