@@ -2,12 +2,12 @@ MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
 .PHONY: bootstrap
 bootstrap:
-	cd Runtime && npm install
+	npm install
 
 .PHONY: build
 build:
 	swift build --triple wasm32-unknown-wasi
-	cd Runtime && npm run build
+	npm run build
 
 .PHONY: test
 test:

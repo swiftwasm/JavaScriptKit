@@ -16,7 +16,7 @@ node_modules: package-lock.json
 
 .PHONY: build_rt
 build_rt: node_modules
-	cd ../Runtime && npm run build
+	cd .. && npm run build
 
 .PHONY: benchmark
 benchmark: build_rt dist/BenchmarkTests.wasm

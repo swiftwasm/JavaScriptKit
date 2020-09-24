@@ -1,0 +1,10 @@
+{
+  "overrides": [
+    {
+      "files": ["tsconfig.json", "*.js", "*.ts"],
+      "options": {
+        "tabWidth": 4
+      }
+    }
+  ]
+}
