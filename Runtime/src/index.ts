@@ -342,11 +342,7 @@ export class SwiftRuntime {
                 payload2: number
             ) => {
                 const obj = this.heap.referenceHeap(ref);
-                Reflect.set(
-                    obj,
-                    index,
-                    decodeValue(kind, payload1, payload2)
-                );
+                Reflect.set(obj, index, decodeValue(kind, payload1, payload2));
             },
             swjs_get_subscript: (
                 ref: ref,
