@@ -149,13 +149,13 @@ public func getJSValue(this: JSObject, name: JSString) -> JSValue {
     var rawValue = RawJSValue()
     _get_prop(this.id, name.asInternalJSRef(),
               &rawValue.kind,
-              &rawValue.payload1, &rawValue.payload2, &rawValue.payload3)
+              &rawValue.payload1, &rawValue.payload2)
     return rawValue.jsValue()
 }
 
 public func setJSValue(this: JSObject, name: JSString, value: JSValue) {
     value.withRawJSValue { rawValue in
-        _set_prop(this.id, name.asInternalJSRef(), rawValue.kind, rawValue.payload1, rawValue.payload2, rawValue.payload3)
+        _set_prop(this.id, name.asInternalJSRef(), rawValue.kind, rawValue.payload1, rawValue.payload2)
     }
 }
 
@@ -163,7 +163,7 @@ public func getJSValue(this: JSObject, index: Int32) -> JSValue {
     var rawValue = RawJSValue()
     _get_subscript(this.id, index,
                    &rawValue.kind,
-                   &rawValue.payload1, &rawValue.payload2, &rawValue.payload3)
+                   &rawValue.payload1, &rawValue.payload2)
     return rawValue.jsValue()
 }
 
@@ -171,7 +171,7 @@ public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
     value.withRawJSValue { rawValue in
         _set_subscript(this.id, index,
                        rawValue.kind,
-                       rawValue.payload1, rawValue.payload2, rawValue.payload3)
+                       rawValue.payload1, rawValue.payload2)
     }
 }
 
