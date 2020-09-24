@@ -24,7 +24,7 @@
 - Add `JSDate` implementation with tests ([#45](https://github.com/swiftwasm/JavaScriptKit/pull/45)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
 - Add `JSError` with tests, add JSObject.description ([#47](https://github.com/swiftwasm/JavaScriptKit/pull/47)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
 
-# 0.5.0 (18 July 2020)
+# 0.6.0 (11 September 2020)
 
 This release adds `JSTypedArray` generic type, renames `JSObjectRef` to `JSObject`, and makes `JSClosure` memory management more explicit.
 
