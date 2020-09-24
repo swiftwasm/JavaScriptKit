@@ -41,7 +41,7 @@
     </a>
 </dt>
 <dd>
-    <p>A wrapper around <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Array">the JavaScript Array class</a>
+    <p>A wrapper around <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">the JavaScript Array class</a>
 that exposes its properties in a type-safe and Swifty way.</p>
 
 </dd>
@@ -80,6 +80,20 @@ exposes its properties in a type-safe way.</p>
 
 </dd>
 <dt class="class">
+    <a href="/JavaScriptKit/JSPromise" title="class - JSPromise">
+        JSPromise
+    </a>
+</dt>
+<dd>
+    <p>A wrapper around <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">the JavaScript <code>Promise</code> class</a>
+that exposes its functions in a type-safe and Swifty way. The <code>JSPromise</code> API is generic over both
+<code>Success</code> and <code>Failure</code> types, which improves compatibility with other statically-typed APIs such
+as Combine. If you don't know the exact type of your <code>Success</code> value, you should use <code>JSValue</code>, e.g.
+<code>JSPromise&lt;JSValue, JSError&gt;</code>. In the rare case, where you can't guarantee that the error thrown
+is of actual JavaScript <code>Error</code> type, you should use <code>JSPromise&lt;JSValue, JSValue&gt;</code>.</p>
+
+</dd>
+<dt class="class">
     <a href="/JavaScriptKit/JSTimer" title="class - JSTimer">
         JSTimer
     </a>
@@ -104,7 +118,7 @@ or deallocate the object that owns the timer.</p>
     </a>
 </dt>
 <dd>
-    <p>A wrapper around all JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArray</a> classes that exposes their properties in a type-safe way.
+    <p>A wrapper around all JavaScript <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArray</a> classes that exposes their properties in a type-safe way.
 FIXME: the BigInt-based TypedArrays are not supported (https://github.com/swiftwasm/JavaScriptKit/issues/56)</p>
 
 </dd>
@@ -311,7 +325,7 @@ For example, a union type of multiple classes or primitive values.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2020-09-24T00:07:08+0000">September 24, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
+    Generated on <time datetime="2020-09-24T07:52:04+0000">September 24, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.4</span>.
 </p>
     </footer>
 </body>
