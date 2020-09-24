@@ -302,7 +302,7 @@ export class SwiftRuntime {
                 const base = ptr + 16 * index;
                 const kind = readUInt32(base);
                 const payload1 = readUInt32(base + 4);
-                const payload2 = readUInt32(base + 8);
+                const payload2 = readFloat64(base + 8);
                 result.push(decodeValue(kind, payload1, payload2));
             }
             return result;
