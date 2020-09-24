@@ -10,7 +10,7 @@ public protocol TypedArrayElement: JSValueConvertible, JSValueConstructible {
     static var typedArrayClass: JSFunction { get }
 }
 
-/// A wrapper around all JavaScript [TypedArray](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) classes that exposes their properties in a type-safe way.
+/// A wrapper around all JavaScript [TypedArray](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) classes that exposes their properties in a type-safe way.
 /// FIXME: the BigInt-based TypedArrays are not supported (https://github.com/swiftwasm/JavaScriptKit/issues/56)
 public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral where Element: TypedArrayElement {
     public static var constructor: JSFunction { Element.typedArrayClass }

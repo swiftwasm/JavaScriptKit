@@ -1,4 +1,4 @@
-/// A wrapper around [the JavaScript Array class](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Array)
+/// A wrapper around [the JavaScript Array class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)
 /// that exposes its properties in a type-safe and Swifty way.
 public class JSArray: JSBridgedClass {
     public static let constructor = JSObject.global.Array.function!
