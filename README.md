@@ -14,10 +14,10 @@ e.g.
 
 ```sh
 
-$ swiftenv install https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-06-03-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2020-06-03-a-osx.tar.gz
+$ swiftenv install https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.3-SNAPSHOT-2020-08-10-a/swift-wasm-5.3-SNAPSHOT-2020-08-10-a-osx.tar.gz
 $ swift --version
-Swift version 5.3-dev (LLVM 47c28180d7, Swift 5f96d487e0)
-Target: x86_64-apple-darwin19.3.0
+Swift version 5.3-dev (LLVM 09686f232a, Swift 5a196c7f13)
+Target: x86_64-apple-darwin19.6.0
 ```
 
 ## Usage
