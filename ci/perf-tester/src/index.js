@@ -32,11 +32,15 @@ const {
     toBool,
 } = require("./utils.js");
 
-const benchmarkCount = 4;
-const runBunchmarks = () =>
-    Promise.all(Array(benchmarkCount).fill().map(runBenchmark)).then(
-        averageBenchmarks
-    );
+const benchmarkParallel = 2;
+const benchmarkSerial = 2;
+const runBunchmarks = async () => {
+    for (let i = 0; i < benchmarkSerial; i++) {
+        await Promise.all(
+            Array(benchmarkParallel).fill().map(runBenchmark)
+        ).then(averageBenchmarks);
+    }
+};
 
 async function run(octokit, context, token) {
     const { number: pull_number } = context.issue;
