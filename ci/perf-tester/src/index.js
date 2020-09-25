@@ -37,7 +37,7 @@ const benchmarkSerial = 2;
 const runBenchmarks = async () => {
     let results = [];
     for (let i = 0; i < benchmarkSerial; i++) {
-        results.concat(
+        results = results.concat(
             await Promise.all(
                 Array(benchmarkParallel).fill().map(runBenchmark)
             ).then(averageBenchmarks)
