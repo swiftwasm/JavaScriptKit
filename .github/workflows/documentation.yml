@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Generate Documentation
-        uses: MaxDesiatov/swift-doc@prebuilt-image
+        uses: SwiftDocOrg/swift-doc@master
         with:
           inputs: "Sources"
           module-name: JavaScriptKit
