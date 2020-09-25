@@ -34,7 +34,7 @@ const {
 
 const benchmarkParallel = 2;
 const benchmarkSerial = 2;
-const runBunchmarks = async () => {
+const runBenchmarks = async () => {
     for (let i = 0; i < benchmarkSerial; i++) {
         await Promise.all(
             Array(benchmarkParallel).fill().map(runBenchmark)
