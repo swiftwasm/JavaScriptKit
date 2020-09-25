@@ -35,11 +35,15 @@ const {
 const benchmarkParallel = 2;
 const benchmarkSerial = 2;
 const runBenchmarks = async () => {
+    let results = [];
     for (let i = 0; i < benchmarkSerial; i++) {
-        await Promise.all(
-            Array(benchmarkParallel).fill().map(runBenchmark)
-        ).then(averageBenchmarks);
+        results.concat(
+            await Promise.all(
+                Array(benchmarkParallel).fill().map(runBenchmark)
+            ).then(averageBenchmarks)
+        );
     }
+    return results;
 };
 
 async function run(octokit, context, token) {
