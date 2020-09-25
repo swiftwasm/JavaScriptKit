@@ -118,7 +118,7 @@ class SwiftRuntimeHeap {
 export class SwiftRuntime {
     private instance: WebAssembly.Instance | null;
     private heap: SwiftRuntimeHeap;
-    private version: number = 611;
+    private version: number = 700;
 
     constructor() {
         this.instance = null;
