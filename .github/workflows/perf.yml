@@ -6,19 +6,19 @@ jobs:
   perf:
     runs-on: Ubuntu-18.04
     steps:
-    - name: Checkout
-      uses: actions/checkout@master
-      with:
-        fetch-depth: 1
-    - name: Run Benchmark
-      run: |
-        git clone https://github.com/kylef/swiftenv.git ~/.swiftenv
-        export SWIFTENV_ROOT="$HOME/.swiftenv"
-        export PATH="$SWIFTENV_ROOT/bin:$PATH"
-        eval "$(swiftenv init -)"
-        swiftenv install $TOOLCHAIN_DOWNLOAD
-        make perf-tester
-        node ci/perf-tester
-      env:
-        TOOLCHAIN_DOWNLOAD: https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.3-SNAPSHOT-2020-08-10-a/swift-wasm-5.3-SNAPSHOT-2020-08-10-a-linux.tar.gz
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@master
+        with:
+          fetch-depth: 1
+      - name: Run Benchmark
+        run: |
+          git clone https://github.com/kylef/swiftenv.git ~/.swiftenv
+          export SWIFTENV_ROOT="$HOME/.swiftenv"
+          export PATH="$SWIFTENV_ROOT/bin:$PATH"
+          eval "$(swiftenv init -)"
+          swiftenv install $TOOLCHAIN_DOWNLOAD
+          make perf-tester
+          node ci/perf-tester
+        env:
+          TOOLCHAIN_DOWNLOAD: https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.3-SNAPSHOT-2020-08-10-a/swift-wasm-5.3-SNAPSHOT-2020-08-10-a-linux.tar.gz
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
