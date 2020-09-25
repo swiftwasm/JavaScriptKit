@@ -1,5 +1,8 @@
 # Unreleased
 
+
+# 0.7.0 (25 September 2020)
+
 **Closed issues:**
 
 - `TypedArray` improvement? ([#52](https://github.com/swiftwasm/JavaScriptKit/issues/52))
