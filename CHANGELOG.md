@@ -1,6 +1,5 @@
 # Unreleased
 
-
 # 0.7.0 (25 September 2020)
 
 This release adds multiple new types bridged from JavaScript, namely `JSError`, `JSDate`, `JSTimer` (which corresponds to `setTimeout`/`setInterval` calls and manages closure lifetime for you), `JSString` and `JSPromise`. We now also have [documentation published automatically](https://swiftwasm.github.io/JavaScriptKit/) for the main branch.
