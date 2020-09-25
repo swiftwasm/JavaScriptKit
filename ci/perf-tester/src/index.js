@@ -32,6 +32,12 @@ const {
     toBool,
 } = require("./utils.js");
 
+const benchmarkCount = 4;
+const runBunchmarks = () =>
+    Promise.all(Array(benchmarkCount).fill().map(runBenchmark)).then(
+        averageBenchmarks
+    );
+
 async function run(octokit, context, token) {
     const { number: pull_number } = context.issue;
 
@@ -55,10 +61,7 @@ async function run(octokit, context, token) {
     endGroup();
 
     startGroup(`[current] Running benchmark`);
-    const newBenchmarks = await Promise.all([
-        runBenchmark(),
-        runBenchmark(),
-    ]).then(averageBenchmarks);
+    const newBenchmarks = await runBenchmarks();
     endGroup();
 
     startGroup(`[base] Checkout target branch`);
@@ -100,10 +103,7 @@ async function run(octokit, context, token) {
     endGroup();
 
     startGroup(`[base] Running benchmark`);
-    const oldBenchmarks = await Promise.all([
-        runBenchmark(),
-        runBenchmark(),
-    ]).then(averageBenchmarks);
+    const oldBenchmarks = await runBenchmarks();
     endGroup();
 
     const diff = toDiff(oldBenchmarks, newBenchmarks);
