@@ -38,12 +38,10 @@ const runBenchmarks = async () => {
     let results = [];
     for (let i = 0; i < benchmarkSerial; i++) {
         results = results.concat(
-            await Promise.all(
-                Array(benchmarkParallel).fill().map(runBenchmark)
-            ).then(averageBenchmarks)
+            await Promise.all(Array(benchmarkParallel).fill().map(runBenchmark))
         );
     }
-    return results;
+    return averageBenchmarks(results);
 };
 
 async function run(octokit, context, token) {
