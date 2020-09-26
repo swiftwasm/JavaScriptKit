@@ -4,7 +4,7 @@
   "description": "A runtime library of JavaScriptKit which is Swift framework to interact with JavaScript through WebAssembly.",
   "main": "Runtime/lib/index.js",
   "files": [
-    "lib"
+    "Runtime/lib"
   ],
   "scripts": {
     "build": "npm run build:clean && npm run build:ts",
