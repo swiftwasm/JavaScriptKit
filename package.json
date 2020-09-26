@@ -1,6 +1,6 @@
 {
   "name": "javascript-kit-swift",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "A runtime library of JavaScriptKit which is Swift framework to interact with JavaScript through WebAssembly.",
   "main": "Runtime/lib/index.js",
   "files": [
