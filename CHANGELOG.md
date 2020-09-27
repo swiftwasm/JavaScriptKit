@@ -1,4 +1,17 @@
-# Unreleased
+# 0.7.1 (27 September 2020)
+
+This is a bugfix release that resolves an issue with the JavaScript runtime being unavailable when installed via NPM.
+
+**Closed issues:**
+
+- 0.7.0 unavailable on NPM ([#79](https://github.com/swiftwasm/JavaScriptKit/issues/79))
+- Automatic performance testing ([#67](https://github.com/swiftwasm/JavaScriptKit/issues/67))
+
+**Merged pull requests:**
+
+- Fix runtime files location in `package.json` ([#81](https://github.com/swiftwasm/JavaScriptKit/pull/81)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Run 4 perf tests instead of 2 ([#80](https://github.com/swiftwasm/JavaScriptKit/pull/80)) via [@j-f1](https://github.com/j-f1)
+- Specify correct SwiftWasm snapshot in `README.md` ([#78](https://github.com/swiftwasm/JavaScriptKit/pull/78)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
 
 # 0.7.0 (25 September 2020)
 
