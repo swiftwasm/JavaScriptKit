@@ -1,3 +1,7 @@
+# 0.7.2 (28 September 2020)
+
+This is a bugfix release that resolves an issue with the JavaScript runtime being unavailable when installed via NPM.
+
 # 0.7.1 (27 September 2020)
 
 This is a bugfix release that resolves an issue with the JavaScript runtime being unavailable when installed via NPM.
