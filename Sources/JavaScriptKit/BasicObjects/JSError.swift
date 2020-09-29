@@ -43,3 +43,10 @@ extension JSError: CustomStringConvertible {
     /// The textual representation of this error.
     public var description: String { jsObject.description }
 }
+
+extension JSError: JSValueConstructible {
+  public static func construct(from value: JSValue) -> JSError? {
+    guard let object = value.object else { return nil }
+    return JSError(unsafelyWrapping: object)
+  }
+}
