@@ -6,9 +6,9 @@ public protocol ConvertibleToJSValue {
     func jsValue() -> JSValue
 }
 
-public typealias JSValueCodable = ConvertibleToJSValue & ConstructibleFromJSValue
+public typealias JSValueCompatible = ConvertibleToJSValue & ConstructibleFromJSValue
 
-extension JSValue: JSValueCodable {
+extension JSValue: JSValueCompatible {
     public static func construct(from value: JSValue) -> Self? {
         return value
     }
@@ -76,7 +76,7 @@ extension JSString: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .string(self) }
 }
 
-extension JSObject: JSValueCodable {
+extension JSObject: JSValueCompatible {
     // `JSObject.jsValue` is defined in JSObject.swift to be able to overridden
     // from `JSFunction`
 }

@@ -12,3 +12,6 @@ public typealias JSValueConvertible = ConvertibleToJSValue
 
 @available(*, deprecated, renamed: "ConstructibleFromJSValue")
 public typealias JSValueConstructible = ConstructibleFromJSValue
+
+@available(*, deprecated, renamed: "JSValueCompatible")
+public typealias JSValueCodable = JSValueCompatible

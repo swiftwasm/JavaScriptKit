@@ -1,6 +1,6 @@
 /// Use this protocol when your type has no single JavaScript class.
 /// For example, a union type of multiple classes or primitive values.
-public protocol JSBridgedType: JSValueCodable, CustomStringConvertible {
+public protocol JSBridgedType: JSValueCompatible, CustomStringConvertible {
     /// This is the value your class wraps.
     var value: JSValue { get }
 
