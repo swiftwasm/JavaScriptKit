@@ -487,9 +487,12 @@ try test("Promise") {
 
 try test("Error") {
     let message = "test error"
+    let expectedDescription = "Error: test error"
     let error = JSError(message: message)
     try expectEqual(error.name, "Error")
     try expectEqual(error.message, message)
-    try expectEqual(error.description, "Error: test error")
+    try expectEqual(error.description, expectedDescription)
     try expectEqual(error.stack?.isEmpty, false)
+    try expectEqual(JSError(from: .string("error"))?.description, nil)
+    try expectEqual(JSError(from: .object(error.jsObject))?.description, expectedDescription)
 }

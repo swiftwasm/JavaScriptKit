@@ -2,7 +2,7 @@
 class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) that
 exposes its properties in a type-safe way.
 */
-public final class JSError: Error, JSValueConvertible {
+public final class JSError: Error, JSBridgedClass {
     /// The constructor function used to create new JavaScript `Error` objects.
     public static let constructor = JSObject.global.Error.function!
 
