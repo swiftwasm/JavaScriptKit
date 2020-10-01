@@ -1,12 +1,12 @@
 import _CJavaScriptKit
 
 /// Objects that can be converted to a JavaScript value, preferably in a lossless manner.
-public protocol JSValueConvertible {
+public protocol ConvertibleToJSValue {
     /// Create a JSValue that represents this object
     func jsValue() -> JSValue
 }
 
-public typealias JSValueCodable = JSValueConvertible & JSValueConstructible
+public typealias JSValueCodable = ConvertibleToJSValue & ConstructibleFromJSValue
 
 extension JSValue: JSValueCodable {
     public static func construct(from value: JSValue) -> Self? {
@@ -16,63 +16,63 @@ extension JSValue: JSValueCodable {
     public func jsValue() -> JSValue { self }
 }
 
-extension Bool: JSValueConvertible {
+extension Bool: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .boolean(self) }
 }
 
-extension Int: JSValueConvertible {
+extension Int: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
-extension UInt: JSValueConvertible {
+extension UInt: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
-extension Float: JSValueConvertible {
+extension Float: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
-extension Double: JSValueConvertible {
+extension Double: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .number(self) }
 }
 
-extension String: JSValueConvertible {
+extension String: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .string(JSString(self)) }
 }
 
-extension UInt8: JSValueConvertible {
+extension UInt8: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
-extension UInt16: JSValueConvertible {
+extension UInt16: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
-extension UInt32: JSValueConvertible {
+extension UInt32: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
-extension UInt64: JSValueConvertible {
+extension UInt64: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
-extension Int8: JSValueConvertible {
+extension Int8: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
-extension Int16: JSValueConvertible {
+extension Int16: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
-extension Int32: JSValueConvertible {
+extension Int32: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
-extension Int64: JSValueConvertible {
+extension Int64: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .number(Double(self)) }
 }
 
-extension JSString: JSValueConvertible {
+extension JSString: ConvertibleToJSValue {
     public func jsValue() -> JSValue { .string(self) }
 }
 
@@ -84,13 +84,13 @@ extension JSObject: JSValueCodable {
 private let objectConstructor = JSObject.global.Object.function!
 private let arrayConstructor = JSObject.global.Array.function!
 
-extension Dictionary where Value: JSValueConvertible, Key == String {
+extension Dictionary where Value: ConvertibleToJSValue, Key == String {
     public func jsValue() -> JSValue {
-        Swift.Dictionary<Key, JSValueConvertible>.jsValue(self)()
+        Swift.Dictionary<Key, ConvertibleToJSValue>.jsValue(self)()
     }
 }
 
-extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key == String {
+extension Dictionary: ConvertibleToJSValue where Value == ConvertibleToJSValue, Key == String {
     public func jsValue() -> JSValue {
         let object = objectConstructor.new()
         for (key, value) in self {
@@ -100,7 +100,7 @@ extension Dictionary: JSValueConvertible where Value == JSValueConvertible, Key 
     }
 }
 
-extension Dictionary: JSValueConstructible where Value: JSValueConstructible, Key == String {
+extension Dictionary: ConstructibleFromJSValue where Value: ConstructibleFromJSValue, Key == String {
     public static func construct(from value: JSValue) -> Self? {
         guard
             let objectRef = value.object,
@@ -119,7 +119,7 @@ extension Dictionary: JSValueConstructible where Value: JSValueConstructible, Ke
     }
 }
 
-extension Optional: JSValueConstructible where Wrapped: JSValueConstructible {
+extension Optional: ConstructibleFromJSValue where Wrapped: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Self? {
         switch value {
         case .null, .undefined:
@@ -130,7 +130,7 @@ extension Optional: JSValueConstructible where Wrapped: JSValueConstructible {
     }
 }
 
-extension Optional: JSValueConvertible where Wrapped: JSValueConvertible {
+extension Optional: ConvertibleToJSValue where Wrapped: ConvertibleToJSValue {
     public func jsValue() -> JSValue {
         switch self {
         case .none: return .null
@@ -139,13 +139,13 @@ extension Optional: JSValueConvertible where Wrapped: JSValueConvertible {
     }
 }
 
-extension Array where Element: JSValueConvertible {
+extension Array where Element: ConvertibleToJSValue {
     public func jsValue() -> JSValue {
-        Array<JSValueConvertible>.jsValue(self)()
+        Array<ConvertibleToJSValue>.jsValue(self)()
     }
 }
 
-extension Array: JSValueConvertible where Element == JSValueConvertible {
+extension Array: ConvertibleToJSValue where Element == ConvertibleToJSValue {
     public func jsValue() -> JSValue {
         let array = arrayConstructor.new(count)
         for (index, element) in enumerated() {
@@ -155,7 +155,7 @@ extension Array: JSValueConvertible where Element == JSValueConvertible {
     }
 }
 
-extension Array: JSValueConstructible where Element: JSValueConstructible {
+extension Array: ConstructibleFromJSValue where Element: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> [Element]? {
         guard
             let objectRef = value.object,
@@ -175,7 +175,7 @@ extension Array: JSValueConstructible where Element: JSValueConstructible {
     }
 }
 
-extension RawJSValue: JSValueConvertible {
+extension RawJSValue: ConvertibleToJSValue {
     public func jsValue() -> JSValue {
         switch kind {
         case .invalid:
@@ -231,10 +231,10 @@ extension JSValue {
     }
 }
 
-extension Array where Element == JSValueConvertible {
+extension Array where Element == ConvertibleToJSValue {
     func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
         func _withRawJSValues<T>(
-            _ values: [JSValueConvertible], _ index: Int,
+            _ values: [ConvertibleToJSValue], _ index: Int,
             _ results: inout [RawJSValue], _ body: ([RawJSValue]) -> T
         ) -> T {
             if index == values.count { return body(results) }
@@ -248,8 +248,8 @@ extension Array where Element == JSValueConvertible {
     }
 }
 
-extension Array where Element: JSValueConvertible {
+extension Array where Element: ConvertibleToJSValue {
     func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
-        [JSValueConvertible].withRawJSValues(self)(body)
+        [ConvertibleToJSValue].withRawJSValues(self)(body)
     }
 }

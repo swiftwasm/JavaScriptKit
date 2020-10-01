@@ -16,7 +16,7 @@ executed.
 If the actual `Promise` object in JavaScript environment lives longer than this `JSPromise`, it may
 attempt to call a deallocated `JSClosure`.
 */
-public final class JSPromise<Success, Failure>: JSValueConvertible, JSValueConstructible {
+public final class JSPromise<Success, Failure>: ConvertibleToJSValue, ConstructibleFromJSValue {
     /// The underlying JavaScript `Promise` object.
     public let jsObject: JSObject
 
@@ -88,7 +88,7 @@ extension JSPromise where Success == (), Failure == Never {
     }
 }
 
-extension JSPromise where Failure: JSValueConvertible {
+extension JSPromise where Failure: ConvertibleToJSValue {
     /** Creates a new `JSPromise` instance from a given `resolver` closure. `resolver` takes 
     two closure that your code should call to either resolve or reject this `JSPromise` instance.
     */
@@ -113,7 +113,7 @@ extension JSPromise where Failure: JSValueConvertible {
     }
 }
 
-extension JSPromise where Success: JSValueConvertible, Failure: JSError {
+extension JSPromise where Success: ConvertibleToJSValue, Failure: JSError {
     /** Creates a new `JSPromise` instance from a given `resolver` closure. `resolver` takes 
     a closure that your code should call to either resolve or reject this `JSPromise` instance.
     */
@@ -138,7 +138,7 @@ extension JSPromise where Success: JSValueConvertible, Failure: JSError {
     }
 }
 
-extension JSPromise where Success: JSValueConstructible {
+extension JSPromise where Success: ConstructibleFromJSValue {
     /** Schedules the `success` closure to be invoked on sucessful completion of `self`.
     */
     public func then(
@@ -160,7 +160,7 @@ extension JSPromise where Success: JSValueConstructible {
     closure invoked on sucessful completion of `self`. The returned promise will have a new 
     `Success` type equal to the return type of `success`.
     */
-    public func then<ResultType: JSValueConvertible>(
+    public func then<ResultType: ConvertibleToJSValue>(
         success: @escaping (Success) -> ResultType,
         file: StaticString = #file,
         line: Int = #line
@@ -179,7 +179,7 @@ extension JSPromise where Success: JSValueConstructible {
     closure invoked on sucessful completion of `self`. The returned promise will have a new type
     equal to the return type of `success`.
     */
-    public func then<ResultSuccess: JSValueConvertible, ResultFailure: JSValueConstructible>(
+    public func then<ResultSuccess: ConvertibleToJSValue, ResultFailure: ConstructibleFromJSValue>(
         success: @escaping (Success) -> JSPromise<ResultSuccess, ResultFailure>,
         file: StaticString = #file,
         line: Int = #line
@@ -195,12 +195,12 @@ extension JSPromise where Success: JSValueConstructible {
     }
 }
 
-extension JSPromise where Failure: JSValueConstructible {
+extension JSPromise where Failure: ConstructibleFromJSValue {
     /** Returns a new promise created from chaining the current `self` promise with the `failure`
     closure invoked on rejected completion of `self`. The returned promise will have a new `Success`
     type equal to the return type of the callback, while the `Failure` type becomes `Never`.
     */
-    public func `catch`<ResultSuccess: JSValueConvertible>(
+    public func `catch`<ResultSuccess: ConvertibleToJSValue>(
         failure: @escaping (Failure) -> ResultSuccess,
         file: StaticString = #file,
         line: Int = #line
@@ -236,7 +236,7 @@ extension JSPromise where Failure: JSValueConstructible {
     closure invoked on rejected completion of `self`.  The returned promise will have a new type
     equal to the return type of `success`.
     */
-    public func `catch`<ResultSuccess: JSValueConvertible, ResultFailure: JSValueConstructible>(
+    public func `catch`<ResultSuccess: ConvertibleToJSValue, ResultFailure: ConstructibleFromJSValue>(
         failure: @escaping (Failure) -> JSPromise<ResultSuccess, ResultFailure>,
         file: StaticString = #file,
         line: Int = #line

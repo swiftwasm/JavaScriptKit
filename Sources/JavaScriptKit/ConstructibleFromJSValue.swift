@@ -1,5 +1,5 @@
 /// Types conforming to this protocol can be constructed from `JSValue`.
-public protocol JSValueConstructible {
+public protocol ConstructibleFromJSValue {
     /// Construct an instance of `Self`, if possible, from the given `JSValue`.
     /// Return `nil` if the value is not compatible with the conforming Swift type.
     ///
@@ -8,91 +8,91 @@ public protocol JSValueConstructible {
     static func construct(from value: JSValue) -> Self?
 }
 
-extension Bool: JSValueConstructible {
+extension Bool: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Bool? {
         value.boolean
     }
 }
 
-extension String: JSValueConstructible {
+extension String: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> String? {
         value.string
     }
 }
 
-extension Double: JSValueConstructible {
+extension Double: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Double? {
         return value.number
     }
 }
 
-extension Float: JSValueConstructible {
+extension Float: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Float? {
         return value.number.map(Float.init)
     }
 }
 
-extension Int: JSValueConstructible {
+extension Int: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Self? {
         value.number.map(Self.init)
     }
 }
 
-extension Int8: JSValueConstructible {
+extension Int8: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Self? {
         value.number.map(Self.init)
     }
 }
 
-extension Int16: JSValueConstructible {
+extension Int16: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Self? {
         value.number.map(Self.init)
     }
 }
 
-extension Int32: JSValueConstructible {
+extension Int32: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Self? {
         value.number.map(Self.init)
     }
 }
 
-extension Int64: JSValueConstructible {
+extension Int64: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Self? {
         value.number.map(Self.init)
     }
 }
 
-extension UInt: JSValueConstructible {
+extension UInt: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Self? {
         value.number.map(Self.init)
     }
 }
 
-extension UInt8: JSValueConstructible {
+extension UInt8: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Self? {
         value.number.map(Self.init)
     }
 }
 
-extension UInt16: JSValueConstructible {
+extension UInt16: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Self? {
         value.number.map(Self.init)
     }
 }
 
-extension UInt32: JSValueConstructible {
+extension UInt32: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Self? {
         value.number.map(Self.init)
     }
 }
 
-extension UInt64: JSValueConstructible {
+extension UInt64: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> Self? {
         value.number.map(Self.init)
     }
 }
 
-extension JSString: JSValueConstructible {
+extension JSString: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> JSString? {
         value.jsString
     }
