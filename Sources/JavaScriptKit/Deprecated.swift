@@ -6,3 +6,9 @@ public typealias JSArrayRef = JSArray
 
 @available(*, deprecated, renamed: "JSFunction")
 public typealias JSFunctionRef = JSFunction
+
+@available(*, deprecated, renamed: "ConvertibleToJSValue")
+public typealias JSValueConvertible = ConvertibleToJSValue
+
+@available(*, deprecated, renamed: "ConstructibleFromJSValue")
+public typealias JSValueConstructible = ConstructibleFromJSValue
