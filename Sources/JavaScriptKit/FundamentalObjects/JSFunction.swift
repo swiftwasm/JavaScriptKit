@@ -18,7 +18,7 @@ public class JSFunction: JSObject {
     ///   - arguments: Arguments to be passed to this function.
     /// - Returns: The result of this call.
     @discardableResult
-    public func callAsFunction(this: JSObject? = nil, arguments: [JSValueConvertible]) -> JSValue {
+    public func callAsFunction(this: JSObject? = nil, arguments: [ConvertibleToJSValue]) -> JSValue {
         let result = arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer -> RawJSValue in
                 let argv = bufferPointer.baseAddress
@@ -42,7 +42,7 @@ public class JSFunction: JSObject {
 
     /// A variadic arguments version of `callAsFunction`.
     @discardableResult
-    public func callAsFunction(this: JSObject? = nil, _ arguments: JSValueConvertible...) -> JSValue {
+    public func callAsFunction(this: JSObject? = nil, _ arguments: ConvertibleToJSValue...) -> JSValue {
         self(this: this, arguments: arguments)
     }
 
@@ -56,7 +56,7 @@ public class JSFunction: JSObject {
     ///
     /// - Parameter arguments: Arguments to be passed to this constructor function.
     /// - Returns: A new instance of this constructor.
-    public func new(arguments: [JSValueConvertible]) -> JSObject {
+    public func new(arguments: [ConvertibleToJSValue]) -> JSObject {
         arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
@@ -69,7 +69,7 @@ public class JSFunction: JSObject {
     }
 
     /// A variadic arguments version of `new`.
-    public func new(_ arguments: JSValueConvertible...) -> JSObject {
+    public func new(_ arguments: ConvertibleToJSValue...) -> JSObject {
         new(arguments: arguments)
     }
 

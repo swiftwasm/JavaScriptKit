@@ -5,7 +5,7 @@
 import _CJavaScriptKit
 
 /// A protocol that allows a Swift numeric type to be mapped to the JavaScript TypedArray that holds integers of its type
-public protocol TypedArrayElement: JSValueConvertible, JSValueConstructible {
+public protocol TypedArrayElement: ConvertibleToJSValue, ConstructibleFromJSValue {
     /// The constructor function for the TypedArray class for this particular kind of number
     static var typedArrayClass: JSFunction { get }
 }

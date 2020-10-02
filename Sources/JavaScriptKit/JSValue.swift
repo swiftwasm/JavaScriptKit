@@ -80,7 +80,7 @@ public enum JSValue: Equatable {
 }
 
 extension JSValue {
-    public func fromJSValue<Type>() -> Type? where Type: JSValueConstructible {
+    public func fromJSValue<Type>() -> Type? where Type: ConstructibleFromJSValue {
         return Type.construct(from: self)
     }
 }

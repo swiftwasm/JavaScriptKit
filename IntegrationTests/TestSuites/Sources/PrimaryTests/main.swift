@@ -286,7 +286,7 @@ try test("Object Conversion") {
     try expectEqual(jsArray1[1], .number(2))
     try expectEqual(jsArray1[2], .number(3))
 
-    let array2: [JSValueConvertible] = [1, "str", false]
+    let array2: [ConvertibleToJSValue] = [1, "str", false]
     let jsArray2 = array2.jsValue().object!
     try expectEqual(jsArray2.length, .number(3))
     try expectEqual(jsArray2[0], .number(1))
@@ -298,7 +298,7 @@ try test("Object Conversion") {
 
     try expectEqual(jsArray2[4], .object(jsArray1))
 
-    let dict1: [String: JSValueConvertible] = [
+    let dict1: [String: ConvertibleToJSValue] = [
         "prop1": 1,
         "prop2": "foo",
     ]

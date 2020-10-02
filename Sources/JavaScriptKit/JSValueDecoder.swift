@@ -113,7 +113,7 @@ private struct _KeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContainerPr
         try _decode(forKey: key).isNull
     }
 
-    func decode<T>(_: T.Type, forKey key: Key) throws -> T where T: JSValueConstructible & Decodable {
+    func decode<T>(_: T.Type, forKey key: Key) throws -> T where T: ConstructibleFromJSValue & Decodable {
         return try _throwTypeMismatchIfNil(forKey: key) { T.construct(from: $0) }
     }
 
@@ -177,7 +177,7 @@ private struct _UnkeyedDecodingContainer: UnkeyedDecodingContainer {
         return _currentValue().isNull
     }
 
-    mutating func decode<T>(_: T.Type) throws -> T where T: JSValueConstructible & Decodable {
+    mutating func decode<T>(_: T.Type) throws -> T where T: ConstructibleFromJSValue & Decodable {
         try _throwTypeMismatchIfNil { T.construct(from: $0) }
     }
 
@@ -214,13 +214,13 @@ extension _Decoder: SingleValueDecodingContainer {
         node.isNull
     }
 
-    func decode<T>(_: T.Type) throws -> T where T: JSValueConstructible & Decodable {
+    func decode<T>(_: T.Type) throws -> T where T: ConstructibleFromJSValue & Decodable {
         try _throwTypeMismatchIfNil { T.construct(from: $0) }
     }
 
     func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
         let primitive = { (node: JSValue) -> T? in
-            guard let constructibleType = type as? JSValueConstructible.Type else {
+            guard let constructibleType = type as? ConstructibleFromJSValue.Type else {
                 return nil
             }
             return constructibleType.construct(from: node) as? T

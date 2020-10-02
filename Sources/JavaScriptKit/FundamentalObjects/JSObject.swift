@@ -32,17 +32,17 @@ public class JSObject: Equatable {
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The `name` member method binding this object as `this` context.
     @_disfavoredOverload
-    public subscript(_ name: String) -> ((JSValueConvertible...) -> JSValue)? {
+    public subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)? {
         guard let function = self[name].function else { return nil }
-        return { (arguments: JSValueConvertible...) in
+        return { (arguments: ConvertibleToJSValue...) in
             function(this: self, arguments: arguments)
         }
     }
 
-    /// A convenience method of `subscript(_ name: String) -> ((JSValueConvertible...) -> JSValue)?`
+    /// A convenience method of `subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
     /// to access the member through Dynamic Member Lookup.
     @_disfavoredOverload
-    public subscript(dynamicMember name: String) -> ((JSValueConvertible...) -> JSValue)? {
+    public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue)? {
         self[name]
     }
 
