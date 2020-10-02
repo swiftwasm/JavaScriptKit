@@ -37,7 +37,7 @@
     <code class="name">JSPromise</code>
 </h1>
 
-<html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">final</span> <span class="keyword">class</span> <span class="type">JSPromise</span>&lt;<span class="variable">Success</span>, <span class="variable">Failure</span>&gt;: <a href="/JavaScriptKit/JSValueConvertible"><span class="type">JSValueConvertible</span></a>, <a href="/JavaScriptKit/JSValueConstructible"><span class="type">JSValueConstructible</span></a></code></pre></body></html>
+<html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">final</span> <span class="keyword">class</span> <span class="type">JSPromise</span>&lt;<span class="variable">Success</span>, <span class="variable">Failure</span>&gt;: <a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>, <a href="/JavaScriptKit/ConstructibleFromJSValue"><span class="type">ConstructibleFromJSValue</span></a></code></pre></body></html>
 <div class="summary" role="doc-abstract">
     <p>A wrapper around <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">the JavaScript <code>Promise</code> class</a>
 that exposes its functions in a type-safe and Swifty way. The <code>JSPromise</code> API is generic over both
@@ -83,33 +83,33 @@ attempt to call a deallocated <code>JSClosure</code>.</p>
 </a>
 </g>
 </g>
-<!-- JSValueConstructible -->
+<!-- ConstructibleFromJSValue -->
 <g id="node2" class="node protocol">
-<title>JSValueConstructible</title>
-<g id="a_node2"><a xlink:href="/JavaScriptKit/JSValueConstructible" xlink:title="JSValueConstructible">
+<title>ConstructibleFromJSValue</title>
+<g id="a_node2"><a xlink:href="/JavaScriptKit/ConstructibleFromJSValue" xlink:title="ConstructibleFromJSValue">
 <path fill="none" stroke="#000000" d="M303,-36C303,-36 111,-36 111,-36 105,-36 99,-30 99,-24 99,-24 99,-12 99,-12 99,-6 105,0 111,0 111,0 303,0 303,0 309,0 315,-6 315,-12 315,-12 315,-24 315,-24 315,-30 309,-36 303,-36"/>
-<text text-anchor="middle" x="207" y="-14.3" font-family="Menlo" font-size="14.00" fill="#000000">JSValueConstructible</text>
+<text text-anchor="middle" x="207" y="-14.3" font-family="Menlo" font-size="14.00" fill="#000000">ConstructibleFromJSValue</text>
 </a>
 </g>
 </g>
-<!-- JSPromise&#45;&gt;JSValueConstructible -->
-<g id="edge1" class="edge conformsTo">
-<title>JSPromise&#45;&gt;JSValueConstructible</title>
+<!-- JSPromise&#45;&gt;ConstructibleFromJSValue -->
+<g id="edge2" class="edge conformsTo">
+<title>JSPromise&#45;&gt;ConstructibleFromJSValue</title>
 <path fill="none" stroke="#000000" d="M375.5134,-71.9243C344.4871,-61.9959 305.8297,-49.6255 273.3694,-39.2382"/>
 <polygon fill="#000000" stroke="#000000" points="274.1008,-35.7975 263.5098,-36.0831 271.9673,-42.4645 274.1008,-35.7975"/>
 </g>
-<!-- JSValueConvertible -->
+<!-- ConvertibleToJSValue -->
 <g id="node3" class="node protocol">
-<title>JSValueConvertible</title>
-<g id="a_node3"><a xlink:href="/JavaScriptKit/JSValueConvertible" xlink:title="JSValueConvertible">
+<title>ConvertibleToJSValue</title>
+<g id="a_node3"><a xlink:href="/JavaScriptKit/ConvertibleToJSValue" xlink:title="ConvertibleToJSValue">
 <path fill="none" stroke="#000000" d="M753,-36C753,-36 561,-36 561,-36 555,-36 549,-30 549,-24 549,-24 549,-12 549,-12 549,-6 555,0 561,0 561,0 753,0 753,0 759,0 765,-6 765,-12 765,-12 765,-24 765,-24 765,-30 759,-36 753,-36"/>
-<text text-anchor="middle" x="657" y="-14.3" font-family="Menlo" font-size="14.00" fill="#000000">JSValueConvertible</text>
+<text text-anchor="middle" x="657" y="-14.3" font-family="Menlo" font-size="14.00" fill="#000000">ConvertibleToJSValue</text>
 </a>
 </g>
 </g>
-<!-- JSPromise&#45;&gt;JSValueConvertible -->
-<g id="edge2" class="edge conformsTo">
-<title>JSPromise&#45;&gt;JSValueConvertible</title>
+<!-- JSPromise&#45;&gt;ConvertibleToJSValue -->
+<g id="edge1" class="edge conformsTo">
+<title>JSPromise&#45;&gt;ConvertibleToJSValue</title>
 <path fill="none" stroke="#000000" d="M488.4866,-71.9243C519.5129,-61.9959 558.1703,-49.6255 590.6306,-39.2382"/>
 <polygon fill="#000000" stroke="#000000" points="592.0327,-42.4645 600.4902,-36.0831 589.8992,-35.7975 592.0327,-42.4645"/>
 </g>
@@ -121,10 +121,10 @@ attempt to call a deallocated <code>JSClosure</code>.</p>
 </figure>
         <h3>Conforms To</h3>
 <dl>
-    <dt class="protocol"><code><a href="/JavaScriptKit/JSValueConstructible">JSValueConstructible</a></code></dt>
+    <dt class="protocol"><code><a href="/JavaScriptKit/ConstructibleFromJSValue">ConstructibleFromJSValue</a></code></dt>
 <dd><p>Types conforming to this protocol can be constructed from <code>JSValue</code>.</p>
 </dd>
-<dt class="protocol"><code><a href="/JavaScriptKit/JSValueConvertible">JSValueConvertible</a></code></dt>
+<dt class="protocol"><code><a href="/JavaScriptKit/ConvertibleToJSValue">ConvertibleToJSValue</a></code></dt>
 <dd><p>Objects that can be converted to a JavaScript value, preferably in a lossless manner.</p>
 </dd>
 </dl>
@@ -213,7 +213,7 @@ return <code>nil</code>.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2020-10-01T17:51:46+0000">October 1, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2020-10-02T00:18:23+0000">October 2, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
 </p>
     </footer>
 </body>

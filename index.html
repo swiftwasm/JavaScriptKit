@@ -208,6 +208,24 @@ runtime bridge library for a member with the specified name in this object.</p>
 
 </dd>
 <dt class="protocol">
+    <a href="/JavaScriptKit/ConstructibleFromJSValue" title="protocol - ConstructibleFromJSValue">
+        Constructible​From​JSValue
+    </a>
+</dt>
+<dd>
+    <p>Types conforming to this protocol can be constructed from <code>JSValue</code>.</p>
+
+</dd>
+<dt class="protocol">
+    <a href="/JavaScriptKit/ConvertibleToJSValue" title="protocol - ConvertibleToJSValue">
+        Convertible​ToJSValue
+    </a>
+</dt>
+<dd>
+    <p>Objects that can be converted to a JavaScript value, preferably in a lossless manner.</p>
+
+</dd>
+<dt class="protocol">
     <a href="/JavaScriptKit/JSBridgedType" title="protocol - JSBridgedType">
         JSBridged​Type
     </a>
@@ -226,30 +244,20 @@ For example, a union type of multiple classes or primitive values.</p>
     <p>Conform to this protocol when your Swift class wraps a JavaScript class.</p>
 
 </dd>
-<dt class="protocol">
-    <a href="/JavaScriptKit/JSValueConstructible" title="protocol - JSValueConstructible">
-        JSValue​Constructible
-    </a>
-</dt>
-<dd>
-    <p>Types conforming to this protocol can be constructed from <code>JSValue</code>.</p>
-
-</dd>
-<dt class="protocol">
-    <a href="/JavaScriptKit/JSValueConvertible" title="protocol - JSValueConvertible">
-        JSValue​Convertible
-    </a>
-</dt>
-<dd>
-    <p>Objects that can be converted to a JavaScript value, preferably in a lossless manner.</p>
-
-</dd>
         </dl>
     </section>
     <section id="typealiases">
         <h2>Typealiases</h2>
         <dl>
             <dt class="typealias">
+    <a href="/JavaScriptKit/JSValueCompatible" title="typealias - JSValueCompatible">
+        JSValue​Compatible
+    </a>
+</dt>
+<dd>
+    
+</dd>
+<dt class="typealias">
     <a href="/JavaScriptKit/JSObjectRef" title="typealias - JSObjectRef">
         JSObject​Ref
     </a>
@@ -268,6 +276,22 @@ For example, a union type of multiple classes or primitive values.</p>
 <dt class="typealias">
     <a href="/JavaScriptKit/JSFunctionRef" title="typealias - JSFunctionRef">
         JSFunction​Ref
+    </a>
+</dt>
+<dd>
+    
+</dd>
+<dt class="typealias">
+    <a href="/JavaScriptKit/JSValueConvertible" title="typealias - JSValueConvertible">
+        JSValue​Convertible
+    </a>
+</dt>
+<dd>
+    
+</dd>
+<dt class="typealias">
+    <a href="/JavaScriptKit/JSValueConstructible" title="typealias - JSValueConstructible">
+        JSValue​Constructible
     </a>
 </dt>
 <dd>
@@ -325,7 +349,7 @@ For example, a union type of multiple classes or primitive values.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2020-10-01T17:51:47+0000">October 1, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2020-10-02T00:18:23+0000">October 2, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
 </p>
     </footer>
 </body>

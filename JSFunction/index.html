@@ -136,7 +136,7 @@ For further discussion, see also <a href="https://github.com/swiftwasm/JavaScrip
     <h3>
         <code>call​AsFunction(this:​arguments:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span> <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">callAsFunction</span>(<span class="variable">this</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a>? = <span class="keyword">nil</span>, <span class="variable">arguments</span>: [<a href="/JavaScriptKit/JSValueConvertible"><span class="type">JSValueConvertible</span></a>]) -&gt; <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a></code></pre></body></html>
+    <html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span> <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">callAsFunction</span>(<span class="variable">this</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a>? = <span class="keyword">nil</span>, <span class="variable">arguments</span>: [<a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>]) -&gt; <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a></code></pre></body></html>
 <div class="summary" role="doc-abstract">
     <p>Call this function with given <code>arguments</code> and binding given <code>this</code> as context.</p>
 
@@ -160,7 +160,7 @@ For further discussion, see also <a href="https://github.com/swiftwasm/JavaScrip
 </tr>
 <tr>
     <th>arguments</th>
-    <td><code class="type">[JSValue​Convertible]</code></td>
+    <td><code class="type">[Convertible​ToJSValue]</code></td>
     <td><p>Arguments to be passed to this function.</p>
 </td>
 </tr>
@@ -174,7 +174,7 @@ For further discussion, see also <a href="https://github.com/swiftwasm/JavaScrip
     <h3>
         <code>call​AsFunction(this:​_:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span> <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">callAsFunction</span>(<span class="variable">this</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a>? = <span class="keyword">nil</span>, <span class="keyword">_</span> <span class="variable">arguments</span>: <a href="/JavaScriptKit/JSValueConvertible"><span class="type">JSValueConvertible</span></a>) -&gt; <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a></code></pre></body></html>
+    <html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span> <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">callAsFunction</span>(<span class="variable">this</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a>? = <span class="keyword">nil</span>, <span class="keyword">_</span> <span class="variable">arguments</span>: <a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>) -&gt; <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a></code></pre></body></html>
 <div class="summary" role="doc-abstract">
     <p>A variadic arguments version of <code>callAsFunction</code>.</p>
 
@@ -184,7 +184,7 @@ For further discussion, see also <a href="https://github.com/swiftwasm/JavaScrip
     <h3>
         <code>new(arguments:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">new</span>(<span class="variable">arguments</span>: [<a href="/JavaScriptKit/JSValueConvertible"><span class="type">JSValueConvertible</span></a>]) -&gt; <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a></code></pre></body></html>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">new</span>(<span class="variable">arguments</span>: [<a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>]) -&gt; <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a></code></pre></body></html>
 <div class="summary" role="doc-abstract">
     <p>Instantiate an object from this function as a constructor.</p>
 
@@ -218,7 +218,7 @@ For further discussion, see also <a href="https://github.com/swiftwasm/JavaScrip
   <tbody>
     <tr>
     <th>arguments</th>
-    <td><code class="type">[JSValue​Convertible]</code></td>
+    <td><code class="type">[Convertible​ToJSValue]</code></td>
     <td><p>Arguments to be passed to this constructor function.</p>
 </td>
 </tr>
@@ -232,7 +232,7 @@ For further discussion, see also <a href="https://github.com/swiftwasm/JavaScrip
     <h3>
         <code>new(_:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">new</span>(<span class="keyword">_</span> <span class="variable">arguments</span>: <a href="/JavaScriptKit/JSValueConvertible"><span class="type">JSValueConvertible</span></a>) -&gt; <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a></code></pre></body></html>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">new</span>(<span class="keyword">_</span> <span class="variable">arguments</span>: <a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>) -&gt; <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a></code></pre></body></html>
 <div class="summary" role="doc-abstract">
     <p>A variadic arguments version of <code>new</code>.</p>
 
@@ -265,7 +265,7 @@ For further discussion, see also <a href="https://github.com/swiftwasm/JavaScrip
 
     <footer>
         <p>
-    Generated on <time datetime="2020-10-01T17:51:46+0000">October 1, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2020-10-02T00:18:23+0000">October 2, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
 </p>
     </footer>
 </body>
