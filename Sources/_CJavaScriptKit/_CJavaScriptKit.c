@@ -1,6 +1,8 @@
 #include "_CJavaScriptKit.h"
 #include <stdlib.h>
 
+#if __wasm32__
+
 void _call_host_function_impl(const JavaScriptHostFuncRef host_func_ref,
                               const RawJSValue *argv, const int argc,
                               const JavaScriptObjectRef callback_func);
@@ -29,3 +31,5 @@ __attribute__((export_name("swjs_library_version")))
 int _library_version() {
     return 700;
 }
+
+#endif
