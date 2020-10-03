@@ -2,6 +2,7 @@ MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
 .PHONY: bootstrap
 bootstrap:
+	./scripts/install-toolchain.sh
 	npm install
 
 .PHONY: build

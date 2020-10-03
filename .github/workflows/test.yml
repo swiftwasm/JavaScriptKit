@@ -6,11 +6,6 @@ jobs:
     strategy:
       matrix:
         os: [macOS-10.15, Ubuntu-18.04]
-        include:
-          - os: macOS-10.15
-            toolchain: https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.3-SNAPSHOT-2020-08-10-a/swift-wasm-5.3-SNAPSHOT-2020-08-10-a-osx.tar.gz
-          - os: Ubuntu-18.04
-            toolchain: https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.3-SNAPSHOT-2020-08-10-a/swift-wasm-5.3-SNAPSHOT-2020-08-10-a-linux.tar.gz
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -23,8 +18,5 @@ jobs:
           export SWIFTENV_ROOT="$HOME/.swiftenv"
           export PATH="$SWIFTENV_ROOT/bin:$PATH"
           eval "$(swiftenv init -)"
-          swiftenv install $TOOLCHAIN_DOWNLOAD
           make bootstrap
           make test
-        env:
-          TOOLCHAIN_DOWNLOAD: ${{ matrix.toolchain }}
