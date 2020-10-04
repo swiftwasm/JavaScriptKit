@@ -2,7 +2,7 @@ name: Documentation
 
 on:
   push:
-    branches: [main]
+#     branches: [main]
 
 jobs:
   swift-doc:
@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Generate Documentation
-        uses: SwiftDocOrg/swift-doc@master
+        uses: SwiftDocOrg/swift-doc@1.0.0-beta.4
         with:
           inputs: "Sources"
           module-name: JavaScriptKit
