@@ -6,15 +6,10 @@ Swift framework to interact with JavaScript through WebAssembly.
 
 ## Requirements
 
-This library only supports [`swiftwasm/swift`](https://github.com/swiftwasm/swift) distribution toolchain. Please install Swift for WebAssembly toolchain from [Release Page](https://github.com/swiftwasm/swift/releases)
-
-The toolchains can be installed via [`swiftenv`](https://github.com/kylef/swiftenv) like official nightly toolchain.
-
-e.g.
+This library only supports [`swiftwasm/swift`](https://github.com/swiftwasm/swift) distribution toolchain. The toolchains can be installed via [`swiftenv`](https://github.com/kylef/swiftenv) like official nightly toolchain. You can use the `install-toolchain.sh` helper script that does this for you:
 
 ```sh
-
-$ swiftenv install https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.3-SNAPSHOT-2020-08-10-a/swift-wasm-5.3-SNAPSHOT-2020-08-10-a-osx.tar.gz
+$ ./scripts/install-toolchain.sh
 $ swift --version
 Swift version 5.3-dev (LLVM 09686f232a, Swift 5a196c7f13)
 Target: x86_64-apple-darwin19.6.0
