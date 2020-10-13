@@ -1,6 +1,7 @@
 import _CJavaScriptKit
 
 /// `JSValue` represents a value in JavaScript.
+@dynamicMemberLookup
 public enum JSValue: Equatable {
     case boolean(Bool)
     case string(JSString)
@@ -76,6 +77,25 @@ public enum JSValue: Equatable {
     /// If not, returns `false`.
     public var isUndefined: Bool {
         return self == .undefined
+    }
+}
+
+extension JSValue {
+    /// An unsafe convenience method of `JSObject.subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
+    public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue) {
+        object![dynamicMember: name]!
+    }
+
+    /// An unsafe convenience method of `JSObject.subscript(_ index: Int) -> JSValue`
+    public subscript(dynamicMember name: String) -> JSValue {
+        get { self.object![name] }
+        set { self.object![name] = newValue }
+    }
+
+    /// An unsafe convenience method of `JSObject.subscript(_ index: Int) -> JSValue`
+    public subscript(_ index: Int) -> JSValue {
+        get { object![index] }
+        set { object![index] = newValue }
     }
 }
 
