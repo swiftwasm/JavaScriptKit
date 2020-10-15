@@ -48,6 +48,9 @@ global.Animal = function (name, age, isCat) {
     this.getIsCat = function () {
         return this.isCat;
     };
+    this.setName = function (name) {
+        this.name = name;
+    }
 };
 
 const { startWasiTask } = require("../lib");

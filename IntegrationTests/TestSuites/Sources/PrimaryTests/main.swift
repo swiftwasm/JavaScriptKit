@@ -268,7 +268,9 @@ try test("Call Function With This") {
     // ```
     let objectConstructor = try expectFunction(getJSValue(this: .global, name: "Animal"))
     let cat1 = objectConstructor.new("Tama", 3, true)
+    let cat1Value = JSValue.object(cat1)
     let getIsCat = try expectFunction(getJSValue(this: cat1, name: "getIsCat"))
+    let setName = try expectFunction(getJSValue(this: cat1, name: "setName"))
 
     // Direct call without this
     try expectEqual(getIsCat(), .undefined)
@@ -276,6 +278,16 @@ try test("Call Function With This") {
     // Call with this
     let gotIsCat = getIsCat(this: cat1)
     try expectEqual(gotIsCat, .boolean(true))
+    try expectEqual(cat1.getIsCat!(), .boolean(true))
+    try expectEqual(cat1Value.getIsCat(), .boolean(true))
+
+    // Call with this and argument
+    setName(this: cat1, JSValue.string("Shiro"))
+    try expectEqual(getJSValue(this: cat1, name: "name"), .string("Shiro"))
+    _ = cat1.setName!("Tora")
+    try expectEqual(getJSValue(this: cat1, name: "name"), .string("Tora"))
+    _ = cat1Value.setName("Chibi")
+    try expectEqual(getJSValue(this: cat1, name: "name"), .string("Chibi"))
 }
 
 try test("Object Conversion") {
@@ -495,4 +507,13 @@ try test("Error") {
     try expectEqual(error.stack?.isEmpty, false)
     try expectEqual(JSError(from: .string("error"))?.description, nil)
     try expectEqual(JSError(from: .object(error.jsObject))?.description, expectedDescription)
+}
+
+try test("JSValue accessor") {
+    let globalObject1 = JSObject.global.globalObject1
+    try expectEqual(globalObject1.prop_1.nested_prop, .number(1))
+    try expectEqual(globalObject1.object!.prop_1.object!.nested_prop, .number(1))
+
+    try expectEqual(globalObject1.prop_4[0], .number(3))
+    try expectEqual(globalObject1.prop_4[1], .number(4))
 }
