@@ -18,13 +18,16 @@ fi
 
 case $(uname -s) in
   Darwin)
-    toolchain_download="$swift_tag-osx.tar.gz"
+    toolchain_download="$swift_tag-macos-x86_64.tar.gz"
+    echo '-macos' >> .swift-version
   ;;
   Linux)
     if [ $(grep RELEASE /etc/lsb-release) == "DISTRIB_RELEASE=18.04" ]; then
-      toolchain_download="$swift_tag-ubuntu18.04.tar.gz"
+      toolchain_download="$swift_tag-ubuntu18.04-x86_64.tar.gz"
+      echo '-ubuntu18.04' >> .swift-version
     elif [ $(grep RELEASE /etc/lsb-release) == "DISTRIB_RELEASE=20.04" ]; then
-      toolchain_download="$swift_tag-ubuntu20.04.tar.gz"
+      toolchain_download="$swift_tag-ubuntu20.04-x86_64.tar.gz"
+      echo '-ubuntu20.04' >> .swift-version
     else
       echo "Unknown Ubuntu version"
       exit 1
