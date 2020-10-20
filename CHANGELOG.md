@@ -26,7 +26,7 @@ Note that the code in the first example is still dynamically typed. The Swift co
 you if you misspell names of properties or cast them to a wrong type. This feature is purely
 additive, and is added for convenience. You can still use force unwraps in your code interfacing
 with JavaScriptKit. If you're interested in a statically-typed DOM API, we recommend having a look
-at the [DOMKit](https://github.com/swiftwasm/DOMKit), which is currently in development.
+at the [DOMKit](https://github.com/swiftwasm/DOMKit) library, which is currently in development.
 
 Lastly, `JSError` now conforms to the `JSBridgedClass` protocol, which makes it easier to integrate
 with idiomatic Swift code.
@@ -40,6 +40,8 @@ with idiomatic Swift code.
 
 **Merged pull requests:**
 
+- Update example code in `README.md` ([#100](https://github.com/swiftwasm/JavaScriptKit/pull/100)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Update toolchain version, script, and `README.md` ([#96](https://github.com/swiftwasm/JavaScriptKit/pull/96)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
 - [Proposal] Add unsafe convenience methods for JSValue ([#98](https://github.com/swiftwasm/JavaScriptKit/pull/98)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
 - Remove all unsafe linker flags from Package.swift ([#91](https://github.com/swiftwasm/JavaScriptKit/pull/91)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
 - Sync package.json and package-lock.json  ([#90](https://github.com/swiftwasm/JavaScriptKit/pull/90)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
