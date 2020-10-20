@@ -32,13 +32,11 @@ Can be written in Swift using JavaScriptKit
 ```swift
 import JavaScriptKit
 
-let alert = JSObject.global.alert.function!
-let document = JSObject.global.document.object!
+let document = JSObject.global.document
 
-let divElement = document.createElement!("div").object!
+let divElement = document.createElement("div")
 divElement.innerText = "Hello, world"
-let body = document.body.object!
-_ = body.appendChild!(divElement)
+_ = document.body.appendChild(divElement)
 
 struct Owner: Codable {
   let name: String
@@ -52,7 +50,7 @@ struct Pet: Codable {
 let jsPet = JSObject.global.pet
 let swiftPet: Pet = try JSValueDecoder().decode(from: jsPet)
 
-alert("Swift is running on browser!")
+JSObject.global.alert("Swift is running in the browser!")
 ```
 
 ### Usage in a browser application
