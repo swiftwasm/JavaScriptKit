@@ -24,9 +24,9 @@ let foundDivs = document.getElementsByTagName!("div").object!
 
 Note that the code in the first example is still dynamically typed. The Swift compiler won't warn
 you if you misspell names of properties or cast them to a wrong type. This feature is purely
-additive, and is added for convenience. You can still use force unwraps in your JavaScript. If
-you're interested in a statically-typed DOM API, we recommend having a look at the
-[DOMKit](https://github.com/swiftwasm/DOMKit), which is currently in development.
+additive, and is added for convenience. You can still use force unwraps in your code interfacing
+with JavaScriptKit. If you're interested in a statically-typed DOM API, we recommend having a look
+at the [DOMKit](https://github.com/swiftwasm/DOMKit), which is currently in development.
 
 Lastly, `JSError` now conforms to the `JSBridgedClass` protocol, which makes it easier to integrate
 with idiomatic Swift code.
