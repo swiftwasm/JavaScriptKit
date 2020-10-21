@@ -1,3 +1,54 @@
+# 0.8.0 (21 October 2020)
+
+This release introduces a few enhancements and deprecations. Namely, `JSValueConstructible`
+and `JSValueConvertible` were renamed to `ConstructibleFromJSValue` and `ConvertibleToJSValue`
+respectively. The old names are deprecated, and you should move away from using the old names in
+your code. Additionally, JavaScriptKit now requires the most recent 5.3 and development toolchains,
+but thanks to this it no longer uses unsafe flags, which prevented building other libraries
+depending on JavaScriptKit on other platforms.
+
+The main user-visible enhancement is that now force casts are no longer required in client code.
+That is, we know allow this
+
+```swift
+let document = JSObject.global.document
+let foundDivs = document.getElementsByTagName("div")
+```
+
+in addition to the previously available explicit style with force unwrapping:
+
+```swift
+let document = JSObject.global.document.object!
+let foundDivs = document.getElementsByTagName!("div").object!
+```
+
+Note that the code in the first example is still dynamically typed. The Swift compiler won't warn
+you if you misspell names of properties or cast them to a wrong type. This feature is purely
+additive, and is added for convenience. You can still use force unwraps in your code interfacing
+with JavaScriptKit. If you're interested in a statically-typed DOM API, we recommend having a look
+at the [DOMKit](https://github.com/swiftwasm/DOMKit) library, which is currently in development.
+
+Lastly, `JSError` now conforms to the `JSBridgedClass` protocol, which makes it easier to integrate
+with idiomatic Swift code.
+
+**Closed issues:**
+
+- Errors building example: undefined symbols ([#95](https://github.com/swiftwasm/JavaScriptKit/issues/95))
+- Documentation website is broken ([#93](https://github.com/swiftwasm/JavaScriptKit/issues/93))
+- Rename `JSValueConstructible` and `JSValueConvertible` ([#87](https://github.com/swiftwasm/JavaScriptKit/issues/87))
+- Build fails with the unsafe flags error ([#6](https://github.com/swiftwasm/JavaScriptKit/issues/6))
+
+**Merged pull requests:**
+
+- Update example code in `README.md` ([#100](https://github.com/swiftwasm/JavaScriptKit/pull/100)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Update toolchain version, script, and `README.md` ([#96](https://github.com/swiftwasm/JavaScriptKit/pull/96)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- [Proposal] Add unsafe convenience methods for JSValue ([#98](https://github.com/swiftwasm/JavaScriptKit/pull/98)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Remove all unsafe linker flags from Package.swift ([#91](https://github.com/swiftwasm/JavaScriptKit/pull/91)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Sync package.json and package-lock.json  ([#90](https://github.com/swiftwasm/JavaScriptKit/pull/90)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Rename JSValueConvertible/Constructible/Codable ([#88](https://github.com/swiftwasm/JavaScriptKit/pull/88)) via [@j-f1](https://github.com/j-f1)
+- Bump @actions/core from 1.2.2 to 1.2.6 in /ci/perf-tester ([#89](https://github.com/swiftwasm/JavaScriptKit/pull/89)) via [@dependabot[bot]](https://github.com/dependabot[bot])
+- Make `JSError` conform to `JSBridgedClass` ([#86](https://github.com/swiftwasm/JavaScriptKit/pull/86)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+
 # 0.7.2 (28 September 2020)
 
 This is a bugfix release that resolves an issue with the JavaScript runtime being unavailable when installed via NPM.
