@@ -34,7 +34,7 @@ import JavaScriptKit
 
 let document = JSObject.global.document
 
-let divElement = document.createElement("div")
+var divElement = document.createElement("div")
 divElement.innerText = "Hello, world"
 _ = document.body.appendChild(divElement)
 
@@ -50,7 +50,7 @@ struct Pet: Codable {
 let jsPet = JSObject.global.pet
 let swiftPet: Pet = try JSValueDecoder().decode(from: jsPet)
 
-JSObject.global.alert("Swift is running in the browser!")
+JSObject.global.alert!("Swift is running in the browser!")
 ```
 
 ### Usage in a browser application
