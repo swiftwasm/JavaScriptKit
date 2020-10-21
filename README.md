@@ -118,7 +118,7 @@ Just pass a toolchain archive URL for [the latest SwiftWasm 5.3
 snapshot](https://github.com/swiftwasm/swift/releases) appropriate for your platform:
 
 ```sh
-$ swiftenv install https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.3-SNAPSHOT-2020-10-16-a/swift-wasm-5.3-SNAPSHOT-2020-10-16-a-macos-x86_64.tar.gz
+$ swiftenv install https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.3-SNAPSHOT-2020-10-20-a/swift-wasm-5.3-SNAPSHOT-2020-10-20-a-macos_x86_64.pkg
 ```
 
 You can also use the `install-toolchain.sh` helper script that uses a hardcoded toolchain snapshot:
@@ -126,6 +126,6 @@ You can also use the `install-toolchain.sh` helper script that uses a hardcoded 
 ```sh
 $ ./scripts/install-toolchain.sh
 $ swift --version
-Swift version 5.3-dev (LLVM 09686f232a, Swift 5a196c7f13)
+Swift version 5.3 (swiftlang-5.3.0)
 Target: x86_64-apple-darwin19.6.0
 ```
