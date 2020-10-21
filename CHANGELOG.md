@@ -8,7 +8,7 @@ but thanks to this it no longer uses unsafe flags, which prevented building othe
 depending on JavaScriptKit on other platforms.
 
 The main user-visible enhancement is that now force casts are no longer required in client code.
-That is, we know allow this
+That is, we now allow this
 
 ```swift
 let document = JSObject.global.document
