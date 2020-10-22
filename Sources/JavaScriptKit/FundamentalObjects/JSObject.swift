@@ -76,6 +76,27 @@ public class JSObject: Equatable {
         get { getJSValue(this: self, index: Int32(index)) }
         set { setJSValue(this: self, index: Int32(index), value: newValue) }
     }
+    
+    /// A modifier to call methods as throwing methods capturing `this`
+    ///
+    ///
+    /// ```javascript
+    /// const animal = {
+    ///   validateAge: function() {
+    ///     if (this.age < 0) {
+    ///       throw new Error("Invalid age");
+    ///     }
+    ///   }
+    /// }
+    /// ```
+    ///
+    /// ```swift
+    /// let animal = JSObject.global.animal.object!
+    /// try animal.throwing.validateAge!()
+    /// ```
+    public var `throwing`: JSThrowingObject {
+        JSThrowingObject(self)
+    }
 
     /// Return `true` if this value is an instance of the passed `constructor` function.
     /// - Parameter constructor: The constructor function to check.
@@ -112,4 +133,33 @@ public class JSObject: Equatable {
 
 extension JSObject: CustomStringConvertible {
     public var description: String { self.toString!().string! }
+}
+
+
+/// A `JSObject` wrapper that enables throwing method calls capturing `this`.
+/// Exceptions produced by JavaScript functions will be thrown as `JSValue`.
+@dynamicMemberLookup
+public class JSThrowingObject {
+    private let base: JSObject
+    public init(_ base: JSObject) {
+        self.base = base
+    }
+
+    /// Returns the `name` member method binding this object as `this` context.
+    /// - Parameter name: The name of this object's member to access.
+    /// - Returns: The `name` member method binding this object as `this` context.
+    @_disfavoredOverload
+    public subscript(_ name: String) -> ((ConvertibleToJSValue...) throws -> JSValue)? {
+        guard let function = base[name].function?.throws else { return nil }
+        return { [base] (arguments: ConvertibleToJSValue...) in
+            try function(this: base, arguments: arguments)
+        }
+    }
+
+    /// A convenience method of `subscript(_ name: String) -> ((ConvertibleToJSValue...) throws -> JSValue)?`
+    /// to access the member through Dynamic Member Lookup.
+    @_disfavoredOverload
+    public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) throws -> JSValue)? {
+        self[name]
+    }
 }

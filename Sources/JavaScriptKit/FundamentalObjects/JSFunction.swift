@@ -50,6 +50,25 @@ public class JSFunction: JSObject {
         }
     }
 
+    /// A modifier to call this function as a throwing function
+    ///
+    ///
+    /// ```javascript
+    /// function validateAge(age) {
+    ///   if (age < 0) {
+    ///     throw new Error("Invalid age");
+    ///   }
+    /// }
+    /// ```
+    ///
+    /// ```swift
+    /// let validateAge = JSObject.global.validateAge.function!
+    /// try validateAge.throws(20)
+    /// ```
+    public var `throws`: JSThrowingFunction {
+        JSThrowingFunction(self)
+    }
+
     /// A variadic arguments version of `new`.
     public func new(_ arguments: ConvertibleToJSValue...) -> JSObject {
         new(arguments: arguments)
@@ -109,7 +128,7 @@ public class JSThrowingFunction {
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
 
-                var exceptionKind: JavaScriptValueKind = .invalid
+                var exceptionKind = JavaScriptValueKindAndFlags()
                 var exceptionPayload1 = JavaScriptPayload1()
                 var exceptionPayload2 = JavaScriptPayload2()
                 var resultObj = JavaScriptObjectRef()
@@ -117,8 +136,8 @@ public class JSThrowingFunction {
                     self.base.id, argv, Int32(argc),
                     &resultObj, &exceptionKind, &exceptionPayload1, &exceptionPayload2
                 )
-                if exceptionKind != .invalid {
-                    let exception = RawJSValue(kind: exceptionKind, payload1: exceptionPayload1, payload2: exceptionPayload2)
+                if exceptionKind.isException {
+                    let exception = RawJSValue(kind: exceptionKind.kind, payload1: exceptionPayload1, payload2: exceptionPayload2)
                     return .failure(exception.jsValue())
                 }
                 return .success(JSObject(id: resultObj))

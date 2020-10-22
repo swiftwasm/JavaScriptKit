@@ -84,3 +84,20 @@ func expectString(_ value: JSValue, file: StaticString = #file, line: UInt = #li
         throw MessageError("Type of \(value) should be \"string\"", file: file, line: line, column: column)
     }
 }
+
+func expectThrow<T>(_ body: @autoclosure () throws -> T, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> Error {
+    do {
+        _ = try body()
+    } catch {
+        return error
+    }
+    throw MessageError("Expect to throw an exception", file: file, line: line, column: column)
+}
+
+func expectNotNil<T>(_ value: T?, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws {
+    switch value {
+    case .some: return
+    case .none:
+        throw MessageError("Expect a non-nil value", file: file, line: line, column: column)
+    }
+}

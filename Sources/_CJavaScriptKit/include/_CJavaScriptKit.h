@@ -214,7 +214,7 @@ __attribute__((__import_module__("javascript_kit"),
 extern void _call_throwing_new(const JavaScriptObjectRef ref,
                                const RawJSValue *argv, const int argc,
                                JavaScriptObjectRef *result_obj,
-                               JavaScriptValueKind *exception_kind,
+                               JavaScriptValueKindAndFlags *exception_kind,
                                JavaScriptPayload1 *exception_payload1,
                                JavaScriptPayload2 *exception_payload2);
 

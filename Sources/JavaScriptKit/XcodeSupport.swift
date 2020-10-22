@@ -70,7 +70,7 @@ import _CJavaScriptKit
         _: JavaScriptObjectRef,
         _: UnsafePointer<RawJSValue>!, _: Int32,
         _: UnsafeMutablePointer<JavaScriptObjectRef>!,
-        _: UnsafeMutablePointer<JavaScriptValueKind>!,
+        _: UnsafeMutablePointer<JavaScriptValueKindAndFlags>!,
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
     ) { fatalError() }
