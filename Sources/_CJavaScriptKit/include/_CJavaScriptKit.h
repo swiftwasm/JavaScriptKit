@@ -23,6 +23,11 @@ typedef enum __attribute__((enum_extensibility(closed))) {
   JavaScriptValueKindFunction = 6,
 } JavaScriptValueKind;
 
+typedef struct {
+  JavaScriptValueKind kind: 31;
+  bool isException: 1;
+} JavaScriptValueKindAndFlags;
+
 typedef unsigned JavaScriptPayload1;
 typedef double JavaScriptPayload2;
 
@@ -155,13 +160,13 @@ extern void _load_string(const JavaScriptObjectRef bytes, unsigned char *buffer)
 /// @param ref The target JavaScript function to call.
 /// @param argv A list of `RawJSValue` arguments to apply.
 /// @param argc The length of `argv``.
-/// @param result_kind A result pointer of JavaScript value kind to get.
-/// @param result_payload1 A result pointer of first payload of JavaScript value to set the target object.
-/// @param result_payload2 A result pointer of second payload of JavaScript value to set the target object.
+/// @param result_kind A result pointer of JavaScript value kind of returned result or thrown exception.
+/// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
+/// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_function")))
 extern void _call_function(const JavaScriptObjectRef ref, const RawJSValue *argv,
-                           const int argc, JavaScriptValueKind *result_kind,
+                           const int argc, JavaScriptValueKindAndFlags *result_kind,
                            JavaScriptPayload1 *result_payload1,
                            JavaScriptPayload2 *result_payload2);
 
@@ -171,15 +176,15 @@ extern void _call_function(const JavaScriptObjectRef ref, const RawJSValue *argv
 /// @param func_ref The target JavaScript function to call.
 /// @param argv A list of `RawJSValue` arguments to apply.
 /// @param argc The length of `argv``.
-/// @param result_kind A result pointer of JavaScript value kind to get.
-/// @param result_payload1 A result pointer of first payload of JavaScript value to set the target object.
-/// @param result_payload2 A result pointer of second payload of JavaScript value to set the target object.
+/// @param result_kind A result pointer of JavaScript value kind of returned result or thrown exception.
+/// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
+/// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_function_with_this")))
 extern void _call_function_with_this(const JavaScriptObjectRef _this,
                                      const JavaScriptObjectRef func_ref,
                                      const RawJSValue *argv, const int argc,
-                                     JavaScriptValueKind *result_kind,
+                                     JavaScriptValueKindAndFlags *result_kind,
                                      JavaScriptPayload1 *result_payload1,
                                      JavaScriptPayload2 *result_payload2);
 
@@ -194,6 +199,24 @@ __attribute__((__import_module__("javascript_kit"),
 extern void _call_new(const JavaScriptObjectRef ref,
                       const RawJSValue *argv, const int argc,
                       JavaScriptObjectRef *result_obj);
+
+/// `_call_throwing_new` calls JavaScript object constructor with given arguments list.
+///
+/// @param ref The target JavaScript constructor to call.
+/// @param argv A list of `RawJSValue` arguments to apply.
+/// @param argc The length of `argv``.
+/// @param result_obj A result pointer of the constructed object.
+/// @param exception_kind A result pointer of JavaScript value kind of thrown exception.
+/// @param exception_payload1 A result pointer of first payload of JavaScript value of thrown exception.
+/// @param exception_payload2 A result pointer of second payload of JavaScript value of thrown exception.
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_call_throwing_new")))
+extern void _call_throwing_new(const JavaScriptObjectRef ref,
+                               const RawJSValue *argv, const int argc,
+                               JavaScriptObjectRef *result_obj,
+                               JavaScriptValueKind *exception_kind,
+                               JavaScriptPayload1 *exception_payload1,
+                               JavaScriptPayload2 *exception_payload2);
 
 /// `_instanceof` acts like JavaScript `instanceof` operator.
 ///

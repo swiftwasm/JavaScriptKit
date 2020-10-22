@@ -49,7 +49,7 @@ import _CJavaScriptKit
     func _call_function(
         _: JavaScriptObjectRef,
         _: UnsafePointer<RawJSValue>!, _: Int32,
-        _: UnsafeMutablePointer<JavaScriptValueKind>!,
+        _: UnsafeMutablePointer<JavaScriptValueKindAndFlags>!,
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
     ) { fatalError() }
@@ -57,7 +57,7 @@ import _CJavaScriptKit
         _: JavaScriptObjectRef,
         _: JavaScriptObjectRef,
         _: UnsafePointer<RawJSValue>!, _: Int32,
-        _: UnsafeMutablePointer<JavaScriptValueKind>!,
+        _: UnsafeMutablePointer<JavaScriptValueKindAndFlags>!,
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
     ) { fatalError() }
@@ -65,6 +65,14 @@ import _CJavaScriptKit
         _: JavaScriptObjectRef,
         _: UnsafePointer<RawJSValue>!, _: Int32,
         _: UnsafeMutablePointer<JavaScriptObjectRef>!
+    ) { fatalError() }
+    func _call_throwing_new(
+        _: JavaScriptObjectRef,
+        _: UnsafePointer<RawJSValue>!, _: Int32,
+        _: UnsafeMutablePointer<JavaScriptObjectRef>!,
+        _: UnsafeMutablePointer<JavaScriptValueKind>!,
+        _: UnsafeMutablePointer<JavaScriptPayload1>!,
+        _: UnsafeMutablePointer<JavaScriptPayload2>!
     ) { fatalError() }
     func _instanceof(
         _: JavaScriptObjectRef,
