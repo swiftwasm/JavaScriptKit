@@ -59,9 +59,10 @@ The easiest way to get started with JavaScriptKit in your browser app is with [t
 bundler](https://carton.dev).
 
 As a part of these steps
-you'll install `carton` via [Homebrew](https://brew.sh/) on macOS (unfortunately you'll have to build
-it manually on Linux). Assuming you already have Homebrew installed, you can create a new app
-that uses JavaScriptKit by following these steps:
+you'll install `carton` via [Homebrew](https://brew.sh/) on macOS (you can also use the
+[`ghcr.io/swiftwasm/carton`](https://github.com/orgs/swiftwasm/packages/container/package/carton)
+Docker image if you prefer to run the build steps on Linux). Assuming you already have Homebrew
+installed, you can create a new app that uses JavaScriptKit by following these steps:
 
 1. Install `carton`:
 
@@ -105,12 +106,12 @@ directory for more information in this more advanced use case.
 
 ### Manual toolchain installation
 
-This library only supports [`swiftwasm/swift`](https://github.com/swiftwasm/swift) distribution
-toolchain. The toolchain can be installed via [`swiftenv`](https://github.com/kylef/swiftenv), in
+This library only supports [`swiftwasm/swift`](https://github.com/swiftwasm/swift) toolchain distribution.
+The toolchain can be installed via [`swiftenv`](https://github.com/kylef/swiftenv), in
 the same way as the official Swift nightly toolchain.
 
-You have to install the toolchain manually when working on the source code JavaScriptKit itself,
-especially if you change anything in the JavaScript runtime parts. This is because the runtime is
+You have to install the toolchain manually when working on the source code of JavaScriptKit itself,
+especially if you change anything in the JavaScript runtime parts. This is because the runtime parts are
 embedded in `carton` and currently can't be replaced dynamically with the JavaScript code you've
 updated locally.
 
