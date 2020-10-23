@@ -5,7 +5,7 @@ interface ExportedMemory {
 type ref = number;
 type pointer = number;
 
-interface GlobalVariable { }
+interface GlobalVariable {}
 declare const window: GlobalVariable;
 declare const global: GlobalVariable;
 let globalVariable: any;
@@ -254,38 +254,56 @@ export class SwiftRuntime {
             payload2_ptr: pointer,
             is_exception: boolean
         ) => {
-            const exceptionBit = (is_exception ? 1 : 0) << 31
+            const exceptionBit = (is_exception ? 1 : 0) << 31;
             if (value === null) {
                 writeUint32(kind_ptr, exceptionBit | JavaScriptValueKind.Null);
                 return;
             }
             switch (typeof value) {
                 case "boolean": {
-                    writeUint32(kind_ptr, exceptionBit | JavaScriptValueKind.Boolean);
+                    writeUint32(
+                        kind_ptr,
+                        exceptionBit | JavaScriptValueKind.Boolean
+                    );
                     writeUint32(payload1_ptr, value ? 1 : 0);
                     break;
                 }
                 case "number": {
-                    writeUint32(kind_ptr, exceptionBit | JavaScriptValueKind.Number);
+                    writeUint32(
+                        kind_ptr,
+                        exceptionBit | JavaScriptValueKind.Number
+                    );
                     writeFloat64(payload2_ptr, value);
                     break;
                 }
                 case "string": {
-                    writeUint32(kind_ptr, exceptionBit | JavaScriptValueKind.String);
+                    writeUint32(
+                        kind_ptr,
+                        exceptionBit | JavaScriptValueKind.String
+                    );
                     writeUint32(payload1_ptr, this.heap.retain(value));
                     break;
                 }
                 case "undefined": {
-                    writeUint32(kind_ptr, exceptionBit | JavaScriptValueKind.Undefined);
+                    writeUint32(
+                        kind_ptr,
+                        exceptionBit | JavaScriptValueKind.Undefined
+                    );
                     break;
                 }
                 case "object": {
-                    writeUint32(kind_ptr, exceptionBit | JavaScriptValueKind.Object);
+                    writeUint32(
+                        kind_ptr,
+                        exceptionBit | JavaScriptValueKind.Object
+                    );
                     writeUint32(payload1_ptr, this.heap.retain(value));
                     break;
                 }
                 case "function": {
-                    writeUint32(kind_ptr, exceptionBit | JavaScriptValueKind.Function);
+                    writeUint32(
+                        kind_ptr,
+                        exceptionBit | JavaScriptValueKind.Function
+                    );
                     writeUint32(payload1_ptr, this.heap.retain(value));
                     break;
                 }
@@ -393,7 +411,13 @@ export class SwiftRuntime {
                         decodeValues(argv, argc)
                     );
                 } catch (error) {
-                    writeValue(error, kind_ptr, payload1_ptr, payload2_ptr, true);
+                    writeValue(
+                        error,
+                        kind_ptr,
+                        payload1_ptr,
+                        payload2_ptr,
+                        true
+                    );
                     return;
                 }
                 writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
@@ -411,13 +435,15 @@ export class SwiftRuntime {
                 const func = this.heap.referenceHeap(func_ref);
                 let result: any;
                 try {
-                    result = Reflect.apply(
-                        func,
-                        obj,
-                        decodeValues(argv, argc)
-                    );
+                    result = Reflect.apply(func, obj, decodeValues(argv, argc));
                 } catch (error) {
-                    writeValue(error, kind_ptr, payload1_ptr, payload2_ptr, true);
+                    writeValue(
+                        error,
+                        kind_ptr,
+                        payload1_ptr,
+                        payload2_ptr,
+                        true
+                    );
                     return;
                 }
                 writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
@@ -444,7 +470,7 @@ export class SwiftRuntime {
                 exception_payload2_ptr: pointer
             ) => {
                 const obj = this.heap.referenceHeap(ref);
-                let result: any
+                let result: any;
                 try {
                     result = Reflect.construct(obj, decodeValues(argv, argc));
                     if (typeof result != "object")
@@ -452,7 +478,13 @@ export class SwiftRuntime {
                             `Invalid result type of object constructor of "${obj}": "${result}"`
                         );
                 } catch (error) {
-                    writeValue(error, exception_kind_ptr, exception_payload1_ptr, exception_payload2_ptr, true);
+                    writeValue(
+                        error,
+                        exception_kind_ptr,
+                        exception_payload1_ptr,
+                        exception_payload2_ptr,
+                        true
+                    );
                     return;
                 }
                 writeUint32(result_obj, this.heap.retain(result));
