@@ -473,10 +473,6 @@ export class SwiftRuntime {
                 let result: any;
                 try {
                     result = Reflect.construct(obj, decodeValues(argv, argc));
-                    if (typeof result != "object")
-                        throw Error(
-                            `Invalid result type of object constructor of "${obj}": "${result}"`
-                        );
                 } catch (error) {
                     writeValue(
                         error,
@@ -497,10 +493,6 @@ export class SwiftRuntime {
             ) => {
                 const obj = this.heap.referenceHeap(ref);
                 const result = Reflect.construct(obj, decodeValues(argv, argc));
-                if (typeof result != "object")
-                    throw Error(
-                        `Invalid result type of object constructor of "${obj}": "${result}"`
-                    );
                 writeUint32(result_obj, this.heap.retain(result));
             },
             swjs_instanceof: (obj_ref: ref, constructor_ref: ref) => {
