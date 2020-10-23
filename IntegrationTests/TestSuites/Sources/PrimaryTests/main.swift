@@ -517,3 +517,57 @@ try test("JSValue accessor") {
     try expectEqual(globalObject1.prop_4[0], .number(3))
     try expectEqual(globalObject1.prop_4[1], .number(4))
 }
+
+try test("Exception") {
+    // ```js
+    // global.globalObject1 = {
+    //   ...
+    //   prop_9: {
+    //       func1: function () {
+    //           throw new Error();
+    //       },
+    //       func2: function () {
+    //           throw "String Error";
+    //       },
+    //       func3: function () {
+    //           throw 3.0
+    //       },
+    //   },
+    //   ...
+    // }
+    // ```
+    //
+
+    let globalObject1 = JSObject.global.globalObject1
+    let prop_9: JSValue = globalObject1.prop_9
+
+    // MARK: Throwing method calls
+    let error1 = try expectThrow(try prop_9.object!.throwing.func1!())
+    try expectEqual(error1 is JSValue, true)
+    let errorObject = JSError(from: error1 as! JSValue)
+    try expectNotNil(errorObject)
+
+    let error2 = try expectThrow(try prop_9.object!.throwing.func2!())
+    try expectEqual(error2 is JSValue, true)
+    let errorString = try expectString(error2 as! JSValue)
+    try expectEqual(errorString, "String Error")
+
+    let error3 = try expectThrow(try prop_9.object!.throwing.func3!())
+    try expectEqual(error3 is JSValue, true)
+    let errorNumber = try expectNumber(error3 as! JSValue)
+    try expectEqual(errorNumber, 3.0)
+
+    // MARK: Simple function calls
+    let error4 = try expectThrow(try prop_9.func1.function!.throws())
+    try expectEqual(error4 is JSValue, true)
+    let errorObject2 = JSError(from: error4 as! JSValue)
+    try expectNotNil(errorObject2)
+    
+    // MARK: Throwing constructor call
+    let Animal = JSObject.global.Animal.function!
+    _ = try Animal.throws.new("Tama", 3, true)
+    let ageError = try expectThrow(try Animal.throws.new("Tama", -3, true))
+    try expectEqual(ageError is JSValue, true)
+    let errorObject3 = JSError(from: ageError as! JSValue)
+    try expectNotNil(errorObject3)
+}
