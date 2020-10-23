@@ -133,6 +133,16 @@ This type can be callable as a function using <code>callAsFunction</code>.</p>
 
 </dd>
 <dt class="class">
+    <a href="/JavaScriptKit/JSThrowingFunction" title="class - JSThrowingFunction">
+        JSThrowing​Function
+    </a>
+</dt>
+<dd>
+    <p>A <code>JSFunction</code> wrapper that enables throwing function calls.
+Exceptions produced by JavaScript functions will be thrown as <code>JSValue</code>.</p>
+
+</dd>
+<dt class="class">
     <a href="/JavaScriptKit/JSClosure" title="class - JSClosure">
         JSClosure
     </a>
@@ -154,6 +164,16 @@ For further discussion, see also <a href="https://github.com/swiftwasm/JavaScrip
     <p><code>JSObject</code> represents an object in JavaScript and supports dynamic member lookup.
 Any member access like <code>object.foo</code> will dynamically request the JavaScript and Swift
 runtime bridge library for a member with the specified name in this object.</p>
+
+</dd>
+<dt class="class">
+    <a href="/JavaScriptKit/JSThrowingObject" title="class - JSThrowingObject">
+        JSThrowing​Object
+    </a>
+</dt>
+<dd>
+    <p>A <code>JSObject</code> wrapper that enables throwing method calls capturing <code>this</code>.
+Exceptions produced by JavaScript functions will be thrown as <code>JSValue</code>.</p>
 
 </dd>
 <dt class="class">
@@ -349,7 +369,7 @@ For example, a union type of multiple classes or primitive values.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2020-10-22T16:24:46+0000">October 22, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2020-10-23T16:42:26+0000">October 23, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
 </p>
     </footer>
 </body>

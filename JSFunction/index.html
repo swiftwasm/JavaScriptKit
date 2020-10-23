@@ -26,7 +26,7 @@
     <nav>
         <div class="wrapper">
             <h2>On This Page</h2>
-            <ol><li><a href="#relationships">Relationships</a><ul><li><a href="#relationships">Superclass</a></li><li><a href="#relationships">Subclasses</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#jsfunction.callasfunction(this:arguments:)">call​AsFunction(this:​arguments:​)</a></li><li class="function"><a href="#jsfunction.callasfunction(this:_:)">call​AsFunction(this:​_:​)</a></li><li class="function"><a href="#jsfunction.new(arguments:)">new(arguments:​)</a></li><li class="function"><a href="#jsfunction.new(_:)">new(_:​)</a></li><li class="function"><a href="#jsfunction.from(_:)">from(_:​)</a></li><li class="function"><a href="#jsfunction.construct(from:)">construct(from:​)</a></li><li class="function"><a href="#jsfunction.jsvalue()">js​Value()</a></li></ul></li></ol>
+            <ol><li><a href="#relationships">Relationships</a><ul><li><a href="#relationships">Superclass</a></li><li><a href="#relationships">Subclasses</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#jsfunction.`throws`">`throws`</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#jsfunction.callasfunction(this:arguments:)">call​AsFunction(this:​arguments:​)</a></li><li class="function"><a href="#jsfunction.callasfunction(this:_:)">call​AsFunction(this:​_:​)</a></li><li class="function"><a href="#jsfunction.new(arguments:)">new(arguments:​)</a></li><li class="function"><a href="#jsfunction.new(_:)">new(_:​)</a></li><li class="function"><a href="#jsfunction.from(_:)">from(_:​)</a></li><li class="function"><a href="#jsfunction.construct(from:)">construct(from:​)</a></li><li class="function"><a href="#jsfunction.jsvalue()">js​Value()</a></li></ul></li></ol>
         </div>
     </nav>
 
@@ -75,9 +75,9 @@ This type can be callable as a function using <code>callAsFunction</code>.</p>
 </g>
 </g>
 <!-- JSObject -->
-<g id="node3" class="node class">
+<g id="node2" class="node class">
 <title>JSObject</title>
-<g id="a_node3"><a xlink:href="/JavaScriptKit/JSObject" xlink:title="JSObject">
+<g id="a_node2"><a xlink:href="/JavaScriptKit/JSObject" xlink:title="JSObject">
 <path fill="none" stroke="#000000" d="M816,-36C816,-36 624,-36 624,-36 618,-36 612,-30 612,-24 612,-24 612,-12 612,-12 612,-6 618,0 624,0 624,0 816,0 816,0 822,0 828,-6 828,-12 828,-12 828,-24 828,-24 828,-30 822,-36 816,-36"/>
 <text text-anchor="middle" x="720" y="-14.3" font-family="Menlo" font-size="14.00" fill="#000000">JSObject</text>
 </a>
@@ -90,9 +90,9 @@ This type can be callable as a function using <code>callAsFunction</code>.</p>
 <polygon fill="#000000" stroke="#000000" points="723.5001,-46.4132 720,-36.4133 716.5001,-46.4133 723.5001,-46.4132"/>
 </g>
 <!-- JSClosure -->
-<g id="node2" class="node class">
+<g id="node3" class="node class">
 <title>JSClosure</title>
-<g id="a_node2"><a xlink:href="/JavaScriptKit/JSClosure" xlink:title="JSClosure">
+<g id="a_node3"><a xlink:href="/JavaScriptKit/JSClosure" xlink:title="JSClosure">
 <path fill="none" stroke="#000000" d="M816,-180C816,-180 624,-180 624,-180 618,-180 612,-174 612,-168 612,-168 612,-156 612,-156 612,-150 618,-144 624,-144 624,-144 816,-144 816,-144 822,-144 828,-150 828,-156 828,-156 828,-168 828,-168 828,-174 822,-180 816,-180"/>
 <text text-anchor="middle" x="720" y="-158.3" font-family="Menlo" font-size="14.00" fill="#000000">JSClosure</text>
 </a>
@@ -129,6 +129,32 @@ For further discussion, see also <a href="https://github.com/swiftwasm/JavaScrip
 </dd>
 </dl>
 </section>
+    <section id="properties">
+        <h2>Properties</h2>
+
+        <div role="article" class="variable" id="jsfunction.`throws`">
+    <h3>
+        <code>`throws`</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">`throws`</span>: <a href="/JavaScriptKit/JSThrowingFunction"><span class="type">JSThrowingFunction</span></a></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>A modifier to call this function as a throwing function</p>
+
+</div>
+<div class="discussion">
+    <html><body><pre><code class="language-javascript">function validateAge(age) {
+  if (age &lt; 0) {
+    throw new Error("Invalid age");
+  }
+}
+</code></pre>
+ </body></html>
+<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">validateAge</span> = <span class="variable">JSObject</span>.<span class="type">global</span>.<span class="type">validateAge</span>.<span class="type">function</span>!
+<span class="keyword">try</span> <span class="variable">validateAge</span>.<span class="type">throws</span>(<span class="number literal">20</span>)
+</code></pre></body></html>
+</div>
+</div>
+    </section>
     <section id="methods">
         <h2>Methods</h2>
 
@@ -265,7 +291,7 @@ For further discussion, see also <a href="https://github.com/swiftwasm/JavaScrip
 
     <footer>
         <p>
-    Generated on <time datetime="2020-10-22T16:24:47+0000">October 22, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2020-10-23T16:42:26+0000">October 23, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
 </p>
     </footer>
 </body>
