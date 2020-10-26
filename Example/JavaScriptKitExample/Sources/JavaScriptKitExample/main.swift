@@ -1,18 +1,17 @@
 import JavaScriptKit
 
 let alert = JSObject.global.alert.function!
-let document = JSObject.global.document.object!
+let document = JSObject.global.document
 
-let divElement = document.createElement!("div").object!
+var divElement = document.createElement("div")
 divElement.innerText = "Hello, world"
-let body = document.body.object!
-_ = body.appendChild!(divElement)
+_ = document.body.appendChild(divElement)
 
-let buttonElement = document.createElement!("button").object!
+var buttonElement = document.createElement("button")
 buttonElement.innerText = "Click me!"
 let listener = JSClosure { _ in
     alert("Swift is running on browser!")
 }
 buttonElement.onclick = .function(listener)
 
-_ = body.appendChild!(buttonElement)
+_ = document.body.appendChild(buttonElement)
