@@ -1,0 +1,23 @@
+name: Check compatibility
+on:
+  pull_request:
+  push:
+    branches: [master]
+jobs:
+  test:
+    name: Check source code compatibility
+    runs-on: Ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+        with:
+          fetch-depth: 1
+      - name: Run Test
+        run: |
+          git clone https://github.com/kylef/swiftenv.git ~/.swiftenv
+          export SWIFTENV_ROOT="$HOME/.swiftenv"
+          export PATH="$SWIFTENV_ROOT/bin:$PATH"
+          eval "$(swiftenv init -)"
+          make bootstrap
+          cd Example
+          swift build --triple wasm32-unknonw-wasi
