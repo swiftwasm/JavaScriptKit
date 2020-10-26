@@ -1,5 +1,8 @@
 name: Check compatibility
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches: [master]
 jobs:
   test:
     name: Check source code compatibility
