@@ -89,5 +89,6 @@ import _CJavaScriptKit
         _: Int32,
         _: UnsafeMutablePointer<JavaScriptObjectRef>!
     ) { fatalError() }
+    func _sleep(_ ms: Int32) { fatalError() }
 
 #endif

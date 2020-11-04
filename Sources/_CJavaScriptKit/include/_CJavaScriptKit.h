@@ -258,6 +258,16 @@ extern void _create_typed_array(const JavaScriptObjectRef constructor,
                                 const void *elements_ptr, const int length,
                                 JavaScriptObjectRef *result_obj);
 
+/// Unwind Wasm module execution stack and rewind it after specified milliseconds,
+/// allowing JavaScript events to continue to be processed.
+/// **Important**: Wasm module must be [asyncified](https://emscripten.org/docs/porting/asyncify.html),
+/// otherwise JavaScriptKit's runtime will throw an exception.
+///
+/// @param ms Length of time in milliseconds to pause execution for.
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_sleep")))
+extern void _sleep(const int ms);
+
 #endif
 
 #endif /* _CJavaScriptKit_h */

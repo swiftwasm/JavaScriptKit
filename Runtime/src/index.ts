@@ -31,6 +31,29 @@ interface SwiftRuntimeExportedFunctions {
     ): void;
 }
 
+/**
+ * Optional methods exposed by Wasm modules after running an `asyncify` pass,
+ * e.g. `wasm-opt -asyncify`.
+ * More details at [Pause and Resume WebAssembly with Binaryen's Asyncify](https://kripken.github.io/blog/wasm/2019/07/16/asyncify.html).
+*/
+interface AsyncifyExportedFunctions {
+    asyncify_start_rewind(stack: pointer): void;
+    asyncify_stop_rewind(): void;
+    asyncify_start_unwind(stack: pointer): void;
+    asyncify_stop_unwind(): void;
+}
+
+/**
+ * Runtime check if Wasm module exposes asyncify methods
+*/
+function isAsyncified(exports: any): exports is AsyncifyExportedFunctions {
+    const asyncifiedExports = exports as AsyncifyExportedFunctions;
+    return asyncifiedExports.asyncify_start_rewind !== undefined &&
+        asyncifiedExports.asyncify_stop_rewind !== undefined &&
+        asyncifiedExports.asyncify_start_unwind !== undefined &&
+        asyncifiedExports.asyncify_stop_unwind !== undefined;
+}
+
 enum JavaScriptValueKind {
     Invalid = -1,
     Boolean = 0,
@@ -119,18 +142,47 @@ export class SwiftRuntime {
     private instance: WebAssembly.Instance | null;
     private heap: SwiftRuntimeHeap;
     private version: number = 701;
+    private isSleeping: boolean;
+    private instanceIsAsyncified: boolean;
+    private resumeCallback: () => void;
 
     constructor() {
         this.instance = null;
         this.heap = new SwiftRuntimeHeap();
+        this.isSleeping = false;
+        this.instanceIsAsyncified = false;
+        this.resumeCallback = () => { };
     }
 
-    setInstance(instance: WebAssembly.Instance) {
+    /**
+     * Set the Wasm instance
+     * @param instance The instantiate Wasm instance
+     * @param resumeCallback Optional callback for resuming instance after
+     * unwinding and rewinding stack (for asyncified modules).
+     */
+    setInstance(instance: WebAssembly.Instance, resumeCallback?: () => void) {
         this.instance = instance;
+        if (resumeCallback) {
+            this.resumeCallback = resumeCallback;
+        }
         const exports = (this.instance
             .exports as any) as SwiftRuntimeExportedFunctions;
         if (exports.swjs_library_version() != this.version) {
             throw new Error("The versions of JavaScriptKit are incompatible.");
+        }
+        this.instanceIsAsyncified = isAsyncified(exports);
+        console.log(`instanceIsAsyncified :: ${this.instanceIsAsyncified}`, 'background: #222; color: #bada55');
+    }
+
+    /**
+    * Report that the module has been started.
+    * Required for asyncified Wasm modules, so runtime has a chance to call required methods.
+    **/
+    didStart() {
+        if (this.instance && this.instanceIsAsyncified) {
+            const asyncifyExports = (this.instance
+                .exports as any) as AsyncifyExportedFunctions;
+            asyncifyExports.asyncify_stop_unwind();
         }
     }
 
@@ -519,6 +571,32 @@ export class SwiftRuntime {
             },
             swjs_release: (ref: ref) => {
                 this.heap.release(ref);
+            },
+            swjs_sleep: (ms: number) => {
+                if (!this.instance || !this.instanceIsAsyncified) {
+                    throw new Error("'sleep' requires asyncified WebAssembly");
+                }
+                const int32Memory = new Int32Array(memory().buffer);
+                const exports = (this.instance
+                    .exports as any) as AsyncifyExportedFunctions;
+                const ASYNCIFY_STACK_POINTER = 16; // Where the unwind/rewind data structure will live.
+                if (!this.isSleeping) {
+                    // Fill in the data structure. The first value has the stack location,
+                    // which for simplicity we can start right after the data structure itself.
+                    int32Memory[ASYNCIFY_STACK_POINTER >> 2] = ASYNCIFY_STACK_POINTER + 8;
+                    // Stack size
+                    int32Memory[ASYNCIFY_STACK_POINTER + 4 >> 2] = 4096;
+                    exports.asyncify_start_unwind(ASYNCIFY_STACK_POINTER);
+                    this.isSleeping = true;
+                    setTimeout(() => {
+                        exports.asyncify_start_rewind(ASYNCIFY_STACK_POINTER);
+                        this.resumeCallback();
+                    }, ms);
+                } else {
+                    // We are called as part of a resume/rewind. Stop sleeping.
+                    exports.asyncify_stop_rewind();
+                    this.isSleeping = false;
+                }
             },
         };
     }
