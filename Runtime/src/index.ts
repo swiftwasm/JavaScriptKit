@@ -184,7 +184,6 @@ export class SwiftRuntime {
             throw new Error("The versions of JavaScriptKit are incompatible.");
         }
         this.instanceIsAsyncified = isAsyncified(exports);
-        console.log(`instanceIsAsyncified :: ${this.instanceIsAsyncified}`, 'background: #222; color: #bada55');
     }
 
     /**
