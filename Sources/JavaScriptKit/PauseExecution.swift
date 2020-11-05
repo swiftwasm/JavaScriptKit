@@ -8,6 +8,8 @@ public func pauseExecution(milliseconds: Int32) {
     _sleep(milliseconds)
 }
 
+
+extension JSPromise where Success == JSValue, Failure == JSError {
     /// Unwind Wasm module execution stack and rewind it after promise resolves,
     /// allowing JavaScript events to continue to be processed in the meantime.
     /// - Parameters:
