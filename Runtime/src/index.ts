@@ -138,6 +138,19 @@ class SwiftRuntimeHeap {
     }
 }
 
+// Helper methods for asyncify
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+const promiseWithTimout = (promise: Promise<any>, timeout: number) => {
+    let timeoutPromise = new Promise((resolve, reject) => {
+        let timeoutID = setTimeout(() => {
+            clearTimeout(timeoutID);
+            reject(Error(`Promise timed out in ${timeout} ms`));
+        }, timeout);
+    });
+    return Promise.race([promise, timeoutPromise]);
+};
+
 export class SwiftRuntime {
     private instance: WebAssembly.Instance | null;
     private heap: SwiftRuntimeHeap;
@@ -380,6 +393,51 @@ export class SwiftRuntime {
             return result;
         };
 
+        const syncAwait = (
+            promise: Promise<any>,
+            kind_ptr?: pointer,
+            payload1_ptr?: pointer,
+            payload2_ptr?: pointer
+        ) => {
+            if (!this.instance || !this.instanceIsAsyncified) {
+                throw new Error("Calling async methods requires preprocessing Wasm module with `--asyncify`");
+            }
+            const exports = (this.instance
+                .exports as any) as AsyncifyExportedFunctions;
+            if (!this.isSleeping) {
+                // Fill in the data structure. The first value has the stack location,
+                // which for simplicity we can start right after the data structure itself.
+                const int32Memory = new Int32Array(memory().buffer);
+                const ASYNCIFY_STACK_POINTER = 16; // Where the unwind/rewind data structure will live.
+                int32Memory[ASYNCIFY_STACK_POINTER >> 2] = ASYNCIFY_STACK_POINTER + 8;
+                // Stack size
+                int32Memory[ASYNCIFY_STACK_POINTER + 4 >> 2] = 4096;
+                exports.asyncify_start_unwind(ASYNCIFY_STACK_POINTER);
+                this.isSleeping = true;
+                const resume = () => {
+                    exports.asyncify_start_rewind(ASYNCIFY_STACK_POINTER);
+                    this.resumeCallback();
+                };
+                promise
+                    .then(result => {
+                        if (kind_ptr && payload1_ptr && payload2_ptr) {
+                            writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
+                        }
+                        resume();
+                    })
+                    .catch(error => {
+                        if (kind_ptr && payload1_ptr && payload2_ptr) {
+                            writeValue(error, kind_ptr, payload1_ptr, payload2_ptr, true);
+                        }
+                        resume();
+                    });
+            } else {
+                // We are called as part of a resume/rewind. Stop sleeping.
+                exports.asyncify_stop_rewind();
+                this.isSleeping = false;
+            }
+        };
+
         return {
             swjs_set_prop: (
                 ref: ref,
@@ -573,30 +631,26 @@ export class SwiftRuntime {
                 this.heap.release(ref);
             },
             swjs_sleep: (ms: number) => {
-                if (!this.instance || !this.instanceIsAsyncified) {
-                    throw new Error("'sleep' requires asyncified WebAssembly");
-                }
-                const int32Memory = new Int32Array(memory().buffer);
-                const exports = (this.instance
-                    .exports as any) as AsyncifyExportedFunctions;
-                const ASYNCIFY_STACK_POINTER = 16; // Where the unwind/rewind data structure will live.
-                if (!this.isSleeping) {
-                    // Fill in the data structure. The first value has the stack location,
-                    // which for simplicity we can start right after the data structure itself.
-                    int32Memory[ASYNCIFY_STACK_POINTER >> 2] = ASYNCIFY_STACK_POINTER + 8;
-                    // Stack size
-                    int32Memory[ASYNCIFY_STACK_POINTER + 4 >> 2] = 4096;
-                    exports.asyncify_start_unwind(ASYNCIFY_STACK_POINTER);
-                    this.isSleeping = true;
-                    setTimeout(() => {
-                        exports.asyncify_start_rewind(ASYNCIFY_STACK_POINTER);
-                        this.resumeCallback();
-                    }, ms);
-                } else {
-                    // We are called as part of a resume/rewind. Stop sleeping.
-                    exports.asyncify_stop_rewind();
-                    this.isSleeping = false;
-                }
+                syncAwait(delay(ms));
+            },
+            swjs_sync_await: (
+                promiseRef: ref,
+                kind_ptr: pointer,
+                payload1_ptr: pointer,
+                payload2_ptr: pointer
+            ) => {
+                const promise: Promise<any> = this.heap.referenceHeap(promiseRef);
+                syncAwait(promise, kind_ptr, payload1_ptr, payload2_ptr);
+            },
+            swjs_sync_await_with_timeout: (
+                promiseRef: ref,
+                timeout: number,
+                kind_ptr: pointer,
+                payload1_ptr: pointer,
+                payload2_ptr: pointer
+            ) => {
+                const promise: Promise<any> = this.heap.referenceHeap(promiseRef);
+                syncAwait(promiseWithTimout(promise, timeout), kind_ptr, payload1_ptr, payload2_ptr);
             },
         };
     }
