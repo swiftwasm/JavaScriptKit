@@ -22,6 +22,7 @@ if (typeof globalThis !== "undefined") {
 interface SwiftRuntimeExportedFunctions {
     swjs_library_version(): number;
     swjs_prepare_host_function_call(size: number): pointer;
+    swjs_allocate_asyncify_buffer(size: number): pointer;
     swjs_cleanup_host_function_call(argv: pointer): void;
     swjs_call_host_function(
         host_func_id: number,
@@ -158,6 +159,7 @@ export class SwiftRuntime {
     private isSleeping: boolean;
     private instanceIsAsyncified: boolean;
     private resumeCallback: () => void;
+    private asyncifyBufferPointer: pointer | null;
 
     constructor() {
         this.instance = null;
@@ -165,6 +167,7 @@ export class SwiftRuntime {
         this.isSleeping = false;
         this.instanceIsAsyncified = false;
         this.resumeCallback = () => { };
+        this.asyncifyBufferPointer = null;
     }
 
     /**
@@ -401,40 +404,38 @@ export class SwiftRuntime {
             if (!this.instance || !this.instanceIsAsyncified) {
                 throw new Error("Calling async methods requires preprocessing Wasm module with `--asyncify`");
             }
-            const exports = (this.instance
-                .exports as any) as AsyncifyExportedFunctions;
-            if (!this.isSleeping) {
-                // Fill in the data structure. The first value has the stack location,
-                // which for simplicity we can start right after the data structure itself.
-                const int32Memory = new Int32Array(memory().buffer);
-                const ASYNCIFY_STACK_POINTER = 16; // Where the unwind/rewind data structure will live.
-                int32Memory[ASYNCIFY_STACK_POINTER >> 2] = ASYNCIFY_STACK_POINTER + 8;
-                // Stack size
-                int32Memory[ASYNCIFY_STACK_POINTER + 4 >> 2] = 4096;
-                exports.asyncify_start_unwind(ASYNCIFY_STACK_POINTER);
-                this.isSleeping = true;
-                const resume = () => {
-                    exports.asyncify_start_rewind(ASYNCIFY_STACK_POINTER);
-                    this.resumeCallback();
-                };
-                promise
-                    .then(result => {
-                        if (kind_ptr && payload1_ptr && payload2_ptr) {
-                            writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
-                        }
-                        resume();
-                    })
-                    .catch(error => {
-                        if (kind_ptr && payload1_ptr && payload2_ptr) {
-                            writeValue(error, kind_ptr, payload1_ptr, payload2_ptr, true);
-                        }
-                        resume();
-                    });
-            } else {
+            const exports = (this.instance.exports as any) as AsyncifyExportedFunctions;
+            if (this.isSleeping) {
                 // We are called as part of a resume/rewind. Stop sleeping.
                 exports.asyncify_stop_rewind();
                 this.isSleeping = false;
+                return;
             }
+
+            if (this.asyncifyBufferPointer == null) {
+                const runtimeExports = (this.instance
+                    .exports as any) as SwiftRuntimeExportedFunctions;
+                this.asyncifyBufferPointer = runtimeExports.swjs_allocate_asyncify_buffer(4096);
+            }
+            exports.asyncify_start_unwind(this.asyncifyBufferPointer!);
+            this.isSleeping = true;
+            const resume = () => {
+                exports.asyncify_start_rewind(this.asyncifyBufferPointer!);
+                this.resumeCallback();
+            };
+            promise
+                .then(result => {
+                    if (kind_ptr && payload1_ptr && payload2_ptr) {
+                        writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
+                    }
+                    resume();
+                })
+                .catch(error => {
+                    if (kind_ptr && payload1_ptr && payload2_ptr) {
+                        writeValue(error, kind_ptr, payload1_ptr, payload2_ptr, true);
+                    }
+                    resume();
+                });
         };
 
         return {
