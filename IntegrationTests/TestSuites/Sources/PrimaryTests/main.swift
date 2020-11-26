@@ -562,7 +562,7 @@ try test("Exception") {
     try expectEqual(error4 is JSValue, true)
     let errorObject2 = JSError(from: error4 as! JSValue)
     try expectNotNil(errorObject2)
-    
+
     // MARK: Throwing constructor call
     let Animal = JSObject.global.Animal.function!
     _ = try Animal.throws.new("Tama", 3, true)

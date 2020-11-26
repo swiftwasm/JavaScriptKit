@@ -76,7 +76,7 @@ public class JSObject: Equatable {
         get { getJSValue(this: self, index: Int32(index)) }
         set { setJSValue(this: self, index: Int32(index), value: newValue) }
     }
-    
+
     /// A modifier to call methods as throwing methods capturing `this`
     ///
     ///
