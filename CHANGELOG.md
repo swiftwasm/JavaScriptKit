@@ -1,3 +1,24 @@
+# 0.9.0 (27 November 2020)
+
+This release introduces support for catching `JSError` instances in Swift from throwing JavaScript
+functions. This is possible thanks to the new `JSThrowingFunction` and `JSThrowingObject` classes.
+The former can only be called with `try`, while the latter will expose all of its member functions
+as throwing. Use the new `throws` property on `JSFunction` to convert it to `JSThrowingFunction`,
+and the new `throwing` property on `JSObject` to convert it to `JSThrowingObject`.
+
+**Closed issues:**
+
+- Support JS errors ([#37](https://github.com/swiftwasm/JavaScriptKit/issues/37))
+
+**Merged pull requests:**
+
+- Update toolchain version swift-wasm-5.3.0-RELEASE ([#108](https://github.com/swiftwasm/JavaScriptKit/pull/108)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Update ci trigger condition ([#104](https://github.com/swiftwasm/JavaScriptKit/pull/104)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Fix branch and triple in `compatibility.yml` ([#105](https://github.com/swiftwasm/JavaScriptKit/pull/105)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Check source code compatibility ([#103](https://github.com/swiftwasm/JavaScriptKit/pull/103)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- JS Exception Support ([#102](https://github.com/swiftwasm/JavaScriptKit/pull/102)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Mention `carton` Docker image and refine wording in `README.md` ([#101](https://github.com/swiftwasm/JavaScriptKit/pull/101)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+
 # 0.8.0 (21 October 2020)
 
 This release introduces a few enhancements and deprecations. Namely, `JSValueConstructible`
