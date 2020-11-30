@@ -1,13 +1,13 @@
 CONFIGURATION ?= debug
 
 FORCE:
-TestSuites/.build/$(CONFIGURATION)/%: FORCE
+TestSuites/.build/$(CONFIGURATION)/%.wasm: FORCE
 	swift build --package-path TestSuites \
-	            --product $(notdir $@) \
+	            --product $(basename $(notdir $@)) \
 	            --triple wasm32-unknown-wasi \
 	            --configuration $(CONFIGURATION)
 
-dist/%.wasm: TestSuites/.build/$(CONFIGURATION)/%
+dist/%.wasm: TestSuites/.build/$(CONFIGURATION)/%.wasm
 	mkdir -p dist
 	cp $< $@
 
