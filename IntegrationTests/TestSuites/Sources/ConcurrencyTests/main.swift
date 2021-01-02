@@ -4,15 +4,12 @@ import JavaScriptKit
 JavaScriptEventLoop.install()
 let fetch = JSObject.global.fetch.function!.async
 
-func printZen(prefix: String) async {
+func printZen() async {
   let result = await try! fetch("https://api.github.com/zen").object!
   let text = await try! result.asyncing.text!()
-  print("\(prefix): \(text)")
-}
-func run(_ prefix: String) {
-  JavaScriptEventLoop.runAsync {
-    await printZen(prefix: prefix)
-  }
+  print(text)
 }
 
-run("Today's lucky word")
+JavaScriptEventLoop.runAsync {
+  await printZen()
+}
