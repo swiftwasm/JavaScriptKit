@@ -56,8 +56,8 @@ void Queue::insertJob(swift::Job *newJob) {
   }
   nextInQueue(newJob) = nullptr;
   *position = newJob;
-  
-  if (isSpinning) {
+
+  if (!isSpinning) {
     isSpinning = true;
     registerEventLoopHook(runEnqueuedJobs, &this->Context);
   }
