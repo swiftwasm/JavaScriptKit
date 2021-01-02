@@ -28,11 +28,5 @@ let package = Package(
                 .linkedLibrary("swift_Concurrency", .when(platforms: [.wasi])),
             ]
         ),
-        .target(
-            name: "_CJavaScriptEventLoopPrototype",
-            linkerSettings: [
-                .linkedLibrary("swift_Concurrency"),
-            ]
-        ),
     ]
 )
