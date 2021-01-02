@@ -34,7 +34,10 @@ public final class JSTimer {
     - callback: the closure to be executed after a given `millisecondsDelay` interval.
   */
   public init(millisecondsDelay: Double, isRepeating: Bool = false, callback: @escaping () -> ()) {
-    closure = JSClosure { _ in callback() }
+    closure = JSClosure { _ in
+        callback()
+        return .undefined
+    }
     self.isRepeating = isRepeating
     if isRepeating {
       value = global.setInterval.function!(closure, millisecondsDelay)

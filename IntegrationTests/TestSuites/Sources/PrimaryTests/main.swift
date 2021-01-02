@@ -183,6 +183,45 @@ try test("Function Call") {
     try expectEqual(func6(true, "OK", 2), .string("OK"))
 }
 
+try test("Closure Lifetime") {
+    do {
+        let c1 = JSClosure { arguments in
+            return arguments[0]
+        }
+        try expectEqual(c1(arguments: [JSValue.number(1.0)]), .number(1.0))
+        c1.release()
+    }
+
+    do {
+        let c1 = JSClosure { arguments in
+            return arguments[0]
+        }
+        c1.release()
+        // Call a released closure
+        _ = try expectThrow(try c1.throws())
+    }
+
+    do {
+        let c1 = JSClosure { _ in
+            // JSClosure will be deallocated before `release()`
+            _ = JSClosure { _ in .undefined }
+            return .undefined
+        }
+        _ = try expectThrow(try c1.throws())
+        c1.release()
+    }
+
+    do {
+        let c1 = JSOneshotClosure { _ in
+            return .boolean(true)
+        }
+        try expectEqual(c1(), .boolean(true))
+        // second call will cause fatalError that can be catched as a JavaScript exception
+        _ = try expectThrow(try c1.throws())
+        // OneshotClosure won't call fatalError even if it's deallocated before `release`
+    }
+}
+
 try test("Host Function Registration") {
     // ```js
     // global.globalObject1 = {
