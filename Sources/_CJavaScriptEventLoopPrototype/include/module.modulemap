@@ -1,0 +1,4 @@
+module SwiftInternal {
+    header "SwiftInternal.h"
+    export *
+}

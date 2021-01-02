@@ -1,0 +1,2 @@
+
+void swiftInstallConcurrencyEnqueueHook(void);

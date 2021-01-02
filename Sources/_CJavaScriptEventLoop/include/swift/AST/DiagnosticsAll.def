@@ -1,0 +1,36 @@
+//===--- DiagnosticsAll.def - Diagnostics Text Index ------------*- C++ -*-===//
+//
+// This source file is part of the Swift.org open source project
+//
+// Copyright (c) 2014 - 2017 Apple Inc. and the Swift project authors
+// Licensed under Apache License v2.0 with Runtime Library Exception
+//
+// See https://swift.org/LICENSE.txt for license information
+// See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file imports all the other diagnostic files.
+//
+//===----------------------------------------------------------------------===//
+
+#define DEFINE_DIAGNOSTIC_MACROS
+#include "DefineDiagnosticMacros.h"
+
+#define DIAG_NO_UNDEF
+
+#include "DiagnosticsCommon.def"
+#include "DiagnosticsParse.def"
+#include "DiagnosticsSema.def"
+#include "DiagnosticsClangImporter.def"
+#include "DiagnosticsSIL.def"
+#include "DiagnosticsIRGen.def"
+#include "DiagnosticsFrontend.def"
+#include "DiagnosticsDriver.def"
+#include "DiagnosticsRefactoring.def"
+#include "DiagnosticsModuleDiffer.def"
+
+#undef DIAG_NO_UNDEF
+
+#define UNDEFINE_DIAGNOSTIC_MACROS
+#include "DefineDiagnosticMacros.h"

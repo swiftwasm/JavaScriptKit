@@ -10,8 +10,28 @@ let package = Package(
     targets: [
         .target(
             name: "JavaScriptKit",
-            dependencies: ["_CJavaScriptKit"]
+            dependencies: ["_CJavaScriptKit"],
+            swiftSettings: [
+                .unsafeFlags(["-Xfrontend", "-enable-experimental-concurrency"]),
+            ]
+        ),
+        .target(
+            name: "JavaScriptEventLoop",
+            dependencies: ["JavaScriptKit", "_CJavaScriptEventLoop"]
         ),
         .target(name: "_CJavaScriptKit"),
+        .target(
+            name: "_CJavaScriptEventLoop",
+            dependencies: ["_CJavaScriptKit"],
+            linkerSettings: [
+                .linkedLibrary("swift_Concurrency"),
+            ]
+        ),
+        .target(
+            name: "_CJavaScriptEventLoopPrototype",
+            linkerSettings: [
+                .linkedLibrary("swift_Concurrency"),
+            ]
+        ),
     ]
 )
