@@ -216,7 +216,7 @@ try test("Closure Lifetime") {
             return .boolean(true)
         }
         try expectEqual(c1(), .boolean(true))
-        // second call will cause fatalError that can be catched as a JavaScript exception
+        // second call will cause `fatalError` that can be caught as a JavaScript exception
         _ = try expectThrow(try c1.throws())
         // OneshotClosure won't call fatalError even if it's deallocated before `release`
     }

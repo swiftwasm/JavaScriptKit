@@ -2,7 +2,7 @@ import _CJavaScriptKit
 
 fileprivate var sharedFunctions: [JavaScriptHostFuncRef: ([JSValue]) -> JSValue] = [:]
 
-/// `JSOneshotClosure` is a JavaScript function that can be called at once.
+/// `JSOneshotClosure` is a JavaScript function that can be called only once.
 public class JSOneshotClosure: JSFunction {
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 
