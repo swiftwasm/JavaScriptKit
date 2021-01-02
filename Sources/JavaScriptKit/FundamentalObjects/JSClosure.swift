@@ -56,6 +56,19 @@ public class JSClosure: JSOneshotClosure {
     
     var isReleased: Bool = false
 
+    @available(*, deprecated, message: "This initializer will be removed in the next minor version update. Please use `init(_ body: @escaping ([JSValue]) -> JSValue)`")
+    @_disfavoredOverload
+    public init(_ body: @escaping ([JSValue]) -> ()) {
+        super.init({
+            body($0)
+            return .undefined
+        })
+    }
+
+    public override init(_ body: @escaping ([JSValue]) -> JSValue) {
+        super.init(body)
+    }
+
     public override func callAsFunction(this: JSObject? = nil, arguments: [ConvertibleToJSValue]) -> JSValue {
         try! invokeJSFunction(self, arguments: arguments, this: this)
     }
