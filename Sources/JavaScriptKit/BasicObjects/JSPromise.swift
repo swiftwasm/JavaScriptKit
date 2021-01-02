@@ -88,36 +88,11 @@ extension JSPromise where Success == (), Failure == Never {
     }
 }
 
-extension JSPromise where Failure: ConvertibleToJSValue {
-    /** Creates a new `JSPromise` instance from a given `resolver` closure. `resolver` takes 
-    two closure that your code should call to either resolve or reject this `JSPromise` instance.
-    */
-    public convenience init(resolver: @escaping (@escaping (Result<Success, JSError>) -> ()) -> ()) {
-        let closure = JSClosure { arguments -> () in
-            // The arguments are always coming from the `Promise` constructor, so we should be
-            // safe to assume their type here
-            let resolve = arguments[0].function!
-            let reject = arguments[1].function!
-
-            resolver {
-                switch $0 {
-                case .success:
-                    resolve()
-                case let .failure(error):
-                    reject(error.jsValue())
-                }
-            }
-        }
-        self.init(unsafe: JSObject.global.Promise.function!.new(closure))
-        callbacks.append(closure)
-    }
-}
-
-extension JSPromise where Success: ConvertibleToJSValue, Failure: JSError {
+extension JSPromise where Success: ConvertibleToJSValue, Failure: ConvertibleToJSValue & Error {
     /** Creates a new `JSPromise` instance from a given `resolver` closure. `resolver` takes 
     a closure that your code should call to either resolve or reject this `JSPromise` instance.
     */
-    public convenience init(resolver: @escaping (@escaping (Result<Success, JSError>) -> ()) -> ()) {
+    public convenience init(resolver: @escaping (@escaping (Result<Success, Failure>) -> ()) -> ()) {
         let closure = JSClosure { arguments -> () in
             // The arguments are always coming from the `Promise` constructor, so we should be
             // safe to assume their type here
@@ -148,7 +123,7 @@ extension JSPromise where Success: ConstructibleFromJSValue {
     ) {
         let closure = JSClosure { arguments -> () in
             guard let result = Success.construct(from: arguments[0]) else {
-                fatalError("\(file):\(line): failed to unwrap success value for `then` callback")
+                fatalError("\(file):\(line): failed to unwrap success value for `then` callback: \(arguments[0])")
             }
             success(result)
         }
@@ -167,7 +142,7 @@ extension JSPromise where Success: ConstructibleFromJSValue {
     ) -> JSPromise<ResultType, Failure> {
         let closure = JSClosure { arguments -> JSValue in
             guard let result = Success.construct(from: arguments[0]) else {
-                fatalError("\(file):\(line): failed to unwrap success value for `then` callback")
+                fatalError("\(file):\(line): failed to unwrap success value for `then` callback: \(arguments[0])")
             }
             return success(result).jsValue()
         }
@@ -186,7 +161,7 @@ extension JSPromise where Success: ConstructibleFromJSValue {
     ) -> JSPromise<ResultSuccess, ResultFailure> {
         let closure = JSClosure { arguments -> JSValue in
             guard let result = Success.construct(from: arguments[0]) else {
-                fatalError("\(file):\(line): failed to unwrap success value for `then` callback")
+                fatalError("\(file):\(line): failed to unwrap success value for `then` callback: \(arguments[0])")
             }
             return success(result).jsValue()
         }
@@ -207,7 +182,7 @@ extension JSPromise where Failure: ConstructibleFromJSValue {
     ) -> JSPromise<ResultSuccess, Never> {
         let closure = JSClosure { arguments -> JSValue in
             guard let error = Failure.construct(from: arguments[0]) else {
-                fatalError("\(file):\(line): failed to unwrap error value for `catch` callback")
+                fatalError("\(file):\(line): failed to unwrap error value for `catch` callback: \(arguments[0])")
             }
             return failure(error).jsValue()
         }
@@ -224,7 +199,7 @@ extension JSPromise where Failure: ConstructibleFromJSValue {
     ) {
         let closure = JSClosure { arguments -> () in
             guard let error = Failure.construct(from: arguments[0]) else {
-                fatalError("\(file):\(line): failed to unwrap error value for `catch` callback")
+                fatalError("\(file):\(line): failed to unwrap error value for `catch` callback: \(arguments[0])")
             }
             failure(error)
         }
@@ -243,7 +218,7 @@ extension JSPromise where Failure: ConstructibleFromJSValue {
     ) -> JSPromise<ResultSuccess, ResultFailure> {
         let closure = JSClosure { arguments -> JSValue in
             guard let error = Failure.construct(from: arguments[0]) else {
-                fatalError("\(file):\(line): failed to unwrap error value for `catch` callback")
+                fatalError("\(file):\(line): failed to unwrap error value for `catch` callback: \(arguments[0])")
             }
             return failure(error).jsValue()
         }

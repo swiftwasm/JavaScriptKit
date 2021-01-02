@@ -5,21 +5,17 @@ public enum JavaScriptEventLoop {
     public static func install() {
         installTaskEnqueueHook()
     }
-    public static func runAsync(_ asyncFun: @escaping () async -> ()) {
-        _runAsync(asyncFun)
+    public static func runAsync(_ asyncFun: @escaping () async throws -> ()) rethrows {
+        try _runAsync(asyncFun)
     }
 }
 
-public struct JSPromiseError: Error {
-    let value: ConstructibleFromJSValue
-}
-
-
-public extension JSPromise where Success: ConstructibleFromJSValue, Failure: ConstructibleFromJSValue {
+public extension JSPromise where Success: ConstructibleFromJSValue,
+                                 Failure: ConstructibleFromJSValue & Error {
     func await() async throws -> Success {
         await try withUnsafeThrowingContinuation { [self] continuation in
             self.catch(failure: { error in
-                continuation.resume(throwing: JSPromiseError(value: error))
+                continuation.resume(throwing: error)
             })
             self.then(success: {
                 continuation.resume(returning: $0)
@@ -29,14 +25,14 @@ public extension JSPromise where Success: ConstructibleFromJSValue, Failure: Con
 }
 
 @_silgen_name("swift_run_async")
-func _runAsync(_ asyncFun: @escaping () async -> ())
+func _runAsync(_ asyncFun: @escaping () async throws -> ()) rethrows
 
 private func getPromise(from context: UnsafeMutablePointer<EventLoopContext>) -> JSPromise<JSValue, JSValue> {
     let promise: JSPromise<JSValue, JSValue>
     if let cached = context.pointee.Promise {
         promise = Unmanaged.fromOpaque(cached).takeUnretainedValue()
     } else {
-        promise = JSPromise(resolver: { resolver -> Void in
+        promise = JSPromise<JSValue, JSValue>(resolver: { resolver -> Void in
             resolver(.success(.undefined))
         })
         let pointer = Unmanaged.passRetained(promise).retain().toOpaque()
@@ -45,6 +41,7 @@ private func getPromise(from context: UnsafeMutablePointer<EventLoopContext>) ->
     return promise
 }
 
+#if arch(wasm32)
 @_cdecl("registerEventLoopHook")
 func registerEventLoopHook(
     _ callback: @convention(c) @escaping (UnsafeMutablePointer<EventLoopContext>) -> Void,
@@ -54,3 +51,5 @@ func registerEventLoopHook(
         callback(context)
     }
 }
+
+#endif
