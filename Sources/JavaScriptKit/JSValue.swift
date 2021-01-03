@@ -145,7 +145,7 @@ extension JSValue {
         .object(JSClosure(body))
     }
 
-    @available(*, deprecated, renamed: "object", message: "JSClosure is not a subclass of JSFunction now")
+    @available(*, deprecated, renamed: "object", message: "JSClosure is no longer a subclass of JSFunction. Use .object(closure) instead.")
     public static func function(_ closure: JSClosure) -> JSValue {
         .object(closure)
     }
