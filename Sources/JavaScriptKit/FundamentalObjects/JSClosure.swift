@@ -90,13 +90,13 @@ public class JSClosure: JSOneshotClosure {
 
 // MARK: - `JSClosure` mechanism note
 //
-// 1. Create thunk function in JavaScript world, that has a reference
-//    to Swift Closure.
+// 1. Create a thunk in the JavaScript world, which has a reference
+//    to a Swift closure.
 // ┌─────────────────────┬──────────────────────────┐
 // │     Swift side      │   JavaScript side        │
 // │                     │                          │
 // │                     │                          │
-// │                     │   ┌──[Thunk function]──┐ │
+// │                     │   ┌──────[Thunk]───────┐ │
 // │          ┌ ─ ─ ─ ─ ─│─ ─│─ ─ ─ ─ ─ ┐         │ │
 // │          ↓          │   │          │         │ │
 // │  [Swift Closure]    │   │  Host Function ID  │ │
@@ -104,13 +104,13 @@ public class JSClosure: JSOneshotClosure {
 // │                     │   └────────────────────┘ │
 // └─────────────────────┴──────────────────────────┘
 //
-// 2. When thunk function is invoked, it calls Swift Closure via
-//    `_call_host_function` and callback the result through callback func
+// 2. When the thunk function is invoked, it calls the Swift closure via
+//    `_call_host_function` and receives the result through a callback.
 // ┌─────────────────────┬──────────────────────────┐
 // │     Swift side      │   JavaScript side        │
 // │                     │                          │
 // │                     │                          │
-// │                   Apply ┌──[Thunk function]──┐ │
+// │                   Apply ┌──────[Thunk]───────┐ │
 // │          ┌ ─ ─ ─ ─ ─│─ ─│─ ─ ─ ─ ─ ┐         │ │
 // │          ↓          │   │          │         │ │
 // │  [Swift Closure]    │   │  Host Function ID  │ │
