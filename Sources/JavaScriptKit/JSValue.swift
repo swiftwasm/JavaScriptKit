@@ -144,6 +144,11 @@ extension JSValue {
     public static func function(_ body: @escaping ([JSValue]) -> JSValue) -> JSValue {
         .object(JSClosure(body))
     }
+
+    @available(*, deprecated, renamed: "object", message: "JSClosure is not a subclass of JSFunction now")
+    public static func function(_ closure: JSClosure) -> JSValue {
+        .object(closure)
+    }
 }
 
 extension JSValue: ExpressibleByStringLiteral {
