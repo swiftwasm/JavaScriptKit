@@ -1,9 +1,17 @@
 import _CJavaScriptKit
 
-fileprivate var sharedFunctions: [JavaScriptHostFuncRef: ([JSValue]) -> JSValue] = [:]
+fileprivate var sharedClosures: [JavaScriptHostFuncRef: ([JSValue]) -> JSValue] = [:]
+
+/// JSClosureProtocol abstracts closure object in JavaScript, whose lifetime is manualy managed
+public protocol JSClosureProtocol: JSValueCompatible {
+
+    /// Release this function resource.
+    /// After calling `release`, calling this function from JavaScript will fail.
+    func release()
+}
 
 /// `JSOneshotClosure` is a JavaScript function that can be called only once.
-public class JSOneshotClosure: JSFunction {
+public class JSOneshotClosure: JSObject, JSClosureProtocol {
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 
     public init(_ body: @escaping ([JSValue]) -> JSValue) {
@@ -12,7 +20,10 @@ public class JSOneshotClosure: JSFunction {
         let objectId = ObjectIdentifier(self)
         let funcRef = JavaScriptHostFuncRef(bitPattern: Int32(objectId.hashValue))
         // 2. Retain the given body in static storage by `funcRef`.
-        sharedFunctions[funcRef] = body
+        sharedClosures[funcRef] = {
+            defer { self.release() }
+            return body($0)
+        }
         // 3. Create a new JavaScript function which calls the given Swift function.
         var objectRef: JavaScriptObjectRef = 0
         _create_function(funcRef, &objectRef)
@@ -21,15 +32,10 @@ public class JSOneshotClosure: JSFunction {
         id = objectRef
     }
 
-    public override func callAsFunction(this: JSObject? = nil, arguments: [ConvertibleToJSValue]) -> JSValue {
-        defer { release() }
-        return super.callAsFunction(this: this, arguments: arguments)
-    }
-
     /// Release this function resource.
     /// After calling `release`, calling this function from JavaScript will fail.
     public func release() {
-        sharedFunctions[hostFuncRef] = nil
+        sharedClosures[hostFuncRef] = nil
     }
 }
 
@@ -52,30 +58,37 @@ public class JSOneshotClosure: JSFunction {
 /// eventListenter.release()
 /// ```
 ///
-public class JSClosure: JSOneshotClosure {
-    
+public class JSClosure: JSObject, JSClosureProtocol {
+    private var hostFuncRef: JavaScriptHostFuncRef = 0
     var isReleased: Bool = false
 
     @available(*, deprecated, message: "This initializer will be removed in the next minor version update. Please use `init(_ body: @escaping ([JSValue]) -> JSValue)` and add `return .undefined` to the end of your closure")
     @_disfavoredOverload
-    public init(_ body: @escaping ([JSValue]) -> ()) {
-        super.init({
+    public convenience init(_ body: @escaping ([JSValue]) -> ()) {
+        self.init({
             body($0)
             return .undefined
         })
     }
 
-    public override init(_ body: @escaping ([JSValue]) -> JSValue) {
-        super.init(body)
+    public init(_ body: @escaping ([JSValue]) -> JSValue) {
+        // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
+        super.init(id: 0)
+        let objectId = ObjectIdentifier(self)
+        let funcRef = JavaScriptHostFuncRef(bitPattern: Int32(objectId.hashValue))
+        // 2. Retain the given body in static storage by `funcRef`.
+        sharedClosures[funcRef] = body
+        // 3. Create a new JavaScript function which calls the given Swift function.
+        var objectRef: JavaScriptObjectRef = 0
+        _create_function(funcRef, &objectRef)
+
+        hostFuncRef = funcRef
+        id = objectRef
     }
 
-    public override func callAsFunction(this: JSObject? = nil, arguments: [ConvertibleToJSValue]) -> JSValue {
-        try! invokeJSFunction(self, arguments: arguments, this: this)
-    }
-    
-    public override func release() {
+    public func release() {
         isReleased = true
-        super.release()
+        sharedClosures[hostFuncRef] = nil
     }
 
     deinit {
@@ -126,7 +139,7 @@ func _call_host_function_impl(
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
 ) {
-    guard let hostFunc = sharedFunctions[hostFuncRef] else {
+    guard let hostFunc = sharedClosures[hostFuncRef] else {
         fatalError("The function was already released")
     }
     let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
