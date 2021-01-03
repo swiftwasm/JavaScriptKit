@@ -56,7 +56,7 @@ public class JSClosure: JSOneshotClosure {
     
     var isReleased: Bool = false
 
-    @available(*, deprecated, message: "This initializer will be removed in the next minor version update. Please use `init(_ body: @escaping ([JSValue]) -> JSValue)`")
+    @available(*, deprecated, message: "This initializer will be removed in the next minor version update. Please use `init(_ body: @escaping ([JSValue]) -> JSValue)` and add `return .undefined` to the end of your closure")
     @_disfavoredOverload
     public init(_ body: @escaping ([JSValue]) -> ()) {
         super.init({
@@ -80,10 +80,8 @@ public class JSClosure: JSOneshotClosure {
 
     deinit {
         guard isReleased else {
-            fatalError("""
-            release() must be called on closures manually before deallocating.
-            This is caused by the lack of support for the `FinalizationRegistry` API in Safari.
-            """)
+            // Safari doesn't support `FinalizationRegistry`, so we cannot automatically manage the lifetime of Swift objects
+            fatalError("release() must be called on JSClosure objects manually before they are deallocated")
         }
     }
 }
