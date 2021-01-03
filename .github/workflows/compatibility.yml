@@ -20,5 +20,5 @@ jobs:
           export PATH="$SWIFTENV_ROOT/bin:$PATH"
           eval "$(swiftenv init -)"
           make bootstrap
-          cd Example
+          cd Example/JavaScriptKitExample
           swift build --triple wasm32-unknown-wasi
