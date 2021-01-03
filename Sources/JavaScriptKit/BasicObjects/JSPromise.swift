@@ -8,19 +8,10 @@ is of actual JavaScript `Error` type, you should use `JSPromise<JSValue, JSValue
 This doesn't 100% match the JavaScript API, as `then` overload with two callbacks is not available.
 It's impossible to unify success and failure types from both callbacks in a single returned promise
 without type erasure. You should chain `then` and `catch` in those cases to avoid type erasure.
-
-**IMPORTANT**: instances of this class must have the same lifetime as the actual `Promise` object in
-the JavaScript environment, because callback handlers will be deallocated when `JSPromise.deinit` is
-executed.
-
-If the actual `Promise` object in JavaScript environment lives longer than this `JSPromise`, it may
-attempt to call a deallocated `JSClosure`.
 */
 public final class JSPromise<Success, Failure>: ConvertibleToJSValue, ConstructibleFromJSValue {
     /// The underlying JavaScript `Promise` object.
     public let jsObject: JSObject
-
-    private var callbacks = [JSClosure]()
 
     /// The underlying JavaScript `Promise` object wrapped as `JSValue`.
     public func jsValue() -> JSValue {
@@ -52,11 +43,10 @@ public final class JSPromise<Success, Failure>: ConvertibleToJSValue, Constructi
     /** Schedules the `success` closure to be invoked on sucessful completion of `self`.
     */
     public func then(success: @escaping () -> ()) {
-        let closure = JSClosure { _ in
+        let closure = JSOneshotClosure { _ in
             success()
             return .undefined
         }
-        callbacks.append(closure)
         _ = jsObject.then!(closure)
     }
 
@@ -64,16 +54,11 @@ public final class JSPromise<Success, Failure>: ConvertibleToJSValue, Constructi
     `self`.
     */
     public func finally(successOrFailure: @escaping () -> ()) -> Self {
-        let closure = JSClosure { _ in
+        let closure = JSOneshotClosure { _ in
             successOrFailure()
             return .undefined
         }
-        callbacks.append(closure)
         return .init(unsafe: jsObject.finally!(closure).object!)
-    }
-
-    deinit {
-        callbacks.forEach { $0.release() }
     }
 }
 
@@ -82,14 +67,13 @@ extension JSPromise where Success == (), Failure == Never {
     a closure that your code should call to resolve this `JSPromise` instance.
     */
     public convenience init(resolver: @escaping (@escaping () -> ()) -> ()) {
-        let closure = JSClosure { arguments in
+        let closure = JSOneshotClosure { arguments in
             // The arguments are always coming from the `Promise` constructor, so we should be
             // safe to assume their type here
             resolver { arguments[0].function!() }
             return .undefined
         }
         self.init(unsafe: JSObject.global.Promise.function!.new(closure))
-        callbacks.append(closure)
     }
 }
 
@@ -98,7 +82,7 @@ extension JSPromise where Failure: ConvertibleToJSValue {
     two closure that your code should call to either resolve or reject this `JSPromise` instance.
     */
     public convenience init(resolver: @escaping (@escaping (Result<Success, JSError>) -> ()) -> ()) {
-        let closure = JSClosure { arguments in
+        let closure = JSOneshotClosure { arguments in
             // The arguments are always coming from the `Promise` constructor, so we should be
             // safe to assume their type here
             let resolve = arguments[0].function!
@@ -115,7 +99,6 @@ extension JSPromise where Failure: ConvertibleToJSValue {
             return .undefined
         }
         self.init(unsafe: JSObject.global.Promise.function!.new(closure))
-        callbacks.append(closure)
     }
 }
 
@@ -124,7 +107,7 @@ extension JSPromise where Success: ConvertibleToJSValue, Failure: JSError {
     a closure that your code should call to either resolve or reject this `JSPromise` instance.
     */
     public convenience init(resolver: @escaping (@escaping (Result<Success, JSError>) -> ()) -> ()) {
-        let closure = JSClosure { arguments in
+        let closure = JSOneshotClosure { arguments in
             // The arguments are always coming from the `Promise` constructor, so we should be
             // safe to assume their type here
             let resolve = arguments[0].function!
@@ -141,7 +124,6 @@ extension JSPromise where Success: ConvertibleToJSValue, Failure: JSError {
             return .undefined
         }
         self.init(unsafe: JSObject.global.Promise.function!.new(closure))
-        callbacks.append(closure)
     }
 }
 
@@ -153,14 +135,13 @@ extension JSPromise where Success: ConstructibleFromJSValue {
         file: StaticString = #file,
         line: Int = #line
     ) {
-        let closure = JSClosure { arguments in
+        let closure = JSOneshotClosure { arguments in
             guard let result = Success.construct(from: arguments[0]) else {
                 fatalError("\(file):\(line): failed to unwrap success value for `then` callback")
             }
             success(result)
             return .undefined
         }
-        callbacks.append(closure)
         _ = jsObject.then!(closure)
     }
 
@@ -173,13 +154,12 @@ extension JSPromise where Success: ConstructibleFromJSValue {
         file: StaticString = #file,
         line: Int = #line
     ) -> JSPromise<ResultType, Failure> {
-        let closure = JSClosure { arguments -> JSValue in
+        let closure = JSOneshotClosure { arguments -> JSValue in
             guard let result = Success.construct(from: arguments[0]) else {
                 fatalError("\(file):\(line): failed to unwrap success value for `then` callback")
             }
             return success(result).jsValue()
         }
-        callbacks.append(closure)
         return .init(unsafe: jsObject.then!(closure).object!)
     }
 
@@ -192,13 +172,12 @@ extension JSPromise where Success: ConstructibleFromJSValue {
         file: StaticString = #file,
         line: Int = #line
     ) -> JSPromise<ResultSuccess, ResultFailure> {
-        let closure = JSClosure { arguments -> JSValue in
+        let closure = JSOneshotClosure { arguments -> JSValue in
             guard let result = Success.construct(from: arguments[0]) else {
                 fatalError("\(file):\(line): failed to unwrap success value for `then` callback")
             }
             return success(result).jsValue()
         }
-        callbacks.append(closure)
         return .init(unsafe: jsObject.then!(closure).object!)
     }
 }
@@ -213,13 +192,12 @@ extension JSPromise where Failure: ConstructibleFromJSValue {
         file: StaticString = #file,
         line: Int = #line
     ) -> JSPromise<ResultSuccess, Never> {
-        let closure = JSClosure { arguments -> JSValue in
+        let closure = JSOneshotClosure { arguments -> JSValue in
             guard let error = Failure.construct(from: arguments[0]) else {
                 fatalError("\(file):\(line): failed to unwrap error value for `catch` callback")
             }
             return failure(error).jsValue()
         }
-        callbacks.append(closure)
         return .init(unsafe: jsObject.then!(JSValue.undefined, closure).object!)
     }
 
@@ -230,14 +208,13 @@ extension JSPromise where Failure: ConstructibleFromJSValue {
         file: StaticString = #file,
         line: Int = #line
     ) {
-        let closure = JSClosure { arguments in
+        let closure = JSOneshotClosure { arguments in
             guard let error = Failure.construct(from: arguments[0]) else {
                 fatalError("\(file):\(line): failed to unwrap error value for `catch` callback")
             }
             failure(error)
             return .undefined
         }
-        callbacks.append(closure)
         _ = jsObject.then!(JSValue.undefined, closure)
     }
 
@@ -250,13 +227,12 @@ extension JSPromise where Failure: ConstructibleFromJSValue {
         file: StaticString = #file,
         line: Int = #line
     ) -> JSPromise<ResultSuccess, ResultFailure> {
-        let closure = JSClosure { arguments -> JSValue in
+        let closure = JSOneshotClosure { arguments -> JSValue in
             guard let error = Failure.construct(from: arguments[0]) else {
                 fatalError("\(file):\(line): failed to unwrap error value for `catch` callback")
             }
             return failure(error).jsValue()
         }
-        callbacks.append(closure)
         return .init(unsafe: jsObject.then!(JSValue.undefined, closure).object!)
     }
 }
