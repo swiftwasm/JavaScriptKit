@@ -10,7 +10,7 @@ dist/JavaScriptKitExample.wasm: JavaScriptKitExample
 	cp ./JavaScriptKitExample/.build/debug/JavaScriptKitExample $@
 
 node_modules:
-	npm install
+	npm ci
 build: node_modules dist/JavaScriptKitExample.wasm
 	cd ../Runtime && npm run build
 	npm run build

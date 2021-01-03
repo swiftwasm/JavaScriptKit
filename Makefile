@@ -3,7 +3,7 @@ MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 .PHONY: bootstrap
 bootstrap:
 	./scripts/install-toolchain.sh
-	npm install
+	npm ci
 
 .PHONY: build
 build:
@@ -26,4 +26,4 @@ run_benchmark:
 
 .PHONY: perf-tester
 perf-tester:
-	cd ci/perf-tester && npm install
+	cd ci/perf-tester && npm ci
