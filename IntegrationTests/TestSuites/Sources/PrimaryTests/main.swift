@@ -488,21 +488,29 @@ try test("Date") {
 }
 
 // make the timers global to prevent early deallocation
-var timeout: JSTimer?
+var timeouts: [JSTimer] = []
 var interval: JSTimer?
 
 try test("Timer") {
     let start = JSDate().valueOf()
     let timeoutMilliseconds = 5.0
-
+    var timeout: JSTimer!
     timeout = JSTimer(millisecondsDelay: timeoutMilliseconds, isRepeating: false) {
         // verify that at least `timeoutMilliseconds` passed since the `timeout` timer started
         try! expectEqual(start + timeoutMilliseconds <= JSDate().valueOf(), true)
     }
+    timeouts += [timeout]
+
+    timeout = JSTimer(millisecondsDelay: timeoutMilliseconds, isRepeating: false) {
+        fatalError("timer should be cancelled")
+    }
+    timeout = nil
 
     var count = 0.0
     let maxCount = 5.0
     interval = JSTimer(millisecondsDelay: 5, isRepeating: true) {
+        // ensure that JSTimer is living
+        try! expectNotNil(interval)
         // verify that at least `timeoutMilliseconds * count` passed since the `timeout` 
         // timer started
         try! expectEqual(start + timeoutMilliseconds * count <= JSDate().valueOf(), true)

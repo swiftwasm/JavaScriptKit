@@ -14,7 +14,7 @@ public final class JSTimer {
   /// Indicates whether this timer instance calls its callback repeatedly at a given delay.
   public let isRepeating: Bool
 
-  private let closure: JSClosure
+  private let closure: JSOneshotClosure
 
   /** Node.js and browser APIs are slightly different. `setTimeout`/`setInterval` return an object
   in Node.js, while browsers return a number. Fortunately, clearTimeout and clearInterval take
@@ -34,9 +34,16 @@ public final class JSTimer {
     - callback: the closure to be executed after a given `millisecondsDelay` interval.
   */
   public init(millisecondsDelay: Double, isRepeating: Bool = false, callback: @escaping () -> ()) {
-    closure = JSClosure { _ in
-        callback()
-        return .undefined
+    if isRepeating {
+        closure = JSClosure { _ in
+            callback()
+            return .undefined
+        }
+    } else {
+        closure = JSOneshotClosure { _ in
+            callback()
+            return .undefined
+        }
     }
     self.isRepeating = isRepeating
     if isRepeating {
