@@ -183,6 +183,47 @@ try test("Function Call") {
     try expectEqual(func6(true, "OK", 2), .string("OK"))
 }
 
+let evalClosure = JSObject.global.globalObject1.eval_closure.function!
+
+try test("Closure Lifetime") {
+    do {
+        let c1 = JSClosure { arguments in
+            return arguments[0]
+        }
+        try expectEqual(evalClosure(c1, JSValue.number(1.0)), .number(1.0))
+        c1.release()
+    }
+
+    do {
+        let c1 = JSClosure { arguments in
+            return arguments[0]
+        }
+        c1.release()
+        // Call a released closure
+        _ = try expectThrow(try evalClosure.throws(c1))
+    }
+
+    do {
+        let c1 = JSClosure { _ in
+            // JSClosure will be deallocated before `release()`
+            _ = JSClosure { _ in .undefined }
+            return .undefined
+        }
+        _ = try expectThrow(try evalClosure.throws(c1))
+        c1.release()
+    }
+
+    do {
+        let c1 = JSOneshotClosure { _ in
+            return .boolean(true)
+        }
+        try expectEqual(evalClosure(c1), .boolean(true))
+        // second call will cause `fatalError` that can be caught as a JavaScript exception
+        _ = try expectThrow(try evalClosure.throws(c1))
+        // OneshotClosure won't call fatalError even if it's deallocated before `release`
+    }
+}
+
 try test("Host Function Registration") {
     // ```js
     // global.globalObject1 = {
@@ -205,7 +246,7 @@ try test("Host Function Registration") {
         return .number(1)
     }
 
-    setJSValue(this: prop_6Ref, name: "host_func_1", value: .function(hostFunc1))
+    setJSValue(this: prop_6Ref, name: "host_func_1", value: .object(hostFunc1))
 
     let call_host_1 = getJSValue(this: prop_6Ref, name: "call_host_1")
     let call_host_1Func = try expectFunction(call_host_1)
@@ -223,8 +264,8 @@ try test("Host Function Registration") {
         }
     }
 
-    try expectEqual(hostFunc2(3), .number(6))
-    _ = try expectString(hostFunc2(true))
+    try expectEqual(evalClosure(hostFunc2, 3), .number(6))
+    _ = try expectString(evalClosure(hostFunc2, true))
     hostFunc2.release()
 }
 
@@ -336,7 +377,7 @@ try test("ObjectRef Lifetime") {
 
     let identity = JSClosure { $0[0] }
     let ref1 = getJSValue(this: .global, name: "globalObject1").object!
-    let ref2 = identity(ref1).object!
+    let ref2 = evalClosure(identity, ref1).object!
     try expectEqual(ref1.prop_2, .number(2))
     try expectEqual(ref2.prop_2, .number(2))
     identity.release()
@@ -449,21 +490,29 @@ try test("Date") {
 }
 
 // make the timers global to prevent early deallocation
-var timeout: JSTimer?
+var timeouts: [JSTimer] = []
 var interval: JSTimer?
 
 try test("Timer") {
     let start = JSDate().valueOf()
     let timeoutMilliseconds = 5.0
-
+    var timeout: JSTimer!
     timeout = JSTimer(millisecondsDelay: timeoutMilliseconds, isRepeating: false) {
         // verify that at least `timeoutMilliseconds` passed since the `timeout` timer started
         try! expectEqual(start + timeoutMilliseconds <= JSDate().valueOf(), true)
     }
+    timeouts += [timeout]
+
+    timeout = JSTimer(millisecondsDelay: timeoutMilliseconds, isRepeating: false) {
+        fatalError("timer should be cancelled")
+    }
+    timeout = nil
 
     var count = 0.0
     let maxCount = 5.0
     interval = JSTimer(millisecondsDelay: 5, isRepeating: true) {
+        // ensure that JSTimer is living
+        try! expectNotNil(interval)
         // verify that at least `timeoutMilliseconds * count` passed since the `timeout` 
         // timer started
         try! expectEqual(start + timeoutMilliseconds * count <= JSDate().valueOf(), true)
