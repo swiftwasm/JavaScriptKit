@@ -3,7 +3,6 @@
   "dependencies": {
     "@wasmer/wasi": "^0.12.0",
     "@wasmer/wasmfs": "^0.12.0",
-    "javascript-kit-swift": "file:..",
-    "node-fetch": "2.6.1"
+    "javascript-kit-swift": "file:.."
   }
 }

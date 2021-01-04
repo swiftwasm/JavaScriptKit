@@ -15,7 +15,7 @@ buttonElement.innerText = "Click me!"
 let listener = JSClosure { _ in
     alert("Swift is running on browser!")
 }
-buttonElement.onclick = .function(listener)
+buttonElement.onclick = .object(listener)
 
 _ = document.body.appendChild(buttonElement)
 

@@ -6,7 +6,7 @@
   "dependencies": {
     "@wasmer/wasi": "^0.12.0",
     "@wasmer/wasmfs": "^0.12.0",
-    "javascript-kit-swift": "file:../Runtime"
+    "javascript-kit-swift": "file:.."
   },
   "devDependencies": {
     "webpack": "^4.44.2",

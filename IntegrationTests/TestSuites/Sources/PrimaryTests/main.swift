@@ -183,6 +183,47 @@ try test("Function Call") {
     try expectEqual(func6(true, "OK", 2), .string("OK"))
 }
 
+let evalClosure = JSObject.global.globalObject1.eval_closure.function!
+
+try test("Closure Lifetime") {
+    do {
+        let c1 = JSClosure { arguments in
+            return arguments[0]
+        }
+        try expectEqual(evalClosure(c1, JSValue.number(1.0)), .number(1.0))
+        c1.release()
+    }
+
+    do {
+        let c1 = JSClosure { arguments in
+            return arguments[0]
+        }
+        c1.release()
+        // Call a released closure
+        _ = try expectThrow(try evalClosure.throws(c1))
+    }
+
+    do {
+        let c1 = JSClosure { _ in
+            // JSClosure will be deallocated before `release()`
+            _ = JSClosure { _ in .undefined }
+            return .undefined
+        }
+        _ = try expectThrow(try evalClosure.throws(c1))
+        c1.release()
+    }
+
+    do {
+        let c1 = JSOneshotClosure { _ in
+            return .boolean(true)
+        }
+        try expectEqual(evalClosure(c1), .boolean(true))
+        // second call will cause `fatalError` that can be caught as a JavaScript exception
+        _ = try expectThrow(try evalClosure.throws(c1))
+        // OneshotClosure won't call fatalError even if it's deallocated before `release`
+    }
+}
+
 try test("Host Function Registration") {
     // ```js
     // global.globalObject1 = {
@@ -205,7 +246,7 @@ try test("Host Function Registration") {
         return .number(1)
     }
 
-    setJSValue(this: prop_6Ref, name: "host_func_1", value: .function(hostFunc1))
+    setJSValue(this: prop_6Ref, name: "host_func_1", value: .object(hostFunc1))
 
     let call_host_1 = getJSValue(this: prop_6Ref, name: "call_host_1")
     let call_host_1Func = try expectFunction(call_host_1)
@@ -223,8 +264,8 @@ try test("Host Function Registration") {
         }
     }
 
-    try expectEqual(hostFunc2(3), .number(6))
-    _ = try expectString(hostFunc2(true))
+    try expectEqual(evalClosure(hostFunc2, 3), .number(6))
+    _ = try expectString(evalClosure(hostFunc2, true))
     hostFunc2.release()
 }
 
@@ -336,7 +377,7 @@ try test("ObjectRef Lifetime") {
 
     let identity = JSClosure { $0[0] }
     let ref1 = getJSValue(this: .global, name: "globalObject1").object!
-    let ref2 = identity(ref1).object!
+    let ref2 = evalClosure(identity, ref1).object!
     try expectEqual(ref1.prop_2, .number(2))
     try expectEqual(ref2.prop_2, .number(2))
     identity.release()
@@ -449,21 +490,29 @@ try test("Date") {
 }
 
 // make the timers global to prevent early deallocation
-var timeout: JSTimer?
+var timeouts: [JSTimer] = []
 var interval: JSTimer?
 
 try test("Timer") {
     let start = JSDate().valueOf()
     let timeoutMilliseconds = 5.0
-
+    var timeout: JSTimer!
     timeout = JSTimer(millisecondsDelay: timeoutMilliseconds, isRepeating: false) {
         // verify that at least `timeoutMilliseconds` passed since the `timeout` timer started
         try! expectEqual(start + timeoutMilliseconds <= JSDate().valueOf(), true)
     }
+    timeouts += [timeout]
+
+    timeout = JSTimer(millisecondsDelay: timeoutMilliseconds, isRepeating: false) {
+        fatalError("timer should be cancelled")
+    }
+    timeout = nil
 
     var count = 0.0
     let maxCount = 5.0
     interval = JSTimer(millisecondsDelay: 5, isRepeating: true) {
+        // ensure that JSTimer is living
+        try! expectNotNil(interval)
         // verify that at least `timeoutMilliseconds * count` passed since the `timeout` 
         // timer started
         try! expectEqual(start + timeoutMilliseconds * count <= JSDate().valueOf(), true)
@@ -479,22 +528,80 @@ try test("Timer") {
 }
 
 var timer: JSTimer?
-var promise: JSPromise<(), Never>?
+var expectations: [Expectation] = []
 
 try test("Promise") {
+
+    let p1 = JSPromise.resolve(.null)
+    let exp1 = Expectation(label: "Promise.then testcase", expectedFulfillmentCount: 4)
+    p1.then { (value) -> JSValue in
+        try! expectEqual(value, .null)
+        exp1.fulfill()
+        return .number(1.0)
+    }
+    .then { value -> JSValue in
+        try! expectEqual(value, .number(1.0))
+        exp1.fulfill()
+        return JSPromise.resolve(.boolean(true)).jsValue()
+    }
+    .then { value -> JSValue in
+        try! expectEqual(value, .boolean(true))
+        exp1.fulfill()
+        return .undefined
+    }
+    .catch { _ -> JSValue in
+        fatalError("Not fired due to no throw")
+    }
+    .finally { exp1.fulfill() }
+
+    let exp2 = Expectation(label: "Promise.catch testcase", expectedFulfillmentCount: 4)
+    let p2 = JSPromise.reject(JSValue.boolean(false))
+    p2.then { _ -> JSValue in
+        fatalError("Not fired due to no success")
+    }
+    .catch { reason -> JSValue in
+        try! expectEqual(reason, .boolean(false))
+        exp2.fulfill()
+        return .boolean(true)
+    }
+    .then { value -> JSValue in
+        try! expectEqual(value, .boolean(true))
+        exp2.fulfill()
+        return JSPromise.reject(JSValue.number(2.0)).jsValue()
+    }
+    .catch { reason -> JSValue in
+        try! expectEqual(reason, .number(2.0))
+        exp2.fulfill()
+        return .undefined
+    }
+    .finally { exp2.fulfill() }
+
+
     let start = JSDate().valueOf()
     let timeoutMilliseconds = 5.0
+    let exp3 = Expectation(label: "Promise and Timer testcae", expectedFulfillmentCount: 2)
 
-    promise = JSPromise { resolve in
+    let p3 = JSPromise { resolve in
         timer = JSTimer(millisecondsDelay: timeoutMilliseconds) {
-            resolve()
+            exp3.fulfill()
+            resolve(.success(.undefined))
         }
     }
 
-    promise!.then {
+    p3.then { _ in
         // verify that at least `timeoutMilliseconds` passed since the timer started
         try! expectEqual(start + timeoutMilliseconds <= JSDate().valueOf(), true)
+        exp3.fulfill()
+        return .undefined
     }
+
+    let exp4 = Expectation(label: "Promise lifetime")
+    // Ensure that users don't need to manage JSPromise lifetime
+    JSPromise.resolve(.boolean(true)).then { _ -> JSValue in
+        exp4.fulfill()
+        return .undefined
+    }
+    expectations += [exp1, exp2, exp3, exp4]
 }
 
 try test("Error") {
@@ -571,3 +678,5 @@ try test("Exception") {
     let errorObject3 = JSError(from: ageError as! JSValue)
     try expectNotNil(errorObject3)
 }
+
+Expectation.wait(expectations)

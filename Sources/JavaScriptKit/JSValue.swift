@@ -142,7 +142,12 @@ extension JSValue {
     /// ```
     @available(*, deprecated, message: "Please create JSClosure directly and manage its lifetime manually.")
     public static func function(_ body: @escaping ([JSValue]) -> JSValue) -> JSValue {
-        .function(JSClosure(body))
+        .object(JSClosure(body))
+    }
+
+    @available(*, deprecated, renamed: "object", message: "JSClosure is no longer a subclass of JSFunction. Use .object(closure) instead.")
+    public static func function(_ closure: JSClosure) -> JSValue {
+        .object(closure)
     }
 }
 
