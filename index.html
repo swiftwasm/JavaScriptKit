@@ -123,23 +123,12 @@ FIXME: <a href="https://github.com/swiftwasm/JavaScriptKit/issues/56">BigInt-bas
 
 </dd>
 <dt class="class">
-    <a href="/JavaScriptKit/JSFunction" title="class - JSFunction">
-        JSFunction
+    <a href="/JavaScriptKit/JSOneshotClosure" title="class - JSOneshotClosure">
+        JSOneshot​Closure
     </a>
 </dt>
 <dd>
-    <p><code>JSFunction</code> represents a function in JavaScript and supports new object instantiation.
-This type can be callable as a function using <code>callAsFunction</code>.</p>
-
-</dd>
-<dt class="class">
-    <a href="/JavaScriptKit/JSThrowingFunction" title="class - JSThrowingFunction">
-        JSThrowing​Function
-    </a>
-</dt>
-<dd>
-    <p>A <code>JSFunction</code> wrapper that enables throwing function calls.
-Exceptions produced by JavaScript functions will be thrown as <code>JSValue</code>.</p>
+    <p><code>JSOneshotClosure</code> is a JavaScript function that can be called only once.</p>
 
 </dd>
 <dt class="class">
@@ -153,6 +142,16 @@ This type can be passed as a callback handler to JavaScript functions.
 Note that the lifetime of <code>JSClosure</code> should be managed by users manually
 due to GC boundary between Swift and JavaScript.
 For further discussion, see also <a href="https://github.com/swiftwasm/JavaScriptKit/pull/33">swiftwasm/JavaScriptKit #33</a></p>
+
+</dd>
+<dt class="class">
+    <a href="/JavaScriptKit/JSFunction" title="class - JSFunction">
+        JSFunction
+    </a>
+</dt>
+<dd>
+    <p><code>JSFunction</code> represents a function in JavaScript and supports new object instantiation.
+This type can be callable as a function using <code>callAsFunction</code>.</p>
 
 </dd>
 <dt class="class">
@@ -173,6 +172,16 @@ runtime bridge library for a member with the specified name in this object.</p>
 </dt>
 <dd>
     <p>A <code>JSObject</code> wrapper that enables throwing method calls capturing <code>this</code>.
+Exceptions produced by JavaScript functions will be thrown as <code>JSValue</code>.</p>
+
+</dd>
+<dt class="class">
+    <a href="/JavaScriptKit/JSThrowingFunction" title="class - JSThrowingFunction">
+        JSThrowing​Function
+    </a>
+</dt>
+<dd>
+    <p>A <code>JSFunction</code> wrapper that enables throwing function calls.
 Exceptions produced by JavaScript functions will be thrown as <code>JSValue</code>.</p>
 
 </dd>
@@ -243,6 +252,15 @@ Exceptions produced by JavaScript functions will be thrown as <code>JSValue</cod
 </dt>
 <dd>
     <p>Objects that can be converted to a JavaScript value, preferably in a lossless manner.</p>
+
+</dd>
+<dt class="protocol">
+    <a href="/JavaScriptKit/JSClosureProtocol" title="protocol - JSClosureProtocol">
+        JSClosure​Protocol
+    </a>
+</dt>
+<dd>
+    <p>JSClosureProtocol abstracts closure object in JavaScript, whose lifetime is manualy managed</p>
 
 </dd>
 <dt class="protocol">
@@ -369,7 +387,7 @@ For example, a union type of multiple classes or primitive values.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2021-01-03T09:21:55+0000">January 3, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2021-01-04T00:56:25+0000">January 4, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
 </p>
     </footer>
 </body>
