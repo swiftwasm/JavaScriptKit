@@ -23,14 +23,14 @@ try JavaScriptEventLoop.runAsync {
     }
 
     await try asyncTest("await resolved Promise") {
-        let p = JSPromise<Int, JSError>(resolver: { resolve in
+        let p = JSPromise(resolver: { resolve in
             resolve(.success(1))
         })
         await try expectEqual(p.await(), 1)
     }
 
     await try asyncTest("await rejected Promise") {
-        let p = JSPromise<JSValue, JSValue>(resolver: { resolve in
+        let p = JSPromise(resolver: { resolve in
             resolve(.failure(.number(3)))
         })
         let error = await try expectAsyncThrow(await p.await())

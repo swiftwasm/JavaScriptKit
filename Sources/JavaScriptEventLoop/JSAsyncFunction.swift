@@ -16,7 +16,7 @@ public class JSAsyncFunction {
     @discardableResult
     public func callAsFunction(this: JSObject? = nil, arguments: [ConvertibleToJSValue]) async throws -> JSValue {
         let result = base.callAsFunction(this: this, arguments: arguments)
-        return await try JSPromise<JSValue, JSValue>(result.object!)!.await()
+        return await try JSPromise(result.object!)!.await()
     }
 
     /// A variadic arguments version of `callAsFunction`.
