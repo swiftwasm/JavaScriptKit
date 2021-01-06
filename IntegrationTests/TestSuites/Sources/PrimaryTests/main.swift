@@ -532,22 +532,22 @@ var expectations: [Expectation] = []
 
 try test("Promise") {
 
-    let p1 = JSPromise.resolve(.null)
+    let p1 = JSPromise.resolve(JSValue.null)
     let exp1 = Expectation(label: "Promise.then testcase", expectedFulfillmentCount: 4)
-    p1.then { (value) -> JSValue in
+    p1.then { value in
         try! expectEqual(value, .null)
         exp1.fulfill()
-        return .number(1.0)
+        return JSValue.number(1.0)
     }
-    .then { value -> JSValue in
+    .then { value in
         try! expectEqual(value, .number(1.0))
         exp1.fulfill()
-        return JSPromise.resolve(.boolean(true)).jsValue()
+        return JSPromise.resolve(JSValue.boolean(true))
     }
-    .then { value -> JSValue in
+    .then { value in
         try! expectEqual(value, .boolean(true))
         exp1.fulfill()
-        return .undefined
+        return JSValue.undefined
     }
     .catch { _ -> JSValue in
         fatalError("Not fired due to no throw")
@@ -559,20 +559,20 @@ try test("Promise") {
     p2.then { _ -> JSValue in
         fatalError("Not fired due to no success")
     }
-    .catch { reason -> JSValue in
+    .catch { reason in
         try! expectEqual(reason, .boolean(false))
         exp2.fulfill()
-        return .boolean(true)
+        return JSValue.boolean(true)
     }
-    .then { value -> JSValue in
+    .then { value in
         try! expectEqual(value, .boolean(true))
         exp2.fulfill()
-        return JSPromise.reject(JSValue.number(2.0)).jsValue()
+        return JSPromise.reject(JSValue.number(2.0))
     }
-    .catch { reason -> JSValue in
+    .catch { reason in
         try! expectEqual(reason, .number(2.0))
         exp2.fulfill()
-        return .undefined
+        return JSValue.undefined
     }
     .finally { exp2.fulfill() }
 
@@ -592,14 +592,14 @@ try test("Promise") {
         // verify that at least `timeoutMilliseconds` passed since the timer started
         try! expectEqual(start + timeoutMilliseconds <= JSDate().valueOf(), true)
         exp3.fulfill()
-        return .undefined
+        return JSValue.undefined
     }
 
     let exp4 = Expectation(label: "Promise lifetime")
     // Ensure that users don't need to manage JSPromise lifetime
-    JSPromise.resolve(.boolean(true)).then { _ -> JSValue in
+    JSPromise.resolve(JSValue.boolean(true)).then { _ in
         exp4.fulfill()
-        return .undefined
+        return JSValue.undefined
     }
     expectations += [exp1, exp2, exp3, exp4]
 }
