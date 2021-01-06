@@ -46,7 +46,7 @@ public final class JSPromise: JSBridgedClass {
     /** Creates a new `JSPromise` instance from a given `resolver` closure. `resolver` takes
     two closure that your code should call to either resolve or reject this `JSPromise` instance.
     */
-    public convenience init(resolver: @escaping (@escaping (Result< JSValueConvertible, JSValueConvertible >) -> ()) -> ()) {
+    public convenience init(resolver: @escaping (@escaping (Result<JSValue, JSValue>) -> ()) -> ()) {
         let closure = JSOneshotClosure { arguments in
             // The arguments are always coming from the `Promise` constructor, so we should be
             // safe to assume their type here
@@ -66,18 +66,18 @@ public final class JSPromise: JSBridgedClass {
         self.init(unsafelyWrapping: Self.constructor.new(closure))
     }
 
-    public static func resolve(_ value: JSValueConvertible) -> JSPromise {
+    public static func resolve(_ value: JSValue) -> JSPromise {
         self.init(unsafelyWrapping: Self.constructor.resolve!(value).object!)
     }
 
-    public static func reject(_ reason: JSValueConvertible) -> JSPromise {
+    public static func reject(_ reason: JSValue) -> JSPromise {
         self.init(unsafelyWrapping: Self.constructor.reject!(reason).object!)
     }
 
     /** Schedules the `success` closure to be invoked on sucessful completion of `self`.
     */
     @discardableResult
-    public func then(success: @escaping (JSValue) -> JSValueConvertible) -> JSPromise {
+    public func then(success: @escaping (JSValue) -> JSValue) -> JSPromise {
         let closure = JSOneshotClosure {
             return success($0[0])
         }
@@ -87,8 +87,8 @@ public final class JSPromise: JSBridgedClass {
     /** Schedules the `success` closure to be invoked on sucessful completion of `self`.
     */
     @discardableResult
-    public func then(success: @escaping (JSValue) -> JSValueConvertible,
-                     failure: @escaping (JSValue) -> JSValueConvertible) -> JSPromise {
+    public func then(success: @escaping (JSValue) -> JSValue,
+                     failure: @escaping (JSValue) -> JSValue) -> JSPromise {
         let successClosure = JSOneshotClosure {
             return success($0[0])
         }
@@ -101,7 +101,7 @@ public final class JSPromise: JSBridgedClass {
     /** Schedules the `failure` closure to be invoked on rejected completion of `self`.
     */
     @discardableResult
-    public func `catch`(failure: @escaping (JSValue) -> JSValueConvertible) -> JSPromise {
+    public func `catch`(failure: @escaping (JSValue) -> JSValue) -> JSPromise {
         let closure = JSOneshotClosure {
             return failure($0[0])
         }
