@@ -4,6 +4,8 @@ interface ExportedMemory {
 
 type ref = number;
 type pointer = number;
+// Function invocation call, using a host function ID and array of parameters
+type function_call = [number, any[]];
 
 interface GlobalVariable {}
 declare const window: GlobalVariable;
@@ -156,10 +158,14 @@ export class SwiftRuntime {
     private instance: WebAssembly.Instance | null;
     private heap: SwiftRuntimeHeap;
     private version: number = 701;
+
+    // Support Asyncified modules
     private isSleeping: boolean;
     private instanceIsAsyncified: boolean;
     private resumeCallback: () => void;
     private asyncifyBufferPointer: pointer | null;
+    // Keeps track of function calls requested while instance is sleeping
+    private pendingHostFunctionCalls: function_call[];
 
     constructor() {
         this.instance = null;
@@ -168,6 +174,7 @@ export class SwiftRuntime {
         this.instanceIsAsyncified = false;
         this.resumeCallback = () => { };
         this.asyncifyBufferPointer = null;
+        this.pendingHostFunctionCalls = [];
     }
 
     /**
@@ -211,6 +218,10 @@ export class SwiftRuntime {
         const callHostFunction = (host_func_id: number, args: any[]) => {
             if (!this.instance)
                 throw new Error("WebAssembly instance is not set yet");
+            if (this.isSleeping) {
+                this.pendingHostFunctionCalls.push([host_func_id, args]);
+                return;
+            }
             const exports = (this.instance
                 .exports as any) as SwiftRuntimeExportedFunctions;
             const argc = args.length;
@@ -409,6 +420,11 @@ export class SwiftRuntime {
                 // We are called as part of a resume/rewind. Stop sleeping.
                 exports.asyncify_stop_rewind();
                 this.isSleeping = false;
+                const pendingCalls = this.pendingHostFunctionCalls;
+                this.pendingHostFunctionCalls = [];
+                pendingCalls.forEach(call => {
+                    callHostFunction(call[0], call[1]);
+                });
                 return;
             }
 
