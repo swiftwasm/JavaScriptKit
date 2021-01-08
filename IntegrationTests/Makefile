@@ -12,7 +12,7 @@ dist/%.wasm: TestSuites/.build/$(CONFIGURATION)/%.wasm
 	cp $< $@
 
 node_modules: package-lock.json
-	npm install
+	npm ci
 
 .PHONY: build_rt
 build_rt: node_modules

@@ -47,6 +47,9 @@ global.globalObject1 = {
             throw 3.0
         },
     },
+    eval_closure: function(fn) {
+        return fn(arguments[1])
+    }
 };
 
 global.Animal = function (name, age, isCat) {
