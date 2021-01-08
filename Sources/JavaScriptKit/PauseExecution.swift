@@ -18,16 +18,12 @@ extension JSPromise where Success == JSValue, Failure == JSError {
     ///
     /// **Important**: Wasm module must be [asyncified](https://emscripten.org/docs/porting/asyncify.html),
     /// otherwise JavaScriptKit's runtime will throw an exception.
-    public func syncAwait(timeout: Int32? = nil) -> Result<Success, Failure> {
+    public func syncAwait() -> Result<Success, Failure> {
         var kindAndFlags = JavaScriptValueKindAndFlags()
         var payload1 = JavaScriptPayload1()
         var payload2 = JavaScriptPayload2()
         
-        if let timout = timeout {
-            _syncAwaitWithTimout(jsObject.id, timout, &kindAndFlags, &payload1, &payload2)
-        } else {
-            _syncAwait(jsObject.id, &kindAndFlags, &payload1, &payload2)
-        }
+        _syncAwait(jsObject.id, &kindAndFlags, &payload1, &payload2)
         let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2).jsValue()
         if kindAndFlags.isException {
             if let error = JSError(from: result) {

@@ -283,24 +283,6 @@ extern void _syncAwait(const JavaScriptObjectRef promise,
                        JavaScriptPayload1 *result_payload1,
                        JavaScriptPayload2 *result_payload2);
 
-/// Unwind Wasm module execution stack and rewind it after promise is fulfilled or timeout is reached.
-/// **Important**: Wasm module must be [asyncified](https://emscripten.org/docs/porting/asyncify.html),
-/// otherwise JavaScriptKit's runtime will throw an exception.
-///
-/// @param promise target JavaScript promise.
-/// @param ms Length of timeout in milliseconds.
-/// @param result_kind A result pointer of JavaScript value kind of returned result or thrown exception.
-/// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
-/// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
-__attribute__((__import_module__("javascript_kit"),
-               __import_name__("swjs_sync_await_with_timeout")))
-extern void _syncAwaitWithTimout(const JavaScriptObjectRef promise,
-                                 const int ms,
-                                 JavaScriptValueKindAndFlags *result_kind,
-                                 JavaScriptPayload1 *result_payload1,
-                                 JavaScriptPayload2 *result_payload2);
-
-
 #endif
 
 #endif /* _CJavaScriptKit_h */

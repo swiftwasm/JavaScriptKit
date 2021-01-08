@@ -144,16 +144,6 @@ class SwiftRuntimeHeap {
 // Helper methods for asyncify
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-const promiseWithTimout = (promise: Promise<any>, timeout: number) => {
-    let timeoutPromise = new Promise((resolve, reject) => {
-        let timeoutID = setTimeout(() => {
-            clearTimeout(timeoutID);
-            reject(Error(`Promise timed out in ${timeout} ms`));
-        }, timeout);
-    });
-    return Promise.race([promise, timeoutPromise]);
-};
-
 export class SwiftRuntime {
     private instance: WebAssembly.Instance | null;
     private heap: SwiftRuntimeHeap;
@@ -657,16 +647,6 @@ export class SwiftRuntime {
             ) => {
                 const promise: Promise<any> = this.heap.referenceHeap(promiseRef);
                 syncAwait(promise, kind_ptr, payload1_ptr, payload2_ptr);
-            },
-            swjs_sync_await_with_timeout: (
-                promiseRef: ref,
-                timeout: number,
-                kind_ptr: pointer,
-                payload1_ptr: pointer,
-                payload2_ptr: pointer
-            ) => {
-                const promise: Promise<any> = this.heap.referenceHeap(promiseRef);
-                syncAwait(promiseWithTimout(promise, timeout), kind_ptr, payload1_ptr, payload2_ptr);
             },
         };
     }
