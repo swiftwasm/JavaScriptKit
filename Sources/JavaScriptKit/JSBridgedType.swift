@@ -35,7 +35,12 @@ public protocol JSBridgedClass: JSBridgedType {
 extension JSBridgedClass {
     public var value: JSValue { jsObject.jsValue() }
     public init?(from value: JSValue) {
-        guard let object = value.object, object.isInstanceOf(Self.constructor) else { return nil }
+        guard let object = value.object else { return nil }
+        self.init(from: object)
+    }
+
+    public init?(from object: JSObject) {
+        guard object.isInstanceOf(Self.constructor) else { return nil }
         self.init(unsafelyWrapping: object)
     }
 }
