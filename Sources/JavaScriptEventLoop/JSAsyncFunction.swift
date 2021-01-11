@@ -1,7 +1,12 @@
 import JavaScriptKit
 
-/// A `JSFunction` wrapper that enables throwing function calls.
+/// A `JSFunction` wrapper that enables async-function calls.
 /// Exceptions produced by JavaScript functions will be thrown as `JSValue`.
+///
+/// ```swift
+/// let fetch = JSObject.global.fetch.function!.async
+/// let result = await try! fetch("https://api.github.com/zen")
+/// ```
 public class JSAsyncFunction {
     private let base: JSFunction
     public init(_ base: JSFunction) {
@@ -16,7 +21,10 @@ public class JSAsyncFunction {
     @discardableResult
     public func callAsFunction(this: JSObject? = nil, arguments: [ConvertibleToJSValue]) async throws -> JSValue {
         let result = base.callAsFunction(this: this, arguments: arguments)
-        return await try JSPromise(result.object!)!.await()
+        guard let object = result.object, let promise = JSPromise(object) else {
+            fatalError("'\(result)' should be Promise object")
+        }
+        return await try promise.await()
     }
 
     /// A variadic arguments version of `callAsFunction`.
@@ -27,12 +35,18 @@ public class JSAsyncFunction {
 }
 
 public extension JSFunction {
+    /// A modifier to call this function as a async function
+    ///
+    /// ```swift
+    /// let fetch = JSObject.global.fetch.function!.async
+    /// let result = await try! fetch("https://api.github.com/zen")
+    /// ```
     var `async`: JSAsyncFunction {
         JSAsyncFunction(self)
     }
 }
 
-/// A `JSObject` wrapper that enables throwing method calls capturing `this`.
+/// A `JSObject` wrapper that enables async method calls capturing `this`.
 /// Exceptions produced by JavaScript functions will be thrown as `JSValue`.
 @dynamicMemberLookup
 public class JSAsyncingObject {
@@ -44,7 +58,6 @@ public class JSAsyncingObject {
     /// Returns the `name` member method binding this object as `this` context.
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The `name` member method binding this object as `this` context.
-    @_disfavoredOverload
     public subscript(_ name: String) -> ((ConvertibleToJSValue...) async throws -> JSValue)? {
         guard let function = base[name].function?.async else { return nil }
         return { [base] (arguments: ConvertibleToJSValue...) in
@@ -54,7 +67,6 @@ public class JSAsyncingObject {
 
     /// A convenience method of `subscript(_ name: String) -> ((ConvertibleToJSValue...) throws -> JSValue)?`
     /// to access the member through Dynamic Member Lookup.
-    @_disfavoredOverload
     public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) async throws -> JSValue)? {
         self[name]
     }
@@ -62,6 +74,13 @@ public class JSAsyncingObject {
 
 
 public extension JSObject {
+
+    /// A modifier to call methods as async methods capturing `this`
+    ///
+    /// ```swift
+    /// let fetch = JSObject.global.fetch.function!.async
+    /// let result = await try! fetch("https://api.github.com/zen")
+    /// ```
     var asyncing: JSAsyncingObject {
         JSAsyncingObject(self)
     }
