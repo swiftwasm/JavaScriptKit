@@ -1,4 +1,9 @@
+# Concurrency support with JavaScript EventLoop
+
 - include/llvm is copied from LLVM project
 - include/swift and stdlib directories are copied from Swift project
-- Concurrency module in Swift project is copied and modified for hooking the original feature
-- 
+
+
+## Update Swift headers
+
+Please update `.swift-version` and run `./scripts/copy-headers`
