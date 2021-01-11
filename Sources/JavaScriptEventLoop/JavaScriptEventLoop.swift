@@ -52,7 +52,7 @@ func registerEventLoopHook(
 ) {
     getPromise(from: context).then { _ in
         callback(context)
-        return .undefined
+        return JSValue.undefined
     }
 }
 
