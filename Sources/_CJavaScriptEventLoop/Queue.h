@@ -1,5 +1,5 @@
-#ifndef _CJavaScriptKit_Queue_h
-#define _CJavaScriptKit_Queue_h
+#ifndef _CJavaScriptEventLoop_Queue_h
+#define _CJavaScriptEventLoop_Queue_h
 
 #include <type_traits>
 #include <cassert>
@@ -19,4 +19,4 @@ public:
 };
 
 
-#endif /* _CJavaScriptKit_Queue_h */
+#endif /* _CJavaScriptEventLoop_Queue_h */
