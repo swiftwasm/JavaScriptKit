@@ -24,6 +24,14 @@ let package = Package(
         .target(
             name: "_CJavaScriptEventLoop",
             dependencies: ["_CJavaScriptKit"],
+            exclude: [
+                "README", "LICENSE-llvm", "LICENSE-swift",
+                "include/swift/ABI/MetadataKind.def",
+                "include/swift/ABI/ValueWitness.def",
+                "include/swift/AST/ReferenceStorage.def",
+                "include/swift/Demangling/DemangleNodes.def",
+                "include/swift/Demangling/ValueWitnessMangling.def",
+            ],
             linkerSettings: [
                 .linkedLibrary("swift_Concurrency", .when(platforms: [.wasi])),
             ]
