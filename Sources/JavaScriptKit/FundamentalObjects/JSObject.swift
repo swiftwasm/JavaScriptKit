@@ -105,9 +105,11 @@ public class JSObject: Equatable {
         _instanceof(id, constructor.id)
     }
 
+    static let _JS_Predef_Value_Global: JavaScriptObjectRef = 0
+
     /// A `JSObject` of the global scope object.
     /// This allows access to the global properties and global names by accessing the `JSObject` returned.
-    public static let global = JSObject(id: JavaScriptObjectRef(_JS_Predef_Value_Global))
+    public static let global = JSObject(id: _JS_Predef_Value_Global)
 
     deinit { _release(id) }
 

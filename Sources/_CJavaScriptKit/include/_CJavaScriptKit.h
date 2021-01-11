@@ -66,8 +66,6 @@ typedef struct {
   JavaScriptPayload2 payload2;
 } RawJSValue;
 
-#define _JS_Predef_Value_Global 0
-
 #if __wasm32__
 
 /// `_set_prop` sets a value of `_this` JavaScript object.
