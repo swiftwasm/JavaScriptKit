@@ -16,11 +16,11 @@ public extension JSPromise {
             self.then(
                 success: {
                     continuation.resume(returning: $0)
-                    return .undefined
+                    return JSValue.undefined
                 },
                 failure: {
                     continuation.resume(throwing: $0)
-                    return .undefined
+                    return JSValue.undefined
                 }
             )
         }
