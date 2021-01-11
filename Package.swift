@@ -28,5 +28,6 @@ let package = Package(
                 .linkedLibrary("swift_Concurrency", .when(platforms: [.wasi])),
             ]
         ),
-    ]
+    ],
+    cxxLanguageStandard: .cxx14
 )
