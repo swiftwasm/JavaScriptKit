@@ -117,6 +117,13 @@ enum class FunctionSigSpecializationParamKind : unsigned {
   ExistentialToGeneric = 1 << 10,
 };
 
+enum class AutoDiffFunctionKind : char {
+  JVP = 'f',
+  VJP = 'r',
+  Differential = 'd',
+  Pullback = 'p',
+};
+
 /// The pass that caused the specialization to occur. We use this to make sure
 /// that two passes that generate similar changes do not yield the same
 /// mangling. This currently cannot happen, so this is just a safety measure
@@ -648,6 +655,7 @@ SWIFT_END_INLINE_NAMESPACE
 //// define what these will be.
 /// \returns the demangled name. Returns nullptr if the input String is not a
 /// Swift mangled name.
+SWIFT_CC(swift)
 SWIFT_RUNTIME_EXPORT
 char *swift_demangle(const char *mangledName,
                      size_t mangledNameLength,

@@ -1,5 +1,16 @@
 #!/bin/bash
 
+set -ex
+scripts_dir="$(cd "$(dirname $0)" && pwd)"
+root_dir="$scripts_dir/../../../"
+swift_version="$(cat $root_dir/.swift-version)"
+
+swift_repo=https://github.com/swiftwasm/swift
+swift_tag="swift-$swift_version"
+
+download_dir="$root_dir/third-party"
+source_dir="$scripts_dir/.."
+
 headers=(
     include/swift/ABI/Executor.h
     include/swift/ABI/HeapObject.h
@@ -33,16 +44,13 @@ headers=(
     include/swift/Demangling/ValueWitnessMangling.def
     include/swift/Runtime/Atomic.h
     include/swift/Runtime/BackDeployment.h
-    include/swift/Runtime/CMakeConfig.h
     include/swift/Runtime/Concurrency.h
-    include/swift/Runtime/Config.h
     include/swift/Runtime/Debug.h
     include/swift/Runtime/HeapObject.h
     include/swift/Runtime/Once.h
     include/swift/Strings.h
     stdlib/public/SwiftShims/HeapObject.h
     stdlib/public/SwiftShims/KeyPath.h
-    stdlib/public/SwiftShims/RefCount.h
     stdlib/public/SwiftShims/RefCount.h
     stdlib/public/SwiftShims/SwiftStddef.h
     stdlib/public/SwiftShims/SwiftStdint.h
@@ -51,7 +59,16 @@ headers=(
     stdlib/public/SwiftShims/Visibility.h
 )
 
+mkdir -p "$download_dir"
+pushd "$download_dir"
+
+curl -L -o archive.tar.gz "$swift_repo/archive/$swift_tag.tar.gz"
+tar xfz archive.tar.gz
+
 for header in ${headers[@]}; do
   mkdir -p "$(dirname $header)"
-  cp "_${header}" "$header"
+  cp "$download_dir/swift-$swift_tag/$header" "$source_dir/$header"
 done
+
+popd
+rm -rf "$download_dir"

@@ -25,7 +25,7 @@ let package = Package(
             name: "_CJavaScriptEventLoop",
             dependencies: ["_CJavaScriptKit"],
             exclude: [
-                "README", "LICENSE-llvm", "LICENSE-swift",
+                "README", "LICENSE-llvm", "LICENSE-swift", "scripts",
                 "include/swift/ABI/MetadataKind.def",
                 "include/swift/ABI/ValueWitness.def",
                 "include/swift/AST/ReferenceStorage.def",
