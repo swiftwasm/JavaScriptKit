@@ -34,13 +34,6 @@ void runEnqueuedJobs(EventLoopContext *context) {
   queue->isSpinning = false;
 }
 
-#ifndef __wasm32__
-void registerEventLoopHook(void callback(EventLoopContext *context),
-                           EventLoopContext *context) {
-    // dummy implementation
-}
-#endif
-
 void Queue::insertJob(swift::Job *newJob) {
   Job **position = &HeadJob;
   while (auto cur = *position) {

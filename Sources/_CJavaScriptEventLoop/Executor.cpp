@@ -88,25 +88,3 @@ extern "C" void swift_run_async(const void *function, HeapObject *functionContex
   context->FunctionContext = functionContext;
   swift_task_enqueueGlobal(pair.Task);
 }
-
-#ifndef __wasm32__
-
-SWIFT_CC(swift)
-void (*swift::swift_task_enqueueGlobal_hook)(Job *job) = nullptr;
-
-SWIFT_EXPORT_FROM(swift_Concurrency) SWIFT_CC(swift)
-void *swift_task_alloc(AsyncTask *task, size_t size) {}
-
-SWIFT_EXPORT_FROM(swift_Concurrency) SWIFT_CC(swift)
-AsyncTaskAndContext swift_task_create_f(JobFlags flags,
-                                        AsyncTask *parent,
-                                        ThinNullaryAsyncSignature::FunctionType *function,
-                                        size_t initialContextSize) {}
-
-SWIFT_EXPORT_FROM(swift_Concurrency) SWIFT_CC(swift)
-void swift_task_dealloc(AsyncTask *task, void *ptr) {}
-
-SWIFT_EXPORT_FROM(swift_Concurrency) SWIFT_CC(swift)
-void swift_task_enqueueGlobal(Job *job) {}
-
-#endif
