@@ -15,6 +15,15 @@ let package = Package(
     dependencies: [.package(name: "JavaScriptKit", path: "../../")],
     targets: [
         .target(name: "PrimaryTests", dependencies: ["JavaScriptKit"]),
+        .target(
+            name: "ConcurrencyTests",
+            dependencies: [
+                .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
+            ],
+            swiftSettings: [
+                .unsafeFlags(["-Xfrontend", "-enable-experimental-concurrency"]),
+            ]
+        ),
         .target(name: "BenchmarkTests", dependencies: ["JavaScriptKit"]),
     ]
 )

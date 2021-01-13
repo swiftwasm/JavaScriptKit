@@ -1,0 +1,74 @@
+#!/bin/bash
+
+set -ex
+scripts_dir="$(cd "$(dirname $0)" && pwd)"
+root_dir="$scripts_dir/../../../"
+swift_version="$(cat $root_dir/.swift-version)"
+
+swift_repo=https://github.com/swiftwasm/swift
+swift_tag="swift-$swift_version"
+
+download_dir="$root_dir/third-party"
+source_dir="$scripts_dir/.."
+
+headers=(
+    include/swift/ABI/Executor.h
+    include/swift/ABI/HeapObject.h
+    include/swift/ABI/KeyPath.h
+    include/swift/ABI/Metadata.h
+    include/swift/ABI/Metadata.h
+    include/swift/ABI/MetadataKind.def
+    include/swift/ABI/MetadataValues.h
+    include/swift/ABI/ProtocolDispatchStrategy.h
+    include/swift/ABI/System.h
+    include/swift/ABI/Task.h
+    include/swift/ABI/TaskStatus.h
+    include/swift/ABI/TrailingObjects.h
+    include/swift/ABI/ValueWitness.def
+    include/swift/AST/Ownership.h
+    include/swift/AST/ReferenceStorage.def
+    include/swift/Basic/Compiler.h
+    include/swift/Basic/FlagSet.h
+    include/swift/Basic/FlaggedPointer.h
+    include/swift/Basic/InlineBitfield.h
+    include/swift/Basic/LLVM.h
+    include/swift/Basic/Malloc.h
+    include/swift/Basic/RelativePointer.h
+    include/swift/Basic/STLExtras.h
+    include/swift/Basic/Unreachable.h
+    include/swift/Basic/type_traits.h
+    include/swift/Demangling/Demangle.h
+    include/swift/Demangling/DemangleNodes.def
+    include/swift/Demangling/ManglingMacros.h
+    include/swift/Demangling/NamespaceMacros.h
+    include/swift/Demangling/ValueWitnessMangling.def
+    include/swift/Runtime/Atomic.h
+    include/swift/Runtime/BackDeployment.h
+    include/swift/Runtime/Concurrency.h
+    include/swift/Runtime/Debug.h
+    include/swift/Runtime/HeapObject.h
+    include/swift/Runtime/Once.h
+    include/swift/Strings.h
+    stdlib/public/SwiftShims/HeapObject.h
+    stdlib/public/SwiftShims/KeyPath.h
+    stdlib/public/SwiftShims/RefCount.h
+    stdlib/public/SwiftShims/SwiftStddef.h
+    stdlib/public/SwiftShims/SwiftStdint.h
+    stdlib/public/SwiftShims/System.h
+    stdlib/public/SwiftShims/Target.h
+    stdlib/public/SwiftShims/Visibility.h
+)
+
+mkdir -p "$download_dir"
+pushd "$download_dir"
+
+curl -L -o archive.tar.gz "$swift_repo/archive/$swift_tag.tar.gz"
+tar xfz archive.tar.gz
+
+for header in ${headers[@]}; do
+  mkdir -p "$(dirname $header)"
+  cp "$download_dir/swift-$swift_tag/$header" "$source_dir/$header"
+done
+
+popd
+rm -rf "$download_dir"
