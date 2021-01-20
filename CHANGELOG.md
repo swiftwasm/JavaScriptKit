@@ -27,7 +27,6 @@ fully control type casting if needed.
 - Bump `ini` from 1.3.5 to 1.3.8 in `/Example` ([#111](https://github.com/swiftwasm/JavaScriptKit/pull/111)) via [@dependabot[bot]](https://github.com/dependabot[bot])
 - Update doc comment in `JSTypedArray.swift` ([#110](https://github.com/swiftwasm/JavaScriptKit/pull/110)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
 
-
 # 0.9.0 (27 November 2020)
 
 This release introduces support for catching `JSError` instances in Swift from throwing JavaScript
