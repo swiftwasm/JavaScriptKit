@@ -5,11 +5,13 @@ this feature is available in a stable SwiftWasm release. Namely:
 
 * `JSClosure.init(_ body: @escaping ([JSValue]) -> ())` overload is deprecated to simplify type
 checking. Its presence requires explicit type signatures at the place of use. It will be removed
-in the future version of JavaScriptKit.
+in a future version of JavaScriptKit.
 * `JSClosure` is no longer a subclass of `JSFunction`. These classes are not related enough to keep
 them in the same class hierarchy.
+As a result, you can no longer call `JSClosure` objects directly from Swift.
 * Introduced `JSOneshotClosure` for closures that are going to be called only once. You don't need
 to manage references to these closures manually, as opposed to `JSClosure`.
+However, they can only be called a single time from the JS side. Subsequent invocation attempts will raise a fatal error on the Swift side.
 * Removed generic parameters on `JSPromise`, now both success and failure values are always assumed
 to be of `JSValue` type. This also significantly simplifies type checking and allows callers to
 fully control type casting if needed.
