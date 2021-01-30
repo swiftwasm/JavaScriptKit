@@ -101,3 +101,32 @@ func expectNotNil<T>(_ value: T?, file: StaticString = #file, line: UInt = #line
         throw MessageError("Expect a non-nil value", file: file, line: line, column: column)
     }
 }
+
+class Expectation {
+    private(set) var isFulfilled: Bool = false
+    private let label: String
+    private let expectedFulfillmentCount: Int
+    private var fulfillmentCount: Int = 0
+
+    init(label: String, expectedFulfillmentCount: Int = 1) {
+        self.label = label
+        self.expectedFulfillmentCount = expectedFulfillmentCount
+    }
+
+    func fulfill() {
+        assert(!isFulfilled, "Too many fulfillment (label: \(label)): expectedFulfillmentCount is \(expectedFulfillmentCount)")
+        fulfillmentCount += 1
+        if fulfillmentCount == expectedFulfillmentCount {
+            isFulfilled = true
+        }
+    }
+
+    static func wait(_ expectations: [Expectation]) {
+        var timer: JSTimer!
+        timer = JSTimer(millisecondsDelay: 5.0, isRepeating: true) {
+            guard expectations.allSatisfy(\.isFulfilled) else { return }
+            assert(timer != nil)
+            timer = nil
+        }
+    }
+}

@@ -528,22 +528,80 @@ try test("Timer") {
 }
 
 var timer: JSTimer?
-var promise: JSPromise<(), Never>?
+var expectations: [Expectation] = []
 
 try test("Promise") {
+
+    let p1 = JSPromise.resolve(JSValue.null)
+    let exp1 = Expectation(label: "Promise.then testcase", expectedFulfillmentCount: 4)
+    p1.then { value in
+        try! expectEqual(value, .null)
+        exp1.fulfill()
+        return JSValue.number(1.0)
+    }
+    .then { value in
+        try! expectEqual(value, .number(1.0))
+        exp1.fulfill()
+        return JSPromise.resolve(JSValue.boolean(true))
+    }
+    .then { value in
+        try! expectEqual(value, .boolean(true))
+        exp1.fulfill()
+        return JSValue.undefined
+    }
+    .catch { _ -> JSValue in
+        fatalError("Not fired due to no throw")
+    }
+    .finally { exp1.fulfill() }
+
+    let exp2 = Expectation(label: "Promise.catch testcase", expectedFulfillmentCount: 4)
+    let p2 = JSPromise.reject(JSValue.boolean(false))
+    p2.then { _ -> JSValue in
+        fatalError("Not fired due to no success")
+    }
+    .catch { reason in
+        try! expectEqual(reason, .boolean(false))
+        exp2.fulfill()
+        return JSValue.boolean(true)
+    }
+    .then { value in
+        try! expectEqual(value, .boolean(true))
+        exp2.fulfill()
+        return JSPromise.reject(JSValue.number(2.0))
+    }
+    .catch { reason in
+        try! expectEqual(reason, .number(2.0))
+        exp2.fulfill()
+        return JSValue.undefined
+    }
+    .finally { exp2.fulfill() }
+
+
     let start = JSDate().valueOf()
     let timeoutMilliseconds = 5.0
+    let exp3 = Expectation(label: "Promise and Timer testcae", expectedFulfillmentCount: 2)
 
-    promise = JSPromise { resolve in
+    let p3 = JSPromise { resolve in
         timer = JSTimer(millisecondsDelay: timeoutMilliseconds) {
-            resolve()
+            exp3.fulfill()
+            resolve(.success(.undefined))
         }
     }
 
-    promise!.then {
+    p3.then { _ in
         // verify that at least `timeoutMilliseconds` passed since the timer started
         try! expectEqual(start + timeoutMilliseconds <= JSDate().valueOf(), true)
+        exp3.fulfill()
+        return JSValue.undefined
     }
+
+    let exp4 = Expectation(label: "Promise lifetime")
+    // Ensure that users don't need to manage JSPromise lifetime
+    JSPromise.resolve(JSValue.boolean(true)).then { _ in
+        exp4.fulfill()
+        return JSValue.undefined
+    }
+    expectations += [exp1, exp2, exp3, exp4]
 }
 
 try test("Error") {
@@ -620,3 +678,5 @@ try test("Exception") {
     let errorObject3 = JSError(from: ageError as! JSValue)
     try expectNotNil(errorObject3)
 }
+
+Expectation.wait(expectations)
