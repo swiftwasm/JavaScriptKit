@@ -440,7 +440,7 @@ export class SwiftRuntime {
                     if (kind_ptr && payload1_ptr && payload2_ptr) {
                         writeValue(error, kind_ptr, payload1_ptr, payload2_ptr, true);
                     }
-                    resume();
+                    queueMicrotask(resume);
                 });
         };
 
