@@ -1,5 +1,5 @@
 /** A wrapper around the [JavaScript Date 
-class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) that
+class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) that
 exposes its properties in a type-safe way. This doesn't 100% match the JS API, for example 
 `getMonth`/`setMonth` etc accessor methods are converted to properties, but the rest of it matches
 in the naming. Parts of the JavaScript `Date` API that are not consistent across browsers and JS 
