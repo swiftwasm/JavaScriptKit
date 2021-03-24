@@ -27,7 +27,7 @@ public protocol JSBridgedClass: JSBridgedType {
     /// You may assume that `jsObject instanceof Self.constructor == true`
     var jsObject: JSObject { get }
 
-    /// Create an instannce wrapping the given JavaScript object.
+    /// Create an instance wrapping the given JavaScript object.
     /// You may assume that `jsObject instanceof Self.constructor`
     init(unsafelyWrapping jsObject: JSObject)
 }
