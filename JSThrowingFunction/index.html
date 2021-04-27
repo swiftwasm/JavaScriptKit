@@ -37,7 +37,9 @@
     <code class="name">JSThrowing​Function</code>
 </h1>
 
-<html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="type">JSThrowingFunction</span></code></pre></body></html>
+<div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="type">JSThrowingFunction</span> </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>A <code>JSFunction</code> wrapper that enables throwing function calls.
 Exceptions produced by JavaScript functions will be thrown as <code>JSValue</code>.</p>
@@ -51,7 +53,9 @@ Exceptions produced by JavaScript functions will be thrown as <code>JSValue</cod
     <h3>
         <code>init(_:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="keyword">_</span> <span class="variable">base</span>: <a href="/JavaScriptKit/JSFunction"><span class="type">JSFunction</span></a>)</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="keyword">_</span> <span class="variable">base</span>: <span class="type">JSFunction</span>) </code></pre>
+</div>
 </div>
     </section>
     <section id="methods">
@@ -61,7 +65,10 @@ Exceptions produced by JavaScript functions will be thrown as <code>JSValue</cod
     <h3>
         <code>call​AsFunction(this:​arguments:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span> <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">callAsFunction</span>(<span class="variable">this</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a>? = <span class="keyword">nil</span>, <span class="variable">arguments</span>: [<a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>]) <span class="keyword">throws</span> -&gt; <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span>
+    <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">callAsFunction</span>(<span class="variable">this</span>: <span class="type">JSObject</span>? = <span class="keyword">nil</span>, <span class="variable">arguments</span>: [<span class="type">ConvertibleToJSValue</span>]) <span class="keyword">throws</span> -&gt; <span class="type">JSValue</span> </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Call this function with given <code>arguments</code> and binding given <code>this</code> as context.</p>
 
@@ -99,7 +106,10 @@ Exceptions produced by JavaScript functions will be thrown as <code>JSValue</cod
     <h3>
         <code>call​AsFunction(this:​_:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span> <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">callAsFunction</span>(<span class="variable">this</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a>? = <span class="keyword">nil</span>, <span class="keyword">_</span> <span class="variable">arguments</span>: <a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>) <span class="keyword">throws</span> -&gt; <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span>
+    <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">callAsFunction</span>(<span class="variable">this</span>: <span class="type">JSObject</span>? = <span class="keyword">nil</span>, <span class="keyword">_</span> <span class="variable">arguments</span>: <span class="type">ConvertibleToJSValue</span>...) <span class="keyword">throws</span> -&gt; <span class="type">JSValue</span> </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>A variadic arguments version of <code>callAsFunction</code>.</p>
 
@@ -109,7 +119,9 @@ Exceptions produced by JavaScript functions will be thrown as <code>JSValue</cod
     <h3>
         <code>new(arguments:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">new</span>(<span class="variable">arguments</span>: [<a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>]) <span class="keyword">throws</span> -&gt; <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">new</span>(<span class="variable">arguments</span>: [<span class="type">ConvertibleToJSValue</span>]) <span class="keyword">throws</span> -&gt; <span class="type">JSObject</span> </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Instantiate an object from this function as a throwing constructor.</p>
 
@@ -157,7 +169,9 @@ Exceptions produced by JavaScript functions will be thrown as <code>JSValue</cod
     <h3>
         <code>new(_:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">new</span>(<span class="keyword">_</span> <span class="variable">arguments</span>: <a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>) <span class="keyword">throws</span> -&gt; <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">new</span>(<span class="keyword">_</span> <span class="variable">arguments</span>: <span class="type">ConvertibleToJSValue</span>...) <span class="keyword">throws</span> -&gt; <span class="type">JSObject</span> </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>A variadic arguments version of <code>new</code>.</p>
 
@@ -172,7 +186,7 @@ Exceptions produced by JavaScript functions will be thrown as <code>JSValue</cod
 
     <footer>
         <p>
-    Generated on <time datetime="2021-03-24T20:09:48+0000">March 24, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2021-04-27T12:49:50+0000">April 27, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.6</span>.
 </p>
     </footer>
 </body>

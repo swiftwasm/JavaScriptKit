@@ -37,7 +37,9 @@
     <code class="name">JSPromise</code>
 </h1>
 
-<html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">final</span> <span class="keyword">class</span> <span class="type">JSPromise</span>: <a href="/JavaScriptKit/JSBridgedClass"><span class="type">JSBridgedClass</span></a></code></pre></body></html>
+<div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">final</span> <span class="keyword">class</span> <span class="type">JSPromise</span>: <span class="type">JSBridgedClass</span> </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>A wrapper around <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">the JavaScript <code>Promise</code> class</a>
 that exposes its functions in a type-safe and Swifty way. The <code>JSPromise</code> API is generic over both
@@ -111,7 +113,9 @@ without type erasure. You should chain <code>then</code> and <code>catch</code> 
     <h3>
         <code>init(unsafely​Wrapping:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">unsafelyWrapping</span> <span class="variable">object</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a>)</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">unsafelyWrapping</span> <span class="variable">object</span>: <span class="type">JSObject</span>) </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>This private initializer assumes that the passed object is a JavaScript <code>Promise</code></p>
 
@@ -121,7 +125,9 @@ without type erasure. You should chain <code>then</code> and <code>catch</code> 
     <h3>
         <code>init?(_:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">convenience</span> <span class="keyword">init</span>?(<span class="keyword">_</span> <span class="variable">jsObject</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a>)</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">convenience</span> <span class="keyword">init</span>?(<span class="keyword">_</span> <span class="variable">jsObject</span>: <span class="type">JSObject</span>) </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Creates a new <code>JSPromise</code> instance from a given JavaScript <code>Promise</code> object. If <code>jsObject</code>
 is not an instance of JavaScript <code>Promise</code>, this initializer will return <code>nil</code>.</p>
@@ -132,7 +138,9 @@ is not an instance of JavaScript <code>Promise</code>, this initializer will ret
     <h3>
         <code>init(resolver:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">convenience</span> <span class="keyword">init</span>(<span class="variable">resolver</span>: <span class="attribute">@</span><span class="attribute">escaping</span> (<span class="attribute">@</span><span class="attribute">escaping</span> (<span class="type">Result</span>&lt;<a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>, <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>&gt;) -&gt; ()) -&gt; ())</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">convenience</span> <span class="keyword">init</span>(<span class="variable">resolver</span>: <span class="attribute">@</span><span class="attribute">escaping</span> (<span class="attribute">@</span><span class="attribute">escaping</span> (<span class="type">Result</span>&lt;<span class="type">JSValue</span>, <span class="type">JSValue</span>&gt;) -&gt; ()) -&gt; ()) </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Creates a new <code>JSPromise</code> instance from a given <code>resolver</code> closure. <code>resolver</code> takes
 two closure that your code should call to either resolve or reject this <code>JSPromise</code> instance.</p>
@@ -147,7 +155,9 @@ two closure that your code should call to either resolve or reject this <code>JS
     <h3>
         <code>js​Object</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">jsObject</span>: <a href="/JavaScriptKit/JSObject"><span class="type">JSObject</span></a></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">let</span> <span class="variable">jsObject</span>: <span class="type">JSObject</span></code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>The underlying JavaScript <code>Promise</code> object.</p>
 
@@ -157,7 +167,9 @@ two closure that your code should call to either resolve or reject this <code>JS
     <h3>
         <code>constructor</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">constructor</span>: <a href="/JavaScriptKit/JSFunction"><span class="type">JSFunction</span></a></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">var</span> <span class="variable">constructor</span>: <span class="type">JSFunction</span> </code></pre>
+</div>
 </div>
     </section>
     <section id="methods">
@@ -167,7 +179,9 @@ two closure that your code should call to either resolve or reject this <code>JS
     <h3>
         <code>js​Value()</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">jsValue</span>() -&gt; <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">jsValue</span>() -&gt; <span class="type">JSValue</span> </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>The underlying JavaScript <code>Promise</code> object wrapped as <code>JSValue</code>.</p>
 
@@ -177,7 +191,9 @@ two closure that your code should call to either resolve or reject this <code>JS
     <h3>
         <code>construct(from:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">func</span> <span class="function">construct</span>(<span class="variable">from</span> <span class="variable">value</span>: <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>) -&gt; <span class="keyword">Self</span>?</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">func</span> <span class="function">construct</span>(<span class="variable">from</span> <span class="variable">value</span>: <span class="type">JSValue</span>) -&gt; <span class="keyword">Self</span>? </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Creates a new <code>JSPromise</code> instance from a given JavaScript <code>Promise</code> object. If <code>value</code>
 is not an object and is not an instance of JavaScript <code>Promise</code>, this function will
@@ -189,19 +205,26 @@ return <code>nil</code>.</p>
     <h3>
         <code>resolve(_:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">func</span> <span class="function">resolve</span>(<span class="keyword">_</span> <span class="variable">value</span>: <a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>) -&gt; <a href="/JavaScriptKit/JSPromise"><span class="type">JSPromise</span></a></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">func</span> <span class="function">resolve</span>(<span class="keyword">_</span> <span class="variable">value</span>: <span class="type">ConvertibleToJSValue</span>) -&gt; <span class="type">JSPromise</span> </code></pre>
+</div>
 </div>
 <div role="article" class="function" id="jspromise.reject(_:)">
     <h3>
         <code>reject(_:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">func</span> <span class="function">reject</span>(<span class="keyword">_</span> <span class="variable">reason</span>: <a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>) -&gt; <a href="/JavaScriptKit/JSPromise"><span class="type">JSPromise</span></a></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">func</span> <span class="function">reject</span>(<span class="keyword">_</span> <span class="variable">reason</span>: <span class="type">ConvertibleToJSValue</span>) -&gt; <span class="type">JSPromise</span> </code></pre>
+</div>
 </div>
 <div role="article" class="function" id="jspromise.then(success:)">
     <h3>
         <code>then(success:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span> <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">then</span>(<span class="variable">success</span>: <span class="attribute">@</span><span class="attribute">escaping</span> (<a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>) -&gt; <a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>) -&gt; <a href="/JavaScriptKit/JSPromise"><span class="type">JSPromise</span></a></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span>
+    <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">then</span>(<span class="variable">success</span>: <span class="attribute">@</span><span class="attribute">escaping</span> (<span class="type">JSValue</span>) -&gt; <span class="type">ConvertibleToJSValue</span>) -&gt; <span class="type">JSPromise</span> </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Schedules the <code>success</code> closure to be invoked on sucessful completion of <code>self</code>.</p>
 
@@ -211,7 +234,11 @@ return <code>nil</code>.</p>
     <h3>
         <code>then(success:​failure:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span> <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">then</span>(<span class="variable">success</span>: <span class="attribute">@</span><span class="attribute">escaping</span> (<a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>) -&gt; <a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>, <span class="variable">failure</span>: <span class="attribute">@</span><span class="attribute">escaping</span> (<a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>) -&gt; <a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>) -&gt; <a href="/JavaScriptKit/JSPromise"><span class="type">JSPromise</span></a></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span>
+    <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">then</span>(<span class="variable">success</span>: <span class="attribute">@</span><span class="attribute">escaping</span> (<span class="type">JSValue</span>) -&gt; <span class="type">ConvertibleToJSValue</span>,
+                     <span class="variable">failure</span>: <span class="attribute">@</span><span class="attribute">escaping</span> (<span class="type">JSValue</span>) -&gt; <span class="type">ConvertibleToJSValue</span>) -&gt; <span class="type">JSPromise</span> </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Schedules the <code>success</code> closure to be invoked on sucessful completion of <code>self</code>.</p>
 
@@ -221,7 +248,10 @@ return <code>nil</code>.</p>
     <h3>
         <code>`catch`(failure:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span> <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">`catch`</span>(<span class="variable">failure</span>: <span class="attribute">@</span><span class="attribute">escaping</span> (<a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>) -&gt; <a href="/JavaScriptKit/ConvertibleToJSValue"><span class="type">ConvertibleToJSValue</span></a>) -&gt; <a href="/JavaScriptKit/JSPromise"><span class="type">JSPromise</span></a></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span>
+    <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">`catch`</span>(<span class="variable">failure</span>: <span class="attribute">@</span><span class="attribute">escaping</span> (<span class="type">JSValue</span>) -&gt; <span class="type">ConvertibleToJSValue</span>) -&gt; <span class="type">JSPromise</span> </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Schedules the <code>failure</code> closure to be invoked on rejected completion of <code>self</code>.</p>
 
@@ -231,7 +261,10 @@ return <code>nil</code>.</p>
     <h3>
         <code>finally(success​OrFailure:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span> <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">finally</span>(<span class="variable">successOrFailure</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; ()) -&gt; <a href="/JavaScriptKit/JSPromise"><span class="type">JSPromise</span></a></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="attribute">@</span><span class="attribute">discardableResult</span>
+    <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">finally</span>(<span class="variable">successOrFailure</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; ()) -&gt; <span class="type">JSPromise</span> </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Schedules the <code>failure</code> closure to be invoked on either successful or rejected completion of
 <code>self</code>.</p>
@@ -247,7 +280,7 @@ return <code>nil</code>.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2021-03-24T20:09:48+0000">March 24, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2021-04-27T12:49:49+0000">April 27, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.6</span>.
 </p>
     </footer>
 </body>

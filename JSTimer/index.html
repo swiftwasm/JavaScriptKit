@@ -37,7 +37,9 @@
     <code class="name">JSTimer</code>
 </h1>
 
-<html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">final</span> <span class="keyword">class</span> <span class="type">JSTimer</span></code></pre></body></html>
+<div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">final</span> <span class="keyword">class</span> <span class="type">JSTimer</span> </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>This timer is an abstraction over <a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setInterval"><code>setInterval</code></a>
 / <a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/clearInterval"><code>clearInterval</code></a> and
@@ -60,7 +62,9 @@ or deallocate the object that owns the timer.</p>
     <h3>
         <code>init(milliseconds​Delay:​is​Repeating:​callback:​)</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">millisecondsDelay</span>: <span class="type">Double</span>, <span class="variable">isRepeating</span>: <span class="type">Bool</span> = <span class="keyword">false</span>, <span class="variable">callback</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; ())</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">millisecondsDelay</span>: <span class="type">Double</span>, <span class="variable">isRepeating</span>: <span class="type">Bool</span> = <span class="keyword">false</span>, <span class="variable">callback</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; ()) </code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Creates a new timer instance that calls <code>setInterval</code> or <code>setTimeout</code> JavaScript functions for you
 under the hood.</p>
@@ -106,7 +110,9 @@ under the hood.</p>
     <h3>
         <code>is​Repeating</code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">isRepeating</span>: <span class="type">Bool</span></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">let</span> <span class="variable">isRepeating</span>: <span class="type">Bool</span></code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Indicates whether this timer instance calls its callback repeatedly at a given delay.</p>
 
@@ -121,7 +127,7 @@ under the hood.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2021-03-24T20:09:47+0000">March 24, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2021-04-27T12:49:49+0000">April 27, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.6</span>.
 </p>
     </footer>
 </body>
