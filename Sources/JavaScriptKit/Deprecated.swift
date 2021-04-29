@@ -15,3 +15,6 @@ public typealias JSValueConstructible = ConstructibleFromJSValue
 
 @available(*, deprecated, renamed: "JSValueCompatible")
 public typealias JSValueCodable = JSValueCompatible
+
+@available(*, deprecated, renamed: "JSClosure")
+public typealias JSOneshotClosure = JSClosure
