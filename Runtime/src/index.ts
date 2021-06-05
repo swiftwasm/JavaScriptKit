@@ -126,9 +126,11 @@ export class SwiftRuntime {
     constructor() {
         this.instance = null;
         this.heap = new SwiftRuntimeHeap();
-        this.functionRegistry = new FinalizationRegistry(
-            this.handleFree.bind(this)
-        );
+        if (typeof FinalizationRegistry !== "undefined") {
+            this.functionRegistry = new FinalizationRegistry(
+                this.handleFree.bind(this)
+            );
+        }
     }
 
     handleFree(id: unknown) {

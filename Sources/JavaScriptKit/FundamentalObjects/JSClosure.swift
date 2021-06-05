@@ -113,3 +113,67 @@ func _call_host_function_impl(
     let callbackFuncRef = JSFunction(id: callbackFuncRef)
     _ = callbackFuncRef(result)
 }
+
+// MARK: - Legacy Closure Types
+
+/// `JSOneshotClosure` is a JavaScript function that can be called only once.
+/// It is recommended to use `JSClosure` instead if your target runtimes support `FinalizationRegistry`.
+public class JSOneshotClosure: JSObject, JSClosureProtocol {
+    private var hostFuncRef: JavaScriptHostFuncRef = 0
+
+    public init(_ body: @escaping ([JSValue]) -> JSValue) {
+        // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
+        super.init(id: 0)
+        let objectId = ObjectIdentifier(self)
+        let funcRef = JavaScriptHostFuncRef(bitPattern: Int32(objectId.hashValue))
+        // 2. Retain the given body in static storage by `funcRef`.
+        sharedClosures[funcRef] = {
+            defer { self.release() }
+            return body($0)
+        }
+        // 3. Create a new JavaScript function which calls the given Swift function.
+        var objectRef: JavaScriptObjectRef = 0
+        _create_function(funcRef, &objectRef)
+
+        hostFuncRef = funcRef
+        id = objectRef
+    }
+
+    /// Release this function resource.
+    /// After calling `release`, calling this function from JavaScript will fail.
+    public func release() {
+        sharedClosures[hostFuncRef] = nil
+    }
+}
+
+public class JSUnretainedClosure: JSObject, JSClosureProtocol {
+    private var hostFuncRef: JavaScriptHostFuncRef = 0
+    var isReleased: Bool = false
+
+    public init(_ body: @escaping ([JSValue]) -> JSValue) {
+        // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
+        super.init(id: 0)
+        let objectId = ObjectIdentifier(self)
+        let funcRef = JavaScriptHostFuncRef(bitPattern: Int32(objectId.hashValue))
+        // 2. Retain the given body in static storage by `funcRef`.
+        sharedClosures[funcRef] = body
+        // 3. Create a new JavaScript function which calls the given Swift function.
+        var objectRef: JavaScriptObjectRef = 0
+        _create_function(funcRef, &objectRef)
+
+        hostFuncRef = funcRef
+        id = objectRef
+    }
+
+    public func release() {
+        isReleased = true
+        sharedClosures[hostFuncRef] = nil
+    }
+
+    deinit {
+        guard isReleased else {
+            // Safari doesn't support `FinalizationRegistry`, so we cannot automatically manage the lifetime of Swift objects
+            fatalError("release() must be called on JSClosure objects manually before they are deallocated")
+        }
+    }
+}
