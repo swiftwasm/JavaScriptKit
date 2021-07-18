@@ -14,7 +14,6 @@
             </strong>
             <span>Documentation</span>
         </a>
-        <sup>Beta</sup>
     </header>
 
     <!--
@@ -38,7 +37,7 @@
 </h1>
 
 <div class="declaration">
-<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="type">JSValueDecoder</span> </code></pre>
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">class</span> <span class="type">JSValueDecoder</span>  </body></html></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
     <p><code>JSValueDecoder</code> facilitates the decoding of JavaScript value into semantic <code>Decodable</code> types.</p>
@@ -50,10 +49,10 @@
 
         <div role="article" class="initializer" id="jsvaluedecoder.init()">
     <h3>
-        <code>init()</code>
+        <code><a href="#jsvaluedecoder.init()">init()</a></code>
     </h3>
     <div class="declaration">
-<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>() </code></pre>
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">init</span>()  </body></html></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
     <p>Initializes a new <code>JSValueDecoder</code>.</p>
@@ -66,14 +65,14 @@
 
         <div role="article" class="function" id="jsvaluedecoder.decode(_:from:userinfo:)">
     <h3>
-        <code>decode(_:​from:​user​Info:​)</code>
+        <code><a href="#jsvaluedecoder.decode(_:from:userinfo:)">decode(_:​from:​user​Info:​)</a></code>
     </h3>
     <div class="declaration">
-<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">decode</span>&lt;<span class="variable">T</span>&gt;(
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">decode</span>&lt;<span class="variable">T</span>&gt;(
         <span class="keyword">_</span>: <span class="type">T</span>.<span class="type">Type</span> = <span class="variable">T</span>.<span class="keyword">self</span>,
-        <span class="variable">from</span> <span class="variable">value</span>: <span class="type">JSValue</span>,
+        <span class="variable">from</span> <span class="variable">value</span>: <a href="/JavaScriptKit/JSValue"><span class="type">JSValue</span></a>,
         <span class="variable">userInfo</span>: [<span class="type">CodingUserInfoKey</span>: <span class="keyword">Any</span>] = [:]
-    ) <span class="keyword">throws</span> -&gt; <span class="type">T</span> <span class="keyword">where</span> <span class="type">T</span>: <span class="type">Decodable</span> </code></pre>
+    ) <span class="keyword">throws</span> -&gt; <span class="type">T</span> <span class="keyword">where</span> <span class="type">T</span>: <span class="type">Decodable</span>  </body></html></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
     <p>Decodes a top-level value of the given type from the given JavaScript value representation.</p>
@@ -114,7 +113,7 @@
 
     <footer>
         <p>
-    Generated on <time datetime="2021-04-29T16:41:31+0000">April 29, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.6</span>.
+    Generated on <time datetime="2021-07-18T23:44:47+0000">July 18, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
 </p>
     </footer>
 </body>
