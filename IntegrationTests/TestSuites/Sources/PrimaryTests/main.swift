@@ -617,12 +617,15 @@ try test("Error") {
 }
 
 try test("JSValue accessor") {
-    let globalObject1 = JSObject.global.globalObject1
+    var globalObject1 = JSObject.global.globalObject1
     try expectEqual(globalObject1.prop_1.nested_prop, .number(1))
     try expectEqual(globalObject1.object!.prop_1.object!.nested_prop, .number(1))
 
     try expectEqual(globalObject1.prop_4[0], .number(3))
     try expectEqual(globalObject1.prop_4[1], .number(4))
+
+    globalObject1.prop_1.nested_prop = "bar"
+    try expectEqual(globalObject1.prop_1.nested_prop, .string("bar"))
 }
 
 try test("Exception") {
