@@ -186,6 +186,12 @@ try test("Function Call") {
 let evalClosure = JSObject.global.globalObject1.eval_closure.function!
 
 try test("Closure Lifetime") {
+    func expectCrashByCall(ofClosure c: JSClosureProtocol) throws {
+        print("======= BEGIN OF EXPECTED FATAL ERROR =====")
+        _ = try expectThrow(try evalClosure.throws(c))
+        print("======= END OF EXPECTED FATAL ERROR =======")
+    }
+
     do {
         let c1 = JSClosure { arguments in
             return arguments[0]
@@ -200,9 +206,7 @@ try test("Closure Lifetime") {
         }
         c1.release()
         // Call a released closure
-        print("======= BEGIN OF EXPECTED FATAL ERROR =====")
-        _ = try expectThrow(try evalClosure.throws(c1))
-        print("======= END OF EXPECTED FATAL ERROR =======")
+        try expectCrashByCall(ofClosure: c1)
     }
 
     do {
@@ -211,9 +215,7 @@ try test("Closure Lifetime") {
             _ = JSClosure { _ in .undefined }
             return .undefined
         }
-        print("======= BEGIN OF EXPECTED FATAL ERROR =====")
-        _ = try expectThrow(try evalClosure.throws(c1))
-        print("======= END OF EXPECTED FATAL ERROR =======")
+        try expectCrashByCall(ofClosure: c1)
         c1.release()
     }
 
@@ -223,9 +225,7 @@ try test("Closure Lifetime") {
         }
         try expectEqual(evalClosure(c1), .boolean(true))
         // second call will cause `fatalError` that can be caught as a JavaScript exception
-        print("======= BEGIN OF EXPECTED FATAL ERROR =====")
-        _ = try expectThrow(try evalClosure.throws(c1))
-        print("======= END OF EXPECTED FATAL ERROR =======")
+        try expectCrashByCall(ofClosure: c1)
         // OneshotClosure won't call fatalError even if it's deallocated before `release`
     }
 }
