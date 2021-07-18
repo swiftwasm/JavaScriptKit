@@ -200,7 +200,9 @@ try test("Closure Lifetime") {
         }
         c1.release()
         // Call a released closure
+        print("======= BEGIN OF EXPECTED FATAL ERROR =====")
         _ = try expectThrow(try evalClosure.throws(c1))
+        print("======= END OF EXPECTED FATAL ERROR =======")
     }
 
     do {
@@ -209,7 +211,9 @@ try test("Closure Lifetime") {
             _ = JSClosure { _ in .undefined }
             return .undefined
         }
+        print("======= BEGIN OF EXPECTED FATAL ERROR =====")
         _ = try expectThrow(try evalClosure.throws(c1))
+        print("======= END OF EXPECTED FATAL ERROR =======")
         c1.release()
     }
 
@@ -219,7 +223,9 @@ try test("Closure Lifetime") {
         }
         try expectEqual(evalClosure(c1), .boolean(true))
         // second call will cause `fatalError` that can be caught as a JavaScript exception
+        print("======= BEGIN OF EXPECTED FATAL ERROR =====")
         _ = try expectThrow(try evalClosure.throws(c1))
+        print("======= END OF EXPECTED FATAL ERROR =======")
         // OneshotClosure won't call fatalError even if it's deallocated before `release`
     }
 }
