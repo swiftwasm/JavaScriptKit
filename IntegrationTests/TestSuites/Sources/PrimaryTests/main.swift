@@ -632,6 +632,16 @@ try test("JSValue accessor") {
 
     globalObject1.prop_1.nested_prop = "bar"
     try expectEqual(globalObject1.prop_1.nested_prop, .string("bar"))
+
+    /* TODO: Fix https://github.com/swiftwasm/JavaScriptKit/issues/132 and un-comment this test
+    `nested` should not be set again to `target.nested` by `target.nested.prop = .number(1)`
+
+    let observableObj = globalObject1.observable_obj.object!
+    observableObj.set_called = .boolean(false)
+    observableObj.target.nested.prop = .number(1)
+    try expectEqual(observableObj.set_called, .boolean(false))
+
+    */
 }
 
 try test("Exception") {
