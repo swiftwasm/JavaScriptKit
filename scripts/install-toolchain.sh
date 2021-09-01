@@ -3,16 +3,17 @@ set -eu
 
 scripts_dir="$(cd "$(dirname $0)" && pwd)"
 
-swift_version="$(cat $scripts_dir/../.swift-version)"
-swift_tag="swift-$swift_version"
+default_swift_version="$(cat $scripts_dir/../.swift-version)"
+SWIFT_VERSION="${SWIFT_VERSION:-$default_swift_version}"
+swift_tag="swift-$SWIFT_VERSION"
 
 if [ -z "$(which swiftenv)" ]; then
   echo "swiftenv not installed, please install it before this script."
   exit 1
 fi
 
-if [ ! -z "$(swiftenv versions | grep $swift_version)" ]; then
-  echo "$swift_version is already installed."
+if [ ! -z "$(swiftenv versions | grep $SWIFT_VERSION)" ]; then
+  echo "$SWIFT_VERSION is already installed."
   exit 0
 fi
 
