@@ -11,8 +11,7 @@ jobs:
         os: [macOS-10.15, Ubuntu-18.04]
         toolchain:
           - wasm-5.3.0-RELEASE
-          - wasm-5.4-SNAPSHOT-2021-08-07-a
-          # - wasm-5.4.0-RELEASE
+          - wasm-5.4.0-RELEASE
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
