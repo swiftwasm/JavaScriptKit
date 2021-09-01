@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.5
 
 import PackageDescription
 
@@ -19,9 +19,6 @@ let package = Package(
             name: "ConcurrencyTests",
             dependencies: [
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
-            ],
-            swiftSettings: [
-                .unsafeFlags(["-Xfrontend", "-enable-experimental-concurrency"]),
             ]
         ),
         .target(name: "BenchmarkTests", dependencies: ["JavaScriptKit"]),
