@@ -186,6 +186,12 @@ try test("Function Call") {
 let evalClosure = JSObject.global.globalObject1.eval_closure.function!
 
 try test("Closure Lifetime") {
+    func expectCrashByCall(ofClosure c: JSClosureProtocol) throws {
+        print("======= BEGIN OF EXPECTED FATAL ERROR =====")
+        _ = try expectThrow(try evalClosure.throws(c))
+        print("======= END OF EXPECTED FATAL ERROR =======")
+    }
+
     do {
         let c1 = JSClosure { arguments in
             return arguments[0]
@@ -220,7 +226,9 @@ try test("Closure Lifetime") {
             return .boolean(true)
         }
         try expectEqual(evalClosure(c1), .boolean(true))
-        try expectEqual(evalClosure(c1), .boolean(true))
+        // second call will cause `fatalError` that can be caught as a JavaScript exception
+        try expectCrashByCall(ofClosure: c1)
+        // OneshotClosure won't call fatalError even if it's deallocated before `release`
     }
 }
 
@@ -610,12 +618,25 @@ try test("Error") {
 }
 
 try test("JSValue accessor") {
-    let globalObject1 = JSObject.global.globalObject1
+    var globalObject1 = JSObject.global.globalObject1
     try expectEqual(globalObject1.prop_1.nested_prop, .number(1))
     try expectEqual(globalObject1.object!.prop_1.object!.nested_prop, .number(1))
 
     try expectEqual(globalObject1.prop_4[0], .number(3))
     try expectEqual(globalObject1.prop_4[1], .number(4))
+
+    globalObject1.prop_1.nested_prop = "bar"
+    try expectEqual(globalObject1.prop_1.nested_prop, .string("bar"))
+
+    /* TODO: Fix https://github.com/swiftwasm/JavaScriptKit/issues/132 and un-comment this test
+    `nested` should not be set again to `target.nested` by `target.nested.prop = .number(1)`
+
+    let observableObj = globalObject1.observable_obj.object!
+    observableObj.set_called = .boolean(false)
+    observableObj.target.nested.prop = .number(1)
+    try expectEqual(observableObj.set_called, .boolean(false))
+
+    */
 }
 
 try test("Exception") {

@@ -7,7 +7,7 @@ JavaScriptKitExample:
 
 dist/JavaScriptKitExample.wasm: JavaScriptKitExample
 	mkdir -p dist
-	cp ./JavaScriptKitExample/.build/debug/JavaScriptKitExample $@
+	cp ./JavaScriptKitExample/.build/debug/JavaScriptKitExample.wasm $@
 
 node_modules:
 	npm ci
