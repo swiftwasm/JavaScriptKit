@@ -120,17 +120,15 @@ class SwiftRuntimeHeap {
 export class SwiftRuntime {
     private instance: WebAssembly.Instance | null;
     private heap: SwiftRuntimeHeap;
-    private functionRegistry: FinalizationRegistry;
+    private functionRegistry: FinalizationRegistry<unknown>;
     private version: number = 701;
 
     constructor() {
         this.instance = null;
         this.heap = new SwiftRuntimeHeap();
-        if (typeof FinalizationRegistry !== "undefined") {
-            this.functionRegistry = new FinalizationRegistry(
-                this.handleFree.bind(this)
-            );
-        }
+        this.functionRegistry = new FinalizationRegistry(
+            this.handleFree.bind(this)
+        );
     }
 
     handleFree(id: unknown) {
