@@ -197,18 +197,26 @@ try test("Closure Lifetime") {
             return arguments[0]
         }
         try expectEqual(evalClosure(c1, JSValue.number(1.0)), .number(1.0))
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+        c1.release()
+#endif
     }
 
     do {
         let c1 = JSClosure { _ in .undefined }
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
         c1.release()
-        c1.release()
+#endif
     }
 
     do {
         let array = JSObject.global.Array.function!.new()
-        _ = array.push!(JSClosure { _ in .number(3) })
+        let c1 = JSClosure { _ in .number(3) }
+        _ = array.push!(c1)
         try expectEqual(array[0].function!().number, 3.0)
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+        c1.release()
+#endif
     }
 
 //    do {
@@ -221,6 +229,7 @@ try test("Closure Lifetime") {
 //        try expectEqual(weakRef.deref!(), .undefined)
 //    }
 
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     do {
         let c1 = JSOneshotClosure { _ in
             return .boolean(true)
@@ -230,6 +239,7 @@ try test("Closure Lifetime") {
         try expectCrashByCall(ofClosure: c1)
         // OneshotClosure won't call fatalError even if it's deallocated before `release`
     }
+#endif
 }
 
 try test("Host Function Registration") {
@@ -261,6 +271,10 @@ try test("Host Function Registration") {
     try expectEqual(call_host_1Func(), .number(1))
     try expectEqual(isHostFunc1Called, true)
 
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+    hostFunc1.release()
+#endif
+
     let hostFunc2 = JSClosure { (arguments) -> JSValue in
         do {
             let input = try expectNumber(arguments[0])
@@ -272,6 +286,10 @@ try test("Host Function Registration") {
 
     try expectEqual(evalClosure(hostFunc2, 3), .number(6))
     _ = try expectString(evalClosure(hostFunc2, true))
+
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+    hostFunc2.release()
+#endif
 }
 
 try test("New Object Construction") {
@@ -380,14 +398,24 @@ try test("ObjectRef Lifetime") {
     // }
     // ```
 
+    let identity = JSClosure { $0[0] }
     let ref1 = getJSValue(this: .global, name: "globalObject1").object!
-    let ref2 = evalClosure(JSClosure { $0[0] }, ref1).object!
+    let ref2 = evalClosure(identity, ref1).object!
     try expectEqual(ref1.prop_2, .number(2))
     try expectEqual(ref2.prop_2, .number(2))
+
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+    identity.release()
+#endif
 }
 
 func closureScope() -> ObjectIdentifier {
-    ObjectIdentifier(JSClosure { _ in .undefined })
+    let closure = JSClosure { _ in .undefined }
+    let result = ObjectIdentifier(closure)
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+    closure.release()
+#endif
+    return result
 }
 
 try test("Closure Identifiers") {

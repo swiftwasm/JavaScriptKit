@@ -21,6 +21,7 @@ if (typeof globalThis !== "undefined") {
 
 interface SwiftRuntimeExportedFunctions {
     swjs_library_version(): number;
+    swjs_library_features(): number;
     swjs_prepare_host_function_call(size: number): pointer;
     swjs_cleanup_host_function_call(argv: pointer): void;
     swjs_call_host_function(
@@ -42,6 +43,10 @@ enum JavaScriptValueKind {
     Null = 4,
     Undefined = 5,
     Function = 6,
+}
+
+enum LibraryFeatures {
+    WeakRefs = 1 << 0,
 }
 
 type TypedArray =
@@ -117,25 +122,33 @@ class SwiftRuntimeHeap {
     }
 }
 
+/// Memory lifetime of closures in Swift are managed by Swift side
+class SwiftClosureHeap {
+    private functionRegistry: FinalizationRegistry<number>;
+    private exports: SwiftRuntimeExportedFunctions
+
+    constructor(exports: SwiftRuntimeExportedFunctions) {
+        this.exports = exports
+        this.functionRegistry = new FinalizationRegistry((id) => {
+            this.exports.swjs_free_host_function(id);
+        });
+    }
+
+    alloc(func: any, func_ref: number) {
+        this.functionRegistry.register(func, func_ref);
+    }
+}
+
 export class SwiftRuntime {
     private instance: WebAssembly.Instance | null;
     private heap: SwiftRuntimeHeap;
-    private functionRegistry: FinalizationRegistry<unknown>;
+    private _closureHeap: SwiftClosureHeap | null;
     private version: number = 701;
 
     constructor() {
         this.instance = null;
         this.heap = new SwiftRuntimeHeap();
-        this.functionRegistry = new FinalizationRegistry(
-            this.handleFree.bind(this)
-        );
-    }
-
-    handleFree(id: unknown) {
-        if (!this.instance || typeof id !== "number") return;
-        const exports = (this.instance
-            .exports as any) as SwiftRuntimeExportedFunctions;
-        exports.swjs_free_host_function(id);
+        this._closureHeap = null;
     }
 
     setInstance(instance: WebAssembly.Instance) {
@@ -145,6 +158,26 @@ export class SwiftRuntime {
         if (exports.swjs_library_version() != this.version) {
             throw new Error("The versions of JavaScriptKit are incompatible.");
         }
+    }
+    get closureHeap(): SwiftClosureHeap | null {
+        if (this._closureHeap)
+            return this._closureHeap;
+        if (!this.instance)
+            throw new Error("WebAssembly instance is not set yet");
+
+        const exports = (this.instance
+            .exports as any) as SwiftRuntimeExportedFunctions;
+        const features = exports.swjs_library_features();
+        const librarySupportsWeakRef = (features & LibraryFeatures.WeakRefs) != 0;
+        if (librarySupportsWeakRef) {
+            if (typeof FinalizationRegistry !== "undefined") {
+                this._closureHeap = new SwiftClosureHeap(exports);
+		return this._closureHeap;
+            } else {
+                throw new Error("The JavaScriptKit in Swift expects the target environment supports WeakRefs. Please build with `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS` to disable features using WeakRefs.");
+            }
+        }
+	return null;
     }
 
     importObjects() {
@@ -472,7 +505,7 @@ export class SwiftRuntime {
                     );
                 };
                 const func_ref = this.heap.retain(func);
-                this.functionRegistry.register(func, func_ref);
+                this.closureHeap?.alloc(func, func_ref);
                 writeUint32(func_ref_ptr, func_ref);
             },
             swjs_call_throwing_new: (
