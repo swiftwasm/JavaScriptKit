@@ -125,12 +125,10 @@ class SwiftRuntimeHeap {
 /// Memory lifetime of closures in Swift are managed by Swift side
 class SwiftClosureHeap {
     private functionRegistry: FinalizationRegistry<number>;
-    private exports: SwiftRuntimeExportedFunctions
 
     constructor(exports: SwiftRuntimeExportedFunctions) {
-        this.exports = exports
         this.functionRegistry = new FinalizationRegistry((id) => {
-            this.exports.swjs_free_host_function(id);
+            exports.swjs_free_host_function(id);
         });
     }
 
@@ -160,24 +158,26 @@ export class SwiftRuntime {
         }
     }
     get closureHeap(): SwiftClosureHeap | null {
-        if (this._closureHeap)
-            return this._closureHeap;
+        if (this._closureHeap) return this._closureHeap;
         if (!this.instance)
             throw new Error("WebAssembly instance is not set yet");
 
         const exports = (this.instance
             .exports as any) as SwiftRuntimeExportedFunctions;
         const features = exports.swjs_library_features();
-        const librarySupportsWeakRef = (features & LibraryFeatures.WeakRefs) != 0;
+        const librarySupportsWeakRef =
+            (features & LibraryFeatures.WeakRefs) != 0;
         if (librarySupportsWeakRef) {
             if (typeof FinalizationRegistry !== "undefined") {
                 this._closureHeap = new SwiftClosureHeap(exports);
-		return this._closureHeap;
+                return this._closureHeap;
             } else {
-                throw new Error("The JavaScriptKit in Swift expects the target environment supports WeakRefs. Please build with `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS` to disable features using WeakRefs.");
+                throw new Error(
+                    "The Swift part of JavaScriptKit was configured to require the availability of JavaScript WeakRefs. Please build with `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS` to disable features that use WeakRefs."
+                );
             }
         }
-	return null;
+        return null;
     }
 
     importObjects() {

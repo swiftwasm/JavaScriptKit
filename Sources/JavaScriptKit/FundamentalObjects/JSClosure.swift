@@ -1,6 +1,8 @@
 import _CJavaScriptKit
 
-/// JSClosureProtocol abstracts closure object in JavaScript, whose lifetime might be manualy managed
+/// JSClosureProtocol wraps Swift closure objects for use in JavaScript. Conforming types
+/// are responsible for managing the lifetime of the closure they wrap, but can delegate that
+/// task to the user by requiring an explicit `release()` call.
 public protocol JSClosureProtocol: JSValueCompatible {
 
     /// Release this function resource.
@@ -149,10 +151,9 @@ func _call_host_function_impl(
 }
 
 
-
-// [WeakRefs](https://github.com/tc39/proposal-weakrefs) is already Stage 4, but it's still newish API,
-// so provide a escape hatch.
-// Please build with `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS` by SwiftPM build system
+/// [WeakRefs](https://github.com/tc39/proposal-weakrefs) are already Stage 4,
+/// but was added recently enough that older browser versions don’t support it.
+/// Build with `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS` to disable the relevant behavior.
 #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
 
 // MARK: - Legacy Closure Types
@@ -171,7 +172,7 @@ func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {}
 
 extension JSClosure {
 
-    @available(*, deprecated, message: "JSClosure.release() is no longer necessary if the target environment supports WeakRefs")
+    @available(*, deprecated, message: "JSClosure.release() is no longer necessary")
     public func release() {}
 
 }
