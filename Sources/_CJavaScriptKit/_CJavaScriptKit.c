@@ -35,8 +35,15 @@ void swjs_cleanup_host_function_call(void *argv_buffer) {
 /// Notes: If you change any interface of runtime library, please increment
 /// this and `SwiftRuntime.version` in `./Runtime/src/index.ts`.
 __attribute__((export_name("swjs_library_version")))
-int swjs_library_version() {
-    return 701;
+int swjs_library_version(void) {
+    return 702;
+}
+
+int _library_features(void);
+
+__attribute__((export_name("swjs_library_features")))
+int swjs_library_features(void) {
+    return _library_features();
 }
 
 #endif
