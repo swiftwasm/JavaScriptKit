@@ -137,10 +137,7 @@ FIXME: <a href="https://github.com/swiftwasm/JavaScriptKit/issues/56">BigInt-bas
 </dt>
 <dd>
     <p><code>JSClosure</code> represents a JavaScript function the body of which is written in Swift.
-This type can be passed as a callback handler to JavaScript functions.
-Note that the lifetime of <code>JSClosure</code> should be managed by users manually
-due to GC boundary between Swift and JavaScript.
-For further discussion, see also <a href="https://github.com/swiftwasm/JavaScriptKit/pull/33">swiftwasm/JavaScriptKit #33</a></p>
+This type can be passed as a callback handler to JavaScript functions.</p>
 
 </dd>
 <dt class="class">
@@ -259,7 +256,9 @@ Exceptions produced by JavaScript functions will be thrown as <code>JSValue</cod
     </a>
 </dt>
 <dd>
-    <p>JSClosureProtocol abstracts closure object in JavaScript, whose lifetime is manualy managed</p>
+    <p>JSClosureProtocol wraps Swift closure objects for use in JavaScript. Conforming types
+are responsible for managing the lifetime of the closure they wrap, but can delegate that
+task to the user by requiring an explicit <code>release()</code> call.</p>
 
 </dd>
 <dt class="protocol">
@@ -471,7 +470,7 @@ For example, a union type of multiple classes or primitive values.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2021-09-02T10:56:56+0000">September 2, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+    Generated on <time datetime="2021-09-10T16:56:45+0000">September 10, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
 </p>
     </footer>
 </body>
