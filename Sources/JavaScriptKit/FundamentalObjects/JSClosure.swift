@@ -21,10 +21,10 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         let objectId = ObjectIdentifier(self)
         let funcRef = JavaScriptHostFuncRef(bitPattern: Int32(objectId.hashValue))
         // 2. Retain the given body in static storage by `funcRef`.
-        JSClosure.sharedClosures[funcRef] = {
+        JSClosure.sharedClosures[funcRef] = (self, {
             defer { self.release() }
             return body($0)
-        }
+        })
         // 3. Create a new JavaScript function which calls the given Swift function.
         var objectRef: JavaScriptObjectRef = 0
         _create_function(funcRef, &objectRef)
@@ -57,7 +57,8 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 ///
 public class JSClosure: JSObject, JSClosureProtocol {
 
-    fileprivate static var sharedClosures: [JavaScriptHostFuncRef: ([JSValue]) -> JSValue] = [:]
+    // Note: Retain the closure object itself also to avoid funcRef conflicts
+    fileprivate static var sharedClosures: [JavaScriptHostFuncRef: (object: JSObject, body: ([JSValue]) -> JSValue)] = [:]
 
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 
@@ -80,7 +81,7 @@ public class JSClosure: JSObject, JSClosureProtocol {
         let objectId = ObjectIdentifier(self)
         let funcRef = JavaScriptHostFuncRef(bitPattern: Int32(objectId.hashValue))
         // 2. Retain the given body in static storage by `funcRef`.
-        Self.sharedClosures[funcRef] = body
+        Self.sharedClosures[funcRef] = (self, body)
         // 3. Create a new JavaScript function which calls the given Swift function.
         var objectRef: JavaScriptObjectRef = 0
         _create_function(funcRef, &objectRef)
@@ -139,7 +140,7 @@ func _call_host_function_impl(
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
 ) {
-    guard let hostFunc = JSClosure.sharedClosures[hostFuncRef] else {
+    guard let (_, hostFunc) = JSClosure.sharedClosures[hostFuncRef] else {
         fatalError("The function was already released")
     }
     let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map {

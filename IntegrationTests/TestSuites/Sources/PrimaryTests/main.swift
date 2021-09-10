@@ -409,12 +409,11 @@ try test("ObjectRef Lifetime") {
 #endif
 }
 
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
 func closureScope() -> ObjectIdentifier {
     let closure = JSClosure { _ in .undefined }
     let result = ObjectIdentifier(closure)
-#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     closure.release()
-#endif
     return result
 }
 
@@ -423,6 +422,7 @@ try test("Closure Identifiers") {
     let oid2 = closureScope()
     try expectEqual(oid1, oid2)
 }
+#endif
 
 func checkArray<T>(_ array: [T]) throws where T: TypedArrayElement {
     try expectEqual(toString(JSTypedArray(array).jsValue().object!), jsStringify(array))
