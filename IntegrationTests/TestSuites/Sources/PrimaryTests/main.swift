@@ -197,28 +197,39 @@ try test("Closure Lifetime") {
             return arguments[0]
         }
         try expectEqual(evalClosure(c1, JSValue.number(1.0)), .number(1.0))
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
         c1.release()
+#endif
     }
 
     do {
-        let c1 = JSClosure { arguments in
-            return arguments[0]
-        }
+        let c1 = JSClosure { _ in .undefined }
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
         c1.release()
-        // Call a released closure
-        try expectCrashByCall(ofClosure: c1)
+#endif
     }
 
     do {
-        let c1 = JSClosure { _ in
-            // JSClosure will be deallocated before `release()`
-            _ = JSClosure { _ in .undefined }
-            return .undefined
-        }
-        try expectCrashByCall(ofClosure: c1)
+        let array = JSObject.global.Array.function!.new()
+        let c1 = JSClosure { _ in .number(3) }
+        _ = array.push!(c1)
+        try expectEqual(array[0].function!().number, 3.0)
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
         c1.release()
+#endif
     }
 
+//    do {
+//        let weakRef = { () -> JSObject in
+//            let c1 = JSClosure { _ in .undefined }
+//            return JSObject.global.WeakRef.function!.new(c1)
+//        }()
+//
+//        // unsure if this will actually work since GC may not run immediately
+//        try expectEqual(weakRef.deref!(), .undefined)
+//    }
+
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     do {
         let c1 = JSOneshotClosure { _ in
             return .boolean(true)
@@ -228,6 +239,7 @@ try test("Closure Lifetime") {
         try expectCrashByCall(ofClosure: c1)
         // OneshotClosure won't call fatalError even if it's deallocated before `release`
     }
+#endif
 }
 
 try test("Host Function Registration") {
@@ -259,7 +271,9 @@ try test("Host Function Registration") {
     try expectEqual(call_host_1Func(), .number(1))
     try expectEqual(isHostFunc1Called, true)
 
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     hostFunc1.release()
+#endif
 
     let hostFunc2 = JSClosure { (arguments) -> JSValue in
         do {
@@ -272,7 +286,10 @@ try test("Host Function Registration") {
 
     try expectEqual(evalClosure(hostFunc2, 3), .number(6))
     _ = try expectString(evalClosure(hostFunc2, true))
+
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     hostFunc2.release()
+#endif
 }
 
 try test("New Object Construction") {
@@ -386,9 +403,13 @@ try test("ObjectRef Lifetime") {
     let ref2 = evalClosure(identity, ref1).object!
     try expectEqual(ref1.prop_2, .number(2))
     try expectEqual(ref2.prop_2, .number(2))
+
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     identity.release()
+#endif
 }
 
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
 func closureScope() -> ObjectIdentifier {
     let closure = JSClosure { _ in .undefined }
     let result = ObjectIdentifier(closure)
@@ -401,6 +422,7 @@ try test("Closure Identifiers") {
     let oid2 = closureScope()
     try expectEqual(oid1, oid2)
 }
+#endif
 
 func checkArray<T>(_ array: [T]) throws where T: TypedArrayElement {
     try expectEqual(toString(JSTypedArray(array).jsValue().object!), jsStringify(array))
@@ -519,7 +541,7 @@ try test("Timer") {
     interval = JSTimer(millisecondsDelay: 5, isRepeating: true) {
         // ensure that JSTimer is living
         try! expectNotNil(interval)
-        // verify that at least `timeoutMilliseconds * count` passed since the `timeout` 
+        // verify that at least `timeoutMilliseconds * count` passed since the `timeout`
         // timer started
         try! expectEqual(start + timeoutMilliseconds * count <= JSDate().valueOf(), true)
 
@@ -555,7 +577,8 @@ try test("Promise") {
         exp1.fulfill()
         return JSValue.undefined
     }
-    .catch { _ -> JSValue in
+    .catch { err -> JSValue in
+        print(err.object!.stack.string!)
         fatalError("Not fired due to no throw")
     }
     .finally { exp1.fulfill() }

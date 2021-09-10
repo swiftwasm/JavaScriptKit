@@ -14,7 +14,9 @@ build:
 test:
 	cd IntegrationTests && \
 	    CONFIGURATION=debug make test && \
-	    CONFIGURATION=release make test
+	    CONFIGURATION=debug SWIFT_BUILD_FLAGS="-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS" make test && \
+	    CONFIGURATION=release make test && \
+	    CONFIGURATION=release SWIFT_BUILD_FLAGS="-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS" make test
 
 .PHONY: benchmark_setup
 benchmark_setup:
