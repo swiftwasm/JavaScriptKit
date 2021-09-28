@@ -47,9 +47,21 @@ global.globalObject1 = {
             throw 3.0
         },
     },
-    eval_closure: function(fn) {
+    eval_closure: function (fn) {
         return fn(arguments[1])
-    }
+    },
+    observable_obj: {
+        set_called: false,
+        target: new Proxy({
+            nested: {}
+        }, {
+            set(target, key, value) {
+                global.globalObject1.observable_obj.set_called = true;
+                target[key] = value;
+                return true;
+            }
+        })
+    },
 };
 
 global.Animal = function (name, age, isCat) {

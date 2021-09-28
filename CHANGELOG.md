@@ -1,3 +1,52 @@
+# 0.10.1 (29 April 2021)
+
+This is a minor patch release that includes updates to our dependencies and minor documentation
+tweaks.
+
+**Closed issues:**
+
+- Do you accept contributions for wrappers over JavaScript objects? ([#124](https://github.com/swiftwasm/JavaScriptKit/issues/124))
+- Can't read from a file using `JSPromise` ([#121](https://github.com/swiftwasm/JavaScriptKit/issues/121))
+- TypeError when trying to implement a `JSBridgedClass` for `WebSocket.send` ([#120](https://github.com/swiftwasm/JavaScriptKit/issues/120))
+
+**Merged pull requests:**
+
+- Update JS dependencies in package-lock.json ([#126](https://github.com/swiftwasm/JavaScriptKit/pull/126))  via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Fix typo in method documentation ([#125](https://github.com/swiftwasm/JavaScriptKit/pull/125)) via [@revolter](https://github.com/revolter)
+- Update exported func name to match exported name ([#123](https://github.com/swiftwasm/JavaScriptKit/pull/123)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Fix incorrect link in `JSDate` documentation ([#122](https://github.com/swiftwasm/JavaScriptKit/pull/122)) via [@revolter](https://github.com/revolter)
+
+# 0.10.0 (21 January 2021)
+
+This release contains multiple breaking changes in preparation for enabling `async`/`await`, when
+this feature is available in a stable SwiftWasm release. Namely:
+
+* `JSClosure.init(_ body: @escaping ([JSValue]) -> ())` overload is deprecated to simplify type
+checking. Its presence requires explicit type signatures at the place of use. It will be removed
+in a future version of JavaScriptKit.
+* `JSClosure` is no longer a subclass of `JSFunction`. These classes are not related enough to keep
+them in the same class hierarchy.
+As a result, you can no longer call `JSClosure` objects directly from Swift.
+* Introduced `JSOneshotClosure` for closures that are going to be called only once. You don't need
+to manage references to these closures manually, as opposed to `JSClosure`.
+However, they can only be called a single time from the JS side. Subsequent invocation attempts will raise a fatal error on the Swift side.
+* Removed generic parameters on `JSPromise`, now both success and failure values are always assumed
+to be of `JSValue` type. This also significantly simplifies type checking and allows callers to
+fully control type casting if needed.
+
+**Closed issues:**
+
+- DOMKit? ([#21](https://github.com/swiftwasm/JavaScriptKit/issues/21))
+
+**Merged pull requests:**
+
+- Simplify `JSPromise` API ([#115](https://github.com/swiftwasm/JavaScriptKit/pull/115)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Create `FUNDING.yml` ([#117](https://github.com/swiftwasm/JavaScriptKit/pull/117)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Major API change on `JSClosure` ([#113](https://github.com/swiftwasm/JavaScriptKit/pull/113)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Update `package.json` to lockfileVersion 2 ([#114](https://github.com/swiftwasm/JavaScriptKit/pull/114)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Bump `ini` from 1.3.5 to 1.3.8 in `/Example` ([#111](https://github.com/swiftwasm/JavaScriptKit/pull/111)) via [@dependabot](https://github.com/dependabot)
+- Update doc comment in `JSTypedArray.swift` ([#110](https://github.com/swiftwasm/JavaScriptKit/pull/110)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+
 # 0.9.0 (27 November 2020)
 
 This release introduces support for catching `JSError` instances in Swift from throwing JavaScript

@@ -1,14 +1,15 @@
 import _CJavaScriptKit
 
-fileprivate var sharedClosures: [JavaScriptHostFuncRef: ([JSValue]) -> JSValue] = [:]
-
-/// JSClosureProtocol abstracts closure object in JavaScript, whose lifetime is manualy managed
+/// JSClosureProtocol wraps Swift closure objects for use in JavaScript. Conforming types
+/// are responsible for managing the lifetime of the closure they wrap, but can delegate that
+/// task to the user by requiring an explicit `release()` call.
 public protocol JSClosureProtocol: JSValueCompatible {
 
     /// Release this function resource.
     /// After calling `release`, calling this function from JavaScript will fail.
     func release()
 }
+
 
 /// `JSOneshotClosure` is a JavaScript function that can be called only once.
 public class JSOneshotClosure: JSObject, JSClosureProtocol {
@@ -20,10 +21,10 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         let objectId = ObjectIdentifier(self)
         let funcRef = JavaScriptHostFuncRef(bitPattern: Int32(objectId.hashValue))
         // 2. Retain the given body in static storage by `funcRef`.
-        sharedClosures[funcRef] = {
+        JSClosure.sharedClosures[funcRef] = (self, {
             defer { self.release() }
             return body($0)
-        }
+        })
         // 3. Create a new JavaScript function which calls the given Swift function.
         var objectRef: JavaScriptObjectRef = 0
         _create_function(funcRef, &objectRef)
@@ -35,15 +36,12 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
     /// Release this function resource.
     /// After calling `release`, calling this function from JavaScript will fail.
     public func release() {
-        sharedClosures[hostFuncRef] = nil
+        JSClosure.sharedClosures[hostFuncRef] = nil
     }
 }
 
 /// `JSClosure` represents a JavaScript function the body of which is written in Swift.
 /// This type can be passed as a callback handler to JavaScript functions.
-/// Note that the lifetime of `JSClosure` should be managed by users manually
-/// due to GC boundary between Swift and JavaScript.
-/// For further discussion, see also [swiftwasm/JavaScriptKit #33](https://github.com/swiftwasm/JavaScriptKit/pull/33)
 ///
 /// e.g.
 /// ```swift
@@ -55,12 +53,18 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 /// button.addEventListener!("click", JSValue.function(eventListenter))
 /// ...
 /// button.removeEventListener!("click", JSValue.function(eventListenter))
-/// eventListenter.release()
 /// ```
 ///
 public class JSClosure: JSObject, JSClosureProtocol {
+
+    // Note: Retain the closure object itself also to avoid funcRef conflicts
+    fileprivate static var sharedClosures: [JavaScriptHostFuncRef: (object: JSObject, body: ([JSValue]) -> JSValue)] = [:]
+
     private var hostFuncRef: JavaScriptHostFuncRef = 0
-    var isReleased: Bool = false
+
+    #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+    private var isReleased: Bool = false
+    #endif
 
     @available(*, deprecated, message: "This initializer will be removed in the next minor version update. Please use `init(_ body: @escaping ([JSValue]) -> JSValue)` and add `return .undefined` to the end of your closure")
     @_disfavoredOverload
@@ -77,7 +81,7 @@ public class JSClosure: JSObject, JSClosureProtocol {
         let objectId = ObjectIdentifier(self)
         let funcRef = JavaScriptHostFuncRef(bitPattern: Int32(objectId.hashValue))
         // 2. Retain the given body in static storage by `funcRef`.
-        sharedClosures[funcRef] = body
+        Self.sharedClosures[funcRef] = (self, body)
         // 3. Create a new JavaScript function which calls the given Swift function.
         var objectRef: JavaScriptObjectRef = 0
         _create_function(funcRef, &objectRef)
@@ -86,18 +90,15 @@ public class JSClosure: JSObject, JSClosureProtocol {
         id = objectRef
     }
 
-    public func release() {
-        isReleased = true
-        sharedClosures[hostFuncRef] = nil
-    }
-
+    #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     deinit {
         guard isReleased else {
-            // Safari doesn't support `FinalizationRegistry`, so we cannot automatically manage the lifetime of Swift objects
             fatalError("release() must be called on JSClosure objects manually before they are deallocated")
         }
     }
+    #endif
 }
+
 
 // MARK: - `JSClosure` mechanism note
 //
@@ -139,7 +140,7 @@ func _call_host_function_impl(
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
 ) {
-    guard let hostFunc = sharedClosures[hostFuncRef] else {
+    guard let (_, hostFunc) = JSClosure.sharedClosures[hostFuncRef] else {
         fatalError("The function was already released")
     }
     let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
@@ -149,3 +150,36 @@ func _call_host_function_impl(
     let callbackFuncRef = JSFunction(id: callbackFuncRef)
     _ = callbackFuncRef(result)
 }
+
+
+/// [WeakRefs](https://github.com/tc39/proposal-weakrefs) are already Stage 4,
+/// but was added recently enough that older browser versions don’t support it.
+/// Build with `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS` to disable the relevant behavior.
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+
+// MARK: - Legacy Closure Types
+
+extension JSClosure {
+    public func release() {
+        isReleased = true
+        Self.sharedClosures[hostFuncRef] = nil
+    }
+}
+
+@_cdecl("_free_host_function_impl")
+func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {}
+
+#else
+
+extension JSClosure {
+
+    @available(*, deprecated, message: "JSClosure.release() is no longer necessary")
+    public func release() {}
+
+}
+
+@_cdecl("_free_host_function_impl")
+func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {
+    JSClosure.sharedClosures[hostFuncRef] = nil
+}
+#endif

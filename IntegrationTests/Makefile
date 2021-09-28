@@ -1,11 +1,13 @@
 CONFIGURATION ?= debug
+SWIFT_BUILD_FLAGS ?=
 
 FORCE:
 TestSuites/.build/$(CONFIGURATION)/%.wasm: FORCE
 	swift build --package-path TestSuites \
 	            --product $(basename $(notdir $@)) \
 	            --triple wasm32-unknown-wasi \
-	            --configuration $(CONFIGURATION)
+	            --configuration $(CONFIGURATION) \
+		    $(SWIFT_BUILD_FLAGS)
 
 dist/%.wasm: TestSuites/.build/$(CONFIGURATION)/%.wasm
 	mkdir -p dist
