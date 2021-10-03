@@ -4,6 +4,7 @@
 
 import _CJavaScriptEventLoop
 
+#if compiler(>=5.5)
 struct QueueState: Sendable {
     fileprivate var headJob: UnownedJob? = nil
     fileprivate var isSpinning: Bool = false
@@ -83,3 +84,4 @@ fileprivate struct JobFlags {
     }
   }
 }
+#endif

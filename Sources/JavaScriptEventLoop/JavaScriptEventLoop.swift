@@ -1,6 +1,7 @@
 import JavaScriptKit
 import _CJavaScriptEventLoop
 
+#if compiler(>=5.5)
 
 public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
@@ -106,3 +107,5 @@ public extension JSPromise {
         }
     }
 }
+
+#endif

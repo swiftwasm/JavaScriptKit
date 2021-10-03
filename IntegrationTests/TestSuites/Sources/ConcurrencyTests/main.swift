@@ -1,6 +1,7 @@
 import JavaScriptEventLoop
 import JavaScriptKit
 
+#if compiler(>=5.5)
 
 func entrypoint() async throws {
     struct E: Error, Equatable {
@@ -90,5 +91,8 @@ Task {
         print(error)
     }
 }
+
+#endif
+
 
 #endif
