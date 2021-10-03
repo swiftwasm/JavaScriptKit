@@ -1,5 +1,6 @@
 import JavaScriptKit
 
+#if compiler(>=5.5)
 var printTestNames = false
 // Uncomment the next line to print the name of each test suite before running it.
 // This will make it easier to debug any errors that occur on the JS side.
@@ -122,3 +123,5 @@ func expectNotNil<T>(_ value: T?, file: StaticString = #file, line: UInt = #line
         throw MessageError("Expect a non-nil value", file: file, line: line, column: column)
     }
 }
+
+#endif
