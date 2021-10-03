@@ -1,5 +1,10 @@
 import JavaScriptEventLoop
 import JavaScriptKit
+#if canImport(WASILibc)
+import WASILibc
+#elseif canImport(Darwin)
+import Darwin
+#endif
 
 #if compiler(>=5.5)
 
@@ -43,12 +48,55 @@ func entrypoint() async throws {
             cont.resume(returning: 1)
         }
         try expectEqual(value, 1)
+
+        let error = try await expectAsyncThrow(
+            try await withUnsafeThrowingContinuation { (cont: UnsafeContinuation<Never, Error>) in
+                cont.resume(throwing: E(value: 2))
+            }
+        )
+        let e = try expectCast(error, to: E.self)
+        try expectEqual(e.value, 2)
     }
 
     try await asyncTest("Task.sleep(_:)") {
-        await Task.sleep(1_000_000_000)
+        let start = time(nil)
+        await Task.sleep(2_000_000_000)
+        let diff = difftime(time(nil), start);
+        try expectEqual(diff >= 2, true)
     }
 
+    try await asyncTest("Job reordering based on priority") {
+        class Context: @unchecked Sendable {
+            var completed: [String] = []
+        }
+        let context = Context()
+
+        // When no priority, they should be ordered by the enqueued order
+        let t1 = Task(priority: nil) {
+            context.completed.append("t1")
+        }
+        let t2 = Task(priority: nil) {
+            context.completed.append("t2")
+        }
+
+        _ = await (t1.value, t2.value)
+        try expectEqual(context.completed, ["t1", "t2"])
+
+        context.completed = []
+        // When high priority is enqueued after a low one, they should be re-ordered
+        let t3 = Task(priority: .low) {
+            context.completed.append("t3")
+        }
+        let t4 = Task(priority: .high) {
+            context.completed.append("t4")
+        }
+        let t5 = Task(priority: .low) {
+            context.completed.append("t5")
+        }
+
+        _ = await (t3.value, t4.value, t5.value)
+        try expectEqual(context.completed, ["t4", "t3", "t5"])
+    }
     // FIXME(katei): Somehow it doesn't work due to a mysterious unreachable inst
     // at the end of thunk.
     // This issue is not only on JS host environment, but also on standalone coop executor.
