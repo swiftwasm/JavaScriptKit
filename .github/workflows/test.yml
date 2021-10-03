@@ -12,7 +12,7 @@ jobs:
         toolchain:
           - wasm-5.3.1-RELEASE
           - wasm-5.4.0-RELEASE
-          - wasm-5.5-SNAPSHOT-2021-09-01-a
+          - wasm-5.5-SNAPSHOT-2021-10-02-a
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
