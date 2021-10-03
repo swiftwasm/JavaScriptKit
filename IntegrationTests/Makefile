@@ -30,8 +30,13 @@ run_benchmark:
 .PHONY: benchmark
 benchmark: benchmark_setup run_benchmark
 
-.PHONY: test
-test: build_rt dist/PrimaryTests.wasm
+.PHONY: primary_test
+primary_test: build_rt dist/PrimaryTests.wasm
 	node bin/primary-tests.js
+
+.PHONY: concurrency_test
 concurrency_test: build_rt dist/ConcurrencyTests.wasm
 	node bin/concurrency-tests.js
+
+.PHONY: test
+test: concurrency_test primary_test
