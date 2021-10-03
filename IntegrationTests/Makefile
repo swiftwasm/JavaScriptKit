@@ -33,3 +33,5 @@ benchmark: benchmark_setup run_benchmark
 .PHONY: test
 test: build_rt dist/PrimaryTests.wasm
 	node bin/primary-tests.js
+concurrency_test: build_rt dist/ConcurrencyTests.wasm
+	node bin/concurrency-tests.js

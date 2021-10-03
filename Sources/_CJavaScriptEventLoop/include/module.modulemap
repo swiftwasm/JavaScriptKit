@@ -1,0 +1,4 @@
+module _CJavaScriptEventLoop {
+    header "_CJavaScriptEventLoop.h"
+    export *
+}
