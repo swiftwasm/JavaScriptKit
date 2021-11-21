@@ -10,7 +10,6 @@ jobs:
       matrix:
         os: [macos-10.15, macos-11, ubuntu-18.04, ubuntu-20.04]
         toolchain:
-          - wasm-5.3.1-RELEASE
           - wasm-5.4.0-RELEASE
           - wasm-5.5-SNAPSHOT-2021-10-02-a
     runs-on: ${{ matrix.os }}
