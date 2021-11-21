@@ -10,5 +10,13 @@ let package = Package(
         ),
     ],
     dependencies: [.package(name: "JavaScriptKit", path: "../../")],
-    targets: [.target(name: "JavaScriptKitExample", dependencies: ["JavaScriptKit"])]
+    targets: [
+        .target(
+            name: "JavaScriptKitExample",
+            dependencies: [
+                "JavaScriptKit",
+                .product(name: "JavaScriptEventLoop", package: "JavaScriptKit")
+            ]
+        )
+    ]
 )

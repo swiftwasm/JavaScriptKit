@@ -1,3 +1,36 @@
+# 0.11.0 (22 November 2021)
+
+This release adds support for `async`/`await` and SwiftWasm 5.5. Use the new `value` async property
+on a `JSPromise` instance to await for its result. You'll have to add a dependency on the new
+`JavaScriptEventLoop` target in your `Package.swift`, `import JavaScriptEventLoop`, and call 
+`JavaScriptEventLoop.installGlobalExecutor()` in your code before you start using `await` and `Task`
+APIs.
+
+Additionally, manual memory management API of `JSClosure` has been removed to improve usability.
+This significantly bumps minimum browser version requirements for users of apps depending on
+JavaScriptKit. Previous manual memory management mode is still available though with a special
+compiler flags, see [`README.md`](./README.md) for more details.
+
+This new release of JavaScriptKit may work with SwiftWasm 5.4 and 5.3, but is no longer tested with
+those versions due to compatibility issues introduced on macOS by latest versions of Xcode.
+
+**Closed issues:**
+
+- Enchancement: Add a link to the docs  ([#136](https://github.com/swiftwasm/JavaScriptKit/issues/136))
+- Use FinalizationRegistry to auto-deinit `JSClosure` ([#131](https://github.com/swiftwasm/JavaScriptKit/issues/131))
+- `make test` crashes due to `JSClosure` memory issues ([#129](https://github.com/swiftwasm/JavaScriptKit/issues/129))
+- Avoid manual memory management with `JSClosure` ([#106](https://github.com/swiftwasm/JavaScriptKit/issues/106))
+
+**Merged pull requests:**
+
+- Fix recursion in `JSTypedArray` initializer ([#142](https://github.com/swiftwasm/JavaScriptKit/pull/142)) via [@PatrickPijnappel](https://github.com/PatrickPijnappel)
+- Experimental global executor cooperating with JS event loop ([#141](https://github.com/swiftwasm/JavaScriptKit/pull/141)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Update NPM dependencies of `Example` project ([#140](https://github.com/swiftwasm/JavaScriptKit/pull/140)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Refactor `JSClosure` to leverage `FinalizationRegistry` ([#128](https://github.com/swiftwasm/JavaScriptKit/pull/128)) via [@j-f1](https://github.com/j-f1)
+- Test with the latest 5.5 snapshot ([#138](https://github.com/swiftwasm/JavaScriptKit/pull/138)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Test with multiple toolchain versions ([#135](https://github.com/swiftwasm/JavaScriptKit/pull/135)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Gardening tests ([#133](https://github.com/swiftwasm/JavaScriptKit/pull/133)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+
 # 0.10.1 (29 April 2021)
 
 This is a minor patch release that includes updates to our dependencies and minor documentation

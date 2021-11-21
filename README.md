@@ -53,7 +53,37 @@ let swiftPet: Pet = try JSValueDecoder().decode(from: jsPet)
 JSObject.global.alert!("Swift is running in the browser!")
 ```
 
-### Usage in a browser application
+## Requirements 
+
+### For developers
+
+- macOS 11 and Xcode 13.0. *Xcode 13.1 is currently not supported.*
+- [Swift 5.4 or later](https://swift.org/download/) and Ubuntu 18.04 if you'd like to use Linux.
+  Other Linux distributions are currently not supported.
+
+### For users of apps depending 
+
+Any recent browser that [supports WebAssembly](https://caniuse.com/#feat=wasm) and required 
+JavaScript features should work, which currently includes:
+
+- Edge 84+
+- Firefox 79+
+- Chrome 84+
+- Desktop Safari 14.1+
+- Mobile Safari 14.8+
+
+If you need to support older browser versions, you'll have to build with
+`JAVASCRIPTKIT_WITHOUT_WEAKREFS` flag, passing `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS` flags
+when compiling. This should lower browser requirements to these versions:
+
+- Edge 16+
+- Firefox 61+
+- Chrome 66+
+- (Mobile) Safari 12+
+
+Not all of these versions are tested on regular basis though, compatibility reports are very welcome!
+
+## Usage in a browser application
 
 The easiest way to get started with JavaScriptKit in your browser app is with [the `carton`
 bundler](https://carton.dev).
@@ -104,7 +134,7 @@ You can also build your project with webpack.js and a manually installed SwiftWa
 see the following sections and the [Example](https://github.com/swiftwasm/JavaScriptKit/tree/main/Example)
 directory for more information in this more advanced use case.
 
-### Manual toolchain installation
+## Manual toolchain installation
 
 This library only supports [`swiftwasm/swift`](https://github.com/swiftwasm/swift) toolchain distribution.
 The toolchain can be installed via [`swiftenv`](https://github.com/kylef/swiftenv), in
@@ -115,11 +145,11 @@ especially if you change anything in the JavaScript runtime parts. This is becau
 embedded in `carton` and currently can't be replaced dynamically with the JavaScript code you've
 updated locally.
 
-Just pass a toolchain archive URL for [the latest SwiftWasm 5.3
-snapshot](https://github.com/swiftwasm/swift/releases) appropriate for your platform:
+Just pass a toolchain archive URL for [the latest SwiftWasm 5.5
+release](https://github.com/swiftwasm/swift/releases) appropriate for your platform:
 
 ```sh
-$ swiftenv install https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.3.0-RELEASE/swift-wasm-5.3.0-RELEASE-macos_x86_64.pkg
+$ swiftenv install https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.5.0-RELEASE/swift-wasm-5.5.0-RELEASE-macos_x86_64.pkg
 ```
 
 You can also use the `install-toolchain.sh` helper script that uses a hardcoded toolchain snapshot:
@@ -127,6 +157,6 @@ You can also use the `install-toolchain.sh` helper script that uses a hardcoded 
 ```sh
 $ ./scripts/install-toolchain.sh
 $ swift --version
-Swift version 5.3 (swiftlang-5.3.0)
-Target: x86_64-apple-darwin19.6.0
+Swift version 5.5 (swiftlang-5.5.0)
+Target: arm64-apple-darwin20.6.0
 ```
