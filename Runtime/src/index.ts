@@ -154,7 +154,7 @@ export class SwiftRuntime {
         const exports = (this.instance
             .exports as any) as SwiftRuntimeExportedFunctions;
         if (exports.swjs_library_version() != this.version) {
-            throw new Error("The versions of JavaScriptKit are incompatible.");
+            throw new Error(`The versions of JavaScriptKit are incompatible. ${exports.swjs_library_version()} != ${this.version}`);
         }
     }
     get closureHeap(): SwiftClosureHeap | null {

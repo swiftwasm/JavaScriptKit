@@ -50,10 +50,10 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         }
         self.init(unsafelyWrapping: JSObject(id: resultObj))
     }
-    
+
     /// Convenience initializer for `Sequence`.
-    public convenience init<S: Sequence>(_ sequence: S) {
-        self.init(sequence.map({ $0 }))
+    public convenience init<S: Sequence>(_ sequence: S) where S.Element == Element {
+        self.init(Array(sequence))
     }
 }
 

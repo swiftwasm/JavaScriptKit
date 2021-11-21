@@ -60,7 +60,7 @@ func entrypoint() async throws {
 
     try await asyncTest("Task.sleep(_:)") {
         let start = time(nil)
-        await Task.sleep(2_000_000_000)
+        try await Task.sleep(nanoseconds: 2_000_000_000)
         let diff = difftime(time(nil), start);
         try expectEqual(diff >= 2, true)
     }
@@ -100,9 +100,9 @@ func entrypoint() async throws {
     // FIXME(katei): Somehow it doesn't work due to a mysterious unreachable inst
     // at the end of thunk.
     // This issue is not only on JS host environment, but also on standalone coop executor.
-    // try await asyncTest("Task.sleep(nanoseconds:)") {
-    //     try await Task.sleep(nanoseconds: 1_000_000_000)
-    // }
+    try await asyncTest("Task.sleep(nanoseconds:)") {
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+    }
 }
 
 
