@@ -441,6 +441,10 @@ try test("TypedArray") {
     let typedArray = JSTypedArray(numbers)
     try expectEqual(typedArray[12], 12)
 
+    let numbersSet = Set(0 ... 255)
+    let typedArrayFromSet = JSTypedArray(numbersSet)
+    try expectEqual(typedArrayFromSet.jsObject.length, 12)
+
     try checkArray([0, .max, 127, 1] as [UInt8])
     try checkArray([0, 1, .max, .min, -1] as [Int8])
 
