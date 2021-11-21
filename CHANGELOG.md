@@ -1,7 +1,7 @@
 # 0.11.0 (22 November 2021)
 
 This release adds support for `async`/`await` and SwiftWasm 5.5. Use the new `value` async property
-on a `JSPromise` instance to await for its result. You'll have to add a dependency on the new
+on a `JSPromise` instance to `await` for its result. You'll have to add a dependency on the new
 `JavaScriptEventLoop` target in your `Package.swift`, `import JavaScriptEventLoop`, and call 
 `JavaScriptEventLoop.installGlobalExecutor()` in your code before you start using `await` and `Task`
 APIs.
