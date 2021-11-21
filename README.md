@@ -53,6 +53,38 @@ let swiftPet: Pet = try JSValueDecoder().decode(from: jsPet)
 JSObject.global.alert!("Swift is running in the browser!")
 ```
 
+### `async`/`await`
+
+Starting with SwiftWasm 5.5 you can use `async`/`await` with `JSPromise` objects. This requires
+a few additional steps though (you can skip these steps if your app depends on
+[Tokamak](https://tokamak.dev)):
+
+1. Make sure that your target depends on `JavaScriptEventLoop` in your `Packages.swift`:
+
+```swift
+.target(
+    name: "JavaScriptKitExample",
+    dependencies: [
+        "JavaScriptKit",
+        .product(name: "JavaScriptEventLoop", package: "JavaScriptKit")
+    ]
+)
+```
+
+2. Add an explicit import in the code that executes **before* you start using `await` and/or `Task`
+APIs (most likely in `main.swift`):
+
+```swift
+import JavaScriptEventLoop
+```
+
+3. Run this function **before* you start using `await` and/or `Task` APIs (again, most likely in
+`main.swift`):
+
+```swift
+JavaScriptEventLoop.installGlobalExecutor()
+```
+
 ## Requirements 
 
 ### For developers
