@@ -137,7 +137,7 @@ since this OS does not need back-deployment.
 - [Swift 5.5 or later](https://swift.org/download/) and Ubuntu 18.04 if you'd like to use Linux.
   Other Linux distributions are currently not supported.
 
-### For users of apps depending 
+### For users of apps depending on JavaScriptKit
 
 Any recent browser that [supports WebAssembly](https://caniuse.com/#feat=wasm) and required 
 JavaScript features should work, which currently includes:
