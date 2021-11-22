@@ -14,10 +14,13 @@ compiler flags, see [`README.md`](./README.md) for more details.
 This new release of JavaScriptKit may work with SwiftWasm 5.4 and 5.3, but is no longer tested with
 those versions due to compatibility issues introduced on macOS by latest versions of Xcode.
 
+Many thanks to [@j-f1](https://github.com/j-f1), [@kateinoigakukun](https://github.com/kateinoigakukun), 
+and [@PatrickPijnappel](https://github.com/PatrickPijnappel) for their contributions to this release!
+
 **Closed issues:**
 
 - Enchancement: Add a link to the docs  ([#136](https://github.com/swiftwasm/JavaScriptKit/issues/136))
-- Use FinalizationRegistry to auto-deinit `JSClosure` ([#131](https://github.com/swiftwasm/JavaScriptKit/issues/131))
+- Use `FinalizationRegistry` to auto-deinit `JSClosure` ([#131](https://github.com/swiftwasm/JavaScriptKit/issues/131))
 - `make test` crashes due to `JSClosure` memory issues ([#129](https://github.com/swiftwasm/JavaScriptKit/issues/129))
 - Avoid manual memory management with `JSClosure` ([#106](https://github.com/swiftwasm/JavaScriptKit/issues/106))
 
