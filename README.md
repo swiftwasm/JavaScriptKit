@@ -85,12 +85,56 @@ import JavaScriptEventLoop
 JavaScriptEventLoop.installGlobalExecutor()
 ```
 
+Then you can `await` on the `value` property of `JSPromise` instances, like in the example below:
+
+```swift
+import JavaScriptKit
+import JavaScriptEventLoop
+
+let alert = JSObject.global.alert.function!
+let document = JSObject.global.document
+
+private let jsFetch = JSObject.global.fetch.function!
+func fetch(_ url: String) -> JSPromise {
+    JSPromise(jsFetch(url).object!)!
+}
+
+JavaScriptEventLoop.installGlobalExecutor()
+
+struct Response: Decodable {
+    let uuid: String
+}
+
+var asyncButtonElement = document.createElement("button")
+asyncButtonElement.innerText = "Fetch UUID demo"
+asyncButtonElement.onclick = .object(JSClosure { _ in
+    Task {
+        do {
+            let response = try await fetch("https://httpbin.org/uuid").value
+            let json = try await JSPromise(response.json().object!)!.value
+            let parsedResponse = try JSValueDecoder().decode(Response.self, from: json)
+            alert(parsedResponse.uuid)
+        } catch {
+            print(error)
+        }
+    }
+
+    return .undefined
+})
+
+_ = document.body.appendChild(asyncButtonElement)
+```
+
 ## Requirements 
 
 ### For developers
 
-- macOS 11 and Xcode 13.0. *Xcode 13.1 is currently not supported.*
-- [Swift 5.4 or later](https://swift.org/download/) and Ubuntu 18.04 if you'd like to use Linux.
+- macOS 11 and Xcode 13.2 or later versions, which support Swift Concurrency back-deployment. 
+To use earlier versions of Xcode on macOS 11 you'll have to 
+add `.unsafeFlags(["-Xfrontend", "-disable-availability-checking"])` in `Package.swift` manifest of
+your package that depends on JavaScriptKit. You can also use Xcode 13.0 and 13.1 on macOS Monterey,
+since this OS does not need back-deployment.
+- [Swift 5.5 or later](https://swift.org/download/) and Ubuntu 18.04 if you'd like to use Linux.
   Other Linux distributions are currently not supported.
 
 ### For users of apps depending 
