@@ -1,3 +1,17 @@
+# 0.11.1 (22 November 2021)
+
+This is a bugfix release that removes a requirement for macOS Monterey in `Package.swift` for this
+package. `README.md` was updated to explicitly specify that if you're building an app or a library
+that depends on JavaScriptKit for macOS (i.e. cross-platform code that supports both WebAssembly
+and macOS), you need either
+* macOS Monterey that has the new Swift concurrency runtime available, or
+* any version of macOS that supports Swift concurrency back-deployment with Xcode 13.2 or later, or
+* add `.unsafeFlags(["-Xfrontend", "-disable-availability-checking"])` in `Package.swift` manifest.
+
+**Merged pull requests:**
+
+- Remove macOS Monterey requirement from `Package.swift` ([#144](https://github.com/swiftwasm/JavaScriptKit/pull/144)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+
 # 0.11.0 (22 November 2021)
 
 This release adds support for `async`/`await` and SwiftWasm 5.5. Use the new `value` async property
