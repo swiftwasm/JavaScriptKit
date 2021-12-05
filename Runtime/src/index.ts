@@ -222,10 +222,7 @@ export class SwiftRuntime {
 
         const writeString = (ptr: pointer, bytes: Uint8Array) => {
             const uint8Memory = new Uint8Array(memory().buffer);
-            for (const [index, byte] of bytes.entries()) {
-                uint8Memory[ptr + index] = byte;
-            }
-            uint8Memory[ptr];
+            uint8Memory.set(bytes, ptr);
         };
 
         const readUInt32 = (ptr: pointer) => {
