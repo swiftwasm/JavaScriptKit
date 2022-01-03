@@ -83,7 +83,7 @@ public class JSFunction: JSObject {
 }
 
 internal func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?, using bridge: JSBridge.Type = CJSBridge.self) throws -> JSValue {
-    let result = arguments.withRawJSValues { (rawValues) -> ThrowingCallResult<RawJSValue> in
+    let result: JSThrowingCallResult<RawJSValue> = arguments.withRawJSValues { (rawValues) in
         if let thisId = this?.id {
             return bridge.call(function: jsFunc.id, this: thisId, args: rawValues)
         } else {

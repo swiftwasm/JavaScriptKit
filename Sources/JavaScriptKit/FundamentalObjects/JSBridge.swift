@@ -15,7 +15,7 @@ extension JSClosure {
     public typealias Ref = _CJavaScriptKit.JavaScriptHostFuncRef
 }
 
-public enum ThrowingCallResult<T> {
+public enum JSThrowingCallResult<T> {
     case success(T)
     case exception(RawJSValue)
 }
@@ -32,10 +32,10 @@ public protocol JSBridge {
     static func decode(string: inout String) -> JSObject.Ref // `inout` to enable the use of withUTF8(_:)
 
     // Functions
-    static func call(function: JSObject.Ref, args: [RawJSValue]) -> ThrowingCallResult<RawJSValue>
-    static func call(function: JSObject.Ref, this: JSObject.Ref, args: [RawJSValue]) -> ThrowingCallResult<RawJSValue>
+    static func call(function: JSObject.Ref, args: [RawJSValue]) -> JSThrowingCallResult<RawJSValue>
+    static func call(function: JSObject.Ref, this: JSObject.Ref, args: [RawJSValue]) -> JSThrowingCallResult<RawJSValue>
     static func new(class: JSObject.Ref, args: [RawJSValue]) -> JSObject.Ref
-    static func throwingNew(class: JSObject.Ref, args: [RawJSValue]) -> ThrowingCallResult<JSObject.Ref>
+    static func throwingNew(class: JSObject.Ref, args: [RawJSValue]) -> JSThrowingCallResult<JSObject.Ref>
     static func createFunction(calling: JSClosure.Ref) -> JSObject.Ref
 
     // Misc

@@ -38,7 +38,7 @@ public struct CJSBridge: JSBridge {
     }
 
     // MARK: Functions
-    public static func call(function: JSObject.Ref, args: [RawJSValue]) -> ThrowingCallResult<RawJSValue> {
+    public static func call(function: JSObject.Ref, args: [RawJSValue]) -> JSThrowingCallResult<RawJSValue> {
         args.withUnsafeBufferPointer { args in
             var kindAndFlags = RawJSValue.KindWithFlags()
             let value = withRawJSValue { jsValue in
@@ -49,7 +49,7 @@ public struct CJSBridge: JSBridge {
         }
     }
 
-    public static func call(function: JSObject.Ref, this: JSObject.Ref, args: [RawJSValue]) -> ThrowingCallResult<RawJSValue> {
+    public static func call(function: JSObject.Ref, this: JSObject.Ref, args: [RawJSValue]) -> JSThrowingCallResult<RawJSValue> {
         args.withUnsafeBufferPointer { args in
             var kindAndFlags = RawJSValue.KindWithFlags()
             let value = withRawJSValue { jsValue in
@@ -66,7 +66,7 @@ public struct CJSBridge: JSBridge {
         }
     }
 
-    public static func throwingNew(class: JSObject.Ref, args: [RawJSValue]) -> ThrowingCallResult<JSObject.Ref> {
+    public static func throwingNew(class: JSObject.Ref, args: [RawJSValue]) -> JSThrowingCallResult<JSObject.Ref> {
         args.withUnsafeBufferPointer { args in
             var kindAndFlags = RawJSValue.KindWithFlags()
             var exception = RawJSValue()
