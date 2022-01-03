@@ -178,10 +178,10 @@ public func getJSValue(this: JSObject, name: JSString) -> JSValue {
     return this.bridge.get(on: this.id, property: name.asInternalJSRef()).jsValue(using: this.bridge)
 }
 
-public func setJSValue(this: JSObject, name: JSString, value: JSValue, using bridge: JSBridge.Type = CJSBridge.self) {
+public func setJSValue(this: JSObject, name: JSString, value: JSValue) {
     assert(this.bridge == name.guts.bridge, "JSBridge mismatch: \(this.bridge) != \(name.guts.bridge)")
     value.withRawJSValue { rawValue in
-        bridge.set(on: this.id, property: name.asInternalJSRef(), to: rawValue)
+        this.bridge.set(on: this.id, property: name.asInternalJSRef(), to: rawValue)
     }
 }
 
