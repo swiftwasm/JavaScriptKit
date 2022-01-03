@@ -197,7 +197,7 @@ extern void _call_function_with_this(const JavaScriptObjectRef _this,
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_new")))
 extern JavaScriptObjectRef _call_new(const JavaScriptObjectRef ref,
-                                     const RawJSValue *argv, const int argc
+                                     const RawJSValue *argv, const int argc);
 
 /// `_call_throwing_new` calls JavaScript object constructor with given arguments list.
 ///
