@@ -193,30 +193,28 @@ extern void _call_function_with_this(const JavaScriptObjectRef _this,
 /// @param ref The target JavaScript constructor to call.
 /// @param argv A list of `RawJSValue` arguments to apply.
 /// @param argc The length of `argv``.
-/// @param result_obj A result pointer of the constructed object.
+/// @returns A reference to the constructed object.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_new")))
-extern void _call_new(const JavaScriptObjectRef ref,
-                      const RawJSValue *argv, const int argc,
-                      JavaScriptObjectRef *result_obj);
+extern JavaScriptObjectRef _call_new(const JavaScriptObjectRef ref,
+                                     const RawJSValue *argv, const int argc);
 
 /// `_call_throwing_new` calls JavaScript object constructor with given arguments list.
 ///
 /// @param ref The target JavaScript constructor to call.
 /// @param argv A list of `RawJSValue` arguments to apply.
 /// @param argc The length of `argv``.
-/// @param result_obj A result pointer of the constructed object.
 /// @param exception_kind A result pointer of JavaScript value kind of thrown exception.
 /// @param exception_payload1 A result pointer of first payload of JavaScript value of thrown exception.
 /// @param exception_payload2 A result pointer of second payload of JavaScript value of thrown exception.
+/// @returns A reference to the constructed object.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_throwing_new")))
-extern void _call_throwing_new(const JavaScriptObjectRef ref,
-                               const RawJSValue *argv, const int argc,
-                               JavaScriptObjectRef *result_obj,
-                               JavaScriptValueKindAndFlags *exception_kind,
-                               JavaScriptPayload1 *exception_payload1,
-                               JavaScriptPayload2 *exception_payload2);
+extern JavaScriptObjectRef _call_throwing_new(const JavaScriptObjectRef ref,
+                                              const RawJSValue *argv, const int argc,
+                                              JavaScriptValueKindAndFlags *exception_kind,
+                                              JavaScriptPayload1 *exception_payload1,
+                                              JavaScriptPayload2 *exception_payload2);
 
 /// `_instanceof` acts like JavaScript `instanceof` operator.
 ///
@@ -232,18 +230,10 @@ extern bool _instanceof(const JavaScriptObjectRef obj,
 /// See also comments on JSFunction.swift
 ///
 /// @param host_func_id The target Swift side function called by the created thunk function.
-/// @param func_ref_ptr A result pointer of created thunk function.
+/// @returns A reference to the newly-created JavaScript thunk function
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_create_function")))
-extern void _create_function(const JavaScriptHostFuncRef host_func_id,
-                             const JavaScriptObjectRef *func_ref_ptr);
-
-/// Decrements reference count of `ref` retained by `SwiftRuntimeHeap` in JavaScript side.
-///
-/// @param ref The target JavaScript object.
-__attribute__((__import_module__("javascript_kit"),
-               __import_name__("swjs_release")))
-extern void _release(const JavaScriptObjectRef ref);
+extern JavaScriptObjectRef _create_function(const JavaScriptHostFuncRef host_func_id);
 
 /// Instantiate a new `TypedArray` object with given elements
 /// This is used to provide an efficient way to create `TypedArray`.
@@ -251,12 +241,18 @@ extern void _release(const JavaScriptObjectRef ref);
 /// @param constructor The `TypedArray` constructor.
 /// @param elements_ptr The elements pointer to initialize. They are assumed to be the same size of `constructor` elements size.
 /// @param length The length of `elements_ptr`
-/// @param result_obj A result pointer of the constructed object.
+/// @returns A reference to the constructed typed array
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_create_typed_array")))
-extern void _create_typed_array(const JavaScriptObjectRef constructor,
-                                const void *elements_ptr, const int length,
-                                JavaScriptObjectRef *result_obj);
+extern JavaScriptObjectRef _create_typed_array(const JavaScriptObjectRef constructor,
+                                               const void *elements_ptr, const int length);
+
+/// Decrements reference count of `ref` retained by `SwiftRuntimeHeap` in JavaScript side.
+///
+/// @param ref The target JavaScript object.
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_release")))
+extern void _release(const JavaScriptObjectRef ref);
 
 #endif
 

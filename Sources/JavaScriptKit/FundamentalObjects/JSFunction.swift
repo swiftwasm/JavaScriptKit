@@ -41,11 +41,7 @@ public class JSFunction: JSObject {
     public func new(arguments: [ConvertibleToJSValue]) -> JSObject {
         arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
-                let argv = bufferPointer.baseAddress
-                let argc = bufferPointer.count
-                var resultObj = JavaScriptObjectRef()
-                _call_new(self.id, argv, Int32(argc), &resultObj)
-                return JSObject(id: resultObj)
+                return JSObject(id: _call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
             }
         }
     }

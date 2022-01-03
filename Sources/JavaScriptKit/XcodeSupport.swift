@@ -63,31 +63,25 @@ import _CJavaScriptKit
     ) { fatalError() }
     func _call_new(
         _: JavaScriptObjectRef,
-        _: UnsafePointer<RawJSValue>!, _: Int32,
-        _: UnsafeMutablePointer<JavaScriptObjectRef>!
-    ) { fatalError() }
+        _: UnsafePointer<RawJSValue>!, _: Int32
+    ) -> JavaScriptObjectRef { fatalError() }
     func _call_throwing_new(
         _: JavaScriptObjectRef,
         _: UnsafePointer<RawJSValue>!, _: Int32,
-        _: UnsafeMutablePointer<JavaScriptObjectRef>!,
         _: UnsafeMutablePointer<JavaScriptValueKindAndFlags>!,
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
-    ) { fatalError() }
+    ) -> JavaScriptObjectRef { fatalError() }
     func _instanceof(
         _: JavaScriptObjectRef,
         _: JavaScriptObjectRef
     ) -> Bool { fatalError() }
-    func _create_function(
-        _: JavaScriptHostFuncRef,
-        _: UnsafePointer<JavaScriptObjectRef>!
-    ) { fatalError() }
-    func _release(_: JavaScriptObjectRef) { fatalError() }
+    func _create_function(_: JavaScriptHostFuncRef) -> JavaScriptObjectRef { fatalError() }
     func _create_typed_array<T: TypedArrayElement>(
         _: JavaScriptObjectRef,
         _: UnsafePointer<T>,
-        _: Int32,
-        _: UnsafeMutablePointer<JavaScriptObjectRef>!
-    ) { fatalError() }
+        _: Int32
+    ) -> JavaScriptObjectRef { fatalError() }
+    func _release(_: JavaScriptObjectRef) { fatalError() }
 
 #endif
