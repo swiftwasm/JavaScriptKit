@@ -44,8 +44,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     ///
     /// - Parameter array: The array that will be copied to create a new instance of TypedArray
     public convenience init(_ array: [Element], using bridge: JSBridge.Type = CJSBridge.self) {
-        let jsArrayRef = array.withUnsafeBufferPointer(bridge.createTypedArray(buffer:))
-        self.init(unsafelyWrapping: JSObject(id: jsArrayRef, using: bridge))
+        self.init(unsafelyWrapping: JSObject(id: bridge.createTypedArray(copying: array), using: bridge))
     }
 
     /// Convenience initializer for `Sequence`.

@@ -26,15 +26,14 @@ public protocol JSBridge {
     static func set(on object: JSObject.Ref, index: Int32, to value: RawJSValue)
     static func get(on object: JSObject.Ref, property: JSObject.Ref) -> RawJSValue
     static func encode(string: JSObject.Ref) -> String
-    // `inout` to enable the use of withUTF8(_:)
-    static func decode(string: inout String) -> JSObject.Ref
+    static func decode(string: inout String) -> JSObject.Ref // `inout` to enable the use of withUTF8(_:)
     static func call(function: JSObject.Ref, args: [RawJSValue]) -> ThrowingCallResult<RawJSValue>
     static func call(function: JSObject.Ref, this: JSObject.Ref, args: [RawJSValue]) -> ThrowingCallResult<RawJSValue>
     static func new(class: JSObject.Ref, args: [RawJSValue]) -> JSObject.Ref
     static func throwingNew(class: JSObject.Ref, args: [RawJSValue]) -> ThrowingCallResult<JSObject.Ref>
     static func instanceof(obj: JSObject.Ref, constructor: JSObject.Ref) -> Bool
     static func createFunction(calling: JSClosure.Ref) -> JSObject.Ref
-    static func createTypedArray<Element: TypedArrayElement>(buffer: UnsafeBufferPointer<Element>) -> JSObject.Ref
+    static func createTypedArray<Element: TypedArrayElement>(copying array: [Element]) -> JSObject.Ref
     static func release(_ obj: JSObject.Ref)
     static var globalRef: JSObject.Ref { get }
 }
