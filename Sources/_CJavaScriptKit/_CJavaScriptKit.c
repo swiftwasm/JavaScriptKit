@@ -36,7 +36,7 @@ void swjs_cleanup_host_function_call(void *argv_buffer) {
 /// this and `SwiftRuntime.version` in `./Runtime/src/index.ts`.
 __attribute__((export_name("swjs_library_version")))
 int swjs_library_version(void) {
-    return 702;
+    return 703;
 }
 
 int _library_features(void);
