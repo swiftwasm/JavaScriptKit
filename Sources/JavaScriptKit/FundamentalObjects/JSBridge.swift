@@ -2,12 +2,7 @@ import Foundation
 import _CJavaScriptKit
 
 public typealias RawJSValue = _CJavaScriptKit.RawJSValue
-extension RawJSValue {
-    typealias Kind = _CJavaScriptKit.JavaScriptValueKind
-    typealias KindWithFlags = _CJavaScriptKit.JavaScriptValueKindAndFlags
-    typealias Payload1 = _CJavaScriptKit.JavaScriptPayload1
-    typealias Payload2 = _CJavaScriptKit.JavaScriptPayload2
-}
+
 extension JSObject {
     public typealias Ref = _CJavaScriptKit.JavaScriptObjectRef
 }

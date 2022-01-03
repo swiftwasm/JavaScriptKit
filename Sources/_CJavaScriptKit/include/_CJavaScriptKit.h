@@ -21,15 +21,15 @@ typedef enum __attribute__((enum_extensibility(closed))) {
   JavaScriptValueKindNull = 4,
   JavaScriptValueKindUndefined = 5,
   JavaScriptValueKindFunction = 6,
-} JavaScriptValueKind;
+} JavaScriptValueKind __attribute__((swift_name("RawJSValue.Kind")));
 
 typedef struct {
   JavaScriptValueKind kind: 31;
   bool isException: 1;
-} JavaScriptValueKindAndFlags;
+} JavaScriptValueKindAndFlags __attribute__((swift_name("RawJSValue.KindAndFlags")));
 
-typedef unsigned JavaScriptPayload1;
-typedef double JavaScriptPayload2;
+typedef unsigned JavaScriptPayload1 __attribute__((swift_name("RawJSValue.Payload1")));
+typedef double JavaScriptPayload2 __attribute__((swift_name("RawJSValue.Payload2")));
 
 /// `RawJSValue` is abstract representaion of JavaScript primitive value.
 ///

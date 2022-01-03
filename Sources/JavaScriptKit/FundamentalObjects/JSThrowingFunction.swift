@@ -41,9 +41,9 @@ public class JSThrowingFunction {
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
 
-                var exceptionKind = JavaScriptValueKindAndFlags()
-                var exceptionPayload1 = JavaScriptPayload1()
-                var exceptionPayload2 = JavaScriptPayload2()
+                var exceptionKind = RawJSValue.KindAndFlags()
+                var exceptionPayload1 = RawJSValue.Payload1()
+                var exceptionPayload2 = RawJSValue.Payload2()
                 let resultObj = _call_throwing_new(
                     self.base.id, argv, Int32(argc),
                     &exceptionKind, &exceptionPayload1, &exceptionPayload2

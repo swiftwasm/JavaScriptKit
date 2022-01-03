@@ -40,7 +40,7 @@ public struct CJSBridge: JSBridge {
     // MARK: Functions
     public static func call(function: JSObject.Ref, args: [RawJSValue]) -> JSThrowingCallResult<RawJSValue> {
         args.withUnsafeBufferPointer { args in
-            var kindAndFlags = RawJSValue.KindWithFlags()
+            var kindAndFlags = RawJSValue.KindAndFlags()
             let value = withRawJSValue { jsValue in
                 _call_function(function, args.baseAddress!, Int32(args.count), &kindAndFlags, &jsValue.payload1, &jsValue.payload2)
                 jsValue.kind = kindAndFlags.kind
@@ -51,7 +51,7 @@ public struct CJSBridge: JSBridge {
 
     public static func call(function: JSObject.Ref, this: JSObject.Ref, args: [RawJSValue]) -> JSThrowingCallResult<RawJSValue> {
         args.withUnsafeBufferPointer { args in
-            var kindAndFlags = RawJSValue.KindWithFlags()
+            var kindAndFlags = RawJSValue.KindAndFlags()
             let value = withRawJSValue { jsValue in
                 _call_function_with_this(function, this, args.baseAddress!, Int32(args.count), &kindAndFlags, &jsValue.payload1, &jsValue.payload2)
                 jsValue.kind = kindAndFlags.kind
@@ -68,7 +68,7 @@ public struct CJSBridge: JSBridge {
 
     public static func throwingNew(class: JSObject.Ref, args: [RawJSValue]) -> JSThrowingCallResult<JSObject.Ref> {
         args.withUnsafeBufferPointer { args in
-            var kindAndFlags = RawJSValue.KindWithFlags()
+            var kindAndFlags = RawJSValue.KindAndFlags()
             var exception = RawJSValue()
             let objectRef = _call_throwing_new(`class`, args.baseAddress!, Int32(args.count), &kindAndFlags, &exception.payload1, &exception.payload2)
             exception.kind = kindAndFlags.kind
