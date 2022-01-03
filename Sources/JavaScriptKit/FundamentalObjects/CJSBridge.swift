@@ -1,10 +1,10 @@
 public struct CJSBridge: JSBridge {
+    // MARK: Objects
     public static func set(on object: JSObject.Ref, property: JSObject.Ref, to value: RawJSValue) {
         _set_prop(object, property, value.kind, value.payload1, value.payload2)
     }
-
     public static func get(on object: JSObject.Ref, property: JSObject.Ref) -> RawJSValue {
-        _withRawJSValue {
+        withRawJSValue {
             _get_prop(object, property, &$0.kind, &$0.payload1, &$0.payload2)
         }
     }
@@ -13,11 +13,12 @@ public struct CJSBridge: JSBridge {
         _set_subscript(object, index, newValue.kind, newValue.payload1, newValue.payload2)
     }
     public static func get(on object: JSObject.Ref, index: Int32) -> RawJSValue {
-        _withRawJSValue {
+        withRawJSValue {
             _get_subscript(object, index, &$0.kind, &$0.payload1, &$0.payload2)
         }
     }
 
+    // MARK: Strings
     public static func encode(string: JSObject.Ref) -> String {
         var bytesRef: JSObject.Ref = 0
         let bytesLength = Int(_encode_string(string, &bytesRef))
@@ -30,17 +31,17 @@ public struct CJSBridge: JSBridge {
         }
         return String(decoding: buffer, as: UTF8.self)
     }
-
     public static func decode(string: inout String) -> JSObject.Ref {
         string.withUTF8 {
             _decode_string($0.baseAddress!, Int32($0.count))
         }
     }
 
+    // MARK: Functions
     public static func call(function: JSObject.Ref, args: [RawJSValue]) -> ThrowingCallResult<RawJSValue> {
         args.withUnsafeBufferPointer { args in
             var kindAndFlags = RawJSValue.KindWithFlags()
-            let value = _withRawJSValue { jsValue in
+            let value = withRawJSValue { jsValue in
                 _call_function(function, args.baseAddress!, Int32(args.count), &kindAndFlags, &jsValue.payload1, &jsValue.payload2)
                 jsValue.kind = kindAndFlags.kind
             }
@@ -51,7 +52,7 @@ public struct CJSBridge: JSBridge {
     public static func call(function: JSObject.Ref, this: JSObject.Ref, args: [RawJSValue]) -> ThrowingCallResult<RawJSValue> {
         args.withUnsafeBufferPointer { args in
             var kindAndFlags = RawJSValue.KindWithFlags()
-            let value = _withRawJSValue { jsValue in
+            let value = withRawJSValue { jsValue in
                 _call_function_with_this(function, this, args.baseAddress!, Int32(args.count), &kindAndFlags, &jsValue.payload1, &jsValue.payload2)
                 jsValue.kind = kindAndFlags.kind
             }
@@ -75,13 +76,13 @@ public struct CJSBridge: JSBridge {
         }
     }
 
-
-    public static func instanceof(obj: JSObject.Ref, constructor: JSObject.Ref) -> Bool {
-        _instanceof(obj, constructor)
-    }
-
     public static func createFunction(calling funcRef: JSClosure.Ref) -> JSObject.Ref {
         _create_function(funcRef)
+    }
+
+    // MARK: Misc
+    public static func instanceof(obj: JSObject.Ref, constructor: JSObject.Ref) -> Bool {
+        _instanceof(obj, constructor)
     }
 
     public static func createTypedArray<Element: TypedArrayElement>(copying array: [Element]) -> JSObject.Ref {
@@ -94,11 +95,5 @@ public struct CJSBridge: JSBridge {
         _release(obj)
     }
 
-    @inlinable public static func _withRawJSValue(perform: (inout RawJSValue) -> Void) -> RawJSValue {
-        var rawValue = RawJSValue()
-        perform(&rawValue)
-        return rawValue
-    }
-
-    public static let globalRef: JSObject.Ref = 0
+    public static let globalThis: JSObject.Ref = 0
 }
