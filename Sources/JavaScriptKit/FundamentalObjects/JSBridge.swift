@@ -40,7 +40,7 @@ public protocol JSBridge {
 
     // Misc
     static func instanceof(obj: JSObject.Ref, constructor: JSObject.Ref) -> Bool
-    static func createTypedArray<Element: TypedArrayElement>(copying array: [Element]) -> JSObject.Ref
+    static func createTypedArray<Element: TypedArrayElement>(copying array: [Element], as class: JSObject.Ref) -> JSObject.Ref
     static func release(_ obj: JSObject.Ref)
     static var globalThis: JSObject.Ref { get }
 }

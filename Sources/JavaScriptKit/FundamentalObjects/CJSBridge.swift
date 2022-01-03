@@ -85,9 +85,9 @@ public struct CJSBridge: JSBridge {
         _instanceof(obj, constructor)
     }
 
-    public static func createTypedArray<Element: TypedArrayElement>(copying array: [Element]) -> JSObject.Ref {
+    public static func createTypedArray<Element: TypedArrayElement>(copying array: [Element], as class: JSObject.Ref) -> JSObject.Ref {
         array.withUnsafeBufferPointer { buffer in
-            _create_typed_array(Element.typedArrayClass.id, buffer.baseAddress!, Int32(buffer.count))
+            _create_typed_array(`class`, buffer.baseAddress!, Int32(buffer.count))
         }
     }
 
