@@ -151,8 +151,8 @@ export class SwiftRuntime {
 
     setInstance(instance: WebAssembly.Instance) {
         this.instance = instance;
-        const exports = this.instance
-            .exports as any as SwiftRuntimeExportedFunctions;
+        const exports = (this.instance
+            .exports as any) as SwiftRuntimeExportedFunctions;
         if (exports.swjs_library_version() != this.version) {
             throw new Error(
                 `The versions of JavaScriptKit are incompatible. ${exports.swjs_library_version()} != ${
@@ -166,8 +166,8 @@ export class SwiftRuntime {
         if (!this.instance)
             throw new Error("WebAssembly instance is not set yet");
 
-        const exports = this.instance
-            .exports as any as SwiftRuntimeExportedFunctions;
+        const exports = (this.instance
+            .exports as any) as SwiftRuntimeExportedFunctions;
         const features = exports.swjs_library_features();
         const librarySupportsWeakRef =
             (features & LibraryFeatures.WeakRefs) != 0;
@@ -194,8 +194,8 @@ export class SwiftRuntime {
         const callHostFunction = (host_func_id: number, args: any[]) => {
             if (!this.instance)
                 throw new Error("WebAssembly instance is not set yet");
-            const exports = this.instance
-                .exports as any as SwiftRuntimeExportedFunctions;
+            const exports = (this.instance
+                .exports as any) as SwiftRuntimeExportedFunctions;
             const argc = args.length;
             const argv = exports.swjs_prepare_host_function_call(argc);
             for (let index = 0; index < args.length; index++) {
@@ -495,10 +495,7 @@ export class SwiftRuntime {
                 }
                 writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
             },
-            swjs_create_function: (
-                host_func_id: number,
-                func_ref_ptr: pointer
-            ) => {
+            swjs_create_function: (host_func_id: number) => {
                 const func = function () {
                     return callHostFunction(
                         host_func_id,
@@ -507,21 +504,23 @@ export class SwiftRuntime {
                 };
                 const func_ref = this.heap.retain(func);
                 this.closureHeap?.alloc(func, func_ref);
-                writeUint32(func_ref_ptr, func_ref);
+                return func_ref;
             },
             swjs_call_throwing_new: (
                 ref: ref,
                 argv: pointer,
                 argc: number,
-                result_obj: pointer,
                 exception_kind_ptr: pointer,
                 exception_payload1_ptr: pointer,
                 exception_payload2_ptr: pointer
             ) => {
-                const obj = this.heap.referenceHeap(ref);
+                const constructor = this.heap.referenceHeap(ref);
                 let result: any;
                 try {
-                    result = Reflect.construct(obj, decodeValues(argv, argc));
+                    result = Reflect.construct(
+                        constructor,
+                        decodeValues(argv, argc)
+                    );
                 } catch (error) {
                     writeValue(
                         error,
@@ -530,7 +529,7 @@ export class SwiftRuntime {
                         exception_payload2_ptr,
                         true
                     );
-                    return;
+                    return -1;
                 }
                 writeValue(
                     null,
@@ -539,17 +538,15 @@ export class SwiftRuntime {
                     exception_payload2_ptr,
                     false
                 );
-                writeUint32(result_obj, this.heap.retain(result));
+                return this.heap.retain(result);
             },
-            swjs_call_new: (
-                ref: ref,
-                argv: pointer,
-                argc: number,
-                result_obj: pointer
-            ) => {
-                const obj = this.heap.referenceHeap(ref);
-                const result = Reflect.construct(obj, decodeValues(argv, argc));
-                writeUint32(result_obj, this.heap.retain(result));
+            swjs_call_new: (ref: ref, argv: pointer, argc: number) => {
+                const constructor = this.heap.referenceHeap(ref);
+                const instance = Reflect.construct(
+                    constructor,
+                    decodeValues(argv, argc)
+                );
+                return this.heap.retain(instance);
             },
             swjs_instanceof: (obj_ref: ref, constructor_ref: ref) => {
                 const obj = this.heap.referenceHeap(obj_ref);
@@ -559,18 +556,18 @@ export class SwiftRuntime {
             swjs_create_typed_array: (
                 constructor_ref: ref,
                 elementsPtr: pointer,
-                length: number,
-                result_obj: pointer
+                length: number
             ) => {
-                const ArrayType: TypedArray =
-                    this.heap.referenceHeap(constructor_ref);
+                const ArrayType: TypedArray = this.heap.referenceHeap(
+                    constructor_ref
+                );
                 const array = new ArrayType(
                     memory().buffer,
                     elementsPtr,
                     length
                 );
                 // Call `.slice()` to copy the memory
-                writeUint32(result_obj, this.heap.retain(array.slice()));
+                return this.heap.retain(array.slice());
             },
             swjs_release: (ref: ref) => {
                 this.heap.release(ref);

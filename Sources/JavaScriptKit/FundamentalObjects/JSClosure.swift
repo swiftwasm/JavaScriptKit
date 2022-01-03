@@ -18,19 +18,16 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
     public init(_ body: @escaping ([JSValue]) -> JSValue) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
         super.init(id: 0)
-        let objectId = ObjectIdentifier(self)
-        let funcRef = JavaScriptHostFuncRef(bitPattern: Int32(objectId.hashValue))
-        // 2. Retain the given body in static storage by `funcRef`.
-        JSClosure.sharedClosures[funcRef] = (self, {
+
+        // 2. Create a new JavaScript function which calls the given Swift function.
+        hostFuncRef = JavaScriptHostFuncRef(bitPattern: Int32(ObjectIdentifier(self).hashValue))
+        id = _create_function(hostFuncRef)
+
+        // 3. Retain the given body in static storage by `funcRef`.
+        JSClosure.sharedClosures[hostFuncRef] = (self, {
             defer { self.release() }
             return body($0)
         })
-        // 3. Create a new JavaScript function which calls the given Swift function.
-        var objectRef: JavaScriptObjectRef = 0
-        _create_function(funcRef, &objectRef)
-
-        hostFuncRef = funcRef
-        id = objectRef
     }
 
     /// Release this function resource.
@@ -78,16 +75,13 @@ public class JSClosure: JSObject, JSClosureProtocol {
     public init(_ body: @escaping ([JSValue]) -> JSValue) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
         super.init(id: 0)
-        let objectId = ObjectIdentifier(self)
-        let funcRef = JavaScriptHostFuncRef(bitPattern: Int32(objectId.hashValue))
-        // 2. Retain the given body in static storage by `funcRef`.
-        Self.sharedClosures[funcRef] = (self, body)
-        // 3. Create a new JavaScript function which calls the given Swift function.
-        var objectRef: JavaScriptObjectRef = 0
-        _create_function(funcRef, &objectRef)
 
-        hostFuncRef = funcRef
-        id = objectRef
+        // 2. Create a new JavaScript function which calls the given Swift function.
+        hostFuncRef = JavaScriptHostFuncRef(bitPattern: Int32(ObjectIdentifier(self).hashValue))
+        id = _create_function(hostFuncRef)
+
+        // 3. Retain the given body in static storage by `funcRef`.
+        Self.sharedClosures[hostFuncRef] = (self, body)
     }
 
     #if JAVASCRIPTKIT_WITHOUT_WEAKREFS

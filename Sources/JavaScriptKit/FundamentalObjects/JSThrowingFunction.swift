@@ -44,10 +44,9 @@ public class JSThrowingFunction {
                 var exceptionKind = JavaScriptValueKindAndFlags()
                 var exceptionPayload1 = JavaScriptPayload1()
                 var exceptionPayload2 = JavaScriptPayload2()
-                var resultObj = JavaScriptObjectRef()
-                _call_throwing_new(
+                let resultObj = _call_throwing_new(
                     self.base.id, argv, Int32(argc),
-                    &resultObj, &exceptionKind, &exceptionPayload1, &exceptionPayload2
+                    &exceptionKind, &exceptionPayload1, &exceptionPayload2
                 )
                 if exceptionKind.isException {
                     let exception = RawJSValue(kind: exceptionKind.kind, payload1: exceptionPayload1, payload2: exceptionPayload2)

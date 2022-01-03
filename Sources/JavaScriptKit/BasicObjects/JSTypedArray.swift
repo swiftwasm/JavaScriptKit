@@ -44,11 +44,10 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     ///
     /// - Parameter array: The array that will be copied to create a new instance of TypedArray
     public convenience init(_ array: [Element]) {
-        var resultObj = JavaScriptObjectRef()
-        array.withUnsafeBufferPointer { ptr in
-            _create_typed_array(Element.typedArrayClass.id, ptr.baseAddress!, Int32(array.count), &resultObj)
+        let jsArrayRef = array.withUnsafeBufferPointer { ptr in
+            _create_typed_array(Element.typedArrayClass.id, ptr.baseAddress!, Int32(array.count))
         }
-        self.init(unsafelyWrapping: JSObject(id: resultObj))
+        self.init(unsafelyWrapping: JSObject(id: jsArrayRef))
     }
 
     /// Convenience initializer for `Sequence`.
