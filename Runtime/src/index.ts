@@ -390,6 +390,7 @@ export class SwiftRuntime {
                     decodeValue(kind, payload1, payload2)
                 );
             },
+
             swjs_get_prop: (
                 ref: ref,
                 name: ref,
@@ -401,6 +402,7 @@ export class SwiftRuntime {
                 const result = Reflect.get(obj, readString(name));
                 writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
             },
+
             swjs_set_subscript: (
                 ref: ref,
                 index: number,
@@ -411,6 +413,7 @@ export class SwiftRuntime {
                 const obj = this.heap.referenceHeap(ref);
                 Reflect.set(obj, index, decodeValue(kind, payload1, payload2));
             },
+
             swjs_get_subscript: (
                 ref: ref,
                 index: number,
@@ -422,12 +425,14 @@ export class SwiftRuntime {
                 const result = Reflect.get(obj, index);
                 writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
             },
+
             swjs_encode_string: (ref: ref, bytes_ptr_result: pointer) => {
                 const bytes = textEncoder.encode(this.heap.referenceHeap(ref));
                 const bytes_ptr = this.heap.retain(bytes);
                 writeUint32(bytes_ptr_result, bytes_ptr);
                 return bytes.length;
             },
+
             swjs_decode_string: (bytes_ptr: pointer, length: number) => {
                 const uint8Memory = new Uint8Array(memory().buffer);
                 const bytes = uint8Memory.subarray(
@@ -437,10 +442,12 @@ export class SwiftRuntime {
                 const string = textDecoder.decode(bytes);
                 return this.heap.retain(string);
             },
+
             swjs_load_string: (ref: ref, buffer: pointer) => {
                 const bytes = this.heap.referenceHeap(ref);
                 writeString(buffer, bytes);
             },
+
             swjs_call_function: (
                 ref: ref,
                 argv: pointer,
@@ -469,6 +476,7 @@ export class SwiftRuntime {
                 }
                 writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
             },
+
             swjs_call_function_with_this: (
                 obj_ref: ref,
                 func_ref: ref,
@@ -495,17 +503,15 @@ export class SwiftRuntime {
                 }
                 writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
             },
-            swjs_create_function: (host_func_id: number) => {
-                const func = function () {
-                    return callHostFunction(
-                        host_func_id,
-                        Array.prototype.slice.call(arguments)
-                    );
-                };
-                const func_ref = this.heap.retain(func);
-                this.closureHeap?.alloc(func, func_ref);
-                return func_ref;
+            swjs_call_new: (ref: ref, argv: pointer, argc: number) => {
+                const constructor = this.heap.referenceHeap(ref);
+                const instance = Reflect.construct(
+                    constructor,
+                    decodeValues(argv, argc)
+                );
+                return this.heap.retain(instance);
             },
+
             swjs_call_throwing_new: (
                 ref: ref,
                 argv: pointer,
@@ -540,19 +546,25 @@ export class SwiftRuntime {
                 );
                 return this.heap.retain(result);
             },
-            swjs_call_new: (ref: ref, argv: pointer, argc: number) => {
-                const constructor = this.heap.referenceHeap(ref);
-                const instance = Reflect.construct(
-                    constructor,
-                    decodeValues(argv, argc)
-                );
-                return this.heap.retain(instance);
-            },
+
             swjs_instanceof: (obj_ref: ref, constructor_ref: ref) => {
                 const obj = this.heap.referenceHeap(obj_ref);
                 const constructor = this.heap.referenceHeap(constructor_ref);
                 return obj instanceof constructor;
             },
+
+            swjs_create_function: (host_func_id: number) => {
+                const func = function () {
+                    return callHostFunction(
+                        host_func_id,
+                        Array.prototype.slice.call(arguments)
+                    );
+                };
+                const func_ref = this.heap.retain(func);
+                this.closureHeap?.alloc(func, func_ref);
+                return func_ref;
+            },
+
             swjs_create_typed_array: (
                 constructor_ref: ref,
                 elementsPtr: pointer,
@@ -569,6 +581,7 @@ export class SwiftRuntime {
                 // Call `.slice()` to copy the memory
                 return this.heap.retain(array.slice());
             },
+
             swjs_release: (ref: ref) => {
                 this.heap.release(ref);
             },

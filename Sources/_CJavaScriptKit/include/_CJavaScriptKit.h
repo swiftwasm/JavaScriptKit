@@ -235,13 +235,6 @@ __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_create_function")))
 extern JavaScriptObjectRef _create_function(const JavaScriptHostFuncRef host_func_id);
 
-/// Decrements reference count of `ref` retained by `SwiftRuntimeHeap` in JavaScript side.
-///
-/// @param ref The target JavaScript object.
-__attribute__((__import_module__("javascript_kit"),
-               __import_name__("swjs_release")))
-extern void _release(const JavaScriptObjectRef ref);
-
 /// Instantiate a new `TypedArray` object with given elements
 /// This is used to provide an efficient way to create `TypedArray`.
 ///
@@ -253,6 +246,13 @@ __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_create_typed_array")))
 extern JavaScriptObjectRef _create_typed_array(const JavaScriptObjectRef constructor,
                                                const void *elements_ptr, const int length);
+
+/// Decrements reference count of `ref` retained by `SwiftRuntimeHeap` in JavaScript side.
+///
+/// @param ref The target JavaScript object.
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_release")))
+extern void _release(const JavaScriptObjectRef ref);
 
 #endif
 
