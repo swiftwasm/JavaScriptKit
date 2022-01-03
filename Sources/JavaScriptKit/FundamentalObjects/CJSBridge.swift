@@ -98,4 +98,5 @@ public struct CJSBridge: JSBridge {
         return rawValue
     }
 
+    public static let globalRef: JSObject.Ref = 0
 }

@@ -50,7 +50,7 @@ public class JSThrowingFunction {
                 )
                 if exceptionKind.isException {
                     let exception = RawJSValue(kind: exceptionKind.kind, payload1: exceptionPayload1, payload2: exceptionPayload2)
-                    return .failure(exception.jsValue())
+                    return .failure(exception.jsValue(using: base.bridge))
                 }
                 return .success(JSObject(id: resultObj, using: base.bridge))
             }

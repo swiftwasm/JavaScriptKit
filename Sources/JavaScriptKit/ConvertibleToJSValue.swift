@@ -173,10 +173,7 @@ extension Array: ConstructibleFromJSValue where Element: ConstructibleFromJSValu
     }
 }
 
-extension RawJSValue: ConvertibleToJSValue {
-    public func jsValue() -> JSValue {
-        jsValue(using: CJSBridge.self)
-    }
+extension RawJSValue {
     public func jsValue(using bridge: JSBridge.Type) -> JSValue {
         switch kind {
         case .invalid:

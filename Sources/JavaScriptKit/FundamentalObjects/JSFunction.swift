@@ -92,8 +92,8 @@ internal func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJS
     }
     switch result {
     case .exception(let exception):
-        throw exception.jsValue()
+        throw exception.jsValue(using: bridge)
     case .success(let value):
-        return value.jsValue()
+        return value.jsValue(using: bridge)
     }
 }

@@ -108,14 +108,13 @@ public class JSObject: Equatable {
         bridge.instanceof(obj: self.id, constructor: constructor.id)
     }
 
-    static let _JS_Predef_Value_Global: JavaScriptObjectRef = 0
 
     /// A `JSObject` of the global scope object.
     /// This allows access to the global properties and global names by accessing the `JSObject` returned.
-    public static let global = JSObject(id: _JS_Predef_Value_Global, using: CJSBridge.self)
+    public static let global = JSObject(id: CJSBridge.globalRef, using: CJSBridge.self)
 
     public static func global(using bridge: JSBridge.Type) -> JSObject {
-        JSObject(id: _JS_Predef_Value_Global, using: bridge)
+        JSObject(id: bridge.globalRef, using: bridge)
     }
 
     deinit { bridge.release(id) }

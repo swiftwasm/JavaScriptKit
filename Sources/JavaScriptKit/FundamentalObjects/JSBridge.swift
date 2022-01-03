@@ -36,4 +36,5 @@ public protocol JSBridge {
     static func createFunction(calling: JSClosure.Ref) -> JSObject.Ref
     static func createTypedArray<Element: TypedArrayElement>(buffer: UnsafeBufferPointer<Element>) -> JSObject.Ref
     static func release(_ obj: JSObject.Ref)
+    static var globalRef: JSObject.Ref { get }
 }

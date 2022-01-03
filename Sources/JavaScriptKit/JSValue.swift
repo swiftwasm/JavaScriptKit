@@ -174,7 +174,7 @@ extension JSValue: ExpressibleByNilLiteral {
 }
 
 public func getJSValue(this: JSObject, name: JSString, using bridge: JSBridge.Type = CJSBridge.self) -> JSValue {
-    bridge.get(on: this.id, property: name.asInternalJSRef()).jsValue()
+    bridge.get(on: this.id, property: name.asInternalJSRef()).jsValue(using: bridge)
 }
 
 public func setJSValue(this: JSObject, name: JSString, value: JSValue, using bridge: JSBridge.Type = CJSBridge.self) {
@@ -184,7 +184,7 @@ public func setJSValue(this: JSObject, name: JSString, value: JSValue, using bri
 }
 
 public func getJSValue(this: JSObject, index: Int32, using bridge: JSBridge.Type = CJSBridge.self) -> JSValue {
-    bridge.get(on: this.id, index: index).jsValue()
+    bridge.get(on: this.id, index: index).jsValue(using: bridge)
 }
 
 public func setJSValue(this: JSObject, index: Int32, value: JSValue, using bridge: JSBridge.Type = CJSBridge.self) {
