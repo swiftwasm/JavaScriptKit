@@ -174,7 +174,7 @@ extension Array: ConstructibleFromJSValue where Element: ConstructibleFromJSValu
 }
 
 extension RawJSValue {
-    public func jsValue(using bridge: JSBridge.Type) -> JSValue {
+    func jsValue(using bridge: JSBridge.Type) -> JSValue {
         switch kind {
         case .invalid:
             fatalError()
