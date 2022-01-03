@@ -19,54 +19,51 @@ public struct JSString: LosslessStringConvertible, Equatable {
     /// The initializers of this type must initialize `jsRef` or `buffer`.
     /// And the uninitialized one will be lazily initialized
     class Guts {
+        let bridge: JSBridge.Type
+
         var shouldDealocateRef: Bool = false
         lazy var jsRef: JavaScriptObjectRef = {
             self.shouldDealocateRef = true
-            return buffer.withUTF8 { bufferPtr in
-                return _decode_string(bufferPtr.baseAddress!, Int32(bufferPtr.count))
-            }
+            return bridge.decode(string: &buffer)
         }()
 
         lazy var buffer: String = {
-            var bytesRef: JavaScriptObjectRef = 0
-            let bytesLength = Int(_encode_string(jsRef, &bytesRef))
-            // +1 for null terminator
-            let buffer = malloc(Int(bytesLength + 1))!.assumingMemoryBound(to: UInt8.self)
-            defer {
-                free(buffer)
-                _release(bytesRef)
-            }
-            _load_string(bytesRef, buffer)
-            buffer[bytesLength] = 0
-            return String(decodingCString: UnsafePointer(buffer), as: UTF8.self)
+            bridge.encode(string: jsRef)
         }()
 
-        init(from stringValue: String) {
+        init(from stringValue: String, using bridge: JSBridge.Type) {
+            self.bridge = bridge
             self.buffer = stringValue
         }
 
-        init(from jsRef: JavaScriptObjectRef) {
+        init(from jsRef: JavaScriptObjectRef, using bridge: JSBridge.Type) {
+            self.bridge = bridge
             self.jsRef = jsRef
             self.shouldDealocateRef = true
         }
 
         deinit {
             guard shouldDealocateRef else { return }
-            _release(jsRef)
+            bridge.release(jsRef)
         }
     }
 
     let guts: Guts
 
-    internal init(jsRef: JavaScriptObjectRef) {
-        self.guts = Guts(from: jsRef)
+    internal init(jsRef: JavaScriptObjectRef, using bridge: JSBridge.Type) {
+        self.guts = Guts(from: jsRef, using: bridge)
+    }
+
+    /// Instantiate a new `JSString` with given Swift.String.
+    public init(_ stringValue: String, using bridge: JSBridge.Type) {
+        self.guts = Guts(from: stringValue, using: bridge)
     }
 
     /// Instantiate a new `JSString` with given Swift.String.
     public init(_ stringValue: String) {
-        self.guts = Guts(from: stringValue)
+        self.init(stringValue, using: CJSBridge.self)
     }
-    
+
     /// A Swift representation of this `JSString`.
     /// Note that this accessor may copy the JS string value into Swift side memory.
     public var description: String { guts.buffer }

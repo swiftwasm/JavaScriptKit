@@ -1,5 +1,3 @@
-import _CJavaScriptKit
-
 /// Objects that can be converted to a JavaScript value, preferably in a lossless manner.
 public protocol ConvertibleToJSValue {
     /// Create a JSValue that represents this object
@@ -177,6 +175,9 @@ extension Array: ConstructibleFromJSValue where Element: ConstructibleFromJSValu
 
 extension RawJSValue: ConvertibleToJSValue {
     public func jsValue() -> JSValue {
+        jsValue(using: CJSBridge.self)
+    }
+    public func jsValue(using bridge: JSBridge.Type) -> JSValue {
         switch kind {
         case .invalid:
             fatalError()
@@ -185,24 +186,24 @@ extension RawJSValue: ConvertibleToJSValue {
         case .number:
             return .number(payload2)
         case .string:
-            return .string(JSString(jsRef: payload1))
+            return .string(JSString(jsRef: payload1, using: bridge))
         case .object:
-            return .object(JSObject(id: UInt32(payload1)))
+            return .object(JSObject(id: UInt32(payload1), using: bridge))
         case .null:
             return .null
         case .undefined:
             return .undefined
         case .function:
-            return .function(JSFunction(id: UInt32(payload1)))
+            return .function(JSFunction(id: UInt32(payload1), using: bridge))
         }
     }
 }
 
 extension JSValue {
     func withRawJSValue<T>(_ body: (RawJSValue) -> T) -> T {
-        let kind: JavaScriptValueKind
-        let payload1: JavaScriptPayload1
-        var payload2: JavaScriptPayload2 = 0
+        let kind: RawJSValue.Kind
+        let payload1: RawJSValue.Payload1
+        var payload2: RawJSValue.Payload2 = 0
         switch self {
         case let .boolean(boolValue):
             kind = .boolean
@@ -215,7 +216,7 @@ extension JSValue {
             return string.withRawJSValue(body)
         case let .object(ref):
             kind = .object
-            payload1 = JavaScriptPayload1(ref.id)
+            payload1 = RawJSValue.Payload1(ref.id)
         case .null:
             kind = .null
             payload1 = 0
@@ -224,7 +225,7 @@ extension JSValue {
             payload1 = 0
         case let .function(functionRef):
             kind = .function
-            payload1 = JavaScriptPayload1(functionRef.id)
+            payload1 = RawJSValue.Payload1(functionRef.id)
         }
         let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
         return body(rawValue)

@@ -16,8 +16,11 @@ import _CJavaScriptKit
 /// reference counting system.
 @dynamicMemberLookup
 public class JSObject: Equatable {
+    internal let bridge: JSBridge.Type
     internal var id: JavaScriptObjectRef
-    init(id: JavaScriptObjectRef) {
+
+    init(id: JavaScriptObjectRef, using bridge: JSBridge.Type) {
+        self.bridge = bridge
         self.id = id
     }
 
@@ -57,24 +60,24 @@ public class JSObject: Equatable {
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The value of the `name` member of this object.
     public subscript(_ name: String) -> JSValue {
-        get { getJSValue(this: self, name: JSString(name)) }
-        set { setJSValue(this: self, name: JSString(name), value: newValue) }
+        get { getJSValue(this: self, name: JSString(name), using: bridge) }
+        set { setJSValue(this: self, name: JSString(name), value: newValue, using: bridge) }
     }
 
     /// Access the `name` member dynamically through JavaScript and Swift runtime bridge library.
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The value of the `name` member of this object.
     public subscript(_ name: JSString) -> JSValue {
-        get { getJSValue(this: self, name: name) }
-        set { setJSValue(this: self, name: name, value: newValue) }
+        get { getJSValue(this: self, name: name, using: bridge) }
+        set { setJSValue(this: self, name: name, value: newValue, using: bridge) }
     }
 
     /// Access the `index` member dynamically through JavaScript and Swift runtime bridge library.
     /// - Parameter index: The index of this object's member to access.
     /// - Returns: The value of the `index` member of this object.
     public subscript(_ index: Int) -> JSValue {
-        get { getJSValue(this: self, index: Int32(index)) }
-        set { setJSValue(this: self, index: Int32(index), value: newValue) }
+        get { getJSValue(this: self, index: Int32(index), using: bridge) }
+        set { setJSValue(this: self, index: Int32(index), value: newValue, using: bridge) }
     }
 
     /// A modifier to call methods as throwing methods capturing `this`
@@ -102,16 +105,20 @@ public class JSObject: Equatable {
     /// - Parameter constructor: The constructor function to check.
     /// - Returns: The result of `instanceof` in the JavaScript environment.
     public func isInstanceOf(_ constructor: JSFunction) -> Bool {
-        _instanceof(id, constructor.id)
+        bridge.instanceof(obj: self.id, constructor: constructor.id)
     }
 
     static let _JS_Predef_Value_Global: JavaScriptObjectRef = 0
 
     /// A `JSObject` of the global scope object.
     /// This allows access to the global properties and global names by accessing the `JSObject` returned.
-    public static let global = JSObject(id: _JS_Predef_Value_Global)
+    public static let global = JSObject(id: _JS_Predef_Value_Global, using: CJSBridge.self)
 
-    deinit { _release(id) }
+    public static func global(using bridge: JSBridge.Type) -> JSObject {
+        JSObject(id: _JS_Predef_Value_Global, using: bridge)
+    }
+
+    deinit { bridge.release(id) }
 
     /// Returns a Boolean value indicating whether two values point to same objects.
     ///

@@ -1,5 +1,3 @@
-import _CJavaScriptKit
-
 /// `JSValue` represents a value in JavaScript.
 @dynamicMemberLookup
 public enum JSValue: Equatable {
@@ -175,33 +173,23 @@ extension JSValue: ExpressibleByNilLiteral {
     }
 }
 
-public func getJSValue(this: JSObject, name: JSString) -> JSValue {
-    var rawValue = RawJSValue()
-    _get_prop(this.id, name.asInternalJSRef(),
-              &rawValue.kind,
-              &rawValue.payload1, &rawValue.payload2)
-    return rawValue.jsValue()
+public func getJSValue(this: JSObject, name: JSString, using bridge: JSBridge.Type = CJSBridge.self) -> JSValue {
+    bridge.get(on: this.id, property: name.asInternalJSRef()).jsValue()
 }
 
-public func setJSValue(this: JSObject, name: JSString, value: JSValue) {
+public func setJSValue(this: JSObject, name: JSString, value: JSValue, using bridge: JSBridge.Type = CJSBridge.self) {
     value.withRawJSValue { rawValue in
-        _set_prop(this.id, name.asInternalJSRef(), rawValue.kind, rawValue.payload1, rawValue.payload2)
+        bridge.set(on: this.id, property: name.asInternalJSRef(), to: rawValue)
     }
 }
 
-public func getJSValue(this: JSObject, index: Int32) -> JSValue {
-    var rawValue = RawJSValue()
-    _get_subscript(this.id, index,
-                   &rawValue.kind,
-                   &rawValue.payload1, &rawValue.payload2)
-    return rawValue.jsValue()
+public func getJSValue(this: JSObject, index: Int32, using bridge: JSBridge.Type = CJSBridge.self) -> JSValue {
+    bridge.get(on: this.id, index: index).jsValue()
 }
 
-public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
+public func setJSValue(this: JSObject, index: Int32, value: JSValue, using bridge: JSBridge.Type = CJSBridge.self) {
     value.withRawJSValue { rawValue in
-        _set_subscript(this.id, index,
-                       rawValue.kind,
-                       rawValue.payload1, rawValue.payload2)
+        bridge.set(on: this.id, index: index, to: rawValue)
     }
 }
 

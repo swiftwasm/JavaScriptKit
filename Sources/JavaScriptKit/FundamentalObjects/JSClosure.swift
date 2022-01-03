@@ -1,5 +1,3 @@
-import _CJavaScriptKit
-
 /// JSClosureProtocol wraps Swift closure objects for use in JavaScript. Conforming types
 /// are responsible for managing the lifetime of the closure they wrap, but can delegate that
 /// task to the user by requiring an explicit `release()` call.
@@ -13,15 +11,15 @@ public protocol JSClosureProtocol: JSValueCompatible {
 
 /// `JSOneshotClosure` is a JavaScript function that can be called only once.
 public class JSOneshotClosure: JSObject, JSClosureProtocol {
-    private var hostFuncRef: JavaScriptHostFuncRef = 0
+    private var hostFuncRef: JSClosure.Ref = 0
 
-    public init(_ body: @escaping ([JSValue]) -> JSValue) {
+    public init(using bridge: JSBridge.Type = CJSBridge.self, _ body: @escaping ([JSValue]) -> JSValue) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
-        super.init(id: 0)
+        super.init(id: 0, using: bridge)
 
         // 2. Create a new JavaScript function which calls the given Swift function.
-        hostFuncRef = JavaScriptHostFuncRef(bitPattern: Int32(ObjectIdentifier(self).hashValue))
-        id = _create_function(hostFuncRef)
+        hostFuncRef = JSClosure.Ref(bitPattern: Int32(ObjectIdentifier(self).hashValue))
+        id = bridge.createFunction(calling: hostFuncRef)
 
         // 3. Retain the given body in static storage by `funcRef`.
         JSClosure.sharedClosures[hostFuncRef] = (self, {
@@ -55,9 +53,9 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 public class JSClosure: JSObject, JSClosureProtocol {
 
     // Note: Retain the closure object itself also to avoid funcRef conflicts
-    fileprivate static var sharedClosures: [JavaScriptHostFuncRef: (object: JSObject, body: ([JSValue]) -> JSValue)] = [:]
+    fileprivate static var sharedClosures: [JSClosure.Ref: (object: JSObject, body: ([JSValue]) -> JSValue)] = [:]
 
-    private var hostFuncRef: JavaScriptHostFuncRef = 0
+    private var hostFuncRef: JSClosure.Ref = 0
 
     #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     private var isReleased: Bool = false
@@ -72,13 +70,13 @@ public class JSClosure: JSObject, JSClosureProtocol {
         })
     }
 
-    public init(_ body: @escaping ([JSValue]) -> JSValue) {
+    public init(using bridge: JSBridge.Type = CJSBridge.self, _ body: @escaping ([JSValue]) -> JSValue) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
-        super.init(id: 0)
+        super.init(id: 0, using: bridge)
 
         // 2. Create a new JavaScript function which calls the given Swift function.
-        hostFuncRef = JavaScriptHostFuncRef(bitPattern: Int32(ObjectIdentifier(self).hashValue))
-        id = _create_function(hostFuncRef)
+        hostFuncRef = JSClosure.Ref(bitPattern: Int32(ObjectIdentifier(self).hashValue))
+        id = bridge.createFunction(calling: hostFuncRef)
 
         // 3. Retain the given body in static storage by `funcRef`.
         Self.sharedClosures[hostFuncRef] = (self, body)
@@ -130,18 +128,18 @@ public class JSClosure: JSObject, JSClosureProtocol {
 
 @_cdecl("_call_host_function_impl")
 func _call_host_function_impl(
-    _ hostFuncRef: JavaScriptHostFuncRef,
+    _ hostFuncRef: JSClosure.Ref,
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
-    _ callbackFuncRef: JavaScriptObjectRef
+    _ callbackFuncRef: JSObject.Ref
 ) {
-    guard let (_, hostFunc) = JSClosure.sharedClosures[hostFuncRef] else {
+    guard let (closure, hostFunc) = JSClosure.sharedClosures[hostFuncRef] else {
         fatalError("The function was already released")
     }
     let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
         $0.jsValue()
     }
     let result = hostFunc(arguments)
-    let callbackFuncRef = JSFunction(id: callbackFuncRef)
+    let callbackFuncRef = JSFunction(id: callbackFuncRef, using: closure.bridge)
     _ = callbackFuncRef(result)
 }
 
@@ -161,7 +159,7 @@ extension JSClosure {
 }
 
 @_cdecl("_free_host_function_impl")
-func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {}
+func _free_host_function_impl(_ hostFuncRef: JSClosure.Ref) {}
 
 #else
 
@@ -173,7 +171,7 @@ extension JSClosure {
 }
 
 @_cdecl("_free_host_function_impl")
-func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {
+func _free_host_function_impl(_ hostFuncRef: JSClosure.Ref) {
     JSClosure.sharedClosures[hostFuncRef] = nil
 }
 #endif

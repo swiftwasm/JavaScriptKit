@@ -40,9 +40,7 @@ public class JSFunction: JSObject {
     /// - Returns: A new instance of this constructor.
     public func new(arguments: [ConvertibleToJSValue]) -> JSObject {
         arguments.withRawJSValues { rawValues in
-            rawValues.withUnsafeBufferPointer { bufferPointer in
-                return JSObject(id: _call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
-            }
+            return JSObject(id: bridge.new(class: self.id, args: rawValues), using: bridge)
         }
     }
 
@@ -84,30 +82,18 @@ public class JSFunction: JSObject {
     }
 }
 
-internal func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) throws -> JSValue {
-    let (result, isException) = arguments.withRawJSValues { rawValues in
-        rawValues.withUnsafeBufferPointer { bufferPointer -> (JSValue, Bool) in
-            let argv = bufferPointer.baseAddress
-            let argc = bufferPointer.count
-            var kindAndFlags = JavaScriptValueKindAndFlags()
-            var payload1 = JavaScriptPayload1()
-            var payload2 = JavaScriptPayload2()
-            if let thisId = this?.id {
-                _call_function_with_this(thisId,
-                                         jsFunc.id, argv, Int32(argc),
-                                         &kindAndFlags, &payload1, &payload2)
-            } else {
-                _call_function(
-                    jsFunc.id, argv, Int32(argc),
-                    &kindAndFlags, &payload1, &payload2
-                )
-            }
-            let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
-            return (result.jsValue(), kindAndFlags.isException)
+internal func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?, using bridge: JSBridge.Type = CJSBridge.self) throws -> JSValue {
+    let result = arguments.withRawJSValues { (rawValues) -> ThrowingCallResult<RawJSValue> in
+        if let thisId = this?.id {
+            return bridge.call(function: jsFunc.id, this: thisId, args: rawValues)
+        } else {
+            return bridge.call(function: jsFunc.id, args: rawValues)
         }
     }
-    if isException {
-        throw result
+    switch result {
+    case .exception(let exception):
+        throw exception.jsValue()
+    case .success(let value):
+        return value.jsValue()
     }
-    return result
 }

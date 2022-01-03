@@ -52,7 +52,7 @@ public class JSThrowingFunction {
                     let exception = RawJSValue(kind: exceptionKind.kind, payload1: exceptionPayload1, payload2: exceptionPayload2)
                     return .failure(exception.jsValue())
                 }
-                return .success(JSObject(id: resultObj))
+                return .success(JSObject(id: resultObj, using: base.bridge))
             }
         }.get()
     }
