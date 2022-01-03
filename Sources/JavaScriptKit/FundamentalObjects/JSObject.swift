@@ -60,24 +60,24 @@ public class JSObject: Equatable {
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The value of the `name` member of this object.
     public subscript(_ name: String) -> JSValue {
-        get { getJSValue(this: self, name: JSString(name), using: bridge) }
-        set { setJSValue(this: self, name: JSString(name), value: newValue, using: bridge) }
+        get { getJSValue(this: self, name: JSString(name)) }
+        set { setJSValue(this: self, name: JSString(name), value: newValue) }
     }
 
     /// Access the `name` member dynamically through JavaScript and Swift runtime bridge library.
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The value of the `name` member of this object.
     public subscript(_ name: JSString) -> JSValue {
-        get { getJSValue(this: self, name: name, using: bridge) }
-        set { setJSValue(this: self, name: name, value: newValue, using: bridge) }
+        get { getJSValue(this: self, name: name) }
+        set { setJSValue(this: self, name: name, value: newValue) }
     }
 
     /// Access the `index` member dynamically through JavaScript and Swift runtime bridge library.
     /// - Parameter index: The index of this object's member to access.
     /// - Returns: The value of the `index` member of this object.
     public subscript(_ index: Int) -> JSValue {
-        get { getJSValue(this: self, index: Int32(index), using: bridge) }
-        set { setJSValue(this: self, index: Int32(index), value: newValue, using: bridge) }
+        get { getJSValue(this: self, index: Int32(index)) }
+        set { setJSValue(this: self, index: Int32(index), value: newValue) }
     }
 
     /// A modifier to call methods as throwing methods capturing `this`
@@ -105,7 +105,8 @@ public class JSObject: Equatable {
     /// - Parameter constructor: The constructor function to check.
     /// - Returns: The result of `instanceof` in the JavaScript environment.
     public func isInstanceOf(_ constructor: JSFunction) -> Bool {
-        bridge.instanceof(obj: self.id, constructor: constructor.id)
+        assert(self.bridge == constructor.bridge, "JSBridge mismatch: \(self.bridge) != \(constructor.bridge)")
+        return bridge.instanceof(obj: self.id, constructor: constructor.id)
     }
 
 

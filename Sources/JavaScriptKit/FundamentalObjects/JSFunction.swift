@@ -39,7 +39,7 @@ public class JSFunction: JSObject {
     /// - Parameter arguments: Arguments to be passed to this constructor function.
     /// - Returns: A new instance of this constructor.
     public func new(arguments: [ConvertibleToJSValue]) -> JSObject {
-        arguments.withRawJSValues { rawValues in
+        arguments.withRawJSValues(using: bridge) { rawValues in
             return JSObject(id: bridge.new(class: self.id, args: rawValues), using: bridge)
         }
     }
@@ -82,18 +82,18 @@ public class JSFunction: JSObject {
     }
 }
 
-internal func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?, using bridge: JSBridge.Type = CJSBridge.self) throws -> JSValue {
-    let result: JSThrowingCallResult<RawJSValue> = arguments.withRawJSValues { (rawValues) in
+internal func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) throws -> JSValue {
+    let result: JSThrowingCallResult<RawJSValue> = arguments.withRawJSValues(using: jsFunc.bridge) { (rawValues) in
         if let thisId = this?.id {
-            return bridge.call(function: jsFunc.id, this: thisId, args: rawValues)
+            return jsFunc.bridge.call(function: jsFunc.id, this: thisId, args: rawValues)
         } else {
-            return bridge.call(function: jsFunc.id, args: rawValues)
+            return jsFunc.bridge.call(function: jsFunc.id, args: rawValues)
         }
     }
     switch result {
     case .exception(let exception):
-        throw exception.jsValue(using: bridge)
+        throw exception.jsValue(using: jsFunc.bridge)
     case .success(let value):
-        return value.jsValue(using: bridge)
+        return value.jsValue(using: jsFunc.bridge)
     }
 }

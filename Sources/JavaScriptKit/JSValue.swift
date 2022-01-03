@@ -173,23 +173,26 @@ extension JSValue: ExpressibleByNilLiteral {
     }
 }
 
-public func getJSValue(this: JSObject, name: JSString, using bridge: JSBridge.Type = CJSBridge.self) -> JSValue {
-    bridge.get(on: this.id, property: name.asInternalJSRef()).jsValue(using: bridge)
+public func getJSValue(this: JSObject, name: JSString) -> JSValue {
+    assert(this.bridge == name.guts.bridge, "JSBridge mismatch: \(this.bridge) != \(name.guts.bridge)")
+    return this.bridge.get(on: this.id, property: name.asInternalJSRef()).jsValue(using: this.bridge)
 }
 
 public func setJSValue(this: JSObject, name: JSString, value: JSValue, using bridge: JSBridge.Type = CJSBridge.self) {
+    assert(this.bridge == name.guts.bridge, "JSBridge mismatch: \(this.bridge) != \(name.guts.bridge)")
     value.withRawJSValue { rawValue in
         bridge.set(on: this.id, property: name.asInternalJSRef(), to: rawValue)
     }
 }
 
-public func getJSValue(this: JSObject, index: Int32, using bridge: JSBridge.Type = CJSBridge.self) -> JSValue {
-    bridge.get(on: this.id, index: index).jsValue(using: bridge)
+public func getJSValue(this: JSObject, index: Int32) -> JSValue {
+    this.bridge.get(on: this.id, index: index).jsValue(using: this.bridge)
 }
 
-public func setJSValue(this: JSObject, index: Int32, value: JSValue, using bridge: JSBridge.Type = CJSBridge.self) {
+public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
+    assert(value.bridge == nil || this.bridge == value.bridge, "JSBridge mismatch: \(this.bridge) != \(value.bridge!)")
     value.withRawJSValue { rawValue in
-        bridge.set(on: this.id, index: index, to: rawValue)
+        this.bridge.set(on: this.id, index: index, to: rawValue)
     }
 }
 
@@ -225,6 +228,21 @@ extension JSValue: CustomStringConvertible {
             return "null"
         case .undefined:
             return "undefined"
+        }
+    }
+}
+
+extension JSValue {
+    internal var bridge: JSBridge.Type? {
+        switch self {
+        case .boolean, .number, .null, .undefined:
+            return nil
+        case .string(let string):
+            return string.guts.bridge
+        case .object(let object):
+            return object.bridge
+        case .function(let function):
+            return function.bridge
         }
     }
 }

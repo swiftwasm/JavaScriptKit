@@ -230,13 +230,19 @@ extension JSValue {
 }
 
 extension Array where Element == ConvertibleToJSValue {
-    func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
+    func withRawJSValues<T>(using bridge: JSBridge.Type, _ body: ([RawJSValue]) -> T) -> T {
         func _withRawJSValues<T>(
             _ values: [ConvertibleToJSValue], _ index: Int,
             _ results: inout [RawJSValue], _ body: ([RawJSValue]) -> T
         ) -> T {
             if index == values.count { return body(results) }
-            return values[index].jsValue().withRawJSValue { (rawValue) -> T in
+
+            let value = values[index].jsValue()
+
+
+            assert(value.bridge == nil || value.bridge == bridge, "JSBridge mismatch: \(bridge) != \(value.bridge!)")
+
+            return value.withRawJSValue { (rawValue) -> T in
                 results.append(rawValue)
                 return _withRawJSValues(values, index + 1, &results, body)
             }
@@ -247,7 +253,7 @@ extension Array where Element == ConvertibleToJSValue {
 }
 
 extension Array where Element: ConvertibleToJSValue {
-    func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
-        [ConvertibleToJSValue].withRawJSValues(self)(body)
+    func withRawJSValues<T>(using bridge: JSBridge.Type, _ body: ([RawJSValue]) -> T) -> T {
+        [ConvertibleToJSValue].withRawJSValues(self)(using: bridge, body)
     }
 }

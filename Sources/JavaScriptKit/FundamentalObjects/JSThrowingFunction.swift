@@ -36,25 +36,15 @@ public class JSThrowingFunction {
     /// - Parameter arguments: Arguments to be passed to this constructor function.
     /// - Returns: A new instance of this constructor.
     public func new(arguments: [ConvertibleToJSValue]) throws -> JSObject {
-        try arguments.withRawJSValues { rawValues -> Result<JSObject, JSValue> in
-            rawValues.withUnsafeBufferPointer { bufferPointer in
-                let argv = bufferPointer.baseAddress
-                let argc = bufferPointer.count
-
-                var exceptionKind = RawJSValue.KindAndFlags()
-                var exceptionPayload1 = RawJSValue.Payload1()
-                var exceptionPayload2 = RawJSValue.Payload2()
-                let resultObj = _call_throwing_new(
-                    self.base.id, argv, Int32(argc),
-                    &exceptionKind, &exceptionPayload1, &exceptionPayload2
-                )
-                if exceptionKind.isException {
-                    let exception = RawJSValue(kind: exceptionKind.kind, payload1: exceptionPayload1, payload2: exceptionPayload2)
-                    return .failure(exception.jsValue(using: base.bridge))
-                }
-                return .success(JSObject(id: resultObj, using: base.bridge))
-            }
-        }.get()
+        let result = arguments.withRawJSValues(using: base.bridge) { rawValues in
+            base.bridge.throwingNew(class: base.id, args: rawValues)
+        }
+        switch result {
+        case .success(let id):
+            return JSObject(id: id, using: base.bridge)
+        case .exception(let error):
+            throw error.jsValue(using: base.bridge)
+        }
     }
 
     /// A variadic arguments version of `new`.
