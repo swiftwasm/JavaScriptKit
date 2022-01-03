@@ -83,17 +83,12 @@ public class JSFunction: JSObject {
 }
 
 internal func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) throws -> JSValue {
-    let result: JSThrowingCallResult<RawJSValue> = arguments.withRawJSValues(using: jsFunc.bridge) { (rawValues) in
+    assert(this == nil || this?.bridge == jsFunc.bridge, "JSBridge mismatch: \(this!.bridge) != \(jsFunc.bridge)")
+    return try arguments.withRawJSValues(using: jsFunc.bridge) { (rawValues) -> JSThrowingCallResult<RawJSValue> in
         if let thisId = this?.id {
             return jsFunc.bridge.call(function: jsFunc.id, this: thisId, args: rawValues)
         } else {
             return jsFunc.bridge.call(function: jsFunc.id, args: rawValues)
         }
-    }
-    switch result {
-    case .exception(let exception):
-        throw exception.jsValue(using: jsFunc.bridge)
-    case .success(let value):
-        return value.jsValue(using: jsFunc.bridge)
-    }
+    }.get(using: jsFunc.bridge).jsValue(using: jsFunc.bridge)
 }

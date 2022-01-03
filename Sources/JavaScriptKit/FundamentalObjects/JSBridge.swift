@@ -13,6 +13,15 @@ extension JSClosure {
 public enum JSThrowingCallResult<T> {
     case success(T)
     case exception(RawJSValue)
+
+    func get(using bridge: JSBridge.Type) throws -> T {
+        switch self {
+        case .success(let value):
+            return value
+        case .exception(let rawValue):
+            throw rawValue.jsValue(using: bridge)
+        }
+    }
 }
 
 public protocol JSBridge {
