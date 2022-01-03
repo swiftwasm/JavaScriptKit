@@ -1,4 +1,4 @@
-public struct CJSBridge: JSBridge {
+public enum CJSBridge: JSBridge {
     // MARK: Objects
     public static func set(on object: JSObject.Ref, property: JSObject.Ref, to value: RawJSValue) {
         _set_prop(object, property, value.kind, value.payload1, value.payload2)
