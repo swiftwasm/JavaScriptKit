@@ -528,6 +528,13 @@ export class SwiftRuntime {
                     );
                     return;
                 }
+                writeValue(
+                    null,
+                    exception_kind_ptr,
+                    exception_payload1_ptr,
+                    exception_payload2_ptr,
+                    false
+                );
                 writeUint32(result_obj, this.heap.retain(result));
             },
             swjs_call_new: (
