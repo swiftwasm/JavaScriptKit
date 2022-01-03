@@ -151,10 +151,14 @@ export class SwiftRuntime {
 
     setInstance(instance: WebAssembly.Instance) {
         this.instance = instance;
-        const exports = (this.instance
-            .exports as any) as SwiftRuntimeExportedFunctions;
+        const exports = this.instance
+            .exports as any as SwiftRuntimeExportedFunctions;
         if (exports.swjs_library_version() != this.version) {
-            throw new Error(`The versions of JavaScriptKit are incompatible. ${exports.swjs_library_version()} != ${this.version}`);
+            throw new Error(
+                `The versions of JavaScriptKit are incompatible. ${exports.swjs_library_version()} != ${
+                    this.version
+                }`
+            );
         }
     }
     get closureHeap(): SwiftClosureHeap | null {
@@ -162,8 +166,8 @@ export class SwiftRuntime {
         if (!this.instance)
             throw new Error("WebAssembly instance is not set yet");
 
-        const exports = (this.instance
-            .exports as any) as SwiftRuntimeExportedFunctions;
+        const exports = this.instance
+            .exports as any as SwiftRuntimeExportedFunctions;
         const features = exports.swjs_library_features();
         const librarySupportsWeakRef =
             (features & LibraryFeatures.WeakRefs) != 0;
@@ -190,8 +194,8 @@ export class SwiftRuntime {
         const callHostFunction = (host_func_id: number, args: any[]) => {
             if (!this.instance)
                 throw new Error("WebAssembly instance is not set yet");
-            const exports = (this.instance
-                .exports as any) as SwiftRuntimeExportedFunctions;
+            const exports = this.instance
+                .exports as any as SwiftRuntimeExportedFunctions;
             const argc = args.length;
             const argv = exports.swjs_prepare_host_function_call(argc);
             for (let index = 0; index < args.length; index++) {
@@ -558,9 +562,8 @@ export class SwiftRuntime {
                 length: number,
                 result_obj: pointer
             ) => {
-                const ArrayType: TypedArray = this.heap.referenceHeap(
-                    constructor_ref
-                );
+                const ArrayType: TypedArray =
+                    this.heap.referenceHeap(constructor_ref);
                 const array = new ArrayType(
                     memory().buffer,
                     elementsPtr,
