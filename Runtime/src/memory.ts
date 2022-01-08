@@ -18,9 +18,8 @@ export class Memory {
     getObject = (ref: number) => this.heap.referenceHeap(ref);
     release = (ref: number) => this.heap.release(ref);
 
-    writeBytes(ptr: pointer, bytes: Uint8Array) {
+    writeBytes = (ptr: pointer, bytes: Uint8Array) =>
         this.bytes.set(bytes, ptr);
-    }
 
     readUint32 = (ptr: pointer) => this.dataView.getUint32(ptr, true);
     readFloat64 = (ptr: pointer) => this.dataView.getFloat64(ptr, true);
