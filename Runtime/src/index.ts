@@ -20,6 +20,9 @@ export class SwiftRuntime {
     private _closureDeallocator: SwiftClosureDeallocator | null;
     private version: number = 703;
 
+    private textDecoder = new TextDecoder("utf-8");
+    private textEncoder = new TextEncoder(); // Only support utf-8
+
     constructor() {
         this._instance = null;
         this._memory = null;
@@ -99,9 +102,6 @@ export class SwiftRuntime {
     }
 
     importObjects() {
-        const textDecoder = new TextDecoder("utf-8");
-        const textEncoder = new TextEncoder(); // Only support utf-8
-
         return {
             swjs_set_prop: (
                 ref: ref,
@@ -172,7 +172,9 @@ export class SwiftRuntime {
             },
 
             swjs_encode_string: (ref: ref, bytes_ptr_result: pointer) => {
-                const bytes = textEncoder.encode(this.memory.getObject(ref));
+                const bytes = this.textEncoder.encode(
+                    this.memory.getObject(ref)
+                );
                 const bytes_ptr = this.memory.retain(bytes);
                 this.memory.writeUint32(bytes_ptr_result, bytes_ptr);
                 return bytes.length;
@@ -183,7 +185,7 @@ export class SwiftRuntime {
                     bytes_ptr,
                     bytes_ptr + length
                 );
-                const string = textDecoder.decode(bytes);
+                const string = this.textDecoder.decode(bytes);
                 return this.memory.retain(string);
             },
 
