@@ -190,7 +190,7 @@ export class SwiftRuntime {
             this.memory.writeBytes(buffer, bytes);
         },
 
-        _swjs_call_function: (
+        swjs_call_function: (
             ref: ref,
             argv: pointer,
             argc: number,
@@ -225,12 +225,6 @@ export class SwiftRuntime {
                 false,
                 this.memory
             );
-        },
-        get swjs_call_function() {
-            return this._swjs_call_function;
-        },
-        set swjs_call_function(value) {
-            this._swjs_call_function = value;
         },
 
         swjs_call_function_with_this: (
