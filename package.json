@@ -3,6 +3,8 @@
   "version": "0.11.1",
   "description": "A runtime library of JavaScriptKit which is Swift framework to interact with JavaScript through WebAssembly.",
   "main": "Runtime/lib/index.js",
+  "module": "Runtime/lib/index.mjs",
+  "types": "Runtime/lib/index.d.ts",
   "files": [
     "Runtime/lib"
   ],

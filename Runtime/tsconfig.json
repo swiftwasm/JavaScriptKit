@@ -1,9 +1,10 @@
 {
     "compilerOptions": {
         "declaration": true,
+        "declarationDir": "lib",
         "importHelpers": true,
         "module": "esnext",
-        "outDir": "lib",
+        "noEmit": true,
         "rootDir": "src",
         "strict": true,
         "target": "es2017",
