@@ -34,19 +34,31 @@ export class SwiftRuntime {
             );
         }
     }
-    get closureHeap(): SwiftClosureHeap | null {
-        if (this._closureHeap) return this._closureHeap;
+
+    private ensureInstance() {
         if (!this.instance)
             throw new Error("WebAssembly instance is not set yet");
+        return this.instance;
+    }
 
-        const exports = this.instance
+    get memory() {
+        return this.ensureInstance().exports.memory as ExportedMemory;
+    }
+
+    get exports() {
+        return this.ensureInstance()
             .exports as any as SwiftRuntimeExportedFunctions;
-        const features = exports.swjs_library_features();
+    }
+
+    get closureHeap(): SwiftClosureHeap | null {
+        if (this._closureHeap) return this._closureHeap;
+
+        const features = this.exports.swjs_library_features();
         const librarySupportsWeakRef =
             (features & LibraryFeatures.WeakRefs) != 0;
         if (librarySupportsWeakRef) {
             if (typeof FinalizationRegistry !== "undefined") {
-                this._closureHeap = new SwiftClosureHeap(exports);
+                this._closureHeap = new SwiftClosureHeap(this.exports);
                 return this._closureHeap;
             } else {
                 throw new Error(
@@ -58,19 +70,9 @@ export class SwiftRuntime {
     }
 
     importObjects() {
-        const memory = () => {
-            if (this.instance)
-                return this.instance.exports.memory as ExportedMemory;
-            throw new Error("WebAssembly instance is not set yet");
-        };
-
         const callHostFunction = (host_func_id: number, args: any[]) => {
-            if (!this.instance)
-                throw new Error("WebAssembly instance is not set yet");
-            const exports = this.instance
-                .exports as any as SwiftRuntimeExportedFunctions;
             const argc = args.length;
-            const argv = exports.swjs_prepare_host_function_call(argc);
+            const argv = this.exports.swjs_prepare_host_function_call(argc);
             for (let index = 0; index < args.length; index++) {
                 const argument = args[index];
                 const base = argv + 16 * index;
@@ -80,13 +82,13 @@ export class SwiftRuntime {
             const callback_func_ref = this.heap.retain(function (result: any) {
                 output = result;
             });
-            exports.swjs_call_host_function(
+            this.exports.swjs_call_host_function(
                 host_func_id,
                 argv,
                 argc,
                 callback_func_ref
             );
-            exports.swjs_cleanup_host_function_call(argv);
+            this.exports.swjs_cleanup_host_function_call(argv);
             return output;
         };
 
@@ -98,12 +100,12 @@ export class SwiftRuntime {
         };
 
         const writeString = (ptr: pointer, bytes: Uint8Array) => {
-            const uint8Memory = new Uint8Array(memory().buffer);
+            const uint8Memory = new Uint8Array(this.memory.buffer);
             uint8Memory.set(bytes, ptr);
         };
 
         const readUInt32 = (ptr: pointer) => {
-            const uint8Memory = new Uint8Array(memory().buffer);
+            const uint8Memory = new Uint8Array(this.memory.buffer);
             return (
                 uint8Memory[ptr + 0] +
                 (uint8Memory[ptr + 1] << 8) +
@@ -113,12 +115,12 @@ export class SwiftRuntime {
         };
 
         const readFloat64 = (ptr: pointer) => {
-            const dataView = new DataView(memory().buffer);
+            const dataView = new DataView(this.memory.buffer);
             return dataView.getFloat64(ptr, true);
         };
 
         const writeUint32 = (ptr: pointer, value: number) => {
-            const uint8Memory = new Uint8Array(memory().buffer);
+            const uint8Memory = new Uint8Array(this.memory.buffer);
             uint8Memory[ptr + 0] = (value & 0x000000ff) >> 0;
             uint8Memory[ptr + 1] = (value & 0x0000ff00) >> 8;
             uint8Memory[ptr + 2] = (value & 0x00ff0000) >> 16;
@@ -126,7 +128,7 @@ export class SwiftRuntime {
         };
 
         const writeFloat64 = (ptr: pointer, value: number) => {
-            const dataView = new DataView(memory().buffer);
+            const dataView = new DataView(this.memory.buffer);
             dataView.setFloat64(ptr, value, true);
         };
 
@@ -307,7 +309,7 @@ export class SwiftRuntime {
             },
 
             swjs_decode_string: (bytes_ptr: pointer, length: number) => {
-                const uint8Memory = new Uint8Array(memory().buffer);
+                const uint8Memory = new Uint8Array(this.memory.buffer);
                 const bytes = uint8Memory.subarray(
                     bytes_ptr,
                     bytes_ptr + length
@@ -446,7 +448,7 @@ export class SwiftRuntime {
                 const ArrayType: TypedArray =
                     this.heap.referenceHeap(constructor_ref);
                 const array = new ArrayType(
-                    memory().buffer,
+                    this.memory.buffer,
                     elementsPtr,
                     length
                 );
