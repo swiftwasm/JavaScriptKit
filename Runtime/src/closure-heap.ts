@@ -1,10 +1,10 @@
-import { SwiftRuntimeExportedFunctions } from "./types";
+import { ExportedFunctions } from "./types";
 
 /// Memory lifetime of closures in Swift are managed by Swift side
 export class SwiftClosureDeallocator {
     private functionRegistry: FinalizationRegistry<number>;
 
-    constructor(exports: SwiftRuntimeExportedFunctions) {
+    constructor(exports: ExportedFunctions) {
         if (typeof FinalizationRegistry === "undefined") {
             throw new Error(
                 "The Swift part of JavaScriptKit was configured to require the availability of JavaScript WeakRefs. Please build with `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS` to disable features that use WeakRefs."

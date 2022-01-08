@@ -1,10 +1,11 @@
 import { SwiftClosureDeallocator } from "./closure-heap";
 import {
     LibraryFeatures,
-    SwiftRuntimeExportedFunctions,
+    ExportedFunctions,
     ref,
     pointer,
     TypedArray,
+    ImportedFunctions,
 } from "./types";
 import * as JSValue from "./js-value";
 import { Memory } from "./memory";
@@ -42,7 +43,7 @@ export class SwiftRuntime {
     }
 
     private get exports() {
-        return this.instance.exports as any as SwiftRuntimeExportedFunctions;
+        return this.instance.exports as any as ExportedFunctions;
     }
 
     private get memory() {
@@ -99,7 +100,7 @@ export class SwiftRuntime {
     /** @deprecated Use `wasmImports` instead */
     importObjects = () => this.wasmImports;
 
-    readonly wasmImports = {
+    readonly wasmImports: ImportedFunctions = {
         swjs_set_prop: (
             ref: ref,
             name: ref,
