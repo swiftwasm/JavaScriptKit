@@ -1,141 +1,14 @@
-interface ExportedMemory {
-    buffer: any;
-}
-
-type ref = number;
-type pointer = number;
-
-interface GlobalVariable {}
-declare const window: GlobalVariable;
-declare const global: GlobalVariable;
-let globalVariable: any;
-if (typeof globalThis !== "undefined") {
-    globalVariable = globalThis;
-} else if (typeof window !== "undefined") {
-    globalVariable = window;
-} else if (typeof global !== "undefined") {
-    globalVariable = global;
-} else if (typeof self !== "undefined") {
-    globalVariable = self;
-}
-
-interface SwiftRuntimeExportedFunctions {
-    swjs_library_version(): number;
-    swjs_library_features(): number;
-    swjs_prepare_host_function_call(size: number): pointer;
-    swjs_cleanup_host_function_call(argv: pointer): void;
-    swjs_call_host_function(
-        host_func_id: number,
-        argv: pointer,
-        argc: number,
-        callback_func_ref: ref
-    ): void;
-
-    swjs_free_host_function(host_func_id: number): void;
-}
-
-enum JavaScriptValueKind {
-    Invalid = -1,
-    Boolean = 0,
-    String = 1,
-    Number = 2,
-    Object = 3,
-    Null = 4,
-    Undefined = 5,
-    Function = 6,
-}
-
-enum LibraryFeatures {
-    WeakRefs = 1 << 0,
-}
-
-type TypedArray =
-    | Int8ArrayConstructor
-    | Uint8ArrayConstructor
-    | Int16ArrayConstructor
-    | Uint16ArrayConstructor
-    | Int32ArrayConstructor
-    | Uint32ArrayConstructor
-    // | BigInt64ArrayConstructor
-    // | BigUint64ArrayConstructor
-    | Float32ArrayConstructor
-    | Float64ArrayConstructor;
-
-type SwiftRuntimeHeapEntry = {
-    id: number;
-    rc: number;
-};
-class SwiftRuntimeHeap {
-    private _heapValueById: Map<number, any>;
-    private _heapEntryByValue: Map<any, SwiftRuntimeHeapEntry>;
-    private _heapNextKey: number;
-
-    constructor() {
-        this._heapValueById = new Map();
-        this._heapValueById.set(0, globalVariable);
-
-        this._heapEntryByValue = new Map();
-        this._heapEntryByValue.set(globalVariable, { id: 0, rc: 1 });
-
-        // Note: 0 is preserved for global
-        this._heapNextKey = 1;
-    }
-
-    retain(value: any) {
-        const isObject = typeof value == "object";
-        const entry = this._heapEntryByValue.get(value);
-        if (isObject && entry) {
-            entry.rc++;
-            return entry.id;
-        }
-        const id = this._heapNextKey++;
-        this._heapValueById.set(id, value);
-        if (isObject) {
-            this._heapEntryByValue.set(value, { id: id, rc: 1 });
-        }
-        return id;
-    }
-
-    release(ref: ref) {
-        const value = this._heapValueById.get(ref);
-        const isObject = typeof value == "object";
-        if (isObject) {
-            const entry = this._heapEntryByValue.get(value)!;
-            entry.rc--;
-            if (entry.rc != 0) return;
-
-            this._heapEntryByValue.delete(value);
-            this._heapValueById.delete(ref);
-        } else {
-            this._heapValueById.delete(ref);
-        }
-    }
-
-    referenceHeap(ref: ref) {
-        const value = this._heapValueById.get(ref);
-        if (value === undefined) {
-            throw new ReferenceError(
-                "Attempted to read invalid reference " + ref
-            );
-        }
-        return value;
-    }
-}
-
-/// Memory lifetime of closures in Swift are managed by Swift side
-class SwiftClosureHeap {
-    private functionRegistry: FinalizationRegistry<number>;
-
-    constructor(exports: SwiftRuntimeExportedFunctions) {
-        this.functionRegistry = new FinalizationRegistry((id) => {
-            exports.swjs_free_host_function(id);
-        });
-    }
-
-    alloc(func: any, func_ref: number) {
-        this.functionRegistry.register(func, func_ref);
-    }
-}
+import { SwiftClosureHeap } from "./closure-heap";
+import { SwiftRuntimeHeap } from "./object-heap";
+import {
+    ExportedMemory,
+    LibraryFeatures,
+    SwiftRuntimeExportedFunctions,
+    ref,
+    pointer,
+    JavaScriptValueKind,
+    TypedArray,
+} from "./types";
 
 export class SwiftRuntime {
     private instance: WebAssembly.Instance | null;
@@ -151,8 +24,8 @@ export class SwiftRuntime {
 
     setInstance(instance: WebAssembly.Instance) {
         this.instance = instance;
-        const exports = (this.instance
-            .exports as any) as SwiftRuntimeExportedFunctions;
+        const exports = this.instance
+            .exports as any as SwiftRuntimeExportedFunctions;
         if (exports.swjs_library_version() != this.version) {
             throw new Error(
                 `The versions of JavaScriptKit are incompatible. ${exports.swjs_library_version()} != ${
@@ -166,8 +39,8 @@ export class SwiftRuntime {
         if (!this.instance)
             throw new Error("WebAssembly instance is not set yet");
 
-        const exports = (this.instance
-            .exports as any) as SwiftRuntimeExportedFunctions;
+        const exports = this.instance
+            .exports as any as SwiftRuntimeExportedFunctions;
         const features = exports.swjs_library_features();
         const librarySupportsWeakRef =
             (features & LibraryFeatures.WeakRefs) != 0;
@@ -194,8 +67,8 @@ export class SwiftRuntime {
         const callHostFunction = (host_func_id: number, args: any[]) => {
             if (!this.instance)
                 throw new Error("WebAssembly instance is not set yet");
-            const exports = (this.instance
-                .exports as any) as SwiftRuntimeExportedFunctions;
+            const exports = this.instance
+                .exports as any as SwiftRuntimeExportedFunctions;
             const argc = args.length;
             const argv = exports.swjs_prepare_host_function_call(argc);
             for (let index = 0; index < args.length; index++) {
@@ -570,9 +443,8 @@ export class SwiftRuntime {
                 elementsPtr: pointer,
                 length: number
             ) => {
-                const ArrayType: TypedArray = this.heap.referenceHeap(
-                    constructor_ref
-                );
+                const ArrayType: TypedArray =
+                    this.heap.referenceHeap(constructor_ref);
                 const array = new ArrayType(
                     memory().buffer,
                     elementsPtr,
