@@ -40,13 +40,13 @@ export class SwiftRuntime {
         }
     }
 
-    get instance() {
+    private get instance() {
         if (!this._instance)
             throw new Error("WebAssembly instance is not set yet");
         return this._instance;
     }
 
-    get exports() {
+    private get exports() {
         return this.instance.exports as any as SwiftRuntimeExportedFunctions;
     }
 
@@ -57,7 +57,7 @@ export class SwiftRuntime {
         return this._memory;
     }
 
-    get closureDeallocator(): SwiftClosureDeallocator | null {
+    private get closureDeallocator(): SwiftClosureDeallocator | null {
         if (this._closureDeallocator) return this._closureDeallocator;
 
         const features = this.exports.swjs_library_features();
@@ -71,7 +71,7 @@ export class SwiftRuntime {
         return this._closureDeallocator;
     }
 
-    callHostFunction(host_func_id: number, args: any[]) {
+    private callHostFunction(host_func_id: number, args: any[]) {
         const argc = args.length;
         const argv = this.exports.swjs_prepare_host_function_call(argc);
         for (let index = 0; index < args.length; index++) {
