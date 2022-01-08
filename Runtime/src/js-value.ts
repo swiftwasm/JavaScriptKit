@@ -1,7 +1,7 @@
 import { Memory } from "./memory";
 import { pointer } from "./types";
 
-export enum JavaScriptValueKind {
+export enum Kind {
     Invalid = -1,
     Boolean = 0,
     String = 1,
@@ -12,32 +12,32 @@ export enum JavaScriptValueKind {
     Function = 6,
 }
 
-export const decodeJSValue = (
-    kind: JavaScriptValueKind,
+export const decode = (
+    kind: Kind,
     payload1: number,
     payload2: number,
     memory: Memory
 ) => {
     switch (kind) {
-        case JavaScriptValueKind.Boolean:
+        case Kind.Boolean:
             switch (payload1) {
                 case 0:
                     return false;
                 case 1:
                     return true;
             }
-        case JavaScriptValueKind.Number:
+        case Kind.Number:
             return payload2;
 
-        case JavaScriptValueKind.String:
-        case JavaScriptValueKind.Object:
-        case JavaScriptValueKind.Function:
+        case Kind.String:
+        case Kind.Object:
+        case Kind.Function:
             return memory.getObject(payload1);
 
-        case JavaScriptValueKind.Null:
+        case Kind.Null:
             return null;
 
-        case JavaScriptValueKind.Undefined:
+        case Kind.Undefined:
             return undefined;
 
         default:
@@ -47,23 +47,19 @@ export const decodeJSValue = (
 
 // Note:
 // `decodeValues` assumes that the size of RawJSValue is 16.
-export const decodeJSValueArray = (
-    ptr: pointer,
-    length: number,
-    memory: Memory
-) => {
+export const decodeArray = (ptr: pointer, length: number, memory: Memory) => {
     let result = [];
     for (let index = 0; index < length; index++) {
         const base = ptr + 16 * index;
         const kind = memory.readUint32(base);
         const payload1 = memory.readUint32(base + 4);
         const payload2 = memory.readFloat64(base + 8);
-        result.push(decodeJSValue(kind, payload1, payload2, memory));
+        result.push(decode(kind, payload1, payload2, memory));
     }
     return result;
 };
 
-export const writeJSValue = (
+export const write = (
     value: any,
     kind_ptr: pointer,
     payload1_ptr: pointer,
@@ -73,54 +69,36 @@ export const writeJSValue = (
 ) => {
     const exceptionBit = (is_exception ? 1 : 0) << 31;
     if (value === null) {
-        memory.writeUint32(kind_ptr, exceptionBit | JavaScriptValueKind.Null);
+        memory.writeUint32(kind_ptr, exceptionBit | Kind.Null);
         return;
     }
     switch (typeof value) {
         case "boolean": {
-            memory.writeUint32(
-                kind_ptr,
-                exceptionBit | JavaScriptValueKind.Boolean
-            );
+            memory.writeUint32(kind_ptr, exceptionBit | Kind.Boolean);
             memory.writeUint32(payload1_ptr, value ? 1 : 0);
             break;
         }
         case "number": {
-            memory.writeUint32(
-                kind_ptr,
-                exceptionBit | JavaScriptValueKind.Number
-            );
+            memory.writeUint32(kind_ptr, exceptionBit | Kind.Number);
             memory.writeFloat64(payload2_ptr, value);
             break;
         }
         case "string": {
-            memory.writeUint32(
-                kind_ptr,
-                exceptionBit | JavaScriptValueKind.String
-            );
+            memory.writeUint32(kind_ptr, exceptionBit | Kind.String);
             memory.writeUint32(payload1_ptr, memory.retain(value));
             break;
         }
         case "undefined": {
-            memory.writeUint32(
-                kind_ptr,
-                exceptionBit | JavaScriptValueKind.Undefined
-            );
+            memory.writeUint32(kind_ptr, exceptionBit | Kind.Undefined);
             break;
         }
         case "object": {
-            memory.writeUint32(
-                kind_ptr,
-                exceptionBit | JavaScriptValueKind.Object
-            );
+            memory.writeUint32(kind_ptr, exceptionBit | Kind.Object);
             memory.writeUint32(payload1_ptr, memory.retain(value));
             break;
         }
         case "function": {
-            memory.writeUint32(
-                kind_ptr,
-                exceptionBit | JavaScriptValueKind.Function
-            );
+            memory.writeUint32(kind_ptr, exceptionBit | Kind.Function);
             memory.writeUint32(payload1_ptr, memory.retain(value));
             break;
         }

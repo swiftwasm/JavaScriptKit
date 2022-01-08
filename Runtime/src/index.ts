@@ -6,12 +6,7 @@ import {
     pointer,
     TypedArray,
 } from "./types";
-import {
-    decodeJSValue,
-    decodeJSValueArray,
-    JavaScriptValueKind,
-    writeJSValue,
-} from "./js-value";
+import * as JSValue from "./js-value";
 import { Memory } from "./memory";
 
 export class SwiftRuntime {
@@ -77,7 +72,7 @@ export class SwiftRuntime {
         for (let index = 0; index < args.length; index++) {
             const argument = args[index];
             const base = argv + 16 * index;
-            writeJSValue(
+            JSValue.write(
                 argument,
                 base,
                 base + 4,
@@ -108,7 +103,7 @@ export class SwiftRuntime {
         swjs_set_prop: (
             ref: ref,
             name: ref,
-            kind: JavaScriptValueKind,
+            kind: JSValue.Kind,
             payload1: number,
             payload2: number
         ) => {
@@ -116,7 +111,7 @@ export class SwiftRuntime {
             Reflect.set(
                 obj,
                 this.memory.getObject(name),
-                decodeJSValue(kind, payload1, payload2, this.memory)
+                JSValue.decode(kind, payload1, payload2, this.memory)
             );
         },
 
@@ -129,7 +124,7 @@ export class SwiftRuntime {
         ) => {
             const obj = this.memory.getObject(ref);
             const result = Reflect.get(obj, this.memory.getObject(name));
-            writeJSValue(
+            JSValue.write(
                 result,
                 kind_ptr,
                 payload1_ptr,
@@ -142,7 +137,7 @@ export class SwiftRuntime {
         swjs_set_subscript: (
             ref: ref,
             index: number,
-            kind: JavaScriptValueKind,
+            kind: JSValue.Kind,
             payload1: number,
             payload2: number
         ) => {
@@ -150,7 +145,7 @@ export class SwiftRuntime {
             Reflect.set(
                 obj,
                 index,
-                decodeJSValue(kind, payload1, payload2, this.memory)
+                JSValue.decode(kind, payload1, payload2, this.memory)
             );
         },
 
@@ -163,7 +158,7 @@ export class SwiftRuntime {
         ) => {
             const obj = this.memory.getObject(ref);
             const result = Reflect.get(obj, index);
-            writeJSValue(
+            JSValue.write(
                 result,
                 kind_ptr,
                 payload1_ptr,
@@ -208,10 +203,10 @@ export class SwiftRuntime {
                 result = Reflect.apply(
                     func,
                     undefined,
-                    decodeJSValueArray(argv, argc, this.memory)
+                    JSValue.decodeArray(argv, argc, this.memory)
                 );
             } catch (error) {
-                writeJSValue(
+                JSValue.write(
                     error,
                     kind_ptr,
                     payload1_ptr,
@@ -221,7 +216,7 @@ export class SwiftRuntime {
                 );
                 return;
             }
-            writeJSValue(
+            JSValue.write(
                 result,
                 kind_ptr,
                 payload1_ptr,
@@ -253,10 +248,10 @@ export class SwiftRuntime {
                 result = Reflect.apply(
                     func,
                     obj,
-                    decodeJSValueArray(argv, argc, this.memory)
+                    JSValue.decodeArray(argv, argc, this.memory)
                 );
             } catch (error) {
-                writeJSValue(
+                JSValue.write(
                     error,
                     kind_ptr,
                     payload1_ptr,
@@ -266,7 +261,7 @@ export class SwiftRuntime {
                 );
                 return;
             }
-            writeJSValue(
+            JSValue.write(
                 result,
                 kind_ptr,
                 payload1_ptr,
@@ -279,7 +274,7 @@ export class SwiftRuntime {
             const constructor = this.memory.getObject(ref);
             const instance = Reflect.construct(
                 constructor,
-                decodeJSValueArray(argv, argc, this.memory)
+                JSValue.decodeArray(argv, argc, this.memory)
             );
             return this.memory.retain(instance);
         },
@@ -297,10 +292,10 @@ export class SwiftRuntime {
             try {
                 result = Reflect.construct(
                     constructor,
-                    decodeJSValueArray(argv, argc, this.memory)
+                    JSValue.decodeArray(argv, argc, this.memory)
                 );
             } catch (error) {
-                writeJSValue(
+                JSValue.write(
                     error,
                     exception_kind_ptr,
                     exception_payload1_ptr,
@@ -310,7 +305,7 @@ export class SwiftRuntime {
                 );
                 return -1;
             }
-            writeJSValue(
+            JSValue.write(
                 null,
                 exception_kind_ptr,
                 exception_payload1_ptr,
