@@ -1,7 +1,7 @@
 import { SwiftRuntimeExportedFunctions } from "./types";
 
 /// Memory lifetime of closures in Swift are managed by Swift side
-export class SwiftClosureHeap {
+export class SwiftClosureDeallocator {
     private functionRegistry: FinalizationRegistry<number>;
 
     constructor(exports: SwiftRuntimeExportedFunctions) {
@@ -16,7 +16,7 @@ export class SwiftClosureHeap {
         });
     }
 
-    alloc(func: any, func_ref: number) {
+    track(func: Function, func_ref: number) {
         this.functionRegistry.register(func, func_ref);
     }
 }

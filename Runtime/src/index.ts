@@ -1,4 +1,4 @@
-import { SwiftClosureHeap } from "./closure-heap";
+import { SwiftClosureDeallocator } from "./closure-heap";
 import {
     LibraryFeatures,
     SwiftRuntimeExportedFunctions,
@@ -17,13 +17,13 @@ import { Memory } from "./memory";
 export class SwiftRuntime {
     private _instance: WebAssembly.Instance | null;
     private _memory: Memory | null;
-    private _closureHeap: SwiftClosureHeap | null;
+    private _closureDeallocator: SwiftClosureDeallocator | null;
     private version: number = 703;
 
     constructor() {
         this._instance = null;
         this._memory = null;
-        this._closureHeap = null;
+        this._closureDeallocator = null;
     }
 
     setInstance(instance: WebAssembly.Instance) {
@@ -54,16 +54,18 @@ export class SwiftRuntime {
         return this._memory;
     }
 
-    get closureHeap(): SwiftClosureHeap | null {
-        if (this._closureHeap) return this._closureHeap;
+    get closureDeallocator(): SwiftClosureDeallocator | null {
+        if (this._closureDeallocator) return this._closureDeallocator;
 
         const features = this.exports.swjs_library_features();
         const librarySupportsWeakRef =
             (features & LibraryFeatures.WeakRefs) != 0;
         if (librarySupportsWeakRef) {
-            this._closureHeap = new SwiftClosureHeap(this.exports);
+            this._closureDeallocator = new SwiftClosureDeallocator(
+                this.exports
+            );
         }
-        return this._closureHeap;
+        return this._closureDeallocator;
     }
 
     importObjects() {
@@ -331,7 +333,7 @@ export class SwiftRuntime {
                     );
                 };
                 const func_ref = this.memory.retain(func);
-                this.closureHeap?.alloc(func, func_ref);
+                this.closureDeallocator?.track(func, func_ref);
                 return func_ref;
             },
 
