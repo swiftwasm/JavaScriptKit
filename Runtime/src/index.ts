@@ -68,37 +68,37 @@ export class SwiftRuntime {
         return this._closureDeallocator;
     }
 
-    importObjects() {
-        const callHostFunction = (host_func_id: number, args: any[]) => {
-            const argc = args.length;
-            const argv = this.exports.swjs_prepare_host_function_call(argc);
-            for (let index = 0; index < args.length; index++) {
-                const argument = args[index];
-                const base = argv + 16 * index;
-                writeJSValue(
-                    argument,
-                    base,
-                    base + 4,
-                    base + 8,
-                    false,
-                    this.memory
-                );
-            }
-            let output: any;
-            // This ref is released by the swjs_call_host_function implementation
-            const callback_func_ref = this.memory.retain((result: any) => {
-                output = result;
-            });
-            this.exports.swjs_call_host_function(
-                host_func_id,
-                argv,
-                argc,
-                callback_func_ref
+    callHostFunction(host_func_id: number, args: any[]) {
+        const argc = args.length;
+        const argv = this.exports.swjs_prepare_host_function_call(argc);
+        for (let index = 0; index < args.length; index++) {
+            const argument = args[index];
+            const base = argv + 16 * index;
+            writeJSValue(
+                argument,
+                base,
+                base + 4,
+                base + 8,
+                false,
+                this.memory
             );
-            this.exports.swjs_cleanup_host_function_call(argv);
-            return output;
-        };
+        }
+        let output: any;
+        // This ref is released by the swjs_call_host_function implementation
+        const callback_func_ref = this.memory.retain((result: any) => {
+            output = result;
+        });
+        this.exports.swjs_call_host_function(
+            host_func_id,
+            argv,
+            argc,
+            callback_func_ref
+        );
+        this.exports.swjs_cleanup_host_function_call(argv);
+        return output;
+    }
 
+    importObjects() {
         const textDecoder = new TextDecoder("utf-8");
         const textEncoder = new TextEncoder(); // Only support utf-8
 
@@ -326,12 +326,8 @@ export class SwiftRuntime {
             },
 
             swjs_create_function: (host_func_id: number) => {
-                const func = function () {
-                    return callHostFunction(
-                        host_func_id,
-                        Array.prototype.slice.call(arguments)
-                    );
-                };
+                const func = (...args: any[]) =>
+                    this.callHostFunction(host_func_id, args);
                 const func_ref = this.memory.retain(func);
                 this.closureDeallocator?.track(func, func_ref);
                 return func_ref;
