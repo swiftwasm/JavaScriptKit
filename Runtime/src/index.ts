@@ -57,16 +57,9 @@ export class SwiftRuntime {
         const librarySupportsWeakRef =
             (features & LibraryFeatures.WeakRefs) != 0;
         if (librarySupportsWeakRef) {
-            if (typeof FinalizationRegistry !== "undefined") {
-                this._closureHeap = new SwiftClosureHeap(this.exports);
-                return this._closureHeap;
-            } else {
-                throw new Error(
-                    "The Swift part of JavaScriptKit was configured to require the availability of JavaScript WeakRefs. Please build with `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS` to disable features that use WeakRefs."
-                );
-            }
+            this._closureHeap = new SwiftClosureHeap(this.exports);
         }
-        return null;
+        return this._closureHeap;
     }
 
     importObjects() {
