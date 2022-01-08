@@ -1,53 +1,57 @@
 import { SwiftClosureHeap } from "./closure-heap";
-import { SwiftRuntimeHeap } from "./object-heap";
 import {
-    ExportedMemory,
     LibraryFeatures,
     SwiftRuntimeExportedFunctions,
     ref,
     pointer,
-    JavaScriptValueKind,
     TypedArray,
 } from "./types";
+import {
+    decodeJSValue,
+    decodeJSValueArray,
+    JavaScriptValueKind,
+    writeJSValue,
+} from "./js-value";
+import { Memory } from "./memory";
 
 export class SwiftRuntime {
-    private instance: WebAssembly.Instance | null;
-    private heap: SwiftRuntimeHeap;
+    private _instance: WebAssembly.Instance | null;
+    private _memory: Memory | null;
     private _closureHeap: SwiftClosureHeap | null;
     private version: number = 703;
 
     constructor() {
-        this.instance = null;
-        this.heap = new SwiftRuntimeHeap();
+        this._instance = null;
+        this._memory = null;
         this._closureHeap = null;
     }
 
     setInstance(instance: WebAssembly.Instance) {
-        this.instance = instance;
-        const exports = this.instance
-            .exports as any as SwiftRuntimeExportedFunctions;
-        if (exports.swjs_library_version() != this.version) {
+        this._instance = instance;
+        if (this.exports.swjs_library_version() != this.version) {
             throw new Error(
-                `The versions of JavaScriptKit are incompatible. ${exports.swjs_library_version()} != ${
+                `The versions of JavaScriptKit are incompatible. ${this.exports.swjs_library_version()} != ${
                     this.version
                 }`
             );
         }
     }
 
-    private ensureInstance() {
-        if (!this.instance)
+    get instance() {
+        if (!this._instance)
             throw new Error("WebAssembly instance is not set yet");
-        return this.instance;
-    }
-
-    get memory() {
-        return this.ensureInstance().exports.memory as ExportedMemory;
+        return this._instance;
     }
 
     get exports() {
-        return this.ensureInstance()
-            .exports as any as SwiftRuntimeExportedFunctions;
+        return this.instance.exports as any as SwiftRuntimeExportedFunctions;
+    }
+
+    private get memory() {
+        if (!this._memory) {
+            this._memory = new Memory(this.instance.exports);
+        }
+        return this._memory;
     }
 
     get closureHeap(): SwiftClosureHeap | null {
@@ -69,10 +73,18 @@ export class SwiftRuntime {
             for (let index = 0; index < args.length; index++) {
                 const argument = args[index];
                 const base = argv + 16 * index;
-                writeValue(argument, base, base + 4, base + 8, false);
+                writeJSValue(
+                    argument,
+                    base,
+                    base + 4,
+                    base + 8,
+                    false,
+                    this.memory
+                );
             }
             let output: any;
-            const callback_func_ref = this.heap.retain(function (result: any) {
+            // This ref is released by the swjs_call_host_function implementation
+            const callback_func_ref = this.memory.retain((result: any) => {
                 output = result;
             });
             this.exports.swjs_call_host_function(
@@ -88,161 +100,6 @@ export class SwiftRuntime {
         const textDecoder = new TextDecoder("utf-8");
         const textEncoder = new TextEncoder(); // Only support utf-8
 
-        const readString = (ref: ref) => {
-            return this.heap.referenceHeap(ref);
-        };
-
-        const writeString = (ptr: pointer, bytes: Uint8Array) => {
-            const uint8Memory = new Uint8Array(this.memory.buffer);
-            uint8Memory.set(bytes, ptr);
-        };
-
-        const readUInt32 = (ptr: pointer) => {
-            const uint8Memory = new Uint8Array(this.memory.buffer);
-            return (
-                uint8Memory[ptr + 0] +
-                (uint8Memory[ptr + 1] << 8) +
-                (uint8Memory[ptr + 2] << 16) +
-                (uint8Memory[ptr + 3] << 24)
-            );
-        };
-
-        const readFloat64 = (ptr: pointer) => {
-            const dataView = new DataView(this.memory.buffer);
-            return dataView.getFloat64(ptr, true);
-        };
-
-        const writeUint32 = (ptr: pointer, value: number) => {
-            const uint8Memory = new Uint8Array(this.memory.buffer);
-            uint8Memory[ptr + 0] = (value & 0x000000ff) >> 0;
-            uint8Memory[ptr + 1] = (value & 0x0000ff00) >> 8;
-            uint8Memory[ptr + 2] = (value & 0x00ff0000) >> 16;
-            uint8Memory[ptr + 3] = (value & 0xff000000) >> 24;
-        };
-
-        const writeFloat64 = (ptr: pointer, value: number) => {
-            const dataView = new DataView(this.memory.buffer);
-            dataView.setFloat64(ptr, value, true);
-        };
-
-        const decodeValue = (
-            kind: JavaScriptValueKind,
-            payload1: number,
-            payload2: number
-        ) => {
-            switch (kind) {
-                case JavaScriptValueKind.Boolean: {
-                    switch (payload1) {
-                        case 0:
-                            return false;
-                        case 1:
-                            return true;
-                    }
-                }
-                case JavaScriptValueKind.Number: {
-                    return payload2;
-                }
-                case JavaScriptValueKind.String: {
-                    return readString(payload1);
-                }
-                case JavaScriptValueKind.Object: {
-                    return this.heap.referenceHeap(payload1);
-                }
-                case JavaScriptValueKind.Null: {
-                    return null;
-                }
-                case JavaScriptValueKind.Undefined: {
-                    return undefined;
-                }
-                case JavaScriptValueKind.Function: {
-                    return this.heap.referenceHeap(payload1);
-                }
-                default:
-                    throw new Error(`Type kind "${kind}" is not supported`);
-            }
-        };
-
-        const writeValue = (
-            value: any,
-            kind_ptr: pointer,
-            payload1_ptr: pointer,
-            payload2_ptr: pointer,
-            is_exception: boolean
-        ) => {
-            const exceptionBit = (is_exception ? 1 : 0) << 31;
-            if (value === null) {
-                writeUint32(kind_ptr, exceptionBit | JavaScriptValueKind.Null);
-                return;
-            }
-            switch (typeof value) {
-                case "boolean": {
-                    writeUint32(
-                        kind_ptr,
-                        exceptionBit | JavaScriptValueKind.Boolean
-                    );
-                    writeUint32(payload1_ptr, value ? 1 : 0);
-                    break;
-                }
-                case "number": {
-                    writeUint32(
-                        kind_ptr,
-                        exceptionBit | JavaScriptValueKind.Number
-                    );
-                    writeFloat64(payload2_ptr, value);
-                    break;
-                }
-                case "string": {
-                    writeUint32(
-                        kind_ptr,
-                        exceptionBit | JavaScriptValueKind.String
-                    );
-                    writeUint32(payload1_ptr, this.heap.retain(value));
-                    break;
-                }
-                case "undefined": {
-                    writeUint32(
-                        kind_ptr,
-                        exceptionBit | JavaScriptValueKind.Undefined
-                    );
-                    break;
-                }
-                case "object": {
-                    writeUint32(
-                        kind_ptr,
-                        exceptionBit | JavaScriptValueKind.Object
-                    );
-                    writeUint32(payload1_ptr, this.heap.retain(value));
-                    break;
-                }
-                case "function": {
-                    writeUint32(
-                        kind_ptr,
-                        exceptionBit | JavaScriptValueKind.Function
-                    );
-                    writeUint32(payload1_ptr, this.heap.retain(value));
-                    break;
-                }
-                default:
-                    throw new Error(
-                        `Type "${typeof value}" is not supported yet`
-                    );
-            }
-        };
-
-        // Note:
-        // `decodeValues` assumes that the size of RawJSValue is 16.
-        const decodeValues = (ptr: pointer, length: number) => {
-            let result = [];
-            for (let index = 0; index < length; index++) {
-                const base = ptr + 16 * index;
-                const kind = readUInt32(base);
-                const payload1 = readUInt32(base + 4);
-                const payload2 = readFloat64(base + 8);
-                result.push(decodeValue(kind, payload1, payload2));
-            }
-            return result;
-        };
-
         return {
             swjs_set_prop: (
                 ref: ref,
@@ -251,11 +108,11 @@ export class SwiftRuntime {
                 payload1: number,
                 payload2: number
             ) => {
-                const obj = this.heap.referenceHeap(ref);
+                const obj = this.memory.getObject(ref);
                 Reflect.set(
                     obj,
-                    readString(name),
-                    decodeValue(kind, payload1, payload2)
+                    this.memory.getObject(name),
+                    decodeJSValue(kind, payload1, payload2, this.memory)
                 );
             },
 
@@ -266,9 +123,16 @@ export class SwiftRuntime {
                 payload1_ptr: pointer,
                 payload2_ptr: pointer
             ) => {
-                const obj = this.heap.referenceHeap(ref);
-                const result = Reflect.get(obj, readString(name));
-                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
+                const obj = this.memory.getObject(ref);
+                const result = Reflect.get(obj, this.memory.getObject(name));
+                writeJSValue(
+                    result,
+                    kind_ptr,
+                    payload1_ptr,
+                    payload2_ptr,
+                    false,
+                    this.memory
+                );
             },
 
             swjs_set_subscript: (
@@ -278,8 +142,12 @@ export class SwiftRuntime {
                 payload1: number,
                 payload2: number
             ) => {
-                const obj = this.heap.referenceHeap(ref);
-                Reflect.set(obj, index, decodeValue(kind, payload1, payload2));
+                const obj = this.memory.getObject(ref);
+                Reflect.set(
+                    obj,
+                    index,
+                    decodeJSValue(kind, payload1, payload2, this.memory)
+                );
             },
 
             swjs_get_subscript: (
@@ -289,34 +157,40 @@ export class SwiftRuntime {
                 payload1_ptr: pointer,
                 payload2_ptr: pointer
             ) => {
-                const obj = this.heap.referenceHeap(ref);
+                const obj = this.memory.getObject(ref);
                 const result = Reflect.get(obj, index);
-                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
+                writeJSValue(
+                    result,
+                    kind_ptr,
+                    payload1_ptr,
+                    payload2_ptr,
+                    false,
+                    this.memory
+                );
             },
 
             swjs_encode_string: (ref: ref, bytes_ptr_result: pointer) => {
-                const bytes = textEncoder.encode(this.heap.referenceHeap(ref));
-                const bytes_ptr = this.heap.retain(bytes);
-                writeUint32(bytes_ptr_result, bytes_ptr);
+                const bytes = textEncoder.encode(this.memory.getObject(ref));
+                const bytes_ptr = this.memory.retain(bytes);
+                this.memory.writeUint32(bytes_ptr_result, bytes_ptr);
                 return bytes.length;
             },
 
             swjs_decode_string: (bytes_ptr: pointer, length: number) => {
-                const uint8Memory = new Uint8Array(this.memory.buffer);
-                const bytes = uint8Memory.subarray(
+                const bytes = this.memory.bytes.subarray(
                     bytes_ptr,
                     bytes_ptr + length
                 );
                 const string = textDecoder.decode(bytes);
-                return this.heap.retain(string);
+                return this.memory.retain(string);
             },
 
             swjs_load_string: (ref: ref, buffer: pointer) => {
-                const bytes = this.heap.referenceHeap(ref);
-                writeString(buffer, bytes);
+                const bytes = this.memory.getObject(ref);
+                this.memory.writeBytes(buffer, bytes);
             },
 
-            swjs_call_function: (
+            _swjs_call_function: (
                 ref: ref,
                 argv: pointer,
                 argc: number,
@@ -324,25 +198,39 @@ export class SwiftRuntime {
                 payload1_ptr: pointer,
                 payload2_ptr: pointer
             ) => {
-                const func = this.heap.referenceHeap(ref);
+                const func = this.memory.getObject(ref);
                 let result: any;
                 try {
                     result = Reflect.apply(
                         func,
                         undefined,
-                        decodeValues(argv, argc)
+                        decodeJSValueArray(argv, argc, this.memory)
                     );
                 } catch (error) {
-                    writeValue(
+                    writeJSValue(
                         error,
                         kind_ptr,
                         payload1_ptr,
                         payload2_ptr,
-                        true
+                        true,
+                        this.memory
                     );
                     return;
                 }
-                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
+                writeJSValue(
+                    result,
+                    kind_ptr,
+                    payload1_ptr,
+                    payload2_ptr,
+                    false,
+                    this.memory
+                );
+            },
+            get swjs_call_function() {
+                return this._swjs_call_function;
+            },
+            set swjs_call_function(value) {
+                this._swjs_call_function = value;
             },
 
             swjs_call_function_with_this: (
@@ -354,30 +242,42 @@ export class SwiftRuntime {
                 payload1_ptr: pointer,
                 payload2_ptr: pointer
             ) => {
-                const obj = this.heap.referenceHeap(obj_ref);
-                const func = this.heap.referenceHeap(func_ref);
+                const obj = this.memory.getObject(obj_ref);
+                const func = this.memory.getObject(func_ref);
                 let result: any;
                 try {
-                    result = Reflect.apply(func, obj, decodeValues(argv, argc));
+                    result = Reflect.apply(
+                        func,
+                        obj,
+                        decodeJSValueArray(argv, argc, this.memory)
+                    );
                 } catch (error) {
-                    writeValue(
+                    writeJSValue(
                         error,
                         kind_ptr,
                         payload1_ptr,
                         payload2_ptr,
-                        true
+                        true,
+                        this.memory
                     );
                     return;
                 }
-                writeValue(result, kind_ptr, payload1_ptr, payload2_ptr, false);
+                writeJSValue(
+                    result,
+                    kind_ptr,
+                    payload1_ptr,
+                    payload2_ptr,
+                    false,
+                    this.memory
+                );
             },
             swjs_call_new: (ref: ref, argv: pointer, argc: number) => {
-                const constructor = this.heap.referenceHeap(ref);
+                const constructor = this.memory.getObject(ref);
                 const instance = Reflect.construct(
                     constructor,
-                    decodeValues(argv, argc)
+                    decodeJSValueArray(argv, argc, this.memory)
                 );
-                return this.heap.retain(instance);
+                return this.memory.retain(instance);
             },
 
             swjs_call_throwing_new: (
@@ -388,36 +288,38 @@ export class SwiftRuntime {
                 exception_payload1_ptr: pointer,
                 exception_payload2_ptr: pointer
             ) => {
-                const constructor = this.heap.referenceHeap(ref);
+                const constructor = this.memory.getObject(ref);
                 let result: any;
                 try {
                     result = Reflect.construct(
                         constructor,
-                        decodeValues(argv, argc)
+                        decodeJSValueArray(argv, argc, this.memory)
                     );
                 } catch (error) {
-                    writeValue(
+                    writeJSValue(
                         error,
                         exception_kind_ptr,
                         exception_payload1_ptr,
                         exception_payload2_ptr,
-                        true
+                        true,
+                        this.memory
                     );
                     return -1;
                 }
-                writeValue(
+                writeJSValue(
                     null,
                     exception_kind_ptr,
                     exception_payload1_ptr,
                     exception_payload2_ptr,
-                    false
+                    false,
+                    this.memory
                 );
-                return this.heap.retain(result);
+                return this.memory.retain(result);
             },
 
             swjs_instanceof: (obj_ref: ref, constructor_ref: ref) => {
-                const obj = this.heap.referenceHeap(obj_ref);
-                const constructor = this.heap.referenceHeap(constructor_ref);
+                const obj = this.memory.getObject(obj_ref);
+                const constructor = this.memory.getObject(constructor_ref);
                 return obj instanceof constructor;
             },
 
@@ -428,7 +330,7 @@ export class SwiftRuntime {
                         Array.prototype.slice.call(arguments)
                     );
                 };
-                const func_ref = this.heap.retain(func);
+                const func_ref = this.memory.retain(func);
                 this.closureHeap?.alloc(func, func_ref);
                 return func_ref;
             },
@@ -439,18 +341,18 @@ export class SwiftRuntime {
                 length: number
             ) => {
                 const ArrayType: TypedArray =
-                    this.heap.referenceHeap(constructor_ref);
+                    this.memory.getObject(constructor_ref);
                 const array = new ArrayType(
-                    this.memory.buffer,
+                    this.memory.rawMemory.buffer,
                     elementsPtr,
                     length
                 );
                 // Call `.slice()` to copy the memory
-                return this.heap.retain(array.slice());
+                return this.memory.retain(array.slice());
             },
 
             swjs_release: (ref: ref) => {
-                this.heap.release(ref);
+                this.memory.release(ref);
             },
         };
     }
