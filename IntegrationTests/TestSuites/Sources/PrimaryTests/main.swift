@@ -424,8 +424,9 @@ try test("Closure Identifiers") {
 }
 #endif
 
-func checkArray<T>(_ array: [T]) throws where T: TypedArrayElement {
+func checkArray<T>(_ array: [T]) throws where T: TypedArrayElement & Equatable {
     try expectEqual(toString(JSTypedArray(array).jsValue().object!), jsStringify(array))
+    try checkArrayUnsafeBytes(array)
 }
 
 func toString<T: JSObject>(_ object: T) -> String {
@@ -436,14 +437,23 @@ func jsStringify(_ array: [Any]) -> String {
     array.map({ String(describing: $0) }).joined(separator: ",")
 }
 
+func checkArrayUnsafeBytes<T>(_ array: [T]) throws where T: TypedArrayElement & Equatable {
+    let copyOfArray: [T] = JSTypedArray(array).withUnsafeBytes { buffer in
+        Array(buffer)
+    }
+    try expectEqual(copyOfArray, array)
+}
+
 try test("TypedArray") {
     let numbers = [UInt8](0 ... 255)
     let typedArray = JSTypedArray(numbers)
     try expectEqual(typedArray[12], 12)
+    try expectEqual(numbers.count, typedArray.lengthInBytes)
 
     let numbersSet = Set(0 ... 255)
     let typedArrayFromSet = JSTypedArray(numbersSet)
     try expectEqual(typedArrayFromSet.jsObject.length, 256)
+    try expectEqual(typedArrayFromSet.lengthInBytes, 256 * MemoryLayout<Int>.size)
 
     try checkArray([0, .max, 127, 1] as [UInt8])
     try checkArray([0, 1, .max, .min, -1] as [Int8])

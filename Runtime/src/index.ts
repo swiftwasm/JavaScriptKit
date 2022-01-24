@@ -141,7 +141,7 @@ export class SwiftRuntime {
     private instance: WebAssembly.Instance | null;
     private heap: SwiftRuntimeHeap;
     private _closureHeap: SwiftClosureHeap | null;
-    private version: number = 703;
+    private version: number = 704;
 
     constructor() {
         this.instance = null;
@@ -224,7 +224,7 @@ export class SwiftRuntime {
             return this.heap.referenceHeap(ref);
         };
 
-        const writeString = (ptr: pointer, bytes: Uint8Array) => {
+        const writeBytes = (ptr: pointer, bytes: Uint8Array) => {
             const uint8Memory = new Uint8Array(memory().buffer);
             uint8Memory.set(bytes, ptr);
         };
@@ -445,7 +445,7 @@ export class SwiftRuntime {
 
             swjs_load_string: (ref: ref, buffer: pointer) => {
                 const bytes = this.heap.referenceHeap(ref);
-                writeString(buffer, bytes);
+                writeBytes(buffer, bytes);
             },
 
             swjs_call_function: (
@@ -580,6 +580,12 @@ export class SwiftRuntime {
                 );
                 // Call `.slice()` to copy the memory
                 return this.heap.retain(array.slice());
+            },
+
+            swjs_load_typed_array: (ref: ref, buffer: pointer) => {
+                const typedArray = this.heap.referenceHeap(ref);
+                const bytes = new Uint8Array(typedArray.buffer);
+                writeBytes(buffer, bytes);
             },
 
             swjs_release: (ref: ref) => {
