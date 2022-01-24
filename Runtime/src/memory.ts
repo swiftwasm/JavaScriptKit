@@ -27,5 +27,5 @@ export class Memory {
     writeUint32 = (ptr: pointer, value: number) =>
         this.dataView.setUint32(ptr, value, true);
     writeFloat64 = (ptr: pointer, value: number) =>
-        this.dataView.setFloat64(ptr, value);
+        this.dataView.setFloat64(ptr, value, true);
 }
