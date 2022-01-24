@@ -247,6 +247,14 @@ __attribute__((__import_module__("javascript_kit"),
 extern JavaScriptObjectRef _create_typed_array(const JavaScriptObjectRef constructor,
                                                const void *elements_ptr, const int length);
 
+/// Copies the byte contents of a typed array into a Swift side memory buffer.
+///
+/// @param ref A JavaScript typed array object.
+/// @param buffer A Swift side buffer into which to copy the bytes.
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_load_typed_array")))
+extern void _load_typed_array(const JavaScriptObjectRef ref, unsigned char *buffer);
+
 /// Decrements reference count of `ref` retained by `SwiftRuntimeHeap` in JavaScript side.
 ///
 /// @param ref The target JavaScript object.

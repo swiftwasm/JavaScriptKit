@@ -54,6 +54,36 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     public convenience init<S: Sequence>(_ sequence: S) where S.Element == Element {
         self.init(Array(sequence))
     }
+
+    /// Length (in bytes) of the typed array.
+    /// The value is established when a TypedArray is constructed and cannot be changed.
+    /// If the TypedArray is not specifying a `byteOffset` or a `length`, the `length` of the referenced `ArrayBuffer` will be returned.
+    public var lengthInBytes: Int {
+        Int(jsObject["byteLength"].number!)
+    }
+
+    /// Calls the given closure with a pointer to a copy of the underlying bytes of the
+    /// array's storage.
+    ///
+    /// - Note: The pointer passed as an argument to `body` is valid only for the
+    /// lifetime of the closure. Do not escape it from the closure for later
+    /// use.
+    ///
+    /// - Parameter body: A closure with an `UnsafeRawBufferPointer` parameter
+    ///   that points to the contiguous storage for the array and `Int` parameter
+    ///   that contains the length *in bytes*, disregarding the underlying type.
+    ///    If `body` has a return value, that value is also
+    ///   used as the return value for the `withUnsafeBytes(_:)` method. The
+    ///   argument is valid only for the duration of the closure's execution.
+    /// - Returns: The return value, if any, of the `body` closure parameter.
+    public func withUnsafeBytes<R>(_ body: (UnsafeRawPointer, Int) throws -> R) rethrows -> R {
+        let bytesLength = lengthInBytes
+        let buffer = malloc(bytesLength)!.assumingMemoryBound(to: UInt8.self)
+        defer { free(buffer) }
+        _load_typed_array(jsObject.id, buffer)
+        let result = try body(buffer, bytesLength)
+        return result
+    }
 }
 
 // MARK: - Int and UInt support
