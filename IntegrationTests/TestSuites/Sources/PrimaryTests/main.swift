@@ -441,7 +441,7 @@ func checkArrayUnsafeBytes<T>(_ array: [T]) throws where T: TypedArrayElement & 
     let copyOfArray: [T] = JSTypedArray(array).withUnsafeBytes { ptr, bytesLength in
         let length = bytesLength / MemoryLayout<T>.size
         let boundPtr = ptr.bindMemory(to: T.self, capacity: length)
-		let buffer = UnsafeBufferPointer(start: boundPtr, count: length)
+        let buffer = UnsafeBufferPointer(start: boundPtr, count: length)
         return Array(buffer)
     }
     try expectEqual(copyOfArray, array)
