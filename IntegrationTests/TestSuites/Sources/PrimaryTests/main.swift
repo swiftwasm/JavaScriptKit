@@ -438,11 +438,8 @@ func jsStringify(_ array: [Any]) -> String {
 }
 
 func checkArrayUnsafeBytes<T>(_ array: [T]) throws where T: TypedArrayElement & Equatable {
-    let copyOfArray: [T] = JSTypedArray(array).withUnsafeBytes { ptr, bytesLength in
-        let length = bytesLength / MemoryLayout<T>.size
-        let boundPtr = ptr.bindMemory(to: T.self, capacity: length)
-        let buffer = UnsafeBufferPointer(start: boundPtr, count: length)
-        return Array(buffer)
+    let copyOfArray: [T] = JSTypedArray(array).withUnsafeBytes { buffer in
+        Array(buffer)
     }
     try expectEqual(copyOfArray, array)
 }

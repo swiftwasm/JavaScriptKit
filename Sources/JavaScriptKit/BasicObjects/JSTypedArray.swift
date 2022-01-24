@@ -69,19 +69,21 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     /// lifetime of the closure. Do not escape it from the closure for later
     /// use.
     ///
-    /// - Parameter body: A closure with an `UnsafeRawBufferPointer` parameter
-    ///   that points to the contiguous storage for the array and `Int` parameter
-    ///   that contains the length *in bytes*, disregarding the underlying type.
+    /// - Parameter body: A closure with an `UnsafeBufferPointer` parameter
+    ///   that points to the contiguous storage for the array.
     ///    If `body` has a return value, that value is also
     ///   used as the return value for the `withUnsafeBytes(_:)` method. The
     ///   argument is valid only for the duration of the closure's execution.
     /// - Returns: The return value, if any, of the `body` closure parameter.
-    public func withUnsafeBytes<R>(_ body: (UnsafeRawPointer, Int) throws -> R) rethrows -> R {
+    public func withUnsafeBytes<R>(_ body: (UnsafeBufferPointer<Element>) throws -> R) rethrows -> R {
         let bytesLength = lengthInBytes
-        let buffer = malloc(bytesLength)!.assumingMemoryBound(to: UInt8.self)
-        defer { free(buffer) }
-        _load_typed_array(jsObject.id, buffer)
-        let result = try body(buffer, bytesLength)
+        let rawBuffer = malloc(bytesLength)!
+        defer { free(rawBuffer) }
+        _load_typed_array(jsObject.id, rawBuffer.assumingMemoryBound(to: UInt8.self))
+        let length = lengthInBytes /  MemoryLayout<Element>.size
+        let boundPtr = rawBuffer.bindMemory(to: Element.self, capacity: length)
+        let bufferPtr = UnsafeBufferPointer<Element>(start: boundPtr, count: length)
+        let result = try body(bufferPtr)
         return result
     }
 }
