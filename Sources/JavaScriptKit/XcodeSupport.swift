@@ -82,6 +82,10 @@ import _CJavaScriptKit
         _: UnsafePointer<T>,
         _: Int32
     ) -> JavaScriptObjectRef { fatalError() }
+    func _load_typed_array(
+        _: JavaScriptObjectRef,
+        _: UnsafeMutablePointer<UInt8>!
+    ) { fatalError() }
     func _release(_: JavaScriptObjectRef) { fatalError() }
 
 #endif

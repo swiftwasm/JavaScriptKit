@@ -14,7 +14,7 @@ export class SwiftRuntime {
     private _instance: WebAssembly.Instance | null;
     private _memory: Memory | null;
     private _closureDeallocator: SwiftClosureDeallocator | null;
-    private version: number = 703;
+    private version: number = 705;
 
     private textDecoder = new TextDecoder("utf-8");
     private textEncoder = new TextEncoder(); // Only support utf-8
@@ -339,6 +339,12 @@ export class SwiftRuntime {
             );
             // Call `.slice()` to copy the memory
             return this.memory.retain(array.slice());
+        },
+
+        swjs_load_typed_array: (ref: ref, buffer: pointer) => {
+            const typedArray = this.memory.getObject(ref);
+            const bytes = new Uint8Array(typedArray.buffer);
+            this.memory.writeBytes(buffer, bytes);
         },
 
         swjs_release: (ref: ref) => {

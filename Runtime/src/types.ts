@@ -83,6 +83,7 @@ export interface ImportedFunctions {
         elementsPtr: pointer,
         length: number
     ): number;
+    swjs_load_typed_array(ref: ref, buffer: pointer): void;
     swjs_release(ref: number): void;
 }
 
