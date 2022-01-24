@@ -48,11 +48,15 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
         return eventLoop
     }()
 
+    private static var didInstallGlobalExecutor = false
+
     /// Set JavaScript event loop based executor to be the global executor
     /// Note that this should be called before any of the jobs are created.
     /// This installation step will be unnecessary after the custom-executor will be introduced officially.
     /// See also: https://github.com/rjmccall/swift-evolution/blob/custom-executors/proposals/0000-custom-executors.md#the-default-global-concurrent-executor
     public static func installGlobalExecutor() {
+        guard !didInstallGlobalExecutor else { return }
+
         typealias swift_task_enqueueGlobal_hook_Fn = @convention(thin) (UnownedJob, swift_task_enqueueGlobal_original) -> Void
         let swift_task_enqueueGlobal_hook_impl: swift_task_enqueueGlobal_hook_Fn = { job, original in
             JavaScriptEventLoop.shared.enqueue(job)
@@ -70,6 +74,8 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
             JavaScriptEventLoop.shared.enqueue(job)
         }
         swift_task_enqueueMainExecutor_hook = unsafeBitCast(swift_task_enqueueMainExecutor_hook_impl, to: UnsafeMutableRawPointer?.self)
+        
+        didInstallGlobalExecutor = true
     }
 
     private func enqueue(_ job: UnownedJob, withDelay nanoseconds: UInt64) {
