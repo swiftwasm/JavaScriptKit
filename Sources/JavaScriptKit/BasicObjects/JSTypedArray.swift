@@ -133,6 +133,7 @@ extension UInt32: TypedArrayElement {
 }
 
 // FIXME: Support passing BigInts across the bridge
+// See https://github.com/swiftwasm/JavaScriptKit/issues/56
 //extension Int64: TypedArrayElement {
 //    public static var typedArrayClass = JSObject.global.BigInt64Array.function!
 //}

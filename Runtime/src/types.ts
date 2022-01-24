@@ -98,6 +98,7 @@ export type TypedArray =
     | Uint16ArrayConstructor
     | Int32ArrayConstructor
     | Uint32ArrayConstructor
+    // BigInt is not yet supported, see https://github.com/swiftwasm/JavaScriptKit/issues/56
     // | BigInt64ArrayConstructor
     // | BigUint64ArrayConstructor
     | Float32ArrayConstructor
