@@ -1,5 +1,5 @@
 import JavaScriptKit
-
+import CHelpers
 
 try test("Literal Conversion") {
     let global = JSObject.global
@@ -733,6 +733,17 @@ try test("Exception") {
     try expectEqual(ageError is JSValue, true)
     let errorObject3 = JSError(from: ageError as! JSValue)
     try expectNotNil(errorObject3)
+}
+
+/// If WebAssembly.Memory is not accessed correctly (i.e. creating a new view each time),
+/// this test will fail with `TypeError: Cannot perform Construct on a detached ArrayBuffer`,
+/// since asking to grow memory will detach the backing ArrayBuffer.
+/// See https://github.com/swiftwasm/JavaScriptKit/pull/153
+try test("Grow Memory") {
+    let string = "Hello"
+    let jsString = JSValue.string(string)
+    growMemory(1)
+    try expectEqual(string, jsString.description)
 }
 
 Expectation.wait(expectations)

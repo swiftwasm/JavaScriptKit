@@ -23,7 +23,11 @@ let package = Package(
     ],
     dependencies: [.package(name: "JavaScriptKit", path: "../../")],
     targets: [
-        .target(name: "PrimaryTests", dependencies: ["JavaScriptKit"]),
+        .target(name: "CHelpers"),
+        .target(name: "PrimaryTests", dependencies: [
+            "JavaScriptKit",
+            "CHelpers",
+        ]),
         .target(
             name: "ConcurrencyTests",
             dependencies: [
