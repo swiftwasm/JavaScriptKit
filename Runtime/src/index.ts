@@ -177,7 +177,7 @@ export class SwiftRuntime {
         },
 
         swjs_decode_string: (bytes_ptr: pointer, length: number) => {
-            const bytes = this.memory.bytes.subarray(
+            const bytes = this.memory.bytes().subarray(
                 bytes_ptr,
                 bytes_ptr + length
             );
