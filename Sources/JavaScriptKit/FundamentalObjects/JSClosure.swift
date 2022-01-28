@@ -84,6 +84,27 @@ public class JSClosure: JSObject, JSClosureProtocol {
         Self.sharedClosures[hostFuncRef] = (self, body)
     }
 
+    #if compiler(>=5.5)
+    static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSClosure {
+        JSClosure { arguments in
+            JSPromise { resolver in
+                Task {
+                    do {
+                        let result = try await body(arguments)
+                        resolver(.success(result))
+                    } catch {
+                        if let jsError = error as? JSError {
+                            resolver(.failure(jsError.jsValue()))
+                        } else {
+                            resolver(.failure(JSError(message: String(describing: error)).jsValue()))
+                        }
+                    }
+                }
+            }.jsValue()
+        }
+    }
+    #endif
+
     #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     deinit {
         guard isReleased else {
