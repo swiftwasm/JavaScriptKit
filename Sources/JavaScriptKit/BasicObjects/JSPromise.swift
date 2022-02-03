@@ -75,6 +75,7 @@ public final class JSPromise: JSBridgedClass {
         return JSPromise(unsafelyWrapping: jsObject.then!(closure).object!)
     }
 
+    #if compiler(>=5.5)
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
     @discardableResult
     public func then(success: @escaping (JSValue) async -> ConvertibleToJSValue) -> JSPromise {
@@ -83,6 +84,7 @@ public final class JSPromise: JSBridgedClass {
         }
         return JSPromise(unsafelyWrapping: jsObject.then!(closure).object!)
     }
+    #endif
 
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
     @discardableResult
@@ -97,6 +99,7 @@ public final class JSPromise: JSBridgedClass {
         return JSPromise(unsafelyWrapping: jsObject.then!(successClosure, failureClosure).object!)
     }
 
+    #if compiler(>=5.5)
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
     @discardableResult
     public func then(success: @escaping (JSValue) async -> ConvertibleToJSValue,
@@ -109,6 +112,7 @@ public final class JSPromise: JSBridgedClass {
         }
         return JSPromise(unsafelyWrapping: jsObject.then!(successClosure, failureClosure).object!)
     }
+    #endif
 
     /// Schedules the `failure` closure to be invoked on rejected completion of `self`.
     @discardableResult
@@ -119,6 +123,7 @@ public final class JSPromise: JSBridgedClass {
         return .init(unsafelyWrapping: jsObject.catch!(closure).object!)
     }
 
+    #if compiler(>=5.5)
     /// Schedules the `failure` closure to be invoked on rejected completion of `self`.
     @discardableResult
     public func `catch`(failure: @escaping (JSValue) async -> ConvertibleToJSValue) -> JSPromise {
@@ -127,6 +132,7 @@ public final class JSPromise: JSBridgedClass {
         }
         return .init(unsafelyWrapping: jsObject.catch!(closure).object!)
     }
+    #endif
 
     /// Schedules the `failure` closure to be invoked on either successful or rejected
     /// completion of `self`.

@@ -105,6 +105,7 @@ public class JSClosure: JSObject, JSClosureProtocol {
     #endif
 }
 
+#if compiler(>=5.5)
 private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSValue) -> (([JSValue]) -> JSValue) {
     { arguments in
         JSPromise { resolver in
@@ -123,7 +124,7 @@ private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSVa
         }.jsValue()
     }
 }
-
+#endif
 
 // MARK: - `JSClosure` mechanism note
 //
