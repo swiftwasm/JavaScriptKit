@@ -1,4 +1,4 @@
-# 0.11.2 (02 February 2022)
+# 0.12.0 (02 February 2022)
 
 This release introduces a [major refactor](https://github.com/swiftwasm/JavaScriptKit/pull/150) of the JavaScript runtime by [@j-f1] and several performance enhancements. 
 
