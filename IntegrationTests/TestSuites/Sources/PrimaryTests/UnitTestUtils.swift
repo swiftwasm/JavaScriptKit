@@ -38,6 +38,15 @@ func expectEqual<T: Equatable>(
     }
 }
 
+func expectNotEqual<T: Equatable>(
+    _ lhs: T, _ rhs: T,
+    file: StaticString = #file, line: UInt = #line, column: UInt = #column
+) throws {
+    if lhs == rhs {
+        throw MessageError("Expect to not be equal \"\(lhs)\" and \"\(rhs)\"", file: file, line: line, column: column)
+    }
+}
+
 func expectObject(_ value: JSValue, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSObject {
     switch value {
     case let .object(ref): return ref

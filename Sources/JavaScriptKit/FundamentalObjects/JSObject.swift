@@ -135,6 +135,16 @@ extension JSObject: CustomStringConvertible {
     public var description: String { self.toString!().string! }
 }
 
+extension JSObject: Hashable {
+    /// Hashes the essential components of this value by feeding them into the
+    /// given hasher.
+    ///
+    /// - Parameter hasher: The hasher to use when combining the components
+    ///   of this instance.
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}
 
 /// A `JSObject` wrapper that enables throwing method calls capturing `this`.
 /// Exceptions produced by JavaScript functions will be thrown as `JSValue`.

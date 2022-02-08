@@ -746,4 +746,23 @@ try test("Grow Memory") {
     try expectEqual(string, jsString.description)
 }
 
+try test("Hashable Conformance") {
+    let globalObject1 = JSObject.global.console.object!
+    let globalObject2 = JSObject.global.console.object!
+    try expectEqual(globalObject1.hashValue, globalObject2.hashValue)
+    // These are 2 different objects in Swift referencing the same object in JavaScript
+    try expectNotEqual(ObjectIdentifier(globalObject1), ObjectIdentifier(globalObject2))
+
+    let sameObjectSet: Set<JSObject> = [globalObject1, globalObject2]
+    try expectEqual(sameObjectSet.count, 1)
+
+    let objectConstructor = JSObject.global.Object.function!
+    let obj = objectConstructor.new()
+    obj.a = 1.jsValue()
+    let firstHash = obj.hashValue
+    obj.b = 2.jsValue()
+    let secondHash = obj.hashValue
+    try expectEqual(firstHash, secondHash)
+}
+
 Expectation.wait(expectations)
