@@ -1,9 +1,10 @@
-# 0.12.0 (02 February 2022)
+# 0.12.0 (08 February 2022)
 
 This release introduces a [major refactor](https://github.com/swiftwasm/JavaScriptKit/pull/150) of the JavaScript runtime by [@j-f1] and several performance enhancements. 
 
 **Merged pull requests:**
 
+- Add Hashable conformance to JSObject ([#162](https://github.com/swiftwasm/JavaScriptKit/pull/162)) via [@yonihemi]
 - Add test for detached ArrayBuffer ([#154](https://github.com/swiftwasm/JavaScriptKit/pull/154)) via [@yonihemi]
 - Fix detached ArrayBuffer errors ([#153](https://github.com/swiftwasm/JavaScriptKit/pull/153)) via [@yonihemi]
 - Split runtime into multiple files ([#150](https://github.com/swiftwasm/JavaScriptKit/pull/150)) via [@j-f1]
