@@ -50,7 +50,7 @@ struct Pet: Codable {
 let jsPet = JSObject.global.pet
 let swiftPet: Pet = try JSValueDecoder().decode(from: jsPet)
 
-JSObject.global.alert!("Swift is running in the browser!")
+_ = JSObject.global.alert!("Swift is running in the browser!")
 ```
 
 ### `async`/`await`
