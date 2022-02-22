@@ -4,6 +4,9 @@ import PackageDescription
 
 let package = Package(
     name: "JavaScriptKit",
+    platforms: [
+       .macOS(.v10_15),
+    ],
     products: [
         .library(name: "JavaScriptKit", targets: ["JavaScriptKit"]),
         .library(name: "JavaScriptEventLoop", targets: ["JavaScriptEventLoop"]),
