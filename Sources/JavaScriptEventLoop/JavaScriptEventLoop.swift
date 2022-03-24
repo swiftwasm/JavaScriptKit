@@ -1,8 +1,11 @@
 import JavaScriptKit
 import _CJavaScriptEventLoop
 
+// NOTE: `@available` annotations are semantically wrong, but they make it easier to develop applications targeting WebAssembly in Xcode.
+
 #if compiler(>=5.5)
 
+@available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
 public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
     /// A function that queues a given closure as a microtask into JavaScript event loop.
@@ -94,6 +97,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     }
 }
 
+@available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
 public extension JSPromise {
     /// Wait for the promise to complete, returning (or throwing) its result.
     var value: JSValue {
