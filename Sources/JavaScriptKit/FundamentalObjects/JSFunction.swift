@@ -93,11 +93,11 @@ internal func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJS
             var payload1 = JavaScriptPayload1()
             var payload2 = JavaScriptPayload2()
             if let thisId = this?.id {
-                _call_function_with_this(thisId,
+                _call_function_with_this_unsafe(thisId,
                                          jsFunc.id, argv, Int32(argc),
                                          &kindAndFlags, &payload1, &payload2)
             } else {
-                _call_function(
+                _call_function_unsafe(
                     jsFunc.id, argv, Int32(argc),
                     &kindAndFlags, &payload1, &payload2
                 )

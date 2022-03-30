@@ -170,6 +170,21 @@ extern void _call_function(const JavaScriptObjectRef ref, const RawJSValue *argv
                            JavaScriptPayload1 *result_payload1,
                            JavaScriptPayload2 *result_payload2);
 
+/// `_call_function` calls JavaScript function with given arguments list without capturing any exception
+///
+/// @param ref The target JavaScript function to call.
+/// @param argv A list of `RawJSValue` arguments to apply.
+/// @param argc The length of `argv``.
+/// @param result_kind A result pointer of JavaScript value kind of returned result or thrown exception.
+/// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
+/// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_call_function_unsafe")))
+extern void _call_function_unsafe(const JavaScriptObjectRef ref, const RawJSValue *argv,
+                           const int argc, JavaScriptValueKindAndFlags *result_kind,
+                           JavaScriptPayload1 *result_payload1,
+                           JavaScriptPayload2 *result_payload2);
+
 /// `_call_function_with_this` calls JavaScript function with given arguments list and given `_this`.
 ///
 /// @param _this The value of `this` provided for the call to `func_ref`.
@@ -182,6 +197,24 @@ extern void _call_function(const JavaScriptObjectRef ref, const RawJSValue *argv
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_function_with_this")))
 extern void _call_function_with_this(const JavaScriptObjectRef _this,
+                                     const JavaScriptObjectRef func_ref,
+                                     const RawJSValue *argv, const int argc,
+                                     JavaScriptValueKindAndFlags *result_kind,
+                                     JavaScriptPayload1 *result_payload1,
+                                     JavaScriptPayload2 *result_payload2);
+
+/// `_call_function_with_this` calls JavaScript function with given arguments list and given `_this` without capturing any exception.
+///
+/// @param _this The value of `this` provided for the call to `func_ref`.
+/// @param func_ref The target JavaScript function to call.
+/// @param argv A list of `RawJSValue` arguments to apply.
+/// @param argc The length of `argv``.
+/// @param result_kind A result pointer of JavaScript value kind of returned result or thrown exception.
+/// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
+/// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_call_function_with_this_unsafe")))
+extern void _call_function_with_this_unsafe(const JavaScriptObjectRef _this,
                                      const JavaScriptObjectRef func_ref,
                                      const RawJSValue *argv, const int argc,
                                      JavaScriptValueKindAndFlags *result_kind,

@@ -58,7 +58,24 @@ export interface ImportedFunctions {
         payload1_ptr: pointer,
         payload2_ptr: pointer
     ): void;
+    swjs_call_function_unsafe(
+        ref: number,
+        argv: pointer,
+        argc: number,
+        kind_ptr: pointer,
+        payload1_ptr: pointer,
+        payload2_ptr: pointer
+    ): void;
     swjs_call_function_with_this(
+        obj_ref: ref,
+        func_ref: ref,
+        argv: pointer,
+        argc: number,
+        kind_ptr: pointer,
+        payload1_ptr: pointer,
+        payload2_ptr: pointer
+    ): void;
+    swjs_call_function_with_this_unsafe(
         obj_ref: ref,
         func_ref: ref,
         argv: pointer,

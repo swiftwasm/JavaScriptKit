@@ -226,6 +226,29 @@ export class SwiftRuntime {
                 this.memory
             );
         },
+        swjs_call_function_unsafe: (
+            ref: ref,
+            argv: pointer,
+            argc: number,
+            kind_ptr: pointer,
+            payload1_ptr: pointer,
+            payload2_ptr: pointer
+        ) => {
+            const func = this.memory.getObject(ref);
+            const result = Reflect.apply(
+                func,
+                undefined,
+                JSValue.decodeArray(argv, argc, this.memory)
+            );
+            JSValue.write(
+                result,
+                kind_ptr,
+                payload1_ptr,
+                payload2_ptr,
+                false,
+                this.memory
+            );
+        },
 
         swjs_call_function_with_this: (
             obj_ref: ref,
@@ -256,6 +279,32 @@ export class SwiftRuntime {
                 );
                 return;
             }
+            JSValue.write(
+                result,
+                kind_ptr,
+                payload1_ptr,
+                payload2_ptr,
+                false,
+                this.memory
+            );
+        },
+
+        swjs_call_function_with_this_unsafe: (
+            obj_ref: ref,
+            func_ref: ref,
+            argv: pointer,
+            argc: number,
+            kind_ptr: pointer,
+            payload1_ptr: pointer,
+            payload2_ptr: pointer
+        ) => {
+            const obj = this.memory.getObject(obj_ref);
+            const func = this.memory.getObject(func_ref);
+            const result = Reflect.apply(
+                func,
+                obj,
+                JSValue.decodeArray(argv, argc, this.memory)
+            );
             JSValue.write(
                 result,
                 kind_ptr,
