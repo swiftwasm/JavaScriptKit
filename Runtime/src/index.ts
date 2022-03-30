@@ -14,7 +14,7 @@ export class SwiftRuntime {
     private _instance: WebAssembly.Instance | null;
     private _memory: Memory | null;
     private _closureDeallocator: SwiftClosureDeallocator | null;
-    private version: number = 705;
+    private version: number = 706;
 
     private textDecoder = new TextDecoder("utf-8");
     private textEncoder = new TextEncoder(); // Only support utf-8
