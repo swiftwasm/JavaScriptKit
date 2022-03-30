@@ -117,7 +117,7 @@ extension UInt8: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Uint8Array.function!
 }
 
-public class Uint8ClampedArray: JSTypedArray<UInt8> {
+public class JSUInt8ClampedArray: JSTypedArray<UInt8> {
     public class override var constructor: JSFunction { JSObject.global.Uint8ClampedArray.function! }
 }
 
