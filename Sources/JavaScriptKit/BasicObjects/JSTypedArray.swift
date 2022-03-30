@@ -12,8 +12,8 @@ public protocol TypedArrayElement: ConvertibleToJSValue, ConstructibleFromJSValu
 
 /// A wrapper around all JavaScript [TypedArray](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) classes that exposes their properties in a type-safe way.
 /// FIXME: [BigInt-based TypedArrays are currently not supported](https://github.com/swiftwasm/JavaScriptKit/issues/56).
-open class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral where Element: TypedArrayElement {
-    open static var constructor: JSFunction { Element.typedArrayClass }
+public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral where Element: TypedArrayElement {
+    public class var constructor: JSFunction { Element.typedArrayClass }
     public var jsObject: JSObject
 
     public subscript(_ index: Int) -> Element {
@@ -116,7 +116,10 @@ extension Int8: TypedArrayElement {
 extension UInt8: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Uint8Array.function!
 }
-// TODO: Support Uint8ClampedArray?
+
+public class Uint8ClampedArray: JSTypedArray<UInt8> {
+    public class override var constructor: JSFunction { JSObject.global.Uint8ClampedArray.function! }
+}
 
 extension Int16: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Int16Array.function!
