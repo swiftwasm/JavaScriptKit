@@ -315,19 +315,34 @@ export class SwiftRuntime {
         ) => {
             const obj = this.memory.getObject(obj_ref);
             const func = this.memory.getObject(func_ref);
-            const result = Reflect.apply(
-                func,
-                obj,
-                JSValue.decodeArray(argv, argc, this.memory)
-            );
-            JSValue.write(
-                result,
-                kind_ptr,
-                payload1_ptr,
-                payload2_ptr,
-                false,
-                this.memory
-            );
+            let isException = true;
+            try {
+                const result = Reflect.apply(
+                    func,
+                    obj,
+                    JSValue.decodeArray(argv, argc, this.memory)
+                );
+                JSValue.write(
+                    result,
+                    kind_ptr,
+                    payload1_ptr,
+                    payload2_ptr,
+                    false,
+                    this.memory
+                );
+                isException = false
+            } finally {
+                if (isException) {
+                    JSValue.write(
+                        undefined,
+                        kind_ptr,
+                        payload1_ptr,
+                        payload2_ptr,
+                        true,
+                        this.memory
+                    );
+                }
+            }
         },
         swjs_call_new: (ref: ref, argv: pointer, argc: number) => {
             const constructor = this.memory.getObject(ref);
