@@ -84,13 +84,17 @@ extension JSObject: JSValueCompatible {
 private let objectConstructor = JSObject.global.Object.function!
 private let arrayConstructor = JSObject.global.Array.function!
 
-extension Dictionary where Value: ConvertibleToJSValue, Key == String {
+extension Dictionary where Value == ConvertibleToJSValue, Key == String {
     public func jsValue() -> JSValue {
-        Swift.Dictionary<Key, ConvertibleToJSValue>.jsValue(self)()
+        let object = objectConstructor.new()
+        for (key, value) in self {
+            object[key] = value.jsValue()
+        }
+        return .object(object)
     }
 }
 
-extension Dictionary: ConvertibleToJSValue where Value == ConvertibleToJSValue, Key == String {
+extension Dictionary: ConvertibleToJSValue where Value: ConvertibleToJSValue, Key == String {
     public func jsValue() -> JSValue {
         let object = objectConstructor.new()
         for (key, value) in self {
@@ -139,13 +143,17 @@ extension Optional: ConvertibleToJSValue where Wrapped: ConvertibleToJSValue {
     }
 }
 
-extension Array where Element: ConvertibleToJSValue {
+extension Array: ConvertibleToJSValue where Element: ConvertibleToJSValue {
     public func jsValue() -> JSValue {
-        Array<ConvertibleToJSValue>.jsValue(self)()
+        let array = arrayConstructor.new(count)
+        for (index, element) in enumerated() {
+            array[index] = element.jsValue()
+        }
+        return .object(array)
     }
 }
 
-extension Array: ConvertibleToJSValue where Element == ConvertibleToJSValue {
+extension Array where Element == ConvertibleToJSValue {
     public func jsValue() -> JSValue {
         let array = arrayConstructor.new(count)
         for (index, element) in enumerated() {
