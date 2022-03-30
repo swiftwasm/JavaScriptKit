@@ -235,19 +235,34 @@ export class SwiftRuntime {
             payload2_ptr: pointer
         ) => {
             const func = this.memory.getObject(ref);
-            const result = Reflect.apply(
-                func,
-                undefined,
-                JSValue.decodeArray(argv, argc, this.memory)
-            );
-            JSValue.write(
-                result,
-                kind_ptr,
-                payload1_ptr,
-                payload2_ptr,
-                false,
-                this.memory
-            );
+            let isException = true;
+            try {
+                const result = Reflect.apply(
+                    func,
+                    undefined,
+                    JSValue.decodeArray(argv, argc, this.memory)
+                );
+                JSValue.write(
+                    result,
+                    kind_ptr,
+                    payload1_ptr,
+                    payload2_ptr,
+                    false,
+                    this.memory
+                );
+                isException = false;
+            } finally {
+                if (isException) {
+                    JSValue.write(
+                        undefined,
+                        kind_ptr,
+                        payload1_ptr,
+                        payload2_ptr,
+                        true,
+                        this.memory
+                    );
+                }
+            }
         },
 
         swjs_call_function_with_this: (
