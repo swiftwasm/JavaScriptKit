@@ -19,7 +19,7 @@ public class JSFunction: JSObject {
     /// - Returns: The result of this call.
     @discardableResult
     public func callAsFunction(this: JSObject? = nil, arguments: [ConvertibleToJSValue]) -> JSValue {
-        try! invokeJSFunction(self, arguments: arguments, this: this)
+        try! invokeNonThrowingJSFunction(self, arguments: arguments, this: this)
     }
 
     /// A variadic arguments version of `callAsFunction`.
@@ -84,7 +84,7 @@ public class JSFunction: JSObject {
     }
 }
 
-internal func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) throws -> JSValue {
+private func invokeNonThrowingJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) throws -> JSValue {
     let (result, isException) = arguments.withRawJSValues { rawValues in
         rawValues.withUnsafeBufferPointer { bufferPointer -> (JSValue, Bool) in
             let argv = bufferPointer.baseAddress
@@ -102,6 +102,7 @@ internal func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJS
                     &kindAndFlags, &payload1, &payload2
                 )
             }
+            assert(!kindAndFlags.isException)
             let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
             return (result.jsValue(), kindAndFlags.isException)
         }
