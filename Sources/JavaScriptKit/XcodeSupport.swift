@@ -86,6 +86,7 @@ import _CJavaScriptKit
         _: JavaScriptObjectRef,
         _: UnsafeMutablePointer<UInt8>!
     ) { fatalError() }
+    func _retain(_: JavaScriptObjectRef) { fatalError() }
     func _release(_: JavaScriptObjectRef) { fatalError() }
 
 #endif

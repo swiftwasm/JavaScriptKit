@@ -255,6 +255,16 @@ __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_load_typed_array")))
 extern void _load_typed_array(const JavaScriptObjectRef ref, unsigned char *buffer);
 
+/// Increments reference count of `ref` retained by `SwiftRuntimeHeap` in JavaScript side.
+///
+/// This is only necessary when copying a JavaScript object to a new JSObject.
+/// All swjs_* APIs return already-retained objects.
+///
+/// @param ref The target JavaScript object.
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_retain")))
+extern void _retain(const JavaScriptObjectRef ref);
+
 /// Decrements reference count of `ref` retained by `SwiftRuntimeHeap` in JavaScript side.
 ///
 /// @param ref The target JavaScript object.
