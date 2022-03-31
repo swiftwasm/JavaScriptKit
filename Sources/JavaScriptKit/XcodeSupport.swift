@@ -53,7 +53,7 @@ import _CJavaScriptKit
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
     ) { fatalError() }
-    func _call_function_unsafe(
+    func _call_function_no_catch(
         _: JavaScriptObjectRef,
         _: UnsafePointer<RawJSValue>!, _: Int32,
         _: UnsafeMutablePointer<JavaScriptValueKindAndFlags>!,
@@ -68,7 +68,7 @@ import _CJavaScriptKit
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
     ) { fatalError() }
-    func _call_function_with_this_unsafe(
+    func _call_function_with_this_no_catch(
         _: JavaScriptObjectRef,
         _: JavaScriptObjectRef,
         _: UnsafePointer<RawJSValue>!, _: Int32,

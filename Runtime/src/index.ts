@@ -226,7 +226,7 @@ export class SwiftRuntime {
                 this.memory
             );
         },
-        swjs_call_function_unsafe: (
+        swjs_call_function_no_catch: (
             ref: ref,
             argv: pointer,
             argc: number,
@@ -304,7 +304,7 @@ export class SwiftRuntime {
             );
         },
 
-        swjs_call_function_with_this_unsafe: (
+        swjs_call_function_with_this_no_catch: (
             obj_ref: ref,
             func_ref: ref,
             argv: pointer,

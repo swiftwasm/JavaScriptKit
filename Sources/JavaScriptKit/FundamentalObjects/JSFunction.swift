@@ -19,7 +19,7 @@ public class JSFunction: JSObject {
     /// - Returns: The result of this call.
     @discardableResult
     public func callAsFunction(this: JSObject? = nil, arguments: [ConvertibleToJSValue]) -> JSValue {
-        try! invokeNonThrowingJSFunction(self, arguments: arguments, this: this)
+        invokeNonThrowingJSFunction(self, arguments: arguments, this: this)
     }
 
     /// A variadic arguments version of `callAsFunction`.
@@ -84,31 +84,27 @@ public class JSFunction: JSObject {
     }
 }
 
-private func invokeNonThrowingJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) throws -> JSValue {
-    let (result, isException) = arguments.withRawJSValues { rawValues in
-        rawValues.withUnsafeBufferPointer { bufferPointer -> (JSValue, Bool) in
+private func invokeNonThrowingJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) -> JSValue {
+    arguments.withRawJSValues { rawValues in
+        rawValues.withUnsafeBufferPointer { bufferPointer -> (JSValue) in
             let argv = bufferPointer.baseAddress
             let argc = bufferPointer.count
             var kindAndFlags = JavaScriptValueKindAndFlags()
             var payload1 = JavaScriptPayload1()
             var payload2 = JavaScriptPayload2()
             if let thisId = this?.id {
-                _call_function_with_this_unsafe(thisId,
+                _call_function_with_this_no_catch(thisId,
                                          jsFunc.id, argv, Int32(argc),
                                          &kindAndFlags, &payload1, &payload2)
             } else {
-                _call_function_unsafe(
+                _call_function_no_catch(
                     jsFunc.id, argv, Int32(argc),
                     &kindAndFlags, &payload1, &payload2
                 )
             }
             assert(!kindAndFlags.isException)
             let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
-            return (result.jsValue(), kindAndFlags.isException)
+            return result.jsValue()
         }
     }
-    if isException {
-        throw result
-    }
-    return result
 }

@@ -179,8 +179,8 @@ extern void _call_function(const JavaScriptObjectRef ref, const RawJSValue *argv
 /// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
 /// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
 __attribute__((__import_module__("javascript_kit"),
-               __import_name__("swjs_call_function_unsafe")))
-extern void _call_function_unsafe(const JavaScriptObjectRef ref, const RawJSValue *argv,
+               __import_name__("swjs_call_function_no_catch")))
+extern void _call_function_no_catch(const JavaScriptObjectRef ref, const RawJSValue *argv,
                            const int argc, JavaScriptValueKindAndFlags *result_kind,
                            JavaScriptPayload1 *result_payload1,
                            JavaScriptPayload2 *result_payload2);
@@ -213,8 +213,8 @@ extern void _call_function_with_this(const JavaScriptObjectRef _this,
 /// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
 /// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
 __attribute__((__import_module__("javascript_kit"),
-               __import_name__("swjs_call_function_with_this_unsafe")))
-extern void _call_function_with_this_unsafe(const JavaScriptObjectRef _this,
+               __import_name__("swjs_call_function_with_this_no_catch")))
+extern void _call_function_with_this_no_catch(const JavaScriptObjectRef _this,
                                      const JavaScriptObjectRef func_ref,
                                      const RawJSValue *argv, const int argc,
                                      JavaScriptValueKindAndFlags *result_kind,
