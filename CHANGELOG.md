@@ -1,3 +1,25 @@
+# 0.13.0 (31 March 2022)
+
+This a small improvement release that improves handling of JavaScript exceptions and compatibility with Xcode.
+
+Thanks to [@kateinoigakukun](https://github.com/kateinoigakukun), [@pedrovgs](https://github.com/pedrovgs), and
+[@valeriyvan](https://github.com/valeriyvan) for contributions!
+
+**Closed issues:**
+
+- UserAgent support? ([#169](https://github.com/swiftwasm/JavaScriptKit/issues/169))
+- Compile error on macOS 12.2.1 ([#167](https://github.com/swiftwasm/JavaScriptKit/issues/167))
+
+**Merged pull requests:**
+
+- Improve error messages when JS code throws exceptions ([#173](https://github.com/swiftwasm/JavaScriptKit/pull/173)) via [@pedrovgs](https://github.com/pedrovgs)
+- Update npm dependencies ([#175](https://github.com/swiftwasm/JavaScriptKit/pull/175)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Bump minimist from 1.2.5 to 1.2.6 in /Example ([#172](https://github.com/swiftwasm/JavaScriptKit/pull/172)) via [@dependabot[bot]](https://github.com/dependabot[bot])
+- Use availability guarded APIs under @available for Xcode development ([#171](https://github.com/swiftwasm/JavaScriptKit/pull/171)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Fix warning in snippet ([#166](https://github.com/swiftwasm/JavaScriptKit/pull/166)) via [@valeriyvan](https://github.com/valeriyvan)
+- Bump follow-redirects from 1.14.5 to 1.14.8 in /Example ([#165](https://github.com/swiftwasm/JavaScriptKit/pull/165)) via [@dependabot[bot]](https://github.com/dependabot[bot])
+
+
 # 0.12.0 (08 February 2022)
 
 This release introduces a [major refactor](https://github.com/swiftwasm/JavaScriptKit/pull/150) of the JavaScript runtime by [@j-f1] and several performance enhancements. 
