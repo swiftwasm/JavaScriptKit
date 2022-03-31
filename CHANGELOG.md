@@ -1,6 +1,6 @@
 # 0.13.0 (31 March 2022)
 
-This a small improvement release that improves handling of JavaScript exceptions and compatibility with Xcode.
+This release improves handling of JavaScript exceptions and compatibility with Xcode.
 
 Thanks to [@kateinoigakukun](https://github.com/kateinoigakukun), [@pedrovgs](https://github.com/pedrovgs), and
 [@valeriyvan](https://github.com/valeriyvan) for contributions!
@@ -18,7 +18,6 @@ Thanks to [@kateinoigakukun](https://github.com/kateinoigakukun), [@pedrovgs](ht
 - Use availability guarded APIs under @available for Xcode development ([#171](https://github.com/swiftwasm/JavaScriptKit/pull/171)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
 - Fix warning in snippet ([#166](https://github.com/swiftwasm/JavaScriptKit/pull/166)) via [@valeriyvan](https://github.com/valeriyvan)
 - Bump follow-redirects from 1.14.5 to 1.14.8 in /Example ([#165](https://github.com/swiftwasm/JavaScriptKit/pull/165)) via [@dependabot[bot]](https://github.com/dependabot[bot])
-
 
 # 0.12.0 (08 February 2022)
 
