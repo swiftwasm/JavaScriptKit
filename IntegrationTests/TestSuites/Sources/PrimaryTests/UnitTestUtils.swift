@@ -103,6 +103,12 @@ func expectThrow<T>(_ body: @autoclosure () throws -> T, file: StaticString = #f
     throw MessageError("Expect to throw an exception", file: file, line: line, column: column)
 }
 
+func wrapUnsafeThrowableFunction(_ body: @escaping () -> Void, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> Error {
+    JSObject.global.callThrowingClosure.function!(JSClosure { _ in 
+            body() 
+            return .undefined
+    })
+}
 func expectNotNil<T>(_ value: T?, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws {
     switch value {
     case .some: return
