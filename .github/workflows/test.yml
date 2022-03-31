@@ -33,7 +33,7 @@ jobs:
       matrix:
         include:
           - os: macos-10.15
-            xcode: Xcode_12.5.1
+            xcode: Xcode_12.4
           - os: macos-11
             xcode: Xcode_13.2.1
           - os: macos-12
