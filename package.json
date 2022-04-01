@@ -1,6 +1,6 @@
 {
   "name": "javascript-kit-swift",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "A runtime library of JavaScriptKit which is Swift framework to interact with JavaScript through WebAssembly.",
   "main": "Runtime/lib/index.js",
   "module": "Runtime/lib/index.mjs",
@@ -34,10 +34,10 @@
   "author": "swiftwasm",
   "license": "MIT",
   "devDependencies": {
-    "@rollup/plugin-typescript": "^8.3.0",
-    "prettier": "2.5.1",
-    "rollup": "^2.63.0",
+    "@rollup/plugin-typescript": "^8.3.1",
+    "prettier": "2.6.1",
+    "rollup": "^2.70.0",
     "tslib": "^2.3.1",
-    "typescript": "^4.5.5"
+    "typescript": "^4.6.3"
   }
 }

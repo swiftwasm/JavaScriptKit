@@ -14,7 +14,7 @@ export class SwiftRuntime {
     private _instance: WebAssembly.Instance | null;
     private _memory: Memory | null;
     private _closureDeallocator: SwiftClosureDeallocator | null;
-    private version: number = 705;
+    private version: number = 706;
 
     private textDecoder = new TextDecoder("utf-8");
     private textEncoder = new TextEncoder(); // Only support utf-8
@@ -226,6 +226,44 @@ export class SwiftRuntime {
                 this.memory
             );
         },
+        swjs_call_function_no_catch: (
+            ref: ref,
+            argv: pointer,
+            argc: number,
+            kind_ptr: pointer,
+            payload1_ptr: pointer,
+            payload2_ptr: pointer
+        ) => {
+            const func = this.memory.getObject(ref);
+            let isException = true;
+            try {
+                const result = Reflect.apply(
+                    func,
+                    undefined,
+                    JSValue.decodeArray(argv, argc, this.memory)
+                );
+                JSValue.write(
+                    result,
+                    kind_ptr,
+                    payload1_ptr,
+                    payload2_ptr,
+                    false,
+                    this.memory
+                );
+                isException = false;
+            } finally {
+                if (isException) {
+                    JSValue.write(
+                        undefined,
+                        kind_ptr,
+                        payload1_ptr,
+                        payload2_ptr,
+                        true,
+                        this.memory
+                    );
+                }
+            }
+        },
 
         swjs_call_function_with_this: (
             obj_ref: ref,
@@ -264,6 +302,47 @@ export class SwiftRuntime {
                 false,
                 this.memory
             );
+        },
+
+        swjs_call_function_with_this_no_catch: (
+            obj_ref: ref,
+            func_ref: ref,
+            argv: pointer,
+            argc: number,
+            kind_ptr: pointer,
+            payload1_ptr: pointer,
+            payload2_ptr: pointer
+        ) => {
+            const obj = this.memory.getObject(obj_ref);
+            const func = this.memory.getObject(func_ref);
+            let isException = true;
+            try {
+                const result = Reflect.apply(
+                    func,
+                    obj,
+                    JSValue.decodeArray(argv, argc, this.memory)
+                );
+                JSValue.write(
+                    result,
+                    kind_ptr,
+                    payload1_ptr,
+                    payload2_ptr,
+                    false,
+                    this.memory
+                );
+                isException = false
+            } finally {
+                if (isException) {
+                    JSValue.write(
+                        undefined,
+                        kind_ptr,
+                        payload1_ptr,
+                        payload2_ptr,
+                        true,
+                        this.memory
+                    );
+                }
+            }
         },
         swjs_call_new: (ref: ref, argv: pointer, argc: number) => {
             const constructor = this.memory.getObject(ref);

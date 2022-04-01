@@ -95,6 +95,14 @@ public class JSObject: Equatable {
         set { setJSValue(this: self, index: Int32(index), value: newValue) }
     }
 
+    /// Access the `symbol` member dynamically through JavaScript and Swift runtime bridge library.
+    /// - Parameter symbol: The name of this object's member to access.
+    /// - Returns: The value of the `name` member of this object.
+    public subscript(_ name: JSSymbol) -> JSValue {
+        get { getJSValue(this: self, symbol: name) }
+        set { setJSValue(this: self, symbol: name, value: newValue) }
+    }
+
     /// A modifier to call methods as throwing methods capturing `this`
     ///
     ///

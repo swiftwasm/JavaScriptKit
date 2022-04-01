@@ -700,7 +700,6 @@ try test("Exception") {
     // }
     // ```
     //
-
     let globalObject1 = JSObject.global.globalObject1
     let prop_9: JSValue = globalObject1.prop_9
 
@@ -735,6 +734,46 @@ try test("Exception") {
     try expectNotNil(errorObject3)
 }
 
+try test("Unhandled Exception") {
+    // ```js
+    // global.globalObject1 = {
+    //   ...
+    //   prop_9: {
+    //       func1: function () {
+    //           throw new Error();
+    //       },
+    //       func2: function () {
+    //           throw "String Error";
+    //       },
+    //       func3: function () {
+    //           throw 3.0
+    //       },
+    //   },
+    //   ...
+    // }
+    // ```
+    //
+
+    let globalObject1 = JSObject.global.globalObject1
+    let prop_9: JSValue = globalObject1.prop_9
+
+    // MARK: Throwing method calls
+    let error1 = try wrapUnsafeThrowableFunction { _ = prop_9.object!.func1!() }
+    try expectEqual(error1 is JSValue, true)
+    let errorObject = JSError(from: error1 as! JSValue)
+    try expectNotNil(errorObject)
+
+    let error2 = try wrapUnsafeThrowableFunction { _ = prop_9.object!.func2!() }
+    try expectEqual(error2 is JSValue, true)
+    let errorString = try expectString(error2 as! JSValue)
+    try expectEqual(errorString, "String Error")
+
+    let error3 = try wrapUnsafeThrowableFunction { _ = prop_9.object!.func3!() }
+    try expectEqual(error3 is JSValue, true)
+    let errorNumber = try expectNumber(error3 as! JSValue)
+    try expectEqual(errorNumber, 3.0)
+}
+
 /// If WebAssembly.Memory is not accessed correctly (i.e. creating a new view each time),
 /// this test will fail with `TypeError: Cannot perform Construct on a detached ArrayBuffer`,
 /// since asking to grow memory will detach the backing ArrayBuffer.
@@ -763,6 +802,30 @@ try test("Hashable Conformance") {
     obj.b = 2.jsValue()
     let secondHash = obj.hashValue
     try expectEqual(firstHash, secondHash)
+}
+
+try test("Symbols") {
+    let symbol1 = JSSymbol("abc")
+    let symbol2 = JSSymbol("abc")
+    try expectNotEqual(symbol1, symbol2)
+    try expectEqual(symbol1.name, symbol2.name)
+    try expectEqual(symbol1.name, "abc")
+
+    try expectEqual(JSSymbol.iterator, JSSymbol.iterator)
+
+    // let hasInstanceClass = {
+    //   prop: Object.assign(function () {}, {
+    //     [Symbol.hasInstance]() { return true }
+    //   })
+    // }.prop
+    let hasInstanceObject = JSObject.global.Object.function!.new()
+    hasInstanceObject.prop = JSClosure { _ in .undefined }.jsValue()
+    let hasInstanceClass = hasInstanceObject.prop.function!
+    hasInstanceClass[JSSymbol.hasInstance] = JSClosure { _ in
+        return .boolean(true)
+    }.jsValue()
+    try expectEqual(hasInstanceClass[JSSymbol.hasInstance].function!().boolean, true)
+    try expectEqual(JSObject.global.Object.isInstanceOf(hasInstanceClass), true)
 }
 
 Expectation.wait(expectations)

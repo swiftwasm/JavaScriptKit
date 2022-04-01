@@ -82,6 +82,14 @@ global.Animal = function (name, age, isCat) {
     }
 };
 
+global.callThrowingClosure = (c) => { 
+    try {
+        c() 
+    } catch (error) {
+        return error
+    }
+}
+
 const { startWasiTask } = require("../lib");
 
 startWasiTask("./dist/PrimaryTests.wasm").catch((err) => {
