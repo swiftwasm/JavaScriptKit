@@ -212,6 +212,20 @@ public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
     }
 }
 
+public func getJSValue(this: JSObject, symbol: JSSymbol) -> JSValue {
+    var rawValue = RawJSValue()
+    _get_prop(this.id, symbol.id,
+              &rawValue.kind,
+              &rawValue.payload1, &rawValue.payload2)
+    return rawValue.jsValue()
+}
+
+public func setJSValue(this: JSObject, symbol: JSSymbol, value: JSValue) {
+    value.withRawJSValue { rawValue in
+        _set_prop(this.id, symbol.id, rawValue.kind, rawValue.payload1, rawValue.payload2)
+    }
+}
+
 public extension JSValue {
     /// Return `true` if this value is an instance of the passed `constructor` function.
     /// Returns `false` for everything except objects and functions.
