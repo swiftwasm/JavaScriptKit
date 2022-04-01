@@ -7,7 +7,7 @@ TestSuites/.build/$(CONFIGURATION)/%.wasm: FORCE
 	            --product $(basename $(notdir $@)) \
 	            --triple wasm32-unknown-wasi \
 	            --configuration $(CONFIGURATION) \
-	            -Xswiftc -Xclang-linker -mexec-model=reactor \
+	            -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor \
 		    $(SWIFT_BUILD_FLAGS)
 
 dist/%.wasm: TestSuites/.build/$(CONFIGURATION)/%.wasm
