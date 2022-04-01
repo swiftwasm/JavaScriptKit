@@ -804,4 +804,28 @@ try test("Hashable Conformance") {
     try expectEqual(firstHash, secondHash)
 }
 
+try test("Symbols") {
+    let symbol1 = JSSymbol("abc")
+    let symbol2 = JSSymbol("abc")
+    try expectNotEqual(symbol1, symbol2)
+    try expectEqual(symbol1.name, symbol2.name)
+    try expectEqual(symbol1.name, "abc")
+
+    try expectEqual(JSSymbol.iterator, JSSymbol.iterator)
+
+    // let hasInstanceClass = {
+    //   prop: Object.assign(function () {}, {
+    //     [Symbol.hasInstance]() { return true }
+    //   })
+    // }.prop
+    let hasInstanceObject = JSObject.global.Object.function!.new()
+    hasInstanceObject.prop = JSClosure { _ in .undefined }.jsValue()
+    let hasInstanceClass = hasInstanceObject.prop.function!
+    hasInstanceClass[JSSymbol.hasInstance] = JSClosure { _ in
+        return .boolean(true)
+    }.jsValue()
+    try expectEqual(hasInstanceClass[JSSymbol.hasInstance].function!().boolean, true)
+    try expectEqual(JSObject.global.Object.isInstanceOf(hasInstanceClass), true)
+}
+
 Expectation.wait(expectations)
