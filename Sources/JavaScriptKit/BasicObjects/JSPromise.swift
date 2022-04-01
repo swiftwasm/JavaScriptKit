@@ -77,6 +77,7 @@ public final class JSPromise: JSBridgedClass {
 
     #if compiler(>=5.5)
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     @discardableResult
     public func then(success: @escaping (JSValue) async -> ConvertibleToJSValue) -> JSPromise {
         let closure = JSOneshotClosure.async {
@@ -101,6 +102,7 @@ public final class JSPromise: JSBridgedClass {
 
     #if compiler(>=5.5)
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     @discardableResult
     public func then(success: @escaping (JSValue) async -> ConvertibleToJSValue,
                      failure: @escaping (JSValue) async -> ConvertibleToJSValue) -> JSPromise {
@@ -125,6 +127,7 @@ public final class JSPromise: JSBridgedClass {
 
     #if compiler(>=5.5)
     /// Schedules the `failure` closure to be invoked on rejected completion of `self`.
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     @discardableResult
     public func `catch`(failure: @escaping (JSValue) async -> ConvertibleToJSValue) -> JSPromise {
         let closure = JSOneshotClosure.async {
