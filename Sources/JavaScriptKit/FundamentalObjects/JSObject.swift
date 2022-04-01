@@ -38,6 +38,24 @@ public class JSObject: Equatable {
         }
     }
 
+    /// Returns the `name` member method binding this object as `this` context.
+    ///
+    /// e.g.
+    /// ```swift
+    /// let document = JSObject.global.document.object!
+    /// let divElement = document.createElement!("div")
+    /// ```
+    ///
+    /// - Parameter name: The name of this object's member to access.
+    /// - Returns: The `name` member method binding this object as `this` context.
+    @_disfavoredOverload
+    public subscript(_ name: JSString) -> ((ConvertibleToJSValue...) -> JSValue)? {
+        guard let function = self[name].function else { return nil }
+        return { (arguments: ConvertibleToJSValue...) in
+            function(this: self, arguments: arguments)
+        }
+    }
+
     /// A convenience method of `subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
     /// to access the member through Dynamic Member Lookup.
     @_disfavoredOverload
