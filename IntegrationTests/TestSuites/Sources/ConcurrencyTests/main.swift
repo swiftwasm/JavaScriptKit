@@ -97,6 +97,24 @@ func entrypoint() async throws {
         _ = await (t3.value, t4.value, t5.value)
         try expectEqual(context.completed, ["t4", "t3", "t5"])
     }
+
+    try await asyncTest("Async JSClosure") {
+        let delayClosure = JSClosure.async { _ -> JSValue in
+            try await Task.sleep(nanoseconds: 2_000_000_000)
+            return JSValue.number(3)
+        }
+        let delayObject = JSObject.global.Object.function!.new()
+        delayObject.closure = delayClosure.jsValue()
+
+        let start = time(nil)
+        let promise = JSPromise(from: delayObject.closure!())
+        try expectNotNil(promise)
+        let result = try await promise!.value
+        let diff = difftime(time(nil), start)
+        try expectEqual(diff >= 2, true)
+        try expectEqual(result, .number(3))
+    }
+
     // FIXME(katei): Somehow it doesn't work due to a mysterious unreachable inst
     // at the end of thunk.
     // This issue is not only on JS host environment, but also on standalone coop executor.
