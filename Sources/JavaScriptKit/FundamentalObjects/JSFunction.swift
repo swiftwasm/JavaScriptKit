@@ -83,7 +83,7 @@ public class JSFunction: JSObject {
     }
 }
 
-internal func invokeNonThrowingJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) -> RawJSValue {
+func invokeNonThrowingJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) -> RawJSValue {
     arguments.withRawJSValues { rawValues in
         rawValues.withUnsafeBufferPointer { bufferPointer in
             let argv = bufferPointer.baseAddress
