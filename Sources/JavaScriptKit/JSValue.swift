@@ -10,6 +10,7 @@ public enum JSValue: Equatable {
     case null
     case undefined
     case function(JSFunction)
+    case symbol(JSSymbol)
 
     /// Returns the `Bool` value of this JS value if its type is boolean.
     /// If not, returns `nil`.
@@ -67,6 +68,13 @@ public enum JSValue: Equatable {
         }
     }
 
+    public var symbol: JSSymbol? {
+        switch self {
+        case let .symbol(symbol): return symbol
+        default: return nil
+        }
+    }
+
     /// Returns the `true` if this JS value is null.
     /// If not, returns `false`.
     public var isNull: Bool {
@@ -80,23 +88,23 @@ public enum JSValue: Equatable {
     }
 }
 
-extension JSValue {
+public extension JSValue {
     /// An unsafe convenience method of `JSObject.subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
     /// - Precondition: `self` must be a JavaScript Object and specified member should be a callable object.
-    public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue) {
+    subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue) {
         object![dynamicMember: name]!
     }
 
     /// An unsafe convenience method of `JSObject.subscript(_ index: Int) -> JSValue`
     /// - Precondition: `self` must be a JavaScript Object.
-    public subscript(dynamicMember name: String) -> JSValue {
+    subscript(dynamicMember name: String) -> JSValue {
         get { self.object![name] }
         set { self.object![name] = newValue }
     }
 
     /// An unsafe convenience method of `JSObject.subscript(_ index: Int) -> JSValue`
     /// - Precondition: `self` must be a JavaScript Object.
-    public subscript(_ index: Int) -> JSValue {
+    subscript(_ index: Int) -> JSValue {
         get { object![index] }
         set { object![index] = newValue }
     }
@@ -104,15 +112,14 @@ extension JSValue {
 
 extension JSValue: Swift.Error {}
 
-extension JSValue {
-    public func fromJSValue<Type>() -> Type? where Type: ConstructibleFromJSValue {
+public extension JSValue {
+    func fromJSValue<Type>() -> Type? where Type: ConstructibleFromJSValue {
         return Type.construct(from: self)
     }
 }
 
-extension JSValue {
-
-    public static func string(_ value: String) -> JSValue {
+public extension JSValue {
+    static func string(_ value: String) -> JSValue {
         .string(JSString(value))
     }
 
@@ -141,12 +148,12 @@ extension JSValue {
     /// eventListenter.release()
     /// ```
     @available(*, deprecated, message: "Please create JSClosure directly and manage its lifetime manually.")
-    public static func function(_ body: @escaping ([JSValue]) -> JSValue) -> JSValue {
+    static func function(_ body: @escaping ([JSValue]) -> JSValue) -> JSValue {
         .object(JSClosure(body))
     }
 
     @available(*, deprecated, renamed: "object", message: "JSClosure is no longer a subclass of JSFunction. Use .object(closure) instead.")
-    public static func function(_ closure: JSClosure) -> JSValue {
+    static func function(_ closure: JSClosure) -> JSValue {
         .object(closure)
     }
 }
@@ -170,7 +177,7 @@ extension JSValue: ExpressibleByFloatLiteral {
 }
 
 extension JSValue: ExpressibleByNilLiteral {
-    public init(nilLiteral: ()) {
+    public init(nilLiteral _: ()) {
         self = .null
     }
 }
@@ -205,14 +212,14 @@ public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
     }
 }
 
-extension JSValue {
-  /// Return `true` if this value is an instance of the passed `constructor` function.
-  /// Returns `false` for everything except objects and functions.
-  /// - Parameter constructor: The constructor function to check.
-  /// - Returns: The result of `instanceof` in the JavaScript environment.
-    public func isInstanceOf(_ constructor: JSFunction) -> Bool {
+public extension JSValue {
+    /// Return `true` if this value is an instance of the passed `constructor` function.
+    /// Returns `false` for everything except objects and functions.
+    /// - Parameter constructor: The constructor function to check.
+    /// - Returns: The result of `instanceof` in the JavaScript environment.
+    func isInstanceOf(_ constructor: JSFunction) -> Bool {
         switch self {
-        case .boolean, .string, .number, .null, .undefined:
+        case .boolean, .string, .number, .null, .undefined, .symbol:
             return false
         case let .object(ref):
             return ref.isInstanceOf(constructor)
@@ -227,11 +234,12 @@ extension JSValue: CustomStringConvertible {
         switch self {
         case let .boolean(boolean):
             return boolean.description
-        case .string(let string):
+        case let .string(string):
             return string.description
-        case .number(let number):
+        case let .number(number):
             return number.description
-        case .object(let object), .function(let object as JSObject):
+        case let .object(object), let .function(object as JSObject),
+             .symbol(let object as JSObject):
             return object.toString!().fromJSValue()!
         case .null:
             return "null"

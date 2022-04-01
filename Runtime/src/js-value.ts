@@ -10,6 +10,7 @@ export enum Kind {
     Null = 4,
     Undefined = 5,
     Function = 6,
+    Symbol = 7,
 }
 
 export const decode = (
@@ -99,6 +100,11 @@ export const write = (
         }
         case "function": {
             memory.writeUint32(kind_ptr, exceptionBit | Kind.Function);
+            memory.writeUint32(payload1_ptr, memory.retain(value));
+            break;
+        }
+        case "symbol": {
+            memory.writeUint32(kind_ptr, exceptionBit | Kind.Symbol);
             memory.writeUint32(payload1_ptr, memory.retain(value));
             break;
         }

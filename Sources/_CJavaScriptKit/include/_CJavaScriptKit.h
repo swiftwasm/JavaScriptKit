@@ -21,6 +21,7 @@ typedef enum __attribute__((enum_extensibility(closed))) {
   JavaScriptValueKindNull = 4,
   JavaScriptValueKindUndefined = 5,
   JavaScriptValueKindFunction = 6,
+  JavaScriptValueKindSymbol = 7,
 } JavaScriptValueKind;
 
 typedef struct {
@@ -58,6 +59,10 @@ typedef double JavaScriptPayload2;
 ///
 /// For function value:
 ///    payload1: the target `JavaScriptHostFuncRef`
+///    payload2: 0
+///
+/// For symbol value:
+///    payload1: `JavaScriptObjectRef`
 ///    payload2: 0
 ///
 typedef struct {
