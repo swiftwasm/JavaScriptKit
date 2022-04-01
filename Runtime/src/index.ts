@@ -177,9 +177,10 @@ export class SwiftRuntime {
         },
 
         swjs_decode_string: (bytes_ptr: pointer, length: number) => {
-            const bytes = this.memory
-                .bytes()
-                .subarray(bytes_ptr, bytes_ptr + length);
+            const bytes = this.memory.bytes().subarray(
+                bytes_ptr,
+                bytes_ptr + length
+            );
             const string = this.textDecoder.decode(bytes);
             return this.memory.retain(string);
         },
@@ -346,9 +347,6 @@ export class SwiftRuntime {
             this.memory.writeBytes(buffer, bytes);
         },
 
-        swjs_retain: (ref: ref) => {
-            this.memory.retain(this.memory.getObject(ref));
-        },
         swjs_release: (ref: ref) => {
             this.memory.release(ref);
         },

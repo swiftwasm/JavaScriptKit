@@ -21,11 +21,6 @@ open class JSObject: Equatable {
         self.id = id
     }
 
-    public init(cloning object: JSObject) {
-        _retain(object.id)
-        self.id = object.id
-    }
-
     /// Returns the `name` member method binding this object as `this` context.
     ///
     /// e.g.
