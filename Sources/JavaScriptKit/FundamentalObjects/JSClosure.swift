@@ -137,9 +137,7 @@ func _call_host_function_impl(
     guard let (_, hostFunc) = JSClosure.sharedClosures[hostFuncRef] else {
         fatalError("The function was already released")
     }
-    let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
-        $0.jsValue
-    }
+    let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map(\.jsValue)
     let result = hostFunc(arguments)
     let callbackFuncRef = JSFunction(id: callbackFuncRef)
     _ = callbackFuncRef(result)
