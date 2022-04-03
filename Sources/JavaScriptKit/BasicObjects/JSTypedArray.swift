@@ -21,7 +21,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
             return Element.construct(from: jsObject[index])!
         }
         set {
-            self.jsObject[index] = newValue.jsValue()
+            self.jsObject[index] = newValue.jsValue
         }
     }
 

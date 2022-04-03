@@ -1,21 +1,16 @@
 /// Use this protocol when your type has no single JavaScript class.
 /// For example, a union type of multiple classes or primitive values.
 public protocol JSBridgedType: JSValueCompatible, CustomStringConvertible {
-    /// This is the value your class wraps.
-    var value: JSValue { get }
-
     /// If your class is incompatible with the provided value, return `nil`.
     init?(from value: JSValue)
 }
 
 extension JSBridgedType {
     public static func construct(from value: JSValue) -> Self? {
-        return Self.init(from: value)
+        Self.init(from: value)
     }
 
-    public func jsValue() -> JSValue { value }
-
-    public var description: String { value.description }
+    public var description: String { jsValue.description }
 }
 
 /// Conform to this protocol when your Swift class wraps a JavaScript class.
@@ -33,7 +28,8 @@ public protocol JSBridgedClass: JSBridgedType {
 }
 
 extension JSBridgedClass {
-    public var value: JSValue { jsObject.jsValue() }
+    public var jsValue: JSValue { jsObject.jsValue }
+
     public init?(from value: JSValue) {
         guard let object = value.object else { return nil }
         self.init(from: object)

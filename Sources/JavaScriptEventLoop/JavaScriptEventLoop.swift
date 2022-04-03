@@ -100,18 +100,20 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public extension JSPromise {
     /// Wait for the promise to complete, returning (or throwing) its result.
-    func get() async throws -> JSValue {
-        try await withUnsafeThrowingContinuation { [self] continuation in
-            self.then(
-                success: {
-                    continuation.resume(returning: $0)
-                    return JSValue.undefined
-                },
-                failure: {
-                    continuation.resume(throwing: $0)
-                    return JSValue.undefined
-                }
-            )
+    var value: JSValue {
+        get async throws {
+            try await withUnsafeThrowingContinuation { [self] continuation in
+                self.then(
+                    success: {
+                        continuation.resume(returning: $0)
+                        return JSValue.undefined
+                    },
+                    failure: {
+                        continuation.resume(throwing: $0)
+                        return JSValue.undefined
+                    }
+                )
+            }
         }
     }
 }

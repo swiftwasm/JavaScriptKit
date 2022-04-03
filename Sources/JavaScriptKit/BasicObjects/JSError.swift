@@ -34,7 +34,7 @@ public final class JSError: Error, JSBridgedClass {
     }
 
     /// Creates a new `JSValue` from this `JSError` instance.
-    public func jsValue() -> JSValue {
+    public var jsValue: JSValue {
         .object(jsObject)
     }
 }

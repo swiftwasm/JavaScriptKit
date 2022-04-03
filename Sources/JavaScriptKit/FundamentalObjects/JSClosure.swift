@@ -138,7 +138,7 @@ func _call_host_function_impl(
         fatalError("The function was already released")
     }
     let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
-        $0.jsValue()
+        $0.jsValue
     }
     let result = hostFunc(arguments)
     let callbackFuncRef = JSFunction(id: callbackFuncRef)

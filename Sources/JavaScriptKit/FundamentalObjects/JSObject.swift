@@ -152,7 +152,7 @@ public class JSObject: Equatable {
         return value.object as? Self
     }
 
-    public func jsValue() -> JSValue {
+    public var jsValue: JSValue {
         .object(self)
     }
 }
