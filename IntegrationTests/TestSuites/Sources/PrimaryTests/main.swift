@@ -356,14 +356,14 @@ try test("Call Function With This") {
 
 try test("Object Conversion") {
     let array1 = [1, 2, 3]
-    let jsArray1 = array1.jsValue().object!
+    let jsArray1 = array1.jsValue.object!
     try expectEqual(jsArray1.length, .number(3))
     try expectEqual(jsArray1[0], .number(1))
     try expectEqual(jsArray1[1], .number(2))
     try expectEqual(jsArray1[2], .number(3))
 
     let array2: [ConvertibleToJSValue] = [1, "str", false]
-    let jsArray2 = array2.jsValue().object!
+    let jsArray2 = array2.jsValue.object!
     try expectEqual(jsArray2.length, .number(3))
     try expectEqual(jsArray2[0], .number(1))
     try expectEqual(jsArray2[1], .string("str"))
@@ -374,11 +374,11 @@ try test("Object Conversion") {
 
     try expectEqual(jsArray2[4], .object(jsArray1))
 
-    let dict1: [String: ConvertibleToJSValue] = [
-        "prop1": 1,
-        "prop2": "foo",
+    let dict1: [String: JSValue] = [
+        "prop1": 1.jsValue,
+        "prop2": "foo".jsValue,
     ]
-    let jsDict1 = dict1.jsValue().object!
+    let jsDict1 = dict1.jsValue.object!
     try expectEqual(jsDict1.prop1, .number(1))
     try expectEqual(jsDict1.prop2, .string("foo"))
 }
@@ -425,7 +425,7 @@ try test("Closure Identifiers") {
 #endif
 
 func checkArray<T>(_ array: [T]) throws where T: TypedArrayElement & Equatable {
-    try expectEqual(toString(JSTypedArray(array).jsValue().object!), jsStringify(array))
+    try expectEqual(toString(JSTypedArray(array).jsValue.object!), jsStringify(array))
     try checkArrayUnsafeBytes(array)
 }
 
@@ -488,7 +488,7 @@ try test("TypedArray_Mutation") {
     for i in 0..<100 {
         try expectEqual(i, array[i])
     }
-    try expectEqual(toString(array.jsValue().object!), jsStringify(Array(0..<100)))
+    try expectEqual(toString(array.jsValue.object!), jsStringify(Array(0..<100)))
 }
 
 try test("Date") {
@@ -797,9 +797,9 @@ try test("Hashable Conformance") {
 
     let objectConstructor = JSObject.global.Object.function!
     let obj = objectConstructor.new()
-    obj.a = 1.jsValue()
+    obj.a = 1.jsValue
     let firstHash = obj.hashValue
-    obj.b = 2.jsValue()
+    obj.b = 2.jsValue
     let secondHash = obj.hashValue
     try expectEqual(firstHash, secondHash)
 }
@@ -819,11 +819,11 @@ try test("Symbols") {
     //   })
     // }.prop
     let hasInstanceObject = JSObject.global.Object.function!.new()
-    hasInstanceObject.prop = JSClosure { _ in .undefined }.jsValue()
+    hasInstanceObject.prop = JSClosure { _ in .undefined }.jsValue
     let hasInstanceClass = hasInstanceObject.prop.function!
     hasInstanceClass[JSSymbol.hasInstance] = JSClosure { _ in
         return .boolean(true)
-    }.jsValue()
+    }.jsValue
     try expectEqual(hasInstanceClass[JSSymbol.hasInstance].function!().boolean, true)
     try expectEqual(JSObject.global.Object.isInstanceOf(hasInstanceClass), true)
 }

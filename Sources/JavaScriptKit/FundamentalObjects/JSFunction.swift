@@ -18,7 +18,7 @@ public class JSFunction: JSObject {
     /// - Returns: The result of this call.
     @discardableResult
     public func callAsFunction(this: JSObject? = nil, arguments: [ConvertibleToJSValue]) -> JSValue {
-        invokeNonThrowingJSFunction(self, arguments: arguments, this: this).jsValue()
+        invokeNonThrowingJSFunction(self, arguments: arguments, this: this).jsValue
     }
 
     /// A variadic arguments version of `callAsFunction`.
@@ -78,7 +78,7 @@ public class JSFunction: JSObject {
         return value.function as? Self
     }
 
-    override public func jsValue() -> JSValue {
+    override public var jsValue: JSValue {
         .function(self)
     }
 }

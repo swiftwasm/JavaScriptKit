@@ -50,7 +50,7 @@ public class JSThrowingFunction {
                 )
                 if exceptionKind.isException {
                     let exception = RawJSValue(kind: exceptionKind.kind, payload1: exceptionPayload1, payload2: exceptionPayload2)
-                    return .failure(exception.jsValue())
+                    return .failure(exception.jsValue)
                 }
                 return .success(JSObject(id: resultObj))
             }
@@ -82,7 +82,7 @@ private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSV
                 )
             }
             let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
-            return (result.jsValue(), kindAndFlags.isException)
+            return (result.jsValue, kindAndFlags.isException)
         }
     }
     if isException {

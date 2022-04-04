@@ -13,7 +13,7 @@ public protocol TypedArrayElement: ConvertibleToJSValue, ConstructibleFromJSValu
 /// A wrapper around all JavaScript [TypedArray](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) classes that exposes their properties in a type-safe way.
 /// FIXME: [BigInt-based TypedArrays are currently not supported](https://github.com/swiftwasm/JavaScriptKit/issues/56).
 public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral where Element: TypedArrayElement {
-    public static var constructor: JSFunction { Element.typedArrayClass }
+    public class var constructor: JSFunction { Element.typedArrayClass }
     public var jsObject: JSObject
 
     public subscript(_ index: Int) -> Element {
@@ -21,7 +21,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
             return Element.construct(from: jsObject[index])!
         }
         set {
-            self.jsObject[index] = newValue.jsValue()
+            self.jsObject[index] = newValue.jsValue
         }
     }
 
@@ -30,7 +30,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     ///
     /// - Parameter length: The number of elements that will be allocated.
     public init(length: Int) {
-        jsObject = Element.typedArrayClass.new(length)
+        jsObject = Self.constructor.new(length)
     }
 
     required public init(unsafelyWrapping jsObject: JSObject) {
@@ -45,7 +45,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     /// - Parameter array: The array that will be copied to create a new instance of TypedArray
     public convenience init(_ array: [Element]) {
         let jsArrayRef = array.withUnsafeBufferPointer { ptr in
-            _create_typed_array(Element.typedArrayClass.id, ptr.baseAddress!, Int32(array.count))
+            _create_typed_array(Self.constructor.id, ptr.baseAddress!, Int32(array.count))
         }
         self.init(unsafelyWrapping: JSObject(id: jsArrayRef))
     }
@@ -116,7 +116,10 @@ extension Int8: TypedArrayElement {
 extension UInt8: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Uint8Array.function!
 }
-// TODO: Support Uint8ClampedArray?
+
+public class JSUInt8ClampedArray: JSTypedArray<UInt8> {
+    public class override var constructor: JSFunction { JSObject.global.Uint8ClampedArray.function! }
+}
 
 extension Int16: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Int16Array.function!
