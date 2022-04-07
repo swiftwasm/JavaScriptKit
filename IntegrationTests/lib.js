@@ -45,6 +45,8 @@ const startWasiTask = async (wasmPath) => {
     swift.setInstance(instance);
     // Start the WebAssembly WASI instance!
     wasi.start(instance);
+    instance.exports._initialize();
+    instance.exports.main();
 };
 
 module.exports = { startWasiTask };

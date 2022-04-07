@@ -22,25 +22,33 @@ export class SwiftRuntimeHeap {
     }
 
     retain(value: any) {
+        const isObject = typeof value == "object";
         const entry = this._heapEntryByValue.get(value);
-        if (entry) {
+        if (isObject && entry) {
             entry.rc++;
             return entry.id;
         }
         const id = this._heapNextKey++;
         this._heapValueById.set(id, value);
-        this._heapEntryByValue.set(value, { id: id, rc: 1 });
+        if (isObject) {
+            this._heapEntryByValue.set(value, { id: id, rc: 1 });
+        }
         return id;
     }
 
     release(ref: ref) {
         const value = this._heapValueById.get(ref);
-        const entry = this._heapEntryByValue.get(value)!;
-        entry.rc--;
-        if (entry.rc != 0) return;
+        const isObject = typeof value == "object";
+        if (isObject) {
+            const entry = this._heapEntryByValue.get(value)!;
+            entry.rc--;
+            if (entry.rc != 0) return;
 
-        this._heapEntryByValue.delete(value);
-        this._heapValueById.delete(ref);
+            this._heapEntryByValue.delete(value);
+            this._heapValueById.delete(ref);
+        } else {
+            this._heapValueById.delete(ref);
+        }
     }
 
     referenceHeap(ref: ref) {
