@@ -29,7 +29,8 @@ export class SwiftRuntime {
         this._instance = instance;
         if (this.exports.swjs_library_version() != this.version) {
             throw new Error(
-                `The versions of JavaScriptKit are incompatible. ${this.exports.swjs_library_version()} != ${
+                `The versions of JavaScriptKit are incompatible.
+                WebAssembly runtime ${this.exports.swjs_library_version()} != JS runtime ${
                     this.version
                 }`
             );
@@ -177,10 +178,9 @@ export class SwiftRuntime {
         },
 
         swjs_decode_string: (bytes_ptr: pointer, length: number) => {
-            const bytes = this.memory.bytes().subarray(
-                bytes_ptr,
-                bytes_ptr + length
-            );
+            const bytes = this.memory
+                .bytes()
+                .subarray(bytes_ptr, bytes_ptr + length);
             const string = this.textDecoder.decode(bytes);
             return this.memory.retain(string);
         },
@@ -330,7 +330,7 @@ export class SwiftRuntime {
                     false,
                     this.memory
                 );
-                isException = false
+                isException = false;
             } finally {
                 if (isException) {
                     JSValue.write(
