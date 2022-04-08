@@ -1,3 +1,13 @@
+# 0.14.0 (8 April 2022)
+
+This is a breaking release that enables full support for SwiftWasm 5.6 and lays groundwork for future updates to [DOMKit](https://github.com/swiftwasm/DOMKit/).
+
+**Merged pull requests:**
+
+- Reenable integration tests ([#180](https://github.com/swiftwasm/JavaScriptKit/pull/180)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Updates for DOMKit ([#174](https://github.com/swiftwasm/JavaScriptKit/pull/174)) via [@j-f1](https://github.com/j-f1)
+- Add 5.6 release and macOS 12 with Xcode 13.3 to CI matrix ([#176](https://github.com/swiftwasm/JavaScriptKit/pull/176)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+
 # 0.13.0 (31 March 2022)
 
 This release improves handling of JavaScript exceptions and compatibility with Xcode.
@@ -21,7 +31,7 @@ Thanks to [@kateinoigakukun](https://github.com/kateinoigakukun), [@pedrovgs](ht
 
 # 0.12.0 (08 February 2022)
 
-This release introduces a [major refactor](https://github.com/swiftwasm/JavaScriptKit/pull/150) of the JavaScript runtime by [@j-f1] and several performance enhancements. 
+This release introduces a [major refactor](https://github.com/swiftwasm/JavaScriptKit/pull/150) of the JavaScript runtime by [@j-f1] and several performance enhancements.
 
 **Merged pull requests:**
 
@@ -40,9 +50,10 @@ This is a bugfix release that removes a requirement for macOS Monterey in `Packa
 package. `README.md` was updated to explicitly specify that if you're building an app or a library
 that depends on JavaScriptKit for macOS (i.e. cross-platform code that supports both WebAssembly
 and macOS), you need either
-* macOS Monterey that has the new Swift concurrency runtime available, or
-* any version of macOS that supports Swift concurrency back-deployment with Xcode 13.2 or later, or
-* add `.unsafeFlags(["-Xfrontend", "-disable-availability-checking"])` in `Package.swift` manifest.
+
+- macOS Monterey that has the new Swift concurrency runtime available, or
+- any version of macOS that supports Swift concurrency back-deployment with Xcode 13.2 or later, or
+- add `.unsafeFlags(["-Xfrontend", "-disable-availability-checking"])` in `Package.swift` manifest.
 
 **Merged pull requests:**
 
@@ -52,7 +63,7 @@ and macOS), you need either
 
 This release adds support for `async`/`await` and SwiftWasm 5.5. Use the new `value` async property
 on a `JSPromise` instance to `await` for its result. You'll have to add a dependency on the new
-`JavaScriptEventLoop` target in your `Package.swift`, `import JavaScriptEventLoop`, and call 
+`JavaScriptEventLoop` target in your `Package.swift`, `import JavaScriptEventLoop`, and call
 `JavaScriptEventLoop.installGlobalExecutor()` in your code before you start using `await` and `Task`
 APIs.
 
@@ -64,12 +75,12 @@ compiler flags, see [`README.md`](./README.md) for more details.
 This new release of JavaScriptKit may work with SwiftWasm 5.4 and 5.3, but is no longer tested with
 those versions due to compatibility issues introduced on macOS by latest versions of Xcode.
 
-Many thanks to [@j-f1], [@kateinoigakukun], 
+Many thanks to [@j-f1], [@kateinoigakukun],
 and [@PatrickPijnappel] for their contributions to this release!
 
 **Closed issues:**
 
-- Enchancement: Add a link to the docs  ([#136](https://github.com/swiftwasm/JavaScriptKit/issues/136))
+- Enchancement: Add a link to the docs ([#136](https://github.com/swiftwasm/JavaScriptKit/issues/136))
 - Use `FinalizationRegistry` to auto-deinit `JSClosure` ([#131](https://github.com/swiftwasm/JavaScriptKit/issues/131))
 - `make test` crashes due to `JSClosure` memory issues ([#129](https://github.com/swiftwasm/JavaScriptKit/issues/129))
 - Avoid manual memory management with `JSClosure` ([#106](https://github.com/swiftwasm/JavaScriptKit/issues/106))
@@ -97,7 +108,7 @@ tweaks.
 
 **Merged pull requests:**
 
-- Update JS dependencies in package-lock.json ([#126](https://github.com/swiftwasm/JavaScriptKit/pull/126))  via [@MaxDesiatov]
+- Update JS dependencies in package-lock.json ([#126](https://github.com/swiftwasm/JavaScriptKit/pull/126)) via [@MaxDesiatov]
 - Fix typo in method documentation ([#125](https://github.com/swiftwasm/JavaScriptKit/pull/125)) via [@revolter]
 - Update exported func name to match exported name ([#123](https://github.com/swiftwasm/JavaScriptKit/pull/123)) via [@kateinoigakukun]
 - Fix incorrect link in `JSDate` documentation ([#122](https://github.com/swiftwasm/JavaScriptKit/pull/122)) via [@revolter]
@@ -107,18 +118,18 @@ tweaks.
 This release contains multiple breaking changes in preparation for enabling `async`/`await`, when
 this feature is available in a stable SwiftWasm release. Namely:
 
-* `JSClosure.init(_ body: @escaping ([JSValue]) -> ())` overload is deprecated to simplify type
-checking. Its presence requires explicit type signatures at the place of use. It will be removed
-in a future version of JavaScriptKit.
-* `JSClosure` is no longer a subclass of `JSFunction`. These classes are not related enough to keep
-them in the same class hierarchy.
-As a result, you can no longer call `JSClosure` objects directly from Swift.
-* Introduced `JSOneshotClosure` for closures that are going to be called only once. You don't need
-to manage references to these closures manually, as opposed to `JSClosure`.
-However, they can only be called a single time from the JS side. Subsequent invocation attempts will raise a fatal error on the Swift side.
-* Removed generic parameters on `JSPromise`, now both success and failure values are always assumed
-to be of `JSValue` type. This also significantly simplifies type checking and allows callers to
-fully control type casting if needed.
+- `JSClosure.init(_ body: @escaping ([JSValue]) -> ())` overload is deprecated to simplify type
+  checking. Its presence requires explicit type signatures at the place of use. It will be removed
+  in a future version of JavaScriptKit.
+- `JSClosure` is no longer a subclass of `JSFunction`. These classes are not related enough to keep
+  them in the same class hierarchy.
+  As a result, you can no longer call `JSClosure` objects directly from Swift.
+- Introduced `JSOneshotClosure` for closures that are going to be called only once. You don't need
+  to manage references to these closures manually, as opposed to `JSClosure`.
+  However, they can only be called a single time from the JS side. Subsequent invocation attempts will raise a fatal error on the Swift side.
+- Removed generic parameters on `JSPromise`, now both success and failure values are always assumed
+  to be of `JSValue` type. This also significantly simplifies type checking and allows callers to
+  fully control type casting if needed.
 
 **Closed issues:**
 
@@ -200,7 +211,7 @@ with idiomatic Swift code.
 - Update toolchain version, script, and `README.md` ([#96](https://github.com/swiftwasm/JavaScriptKit/pull/96)) via [@MaxDesiatov]
 - [Proposal] Add unsafe convenience methods for JSValue ([#98](https://github.com/swiftwasm/JavaScriptKit/pull/98)) via [@kateinoigakukun]
 - Remove all unsafe linker flags from Package.swift ([#91](https://github.com/swiftwasm/JavaScriptKit/pull/91)) via [@kateinoigakukun]
-- Sync package.json and package-lock.json  ([#90](https://github.com/swiftwasm/JavaScriptKit/pull/90)) via [@kateinoigakukun]
+- Sync package.json and package-lock.json ([#90](https://github.com/swiftwasm/JavaScriptKit/pull/90)) via [@kateinoigakukun]
 - Rename JSValueConvertible/Constructible/Codable ([#88](https://github.com/swiftwasm/JavaScriptKit/pull/88)) via [@j-f1]
 - Bump @actions/core from 1.2.2 to 1.2.6 in /ci/perf-tester ([#89](https://github.com/swiftwasm/JavaScriptKit/pull/89)) via [@dependabot]
 - Make `JSError` conform to `JSBridgedClass` ([#86](https://github.com/swiftwasm/JavaScriptKit/pull/86)) via [@MaxDesiatov]
@@ -278,10 +289,10 @@ This release adds `JSTypedArray` generic type, renames `JSObjectRef` to `JSObjec
 - Clean up the `JSObjectRef` API ([#28](https://github.com/swiftwasm/JavaScriptKit/pull/28)) via [@j-f1]
 - Remove unused `Tests` directory ([#32](https://github.com/swiftwasm/JavaScriptKit/pull/32)) via [@MaxDesiatov]
 
-[@MaxDesiatov]: https://github.com/MaxDesiatov
+[@maxdesiatov]: https://github.com/MaxDesiatov
 [@j-f1]: https://github.com/j-f1
 [@kateinoigakukun]: https://github.com/kateinoigakukun
 [@yonihemi]: https://github.com/yonihemi
-[@PatrickPijnappel]: https://github.com/PatrickPijnappel
+[@patrickpijnappel]: https://github.com/PatrickPijnappel
 [@revolter]: https://github.com/revolter
 [@dependabot]: https://github.com/dependabot
