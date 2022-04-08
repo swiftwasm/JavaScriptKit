@@ -814,16 +814,18 @@ try test("Symbols") {
     try expectEqual(JSSymbol.iterator, JSSymbol.iterator)
 
     // let hasInstanceClass = {
-    //   prop: Object.assign(function () {}, {
-    //     [Symbol.hasInstance]() { return true }
-    //   })
+    //   prop: function () {}
     // }.prop
+    // Object.defineProperty(hasInstanceClass, Symbol.hasInstance, { value: () => true })
     let hasInstanceObject = JSObject.global.Object.function!.new()
     hasInstanceObject.prop = JSClosure { _ in .undefined }.jsValue
     let hasInstanceClass = hasInstanceObject.prop.function!
-    hasInstanceClass[JSSymbol.hasInstance] = JSClosure { _ in
-        return .boolean(true)
-    }.jsValue
+    let propertyDescriptor = JSObject.global.Object.function!.new()
+    propertyDescriptor.value = JSClosure { _ in .boolean(true) }.jsValue
+    _ = JSObject.global.Object.function!.defineProperty!(
+        hasInstanceClass, JSSymbol.hasInstance,
+        propertyDescriptor
+    )
     try expectEqual(hasInstanceClass[JSSymbol.hasInstance].function!().boolean, true)
     try expectEqual(JSObject.global.Object.isInstanceOf(hasInstanceClass), true)
 }
