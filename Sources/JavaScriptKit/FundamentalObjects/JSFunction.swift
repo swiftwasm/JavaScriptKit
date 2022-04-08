@@ -104,7 +104,7 @@ private func invokeNonThrowingJSFunction(_ jsFunc: JSFunction, arguments: [Conve
             }
             assert(!kindAndFlags.isException)
             let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
-            return result.jsValue()
+            return result.jsValue
         }
     }
 }
