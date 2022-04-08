@@ -110,11 +110,9 @@ export class SwiftRuntime {
             payload2: number
         ) => {
             const obj = this.memory.getObject(ref);
-            Reflect.set(
-                obj,
-                this.memory.getObject(name),
-                JSValue.decode(kind, payload1, payload2, this.memory)
-            );
+            const key = this.memory.getObject(name);
+            const value = JSValue.decode(kind, payload1, payload2, this.memory);
+            obj[key] = value;
         },
 
         swjs_get_prop: (
@@ -125,7 +123,8 @@ export class SwiftRuntime {
             payload2_ptr: pointer
         ) => {
             const obj = this.memory.getObject(ref);
-            const result = Reflect.get(obj, this.memory.getObject(name));
+            const key = this.memory.getObject(name);
+            const result = obj[key];
             JSValue.write(
                 result,
                 kind_ptr,
@@ -144,11 +143,8 @@ export class SwiftRuntime {
             payload2: number
         ) => {
             const obj = this.memory.getObject(ref);
-            Reflect.set(
-                obj,
-                index,
-                JSValue.decode(kind, payload1, payload2, this.memory)
-            );
+            const value = JSValue.decode(kind, payload1, payload2, this.memory);
+            obj[index] = value;
         },
 
         swjs_get_subscript: (
@@ -159,7 +155,7 @@ export class SwiftRuntime {
             payload2_ptr: pointer
         ) => {
             const obj = this.memory.getObject(ref);
-            const result = Reflect.get(obj, index);
+            const result = obj[index];
             JSValue.write(
                 result,
                 kind_ptr,
