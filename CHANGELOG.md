@@ -2,6 +2,14 @@
 
 This is a breaking release that enables full support for SwiftWasm 5.6 and lays groundwork for future updates to [DOMKit](https://github.com/swiftwasm/DOMKit/).
 
+- The `ConvertibleToJSValue` conformance on `Array` and `Dictionary` has been swapped from the `== ConvertibleToJSValue` case to the `: ConvertibleToJSValue` case.
+  - This means that e.g. `[String]` is now `ConvertibleToJSValue`, but `[ConvertibleToJSValue]` no longer conforms;
+  - the `jsValue()` method still works in both cases;
+  - to adapt existing code, use one of these approaches:
+    - use generics where possible (for single-type arrays)
+    - call `.map { $0.jsValue() }` (or `mapValues`) to get an array/dictionary of `JSValue` which you can then use as `ConvertibleToJSValue`
+    - add `.jsValue` to the end of all of the values in the array/dictionary literal.
+
 **Merged pull requests:**
 
 - Reenable integration tests ([#180](https://github.com/swiftwasm/JavaScriptKit/pull/180)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
