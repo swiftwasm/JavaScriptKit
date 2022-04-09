@@ -11,6 +11,7 @@ export enum Kind {
     Undefined = 5,
     Function = 6,
     Symbol = 7,
+    BigInt = 8,
 }
 
 export const decode = (
@@ -33,6 +34,7 @@ export const decode = (
         case Kind.String:
         case Kind.Object:
         case Kind.Function:
+        case Kind.BigInt:
             return memory.getObject(payload1);
 
         case Kind.Null:
@@ -73,6 +75,12 @@ export const write = (
         memory.writeUint32(kind_ptr, exceptionBit | Kind.Null);
         return;
     }
+
+    const writeRef = (type: Kind) => {
+        memory.writeUint32(kind_ptr, exceptionBit | type);
+        memory.writeUint32(payload1_ptr, memory.retain(value));
+    };
+
     switch (typeof value) {
         case "boolean": {
             memory.writeUint32(kind_ptr, exceptionBit | Kind.Boolean);
@@ -85,8 +93,7 @@ export const write = (
             break;
         }
         case "string": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.String);
-            memory.writeUint32(payload1_ptr, memory.retain(value));
+            writeRef(Kind.String);
             break;
         }
         case "undefined": {
@@ -94,18 +101,19 @@ export const write = (
             break;
         }
         case "object": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.Object);
-            memory.writeUint32(payload1_ptr, memory.retain(value));
+            writeRef(Kind.Object);
             break;
         }
         case "function": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.Function);
-            memory.writeUint32(payload1_ptr, memory.retain(value));
+            writeRef(Kind.Function);
             break;
         }
         case "symbol": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.Symbol);
-            memory.writeUint32(payload1_ptr, memory.retain(value));
+            writeRef(Kind.Symbol);
+            break;
+        }
+        case "bigint": {
+            writeRef(Kind.BigInt);
             break;
         }
         default:

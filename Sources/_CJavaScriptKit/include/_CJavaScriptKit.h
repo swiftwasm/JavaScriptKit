@@ -22,6 +22,7 @@ typedef enum __attribute__((enum_extensibility(closed))) {
   JavaScriptValueKindUndefined = 5,
   JavaScriptValueKindFunction = 6,
   JavaScriptValueKindSymbol = 7,
+  JavaScriptValueKindBigInt = 8,
 } JavaScriptValueKind;
 
 typedef struct {
@@ -61,7 +62,7 @@ typedef double JavaScriptPayload2;
 ///    payload1: the target `JavaScriptHostFuncRef`
 ///    payload2: 0
 ///
-/// For symbol value:
+/// For symbol and bigint values:
 ///    payload1: `JavaScriptObjectRef`
 ///    payload2: 0
 ///
@@ -299,6 +300,23 @@ extern void _load_typed_array(const JavaScriptObjectRef ref, unsigned char *buff
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_release")))
 extern void _release(const JavaScriptObjectRef ref);
+
+
+/// Converts the provided Int64 or UInt64 to a BigInt.
+///
+/// @param value The value to convert.
+/// @param is_signed Whether to treat the value as a signed integer or not.
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_i64_to_bigint")))
+extern JavaScriptObjectRef _i64_to_bigint(const int64_t value, bool is_signed);
+
+/// Converts the provided BigInt to an Int64 or UInt64.
+///
+/// @param ref The target JavaScript object.
+/// @param is_signed Whether to treat the return value as a signed integer or not.
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_bigint_to_i64")))
+extern int64_t _bigint_to_i64(const JavaScriptObjectRef ref, bool is_signed);
 
 #endif
 

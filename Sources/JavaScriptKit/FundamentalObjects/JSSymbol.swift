@@ -37,6 +37,14 @@ public class JSSymbol: JSObject {
     public static func key(for symbol: JSSymbol) -> String? {
         Symbol.keyFor!(symbol).string
     }
+
+    override public class func construct(from value: JSValue) -> Self? {
+        return value.symbol as? Self
+    }
+
+    override public var jsValue: JSValue {
+        .symbol(self)
+    }
 }
 
 extension JSSymbol {

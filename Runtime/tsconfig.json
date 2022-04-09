@@ -7,8 +7,8 @@
         "noEmit": true,
         "rootDir": "src",
         "strict": true,
-        "target": "es2017",
-        "lib": ["es2017", "DOM", "ESNext.WeakRef"],
+        "target": "es2020",
+        "lib": ["es2020", "DOM", "ESNext.WeakRef"],
         "skipLibCheck": true
     },
     "include": ["src/**/*"],

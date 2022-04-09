@@ -11,6 +11,7 @@ public enum JSValue: Equatable {
     case undefined
     case function(JSFunction)
     case symbol(JSSymbol)
+    case bigInt(JSBigInt)
 
     /// Returns the `Bool` value of this JS value if its type is boolean.
     /// If not, returns `nil`.
@@ -68,9 +69,20 @@ public enum JSValue: Equatable {
         }
     }
 
+    /// Returns the `JSSymbol` of this JS value if its type is function.
+    /// If not, returns `nil`.
     public var symbol: JSSymbol? {
         switch self {
         case let .symbol(symbol): return symbol
+        default: return nil
+        }
+    }
+
+    /// Returns the `JSBigInt` of this JS value if its type is function.
+    /// If not, returns `nil`.
+    public var bigInt: JSBigInt? {
+        switch self {
+        case let .bigInt(bigInt): return bigInt
         default: return nil
         }
     }
@@ -233,7 +245,7 @@ public extension JSValue {
     /// - Returns: The result of `instanceof` in the JavaScript environment.
     func isInstanceOf(_ constructor: JSFunction) -> Bool {
         switch self {
-        case .boolean, .string, .number, .null, .undefined, .symbol:
+        case .boolean, .string, .number, .null, .undefined, .symbol, .bigInt:
             return false
         case let .object(ref):
             return ref.isInstanceOf(constructor)
@@ -253,7 +265,7 @@ extension JSValue: CustomStringConvertible {
         case let .number(number):
             return number.description
         case let .object(object), let .function(object as JSObject),
-             .symbol(let object as JSObject):
+            let .symbol(object as JSObject), let .bigInt(object as JSObject):
             return object.toString!().fromJSValue()!
         case .null:
             return "null"

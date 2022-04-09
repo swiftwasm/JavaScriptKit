@@ -2,6 +2,7 @@ import * as JSValue from "./js-value";
 
 export type ref = number;
 export type pointer = number;
+export type bool = number;
 
 export interface ExportedFunctions {
     swjs_library_version(): number;
@@ -102,6 +103,8 @@ export interface ImportedFunctions {
     ): number;
     swjs_load_typed_array(ref: ref, buffer: pointer): void;
     swjs_release(ref: number): void;
+    swjs_i64_to_bigint(value: bigint, signed: bool): ref;
+    swjs_bigint_to_i64(ref: ref, signed: bool): bigint;
 }
 
 export enum LibraryFeatures {

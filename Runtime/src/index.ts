@@ -409,5 +409,25 @@ export class SwiftRuntime {
         swjs_release: (ref: ref) => {
             this.memory.release(ref);
         },
+
+        swjs_i64_to_bigint: (value: bigint, signed: number) => {
+            return this.memory.retain(
+                signed ? value : BigInt.asUintN(64, value)
+            );
+        },
+        swjs_bigint_to_i64: (ref: ref, signed: number) => {
+            const object = this.memory.getObject(ref);
+            if (typeof object !== "bigint") {
+                throw new Error(`Expected a BigInt, but got ${typeof object}`);
+            }
+            if (signed) {
+                return object;
+            } else {
+                if (object < 0n) {
+                    return 0n;
+                }
+                return BigInt.asIntN(64, object);
+            }
+        },
     };
 }
