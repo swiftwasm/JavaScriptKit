@@ -213,9 +213,3 @@ exports.diffTable = (
 
     return out;
 };
-
-/**
- * Convert a string "true"/"yes"/"1" argument value to a boolean
- * @param {string} v
- */
-exports.toBool = (v) => /^(1|true|yes)$/.test(v);
