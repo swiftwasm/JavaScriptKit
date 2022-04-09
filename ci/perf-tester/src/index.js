@@ -136,7 +136,7 @@ async function run(octokit, context, token) {
         body: markdownDiff,
     };
 
-    if (toBool(getInput("use-check"))) {
+    // if (toBool(getInput("use-check"))) {
         if (token) {
             const finish = await createCheck(octokit, context);
             await finish({
@@ -149,7 +149,7 @@ async function run(octokit, context, token) {
         } else {
             outputRawMarkdown = true;
         }
-    } else {
+    // } else {
         startGroup(`Updating stats PR comment`);
         let commentId;
         try {
@@ -205,7 +205,7 @@ async function run(octokit, context, token) {
                     outputRawMarkdown = true;
                 }
             }
-        }
+        // }
         endGroup();
     }
 
