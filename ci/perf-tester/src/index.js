@@ -43,6 +43,9 @@ const runBenchmarks = async () => {
     return averageBenchmarks(results);
 };
 
+const perfActionComment =
+    "<!-- this-is-an-automated-performance-comment-do-not-edit -->";
+
 async function run(octokit, context) {
     const { number: pull_number } = context.issue;
 
@@ -132,7 +135,7 @@ async function run(octokit, context) {
 
     const comment = {
         ...commentInfo,
-        body: markdownDiff,
+        body: markdownDiff + "\n\n" + perfActionComment,
     };
 
     startGroup(`Updating stats PR comment`);
@@ -141,10 +144,7 @@ async function run(octokit, context) {
         const comments = (await octokit.issues.listComments(commentInfo)).data;
         for (let i = comments.length; i--; ) {
             const c = comments[i];
-            if (
-                c.user.type === "Bot" &&
-                /<sub>[\s\n]*performance-action/.test(c.body)
-            ) {
+            if (c.user.type === "Bot" && c.body.includes(perfActionComment)) {
                 commentId = c.id;
                 break;
             }
