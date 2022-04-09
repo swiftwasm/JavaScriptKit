@@ -58,7 +58,11 @@ extension UInt32: ConvertibleToJSValue {
 }
 
 extension UInt64: ConvertibleToJSValue {
+#if JAVASCRIPTKIT_WITHOUT_BIGINTS
     public var jsValue: JSValue { .number(Double(self)) }
+#else
+    public var jsValue: JSValue { .bigInt(JSBigInt(unsigned: self)) }
+#endif
 }
 
 extension Int8: ConvertibleToJSValue {
@@ -74,7 +78,11 @@ extension Int32: ConvertibleToJSValue {
 }
 
 extension Int64: ConvertibleToJSValue {
+#if JAVASCRIPTKIT_WITHOUT_BIGINTS
     public var jsValue: JSValue { .number(Double(self)) }
+#else
+    public var jsValue: JSValue { .bigInt(JSBigInt(self)) }
+#endif
 }
 
 extension JSString: ConvertibleToJSValue {
@@ -210,7 +218,11 @@ extension RawJSValue: ConvertibleToJSValue {
         case .symbol:
             return .symbol(JSSymbol(id: UInt32(payload1)))
         case .bigInt:
+#if JAVASCRIPTKIT_WITHOUT_BIGINTS
+            fatalError("Received unsupported BigInt value")
+#else
             return .bigInt(JSBigInt(id: UInt32(payload1)))
+#endif
         }
     }
 }
@@ -245,9 +257,11 @@ extension JSValue {
         case let .symbol(symbolRef):
             kind = .symbol
             payload1 = JavaScriptPayload1(symbolRef.id)
+#if !JAVASCRIPTKIT_WITHOUT_BIGINTS
         case let .bigInt(bigIntRef):
             kind = .bigInt
             payload1 = JavaScriptPayload1(bigIntRef.id)
+#endif
         }
         let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
         return body(rawValue)

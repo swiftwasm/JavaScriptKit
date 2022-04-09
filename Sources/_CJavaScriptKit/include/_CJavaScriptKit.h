@@ -302,6 +302,7 @@ __attribute__((__import_module__("javascript_kit"),
 extern void _release(const JavaScriptObjectRef ref);
 
 
+#if !JAVASCRIPTKIT_WITHOUT_BIGINTS
 /// Converts the provided Int64 or UInt64 to a BigInt.
 ///
 /// @param value The value to convert.
@@ -317,6 +318,7 @@ extern JavaScriptObjectRef _i64_to_bigint(const int64_t value, bool is_signed);
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_bigint_to_i64")))
 extern int64_t _bigint_to_i64(const JavaScriptObjectRef ref, bool is_signed);
+#endif
 
 #endif
 

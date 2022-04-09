@@ -35,12 +35,18 @@ extension Double: ConstructibleFromJSValue {}
 extension Float: ConstructibleFromJSValue {}
 
 extension SignedInteger where Self: ConstructibleFromJSValue {
+#if JAVASCRIPTKIT_WITHOUT_BIGINTS
+    public static func construct(from value: JSValue) -> Self? {
+        value.number.map(Self.init)
+    }
+#else
     public init(_ bigInt: JSBigInt) {
         self.init(bigInt.int64Value)
     }
     public static func construct(from value: JSValue) -> Self? {
         value.bigInt.map(Self.init) ?? value.number.map(Self.init)
     }
+#endif
 }
 extension Int: ConstructibleFromJSValue {}
 extension Int8: ConstructibleFromJSValue {}
@@ -49,12 +55,18 @@ extension Int32: ConstructibleFromJSValue {}
 extension Int64: ConstructibleFromJSValue {}
 
 extension UnsignedInteger where Self: ConstructibleFromJSValue {
+#if JAVASCRIPTKIT_WITHOUT_BIGINTS
+    public static func construct(from value: JSValue) -> Self? {
+        value.number.map(Self.init)
+    }
+#else
     public init(_ bigInt: JSBigInt) {
         self.init(bigInt.uInt64Value)
     }
     public static func construct(from value: JSValue) -> Self? {
         value.bigInt.map(Self.init) ?? value.number.map(Self.init)
     }
+#endif
 }
 extension UInt: ConstructibleFromJSValue {}
 extension UInt8: ConstructibleFromJSValue {}

@@ -1,5 +1,6 @@
 import _CJavaScriptKit
 
+#if !JAVASCRIPTKIT_WITHOUT_BIGINTS
 private let constructor = JSObject.global.BigInt.function!
 
 public final class JSBigInt: JSObject {
@@ -37,3 +38,4 @@ public final class JSBigInt: JSObject {
         }
     }
 }
+#endif

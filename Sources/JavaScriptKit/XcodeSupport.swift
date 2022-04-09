@@ -102,7 +102,9 @@ import _CJavaScriptKit
         _: UnsafeMutablePointer<UInt8>!
     ) { fatalError() }
     func _release(_: JavaScriptObjectRef) { fatalError() }
+#if !JAVASCRIPTKIT_WITHOUT_BIGINTS
     func _i64_to_bigint(_: Int64, _: Bool) -> JavaScriptObjectRef { fatalError() }
     func _bigint_to_i64(_: JavaScriptObjectRef, _: Bool) -> Int64 { fatalError() }
+#endif
 
 #endif

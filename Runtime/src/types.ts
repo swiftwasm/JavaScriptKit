@@ -109,6 +109,7 @@ export interface ImportedFunctions {
 
 export const enum LibraryFeatures {
     WeakRefs = 1 << 0,
+    BigInts = 1 << 1,
 }
 
 export type TypedArray =

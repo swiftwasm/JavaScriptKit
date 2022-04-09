@@ -35,6 +35,17 @@ export class SwiftRuntime {
                 }`
             );
         }
+
+        if (this.exports.swjs_library_features() & LibraryFeatures.BigInts) {
+            if (typeof BigInt === "undefined") {
+                throw new Error(
+                    "The Swift part of JavaScriptKit was configured to require " +
+                        "the availability of JavaScript BigInts. Please build " +
+                        "with `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_BIGINTS` to " +
+                        "disable features that use BigInts."
+                );
+            }
+        }
     }
 
     private get instance() {
