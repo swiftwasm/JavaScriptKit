@@ -804,5 +804,27 @@ try test("Hashable Conformance") {
     try expectEqual(firstHash, secondHash)
 }
 
+struct AnimalStruct: Decodable {
+    let name: String
+    let age: Int
+    let isCat: Bool
+}
+
+try test("JSValueDecoder") {
+    let Animal = JSObject.global.Animal.function!
+    let tama = try Animal.throws.new("Tama", 3, true)
+    let decoder = JSValueDecoder()
+    let decodedTama = try decoder.decode(AnimalStruct.self, from: tama.jsValue)
+
+    try expectEqual(decodedTama.name, tama.name.string)
+    try expectEqual(decodedTama.name, "Tama")
+
+    try expectEqual(decodedTama.age, tama.age.number.map(Int.init))
+    try expectEqual(decodedTama.age, 3)
+
+    try expectEqual(decodedTama.isCat, tama.isCat.boolean)
+    try expectEqual(decodedTama.isCat, true)
+}
+
 
 Expectation.wait(expectations)
