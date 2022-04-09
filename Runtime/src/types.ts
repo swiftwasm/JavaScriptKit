@@ -107,7 +107,7 @@ export interface ImportedFunctions {
     swjs_bigint_to_i64(ref: ref, signed: bool): bigint;
 }
 
-export enum LibraryFeatures {
+export const enum LibraryFeatures {
     WeakRefs = 1 << 0,
 }
 
