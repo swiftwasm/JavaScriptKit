@@ -309,7 +309,7 @@ extern void _release(const JavaScriptObjectRef ref);
 /// @param is_signed Whether to treat the value as a signed integer or not.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_i64_to_bigint")))
-extern JavaScriptObjectRef _i64_to_bigint(const int64_t value, bool is_signed);
+extern JavaScriptObjectRef _i64_to_bigint(const long long value, bool is_signed);
 
 /// Converts the provided BigInt to an Int64 or UInt64.
 ///
@@ -317,7 +317,7 @@ extern JavaScriptObjectRef _i64_to_bigint(const int64_t value, bool is_signed);
 /// @param is_signed Whether to treat the return value as a signed integer or not.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_bigint_to_i64")))
-extern int64_t _bigint_to_i64(const JavaScriptObjectRef ref, bool is_signed);
+extern long long _bigint_to_i64(const JavaScriptObjectRef ref, bool is_signed);
 #endif
 
 #endif
