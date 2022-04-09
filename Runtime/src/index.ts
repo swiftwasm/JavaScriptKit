@@ -434,8 +434,8 @@ export class SwiftRuntime {
             if (signed) {
                 return object;
             } else {
-                if (object < 0n) {
-                    return 0n;
+                if (object < BigInt(0)) {
+                    return BigInt(0);
                 }
                 return BigInt.asIntN(64, object);
             }
