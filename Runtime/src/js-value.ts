@@ -34,6 +34,7 @@ export const decode = (
         case Kind.String:
         case Kind.Object:
         case Kind.Function:
+        case Kind.Symbol:
         case Kind.BigInt:
             return memory.getObject(payload1);
 
