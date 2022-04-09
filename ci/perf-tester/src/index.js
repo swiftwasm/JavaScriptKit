@@ -31,8 +31,8 @@ const {
     diffTable,
 } = require("./utils.js");
 
-const benchmarkParallel = 2;
-const benchmarkSerial = 2;
+const benchmarkParallel = 4;
+const benchmarkSerial = 4;
 const runBenchmarks = async () => {
     let results = [];
     for (let i = 0; i < benchmarkSerial; i++) {
