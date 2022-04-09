@@ -2,7 +2,6 @@ import { Memory } from "./memory";
 import { pointer } from "./types";
 
 export const enum Kind {
-    Invalid = -1,
     Boolean = 0,
     String = 1,
     Number = 2,

@@ -199,8 +199,6 @@ extension Array: ConstructibleFromJSValue where Element: ConstructibleFromJSValu
 extension RawJSValue: ConvertibleToJSValue {
     public var jsValue: JSValue {
         switch kind {
-        case .invalid:
-            fatalError()
         case .boolean:
             return .boolean(payload1 != 0)
         case .number:

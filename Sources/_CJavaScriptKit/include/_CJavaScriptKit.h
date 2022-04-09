@@ -13,7 +13,6 @@ typedef unsigned int JavaScriptHostFuncRef;
 
 /// `JavaScriptValueKind` represents the kind of JavaScript primitive value.
 typedef enum __attribute__((enum_extensibility(closed))) {
-  JavaScriptValueKindInvalid = -1,
   JavaScriptValueKindBoolean = 0,
   JavaScriptValueKindString = 1,
   JavaScriptValueKindNumber = 2,
