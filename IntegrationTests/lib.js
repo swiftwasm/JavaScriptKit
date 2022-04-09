@@ -6,6 +6,8 @@ const promisify = require("util").promisify;
 const fs = require("fs");
 const readFile = promisify(fs.readFile);
 
+Error.stackTraceLimit = Infinity;
+
 const startWasiTask = async (wasmPath) => {
     // Instantiate a new WASI Instance
     const wasmFs = new WasmFs();
