@@ -1,5 +1,5 @@
 import { Memory } from "./memory";
-import { pointer } from "./types";
+import { assertNever, pointer } from "./types";
 
 export const enum Kind {
     Boolean = 0,
@@ -44,7 +44,7 @@ export const decode = (
             return undefined;
 
         default:
-            throw new Error(`JSValue Type kind "${kind}" is not supported`);
+            assertNever(kind, `JSValue Type kind "${kind}" is not supported`);
     }
 };
 
@@ -81,7 +81,8 @@ export const write = (
         memory.writeUint32(payload1_ptr, memory.retain(value));
     };
 
-    switch (typeof value) {
+    const type = typeof value;
+    switch (type) {
         case "boolean": {
             memory.writeUint32(kind_ptr, exceptionBit | Kind.Boolean);
             memory.writeUint32(payload1_ptr, value ? 1 : 0);
@@ -117,6 +118,6 @@ export const write = (
             break;
         }
         default:
-            throw new Error(`Type "${typeof value}" is not supported yet`);
+            assertNever(type, `Type "${type}" is not supported yet`);
     }
 };

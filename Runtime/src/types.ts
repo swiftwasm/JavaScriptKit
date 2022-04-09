@@ -124,3 +124,7 @@ export type TypedArray =
     // | BigUint64ArrayConstructor
     | Float32ArrayConstructor
     | Float64ArrayConstructor;
+
+export function assertNever(x: never, message: string) {
+    throw new Error(message);
+}
