@@ -133,9 +133,7 @@ async function run(octokit, context, token) {
 
     const comment = {
         ...commentInfo,
-        body:
-            markdownDiff +
-            '\n\n<a href="https://github.com/j-f1/performance-action"><sub>performance-action</sub></a>',
+        body: markdownDiff,
     };
 
     if (toBool(getInput("use-check"))) {
