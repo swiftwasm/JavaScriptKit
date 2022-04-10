@@ -125,7 +125,6 @@ export class SwiftRuntime {
             const value = JSValue.decode(kind, payload1, payload2, this.memory);
             obj[key] = value;
         },
-
         swjs_get_prop: (
             ref: ref,
             name: ref,
@@ -157,7 +156,6 @@ export class SwiftRuntime {
             const value = JSValue.decode(kind, payload1, payload2, this.memory);
             obj[index] = value;
         },
-
         swjs_get_subscript: (
             ref: ref,
             index: number,
@@ -183,7 +181,6 @@ export class SwiftRuntime {
             this.memory.writeUint32(bytes_ptr_result, bytes_ptr);
             return bytes.length;
         },
-
         swjs_decode_string: (bytes_ptr: pointer, length: number) => {
             const bytes = this.memory
                 .bytes()
@@ -191,7 +188,6 @@ export class SwiftRuntime {
             const string = this.textDecoder.decode(bytes);
             return this.memory.retain(string);
         },
-
         swjs_load_string: (ref: ref, buffer: pointer) => {
             const bytes = this.memory.getObject(ref);
             this.memory.writeBytes(buffer, bytes);
@@ -301,7 +297,6 @@ export class SwiftRuntime {
                 this.memory
             );
         },
-
         swjs_call_function_with_this_no_catch: (
             obj_ref: ref,
             func_ref: ref,
@@ -339,13 +334,13 @@ export class SwiftRuntime {
                 }
             }
         },
+
         swjs_call_new: (ref: ref, argv: pointer, argc: number) => {
             const constructor = this.memory.getObject(ref);
             const args = JSValue.decodeArray(argv, argc, this.memory);
             const instance = new constructor(...args);
             return this.memory.retain(instance);
         },
-
         swjs_call_throwing_new: (
             ref: ref,
             argv: pointer,
