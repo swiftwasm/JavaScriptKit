@@ -11,7 +11,6 @@ import _CJavaScriptKit
 /// ```
 ///
 public class JSFunction: JSObject {
-
     /// Call this function with given `arguments` and binding given `this` as context.
     /// - Parameters:
     ///   - this: The value to be passed as the `this` parameter to this function.
@@ -19,7 +18,7 @@ public class JSFunction: JSObject {
     /// - Returns: The result of this call.
     @discardableResult
     public func callAsFunction(this: JSObject? = nil, arguments: [ConvertibleToJSValue]) -> JSValue {
-        invokeNonThrowingJSFunction(self, arguments: arguments, this: this)
+        invokeNonThrowingJSFunction(self, arguments: arguments, this: this).jsValue
     }
 
     /// A variadic arguments version of `callAsFunction`.
@@ -41,7 +40,7 @@ public class JSFunction: JSObject {
     public func new(arguments: [ConvertibleToJSValue]) -> JSObject {
         arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
-                return JSObject(id: _call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
+                JSObject(id: _call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
             }
         }
     }
@@ -75,7 +74,7 @@ public class JSFunction: JSObject {
         fatalError("unavailable")
     }
 
-    public override class func construct(from value: JSValue) -> Self? {
+    override public class func construct(from value: JSValue) -> Self? {
         return value.function as? Self
     }
 
@@ -84,9 +83,9 @@ public class JSFunction: JSObject {
     }
 }
 
-private func invokeNonThrowingJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) -> JSValue {
+func invokeNonThrowingJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) -> RawJSValue {
     arguments.withRawJSValues { rawValues in
-        rawValues.withUnsafeBufferPointer { bufferPointer -> (JSValue) in
+        rawValues.withUnsafeBufferPointer { bufferPointer in
             let argv = bufferPointer.baseAddress
             let argc = bufferPointer.count
             var kindAndFlags = JavaScriptValueKindAndFlags()
@@ -94,8 +93,8 @@ private func invokeNonThrowingJSFunction(_ jsFunc: JSFunction, arguments: [Conve
             var payload2 = JavaScriptPayload2()
             if let thisId = this?.id {
                 _call_function_with_this_no_catch(thisId,
-                                         jsFunc.id, argv, Int32(argc),
-                                         &kindAndFlags, &payload1, &payload2)
+                                                  jsFunc.id, argv, Int32(argc),
+                                                  &kindAndFlags, &payload1, &payload2)
             } else {
                 _call_function_no_catch(
                     jsFunc.id, argv, Int32(argc),
@@ -104,7 +103,7 @@ private func invokeNonThrowingJSFunction(_ jsFunc: JSFunction, arguments: [Conve
             }
             assert(!kindAndFlags.isException)
             let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
-            return result.jsValue
+            return result
         }
     }
 }

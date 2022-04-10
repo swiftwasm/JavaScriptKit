@@ -804,6 +804,32 @@ try test("Hashable Conformance") {
     try expectEqual(firstHash, secondHash)
 }
 
+try test("Symbols") {
+    let symbol1 = JSSymbol("abc")
+    let symbol2 = JSSymbol("abc")
+    try expectNotEqual(symbol1, symbol2)
+    try expectEqual(symbol1.name, symbol2.name)
+    try expectEqual(symbol1.name, "abc")
+
+    try expectEqual(JSSymbol.iterator, JSSymbol.iterator)
+
+    // let hasInstanceClass = {
+    //   prop: function () {}
+    // }.prop
+    // Object.defineProperty(hasInstanceClass, Symbol.hasInstance, { value: () => true })
+    let hasInstanceObject = JSObject.global.Object.function!.new()
+    hasInstanceObject.prop = JSClosure { _ in .undefined }.jsValue
+    let hasInstanceClass = hasInstanceObject.prop.function!
+    let propertyDescriptor = JSObject.global.Object.function!.new()
+    propertyDescriptor.value = JSClosure { _ in .boolean(true) }.jsValue
+    _ = JSObject.global.Object.function!.defineProperty!(
+        hasInstanceClass, JSSymbol.hasInstance,
+        propertyDescriptor
+    )
+    try expectEqual(hasInstanceClass[JSSymbol.hasInstance].function!().boolean, true)
+    try expectEqual(JSObject.global.Object.isInstanceOf(hasInstanceClass), true)
+}
+
 struct AnimalStruct: Decodable {
     let name: String
     let age: Int
