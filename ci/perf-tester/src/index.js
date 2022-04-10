@@ -24,16 +24,15 @@ const { setFailed, startGroup, endGroup, debug } = require("@actions/core");
 const { GitHub, context } = require("@actions/github");
 const { exec } = require("@actions/exec");
 const {
-    getInput,
+    config,
     runBenchmark,
     averageBenchmarks,
     toDiff,
     diffTable,
-    toBool,
 } = require("./utils.js");
 
-const benchmarkParallel = 2;
-const benchmarkSerial = 2;
+const benchmarkParallel = 4;
+const benchmarkSerial = 4;
 const runBenchmarks = async () => {
     let results = [];
     for (let i = 0; i < benchmarkSerial; i++) {
@@ -44,7 +43,10 @@ const runBenchmarks = async () => {
     return averageBenchmarks(results);
 };
 
-async function run(octokit, context, token) {
+const perfActionComment =
+    "<!-- this-is-an-automated-performance-comment-do-not-edit -->";
+
+async function run(octokit, context) {
     const { number: pull_number } = context.issue;
 
     const pr = context.payload.pull_request;
@@ -61,9 +63,8 @@ async function run(octokit, context, token) {
         `PR #${pull_number} is targetted at ${pr.base.ref} (${pr.base.sha})`
     );
 
-    const buildScript = getInput("build-script");
-    startGroup(`[current] Build using '${buildScript}'`);
-    await exec(buildScript);
+    startGroup(`[current] Build using '${config.buildScript}'`);
+    await exec(config.buildScript);
     endGroup();
 
     startGroup(`[current] Running benchmark`);
@@ -104,8 +105,8 @@ async function run(octokit, context, token) {
     }
     endGroup();
 
-    startGroup(`[base] Build using '${buildScript}'`);
-    await exec(buildScript);
+    startGroup(`[base] Build using '${config.buildScript}'`);
+    await exec(config.buildScript);
     endGroup();
 
     startGroup(`[base] Running benchmark`);
@@ -118,10 +119,7 @@ async function run(octokit, context, token) {
         collapseUnchanged: true,
         omitUnchanged: false,
         showTotal: true,
-        minimumChangeThreshold: parseInt(
-            getInput("minimum-change-threshold"),
-            10
-        ),
+        minimumChangeThreshold: config.minimumChangeThreshold,
     });
 
     let outputRawMarkdown = false;
@@ -133,79 +131,58 @@ async function run(octokit, context, token) {
 
     const comment = {
         ...commentInfo,
-        body:
-            markdownDiff +
-            '\n\n<a href="https://github.com/j-f1/performance-action"><sub>performance-action</sub></a>',
+        body: markdownDiff + "\n\n" + perfActionComment,
     };
 
-    if (toBool(getInput("use-check"))) {
-        if (token) {
-            const finish = await createCheck(octokit, context);
-            await finish({
-                conclusion: "success",
-                output: {
-                    title: `Compressed Size Action`,
-                    summary: markdownDiff,
-                },
-            });
-        } else {
-            outputRawMarkdown = true;
-        }
-    } else {
-        startGroup(`Updating stats PR comment`);
-        let commentId;
-        try {
-            const comments = (await octokit.issues.listComments(commentInfo))
-                .data;
-            for (let i = comments.length; i--; ) {
-                const c = comments[i];
-                if (
-                    c.user.type === "Bot" &&
-                    /<sub>[\s\n]*performance-action/.test(c.body)
-                ) {
-                    commentId = c.id;
-                    break;
-                }
+    startGroup(`Updating stats PR comment`);
+    let commentId;
+    try {
+        const comments = (await octokit.issues.listComments(commentInfo)).data;
+        for (let i = comments.length; i--; ) {
+            const c = comments[i];
+            if (c.user.type === "Bot" && c.body.includes(perfActionComment)) {
+                commentId = c.id;
+                break;
             }
-        } catch (e) {
-            console.log("Error checking for previous comments: " + e.message);
         }
+    } catch (e) {
+        console.log("Error checking for previous comments: " + e.message);
+    }
 
-        if (commentId) {
-            console.log(`Updating previous comment #${commentId}`);
+    if (commentId) {
+        console.log(`Updating previous comment #${commentId}`);
+        try {
+            await octokit.issues.updateComment({
+                ...context.repo,
+                comment_id: commentId,
+                body: comment.body,
+            });
+        } catch (e) {
+            console.log("Error editing previous comment: " + e.message);
+            commentId = null;
+        }
+    }
+
+    // no previous or edit failed
+    if (!commentId) {
+        console.log("Creating new comment");
+        try {
+            await octokit.issues.createComment(comment);
+        } catch (e) {
+            console.log(`Error creating comment: ${e.message}`);
+            console.log(`Submitting a PR review comment instead...`);
             try {
-                await octokit.issues.updateComment({
-                    ...context.repo,
-                    comment_id: commentId,
+                const issue = context.issue || pr;
+                await octokit.pulls.createReview({
+                    owner: issue.owner,
+                    repo: issue.repo,
+                    pull_number: issue.number,
+                    event: "COMMENT",
                     body: comment.body,
                 });
             } catch (e) {
-                console.log("Error editing previous comment: " + e.message);
-                commentId = null;
-            }
-        }
-
-        // no previous or edit failed
-        if (!commentId) {
-            console.log("Creating new comment");
-            try {
-                await octokit.issues.createComment(comment);
-            } catch (e) {
-                console.log(`Error creating comment: ${e.message}`);
-                console.log(`Submitting a PR review comment instead...`);
-                try {
-                    const issue = context.issue || pr;
-                    await octokit.pulls.createReview({
-                        owner: issue.owner,
-                        repo: issue.repo,
-                        pull_number: issue.number,
-                        event: "COMMENT",
-                        body: comment.body,
-                    });
-                } catch (e) {
-                    console.log("Error creating PR review.");
-                    outputRawMarkdown = true;
-                }
+                console.log("Error creating PR review.");
+                outputRawMarkdown = true;
             }
         }
         endGroup();
@@ -225,31 +202,10 @@ async function run(octokit, context, token) {
     console.log("All done!");
 }
 
-// create a check and return a function that updates (completes) it
-async function createCheck(octokit, context) {
-    const check = await octokit.checks.create({
-        ...context.repo,
-        name: "Compressed Size",
-        head_sha: context.payload.pull_request.head.sha,
-        status: "in_progress",
-    });
-
-    return async (details) => {
-        await octokit.checks.update({
-            ...context.repo,
-            check_run_id: check.data.id,
-            completed_at: new Date().toISOString(),
-            status: "completed",
-            ...details,
-        });
-    };
-}
-
 (async () => {
     try {
-        const token = getInput("repo-token", { required: true });
-        const octokit = new GitHub(token);
-        await run(octokit, context, token);
+        const octokit = new GitHub(process.env.GITHUB_TOKEN);
+        await run(octokit, context);
     } catch (e) {
         setFailed(e.message);
     }

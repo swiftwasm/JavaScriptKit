@@ -20,22 +20,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-const fs = require("fs");
 const { exec } = require("@actions/exec");
 
-const getInput = (key) =>
-    ({
-        "build-script": "make bootstrap benchmark_setup",
-        benchmark: "make -s run_benchmark",
-        "minimum-change-threshold": 5,
-        "use-check": "no",
-        "repo-token": process.env.GITHUB_TOKEN,
-    }[key]);
-exports.getInput = getInput;
+const formatMS = (ms) =>
+    `${ms.toLocaleString("en-US", {
+        maximumFractionDigits: 0,
+    })}ms`;
+
+const config = {
+    buildScript: "make bootstrap benchmark_setup",
+    benchmark: "make -s run_benchmark",
+    minimumChangeThreshold: 5,
+};
+exports.config = config;
 
 exports.runBenchmark = async () => {
     let benchmarkBuffers = [];
-    await exec(getInput("benchmark"), [], {
+    await exec(config.benchmark, [], {
         listeners: {
             stdout: (data) => benchmarkBuffers.push(data),
         },
@@ -88,8 +89,7 @@ exports.toDiff = (before, after) => {
  * @param {number} difference
  */
 function getDeltaText(delta, difference) {
-    let deltaText =
-        (delta > 0 ? "+" : "") + delta.toLocaleString("en-US") + "ms";
+    let deltaText = (delta > 0 ? "+" : "") + formatMS(delta);
     if (delta && Math.abs(delta) > 1) {
         deltaText += ` (${Math.abs(difference)}%)`;
     }
@@ -183,7 +183,7 @@ exports.diffTable = (
 
         const columns = [
             name,
-            time.toLocaleString("en-US") + "ms",
+            formatMS(time),
             getDeltaText(delta, difference),
             iconForDifference(difference),
         ];
@@ -198,24 +198,16 @@ exports.diffTable = (
 
     if (unChangedRows.length !== 0) {
         const outUnchanged = markdownTable(unChangedRows);
-        out += `\n\n<details><summary>ℹ️ <strong>View Unchanged</strong></summary>\n\n${outUnchanged}\n\n</details>\n\n`;
+        out += `\n\n<details><summary><strong>View Unchanged</strong></summary>\n\n${outUnchanged}\n\n</details>\n\n`;
     }
 
     if (showTotal) {
         const totalDifference = ((totalDelta / totalTime) * 100) | 0;
         let totalDeltaText = getDeltaText(totalDelta, totalDifference);
         let totalIcon = iconForDifference(totalDifference);
-        out = `**Total Time:** ${totalTime.toLocaleString(
-            "en-US"
-        )}ms\n\n${out}`;
+        out = `**Total Time:** ${formatMS(totalTime)}\n\n${out}`;
         out = `**Time Change:** ${totalDeltaText} ${totalIcon}\n\n${out}`;
     }
 
     return out;
 };
-
-/**
- * Convert a string "true"/"yes"/"1" argument value to a boolean
- * @param {string} v
- */
-exports.toBool = (v) => /^(1|true|yes)$/.test(v);
