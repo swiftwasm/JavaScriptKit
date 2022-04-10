@@ -76,8 +76,8 @@ export const write = (
         return;
     }
 
-    const writeRef = (type: Kind) => {
-        memory.writeUint32(kind_ptr, exceptionBit | type);
+    const writeRef = (kind: Kind) => {
+        memory.writeUint32(kind_ptr, exceptionBit | kind);
         memory.writeUint32(payload1_ptr, memory.retain(value));
     };
 
