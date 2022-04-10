@@ -23,7 +23,7 @@ public final class JSBigInt: JSObject {
     }
 
     override public class func construct(from value: JSValue) -> Self? {
-        return value.bigInt as? Self
+        value.bigInt as? Self
     }
 
     override public var jsValue: JSValue {
