@@ -71,15 +71,15 @@ a few additional steps though (you can skip these steps if your app depends on
 )
 ```
 
-1. Add an explicit import in the code that executes **before** you start using `await` and/or `Task`
-   APIs (most likely in `main.swift`):
+2. Add an explicit import in the code that executes **before* you start using `await` and/or `Task`
+APIs (most likely in `main.swift`):
 
 ```swift
 import JavaScriptEventLoop
 ```
 
-3. Run this function **before** you start using `await` and/or `Task` APIs (again, most likely in
-   `main.swift`):
+3. Run this function **before* you start using `await` and/or `Task` APIs (again, most likely in
+`main.swift`):
 
 ```swift
 JavaScriptEventLoop.installGlobalExecutor()
@@ -125,21 +125,21 @@ asyncButtonElement.onclick = .object(JSClosure { _ in
 _ = document.body.appendChild(asyncButtonElement)
 ```
 
-## Requirements
+## Requirements 
 
 ### For developers
 
-- macOS 11 and Xcode 13.2 or later versions, which support Swift Concurrency back-deployment.
-  To use earlier versions of Xcode on macOS 11 you'll have to
-  add `.unsafeFlags(["-Xfrontend", "-disable-availability-checking"])` in `Package.swift` manifest of
-  your package that depends on JavaScriptKit. You can also use Xcode 13.0 and 13.1 on macOS Monterey,
-  since this OS does not need back-deployment.
+- macOS 11 and Xcode 13.2 or later versions, which support Swift Concurrency back-deployment. 
+To use earlier versions of Xcode on macOS 11 you'll have to 
+add `.unsafeFlags(["-Xfrontend", "-disable-availability-checking"])` in `Package.swift` manifest of
+your package that depends on JavaScriptKit. You can also use Xcode 13.0 and 13.1 on macOS Monterey,
+since this OS does not need back-deployment.
 - [Swift 5.5 or later](https://swift.org/download/) and Ubuntu 18.04 if you'd like to use Linux.
   Other Linux distributions are currently not supported.
 
 ### For users of apps depending on JavaScriptKit
 
-Any recent browser that [supports WebAssembly](https://caniuse.com/#feat=wasm) and required
+Any recent browser that [supports WebAssembly](https://caniuse.com/#feat=wasm) and required 
 JavaScript features should work, which currently includes:
 
 - Edge 84+
