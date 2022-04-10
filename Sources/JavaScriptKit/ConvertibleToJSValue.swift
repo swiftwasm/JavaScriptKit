@@ -26,11 +26,17 @@ extension Bool: ConvertibleToJSValue {
 }
 
 extension Int: ConvertibleToJSValue {
-    public var jsValue: JSValue { .number(Double(self)) }
+    public var jsValue: JSValue {
+        assert(Self.bitWidth == 32)
+        return .number(Double(self))
+    }
 }
 
 extension UInt: ConvertibleToJSValue {
-    public var jsValue: JSValue { .number(Double(self)) }
+    public var jsValue: JSValue {
+        assert(Self.bitWidth == 32)
+        return .number(Double(self))
+    }
 }
 
 extension Float: ConvertibleToJSValue {
