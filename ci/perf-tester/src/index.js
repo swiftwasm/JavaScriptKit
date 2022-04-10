@@ -24,7 +24,7 @@ const { setFailed, startGroup, endGroup, debug } = require("@actions/core");
 const { GitHub, context } = require("@actions/github");
 const { exec } = require("@actions/exec");
 const {
-    getInput,
+    config,
     runBenchmark,
     averageBenchmarks,
     toDiff,
@@ -63,9 +63,8 @@ async function run(octokit, context) {
         `PR #${pull_number} is targetted at ${pr.base.ref} (${pr.base.sha})`
     );
 
-    const buildScript = getInput("build-script");
-    startGroup(`[current] Build using '${buildScript}'`);
-    await exec(buildScript);
+    startGroup(`[current] Build using '${config.buildScript}'`);
+    await exec(config.buildScript);
     endGroup();
 
     startGroup(`[current] Running benchmark`);
@@ -106,8 +105,8 @@ async function run(octokit, context) {
     }
     endGroup();
 
-    startGroup(`[base] Build using '${buildScript}'`);
-    await exec(buildScript);
+    startGroup(`[base] Build using '${config.buildScript}'`);
+    await exec(config.buildScript);
     endGroup();
 
     startGroup(`[base] Running benchmark`);
@@ -120,10 +119,7 @@ async function run(octokit, context) {
         collapseUnchanged: true,
         omitUnchanged: false,
         showTotal: true,
-        minimumChangeThreshold: parseInt(
-            getInput("minimum-change-threshold"),
-            10
-        ),
+        minimumChangeThreshold: config.minimumChangeThreshold,
     });
 
     let outputRawMarkdown = false;
@@ -208,8 +204,7 @@ async function run(octokit, context) {
 
 (async () => {
     try {
-        const token = getInput("repo-token", { required: true });
-        const octokit = new GitHub(token);
+        const octokit = new GitHub(process.env.GITHUB_TOKEN);
         await run(octokit, context);
     } catch (e) {
         setFailed(e.message);

@@ -27,19 +27,16 @@ const formatMS = (ms) =>
         maximumFractionDigits: 0,
     })}ms`;
 
-const getInput = (key) =>
-    ({
-        "build-script": "make bootstrap benchmark_setup",
-        benchmark: "make -s run_benchmark",
-        "minimum-change-threshold": 5,
-        "use-check": "no",
-        "repo-token": process.env.GITHUB_TOKEN,
-    }[key]);
-exports.getInput = getInput;
+const config = {
+    buildScript: "make bootstrap benchmark_setup",
+    benchmark: "make -s run_benchmark",
+    minimumChangeThreshold: 5,
+};
+exports.config = config;
 
 exports.runBenchmark = async () => {
     let benchmarkBuffers = [];
-    await exec(getInput("benchmark"), [], {
+    await exec(config.benchmark, [], {
         listeners: {
             stdout: (data) => benchmarkBuffers.push(data),
         },
