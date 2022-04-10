@@ -1,3 +1,5 @@
+Error.stackTraceLimit = Infinity;
+
 global.globalObject1 = {
     prop_1: {
         nested_prop: 1,
