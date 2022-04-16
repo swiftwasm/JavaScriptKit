@@ -16,8 +16,8 @@ import _CJavaScriptKit
 /// reference counting system.
 @dynamicMemberLookup
 public class JSObject: Equatable {
-    internal var id: JavaScriptObjectRef
-    init(id: JavaScriptObjectRef) {
+    @_spi(JSObject_id) public var id: JavaScriptObjectRef
+    @_spi(JSObject_id) public init(id: JavaScriptObjectRef) {
         self.id = id
     }
 

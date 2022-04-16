@@ -19,7 +19,7 @@ public final class JSBigInt: JSObject {
         self.init(id: _i64_to_bigint(Int64(bitPattern: value), false))
     }
 
-    override public init(id: JavaScriptObjectRef) {
+    @_spi(JSObject_id) override public init(id: JavaScriptObjectRef) {
         super.init(id: id)
     }
 
