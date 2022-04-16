@@ -109,7 +109,6 @@ export interface ImportedFunctions {
 
 export const enum LibraryFeatures {
     WeakRefs = 1 << 0,
-    BigInts = 1 << 1,
 }
 
 export type TypedArray =
@@ -119,9 +118,8 @@ export type TypedArray =
     | Uint16ArrayConstructor
     | Int32ArrayConstructor
     | Uint32ArrayConstructor
-    // BigInt is not yet supported, see https://github.com/swiftwasm/JavaScriptKit/issues/56
-    // | BigInt64ArrayConstructor
-    // | BigUint64ArrayConstructor
+    | BigInt64ArrayConstructor
+    | BigUint64ArrayConstructor
     | Float32ArrayConstructor
     | Float64ArrayConstructor;
 
