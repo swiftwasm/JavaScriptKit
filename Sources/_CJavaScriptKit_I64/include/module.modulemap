@@ -1,0 +1,4 @@
+module _CJavaScriptKit_I64 {
+    header "_CJavaScriptKit+I64.h"
+    export *
+}

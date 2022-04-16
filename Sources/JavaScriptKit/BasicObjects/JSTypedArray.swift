@@ -135,15 +135,6 @@ extension UInt32: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Uint32Array.function!
 }
 
-#if !JAVASCRIPTKIT_WITHOUT_BIGINTS
-extension Int64: TypedArrayElement {
-    public static var typedArrayClass = JSObject.global.BigInt64Array.function!
-}
-extension UInt64: TypedArrayElement {
-    public static var typedArrayClass = JSObject.global.BigUint64Array.function!
-}
-#endif
-
 extension Float32: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Float32Array.function!
 }

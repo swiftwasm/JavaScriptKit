@@ -63,11 +63,6 @@ extension UInt32: ConvertibleToJSValue {
     public var jsValue: JSValue { .number(Double(self)) }
 }
 
-#if !JAVASCRIPTKIT_WITHOUT_BIGINTS
-extension UInt64: ConvertibleToJSValue {
-    public var jsValue: JSValue { .bigInt(JSBigInt(unsigned: self)) }
-}
-#endif
 
 extension Int8: ConvertibleToJSValue {
     public var jsValue: JSValue { .number(Double(self)) }
@@ -80,12 +75,6 @@ extension Int16: ConvertibleToJSValue {
 extension Int32: ConvertibleToJSValue {
     public var jsValue: JSValue { .number(Double(self)) }
 }
-
-#if !JAVASCRIPTKIT_WITHOUT_BIGINTS
-extension Int64: ConvertibleToJSValue {
-    public var jsValue: JSValue { .bigInt(JSBigInt(self)) }
-}
-#endif
 
 extension JSString: ConvertibleToJSValue {
     public var jsValue: JSValue { .string(self) }
