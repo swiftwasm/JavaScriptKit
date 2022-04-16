@@ -35,11 +35,17 @@ extension Double: ConstructibleFromJSValue {}
 extension Float: ConstructibleFromJSValue {}
 
 extension SignedInteger where Self: ConstructibleFromJSValue {
-    public init(_ bigInt: JSBigInt) {
+    public init(_ bigInt: JSBigIntExtended) {
         self.init(bigInt.int64Value)
     }
     public static func construct(from value: JSValue) -> Self? {
-        value.bigInt.map(Self.init) ?? value.number.map(Self.init)
+        if let number = value.number {
+            return Self(number)
+        }
+        if let bigInt = value.bigInt as? JSBigIntExtended {
+            return Self(bigInt)
+        }
+        return nil
     }
 }
 extension Int: ConstructibleFromJSValue {}
@@ -49,11 +55,17 @@ extension Int32: ConstructibleFromJSValue {}
 extension Int64: ConstructibleFromJSValue {}
 
 extension UnsignedInteger where Self: ConstructibleFromJSValue {
-    public init(_ bigInt: JSBigInt) {
+    public init(_ bigInt: JSBigIntExtended) {
         self.init(bigInt.uInt64Value)
     }
     public static func construct(from value: JSValue) -> Self? {
-        value.bigInt.map(Self.init) ?? value.number.map(Self.init)
+        if let number = value.number {
+            return Self(number)
+        }
+        if let bigInt = value.bigInt as? JSBigIntExtended {
+            return Self(bigInt)
+        }
+        return nil
     }
 }
 extension UInt: ConstructibleFromJSValue {}

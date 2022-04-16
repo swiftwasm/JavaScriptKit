@@ -23,3 +23,11 @@ public final class JSBigInt: JSObject {
         }
     }
 }
+
+public protocol JSBigIntExtended: JSBigInt {
+    var int64Value: Int64 { get }
+    var uInt64Value: UInt64 { get }
+
+    init(_ value: Int64)
+    init(unsigned value: UInt64)
+}
