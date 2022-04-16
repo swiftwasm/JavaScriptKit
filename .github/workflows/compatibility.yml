@@ -23,5 +23,3 @@ jobs:
           cd Example/JavaScriptKitExample
           swift build --triple wasm32-unknown-wasi
           swift build --triple wasm32-unknown-wasi -Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS
-          swift build --triple wasm32-unknown-wasi -Xswiftc -DJAVASCRIPTKIT_WITHOUT_BIGINTS
-          swift build --triple wasm32-unknown-wasi -Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS -Xswiftc -DJAVASCRIPTKIT_WITHOUT_BIGINTS

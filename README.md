@@ -149,7 +149,7 @@ JavaScript features should work, which currently includes:
 - Mobile Safari 14.8+
 
 If you need to support older browser versions, you'll have to build with
-`JAVASCRIPTKIT_WITHOUT_WEAKREFS` and `JAVASCRIPTKIT_WITHOUT_BIGINTS` flags, passing `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS -Xswiftc -DJAVASCRIPTKIT_WITHOUT_BIGINTS` flags
+the `JAVASCRIPTKIT_WITHOUT_WEAKREFS` flag, passing `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS` flags
 when compiling. This should lower browser requirements to these versions:
 
 - Edge 16+

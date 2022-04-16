@@ -218,11 +218,7 @@ extension RawJSValue: ConvertibleToJSValue {
         case .symbol:
             return .symbol(JSSymbol(id: UInt32(payload1)))
         case .bigInt:
-#if JAVASCRIPTKIT_WITHOUT_BIGINTS
-            fatalError("Received unsupported BigInt value")
-#else
             return .bigInt(JSBigInt(id: UInt32(payload1)))
-#endif
         }
     }
 }
@@ -257,11 +253,9 @@ extension JSValue {
         case let .symbol(symbolRef):
             kind = .symbol
             payload1 = JavaScriptPayload1(symbolRef.id)
-#if !JAVASCRIPTKIT_WITHOUT_BIGINTS
         case let .bigInt(bigIntRef):
             kind = .bigInt
             payload1 = JavaScriptPayload1(bigIntRef.id)
-#endif
         }
         let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
         return body(rawValue)
