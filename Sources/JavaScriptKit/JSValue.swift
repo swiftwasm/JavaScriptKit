@@ -257,20 +257,8 @@ public extension JSValue {
 
 extension JSValue: CustomStringConvertible {
     public var description: String {
-        switch self {
-        case let .boolean(boolean):
-            return boolean.description
-        case let .string(string):
-            return string.description
-        case let .number(number):
-            return number.description
-        case let .object(object), let .function(object as JSObject),
-            let .symbol(object as JSObject), let .bigInt(object as JSObject):
-            return object.toString!().fromJSValue()!
-        case .null:
-            return "null"
-        case .undefined:
-            return "undefined"
-        }
+        // per https://tc39.es/ecma262/multipage/text-processing.html#sec-string-constructor-string-value
+        // this always returns a string
+        JSObject.global.String.function!(self).string!
     }
 }
