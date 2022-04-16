@@ -25,6 +25,7 @@ let package = Package(
     targets: [
         .target(name: "CHelpers"),
         .target(name: "PrimaryTests", dependencies: [
+            .product(name: "JavaScriptKit_I64", package: "JavaScriptKit"),
             "JavaScriptKit",
             "CHelpers",
         ]),
