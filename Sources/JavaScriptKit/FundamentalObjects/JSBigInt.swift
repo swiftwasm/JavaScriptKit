@@ -3,7 +3,8 @@ import _CJavaScriptKit
 private let constructor = JSObject.global.BigInt.function!
 
 public final class JSBigInt: JSObject {
-    @_spi(JSObject_id) override public init(id: JavaScriptObjectRef) {
+    @_spi(JSObject_id)
+    override public init(id: JavaScriptObjectRef) {
         super.init(id: id)
     }
 

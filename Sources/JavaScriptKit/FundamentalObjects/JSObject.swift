@@ -16,8 +16,10 @@ import _CJavaScriptKit
 /// reference counting system.
 @dynamicMemberLookup
 public class JSObject: Equatable {
-    @_spi(JSObject_id) public var id: JavaScriptObjectRef
-    @_spi(JSObject_id) public init(id: JavaScriptObjectRef) {
+    @_spi(JSObject_id)
+    public var id: JavaScriptObjectRef
+    @_spi(JSObject_id)
+    public init(id: JavaScriptObjectRef) {
         self.id = id
     }
 
@@ -120,7 +122,7 @@ public class JSObject: Equatable {
     /// let animal = JSObject.global.animal.object!
     /// try animal.throwing.validateAge!()
     /// ```
-    public var `throwing`: JSThrowingObject {
+    public var throwing: JSThrowingObject {
         JSThrowingObject(self)
     }
 
