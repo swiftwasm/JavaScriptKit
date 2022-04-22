@@ -26,11 +26,17 @@ extension Bool: ConvertibleToJSValue {
 }
 
 extension Int: ConvertibleToJSValue {
-    public var jsValue: JSValue { .number(Double(self)) }
+    public var jsValue: JSValue {
+        assert(Self.bitWidth == 32)
+        return .number(Double(self))
+    }
 }
 
 extension UInt: ConvertibleToJSValue {
-    public var jsValue: JSValue { .number(Double(self)) }
+    public var jsValue: JSValue {
+        assert(Self.bitWidth == 32)
+        return .number(Double(self))
+    }
 }
 
 extension Float: ConvertibleToJSValue {
@@ -57,9 +63,6 @@ extension UInt32: ConvertibleToJSValue {
     public var jsValue: JSValue { .number(Double(self)) }
 }
 
-extension UInt64: ConvertibleToJSValue {
-    public var jsValue: JSValue { .number(Double(self)) }
-}
 
 extension Int8: ConvertibleToJSValue {
     public var jsValue: JSValue { .number(Double(self)) }
@@ -70,10 +73,6 @@ extension Int16: ConvertibleToJSValue {
 }
 
 extension Int32: ConvertibleToJSValue {
-    public var jsValue: JSValue { .number(Double(self)) }
-}
-
-extension Int64: ConvertibleToJSValue {
     public var jsValue: JSValue { .number(Double(self)) }
 }
 
@@ -191,8 +190,6 @@ extension Array: ConstructibleFromJSValue where Element: ConstructibleFromJSValu
 extension RawJSValue: ConvertibleToJSValue {
     public var jsValue: JSValue {
         switch kind {
-        case .invalid:
-            fatalError()
         case .boolean:
             return .boolean(payload1 != 0)
         case .number:
@@ -209,6 +206,8 @@ extension RawJSValue: ConvertibleToJSValue {
             return .function(JSFunction(id: UInt32(payload1)))
         case .symbol:
             return .symbol(JSSymbol(id: UInt32(payload1)))
+        case .bigInt:
+            return .bigInt(JSBigInt(id: UInt32(payload1)))
         }
     }
 }
@@ -243,6 +242,9 @@ extension JSValue {
         case let .symbol(symbolRef):
             kind = .symbol
             payload1 = JavaScriptPayload1(symbolRef.id)
+        case let .bigInt(bigIntRef):
+            kind = .bigInt
+            payload1 = JavaScriptPayload1(bigIntRef.id)
         }
         let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
         return body(rawValue)

@@ -1,3 +1,5 @@
+Error.stackTraceLimit = Infinity;
+
 global.globalObject1 = {
     prop_1: {
         nested_prop: 1,
@@ -44,23 +46,26 @@ global.globalObject1 = {
             throw "String Error";
         },
         func3: function () {
-            throw 3.0
+            throw 3.0;
         },
     },
     eval_closure: function (fn) {
-        return fn(arguments[1])
+        return fn(arguments[1]);
     },
     observable_obj: {
         set_called: false,
-        target: new Proxy({
-            nested: {}
-        }, {
-            set(target, key, value) {
-                global.globalObject1.observable_obj.set_called = true;
-                target[key] = value;
-                return true;
+        target: new Proxy(
+            {
+                nested: {},
+            },
+            {
+                set(target, key, value) {
+                    global.globalObject1.observable_obj.set_called = true;
+                    target[key] = value;
+                    return true;
+                },
             }
-        })
+        ),
     },
 };
 
@@ -79,16 +84,16 @@ global.Animal = function (name, age, isCat) {
     };
     this.setName = function (name) {
         this.name = name;
-    }
+    };
 };
 
-global.callThrowingClosure = (c) => { 
+global.callThrowingClosure = (c) => {
     try {
-        c() 
+        c();
     } catch (error) {
-        return error
+        return error;
     }
-}
+};
 
 const { startWasiTask } = require("../lib");
 

@@ -13,7 +13,6 @@ typedef unsigned int JavaScriptHostFuncRef;
 
 /// `JavaScriptValueKind` represents the kind of JavaScript primitive value.
 typedef enum __attribute__((enum_extensibility(closed))) {
-  JavaScriptValueKindInvalid = -1,
   JavaScriptValueKindBoolean = 0,
   JavaScriptValueKindString = 1,
   JavaScriptValueKindNumber = 2,
@@ -22,6 +21,7 @@ typedef enum __attribute__((enum_extensibility(closed))) {
   JavaScriptValueKindUndefined = 5,
   JavaScriptValueKindFunction = 6,
   JavaScriptValueKindSymbol = 7,
+  JavaScriptValueKindBigInt = 8,
 } JavaScriptValueKind;
 
 typedef struct {
@@ -61,7 +61,7 @@ typedef double JavaScriptPayload2;
 ///    payload1: the target `JavaScriptHostFuncRef`
 ///    payload2: 0
 ///
-/// For symbol value:
+/// For symbol and bigint values:
 ///    payload1: `JavaScriptObjectRef`
 ///    payload2: 0
 ///
@@ -299,6 +299,7 @@ extern void _load_typed_array(const JavaScriptObjectRef ref, unsigned char *buff
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_release")))
 extern void _release(const JavaScriptObjectRef ref);
+
 
 #endif
 

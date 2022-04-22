@@ -135,15 +135,6 @@ extension UInt32: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Uint32Array.function!
 }
 
-// FIXME: Support passing BigInts across the bridge
-// See https://github.com/swiftwasm/JavaScriptKit/issues/56
-//extension Int64: TypedArrayElement {
-//    public static var typedArrayClass = JSObject.global.BigInt64Array.function!
-//}
-//extension UInt64: TypedArrayElement {
-//    public static var typedArrayClass = JSObject.global.BigUint64Array.function!
-//}
-
 extension Float32: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Float32Array.function!
 }

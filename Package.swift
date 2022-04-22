@@ -7,6 +7,7 @@ let package = Package(
     products: [
         .library(name: "JavaScriptKit", targets: ["JavaScriptKit"]),
         .library(name: "JavaScriptEventLoop", targets: ["JavaScriptEventLoop"]),
+        .library(name: "JavaScriptBigIntSupport", targets: ["JavaScriptBigIntSupport"]),
     ],
     targets: [
         .target(
@@ -14,6 +15,11 @@ let package = Package(
             dependencies: ["_CJavaScriptKit"]
         ),
         .target(name: "_CJavaScriptKit"),
+        .target(
+            name: "JavaScriptBigIntSupport",
+            dependencies: ["_CJavaScriptBigIntSupport", "JavaScriptKit"]
+        ),
+        .target(name: "_CJavaScriptBigIntSupport", dependencies: ["_CJavaScriptKit"]),
         .target(
             name: "JavaScriptEventLoop",
             dependencies: ["JavaScriptKit", "_CJavaScriptEventLoop"]

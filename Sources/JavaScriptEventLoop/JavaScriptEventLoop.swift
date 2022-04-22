@@ -12,7 +12,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     /// See also: https://developer.mozilla.org/en-US/docs/Web/API/HTML_DOM_API/Microtask_guide
     let queueMicrotask: @Sendable (@escaping () -> Void) -> Void
     /// A function that invokes a given closure after a specified number of milliseconds.
-    let setTimeout: @Sendable (UInt64, @escaping () -> Void) -> Void
+    let setTimeout: @Sendable (Double, @escaping () -> Void) -> Void
 
     /// A mutable state to manage internal job queue
     /// Note that this should be guarded atomically when supporting multi-threaded environment.
@@ -20,7 +20,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
     private init(
         queueTask: @Sendable @escaping (@escaping () -> Void) -> Void,
-        setTimeout: @Sendable @escaping (UInt64, @escaping () -> Void) -> Void
+        setTimeout: @Sendable @escaping (Double, @escaping () -> Void) -> Void
     ) {
         self.queueMicrotask = queueTask
         self.setTimeout = setTimeout
@@ -83,7 +83,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
     private func enqueue(_ job: UnownedJob, withDelay nanoseconds: UInt64) {
         let milliseconds = nanoseconds / 1_000_000
-        setTimeout(milliseconds, {
+        setTimeout(Double(milliseconds), {
             job._runSynchronously(on: self.asUnownedSerialExecutor())
         })
     }

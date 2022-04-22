@@ -1,8 +1,7 @@
 import { Memory } from "./memory";
-import { pointer } from "./types";
+import { assertNever, pointer } from "./types";
 
-export enum Kind {
-    Invalid = -1,
+export const enum Kind {
     Boolean = 0,
     String = 1,
     Number = 2,
@@ -11,6 +10,7 @@ export enum Kind {
     Undefined = 5,
     Function = 6,
     Symbol = 7,
+    BigInt = 8,
 }
 
 export const decode = (
@@ -33,6 +33,8 @@ export const decode = (
         case Kind.String:
         case Kind.Object:
         case Kind.Function:
+        case Kind.Symbol:
+        case Kind.BigInt:
             return memory.getObject(payload1);
 
         case Kind.Null:
@@ -42,7 +44,7 @@ export const decode = (
             return undefined;
 
         default:
-            throw new Error(`JSValue Type kind "${kind}" is not supported`);
+            assertNever(kind, `JSValue Type kind "${kind}" is not supported`);
     }
 };
 
@@ -73,7 +75,14 @@ export const write = (
         memory.writeUint32(kind_ptr, exceptionBit | Kind.Null);
         return;
     }
-    switch (typeof value) {
+
+    const writeRef = (kind: Kind) => {
+        memory.writeUint32(kind_ptr, exceptionBit | kind);
+        memory.writeUint32(payload1_ptr, memory.retain(value));
+    };
+
+    const type = typeof value;
+    switch (type) {
         case "boolean": {
             memory.writeUint32(kind_ptr, exceptionBit | Kind.Boolean);
             memory.writeUint32(payload1_ptr, value ? 1 : 0);
@@ -85,8 +94,7 @@ export const write = (
             break;
         }
         case "string": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.String);
-            memory.writeUint32(payload1_ptr, memory.retain(value));
+            writeRef(Kind.String);
             break;
         }
         case "undefined": {
@@ -94,21 +102,22 @@ export const write = (
             break;
         }
         case "object": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.Object);
-            memory.writeUint32(payload1_ptr, memory.retain(value));
+            writeRef(Kind.Object);
             break;
         }
         case "function": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.Function);
-            memory.writeUint32(payload1_ptr, memory.retain(value));
+            writeRef(Kind.Function);
             break;
         }
         case "symbol": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.Symbol);
-            memory.writeUint32(payload1_ptr, memory.retain(value));
+            writeRef(Kind.Symbol);
+            break;
+        }
+        case "bigint": {
+            writeRef(Kind.BigInt);
             break;
         }
         default:
-            throw new Error(`Type "${typeof value}" is not supported yet`);
+            assertNever(type, `Type "${type}" is not supported yet`);
     }
 };
