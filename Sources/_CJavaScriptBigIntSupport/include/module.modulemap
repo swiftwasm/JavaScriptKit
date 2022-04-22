@@ -1,4 +1,4 @@
-module _CJavaScriptKit_I64 {
+module _CJavaScriptBigIntSupport {
     header "_CJavaScriptKit+I64.h"
     export *
 }

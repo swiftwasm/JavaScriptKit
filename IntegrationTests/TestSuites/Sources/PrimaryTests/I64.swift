@@ -1,5 +1,5 @@
+import JavaScriptBigIntSupport
 import JavaScriptKit
-import JavaScriptKit_I64
 
 func testI64() throws {
     try test("BigInt") {

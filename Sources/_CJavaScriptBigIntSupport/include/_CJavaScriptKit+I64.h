@@ -1,6 +1,6 @@
 
-#ifndef _CJavaScriptKit_I64_h
-#define _CJavaScriptKit_I64_h
+#ifndef _CJavaScriptBigIntSupport_h
+#define _CJavaScriptBigIntSupport_h
 
 #include <_CJavaScriptKit.h>
 
@@ -20,4 +20,4 @@ __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_bigint_to_i64")))
 extern long long _bigint_to_i64(const JavaScriptObjectRef ref, bool is_signed);
 
-#endif /* _CJavaScriptKit_I64_h */
+#endif /* _CJavaScriptBigIntSupport_h */
