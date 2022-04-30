@@ -118,9 +118,9 @@ private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSVa
                     resolver(.success(result))
                 } catch {
                     if let jsError = error as? JSError {
-                        resolver(.failure(jsError.jsValue()))
+                        resolver(.failure(jsError.jsValue))
                     } else {
-                        resolver(.failure(JSError(message: String(describing: error)).jsValue()))
+                        resolver(.failure(JSError(message: String(describing: error)).jsValue))
                     }
                 }
             }

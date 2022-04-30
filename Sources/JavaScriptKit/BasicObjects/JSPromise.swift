@@ -81,7 +81,7 @@ public final class JSPromise: JSBridgedClass {
     @discardableResult
     public func then(success: @escaping (JSValue) async -> ConvertibleToJSValue) -> JSPromise {
         let closure = JSOneshotClosure.async {
-            return await success($0[0]).jsValue()
+            return await success($0[0]).jsValue
         }
         return JSPromise(unsafelyWrapping: jsObject.then!(closure).object!)
     }
@@ -107,10 +107,10 @@ public final class JSPromise: JSBridgedClass {
     public func then(success: @escaping (JSValue) async -> ConvertibleToJSValue,
                      failure: @escaping (JSValue) async -> ConvertibleToJSValue) -> JSPromise {
         let successClosure = JSOneshotClosure.async {
-            return await success($0[0]).jsValue()
+            return await success($0[0]).jsValue
         }
         let failureClosure = JSOneshotClosure.async {
-            return await failure($0[0]).jsValue()
+            return await failure($0[0]).jsValue
         }
         return JSPromise(unsafelyWrapping: jsObject.then!(successClosure, failureClosure).object!)
     }
@@ -131,7 +131,7 @@ public final class JSPromise: JSBridgedClass {
     @discardableResult
     public func `catch`(failure: @escaping (JSValue) async -> ConvertibleToJSValue) -> JSPromise {
         let closure = JSOneshotClosure.async {
-            return await failure($0[0]).jsValue()
+            return await failure($0[0]).jsValue
         }
         return .init(unsafelyWrapping: jsObject.catch!(closure).object!)
     }

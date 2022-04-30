@@ -104,7 +104,7 @@ func entrypoint() async throws {
             return JSValue.number(3)
         }
         let delayObject = JSObject.global.Object.function!.new()
-        delayObject.closure = delayClosure.jsValue()
+        delayObject.closure = delayClosure.jsValue
 
         let start = time(nil)
         let promise = JSPromise(from: delayObject.closure!())
