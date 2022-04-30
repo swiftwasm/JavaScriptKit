@@ -32,7 +32,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 
     #if compiler(>=5.5)
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSOneshotClosure {
+    public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSOneshotClosure {
         JSOneshotClosure(makeAsyncClosure(body))
     }
     #endif
@@ -93,7 +93,7 @@ public class JSClosure: JSObject, JSClosureProtocol {
 
     #if compiler(>=5.5)
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSClosure {
+    public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSClosure {
         JSClosure(makeAsyncClosure(body))
     }
     #endif
