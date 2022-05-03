@@ -221,11 +221,11 @@ especially if you change anything in the JavaScript runtime parts. This is becau
 embedded in `carton` and currently can't be replaced dynamically with the JavaScript code you've
 updated locally.
 
-Just pass a toolchain archive URL for [the latest SwiftWasm 5.5
-release](https://github.com/swiftwasm/swift/releases) appropriate for your platform:
+Just pass a toolchain archive URL for [the latest SwiftWasm 5.6
+release](https://github.com/swiftwasm/swift/releases/tag/swift-wasm-5.6.0-RELEASE) appropriate for your platform:
 
 ```sh
-$ swiftenv install https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.5.0-RELEASE/swift-wasm-5.5.0-RELEASE-macos_x86_64.pkg
+$ swiftenv install "https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.6.0-RELEASE/swift-wasm-5.6.0-RELEASE-macos_$(uname -m).pkg"
 ```
 
 You can also use the `install-toolchain.sh` helper script that uses a hardcoded toolchain snapshot:
@@ -233,6 +233,6 @@ You can also use the `install-toolchain.sh` helper script that uses a hardcoded 
 ```sh
 $ ./scripts/install-toolchain.sh
 $ swift --version
-Swift version 5.5 (swiftlang-5.5.0)
+Swift version 5.6 (swiftlang-5.6.0)
 Target: arm64-apple-darwin20.6.0
 ```
