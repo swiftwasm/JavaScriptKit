@@ -1,32 +1,32 @@
-/** A wrapper around the [JavaScript Date 
-class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) that
-exposes its properties in a type-safe way. This doesn't 100% match the JS API, for example 
-`getMonth`/`setMonth` etc accessor methods are converted to properties, but the rest of it matches
-in the naming. Parts of the JavaScript `Date` API that are not consistent across browsers and JS 
-implementations are not exposed in a type-safe manner, you should access the underlying `jsObject`
-property if you need those.
-*/
+/** A wrapper around the [JavaScript Date
+ class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) that
+ exposes its properties in a type-safe way. This doesn't 100% match the JS API, for example
+ `getMonth`/`setMonth` etc accessor methods are converted to properties, but the rest of it matches
+ in the naming. Parts of the JavaScript `Date` API that are not consistent across browsers and JS
+ implementations are not exposed in a type-safe manner, you should access the underlying `jsObject`
+ property if you need those.
+ */
 public final class JSDate: JSBridgedClass {
     /// The constructor function used to create new `Date` objects.
-    public static let constructor = JSObject.global.Date.function!
+    public static let constructor = JSObject.global.Date.function
 
     /// The underlying JavaScript `Date` object.
     public let jsObject: JSObject
 
     /** Creates a new instance of the JavaScript `Date` class with a given amount of milliseconds
-    that passed since midnight 01 January 1970 UTC.
-    */
+     that passed since midnight 01 January 1970 UTC.
+     */
     public init(millisecondsSinceEpoch: Double? = nil) {
         if let milliseconds = millisecondsSinceEpoch {
-            jsObject = Self.constructor.new(milliseconds)
+            jsObject = Self.constructor!.new(milliseconds)
         } else {
-            jsObject = Self.constructor.new()
+            jsObject = Self.constructor!.new()
         }
     }
 
-    /** According to the standard, `monthIndex` is zero-indexed, where `11` is December. `day` 
-    represents a day of the month starting at `1`.
-    */
+    /** According to the standard, `monthIndex` is zero-indexed, where `11` is December. `day`
+     represents a day of the month starting at `1`.
+     */
     public init(
         year: Int,
         monthIndex: Int,
@@ -36,7 +36,7 @@ public final class JSDate: JSBridgedClass {
         seconds: Int = 0,
         milliseconds: Int = 0
     ) {
-        jsObject = Self.constructor.new(year, monthIndex, day, hours, minutes, seconds, milliseconds)
+        jsObject = Self.constructor!.new(year, monthIndex, day, hours, minutes, seconds, milliseconds)
     }
 
     public init(unsafelyWrapping jsObject: JSObject) {
@@ -198,7 +198,7 @@ public final class JSDate: JSBridgedClass {
         Int(jsObject.getTimezoneOffset!().number!)
     }
 
-    /// Returns a string conforming to ISO 8601 that contains date and time, e.g. 
+    /// Returns a string conforming to ISO 8601 that contains date and time, e.g.
     /// `"2020-09-15T08:56:54.811Z"`.
     public func toISOString() -> String {
         jsObject.toISOString!().string!
@@ -214,25 +214,25 @@ public final class JSDate: JSBridgedClass {
         jsObject.toLocaleTimeString!().string!
     }
 
-    /** Returns a string formatted according to 
-    [rfc7231](https://tools.ietf.org/html/rfc7231#section-7.1.1.1) and modified according to 
-    [ecma-262](https://www.ecma-international.org/ecma-262/10.0/index.html#sec-date.prototype.toutcstring),
-    e.g. `Tue, 15 Sep 2020 09:04:40 GMT`.
-    */
+    /** Returns a string formatted according to
+     [rfc7231](https://tools.ietf.org/html/rfc7231#section-7.1.1.1) and modified according to
+     [ecma-262](https://www.ecma-international.org/ecma-262/10.0/index.html#sec-date.prototype.toutcstring),
+     e.g. `Tue, 15 Sep 2020 09:04:40 GMT`.
+     */
     public func toUTCString() -> String {
         jsObject.toUTCString!().string!
     }
 
-    /** Number of milliseconds since midnight 01 January 1970 UTC to the present moment ignoring 
-    leap seconds.
-    */
+    /** Number of milliseconds since midnight 01 January 1970 UTC to the present moment ignoring
+     leap seconds.
+     */
     public static func now() -> Double {
-        constructor.now!().number!
+        constructor!.now!().number!
     }
 
-    /** Number of milliseconds since midnight 01 January 1970 UTC to the given date ignoring leap 
-    seconds.
-    */
+    /** Number of milliseconds since midnight 01 January 1970 UTC to the given date ignoring leap
+     seconds.
+     */
     public func valueOf() -> Double {
         jsObject.valueOf!().number!
     }

@@ -1,10 +1,10 @@
 /// A wrapper around [the JavaScript Array class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)
 /// that exposes its properties in a type-safe and Swifty way.
 public class JSArray: JSBridgedClass {
-    public static let constructor = JSObject.global.Array.function!
+    public static let constructor = JSObject.global.Array.function
 
     static func isArray(_ object: JSObject) -> Bool {
-        constructor.isArray!(object).boolean!
+        constructor!.isArray!(object).boolean!
     }
 
     public let jsObject: JSObject
@@ -94,8 +94,8 @@ private func getObjectValuesLength(_ object: JSObject) -> Int {
     return Int(values.length.number!)
 }
 
-extension JSValue {
-    public var array: JSArray? {
+public extension JSValue {
+    var array: JSArray? {
         object.flatMap(JSArray.init)
     }
 }

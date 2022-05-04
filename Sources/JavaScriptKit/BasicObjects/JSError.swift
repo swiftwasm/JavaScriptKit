@@ -1,17 +1,17 @@
-/** A wrapper around [the JavaScript Error 
-class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) that
-exposes its properties in a type-safe way.
-*/
+/** A wrapper around [the JavaScript Error
+ class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) that
+ exposes its properties in a type-safe way.
+ */
 public final class JSError: Error, JSBridgedClass {
     /// The constructor function used to create new JavaScript `Error` objects.
-    public static let constructor = JSObject.global.Error.function!
+    public static let constructor = JSObject.global.Error.function
 
     /// The underlying JavaScript `Error` object.
     public let jsObject: JSObject
 
     /// Creates a new instance of the JavaScript `Error` class with a given message.
     public init(message: String) {
-        jsObject = Self.constructor.new([message])
+        jsObject = Self.constructor!.new([message])
     }
 
     public init(unsafelyWrapping jsObject: JSObject) {
