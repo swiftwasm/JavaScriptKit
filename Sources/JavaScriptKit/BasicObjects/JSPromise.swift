@@ -87,9 +87,10 @@ public final class JSPromise: JSBridgedClass {
     /** Schedules the `success` closure to be invoked on sucessful completion of `self`.
      */
     @discardableResult
-    public func then(success: @escaping (JSValue) -> ConvertibleToJSValue,
-                     failure: @escaping (JSValue) -> ConvertibleToJSValue) -> JSPromise
-    {
+    public func then(
+        success: @escaping (JSValue) -> ConvertibleToJSValue,
+        failure: @escaping (JSValue) -> ConvertibleToJSValue
+    ) -> JSPromise {
         let successClosure = JSOneshotClosure {
             success($0[0]).jsValue
         }
