@@ -1,40 +1,81 @@
 const SwiftRuntime = require("javascript-kit-swift").SwiftRuntime;
-const WASI = require("@wasmer/wasi").WASI;
+const WasmerWASI = require("@wasmer/wasi").WASI;
 const WasmFs = require("@wasmer/wasmfs").WasmFs;
+const NodeWASI = require("wasi").WASI;
 
 const promisify = require("util").promisify;
 const fs = require("fs");
 const readFile = promisify(fs.readFile);
 
-const startWasiTask = async (wasmPath) => {
-    // Instantiate a new WASI Instance
-    const wasmFs = new WasmFs();
-    // Output stdout and stderr to console
-    const originalWriteSync = wasmFs.fs.writeSync;
-    wasmFs.fs.writeSync = (fd, buffer, offset, length, position) => {
-        const text = new TextDecoder("utf-8").decode(buffer);
-        switch (fd) {
-            case 1:
-                console.log(text);
-                break;
-            case 2:
-                console.error(text);
-                break;
-        }
-        return originalWriteSync(fd, buffer, offset, length, position);
-    };
-    let wasi = new WASI({
-        args: [],
-        env: {},
-        bindings: {
-            ...WASI.defaultBindings,
-            fs: wasmFs.fs,
-        },
-    });
+const WASI = {
+    Wasmer: () => {
+        // Instantiate a new WASI Instance
+        const wasmFs = new WasmFs();
+        // Output stdout and stderr to console
+        const originalWriteSync = wasmFs.fs.writeSync;
+        wasmFs.fs.writeSync = (fd, buffer, offset, length, position) => {
+            const text = new TextDecoder("utf-8").decode(buffer);
+            switch (fd) {
+                case 1:
+                    console.log(text);
+                    break;
+                case 2:
+                    console.error(text);
+                    break;
+            }
+            return originalWriteSync(fd, buffer, offset, length, position);
+        };
+        const wasi = new WasmerWASI({
+            args: [],
+            env: {},
+            bindings: {
+                ...WasmerWASI.defaultBindings,
+                fs: wasmFs.fs,
+            },
+        });
 
+        return {
+            wasiImport: wasi.wasiImport,
+            start(instance) {
+                wasi.start(instance);
+                instance.exports._initialize();
+                instance.exports.main();
+            }
+        }
+    },
+    Node: () => {
+        const wasi = new NodeWASI({
+            args: [],
+            env: {},
+            returnOnExit: true,
+        })
+
+        return {
+            wasiImport: wasi.wasiImport,
+            start(instance) {
+                wasi.initialize(instance);
+                instance.exports.main();
+            }
+        }
+    },
+};
+
+const selectWASIBackend = () => {
+    const value = process.env["JAVASCRIPTKIT_WASI_BACKEND"]
+    if (value) {
+        const backend = WASI[value];
+        if (backend) {
+            return backend;
+        }
+    }
+    return WASI.Node;
+};
+
+const startWasiTask = async (wasmPath, wasiConstructor = selectWASIBackend()) => {
     const swift = new SwiftRuntime();
     // Fetch our Wasm File
     const wasmBinary = await readFile(wasmPath);
+    const wasi = wasiConstructor();
 
     // Instantiate the WebAssembly file
     let { instance } = await WebAssembly.instantiate(wasmBinary, {
@@ -45,8 +86,6 @@ const startWasiTask = async (wasmPath) => {
     swift.setInstance(instance);
     // Start the WebAssembly WASI instance!
     wasi.start(instance);
-    instance.exports._initialize();
-    instance.exports.main();
 };
 
-module.exports = { startWasiTask };
+module.exports = { startWasiTask, WASI };
