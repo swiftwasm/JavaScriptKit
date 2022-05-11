@@ -1,5 +1,38 @@
-import { assertNever } from "./types.js";
-export var Kind = /* @__PURE__ */ ((Kind2) => {
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/js-value.ts
+var js_value_exports = {};
+__export(js_value_exports, {
+  Kind: () => Kind,
+  decode: () => decode,
+  decodeArray: () => decodeArray,
+  write: () => write
+});
+module.exports = __toCommonJS(js_value_exports);
+
+// src/types.ts
+function assertNever(x, message) {
+  throw new Error(message);
+}
+
+// src/js-value.ts
+var Kind = /* @__PURE__ */ ((Kind2) => {
   Kind2[Kind2["Boolean"] = 0] = "Boolean";
   Kind2[Kind2["String"] = 1] = "String";
   Kind2[Kind2["Number"] = 2] = "Number";
@@ -11,7 +44,7 @@ export var Kind = /* @__PURE__ */ ((Kind2) => {
   Kind2[Kind2["BigInt"] = 8] = "BigInt";
   return Kind2;
 })(Kind || {});
-export const decode = (kind, payload1, payload2, memory) => {
+var decode = (kind, payload1, payload2, memory) => {
   switch (kind) {
     case 0 /* Boolean */:
       switch (payload1) {
@@ -36,7 +69,7 @@ export const decode = (kind, payload1, payload2, memory) => {
       assertNever(kind, `JSValue Type kind "${kind}" is not supported`);
   }
 };
-export const decodeArray = (ptr, length, memory) => {
+var decodeArray = (ptr, length, memory) => {
   let result = [];
   for (let index = 0; index < length; index++) {
     const base = ptr + 16 * index;
@@ -47,7 +80,7 @@ export const decodeArray = (ptr, length, memory) => {
   }
   return result;
 };
-export const write = (value, kind_ptr, payload1_ptr, payload2_ptr, is_exception, memory) => {
+var write = (value, kind_ptr, payload1_ptr, payload2_ptr, is_exception, memory) => {
   const exceptionBit = (is_exception ? 1 : 0) << 31;
   if (value === null) {
     memory.writeUint32(kind_ptr, exceptionBit | 4 /* Null */);
