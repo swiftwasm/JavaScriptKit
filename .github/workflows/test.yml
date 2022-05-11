@@ -8,14 +8,20 @@ jobs:
     name: Build and Test
     strategy:
       matrix:
-        os: [macos-10.15, macos-11, macos-12, ubuntu-18.04, ubuntu-20.04]
-        toolchain:
-          - wasm-5.5.0-RELEASE
-          - wasm-5.6.0-RELEASE
-        wasi-backend:
-          - Node
-          - Wasmer
-    runs-on: ${{ matrix.os }}
+        entry:
+          # Ensure that all host can install toolchain, build project, and run tests
+          - { os: macos-10.15,  toolchain: wasm-5.6.0-RELEASE, wasi-backend: Node }
+          - { os: macos-11,     toolchain: wasm-5.6.0-RELEASE, wasi-backend: Node }
+          - { os: macos-12,     toolchain: wasm-5.6.0-RELEASE, wasi-backend: Node }
+          - { os: ubuntu-18.04, toolchain: wasm-5.6.0-RELEASE, wasi-backend: Node }
+
+          # Ensure that test succeeds with all toolchains and wasi backend combinations
+          - { os: ubuntu-20.04, toolchain: wasm-5.5.0-RELEASE, wasi-backend: Node }
+          - { os: ubuntu-20.04, toolchain: wasm-5.6.0-RELEASE, wasi-backend: Node }
+          - { os: ubuntu-20.04, toolchain: wasm-5.5.0-RELEASE, wasi-backend: Wasmer }
+          - { os: ubuntu-20.04, toolchain: wasm-5.6.0-RELEASE, wasi-backend: Wasmer }
+
+    runs-on: ${{ matrix.entry.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@master
@@ -23,14 +29,14 @@ jobs:
           fetch-depth: 1
       - name: Run Test
         env:
-          JAVASCRIPTKIT_WASI_BACKEND: ${{ matrix.wasi-backend }}
+          JAVASCRIPTKIT_WASI_BACKEND: ${{ matrix.entry.wasi-backend }}
         run: |
           git clone https://github.com/kylef/swiftenv.git ~/.swiftenv
           export SWIFTENV_ROOT="$HOME/.swiftenv"
           export PATH="$SWIFTENV_ROOT/bin:$PATH"
           eval "$(swiftenv init -)"
-          SWIFT_VERSION=${{ matrix.toolchain }} make bootstrap
-          echo ${{ matrix.toolchain }} > .swift-version
+          SWIFT_VERSION=${{ matrix.entry.toolchain }} make bootstrap
+          echo ${{ matrix.entry.toolchain }} > .swift-version
           make test
   native-build:
     # Check native build to make it easy to develop applications by Xcode
