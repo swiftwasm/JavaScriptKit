@@ -1,4 +1,4 @@
-import { ExportedFunctions } from "./types";
+import { ExportedFunctions } from "./types.js";
 
 /// Memory lifetime of closures in Swift are managed by Swift side
 export class SwiftClosureDeallocator {

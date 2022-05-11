@@ -1,5 +1,5 @@
-import { globalVariable } from "./find-global";
-import { ref } from "./types";
+import { globalVariable } from "./find-global.js";
+import { ref } from "./types.js";
 
 type SwiftRuntimeHeapEntry = {
     id: number;

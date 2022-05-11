@@ -1,4 +1,4 @@
-import * as JSValue from "./js-value";
+import * as JSValue from "./js-value.js";
 
 export type ref = number;
 export type pointer = number;
