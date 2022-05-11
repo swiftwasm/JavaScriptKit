@@ -1,6 +1,8 @@
 CONFIGURATION ?= debug
 SWIFT_BUILD_FLAGS ?=
 
+NODEJS = node --experimental-wasi-unstable-preview1
+
 FORCE:
 TestSuites/.build/$(CONFIGURATION)/%.wasm: FORCE
 	swift build --package-path TestSuites \
@@ -27,18 +29,18 @@ benchmark_setup: build_rt dist/BenchmarkTests.wasm
 
 .PHONY: run_benchmark
 run_benchmark:
-	node bin/benchmark-tests.js
+	$(NODEJS) bin/benchmark-tests.js
 
 .PHONY: benchmark
 benchmark: benchmark_setup run_benchmark
 
 .PHONY: primary_test
 primary_test: build_rt dist/PrimaryTests.wasm
-	node bin/primary-tests.js
+	$(NODEJS) bin/primary-tests.js
 
 .PHONY: concurrency_test
 concurrency_test: build_rt dist/ConcurrencyTests.wasm
-	node bin/concurrency-tests.js
+	$(NODEJS) bin/concurrency-tests.js
 
 .PHONY: test
 test: concurrency_test primary_test

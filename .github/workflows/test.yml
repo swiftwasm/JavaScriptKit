@@ -12,6 +12,9 @@ jobs:
         toolchain:
           - wasm-5.5.0-RELEASE
           - wasm-5.6.0-RELEASE
+        wasi-backend:
+          - Node
+          - Wasmer
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -19,6 +22,8 @@ jobs:
         with:
           fetch-depth: 1
       - name: Run Test
+        env:
+          JAVASCRIPTKIT_WASI_BACKEND: ${{ matrix.wasi-backend }}
         run: |
           git clone https://github.com/kylef/swiftenv.git ~/.swiftenv
           export SWIFTENV_ROOT="$HOME/.swiftenv"

@@ -95,7 +95,7 @@ global.callThrowingClosure = (c) => {
     }
 };
 
-const { startWasiTask } = require("../lib");
+const { startWasiTask, WASI } = require("../lib");
 
 startWasiTask("./dist/PrimaryTests.wasm").catch((err) => {
     console.log(err);
