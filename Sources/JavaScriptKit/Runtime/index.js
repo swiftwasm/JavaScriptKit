@@ -1,9 +1,9 @@
-import { SwiftClosureDeallocator } from "./closure-heap";
+import { SwiftClosureDeallocator } from "./closure-heap.js";
 import {
   LibraryFeatures
-} from "./types";
-import * as JSValue from "./js-value";
-import { Memory } from "./memory";
+} from "./types.js";
+import * as JSValue from "./js-value.js";
+import { Memory } from "./memory.js";
 export class SwiftRuntime {
   constructor() {
     this.version = 707;

@@ -1,4 +1,4 @@
-import { globalVariable } from "./find-global";
+import { globalVariable } from "./find-global.js";
 export class SwiftRuntimeHeap {
   constructor() {
     this._heapValueById = /* @__PURE__ */ new Map();

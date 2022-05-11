@@ -1,5 +1,5 @@
-import { Memory } from "./memory";
-import { assertNever, pointer } from "./types";
+import { Memory } from "./memory.js";
+import { assertNever, pointer } from "./types.js";
 
 export const enum Kind {
     Boolean = 0,

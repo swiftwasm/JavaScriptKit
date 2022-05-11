@@ -1,4 +1,4 @@
-import { assertNever } from "./types";
+import { assertNever } from "./types.js";
 export var Kind = /* @__PURE__ */ ((Kind2) => {
   Kind2[Kind2["Boolean"] = 0] = "Boolean";
   Kind2[Kind2["String"] = 1] = "String";

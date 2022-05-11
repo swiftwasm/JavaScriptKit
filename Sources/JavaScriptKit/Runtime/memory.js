@@ -1,4 +1,4 @@
-import { SwiftRuntimeHeap } from "./object-heap";
+import { SwiftRuntimeHeap } from "./object-heap.js";
 export class Memory {
   constructor(exports) {
     this.heap = new SwiftRuntimeHeap();
