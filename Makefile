@@ -33,4 +33,4 @@ perf-tester:
 .PHONY: regenerate_swiftpm_resources
 regenerate_swiftpm_resources:
 	npm run build
-	cp Runtime/lib/index.{js,mjs} Sources/JavaScriptKit/Runtime
+	cp Runtime/lib/index.js Runtime/lib/index.mjs Sources/JavaScriptKit/Runtime
