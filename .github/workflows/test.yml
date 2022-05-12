@@ -40,6 +40,7 @@ jobs:
           make test
       - name: Check if SwiftPM resources are stale
         run:
+          make regenerate_swiftpm_resources
           git diff --exit-code Sources/JavaScriptKit/Runtime
 
   native-build:
