@@ -1,5 +1,5 @@
-import { SwiftRuntimeHeap } from "./object-heap";
-import { pointer } from "./types";
+import { SwiftRuntimeHeap } from "./object-heap.js";
+import { pointer } from "./types.js";
 
 export class Memory {
     readonly rawMemory: WebAssembly.Memory;

@@ -29,3 +29,8 @@ run_benchmark:
 .PHONY: perf-tester
 perf-tester:
 	cd ci/perf-tester && npm ci
+
+.PHONY: regenerate_swiftpm_resources
+regenerate_swiftpm_resources:
+	npm run build
+	cp Runtime/lib/index.js Runtime/lib/index.mjs Sources/JavaScriptKit/Runtime

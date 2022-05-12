@@ -38,6 +38,11 @@ jobs:
           SWIFT_VERSION=${{ matrix.entry.toolchain }} make bootstrap
           echo ${{ matrix.entry.toolchain }} > .swift-version
           make test
+      - name: Check if SwiftPM resources are stale
+        run: |
+          make regenerate_swiftpm_resources
+          git diff --exit-code Sources/JavaScriptKit/Runtime
+
   native-build:
     # Check native build to make it easy to develop applications by Xcode
     name: Build for native target

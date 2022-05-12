@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.3
 
 import PackageDescription
 
@@ -12,7 +12,8 @@ let package = Package(
     targets: [
         .target(
             name: "JavaScriptKit",
-            dependencies: ["_CJavaScriptKit"]
+            dependencies: ["_CJavaScriptKit"],
+            resources: [.copy("Runtime")]
         ),
         .target(name: "_CJavaScriptKit"),
         .target(
