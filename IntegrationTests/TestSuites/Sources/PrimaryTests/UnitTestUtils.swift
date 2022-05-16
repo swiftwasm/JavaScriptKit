@@ -94,6 +94,12 @@ func expectString(_ value: JSValue, file: StaticString = #file, line: UInt = #li
     }
 }
 
+func expect(_ description: String, _ result: Bool, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws {
+    if !result {
+        throw MessageError(description, file: file, line: line, column: column)
+    }
+}
+
 func expectThrow<T>(_ body: @autoclosure () throws -> T, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> Error {
     do {
         _ = try body()

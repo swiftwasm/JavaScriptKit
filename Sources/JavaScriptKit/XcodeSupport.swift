@@ -91,7 +91,7 @@ import _CJavaScriptKit
         _: JavaScriptObjectRef,
         _: JavaScriptObjectRef
     ) -> Bool { fatalError() }
-    func _create_function(_: JavaScriptHostFuncRef) -> JavaScriptObjectRef { fatalError() }
+    func _create_function(_: JavaScriptHostFuncRef, _: UInt32, _: JavaScriptObjectRef) -> JavaScriptObjectRef { fatalError() }
     func _create_typed_array<T: TypedArrayElement>(
         _: JavaScriptObjectRef,
         _: UnsafePointer<T>,

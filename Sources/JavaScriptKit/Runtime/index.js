@@ -190,7 +190,7 @@
 
     class SwiftRuntime {
         constructor() {
-            this.version = 707;
+            this.version = 708;
             this.textDecoder = new TextDecoder("utf-8");
             this.textEncoder = new TextEncoder(); // Only support utf-8
             /** @deprecated Use `wasmImports` instead */
@@ -318,9 +318,10 @@
                     const constructor = this.memory.getObject(constructor_ref);
                     return obj instanceof constructor;
                 },
-                swjs_create_function: (host_func_id) => {
+                swjs_create_function: (host_func_id, line, file) => {
                     var _a;
-                    const func = (...args) => this.callHostFunction(host_func_id, args);
+                    const fileString = this.memory.getObject(file);
+                    const func = (...args) => this.callHostFunction(host_func_id, line, fileString, args);
                     const func_ref = this.memory.retain(func);
                     (_a = this.closureDeallocator) === null || _a === void 0 ? void 0 : _a.track(func, func_ref);
                     return func_ref;
@@ -393,7 +394,7 @@
             }
             return this._closureDeallocator;
         }
-        callHostFunction(host_func_id, args) {
+        callHostFunction(host_func_id, line, file, args) {
             const argc = args.length;
             const argv = this.exports.swjs_prepare_host_function_call(argc);
             for (let index = 0; index < args.length; index++) {
@@ -406,7 +407,10 @@
             const callback_func_ref = this.memory.retain((result) => {
                 output = result;
             });
-            this.exports.swjs_call_host_function(host_func_id, argv, argc, callback_func_ref);
+            const alreadyReleased = this.exports.swjs_call_host_function(host_func_id, argv, argc, callback_func_ref);
+            if (alreadyReleased) {
+                throw new Error(`The JSClosure has been already released by Swift side. The closure is created at ${file}:${line}`);
+            }
             this.exports.swjs_cleanup_host_function_call(argv);
             return output;
         }

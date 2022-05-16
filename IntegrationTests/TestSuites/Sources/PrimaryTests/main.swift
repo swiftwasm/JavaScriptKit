@@ -240,6 +240,17 @@ try test("Closure Lifetime") {
         // OneshotClosure won't call fatalError even if it's deallocated before `release`
     }
 #endif
+
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+    // Check diagnostics of use-after-free
+    do {
+        let c1 = JSClosure { $0[0] }
+        c1.release()
+        let error = try expectThrow(try evalClosure.throws(c1, JSValue.number(42.0))) as! JSValue
+        try expect("Error message should contains definition location", error.description.hasSuffix("PrimaryTests/main.swift:247"))
+    }
+#endif
+
 }
 
 try test("Host Function Registration") {
