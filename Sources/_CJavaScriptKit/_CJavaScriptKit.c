@@ -1,17 +1,18 @@
 #include "_CJavaScriptKit.h"
 #include <stdlib.h>
+#include <stdbool.h>
 
 #if __wasm32__
 
-void _call_host_function_impl(const JavaScriptHostFuncRef host_func_ref,
+bool _call_host_function_impl(const JavaScriptHostFuncRef host_func_ref,
                               const RawJSValue *argv, const int argc,
                               const JavaScriptObjectRef callback_func);
 
 __attribute__((export_name("swjs_call_host_function")))
-void swjs_call_host_function(const JavaScriptHostFuncRef host_func_ref,
+bool swjs_call_host_function(const JavaScriptHostFuncRef host_func_ref,
                              const RawJSValue *argv, const int argc,
                              const JavaScriptObjectRef callback_func) {
-    _call_host_function_impl(host_func_ref, argv, argc, callback_func);
+    return _call_host_function_impl(host_func_ref, argv, argc, callback_func);
 }
 
 void _free_host_function_impl(const JavaScriptHostFuncRef host_func_ref);
@@ -36,7 +37,7 @@ void swjs_cleanup_host_function_call(void *argv_buffer) {
 /// this and `SwiftRuntime.version` in `./Runtime/src/index.ts`.
 __attribute__((export_name("swjs_library_version")))
 int swjs_library_version(void) {
-    return 707;
+    return 708;
 }
 
 int _library_features(void);
