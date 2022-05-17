@@ -1,14 +1,14 @@
 # 0.15.0 (17 May 2022)
 
 This is a major release that adds new features and fixes issues. Specifically:
-* `BigInt` and `BigInt`-based `JSTypedArray` types are now supported. Now, when passing `Int64` function from Swift,
-it will be mapped to `BigInt` on JavaScript side. 
-* `constructor` property on `JSBridgedClass` is now optional, which allows bridging JavaScript classes that aren't
-available in every browser.
+* `BigInt` and `BigInt`-based `JSTypedArray` types are now supported. Now, when passing `Int64` values from Swift,
+they will be mapped to `BigInt` values on the JavaScript side. 
+* The `constructor` property on `JSBridgedClass` is now an Optional, which allows bridging JavaScript classes that aren't
+available in every browser or environment.
 * JavaScriptKit runtime files are now supplied as SwiftPM resources. This allows us to resolve a long-standing issue
 in `carton` that could lead to a version mismatch between JavaScriptKit dependency in `Package.swift` or
-`Package.resolved` and supplied JavaScriptKit runtime version.
-* `JSSymbol` type is now supported for bridging [JavaScript `Symbol`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol).
+`Package.resolved` and carton’s bundled JavaScriptKit runtime version.
+* The `JSSymbol` type has been added, enabling support for [JavaScript `Symbol` values](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol), including accessing `Symbol`-keyed properties on objects.
 
 **Merged pull requests:**
 
