@@ -1,3 +1,30 @@
+# 0.15.0 (17 May 2022)
+
+This is a major release that adds new features and fixes issues. Specifically:
+* `BigInt` and `BigInt`-based `JSTypedArray` types are now supported. Now, when passing `Int64` function from Swift,
+it will be mapped to `BigInt` on JavaScript side. 
+* `constructor` property on `JSBridgedClass` is now optional, which allows bridging JavaScript classes that aren't
+available in every browser.
+* JavaScriptKit runtime files are now supplied as SwiftPM resources. This allows us to resolve a long-standing issue
+in `carton` that could lead to a version mismatch between JavaScriptKit dependency in `Package.swift` or
+`Package.resolved` and supplied JavaScriptKit runtime version.
+* `JSSymbol` type is now supported for bridging [JavaScript `Symbol`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol).
+
+**Merged pull requests:**
+
+- Improve JSKit diagnostics for use-after-free of JSClosure ([#195](https://github.com/swiftwasm/JavaScriptKit/pull/195)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Gracefully handle unavailable `JSBridgedClass` ([#190](https://github.com/swiftwasm/JavaScriptKit/pull/190)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Supply JSKit runtime in SwiftPM resources ([#193](https://github.com/swiftwasm/JavaScriptKit/pull/193)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Test with Node.js's WASI implementation ([#192](https://github.com/swiftwasm/JavaScriptKit/pull/192)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Add support for BigInts and BigInt-based TypedArrays ([#184](https://github.com/swiftwasm/JavaScriptKit/pull/184)) via [@j-f1](https://github.com/j-f1)
+- Update toolchain references to 5.6.0 in `README.md` ([#189](https://github.com/swiftwasm/JavaScriptKit/pull/189)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Bump async from 2.6.3 to 2.6.4 in /Example ([#188](https://github.com/swiftwasm/JavaScriptKit/pull/188)) via [@dependabot[bot]](https://github.com/dependabot[bot])
+- Remove outdated `BigInt` support `FIXME` from `JSTypedArray` ([#187](https://github.com/swiftwasm/JavaScriptKit/pull/187)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Cleanup & improvements to perf-tester ([#186](https://github.com/swiftwasm/JavaScriptKit/pull/186)) via [@j-f1](https://github.com/j-f1)
+- Re-add support for Symbol objects via JSSymbol ([#183](https://github.com/swiftwasm/JavaScriptKit/pull/183)) via [@j-f1](https://github.com/j-f1)
+- Fix JSValueDecoder ([#185](https://github.com/swiftwasm/JavaScriptKit/pull/185)) via [@j-f1](https://github.com/j-f1)
+- Fix deprecation warning in `JSFunction.swift` ([#182](https://github.com/swiftwasm/JavaScriptKit/pull/182)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+
 # 0.14.0 (8 April 2022)
 
 This is a breaking release that enables full support for SwiftWasm 5.6 and lays groundwork for future updates to [DOMKit](https://github.com/swiftwasm/DOMKit/).
