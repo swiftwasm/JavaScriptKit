@@ -12,7 +12,7 @@ in `carton` that could lead to a version mismatch between JavaScriptKit dependen
 
 **Source breaking changes**
 
-`UInt64.jsValue` and `Int64.jsValue`, which are a part of `JavaScriptKit` module, has been moved into `JavaScriptBigIntSupport` module since their implementation has been changed to require [JS-BigInt-integration](https://github.com/WebAssembly/JS-BigInt-integration) to avoid implicit cast from 64-bit integer to JS `Number`. 
+`UInt64.jsValue` and `Int64.jsValue`, which are a part of `JavaScriptKit` module, have been moved into `JavaScriptBigIntSupport` module since their implementation changed to require [JS-BigInt-integration](https://github.com/WebAssembly/JS-BigInt-integration) to avoid implicit casts from 64-bit integer to JS number type. 
 
 If you want to keep the behavior so far, please cast the 64-bit integer values to `Double`.
 
