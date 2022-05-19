@@ -10,6 +10,12 @@ in `carton` that could lead to a version mismatch between JavaScriptKit dependen
 `Package.resolved` and carton’s bundled JavaScriptKit runtime version.
 * The `JSSymbol` type has been added, enabling support for [JavaScript `Symbol` values](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol), including accessing `Symbol`-keyed properties on objects.
 
+**Source breaking changes**
+
+`UInt64.jsValue` and `Int64.jsValue`, which are a part of `JavaScriptKit` module, has been moved into `JavaScriptBigIntSupport` module since their implementation has been changed to require [JS-BigInt-integration](https://github.com/WebAssembly/JS-BigInt-integration) to avoid implicit cast from 64-bit integer to JS `Number`. 
+
+If you want to keep the behavior so far, please cast the 64-bit integer values to `Double`.
+
 **Merged pull requests:**
 
 - Improve JSKit diagnostics for use-after-free of JSClosure ([#195](https://github.com/swiftwasm/JavaScriptKit/pull/195)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
