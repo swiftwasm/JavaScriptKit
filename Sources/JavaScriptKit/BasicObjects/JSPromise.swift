@@ -79,9 +79,9 @@ public final class JSPromise: JSBridgedClass {
         /// Schedules the `success` closure to be invoked on successful completion of `self`.
         @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
         @discardableResult
-        public func then(success: @escaping (JSValue) async -> ConvertibleToJSValue) -> JSPromise {
+        public func then(success: @escaping (JSValue) async throws -> ConvertibleToJSValue) -> JSPromise {
             let closure = JSOneshotClosure.async {
-                await success($0[0]).jsValue
+                try await success($0[0]).jsValue
             }
             return JSPromise(unsafelyWrapping: jsObject.then!(closure).object!)
         }
@@ -106,14 +106,14 @@ public final class JSPromise: JSBridgedClass {
         /// Schedules the `success` closure to be invoked on successful completion of `self`.
         @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
         @discardableResult
-        public func then(success: @escaping (JSValue) async -> ConvertibleToJSValue,
-                         failure: @escaping (JSValue) async -> ConvertibleToJSValue) -> JSPromise
+        public func then(success: @escaping (JSValue) async throws -> ConvertibleToJSValue,
+                         failure: @escaping (JSValue) async throws -> ConvertibleToJSValue) -> JSPromise
         {
             let successClosure = JSOneshotClosure.async {
-                await success($0[0]).jsValue
+                try await success($0[0]).jsValue
             }
             let failureClosure = JSOneshotClosure.async {
-                await failure($0[0]).jsValue
+                try await failure($0[0]).jsValue
             }
             return JSPromise(unsafelyWrapping: jsObject.then!(successClosure, failureClosure).object!)
         }
@@ -132,9 +132,9 @@ public final class JSPromise: JSBridgedClass {
         /// Schedules the `failure` closure to be invoked on rejected completion of `self`.
         @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
         @discardableResult
-        public func `catch`(failure: @escaping (JSValue) async -> ConvertibleToJSValue) -> JSPromise {
+        public func `catch`(failure: @escaping (JSValue) async throws -> ConvertibleToJSValue) -> JSPromise {
             let closure = JSOneshotClosure.async {
-                await failure($0[0]).jsValue
+                try await failure($0[0]).jsValue
             }
             return .init(unsafelyWrapping: jsObject.catch!(closure).object!)
         }
