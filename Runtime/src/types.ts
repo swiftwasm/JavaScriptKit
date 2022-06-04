@@ -14,7 +14,7 @@ export interface ExportedFunctions {
         argv: pointer,
         argc: number,
         callback_func_ref: ref
-    ): void;
+    ): bool;
 
     swjs_free_host_function(host_func_id: number): void;
 }
@@ -95,7 +95,7 @@ export interface ImportedFunctions {
         exception_payload2_ptr: pointer
     ): number;
     swjs_instanceof(obj_ref: ref, constructor_ref: ref): boolean;
-    swjs_create_function(host_func_id: number): number;
+    swjs_create_function(host_func_id: number, line: number, file: ref): number;
     swjs_create_typed_array(
         constructor_ref: ref,
         elementsPtr: pointer,

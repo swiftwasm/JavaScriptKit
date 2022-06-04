@@ -14,7 +14,7 @@ export class SwiftRuntime {
     private _instance: WebAssembly.Instance | null;
     private _memory: Memory | null;
     private _closureDeallocator: SwiftClosureDeallocator | null;
-    private version: number = 707;
+    private version: number = 708;
 
     private textDecoder = new TextDecoder("utf-8");
     private textEncoder = new TextEncoder(); // Only support utf-8
@@ -68,7 +68,7 @@ export class SwiftRuntime {
         return this._closureDeallocator;
     }
 
-    private callHostFunction(host_func_id: number, args: any[]) {
+    private callHostFunction(host_func_id: number, line: number, file: string, args: any[]) {
         const argc = args.length;
         const argv = this.exports.swjs_prepare_host_function_call(argc);
         for (let index = 0; index < args.length; index++) {
@@ -88,12 +88,15 @@ export class SwiftRuntime {
         const callback_func_ref = this.memory.retain((result: any) => {
             output = result;
         });
-        this.exports.swjs_call_host_function(
+        const alreadyReleased = this.exports.swjs_call_host_function(
             host_func_id,
             argv,
             argc,
             callback_func_ref
         );
+        if (alreadyReleased) {
+          throw new Error(`The JSClosure has been already released by Swift side. The closure is created at ${file}:${line}`);
+        }
         this.exports.swjs_cleanup_host_function_call(argv);
         return output;
     }
@@ -371,9 +374,10 @@ export class SwiftRuntime {
             return obj instanceof constructor;
         },
 
-        swjs_create_function: (host_func_id: number) => {
+        swjs_create_function: (host_func_id: number, line: number, file: ref) => {
+            const fileString = this.memory.getObject(file) as string;
             const func = (...args: any[]) =>
-                this.callHostFunction(host_func_id, args);
+                this.callHostFunction(host_func_id, line, fileString, args);
             const func_ref = this.memory.retain(func);
             this.closureDeallocator?.track(func, func_ref);
             return func_ref;

@@ -13,7 +13,7 @@ public protocol TypedArrayElement: ConvertibleToJSValue, ConstructibleFromJSValu
 /// A wrapper around all JavaScript [TypedArray](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
 /// classes that exposes their properties in a type-safe way.
 public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral where Element: TypedArrayElement {
-    public class var constructor: JSFunction { Element.typedArrayClass }
+    public class var constructor: JSFunction? { Element.typedArrayClass }
     public var jsObject: JSObject
 
     public subscript(_ index: Int) -> Element {
@@ -21,7 +21,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
             return Element.construct(from: jsObject[index])!
         }
         set {
-            self.jsObject[index] = newValue.jsValue
+            jsObject[index] = newValue.jsValue
         }
     }
 
@@ -30,22 +30,23 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     ///
     /// - Parameter length: The number of elements that will be allocated.
     public init(length: Int) {
-        jsObject = Self.constructor.new(length)
+        jsObject = Self.constructor!.new(length)
     }
 
-    required public init(unsafelyWrapping jsObject: JSObject) {
+    public required init(unsafelyWrapping jsObject: JSObject) {
         self.jsObject = jsObject
     }
 
-    required public convenience init(arrayLiteral elements: Element...) {
+    public required convenience init(arrayLiteral elements: Element...) {
         self.init(elements)
     }
+
     /// Initialize a new instance of TypedArray in JavaScript environment with given elements.
     ///
     /// - Parameter array: The array that will be copied to create a new instance of TypedArray
     public convenience init(_ array: [Element]) {
         let jsArrayRef = array.withUnsafeBufferPointer { ptr in
-            _create_typed_array(Self.constructor.id, ptr.baseAddress!, Int32(array.count))
+            _create_typed_array(Self.constructor!.id, ptr.baseAddress!, Int32(array.count))
         }
         self.init(unsafelyWrapping: JSObject(id: jsArrayRef))
     }
@@ -80,7 +81,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         let rawBuffer = malloc(bytesLength)!
         defer { free(rawBuffer) }
         _load_typed_array(jsObject.id, rawBuffer.assumingMemoryBound(to: UInt8.self))
-        let length = lengthInBytes /  MemoryLayout<Element>.size
+        let length = lengthInBytes / MemoryLayout<Element>.size
         let boundPtr = rawBuffer.bindMemory(to: Element.self, capacity: length)
         let bufferPtr = UnsafeBufferPointer<Element>(start: boundPtr, count: length)
         let result = try body(bufferPtr)
@@ -105,6 +106,7 @@ extension Int: TypedArrayElement {
     public static var typedArrayClass: JSFunction =
         valueForBitWidth(typeName: "Int", bitWidth: Int.bitWidth, when32: JSObject.global.Int32Array).function!
 }
+
 extension UInt: TypedArrayElement {
     public static var typedArrayClass: JSFunction =
         valueForBitWidth(typeName: "UInt", bitWidth: Int.bitWidth, when32: JSObject.global.Uint32Array).function!
@@ -113,17 +115,19 @@ extension UInt: TypedArrayElement {
 extension Int8: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Int8Array.function!
 }
+
 extension UInt8: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Uint8Array.function!
 }
 
 public class JSUInt8ClampedArray: JSTypedArray<UInt8> {
-    public class override var constructor: JSFunction { JSObject.global.Uint8ClampedArray.function! }
+    override public class var constructor: JSFunction? { JSObject.global.Uint8ClampedArray.function! }
 }
 
 extension Int16: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Int16Array.function!
 }
+
 extension UInt16: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Uint16Array.function!
 }
@@ -131,6 +135,7 @@ extension UInt16: TypedArrayElement {
 extension Int32: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Int32Array.function!
 }
+
 extension UInt32: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Uint32Array.function!
 }
@@ -138,6 +143,7 @@ extension UInt32: TypedArrayElement {
 extension Float32: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Float32Array.function!
 }
+
 extension Float64: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Float64Array.function!
 }

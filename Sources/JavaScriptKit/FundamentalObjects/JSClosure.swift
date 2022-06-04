@@ -15,13 +15,15 @@ public protocol JSClosureProtocol: JSValueCompatible {
 public class JSOneshotClosure: JSObject, JSClosureProtocol {
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 
-    public init(_ body: @escaping ([JSValue]) -> JSValue) {
+    public init(_ body: @escaping ([JSValue]) -> JSValue, file: String = #fileID, line: UInt32 = #line) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
         super.init(id: 0)
 
         // 2. Create a new JavaScript function which calls the given Swift function.
         hostFuncRef = JavaScriptHostFuncRef(bitPattern: Int32(ObjectIdentifier(self).hashValue))
-        id = _create_function(hostFuncRef)
+        id = withExtendedLifetime(JSString(file)) { file in
+          _create_function(hostFuncRef, line, file.asInternalJSRef())
+        }
 
         // 3. Retain the given body in static storage by `funcRef`.
         JSClosure.sharedClosures[hostFuncRef] = (self, {
@@ -79,13 +81,15 @@ public class JSClosure: JSObject, JSClosureProtocol {
         })
     }
 
-    public init(_ body: @escaping ([JSValue]) -> JSValue) {
+    public init(_ body: @escaping ([JSValue]) -> JSValue, file: String = #fileID, line: UInt32 = #line) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
         super.init(id: 0)
 
         // 2. Create a new JavaScript function which calls the given Swift function.
         hostFuncRef = JavaScriptHostFuncRef(bitPattern: Int32(ObjectIdentifier(self).hashValue))
-        id = _create_function(hostFuncRef)
+        id = withExtendedLifetime(JSString(file)) { file in
+          _create_function(hostFuncRef, line, file.asInternalJSRef())
+        }
 
         // 3. Retain the given body in static storage by `funcRef`.
         Self.sharedClosures[hostFuncRef] = (self, body)
@@ -163,19 +167,21 @@ private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSVa
 // │                     │                          │
 // └─────────────────────┴──────────────────────────┘
 
+/// Returns true if the host function has been already released, otherwise false.
 @_cdecl("_call_host_function_impl")
 func _call_host_function_impl(
     _ hostFuncRef: JavaScriptHostFuncRef,
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
-) {
+) -> Bool {
     guard let (_, hostFunc) = JSClosure.sharedClosures[hostFuncRef] else {
-        fatalError("The function was already released")
+        return true
     }
     let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map(\.jsValue)
     let result = hostFunc(arguments)
     let callbackFuncRef = JSFunction(id: callbackFuncRef)
     _ = callbackFuncRef(result)
+    return false
 }
 
 

@@ -268,10 +268,13 @@ extern bool _instanceof(const JavaScriptObjectRef obj,
 /// See also comments on JSFunction.swift
 ///
 /// @param host_func_id The target Swift side function called by the created thunk function.
+/// @param line The line where the function is created. Will be used for diagnostics
+/// @param file The file name where the function is created. Will be used for diagnostics
 /// @returns A reference to the newly-created JavaScript thunk function
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_create_function")))
-extern JavaScriptObjectRef _create_function(const JavaScriptHostFuncRef host_func_id);
+extern JavaScriptObjectRef _create_function(const JavaScriptHostFuncRef host_func_id,
+                                            unsigned int line, JavaScriptObjectRef file);
 
 /// Instantiate a new `TypedArray` object with given elements
 /// This is used to provide an efficient way to create `TypedArray`.
