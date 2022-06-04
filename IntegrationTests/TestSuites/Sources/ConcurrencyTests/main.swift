@@ -62,7 +62,7 @@ func entrypoint() async throws {
         let start = time(nil)
         try await Task.sleep(nanoseconds: 2_000_000_000)
         let diff = difftime(time(nil), start);
-        try expectEqual(diff >= 2, true)
+        try expectGTE(diff, 2)
     }
 
     try await asyncTest("Job reordering based on priority") {
@@ -111,7 +111,7 @@ func entrypoint() async throws {
         try expectNotNil(promise)
         let result = try await promise!.value
         let diff = difftime(time(nil), start)
-        try expectEqual(diff >= 2, true)
+        try expectGTE(diff, 2)
         try expectEqual(result, .number(3))
     }
 
