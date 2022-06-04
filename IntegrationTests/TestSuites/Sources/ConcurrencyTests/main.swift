@@ -115,6 +115,67 @@ func entrypoint() async throws {
         try expectEqual(result, .number(3))
     }
 
+    try await asyncTest("Async JSPromise: then") {
+        let promise = JSPromise { resolve in
+            _ = JSObject.global.setTimeout!(
+                JSClosure { _  in
+                    resolve(.success(JSValue.number(3)))
+                    return .undefined
+                }.jsValue,
+                1_000
+            )
+        }
+        let promise2 = promise.then { result in
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            return String(result.number!)
+        }
+        let start = time(nil)
+        let result = try await promise2.value
+        let diff = difftime(time(nil), start)
+        try expectGTE(diff, 2)
+        try expectEqual(result, .string("3.0"))
+    }
+
+    try await asyncTest("Async JSPromise: then(success:failure:)") {
+        let promise = JSPromise { resolve in
+            _ = JSObject.global.setTimeout!(
+                JSClosure { _ in
+                    resolve(.failure(JSError(message: "test").jsValue))
+                    return .undefined
+                }.jsValue,
+                1_000
+            )
+        }
+        let promise2 = promise.then { _ in
+            throw JSError(message: "should not succeed")
+        } failure: { err in
+            return err
+        }
+        let result = try await promise2.value
+        try expectEqual(result.object?.message, .string("test"))
+    }
+
+    try await asyncTest("Async JSPromise: catch") {
+        let promise = JSPromise { resolve in
+            _ = JSObject.global.setTimeout!(
+                JSClosure { _ in
+                    resolve(.failure(JSError(message: "test").jsValue))
+                    return .undefined
+                }.jsValue,
+                1_000
+            )
+        }
+        let promise2 = promise.catch { err in
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            return err
+        }
+        let start = time(nil)
+        let result = try await promise2.value
+        let diff = difftime(time(nil), start)
+        try expectGTE(diff, 2)
+        try expectEqual(result.object?.message, .string("test"))
+    }
+
     // FIXME(katei): Somehow it doesn't work due to a mysterious unreachable inst
     // at the end of thunk.
     // This issue is not only on JS host environment, but also on standalone coop executor.
