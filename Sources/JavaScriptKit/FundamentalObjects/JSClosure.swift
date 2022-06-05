@@ -32,6 +32,13 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         })
     }
 
+    #if compiler(>=5.5)
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSOneshotClosure {
+        JSOneshotClosure(makeAsyncClosure(body))
+    }
+    #endif
+
     /// Release this function resource.
     /// After calling `release`, calling this function from JavaScript will fail.
     public func release() {
@@ -88,6 +95,13 @@ public class JSClosure: JSObject, JSClosureProtocol {
         Self.sharedClosures[hostFuncRef] = (self, body)
     }
 
+    #if compiler(>=5.5)
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSClosure {
+        JSClosure(makeAsyncClosure(body))
+    }
+    #endif
+
     #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     deinit {
         guard isReleased else {
@@ -97,6 +111,27 @@ public class JSClosure: JSObject, JSClosureProtocol {
     #endif
 }
 
+#if compiler(>=5.5)
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSValue) -> (([JSValue]) -> JSValue) {
+    { arguments in
+        JSPromise { resolver in
+            Task {
+                do {
+                    let result = try await body(arguments)
+                    resolver(.success(result))
+                } catch {
+                    if let jsError = error as? JSError {
+                        resolver(.failure(jsError.jsValue))
+                    } else {
+                        resolver(.failure(JSError(message: String(describing: error)).jsValue))
+                    }
+                }
+            }
+        }.jsValue()
+    }
+}
+#endif
 
 // MARK: - `JSClosure` mechanism note
 //

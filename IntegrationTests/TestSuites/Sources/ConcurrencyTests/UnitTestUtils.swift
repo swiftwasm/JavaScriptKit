@@ -41,6 +41,18 @@ struct MessageError: Error {
     }
 }
 
+func expectGTE<T: Comparable>(
+    _ lhs: T, _ rhs: T,
+    file: StaticString = #file, line: UInt = #line, column: UInt = #column
+) throws {
+    if lhs < rhs {
+        throw MessageError(
+            "Expected \(lhs) to be greater than or equal to \(rhs)",
+            file: file, line: line, column: column
+        )
+    }
+}
+
 func expectEqual<T: Equatable>(
     _ lhs: T, _ rhs: T,
     file: StaticString = #file, line: UInt = #line, column: UInt = #column
