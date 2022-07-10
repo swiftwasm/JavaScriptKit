@@ -2,6 +2,7 @@ const SwiftRuntime = require("javascript-kit-swift").SwiftRuntime;
 const WasmerWASI = require("@wasmer/wasi").WASI;
 const WasmFs = require("@wasmer/wasmfs").WasmFs;
 const NodeWASI = require("wasi").WASI;
+const { WASI: MicroWASI, useAll } = require("uwasi");
 
 const promisify = require("util").promisify;
 const fs = require("fs");
@@ -39,6 +40,21 @@ const WASI = {
             start(instance) {
                 wasi.start(instance);
                 instance.exports._initialize();
+                instance.exports.main();
+            }
+        }
+    },
+    MicroWASI: () => {
+        const wasi = new MicroWASI({
+            args: [],
+            env: {},
+            features: [useAll()],
+        })
+
+        return {
+            wasiImport: wasi.wasiImport,
+            start(instance) {
+                wasi.initialize(instance);
                 instance.exports.main();
             }
         }
