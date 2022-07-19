@@ -32,6 +32,7 @@ func entrypoint() async throws {
             resolve(.success(1))
         })
         try await expectEqual(p.value, 1)
+        try await expectEqual(p.result, .success(.number(1)))
     }
 
     try await asyncTest("await rejected Promise") {
@@ -41,6 +42,7 @@ func entrypoint() async throws {
         let error = try await expectAsyncThrow(await p.value)
         let jsValue = try expectCast(error, to: JSValue.self)
         try expectEqual(jsValue, 3)
+        try await expectEqual(p.result, .failure(.number(3)))
     }
 
     try await asyncTest("Continuation") {

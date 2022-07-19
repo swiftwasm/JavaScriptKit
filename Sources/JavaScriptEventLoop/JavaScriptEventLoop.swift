@@ -116,6 +116,24 @@ public extension JSPromise {
             }
         }
     }
+
+    /// Wait for the promise to complete, returning its result or exception as a Result.
+    var result: Result<JSValue, JSValue> {
+        get async {
+            await withUnsafeContinuation { [self] continuation in
+                self.then(
+                    success: {
+                        continuation.resume(returning: .success($0))
+                        return JSValue.undefined
+                    },
+                    failure: {
+                        continuation.resume(returning: .failure($0))
+                        return JSValue.undefined
+                    }
+                )
+            }
+        }
+    }
 }
 
 #endif
