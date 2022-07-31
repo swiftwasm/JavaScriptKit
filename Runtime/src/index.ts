@@ -27,6 +27,14 @@ export class SwiftRuntime {
 
     setInstance(instance: WebAssembly.Instance) {
         this._instance = instance;
+        if (typeof (this.exports as any)._start === "function") {
+            throw new Error(
+                `JavaScriptKit supports only WASI reactor ABI.
+                Please make sure you are building with:
+                -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor
+                `
+            );
+        }
         if (this.exports.swjs_library_version() != this.version) {
             throw new Error(
                 `The versions of JavaScriptKit are incompatible.

@@ -365,6 +365,12 @@
         }
         setInstance(instance) {
             this._instance = instance;
+            if (typeof this.exports._start === "function") {
+                throw new Error(`JavaScriptKit supports only WASI reactor ABI.
+                Please make sure you are building with:
+                -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor
+                `);
+            }
             if (this.exports.swjs_library_version() != this.version) {
                 throw new Error(`The versions of JavaScriptKit are incompatible.
                 WebAssembly runtime ${this.exports.swjs_library_version()} != JS runtime ${this.version}`);
