@@ -12,6 +12,8 @@ global.benchmarkRunner = function (name, body) {
 };
 
 global.noopFunction = function () {}
+global.jsNumber = 42
+global.jsString = "myString"
 
 class JSBenchmark {
     constructor(title) {

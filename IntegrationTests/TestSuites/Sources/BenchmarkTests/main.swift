@@ -40,6 +40,14 @@ serialization.testSuite("Swift Int to JavaScript with call") { n in
     }
 }
 
+serialization.testSuite("JavaScript Number to Swift Int") { n in
+    let object = JSObject.global
+    let key = JSString("jsNumber")
+    for _ in 0 ..< n {
+        _ = object[key].number
+    }
+}
+
 let swiftString = "Hello, world"
 serialization.testSuite("Swift String to JavaScript with assignment") { n in
     let jsString = JSValue.string(swiftString)
@@ -54,6 +62,14 @@ serialization.testSuite("Swift String to JavaScript with call") { n in
     let jsString = JSValue.string(swiftString)
     for _ in 0 ..< n {
         _ = noopFunction(jsString)
+    }
+}
+
+serialization.testSuite("JavaScript String to Swift String") { n in
+    let object = JSObject.global
+    let key = JSString("jsString")
+    for _ in 0 ..< n {
+        _ = object[key].string
     }
 }
 
