@@ -46,6 +46,9 @@ import _CJavaScriptKit
         _: JavaScriptObjectRef,
         _: UnsafeMutablePointer<UInt8>!
     ) { fatalError() }
+    func _i64_to_bigint_slow(
+        _: UInt32, _: UInt32, _: Bool
+    ) -> JavaScriptObjectRef { fatalError() }
     func _call_function(
         _: JavaScriptObjectRef,
         _: UnsafePointer<RawJSValue>!, _: Int32,

@@ -352,6 +352,11 @@ class SwiftRuntime {
                     return BigInt.asIntN(64, object);
                 }
             },
+            swjs_i64_to_bigint_slow: (lower, upper, signed) => {
+                const value = BigInt.asUintN(32, BigInt(lower)) +
+                    (BigInt.asUintN(32, BigInt(upper)) << BigInt(32));
+                return this.memory.retain(signed ? BigInt.asIntN(64, value) : BigInt.asUintN(64, value));
+            },
         };
         this._instance = null;
         this._memory = null;
