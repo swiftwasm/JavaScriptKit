@@ -97,6 +97,10 @@ const startWasiTask = async (wasmPath, wasiConstructor = selectWASIBackend()) =>
     let { instance } = await WebAssembly.instantiate(wasmBinary, {
         wasi_snapshot_preview1: wasi.wasiImport,
         javascript_kit: swift.importObjects(),
+        benchmark_helper: {
+            noop: () => {},
+            noop_with_int: (_) => {},
+        }
     });
 
     swift.setInstance(instance);

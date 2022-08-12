@@ -1,13 +1,17 @@
 const { startWasiTask } = require("../lib");
 const { performance } = require("perf_hooks");
 
+const SAMPLE_ITERATION = 1000000
+
 global.benchmarkRunner = function (name, body) {
     console.log(`Running '${name}' ...`);
     const startTime = performance.now();
-    body(5000);
+    body(SAMPLE_ITERATION);
     const endTime = performance.now();
     console.log("done " + (endTime - startTime) + " ms");
 };
+
+global.noopFunction = function () {}
 
 class JSBenchmark {
     constructor(title) {
@@ -15,27 +19,47 @@ class JSBenchmark {
     }
     testSuite(name, body) {
         benchmarkRunner(`${this.title}/${name}`, (iteration) => {
-            for (let idx = 0; idx < iteration; idx++) {
-                body();
-            }
+            body(iteration);
         });
     }
 }
 
 const serialization = new JSBenchmark("Serialization");
-serialization.testSuite("Write JavaScript number directly", () => {
-    const jsNumber = 42;
-    const object = global;
-    for (let idx = 0; idx < 100; idx++) {
-        object["numberValue" + idx] = jsNumber;
+serialization.testSuite("Call JavaScript function directly", (n) => {
+    for (let idx = 0; idx < n; idx++) {
+        global.noopFunction()
     }
 });
 
-serialization.testSuite("Write JavaScript string directly", () => {
+serialization.testSuite("Assign JavaScript number directly", (n) => {
+    const jsNumber = 42;
+    const object = global;
+    const key = "numberValue"
+    for (let idx = 0; idx < n; idx++) {
+        object[key] = jsNumber;
+    }
+});
+
+serialization.testSuite("Call with JavaScript number directly", (n) => {
+    const jsNumber = 42;
+    for (let idx = 0; idx < n; idx++) {
+        global.noopFunction(jsNumber)
+    }
+});
+
+serialization.testSuite("Write JavaScript string directly", (n) => {
     const jsString = "Hello, world";
     const object = global;
-    for (let idx = 0; idx < 100; idx++) {
-        object["stringValue" + idx] = jsString;
+    const key = "stringValue"
+    for (let idx = 0; idx < n; idx++) {
+        object[key] = jsString;
+    }
+});
+
+serialization.testSuite("Call with JavaScript string directly", (n) => {
+    const jsString = "Hello, world";
+    for (let idx = 0; idx < n; idx++) {
+        global.noopFunction(jsString)
     }
 });
 
