@@ -20,11 +20,11 @@ test:
 
 .PHONY: benchmark_setup
 benchmark_setup:
-	cd IntegrationTests && make benchmark_setup
+	cd IntegrationTests && CONFIGURATION=release make benchmark_setup
 
 .PHONY: run_benchmark
 run_benchmark:
-	cd IntegrationTests && make -s run_benchmark
+	cd IntegrationTests && CONFIGURATION=release make -s run_benchmark
 
 .PHONY: perf-tester
 perf-tester:

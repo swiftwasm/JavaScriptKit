@@ -35,6 +35,6 @@ let package = Package(
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
             ]
         ),
-        .target(name: "BenchmarkTests", dependencies: ["JavaScriptKit"]),
+        .target(name: "BenchmarkTests", dependencies: ["JavaScriptKit", "CHelpers"]),
     ]
 )
