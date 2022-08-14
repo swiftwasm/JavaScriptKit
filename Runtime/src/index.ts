@@ -76,7 +76,12 @@ export class SwiftRuntime {
         return this._closureDeallocator;
     }
 
-    private callHostFunction(host_func_id: number, line: number, file: string, args: any[]) {
+    private callHostFunction(
+        host_func_id: number,
+        line: number,
+        file: string,
+        args: any[]
+    ) {
         const argc = args.length;
         const argv = this.exports.swjs_prepare_host_function_call(argc);
         for (let index = 0; index < args.length; index++) {
@@ -103,7 +108,9 @@ export class SwiftRuntime {
             callback_func_ref
         );
         if (alreadyReleased) {
-          throw new Error(`The JSClosure has been already released by Swift side. The closure is created at ${file}:${line}`);
+            throw new Error(
+                `The JSClosure has been already released by Swift side. The closure is created at ${file}:${line}`
+            );
         }
         this.exports.swjs_cleanup_host_function_call(argv);
         return output;
@@ -382,7 +389,11 @@ export class SwiftRuntime {
             return obj instanceof constructor;
         },
 
-        swjs_create_function: (host_func_id: number, line: number, file: ref) => {
+        swjs_create_function: (
+            host_func_id: number,
+            line: number,
+            file: ref
+        ) => {
             const fileString = this.memory.getObject(file) as string;
             const func = (...args: any[]) =>
                 this.callHostFunction(host_func_id, line, fileString, args);
@@ -435,6 +446,14 @@ export class SwiftRuntime {
                 }
                 return BigInt.asIntN(64, object);
             }
+        },
+        swjs_i64_to_bigint_slow: (lower, upper, signed) => {
+            const value =
+                BigInt.asUintN(32, BigInt(lower)) +
+                (BigInt.asUintN(32, BigInt(upper)) << BigInt(32));
+            return this.memory.retain(
+                signed ? BigInt.asIntN(64, value) : BigInt.asUintN(64, value)
+            );
         },
     };
 }

@@ -6,11 +6,15 @@ func testI64() throws {
         func expectPassesThrough(signed value: Int64) throws {
             let bigInt = JSBigInt(value)
             try expectEqual(bigInt.description, value.description)
+            let bigInt2 = JSBigInt(_slowBridge: value)
+            try expectEqual(bigInt2.description, value.description)
         }
 
         func expectPassesThrough(unsigned value: UInt64) throws {
             let bigInt = JSBigInt(unsigned: value)
             try expectEqual(bigInt.description, value.description)
+            let bigInt2 = JSBigInt(_slowBridge: value)
+            try expectEqual(bigInt2.description, value.description)
         }
 
         try expectPassesThrough(signed: 0)

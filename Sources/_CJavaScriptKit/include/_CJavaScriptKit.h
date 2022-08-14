@@ -160,6 +160,16 @@ __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_load_string")))
 extern void _load_string(const JavaScriptObjectRef bytes, unsigned char *buffer);
 
+/// Converts the provided Int64 or UInt64 to a BigInt in slow path by splitting 64bit integer to two 32bit integers
+/// to avoid depending on [JS-BigInt-integration](https://github.com/WebAssembly/JS-BigInt-integration) feature
+///
+/// @param lower The lower 32bit of the value to convert.
+/// @param upper The upper 32bit of the value to convert.
+/// @param is_signed Whether to treat the value as a signed integer or not.
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_i64_to_bigint_slow")))
+extern JavaScriptObjectRef _i64_to_bigint_slow(unsigned int lower, unsigned int upper, bool is_signed);
+
 /// `_call_function` calls JavaScript function with given arguments list.
 ///
 /// @param ref The target JavaScript function to call.

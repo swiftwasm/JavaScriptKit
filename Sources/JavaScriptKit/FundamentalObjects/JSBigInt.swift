@@ -7,6 +7,19 @@ public final class JSBigInt: JSObject {
     override public init(id: JavaScriptObjectRef) {
         super.init(id: id)
     }
+    
+    /// Instantiate a new `JSBigInt` with given Int64 value in a slow path
+    /// This doesn't require [JS-BigInt-integration](https://github.com/WebAssembly/JS-BigInt-integration) feature.
+    public init(_slowBridge value: Int64) {
+        let value = UInt64(bitPattern: value)
+        super.init(id: _i64_to_bigint_slow(UInt32(value & 0xffffffff), UInt32(value >> 32), true))
+    }
+
+    /// Instantiate a new `JSBigInt` with given UInt64 value in a slow path
+    /// This doesn't require [JS-BigInt-integration](https://github.com/WebAssembly/JS-BigInt-integration) feature.
+    public init(_slowBridge value: UInt64) {
+        super.init(id: _i64_to_bigint_slow(UInt32(value & 0xffffffff), UInt32(value >> 32), false))
+    }
 
     override public class func construct(from value: JSValue) -> Self? {
         value.bigInt as? Self
