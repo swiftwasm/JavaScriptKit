@@ -54,12 +54,19 @@
     // Note:
     // `decodeValues` assumes that the size of RawJSValue is 16.
     const decodeArray = (ptr, length, memory) => {
+        // fast path for empty array
+        if (length === 0) {
+            return [];
+        }
         let result = [];
+        // It's safe to hold DataView here because WebAssembly.Memory.buffer won't
+        // change within this function.
+        const view = memory.dataView();
         for (let index = 0; index < length; index++) {
             const base = ptr + 16 * index;
-            const kind = memory.readUint32(base);
-            const payload1 = memory.readUint32(base + 4);
-            const payload2 = memory.readFloat64(base + 8);
+            const kind = view.getUint32(base, true);
+            const payload1 = view.getUint32(base + 4, true);
+            const payload2 = view.getFloat64(base + 8, true);
             result.push(decode(kind, payload1, payload2, memory));
         }
         return result;
@@ -113,6 +120,51 @@
             default:
                 assertNever(type, `Type "${type}" is not supported yet`);
         }
+    };
+    const writeV2 = (value, payload1_ptr, payload2_ptr, is_exception, memory) => {
+        if (value === undefined) {
+            return 5 /* Undefined */;
+        }
+        const exceptionBit = (is_exception ? 1 : 0) << 31;
+        if (value === null) {
+            return exceptionBit | 4 /* Null */;
+        }
+        const writeRef = (kind) => {
+            memory.writeUint32(payload1_ptr, memory.retain(value));
+            return exceptionBit | kind;
+        };
+        const type = typeof value;
+        switch (type) {
+            case "boolean": {
+                memory.writeUint32(payload1_ptr, value ? 1 : 0);
+                return exceptionBit | 0 /* Boolean */;
+            }
+            case "number": {
+                memory.writeFloat64(payload2_ptr, value);
+                return exceptionBit | 2 /* Number */;
+            }
+            case "string": {
+                return writeRef(1 /* String */);
+            }
+            case "undefined": {
+                return exceptionBit | 5 /* Undefined */;
+            }
+            case "object": {
+                return writeRef(3 /* Object */);
+            }
+            case "function": {
+                return writeRef(6 /* Function */);
+            }
+            case "symbol": {
+                return writeRef(7 /* Symbol */);
+            }
+            case "bigint": {
+                return writeRef(8 /* BigInt */);
+            }
+            default:
+                assertNever(type, `Type "${type}" is not supported yet`);
+        }
+        throw new Error("Unreachable");
     };
 
     let globalVariable;
@@ -248,19 +300,17 @@
                     }
                     write(result, kind_ptr, payload1_ptr, payload2_ptr, false, this.memory);
                 },
-                swjs_call_function_no_catch: (ref, argv, argc, kind_ptr, payload1_ptr, payload2_ptr) => {
+                swjs_call_function_no_catch: (ref, argv, argc, payload1_ptr, payload2_ptr) => {
                     const func = this.memory.getObject(ref);
+                    let result = undefined;
                     let isException = true;
                     try {
                         const args = decodeArray(argv, argc, this.memory);
-                        const result = func(...args);
-                        write(result, kind_ptr, payload1_ptr, payload2_ptr, false, this.memory);
+                        result = func(...args);
                         isException = false;
                     }
                     finally {
-                        if (isException) {
-                            write(undefined, kind_ptr, payload1_ptr, payload2_ptr, true, this.memory);
-                        }
+                        return writeV2(result, payload1_ptr, payload2_ptr, isException, this.memory);
                     }
                 },
                 swjs_call_function_with_this: (obj_ref, func_ref, argv, argc, kind_ptr, payload1_ptr, payload2_ptr) => {
