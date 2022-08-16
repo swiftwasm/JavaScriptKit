@@ -1,7 +1,8 @@
 CONFIGURATION ?= debug
 SWIFT_BUILD_FLAGS ?=
+NODEJS_FLAGS ?=
 
-NODEJS = node --experimental-wasi-unstable-preview1
+NODEJS = node --experimental-wasi-unstable-preview1 $(NODEJS_FLAGS)
 
 FORCE:
 TestSuites/.build/$(CONFIGURATION)/%.wasm: FORCE
