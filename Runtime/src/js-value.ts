@@ -1,5 +1,5 @@
 import { Memory } from "./memory.js";
-import { assertNever, pointer } from "./types.js";
+import { assertNever, JavaScriptValueKindAndFlags, pointer } from "./types.js";
 
 export const enum Kind {
     Boolean = 0,
@@ -120,4 +120,60 @@ export const write = (
         default:
             assertNever(type, `Type "${type}" is not supported yet`);
     }
+};
+
+
+export const writeV2 = (
+    value: any,
+    payload1_ptr: pointer,
+    payload2_ptr: pointer,
+    is_exception: boolean,
+    memory: Memory
+): JavaScriptValueKindAndFlags => {
+    if (value === undefined) {
+        return Kind.Undefined;
+    }
+
+    const exceptionBit = (is_exception ? 1 : 0) << 31;
+    if (value === null) {
+        return exceptionBit | Kind.Null;
+    }
+
+    const writeRef = (kind: Kind) => {
+        memory.writeUint32(payload1_ptr, memory.retain(value));
+        return exceptionBit | kind
+    };
+
+    const type = typeof value;
+    switch (type) {
+        case "boolean": {
+            memory.writeUint32(payload1_ptr, value ? 1 : 0);
+            return exceptionBit | Kind.Boolean;
+        }
+        case "number": {
+            memory.writeFloat64(payload2_ptr, value);
+            return exceptionBit | Kind.Number;
+        }
+        case "string": {
+            return writeRef(Kind.String);
+        }
+        case "undefined": {
+            return exceptionBit | Kind.Undefined;
+        }
+        case "object": {
+            return writeRef(Kind.Object);
+        }
+        case "function": {
+            return writeRef(Kind.Function);
+        }
+        case "symbol": {
+            return writeRef(Kind.Symbol);
+        }
+        case "bigint": {
+            return writeRef(Kind.BigInt);
+        }
+        default:
+            assertNever(type, `Type "${type}" is not supported yet`);
+    }
+    throw new Error("Unreachable");
 };

@@ -3,6 +3,7 @@ import * as JSValue from "./js-value.js";
 export type ref = number;
 export type pointer = number;
 export type bool = number;
+export type JavaScriptValueKindAndFlags = number;
 
 export interface ExportedFunctions {
     swjs_library_version(): number;
@@ -63,10 +64,9 @@ export interface ImportedFunctions {
         ref: number,
         argv: pointer,
         argc: number,
-        kind_ptr: pointer,
         payload1_ptr: pointer,
         payload2_ptr: pointer
-    ): void;
+    ): JavaScriptValueKindAndFlags;
     swjs_call_function_with_this(
         obj_ref: ref,
         func_ref: ref,

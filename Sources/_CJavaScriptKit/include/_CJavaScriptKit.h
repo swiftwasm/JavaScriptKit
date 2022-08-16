@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 /// `JavaScriptObjectRef` represents JavaScript object reference that is referenced by Swift side.
 /// This value is an address of `SwiftRuntimeHeap`.
@@ -193,12 +194,15 @@ extern void _call_function(const JavaScriptObjectRef ref, const RawJSValue *argv
 /// @param result_kind A result pointer of JavaScript value kind of returned result or thrown exception.
 /// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
 /// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
+/// @return A JavaScriptValueKindAndFlags bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_function_no_catch")))
-extern void _call_function_no_catch(const JavaScriptObjectRef ref, const RawJSValue *argv,
-                           const int argc, JavaScriptValueKindAndFlags *result_kind,
-                           JavaScriptPayload1 *result_payload1,
-                           JavaScriptPayload2 *result_payload2);
+extern uint32_t _call_function_no_catch(
+  const JavaScriptObjectRef ref, const RawJSValue *argv,
+  const int argc,
+  JavaScriptPayload1 *result_payload1,
+  JavaScriptPayload2 *result_payload2
+);
 
 /// `_call_function_with_this` calls JavaScript function with given arguments list and given `_this`.
 ///

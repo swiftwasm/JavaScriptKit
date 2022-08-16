@@ -96,10 +96,11 @@ func invokeNonThrowingJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleTo
                                                   jsFunc.id, argv, Int32(argc),
                                                   &kindAndFlags, &payload1, &payload2)
             } else {
-                _call_function_no_catch(
+                let result = _call_function_no_catch(
                     jsFunc.id, argv, Int32(argc),
-                    &kindAndFlags, &payload1, &payload2
+                    &payload1, &payload2
                 )
+                kindAndFlags = unsafeBitCast(result, to: JavaScriptValueKindAndFlags.self)
             }
             assert(!kindAndFlags.isException)
             let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)

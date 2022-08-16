@@ -237,35 +237,24 @@ export class SwiftRuntime {
             ref: ref,
             argv: pointer,
             argc: number,
-            kind_ptr: pointer,
             payload1_ptr: pointer,
             payload2_ptr: pointer
         ) => {
             const func = this.memory.getObject(ref);
+            let result = undefined;
             let isException = true;
             try {
                 const args = JSValue.decodeArray(argv, argc, this.memory);
-                const result = func(...args);
-                JSValue.write(
-                    result,
-                    kind_ptr,
-                    payload1_ptr,
-                    payload2_ptr,
-                    false,
-                    this.memory
-                );
+                result = func(...args);
                 isException = false;
             } finally {
-                if (isException) {
-                    JSValue.write(
-                        undefined,
-                        kind_ptr,
-                        payload1_ptr,
-                        payload2_ptr,
-                        true,
-                        this.memory
-                    );
-                }
+                return JSValue.writeV2(
+                    result,
+                    payload1_ptr,
+                    payload2_ptr,
+                    isException,
+                    this.memory
+                );
             }
         },
 
