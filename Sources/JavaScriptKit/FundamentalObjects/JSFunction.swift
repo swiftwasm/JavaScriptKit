@@ -98,7 +98,8 @@ public class JSFunction: JSObject {
     }
 
     final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue]) -> RawJSValue {
-        arguments.withRawJSValues { rawValues in
+        let id = self.id
+        return arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
@@ -118,7 +119,8 @@ public class JSFunction: JSObject {
     }
 
     final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue], this: JSObject) -> RawJSValue {
-        arguments.withRawJSValues { rawValues in
+        let id = self.id
+        return arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
