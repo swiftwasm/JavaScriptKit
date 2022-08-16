@@ -253,6 +253,9 @@ extension JSValue {
 
 extension Array where Element == ConvertibleToJSValue {
     func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
+        // fast path for empty array
+        guard self.count != 0 else { return body([]) }
+
         func _withRawJSValues<T>(
             _ values: [ConvertibleToJSValue], _ index: Int,
             _ results: inout [RawJSValue], _ body: ([RawJSValue]) -> T
