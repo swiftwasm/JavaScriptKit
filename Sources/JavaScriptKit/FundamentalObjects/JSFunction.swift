@@ -38,8 +38,10 @@ public class JSFunction: JSObject {
     /// - Parameter arguments: Arguments to be passed to this constructor function.
     /// - Returns: A new instance of this constructor.
     public func new(arguments: [ConvertibleToJSValue]) -> JSObject {
-        arguments.withRawJSValues { bufferPointer in
-            JSObject(id: _call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
+        arguments.withRawJSValues { rawValues in
+            rawValues.withUnsafeBufferPointer { bufferPointer in
+                JSObject(id: _call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
+            }
         }
     }
 
@@ -82,25 +84,27 @@ public class JSFunction: JSObject {
 }
 
 func invokeNonThrowingJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) -> RawJSValue {
-    arguments.withRawJSValues { bufferPointer in
-        let argv = bufferPointer.baseAddress
-        let argc = bufferPointer.count
-        var kindAndFlags = JavaScriptValueKindAndFlags()
-        var payload1 = JavaScriptPayload1()
-        var payload2 = JavaScriptPayload2()
-        if let thisId = this?.id {
-            _call_function_with_this_no_catch(thisId,
-                                              jsFunc.id, argv, Int32(argc),
-                                              &kindAndFlags, &payload1, &payload2)
-        } else {
-            let result = _call_function_no_catch(
-                jsFunc.id, argv, Int32(argc),
-                &payload1, &payload2
-            )
-            kindAndFlags = unsafeBitCast(result, to: JavaScriptValueKindAndFlags.self)
+    arguments.withRawJSValues { rawValues in
+        rawValues.withUnsafeBufferPointer { bufferPointer in
+            let argv = bufferPointer.baseAddress
+            let argc = bufferPointer.count
+            var kindAndFlags = JavaScriptValueKindAndFlags()
+            var payload1 = JavaScriptPayload1()
+            var payload2 = JavaScriptPayload2()
+            if let thisId = this?.id {
+                _call_function_with_this_no_catch(thisId,
+                                                  jsFunc.id, argv, Int32(argc),
+                                                  &kindAndFlags, &payload1, &payload2)
+            } else {
+                let result = _call_function_no_catch(
+                    jsFunc.id, argv, Int32(argc),
+                    &payload1, &payload2
+                )
+                kindAndFlags = unsafeBitCast(result, to: JavaScriptValueKindAndFlags.self)
+            }
+            assert(!kindAndFlags.isException)
+            let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
+            return result
         }
-        assert(!kindAndFlags.isException)
-        let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
-        return result
     }
 }
