@@ -95,10 +95,9 @@ extension JSString {
         guts.jsRef
     }
 
-    func withRawJSValue<T>(_ body: (RawJSValue) -> T) -> T {
-        let rawValue = RawJSValue(
+    func toRawJSValue() -> RawJSValue {
+        return RawJSValue(
             kind: .string, payload1: guts.jsRef, payload2: 0
         )
-        return body(rawValue)
     }
 }

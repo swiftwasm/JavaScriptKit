@@ -203,9 +203,8 @@ public func getJSValue(this: JSObject, name: JSString) -> JSValue {
 }
 
 public func setJSValue(this: JSObject, name: JSString, value: JSValue) {
-    value.withRawJSValue { rawValue in
-        _set_prop(this.id, name.asInternalJSRef(), rawValue.kind, rawValue.payload1, rawValue.payload2)
-    }
+    let rawValue = value.toRawJSValue()
+    _set_prop(this.id, name.asInternalJSRef(), rawValue.kind, rawValue.payload1, rawValue.payload2)
 }
 
 public func getJSValue(this: JSObject, index: Int32) -> JSValue {
@@ -217,11 +216,10 @@ public func getJSValue(this: JSObject, index: Int32) -> JSValue {
 }
 
 public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
-    value.withRawJSValue { rawValue in
-        _set_subscript(this.id, index,
-                       rawValue.kind,
-                       rawValue.payload1, rawValue.payload2)
-    }
+    let rawValue = value.toRawJSValue()
+    _set_subscript(this.id, index,
+                   rawValue.kind,
+                   rawValue.payload1, rawValue.payload2)
 }
 
 public func getJSValue(this: JSObject, symbol: JSSymbol) -> JSValue {
@@ -233,9 +231,8 @@ public func getJSValue(this: JSObject, symbol: JSSymbol) -> JSValue {
 }
 
 public func setJSValue(this: JSObject, symbol: JSSymbol, value: JSValue) {
-    value.withRawJSValue { rawValue in
-        _set_prop(this.id, symbol.id, rawValue.kind, rawValue.payload1, rawValue.payload2)
-    }
+    let rawValue = value.toRawJSValue()
+    _set_prop(this.id, symbol.id, rawValue.kind, rawValue.payload1, rawValue.payload2)
 }
 
 public extension JSValue {
