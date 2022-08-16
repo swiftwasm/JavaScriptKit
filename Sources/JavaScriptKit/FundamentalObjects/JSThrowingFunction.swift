@@ -36,24 +36,22 @@ public class JSThrowingFunction {
     /// - Parameter arguments: Arguments to be passed to this constructor function.
     /// - Returns: A new instance of this constructor.
     public func new(arguments: [ConvertibleToJSValue]) throws -> JSObject {
-        try arguments.withRawJSValues { rawValues -> Result<JSObject, JSValue> in
-            rawValues.withUnsafeBufferPointer { bufferPointer in
-                let argv = bufferPointer.baseAddress
-                let argc = bufferPointer.count
+        try arguments.withRawJSValues { bufferPointer -> Result<JSObject, JSValue> in
+            let argv = bufferPointer.baseAddress
+            let argc = bufferPointer.count
 
-                var exceptionKind = JavaScriptValueKindAndFlags()
-                var exceptionPayload1 = JavaScriptPayload1()
-                var exceptionPayload2 = JavaScriptPayload2()
-                let resultObj = _call_throwing_new(
-                    self.base.id, argv, Int32(argc),
-                    &exceptionKind, &exceptionPayload1, &exceptionPayload2
-                )
-                if exceptionKind.isException {
-                    let exception = RawJSValue(kind: exceptionKind.kind, payload1: exceptionPayload1, payload2: exceptionPayload2)
-                    return .failure(exception.jsValue)
-                }
-                return .success(JSObject(id: resultObj))
+            var exceptionKind = JavaScriptValueKindAndFlags()
+            var exceptionPayload1 = JavaScriptPayload1()
+            var exceptionPayload2 = JavaScriptPayload2()
+            let resultObj = _call_throwing_new(
+                self.base.id, argv, Int32(argc),
+                &exceptionKind, &exceptionPayload1, &exceptionPayload2
+            )
+            if exceptionKind.isException {
+                let exception = RawJSValue(kind: exceptionKind.kind, payload1: exceptionPayload1, payload2: exceptionPayload2)
+                return .failure(exception.jsValue)
             }
+            return .success(JSObject(id: resultObj))
         }.get()
     }
 
@@ -64,26 +62,24 @@ public class JSThrowingFunction {
 }
 
 private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) throws -> JSValue {
-    let (result, isException) = arguments.withRawJSValues { rawValues in
-        rawValues.withUnsafeBufferPointer { bufferPointer -> (JSValue, Bool) in
-            let argv = bufferPointer.baseAddress
-            let argc = bufferPointer.count
-            var kindAndFlags = JavaScriptValueKindAndFlags()
-            var payload1 = JavaScriptPayload1()
-            var payload2 = JavaScriptPayload2()
-            if let thisId = this?.id {
-                _call_function_with_this(thisId,
-                                         jsFunc.id, argv, Int32(argc),
-                                         &kindAndFlags, &payload1, &payload2)
-            } else {
-                _call_function(
-                    jsFunc.id, argv, Int32(argc),
-                    &kindAndFlags, &payload1, &payload2
-                )
-            }
-            let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
-            return (result.jsValue, kindAndFlags.isException)
+    let (result, isException): (JSValue, Bool) = arguments.withRawJSValues { bufferPointer in
+        let argv = bufferPointer.baseAddress
+        let argc = bufferPointer.count
+        var kindAndFlags = JavaScriptValueKindAndFlags()
+        var payload1 = JavaScriptPayload1()
+        var payload2 = JavaScriptPayload2()
+        if let thisId = this?.id {
+            _call_function_with_this(thisId,
+                                     jsFunc.id, argv, Int32(argc),
+                                     &kindAndFlags, &payload1, &payload2)
+        } else {
+            _call_function(
+                jsFunc.id, argv, Int32(argc),
+                &kindAndFlags, &payload1, &payload2
+            )
         }
+        let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
+        return (result.jsValue, kindAndFlags.isException)
     }
     if isException {
         throw result
