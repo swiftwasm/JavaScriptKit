@@ -213,7 +213,7 @@ extension RawJSValue: ConvertibleToJSValue {
 }
 
 extension JSValue {
-    func toRawJSValue() -> RawJSValue {
+    func withRawJSValue<T>(_ body: (RawJSValue) -> T) -> T {
         let kind: JavaScriptValueKind
         let payload1: JavaScriptPayload1
         var payload2: JavaScriptPayload2 = 0
@@ -226,7 +226,7 @@ extension JSValue {
             payload1 = 0
             payload2 = numberValue
         case let .string(string):
-            return string.toRawJSValue()
+            return string.withRawJSValue(body)
         case let .object(ref):
             kind = .object
             payload1 = JavaScriptPayload1(ref.id)
@@ -246,30 +246,30 @@ extension JSValue {
             kind = .bigInt
             payload1 = JavaScriptPayload1(bigIntRef.id)
         }
-        return RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
-    }
-}
-
-extension Array where Element == JSValue {
-    func withRawJSValues<T>(_ body: (UnsafeBufferPointer<RawJSValue>) -> T) -> T {
-        withUnsafeTemporaryAllocation(of: RawJSValue.self, capacity: self.count) { buffer in
-            for (index, value) in self.enumerated() {
-                buffer[index] = value.toRawJSValue()
-            }
-            return body(UnsafeBufferPointer(buffer))
-        }
+        let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
+        return body(rawValue)
     }
 }
 
 extension Array where Element == ConvertibleToJSValue {
-    func withRawJSValues<T>(_ body: (UnsafeBufferPointer<RawJSValue>) -> T) -> T {
-        map { $0.jsValue }.withRawJSValues(body)
+    func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
+        func _withRawJSValues<T>(
+            _ values: [ConvertibleToJSValue], _ index: Int,
+            _ results: inout [RawJSValue], _ body: ([RawJSValue]) -> T
+        ) -> T {
+            if index == values.count { return body(results) }
+            return values[index].jsValue.withRawJSValue { (rawValue) -> T in
+                results.append(rawValue)
+                return _withRawJSValues(values, index + 1, &results, body)
+            }
+        }
+        var _results = [RawJSValue]()
+        return _withRawJSValues(self, 0, &_results, body)
     }
 }
 
-
 extension Array where Element: ConvertibleToJSValue {
-    func withRawJSValues<T>(_ body: (UnsafeBufferPointer<RawJSValue>) -> T) -> T {
-        map { $0.jsValue }.withRawJSValues(body)
+    func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
+        [ConvertibleToJSValue].withRawJSValues(self)(body)
     }
 }
