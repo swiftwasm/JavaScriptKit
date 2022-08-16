@@ -51,12 +51,18 @@ export const decode = (
 // Note:
 // `decodeValues` assumes that the size of RawJSValue is 16.
 export const decodeArray = (ptr: pointer, length: number, memory: Memory) => {
+    // fast path for empty array
+    if (length === 0) { return []; }
+
     let result = [];
+    // It's safe to hold DataView here because WebAssembly.Memory.buffer won't
+    // change within this function.
+    const view = memory.dataView();
     for (let index = 0; index < length; index++) {
         const base = ptr + 16 * index;
-        const kind = memory.readUint32(base);
-        const payload1 = memory.readUint32(base + 4);
-        const payload2 = memory.readFloat64(base + 8);
+        const kind = view.getUint32(base, true);
+        const payload1 = view.getUint32(base + 4, true);
+        const payload2 = view.getFloat64(base + 8, true);
         result.push(decode(kind, payload1, payload2, memory));
     }
     return result;
