@@ -5,6 +5,35 @@ import _CJavaScriptEventLoop
 
 #if compiler(>=5.5)
 
+/** Singleton type responsible for integrating JavaScript event loop as a Swift concurrency executor, conforming to
+`SerialExecutor` protocol from the standard library. To utilize it:
+
+1. Make sure that your target depends on `JavaScriptEventLoop` in your `Packages.swift`:
+
+```swift
+.target(
+    name: "JavaScriptKitExample",
+    dependencies: [
+        "JavaScriptKit",
+        .product(name: "JavaScriptEventLoop", package: "JavaScriptKit")
+    ]
+)
+```
+
+2. Add an explicit import in the code that executes **before* you start using `await` and/or `Task`
+APIs (most likely in `main.swift`):
+
+```swift
+import JavaScriptEventLoop
+```
+
+3. Run this function **before* you start using `await` and/or `Task` APIs (again, most likely in
+`main.swift`):
+
+```swift
+JavaScriptEventLoop.installGlobalExecutor()
+```
+*/
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
