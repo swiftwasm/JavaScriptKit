@@ -40,7 +40,9 @@
     </a>
 </dt>
 <dd>
-    
+    <p>Singleton type responsible for integrating JavaScript event loop as a Swift concurrency executor, conforming to
+<code>SerialExecutor</code> protocol from the standard library. To utilize it:</p>
+
 </dd>
 <dt class="class">
     <a href="/JavaScriptKit/JSArray" title="class - JSArray">
@@ -48,7 +50,8 @@
     </a>
 </dt>
 <dd>
-    <p>A wrapper around <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">the JavaScript Array class</a>
+    <p>A wrapper around <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">the JavaScript <code>Array</code>
+class</a>
 that exposes its properties in a type-safe and Swifty way.</p>
 
 </dd>
@@ -58,7 +61,9 @@ that exposes its properties in a type-safe and Swifty way.</p>
     </a>
 </dt>
 <dd>
-    
+    <p>Iterator type for <code>JSArray</code>, conforming to <code>IteratorProtocol</code> from the standard library, which allows
+easy iteration over elements of <code>JSArray</code> instances.</p>
+
 </dd>
 <dt class="class">
     <a href="/JavaScriptKit/JSDate" title="class - JSDate">
@@ -66,7 +71,7 @@ that exposes its properties in a type-safe and Swifty way.</p>
     </a>
 </dt>
 <dd>
-    <p>A wrapper around the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">JavaScript Date
+    <p>A wrapper around the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">JavaScript <code>Date</code>
 class</a> that
 exposes its properties in a type-safe way. This doesn't 100% match the JS API, for example
 <code>getMonth</code>/<code>setMonth</code> etc accessor methods are converted to properties, but the rest of it matches
@@ -81,7 +86,7 @@ property if you need those.</p>
     </a>
 </dt>
 <dd>
-    <p>A wrapper around <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">the JavaScript Error
+    <p>A wrapper around <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">the JavaScript <code>Error</code>
 class</a> that
 exposes its properties in a type-safe way.</p>
 
@@ -120,8 +125,8 @@ or deallocate the object that owns the timer.</p>
     </a>
 </dt>
 <dd>
-    <p>A wrapper around all JavaScript <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArray</a>
-classes that exposes their properties in a type-safe way.</p>
+    <p>A wrapper around all [JavaScript <code>TypedArray</code>(https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
+classes] that exposes their properties in a type-safe way.</p>
 
 </dd>
 <dt class="class">
@@ -130,7 +135,10 @@ classes that exposes their properties in a type-safe way.</p>
     </a>
 </dt>
 <dd>
-    
+    <p>A wrapper around <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">the JavaScript <code>Uint8ClampedArray</code>
+class</a>
+that exposes its properties in a type-safe and Swifty way.</p>
+
 </dd>
 <dt class="class">
     <a href="/JavaScriptKit/JSBigInt" title="class - JSBigInt">
@@ -138,7 +146,10 @@ classes that exposes their properties in a type-safe way.</p>
     </a>
 </dt>
 <dd>
-    
+    <p>A wrapper around <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">the JavaScript <code>BigInt</code>
+class</a>
+that exposes its properties in a type-safe and Swifty way.</p>
+
 </dd>
 <dt class="class">
     <a href="/JavaScriptKit/JSOneshotClosure" title="class - JSOneshotClosure">
@@ -146,7 +157,8 @@ classes that exposes their properties in a type-safe way.</p>
     </a>
 </dt>
 <dd>
-    <p><code>JSOneshotClosure</code> is a JavaScript function that can be called only once.</p>
+    <p><code>JSOneshotClosure</code> is a JavaScript function that can be called only once. This class can be used
+for optimized memory management when compared to the common <code>JSClosure</code>.</p>
 
 </dd>
 <dt class="class">
@@ -196,7 +208,10 @@ Exceptions produced by JavaScript functions will be thrown as <code>JSValue</cod
     </a>
 </dt>
 <dd>
-    
+    <p>A wrapper around <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Symbol">the JavaScript <code>Symbol</code>
+class</a>
+that exposes its properties in a type-safe and Swifty way.</p>
+
 </dd>
 <dt class="class">
     <a href="/JavaScriptKit/JSThrowingFunction" title="class - JSThrowingFunction">
@@ -291,7 +306,7 @@ Exceptions produced by JavaScript functions will be thrown as <code>JSValue</cod
     </a>
 </dt>
 <dd>
-    <p>JSClosureProtocol wraps Swift closure objects for use in JavaScript. Conforming types
+    <p><code>JSClosureProtocol</code> wraps Swift closure objects for use in JavaScript. Conforming types
 are responsible for managing the lifetime of the closure they wrap, but can delegate that
 task to the user by requiring an explicit <code>release()</code> call.</p>
 
@@ -533,7 +548,7 @@ For example, a union type of multiple classes or primitive values.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2022-08-14T12:34:12+0000">August 14, 2022</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+    Generated on <time datetime="2022-08-17T17:48:31+0000">August 17, 2022</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
 </p>
     </footer>
 </body>
