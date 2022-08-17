@@ -103,14 +103,13 @@ public class JSFunction: JSObject {
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
-                var kindAndFlags = JavaScriptValueKindAndFlags()
                 var payload1 = JavaScriptPayload1()
                 var payload2 = JavaScriptPayload2()
                 let resultBitPattern = _call_function_no_catch(
                     id, argv, Int32(argc),
                     &payload1, &payload2
                 )
-                kindAndFlags = unsafeBitCast(resultBitPattern, to: JavaScriptValueKindAndFlags.self)
+                let kindAndFlags = unsafeBitCast(resultBitPattern, to: JavaScriptValueKindAndFlags.self)
                 assert(!kindAndFlags.isException)
                 let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
                 return result
@@ -124,12 +123,13 @@ public class JSFunction: JSObject {
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
-                var kindAndFlags = JavaScriptValueKindAndFlags()
                 var payload1 = JavaScriptPayload1()
                 var payload2 = JavaScriptPayload2()
-                _call_function_with_this_no_catch(this.id,
-                                                  id, argv, Int32(argc),
-                                                  &kindAndFlags, &payload1, &payload2)
+                let resultBitPattern = _call_function_with_this_no_catch(this.id,
+                    id, argv, Int32(argc),
+                    &payload1, &payload2
+                )
+                let kindAndFlags = unsafeBitCast(resultBitPattern, to: JavaScriptValueKindAndFlags.self)
                 assert(!kindAndFlags.isException)
                 let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
                 return result

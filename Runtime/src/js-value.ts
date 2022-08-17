@@ -136,10 +136,6 @@ export const writeV2 = (
     is_exception: boolean,
     memory: Memory
 ): JavaScriptValueKindAndFlags => {
-    if (value === undefined) {
-        return Kind.Undefined;
-    }
-
     const exceptionBit = (is_exception ? 1 : 0) << 31;
     if (value === null) {
         return exceptionBit | Kind.Null;

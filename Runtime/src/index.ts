@@ -204,29 +204,25 @@ export class SwiftRuntime {
             ref: ref,
             argv: pointer,
             argc: number,
-            kind_ptr: pointer,
             payload1_ptr: pointer,
             payload2_ptr: pointer
         ) => {
             const func = this.memory.getObject(ref);
-            let result: any;
+            let result = undefined;
             try {
                 const args = JSValue.decodeArray(argv, argc, this.memory);
                 result = func(...args);
             } catch (error) {
-                JSValue.write(
+                return JSValue.writeV2(
                     error,
-                    kind_ptr,
                     payload1_ptr,
                     payload2_ptr,
                     true,
                     this.memory
                 );
-                return;
             }
-            JSValue.write(
+            return JSValue.writeV2(
                 result,
-                kind_ptr,
                 payload1_ptr,
                 payload2_ptr,
                 false,
@@ -241,21 +237,15 @@ export class SwiftRuntime {
             payload2_ptr: pointer
         ) => {
             const func = this.memory.getObject(ref);
-            let result = undefined;
-            let isException = true;
-            try {
-                const args = JSValue.decodeArray(argv, argc, this.memory);
-                result = func(...args);
-                isException = false;
-            } finally {
-                return JSValue.writeV2(
-                    result,
-                    payload1_ptr,
-                    payload2_ptr,
-                    isException,
-                    this.memory
-                );
-            }
+            const args = JSValue.decodeArray(argv, argc, this.memory);
+            const result = func(...args);
+            return JSValue.writeV2(
+                result,
+                payload1_ptr,
+                payload2_ptr,
+                false,
+                this.memory
+            );
         },
 
         swjs_call_function_with_this: (
@@ -263,7 +253,6 @@ export class SwiftRuntime {
             func_ref: ref,
             argv: pointer,
             argc: number,
-            kind_ptr: pointer,
             payload1_ptr: pointer,
             payload2_ptr: pointer
         ) => {
@@ -274,19 +263,16 @@ export class SwiftRuntime {
                 const args = JSValue.decodeArray(argv, argc, this.memory);
                 result = func.apply(obj, args);
             } catch (error) {
-                JSValue.write(
+                return JSValue.writeV2(
                     error,
-                    kind_ptr,
                     payload1_ptr,
                     payload2_ptr,
                     true,
                     this.memory
                 );
-                return;
             }
-            JSValue.write(
+            return JSValue.writeV2(
                 result,
-                kind_ptr,
                 payload1_ptr,
                 payload2_ptr,
                 false,
@@ -298,37 +284,21 @@ export class SwiftRuntime {
             func_ref: ref,
             argv: pointer,
             argc: number,
-            kind_ptr: pointer,
             payload1_ptr: pointer,
             payload2_ptr: pointer
         ) => {
             const obj = this.memory.getObject(obj_ref);
             const func = this.memory.getObject(func_ref);
-            let isException = true;
-            try {
+            let result = undefined;
                 const args = JSValue.decodeArray(argv, argc, this.memory);
-                const result = func.apply(obj, args);
-                JSValue.write(
-                    result,
-                    kind_ptr,
-                    payload1_ptr,
-                    payload2_ptr,
-                    false,
-                    this.memory
-                );
-                isException = false;
-            } finally {
-                if (isException) {
-                    JSValue.write(
-                        undefined,
-                        kind_ptr,
-                        payload1_ptr,
-                        payload2_ptr,
-                        true,
-                        this.memory
-                    );
-                }
-            }
+                result = func.apply(obj, args);
+            return JSValue.writeV2(
+                result,
+                payload1_ptr,
+                payload2_ptr,
+                false,
+                this.memory
+            );
         },
 
         swjs_call_new: (ref: ref, argv: pointer, argc: number) => {

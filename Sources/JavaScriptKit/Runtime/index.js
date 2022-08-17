@@ -122,9 +122,6 @@
         }
     };
     const writeV2 = (value, payload1_ptr, payload2_ptr, is_exception, memory) => {
-        if (value === undefined) {
-            return 5 /* Undefined */;
-        }
         const exceptionBit = (is_exception ? 1 : 0) << 31;
         if (value === null) {
             return exceptionBit | 4 /* Null */;
@@ -287,33 +284,25 @@
                     const bytes = this.memory.getObject(ref);
                     this.memory.writeBytes(buffer, bytes);
                 },
-                swjs_call_function: (ref, argv, argc, kind_ptr, payload1_ptr, payload2_ptr) => {
+                swjs_call_function: (ref, argv, argc, payload1_ptr, payload2_ptr) => {
                     const func = this.memory.getObject(ref);
-                    let result;
+                    let result = undefined;
                     try {
                         const args = decodeArray(argv, argc, this.memory);
                         result = func(...args);
                     }
                     catch (error) {
-                        write(error, kind_ptr, payload1_ptr, payload2_ptr, true, this.memory);
-                        return;
+                        return writeV2(error, payload1_ptr, payload2_ptr, true, this.memory);
                     }
-                    write(result, kind_ptr, payload1_ptr, payload2_ptr, false, this.memory);
+                    return writeV2(result, payload1_ptr, payload2_ptr, false, this.memory);
                 },
                 swjs_call_function_no_catch: (ref, argv, argc, payload1_ptr, payload2_ptr) => {
                     const func = this.memory.getObject(ref);
-                    let result = undefined;
-                    let isException = true;
-                    try {
-                        const args = decodeArray(argv, argc, this.memory);
-                        result = func(...args);
-                        isException = false;
-                    }
-                    finally {
-                        return writeV2(result, payload1_ptr, payload2_ptr, isException, this.memory);
-                    }
+                    const args = decodeArray(argv, argc, this.memory);
+                    const result = func(...args);
+                    return writeV2(result, payload1_ptr, payload2_ptr, false, this.memory);
                 },
-                swjs_call_function_with_this: (obj_ref, func_ref, argv, argc, kind_ptr, payload1_ptr, payload2_ptr) => {
+                swjs_call_function_with_this: (obj_ref, func_ref, argv, argc, payload1_ptr, payload2_ptr) => {
                     const obj = this.memory.getObject(obj_ref);
                     const func = this.memory.getObject(func_ref);
                     let result;
@@ -322,26 +311,17 @@
                         result = func.apply(obj, args);
                     }
                     catch (error) {
-                        write(error, kind_ptr, payload1_ptr, payload2_ptr, true, this.memory);
-                        return;
+                        return writeV2(error, payload1_ptr, payload2_ptr, true, this.memory);
                     }
-                    write(result, kind_ptr, payload1_ptr, payload2_ptr, false, this.memory);
+                    return writeV2(result, payload1_ptr, payload2_ptr, false, this.memory);
                 },
-                swjs_call_function_with_this_no_catch: (obj_ref, func_ref, argv, argc, kind_ptr, payload1_ptr, payload2_ptr) => {
+                swjs_call_function_with_this_no_catch: (obj_ref, func_ref, argv, argc, payload1_ptr, payload2_ptr) => {
                     const obj = this.memory.getObject(obj_ref);
                     const func = this.memory.getObject(func_ref);
-                    let isException = true;
-                    try {
-                        const args = decodeArray(argv, argc, this.memory);
-                        const result = func.apply(obj, args);
-                        write(result, kind_ptr, payload1_ptr, payload2_ptr, false, this.memory);
-                        isException = false;
-                    }
-                    finally {
-                        if (isException) {
-                            write(undefined, kind_ptr, payload1_ptr, payload2_ptr, true, this.memory);
-                        }
-                    }
+                    let result = undefined;
+                    const args = decodeArray(argv, argc, this.memory);
+                    result = func.apply(obj, args);
+                    return writeV2(result, payload1_ptr, payload2_ptr, false, this.memory);
                 },
                 swjs_call_new: (ref, argv, argc) => {
                     const constructor = this.memory.getObject(ref);

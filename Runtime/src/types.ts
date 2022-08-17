@@ -56,10 +56,9 @@ export interface ImportedFunctions {
         ref: number,
         argv: pointer,
         argc: number,
-        kind_ptr: pointer,
         payload1_ptr: pointer,
         payload2_ptr: pointer
-    ): void;
+    ): JavaScriptValueKindAndFlags;
     swjs_call_function_no_catch(
         ref: number,
         argv: pointer,
@@ -72,19 +71,17 @@ export interface ImportedFunctions {
         func_ref: ref,
         argv: pointer,
         argc: number,
-        kind_ptr: pointer,
         payload1_ptr: pointer,
         payload2_ptr: pointer
-    ): void;
+    ): JavaScriptValueKindAndFlags;
     swjs_call_function_with_this_no_catch(
         obj_ref: ref,
         func_ref: ref,
         argv: pointer,
         argc: number,
-        kind_ptr: pointer,
         payload1_ptr: pointer,
         payload2_ptr: pointer
-    ): void;
+    ): JavaScriptValueKindAndFlags;
     swjs_call_new(ref: number, argv: pointer, argc: number): number;
     swjs_call_throwing_new(
         ref: number,

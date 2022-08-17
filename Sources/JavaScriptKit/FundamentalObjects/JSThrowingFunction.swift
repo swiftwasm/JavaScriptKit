@@ -64,6 +64,7 @@ public class JSThrowingFunction {
 }
 
 private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) throws -> JSValue {
+    let id = jsFunc.id
     let (result, isException) = arguments.withRawJSValues { rawValues in
         rawValues.withUnsafeBufferPointer { bufferPointer -> (JSValue, Bool) in
             let argv = bufferPointer.baseAddress
@@ -72,14 +73,17 @@ private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSV
             var payload1 = JavaScriptPayload1()
             var payload2 = JavaScriptPayload2()
             if let thisId = this?.id {
-                _call_function_with_this(thisId,
-                                         jsFunc.id, argv, Int32(argc),
-                                         &kindAndFlags, &payload1, &payload2)
-            } else {
-                _call_function(
-                    jsFunc.id, argv, Int32(argc),
-                    &kindAndFlags, &payload1, &payload2
+                let resultBitPattern = _call_function_with_this(
+                    thisId, id, argv, Int32(argc),
+                    &payload1, &payload2
                 )
+                kindAndFlags = unsafeBitCast(resultBitPattern, to: JavaScriptValueKindAndFlags.self)
+            } else {
+                let resultBitPattern = _call_function(
+                    id, argv, Int32(argc),
+                    &payload1, &payload2
+                )
+                kindAndFlags = unsafeBitCast(resultBitPattern, to: JavaScriptValueKindAndFlags.self)
             }
             let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
             return (result.jsValue, kindAndFlags.isException)
