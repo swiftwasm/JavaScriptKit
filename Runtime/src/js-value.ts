@@ -52,7 +52,9 @@ export const decode = (
 // `decodeValues` assumes that the size of RawJSValue is 16.
 export const decodeArray = (ptr: pointer, length: number, memory: Memory) => {
     // fast path for empty array
-    if (length === 0) { return []; }
+    if (length === 0) {
+        return [];
+    }
 
     let result = [];
     // It's safe to hold DataView here because WebAssembly.Memory.buffer won't
@@ -128,7 +130,6 @@ export const write = (
     }
 };
 
-
 export const writeV2 = (
     value: any,
     payload1_ptr: pointer,
@@ -143,7 +144,7 @@ export const writeV2 = (
 
     const writeRef = (kind: Kind) => {
         memory.writeUint32(payload1_ptr, memory.retain(value));
-        return exceptionBit | kind
+        return exceptionBit | kind;
     };
 
     const type = typeof value;

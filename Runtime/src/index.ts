@@ -88,14 +88,7 @@ export class SwiftRuntime {
         for (let index = 0; index < args.length; index++) {
             const argument = args[index];
             const base = argv + 16 * index;
-            JSValue.write(
-                argument,
-                base,
-                base + 4,
-                base + 8,
-                false,
-                memory
-            );
+            JSValue.write(argument, base, base + 4, base + 8, false, memory);
         }
         let output: any;
         // This ref is released by the swjs_call_host_function implementation
@@ -301,8 +294,8 @@ export class SwiftRuntime {
             const obj = memory.getObject(obj_ref);
             const func = memory.getObject(func_ref);
             let result = undefined;
-                const args = JSValue.decodeArray(argv, argc, memory);
-                result = func.apply(obj, args);
+            const args = JSValue.decodeArray(argv, argc, memory);
+            result = func.apply(obj, args);
             return JSValue.writeV2(
                 result,
                 payload1_ptr,
