@@ -84,8 +84,9 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
     /// Set JavaScript event loop based executor to be the global executor
     /// Note that this should be called before any of the jobs are created.
-    /// This installation step will be unnecessary after the custom-executor will be introduced officially.
-    /// See also: https://github.com/rjmccall/swift-evolution/blob/custom-executors/proposals/0000-custom-executors.md#the-default-global-concurrent-executor
+    /// This installation step will be unnecessary after custom executor are
+    /// introduced officially. See also [a draft proposal for custom 
+    /// executors](https://github.com/rjmccall/swift-evolution/blob/custom-executors/proposals/0000-custom-executors.md#the-default-global-concurrent-executor)
     public static func installGlobalExecutor() {
         guard !didInstallGlobalExecutor else { return }
 
