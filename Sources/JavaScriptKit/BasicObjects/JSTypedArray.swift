@@ -10,8 +10,8 @@ public protocol TypedArrayElement: ConvertibleToJSValue, ConstructibleFromJSValu
     static var typedArrayClass: JSFunction { get }
 }
 
-/// A wrapper around all JavaScript [TypedArray](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
-/// classes that exposes their properties in a type-safe way.
+/// A wrapper around all [JavaScript `TypedArray`(https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
+/// classes] that exposes their properties in a type-safe way.
 public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral where Element: TypedArrayElement {
     public class var constructor: JSFunction? { Element.typedArrayClass }
     public var jsObject: JSObject
@@ -120,6 +120,9 @@ extension UInt8: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Uint8Array.function!
 }
 
+/// A wrapper around [the JavaScript `Uint8ClampedArray`
+/// class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)
+/// that exposes its properties in a type-safe and Swifty way.
 public class JSUInt8ClampedArray: JSTypedArray<UInt8> {
     override public class var constructor: JSFunction? { JSObject.global.Uint8ClampedArray.function! }
 }

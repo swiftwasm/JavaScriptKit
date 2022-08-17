@@ -2,6 +2,9 @@ import _CJavaScriptKit
 
 private let Symbol = JSObject.global.Symbol.function!
 
+/// A wrapper around [the JavaScript `Symbol`
+/// class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Symbol)
+/// that exposes its properties in a type-safe and Swifty way.
 public class JSSymbol: JSObject {
     public var name: String? { self["description"].string }
 

@@ -1,4 +1,4 @@
-/** A wrapper around [the JavaScript Error
+/** A wrapper around [the JavaScript `Error`
  class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) that
  exposes its properties in a type-safe way.
  */

@@ -2,6 +2,9 @@ import _CJavaScriptKit
 
 private let constructor = JSObject.global.BigInt.function!
 
+/// A wrapper around [the JavaScript `BigInt`
+/// class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)
+/// that exposes its properties in a type-safe and Swifty way.
 public final class JSBigInt: JSObject {
     @_spi(JSObject_id)
     override public init(id: JavaScriptObjectRef) {

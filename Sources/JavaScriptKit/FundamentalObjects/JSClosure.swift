@@ -1,6 +1,6 @@
 import _CJavaScriptKit
 
-/// JSClosureProtocol wraps Swift closure objects for use in JavaScript. Conforming types
+/// `JSClosureProtocol` wraps Swift closure objects for use in JavaScript. Conforming types
 /// are responsible for managing the lifetime of the closure they wrap, but can delegate that
 /// task to the user by requiring an explicit `release()` call.
 public protocol JSClosureProtocol: JSValueCompatible {
@@ -10,8 +10,8 @@ public protocol JSClosureProtocol: JSValueCompatible {
     func release()
 }
 
-
-/// `JSOneshotClosure` is a JavaScript function that can be called only once.
+/// `JSOneshotClosure` is a JavaScript function that can be called only once. This class can be used
+/// for optimized memory management when compared to the common `JSClosure`.
 public class JSOneshotClosure: JSObject, JSClosureProtocol {
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 
