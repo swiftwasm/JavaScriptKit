@@ -65,6 +65,10 @@ const decodeArray = (ptr, length, memory) => {
     }
     return result;
 };
+// A helper function to encode a RawJSValue into a pointers.
+// Please prefer to use `writeAndReturnKindBits` to avoid unnecessary
+// memory stores.
+// This function should be used only when kind flag is stored in memory.
 const write = (value, kind_ptr, payload1_ptr, payload2_ptr, is_exception, memory) => {
     const kind = writeAndReturnKindBits(value, payload1_ptr, payload2_ptr, is_exception, memory);
     memory.writeUint32(kind_ptr, kind);
