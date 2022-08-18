@@ -130,7 +130,9 @@ export const write = (
     }
 };
 
-export const writeV2 = (
+/// This is a fast version of the above `write` function.
+/// Please synchronize with the above `write` function if you change either.
+export const writeAndReturnKindBits = (
     value: any,
     payload1_ptr: pointer,
     payload2_ptr: pointer,

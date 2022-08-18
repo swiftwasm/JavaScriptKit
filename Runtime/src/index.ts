@@ -137,7 +137,7 @@ export class SwiftRuntime {
             const obj = memory.getObject(ref);
             const key = memory.getObject(name);
             const result = obj[key];
-            return JSValue.writeV2(
+            return JSValue.writeAndReturnKindBits(
                 result,
                 payload1_ptr,
                 payload2_ptr,
@@ -166,7 +166,7 @@ export class SwiftRuntime {
         ) => {
             const obj = this.memory.getObject(ref);
             const result = obj[index];
-            return JSValue.writeV2(
+            return JSValue.writeAndReturnKindBits(
                 result,
                 payload1_ptr,
                 payload2_ptr,
@@ -210,7 +210,7 @@ export class SwiftRuntime {
                 const args = JSValue.decodeArray(argv, argc, memory);
                 result = func(...args);
             } catch (error) {
-                return JSValue.writeV2(
+                return JSValue.writeAndReturnKindBits(
                     error,
                     payload1_ptr,
                     payload2_ptr,
@@ -218,7 +218,7 @@ export class SwiftRuntime {
                     this.memory
                 );
             }
-            return JSValue.writeV2(
+            return JSValue.writeAndReturnKindBits(
                 result,
                 payload1_ptr,
                 payload2_ptr,
@@ -237,7 +237,7 @@ export class SwiftRuntime {
             const func = memory.getObject(ref);
             const args = JSValue.decodeArray(argv, argc, memory);
             const result = func(...args);
-            return JSValue.writeV2(
+            return JSValue.writeAndReturnKindBits(
                 result,
                 payload1_ptr,
                 payload2_ptr,
@@ -262,7 +262,7 @@ export class SwiftRuntime {
                 const args = JSValue.decodeArray(argv, argc, memory);
                 result = func.apply(obj, args);
             } catch (error) {
-                return JSValue.writeV2(
+                return JSValue.writeAndReturnKindBits(
                     error,
                     payload1_ptr,
                     payload2_ptr,
@@ -270,7 +270,7 @@ export class SwiftRuntime {
                     this.memory
                 );
             }
-            return JSValue.writeV2(
+            return JSValue.writeAndReturnKindBits(
                 result,
                 payload1_ptr,
                 payload2_ptr,
@@ -292,7 +292,7 @@ export class SwiftRuntime {
             let result = undefined;
             const args = JSValue.decodeArray(argv, argc, memory);
             result = func.apply(obj, args);
-            return JSValue.writeV2(
+            return JSValue.writeAndReturnKindBits(
                 result,
                 payload1_ptr,
                 payload2_ptr,

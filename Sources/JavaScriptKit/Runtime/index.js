@@ -121,7 +121,9 @@
                 assertNever(type, `Type "${type}" is not supported yet`);
         }
     };
-    const writeV2 = (value, payload1_ptr, payload2_ptr, is_exception, memory) => {
+    /// This is a fast version of the above `write` function.
+    /// Please synchronize with the above `write` function if you change either.
+    const writeAndReturnKindBits = (value, payload1_ptr, payload2_ptr, is_exception, memory) => {
         const exceptionBit = (is_exception ? 1 : 0) << 31;
         if (value === null) {
             return exceptionBit | 4 /* Null */;
@@ -257,7 +259,7 @@
                     const obj = memory.getObject(ref);
                     const key = memory.getObject(name);
                     const result = obj[key];
-                    return writeV2(result, payload1_ptr, payload2_ptr, false, memory);
+                    return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, memory);
                 },
                 swjs_set_subscript: (ref, index, kind, payload1, payload2) => {
                     const memory = this.memory;
@@ -268,7 +270,7 @@
                 swjs_get_subscript: (ref, index, payload1_ptr, payload2_ptr) => {
                     const obj = this.memory.getObject(ref);
                     const result = obj[index];
-                    return writeV2(result, payload1_ptr, payload2_ptr, false, this.memory);
+                    return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, this.memory);
                 },
                 swjs_encode_string: (ref, bytes_ptr_result) => {
                     const memory = this.memory;
@@ -299,16 +301,16 @@
                         result = func(...args);
                     }
                     catch (error) {
-                        return writeV2(error, payload1_ptr, payload2_ptr, true, this.memory);
+                        return writeAndReturnKindBits(error, payload1_ptr, payload2_ptr, true, this.memory);
                     }
-                    return writeV2(result, payload1_ptr, payload2_ptr, false, this.memory);
+                    return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, this.memory);
                 },
                 swjs_call_function_no_catch: (ref, argv, argc, payload1_ptr, payload2_ptr) => {
                     const memory = this.memory;
                     const func = memory.getObject(ref);
                     const args = decodeArray(argv, argc, memory);
                     const result = func(...args);
-                    return writeV2(result, payload1_ptr, payload2_ptr, false, this.memory);
+                    return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, this.memory);
                 },
                 swjs_call_function_with_this: (obj_ref, func_ref, argv, argc, payload1_ptr, payload2_ptr) => {
                     const memory = this.memory;
@@ -320,9 +322,9 @@
                         result = func.apply(obj, args);
                     }
                     catch (error) {
-                        return writeV2(error, payload1_ptr, payload2_ptr, true, this.memory);
+                        return writeAndReturnKindBits(error, payload1_ptr, payload2_ptr, true, this.memory);
                     }
-                    return writeV2(result, payload1_ptr, payload2_ptr, false, this.memory);
+                    return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, this.memory);
                 },
                 swjs_call_function_with_this_no_catch: (obj_ref, func_ref, argv, argc, payload1_ptr, payload2_ptr) => {
                     const memory = this.memory;
@@ -331,7 +333,7 @@
                     let result = undefined;
                     const args = decodeArray(argv, argc, memory);
                     result = func.apply(obj, args);
-                    return writeV2(result, payload1_ptr, payload2_ptr, false, this.memory);
+                    return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, this.memory);
                 },
                 swjs_call_new: (ref, argv, argc) => {
                     const memory = this.memory;
