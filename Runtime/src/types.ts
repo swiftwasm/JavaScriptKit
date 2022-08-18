@@ -3,6 +3,7 @@ import * as JSValue from "./js-value.js";
 export type ref = number;
 export type pointer = number;
 export type bool = number;
+export type JavaScriptValueKind = number;
 export type JavaScriptValueKindAndFlags = number;
 
 export interface ExportedFunctions {
@@ -31,10 +32,9 @@ export interface ImportedFunctions {
     swjs_get_prop(
         ref: number,
         name: number,
-        kind_ptr: pointer,
         payload1_ptr: pointer,
         payload2_ptr: pointer
-    ): void;
+    ): JavaScriptValueKind;
     swjs_set_subscript(
         ref: number,
         index: number,

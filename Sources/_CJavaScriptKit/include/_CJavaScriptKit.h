@@ -93,16 +93,17 @@ extern void _set_prop(const JavaScriptObjectRef _this,
 ///
 /// @param _this The target JavaScript object to get its member value.
 /// @param prop A JavaScript string object to reference a member of `_this` object.
-/// @param kind A result pointer of JavaScript value kind to get.
 /// @param payload1 A result pointer of first payload of JavaScript value to set the target object.
 /// @param payload2 A result pointer of second payload of JavaScript value to set the target object.
+/// @return A JavaScriptValueKind bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_get_prop")))
-extern void _get_prop(const JavaScriptObjectRef _this,
-                      const JavaScriptObjectRef prop,
-                      JavaScriptValueKind *kind,
-                      JavaScriptPayload1 *payload1,
-                      JavaScriptPayload2 *payload2);
+extern uint32_t _get_prop(
+  const JavaScriptObjectRef _this,
+  const JavaScriptObjectRef prop,
+  JavaScriptPayload1 *payload1,
+  JavaScriptPayload2 *payload2
+);
 
 /// `_set_subscript` sets a value of `_this` JavaScript object.
 ///

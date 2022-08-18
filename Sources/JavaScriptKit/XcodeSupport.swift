@@ -16,10 +16,9 @@ import _CJavaScriptKit
     func _get_prop(
         _: JavaScriptObjectRef,
         _: JavaScriptObjectRef,
-        _: UnsafeMutablePointer<JavaScriptValueKind>!,
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
-    ) { fatalError() }
+    ) -> UInt32 { fatalError() }
     func _set_subscript(
         _: JavaScriptObjectRef,
         _: Int32,

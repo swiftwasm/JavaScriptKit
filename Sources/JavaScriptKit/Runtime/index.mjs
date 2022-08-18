@@ -246,12 +246,12 @@ class SwiftRuntime {
                 const value = decode(kind, payload1, payload2, memory);
                 obj[key] = value;
             },
-            swjs_get_prop: (ref, name, kind_ptr, payload1_ptr, payload2_ptr) => {
+            swjs_get_prop: (ref, name, payload1_ptr, payload2_ptr) => {
                 const memory = this.memory;
                 const obj = memory.getObject(ref);
                 const key = memory.getObject(name);
                 const result = obj[key];
-                write(result, kind_ptr, payload1_ptr, payload2_ptr, false, memory);
+                return writeV2(result, payload1_ptr, payload2_ptr, false, memory);
             },
             swjs_set_subscript: (ref, index, kind, payload1, payload2) => {
                 const memory = this.memory;

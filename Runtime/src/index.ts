@@ -130,7 +130,6 @@ export class SwiftRuntime {
         swjs_get_prop: (
             ref: ref,
             name: ref,
-            kind_ptr: pointer,
             payload1_ptr: pointer,
             payload2_ptr: pointer
         ) => {
@@ -138,9 +137,8 @@ export class SwiftRuntime {
             const obj = memory.getObject(ref);
             const key = memory.getObject(name);
             const result = obj[key];
-            JSValue.write(
+            return JSValue.writeV2(
                 result,
-                kind_ptr,
                 payload1_ptr,
                 payload2_ptr,
                 false,
