@@ -66,57 +66,9 @@ const decodeArray = (ptr, length, memory) => {
     return result;
 };
 const write = (value, kind_ptr, payload1_ptr, payload2_ptr, is_exception, memory) => {
-    const exceptionBit = (is_exception ? 1 : 0) << 31;
-    if (value === null) {
-        memory.writeUint32(kind_ptr, exceptionBit | 4 /* Null */);
-        return;
-    }
-    const writeRef = (kind) => {
-        memory.writeUint32(kind_ptr, exceptionBit | kind);
-        memory.writeUint32(payload1_ptr, memory.retain(value));
-    };
-    const type = typeof value;
-    switch (type) {
-        case "boolean": {
-            memory.writeUint32(kind_ptr, exceptionBit | 0 /* Boolean */);
-            memory.writeUint32(payload1_ptr, value ? 1 : 0);
-            break;
-        }
-        case "number": {
-            memory.writeUint32(kind_ptr, exceptionBit | 2 /* Number */);
-            memory.writeFloat64(payload2_ptr, value);
-            break;
-        }
-        case "string": {
-            writeRef(1 /* String */);
-            break;
-        }
-        case "undefined": {
-            memory.writeUint32(kind_ptr, exceptionBit | 5 /* Undefined */);
-            break;
-        }
-        case "object": {
-            writeRef(3 /* Object */);
-            break;
-        }
-        case "function": {
-            writeRef(6 /* Function */);
-            break;
-        }
-        case "symbol": {
-            writeRef(7 /* Symbol */);
-            break;
-        }
-        case "bigint": {
-            writeRef(8 /* BigInt */);
-            break;
-        }
-        default:
-            assertNever(type, `Type "${type}" is not supported yet`);
-    }
+    const kind = writeAndReturnKindBits(value, payload1_ptr, payload2_ptr, is_exception, memory);
+    memory.writeUint32(kind_ptr, kind);
 };
-/// This is a fast version of the above `write` function.
-/// Please synchronize with the above `write` function if you change either.
 const writeAndReturnKindBits = (value, payload1_ptr, payload2_ptr, is_exception, memory) => {
     const exceptionBit = (is_exception ? 1 : 0) << 31;
     if (value === null) {

@@ -78,60 +78,10 @@ export const write = (
     is_exception: boolean,
     memory: Memory
 ) => {
-    const exceptionBit = (is_exception ? 1 : 0) << 31;
-    if (value === null) {
-        memory.writeUint32(kind_ptr, exceptionBit | Kind.Null);
-        return;
-    }
-
-    const writeRef = (kind: Kind) => {
-        memory.writeUint32(kind_ptr, exceptionBit | kind);
-        memory.writeUint32(payload1_ptr, memory.retain(value));
-    };
-
-    const type = typeof value;
-    switch (type) {
-        case "boolean": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.Boolean);
-            memory.writeUint32(payload1_ptr, value ? 1 : 0);
-            break;
-        }
-        case "number": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.Number);
-            memory.writeFloat64(payload2_ptr, value);
-            break;
-        }
-        case "string": {
-            writeRef(Kind.String);
-            break;
-        }
-        case "undefined": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.Undefined);
-            break;
-        }
-        case "object": {
-            writeRef(Kind.Object);
-            break;
-        }
-        case "function": {
-            writeRef(Kind.Function);
-            break;
-        }
-        case "symbol": {
-            writeRef(Kind.Symbol);
-            break;
-        }
-        case "bigint": {
-            writeRef(Kind.BigInt);
-            break;
-        }
-        default:
-            assertNever(type, `Type "${type}" is not supported yet`);
-    }
+    const kind = writeAndReturnKindBits(value, payload1_ptr, payload2_ptr, is_exception, memory);
+    memory.writeUint32(kind_ptr, kind);
 };
 
-/// This is a fast version of the above `write` function.
-/// Please synchronize with the above `write` function if you change either.
 export const writeAndReturnKindBits = (
     value: any,
     payload1_ptr: pointer,
