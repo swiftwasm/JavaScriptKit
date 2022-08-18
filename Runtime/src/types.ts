@@ -45,10 +45,9 @@ export interface ImportedFunctions {
     swjs_get_subscript(
         ref: number,
         index: number,
-        kind_ptr: pointer,
         payload1_ptr: pointer,
         payload2_ptr: pointer
-    ): void;
+    ): JavaScriptValueKind;
     swjs_encode_string(ref: number, bytes_ptr_result: pointer): number;
     swjs_decode_string(bytes_ptr: pointer, length: number): number;
     swjs_load_string(ref: number, buffer: pointer): void;

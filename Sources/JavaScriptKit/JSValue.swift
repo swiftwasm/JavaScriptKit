@@ -212,9 +212,11 @@ public func setJSValue(this: JSObject, name: JSString, value: JSValue) {
 
 public func getJSValue(this: JSObject, index: Int32) -> JSValue {
     var rawValue = RawJSValue()
-    _get_subscript(this.id, index,
-                   &rawValue.kind,
-                   &rawValue.payload1, &rawValue.payload2)
+    let rawBitPattern = _get_subscript(
+        this.id, index,
+        &rawValue.payload1, &rawValue.payload2
+    )
+    rawValue.kind = unsafeBitCast(rawBitPattern, to: JavaScriptValueKind.self)
     return rawValue.jsValue
 }
 

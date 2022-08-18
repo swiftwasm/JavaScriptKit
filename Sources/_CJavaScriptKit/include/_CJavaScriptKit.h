@@ -124,16 +124,17 @@ extern void _set_subscript(const JavaScriptObjectRef _this,
 ///
 /// @param _this The target JavaScript object to get its member value.
 /// @param index A subscript index to get value.
-/// @param kind A result pointer of JavaScript value kind to get.
 /// @param payload1 A result pointer of first payload of JavaScript value to get the target object.
 /// @param payload2 A result pointer of second payload of JavaScript value to get the target object.
+/// @return A JavaScriptValueKind bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_get_subscript")))
-extern void _get_subscript(const JavaScriptObjectRef _this,
-                           const int index,
-                           JavaScriptValueKind *kind,
-                           JavaScriptPayload1 *payload1,
-                           JavaScriptPayload2 *payload2);
+extern uint32_t _get_subscript(
+  const JavaScriptObjectRef _this,
+  const int index,
+  JavaScriptPayload1 *payload1,
+  JavaScriptPayload2 *payload2
+);
 
 /// `_encode_string` encodes the `str_obj` to bytes sequence and returns the length of bytes.
 ///

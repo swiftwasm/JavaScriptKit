@@ -29,10 +29,9 @@ import _CJavaScriptKit
     func _get_subscript(
         _: JavaScriptObjectRef,
         _: Int32,
-        _: UnsafeMutablePointer<JavaScriptValueKind>!,
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
-    ) { fatalError() }
+    ) -> UInt32 { fatalError() }
     func _encode_string(
         _: JavaScriptObjectRef,
         _: UnsafeMutablePointer<JavaScriptObjectRef>!

@@ -161,15 +161,13 @@ export class SwiftRuntime {
         swjs_get_subscript: (
             ref: ref,
             index: number,
-            kind_ptr: pointer,
             payload1_ptr: pointer,
             payload2_ptr: pointer
         ) => {
             const obj = this.memory.getObject(ref);
             const result = obj[index];
-            JSValue.write(
+            return JSValue.writeV2(
                 result,
-                kind_ptr,
                 payload1_ptr,
                 payload2_ptr,
                 false,
