@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 /// `JavaScriptObjectRef` represents JavaScript object reference that is referenced by Swift side.
 /// This value is an address of `SwiftRuntimeHeap`.
@@ -92,16 +93,17 @@ extern void _set_prop(const JavaScriptObjectRef _this,
 ///
 /// @param _this The target JavaScript object to get its member value.
 /// @param prop A JavaScript string object to reference a member of `_this` object.
-/// @param kind A result pointer of JavaScript value kind to get.
 /// @param payload1 A result pointer of first payload of JavaScript value to set the target object.
 /// @param payload2 A result pointer of second payload of JavaScript value to set the target object.
+/// @return A `JavaScriptValueKind` bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_get_prop")))
-extern void _get_prop(const JavaScriptObjectRef _this,
-                      const JavaScriptObjectRef prop,
-                      JavaScriptValueKind *kind,
-                      JavaScriptPayload1 *payload1,
-                      JavaScriptPayload2 *payload2);
+extern uint32_t _get_prop(
+  const JavaScriptObjectRef _this,
+  const JavaScriptObjectRef prop,
+  JavaScriptPayload1 *payload1,
+  JavaScriptPayload2 *payload2
+);
 
 /// `_set_subscript` sets a value of `_this` JavaScript object.
 ///
@@ -122,16 +124,17 @@ extern void _set_subscript(const JavaScriptObjectRef _this,
 ///
 /// @param _this The target JavaScript object to get its member value.
 /// @param index A subscript index to get value.
-/// @param kind A result pointer of JavaScript value kind to get.
 /// @param payload1 A result pointer of first payload of JavaScript value to get the target object.
 /// @param payload2 A result pointer of second payload of JavaScript value to get the target object.
+/// @return A `JavaScriptValueKind` bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_get_subscript")))
-extern void _get_subscript(const JavaScriptObjectRef _this,
-                           const int index,
-                           JavaScriptValueKind *kind,
-                           JavaScriptPayload1 *payload1,
-                           JavaScriptPayload2 *payload2);
+extern uint32_t _get_subscript(
+  const JavaScriptObjectRef _this,
+  const int index,
+  JavaScriptPayload1 *payload1,
+  JavaScriptPayload2 *payload2
+);
 
 /// `_encode_string` encodes the `str_obj` to bytes sequence and returns the length of bytes.
 ///
@@ -175,30 +178,34 @@ extern JavaScriptObjectRef _i64_to_bigint_slow(unsigned int lower, unsigned int 
 /// @param ref The target JavaScript function to call.
 /// @param argv A list of `RawJSValue` arguments to apply.
 /// @param argc The length of `argv``.
-/// @param result_kind A result pointer of JavaScript value kind of returned result or thrown exception.
 /// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
 /// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
+/// @return A `JavaScriptValueKindAndFlags` bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_function")))
-extern void _call_function(const JavaScriptObjectRef ref, const RawJSValue *argv,
-                           const int argc, JavaScriptValueKindAndFlags *result_kind,
-                           JavaScriptPayload1 *result_payload1,
-                           JavaScriptPayload2 *result_payload2);
+extern uint32_t _call_function(
+  const JavaScriptObjectRef ref, const RawJSValue *argv,
+  const int argc,
+  JavaScriptPayload1 *result_payload1,
+  JavaScriptPayload2 *result_payload2
+);
 
 /// `_call_function` calls JavaScript function with given arguments list without capturing any exception
 ///
 /// @param ref The target JavaScript function to call.
 /// @param argv A list of `RawJSValue` arguments to apply.
 /// @param argc The length of `argv``.
-/// @param result_kind A result pointer of JavaScript value kind of returned result or thrown exception.
 /// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
 /// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
+/// @return A `JavaScriptValueKindAndFlags` bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_function_no_catch")))
-extern void _call_function_no_catch(const JavaScriptObjectRef ref, const RawJSValue *argv,
-                           const int argc, JavaScriptValueKindAndFlags *result_kind,
-                           JavaScriptPayload1 *result_payload1,
-                           JavaScriptPayload2 *result_payload2);
+extern uint32_t _call_function_no_catch(
+  const JavaScriptObjectRef ref, const RawJSValue *argv,
+  const int argc,
+  JavaScriptPayload1 *result_payload1,
+  JavaScriptPayload2 *result_payload2
+);
 
 /// `_call_function_with_this` calls JavaScript function with given arguments list and given `_this`.
 ///
@@ -206,17 +213,18 @@ extern void _call_function_no_catch(const JavaScriptObjectRef ref, const RawJSVa
 /// @param func_ref The target JavaScript function to call.
 /// @param argv A list of `RawJSValue` arguments to apply.
 /// @param argc The length of `argv``.
-/// @param result_kind A result pointer of JavaScript value kind of returned result or thrown exception.
 /// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
 /// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
+/// @return A `JavaScriptValueKindAndFlags` bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_function_with_this")))
-extern void _call_function_with_this(const JavaScriptObjectRef _this,
-                                     const JavaScriptObjectRef func_ref,
-                                     const RawJSValue *argv, const int argc,
-                                     JavaScriptValueKindAndFlags *result_kind,
-                                     JavaScriptPayload1 *result_payload1,
-                                     JavaScriptPayload2 *result_payload2);
+extern uint32_t _call_function_with_this(
+  const JavaScriptObjectRef _this,
+  const JavaScriptObjectRef func_ref,
+  const RawJSValue *argv, const int argc,
+  JavaScriptPayload1 *result_payload1,
+  JavaScriptPayload2 *result_payload2
+);
 
 /// `_call_function_with_this` calls JavaScript function with given arguments list and given `_this` without capturing any exception.
 ///
@@ -224,17 +232,18 @@ extern void _call_function_with_this(const JavaScriptObjectRef _this,
 /// @param func_ref The target JavaScript function to call.
 /// @param argv A list of `RawJSValue` arguments to apply.
 /// @param argc The length of `argv``.
-/// @param result_kind A result pointer of JavaScript value kind of returned result or thrown exception.
 /// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
 /// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
+/// @return A `JavaScriptValueKindAndFlags` bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_function_with_this_no_catch")))
-extern void _call_function_with_this_no_catch(const JavaScriptObjectRef _this,
-                                     const JavaScriptObjectRef func_ref,
-                                     const RawJSValue *argv, const int argc,
-                                     JavaScriptValueKindAndFlags *result_kind,
-                                     JavaScriptPayload1 *result_payload1,
-                                     JavaScriptPayload2 *result_payload2);
+extern uint32_t _call_function_with_this_no_catch(
+  const JavaScriptObjectRef _this,
+  const JavaScriptObjectRef func_ref,
+  const RawJSValue *argv, const int argc,
+  JavaScriptPayload1 *result_payload1,
+  JavaScriptPayload2 *result_payload2
+);
 
 /// `_call_new` calls JavaScript object constructor with given arguments list.
 ///

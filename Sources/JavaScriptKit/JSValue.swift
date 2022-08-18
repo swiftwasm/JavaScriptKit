@@ -196,9 +196,11 @@ extension JSValue: ExpressibleByNilLiteral {
 
 public func getJSValue(this: JSObject, name: JSString) -> JSValue {
     var rawValue = RawJSValue()
-    _get_prop(this.id, name.asInternalJSRef(),
-              &rawValue.kind,
-              &rawValue.payload1, &rawValue.payload2)
+    let rawBitPattern = _get_prop(
+        this.id, name.asInternalJSRef(),
+        &rawValue.payload1, &rawValue.payload2
+    )
+    rawValue.kind = unsafeBitCast(rawBitPattern, to: JavaScriptValueKind.self)
     return rawValue.jsValue
 }
 
@@ -210,9 +212,11 @@ public func setJSValue(this: JSObject, name: JSString, value: JSValue) {
 
 public func getJSValue(this: JSObject, index: Int32) -> JSValue {
     var rawValue = RawJSValue()
-    _get_subscript(this.id, index,
-                   &rawValue.kind,
-                   &rawValue.payload1, &rawValue.payload2)
+    let rawBitPattern = _get_subscript(
+        this.id, index,
+        &rawValue.payload1, &rawValue.payload2
+    )
+    rawValue.kind = unsafeBitCast(rawBitPattern, to: JavaScriptValueKind.self)
     return rawValue.jsValue
 }
 
@@ -226,9 +230,11 @@ public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
 
 public func getJSValue(this: JSObject, symbol: JSSymbol) -> JSValue {
     var rawValue = RawJSValue()
-    _get_prop(this.id, symbol.id,
-              &rawValue.kind,
-              &rawValue.payload1, &rawValue.payload2)
+    let rawBitPattern = _get_prop(
+        this.id, symbol.id,
+        &rawValue.payload1, &rawValue.payload2
+    )
+    rawValue.kind = unsafeBitCast(rawBitPattern, to: JavaScriptValueKind.self)
     return rawValue.jsValue
 }
 

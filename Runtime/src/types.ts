@@ -3,6 +3,8 @@ import * as JSValue from "./js-value.js";
 export type ref = number;
 export type pointer = number;
 export type bool = number;
+export type JavaScriptValueKind = number;
+export type JavaScriptValueKindAndFlags = number;
 
 export interface ExportedFunctions {
     swjs_library_version(): number;
@@ -30,10 +32,9 @@ export interface ImportedFunctions {
     swjs_get_prop(
         ref: number,
         name: number,
-        kind_ptr: pointer,
         payload1_ptr: pointer,
         payload2_ptr: pointer
-    ): void;
+    ): JavaScriptValueKind;
     swjs_set_subscript(
         ref: number,
         index: number,
@@ -44,10 +45,9 @@ export interface ImportedFunctions {
     swjs_get_subscript(
         ref: number,
         index: number,
-        kind_ptr: pointer,
         payload1_ptr: pointer,
         payload2_ptr: pointer
-    ): void;
+    ): JavaScriptValueKind;
     swjs_encode_string(ref: number, bytes_ptr_result: pointer): number;
     swjs_decode_string(bytes_ptr: pointer, length: number): number;
     swjs_load_string(ref: number, buffer: pointer): void;
@@ -55,36 +55,32 @@ export interface ImportedFunctions {
         ref: number,
         argv: pointer,
         argc: number,
-        kind_ptr: pointer,
         payload1_ptr: pointer,
         payload2_ptr: pointer
-    ): void;
+    ): JavaScriptValueKindAndFlags;
     swjs_call_function_no_catch(
         ref: number,
         argv: pointer,
         argc: number,
-        kind_ptr: pointer,
         payload1_ptr: pointer,
         payload2_ptr: pointer
-    ): void;
+    ): JavaScriptValueKindAndFlags;
     swjs_call_function_with_this(
         obj_ref: ref,
         func_ref: ref,
         argv: pointer,
         argc: number,
-        kind_ptr: pointer,
         payload1_ptr: pointer,
         payload2_ptr: pointer
-    ): void;
+    ): JavaScriptValueKindAndFlags;
     swjs_call_function_with_this_no_catch(
         obj_ref: ref,
         func_ref: ref,
         argv: pointer,
         argc: number,
-        kind_ptr: pointer,
         payload1_ptr: pointer,
         payload2_ptr: pointer
-    ): void;
+    ): JavaScriptValueKindAndFlags;
     swjs_call_new(ref: number, argv: pointer, argc: number): number;
     swjs_call_throwing_new(
         ref: number,

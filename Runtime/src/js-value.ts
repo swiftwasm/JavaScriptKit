@@ -1,5 +1,5 @@
 import { Memory } from "./memory.js";
-import { assertNever, pointer } from "./types.js";
+import { assertNever, JavaScriptValueKindAndFlags, pointer } from "./types.js";
 
 export const enum Kind {
     Boolean = 0,
@@ -51,17 +51,29 @@ export const decode = (
 // Note:
 // `decodeValues` assumes that the size of RawJSValue is 16.
 export const decodeArray = (ptr: pointer, length: number, memory: Memory) => {
+    // fast path for empty array
+    if (length === 0) {
+        return [];
+    }
+
     let result = [];
+    // It's safe to hold DataView here because WebAssembly.Memory.buffer won't
+    // change within this function.
+    const view = memory.dataView();
     for (let index = 0; index < length; index++) {
         const base = ptr + 16 * index;
-        const kind = memory.readUint32(base);
-        const payload1 = memory.readUint32(base + 4);
-        const payload2 = memory.readFloat64(base + 8);
+        const kind = view.getUint32(base, true);
+        const payload1 = view.getUint32(base + 4, true);
+        const payload2 = view.getFloat64(base + 8, true);
         result.push(decode(kind, payload1, payload2, memory));
     }
     return result;
 };
 
+// A helper function to encode a RawJSValue into a pointers.
+// Please prefer to use `writeAndReturnKindBits` to avoid unnecessary
+// memory stores.
+// This function should be used only when kind flag is stored in memory.
 export const write = (
     value: any,
     kind_ptr: pointer,
@@ -70,54 +82,57 @@ export const write = (
     is_exception: boolean,
     memory: Memory
 ) => {
+    const kind = writeAndReturnKindBits(value, payload1_ptr, payload2_ptr, is_exception, memory);
+    memory.writeUint32(kind_ptr, kind);
+};
+
+export const writeAndReturnKindBits = (
+    value: any,
+    payload1_ptr: pointer,
+    payload2_ptr: pointer,
+    is_exception: boolean,
+    memory: Memory
+): JavaScriptValueKindAndFlags => {
     const exceptionBit = (is_exception ? 1 : 0) << 31;
     if (value === null) {
-        memory.writeUint32(kind_ptr, exceptionBit | Kind.Null);
-        return;
+        return exceptionBit | Kind.Null;
     }
 
     const writeRef = (kind: Kind) => {
-        memory.writeUint32(kind_ptr, exceptionBit | kind);
         memory.writeUint32(payload1_ptr, memory.retain(value));
+        return exceptionBit | kind;
     };
 
     const type = typeof value;
     switch (type) {
         case "boolean": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.Boolean);
             memory.writeUint32(payload1_ptr, value ? 1 : 0);
-            break;
+            return exceptionBit | Kind.Boolean;
         }
         case "number": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.Number);
             memory.writeFloat64(payload2_ptr, value);
-            break;
+            return exceptionBit | Kind.Number;
         }
         case "string": {
-            writeRef(Kind.String);
-            break;
+            return writeRef(Kind.String);
         }
         case "undefined": {
-            memory.writeUint32(kind_ptr, exceptionBit | Kind.Undefined);
-            break;
+            return exceptionBit | Kind.Undefined;
         }
         case "object": {
-            writeRef(Kind.Object);
-            break;
+            return writeRef(Kind.Object);
         }
         case "function": {
-            writeRef(Kind.Function);
-            break;
+            return writeRef(Kind.Function);
         }
         case "symbol": {
-            writeRef(Kind.Symbol);
-            break;
+            return writeRef(Kind.Symbol);
         }
         case "bigint": {
-            writeRef(Kind.BigInt);
-            break;
+            return writeRef(Kind.BigInt);
         }
         default:
             assertNever(type, `Type "${type}" is not supported yet`);
     }
+    throw new Error("Unreachable");
 };

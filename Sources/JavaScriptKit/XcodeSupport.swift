@@ -16,10 +16,9 @@ import _CJavaScriptKit
     func _get_prop(
         _: JavaScriptObjectRef,
         _: JavaScriptObjectRef,
-        _: UnsafeMutablePointer<JavaScriptValueKind>!,
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
-    ) { fatalError() }
+    ) -> UInt32 { fatalError() }
     func _set_subscript(
         _: JavaScriptObjectRef,
         _: Int32,
@@ -30,10 +29,9 @@ import _CJavaScriptKit
     func _get_subscript(
         _: JavaScriptObjectRef,
         _: Int32,
-        _: UnsafeMutablePointer<JavaScriptValueKind>!,
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
-    ) { fatalError() }
+    ) -> UInt32 { fatalError() }
     func _encode_string(
         _: JavaScriptObjectRef,
         _: UnsafeMutablePointer<JavaScriptObjectRef>!
@@ -52,33 +50,29 @@ import _CJavaScriptKit
     func _call_function(
         _: JavaScriptObjectRef,
         _: UnsafePointer<RawJSValue>!, _: Int32,
-        _: UnsafeMutablePointer<JavaScriptValueKindAndFlags>!,
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
-    ) { fatalError() }
+    ) -> UInt32 { fatalError() }
     func _call_function_no_catch(
         _: JavaScriptObjectRef,
         _: UnsafePointer<RawJSValue>!, _: Int32,
-        _: UnsafeMutablePointer<JavaScriptValueKindAndFlags>!,
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
-    ) { fatalError() }
+    ) -> UInt32 { fatalError() }
     func _call_function_with_this(
         _: JavaScriptObjectRef,
         _: JavaScriptObjectRef,
         _: UnsafePointer<RawJSValue>!, _: Int32,
-        _: UnsafeMutablePointer<JavaScriptValueKindAndFlags>!,
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
-    ) { fatalError() }
+    ) -> UInt32 { fatalError() }
     func _call_function_with_this_no_catch(
         _: JavaScriptObjectRef,
         _: JavaScriptObjectRef,
         _: UnsafePointer<RawJSValue>!, _: Int32,
-        _: UnsafeMutablePointer<JavaScriptValueKindAndFlags>!,
         _: UnsafeMutablePointer<JavaScriptPayload1>!,
         _: UnsafeMutablePointer<JavaScriptPayload2>!
-    ) { fatalError() }
+    ) -> UInt32 { fatalError() }
     func _call_new(
         _: JavaScriptObjectRef,
         _: UnsafePointer<RawJSValue>!, _: Int32

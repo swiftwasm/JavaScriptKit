@@ -48,65 +48,72 @@ const decode = (kind, payload1, payload2, memory) => {
 // Note:
 // `decodeValues` assumes that the size of RawJSValue is 16.
 const decodeArray = (ptr, length, memory) => {
+    // fast path for empty array
+    if (length === 0) {
+        return [];
+    }
     let result = [];
+    // It's safe to hold DataView here because WebAssembly.Memory.buffer won't
+    // change within this function.
+    const view = memory.dataView();
     for (let index = 0; index < length; index++) {
         const base = ptr + 16 * index;
-        const kind = memory.readUint32(base);
-        const payload1 = memory.readUint32(base + 4);
-        const payload2 = memory.readFloat64(base + 8);
+        const kind = view.getUint32(base, true);
+        const payload1 = view.getUint32(base + 4, true);
+        const payload2 = view.getFloat64(base + 8, true);
         result.push(decode(kind, payload1, payload2, memory));
     }
     return result;
 };
+// A helper function to encode a RawJSValue into a pointers.
+// Please prefer to use `writeAndReturnKindBits` to avoid unnecessary
+// memory stores.
+// This function should be used only when kind flag is stored in memory.
 const write = (value, kind_ptr, payload1_ptr, payload2_ptr, is_exception, memory) => {
+    const kind = writeAndReturnKindBits(value, payload1_ptr, payload2_ptr, is_exception, memory);
+    memory.writeUint32(kind_ptr, kind);
+};
+const writeAndReturnKindBits = (value, payload1_ptr, payload2_ptr, is_exception, memory) => {
     const exceptionBit = (is_exception ? 1 : 0) << 31;
     if (value === null) {
-        memory.writeUint32(kind_ptr, exceptionBit | 4 /* Null */);
-        return;
+        return exceptionBit | 4 /* Null */;
     }
     const writeRef = (kind) => {
-        memory.writeUint32(kind_ptr, exceptionBit | kind);
         memory.writeUint32(payload1_ptr, memory.retain(value));
+        return exceptionBit | kind;
     };
     const type = typeof value;
     switch (type) {
         case "boolean": {
-            memory.writeUint32(kind_ptr, exceptionBit | 0 /* Boolean */);
             memory.writeUint32(payload1_ptr, value ? 1 : 0);
-            break;
+            return exceptionBit | 0 /* Boolean */;
         }
         case "number": {
-            memory.writeUint32(kind_ptr, exceptionBit | 2 /* Number */);
             memory.writeFloat64(payload2_ptr, value);
-            break;
+            return exceptionBit | 2 /* Number */;
         }
         case "string": {
-            writeRef(1 /* String */);
-            break;
+            return writeRef(1 /* String */);
         }
         case "undefined": {
-            memory.writeUint32(kind_ptr, exceptionBit | 5 /* Undefined */);
-            break;
+            return exceptionBit | 5 /* Undefined */;
         }
         case "object": {
-            writeRef(3 /* Object */);
-            break;
+            return writeRef(3 /* Object */);
         }
         case "function": {
-            writeRef(6 /* Function */);
-            break;
+            return writeRef(6 /* Function */);
         }
         case "symbol": {
-            writeRef(7 /* Symbol */);
-            break;
+            return writeRef(7 /* Symbol */);
         }
         case "bigint": {
-            writeRef(8 /* BigInt */);
-            break;
+            return writeRef(8 /* BigInt */);
         }
         default:
             assertNever(type, `Type "${type}" is not supported yet`);
     }
+    throw new Error("Unreachable");
 };
 
 let globalVariable;
@@ -191,125 +198,120 @@ class SwiftRuntime {
         this.importObjects = () => this.wasmImports;
         this.wasmImports = {
             swjs_set_prop: (ref, name, kind, payload1, payload2) => {
-                const obj = this.memory.getObject(ref);
-                const key = this.memory.getObject(name);
-                const value = decode(kind, payload1, payload2, this.memory);
+                const memory = this.memory;
+                const obj = memory.getObject(ref);
+                const key = memory.getObject(name);
+                const value = decode(kind, payload1, payload2, memory);
                 obj[key] = value;
             },
-            swjs_get_prop: (ref, name, kind_ptr, payload1_ptr, payload2_ptr) => {
-                const obj = this.memory.getObject(ref);
-                const key = this.memory.getObject(name);
+            swjs_get_prop: (ref, name, payload1_ptr, payload2_ptr) => {
+                const memory = this.memory;
+                const obj = memory.getObject(ref);
+                const key = memory.getObject(name);
                 const result = obj[key];
-                write(result, kind_ptr, payload1_ptr, payload2_ptr, false, this.memory);
+                return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, memory);
             },
             swjs_set_subscript: (ref, index, kind, payload1, payload2) => {
-                const obj = this.memory.getObject(ref);
-                const value = decode(kind, payload1, payload2, this.memory);
+                const memory = this.memory;
+                const obj = memory.getObject(ref);
+                const value = decode(kind, payload1, payload2, memory);
                 obj[index] = value;
             },
-            swjs_get_subscript: (ref, index, kind_ptr, payload1_ptr, payload2_ptr) => {
+            swjs_get_subscript: (ref, index, payload1_ptr, payload2_ptr) => {
                 const obj = this.memory.getObject(ref);
                 const result = obj[index];
-                write(result, kind_ptr, payload1_ptr, payload2_ptr, false, this.memory);
+                return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, this.memory);
             },
             swjs_encode_string: (ref, bytes_ptr_result) => {
-                const bytes = this.textEncoder.encode(this.memory.getObject(ref));
-                const bytes_ptr = this.memory.retain(bytes);
-                this.memory.writeUint32(bytes_ptr_result, bytes_ptr);
+                const memory = this.memory;
+                const bytes = this.textEncoder.encode(memory.getObject(ref));
+                const bytes_ptr = memory.retain(bytes);
+                memory.writeUint32(bytes_ptr_result, bytes_ptr);
                 return bytes.length;
             },
             swjs_decode_string: (bytes_ptr, length) => {
-                const bytes = this.memory
+                const memory = this.memory;
+                const bytes = memory
                     .bytes()
                     .subarray(bytes_ptr, bytes_ptr + length);
                 const string = this.textDecoder.decode(bytes);
-                return this.memory.retain(string);
+                return memory.retain(string);
             },
             swjs_load_string: (ref, buffer) => {
-                const bytes = this.memory.getObject(ref);
-                this.memory.writeBytes(buffer, bytes);
+                const memory = this.memory;
+                const bytes = memory.getObject(ref);
+                memory.writeBytes(buffer, bytes);
             },
-            swjs_call_function: (ref, argv, argc, kind_ptr, payload1_ptr, payload2_ptr) => {
-                const func = this.memory.getObject(ref);
-                let result;
+            swjs_call_function: (ref, argv, argc, payload1_ptr, payload2_ptr) => {
+                const memory = this.memory;
+                const func = memory.getObject(ref);
+                let result = undefined;
                 try {
-                    const args = decodeArray(argv, argc, this.memory);
+                    const args = decodeArray(argv, argc, memory);
                     result = func(...args);
                 }
                 catch (error) {
-                    write(error, kind_ptr, payload1_ptr, payload2_ptr, true, this.memory);
-                    return;
+                    return writeAndReturnKindBits(error, payload1_ptr, payload2_ptr, true, this.memory);
                 }
-                write(result, kind_ptr, payload1_ptr, payload2_ptr, false, this.memory);
+                return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, this.memory);
             },
-            swjs_call_function_no_catch: (ref, argv, argc, kind_ptr, payload1_ptr, payload2_ptr) => {
-                const func = this.memory.getObject(ref);
-                let isException = true;
-                try {
-                    const args = decodeArray(argv, argc, this.memory);
-                    const result = func(...args);
-                    write(result, kind_ptr, payload1_ptr, payload2_ptr, false, this.memory);
-                    isException = false;
-                }
-                finally {
-                    if (isException) {
-                        write(undefined, kind_ptr, payload1_ptr, payload2_ptr, true, this.memory);
-                    }
-                }
+            swjs_call_function_no_catch: (ref, argv, argc, payload1_ptr, payload2_ptr) => {
+                const memory = this.memory;
+                const func = memory.getObject(ref);
+                const args = decodeArray(argv, argc, memory);
+                const result = func(...args);
+                return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, this.memory);
             },
-            swjs_call_function_with_this: (obj_ref, func_ref, argv, argc, kind_ptr, payload1_ptr, payload2_ptr) => {
-                const obj = this.memory.getObject(obj_ref);
-                const func = this.memory.getObject(func_ref);
+            swjs_call_function_with_this: (obj_ref, func_ref, argv, argc, payload1_ptr, payload2_ptr) => {
+                const memory = this.memory;
+                const obj = memory.getObject(obj_ref);
+                const func = memory.getObject(func_ref);
                 let result;
                 try {
-                    const args = decodeArray(argv, argc, this.memory);
+                    const args = decodeArray(argv, argc, memory);
                     result = func.apply(obj, args);
                 }
                 catch (error) {
-                    write(error, kind_ptr, payload1_ptr, payload2_ptr, true, this.memory);
-                    return;
+                    return writeAndReturnKindBits(error, payload1_ptr, payload2_ptr, true, this.memory);
                 }
-                write(result, kind_ptr, payload1_ptr, payload2_ptr, false, this.memory);
+                return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, this.memory);
             },
-            swjs_call_function_with_this_no_catch: (obj_ref, func_ref, argv, argc, kind_ptr, payload1_ptr, payload2_ptr) => {
-                const obj = this.memory.getObject(obj_ref);
-                const func = this.memory.getObject(func_ref);
-                let isException = true;
-                try {
-                    const args = decodeArray(argv, argc, this.memory);
-                    const result = func.apply(obj, args);
-                    write(result, kind_ptr, payload1_ptr, payload2_ptr, false, this.memory);
-                    isException = false;
-                }
-                finally {
-                    if (isException) {
-                        write(undefined, kind_ptr, payload1_ptr, payload2_ptr, true, this.memory);
-                    }
-                }
+            swjs_call_function_with_this_no_catch: (obj_ref, func_ref, argv, argc, payload1_ptr, payload2_ptr) => {
+                const memory = this.memory;
+                const obj = memory.getObject(obj_ref);
+                const func = memory.getObject(func_ref);
+                let result = undefined;
+                const args = decodeArray(argv, argc, memory);
+                result = func.apply(obj, args);
+                return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, this.memory);
             },
             swjs_call_new: (ref, argv, argc) => {
-                const constructor = this.memory.getObject(ref);
-                const args = decodeArray(argv, argc, this.memory);
+                const memory = this.memory;
+                const constructor = memory.getObject(ref);
+                const args = decodeArray(argv, argc, memory);
                 const instance = new constructor(...args);
                 return this.memory.retain(instance);
             },
             swjs_call_throwing_new: (ref, argv, argc, exception_kind_ptr, exception_payload1_ptr, exception_payload2_ptr) => {
-                const constructor = this.memory.getObject(ref);
+                let memory = this.memory;
+                const constructor = memory.getObject(ref);
                 let result;
                 try {
-                    const args = decodeArray(argv, argc, this.memory);
+                    const args = decodeArray(argv, argc, memory);
                     result = new constructor(...args);
                 }
                 catch (error) {
                     write(error, exception_kind_ptr, exception_payload1_ptr, exception_payload2_ptr, true, this.memory);
                     return -1;
                 }
-                write(null, exception_kind_ptr, exception_payload1_ptr, exception_payload2_ptr, false, this.memory);
-                return this.memory.retain(result);
+                memory = this.memory;
+                write(null, exception_kind_ptr, exception_payload1_ptr, exception_payload2_ptr, false, memory);
+                return memory.retain(result);
             },
             swjs_instanceof: (obj_ref, constructor_ref) => {
-                const obj = this.memory.getObject(obj_ref);
-                const constructor = this.memory.getObject(constructor_ref);
+                const memory = this.memory;
+                const obj = memory.getObject(obj_ref);
+                const constructor = memory.getObject(constructor_ref);
                 return obj instanceof constructor;
             },
             swjs_create_function: (host_func_id, line, file) => {
@@ -327,9 +329,10 @@ class SwiftRuntime {
                 return this.memory.retain(array.slice());
             },
             swjs_load_typed_array: (ref, buffer) => {
-                const typedArray = this.memory.getObject(ref);
+                const memory = this.memory;
+                const typedArray = memory.getObject(ref);
                 const bytes = new Uint8Array(typedArray.buffer);
-                this.memory.writeBytes(buffer, bytes);
+                memory.writeBytes(buffer, bytes);
             },
             swjs_release: (ref) => {
                 this.memory.release(ref);
@@ -402,14 +405,15 @@ class SwiftRuntime {
     callHostFunction(host_func_id, line, file, args) {
         const argc = args.length;
         const argv = this.exports.swjs_prepare_host_function_call(argc);
+        const memory = this.memory;
         for (let index = 0; index < args.length; index++) {
             const argument = args[index];
             const base = argv + 16 * index;
-            write(argument, base, base + 4, base + 8, false, this.memory);
+            write(argument, base, base + 4, base + 8, false, memory);
         }
         let output;
         // This ref is released by the swjs_call_host_function implementation
-        const callback_func_ref = this.memory.retain((result) => {
+        const callback_func_ref = memory.retain((result) => {
             output = result;
         });
         const alreadyReleased = this.exports.swjs_call_host_function(host_func_id, argv, argc, callback_func_ref);
