@@ -95,7 +95,7 @@ extern void _set_prop(const JavaScriptObjectRef _this,
 /// @param prop A JavaScript string object to reference a member of `_this` object.
 /// @param payload1 A result pointer of first payload of JavaScript value to set the target object.
 /// @param payload2 A result pointer of second payload of JavaScript value to set the target object.
-/// @return A JavaScriptValueKind bits represented as 32bit integer for the returned value.
+/// @return A `JavaScriptValueKind` bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_get_prop")))
 extern uint32_t _get_prop(
@@ -126,7 +126,7 @@ extern void _set_subscript(const JavaScriptObjectRef _this,
 /// @param index A subscript index to get value.
 /// @param payload1 A result pointer of first payload of JavaScript value to get the target object.
 /// @param payload2 A result pointer of second payload of JavaScript value to get the target object.
-/// @return A JavaScriptValueKind bits represented as 32bit integer for the returned value.
+/// @return A `JavaScriptValueKind` bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_get_subscript")))
 extern uint32_t _get_subscript(
@@ -180,7 +180,7 @@ extern JavaScriptObjectRef _i64_to_bigint_slow(unsigned int lower, unsigned int 
 /// @param argc The length of `argv``.
 /// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
 /// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
-/// @return A JavaScriptValueKindAndFlags bits represented as 32bit integer for the returned value.
+/// @return A `JavaScriptValueKindAndFlags` bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_function")))
 extern uint32_t _call_function(
@@ -197,7 +197,7 @@ extern uint32_t _call_function(
 /// @param argc The length of `argv``.
 /// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
 /// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
-/// @return A JavaScriptValueKindAndFlags bits represented as 32bit integer for the returned value.
+/// @return A `JavaScriptValueKindAndFlags` bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_function_no_catch")))
 extern uint32_t _call_function_no_catch(
@@ -215,7 +215,7 @@ extern uint32_t _call_function_no_catch(
 /// @param argc The length of `argv``.
 /// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
 /// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
-/// @return A JavaScriptValueKindAndFlags bits represented as 32bit integer for the returned value.
+/// @return A `JavaScriptValueKindAndFlags` bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_function_with_this")))
 extern uint32_t _call_function_with_this(
@@ -234,7 +234,7 @@ extern uint32_t _call_function_with_this(
 /// @param argc The length of `argv``.
 /// @param result_payload1 A result pointer of first payload of JavaScript value of returned result or thrown exception.
 /// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
-/// @return A JavaScriptValueKindAndFlags bits represented as 32bit integer for the returned value.
+/// @return A `JavaScriptValueKindAndFlags` bits represented as 32bit integer for the returned value.
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_function_with_this_no_catch")))
 extern uint32_t _call_function_with_this_no_catch(
