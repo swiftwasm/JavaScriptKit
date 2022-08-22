@@ -1,3 +1,23 @@
+# 0.16.0 (22 Aug 2022)
+
+This release contains significant performance improvements, API enhancements for `JSPromise` / `JSBigInt` / `JSClosure`, and documentation improvements.
+
+**Merged pull requests:**
+
+- Runtime Performance Optimization ([#207](https://github.com/swiftwasm/JavaScriptKit/pull/207)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Add missing doc comments for more types ([#208](https://github.com/swiftwasm/JavaScriptKit/pull/208)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Add Int64/UInt64 to Bigint slow conversion ([#204](https://github.com/swiftwasm/JavaScriptKit/pull/204)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Test native builds with Xcode 14.0 ([#206](https://github.com/swiftwasm/JavaScriptKit/pull/206)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Support DocC generation in Swift Package Index ([#205](https://github.com/swiftwasm/JavaScriptKit/pull/205)) via [@MaxDesiatov](https://github.com/MaxDesiatov)
+- Refine benchmark suite ([#203](https://github.com/swiftwasm/JavaScriptKit/pull/203)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Add diagnostics for those who build with WASI command line ABI ([#202](https://github.com/swiftwasm/JavaScriptKit/pull/202)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Bump terser from 5.10.0 to 5.14.2 in /Example ([#201](https://github.com/swiftwasm/JavaScriptKit/pull/201)) via [@dependabot[bot]](https://github.com/dependabot[bot])
+- Test with uwasi implementation ([#198](https://github.com/swiftwasm/JavaScriptKit/pull/198)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Add async JSPromise.result property ([#200](https://github.com/swiftwasm/JavaScriptKit/pull/200)) via [@kateinoigakukun](https://github.com/kateinoigakukun)
+- Asynchronous calls in JSClosure ([#157](https://github.com/swiftwasm/JavaScriptKit/issues/157)) via [@j-f1](https://github.com/j-f1)
+- JSPromise(resolver:) usage ([#156](https://github.com/swiftwasm/JavaScriptKit/issues/156)) via [@j-f1](https://github.com/j-f1)
+
+
 # 0.15.0 (17 May 2022)
 
 This is a major release that adds new features and fixes issues. Specifically:
