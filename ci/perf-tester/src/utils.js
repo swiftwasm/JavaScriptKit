@@ -168,6 +168,7 @@ exports.diffTable = (
 ) => {
     let changedRows = [];
     let unChangedRows = [];
+    let baselineRows = [];
 
     let totalTime = 0;
     let totalDelta = 0;
@@ -187,7 +188,9 @@ exports.diffTable = (
             getDeltaText(delta, difference),
             iconForDifference(difference),
         ];
-        if (isUnchanged && collapseUnchanged) {
+        if (name.includes('directly')) {
+            baselineRows.push(columns);
+        } else if (isUnchanged && collapseUnchanged) {
             unChangedRows.push(columns);
         } else {
             changedRows.push(columns);
@@ -199,6 +202,11 @@ exports.diffTable = (
     if (unChangedRows.length !== 0) {
         const outUnchanged = markdownTable(unChangedRows);
         out += `\n\n<details><summary><strong>View Unchanged</strong></summary>\n\n${outUnchanged}\n\n</details>\n\n`;
+    }
+    
+    if (baselineRows.length !== 0) {
+        const outBaseline = markdownTable(baselineRows.map(line => line.slice(0, 2));
+        out += `\n\n<details><summary><strong>View Baselines</strong></summary>\n\n${outBaseline}\n\n</details>\n\n`;
     }
 
     if (showTotal) {
