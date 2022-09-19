@@ -205,7 +205,7 @@ exports.diffTable = (
     }
     
     if (baselineRows.length !== 0) {
-        const outBaseline = markdownTable(baselineRows.map(line => line.slice(0, 2));
+        const outBaseline = markdownTable(baselineRows.map(line => line.slice(0, 2)));
         out += `\n\n<details><summary><strong>View Baselines</strong></summary>\n\n${outBaseline}\n\n</details>\n\n`;
     }
 
