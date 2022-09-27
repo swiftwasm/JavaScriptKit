@@ -26,5 +26,13 @@ let package = Package(
             dependencies: ["JavaScriptKit", "_CJavaScriptEventLoop"]
         ),
         .target(name: "_CJavaScriptEventLoop"),
+        .target(
+            name: "JavaScriptEventLoopTestSupport",
+            dependencies: [
+                "_CJavaScriptEventLoopTestSupport",
+                .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
+            ]
+        ),
+        .target(name: "_CJavaScriptEventLoopTestSupport"),
     ]
 )
