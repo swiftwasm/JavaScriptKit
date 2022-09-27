@@ -18,11 +18,11 @@ jobs:
           # Ensure that test succeeds with all toolchains and wasi backend combinations
           - { os: ubuntu-20.04, toolchain: wasm-5.5.0-RELEASE, wasi-backend: Node }
           - { os: ubuntu-20.04, toolchain: wasm-5.6.0-RELEASE, wasi-backend: Node }
-          - { os: ubuntu-20.04, toolchain: wasm-5.7-SNAPSHOT-2022-09-18-a, wasi-backend: Node }
+          - { os: ubuntu-20.04, toolchain: wasm-5.7.1-RELEASE, wasi-backend: Node }
           - { os: ubuntu-20.04, toolchain: wasm-5.6.0-RELEASE, wasi-backend: Wasmer }
-          - { os: ubuntu-20.04, toolchain: wasm-5.7-SNAPSHOT-2022-09-18-a, wasi-backend: Wasmer }
+          - { os: ubuntu-20.04, toolchain: wasm-5.7.1-RELEASE, wasi-backend: Wasmer }
           - { os: ubuntu-20.04, toolchain: wasm-5.6.0-RELEASE, wasi-backend: MicroWASI }
-          - { os: ubuntu-20.04, toolchain: wasm-5.7-SNAPSHOT-2022-09-18-a, wasi-backend: MicroWASI }
+          - { os: ubuntu-20.04, toolchain: wasm-5.7.1-RELEASE, wasi-backend: MicroWASI }
 
     runs-on: ${{ matrix.entry.os }}
     steps:
