@@ -8,6 +8,7 @@ let package = Package(
         .library(name: "JavaScriptKit", targets: ["JavaScriptKit"]),
         .library(name: "JavaScriptEventLoop", targets: ["JavaScriptEventLoop"]),
         .library(name: "JavaScriptBigIntSupport", targets: ["JavaScriptBigIntSupport"]),
+        .library(name: "JavaScriptEventLoopTestSupport", targets: ["JavaScriptEventLoopTestSupport"]),
     ],
     targets: [
         .target(
