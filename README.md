@@ -125,6 +125,23 @@ asyncButtonElement.onclick = .object(JSClosure { _ in
 _ = document.body.appendChild(asyncButtonElement)
 ```
 
+### `JavaScriptEventLoop` activation in XCTest suites
+
+If you need to execute Swift async functions that can be resumed by JS event loop in your XCTest suites, please add `JavaScriptEventLoopTestSupport` to your test target dependencies.
+
+```diff
+ .testTarget(
+   name: "MyAppTests",
+   dependencies: [
+     "MyApp",
++    "JavaScriptEventLoopTestSupport",
+   ]
+ )
+```
+
+Linking this module automatically activates JS event loop based global executor by calling `JavaScriptEventLoop.installGlobalExecutor()`
+
+
 ## Requirements 
 
 ### For developers

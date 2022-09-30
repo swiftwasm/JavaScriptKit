@@ -9,7 +9,7 @@ const fs = require("fs");
 const readFile = promisify(fs.readFile);
 
 const WASI = {
-    Wasmer: () => {
+    Wasmer: ({ programName }) => {
         // Instantiate a new WASI Instance
         const wasmFs = new WasmFs();
         // Output stdout and stderr to console
@@ -27,7 +27,7 @@ const WASI = {
             return originalWriteSync(fd, buffer, offset, length, position);
         };
         const wasi = new WasmerWASI({
-            args: [],
+            args: [programName],
             env: {},
             bindings: {
                 ...WasmerWASI.defaultBindings,
@@ -44,9 +44,9 @@ const WASI = {
             }
         }
     },
-    MicroWASI: () => {
+    MicroWASI: ({ programName }) => {
         const wasi = new MicroWASI({
-            args: [],
+            args: [programName],
             env: {},
             features: [useAll()],
         })
@@ -59,11 +59,11 @@ const WASI = {
             }
         }
     },
-    Node: () => {
+    Node: ({ programName }) => {
         const wasi = new NodeWASI({
-            args: [],
+            args: [programName],
             env: {},
-            returnOnExit: true,
+            returnOnExit: false,
         })
 
         return {
@@ -91,7 +91,7 @@ const startWasiTask = async (wasmPath, wasiConstructor = selectWASIBackend()) =>
     const swift = new SwiftRuntime();
     // Fetch our Wasm File
     const wasmBinary = await readFile(wasmPath);
-    const wasi = wasiConstructor();
+    const wasi = wasiConstructor({ programName: wasmPath });
 
     // Instantiate the WebAssembly file
     let { instance } = await WebAssembly.instantiate(wasmBinary, {
