@@ -63,7 +63,7 @@ const WASI = {
         const wasi = new NodeWASI({
             args: [programName],
             env: {},
-            returnOnExit: true,
+            returnOnExit: false,
         })
 
         return {
