@@ -12,15 +12,18 @@ build:
 
 .PHONY: test
 test:
-	@echo Running unit tests
-	swift build --build-tests --triple wasm32-unknown-wasi -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor -Xlinker --export=main
-	node --experimental-wasi-unstable-preview1 scripts/test-harness.js ./.build/wasm32-unknown-wasi/debug/JavaScriptKitPackageTests.wasm
 	@echo Running integration tests
 	cd IntegrationTests && \
 	    CONFIGURATION=debug make test && \
 	    CONFIGURATION=debug SWIFT_BUILD_FLAGS="-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS" make test && \
 	    CONFIGURATION=release make test && \
 	    CONFIGURATION=release SWIFT_BUILD_FLAGS="-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS" make test
+
+.PHONY: unittest
+unittest:
+	@echo Running unit tests
+	swift build --build-tests --triple wasm32-unknown-wasi -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor -Xlinker --export=main
+	node --experimental-wasi-unstable-preview1 scripts/test-harness.js ./.build/wasm32-unknown-wasi/debug/JavaScriptKitPackageTests.wasm
 
 .PHONY: benchmark_setup
 benchmark_setup:

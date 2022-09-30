@@ -25,22 +25,27 @@ jobs:
           - { os: ubuntu-20.04, toolchain: wasm-5.7.1-RELEASE, wasi-backend: MicroWASI }
 
     runs-on: ${{ matrix.entry.os }}
+    env:
+      JAVASCRIPTKIT_WASI_BACKEND: ${{ matrix.entry.wasi-backend }}
+      SWIFT_VERSION: ${{ matrix.entry.toolchain }}
     steps:
       - name: Checkout
         uses: actions/checkout@master
         with:
           fetch-depth: 1
-      - name: Run Test
-        env:
-          JAVASCRIPTKIT_WASI_BACKEND: ${{ matrix.entry.wasi-backend }}
+      - name: Install swiftenv
         run: |
           git clone https://github.com/kylef/swiftenv.git ~/.swiftenv
           export SWIFTENV_ROOT="$HOME/.swiftenv"
           export PATH="$SWIFTENV_ROOT/bin:$PATH"
           eval "$(swiftenv init -)"
-          SWIFT_VERSION=${{ matrix.entry.toolchain }} make bootstrap
+          echo $PATH >> $GITHUB_PATH
+          env >> $GITHUB_ENV
           echo ${{ matrix.entry.toolchain }} > .swift-version
-          make test
+      - run: make bootstrap
+      - run: make test
+      - run: make unittest
+        if: ${{ startsWith(matrix.toolchain, 'wasm-5.7.') }}
       - name: Check if SwiftPM resources are stale
         run: |
           make regenerate_swiftpm_resources
