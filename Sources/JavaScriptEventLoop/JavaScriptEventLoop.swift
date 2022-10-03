@@ -39,9 +39,9 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
     /// A function that queues a given closure as a microtask into JavaScript event loop.
     /// See also: https://developer.mozilla.org/en-US/docs/Web/API/HTML_DOM_API/Microtask_guide
-    let queueMicrotask: @Sendable (@escaping () -> Void) -> Void
+    public var queueMicrotask: @Sendable (@escaping () -> Void) -> Void
     /// A function that invokes a given closure after a specified number of milliseconds.
-    let setTimeout: @Sendable (Double, @escaping () -> Void) -> Void
+    public var setTimeout: @Sendable (Double, @escaping () -> Void) -> Void
 
     /// A mutable state to manage internal job queue
     /// Note that this should be guarded atomically when supporting multi-threaded environment.
