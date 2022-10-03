@@ -1,3 +1,21 @@
+# 0.17.0 (4 Oct 2022)
+
+This release introduces testing support module, minor API enhancements for `JavaScriptEventLoop`.
+
+Linking the new `JavaScriptEventLoopTestSupport` module automatically activates JS event loop based global executor.
+This automatic activation is just for XCTest integration since XCTest with SwiftPM doesn't allow to call `JavaScriptEventLoop.installGlobalExecutor()` at first.
+
+## What's Changed
+
+* Bump @actions/core from 1.2.6 to 1.9.1 in /ci/perf-tester by @dependabot in https://github.com/swiftwasm/JavaScriptKit/pull/209
+* Remove baseline tests (e.g. “Call JavaScript function directly”) from comparison by @j-f1 in https://github.com/swiftwasm/JavaScriptKit/pull/211
+* Add 5.7 toolchain matrix by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/210
+* Add JavaScriptEventLoopTestSupport module to install executor by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/213
+* Expose `JavaScriptEventLoop.queueMicrotask` and `.setTimeout` by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/214
+
+
+**Full Changelog**: https://github.com/swiftwasm/JavaScriptKit/compare/0.16.0...0.17.0
+
 # 0.16.0 (22 Aug 2022)
 
 This release contains significant performance improvements, API enhancements for `JSPromise` / `JSBigInt` / `JSClosure`, and documentation improvements.
