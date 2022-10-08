@@ -33,15 +33,9 @@ jobs:
         uses: actions/checkout@master
         with:
           fetch-depth: 1
-      - name: Install swiftenv
-        run: |
-          git clone https://github.com/kylef/swiftenv.git ~/.swiftenv
-          export SWIFTENV_ROOT="$HOME/.swiftenv"
-          export PATH="$SWIFTENV_ROOT/bin:$PATH"
-          eval "$(swiftenv init -)"
-          echo $PATH >> $GITHUB_PATH
-          env >> $GITHUB_ENV
-          echo ${{ matrix.entry.toolchain }} > .swift-version
+      - uses: swiftwasm/setup-swiftwasm@v1
+        with:
+          swift-version: ${{ matrix.entry.toolchain }}
       - run: make bootstrap
       - run: make test
       - run: make unittest
