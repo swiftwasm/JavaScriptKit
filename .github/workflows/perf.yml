@@ -4,18 +4,15 @@ on: [pull_request]
 
 jobs:
   perf:
-    runs-on: Ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@master
         with:
           fetch-depth: 1
+      - uses: swiftwasm/setup-swiftwasm@v1
       - name: Run Benchmark
         run: |
-          git clone https://github.com/kylef/swiftenv.git ~/.swiftenv
-          export SWIFTENV_ROOT="$HOME/.swiftenv"
-          export PATH="$SWIFTENV_ROOT/bin:$PATH"
-          eval "$(swiftenv init -)"
           make bootstrap
           make perf-tester
           node ci/perf-tester
