@@ -8,6 +8,16 @@ import Darwin
 
 #if compiler(>=5.5)
 
+func performanceNow() -> Double {
+    return JSObject.global.performance.now.function!().number!
+}
+
+func measure(_ block: () async throws -> Void) async rethrows -> Double {
+    let start = performanceNow()
+    try await block()
+    return performanceNow() - start
+}
+
 func entrypoint() async throws {
     struct E: Error, Equatable {
         let value: Int
@@ -61,10 +71,10 @@ func entrypoint() async throws {
     }
 
     try await asyncTest("Task.sleep(_:)") {
-        let start = time(nil)
-        try await Task.sleep(nanoseconds: 2_000_000_000)
-        let diff = difftime(time(nil), start);
-        try expectGTE(diff, 2)
+        let diff = try await measure {
+            try await Task.sleep(nanoseconds: 200_000_000)
+        }
+        try expectGTE(diff, 200)
     }
 
     try await asyncTest("Job reordering based on priority") {
@@ -102,19 +112,19 @@ func entrypoint() async throws {
 
     try await asyncTest("Async JSClosure") {
         let delayClosure = JSClosure.async { _ -> JSValue in
-            try await Task.sleep(nanoseconds: 2_000_000_000)
+            try await Task.sleep(nanoseconds: 200_000_000)
             return JSValue.number(3)
         }
         let delayObject = JSObject.global.Object.function!.new()
         delayObject.closure = delayClosure.jsValue
 
-        let start = time(nil)
-        let promise = JSPromise(from: delayObject.closure!())
-        try expectNotNil(promise)
-        let result = try await promise!.value
-        let diff = difftime(time(nil), start)
-        try expectGTE(diff, 2)
-        try expectEqual(result, .number(3))
+        let diff = try await measure {
+            let promise = JSPromise(from: delayObject.closure!())
+            try expectNotNil(promise)
+            let result = try await promise!.value
+            try expectEqual(result, .number(3))
+        }
+        try expectGTE(diff, 200)
     }
 
     try await asyncTest("Async JSPromise: then") {
@@ -124,18 +134,18 @@ func entrypoint() async throws {
                     resolve(.success(JSValue.number(3)))
                     return .undefined
                 }.jsValue,
-                1_000
+                100
             )
         }
         let promise2 = promise.then { result in
-            try await Task.sleep(nanoseconds: 1_000_000_000)
+            try await Task.sleep(nanoseconds: 100_000_000)
             return String(result.number!)
         }
-        let start = time(nil)
-        let result = try await promise2.value
-        let diff = difftime(time(nil), start)
-        try expectGTE(diff, 2)
-        try expectEqual(result, .string("3.0"))
+        let diff = try await measure {
+            let result = try await promise2.value
+            try expectEqual(result, .string("3.0"))
+        }
+        try expectGTE(diff, 200)
     }
 
     try await asyncTest("Async JSPromise: then(success:failure:)") {
@@ -145,7 +155,7 @@ func entrypoint() async throws {
                     resolve(.failure(JSError(message: "test").jsValue))
                     return .undefined
                 }.jsValue,
-                1_000
+                100
             )
         }
         let promise2 = promise.then { _ in
@@ -164,26 +174,43 @@ func entrypoint() async throws {
                     resolve(.failure(JSError(message: "test").jsValue))
                     return .undefined
                 }.jsValue,
-                1_000
+                100
             )
         }
         let promise2 = promise.catch { err in
-            try await Task.sleep(nanoseconds: 1_000_000_000)
+            try await Task.sleep(nanoseconds: 100_000_000)
             return err
         }
-        let start = time(nil)
-        let result = try await promise2.value
-        let diff = difftime(time(nil), start)
-        try expectGTE(diff, 2)
-        try expectEqual(result.object?.message, .string("test"))
+        let diff = try await measure {
+            let result = try await promise2.value
+            try expectEqual(result.object?.message, .string("test"))
+        }
+        try expectGTE(diff, 200)
     }
 
-    // FIXME(katei): Somehow it doesn't work due to a mysterious unreachable inst
-    // at the end of thunk.
-    // This issue is not only on JS host environment, but also on standalone coop executor.
     try await asyncTest("Task.sleep(nanoseconds:)") {
-        try await Task.sleep(nanoseconds: 1_000_000_000)
+        let diff = try await measure {
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        try expectGTE(diff, 100)
     }
+
+    #if compiler(>=5.7)
+    try await asyncTest("ContinuousClock.sleep") {
+        let diff = try await measure {
+            let c = ContinuousClock()
+            try await c.sleep(until: .now + .milliseconds(100))
+        }
+        try expectGTE(diff, 99)
+    }
+    try await asyncTest("SuspendingClock.sleep") {
+        let diff = try await measure {
+            let c = SuspendingClock()
+            try await c.sleep(until: .now + .milliseconds(100))
+        }
+        try expectGTE(diff, 99)
+    }
+    #endif
 }
 
 
