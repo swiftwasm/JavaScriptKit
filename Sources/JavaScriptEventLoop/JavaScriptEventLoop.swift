@@ -143,6 +143,7 @@ internal func swift_get_time(
   _ nanoseconds: UnsafeMutablePointer<Int64>,
   _ clock: CInt)
 
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension JavaScriptEventLoop {
     fileprivate func enqueue(
         _ job: UnownedJob, withDelay seconds: Int64, _ nanoseconds: Int64,
