@@ -35,7 +35,14 @@ typedef SWIFT_CC(swift) void (*swift_task_enqueueGlobalWithDelay_original)(
 SWIFT_EXPORT_FROM(swift_Concurrency)
 void *_Nullable swift_task_enqueueGlobalWithDelay_hook;
 
-unsigned long long foo;
+typedef SWIFT_CC(swift) void (*swift_task_enqueueGlobalWithDeadline_original)(
+    long long sec,
+    long long nsec,
+    long long tsec,
+    long long tnsec,
+    int clock, Job *_Nonnull job);
+SWIFT_EXPORT_FROM(swift_Concurrency)
+void *_Nullable swift_task_enqueueGlobalWithDeadline_hook;
 
 /// A hook to take over main executor enqueueing.
 typedef SWIFT_CC(swift) void (*swift_task_enqueueMainExecutor_original)(
