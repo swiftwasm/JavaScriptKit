@@ -20,7 +20,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         super.init(id: 0)
 
         // 2. Create a new JavaScript function which calls the given Swift function.
-        hostFuncRef = JavaScriptHostFuncRef(bitPattern: Int32(ObjectIdentifier(self).hashValue))
+        hostFuncRef = JavaScriptHostFuncRef(bitPattern: ObjectIdentifier(self))
         id = withExtendedLifetime(JSString(file)) { file in
           _create_function(hostFuncRef, line, file.asInternalJSRef())
         }
@@ -86,7 +86,7 @@ public class JSClosure: JSObject, JSClosureProtocol {
         super.init(id: 0)
 
         // 2. Create a new JavaScript function which calls the given Swift function.
-        hostFuncRef = JavaScriptHostFuncRef(bitPattern: Int32(ObjectIdentifier(self).hashValue))
+        hostFuncRef = JavaScriptHostFuncRef(bitPattern: ObjectIdentifier(self))
         id = withExtendedLifetime(JSString(file)) { file in
           _create_function(hostFuncRef, line, file.asInternalJSRef())
         }
