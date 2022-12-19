@@ -10,7 +10,7 @@
 typedef unsigned int JavaScriptObjectRef;
 /// `JavaScriptHostFuncRef` represents Swift closure that is referenced by JavaScript side.
 /// This value is produced by `JSClosure`.
-typedef unsigned int JavaScriptHostFuncRef;
+typedef uintptr_t JavaScriptHostFuncRef;
 
 /// `JavaScriptValueKind` represents the kind of JavaScript primitive value.
 typedef enum __attribute__((enum_extensibility(closed))) {
