@@ -10,8 +10,9 @@ public protocol TypedArrayElement: ConvertibleToJSValue, ConstructibleFromJSValu
     static var typedArrayClass: JSFunction { get }
 }
 
-/// A wrapper around all [JavaScript `TypedArray`(https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
-/// classes] that exposes their properties in a type-safe way.
+/// A wrapper around all [JavaScript `TypedArray`
+/// classes](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
+/// that exposes their properties in a type-safe way.
 public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral where Element: TypedArrayElement {
     public class var constructor: JSFunction? { Element.typedArrayClass }
     public var jsObject: JSObject
