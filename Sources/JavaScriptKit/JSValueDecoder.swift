@@ -118,7 +118,12 @@ private struct _KeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContainerPr
     }
 
     func decode<T>(_: T.Type, forKey key: Key) throws -> T where T: Decodable {
-        return try T(from: _decoder(forKey: key))
+        let jsValue = try _decode(forKey: key)
+        if let jsType = T.self as? ConstructibleFromJSValue.Type {
+            let maybeValue = jsType.construct(from: jsValue)
+            if let value = maybeValue { return value as! T }
+        }
+        return try T(from: _decoder(forKey: key, value: jsValue))
     }
 
     func nestedContainer<NestedKey>(keyedBy _: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
@@ -139,6 +144,10 @@ private struct _KeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContainerPr
 
     func _decoder(forKey key: CodingKey) throws -> Decoder {
         let value = try _decode(forKey: key)
+        return _decoder(forKey: key, value: value)
+    }
+
+    func _decoder(forKey key: CodingKey, value: JSValue) -> Decoder {
         return decoder.decoder(referencing: value, with: key)
     }
 }
@@ -182,7 +191,12 @@ private struct _UnkeyedDecodingContainer: UnkeyedDecodingContainer {
     }
 
     mutating func decode<T>(_: T.Type) throws -> T where T: Decodable {
-        return try T(from: _decoder())
+        let jsValue = _currentValue()
+        if let jsType = T.self as? ConstructibleFromJSValue.Type {
+            let maybeValue = jsType.construct(from: jsValue)
+            if let value = maybeValue { return value as! T }
+        }
+        return try T(from: _decoder(value: jsValue))
     }
 
     mutating func nestedContainer<NestedKey>(keyedBy _: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
@@ -198,7 +212,11 @@ private struct _UnkeyedDecodingContainer: UnkeyedDecodingContainer {
     }
 
     mutating func _decoder() -> Decoder {
-        decoder.decoder(referencing: _currentValue(), with: currentKey)
+        _decoder(value: _currentValue())
+    }
+
+    func _decoder(value: JSValue) -> Decoder {
+        decoder.decoder(referencing: value, with: currentKey)
     }
 }
 
