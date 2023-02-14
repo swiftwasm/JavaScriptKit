@@ -262,6 +262,10 @@ public class JSValueDecoder {
         from value: JSValue,
         userInfo: [CodingUserInfoKey: Any] = [:]
     ) throws -> T where T: Decodable {
+        if let jsType = T.self as? ConstructibleFromJSValue.Type {
+            let maybeValue = jsType.construct(from: value)
+            if let value = maybeValue { return value as! T }
+        }
         let decoder = _Decoder(referencing: value, userInfo: userInfo)
         return try T(from: decoder)
     }
