@@ -52,6 +52,14 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         self.init(unsafelyWrapping: JSObject(id: jsArrayRef))
     }
 
+    /// Initialize a new instance of TypedArray in JavaScript environment with given buffer elements.
+    ///
+    /// - Parameter buffer: The buffer that will be copied to create a new instance of TypedArray
+    public convenience init(buffer: UnsafeBufferPointer<Element>) {
+        let jsArrayRef = _create_typed_array(Self.constructor!.id, buffer.baseAddress!, Int32(buffer.count))
+        self.init(unsafelyWrapping: JSObject(id: jsArrayRef))
+    }
+
     /// Convenience initializer for `Sequence`.
     public convenience init<S: Sequence>(_ sequence: S) where S.Element == Element {
         self.init(Array(sequence))
