@@ -1,3 +1,20 @@
+# 0.18.0 (13 Mar 2023)
+
+## What's Changed
+* Use swiftwasm/setup-swiftwasm instead of swiftenv on CI by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/215
+* Support Clock-based sleep APIs by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/216
+* Prefer `UInt(bitPattern:)` for object id to guarantee uniqueness by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/219
+* Fix wrong markdown in documentation by @gibachan in https://github.com/swiftwasm/JavaScriptKit/pull/221
+* Add `withUnsafeBytesAsync` function to `JSTypedArray` by @fjtrujy in https://github.com/swiftwasm/JavaScriptKit/pull/222
+* Trivial fixes to JSTypedArray by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/223
+
+## New Contributors
+* @gibachan made their first contribution in https://github.com/swiftwasm/JavaScriptKit/pull/221
+* @fjtrujy made their first contribution in https://github.com/swiftwasm/JavaScriptKit/pull/222
+
+**Full Changelog**: https://github.com/swiftwasm/JavaScriptKit/compare/0.17.0...0.18.0
+
+
 # 0.17.0 (4 Oct 2022)
 
 This release introduces testing support module, minor API enhancements for `JavaScriptEventLoop`.
