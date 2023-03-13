@@ -88,31 +88,34 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         let result = try body(bufferPtr)
         return result
     }
-    
-    /// Calls the given async closure with a pointer to a copy of the underlying bytes of the
-    /// array's storage.
-    ///
-    /// - Note: The pointer passed as an argument to `body` is valid only for the
-    /// lifetime of the closure. Do not escape it from the async closure for later
-    /// use.
-    ///
-    /// - Parameter body: A closure with an `UnsafeBufferPointer` parameter
-    ///   that points to the contiguous storage for the array.
-    ///    If `body` has a return value, that value is also
-    ///   used as the return value for the `withUnsafeBytes(_:)` method. The
-    ///   argument is valid only for the duration of the closure's execution.
-    /// - Returns: The return value, if any, of the `body`async closure parameter.
-    public func withUnsafeBytesAsync<R>(_ body: (UnsafeBufferPointer<Element>) async throws -> R) async rethrows -> R {
-        let bytesLength = lengthInBytes
-        let rawBuffer = malloc(bytesLength)!
-        defer { free(rawBuffer) }
-        _load_typed_array(jsObject.id, rawBuffer.assumingMemoryBound(to: UInt8.self))
-        let length = lengthInBytes / MemoryLayout<Element>.size
-        let boundPtr = rawBuffer.bindMemory(to: Element.self, capacity: length)
-        let bufferPtr = UnsafeBufferPointer<Element>(start: boundPtr, count: length)
-        let result = try await body(bufferPtr)
-        return result
-    }
+
+    #if compiler(>=5.5)
+        /// Calls the given async closure with a pointer to a copy of the underlying bytes of the
+        /// array's storage.
+        ///
+        /// - Note: The pointer passed as an argument to `body` is valid only for the
+        /// lifetime of the closure. Do not escape it from the async closure for later
+        /// use.
+        ///
+        /// - Parameter body: A closure with an `UnsafeBufferPointer` parameter
+        ///   that points to the contiguous storage for the array.
+        ///    If `body` has a return value, that value is also
+        ///   used as the return value for the `withUnsafeBytes(_:)` method. The
+        ///   argument is valid only for the duration of the closure's execution.
+        /// - Returns: The return value, if any, of the `body`async closure parameter.
+        @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+        public func withUnsafeBytesAsync<R>(_ body: (UnsafeBufferPointer<Element>) async throws -> R) async rethrows -> R {
+            let bytesLength = lengthInBytes
+            let rawBuffer = malloc(bytesLength)!
+            defer { free(rawBuffer) }
+            _load_typed_array(jsObject.id, rawBuffer.assumingMemoryBound(to: UInt8.self))
+            let length = lengthInBytes / MemoryLayout<Element>.size
+            let boundPtr = rawBuffer.bindMemory(to: Element.self, capacity: length)
+            let bufferPtr = UnsafeBufferPointer<Element>(start: boundPtr, count: length)
+            let result = try await body(bufferPtr)
+            return result
+        }
+    #endif
 }
 
 // MARK: - Int and UInt support
