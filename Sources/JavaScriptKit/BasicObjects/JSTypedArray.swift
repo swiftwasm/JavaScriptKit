@@ -79,12 +79,16 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     /// - Returns: The return value, if any, of the `body` closure parameter.
     public func withUnsafeBytes<R>(_ body: (UnsafeBufferPointer<Element>) throws -> R) rethrows -> R {
         let bytesLength = lengthInBytes
-        let rawBuffer = malloc(bytesLength)!
-        defer { free(rawBuffer) }
-        _load_typed_array(jsObject.id, rawBuffer.assumingMemoryBound(to: UInt8.self))
+        let rawBuffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: bytesLength)
+        defer { rawBuffer.deallocate() }
+        let baseAddress = rawBuffer.baseAddress!
+        _load_typed_array(jsObject.id, baseAddress)
         let length = bytesLength / MemoryLayout<Element>.size
-        let boundPtr = rawBuffer.bindMemory(to: Element.self, capacity: length)
-        let bufferPtr = UnsafeBufferPointer<Element>(start: boundPtr, count: length)
+        let rawBaseAddress = UnsafeRawPointer(baseAddress)
+        let bufferPtr = UnsafeBufferPointer<Element>(
+            start: rawBaseAddress.assumingMemoryBound(to: Element.self),
+            count: length
+        )
         let result = try body(bufferPtr)
         return result
     }
@@ -106,12 +110,16 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
         public func withUnsafeBytesAsync<R>(_ body: (UnsafeBufferPointer<Element>) async throws -> R) async rethrows -> R {
             let bytesLength = lengthInBytes
-            let rawBuffer = malloc(bytesLength)!
-            defer { free(rawBuffer) }
-            _load_typed_array(jsObject.id, rawBuffer.assumingMemoryBound(to: UInt8.self))
+            let rawBuffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: bytesLength)
+            defer { rawBuffer.deallocate() }
+            let baseAddress = rawBuffer.baseAddress!
+            _load_typed_array(jsObject.id, baseAddress)
             let length = bytesLength / MemoryLayout<Element>.size
-            let boundPtr = rawBuffer.bindMemory(to: Element.self, capacity: length)
-            let bufferPtr = UnsafeBufferPointer<Element>(start: boundPtr, count: length)
+            let rawBaseAddress = UnsafeRawPointer(baseAddress)
+            let bufferPtr = UnsafeBufferPointer<Element>(
+                start: rawBaseAddress.assumingMemoryBound(to: Element.self),
+                count: length
+            )
             let result = try await body(bufferPtr)
             return result
         }
