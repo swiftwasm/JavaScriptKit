@@ -82,7 +82,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         let rawBuffer = malloc(bytesLength)!
         defer { free(rawBuffer) }
         _load_typed_array(jsObject.id, rawBuffer.assumingMemoryBound(to: UInt8.self))
-        let length = lengthInBytes / MemoryLayout<Element>.size
+        let length = bytesLength / MemoryLayout<Element>.size
         let boundPtr = rawBuffer.bindMemory(to: Element.self, capacity: length)
         let bufferPtr = UnsafeBufferPointer<Element>(start: boundPtr, count: length)
         let result = try body(bufferPtr)
@@ -109,7 +109,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
             let rawBuffer = malloc(bytesLength)!
             defer { free(rawBuffer) }
             _load_typed_array(jsObject.id, rawBuffer.assumingMemoryBound(to: UInt8.self))
-            let length = lengthInBytes / MemoryLayout<Element>.size
+            let length = bytesLength / MemoryLayout<Element>.size
             let boundPtr = rawBuffer.bindMemory(to: Element.self, capacity: length)
             let bufferPtr = UnsafeBufferPointer<Element>(start: boundPtr, count: length)
             let result = try await body(bufferPtr)
