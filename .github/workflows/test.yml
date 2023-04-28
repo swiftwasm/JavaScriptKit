@@ -13,7 +13,6 @@ jobs:
           - { os: macos-10.15,  toolchain: wasm-5.7.3-RELEASE, wasi-backend: Node, xcode: Xcode_12.4.app }
           - { os: macos-11,     toolchain: wasm-5.7.3-RELEASE, wasi-backend: Node, xcode: Xcode_13.2.1.app }
           - { os: macos-12,     toolchain: wasm-5.7.3-RELEASE, wasi-backend: Node, xcode: Xcode_13.4.1.app }
-          - { os: ubuntu-22.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: Node }
 
           # Ensure that test succeeds with all toolchains and wasi backend combinations
           - { os: ubuntu-20.04, toolchain: wasm-5.5.0-RELEASE, wasi-backend: Node }
