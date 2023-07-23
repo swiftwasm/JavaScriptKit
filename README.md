@@ -260,5 +260,5 @@ Target: arm64-apple-darwin20.6.0
 
 
 <a href="https://www.emergetools.com/">
-  <img src="https://github.com/swiftwasm/swift/assets/11702759/6cb83079-f3e0-4749-b40d-a684fae160ad" width="30%">
+  <img src="https://github.com/swiftwasm/swift/raw/swiftwasm-distribution/assets/sponsors/emergetools.png" width="30%">
 </a>
