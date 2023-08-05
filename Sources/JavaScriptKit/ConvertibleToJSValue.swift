@@ -256,7 +256,7 @@ extension Array where Element == ConvertibleToJSValue {
         // fast path for empty array
         guard self.count != 0 else { return body([]) }
 
-        func _withRawJSValues<T>(
+        func _withRawJSValues(
             _ values: [ConvertibleToJSValue], _ index: Int,
             _ results: inout [RawJSValue], _ body: ([RawJSValue]) -> T
         ) -> T {
