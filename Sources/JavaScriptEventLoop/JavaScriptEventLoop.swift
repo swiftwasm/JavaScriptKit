@@ -122,7 +122,11 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     private func enqueue(_ job: UnownedJob, withDelay nanoseconds: UInt64) {
         let milliseconds = nanoseconds / 1_000_000
         setTimeout(Double(milliseconds), {
+            #if compiler(>=5.9)
+            job.runSynchronously(on: self.asUnownedSerialExecutor())
+            #else
             job._runSynchronously(on: self.asUnownedSerialExecutor())
+            #endif
         })
     }
 
