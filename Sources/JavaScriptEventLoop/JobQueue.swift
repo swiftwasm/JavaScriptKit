@@ -43,7 +43,11 @@ extension JavaScriptEventLoop {
         assert(queueState.isSpinning)
 
         while let job = self.claimNextFromQueue() {
+            #if compiler(>=5.9)
+            job.runSynchronously(on: self.asUnownedSerialExecutor())
+            #else
             job._runSynchronously(on: self.asUnownedSerialExecutor())
+            #endif
         }
 
         queueState.isSpinning = false

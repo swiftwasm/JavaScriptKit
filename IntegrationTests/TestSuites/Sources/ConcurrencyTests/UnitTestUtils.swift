@@ -15,6 +15,7 @@ func test(_ name: String, testBlock: () throws -> Void) throws {
         print(error)
         throw error
     }
+    print("✅ \(name)")
 }
 
 func asyncTest(_ name: String, testBlock: () async throws -> Void) async throws -> Void {
@@ -26,6 +27,7 @@ func asyncTest(_ name: String, testBlock: () async throws -> Void) async throws 
         print(error)
         throw error
     }
+    print("✅ \(name)")
 }
 
 struct MessageError: Error {
