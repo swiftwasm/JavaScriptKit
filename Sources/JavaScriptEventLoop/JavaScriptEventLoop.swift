@@ -130,9 +130,17 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
         })
     }
 
+    #if compiler(>=5.9)
+    public func enqueue(_ job: consuming ExecutorJob) {
+        // NOTE: Converting a `ExecutorJob` to an ``UnownedJob`` and invoking
+        // ``UnownedJob/runSynchronously(_:)` on it multiple times is undefined behavior.
+        insertJobQueue(job: UnownedJob(job))
+    }
+    #else
     public func enqueue(_ job: UnownedJob) {
         insertJobQueue(job: job)
     }
+    #endif
 
     public func asUnownedSerialExecutor() -> UnownedSerialExecutor {
         return UnownedSerialExecutor(ordinary: self)
