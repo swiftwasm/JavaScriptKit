@@ -3,7 +3,7 @@
   "dependencies": {
     "@wasmer/wasi": "^0.12.0",
     "@wasmer/wasmfs": "^0.12.0",
-    "uwasi": "^1.0.0",
+    "uwasi": "^1.2.0",
     "javascript-kit-swift": "file:.."
   }
 }
