@@ -64,6 +64,7 @@ const WASI = {
             args: [programName],
             env: {},
             returnOnExit: false,
+            version: "preview1",
         })
 
         return {

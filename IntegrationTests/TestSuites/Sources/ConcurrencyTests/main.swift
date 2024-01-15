@@ -9,7 +9,7 @@ import Darwin
 #if compiler(>=5.5)
 
 func performanceNow() -> Double {
-    return JSObject.global.performance.now.function!().number!
+    return JSObject.global.performance.now().number!
 }
 
 func measure(_ block: () async throws -> Void) async rethrows -> Double {
