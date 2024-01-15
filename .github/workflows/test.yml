@@ -43,6 +43,9 @@ jobs:
       - run: make bootstrap
       - run: make test
       - run: make unittest
+        # Skip unit tests with uwasi because its proc_exit throws
+        # unhandled promise rejection.
+        if: ${{ matrix.entry.wasi-backend != 'MicroWASI' }}
       - name: Check if SwiftPM resources are stale
         run: |
           make regenerate_swiftpm_resources
