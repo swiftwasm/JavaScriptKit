@@ -20,8 +20,10 @@ jobs:
           - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: Node }
           - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: Wasmer }
           - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: Wasmer }
+          - { os: ubuntu-20.04, toolchain: wasm-5.9-SNAPSHOT-2024-01-12-a, wasi-backend: Wasmer }
           - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: MicroWASI }
           - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: MicroWASI }
+          - { os: ubuntu-20.04, toolchain: wasm-5.9-SNAPSHOT-2024-01-12-a, wasi-backend: MicroWASI }
 
     runs-on: ${{ matrix.entry.os }}
     env:
