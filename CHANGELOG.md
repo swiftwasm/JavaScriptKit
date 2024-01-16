@@ -1,3 +1,17 @@
+# 0.19.0 (16 Jan 2024)
+
+## What's Changed
+* Update 5.7 patch version by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/226
+* Add 5.8 toolchain matrix by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/227
+* Fix warnings Aug 5, 2023 by @STREGA in https://github.com/swiftwasm/JavaScriptKit/pull/228
+* Swift 5.9 Changes by @STREGA in https://github.com/swiftwasm/JavaScriptKit/pull/229
+
+## New Contributors
+* @STREGA made their first contribution in https://github.com/swiftwasm/JavaScriptKit/pull/228
+
+**Full Changelog**: https://github.com/swiftwasm/JavaScriptKit/compare/0.18.0...0.19.0
+
+
 # 0.18.0 (13 Mar 2023)
 
 ## What's Changed
