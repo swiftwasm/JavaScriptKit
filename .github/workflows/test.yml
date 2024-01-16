@@ -10,20 +10,20 @@ jobs:
       matrix:
         entry:
           # Ensure that all host can install toolchain, build project, and run tests
-          - { os: macos-11,     toolchain: wasm-5.9-SNAPSHOT-2024-01-12-a, wasi-backend: Node, xcode: Xcode_13.2.1.app }
-          - { os: macos-12,     toolchain: wasm-5.9-SNAPSHOT-2024-01-12-a, wasi-backend: Node, xcode: Xcode_13.4.1.app }
-          - { os: macos-13,     toolchain: wasm-5.9-SNAPSHOT-2024-01-12-a, wasi-backend: Node, xcode: Xcode_14.3.app }
-          - { os: ubuntu-22.04, toolchain: wasm-5.9-SNAPSHOT-2024-01-12-a, wasi-backend: Node }
+          - { os: macos-11,     toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node, xcode: Xcode_13.2.1.app }
+          - { os: macos-12,     toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node, xcode: Xcode_13.4.1.app }
+          - { os: macos-13,     toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node, xcode: Xcode_14.3.app }
+          - { os: ubuntu-22.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node }
 
           # Ensure that test succeeds with all toolchains and wasi backend combinations
           - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: Node }
           - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: Node }
           - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: Wasmer }
           - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: Wasmer }
-          - { os: ubuntu-20.04, toolchain: wasm-5.9-SNAPSHOT-2024-01-12-a, wasi-backend: Wasmer }
+          - { os: ubuntu-20.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: Wasmer }
           - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: MicroWASI }
           - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: MicroWASI }
-          - { os: ubuntu-20.04, toolchain: wasm-5.9-SNAPSHOT-2024-01-12-a, wasi-backend: MicroWASI }
+          - { os: ubuntu-20.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: MicroWASI }
 
     runs-on: ${{ matrix.entry.os }}
     env:
