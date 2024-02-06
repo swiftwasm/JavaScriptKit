@@ -22,7 +22,7 @@ import JavaScriptEventLoop
 
 #if compiler(>=5.5)
 
-@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)
 @_cdecl("swift_javascriptkit_activate_js_executor_impl")
 func swift_javascriptkit_activate_js_executor_impl() {
     JavaScriptEventLoop.installGlobalExecutor()
