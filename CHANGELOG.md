@@ -1,3 +1,11 @@
+# 0.19.1 (6 Feb 2024)
+
+## What's Changed
+* Fix availability marker for Swift 5.9 compiler targeting host machine by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/232
+
+**Full Changelog**: https://github.com/swiftwasm/JavaScriptKit/compare/0.19.0...0.19.1
+
+
 # 0.19.0 (16 Jan 2024)
 
 ## What's Changed
