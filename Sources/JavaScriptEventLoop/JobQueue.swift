@@ -12,7 +12,7 @@ struct QueueState: Sendable {
     fileprivate var isSpinning: Bool = false
 }
 
-@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)
 extension JavaScriptEventLoop {
 
     func insertJobQueue(job newJob: UnownedJob) {

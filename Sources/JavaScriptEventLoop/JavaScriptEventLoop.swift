@@ -34,7 +34,7 @@ import JavaScriptEventLoop
 JavaScriptEventLoop.installGlobalExecutor()
 ```
 */
-@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)
 public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
     /// A function that queues a given closure as a microtask into JavaScript event loop.
@@ -92,7 +92,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
         typealias swift_task_enqueueGlobal_hook_Fn = @convention(thin) (UnownedJob, swift_task_enqueueGlobal_original) -> Void
         let swift_task_enqueueGlobal_hook_impl: swift_task_enqueueGlobal_hook_Fn = { job, original in
-            JavaScriptEventLoop.shared.enqueue(job)
+            JavaScriptEventLoop.shared.unsafeEnqueue(job)
         }
         swift_task_enqueueGlobal_hook = unsafeBitCast(swift_task_enqueueGlobal_hook_impl, to: UnsafeMutableRawPointer?.self)
 
@@ -112,7 +112,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
         typealias swift_task_enqueueMainExecutor_hook_Fn = @convention(thin) (UnownedJob, swift_task_enqueueMainExecutor_original) -> Void
         let swift_task_enqueueMainExecutor_hook_impl: swift_task_enqueueMainExecutor_hook_Fn = { job, original in
-            JavaScriptEventLoop.shared.enqueue(job)
+            JavaScriptEventLoop.shared.unsafeEnqueue(job)
         }
         swift_task_enqueueMainExecutor_hook = unsafeBitCast(swift_task_enqueueMainExecutor_hook_impl, to: UnsafeMutableRawPointer?.self)
         
@@ -130,15 +130,20 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
         })
     }
 
+    private func unsafeEnqueue(_ job: UnownedJob) {
+        insertJobQueue(job: job)
+    }
+
     #if compiler(>=5.9)
+    @available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)
     public func enqueue(_ job: consuming ExecutorJob) {
         // NOTE: Converting a `ExecutorJob` to an ``UnownedJob`` and invoking
         // ``UnownedJob/runSynchronously(_:)` on it multiple times is undefined behavior.
-        insertJobQueue(job: UnownedJob(job))
+        unsafeEnqueue(UnownedJob(job))
     }
     #else
     public func enqueue(_ job: UnownedJob) {
-        insertJobQueue(job: job)
+        unsafeEnqueue(job)
     }
     #endif
 
@@ -155,7 +160,7 @@ internal func swift_get_time(
   _ nanoseconds: UnsafeMutablePointer<Int64>,
   _ clock: CInt)
 
-@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)
 extension JavaScriptEventLoop {
     fileprivate func enqueue(
         _ job: UnownedJob, withDelay seconds: Int64, _ nanoseconds: Int64,
