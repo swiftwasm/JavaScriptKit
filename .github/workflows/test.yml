@@ -13,6 +13,7 @@ jobs:
           - { os: macos-11,     toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node, xcode: Xcode_13.2.1.app }
           - { os: macos-12,     toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node, xcode: Xcode_13.4.1.app }
           - { os: macos-13,     toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node, xcode: Xcode_14.3.app }
+          - { os: macos-14,     toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node, xcode: Xcode_15.2.app }
           - { os: ubuntu-22.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node }
 
           # Ensure that test succeeds with all toolchains and wasi backend combinations
@@ -65,6 +66,8 @@ jobs:
             xcode: Xcode_14.0
           - os: macos-13
             xcode: Xcode_14.3
+          - os: macos-14
+            xcode: Xcode_15.2
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
