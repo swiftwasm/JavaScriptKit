@@ -58,8 +58,6 @@ jobs:
       matrix:
         include:
           - os: macos-12
-            xcode: Xcode_13.3
-          - os: macos-12
             xcode: Xcode_14.0
           - os: macos-13
             xcode: Xcode_14.3

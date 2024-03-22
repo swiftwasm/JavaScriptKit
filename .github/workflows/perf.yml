@@ -11,6 +11,8 @@ jobs:
         with:
           fetch-depth: 1
       - uses: swiftwasm/setup-swiftwasm@v1
+        with:
+          swift-version: wasm-5.9.1-RELEASE
       - name: Run Benchmark
         run: |
           make bootstrap
