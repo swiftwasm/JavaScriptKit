@@ -31,9 +31,7 @@ jobs:
       SWIFT_VERSION: ${{ matrix.entry.toolchain }}
     steps:
       - name: Checkout
-        uses: actions/checkout@master
-        with:
-          fetch-depth: 1
+        uses: actions/checkout@v4
       - name: Select SDKROOT
         if: ${{ matrix.entry.xcode }}
         run: sudo xcode-select -s /Applications/${{ matrix.entry.xcode }}
@@ -65,7 +63,7 @@ jobs:
             xcode: Xcode_15.2
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: swift build
         env:
           DEVELOPER_DIR: /Applications/${{ matrix.xcode }}.app/Contents/Developer/
