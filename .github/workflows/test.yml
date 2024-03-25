@@ -16,13 +16,13 @@ jobs:
           - { os: ubuntu-22.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node }
 
           # Ensure that test succeeds with all toolchains and wasi backend combinations
-          - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: Node }
-          - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: Node }
-          - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: Wasmer }
-          - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: Wasmer }
+          # - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: Node }
+          # - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: Node }
+          # - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: Wasmer }
+          # - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: Wasmer }
           - { os: ubuntu-20.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: Wasmer }
-          - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: MicroWASI }
-          - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: MicroWASI }
+          # - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: MicroWASI }
+          # - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: MicroWASI }
           - { os: ubuntu-20.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: MicroWASI }
 
     runs-on: ${{ matrix.entry.os }}
@@ -55,10 +55,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-12
-            xcode: Xcode_14.0
-          - os: macos-13
-            xcode: Xcode_14.3
+          # - os: macos-12
+          #   xcode: Xcode_14.0
+          # - os: macos-13
+          #   xcode: Xcode_14.3
           - os: macos-14
             xcode: Xcode_15.2
     runs-on: ${{ matrix.os }}

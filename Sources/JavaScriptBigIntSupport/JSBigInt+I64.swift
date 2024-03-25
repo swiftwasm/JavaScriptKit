@@ -1,5 +1,5 @@
 import _CJavaScriptBigIntSupport
-@_spi(JSObject_id) import JavaScriptKit
+import JavaScriptKit
 
 extension JSBigInt: JSBigIntExtended {
     public var int64Value: Int64 {
