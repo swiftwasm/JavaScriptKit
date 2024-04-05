@@ -131,9 +131,10 @@ extension Optional: ConstructibleFromJSValue where Wrapped: ConstructibleFromJSV
     public static func construct(from value: JSValue) -> Self? {
         switch value {
         case .null, .undefined:
-            return nil
+            return .some(nil)
         default:
-            return Wrapped.construct(from: value)
+            guard let wrapped = Wrapped.construct(from: value) else { return nil }
+            return .some(wrapped)
         }
     }
 }
