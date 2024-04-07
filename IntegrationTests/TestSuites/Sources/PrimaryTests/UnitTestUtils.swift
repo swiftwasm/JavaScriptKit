@@ -14,6 +14,7 @@ func test(_ name: String, testBlock: () throws -> Void) throws {
         print(error)
         throw error
     }
+    print("✅ \(name)")
 }
 
 struct MessageError: Error {

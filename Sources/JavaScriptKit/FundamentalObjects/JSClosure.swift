@@ -61,7 +61,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 /// button.removeEventListener!("click", JSValue.function(eventListenter))
 /// ```
 ///
-public class JSClosure: JSObject, JSClosureProtocol {
+public class JSClosure: JSFunction, JSClosureProtocol {
 
     // Note: Retain the closure object itself also to avoid funcRef conflicts
     fileprivate static var sharedClosures: [JavaScriptHostFuncRef: (object: JSObject, body: ([JSValue]) -> JSValue)] = [:]

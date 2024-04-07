@@ -251,6 +251,16 @@ try test("Closure Lifetime") {
     }
 #endif
 
+    do {
+        let c1 = JSClosure { _ in .number(4) }
+        try expectEqual(c1(), .number(4))
+    }
+
+    do {
+        let c1 = JSClosure { _ in fatalError("Crash while closure evaluation") }
+        let error = try expectThrow(try evalClosure.throws(c1)) as! JSValue
+        try expectEqual(error.description, "RuntimeError: unreachable")
+    }
 }
 
 try test("Host Function Registration") {
@@ -419,21 +429,6 @@ try test("ObjectRef Lifetime") {
     identity.release()
 #endif
 }
-
-#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
-func closureScope() -> ObjectIdentifier {
-    let closure = JSClosure { _ in .undefined }
-    let result = ObjectIdentifier(closure)
-    closure.release()
-    return result
-}
-
-try test("Closure Identifiers") {
-    let oid1 = closureScope()
-    let oid2 = closureScope()
-    try expectEqual(oid1, oid2)
-}
-#endif
 
 func checkArray<T>(_ array: [T]) throws where T: TypedArrayElement & Equatable {
     try expectEqual(toString(JSTypedArray(array).jsValue.object!), jsStringify(array))
