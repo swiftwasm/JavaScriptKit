@@ -254,12 +254,18 @@ try test("Closure Lifetime") {
     do {
         let c1 = JSClosure { _ in .number(4) }
         try expectEqual(c1(), .number(4))
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+        c1.release()
+#endif
     }
 
     do {
         let c1 = JSClosure { _ in fatalError("Crash while closure evaluation") }
         let error = try expectThrow(try evalClosure.throws(c1)) as! JSValue
         try expectEqual(error.description, "RuntimeError: unreachable")
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+        c1.release()
+#endif
     }
 }
 
@@ -824,16 +830,24 @@ try test("Symbols") {
     // }.prop
     // Object.defineProperty(hasInstanceClass, Symbol.hasInstance, { value: () => true })
     let hasInstanceObject = JSObject.global.Object.function!.new()
-    hasInstanceObject.prop = JSClosure { _ in .undefined }.jsValue
+    let hasInstanceObjectClosure = JSClosure { _ in .undefined }
+    hasInstanceObject.prop = hasInstanceObjectClosure.jsValue
     let hasInstanceClass = hasInstanceObject.prop.function!
     let propertyDescriptor = JSObject.global.Object.function!.new()
-    propertyDescriptor.value = JSClosure { _ in .boolean(true) }.jsValue
+    let propertyDescriptorClosure = JSClosure { _ in .boolean(true) }
+    propertyDescriptor.value = propertyDescriptorClosure.jsValue
     _ = JSObject.global.Object.function!.defineProperty!(
         hasInstanceClass, JSSymbol.hasInstance,
         propertyDescriptor
     )
     try expectEqual(hasInstanceClass[JSSymbol.hasInstance].function!().boolean, true)
     try expectEqual(JSObject.global.Object.isInstanceOf(hasInstanceClass), true)
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+    hasInstanceObject.prop = .undefined
+    propertyDescriptor.value = .undefined
+    hasInstanceObjectClosure.release()
+    propertyDescriptorClosure.release()
+#endif
 }
 
 struct AnimalStruct: Decodable {
