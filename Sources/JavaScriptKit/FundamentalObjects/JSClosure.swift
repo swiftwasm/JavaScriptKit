@@ -20,7 +20,8 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         super.init(id: 0)
 
         // 2. Retain the given body in static storage
-        hostFuncRef = JSClosure.sharedClosures.register(ObjectIdentifier(self), object: self, body: {
+        // Leak the self object globally and release once it's called
+        hostFuncRef = JSClosure.sharedClosures.register(ObjectIdentifier(self), object: .strong(self), body: {
             defer { self.release() }
             return body($0)
         })
@@ -87,9 +88,8 @@ public class JSClosure: JSFunction, JSClosureProtocol {
         super.init(id: 0)
 
         // 2. Retain the given body in static storage
-        let objectHolder = SharedJSClosureRegistry.WeakBox(underlying: self)
         hostFuncRef = Self.sharedClosures.register(
-            ObjectIdentifier(self), object: objectHolder, body: body
+            ObjectIdentifier(self), object: .weak(self), body: body
         )
 
         id = withExtendedLifetime(JSString(file)) { file in
@@ -138,17 +138,25 @@ private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSVa
 
 /// Registry for Swift closures that are referenced from JavaScript.
 private struct SharedJSClosureRegistry {
-    class ClosureEntry {
+    struct ClosureEntry {
         // Note: Retain the closure object itself also to avoid funcRef conflicts.
-        var object: AnyObject
+        var object: AnyObjectReference
         var body: ([JSValue]) -> JSValue
 
-        init(object: AnyObject, body: @escaping ([JSValue]) -> JSValue) {
+        init(object: AnyObjectReference, body: @escaping ([JSValue]) -> JSValue) {
             self.object = object
             self.body = body
         }
     }
-    class WeakBox {
+    enum AnyObjectReference {
+        case strong(AnyObject)
+        case weak(WeakObject)
+
+        static func `weak`(_ object: AnyObject) -> AnyObjectReference {
+            .weak(SharedJSClosureRegistry.WeakObject(underlying: object))
+        }
+    }
+    struct WeakObject {
         weak var underlying: AnyObject?
         init(underlying: AnyObject) {
             self.underlying = underlying
@@ -164,7 +172,7 @@ private struct SharedJSClosureRegistry {
     /// - Returns: An unique identifier for the registered closure.
     mutating func register(
         _ hint: ObjectIdentifier,
-        object: AnyObject, body: @escaping ([JSValue]) -> JSValue
+        object: AnyObjectReference, body: @escaping ([JSValue]) -> JSValue
     ) -> JavaScriptHostFuncRef {
         let ref = JavaScriptHostFuncRef(bitPattern: hint)
         closures[ref] = ClosureEntry(object: object, body: body)
