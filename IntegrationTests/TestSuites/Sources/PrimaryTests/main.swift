@@ -359,9 +359,9 @@ try test("Object Decoding") {
     let bigInt: JSValue = js.bi
 
     try expectNotNil(JSObject.construct(from: object))
-    try expectNotNil(JSObject.construct(from: function))
-    try expectNotNil(JSObject.construct(from: symbol))
-    try expectNotNil(JSObject.construct(from: bigInt))
+    try expectEqual(JSObject.construct(from: function).map { $0 is JSFunction }, .some(true))
+    try expectEqual(JSObject.construct(from: symbol).map { $0 is JSSymbol }, .some(true))
+    try expectEqual(JSObject.construct(from: bigInt).map { $0 is JSBigInt }, .some(true))
 
     try expectNil(JSFunction.construct(from: object))
     try expectNotNil(JSFunction.construct(from: function))
