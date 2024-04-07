@@ -150,8 +150,22 @@ public class JSObject: Equatable {
         return lhs.id == rhs.id
     }
 
-    public class func construct(from value: JSValue) -> Self? {
-        return value.object as? Self
+    public static func construct(from value: JSValue) -> Self? {
+        switch value {
+        case .boolean,
+                .string,
+                .number,
+                .null,
+                .undefined: return nil
+        case .object(let object):
+            return object as? Self
+        case .function(let function):
+            return function as? Self
+        case .symbol(let symbol):
+            return symbol as? Self
+        case .bigInt(let bigInt):
+            return bigInt as? Self
+        }
     }
 
     public var jsValue: JSValue {
