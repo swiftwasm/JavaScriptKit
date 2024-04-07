@@ -24,10 +24,6 @@ public final class JSBigInt: JSObject {
         super.init(id: _i64_to_bigint_slow(UInt32(value & 0xffffffff), UInt32(value >> 32), false))
     }
 
-    override public class func construct(from value: JSValue) -> Self? {
-        value.bigInt as? Self
-    }
-
     override public var jsValue: JSValue {
         .bigInt(self)
     }

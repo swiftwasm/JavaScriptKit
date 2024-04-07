@@ -89,10 +89,6 @@ public class JSFunction: JSObject {
         fatalError("unavailable")
     }
 
-    override public class func construct(from value: JSValue) -> Self? {
-        return value.function as? Self
-    }
-
     override public var jsValue: JSValue {
         .function(self)
     }

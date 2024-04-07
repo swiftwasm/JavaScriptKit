@@ -41,10 +41,6 @@ public class JSSymbol: JSObject {
         Symbol.keyFor!(symbol).string
     }
 
-    override public class func construct(from value: JSValue) -> Self? {
-        return value.symbol as? Self
-    }
-
     override public var jsValue: JSValue {
         .symbol(self)
     }
