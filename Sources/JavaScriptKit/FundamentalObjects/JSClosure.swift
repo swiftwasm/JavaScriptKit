@@ -64,6 +64,8 @@ public class JSClosure: JSFunction, JSClosureProtocol {
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 
     #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+    private let file: String
+    private let line: UInt32
     private var isReleased: Bool = false
     #endif
 
@@ -77,6 +79,10 @@ public class JSClosure: JSFunction, JSClosureProtocol {
     }
 
     public init(_ body: @escaping ([JSValue]) -> JSValue, file: String = #fileID, line: UInt32 = #line) {
+        #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+        self.file = file
+        self.line = line
+        #endif
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
         super.init(id: 0)
 
@@ -94,15 +100,15 @@ public class JSClosure: JSFunction, JSClosureProtocol {
 
     #if compiler(>=5.5)
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSClosure {
-        JSClosure(makeAsyncClosure(body))
+    public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue, file: String = #fileID, line: UInt32 = #line) -> JSClosure {
+        JSClosure(makeAsyncClosure(body), file: file, line: line)
     }
     #endif
 
     #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     deinit {
         guard isReleased else {
-            fatalError("release() must be called on JSClosure objects manually before they are deallocated")
+            fatalError("release() must be called on JSClosure object (\(file):\(line)) manually before they are deallocated")
         }
     }
     #endif
