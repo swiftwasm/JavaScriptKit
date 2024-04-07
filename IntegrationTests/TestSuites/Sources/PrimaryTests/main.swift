@@ -337,6 +337,48 @@ try test("New Object Construction") {
     try expectEqual(dog1Bark(), .string("wan"))
 }
 
+try test("Object Decoding") {
+    /* 
+     ```js
+     global.objectDecodingTest = {
+         obj: {},
+         fn: () => {},
+         sym: Symbol("s"),
+         bi: BigInt(3)
+     };
+     ```
+     */
+    let js: JSValue = JSObject.global.objectDecodingTest
+
+    // I can't use regular name like `js.object` here
+    // cz its conflicting with case name and DML.
+    // so I use abbreviated names
+    let object: JSValue = js.obj
+    let function: JSValue = js.fn
+    let symbol: JSValue = js.sym
+    let bigInt: JSValue = js.bi
+
+    try expectNotNil(JSObject.construct(from: object))
+    try expectNotNil(JSObject.construct(from: function))
+    try expectNotNil(JSObject.construct(from: symbol))
+    try expectNotNil(JSObject.construct(from: bigInt))
+
+    try expectNil(JSFunction.construct(from: object))
+    try expectNotNil(JSFunction.construct(from: function))
+    try expectNil(JSFunction.construct(from: symbol))
+    try expectNil(JSFunction.construct(from: bigInt))
+
+    try expectNil(JSSymbol.construct(from: object))
+    try expectNil(JSSymbol.construct(from: function))
+    try expectNotNil(JSSymbol.construct(from: symbol))
+    try expectNil(JSSymbol.construct(from: bigInt))
+
+    try expectNil(JSBigInt.construct(from: object))
+    try expectNil(JSBigInt.construct(from: function))
+    try expectNil(JSBigInt.construct(from: symbol))
+    try expectNotNil(JSBigInt.construct(from: bigInt))
+}
+
 try test("Call Function With This") {
     // ```js
     // global.Animal = function(name, age, isCat) {

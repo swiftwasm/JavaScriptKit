@@ -123,6 +123,13 @@ func expectNotNil<T>(_ value: T?, file: StaticString = #file, line: UInt = #line
         throw MessageError("Expect a non-nil value", file: file, line: line, column: column)
     }
 }
+func expectNil<T>(_ value: T?, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws {
+    switch value {
+    case .some:
+        throw MessageError("Expect an nil", file: file, line: line, column: column)
+    case .none: return
+    }
+}
 
 class Expectation {
     private(set) var isFulfilled: Bool = false

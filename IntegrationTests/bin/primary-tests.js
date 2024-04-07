@@ -95,6 +95,13 @@ global.callThrowingClosure = (c) => {
     }
 };
 
+global.objectDecodingTest = {
+    obj: {},
+    fn: () => {},
+    sym: Symbol("s"),
+    bi: BigInt(3)
+};
+
 const { startWasiTask, WASI } = require("../lib");
 
 startWasiTask("./dist/PrimaryTests.wasm").catch((err) => {
