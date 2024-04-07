@@ -19,17 +19,14 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
         super.init(id: 0)
 
-        // 2. Create a new JavaScript function which calls the given Swift function.
-        hostFuncRef = JavaScriptHostFuncRef(bitPattern: ObjectIdentifier(self))
-        id = withExtendedLifetime(JSString(file)) { file in
-          _create_function(hostFuncRef, line, file.asInternalJSRef())
-        }
-
-        // 3. Retain the given body in static storage by `funcRef`.
-        JSClosure.sharedClosures[hostFuncRef] = (self, {
+        // 2. Retain the given body in static storage
+        hostFuncRef = JSClosure.sharedClosures.register(ObjectIdentifier(self), object: self, body: {
             defer { self.release() }
             return body($0)
         })
+        id = withExtendedLifetime(JSString(file)) { file in
+          _create_function(hostFuncRef, line, file.asInternalJSRef())
+        }
     }
 
     #if compiler(>=5.5)
@@ -42,7 +39,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
     /// Release this function resource.
     /// After calling `release`, calling this function from JavaScript will fail.
     public func release() {
-        JSClosure.sharedClosures[hostFuncRef] = nil
+        JSClosure.sharedClosures.unregister(hostFuncRef)
     }
 }
 
@@ -62,9 +59,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 /// ```
 ///
 public class JSClosure: JSFunction, JSClosureProtocol {
-
-    // Note: Retain the closure object itself also to avoid funcRef conflicts
-    fileprivate static var sharedClosures: [JavaScriptHostFuncRef: (object: JSObject, body: ([JSValue]) -> JSValue)] = [:]
+    fileprivate static var sharedClosures = SharedJSClosureRegistry()
 
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 
@@ -85,14 +80,16 @@ public class JSClosure: JSFunction, JSClosureProtocol {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
         super.init(id: 0)
 
-        // 2. Create a new JavaScript function which calls the given Swift function.
-        hostFuncRef = JavaScriptHostFuncRef(bitPattern: ObjectIdentifier(self))
+        // 2. Retain the given body in static storage
+        let objectHolder = SharedJSClosureRegistry.WeakBox(underlying: self)
+        hostFuncRef = Self.sharedClosures.register(
+            ObjectIdentifier(self), object: objectHolder, body: body
+        )
+
         id = withExtendedLifetime(JSString(file)) { file in
           _create_function(hostFuncRef, line, file.asInternalJSRef())
         }
 
-        // 3. Retain the given body in static storage by `funcRef`.
-        Self.sharedClosures[hostFuncRef] = (self, body)
     }
 
     #if compiler(>=5.5)
@@ -132,6 +129,52 @@ private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSVa
     }
 }
 #endif
+
+/// Registry for Swift closures that are referenced from JavaScript.
+private struct SharedJSClosureRegistry {
+    class ClosureEntry {
+        // Note: Retain the closure object itself also to avoid funcRef conflicts.
+        var object: AnyObject
+        var body: ([JSValue]) -> JSValue
+
+        init(object: AnyObject, body: @escaping ([JSValue]) -> JSValue) {
+            self.object = object
+            self.body = body
+        }
+    }
+    class WeakBox {
+        weak var underlying: AnyObject?
+        init(underlying: AnyObject) {
+            self.underlying = underlying
+        }
+    }
+    private var closures: [JavaScriptHostFuncRef: ClosureEntry] = [:]
+
+    /// Register a Swift closure to be called from JavaScript.
+    /// - Parameters:
+    ///   - hint: A hint to identify the closure.
+    ///   - object: The object should be retained until the closure is released from JavaScript.
+    ///   - body: The closure to be called from JavaScript.
+    /// - Returns: An unique identifier for the registered closure.
+    mutating func register(
+        _ hint: ObjectIdentifier,
+        object: AnyObject, body: @escaping ([JSValue]) -> JSValue
+    ) -> JavaScriptHostFuncRef {
+        let ref = JavaScriptHostFuncRef(bitPattern: hint)
+        closures[ref] = ClosureEntry(object: object, body: body)
+        return ref
+    }
+
+    /// Unregister a Swift closure from the registry.
+    mutating func unregister(_ ref: JavaScriptHostFuncRef) {
+        closures[ref] = nil
+    }
+
+    /// Get the Swift closure from the registry.
+    subscript(_ ref: JavaScriptHostFuncRef) -> (([JSValue]) -> JSValue)? {
+        closures[ref]?.body
+    }
+}
 
 // MARK: - `JSClosure` mechanism note
 //
@@ -174,7 +217,7 @@ func _call_host_function_impl(
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
 ) -> Bool {
-    guard let (_, hostFunc) = JSClosure.sharedClosures[hostFuncRef] else {
+    guard let hostFunc = JSClosure.sharedClosures[hostFuncRef] else {
         return true
     }
     let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map(\.jsValue)
@@ -195,7 +238,7 @@ func _call_host_function_impl(
 extension JSClosure {
     public func release() {
         isReleased = true
-        Self.sharedClosures[hostFuncRef] = nil
+        Self.sharedClosures.unregister(hostFuncRef)
     }
 }
 
@@ -213,6 +256,6 @@ extension JSClosure {
 
 @_cdecl("_free_host_function_impl")
 func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {
-    JSClosure.sharedClosures[hostFuncRef] = nil
+    JSClosure.sharedClosures.unregister(hostFuncRef)
 }
 #endif
