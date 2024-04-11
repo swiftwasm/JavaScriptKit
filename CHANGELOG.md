@@ -1,3 +1,20 @@
+# 0.19.2 (11 Apr 2024)
+
+## What's Changed
+* [CI] macos-14 by @ikesyo in https://github.com/swiftwasm/JavaScriptKit/pull/233
+* [CI] Drop macos-11 since that is deprecated and will be removed in Q2 2024 by @ikesyo in https://github.com/swiftwasm/JavaScriptKit/pull/234
+* Update swift-tools-version to reflect the supported Swift versions by @ikesyo in https://github.com/swiftwasm/JavaScriptKit/pull/235
+* [CI] Update actions and configure Dependabot by @ikesyo in https://github.com/swiftwasm/JavaScriptKit/pull/236
+* Fix Optional implementation for ConstructibleFromJSValue by @omochi in https://github.com/swiftwasm/JavaScriptKit/pull/238
+* Inherit JSFunction from JSClosure by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/239
+* Fix object decode by @omochi in https://github.com/swiftwasm/JavaScriptKit/pull/241
+
+## New Contributors
+* @ikesyo made their first contribution in https://github.com/swiftwasm/JavaScriptKit/pull/233
+* @omochi made their first contribution in https://github.com/swiftwasm/JavaScriptKit/pull/238
+
+**Full Changelog**: https://github.com/swiftwasm/JavaScriptKit/compare/0.19.1...0.19.2
+
 # 0.19.1 (6 Feb 2024)
 
 ## What's Changed
