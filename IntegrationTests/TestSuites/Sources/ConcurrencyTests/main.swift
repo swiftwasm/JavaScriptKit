@@ -123,16 +123,12 @@ func entrypoint() async throws {
             try expectEqual(result, .number(3))
         }
         try expectGTE(diff, 200)
-#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
-        delayObject.closure = nil
-        delayClosure.release()
-#endif
     }
 
     try await asyncTest("Async JSPromise: then") {
         let promise = JSPromise { resolve in
             _ = JSObject.global.setTimeout!(
-                JSOneshotClosure { _  in
+                JSClosure { _  in
                     resolve(.success(JSValue.number(3)))
                     return .undefined
                 }.jsValue,
@@ -153,7 +149,7 @@ func entrypoint() async throws {
     try await asyncTest("Async JSPromise: then(success:failure:)") {
         let promise = JSPromise { resolve in
             _ = JSObject.global.setTimeout!(
-                JSOneshotClosure { _ in
+                JSClosure { _ in
                     resolve(.failure(JSError(message: "test").jsValue))
                     return .undefined
                 }.jsValue,
@@ -172,7 +168,7 @@ func entrypoint() async throws {
     try await asyncTest("Async JSPromise: catch") {
         let promise = JSPromise { resolve in
             _ = JSObject.global.setTimeout!(
-                JSOneshotClosure { _ in
+                JSClosure { _ in
                     resolve(.failure(JSError(message: "test").jsValue))
                     return .undefined
                 }.jsValue,

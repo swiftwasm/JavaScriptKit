@@ -111,7 +111,7 @@ func expectThrow<T>(_ body: @autoclosure () throws -> T, file: StaticString = #f
 }
 
 func wrapUnsafeThrowableFunction(_ body: @escaping () -> Void, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> Error {
-    JSObject.global.callThrowingClosure.function!(JSOneshotClosure { _ in
+    JSObject.global.callThrowingClosure.function!(JSClosure { _ in 
             body() 
             return .undefined
     })
