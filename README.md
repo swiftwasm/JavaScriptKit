@@ -192,7 +192,7 @@ dependencies: [
 > - If you already use `carton` before 0.x.x versions via Homebrew, you can remove it with `brew uninstall carton` and install the new version as a SwiftPM dependency.
 > - Also please remove the old `.build` directory before using the new `carton`
 
-## Legacy Installation
+<details><summary>Legacy Installation</summary>
 
 
 As a part of these steps
@@ -231,6 +231,8 @@ carton init --template basic
 ```
 carton dev
 ```
+
+</details>
 
 5. Open [http://127.0.0.1:8080/](http://127.0.0.1:8080/) in your browser and a developer console
    within it. You'll see `Hello, world!` output in the console. You can edit the app source code in
