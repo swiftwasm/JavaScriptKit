@@ -179,7 +179,20 @@ Not all of these versions are tested on regular basis though, compatibility repo
 ## Usage in a browser application
 
 The easiest way to get started with JavaScriptKit in your browser app is with [the `carton`
-bundler](https://carton.dev).
+bundler](https://carton.dev). Add carton to your swift package dependencies:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/swiftwasm/carton", from: "1.0.0"),
+],
+```
+
+> [!WARNING]
+> - If you already use `carton` before 0.x.x versions via Homebrew, you can remove it with `brew uninstall carton` and install the new version as a SwiftPM dependency.
+> - Also please remove the old `.build` directory before using the new `carton`
+
+## Legacy Installation
+
 
 As a part of these steps
 you'll install `carton` via [Homebrew](https://brew.sh/) on macOS (you can also use the
