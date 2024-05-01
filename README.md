@@ -193,6 +193,7 @@ dependencies: [
 
 <details><summary>Legacy Installation</summary>
 
+---
 
 As a part of these steps
 you'll install `carton` via [Homebrew](https://brew.sh/) on macOS (you can also use the
@@ -230,6 +231,8 @@ carton init --template basic
 ```
 carton dev
 ```
+
+---
 
 </details>
 
