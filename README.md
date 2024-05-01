@@ -66,7 +66,8 @@ a few additional steps though (you can skip these steps if your app depends on
     name: "JavaScriptKitExample",
     dependencies: [
         "JavaScriptKit",
-        .product(name: "JavaScriptEventLoop", package: "JavaScriptKit")
+        .package(url: "https://github.com/swiftwasm/carton", from: "1.0.0"),
+        .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
     ]
 )
 ```
