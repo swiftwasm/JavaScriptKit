@@ -181,10 +181,22 @@ Not all of these versions are tested on regular basis though, compatibility repo
 The easiest way to get started with JavaScriptKit in your browser app is with [the `carton`
 bundler](https://carton.dev). Add carton to your swift package dependencies:
 
-```swift
+```diff
 dependencies: [
-    .package(url: "https://github.com/swiftwasm/carton", from: "1.0.0"),
++    .package(url: "https://github.com/swiftwasm/carton", from: "1.0.0"),
 ],
+```
+
+Now you can activate the package dependency through swift:
+
+```
+swift run carton dev
+```
+
+If you have multiple products in your package, you can also used the product flag:
+
+```
+swift run carton dev --product MyApp
 ```
 
 > [!WARNING]
