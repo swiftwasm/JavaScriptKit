@@ -66,7 +66,7 @@ a few additional steps though (you can skip these steps if your app depends on
     name: "JavaScriptKitExample",
     dependencies: [
         "JavaScriptKit",
-        .product(name: "JavaScriptEventLoop", package: "JavaScriptKit")
+        .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
     ]
 )
 ```
@@ -179,7 +179,33 @@ Not all of these versions are tested on regular basis though, compatibility repo
 ## Usage in a browser application
 
 The easiest way to get started with JavaScriptKit in your browser app is with [the `carton`
-bundler](https://carton.dev).
+bundler](https://carton.dev). Add carton to your swift package dependencies:
+
+```diff
+dependencies: [
++    .package(url: "https://github.com/swiftwasm/carton", from: "1.0.0"),
+],
+```
+
+Now you can activate the package dependency through swift:
+
+```
+swift run carton dev
+```
+
+If you have multiple products in your package, you can also used the product flag:
+
+```
+swift run carton dev --product MyApp
+```
+
+> [!WARNING]
+> - If you already use `carton` before 0.x.x versions via Homebrew, you can remove it with `brew uninstall carton` and install the new version as a SwiftPM dependency.
+> - Also please remove the old `.build` directory before using the new `carton`
+
+<details><summary>Legacy Installation</summary>
+
+---
 
 As a part of these steps
 you'll install `carton` via [Homebrew](https://brew.sh/) on macOS (you can also use the
@@ -217,6 +243,10 @@ carton init --template basic
 ```
 carton dev
 ```
+
+---
+
+</details>
 
 5. Open [http://127.0.0.1:8080/](http://127.0.0.1:8080/) in your browser and a developer console
    within it. You'll see `Hello, world!` output in the console. You can edit the app source code in
