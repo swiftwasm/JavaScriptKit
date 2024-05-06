@@ -248,10 +248,10 @@ carton dev
 
 </details>
 
-5. Open [http://127.0.0.1:8080/](http://127.0.0.1:8080/) in your browser and a developer console
-   within it. You'll see `Hello, world!` output in the console. You can edit the app source code in
-   your favorite editor and save it, `carton` will immediately rebuild the app and reload all
-   browser tabs that have the app open.
+Open [http://127.0.0.1:8080/](http://127.0.0.1:8080/) in your browser and a developer console
+within it. You'll see `Hello, world!` output in the console. You can edit the app source code in
+your favorite editor and save it, `carton` will immediately rebuild the app and reload all
+browser tabs that have the app open.
 
 You can also build your project with webpack.js and a manually installed SwiftWasm toolchain. Please
 see the following sections and the [Example](https://github.com/swiftwasm/JavaScriptKit/tree/main/Example)
