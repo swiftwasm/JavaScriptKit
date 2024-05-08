@@ -1,6 +1,6 @@
 Error.stackTraceLimit = Infinity;
 
-const { startWasiTask } = require("../IntegrationTests/lib");
+import { startWasiTask } from "../IntegrationTests/lib.js";
 
 if (process.env["JAVASCRIPTKIT_WASI_BACKEND"] === "MicroWASI") {
   console.log("Skipping XCTest tests for MicroWASI because it is not supported yet.");

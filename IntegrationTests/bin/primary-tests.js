@@ -102,7 +102,7 @@ global.objectDecodingTest = {
     bi: BigInt(3)
 };
 
-const { startWasiTask, WASI } = require("../lib");
+import { startWasiTask } from "../lib.js";
 
 startWasiTask("./dist/PrimaryTests.wasm").catch((err) => {
     console.log(err);

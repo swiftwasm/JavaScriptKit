@@ -1,5 +1,5 @@
-const { startWasiTask } = require("../lib");
-const { performance } = require("perf_hooks");
+import { startWasiTask } from "../lib.js";
+import { performance } from "perf_hooks";
 
 const SAMPLE_ITERATION = 1000000
 

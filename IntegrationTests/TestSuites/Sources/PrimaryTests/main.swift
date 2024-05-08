@@ -400,7 +400,7 @@ try test("Call Function With This") {
     let setName = try expectFunction(getJSValue(this: cat1, name: "setName"))
 
     // Direct call without this
-    try expectEqual(getIsCat(), .undefined)
+    _ = try expectThrow(try getIsCat.throws())
 
     // Call with this
     let gotIsCat = getIsCat(this: cat1)

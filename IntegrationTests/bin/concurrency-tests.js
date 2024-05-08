@@ -1,4 +1,4 @@
-const { startWasiTask } = require("../lib");
+import { startWasiTask } from "../lib.js";
 
 Error.stackTraceLimit = Infinity;
 

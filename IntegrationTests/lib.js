@@ -1,10 +1,7 @@
-const SwiftRuntime = require("javascript-kit-swift").SwiftRuntime;
-const NodeWASI = require("wasi").WASI;
-const { WASI: MicroWASI, useAll } = require("uwasi");
-
-const promisify = require("util").promisify;
-const fs = require("fs");
-const readFile = promisify(fs.readFile);
+import { SwiftRuntime } from "javascript-kit-swift"
+import { WASI as NodeWASI } from "wasi"
+import { WASI as MicroWASI, useAll } from "uwasi"
+import * as fs from "fs/promises"
 
 const WASI = {
     MicroWASI: ({ programName }) => {
@@ -54,10 +51,10 @@ const selectWASIBackend = () => {
     return WASI.Node;
 };
 
-const startWasiTask = async (wasmPath, wasiConstructor = selectWASIBackend()) => {
+export const startWasiTask = async (wasmPath, wasiConstructor = selectWASIBackend()) => {
     const swift = new SwiftRuntime();
     // Fetch our Wasm File
-    const wasmBinary = await readFile(wasmPath);
+    const wasmBinary = await fs.readFile(wasmPath);
     const wasi = wasiConstructor({ programName: wasmPath });
 
     // Instantiate the WebAssembly file
@@ -74,5 +71,3 @@ const startWasiTask = async (wasmPath, wasiConstructor = selectWASIBackend()) =>
     // Start the WebAssembly WASI instance!
     wasi.start(instance, swift);
 };
-
-module.exports = { startWasiTask, WASI };
