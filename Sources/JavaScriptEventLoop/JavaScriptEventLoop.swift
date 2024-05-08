@@ -1,5 +1,6 @@
 import JavaScriptKit
 import _CJavaScriptEventLoop
+import _CJavaScriptKit
 
 // NOTE: `@available` annotations are semantically wrong, but they make it easier to develop applications targeting WebAssembly in Xcode.
 
@@ -89,6 +90,14 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     /// executors](https://github.com/rjmccall/swift-evolution/blob/custom-executors/proposals/0000-custom-executors.md#the-default-global-concurrent-executor)
     public static func installGlobalExecutor() {
         guard !didInstallGlobalExecutor else { return }
+
+        #if compiler(>=5.9)
+        typealias swift_task_asyncMainDrainQueue_hook_Fn = @convention(thin) (swift_task_asyncMainDrainQueue_original, swift_task_asyncMainDrainQueue_override) -> Void
+        let swift_task_asyncMainDrainQueue_hook_impl: swift_task_asyncMainDrainQueue_hook_Fn = { _, _ in
+            _unsafe_event_loop_yield()
+        }
+        swift_task_asyncMainDrainQueue_hook = unsafeBitCast(swift_task_asyncMainDrainQueue_hook_impl, to: UnsafeMutableRawPointer?.self)
+        #endif
 
         typealias swift_task_enqueueGlobal_hook_Fn = @convention(thin) (UnownedJob, swift_task_enqueueGlobal_original) -> Void
         let swift_task_enqueueGlobal_hook_impl: swift_task_enqueueGlobal_hook_Fn = { job, original in

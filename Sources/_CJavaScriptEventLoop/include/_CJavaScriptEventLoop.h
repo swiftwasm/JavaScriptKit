@@ -27,13 +27,13 @@ typedef SWIFT_CC(swift) void (*swift_task_enqueueGlobal_original)(
     Job *_Nonnull job);
 
 SWIFT_EXPORT_FROM(swift_Concurrency)
-void *_Nullable swift_task_enqueueGlobal_hook;
+extern void *_Nullable swift_task_enqueueGlobal_hook;
 
 /// A hook to take over global enqueuing with delay.
 typedef SWIFT_CC(swift) void (*swift_task_enqueueGlobalWithDelay_original)(
     unsigned long long delay, Job *_Nonnull job);
 SWIFT_EXPORT_FROM(swift_Concurrency)
-void *_Nullable swift_task_enqueueGlobalWithDelay_hook;
+extern void *_Nullable swift_task_enqueueGlobalWithDelay_hook;
 
 typedef SWIFT_CC(swift) void (*swift_task_enqueueGlobalWithDeadline_original)(
     long long sec,
@@ -42,12 +42,23 @@ typedef SWIFT_CC(swift) void (*swift_task_enqueueGlobalWithDeadline_original)(
     long long tnsec,
     int clock, Job *_Nonnull job);
 SWIFT_EXPORT_FROM(swift_Concurrency)
-void *_Nullable swift_task_enqueueGlobalWithDeadline_hook;
+extern void *_Nullable swift_task_enqueueGlobalWithDeadline_hook;
 
 /// A hook to take over main executor enqueueing.
 typedef SWIFT_CC(swift) void (*swift_task_enqueueMainExecutor_original)(
     Job *_Nonnull job);
 SWIFT_EXPORT_FROM(swift_Concurrency)
-void *_Nullable swift_task_enqueueMainExecutor_hook;
+extern void *_Nullable swift_task_enqueueMainExecutor_hook;
+
+/// A hook to override the entrypoint to the main runloop used to drive the
+/// concurrency runtime and drain the main queue. This function must not return.
+/// Note: If the hook is wrapping the original function and the `compatOverride`
+///       is passed in, the `original` function pointer must be passed into the
+///       compatibility override function as the original function.
+typedef SWIFT_CC(swift) void (*swift_task_asyncMainDrainQueue_original)();
+typedef SWIFT_CC(swift) void (*swift_task_asyncMainDrainQueue_override)(
+    swift_task_asyncMainDrainQueue_original _Nullable original);
+SWIFT_EXPORT_FROM(swift_Concurrency)
+extern void *_Nullable swift_task_asyncMainDrainQueue_hook;
 
 #endif

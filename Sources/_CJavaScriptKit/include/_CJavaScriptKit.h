@@ -322,6 +322,9 @@ __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_release")))
 extern void _release(const JavaScriptObjectRef ref);
 
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_unsafe_event_loop_yield")))
+extern void _unsafe_event_loop_yield(void);
 
 #endif
 

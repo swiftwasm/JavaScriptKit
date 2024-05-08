@@ -45,6 +45,27 @@ export class SwiftRuntime {
         }
     }
 
+    main() {
+        const instance = this.instance;
+        try {
+            if (typeof instance.exports.main === "function") {
+                instance.exports.main();
+            } else if (
+                typeof instance.exports.__main_argc_argv === "function"
+            ) {
+                // Swift 6.0 and later use `__main_argc_argv` instead of `main`.
+                instance.exports.__main_argc_argv(0, 0);
+            }
+        } catch (error) {
+            if (error instanceof UnsafeEventLoopYield) {
+                // Ignore the error
+                return;
+            }
+            // Rethrow other errors
+            throw error;
+        }
+    }
+
     private get instance() {
         if (!this._instance)
             throw new Error("WebAssembly instance is not set yet");
@@ -419,5 +440,23 @@ export class SwiftRuntime {
                 signed ? BigInt.asIntN(64, value) : BigInt.asUintN(64, value)
             );
         },
+        swjs_unsafe_event_loop_yield: () => {
+            throw new UnsafeEventLoopYield();
+        },
     };
 }
+
+/// This error is thrown when yielding event loop control from `swift_task_asyncMainDrainQueue`
+/// to JavaScript. This is usually thrown when:
+/// - The entry point of the Swift program is `func main() async`
+/// - The Swift Concurrency's global executor is hooked by `JavaScriptEventLoop.installGlobalExecutor()`
+/// - Calling exported `main` or `__main_argc_argv` function from JavaScript
+///
+/// This exception must be caught by the caller of the exported function and the caller should
+/// catch this exception and just ignore it.
+///
+/// FAQ: Why this error is thrown?
+/// This error is thrown to unwind the call stack of the Swift program and return the control to
+/// the JavaScript side. Otherwise, the `swift_task_asyncMainDrainQueue` ends up with `abort()`
+/// because the event loop expects `exit()` call before the end of the event loop.
+class UnsafeEventLoopYield extends Error {}
