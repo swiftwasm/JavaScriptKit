@@ -225,3 +225,8 @@ public extension JSPromise {
 }
 
 #endif
+
+// See `Sources/JavaScriptKit/XcodeSupport.swift` for rationale of the stub functions.
+#if !arch(wasm32)
+    func _unsafe_event_loop_yield() { fatalError() }
+#endif

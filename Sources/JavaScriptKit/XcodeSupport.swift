@@ -1,10 +1,10 @@
 import _CJavaScriptKit
 
 /// Note:
-/// Define all runtime function stubs which are imported from JavaScript environment.
-/// SwiftPM doesn't support WebAssembly target yet, so we need to define them to
-/// avoid link failure.
-/// When running with JavaScript runtime library, they are ignored completely.
+/// Define stubs for runtime functions which are usually imported from JavaScript environment.
+/// JavaScriptKit itself supports only WebAssembly target, but it should be able
+/// to be built for host platforms like macOS or Linux for tentative IDE support.
+/// (ideally, IDE should build for WebAssembly target though)
 #if !arch(wasm32)
     func _set_prop(
         _: JavaScriptObjectRef,
