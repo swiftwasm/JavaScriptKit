@@ -24,17 +24,17 @@ let package = Package(
     dependencies: [.package(name: "JavaScriptKit", path: "../../")],
     targets: [
         .target(name: "CHelpers"),
-        .target(name: "PrimaryTests", dependencies: [
+        .executableTarget(name: "PrimaryTests", dependencies: [
             .product(name: "JavaScriptBigIntSupport", package: "JavaScriptKit"),
             "JavaScriptKit",
             "CHelpers",
         ]),
-        .target(
+        .executableTarget(
             name: "ConcurrencyTests",
             dependencies: [
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
             ]
         ),
-        .target(name: "BenchmarkTests", dependencies: ["JavaScriptKit", "CHelpers"]),
+        .executableTarget(name: "BenchmarkTests", dependencies: ["JavaScriptKit", "CHelpers"]),
     ]
 )
