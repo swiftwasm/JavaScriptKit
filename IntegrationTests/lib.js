@@ -16,9 +16,9 @@ const WASI = {
 
         return {
             wasiImport: wasi.wasiImport,
-            start(instance) {
+            start(instance, swift) {
                 wasi.initialize(instance);
-                instance.exports.main();
+                swift.main();
             }
         }
     },
@@ -26,15 +26,18 @@ const WASI = {
         const wasi = new NodeWASI({
             args: [programName],
             env: {},
+            preopens: {
+              "/": "./",
+            },
             returnOnExit: false,
             version: "preview1",
         })
 
         return {
             wasiImport: wasi.wasiImport,
-            start(instance) {
+            start(instance, swift) {
                 wasi.initialize(instance);
-                instance.exports.main();
+                swift.main();
             }
         }
     },
@@ -69,7 +72,7 @@ const startWasiTask = async (wasmPath, wasiConstructor = selectWASIBackend()) =>
 
     swift.setInstance(instance);
     // Start the WebAssembly WASI instance!
-    wasi.start(instance);
+    wasi.start(instance, swift);
 };
 
 module.exports = { startWasiTask, WASI };

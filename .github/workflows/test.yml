@@ -21,6 +21,7 @@ jobs:
           - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: MicroWASI }
           - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: MicroWASI }
           - { os: ubuntu-20.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: MicroWASI }
+          - { os: ubuntu-22.04, toolchain: wasm-DEVELOPMENT-SNAPSHOT-2024-05-02-a, wasi-backend: Node }
 
     runs-on: ${{ matrix.entry.os }}
     env:

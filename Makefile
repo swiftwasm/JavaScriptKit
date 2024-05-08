@@ -21,7 +21,7 @@ test:
 .PHONY: unittest
 unittest:
 	@echo Running unit tests
-	swift build --build-tests --triple wasm32-unknown-wasi -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor -Xlinker --export=main
+	swift build --build-tests --triple wasm32-unknown-wasi -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor -Xlinker --export-if-defined=main -Xlinker --export-if-defined=__main_argc_argv --static-swift-stdlib -Xswiftc -static-stdlib
 	node --experimental-wasi-unstable-preview1 scripts/test-harness.js ./.build/wasm32-unknown-wasi/debug/JavaScriptKitPackageTests.wasm
 
 .PHONY: benchmark_setup
