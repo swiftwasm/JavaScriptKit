@@ -102,6 +102,7 @@ export interface ImportedFunctions {
     swjs_i64_to_bigint(value: bigint, signed: bool): ref;
     swjs_bigint_to_i64(ref: ref, signed: bool): bigint;
     swjs_i64_to_bigint_slow(lower: number, upper: number, signed: bool): ref;
+    swjs_unsafe_event_loop_yield: () => void;
 }
 
 export const enum LibraryFeatures {

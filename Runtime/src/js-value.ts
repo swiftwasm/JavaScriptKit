@@ -82,7 +82,13 @@ export const write = (
     is_exception: boolean,
     memory: Memory
 ) => {
-    const kind = writeAndReturnKindBits(value, payload1_ptr, payload2_ptr, is_exception, memory);
+    const kind = writeAndReturnKindBits(
+        value,
+        payload1_ptr,
+        payload2_ptr,
+        is_exception,
+        memory
+    );
     memory.writeUint32(kind_ptr, kind);
 };
 
