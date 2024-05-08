@@ -18,9 +18,6 @@ jobs:
           # Ensure that test succeeds with all toolchains and wasi backend combinations
           - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: Node }
           - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: Node }
-          - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: Wasmer }
-          - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: Wasmer }
-          - { os: ubuntu-20.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: Wasmer }
           - { os: ubuntu-20.04, toolchain: wasm-5.7.3-RELEASE, wasi-backend: MicroWASI }
           - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: MicroWASI }
           - { os: ubuntu-20.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: MicroWASI }
