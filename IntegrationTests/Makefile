@@ -8,7 +8,6 @@ FORCE:
 TestSuites/.build/$(CONFIGURATION)/%.wasm: FORCE
 	swift build --package-path TestSuites \
 	            --product $(basename $(notdir $@)) \
-	            --triple wasm32-unknown-wasi \
 	            --configuration $(CONFIGURATION) \
 	            -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor \
 	            -Xlinker --export-if-defined=main -Xlinker --export-if-defined=__main_argc_argv \
