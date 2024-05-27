@@ -190,13 +190,97 @@ class Memory {
 }
 
 class SwiftRuntime {
-    constructor() {
+    constructor(options) {
         this.version = 708;
         this.textDecoder = new TextDecoder("utf-8");
         this.textEncoder = new TextEncoder(); // Only support utf-8
         /** @deprecated Use `wasmImports` instead */
         this.importObjects = () => this.wasmImports;
-        this.wasmImports = {
+        this._instance = null;
+        this._memory = null;
+        this._closureDeallocator = null;
+        this.options = options || {};
+    }
+    setInstance(instance) {
+        this._instance = instance;
+        if (typeof this.exports._start === "function") {
+            throw new Error(`JavaScriptKit supports only WASI reactor ABI.
+                Please make sure you are building with:
+                -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor
+                `);
+        }
+        if (this.exports.swjs_library_version() != this.version) {
+            throw new Error(`The versions of JavaScriptKit are incompatible.
+                WebAssembly runtime ${this.exports.swjs_library_version()} != JS runtime ${this.version}`);
+        }
+    }
+    main() {
+        const instance = this.instance;
+        try {
+            if (typeof instance.exports.main === "function") {
+                instance.exports.main();
+            }
+            else if (typeof instance.exports.__main_argc_argv === "function") {
+                // Swift 6.0 and later use `__main_argc_argv` instead of `main`.
+                instance.exports.__main_argc_argv(0, 0);
+            }
+        }
+        catch (error) {
+            if (error instanceof UnsafeEventLoopYield) {
+                // Ignore the error
+                return;
+            }
+            // Rethrow other errors
+            throw error;
+        }
+    }
+    get instance() {
+        if (!this._instance)
+            throw new Error("WebAssembly instance is not set yet");
+        return this._instance;
+    }
+    get exports() {
+        return this.instance.exports;
+    }
+    get memory() {
+        if (!this._memory) {
+            this._memory = new Memory(this.instance.exports);
+        }
+        return this._memory;
+    }
+    get closureDeallocator() {
+        if (this._closureDeallocator)
+            return this._closureDeallocator;
+        const features = this.exports.swjs_library_features();
+        const librarySupportsWeakRef = (features & 1 /* WeakRefs */) != 0;
+        if (librarySupportsWeakRef) {
+            this._closureDeallocator = new SwiftClosureDeallocator(this.exports);
+        }
+        return this._closureDeallocator;
+    }
+    callHostFunction(host_func_id, line, file, args) {
+        const argc = args.length;
+        const argv = this.exports.swjs_prepare_host_function_call(argc);
+        const memory = this.memory;
+        for (let index = 0; index < args.length; index++) {
+            const argument = args[index];
+            const base = argv + 16 * index;
+            write(argument, base, base + 4, base + 8, false, memory);
+        }
+        let output;
+        // This ref is released by the swjs_call_host_function implementation
+        const callback_func_ref = memory.retain((result) => {
+            output = result;
+        });
+        const alreadyReleased = this.exports.swjs_call_host_function(host_func_id, argv, argc, callback_func_ref);
+        if (alreadyReleased) {
+            throw new Error(`The JSClosure has been already released by Swift side. The closure is created at ${file}:${line}`);
+        }
+        this.exports.swjs_cleanup_host_function_call(argv);
+        return output;
+    }
+    get wasmImports() {
+        return {
             swjs_set_prop: (ref, name, kind, payload1, payload2) => {
                 const memory = this.memory;
                 const obj = memory.getObject(ref);
@@ -229,14 +313,25 @@ class SwiftRuntime {
                 memory.writeUint32(bytes_ptr_result, bytes_ptr);
                 return bytes.length;
             },
-            swjs_decode_string: (bytes_ptr, length) => {
-                const memory = this.memory;
-                const bytes = memory
-                    .bytes()
-                    .subarray(bytes_ptr, bytes_ptr + length);
-                const string = this.textDecoder.decode(bytes);
-                return memory.retain(string);
-            },
+            swjs_decode_string: (
+            // NOTE: TextDecoder can't decode typed arrays backed by SharedArrayBuffer
+            this.options.sharedMemory == true
+                ? ((bytes_ptr, length) => {
+                    const memory = this.memory;
+                    const bytes = memory
+                        .bytes()
+                        .slice(bytes_ptr, bytes_ptr + length);
+                    const string = this.textDecoder.decode(bytes);
+                    return memory.retain(string);
+                })
+                : ((bytes_ptr, length) => {
+                    const memory = this.memory;
+                    const bytes = memory
+                        .bytes()
+                        .subarray(bytes_ptr, bytes_ptr + length);
+                    const string = this.textDecoder.decode(bytes);
+                    return memory.retain(string);
+                })),
             swjs_load_string: (ref, buffer) => {
                 const memory = this.memory;
                 const bytes = memory.getObject(ref);
@@ -364,87 +459,6 @@ class SwiftRuntime {
                 throw new UnsafeEventLoopYield();
             },
         };
-        this._instance = null;
-        this._memory = null;
-        this._closureDeallocator = null;
-    }
-    setInstance(instance) {
-        this._instance = instance;
-        if (typeof this.exports._start === "function") {
-            throw new Error(`JavaScriptKit supports only WASI reactor ABI.
-                Please make sure you are building with:
-                -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor
-                `);
-        }
-        if (this.exports.swjs_library_version() != this.version) {
-            throw new Error(`The versions of JavaScriptKit are incompatible.
-                WebAssembly runtime ${this.exports.swjs_library_version()} != JS runtime ${this.version}`);
-        }
-    }
-    main() {
-        const instance = this.instance;
-        try {
-            if (typeof instance.exports.main === "function") {
-                instance.exports.main();
-            }
-            else if (typeof instance.exports.__main_argc_argv === "function") {
-                // Swift 6.0 and later use `__main_argc_argv` instead of `main`.
-                instance.exports.__main_argc_argv(0, 0);
-            }
-        }
-        catch (error) {
-            if (error instanceof UnsafeEventLoopYield) {
-                // Ignore the error
-                return;
-            }
-            // Rethrow other errors
-            throw error;
-        }
-    }
-    get instance() {
-        if (!this._instance)
-            throw new Error("WebAssembly instance is not set yet");
-        return this._instance;
-    }
-    get exports() {
-        return this.instance.exports;
-    }
-    get memory() {
-        if (!this._memory) {
-            this._memory = new Memory(this.instance.exports);
-        }
-        return this._memory;
-    }
-    get closureDeallocator() {
-        if (this._closureDeallocator)
-            return this._closureDeallocator;
-        const features = this.exports.swjs_library_features();
-        const librarySupportsWeakRef = (features & 1 /* WeakRefs */) != 0;
-        if (librarySupportsWeakRef) {
-            this._closureDeallocator = new SwiftClosureDeallocator(this.exports);
-        }
-        return this._closureDeallocator;
-    }
-    callHostFunction(host_func_id, line, file, args) {
-        const argc = args.length;
-        const argv = this.exports.swjs_prepare_host_function_call(argc);
-        const memory = this.memory;
-        for (let index = 0; index < args.length; index++) {
-            const argument = args[index];
-            const base = argv + 16 * index;
-            write(argument, base, base + 4, base + 8, false, memory);
-        }
-        let output;
-        // This ref is released by the swjs_call_host_function implementation
-        const callback_func_ref = memory.retain((result) => {
-            output = result;
-        });
-        const alreadyReleased = this.exports.swjs_call_host_function(host_func_id, argv, argc, callback_func_ref);
-        if (alreadyReleased) {
-            throw new Error(`The JSClosure has been already released by Swift side. The closure is created at ${file}:${line}`);
-        }
-        this.exports.swjs_cleanup_host_function_call(argv);
-        return output;
     }
 }
 /// This error is thrown when yielding event loop control from `swift_task_asyncMainDrainQueue`
