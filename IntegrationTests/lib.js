@@ -2,11 +2,12 @@ import { SwiftRuntime } from "javascript-kit-swift"
 import { WASI as NodeWASI } from "wasi"
 import { WASI as MicroWASI, useAll } from "uwasi"
 import * as fs from "fs/promises"
+import path from "path";
 
 const WASI = {
     MicroWASI: ({ programName }) => {
         const wasi = new MicroWASI({
-            args: [programName],
+            args: [path.basename(programName)],
             env: {},
             features: [useAll()],
         })
@@ -21,7 +22,7 @@ const WASI = {
     },
     Node: ({ programName }) => {
         const wasi = new NodeWASI({
-            args: [programName],
+            args: [path.basename(programName)],
             env: {},
             preopens: {
               "/": "./",
