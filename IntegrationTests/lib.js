@@ -51,21 +51,49 @@ const selectWASIBackend = () => {
     return WASI.Node;
 };
 
+function isUsingSharedMemory(module) {
+    const imports = WebAssembly.Module.imports(module);
+    for (const entry of imports) {
+        if (entry.module === "env" && entry.name === "memory" && entry.kind == "memory") {
+            return true;
+        }
+    }
+    return false;
+}
+
 export const startWasiTask = async (wasmPath, wasiConstructor = selectWASIBackend()) => {
     const swift = new SwiftRuntime();
     // Fetch our Wasm File
     const wasmBinary = await fs.readFile(wasmPath);
     const wasi = wasiConstructor({ programName: wasmPath });
 
-    // Instantiate the WebAssembly file
-    let { instance } = await WebAssembly.instantiate(wasmBinary, {
+    const module = await WebAssembly.compile(wasmBinary);
+
+    const importObject = {
         wasi_snapshot_preview1: wasi.wasiImport,
         javascript_kit: swift.importObjects(),
         benchmark_helper: {
             noop: () => {},
             noop_with_int: (_) => {},
         }
-    });
+    };
+
+    if (isUsingSharedMemory(module)) {
+        importObject["env"] = {
+          // We don't have JS API to get memory descriptor of imported memory
+          // at this moment, so we assume 256 pages (16MB) memory is enough
+          // large for initial memory size.
+          memory: new WebAssembly.Memory({ initial: 256, maximum: 16384, shared: true }),
+        };
+        importObject["wasi"] = {
+          "thread-spawn": () => {
+            throw new Error("thread-spawn not implemented");
+          }
+        }
+    }
+
+    // Instantiate the WebAssembly file
+    const instance = await WebAssembly.instantiate(module, importObject);
 
     swift.setInstance(instance);
     // Start the WebAssembly WASI instance!
