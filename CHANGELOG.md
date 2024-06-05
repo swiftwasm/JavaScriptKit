@@ -1,3 +1,19 @@
+# 0.19.3 (6 Jun 2024)
+
+## What's Changed
+* Fix `JSClosure` leak by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/240
+* Update README file to include new carton 1.0 implementation. by @kuhl in https://github.com/swiftwasm/JavaScriptKit/pull/243
+* Update Carton context on README. by @kuhl in https://github.com/swiftwasm/JavaScriptKit/pull/245
+* Support latest nightly snapshot by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/246
+* Use Swift SDK for development snapshot testing in CI by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/248
+* Add `sharedMemory` option to allow threads with shared memory by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/247
+* Check 5.10 toolchain in CI by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/249
+
+## New Contributors
+* @kuhl made their first contribution in https://github.com/swiftwasm/JavaScriptKit/pull/243
+
+**Full Changelog**: https://github.com/swiftwasm/JavaScriptKit/compare/0.19.2...0.19.3
+
 # 0.19.2 (11 Apr 2024)
 
 ## What's Changed
