@@ -5,7 +5,11 @@ public class JSArray: JSBridgedClass {
     public static let constructor = JSObject.global.Array.function
 
     static func isArray(_ object: JSObject) -> Bool {
+        #if hasFeature(Embedded)
+        constructor!.isArray!(object.jsValue).boolean!
+        #else
         constructor!.isArray!(object).boolean!
+        #endif
     }
 
     public let jsObject: JSObject
@@ -51,9 +55,15 @@ extension JSArray: RandomAccessCollection {
                 return nil
             }
             index += 1
+            #if hasFeature(Embedded)
+            guard jsObject.hasOwnProperty!(currentIndex.jsValue).boolean! else {
+                return next()
+            }
+            #else
             guard jsObject.hasOwnProperty!(currentIndex).boolean! else {
                 return next()
             }
+            #endif
             let value = jsObject[currentIndex]
             return value
         }
@@ -91,11 +101,18 @@ extension JSArray: RandomAccessCollection {
     }
 }
 
+#if hasFeature(Embedded)
+private func getObjectValuesLength(_ object: JSObject) -> Int {
+   let values = object.filter!((JSClosure { _ in true.jsValue }).jsValue).object!
+   return Int(values.length.number!)
+}
+#else
 private let alwaysTrue = JSClosure { _ in .boolean(true) }
 private func getObjectValuesLength(_ object: JSObject) -> Int {
     let values = object.filter!(alwaysTrue).object!
     return Int(values.length.number!)
 }
+#endif
 
 public extension JSValue {
     var array: JSArray? {

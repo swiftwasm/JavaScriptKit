@@ -14,16 +14,30 @@ public class JSThrowingFunction {
     ///   - this: The value to be passed as the `this` parameter to this function.
     ///   - arguments: Arguments to be passed to this function.
     /// - Returns: The result of this call.
+    #if hasFeature(Embedded) && swift(>=5.10) // FIXME: change to >=6.0
+    @discardableResult
+    public func callAsFunction(this: JSObject? = nil, arguments: [JSValue]) throws(JSValue) -> JSValue {
+        try invokeJSFunction(base, arguments: arguments, this: this)
+    }
+    #else
     @discardableResult
     public func callAsFunction(this: JSObject? = nil, arguments: [ConvertibleToJSValue]) throws -> JSValue {
         try invokeJSFunction(base, arguments: arguments, this: this)
     }
+    #endif
 
     /// A variadic arguments version of `callAsFunction`.
+    #if hasFeature(Embedded) && swift(>=5.10) // FIXME: change to >=6.0
+    @discardableResult
+    public func callAsFunction(this: JSObject? = nil, _ arguments: JSValue...) throws(JSValue) -> JSValue {
+        try self(this: this, arguments: arguments)
+    }
+    #else
     @discardableResult
     public func callAsFunction(this: JSObject? = nil, _ arguments: ConvertibleToJSValue...) throws -> JSValue {
         try self(this: this, arguments: arguments)
     }
+    #endif
 
     /// Instantiate an object from this function as a throwing constructor.
     ///
@@ -35,6 +49,30 @@ public class JSThrowingFunction {
     ///
     /// - Parameter arguments: Arguments to be passed to this constructor function.
     /// - Returns: A new instance of this constructor.
+    #if hasFeature(Embedded) && swift(>=5.10) // FIXME: change to >=6.0
+    public func new(arguments: [JSValue]) throws(JSValue) -> JSObject {
+        try arguments.withRawJSValues { rawValues -> Result<JSObject, JSValue> in
+            rawValues.withUnsafeBufferPointer { bufferPointer in
+               let argv = bufferPointer.baseAddress
+               let argc = bufferPointer.count
+
+               var exceptionKind: UInt32 = 0
+               var exceptionPayload1 = JavaScriptPayload1()
+               var exceptionPayload2 = JavaScriptPayload2()
+               let resultObj = _call_throwing_new(
+                   self.base.id, argv, Int32(argc),
+                   &exceptionKind, &exceptionPayload1, &exceptionPayload2
+               )
+               let kindAndFlags = JSValueKindAndFlags.decode(exceptionKind)
+               if kindAndFlags.isException {
+                   let exception = RawJSValue(kind: kindAndFlags.kind, payload1: exceptionPayload1, payload2: exceptionPayload2)
+                   return .failure(exception.jsValue)
+               }
+               return .success(JSObject(id: resultObj))
+            }
+        }.get()
+    }
+    #else
     public func new(arguments: [ConvertibleToJSValue]) throws -> JSObject {
         try arguments.withRawJSValues { rawValues -> Result<JSObject, JSValue> in
             rawValues.withUnsafeBufferPointer { bufferPointer in
@@ -56,13 +94,53 @@ public class JSThrowingFunction {
             }
         }.get()
     }
+    #endif
 
     /// A variadic arguments version of `new`.
+    #if hasFeature(Embedded) && swift(>=5.10) // FIXME: change to >=6.0
+    public func new(_ arguments: JSValue...) throws(JSValue) -> JSObject {
+        try new(arguments: arguments)
+    }
+    #else
     public func new(_ arguments: ConvertibleToJSValue...) throws -> JSObject {
         try new(arguments: arguments)
     }
+    #endif
 }
 
+#if hasFeature(Embedded) && swift(>=5.10) // FIXME: change to >=6.0
+private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [JSValue], this: JSObject?) throws(JSValue) -> JSValue {
+    let id = jsFunc.id
+    let (result, isException) = arguments.withRawJSValues { rawValues in
+        rawValues.withUnsafeBufferPointer { bufferPointer -> (JSValue, Bool) in
+           let argv = bufferPointer.baseAddress
+           let argc = bufferPointer.count
+           let kindAndFlags: JSValueKindAndFlags
+           var payload1 = JavaScriptPayload1()
+           var payload2 = JavaScriptPayload2()
+           if let thisId = this?.id {
+               let resultBitPattern = _call_function_with_this(
+                   thisId, id, argv, Int32(argc),
+                   &payload1, &payload2
+               )
+               kindAndFlags = JSValueKindAndFlags.decode(resultBitPattern)
+           } else {
+               let resultBitPattern = _call_function(
+                   id, argv, Int32(argc),
+                   &payload1, &payload2
+               )
+               kindAndFlags = JSValueKindAndFlags.decode(resultBitPattern)
+           }
+           let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
+           return (result.jsValue, kindAndFlags.isException)
+        }
+    }
+    if isException {
+        throw result
+    }
+    return result
+}
+#else
 private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) throws -> JSValue {
     let id = jsFunc.id
     let (result, isException) = arguments.withRawJSValues { rawValues in
@@ -94,3 +172,4 @@ private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSV
     }
     return result
 }
+#endif

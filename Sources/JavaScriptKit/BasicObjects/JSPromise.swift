@@ -55,18 +55,43 @@ public final class JSPromise: JSBridgedClass {
             }
             return .undefined
         }
+        #if hasFeature(Embedded)
+        self.init(unsafelyWrapping: Self.constructor!.new(closure.jsValue))
+        #else
         self.init(unsafelyWrapping: Self.constructor!.new(closure))
+        #endif
     }
 
+    #if hasFeature(Embedded)
+    public static func resolve(_ value: JSValue) -> JSPromise {
+        self.init(unsafelyWrapping: Self.constructor!.resolve!(value).object!)
+    }
+    #else
     public static func resolve(_ value: ConvertibleToJSValue) -> JSPromise {
         self.init(unsafelyWrapping: Self.constructor!.resolve!(value).object!)
     }
+    #endif
 
+    #if hasFeature(Embedded)
+    public static func reject(_ reason: JSValue) -> JSPromise {
+        self.init(unsafelyWrapping: Self.constructor!.reject!(reason).object!)
+    }
+    #else
     public static func reject(_ reason: ConvertibleToJSValue) -> JSPromise {
         self.init(unsafelyWrapping: Self.constructor!.reject!(reason).object!)
     }
+    #endif
 
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
+    #if hasFeature(Embedded)
+    @discardableResult
+    public func then(success: @escaping (JSValue) -> JSValue) -> JSPromise {
+        let closure = JSOneshotClosure {
+            success($0[0]).jsValue
+        }
+        return JSPromise(unsafelyWrapping: jsObject.then!(closure.jsValue).object!)
+    }
+    #else
     @discardableResult
     public func then(success: @escaping (JSValue) -> ConvertibleToJSValue) -> JSPromise {
         let closure = JSOneshotClosure {
@@ -74,7 +99,9 @@ public final class JSPromise: JSBridgedClass {
         }
         return JSPromise(unsafelyWrapping: jsObject.then!(closure).object!)
     }
+    #endif
 
+    #if !hasFeature(Embedded)
     #if compiler(>=5.5)
         /// Schedules the `success` closure to be invoked on successful completion of `self`.
         @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
@@ -86,12 +113,13 @@ public final class JSPromise: JSBridgedClass {
             return JSPromise(unsafelyWrapping: jsObject.then!(closure).object!)
         }
     #endif
+    #endif
 
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
     @discardableResult
     public func then(
-        success: @escaping (JSValue) -> ConvertibleToJSValue,
-        failure: @escaping (JSValue) -> ConvertibleToJSValue
+        success: @escaping (JSValue) -> JSValue,
+        failure: @escaping (JSValue) -> JSValue
     ) -> JSPromise {
         let successClosure = JSOneshotClosure {
             success($0[0]).jsValue
@@ -99,9 +127,14 @@ public final class JSPromise: JSBridgedClass {
         let failureClosure = JSOneshotClosure {
             failure($0[0]).jsValue
         }
+        #if hasFeature(Embedded)
+        return JSPromise(unsafelyWrapping: jsObject.then!(successClosure.jsValue, failureClosure.jsValue).object!)
+        #else
         return JSPromise(unsafelyWrapping: jsObject.then!(successClosure, failureClosure).object!)
+        #endif
     }
 
+    #if !hasFeature(Embedded)
     #if compiler(>=5.5)
         /// Schedules the `success` closure to be invoked on successful completion of `self`.
         @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
@@ -118,16 +151,22 @@ public final class JSPromise: JSBridgedClass {
             return JSPromise(unsafelyWrapping: jsObject.then!(successClosure, failureClosure).object!)
         }
     #endif
+    #endif
 
     /// Schedules the `failure` closure to be invoked on rejected completion of `self`.
     @discardableResult
-    public func `catch`(failure: @escaping (JSValue) -> ConvertibleToJSValue) -> JSPromise {
+    public func `catch`(failure: @escaping (JSValue) -> JSValue) -> JSPromise {
         let closure = JSOneshotClosure {
             failure($0[0]).jsValue
         }
+        #if hasFeature(Embedded)
+        return .init(unsafelyWrapping: jsObject.catch!(closure.jsValue).object!)
+        #else
         return .init(unsafelyWrapping: jsObject.catch!(closure).object!)
+        #endif
     }
 
+    #if !hasFeature(Embedded)
     #if compiler(>=5.5)
         /// Schedules the `failure` closure to be invoked on rejected completion of `self`.
         @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
@@ -139,6 +178,7 @@ public final class JSPromise: JSBridgedClass {
             return .init(unsafelyWrapping: jsObject.catch!(closure).object!)
         }
     #endif
+    #endif
 
     /// Schedules the `failure` closure to be invoked on either successful or rejected
     /// completion of `self`.
@@ -148,6 +188,10 @@ public final class JSPromise: JSBridgedClass {
             successOrFailure()
             return .undefined
         }
+        #if hasFeature(Embedded)
+        return .init(unsafelyWrapping: jsObject.finally!(closure.jsValue).object!)
+        #else
         return .init(unsafelyWrapping: jsObject.finally!(closure).object!)
+        #endif
     }
 }

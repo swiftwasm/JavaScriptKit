@@ -16,31 +16,59 @@ public class JSFunction: JSObject {
     ///   - this: The value to be passed as the `this` parameter to this function.
     ///   - arguments: Arguments to be passed to this function.
     /// - Returns: The result of this call.
+    #if hasFeature(Embedded)
+    @discardableResult
+    public func callAsFunction(this: JSObject, arguments: [JSValue]) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: arguments, this: this).jsValue
+    }
+    #else
     @discardableResult
     public func callAsFunction(this: JSObject, arguments: [ConvertibleToJSValue]) -> JSValue {
         invokeNonThrowingJSFunction(arguments: arguments, this: this).jsValue
     }
+    #endif
 
     /// Call this function with given `arguments`.
     /// - Parameters:
     ///   - arguments: Arguments to be passed to this function.
     /// - Returns: The result of this call.
+    #if hasFeature(Embedded)
+    @discardableResult
+    public func callAsFunction(arguments: [JSValue]) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: arguments).jsValue
+    }
+    #else
     @discardableResult
     public func callAsFunction(arguments: [ConvertibleToJSValue]) -> JSValue {
         invokeNonThrowingJSFunction(arguments: arguments).jsValue
     }
+    #endif
 
     /// A variadic arguments version of `callAsFunction`.
+    #if hasFeature(Embedded)
+    @discardableResult
+    public func callAsFunction(this: JSObject, _ arguments: JSValue...) -> JSValue {
+       self(this: this, arguments: arguments)
+    }
+    #else
     @discardableResult
     public func callAsFunction(this: JSObject, _ arguments: ConvertibleToJSValue...) -> JSValue {
         self(this: this, arguments: arguments)
     }
+    #endif
 
     /// A variadic arguments version of `callAsFunction`.
+    #if hasFeature(Embedded)
+    @discardableResult
+    public func callAsFunction(_ arguments: JSValue...) -> JSValue {
+       self(arguments: arguments)
+    }
+    #else
     @discardableResult
     public func callAsFunction(_ arguments: ConvertibleToJSValue...) -> JSValue {
         self(arguments: arguments)
     }
+    #endif
 
     /// Instantiate an object from this function as a constructor.
     ///
@@ -52,6 +80,15 @@ public class JSFunction: JSObject {
     ///
     /// - Parameter arguments: Arguments to be passed to this constructor function.
     /// - Returns: A new instance of this constructor.
+    #if hasFeature(Embedded)
+    public func new(arguments: [JSValue]) -> JSObject {
+        arguments.withRawJSValues { rawValues in
+            rawValues.withUnsafeBufferPointer { bufferPointer in
+                JSObject(id: _call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
+            }
+        }
+    }
+    #else
     public func new(arguments: [ConvertibleToJSValue]) -> JSObject {
         arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
@@ -59,6 +96,7 @@ public class JSFunction: JSObject {
             }
         }
     }
+    #endif
 
     /// A modifier to call this function as a throwing function
     ///
@@ -80,19 +118,40 @@ public class JSFunction: JSObject {
     }
 
     /// A variadic arguments version of `new`.
+    #if hasFeature(Embedded)
+    public func new(_ arguments: JSValue...) -> JSObject {
+        new(arguments: arguments)
+    }
+    #else
     public func new(_ arguments: ConvertibleToJSValue...) -> JSObject {
         new(arguments: arguments)
     }
-
-    @available(*, unavailable, message: "Please use JSClosure instead")
-    public static func from(_: @escaping ([JSValue]) -> JSValue) -> JSFunction {
-        fatalError("unavailable")
-    }
+    #endif
 
     override public var jsValue: JSValue {
         .function(self)
     }
 
+    #if hasFeature(Embedded)
+    final func invokeNonThrowingJSFunction(arguments: [JSValue]) -> RawJSValue {
+        let id = self.id
+        return arguments.withRawJSValues { rawValues in
+            rawValues.withUnsafeBufferPointer { bufferPointer in
+                let argv = bufferPointer.baseAddress
+                let argc = bufferPointer.count
+                var payload1 = JavaScriptPayload1()
+                var payload2 = JavaScriptPayload2()
+                let resultBitPattern = _call_function_no_catch(
+                    id, argv, Int32(argc),
+                    &payload1, &payload2
+                )
+                let kindAndFlags = JSValueKindAndFlags.decode(resultBitPattern)
+                assert(!kindAndFlags.isException)
+                return RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
+            }
+        }
+    }
+    #else
     final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue]) -> RawJSValue {
         let id = self.id
         return arguments.withRawJSValues { rawValues in
@@ -112,7 +171,28 @@ public class JSFunction: JSObject {
             }
         }
     }
+    #endif
 
+    #if hasFeature(Embedded)
+    final func invokeNonThrowingJSFunction(arguments: [JSValue], this: JSObject) -> RawJSValue {
+        let id = self.id
+        return arguments.withRawJSValues { rawValues in
+            rawValues.withUnsafeBufferPointer { bufferPointer in
+                let argv = bufferPointer.baseAddress
+                let argc = bufferPointer.count
+                var payload1 = JavaScriptPayload1()
+                var payload2 = JavaScriptPayload2()
+                let resultBitPattern = _call_function_with_this_no_catch(this.id,
+                    id, argv, Int32(argc),
+                    &payload1, &payload2
+                )
+                let kindAndFlags = JSValueKindAndFlags.decode(resultBitPattern)
+                assert(!kindAndFlags.isException)
+                return RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
+            }
+        }
+    }
+    #else
     final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue], this: JSObject) -> RawJSValue {
         let id = self.id
         return arguments.withRawJSValues { rawValues in
@@ -132,4 +212,21 @@ public class JSFunction: JSObject {
             }
         }
     }
+    #endif
 }
+
+#if hasFeature(Embedded)
+struct JSValueKindAndFlags {
+    let kind: UInt
+    let isException: Bool
+
+    static func decode(_ resultBitPattern: UInt32) -> JSValueKindAndFlags {
+        .init(
+            // Extract the kind (first 4 bits)
+            kind: UInt(UInt8(resultBitPattern & 0b00000000000000000000000000001111)),
+            // Extract the isException (5th bit)
+            isException: (resultBitPattern & 0b00000000000000000000000000010000) != 0
+        )
+    }
+}
+#endif

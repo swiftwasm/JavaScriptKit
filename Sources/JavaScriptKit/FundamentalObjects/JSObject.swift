@@ -1,4 +1,7 @@
 import _CJavaScriptKit
+#if hasFeature(Embedded)
+import String16
+#endif
 
 /// `JSObject` represents an object in JavaScript and supports dynamic member lookup.
 /// Any member access like `object.foo` will dynamically request the JavaScript and Swift
@@ -33,6 +36,15 @@ public class JSObject: Equatable {
     ///
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The `name` member method binding this object as `this` context.
+    #if hasFeature(Embedded)
+    @_disfavoredOverload
+    public subscript(_ name: String16) -> ((JSValue...) -> JSValue)? {
+        guard let function = self[name].function else { return nil }
+        return { (arguments: JSValue...) in
+            function(this: self, arguments: arguments)
+        }
+    }
+    #else
     @_disfavoredOverload
     public subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)? {
         guard let function = self[name].function else { return nil }
@@ -40,6 +52,14 @@ public class JSObject: Equatable {
             function(this: self, arguments: arguments)
         }
     }
+    #endif
+    
+    #if hasFeature(Embedded)
+    @_disfavoredOverload
+    public subscript(_ name: StaticString) -> ((JSValue...) -> JSValue)? {
+        self[String16(stringLiteral: name)]
+    }
+    #endif
 
     /// Returns the `name` member method binding this object as `this` context.
     ///
@@ -51,6 +71,15 @@ public class JSObject: Equatable {
     ///
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The `name` member method binding this object as `this` context.
+    #if hasFeature(Embedded)
+    @_disfavoredOverload
+    public subscript(_ name: JSString) -> ((JSValue...) -> JSValue)? {
+        guard let function = self[name].function else { return nil }
+        return { (arguments: JSValue...) in
+            function(this: self, arguments: arguments)
+        }
+    }
+    #else
     @_disfavoredOverload
     public subscript(_ name: JSString) -> ((ConvertibleToJSValue...) -> JSValue)? {
         guard let function = self[name].function else { return nil }
@@ -58,28 +87,54 @@ public class JSObject: Equatable {
             function(this: self, arguments: arguments)
         }
     }
+    #endif
 
+    #if hasFeature(Embedded)
+    /// A convenience method of `subscript(_ name: String16) -> ((JSValue...) -> JSValue)?`
+    /// to access the member through Dynamic Member Lookup.
+    @_disfavoredOverload
+    public subscript(dynamicMember name: String16) -> ((JSValue...) -> JSValue)? {
+        self[name]
+    }
+    #else
     /// A convenience method of `subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
     /// to access the member through Dynamic Member Lookup.
     @_disfavoredOverload
     public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue)? {
         self[name]
     }
+    #endif
 
+    #if hasFeature(Embedded)
+    /// A convenience method of `subscript(_ name: String16) -> JSValue`
+    /// to access the member through Dynamic Member Lookup.
+    public subscript(dynamicMember name: String16) -> JSValue {
+        get { self[name] }
+        set { self[name] = newValue }
+    }
+    #else
     /// A convenience method of `subscript(_ name: String) -> JSValue`
     /// to access the member through Dynamic Member Lookup.
     public subscript(dynamicMember name: String) -> JSValue {
         get { self[name] }
         set { self[name] = newValue }
     }
+    #endif
 
     /// Access the `name` member dynamically through JavaScript and Swift runtime bridge library.
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The value of the `name` member of this object.
+    #if hasFeature(Embedded)
+    public subscript(_ name: String16) -> JSValue {
+        get { getJSValue(this: self, name: JSString(name)) }
+        set { setJSValue(this: self, name: JSString(name), value: newValue) }
+    }
+    #else
     public subscript(_ name: String) -> JSValue {
         get { getJSValue(this: self, name: JSString(name)) }
         set { setJSValue(this: self, name: JSString(name), value: newValue) }
     }
+    #endif
 
     /// Access the `name` member dynamically through JavaScript and Swift runtime bridge library.
     /// - Parameter name: The name of this object's member to access.
@@ -174,7 +229,11 @@ public class JSObject: Equatable {
 }
 
 extension JSObject: CustomStringConvertible {
+    #if hasFeature(Embedded)
+    public var description: String16 { self.toString!().string! }
+    #else
     public var description: String { self.toString!().string! }
+    #endif
 }
 
 extension JSObject: Hashable {
@@ -200,6 +259,15 @@ public class JSThrowingObject {
     /// Returns the `name` member method binding this object as `this` context.
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The `name` member method binding this object as `this` context.
+    #if hasFeature(Embedded) && swift(>=5.10) // FIXME: change to >=6.0
+    @_disfavoredOverload
+    public subscript(_ name: String16) -> ((JSValue...) throws(JSValue) -> JSValue)? {
+        guard let function = base[name].function?.throws else { return nil }
+        return { [base] (arguments: JSValue...) throws(JSValue) in
+            try function(this: base, arguments: arguments)
+        }
+    }
+    #else
     @_disfavoredOverload
     public subscript(_ name: String) -> ((ConvertibleToJSValue...) throws -> JSValue)? {
         guard let function = base[name].function?.throws else { return nil }
@@ -207,11 +275,21 @@ public class JSThrowingObject {
             try function(this: base, arguments: arguments)
         }
     }
+    #endif
 
+    #if hasFeature(Embedded) && swift(>=5.10) // FIXME: change to >=6.0
+    /// A convenience method of `subscript(_ name: String16) -> ((JSValue...) throws(JSValue) -> JSValue)?`
+    /// to access the member through Dynamic Member Lookup.
+    @_disfavoredOverload
+    public subscript(dynamicMember name: String16) -> ((JSValue...) throws(JSValue) -> JSValue)? {
+        self[name]
+    }
+    #else
     /// A convenience method of `subscript(_ name: String) -> ((ConvertibleToJSValue...) throws -> JSValue)?`
     /// to access the member through Dynamic Member Lookup.
     @_disfavoredOverload
     public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) throws -> JSValue)? {
         self[name]
     }
+    #endif
 }

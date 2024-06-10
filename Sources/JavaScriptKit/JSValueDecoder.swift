@@ -1,3 +1,4 @@
+#if !hasFeature(Embedded)
 private struct _Decoder: Decoder {
     fileprivate let node: JSValue
 
@@ -248,3 +249,4 @@ public class JSValueDecoder {
         return try T(from: decoder)
     }
 }
+#endif

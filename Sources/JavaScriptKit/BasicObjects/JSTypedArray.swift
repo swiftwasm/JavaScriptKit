@@ -1,5 +1,6 @@
 //
 //  Created by Manuel Burghard. Licensed unter MIT.
+//  Improved for Embedded Swift by Mikhail Isaev. Licensed under MIT.
 //
 
 import _CJavaScriptKit
@@ -10,14 +11,20 @@ public protocol TypedArrayElement: ConvertibleToJSValue, ConstructibleFromJSValu
     static var typedArrayClass: JSFunction { get }
 }
 
-/// A wrapper around all [JavaScript `TypedArray`
-/// classes](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
-/// that exposes their properties in a type-safe way.
-public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral where Element: TypedArrayElement {
-    public class var constructor: JSFunction? { Element.typedArrayClass }
-    public var jsObject: JSObject
+public protocol JSTypedArrayable: AnyObject {
+    associatedtype Element: TypedArrayElement
 
-    public subscript(_ index: Int) -> Element {
+    static var constructor: JSFunction? { get }
+    var jsObject: JSObject { get }
+
+    subscript (_ index: Int) -> Element { get set }
+
+    init (length: Int)
+    init(unsafelyWrapping jsObject: JSObject)
+}
+
+extension JSTypedArrayable {
+    public subscript (_ index: Int) -> Element {
         get {
             return Element.construct(from: jsObject[index])!
         }
@@ -26,12 +33,41 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         }
     }
 
+    /// Initialize a new instance of TypedArray in JavaScript environment with given elements.
+    ///
+    /// - Parameter array: The array that will be copied to create a new instance of TypedArray
+    public init(_ array: [Element]) {
+        let jsArrayRef = array.withUnsafeBufferPointer { ptr in
+            _create_typed_array(Self.constructor!.id, ptr.baseAddress!, Int32(array.count))
+        }
+        self.init(unsafelyWrapping: JSObject(id: jsArrayRef))
+    }
+
+    /// Convenience initializer for `Sequence`.
+    public init<S: Sequence>(_ sequence: S) where S.Element == Element {
+        self.init(Array(sequence))
+    }
+
+    /// Length (in bytes) of the typed array.
+    /// The value is established when a TypedArray is constructed and cannot be changed.
+    /// If the TypedArray is not specifying a `byteOffset` or a `length`, the `length` of the referenced `ArrayBuffer` will be returned.
+    public var lengthInBytes: Int {
+        Int(jsObject["byteLength"].number!)
+    }
+}
+
+/// A wrapper around all [JavaScript `TypedArray` classes](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
+/// that exposes their properties in a type-safe way.
+public final class JSTypedArray<Element>: JSBridgedClass, JSTypedArrayable, ExpressibleByArrayLiteral where Element: TypedArrayElement {
+    public class var constructor: JSFunction? { Element.typedArrayClass }
+    public var jsObject: JSObject
+
     /// Initialize a new instance of TypedArray in JavaScript environment with given length.
     ///  All the elements will be initialized to zero.
     ///
     /// - Parameter length: The number of elements that will be allocated.
-    public init(length: Int) {
-        jsObject = Self.constructor!.new(length)
+    public init (length: Int) {
+        jsObject = Self.constructor!.new(length.jsValue)
     }
 
     public required init(unsafelyWrapping jsObject: JSObject) {
@@ -42,28 +78,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         self.init(elements)
     }
 
-    /// Initialize a new instance of TypedArray in JavaScript environment with given elements.
-    ///
-    /// - Parameter array: The array that will be copied to create a new instance of TypedArray
-    public convenience init(_ array: [Element]) {
-        let jsArrayRef = array.withUnsafeBufferPointer { ptr in
-            _create_typed_array(Self.constructor!.id, ptr.baseAddress!, Int32(array.count))
-        }
-        self.init(unsafelyWrapping: JSObject(id: jsArrayRef))
-    }
-
-    /// Convenience initializer for `Sequence`.
-    public convenience init<S: Sequence>(_ sequence: S) where S.Element == Element {
-        self.init(Array(sequence))
-    }
-
-    /// Length (in bytes) of the typed array.
-    /// The value is established when a TypedArray is constructed and cannot be changed.
-    /// If the TypedArray is not specifying a `byteOffset` or a `length`, the `length` of the referenced `ArrayBuffer` will be returned.
-    public var lengthInBytes: Int {
-        Int(jsObject["byteLength"].number!)
-    }
-
+    #if !hasFeature(Embedded)
     /// Calls the given closure with a pointer to a copy of the underlying bytes of the
     /// array's storage.
     ///
@@ -92,7 +107,9 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         let result = try body(bufferPtr)
         return result
     }
+    #endif
 
+    #if !hasFeature(Embedded)
     #if compiler(>=5.5)
         /// Calls the given async closure with a pointer to a copy of the underlying bytes of the
         /// array's storage.
@@ -124,11 +141,23 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
             return result
         }
     #endif
+    #endif
 }
 
 // MARK: - Int and UInt support
 
 // FIXME: Should be updated to support wasm64 when that becomes available.
+#if hasFeature(Embedded)
+func valueForBitWidth<T>(typeName: StaticString, bitWidth: Int, when32: T) -> T {
+    if bitWidth == 32 {
+        return when32
+    } else if bitWidth == 64 {
+        fatalError()
+    } else {
+        fatalError()
+    }
+}
+#else
 func valueForBitWidth<T>(typeName: String, bitWidth: Int, when32: T) -> T {
     if bitWidth == 32 {
         return when32
@@ -138,6 +167,7 @@ func valueForBitWidth<T>(typeName: String, bitWidth: Int, when32: T) -> T {
         fatalError("Unsupported bit width for type \(typeName): \(bitWidth) (hint: stick to fixed-size \(typeName)s to avoid this issue)")
     }
 }
+#endif
 
 extension Int: TypedArrayElement {
     public static var typedArrayClass: JSFunction =
@@ -160,8 +190,30 @@ extension UInt8: TypedArrayElement {
 /// A wrapper around [the JavaScript `Uint8ClampedArray`
 /// class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)
 /// that exposes its properties in a type-safe and Swifty way.
-public class JSUInt8ClampedArray: JSTypedArray<UInt8> {
-    override public class var constructor: JSFunction? { JSObject.global.Uint8ClampedArray.function! }
+public final class JSUInt8ClampedArray: JSBridgedClass, JSTypedArrayable, ExpressibleByArrayLiteral {
+    public typealias Element = UInt8
+    public class var constructor: JSFunction? { JSObject.global.Uint8ClampedArray.function! }
+    public var jsObject: JSObject
+
+    /// Initialize a new instance of TypedArray in JavaScript environment with given length.
+    ///  All the elements will be initialized to zero.
+    ///
+    /// - Parameter length: The number of elements that will be allocated.
+    public init (length: Int) {
+        #if hasFeature(Embedded)
+        jsObject = Self.constructor!.new(length.jsValue)
+        #else
+        jsObject = Self.constructor!.new(length)
+        #endif
+    }
+
+    public required init(unsafelyWrapping jsObject: JSObject) {
+        self.jsObject = jsObject
+    }
+
+    public required convenience init(arrayLiteral elements: Element...) {
+        self.init(elements)
+    }
 }
 
 extension Int16: TypedArrayElement {

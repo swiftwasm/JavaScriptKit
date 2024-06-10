@@ -49,7 +49,9 @@ export interface ImportedFunctions {
         payload2_ptr: pointer
     ): JavaScriptValueKind;
     swjs_encode_string(ref: number, bytes_ptr_result: pointer): number;
+    swjs_encode_utf16_string(ref: number, bytes_ptr_result: pointer): number;
     swjs_decode_string(bytes_ptr: pointer, length: number): number;
+    swjs_decode_utf16_string(bytes_ptr: pointer, length: number): number;
     swjs_load_string(ref: number, buffer: pointer): void;
     swjs_call_function(
         ref: number,

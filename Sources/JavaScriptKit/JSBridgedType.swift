@@ -1,3 +1,7 @@
+#if hasFeature(Embedded)
+import String16
+#endif
+
 /// Use this protocol when your type has no single JavaScript class.
 /// For example, a union type of multiple classes or primitive values.
 public protocol JSBridgedType: JSValueCompatible, CustomStringConvertible {
@@ -9,8 +13,11 @@ public extension JSBridgedType {
     static func construct(from value: JSValue) -> Self? {
         Self(from: value)
     }
-
+    #if hasFeature(Embedded)
+    var description: String16 { jsValue.description }
+    #else
     var description: String { jsValue.description }
+    #endif
 }
 
 /// Conform to this protocol when your Swift class wraps a JavaScript class.

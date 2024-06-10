@@ -1,3 +1,4 @@
+#if !hasFeature(Embedded)
 @available(*, deprecated, renamed: "JSObject")
 public typealias JSObjectRef = JSObject
 
@@ -15,3 +16,4 @@ public typealias JSValueConstructible = ConstructibleFromJSValue
 
 @available(*, deprecated, renamed: "JSValueCompatible")
 public typealias JSValueCodable = JSValueCompatible
+#endif

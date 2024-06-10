@@ -14,7 +14,12 @@ public final class JSTimer {
     /// Indicates whether this timer instance calls its callback repeatedly at a given delay.
     public let isRepeating: Bool
 
+    #if hasFeature(Embedded)
+    private let closure: JSClosure?
+    private let oneShotClosure: JSOneshotClosure?
+    #else
     private let closure: JSClosureProtocol
+    #endif
 
     /** Node.js and browser APIs are slightly different. `setTimeout`/`setInterval` return an object
      in Node.js, while browsers return a number. Fortunately, clearTimeout and clearInterval take
@@ -35,22 +40,33 @@ public final class JSTimer {
      */
     public init(millisecondsDelay: Double, isRepeating: Bool = false, callback: @escaping () -> ()) {
         if isRepeating {
-            closure = JSClosure { _ in
+            let closure: JSClosure = JSClosure { _ in
                 callback()
                 return .undefined
             }
+            #if hasFeature(Embedded)
+            self.closure = closure
+            self.oneShotClosure = nil
+            self.value = JSObject.global.setInterval.function!(closure.jsValue, millisecondsDelay.jsValue)
+            #else
+            self.closure = closure
+            self.value = global.setInterval.function!(closure, millisecondsDelay)
+            #endif
         } else {
-            closure = JSOneshotClosure { _ in
+            let oneShotClosure: JSOneshotClosure = JSOneshotClosure { _ in
                 callback()
                 return .undefined
             }
+            #if hasFeature(Embedded)
+            self.closure = nil
+            self.oneShotClosure = oneShotClosure
+            self.value = JSObject.global.setTimeout.function!(oneShotClosure.jsValue, millisecondsDelay.jsValue)
+            #else
+            self.closure = oneShotClosure
+            self.value = global.setTimeout.function!(oneShotClosure, millisecondsDelay)
+            #endif
         }
         self.isRepeating = isRepeating
-        if isRepeating {
-            value = global.setInterval.function!(closure, millisecondsDelay)
-        } else {
-            value = global.setTimeout.function!(closure, millisecondsDelay)
-        }
     }
 
     /** Makes a corresponding `clearTimeout` or `clearInterval` call, depending on whether this timer
@@ -60,9 +76,16 @@ public final class JSTimer {
     deinit {
         if isRepeating {
             global.clearInterval.function!(value)
+            #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+            closure?.release()
+           #endif
         } else {
             global.clearTimeout.function!(value)
+            #if hasFeature(Embedded)
+            oneShotClosure?.release()
+            #else
+            closure.release()
+            #endif
         }
-        closure.release()
     }
 }

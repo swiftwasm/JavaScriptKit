@@ -1,8 +1,18 @@
 #include "_CJavaScriptKit.h"
+#if __wasm32__
+#if __Embedded
+#if __has_include("malloc.h")
+#include <malloc.h>
+#endif
+extern void *malloc(size_t size);
+extern void free(void *ptr);
+extern void *memset (void *, int, size_t);
+extern void *memcpy (void *__restrict, const void *__restrict, size_t);
+#else
 #include <stdlib.h>
 #include <stdbool.h>
 
-#if __wasm32__
+#endif
 
 bool _call_host_function_impl(const JavaScriptHostFuncRef host_func_ref,
                               const RawJSValue *argv, const int argc,
