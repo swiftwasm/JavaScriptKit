@@ -1,7 +1,12 @@
 #ifndef _CJavaScriptKit_h
 #define _CJavaScriptKit_h
 
+#if __Embedded
+#include <stddef.h>
+#else
 #include <stdlib.h>
+#endif
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -25,10 +30,17 @@ typedef enum __attribute__((enum_extensibility(closed))) {
   JavaScriptValueKindBigInt = 8,
 } JavaScriptValueKind;
 
+#if __Embedded
+typedef struct {
+  unsigned long kind: 4;
+  bool isException: 1;
+} JavaScriptValueKindAndFlags;
+#else
 typedef struct {
   JavaScriptValueKind kind: 31;
   bool isException: 1;
 } JavaScriptValueKindAndFlags;
+#endif
 
 typedef unsigned JavaScriptPayload1;
 typedef double JavaScriptPayload2;
@@ -66,11 +78,19 @@ typedef double JavaScriptPayload2;
 ///    payload1: `JavaScriptObjectRef`
 ///    payload2: 0
 ///
+#if __Embedded
+typedef struct {
+  unsigned long kind;
+  JavaScriptPayload1 payload1;
+  JavaScriptPayload2 payload2;
+} RawJSValue;
+#else
 typedef struct {
   JavaScriptValueKind kind;
   JavaScriptPayload1 payload1;
   JavaScriptPayload2 payload2;
 } RawJSValue;
+#endif
 
 #if __wasm32__
 
@@ -81,6 +101,15 @@ typedef struct {
 /// @param kind A kind of JavaScript value to set the target object.
 /// @param payload1 The first payload of JavaScript value to set the target object.
 /// @param payload2 The second payload of JavaScript value to set the target object.
+#if __Embedded
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_set_prop")))
+extern void _set_prop(const JavaScriptObjectRef _this,
+                      const JavaScriptObjectRef prop,
+                      const unsigned long kind,
+                      const JavaScriptPayload1 payload1,
+                      const JavaScriptPayload2 payload2);
+#else
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_set_prop")))
 extern void _set_prop(const JavaScriptObjectRef _this,
@@ -88,6 +117,7 @@ extern void _set_prop(const JavaScriptObjectRef _this,
                       const JavaScriptValueKind kind,
                       const JavaScriptPayload1 payload1,
                       const JavaScriptPayload2 payload2);
+#endif
 
 /// `_get_prop` gets a value of `_this` JavaScript object.
 ///
@@ -112,6 +142,15 @@ extern uint32_t _get_prop(
 /// @param kind A kind of JavaScript value to set the target object.
 /// @param payload1 The first payload of JavaScript value to set the target object.
 /// @param payload2 The second payload of JavaScript value to set the target object.
+#if __Embedded
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_set_subscript")))
+extern void _set_subscript(const JavaScriptObjectRef _this,
+                           const int index,
+                           const unsigned long kind,
+                           const JavaScriptPayload1 payload1,
+                           const JavaScriptPayload2 payload2);
+#else
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_set_subscript")))
 extern void _set_subscript(const JavaScriptObjectRef _this,
@@ -119,6 +158,7 @@ extern void _set_subscript(const JavaScriptObjectRef _this,
                            const JavaScriptValueKind kind,
                            const JavaScriptPayload1 payload1,
                            const JavaScriptPayload2 payload2);
+#endif
 
 /// `_get_subscript` gets a value of `_this` JavaScript object.
 ///
@@ -151,9 +191,15 @@ extern int _encode_string(const JavaScriptObjectRef str_obj, JavaScriptObjectRef
 /// @param bytes_ptr A `uint8_t` byte sequence to decode.
 /// @param length The length of `bytes_ptr`.
 /// @result The decoded JavaScript string object.
+#if __Embedded
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_decode_string")))
+extern JavaScriptObjectRef _decode_string(const int pointer, const int length);
+#else
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_decode_string")))
 extern JavaScriptObjectRef _decode_string(const unsigned char *bytes_ptr, const int length);
+#endif
 
 /// `_load_string` loads the actual bytes sequence of `bytes` into `buffer` which is a Swift side memory address.
 ///
@@ -265,6 +311,15 @@ extern JavaScriptObjectRef _call_new(const JavaScriptObjectRef ref,
 /// @param exception_payload1 A result pointer of first payload of JavaScript value of thrown exception.
 /// @param exception_payload2 A result pointer of second payload of JavaScript value of thrown exception.
 /// @returns A reference to the constructed object.
+#if __Embedded
+__attribute__((__import_module__("javascript_kit"),
+               __import_name__("swjs_call_throwing_new")))
+extern JavaScriptObjectRef _call_throwing_new(const JavaScriptObjectRef ref,
+                                              const RawJSValue *argv, const int argc,
+                                              uint32_t *exception_kind,
+                                              JavaScriptPayload1 *exception_payload1,
+                                              JavaScriptPayload2 *exception_payload2);
+#else
 __attribute__((__import_module__("javascript_kit"),
                __import_name__("swjs_call_throwing_new")))
 extern JavaScriptObjectRef _call_throwing_new(const JavaScriptObjectRef ref,
@@ -272,6 +327,7 @@ extern JavaScriptObjectRef _call_throwing_new(const JavaScriptObjectRef ref,
                                               JavaScriptValueKindAndFlags *exception_kind,
                                               JavaScriptPayload1 *exception_payload1,
                                               JavaScriptPayload2 *exception_payload2);
+#endif
 
 /// `_instanceof` acts like JavaScript `instanceof` operator.
 ///

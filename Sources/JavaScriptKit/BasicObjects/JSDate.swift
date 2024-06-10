@@ -1,3 +1,7 @@
+#if hasFeature(Embedded)
+import String16
+#endif
+
 /** A wrapper around the [JavaScript `Date`
  class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) that
  exposes its properties in a type-safe way. This doesn't 100% match the JS API, for example
@@ -18,7 +22,11 @@ public final class JSDate: JSBridgedClass {
      */
     public init(millisecondsSinceEpoch: Double? = nil) {
         if let milliseconds = millisecondsSinceEpoch {
+            #if hasFeature(Embedded)
+            jsObject = Self.constructor!.new(milliseconds.jsValue)
+            #else
             jsObject = Self.constructor!.new(milliseconds)
+            #endif
         } else {
             jsObject = Self.constructor!.new()
         }
@@ -36,7 +44,11 @@ public final class JSDate: JSBridgedClass {
         seconds: Int = 0,
         milliseconds: Int = 0
     ) {
+        #if hasFeature(Embedded)
+        jsObject = Self.constructor!.new(year.jsValue, monthIndex.jsValue, day.jsValue, hours.jsValue, minutes.jsValue, seconds.jsValue, milliseconds.jsValue)
+        #else
         jsObject = Self.constructor!.new(year, monthIndex, day, hours, minutes, seconds, milliseconds)
+        #endif
     }
 
     public init(unsafelyWrapping jsObject: JSObject) {
@@ -49,7 +61,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getFullYear!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setFullYear!(newValue.jsValue)
+            #else
             _ = jsObject.setFullYear!(newValue)
+            #endif
         }
     }
 
@@ -59,7 +75,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getMonth!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setMonth!(newValue.jsValue)
+            #else
             _ = jsObject.setMonth!(newValue)
+            #endif
         }
     }
 
@@ -69,7 +89,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getDate!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setDate!(newValue.jsValue)
+            #else
             _ = jsObject.setDate!(newValue)
+            #endif
         }
     }
 
@@ -84,7 +108,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getHours!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setHours!(newValue.jsValue)
+            #else
             _ = jsObject.setHours!(newValue)
+            #endif
         }
     }
 
@@ -94,7 +122,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getMinutes!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setMinutes!(newValue.jsValue)
+            #else
             _ = jsObject.setMinutes!(newValue)
+            #endif
         }
     }
 
@@ -104,7 +136,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getSeconds!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setSeconds!(newValue.jsValue)
+            #else
             _ = jsObject.setSeconds!(newValue)
+            #endif
         }
     }
 
@@ -114,7 +150,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getMilliseconds!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setMilliseconds!(newValue.jsValue)
+            #else
             _ = jsObject.setMilliseconds!(newValue)
+            #endif
         }
     }
 
@@ -124,7 +164,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getUTCFullYear!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setUTCFullYear!(newValue.jsValue)
+            #else
             _ = jsObject.setUTCFullYear!(newValue)
+            #endif
         }
     }
 
@@ -134,7 +178,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getUTCMonth!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setUTCMonth!(newValue.jsValue)
+            #else
             _ = jsObject.setUTCMonth!(newValue)
+            #endif
         }
     }
 
@@ -144,7 +192,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getUTCDate!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setUTCDate!(newValue.jsValue)
+            #else
             _ = jsObject.setUTCDate!(newValue)
+            #endif
         }
     }
 
@@ -159,7 +211,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getUTCHours!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setUTCHours!(newValue.jsValue)
+            #else
             _ = jsObject.setUTCHours!(newValue)
+            #endif
         }
     }
 
@@ -169,7 +225,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getUTCMinutes!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setUTCMinutes!(newValue.jsValue)
+            #else
             _ = jsObject.setUTCMinutes!(newValue)
+            #endif
         }
     }
 
@@ -179,7 +239,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getUTCSeconds!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setUTCSeconds!(newValue.jsValue)
+            #else
             _ = jsObject.setUTCSeconds!(newValue)
+            #endif
         }
     }
 
@@ -189,7 +253,11 @@ public final class JSDate: JSBridgedClass {
             Int(jsObject.getUTCMilliseconds!().number!)
         }
         set {
+            #if hasFeature(Embedded)
+            _ = jsObject.setUTCMilliseconds!(newValue.jsValue)
+            #else
             _ = jsObject.setUTCMilliseconds!(newValue)
+            #endif
         }
     }
 
@@ -200,28 +268,52 @@ public final class JSDate: JSBridgedClass {
 
     /// Returns a string conforming to ISO 8601 that contains date and time, e.g.
     /// `"2020-09-15T08:56:54.811Z"`.
+    #if hasFeature(Embedded)
+    public func toISOString() -> String16 {
+        jsObject.toISOString!().string!
+    }
+    #else
     public func toISOString() -> String {
         jsObject.toISOString!().string!
     }
+    #endif
 
     /// Returns a string with date parts in a format defined by user's locale, e.g. `"9/15/2020"`.
+    #if hasFeature(Embedded)
+    public func toLocaleDateString() -> String16 {
+        jsObject.toLocaleDateString!().string!
+    }
+    #else
     public func toLocaleDateString() -> String {
         jsObject.toLocaleDateString!().string!
     }
+    #endif
 
     /// Returns a string with time parts in a format defined by user's locale, e.g. `"10:04:14"`.
+    #if hasFeature(Embedded)
+    public func toLocaleTimeString() -> String16 {
+        jsObject.toLocaleTimeString!().string!
+    }
+    #else
     public func toLocaleTimeString() -> String {
         jsObject.toLocaleTimeString!().string!
     }
+    #endif
 
     /** Returns a string formatted according to
      [rfc7231](https://tools.ietf.org/html/rfc7231#section-7.1.1.1) and modified according to
      [ecma-262](https://www.ecma-international.org/ecma-262/10.0/index.html#sec-date.prototype.toutcstring),
      e.g. `Tue, 15 Sep 2020 09:04:40 GMT`.
      */
+    #if hasFeature(Embedded)
+    public func toUTCString() -> String16 {
+        jsObject.toUTCString!().string!
+    }
+    #else
     public func toUTCString() -> String {
         jsObject.toUTCString!().string!
     }
+    #endif
 
     /** Number of milliseconds since midnight 01 January 1970 UTC to the present moment ignoring
      leap seconds.

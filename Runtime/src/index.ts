@@ -21,7 +21,8 @@ export class SwiftRuntime {
     private options: SwiftRuntimeOptions;
     private version: number = 708;
 
-    private textDecoder = new TextDecoder("utf-8");
+    private textDecoderUTF8 = new TextDecoder("utf-8");
+    private textDecoderUTF16 = new TextDecoder("utf-16");
     private textEncoder = new TextEncoder(); // Only support utf-8
 
     constructor(options?: SwiftRuntimeOptions) {
@@ -210,6 +211,13 @@ export class SwiftRuntime {
                 memory.writeUint32(bytes_ptr_result, bytes_ptr);
                 return bytes.length;
             },
+            swjs_encode_utf16_string: (ref: ref, bytes_ptr_result: pointer) => {
+                const memory = this.memory;
+                const bytes = memory.getObject(ref);
+                const bytes_ptr = memory.retain(bytes);
+                memory.writeUint32(bytes_ptr_result, bytes_ptr);
+                return bytes.length;
+            },
             swjs_decode_string: (
                 // NOTE: TextDecoder can't decode typed arrays backed by SharedArrayBuffer
                 this.options.sharedMemory == true
@@ -218,7 +226,7 @@ export class SwiftRuntime {
                     const bytes = memory
                         .bytes()
                         .slice(bytes_ptr, bytes_ptr + length);
-                    const string = this.textDecoder.decode(bytes);
+                    const string = this.textDecoderUTF8.decode(bytes);
                     return memory.retain(string);
                 })
                 : ((bytes_ptr: pointer, length: number) => {
@@ -226,7 +234,27 @@ export class SwiftRuntime {
                     const bytes = memory
                         .bytes()
                         .subarray(bytes_ptr, bytes_ptr + length);
-                    const string = this.textDecoder.decode(bytes);
+                    const string = this.textDecoderUTF8.decode(bytes);
+                    return memory.retain(string);
+                })
+            ),
+            swjs_decode_utf16_string: (
+                // NOTE: TextDecoder can't decode typed arrays backed by SharedArrayBuffer
+                this.options.sharedMemory == true
+                ? ((bytes_ptr: pointer, length: number) => {
+                    const memory = this.memory;
+                    const bytes = memory
+                        .bytes()
+                        .slice(bytes_ptr, bytes_ptr + length);
+                    const string = this.textDecoderUTF16.decode(bytes);
+                    return memory.retain(string);
+                })
+                : ((bytes_ptr: pointer, length: number) => {
+                    const memory = this.memory;
+                    const bytes = memory
+                        .bytes()
+                        .subarray(bytes_ptr, bytes_ptr + length);
+                    const string = this.textDecoderUTF16.decode(bytes);
                     return memory.retain(string);
                 })
             ),

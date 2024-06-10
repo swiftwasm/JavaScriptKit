@@ -1,4 +1,7 @@
 import _CJavaScriptKit
+#if hasFeature(Embedded)
+import String16
+#endif
 
 /// `JSClosureProtocol` wraps Swift closure objects for use in JavaScript. Conforming types
 /// are responsible for managing the lifetime of the closure they wrap, but can delegate that
@@ -15,6 +18,24 @@ public protocol JSClosureProtocol: JSValueCompatible {
 public class JSOneshotClosure: JSObject, JSClosureProtocol {
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 
+    #if hasFeature(Embedded)
+    public init(_ body: @escaping ([JSValue]) -> JSValue, file: StaticString = #fileID, line: UInt32 = #line) {
+        // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
+        super.init(id: 0)
+
+        // 2. Create a new JavaScript function which calls the given Swift function.
+        hostFuncRef = JavaScriptHostFuncRef(bitPattern: ObjectIdentifier(self))
+        id = withExtendedLifetime(JSString(String16(stringLiteral: file))) { file in
+          _create_function(hostFuncRef, line, file.asInternalJSRef())
+        }
+
+        // 3. Retain the given body in static storage by `funcRef`.
+        JSClosure.sharedClosures[hostFuncRef] = (self, {
+            defer { self.release() }
+            return body($0)
+        })
+    }
+    #else
     public init(_ body: @escaping ([JSValue]) -> JSValue, file: String = #fileID, line: UInt32 = #line) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
         super.init(id: 0)
@@ -31,12 +52,15 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
             return body($0)
         })
     }
+    #endif
 
+    #if !hasFeature(Embedded)
     #if compiler(>=5.5)
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSOneshotClosure {
         JSOneshotClosure(makeAsyncClosure(body))
     }
+    #endif
     #endif
 
     /// Release this function resource.
@@ -71,7 +95,8 @@ public class JSClosure: JSFunction, JSClosureProtocol {
     #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     private var isReleased: Bool = false
     #endif
-
+    
+    #if !hasFeature(Embedded)
     @available(*, deprecated, message: "This initializer will be removed in the next minor version update. Please use `init(_ body: @escaping ([JSValue]) -> JSValue)` and add `return .undefined` to the end of your closure")
     @_disfavoredOverload
     public convenience init(_ body: @escaping ([JSValue]) -> ()) {
@@ -80,7 +105,23 @@ public class JSClosure: JSFunction, JSClosureProtocol {
             return .undefined
         })
     }
+    #endif
 
+    #if hasFeature(Embedded)
+    public init(_ body: @escaping ([JSValue]) -> JSValue, file: StaticString = #fileID, line: UInt32 = #line) {
+        // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
+        super.init(id: 0)
+
+        // 2. Create a new JavaScript function which calls the given Swift function.
+        hostFuncRef = JavaScriptHostFuncRef(bitPattern: ObjectIdentifier(self))
+        id = withExtendedLifetime(JSString(String16(stringLiteral: file))) { file in
+          _create_function(hostFuncRef, line, file.asInternalJSRef())
+        }
+
+        // 3. Retain the given body in static storage by `funcRef`.
+        Self.sharedClosures[hostFuncRef] = (self, body)
+    }
+    #else
     public init(_ body: @escaping ([JSValue]) -> JSValue, file: String = #fileID, line: UInt32 = #line) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
         super.init(id: 0)
@@ -94,23 +135,27 @@ public class JSClosure: JSFunction, JSClosureProtocol {
         // 3. Retain the given body in static storage by `funcRef`.
         Self.sharedClosures[hostFuncRef] = (self, body)
     }
-
-    #if compiler(>=5.5)
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSClosure {
-        JSClosure(makeAsyncClosure(body))
-    }
     #endif
 
-    #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
-    deinit {
-        guard isReleased else {
-            fatalError("release() must be called on JSClosure objects manually before they are deallocated")
-        }
-    }
-    #endif
+//    #if compiler(>=5.5)//FIXME
+//    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+//    public static func async(_ body: @escaping ([JSValue]) async throws(JSValue) -> JSValue) -> JSClosure {
+//        JSClosure(makeAsyncClosure(body))
+//    }
+//    #endif
+
+   #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+   deinit {
+       guard isReleased else {
+           // FIXME
+           fatalError()//("release() must be called on JSClosure objects manually before they are deallocated")
+           return
+       }
+   }
+   #endif
 }
 
+#if !hasFeature(Embedded)
 #if compiler(>=5.5)
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSValue) -> (([JSValue]) -> JSValue) {
@@ -131,6 +176,7 @@ private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSVa
         }.jsValue()
     }
 }
+#endif
 #endif
 
 // MARK: - `JSClosure` mechanism note
@@ -168,8 +214,14 @@ private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSVa
 // └─────────────────────┴──────────────────────────┘
 
 /// Returns true if the host function has been already released, otherwise false.
+#if hasFeature(Embedded)
+public typealias JSHFR = JavaScriptHostFuncRef
+public typealias RJSV = RawJSValue
+public typealias JSOR = JavaScriptObjectRef
+#endif
+
 @_cdecl("_call_host_function_impl")
-func _call_host_function_impl(
+public func _call_host_function_impl( // FIXME: it's public because _cdecl isn't visible outside in Embedded Swift
     _ hostFuncRef: JavaScriptHostFuncRef,
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
@@ -177,7 +229,9 @@ func _call_host_function_impl(
     guard let (_, hostFunc) = JSClosure.sharedClosures[hostFuncRef] else {
         return true
     }
-    let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map(\.jsValue)
+    let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map {
+        $0.jsValue
+    }
     let result = hostFunc(arguments)
     let callbackFuncRef = JSFunction(id: callbackFuncRef)
     _ = callbackFuncRef(result)
@@ -200,7 +254,7 @@ extension JSClosure {
 }
 
 @_cdecl("_free_host_function_impl")
-func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {}
+public func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {} // FIXME: it's public because _cdecl isn't visible outside in Embedded Swift
 
 #else
 
@@ -212,7 +266,8 @@ extension JSClosure {
 }
 
 @_cdecl("_free_host_function_impl")
-func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {
+public func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) { // FIXME: it's public because _cdecl isn't visible outside in Embedded Swift
     JSClosure.sharedClosures[hostFuncRef] = nil
 }
+
 #endif

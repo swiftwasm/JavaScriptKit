@@ -30,9 +30,17 @@ public final class JSBigInt: JSObject {
 
     public func clamped(bitSize: Int, signed: Bool) -> JSBigInt {
         if signed {
+            #if hasFeature(Embedded)
+            return constructor.asIntN!(bitSize.jsValue, self.jsValue).bigInt!
+            #else
             return constructor.asIntN!(bitSize, self).bigInt!
+            #endif
         } else {
+            #if hasFeature(Embedded)
+            return constructor.asUintN!(bitSize.jsValue, self.jsValue).bigInt!
+            #else
             return constructor.asUintN!(bitSize, self).bigInt!
+            #endif
         }
     }
 }

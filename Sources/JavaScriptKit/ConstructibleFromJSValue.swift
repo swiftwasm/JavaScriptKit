@@ -1,3 +1,7 @@
+#if hasFeature(Embedded)
+import String16
+#endif
+
 /// Types conforming to this protocol can be constructed from `JSValue`.
 public protocol ConstructibleFromJSValue {
     /// Construct an instance of `Self`, if possible, from the given `JSValue`.
@@ -14,11 +18,19 @@ extension Bool: ConstructibleFromJSValue {
     }
 }
 
+#if hasFeature(Embedded)
+extension String16: ConstructibleFromJSValue {
+    public static func construct(from value: JSValue) -> String16? {
+        value.string
+    }
+}
+#else
 extension String: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> String? {
         value.string
     }
 }
+#endif
 
 extension JSString: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> JSString? {
@@ -35,16 +47,21 @@ extension Double: ConstructibleFromJSValue {}
 extension Float: ConstructibleFromJSValue {}
 
 extension SignedInteger where Self: ConstructibleFromJSValue {
+    #if !hasFeature(Embedded)
     public init(_ bigInt: JSBigIntExtended) {
         self.init(bigInt.int64Value)
     }
+    #endif
+
     public static func construct(from value: JSValue) -> Self? {
         if let number = value.number {
             return Self(number)
         }
+        #if !hasFeature(Embedded)
         if let bigInt = value.bigInt as? JSBigIntExtended {
             return Self(bigInt)
         }
+        #endif
         return nil
     }
 }
@@ -55,16 +72,20 @@ extension Int32: ConstructibleFromJSValue {}
 extension Int64: ConstructibleFromJSValue {}
 
 extension UnsignedInteger where Self: ConstructibleFromJSValue {
+    #if !hasFeature(Embedded)
     public init(_ bigInt: JSBigIntExtended) {
         self.init(bigInt.uInt64Value)
     }
+    #endif
     public static func construct(from value: JSValue) -> Self? {
         if let number = value.number {
             return Self(number)
         }
+        #if !hasFeature(Embedded)
         if let bigInt = value.bigInt as? JSBigIntExtended {
             return Self(bigInt)
         }
+        #endif
         return nil
     }
 }

@@ -1,4 +1,7 @@
 import _CJavaScriptKit
+#if hasFeature(Embedded)
+import String16
+#endif
 
 /// `JSValue` represents a value in JavaScript.
 @dynamicMemberLookup
@@ -28,9 +31,15 @@ public enum JSValue: Equatable {
     /// Note that this accessor may copy the JS string value into Swift side memory.
     ///
     /// To avoid the copying, please consider the `jsString` instead.
+    #if hasFeature(Embedded)
+    public var string: String16? {
+        jsString.map({ $0.string16 })
+    }
+    #else
     public var string: String? {
         jsString.map(String.init)
     }
+    #endif
 
     /// Returns the `JSString` value of this JS value if the type is string.
     /// If not, returns `nil`.
@@ -101,18 +110,33 @@ public enum JSValue: Equatable {
 }
 
 public extension JSValue {
+    #if hasFeature(Embedded)
+    /// An unsafe convenience method of `JSObject.subscript(_ name: String16) -> ((JSValue...) -> JSValue)?`
+    /// - Precondition: `self` must be a JavaScript Object and specified member should be a callable object.
+    subscript(dynamicMember name: String16) -> ((JSValue...) -> JSValue) {
+        object![dynamicMember: name]!
+    }
+    #else
     /// An unsafe convenience method of `JSObject.subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
     /// - Precondition: `self` must be a JavaScript Object and specified member should be a callable object.
     subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue) {
         object![dynamicMember: name]!
     }
+    #endif
 
     /// An unsafe convenience method of `JSObject.subscript(_ index: Int) -> JSValue`
     /// - Precondition: `self` must be a JavaScript Object.
+    #if hasFeature(Embedded)
+    subscript(dynamicMember name: String16) -> JSValue {
+        get { self.object![name] }
+        set { self.object![name] = newValue }
+    }
+    #else
     subscript(dynamicMember name: String) -> JSValue {
         get { self.object![name] }
         set { self.object![name] = newValue }
     }
+    #endif
 
     /// An unsafe convenience method of `JSObject.subscript(_ index: Int) -> JSValue`
     /// - Precondition: `self` must be a JavaScript Object.
@@ -131,10 +155,17 @@ public extension JSValue {
 }
 
 public extension JSValue {
+    #if hasFeature(Embedded)
+    static func string(_ value: String16) -> JSValue {
+        .string(JSString(value))
+    }
+    #else
     static func string(_ value: String) -> JSValue {
         .string(JSString(value))
     }
-
+    #endif
+    
+    #if !hasFeature(Embedded)
     /// Deprecated: Please create `JSClosure` directly and manage its lifetime manually.
     ///
     /// Migrate this usage
@@ -168,13 +199,16 @@ public extension JSValue {
     static func function(_ closure: JSClosure) -> JSValue {
         .object(closure)
     }
+    #endif
 }
 
+#if !hasFeature(Embedded)
 extension JSValue: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         self = .string(JSString(value))
     }
 }
+#endif
 
 extension JSValue: ExpressibleByIntegerLiteral {
     public init(integerLiteral value: Int32) {
@@ -200,7 +234,11 @@ public func getJSValue(this: JSObject, name: JSString) -> JSValue {
         this.id, name.asInternalJSRef(),
         &rawValue.payload1, &rawValue.payload2
     )
+    #if hasFeature(Embedded)
+    rawValue.kind = UInt(rawBitPattern)
+    #else
     rawValue.kind = unsafeBitCast(rawBitPattern, to: JavaScriptValueKind.self)
+    #endif
     return rawValue.jsValue
 }
 
@@ -216,7 +254,11 @@ public func getJSValue(this: JSObject, index: Int32) -> JSValue {
         this.id, index,
         &rawValue.payload1, &rawValue.payload2
     )
+    #if hasFeature(Embedded)
+    rawValue.kind = UInt(rawBitPattern)
+    #else
     rawValue.kind = unsafeBitCast(rawBitPattern, to: JavaScriptValueKind.self)
+    #endif
     return rawValue.jsValue
 }
 
@@ -234,7 +276,11 @@ public func getJSValue(this: JSObject, symbol: JSSymbol) -> JSValue {
         this.id, symbol.id,
         &rawValue.payload1, &rawValue.payload2
     )
+    #if hasFeature(Embedded)
+    rawValue.kind = UInt(rawBitPattern)
+    #else
     rawValue.kind = unsafeBitCast(rawBitPattern, to: JavaScriptValueKind.self)
+    #endif
     return rawValue.jsValue
 }
 
@@ -262,9 +308,17 @@ public extension JSValue {
 }
 
 extension JSValue: CustomStringConvertible {
+    #if hasFeature(Embedded)
+    public var description: String16 {
+        // per https://tc39.es/ecma262/multipage/text-processing.html#sec-string-constructor-string-value
+        // this always returns a string
+        JSObject.global.String.function!(self).string!
+    }
+    #else
     public var description: String {
         // per https://tc39.es/ecma262/multipage/text-processing.html#sec-string-constructor-string-value
         // this always returns a string
         JSObject.global.String.function!(self).string!
     }
+    #endif
 }
