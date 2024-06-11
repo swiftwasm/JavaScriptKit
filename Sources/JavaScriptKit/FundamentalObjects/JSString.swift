@@ -23,20 +23,20 @@ public struct JSString: LosslessStringConvertible, Equatable {
         lazy var jsRef: JavaScriptObjectRef = {
             self.shouldDealocateRef = true
             return buffer.withUTF8 { bufferPtr in
-                return _decode_string(bufferPtr.baseAddress!, Int32(bufferPtr.count))
+                return swjs_decode_string(bufferPtr.baseAddress!, Int32(bufferPtr.count))
             }
         }()
 
         lazy var buffer: String = {
             var bytesRef: JavaScriptObjectRef = 0
-            let bytesLength = Int(_encode_string(jsRef, &bytesRef))
+            let bytesLength = Int(swjs_encode_string(jsRef, &bytesRef))
             // +1 for null terminator
             let buffer = malloc(Int(bytesLength + 1))!.assumingMemoryBound(to: UInt8.self)
             defer {
                 free(buffer)
-                _release(bytesRef)
+                swjs_release(bytesRef)
             }
-            _load_string(bytesRef, buffer)
+            swjs_load_string(bytesRef, buffer)
             buffer[bytesLength] = 0
             return String(decodingCString: UnsafePointer(buffer), as: UTF8.self)
         }()
@@ -52,7 +52,7 @@ public struct JSString: LosslessStringConvertible, Equatable {
 
         deinit {
             guard shouldDealocateRef else { return }
-            _release(jsRef)
+            swjs_release(jsRef)
         }
     }
 

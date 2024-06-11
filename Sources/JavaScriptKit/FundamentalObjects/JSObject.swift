@@ -130,7 +130,7 @@ public class JSObject: Equatable {
     /// - Parameter constructor: The constructor function to check.
     /// - Returns: The result of `instanceof` in the JavaScript environment.
     public func isInstanceOf(_ constructor: JSFunction) -> Bool {
-        _instanceof(id, constructor.id)
+        swjs_instanceof(id, constructor.id)
     }
 
     static let _JS_Predef_Value_Global: JavaScriptObjectRef = 0
@@ -139,7 +139,7 @@ public class JSObject: Equatable {
     /// This allows access to the global properties and global names by accessing the `JSObject` returned.
     public static let global = JSObject(id: _JS_Predef_Value_Global)
 
-    deinit { _release(id) }
+    deinit { swjs_release(id) }
 
     /// Returns a Boolean value indicating whether two values point to same objects.
     ///
