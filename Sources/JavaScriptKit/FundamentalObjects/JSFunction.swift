@@ -55,7 +55,7 @@ public class JSFunction: JSObject {
     public func new(arguments: [ConvertibleToJSValue]) -> JSObject {
         arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
-                JSObject(id: _call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
+                JSObject(id: swjs_call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
             }
         }
     }
@@ -101,7 +101,7 @@ public class JSFunction: JSObject {
                 let argc = bufferPointer.count
                 var payload1 = JavaScriptPayload1()
                 var payload2 = JavaScriptPayload2()
-                let resultBitPattern = _call_function_no_catch(
+                let resultBitPattern = swjs_call_function_no_catch(
                     id, argv, Int32(argc),
                     &payload1, &payload2
                 )
@@ -121,7 +121,7 @@ public class JSFunction: JSObject {
                 let argc = bufferPointer.count
                 var payload1 = JavaScriptPayload1()
                 var payload2 = JavaScriptPayload2()
-                let resultBitPattern = _call_function_with_this_no_catch(this.id,
+                let resultBitPattern = swjs_call_function_with_this_no_catch(this.id,
                     id, argv, Int32(argc),
                     &payload1, &payload2
                 )

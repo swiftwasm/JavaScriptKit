@@ -47,7 +47,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     /// - Parameter array: The array that will be copied to create a new instance of TypedArray
     public convenience init(_ array: [Element]) {
         let jsArrayRef = array.withUnsafeBufferPointer { ptr in
-            _create_typed_array(Self.constructor!.id, ptr.baseAddress!, Int32(array.count))
+            swjs_create_typed_array(Self.constructor!.id, ptr.baseAddress!, Int32(array.count))
         }
         self.init(unsafelyWrapping: JSObject(id: jsArrayRef))
     }
@@ -82,7 +82,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         let rawBuffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: bytesLength)
         defer { rawBuffer.deallocate() }
         let baseAddress = rawBuffer.baseAddress!
-        _load_typed_array(jsObject.id, baseAddress)
+        swjs_load_typed_array(jsObject.id, baseAddress)
         let length = bytesLength / MemoryLayout<Element>.size
         let rawBaseAddress = UnsafeRawPointer(baseAddress)
         let bufferPtr = UnsafeBufferPointer<Element>(
@@ -113,7 +113,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
             let rawBuffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: bytesLength)
             defer { rawBuffer.deallocate() }
             let baseAddress = rawBuffer.baseAddress!
-            _load_typed_array(jsObject.id, baseAddress)
+            swjs_load_typed_array(jsObject.id, baseAddress)
             let length = bytesLength / MemoryLayout<Element>.size
             let rawBaseAddress = UnsafeRawPointer(baseAddress)
             let bufferPtr = UnsafeBufferPointer<Element>(

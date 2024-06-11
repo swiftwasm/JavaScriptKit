@@ -196,7 +196,7 @@ extension JSValue: ExpressibleByNilLiteral {
 
 public func getJSValue(this: JSObject, name: JSString) -> JSValue {
     var rawValue = RawJSValue()
-    let rawBitPattern = _get_prop(
+    let rawBitPattern = swjs_get_prop(
         this.id, name.asInternalJSRef(),
         &rawValue.payload1, &rawValue.payload2
     )
@@ -206,13 +206,13 @@ public func getJSValue(this: JSObject, name: JSString) -> JSValue {
 
 public func setJSValue(this: JSObject, name: JSString, value: JSValue) {
     value.withRawJSValue { rawValue in
-        _set_prop(this.id, name.asInternalJSRef(), rawValue.kind, rawValue.payload1, rawValue.payload2)
+        swjs_set_prop(this.id, name.asInternalJSRef(), rawValue.kind, rawValue.payload1, rawValue.payload2)
     }
 }
 
 public func getJSValue(this: JSObject, index: Int32) -> JSValue {
     var rawValue = RawJSValue()
-    let rawBitPattern = _get_subscript(
+    let rawBitPattern = swjs_get_subscript(
         this.id, index,
         &rawValue.payload1, &rawValue.payload2
     )
@@ -222,7 +222,7 @@ public func getJSValue(this: JSObject, index: Int32) -> JSValue {
 
 public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
     value.withRawJSValue { rawValue in
-        _set_subscript(this.id, index,
+        swjs_set_subscript(this.id, index,
                        rawValue.kind,
                        rawValue.payload1, rawValue.payload2)
     }
@@ -230,7 +230,7 @@ public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
 
 public func getJSValue(this: JSObject, symbol: JSSymbol) -> JSValue {
     var rawValue = RawJSValue()
-    let rawBitPattern = _get_prop(
+    let rawBitPattern = swjs_get_prop(
         this.id, symbol.id,
         &rawValue.payload1, &rawValue.payload2
     )
@@ -240,7 +240,7 @@ public func getJSValue(this: JSObject, symbol: JSSymbol) -> JSValue {
 
 public func setJSValue(this: JSObject, symbol: JSSymbol, value: JSValue) {
     value.withRawJSValue { rawValue in
-        _set_prop(this.id, symbol.id, rawValue.kind, rawValue.payload1, rawValue.payload2)
+        swjs_set_prop(this.id, symbol.id, rawValue.kind, rawValue.payload1, rawValue.payload2)
     }
 }
 

@@ -44,7 +44,7 @@ public class JSThrowingFunction {
                 var exceptionKind = JavaScriptValueKindAndFlags()
                 var exceptionPayload1 = JavaScriptPayload1()
                 var exceptionPayload2 = JavaScriptPayload2()
-                let resultObj = _call_throwing_new(
+                let resultObj = swjs_call_throwing_new(
                     self.base.id, argv, Int32(argc),
                     &exceptionKind, &exceptionPayload1, &exceptionPayload2
                 )
@@ -73,13 +73,13 @@ private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSV
             var payload1 = JavaScriptPayload1()
             var payload2 = JavaScriptPayload2()
             if let thisId = this?.id {
-                let resultBitPattern = _call_function_with_this(
+                let resultBitPattern = swjs_call_function_with_this(
                     thisId, id, argv, Int32(argc),
                     &payload1, &payload2
                 )
                 kindAndFlags = unsafeBitCast(resultBitPattern, to: JavaScriptValueKindAndFlags.self)
             } else {
-                let resultBitPattern = _call_function(
+                let resultBitPattern = swjs_call_function(
                     id, argv, Int32(argc),
                     &payload1, &payload2
                 )

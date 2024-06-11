@@ -94,7 +94,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
         #if compiler(>=5.9)
         typealias swift_task_asyncMainDrainQueue_hook_Fn = @convention(thin) (swift_task_asyncMainDrainQueue_original, swift_task_asyncMainDrainQueue_override) -> Void
         let swift_task_asyncMainDrainQueue_hook_impl: swift_task_asyncMainDrainQueue_hook_Fn = { _, _ in
-            _unsafe_event_loop_yield()
+            swjs_unsafe_event_loop_yield()
         }
         swift_task_asyncMainDrainQueue_hook = unsafeBitCast(swift_task_asyncMainDrainQueue_hook_impl, to: UnsafeMutableRawPointer?.self)
         #endif
@@ -224,9 +224,4 @@ public extension JSPromise {
     }
 }
 
-#endif
-
-// See `Sources/JavaScriptKit/XcodeSupport.swift` for rationale of the stub functions.
-#if !arch(wasm32)
-    func _unsafe_event_loop_yield() { fatalError() }
 #endif
