@@ -73,21 +73,29 @@ typedef struct {
 } RawJSValue;
 
 #if __wasm32__
+# define IMPORT_JS_FUNCTION(name, returns, args) \
+__attribute__((__import_module__("javascript_kit"), __import_name__(#name))) extern returns name args;
+#else
+# define IMPORT_JS_FUNCTION(name, returns, args) \
+  static inline returns name args { \
+    abort(); \
+  }
+#endif
 
-/// `_set_prop` sets a value of `_this` JavaScript object.
+/// Set a value of `_this` JavaScript object.
 ///
 /// @param _this The target JavaScript object to set the given value.
 /// @param prop A JavaScript string object to reference a member of `_this` object.
 /// @param kind A kind of JavaScript value to set the target object.
 /// @param payload1 The first payload of JavaScript value to set the target object.
 /// @param payload2 The second payload of JavaScript value to set the target object.
-__attribute__((__import_module__("javascript_kit"),
-               __import_name__("swjs_set_prop")))
-extern void _set_prop(const JavaScriptObjectRef _this,
-                      const JavaScriptObjectRef prop,
-                      const JavaScriptValueKind kind,
-                      const JavaScriptPayload1 payload1,
-                      const JavaScriptPayload2 payload2);
+IMPORT_JS_FUNCTION(swjs_set_prop, void, (const JavaScriptObjectRef _this,
+                                         const JavaScriptObjectRef prop,
+                                         const JavaScriptValueKind kind,
+                                         const JavaScriptPayload1 payload1,
+                                         const JavaScriptPayload2 payload2))
+
+#if __wasm32__
 
 /// `_get_prop` gets a value of `_this` JavaScript object.
 ///

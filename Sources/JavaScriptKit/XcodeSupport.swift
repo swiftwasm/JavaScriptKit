@@ -6,13 +6,6 @@ import _CJavaScriptKit
 /// to be built for host platforms like macOS or Linux for tentative IDE support.
 /// (ideally, IDE should build for WebAssembly target though)
 #if !arch(wasm32)
-    func _set_prop(
-        _: JavaScriptObjectRef,
-        _: JavaScriptObjectRef,
-        _: JavaScriptValueKind,
-        _: JavaScriptPayload1,
-        _: JavaScriptPayload2
-    ) { fatalError() }
     func _get_prop(
         _: JavaScriptObjectRef,
         _: JavaScriptObjectRef,
