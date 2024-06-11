@@ -83,3 +83,11 @@ objectHeap.testSuite("Increment and decrement RC") { n in
         _ = global.objectHeapDummy
     }
 }
+
+let propertyAccess = Benchmark("Property access")
+
+propertyAccess.testSuite("Dynamic member lookup") { n in
+    for _ in 0 ..< n {
+        _ = global.jsNumber
+    }
+}
