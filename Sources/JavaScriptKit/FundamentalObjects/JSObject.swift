@@ -52,6 +52,24 @@ public class JSObject: Equatable {
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The `name` member method binding this object as `this` context.
     @_disfavoredOverload
+    public subscript(_ name: StaticString) -> ((ConvertibleToJSValue...) -> JSValue)? {
+        guard let function = self[name].function else { return nil }
+        return { (arguments: ConvertibleToJSValue...) in
+            function(this: self, arguments: arguments)
+        }
+    }
+
+    /// Returns the `name` member method binding this object as `this` context.
+    ///
+    /// e.g.
+    /// ```swift
+    /// let document = JSObject.global.document.object!
+    /// let divElement = document.createElement!("div")
+    /// ```
+    ///
+    /// - Parameter name: The name of this object's member to access.
+    /// - Returns: The `name` member method binding this object as `this` context.
+    @_disfavoredOverload
     public subscript(_ name: JSString) -> ((ConvertibleToJSValue...) -> JSValue)? {
         guard let function = self[name].function else { return nil }
         return { (arguments: ConvertibleToJSValue...) in
@@ -62,13 +80,13 @@ public class JSObject: Equatable {
     /// A convenience method of `subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
     /// to access the member through Dynamic Member Lookup.
     @_disfavoredOverload
-    public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue)? {
+    public subscript(dynamicMember name: StaticString) -> ((ConvertibleToJSValue...) -> JSValue)? {
         self[name]
     }
 
     /// A convenience method of `subscript(_ name: String) -> JSValue`
     /// to access the member through Dynamic Member Lookup.
-    public subscript(dynamicMember name: String) -> JSValue {
+    public subscript(dynamicMember name: StaticString) -> JSValue {
         get { self[name] }
         set { self[name] = newValue }
     }
@@ -79,6 +97,14 @@ public class JSObject: Equatable {
     public subscript(_ name: String) -> JSValue {
         get { getJSValue(this: self, name: JSString(name)) }
         set { setJSValue(this: self, name: JSString(name), value: newValue) }
+    }
+
+    /// Access the `name` member dynamically through JavaScript and Swift runtime bridge library.
+    /// - Parameter name: The name of this object's member to access.
+    /// - Returns: The value of the `name` member of this object.
+    public subscript(_ name: StaticString) -> JSValue {
+        get { getJSValue(this: self, name: name) }
+        set { setJSValue(this: self, name: name, value: newValue) }
     }
 
     /// Access the `name` member dynamically through JavaScript and Swift runtime bridge library.
@@ -201,6 +227,17 @@ public class JSThrowingObject {
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The `name` member method binding this object as `this` context.
     @_disfavoredOverload
+    public subscript(_ name: StaticString) -> ((ConvertibleToJSValue...) throws -> JSValue)? {
+        guard let function = base[name].function?.throws else { return nil }
+        return { [base] (arguments: ConvertibleToJSValue...) in
+            try function(this: base, arguments: arguments)
+        }
+    }
+
+    /// Returns the `name` member method binding this object as `this` context.
+    /// - Parameter name: The name of this object's member to access.
+    /// - Returns: The `name` member method binding this object as `this` context.
+    @_disfavoredOverload
     public subscript(_ name: String) -> ((ConvertibleToJSValue...) throws -> JSValue)? {
         guard let function = base[name].function?.throws else { return nil }
         return { [base] (arguments: ConvertibleToJSValue...) in
@@ -211,7 +248,7 @@ public class JSThrowingObject {
     /// A convenience method of `subscript(_ name: String) -> ((ConvertibleToJSValue...) throws -> JSValue)?`
     /// to access the member through Dynamic Member Lookup.
     @_disfavoredOverload
-    public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) throws -> JSValue)? {
+    public subscript(dynamicMember name: StaticString) -> ((ConvertibleToJSValue...) throws -> JSValue)? {
         self[name]
     }
 }
