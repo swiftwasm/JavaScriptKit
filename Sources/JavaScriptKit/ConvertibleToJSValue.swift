@@ -334,7 +334,7 @@ extension JSValue {
             payload1 = boolValue ? 1 : 0
         case let .number(numberValue):
             #if hasFeature(Embedded)
-            kind = 1
+            kind = 2
             #else
             kind = .number
             #endif
@@ -344,42 +344,42 @@ extension JSValue {
             return string.withRawJSValue(body)
         case let .object(ref):
             #if hasFeature(Embedded)
-            kind = 2
+            kind = 3
             #else
             kind = .object
             #endif
             payload1 = JavaScriptPayload1(ref.id)
         case .null:
             #if hasFeature(Embedded)
-            kind = 3
+            kind = 4
             #else
             kind = .null
             #endif
             payload1 = 0
         case .undefined:
             #if hasFeature(Embedded)
-            kind = 4
+            kind = 5
             #else
             kind = .undefined
             #endif
             payload1 = 0
         case let .function(functionRef):
             #if hasFeature(Embedded)
-            kind = 5
+            kind = 6
             #else
             kind = .function
             #endif
             payload1 = JavaScriptPayload1(functionRef.id)
         case let .symbol(symbolRef):
             #if hasFeature(Embedded)
-            kind = 6
+            kind = 7
             #else
             kind = .symbol
             #endif
             payload1 = JavaScriptPayload1(symbolRef.id)
         case let .bigInt(bigIntRef):
             #if hasFeature(Embedded)
-            kind = 7
+            kind = 8
             #else
             kind = .bigInt
             #endif
