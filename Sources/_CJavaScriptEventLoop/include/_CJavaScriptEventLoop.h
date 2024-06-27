@@ -61,4 +61,9 @@ typedef SWIFT_CC(swift) void (*swift_task_asyncMainDrainQueue_override)(
 SWIFT_EXPORT_FROM(swift_Concurrency)
 extern void *_Nullable swift_task_asyncMainDrainQueue_hook;
 
+
+/// MARK: - thread local storage
+
+extern _Thread_local void * _Nullable swjs_thread_local_event_loop;
+
 #endif

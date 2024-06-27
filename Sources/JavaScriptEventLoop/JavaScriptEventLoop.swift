@@ -57,7 +57,28 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     }
 
     /// A singleton instance of the Executor
-    public static let shared: JavaScriptEventLoop = {
+    public static var shared: JavaScriptEventLoop {
+        return _shared
+    }
+
+    #if compiler(>=6.0) && _runtime(_multithreaded)
+    // In multi-threaded environment, we have an event loop executor per
+    // thread (per Web Worker). A job enqueued in one thread should be
+    // executed in the same thread under this global executor.
+    private static var _shared: JavaScriptEventLoop {
+        if let tls = swjs_thread_local_event_loop {
+            let eventLoop = Unmanaged<JavaScriptEventLoop>.fromOpaque(tls).takeUnretainedValue()
+            return eventLoop
+        }
+        let eventLoop = create()
+        swjs_thread_local_event_loop = Unmanaged.passRetained(eventLoop).toOpaque()
+        return eventLoop
+    }
+    #else
+    private static let _shared: JavaScriptEventLoop = create()
+    #endif
+
+    private static func create() -> JavaScriptEventLoop {
         let promise = JSPromise(resolver: { resolver -> Void in
             resolver(.success(.undefined))
         })
@@ -79,7 +100,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
             }
         )
         return eventLoop
-    }()
+    }
 
     private static var didInstallGlobalExecutor = false
 
@@ -124,7 +145,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
             JavaScriptEventLoop.shared.unsafeEnqueue(job)
         }
         swift_task_enqueueMainExecutor_hook = unsafeBitCast(swift_task_enqueueMainExecutor_hook_impl, to: UnsafeMutableRawPointer?.self)
-        
+
         didInstallGlobalExecutor = true
     }
 
