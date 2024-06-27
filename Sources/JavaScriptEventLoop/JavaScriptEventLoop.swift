@@ -150,7 +150,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
         typealias swift_task_enqueueMainExecutor_hook_Fn = @convention(thin) (UnownedJob, swift_task_enqueueMainExecutor_original) -> Void
         let swift_task_enqueueMainExecutor_hook_impl: swift_task_enqueueMainExecutor_hook_Fn = { job, original in
-            JavaScriptEventLoop.enqueueMainJob(job)
+            JavaScriptEventLoop.shared.unsafeEnqueue(job)
         }
         swift_task_enqueueMainExecutor_hook = unsafeBitCast(swift_task_enqueueMainExecutor_hook_impl, to: UnsafeMutableRawPointer?.self)
 
@@ -187,21 +187,6 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
     public func asUnownedSerialExecutor() -> UnownedSerialExecutor {
         return UnownedSerialExecutor(ordinary: self)
-    }
-
-    public static func enqueueMainJob(_ job: consuming ExecutorJob) {
-        self.enqueueMainJob(UnownedJob(job))
-    }
-
-    static func enqueueMainJob(_ job: UnownedJob) {
-        let currentEventLoop = JavaScriptEventLoop.shared
-        if currentEventLoop === JavaScriptEventLoop.mainThreadEventLoop {
-            currentEventLoop.unsafeEnqueue(job)
-        } else {
-            // Notify the main thread to execute the job
-            let jobBitPattern = unsafeBitCast(job, to: UInt.self)
-            _ = JSObject.global.postMessage!(jobBitPattern)
-        }
     }
 }
 
