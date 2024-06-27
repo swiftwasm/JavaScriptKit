@@ -61,7 +61,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
         return _shared
     }
 
-    #if _runtime(_multithreaded)
+    #if compiler(>=6.0) && _runtime(_multithreaded)
     // In multi-threaded environment, we have an event loop executor per
     // thread (per Web Worker). A job enqueued in one thread should be
     // executed in the same thread under this global executor.
