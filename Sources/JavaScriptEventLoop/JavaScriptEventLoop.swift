@@ -57,7 +57,28 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     }
 
     /// A singleton instance of the Executor
-    public static let shared: JavaScriptEventLoop = {
+    public static var shared: JavaScriptEventLoop {
+        return _shared
+    }
+
+    #if _runtime(_multithreaded)
+    // In multi-threaded environment, we have an event loop executor per
+    // thread (per Web Worker). A job enqueued in one thread should be
+    // executed in the same thread under this global executor.
+    private static var _shared: JavaScriptEventLoop {
+        if let tls = swjs_thread_local_event_loop {
+            let eventLoop = Unmanaged<JavaScriptEventLoop>.fromOpaque(tls).takeUnretainedValue()
+            return eventLoop
+        }
+        let eventLoop = create()
+        swjs_thread_local_event_loop = Unmanaged.passRetained(eventLoop).toOpaque()
+        return eventLoop
+    }
+    #else
+    private static let _shared: JavaScriptEventLoop = create()
+    #endif
+
+    private static func create() -> JavaScriptEventLoop {
         let promise = JSPromise(resolver: { resolver -> Void in
             resolver(.success(.undefined))
         })
@@ -79,9 +100,13 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
             }
         )
         return eventLoop
-    }()
+    }
 
     private static var didInstallGlobalExecutor = false
+    fileprivate static var _mainThreadEventLoop: JavaScriptEventLoop!
+    fileprivate static var mainThreadEventLoop: JavaScriptEventLoop {
+        return _mainThreadEventLoop
+    }
 
     /// Set JavaScript event loop based executor to be the global executor
     /// Note that this should be called before any of the jobs are created.
@@ -90,6 +115,10 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     /// executors](https://github.com/rjmccall/swift-evolution/blob/custom-executors/proposals/0000-custom-executors.md#the-default-global-concurrent-executor)
     public static func installGlobalExecutor() {
         guard !didInstallGlobalExecutor else { return }
+
+        // NOTE: We assume that this function is called before any of the jobs are created, so we can safely
+        // assume that we are in the main thread.
+        _mainThreadEventLoop = JavaScriptEventLoop.shared
 
         #if compiler(>=5.9)
         typealias swift_task_asyncMainDrainQueue_hook_Fn = @convention(thin) (swift_task_asyncMainDrainQueue_original, swift_task_asyncMainDrainQueue_override) -> Void
@@ -121,10 +150,10 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
         typealias swift_task_enqueueMainExecutor_hook_Fn = @convention(thin) (UnownedJob, swift_task_enqueueMainExecutor_original) -> Void
         let swift_task_enqueueMainExecutor_hook_impl: swift_task_enqueueMainExecutor_hook_Fn = { job, original in
-            JavaScriptEventLoop.shared.unsafeEnqueue(job)
+            JavaScriptEventLoop.enqueueMainJob(job)
         }
         swift_task_enqueueMainExecutor_hook = unsafeBitCast(swift_task_enqueueMainExecutor_hook_impl, to: UnsafeMutableRawPointer?.self)
-        
+
         didInstallGlobalExecutor = true
     }
 
@@ -158,6 +187,21 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
     public func asUnownedSerialExecutor() -> UnownedSerialExecutor {
         return UnownedSerialExecutor(ordinary: self)
+    }
+
+    public static func enqueueMainJob(_ job: consuming ExecutorJob) {
+        self.enqueueMainJob(UnownedJob(job))
+    }
+
+    static func enqueueMainJob(_ job: UnownedJob) {
+        let currentEventLoop = JavaScriptEventLoop.shared
+        if currentEventLoop === JavaScriptEventLoop.mainThreadEventLoop {
+            currentEventLoop.unsafeEnqueue(job)
+        } else {
+            // Notify the main thread to execute the job
+            let jobBitPattern = unsafeBitCast(job, to: UInt.self)
+            _ = JSObject.global.postMessage!(jobBitPattern)
+        }
     }
 }
 
