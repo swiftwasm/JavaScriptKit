@@ -48,6 +48,23 @@ export const decode = (
     }
 };
 
+export function makeStringDecoder(sharedMemory: boolean, textDecoder: TextDecoder): (ptr: pointer, length: number, memory: Memory) => string {
+    // NOTE: TextDecoder can't decode typed arrays backed by SharedArrayBuffer
+    return sharedMemory == true
+        ? ((bytes_ptr: pointer, length: number, memory: Memory) => {
+            const bytes = memory
+                .bytes()
+                .slice(bytes_ptr, bytes_ptr + length);
+            return textDecoder.decode(bytes);
+        })
+        : ((bytes_ptr: pointer, length: number, memory: Memory) => {
+            const bytes = memory
+                .bytes()
+                .subarray(bytes_ptr, bytes_ptr + length);
+            return textDecoder.decode(bytes);
+        })
+}
+
 // Note:
 // `decodeValues` assumes that the size of RawJSValue is 16.
 export const decodeArray = (ptr: pointer, length: number, memory: Memory) => {

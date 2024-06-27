@@ -45,6 +45,22 @@ const decode = (kind, payload1, payload2, memory) => {
             assertNever(kind, `JSValue Type kind "${kind}" is not supported`);
     }
 };
+function makeStringDecoder(sharedMemory, textDecoder) {
+    // NOTE: TextDecoder can't decode typed arrays backed by SharedArrayBuffer
+    return sharedMemory == true
+        ? ((bytes_ptr, length, memory) => {
+            const bytes = memory
+                .bytes()
+                .slice(bytes_ptr, bytes_ptr + length);
+            return textDecoder.decode(bytes);
+        })
+        : ((bytes_ptr, length, memory) => {
+            const bytes = memory
+                .bytes()
+                .subarray(bytes_ptr, bytes_ptr + length);
+            return textDecoder.decode(bytes);
+        });
+}
 // Note:
 // `decodeValues` assumes that the size of RawJSValue is 16.
 const decodeArray = (ptr, length, memory) => {
@@ -280,6 +296,7 @@ class SwiftRuntime {
         return output;
     }
     get wasmImports() {
+        const decodeString = makeStringDecoder(this.options.sharedMemory == true, this.textDecoder);
         return {
             swjs_set_prop: (ref, name, kind, payload1, payload2) => {
                 const memory = this.memory;
@@ -292,6 +309,20 @@ class SwiftRuntime {
                 const memory = this.memory;
                 const obj = memory.getObject(ref);
                 const key = memory.getObject(name);
+                const result = obj[key];
+                return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, memory);
+            },
+            swjs_set_prop_with_string_key: (ref, prop_ptr, prop_length, kind, payload1, payload2) => {
+                const memory = this.memory;
+                const obj = memory.getObject(ref);
+                const key = decodeString(prop_ptr, prop_length, memory);
+                const value = decode(kind, payload1, payload2, memory);
+                obj[key] = value;
+            },
+            swjs_get_prop_with_string_key: (ref, prop_ptr, prop_length, payload1_ptr, payload2_ptr) => {
+                const memory = this.memory;
+                const obj = memory.getObject(ref);
+                const key = decodeString(prop_ptr, prop_length, memory);
                 const result = obj[key];
                 return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, memory);
             },
@@ -313,25 +344,11 @@ class SwiftRuntime {
                 memory.writeUint32(bytes_ptr_result, bytes_ptr);
                 return bytes.length;
             },
-            swjs_decode_string: (
-            // NOTE: TextDecoder can't decode typed arrays backed by SharedArrayBuffer
-            this.options.sharedMemory == true
-                ? ((bytes_ptr, length) => {
-                    const memory = this.memory;
-                    const bytes = memory
-                        .bytes()
-                        .slice(bytes_ptr, bytes_ptr + length);
-                    const string = this.textDecoder.decode(bytes);
-                    return memory.retain(string);
-                })
-                : ((bytes_ptr, length) => {
-                    const memory = this.memory;
-                    const bytes = memory
-                        .bytes()
-                        .subarray(bytes_ptr, bytes_ptr + length);
-                    const string = this.textDecoder.decode(bytes);
-                    return memory.retain(string);
-                })),
+            swjs_decode_string: (bytes_ptr, length) => {
+                const memory = this.memory;
+                const string = decodeString(bytes_ptr, length, memory);
+                return memory.retain(string);
+            },
             swjs_load_string: (ref, buffer) => {
                 const memory = this.memory;
                 const bytes = memory.getObject(ref);

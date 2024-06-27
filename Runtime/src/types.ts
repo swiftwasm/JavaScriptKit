@@ -35,6 +35,21 @@ export interface ImportedFunctions {
         payload1_ptr: pointer,
         payload2_ptr: pointer
     ): JavaScriptValueKind;
+    swjs_set_prop_with_string_key(
+        ref: number,
+        name: number,
+        prop_ptr: pointer,
+        prop_length: number,
+        payload1: number,
+        payload2: number
+    ): void;
+    swjs_get_prop_with_string_key(
+        ref: number,
+        prop_ptr: pointer,
+        prop_length: number,
+        payload1_ptr: pointer,
+        payload2_ptr: pointer
+    ): JavaScriptValueKind;
     swjs_set_subscript(
         ref: number,
         index: number,

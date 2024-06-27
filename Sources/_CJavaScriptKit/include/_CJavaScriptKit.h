@@ -107,6 +107,37 @@ IMPORT_JS_FUNCTION(swjs_get_prop, uint32_t, (const JavaScriptObjectRef _this,
                                              JavaScriptPayload1 *payload1,
                                              JavaScriptPayload2 *payload2))
 
+/// Sets a value of `_this` JavaScript object with a string key
+/// This is a fast path of `swjs_set_prop` for the case where property key is known to be a string in the linear memory
+///
+/// @param _this The target JavaScript object to set the given value.
+/// @param prop_ptr A `uint8_t` byte sequence to decode.
+/// @param prop_length The length of `prop_ptr` byte sequence.
+/// @param kind A kind of JavaScript value to set the target object.
+/// @param payload1 The first payload of JavaScript value to set the target object.
+/// @param payload2 The second payload of JavaScript value to set the target object.
+IMPORT_JS_FUNCTION(swjs_set_prop_with_string_key, void, (const JavaScriptObjectRef _this,
+                                                         const unsigned char *prop_ptr,
+                                                         const int prop_length,
+                                                         const JavaScriptValueKind kind,
+                                                         const JavaScriptPayload1 payload1,
+                                                         const JavaScriptPayload2 payload2))
+
+/// Gets a value of `_this` JavaScript object with a string key
+/// This is a fast path of `swjs_get_prop` for the case where property key is known to be a string in the linear memory
+///
+/// @param _this The target JavaScript object to get its member value.
+/// @param prop_ptr A `uint8_t` byte sequence to decode.
+/// @param prop_length The length of `prop_ptr` byte sequence.
+/// @param payload1 A result pointer of first payload of JavaScript value to set the target object.
+/// @param payload2 A result pointer of second payload of JavaScript value to set the target object.
+/// @return A `JavaScriptValueKind` bits represented as 32bit integer for the returned value.
+IMPORT_JS_FUNCTION(swjs_get_prop_with_string_key, uint32_t, (const JavaScriptObjectRef _this,
+                                                             const unsigned char *prop_ptr,
+                                                             const int prop_length,
+                                                             JavaScriptPayload1 *payload1,
+                                                             JavaScriptPayload2 *payload2))
+
 /// Sets a value of `_this` JavaScript object.
 ///
 /// @param _this The target JavaScript object to set its member value.
