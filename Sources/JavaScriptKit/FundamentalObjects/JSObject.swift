@@ -137,7 +137,16 @@ public class JSObject: Equatable {
 
     /// A `JSObject` of the global scope object.
     /// This allows access to the global properties and global names by accessing the `JSObject` returned.
-    public static let global = JSObject(id: _JS_Predef_Value_Global)
+    public static var global: JSObject { return _global }
+
+    // `JSObject` storage itself is immutable, and use of `JSObject.global` from other
+    // threads maintains the same semantics as `globalThis` in JavaScript.
+    #if compiler(>=5.10)
+    nonisolated(unsafe)
+    static let _global = JSObject(id: _JS_Predef_Value_Global)
+    #else
+    static let _global = JSObject(id: _JS_Predef_Value_Global)
+    #endif
 
     deinit { swjs_release(id) }
 
