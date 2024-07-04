@@ -47,4 +47,6 @@ int swjs_library_features(void) {
     return _library_features();
 }
 
+_Thread_local void *swjs_thread_local_closures;
+
 #endif

@@ -12,4 +12,6 @@ const handleExitOrError = (error) => {
   process.exit(1);
 }
 
+Error.stackTraceLimit = Infinity;
+
 startWasiTask(process.argv[2]).catch(handleExitOrError);

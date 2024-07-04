@@ -9,7 +9,7 @@ import _CJavaScriptEventLoop
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 struct QueueState: Sendable {
     fileprivate var headJob: UnownedJob? = nil
-    fileprivate var isSpinning: Bool = false
+    var isSpinning: Bool = false
 }
 
 @available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)

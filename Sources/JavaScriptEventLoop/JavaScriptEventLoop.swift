@@ -1,6 +1,7 @@
 import JavaScriptKit
 import _CJavaScriptEventLoop
 import _CJavaScriptKit
+import Synchronization
 
 // NOTE: `@available` annotations are semantically wrong, but they make it easier to develop applications targeting WebAssembly in Xcode.
 
@@ -56,7 +57,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
         self.setTimeout = setTimeout
     }
 
-    /// A singleton instance of the Executor
+    /// A per-thread singleton instance of the Executor
     public static var shared: JavaScriptEventLoop {
         return _shared
     }
@@ -142,6 +143,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
         typealias swift_task_enqueueMainExecutor_hook_Fn = @convention(thin) (UnownedJob, swift_task_enqueueMainExecutor_original) -> Void
         let swift_task_enqueueMainExecutor_hook_impl: swift_task_enqueueMainExecutor_hook_Fn = { job, original in
+            assert(false)
             JavaScriptEventLoop.shared.unsafeEnqueue(job)
         }
         swift_task_enqueueMainExecutor_hook = unsafeBitCast(swift_task_enqueueMainExecutor_hook_impl, to: UnsafeMutableRawPointer?.self)
@@ -149,15 +151,31 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
         didInstallGlobalExecutor = true
     }
 
-    private func enqueue(_ job: UnownedJob, withDelay nanoseconds: UInt64) {
-        let milliseconds = nanoseconds / 1_000_000
-        setTimeout(Double(milliseconds), {
+    func enqueue(_ job: UnownedJob, withDelay nanoseconds: UInt64) {
+        enqueue(withDelay: nanoseconds, job: {
             #if compiler(>=5.9)
             job.runSynchronously(on: self.asUnownedSerialExecutor())
             #else
             job._runSynchronously(on: self.asUnownedSerialExecutor())
             #endif
         })
+    }
+
+    func enqueue(withDelay nanoseconds: UInt64, job: @escaping () -> Void) {
+        let milliseconds = nanoseconds / 1_000_000
+        setTimeout(Double(milliseconds), job)
+    }
+
+    func enqueue(
+        withDelay seconds: Int64, _ nanoseconds: Int64,
+        _ toleranceSec: Int64, _ toleranceNSec: Int64,
+        _ clock: Int32, job: @escaping () -> Void
+    ) {
+        var nowSec: Int64 = 0
+        var nowNSec: Int64 = 0
+        swift_get_time(&nowSec, &nowNSec, clock)
+        let delayNanosec = (seconds - nowSec) * 1_000_000_000 + (nanoseconds - nowNSec)
+        enqueue(withDelay: delayNanosec <= 0 ? 0 : UInt64(delayNanosec), job: job)
     }
 
     private func unsafeEnqueue(_ job: UnownedJob) {

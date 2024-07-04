@@ -63,8 +63,26 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 ///
 public class JSClosure: JSFunction, JSClosureProtocol {
 
+    class SharedJSClosure {
+        private var storage: [JavaScriptHostFuncRef: (object: JSObject, body: ([JSValue]) -> JSValue)] = [:]
+        init() {}
+
+        subscript(_ key: JavaScriptHostFuncRef) -> (object: JSObject, body: ([JSValue]) -> JSValue)? {
+            get { storage[key] }
+            set { storage[key] = newValue }
+        }
+    }
+
     // Note: Retain the closure object itself also to avoid funcRef conflicts
-    fileprivate static var sharedClosures: [JavaScriptHostFuncRef: (object: JSObject, body: ([JSValue]) -> JSValue)] = [:]
+    fileprivate static var sharedClosures: SharedJSClosure {
+        if let swjs_thread_local_closures {
+            return Unmanaged<SharedJSClosure>.fromOpaque(swjs_thread_local_closures).takeUnretainedValue()
+        } else {
+            let shared = SharedJSClosure()
+            swjs_thread_local_closures = Unmanaged.passRetained(shared).toOpaque()
+            return shared
+        }
+    }
 
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 

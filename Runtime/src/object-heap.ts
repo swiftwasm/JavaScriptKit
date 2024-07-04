@@ -4,6 +4,7 @@ import { ref } from "./types.js";
 type SwiftRuntimeHeapEntry = {
     id: number;
     rc: number;
+    released: boolean;
 };
 export class SwiftRuntimeHeap {
     private _heapValueById: Map<number, any>;
@@ -15,7 +16,11 @@ export class SwiftRuntimeHeap {
         this._heapValueById.set(0, globalVariable);
 
         this._heapEntryByValue = new Map();
-        this._heapEntryByValue.set(globalVariable, { id: 0, rc: 1 });
+        this._heapEntryByValue.set(globalVariable, {
+            id: 0,
+            rc: 1,
+            released: false,
+        });
 
         // Note: 0 is preserved for global
         this._heapNextKey = 1;
@@ -29,13 +34,22 @@ export class SwiftRuntimeHeap {
         }
         const id = this._heapNextKey++;
         this._heapValueById.set(id, value);
-        this._heapEntryByValue.set(value, { id: id, rc: 1 });
+        this._heapEntryByValue.set(value, { id: id, rc: 1, released: false });
         return id;
     }
 
     release(ref: ref) {
         const value = this._heapValueById.get(ref);
         const entry = this._heapEntryByValue.get(value)!;
+        if (entry.released) {
+            console.error(
+                "Double release detected for reference " + ref,
+                entry
+            );
+            throw new ReferenceError(
+                "Double release detected for reference " + ref
+            );
+        }
         entry.rc--;
         if (entry.rc != 0) return;
 
