@@ -199,6 +199,7 @@ class SwiftRuntime {
         this._instance = null;
         this._memory = null;
         this._closureDeallocator = null;
+        this.tid = null;
         this.options = options || {};
     }
     setInstance(instance) {
@@ -223,6 +224,31 @@ class SwiftRuntime {
             else if (typeof instance.exports.__main_argc_argv === "function") {
                 // Swift 6.0 and later use `__main_argc_argv` instead of `main`.
                 instance.exports.__main_argc_argv(0, 0);
+            }
+        }
+        catch (error) {
+            if (error instanceof UnsafeEventLoopYield) {
+                // Ignore the error
+                return;
+            }
+            // Rethrow other errors
+            throw error;
+        }
+    }
+    /**
+     * Start a new thread with the given `tid` and `startArg`, which
+     * is forwarded to the `wasi_thread_start` function.
+     * This function is expected to be called from the spawned Web Worker thread.
+     */
+    startThread(tid, startArg) {
+        this.tid = tid;
+        const instance = this.instance;
+        try {
+            if (typeof instance.exports.wasi_thread_start === "function") {
+                instance.exports.wasi_thread_start(tid, startArg);
+            }
+            else {
+                throw new Error(`The WebAssembly module is not built for wasm32-unknown-wasip1-threads target.`);
             }
         }
         catch (error) {
@@ -457,6 +483,53 @@ class SwiftRuntime {
             },
             swjs_unsafe_event_loop_yield: () => {
                 throw new UnsafeEventLoopYield();
+            },
+            // This function is called by WebWorkerTaskExecutor on Web Worker thread.
+            swjs_send_job_to_main_thread: (unowned_job) => {
+                const threadChannel = this.options.threadChannel;
+                if (threadChannel && "wakeUpMainThread" in threadChannel) {
+                    threadChannel.wakeUpMainThread(unowned_job);
+                }
+                else {
+                    throw new Error("wakeUpMainThread is not set in options given to SwiftRuntime. Please set it to send jobs to the main thread.");
+                }
+            },
+            swjs_listen_wake_event_from_main_thread: () => {
+                // After the thread is started,
+                const swjs_wake_worker_thread = this.exports.swjs_wake_worker_thread;
+                const threadChannel = this.options.threadChannel;
+                if (threadChannel &&
+                    "listenWakeEventFromMainThread" in threadChannel) {
+                    threadChannel.listenWakeEventFromMainThread(() => {
+                        swjs_wake_worker_thread();
+                    });
+                }
+                else {
+                    throw new Error("listenWakeEventFromMainThread is not set in options given to SwiftRuntime. Please set it to listen to wake events from the main thread.");
+                }
+            },
+            swjs_wake_up_worker_thread: (tid) => {
+                const threadChannel = this.options.threadChannel;
+                if (threadChannel && "wakeUpWorkerThread" in threadChannel) {
+                    threadChannel.wakeUpWorkerThread(tid);
+                }
+                else {
+                    throw new Error("wakeUpWorkerThread is not set in options given to SwiftRuntime. Please set it to wake up worker threads.");
+                }
+            },
+            swjs_listen_main_job_from_worker_thread: (tid) => {
+                const threadChannel = this.options.threadChannel;
+                if (threadChannel &&
+                    "listenMainJobFromWorkerThread" in threadChannel) {
+                    threadChannel.listenMainJobFromWorkerThread(tid, this.exports.swjs_enqueue_main_job_from_worker);
+                }
+                else {
+                    throw new Error("listenMainJobFromWorkerThread is not set in options given to SwiftRuntime. Please set it to listen to jobs from worker threads.");
+                }
+            },
+            swjs_get_worker_thread_id: () => {
+                // Main thread's tid is always -1
+                return this.tid || -1;
             },
         };
     }
