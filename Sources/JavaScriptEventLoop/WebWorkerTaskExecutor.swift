@@ -263,7 +263,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
             self.workers = workers
         }
 
-        func start() {
+        func start(timeout: Duration, checkInterval: Duration) async throws {
             class Context: @unchecked Sendable {
                 let executor: WebWorkerTaskExecutor.Executor
                 let worker: Worker
@@ -293,10 +293,16 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
             }
             // Wait until all worker threads are started and wire up messaging channels
             // between the main thread and workers to notify job enqueuing events each other.
+            let clock = ContinuousClock()
+            let workerInitStarted = clock.now
             for worker in workers {
                 var tid: pid_t
                 repeat {
+                    if workerInitStarted.duration(to: .now) > timeout {
+                        fatalError("Worker thread initialization timeout exceeded (\(timeout))")
+                    }
                     tid = worker.tid.load(ordering: .sequentiallyConsistent)
+                    try await clock.sleep(for: checkInterval)
                 } while tid == 0
                 swjs_listen_main_job_from_worker_thread(tid)
             }
@@ -330,10 +336,13 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
 
     /// Create a new Web Worker task executor.
     ///
-    /// - Parameter numberOfThreads: The number of Web Worker threads to spawn.
-    public init(numberOfThreads: Int) {
+    /// - Parameters:
+    ///   - numberOfThreads: The number of Web Worker threads to spawn.
+    ///   - timeout: The timeout to wait for all worker threads to be started.
+    ///   - checkInterval: The interval to check if all worker threads are started.
+    public init(numberOfThreads: Int, timeout: Duration = .seconds(3), checkInterval: Duration = .microseconds(5)) async throws {
         self.executor = Executor(numberOfThreads: numberOfThreads)
-        self.executor.start()
+        try await self.executor.start(timeout: timeout, checkInterval: checkInterval)
     }
 
     /// Terminate child Web Worker threads.

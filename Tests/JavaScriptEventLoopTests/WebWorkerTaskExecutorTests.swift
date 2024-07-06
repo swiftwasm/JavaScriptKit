@@ -12,8 +12,8 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         WebWorkerTaskExecutor.installGlobalExecutor()
     }
 
-    func testTaskRunOnMainThread() async {
-        let executor = WebWorkerTaskExecutor(numberOfThreads: 1)
+    func testTaskRunOnMainThread() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
 
         XCTAssertTrue(isMainThread())
 
@@ -29,15 +29,15 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         executor.terminate()
     }
 
-    func testWithPreferenceBlock() async {
-        let executor = WebWorkerTaskExecutor(numberOfThreads: 1)
+    func testWithPreferenceBlock() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
         await withTaskExecutorPreference(executor) {
             XCTAssertFalse(isMainThread())
         }
     }
 
     func testAwaitInsideTask() async throws {
-        let executor = WebWorkerTaskExecutor(numberOfThreads: 1)
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
 
         let task = Task(executorPreference: executor) {
             await Task.yield()
@@ -51,7 +51,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
     }
 
     func testSleepInsideTask() async throws {
-        let executor = WebWorkerTaskExecutor(numberOfThreads: 1)
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
 
         let task = Task(executorPreference: executor) {
             XCTAssertFalse(isMainThread())
@@ -69,8 +69,8 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         executor.terminate()
     }
 
-    func testMainActorRun() async {
-        let executor = WebWorkerTaskExecutor(numberOfThreads: 1)
+    func testMainActorRun() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
 
         let task = Task(executorPreference: executor) {
             await MainActor.run {
@@ -87,8 +87,8 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         executor.terminate()
     }
 
-    func testTaskGroupRunOnSameThread() async {
-        let executor = WebWorkerTaskExecutor(numberOfThreads: 3)
+    func testTaskGroupRunOnSameThread() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 3)
 
         let mainTid = swjs_get_worker_thread_id()
         await withTaskExecutorPreference(executor) {
@@ -112,8 +112,8 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         executor.terminate()
     }
 
-    func testTaskGroupRunOnDifferentThreads() async {
-        let executor = WebWorkerTaskExecutor(numberOfThreads: 2)
+    func testTaskGroupRunOnDifferentThreads() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 2)
 
         struct Item: Hashable {
             let type: String
