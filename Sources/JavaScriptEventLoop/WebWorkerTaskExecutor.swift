@@ -441,6 +441,8 @@ func _swjs_enqueue_main_job_from_worker(_ job: UnownedJob) {
     JavaScriptEventLoop.shared.enqueue(ExecutorJob(job))
 }
 
+/// Wake up the worker thread.
+/// This function is called when a job is enqueued from the main thread to a worker thread.
 @_expose(wasm, "swjs_wake_worker_thread")
 func _swjs_wake_worker_thread() {
     WebWorkerTaskExecutor.Worker.currentThread!.run()
