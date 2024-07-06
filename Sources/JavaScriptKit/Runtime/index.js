@@ -517,7 +517,8 @@
                 swjs_wake_up_worker_thread: (tid) => {
                     const threadChannel = this.options.threadChannel;
                     if (threadChannel && "wakeUpWorkerThread" in threadChannel) {
-                        threadChannel.wakeUpWorkerThread(tid);
+                        // Currently, the data is not used, but it can be used in the future.
+                        threadChannel.wakeUpWorkerThread(tid, {});
                     }
                     else {
                         throw new Error("wakeUpWorkerThread is not set in options given to SwiftRuntime. Please set it to wake up worker threads.");
