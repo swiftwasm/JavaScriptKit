@@ -10,21 +10,27 @@ import {
 import * as JSValue from "./js-value.js";
 import { Memory } from "./memory.js";
 
+type MainToWorkerMessage = {
+    type: "wake";
+};
+
+type WorkerToMainMessage = {
+    type: "job";
+    data: number;
+};
+
 /**
  * A thread channel is a set of functions that are used to communicate between
  * the main thread and the worker thread. The main thread and the worker thread
- * can send jobs to each other using these functions.
+ * can send messages to each other using these functions.
  *
  * @example
  * ```javascript
  * // worker.js
  * const runtime = new SwiftRuntime({
  *   threadChannel: {
- *     wakeUpMainThread: (unownedJob) => {
- *       // Send the job to the main thread
- *       postMessage(unownedJob);
- *     },
- *     listenWakeEventFromMainThread: (listener) => {
+ *     postMessageToMainThread: postMessage,
+ *     listenMessageFromMainThread: (listener) => {
  *       self.onmessage = (event) => {
  *         listener(event.data);
  *       };
@@ -36,10 +42,10 @@ import { Memory } from "./memory.js";
  * const worker = new Worker("worker.js");
  * const runtime = new SwiftRuntime({
  *   threadChannel: {
- *     wakeUpWorkerThread: (tid, data) => {
+ *     postMessageToWorkerThread: (tid, data) => {
  *       worker.postMessage(data);
  *     },
- *     listenMainJobFromWorkerThread: (tid, listener) => {
+ *     listenMessageFromWorkerThread: (tid, listener) => {
  *       worker.onmessage = (event) => {
            listener(event.data);
  *       };
@@ -50,40 +56,42 @@ import { Memory } from "./memory.js";
  */
 export type SwiftRuntimeThreadChannel =
     | {
-          /**
-           * This function is called when the Web Worker thread sends a job to the main thread.
-           * The unownedJob is the pointer to the unowned job object in the Web Worker thread.
-           * The job submitted by this function expected to be listened by `listenMainJobFromWorkerThread`.
-           */
-          wakeUpMainThread: (unownedJob: number) => void;
+        /**
+         * This function is used to send messages from the worker thread to the main thread.
+         * The message submitted by this function is expected to be listened by `listenMessageFromWorkerThread`.
+         * @param message The message to be sent to the main thread.
+         */
+          postMessageToMainThread: (message: WorkerToMainMessage) => void;
           /**
            * This function is expected to be set in the worker thread and should listen
-           * to the wake event from the main thread sent by `wakeUpWorkerThread`.
-           * The passed listener function awakes the Web Worker thread.
+           * to messages from the main thread sent by `postMessageToWorkerThread`.
+           * @param listener The listener function to be called when a message is received from the main thread.
            */
-          listenWakeEventFromMainThread: (listener: (data: unknown) => void) => void;
+          listenMessageFromMainThread: (listener: (message: MainToWorkerMessage) => void) => void;
       }
     | {
           /**
-           * This function is expected to be set in the main thread and called
-           * when the main thread sends a wake event to the Web Worker thread.
-           * The `tid` is the thread ID of the worker thread to be woken up.
-           * The `data` is the data to be sent to the worker thread.
-           * The wake event is expected to be listened by `listenWakeEventFromMainThread`.
+           * This function is expected to be set in the main thread.
+           * The message submitted by this function is expected to be listened by `listenMessageFromMainThread`.
+           * @param tid The thread ID of the worker thread.
+           * @param message The message to be sent to the worker thread.
            */
-          wakeUpWorkerThread: (tid: number, data: unknown) => void;
+          postMessageToWorkerThread: (tid: number, message: MainToWorkerMessage) => void;
           /**
            * This function is expected to be set in the main thread and shuold listen
-           * to the main job sent by `wakeUpMainThread` from the worker thread.
+           * to messsages sent by `postMessageToMainThread` from the worker thread.
+           * @param tid The thread ID of the worker thread.
+           * @param listener The listener function to be called when a message is received from the worker thread.
            */
-          listenMainJobFromWorkerThread: (
+          listenMessageFromWorkerThread: (
               tid: number,
-              listener: (unownedJob: number) => void
+              listener: (message: WorkerToMainMessage) => void
           ) => void;
 
           /**
            * This function is expected to be set in the main thread and called
            * when the worker thread is terminated.
+           * @param tid The thread ID of the worker thread.
            */
           terminateWorkerThread?: (tid: number) => void;
       };
@@ -578,60 +586,49 @@ export class SwiftRuntime {
             swjs_unsafe_event_loop_yield: () => {
                 throw new UnsafeEventLoopYield();
             },
-            // This function is called by WebWorkerTaskExecutor on Web Worker thread.
             swjs_send_job_to_main_thread: (unowned_job) => {
-                const threadChannel = this.options.threadChannel;
-                if (threadChannel && "wakeUpMainThread" in threadChannel) {
-                    threadChannel.wakeUpMainThread(unowned_job);
-                } else {
-                    throw new Error(
-                        "wakeUpMainThread is not set in options given to SwiftRuntime. Please set it to send jobs to the main thread."
-                    );
-                }
+                this.postMessageToMainThread({ type: "job", data: unowned_job });
             },
-            swjs_listen_wake_event_from_main_thread: () => {
-                // After the thread is started,
-                const swjs_wake_worker_thread =
-                    this.exports.swjs_wake_worker_thread;
+            swjs_listen_message_from_main_thread: () => {
                 const threadChannel = this.options.threadChannel;
-                if (
-                    threadChannel &&
-                    "listenWakeEventFromMainThread" in threadChannel
-                ) {
-                    threadChannel.listenWakeEventFromMainThread(() => {
-                        swjs_wake_worker_thread();
-                    });
-                } else {
+                if (!(threadChannel && "listenMessageFromMainThread" in threadChannel)) {
                     throw new Error(
-                        "listenWakeEventFromMainThread is not set in options given to SwiftRuntime. Please set it to listen to wake events from the main thread."
+                        "listenMessageFromMainThread is not set in options given to SwiftRuntime. Please set it to listen to wake events from the main thread."
                     );
                 }
+                threadChannel.listenMessageFromMainThread((message) => {
+                    switch (message.type) {
+                    case "wake":
+                        this.exports.swjs_wake_worker_thread();
+                        break;
+                    default:
+                        const unknownMessage: never = message.type;
+                        throw new Error(`Unknown message type: ${unknownMessage}`);
+                    }
+                });
             },
             swjs_wake_up_worker_thread: (tid) => {
-                const threadChannel = this.options.threadChannel;
-                if (threadChannel && "wakeUpWorkerThread" in threadChannel) {
-                    // Currently, the data is not used, but it can be used in the future.
-                    threadChannel.wakeUpWorkerThread(tid, {});
-                } else {
-                    throw new Error(
-                        "wakeUpWorkerThread is not set in options given to SwiftRuntime. Please set it to wake up worker threads."
-                    );
-                }
+                this.postMessageToWorkerThread(tid, { type: "wake" });
             },
-            swjs_listen_main_job_from_worker_thread: (tid) => {
+            swjs_listen_message_from_worker_thread: (tid) => {
                 const threadChannel = this.options.threadChannel;
-                if (
-                    threadChannel &&
-                    "listenMainJobFromWorkerThread" in threadChannel
-                ) {
-                    threadChannel.listenMainJobFromWorkerThread(
-                        tid, this.exports.swjs_enqueue_main_job_from_worker,
-                    );
-                } else {
+                if (!(threadChannel && "listenMessageFromWorkerThread" in threadChannel)) {
                     throw new Error(
-                        "listenMainJobFromWorkerThread is not set in options given to SwiftRuntime. Please set it to listen to jobs from worker threads."
+                        "listenMessageFromWorkerThread is not set in options given to SwiftRuntime. Please set it to listen to jobs from worker threads."
                     );
                 }
+                threadChannel.listenMessageFromWorkerThread(
+                    tid, (message) => {
+                        switch (message.type) {
+                        case "job":
+                            this.exports.swjs_enqueue_main_job_from_worker(message.data);
+                            break;
+                        default:
+                            const unknownMessage: never = message.type;
+                            throw new Error(`Unknown message type: ${unknownMessage}`);
+                        }
+                    },
+                );
             },
             swjs_terminate_worker_thread: (tid) => {
                 const threadChannel = this.options.threadChannel;
@@ -644,6 +641,26 @@ export class SwiftRuntime {
                 return this.tid || -1;
             },
         };
+    }
+
+    private postMessageToMainThread(message: WorkerToMainMessage) {
+        const threadChannel = this.options.threadChannel;
+        if (!(threadChannel && "postMessageToMainThread" in threadChannel)) {
+            throw new Error(
+                "postMessageToMainThread is not set in options given to SwiftRuntime. Please set it to send messages to the main thread."
+            );
+        }
+        threadChannel.postMessageToMainThread(message);
+    }
+
+    private postMessageToWorkerThread(tid: number, message: MainToWorkerMessage) {
+        const threadChannel = this.options.threadChannel;
+        if (!(threadChannel && "postMessageToWorkerThread" in threadChannel)) {
+            throw new Error(
+                "postMessageToWorkerThread is not set in options given to SwiftRuntime. Please set it to send messages to worker threads."
+            );
+        }
+        threadChannel.postMessageToWorkerThread(tid, message);
     }
 }
 

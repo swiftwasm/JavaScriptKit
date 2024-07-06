@@ -297,11 +297,11 @@ IMPORT_JS_FUNCTION(swjs_unsafe_event_loop_yield, void, (void))
 
 IMPORT_JS_FUNCTION(swjs_send_job_to_main_thread, void, (uintptr_t job))
 
-IMPORT_JS_FUNCTION(swjs_listen_wake_event_from_main_thread, void, (void))
+IMPORT_JS_FUNCTION(swjs_listen_message_from_main_thread, void, (void))
 
 IMPORT_JS_FUNCTION(swjs_wake_up_worker_thread, void, (int tid))
 
-IMPORT_JS_FUNCTION(swjs_listen_main_job_from_worker_thread, void, (int tid))
+IMPORT_JS_FUNCTION(swjs_listen_message_from_worker_thread, void, (int tid))
 
 IMPORT_JS_FUNCTION(swjs_terminate_worker_thread, void, (int tid))
 

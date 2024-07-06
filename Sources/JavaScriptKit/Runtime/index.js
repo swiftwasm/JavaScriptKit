@@ -490,49 +490,43 @@
                 swjs_unsafe_event_loop_yield: () => {
                     throw new UnsafeEventLoopYield();
                 },
-                // This function is called by WebWorkerTaskExecutor on Web Worker thread.
                 swjs_send_job_to_main_thread: (unowned_job) => {
-                    const threadChannel = this.options.threadChannel;
-                    if (threadChannel && "wakeUpMainThread" in threadChannel) {
-                        threadChannel.wakeUpMainThread(unowned_job);
-                    }
-                    else {
-                        throw new Error("wakeUpMainThread is not set in options given to SwiftRuntime. Please set it to send jobs to the main thread.");
-                    }
+                    this.postMessageToMainThread({ type: "job", data: unowned_job });
                 },
-                swjs_listen_wake_event_from_main_thread: () => {
-                    // After the thread is started,
-                    const swjs_wake_worker_thread = this.exports.swjs_wake_worker_thread;
+                swjs_listen_message_from_main_thread: () => {
                     const threadChannel = this.options.threadChannel;
-                    if (threadChannel &&
-                        "listenWakeEventFromMainThread" in threadChannel) {
-                        threadChannel.listenWakeEventFromMainThread(() => {
-                            swjs_wake_worker_thread();
-                        });
+                    if (!(threadChannel && "listenMessageFromMainThread" in threadChannel)) {
+                        throw new Error("listenMessageFromMainThread is not set in options given to SwiftRuntime. Please set it to listen to wake events from the main thread.");
                     }
-                    else {
-                        throw new Error("listenWakeEventFromMainThread is not set in options given to SwiftRuntime. Please set it to listen to wake events from the main thread.");
-                    }
+                    threadChannel.listenMessageFromMainThread((message) => {
+                        switch (message.type) {
+                            case "wake":
+                                this.exports.swjs_wake_worker_thread();
+                                break;
+                            default:
+                                const unknownMessage = message.type;
+                                throw new Error(`Unknown message type: ${unknownMessage}`);
+                        }
+                    });
                 },
                 swjs_wake_up_worker_thread: (tid) => {
-                    const threadChannel = this.options.threadChannel;
-                    if (threadChannel && "wakeUpWorkerThread" in threadChannel) {
-                        // Currently, the data is not used, but it can be used in the future.
-                        threadChannel.wakeUpWorkerThread(tid, {});
-                    }
-                    else {
-                        throw new Error("wakeUpWorkerThread is not set in options given to SwiftRuntime. Please set it to wake up worker threads.");
-                    }
+                    this.postMessageToWorkerThread(tid, { type: "wake" });
                 },
-                swjs_listen_main_job_from_worker_thread: (tid) => {
+                swjs_listen_message_from_worker_thread: (tid) => {
                     const threadChannel = this.options.threadChannel;
-                    if (threadChannel &&
-                        "listenMainJobFromWorkerThread" in threadChannel) {
-                        threadChannel.listenMainJobFromWorkerThread(tid, this.exports.swjs_enqueue_main_job_from_worker);
+                    if (!(threadChannel && "listenMessageFromWorkerThread" in threadChannel)) {
+                        throw new Error("listenMessageFromWorkerThread is not set in options given to SwiftRuntime. Please set it to listen to jobs from worker threads.");
                     }
-                    else {
-                        throw new Error("listenMainJobFromWorkerThread is not set in options given to SwiftRuntime. Please set it to listen to jobs from worker threads.");
-                    }
+                    threadChannel.listenMessageFromWorkerThread(tid, (message) => {
+                        switch (message.type) {
+                            case "job":
+                                this.exports.swjs_enqueue_main_job_from_worker(message.data);
+                                break;
+                            default:
+                                const unknownMessage = message.type;
+                                throw new Error(`Unknown message type: ${unknownMessage}`);
+                        }
+                    });
                 },
                 swjs_terminate_worker_thread: (tid) => {
                     var _a;
@@ -546,6 +540,20 @@
                     return this.tid || -1;
                 },
             };
+        }
+        postMessageToMainThread(message) {
+            const threadChannel = this.options.threadChannel;
+            if (!(threadChannel && "postMessageToMainThread" in threadChannel)) {
+                throw new Error("postMessageToMainThread is not set in options given to SwiftRuntime. Please set it to send messages to the main thread.");
+            }
+            threadChannel.postMessageToMainThread(message);
+        }
+        postMessageToWorkerThread(tid, message) {
+            const threadChannel = this.options.threadChannel;
+            if (!(threadChannel && "postMessageToWorkerThread" in threadChannel)) {
+                throw new Error("postMessageToWorkerThread is not set in options given to SwiftRuntime. Please set it to send messages to worker threads.");
+            }
+            threadChannel.postMessageToWorkerThread(tid, message);
         }
     }
     /// This error is thrown when yielding event loop control from `swift_task_asyncMainDrainQueue`

@@ -79,8 +79,8 @@ export async function startWasiChildThread(event) {
     const swift = new SwiftRuntime({
         sharedMemory: true,
         threadChannel: {
-            wakeUpMainThread: parentPort.postMessage.bind(parentPort),
-            listenWakeEventFromMainThread: (listener) => {
+            postMessageToMainThread: parentPort.postMessage.bind(parentPort),
+            listenMessageFromMainThread: (listener) => {
                 parentPort.on("message", listener)
             }
         }
@@ -138,9 +138,9 @@ class ThreadRegistry {
         return this.workers.get(tid);
     }
 
-    wakeUpWorkerThread(tid) {
+    wakeUpWorkerThread(tid, message) {
         const worker = this.workers.get(tid);
-        worker.postMessage(null);
+        worker.postMessage(message);
     }
 }
 
@@ -159,8 +159,8 @@ export const startWasiTask = async (wasmPath, wasiConstructorKey = selectWASIBac
     const swift = new SwiftRuntime({
         sharedMemory,
         threadChannel: {
-            wakeUpWorkerThread: threadRegistry.wakeUpWorkerThread.bind(threadRegistry),
-            listenMainJobFromWorkerThread: (tid, listener) => {
+            postMessageToWorkerThread: threadRegistry.wakeUpWorkerThread.bind(threadRegistry),
+            listenMessageFromWorkerThread: (tid, listener) => {
                 const worker = threadRegistry.worker(tid);
                 worker.on("message", listener);
             }

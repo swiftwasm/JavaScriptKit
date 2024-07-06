@@ -188,10 +188,10 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
             // `self` outlives the worker thread because `Executor` retains the worker.
             // Thus it's safe to store the reference without extra retain.
             swjs_thread_local_task_executor_worker = Unmanaged.passUnretained(self).toOpaque()
-            // Start listening wake-up events from the main thread.
+            // Start listening events from the main thread.
             // This must be called after setting the swjs_thread_local_task_executor_worker
             // because the event listener enqueues jobs to the TLS worker.
-            swjs_listen_wake_event_from_main_thread()
+            swjs_listen_message_from_main_thread()
             // Set the parent executor.
             parentTaskExecutor = executor
             // Store the thread ID to the worker. This notifies the main thread that the worker is started.
@@ -310,7 +310,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                     tid = worker.tid.load(ordering: .sequentiallyConsistent)
                     try await clock.sleep(for: checkInterval)
                 } while tid == 0
-                swjs_listen_main_job_from_worker_thread(tid)
+                swjs_listen_message_from_worker_thread(tid)
             }
         }
 
