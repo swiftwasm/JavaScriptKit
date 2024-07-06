@@ -22,13 +22,11 @@ import { Memory } from "./memory.js";
  *   threadChannel: {
  *     wakeUpMainThread: (unownedJob) => {
  *       // Send the job to the main thread
- *       postMessage({ type: "job", unownedJob });
+ *       postMessage(unownedJob);
  *     },
  *     listenWakeEventFromMainThread: (listener) => {
  *       self.onmessage = (event) => {
- *         if (event.data.type === "wake") {
- *           listener();
- *         }
+ *         listener(event.data);
  *       };
  *     }
  *   }
@@ -38,14 +36,12 @@ import { Memory } from "./memory.js";
  * const worker = new Worker("worker.js");
  * const runtime = new SwiftRuntime({
  *   threadChannel: {
- *     wakeUpWorkerThread: (tid) => {
- *       worker.postMessage({ type: "wake" });
+ *     wakeUpWorkerThread: (tid, data) => {
+ *       worker.postMessage(data);
  *     },
  *     listenMainJobFromWorkerThread: (tid, listener) => {
  *       worker.onmessage = (event) => {
- *         if (event.data.type === "job") {
- *           listener(event.data.unownedJob);
- *         }
+           listener(event.data);
  *       };
  *     }
  *   }
@@ -65,16 +61,17 @@ export type SwiftRuntimeThreadChannel =
            * to the wake event from the main thread sent by `wakeUpWorkerThread`.
            * The passed listener function awakes the Web Worker thread.
            */
-          listenWakeEventFromMainThread: (listener: () => void) => void;
+          listenWakeEventFromMainThread: (listener: (data: unknown) => void) => void;
       }
     | {
           /**
            * This function is expected to be set in the main thread and called
            * when the main thread sends a wake event to the Web Worker thread.
            * The `tid` is the thread ID of the worker thread to be woken up.
+           * The `data` is the data to be sent to the worker thread.
            * The wake event is expected to be listened by `listenWakeEventFromMainThread`.
            */
-          wakeUpWorkerThread: (tid: number) => void;
+          wakeUpWorkerThread: (tid: number, data: unknown) => void;
           /**
            * This function is expected to be set in the main thread and shuold listen
            * to the main job sent by `wakeUpMainThread` from the worker thread.
@@ -607,7 +604,8 @@ export class SwiftRuntime {
             swjs_wake_up_worker_thread: (tid) => {
                 const threadChannel = this.options.threadChannel;
                 if (threadChannel && "wakeUpWorkerThread" in threadChannel) {
-                    threadChannel.wakeUpWorkerThread(tid);
+                    // Currently, the data is not used, but it can be used in the future.
+                    threadChannel.wakeUpWorkerThread(tid, {});
                 } else {
                     throw new Error(
                         "wakeUpWorkerThread is not set in options given to SwiftRuntime. Please set it to wake up worker threads."
