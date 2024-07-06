@@ -245,6 +245,12 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
         func terminate() {
             trace("Worker.terminate")
             state.store(.terminated, ordering: .sequentiallyConsistent)
+            let tid = self.tid.load(ordering: .sequentiallyConsistent)
+            guard tid != 0 else {
+                // The worker is not started yet.
+                return
+            }
+            swjs_terminate_worker_thread(tid)
         }
     }
 

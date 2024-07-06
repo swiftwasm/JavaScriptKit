@@ -80,6 +80,12 @@ export type SwiftRuntimeThreadChannel =
               tid: number,
               listener: (unownedJob: number) => void
           ) => void;
+
+          /**
+           * This function is expected to be set in the main thread and called
+           * when the worker thread is terminated.
+           */
+          terminateWorkerThread?: (tid: number) => void;
       };
 
 export type SwiftRuntimeOptions = {
@@ -626,6 +632,12 @@ export class SwiftRuntime {
                         "listenMainJobFromWorkerThread is not set in options given to SwiftRuntime. Please set it to listen to jobs from worker threads."
                     );
                 }
+            },
+            swjs_terminate_worker_thread: (tid) => {
+                const threadChannel = this.options.threadChannel;
+                if (threadChannel && "terminateWorkerThread" in threadChannel) {
+                    threadChannel.terminateWorkerThread?.(tid);
+                } // Otherwise, just ignore the termination request
             },
             swjs_get_worker_thread_id: () => {
                 // Main thread's tid is always -1

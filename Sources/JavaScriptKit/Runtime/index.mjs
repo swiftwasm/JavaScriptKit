@@ -528,6 +528,13 @@ class SwiftRuntime {
                     throw new Error("listenMainJobFromWorkerThread is not set in options given to SwiftRuntime. Please set it to listen to jobs from worker threads.");
                 }
             },
+            swjs_terminate_worker_thread: (tid) => {
+                var _a;
+                const threadChannel = this.options.threadChannel;
+                if (threadChannel && "terminateWorkerThread" in threadChannel) {
+                    (_a = threadChannel.terminateWorkerThread) === null || _a === void 0 ? void 0 : _a.call(threadChannel, tid);
+                } // Otherwise, just ignore the termination request
+            },
             swjs_get_worker_thread_id: () => {
                 // Main thread's tid is always -1
                 return this.tid || -1;

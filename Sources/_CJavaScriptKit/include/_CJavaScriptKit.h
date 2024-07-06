@@ -303,6 +303,8 @@ IMPORT_JS_FUNCTION(swjs_wake_up_worker_thread, void, (int tid))
 
 IMPORT_JS_FUNCTION(swjs_listen_main_job_from_worker_thread, void, (int tid))
 
+IMPORT_JS_FUNCTION(swjs_terminate_worker_thread, void, (int tid))
+
 IMPORT_JS_FUNCTION(swjs_get_worker_thread_id, int, (void))
 
 /// MARK: - thread local storage

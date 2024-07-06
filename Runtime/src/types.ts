@@ -110,6 +110,7 @@ export interface ImportedFunctions {
     swjs_listen_wake_event_from_main_thread: () => void;
     swjs_wake_up_worker_thread: (tid: number) => void;
     swjs_listen_main_job_from_worker_thread: (tid: number) => void;
+    swjs_terminate_worker_thread: (tid: number) => void;
     swjs_get_worker_thread_id: () => number;
 }
 
