@@ -308,10 +308,9 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
             }
         }
 
-        func enqueue(_ job: consuming ExecutorJob) {
+        func enqueue(_ job: UnownedJob) {
             precondition(!workers.isEmpty, "No worker threads are available")
 
-            let job = UnownedJob(job)
             // If the current thread is a worker thread, enqueue the job to the current worker.
             if let worker = Worker.currentThread {
                 worker.enqueue(job)
@@ -356,7 +355,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
     /// Enqueue a job to the executor.
     ///
     /// NOTE: Called from the Swift Concurrency runtime.
-    public func enqueue(_ job: consuming ExecutorJob) {
+    public func enqueue(_ job: UnownedJob) {
         Self.traceStatsIncrement(\.enqueueExecutor)
         executor.enqueue(job)
     }
