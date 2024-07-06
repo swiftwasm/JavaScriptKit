@@ -56,7 +56,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
         self.setTimeout = setTimeout
     }
 
-    /// A singleton instance of the Executor
+    /// A per-thread singleton instance of the Executor
     public static var shared: JavaScriptEventLoop {
         return _shared
     }

@@ -295,4 +295,21 @@ IMPORT_JS_FUNCTION(swjs_release, void, (const JavaScriptObjectRef ref))
 /// @note This function never returns
 IMPORT_JS_FUNCTION(swjs_unsafe_event_loop_yield, void, (void))
 
+IMPORT_JS_FUNCTION(swjs_send_job_to_main_thread, void, (uintptr_t job))
+
+IMPORT_JS_FUNCTION(swjs_listen_message_from_main_thread, void, (void))
+
+IMPORT_JS_FUNCTION(swjs_wake_up_worker_thread, void, (int tid))
+
+IMPORT_JS_FUNCTION(swjs_listen_message_from_worker_thread, void, (int tid))
+
+IMPORT_JS_FUNCTION(swjs_terminate_worker_thread, void, (int tid))
+
+IMPORT_JS_FUNCTION(swjs_get_worker_thread_id, int, (void))
+
+/// MARK: - thread local storage
+
+// TODO: Rewrite closure system without global storage
+extern _Thread_local void * _Nullable swjs_thread_local_closures;
+
 #endif /* _CJavaScriptKit_h */

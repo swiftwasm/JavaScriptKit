@@ -23,16 +23,16 @@ jobs:
           - { os: ubuntu-20.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: MicroWASI }
           - { os: ubuntu-20.04, toolchain: wasm-5.10.0-RELEASE, wasi-backend: MicroWASI }
           - os: ubuntu-22.04
-            toolchain: DEVELOPMENT-SNAPSHOT-2024-05-01-a
+            toolchain: DEVELOPMENT-SNAPSHOT-2024-06-13-a
             swift-sdk:
-              id: DEVELOPMENT-SNAPSHOT-2024-05-25-a-wasm32-unknown-wasi
-              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-05-25-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-05-25-a-wasm32-unknown-wasi.artifactbundle.zip"
+              id: DEVELOPMENT-SNAPSHOT-2024-06-14-a-wasm32-unknown-wasi
+              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-06-14-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-06-14-a-wasm32-unknown-wasi.artifactbundle.zip"
             wasi-backend: Node
           - os: ubuntu-22.04
-            toolchain: DEVELOPMENT-SNAPSHOT-2024-05-01-a
+            toolchain: DEVELOPMENT-SNAPSHOT-2024-06-13-a
             swift-sdk:
-              id: DEVELOPMENT-SNAPSHOT-2024-05-25-a-wasm32-unknown-wasip1-threads
-              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-05-25-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-05-25-a-wasm32-unknown-wasip1-threads.artifactbundle.zip"
+              id: DEVELOPMENT-SNAPSHOT-2024-06-14-a-wasm32-unknown-wasip1-threads
+              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-06-14-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-06-14-a-wasm32-unknown-wasip1-threads.artifactbundle.zip"
             wasi-backend: Node
 
     runs-on: ${{ matrix.entry.os }}

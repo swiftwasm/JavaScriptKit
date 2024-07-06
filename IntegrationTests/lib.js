@@ -3,26 +3,30 @@ import { WASI as NodeWASI } from "wasi"
 import { WASI as MicroWASI, useAll } from "uwasi"
 import * as fs from "fs/promises"
 import path from "path";
+import { Worker, parentPort } from "node:worker_threads";
 
 const WASI = {
-    MicroWASI: ({ programName }) => {
+    MicroWASI: ({ args }) => {
         const wasi = new MicroWASI({
-            args: [path.basename(programName)],
+            args: args,
             env: {},
             features: [useAll()],
         })
 
         return {
             wasiImport: wasi.wasiImport,
+            setInstance(instance) {
+                wasi.instance = instance;
+            },
             start(instance, swift) {
                 wasi.initialize(instance);
                 swift.main();
             }
         }
     },
-    Node: ({ programName }) => {
+    Node: ({ args }) => {
         const wasi = new NodeWASI({
-            args: [path.basename(programName)],
+            args: args,
             env: {},
             preopens: {
               "/": "./",
@@ -44,12 +48,9 @@ const WASI = {
 const selectWASIBackend = () => {
     const value = process.env["JAVASCRIPTKIT_WASI_BACKEND"]
     if (value) {
-        const backend = WASI[value];
-        if (backend) {
-            return backend;
-        }
+        return value;
     }
-    return WASI.Node;
+    return "Node"
 };
 
 function isUsingSharedMemory(module) {
@@ -62,33 +63,125 @@ function isUsingSharedMemory(module) {
     return false;
 }
 
-export const startWasiTask = async (wasmPath, wasiConstructor = selectWASIBackend()) => {
-    const swift = new SwiftRuntime();
-    // Fetch our Wasm File
-    const wasmBinary = await fs.readFile(wasmPath);
-    const wasi = wasiConstructor({ programName: wasmPath });
-
-    const module = await WebAssembly.compile(wasmBinary);
-
-    const importObject = {
+function constructBaseImportObject(wasi, swift) {
+    return {
         wasi_snapshot_preview1: wasi.wasiImport,
-        javascript_kit: swift.importObjects(),
+        javascript_kit: swift.wasmImports,
         benchmark_helper: {
             noop: () => {},
             noop_with_int: (_) => {},
+        },
+    }
+}
+
+export async function startWasiChildThread(event) {
+    const { module, programName, memory, tid, startArg } = event;
+    const swift = new SwiftRuntime({
+        sharedMemory: true,
+        threadChannel: {
+            postMessageToMainThread: parentPort.postMessage.bind(parentPort),
+            listenMessageFromMainThread: (listener) => {
+                parentPort.on("message", listener)
+            }
+        }
+    });
+    // Use uwasi for child threads because Node.js WASI cannot be used without calling
+    // `WASI.start` or `WASI.initialize`, which is already called in the main thread and
+    // will cause an error if called again.
+    const wasi = WASI.MicroWASI({ programName });
+
+    const importObject = constructBaseImportObject(wasi, swift);
+
+    importObject["wasi"] = {
+        "thread-spawn": () => {
+            throw new Error("Cannot spawn a new thread from a worker thread")
         }
     };
+    importObject["env"] = { memory };
+    importObject["JavaScriptEventLoopTestSupportTests"] = {
+        "isMainThread": () => false,
+    }
 
-    if (isUsingSharedMemory(module)) {
-        importObject["env"] = {
-          // We don't have JS API to get memory descriptor of imported memory
-          // at this moment, so we assume 256 pages (16MB) memory is enough
-          // large for initial memory size.
-          memory: new WebAssembly.Memory({ initial: 256, maximum: 16384, shared: true }),
-        };
+    const instance = await WebAssembly.instantiate(module, importObject);
+    swift.setInstance(instance);
+    wasi.setInstance(instance);
+    swift.startThread(tid, startArg);
+}
+
+class ThreadRegistry {
+    workers = new Map();
+    nextTid = 1;
+
+    spawnThread(module, programName, memory, startArg) {
+        const tid = this.nextTid++;
+        const selfFilePath = new URL(import.meta.url).pathname;
+        const worker = new Worker(`
+            const { parentPort } = require('node:worker_threads');
+
+            Error.stackTraceLimit = 100;
+            parentPort.once("message", async (event) => {
+                const { selfFilePath } = event;
+                const { startWasiChildThread } = await import(selfFilePath);
+                await startWasiChildThread(event);
+            })
+        `, { type: "module", eval: true })
+
+        worker.on("error", (error) => {
+            console.error(`Worker thread ${tid} error:`, error);
+        });
+        this.workers.set(tid, worker);
+        worker.postMessage({ selfFilePath, module, programName, memory, tid, startArg });
+        return tid;
+    }
+
+    worker(tid) {
+        return this.workers.get(tid);
+    }
+
+    wakeUpWorkerThread(tid, message) {
+        const worker = this.workers.get(tid);
+        worker.postMessage(message);
+    }
+}
+
+export const startWasiTask = async (wasmPath, wasiConstructorKey = selectWASIBackend()) => {
+    // Fetch our Wasm File
+    const wasmBinary = await fs.readFile(wasmPath);
+    const programName = wasmPath;
+    const args = [path.basename(programName)];
+    args.push(...process.argv.slice(3));
+    const wasi = WASI[wasiConstructorKey]({ args });
+
+    const module = await WebAssembly.compile(wasmBinary);
+
+    const sharedMemory = isUsingSharedMemory(module);
+    const threadRegistry = new ThreadRegistry();
+    const swift = new SwiftRuntime({
+        sharedMemory,
+        threadChannel: {
+            postMessageToWorkerThread: threadRegistry.wakeUpWorkerThread.bind(threadRegistry),
+            listenMessageFromWorkerThread: (tid, listener) => {
+                const worker = threadRegistry.worker(tid);
+                worker.on("message", listener);
+            }
+        }
+    });
+
+    const importObject = constructBaseImportObject(wasi, swift);
+
+    importObject["JavaScriptEventLoopTestSupportTests"] = {
+        "isMainThread": () => true,
+    }
+
+    if (sharedMemory) {
+        // We don't have JS API to get memory descriptor of imported memory
+        // at this moment, so we assume 256 pages (16MB) memory is enough
+        // large for initial memory size.
+        const memory = new WebAssembly.Memory({ initial: 256, maximum: 16384, shared: true })
+        importObject["env"] = { memory };
         importObject["wasi"] = {
-          "thread-spawn": () => {
-            throw new Error("thread-spawn not implemented");
+          "thread-spawn": (startArg) => {
+            return threadRegistry.spawnThread(module, programName, memory, startArg);
           }
         }
     }
