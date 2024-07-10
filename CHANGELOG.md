@@ -1,3 +1,14 @@
+# 0.19.3 (11 July 2024)
+
+This release adds an initial multi-threading support.
+
+## What's Changed
+* Start migrating imported functions to the new definition style  by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/252
+* Allocate JavaScriptEventLoop per thread in multi-threaded environment  by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/255
+* Add `WebWorkerTaskExecutor` by @kateinoigakukun in https://github.com/swiftwasm/JavaScriptKit/pull/256
+
+**Full Changelog**: https://github.com/swiftwasm/JavaScriptKit/compare/0.19.3...0.20.0
+
 # 0.19.3 (6 Jun 2024)
 
 ## What's Changed
