@@ -59,6 +59,7 @@ import Synchronization
 /// }
 /// ````
 /// 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) // For `Atomic` and `TaskExecutor` types
 public final class WebWorkerTaskExecutor: TaskExecutor {
 
     /// A job worker dedicated to a single Web Worker thread.
@@ -449,6 +450,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
 
 /// Enqueue a job scheduled from a Web Worker thread to the main thread.
 /// This function is called when a job is enqueued from a Web Worker thread.
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 @_expose(wasm, "swjs_enqueue_main_job_from_worker")
 func _swjs_enqueue_main_job_from_worker(_ job: UnownedJob) {
     WebWorkerTaskExecutor.traceStatsIncrement(\.recieveJobFromWorkerThread)
@@ -457,6 +459,7 @@ func _swjs_enqueue_main_job_from_worker(_ job: UnownedJob) {
 
 /// Wake up the worker thread.
 /// This function is called when a job is enqueued from the main thread to a worker thread.
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 @_expose(wasm, "swjs_wake_worker_thread")
 func _swjs_wake_worker_thread() {
     WebWorkerTaskExecutor.Worker.currentThread!.run()
