@@ -1,4 +1,9 @@
-# 0.19.3 (11 July 2024)
+> [!IMPORTANT]
+> For future releases, please refer to the [GitHub releases page](https://github.com/swiftwasm/JavaScriptKit/releases)
+
+----
+
+# 0.20.0 (11 July 2024)
 
 This release adds an initial multi-threading support.
 
