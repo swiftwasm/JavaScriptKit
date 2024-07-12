@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: swiftwasm/setup-swiftwasm@v1
         with:
-          swift-version: wasm-5.9.1-RELEASE
+          swift-version: wasm-5.10.0-RELEASE
       - name: Run Test
         run: |
           set -eux
