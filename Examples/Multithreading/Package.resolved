@@ -1,0 +1,14 @@
+{
+  "originHash" : "e66f4c272838a860049b7e3528f1db03ee6ae99c2b21c3b6ea58a293be4db41b",
+  "pins" : [
+    {
+      "identity" : "chibi-ray",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kateinoigakukun/chibi-ray",
+      "state" : {
+        "revision" : "c8cab621a3338dd2f8e817d3785362409d3b8cf1"
+      }
+    }
+  ],
+  "version" : 3
+}
