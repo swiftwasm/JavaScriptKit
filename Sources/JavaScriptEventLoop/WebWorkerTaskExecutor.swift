@@ -138,34 +138,37 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
         /// Enqueue a job to the worker.
         func enqueue(_ job: UnownedJob) {
             statsIncrement(\.enqueuedJobs)
-            jobQueue.withLock { queue in
-                queue.append(job)
-
-                // Wake up the worker to process a job.
-                switch state.exchange(.running, ordering: .sequentiallyConsistent) {
-                case .idle:
-                    if Self.currentThread === self {
-                        // Enqueueing a new job to the current worker thread, but it's idle now.
-                        // This is usually the case when a continuation is resumed by JS events
-                        // like `setTimeout` or `addEventListener`.
-                        // We can run the job and subsequently spawned jobs immediately.
-                        // JSPromise.resolve(JSValue.undefined).then { _ in
-                        _ = JSObject.global.queueMicrotask!(JSOneshotClosure { _ in
-                            self.run()
-                            return JSValue.undefined
-                        })
-                    } else {
-                        let tid = self.tid.load(ordering: .sequentiallyConsistent)
-                        swjs_wake_up_worker_thread(tid)
+            var locked: Bool
+            repeat {
+                let result: Void? = jobQueue.withLockIfAvailable { queue in
+                    queue.append(job)
+                    // Wake up the worker to process a job.
+                    switch state.exchange(.running, ordering: .sequentiallyConsistent) {
+                    case .idle:
+                        if Self.currentThread === self {
+                            // Enqueueing a new job to the current worker thread, but it's idle now.
+                            // This is usually the case when a continuation is resumed by JS events
+                            // like `setTimeout` or `addEventListener`.
+                            // We can run the job and subsequently spawned jobs immediately.
+                            // JSPromise.resolve(JSValue.undefined).then { _ in
+                            _ = JSObject.global.queueMicrotask!(JSOneshotClosure { _ in
+                                self.run()
+                                return JSValue.undefined
+                            })
+                        } else {
+                            let tid = self.tid.load(ordering: .sequentiallyConsistent)
+                            swjs_wake_up_worker_thread(tid)
+                        }
+                    case .running:
+                        // The worker is already running, no need to wake up.
+                        break
+                    case .terminated:
+                        // Will not wake up the worker because it's already terminated.
+                        break
                     }
-                case .running:
-                    // The worker is already running, no need to wake up.
-                    break
-                case .terminated:
-                    // Will not wake up the worker because it's already terminated.
-                    break
                 }
-            }
+                locked = result != nil
+            } while !locked
         }
 
         func scheduleNextRun() {
