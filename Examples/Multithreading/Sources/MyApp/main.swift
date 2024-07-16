@@ -57,7 +57,7 @@ struct Work: Sendable {
     }
 }
 
-func render(scene: Scene, ctx: JSObject, renderTime: JSObject, concurrency: Int, executor: WebWorkerTaskExecutor) async {
+func render(scene: Scene, ctx: JSObject, renderTimeElement: JSObject, concurrency: Int, executor: (some TaskExecutor)?) async {
 
     let imageBuffer = UnsafeMutableBufferPointer<Color>.allocate(capacity: scene.width * scene.height)
     // Initialize the buffer with black color
@@ -67,12 +67,16 @@ func render(scene: Scene, ctx: JSObject, renderTime: JSObject, concurrency: Int,
     let clock = ContinuousClock()
     let start = clock.now
 
+    func updateRenderTime() {
+        let renderSceneDuration = clock.now - start
+        renderTimeElement.textContent = .string("Render time: \(renderSceneDuration)")
+    }
+
     var checkTimer: JSValue?
     checkTimer = JSObject.global.setInterval!(JSClosure { _ in
         print("Checking thread work...")
         renderInCanvas(ctx: ctx, image: imageView)
-        let renderSceneDuration = clock.now - start
-        renderTime.textContent = .string("Render time: \(renderSceneDuration)")
+        updateRenderTime()
         return .undefined
     }, 250)
 
@@ -94,30 +98,41 @@ func render(scene: Scene, ctx: JSObject, renderTime: JSObject, concurrency: Int,
     checkTimer = nil
 
     renderInCanvas(ctx: ctx, image: imageView)
+    updateRenderTime()
     imageBuffer.deallocate()
     print("All work done")
 }
 
-func main() async throws {
-    let canvas = JSObject.global.document.getElementById("canvas").object!
-    let renderButton = JSObject.global.document.getElementById("render-button").object!
-    let concurrency = JSObject.global.document.getElementById("concurrency").object!
-    concurrency.value = JSObject.global.navigator.hardwareConcurrency
-    let scene = createDemoScene()
-    canvas.width  = .number(Double(scene.width))
-    canvas.height = .number(Double(scene.height))
+func onClick() async throws {
+    let document = JSObject.global.document
 
-    _ = renderButton.addEventListener!("click", JSClosure { _ in
+    let canvasElement = document.getElementById("canvas").object!
+    let renderTimeElement = document.getElementById("render-time").object!
+
+    let concurrency = max(Int(document.getElementById("concurrency").object!.value.string!) ?? 1, 1)
+    let background = document.getElementById("background").object!.checked.boolean!
+    let size = Int(document.getElementById("size").object!.value.string ?? "800")!
+
+    let ctx = canvasElement.getContext!("2d").object!
+
+    let scene = createDemoScene(size: size)
+    let executor = background ? try await WebWorkerTaskExecutor(numberOfThreads: concurrency) : nil
+    canvasElement.width  = .number(Double(scene.width))
+    canvasElement.height = .number(Double(scene.height))
+
+    await render(scene: scene, ctx: ctx, renderTimeElement: renderTimeElement, concurrency: concurrency, executor: executor)
+    executor?.terminate()
+    print("Render done")
+}
+
+func main() async throws {
+    let renderButtonElement = JSObject.global.document.getElementById("render-button").object!
+    let concurrencyElement = JSObject.global.document.getElementById("concurrency").object!
+    concurrencyElement.value = JSObject.global.navigator.hardwareConcurrency
+
+    _ = renderButtonElement.addEventListener!("click", JSClosure { _ in
         Task {
-            let canvas = JSObject.global.document.getElementById("canvas").object!
-            let renderTime = JSObject.global.document.getElementById("render-time").object!
-            let concurrency = JSObject.global.document.getElementById("concurrency").object!
-            let concurrencyValue = max(Int(concurrency.value.string!) ?? 1, 1)
-            let ctx = canvas.getContext!("2d").object!
-            let executor = try await WebWorkerTaskExecutor(numberOfThreads: concurrencyValue)
-            await render(scene: scene, ctx: ctx, renderTime: renderTime, concurrency: concurrencyValue, executor: executor)
-            executor.terminate()
-            print("Render done")
+            try await onClick()
         }
         return JSValue.undefined
     })
@@ -126,3 +141,21 @@ func main() async throws {
 Task {
     try await main()
 }
+
+
+#if canImport(wasi_pthread)
+import wasi_pthread
+import WASILibc
+
+/// Trick to avoid blocking the main thread. pthread_mutex_lock function is used by
+/// the Swift concurrency runtime.
+@_cdecl("pthread_mutex_lock")
+func pthread_mutex_lock(_ mutex: UnsafeMutablePointer<pthread_mutex_t>) -> Int32 {
+    // DO NOT BLOCK MAIN THREAD
+    var ret: Int32
+    repeat {
+        ret = pthread_mutex_trylock(mutex)
+    } while ret == EBUSY
+    return ret
+}
+#endif

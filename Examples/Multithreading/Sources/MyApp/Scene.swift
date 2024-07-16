@@ -1,9 +1,9 @@
 import ChibiRay
 
-func createDemoScene() -> Scene {
+func createDemoScene(size: Int) -> Scene {
     return Scene(
-        width: 800,
-        height: 800,
+        width: size,
+        height: size,
         fov: 90,
         elements: [
             .sphere(

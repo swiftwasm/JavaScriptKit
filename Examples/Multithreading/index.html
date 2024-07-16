@@ -1,19 +1,54 @@
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Threading Example</title>
-  </head>
-  <body>
-    <script type="module" src="Sources/JavaScript/index.js"></script>
-    <h1>Threading Example</h1>
+
+<head>
+  <meta charset="utf-8">
+  <title>Threading Example</title>
+  <style>
+    .loading-emoji {
+      font-size: 60px;
+      width: 60px;
+      height: 80px;
+    }
+  </style>
+  <script>
+    function rotateElement(element, speed = 2) {
+      let degree = 0;
+      setInterval(() => {
+        degree = (degree + speed) % 360;
+        element.style.transform = `rotate(${degree}deg)`;
+      }, 20);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const loadingCircle = document.getElementById('loading-emoji');
+      rotateElement(loadingCircle);
+    });
+  </script>
+</head>
+
+<body>
+  <script type="module" src="Sources/JavaScript/index.js"></script>
+  <h1>Threading Example</h1>
+  <p>
     <div>
-      <p>
-        <label for="concurrency">Concurrency:</label>
-        <input id="concurrency" type="number">
-        <button id="render-button">Render</button>
-      </p>
-      <p id="render-time"></p>
+      <label for="background">Background:</label>
+      <input id="background" type="checkbox" checked>
     </div>
-    <canvas id="canvas"></canvas>
-  </body>
+    <div>
+      <label for="size">Size:</label>
+      <input id="size" type="number" value="800">
+    </div>
+    <div>
+      <label for="concurrency">Concurrency:</label>
+      <input id="concurrency" type="number">
+      <button id="render-button">Render</button>
+    </div>
+  </p>
+  <p>
+    <div id="loading-emoji" class="loading-emoji">🧵</div>
+  </p>
+  <p id="render-time"></p>
+  <canvas id="canvas"></canvas>
+</body>
+
 </html>
