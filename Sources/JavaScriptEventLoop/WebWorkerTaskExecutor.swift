@@ -1,4 +1,4 @@
-#if compiler(>=6.0) && hasFeature(Extern) && _runtime(_multithreaded) // @_expose and @_extern are only available in Swift 6.0+
+#if compiler(>=6.0) && hasFeature(IsolatedAny2) && _runtime(_multithreaded) // @_expose and @_extern are only available in Swift 6.0+
 
 import JavaScriptKit
 import _CJavaScriptKit
