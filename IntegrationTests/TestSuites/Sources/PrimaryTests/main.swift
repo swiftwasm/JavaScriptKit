@@ -260,10 +260,11 @@ try test("Closure Lifetime") {
 #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     // Check diagnostics of use-after-free
     do {
+        let c1Line = #line + 1
         let c1 = JSClosure { $0[0] }
         c1.release()
         let error = try expectThrow(try evalClosure.throws(c1, JSValue.number(42.0))) as! JSValue
-        try expect("Error message should contains definition location", error.description.hasSuffix("PrimaryTests/main.swift:247"))
+        try expect("Error message should contains definition location", error.description.hasSuffix("PrimaryTests/main.swift:\(c1Line)"))
     }
 #endif
 
