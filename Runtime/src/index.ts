@@ -265,6 +265,7 @@ export class SwiftRuntime {
     importObjects = () => this.wasmImports;
 
     get wasmImports(): ImportedFunctions {
+        const decodeString = JSValue.makeStringDecoder(this.options.sharedMemory == true, this.textDecoder);
         return {
             swjs_set_prop: (
                 ref: ref,
@@ -298,6 +299,39 @@ export class SwiftRuntime {
                 );
             },
 
+            swjs_set_prop_with_string_key: (
+                ref: ref,
+                prop_ptr: pointer,
+                prop_length: number,
+                kind: JSValue.Kind,
+                payload1: number,
+                payload2: number
+            ) => {
+                const memory = this.memory;
+                const obj = memory.getObject(ref);
+                const key = decodeString(prop_ptr, prop_length, memory);
+                const value = JSValue.decode(kind, payload1, payload2, memory);
+                obj[key] = value;
+            },
+            swjs_get_prop_with_string_key: (
+                ref: ref,
+                prop_ptr: pointer,
+                prop_length: number,
+                payload1_ptr: pointer,
+                payload2_ptr: pointer
+            ) => {
+                const memory = this.memory;
+                const obj = memory.getObject(ref);
+                const key = decodeString(prop_ptr, prop_length, memory);
+                const result = obj[key];
+                return JSValue.writeAndReturnKindBits(
+                    result,
+                    payload1_ptr,
+                    payload2_ptr,
+                    false,
+                    memory
+                );
+            },
             swjs_set_subscript: (
                 ref: ref,
                 index: number,
@@ -334,26 +368,11 @@ export class SwiftRuntime {
                 memory.writeUint32(bytes_ptr_result, bytes_ptr);
                 return bytes.length;
             },
-            swjs_decode_string: (
-                // NOTE: TextDecoder can't decode typed arrays backed by SharedArrayBuffer
-                this.options.sharedMemory == true
-                ? ((bytes_ptr: pointer, length: number) => {
-                    const memory = this.memory;
-                    const bytes = memory
-                        .bytes()
-                        .slice(bytes_ptr, bytes_ptr + length);
-                    const string = this.textDecoder.decode(bytes);
-                    return memory.retain(string);
-                })
-                : ((bytes_ptr: pointer, length: number) => {
-                    const memory = this.memory;
-                    const bytes = memory
-                        .bytes()
-                        .subarray(bytes_ptr, bytes_ptr + length);
-                    const string = this.textDecoder.decode(bytes);
-                    return memory.retain(string);
-                })
-            ),
+            swjs_decode_string: (bytes_ptr: pointer, length: number) => {
+                const memory = this.memory;
+                const string = decodeString(bytes_ptr, length, memory);
+                return memory.retain(string);
+            },
             swjs_load_string: (ref: ref, buffer: pointer) => {
                 const memory = this.memory;
                 const bytes = memory.getObject(ref);
