@@ -1,4 +1,4 @@
-#if compiler(>=6.0) && _runtime(_multithreaded)
+#if compiler(>=6.0) && hasFeature(IsolatedAny2) && _runtime(_multithreaded)
 import XCTest
 import JavaScriptKit
 import _CJavaScriptKit // For swjs_get_worker_thread_id
