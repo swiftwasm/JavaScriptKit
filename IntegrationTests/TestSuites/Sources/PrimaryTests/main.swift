@@ -81,6 +81,22 @@ try test("Value Construction") {
     let prop_7 = getJSValue(this: globalObject1Ref, name: "prop_7")
     try expectEqual(Double.construct(from: prop_7), 3.14)
     try expectEqual(Float.construct(from: prop_7), 3.14)
+
+    for source: JSValue in [
+        .number(.infinity), .number(.nan),
+        .number(Double(UInt64.max).nextUp), .number(Double(Int64.min).nextDown)
+    ] {
+        try expectNil(Int.construct(from: source))
+        try expectNil(Int8.construct(from: source))
+        try expectNil(Int16.construct(from: source))
+        try expectNil(Int32.construct(from: source))
+        try expectNil(Int64.construct(from: source))
+        try expectNil(UInt.construct(from: source))
+        try expectNil(UInt8.construct(from: source))
+        try expectNil(UInt16.construct(from: source))
+        try expectNil(UInt32.construct(from: source))
+        try expectNil(UInt64.construct(from: source))
+    }
 }
 
 try test("Array Iterator") {
@@ -244,10 +260,11 @@ try test("Closure Lifetime") {
 #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     // Check diagnostics of use-after-free
     do {
+        let c1Line = #line + 1
         let c1 = JSClosure { $0[0] }
         c1.release()
         let error = try expectThrow(try evalClosure.throws(c1, JSValue.number(42.0))) as! JSValue
-        try expect("Error message should contains definition location", error.description.hasSuffix("PrimaryTests/main.swift:247"))
+        try expect("Error message should contains definition location", error.description.hasSuffix("PrimaryTests/main.swift:\(c1Line)"))
     }
 #endif
 
