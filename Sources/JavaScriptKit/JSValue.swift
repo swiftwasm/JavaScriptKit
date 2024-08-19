@@ -149,15 +149,15 @@ public extension JSValue {
     /// into below code.
     ///
     /// ```swift
-    /// let eventListenter = JSClosure { _ in
+    /// let eventListener = JSClosure { _ in
     ///     ...
     ///     return JSValue.undefined
     /// }
     ///
-    /// button.addEventListener!("click", JSValue.function(eventListenter))
+    /// button.addEventListener!("click", JSValue.function(eventListener))
     /// ...
-    /// button.removeEventListener!("click", JSValue.function(eventListenter))
-    /// eventListenter.release()
+    /// button.removeEventListener!("click", JSValue.function(eventListener))
+    /// eventListener.release()
     /// ```
     @available(*, deprecated, message: "Please create JSClosure directly and manage its lifetime manually.")
     static func function(_ body: @escaping ([JSValue]) -> JSValue) -> JSValue {

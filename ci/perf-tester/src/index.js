@@ -60,7 +60,7 @@ async function run(octokit, context) {
     }
 
     console.log(
-        `PR #${pull_number} is targetted at ${pr.base.ref} (${pr.base.sha})`
+        `PR #${pull_number} is targeted at ${pr.base.ref} (${pr.base.sha})`
     );
 
     startGroup(`[current] Build using '${config.buildScript}'`);
