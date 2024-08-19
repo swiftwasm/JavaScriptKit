@@ -19,9 +19,9 @@ public struct JSString: LosslessStringConvertible, Equatable {
     /// The initializers of this type must initialize `jsRef` or `buffer`.
     /// And the uninitialized one will be lazily initialized
     class Guts {
-        var shouldDealocateRef: Bool = false
+        var shouldDeallocateRef: Bool = false
         lazy var jsRef: JavaScriptObjectRef = {
-            self.shouldDealocateRef = true
+            self.shouldDeallocateRef = true
             return buffer.withUTF8 { bufferPtr in
                 return swjs_decode_string(bufferPtr.baseAddress!, Int32(bufferPtr.count))
             }
@@ -47,11 +47,11 @@ public struct JSString: LosslessStringConvertible, Equatable {
 
         init(from jsRef: JavaScriptObjectRef) {
             self.jsRef = jsRef
-            self.shouldDealocateRef = true
+            self.shouldDeallocateRef = true
         }
 
         deinit {
-            guard shouldDealocateRef else { return }
+            guard shouldDeallocateRef else { return }
             swjs_release(jsRef)
         }
     }

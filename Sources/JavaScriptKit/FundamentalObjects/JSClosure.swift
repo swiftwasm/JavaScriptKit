@@ -51,14 +51,14 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 ///
 /// e.g.
 /// ```swift
-/// let eventListenter = JSClosure { _ in
+/// let eventListener = JSClosure { _ in
 ///     ...
 ///     return JSValue.undefined
 /// }
 ///
-/// button.addEventListener!("click", JSValue.function(eventListenter))
+/// button.addEventListener!("click", JSValue.function(eventListener))
 /// ...
-/// button.removeEventListener!("click", JSValue.function(eventListenter))
+/// button.removeEventListener!("click", JSValue.function(eventListener))
 /// ```
 ///
 public class JSClosure: JSFunction, JSClosureProtocol {

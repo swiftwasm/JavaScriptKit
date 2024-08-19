@@ -33,7 +33,7 @@ typedef struct {
 typedef unsigned JavaScriptPayload1;
 typedef double JavaScriptPayload2;
 
-/// `RawJSValue` is abstract representaion of JavaScript primitive value.
+/// `RawJSValue` is abstract representation of JavaScript primitive value.
 ///
 /// For boolean value:
 ///    payload1: 1 or 0

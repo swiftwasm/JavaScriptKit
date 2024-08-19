@@ -78,8 +78,8 @@ export type SwiftRuntimeThreadChannel =
            */
           postMessageToWorkerThread: (tid: number, message: MainToWorkerMessage) => void;
           /**
-           * This function is expected to be set in the main thread and shuold listen
-           * to messsages sent by `postMessageToMainThread` from the worker thread.
+           * This function is expected to be set in the main thread and should listen
+           * to messages sent by `postMessageToMainThread` from the worker thread.
            * @param tid The thread ID of the worker thread.
            * @param listener The listener function to be called when a message is received from the worker thread.
            */

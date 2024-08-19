@@ -384,12 +384,12 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
     /// Executor global statistics
     internal struct ExecutorStats: CustomStringConvertible {
         var sendJobToMainThread: Int = 0
-        var recieveJobFromWorkerThread: Int = 0
+        var receiveJobFromWorkerThread: Int = 0
         var enqueueGlobal: Int = 0
         var enqueueExecutor: Int = 0
 
         var description: String {
-            "ExecutorStats(sendWtoM: \(sendJobToMainThread), recvWfromM: \(recieveJobFromWorkerThread)), enqueueGlobal: \(enqueueGlobal), enqueueExecutor: \(enqueueExecutor)"
+            "ExecutorStats(sendWtoM: \(sendJobToMainThread), recvWfromM: \(receiveJobFromWorkerThread)), enqueueGlobal: \(enqueueGlobal), enqueueExecutor: \(enqueueExecutor)"
         }
     }
     #if JAVASCRIPTKIT_STATS
@@ -456,7 +456,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
 @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 @_expose(wasm, "swjs_enqueue_main_job_from_worker")
 func _swjs_enqueue_main_job_from_worker(_ job: UnownedJob) {
-    WebWorkerTaskExecutor.traceStatsIncrement(\.recieveJobFromWorkerThread)
+    WebWorkerTaskExecutor.traceStatsIncrement(\.receiveJobFromWorkerThread)
     JavaScriptEventLoop.shared.enqueue(ExecutorJob(job))
 }
 
