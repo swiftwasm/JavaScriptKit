@@ -1,4 +1,4 @@
-#if compiler(>=6.1) && _runtime(_multithreaded) // @_expose and @_extern are only available in Swift 6.0+
+#if compiler(>=6.1) && _runtime(_multithreaded) // @_expose and @_extern are only available in Swift 6.1+
 
 import JavaScriptKit
 import _CJavaScriptKit
@@ -274,6 +274,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
         }
 
         func start(timeout: Duration, checkInterval: Duration) async throws {
+            #if canImport(wasi_pthread)
             class Context: @unchecked Sendable {
                 let executor: WebWorkerTaskExecutor.Executor
                 let worker: Worker
@@ -316,6 +317,9 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                 } while tid == 0
                 swjs_listen_message_from_worker_thread(tid)
             }
+            #else
+            fatalError("Unsupported platform")
+            #endif
         }
 
         func terminate() {
@@ -420,6 +424,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
     ///
     /// This function must be called once before using the Web Worker task executor.
     public static func installGlobalExecutor() {
+        #if canImport(wasi_pthread)
         // Ensure this function is called only once.
         guard _mainThread == nil else { return }
 
@@ -448,6 +453,9 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
             }
         }
         swift_task_enqueueGlobal_hook = unsafeBitCast(swift_task_enqueueGlobal_hook_impl, to: UnsafeMutableRawPointer?.self)
+        #else
+        fatalError("Unsupported platform")
+        #endif
     }
 }
 
