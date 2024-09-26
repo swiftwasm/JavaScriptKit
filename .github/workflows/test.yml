@@ -76,10 +76,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-13
-            xcode: Xcode_14.3
           - os: macos-14
             xcode: Xcode_15.2
+          - os: macos-15
+            xcode: Xcode_16
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
