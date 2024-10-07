@@ -32,7 +32,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         })
     }
 
-    #if compiler(>=5.5)
+    #if compiler(>=5.5) && !hasFeature(Embedded)
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSOneshotClosure {
         JSOneshotClosure(makeAsyncClosure(body))
@@ -113,7 +113,7 @@ public class JSClosure: JSFunction, JSClosureProtocol {
         Self.sharedClosures[hostFuncRef] = (self, body)
     }
 
-    #if compiler(>=5.5)
+    #if compiler(>=5.5) && !hasFeature(Embedded)
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSClosure {
         JSClosure(makeAsyncClosure(body))
@@ -129,7 +129,7 @@ public class JSClosure: JSFunction, JSClosureProtocol {
     #endif
 }
 
-#if compiler(>=5.5)
+#if compiler(>=5.5) && !hasFeature(Embedded)
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSValue) -> (([JSValue]) -> JSValue) {
     { arguments in
@@ -195,7 +195,7 @@ func _call_host_function_impl(
     guard let (_, hostFunc) = JSClosure.sharedClosures[hostFuncRef] else {
         return true
     }
-    let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map(\.jsValue)
+    let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map { $0.jsValue}
     let result = hostFunc(arguments)
     let callbackFuncRef = JSFunction(id: callbackFuncRef)
     _ = callbackFuncRef(result)

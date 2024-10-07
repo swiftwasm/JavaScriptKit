@@ -11,10 +11,33 @@ For invalidation you should either store the timer in an optional property and a
 or deallocate the object that owns the timer.
 */
 public final class JSTimer {
+    enum ClosureStorage {
+        case oneshot(JSOneshotClosure)
+        case repeating(JSClosure)
+
+        var jsValue: JSValue {
+            switch self {
+            case .oneshot(let closure):
+                closure.jsValue
+            case .repeating(let closure):
+                closure.jsValue
+            }
+        }
+
+        func release() {
+            switch self {
+            case .oneshot(let closure):
+                closure.release()
+            case .repeating(let closure):
+                closure.release()
+            }
+        }
+    }
+
     /// Indicates whether this timer instance calls its callback repeatedly at a given delay.
     public let isRepeating: Bool
 
-    private let closure: JSClosureProtocol
+    private let closure: ClosureStorage
 
     /** Node.js and browser APIs are slightly different. `setTimeout`/`setInterval` return an object
      in Node.js, while browsers return a number. Fortunately, clearTimeout and clearInterval take
@@ -35,21 +58,21 @@ public final class JSTimer {
      */
     public init(millisecondsDelay: Double, isRepeating: Bool = false, callback: @escaping () -> ()) {
         if isRepeating {
-            closure = JSClosure { _ in
+            closure = .repeating(JSClosure { _ in
                 callback()
                 return .undefined
-            }
+            })
         } else {
-            closure = JSOneshotClosure { _ in
+            closure = .oneshot(JSOneshotClosure { _ in
                 callback()
                 return .undefined
-            }
+            })
         }
         self.isRepeating = isRepeating
         if isRepeating {
-            value = global.setInterval.function!(closure, millisecondsDelay)
+            value = global.setInterval.function!(arguments: [closure.jsValue, millisecondsDelay.jsValue])
         } else {
-            value = global.setTimeout.function!(closure, millisecondsDelay)
+            value = global.setTimeout.function!(arguments: [closure.jsValue, millisecondsDelay.jsValue])
         }
     }
 

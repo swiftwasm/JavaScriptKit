@@ -58,6 +58,7 @@ public final class JSPromise: JSBridgedClass {
         self.init(unsafelyWrapping: Self.constructor!.new(closure))
     }
 
+#if !hasFeature(Embedded)
     public static func resolve(_ value: ConvertibleToJSValue) -> JSPromise {
         self.init(unsafelyWrapping: Self.constructor!.resolve!(value).object!)
     }
@@ -65,7 +66,17 @@ public final class JSPromise: JSBridgedClass {
     public static func reject(_ reason: ConvertibleToJSValue) -> JSPromise {
         self.init(unsafelyWrapping: Self.constructor!.reject!(reason).object!)
     }
+#else
+    public static func resolve(_ value: some ConvertibleToJSValue) -> JSPromise {
+        self.init(unsafelyWrapping: constructor!.resolve!(value).object!)
+    }
 
+    public static func reject(_ reason: some ConvertibleToJSValue) -> JSPromise {
+        self.init(unsafelyWrapping: constructor!.reject!(reason).object!)
+    }
+#endif
+
+#if !hasFeature(Embedded)
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
     @discardableResult
     public func then(success: @escaping (JSValue) -> ConvertibleToJSValue) -> JSPromise {
@@ -150,4 +161,5 @@ public final class JSPromise: JSBridgedClass {
         }
         return .init(unsafelyWrapping: jsObject.finally!(closure).object!)
     }
+#endif
 }

@@ -14,7 +14,8 @@ let package = Package(
         .target(
             name: "JavaScriptKit",
             dependencies: ["_CJavaScriptKit"],
-            resources: [.copy("Runtime")]
+            //LES: TODO - make this conditional
+            // resources: [.copy("Runtime")]
         ),
         .target(name: "_CJavaScriptKit"),
         .target(

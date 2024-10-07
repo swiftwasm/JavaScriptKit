@@ -10,7 +10,11 @@ public class JSSymbol: JSObject {
 
     public init(_ description: JSString) {
         // can’t do `self =` so we have to get the ID manually
+    #if hasFeature(Embedded)
+        let result = Symbol.invokeNonThrowingJSFunction(arguments: [description.jsValue])
+    #else
         let result = Symbol.invokeNonThrowingJSFunction(arguments: [description])
+    #endif
         precondition(result.kind == .symbol)
         super.init(id: UInt32(result.payload1))
     }

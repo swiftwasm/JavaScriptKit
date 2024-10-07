@@ -1,0 +1,34 @@
+swift build --target JavaScriptKit \
+  --triple wasm32-unknown-none-wasm  \
+  -Xswiftc -enable-experimental-feature -Xswiftc Embedded \
+  -Xswiftc -enable-experimental-feature -Xswiftc Extern \
+  -Xswiftc -wmo -Xswiftc -disable-cmo \
+  -Xswiftc -Xfrontend -Xswiftc -gnone \
+  -Xswiftc -Xfrontend -Xswiftc -disable-stack-protector \
+  -Xswiftc -cxx-interoperability-mode=default \
+  -Xcc -D__Embedded -Xcc -fdeclspec \
+  -Xlinker --export-if-defined=__main_argc_argv \
+  -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor
+  
+
+  # -Xlinker --export-if-defined=_initialize
+  # -Xswiftc -static-stdlib \
+  
+  # --verbose
+  
+  # -Xswiftc -Xclang-linker -Xswiftc -nostdlib \
+
+####### 
+# swift build -c release --product ExampleApp \
+#   --sdk DEVELOPMENT-SNAPSHOT-2024-09-20-a-wasm32-unknown-wasi \
+#   --triple wasm32-unknown-none-wasm  \
+#   -Xcc -D__Embedded \
+#   -Xswiftc -enable-experimental-feature -Xswiftc Embedded \
+#   -Xswiftc -enable-experimental-feature -Xswiftc Extern \
+  # -Xswiftc -wmo -Xswiftc -disable-cmo \
+  #  -Xcc -fdeclspec \
+  # -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor \
+  # -Xlinker --export-if-defined=__main_argc_argv \
+  
+
+#cp .build/release/ExampleApp.wasm ./TestPage/app.wasm

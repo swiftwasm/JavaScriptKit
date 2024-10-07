@@ -1,7 +1,11 @@
 #ifndef _CJavaScriptKit_h
 #define _CJavaScriptKit_h
 
+#if __Embedded
+#include <stddef.h>
+#else
 #include <stdlib.h>
+#endif
 #include <stdbool.h>
 #include <stdint.h>
 
