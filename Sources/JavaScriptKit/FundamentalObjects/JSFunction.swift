@@ -258,6 +258,6 @@ private func valueKindAndFlagsFromBits(_ bits: UInt32) -> JavaScriptValueKindAnd
     #if hasFeature(Embedded)
     JavaScriptValueKindAndFlags(bitPattern: bits)
     #else 
-    unsafeBitCast(resultBitPattern, to: JavaScriptValueKindAndFlags.self)
+    unsafeBitCast(bits, to: JavaScriptValueKindAndFlags.self)
     #endif
 }

@@ -270,3 +270,22 @@ extension JSValue: CustomStringConvertible {
         JSObject.global.String.function!(self).string!
     }
 }
+
+#if hasFeature(Embedded)
+public extension JSValue {
+    @_disfavoredOverload
+    subscript(dynamicMember name: String) -> (() -> JSValue) { 
+        object![dynamicMember: name]!
+    }
+
+    @_disfavoredOverload
+    subscript<A0: ConvertibleToJSValue>(dynamicMember name: String) -> ((A0) -> JSValue) {
+        object![dynamicMember: name]!
+    }
+
+    @_disfavoredOverload
+    subscript<A0: ConvertibleToJSValue, A1: ConvertibleToJSValue>(dynamicMember name: String) -> ((A0, A1) -> JSValue) {
+        object![dynamicMember: name]!
+    }
+}
+#endif

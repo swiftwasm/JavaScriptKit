@@ -186,8 +186,8 @@ private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSVa
 // └─────────────────────┴──────────────────────────┘
 
 /// Returns true if the host function has been already released, otherwise false.
-@_cdecl("_call_host_function_impl")
-func _call_host_function_impl(
+@_expose(wasm, "swjs_call_host_function")
+public func _call_host_function_impl(
     _ hostFuncRef: JavaScriptHostFuncRef,
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
@@ -217,8 +217,8 @@ extension JSClosure {
     }
 }
 
-@_cdecl("_free_host_function_impl")
-func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {}
+@_expose(wasm, "swjs_free_host_function")
+public func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {}
 
 #else
 
@@ -229,8 +229,8 @@ extension JSClosure {
 
 }
 
-@_cdecl("_free_host_function_impl")
-func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {
+@_expose(wasm, "swjs_free_host_function")
+public func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {
     JSClosure.sharedClosures[hostFuncRef] = nil
 }
 #endif
