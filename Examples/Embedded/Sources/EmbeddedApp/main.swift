@@ -3,16 +3,19 @@ import JavaScriptKit
 let alert = JSObject.global.alert.function!
 let document = JSObject.global.document
 
-print("Document title: \(document.title.string ?? "")")
+print("Hello from WASM, document title: \(document.title.string ?? "")")
+
+var count = 0
 
 var divElement = document.createElement("div")
-divElement.innerText = "Hello, world 2"
+divElement.innerText = .string("Count \(count)")
 _ = document.body.appendChild(divElement)
 
 var buttonElement = document.createElement("button")
-buttonElement.innerText = "Alert demo"
+buttonElement.innerText = "Click me"
 buttonElement.onclick = JSValue.object(JSClosure { _ in
-    divElement.innerText = "Hello, world 3"
+    count += 1    
+    divElement.innerText = .string("Count \(count)")
     return .undefined
 })
 
