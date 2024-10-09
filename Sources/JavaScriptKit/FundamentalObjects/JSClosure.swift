@@ -236,7 +236,7 @@ func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {
 }
 #endif
 
-#if hasFeature(Embedded)
+#if compiler(>=6.0) && hasFeature(Embedded)
 // cdecls currently don't work in embedded, and expose for wasm only works >=6.0
 @_expose(wasm, "swjs_call_host_function")
 public func _swjs_call_host_function(
