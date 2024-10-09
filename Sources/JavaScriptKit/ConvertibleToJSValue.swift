@@ -88,6 +88,7 @@ extension JSObject: JSValueCompatible {
 private let objectConstructor = JSObject.global.Object.function!
 private let arrayConstructor = JSObject.global.Array.function!
 
+#if !hasFeature(Embedded)
 extension Dictionary where Value == ConvertibleToJSValue, Key == String {
     public var jsValue: JSValue {
         let object = objectConstructor.new()
@@ -97,6 +98,7 @@ extension Dictionary where Value == ConvertibleToJSValue, Key == String {
         return .object(object)
     }
 }
+#endif
 
 extension Dictionary: ConvertibleToJSValue where Value: ConvertibleToJSValue, Key == String {
     public var jsValue: JSValue {
@@ -158,6 +160,7 @@ extension Array: ConvertibleToJSValue where Element: ConvertibleToJSValue {
     }
 }
 
+#if !hasFeature(Embedded)
 extension Array where Element == ConvertibleToJSValue {
     public var jsValue: JSValue {
         let array = arrayConstructor.new(count)
@@ -167,6 +170,7 @@ extension Array where Element == ConvertibleToJSValue {
         return .object(array)
     }
 }
+#endif
 
 extension Array: ConstructibleFromJSValue where Element: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> [Element]? {
@@ -252,6 +256,27 @@ extension JSValue {
     }
 }
 
+extension Array where Element: ConvertibleToJSValue {
+    func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
+        // fast path for empty array
+        guard self.count != 0 else { return body([]) }
+
+        func _withRawJSValues(
+            _ values: Self, _ index: Int,
+            _ results: inout [RawJSValue], _ body: ([RawJSValue]) -> T
+        ) -> T {
+            if index == values.count { return body(results) }
+            return values[index].jsValue.withRawJSValue { (rawValue) -> T in
+                results.append(rawValue)
+                return _withRawJSValues(values, index + 1, &results, body)
+            }
+        }
+        var _results = [RawJSValue]()
+        return _withRawJSValues(self, 0, &_results, body)
+    }
+}
+
+#if !hasFeature(Embedded)
 extension Array where Element == ConvertibleToJSValue {
     func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
         // fast path for empty array
@@ -271,9 +296,4 @@ extension Array where Element == ConvertibleToJSValue {
         return _withRawJSValues(self, 0, &_results, body)
     }
 }
-
-extension Array where Element: ConvertibleToJSValue {
-    func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
-        [ConvertibleToJSValue].withRawJSValues(self)(body)
-    }
-}
+#endif

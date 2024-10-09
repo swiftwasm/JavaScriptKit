@@ -31,9 +31,9 @@ public struct JSString: LosslessStringConvertible, Equatable {
             var bytesRef: JavaScriptObjectRef = 0
             let bytesLength = Int(swjs_encode_string(jsRef, &bytesRef))
             // +1 for null terminator
-            let buffer = malloc(Int(bytesLength + 1))!.assumingMemoryBound(to: UInt8.self)
+            let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bytesLength + 1)
             defer {
-                free(buffer)
+                buffer.deallocate()
                 swjs_release(bytesRef)
             }
             swjs_load_string(bytesRef, buffer)

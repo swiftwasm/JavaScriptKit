@@ -32,7 +32,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         })
     }
 
-    #if compiler(>=5.5)
+    #if compiler(>=5.5) && !hasFeature(Embedded)
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSOneshotClosure {
         JSOneshotClosure(makeAsyncClosure(body))
@@ -113,7 +113,7 @@ public class JSClosure: JSFunction, JSClosureProtocol {
         Self.sharedClosures[hostFuncRef] = (self, body)
     }
 
-    #if compiler(>=5.5)
+    #if compiler(>=5.5) && !hasFeature(Embedded)
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSClosure {
         JSClosure(makeAsyncClosure(body))
@@ -129,7 +129,7 @@ public class JSClosure: JSFunction, JSClosureProtocol {
     #endif
 }
 
-#if compiler(>=5.5)
+#if compiler(>=5.5) && !hasFeature(Embedded)
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSValue) -> (([JSValue]) -> JSValue) {
     { arguments in
@@ -195,7 +195,7 @@ func _call_host_function_impl(
     guard let (_, hostFunc) = JSClosure.sharedClosures[hostFuncRef] else {
         return true
     }
-    let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map(\.jsValue)
+    let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map { $0.jsValue}
     let result = hostFunc(arguments)
     let callbackFuncRef = JSFunction(id: callbackFuncRef)
     _ = callbackFuncRef(result)
@@ -217,6 +217,7 @@ extension JSClosure {
     }
 }
 
+
 @_cdecl("_free_host_function_impl")
 func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {}
 
@@ -232,5 +233,22 @@ extension JSClosure {
 @_cdecl("_free_host_function_impl")
 func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {
     JSClosure.sharedClosures[hostFuncRef] = nil
+}
+#endif
+
+#if compiler(>=6.0) && hasFeature(Embedded)
+// cdecls currently don't work in embedded, and expose for wasm only works >=6.0
+@_expose(wasm, "swjs_call_host_function")
+public func _swjs_call_host_function(
+        _ hostFuncRef: JavaScriptHostFuncRef,
+        _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
+        _ callbackFuncRef: JavaScriptObjectRef) -> Bool {
+
+    _call_host_function_impl(hostFuncRef, argv, argc, callbackFuncRef) 
+}
+
+@_expose(wasm, "swjs_free_host_function")
+public func _swjs_free_host_function(_ hostFuncRef: JavaScriptHostFuncRef) {
+    _free_host_function_impl(hostFuncRef)
 }
 #endif

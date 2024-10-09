@@ -10,7 +10,8 @@ import _CJavaScriptKit
 /// alert("Hello, world")
 /// ```
 ///
-public class JSFunction: JSObject {
+public class JSFunction: JSObject, _JSFunctionProtocol {
+#if !hasFeature(Embedded)
     /// Call this function with given `arguments` and binding given `this` as context.
     /// - Parameters:
     ///   - this: The value to be passed as the `this` parameter to this function.
@@ -60,6 +61,11 @@ public class JSFunction: JSObject {
         }
     }
 
+    /// A variadic arguments version of `new`.
+    public func new(_ arguments: ConvertibleToJSValue...) -> JSObject {
+        new(arguments: arguments)
+    }
+
     /// A modifier to call this function as a throwing function
     ///
     ///
@@ -78,10 +84,19 @@ public class JSFunction: JSObject {
     public var `throws`: JSThrowingFunction {
         JSThrowingFunction(self)
     }
+#endif
 
-    /// A variadic arguments version of `new`.
-    public func new(_ arguments: ConvertibleToJSValue...) -> JSObject {
-        new(arguments: arguments)
+    @discardableResult
+    public func callAsFunction(arguments: [JSValue]) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: arguments).jsValue
+    }
+
+    public func new(arguments: [JSValue]) -> JSObject {
+        arguments.withRawJSValues { rawValues in
+            rawValues.withUnsafeBufferPointer { bufferPointer in
+                JSObject(id: swjs_call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
+            }
+        }
     }
 
     @available(*, unavailable, message: "Please use JSClosure instead")
@@ -93,43 +108,158 @@ public class JSFunction: JSObject {
         .function(self)
     }
 
+    final func invokeNonThrowingJSFunction(arguments: [JSValue]) -> RawJSValue {
+        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0) }
+    }
+
+    final func invokeNonThrowingJSFunction(arguments: [JSValue], this: JSObject) -> RawJSValue {
+        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0, this: this) }
+    }
+
+#if !hasFeature(Embedded)
     final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue]) -> RawJSValue {
-        let id = self.id
-        return arguments.withRawJSValues { rawValues in
-            rawValues.withUnsafeBufferPointer { bufferPointer in
-                let argv = bufferPointer.baseAddress
-                let argc = bufferPointer.count
-                var payload1 = JavaScriptPayload1()
-                var payload2 = JavaScriptPayload2()
-                let resultBitPattern = swjs_call_function_no_catch(
-                    id, argv, Int32(argc),
-                    &payload1, &payload2
-                )
-                let kindAndFlags = unsafeBitCast(resultBitPattern, to: JavaScriptValueKindAndFlags.self)
-                assert(!kindAndFlags.isException)
-                let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
-                return result
-            }
-        }
+        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0) }
     }
 
     final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue], this: JSObject) -> RawJSValue {
-        let id = self.id
-        return arguments.withRawJSValues { rawValues in
-            rawValues.withUnsafeBufferPointer { bufferPointer in
-                let argv = bufferPointer.baseAddress
-                let argc = bufferPointer.count
-                var payload1 = JavaScriptPayload1()
-                var payload2 = JavaScriptPayload2()
-                let resultBitPattern = swjs_call_function_with_this_no_catch(this.id,
-                    id, argv, Int32(argc),
-                    &payload1, &payload2
-                )
-                let kindAndFlags = unsafeBitCast(resultBitPattern, to: JavaScriptValueKindAndFlags.self)
-                assert(!kindAndFlags.isException)
-                let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
-                return result
-            }
+        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0, this: this) }
+    }
+#endif
+
+    final private func invokeNonThrowingJSFunction(rawValues: [RawJSValue]) -> RawJSValue {
+        rawValues.withUnsafeBufferPointer { [id] bufferPointer in
+            let argv = bufferPointer.baseAddress
+            let argc = bufferPointer.count
+            var payload1 = JavaScriptPayload1()
+            var payload2 = JavaScriptPayload2()
+            let resultBitPattern = swjs_call_function_no_catch(
+                id, argv, Int32(argc),
+                &payload1, &payload2
+            )
+            let kindAndFlags = valueKindAndFlagsFromBits(resultBitPattern)
+            assert(!kindAndFlags.isException)
+            let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
+            return result
         }
     }
+
+    final private func invokeNonThrowingJSFunction(rawValues: [RawJSValue], this: JSObject) -> RawJSValue {
+        rawValues.withUnsafeBufferPointer { [id] bufferPointer in
+            let argv = bufferPointer.baseAddress
+            let argc = bufferPointer.count
+            var payload1 = JavaScriptPayload1()
+            var payload2 = JavaScriptPayload2()
+            let resultBitPattern = swjs_call_function_with_this_no_catch(this.id,
+                id, argv, Int32(argc),
+                &payload1, &payload2
+            )
+            let kindAndFlags = valueKindAndFlagsFromBits(resultBitPattern)
+            #if !hasFeature(Embedded)
+            assert(!kindAndFlags.isException)
+            #endif
+            let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
+            return result
+        }
+    }
+}
+
+/// Internal protocol to support generic arguments for `JSFunction`.
+/// 
+/// In Swift Embedded, non-final classes cannot have generic methods.
+public protocol _JSFunctionProtocol: JSFunction {}
+
+#if hasFeature(Embedded)
+// NOTE: once embedded supports variadic generics, we can remove these overloads
+public extension _JSFunctionProtocol {
+
+    @discardableResult
+    func callAsFunction(this: JSObject) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [], this: this).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(this: JSObject, _ arg0: some ConvertibleToJSValue) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue], this: this).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(this: JSObject, _ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue], this: this).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(this: JSObject, _ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue, _ arg2: some ConvertibleToJSValue) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue], this: this).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(this: JSObject, arguments: [JSValue]) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: arguments, this: this).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction() -> JSValue {
+        invokeNonThrowingJSFunction(arguments: []).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(_ arg0: some ConvertibleToJSValue) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue]).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue]).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue, _ arg2: some ConvertibleToJSValue) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue]).jsValue
+    }
+
+    func new() -> JSObject {
+        new(arguments: [])
+    }
+
+    func new(_ arg0: some ConvertibleToJSValue) -> JSObject {
+        new(arguments: [arg0.jsValue])
+    }
+
+    func new(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue) -> JSObject {
+        new(arguments: [arg0.jsValue, arg1.jsValue])
+    }
+
+    func new(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue, _ arg2: some ConvertibleToJSValue) -> JSObject {
+        new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue])
+    }
+
+    func new(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue, _ arg2: some ConvertibleToJSValue, arg3: some ConvertibleToJSValue) -> JSObject {
+        new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue])
+    }
+
+    func new(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue, _ arg2: some ConvertibleToJSValue, _ arg3: some ConvertibleToJSValue, _ arg4: some ConvertibleToJSValue, _ arg5: some ConvertibleToJSValue, _ arg6: some ConvertibleToJSValue) -> JSObject {
+        new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue])
+    }
+}
+
+// C bit fields seem to not work with Embedded
+// in "normal mode" this is defined as a C struct
+private struct JavaScriptValueKindAndFlags {
+    let errorBit: UInt32 = 1 << 32
+    let kind: JavaScriptValueKind
+    let isException: Bool
+
+    init(bitPattern: UInt32) {
+        self.kind = JavaScriptValueKind(rawValue: bitPattern & ~errorBit)!
+        self.isException = (bitPattern & errorBit) != 0
+    }
+}
+#endif
+
+private func valueKindAndFlagsFromBits(_ bits: UInt32) -> JavaScriptValueKindAndFlags {
+    #if hasFeature(Embedded)
+    JavaScriptValueKindAndFlags(bitPattern: bits)
+    #else 
+    unsafeBitCast(bits, to: JavaScriptValueKindAndFlags.self)
+    #endif
 }

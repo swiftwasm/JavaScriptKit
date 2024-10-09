@@ -1,7 +1,7 @@
 //
 //  Created by Manuel Burghard. Licensed unter MIT.
 //
-
+#if !hasFeature(Embedded)
 import _CJavaScriptKit
 
 /// A protocol that allows a Swift numeric type to be mapped to the JavaScript TypedArray that holds integers of its type
@@ -187,3 +187,4 @@ extension Float32: TypedArrayElement {
 extension Float64: TypedArrayElement {
     public static var typedArrayClass = JSObject.global.Float64Array.function!
 }
+#endif

@@ -1,3 +1,4 @@
+#if !hasFeature(Embedded)
 import _CJavaScriptKit
 
 
@@ -94,3 +95,4 @@ private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSV
     }
     return result
 }
+#endif
