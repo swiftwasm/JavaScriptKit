@@ -17,10 +17,8 @@ public final class JSTimer {
 
         var jsValue: JSValue {
             switch self {
-            case .oneshot(let closure):
-                closure.jsValue
-            case .repeating(let closure):
-                closure.jsValue
+            case .oneshot(let closure): return closure.jsValue
+            case .repeating(let closure): return closure.jsValue
             }
         }
 
