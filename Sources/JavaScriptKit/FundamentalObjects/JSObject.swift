@@ -231,10 +231,14 @@ public class JSThrowingObject {
 }
 #endif
 
+/// Internal protocol to support generic arguments for `JSObject`.
+/// 
+/// In Swift Embedded, non-final classes cannot have generic methods.
 public protocol _JSObjectProtocol: JSObject {
 }
 
 #if hasFeature(Embedded)
+// NOTE: once embedded supports variadic generics, we can remove these overloads
 public extension _JSObjectProtocol {
     @_disfavoredOverload
     subscript(dynamicMember name: String) -> (() -> JSValue)? {

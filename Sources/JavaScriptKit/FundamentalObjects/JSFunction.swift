@@ -84,8 +84,8 @@ public class JSFunction: JSObject, _JSFunctionProtocol {
     public var `throws`: JSThrowingFunction {
         JSThrowingFunction(self)
     }
+#endif
 
-#else
     @discardableResult
     public func callAsFunction(arguments: [JSValue]) -> JSValue {
         invokeNonThrowingJSFunction(arguments: arguments).jsValue
@@ -98,7 +98,6 @@ public class JSFunction: JSObject, _JSFunctionProtocol {
             }
         }
     }
-#endif
 
     @available(*, unavailable, message: "Please use JSClosure instead")
     public static func from(_: @escaping ([JSValue]) -> JSValue) -> JSFunction {
@@ -109,7 +108,6 @@ public class JSFunction: JSObject, _JSFunctionProtocol {
         .function(self)
     }
 
-#if hasFeature(Embedded)
     final func invokeNonThrowingJSFunction(arguments: [JSValue]) -> RawJSValue {
         arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0) }
     }
@@ -117,7 +115,8 @@ public class JSFunction: JSObject, _JSFunctionProtocol {
     final func invokeNonThrowingJSFunction(arguments: [JSValue], this: JSObject) -> RawJSValue {
         arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0, this: this) }
     }
-#else
+
+#if !hasFeature(Embedded)
     final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue]) -> RawJSValue {
         arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0) }
     }
@@ -164,11 +163,14 @@ public class JSFunction: JSObject, _JSFunctionProtocol {
     }
 }
 
+/// Internal protocol to support generic arguments for `JSFunction`.
+/// 
+/// In Swift Embedded, non-final classes cannot have generic methods.
 public protocol _JSFunctionProtocol: JSFunction {}
 
 #if hasFeature(Embedded)
+// NOTE: once embedded supports variadic generics, we can remove these overloads
 public extension _JSFunctionProtocol {
-     // hand-made "varidacs" for Embedded
 
     @discardableResult
     func callAsFunction(this: JSObject) -> JSValue {
