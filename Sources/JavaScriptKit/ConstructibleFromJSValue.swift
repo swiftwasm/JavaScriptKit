@@ -40,7 +40,7 @@ extension SignedInteger where Self: ConstructibleFromJSValue {
     /// If the value is too large to fit in the `Self` type, `nil` is returned.
     ///
     /// - Parameter bigInt: The `JSBigIntExtended` to decode
-    public init?(exactly bigInt: JSBigIntExtended) {
+    public init?(exactly bigInt: some JSBigIntExtended) {
         self.init(exactly: bigInt.int64Value)
     }
 
@@ -49,7 +49,7 @@ extension SignedInteger where Self: ConstructibleFromJSValue {
     /// Crash if the value is too large to fit in the `Self` type.
     ///
     /// - Parameter bigInt: The `JSBigIntExtended` to decode
-    public init(_ bigInt: JSBigIntExtended) {
+    public init(_ bigInt: some JSBigIntExtended) {
         self.init(bigInt.int64Value)
     }
 
@@ -68,9 +68,11 @@ extension SignedInteger where Self: ConstructibleFromJSValue {
         if let number = value.number {
             return Self(exactly: number.rounded(.towardZero))
         }
+#if !hasFeature(Embedded)
         if let bigInt = value.bigInt as? JSBigIntExtended {
             return Self(exactly: bigInt)
         }
+#endif
         return nil
     }
 }
@@ -87,7 +89,7 @@ extension UnsignedInteger where Self: ConstructibleFromJSValue {
     /// Returns `nil` if the value is negative or too large to fit in the `Self` type.
     ///
     /// - Parameter bigInt: The `JSBigIntExtended` to decode
-    public init?(exactly bigInt: JSBigIntExtended) {
+    public init?(exactly bigInt: some JSBigIntExtended) {
         self.init(exactly: bigInt.uInt64Value)
     }
 
@@ -96,7 +98,7 @@ extension UnsignedInteger where Self: ConstructibleFromJSValue {
     /// Crash if the value is negative or too large to fit in the `Self` type.
     ///
     /// - Parameter bigInt: The `JSBigIntExtended` to decode
-    public init(_ bigInt: JSBigIntExtended) {
+    public init(_ bigInt: some JSBigIntExtended) {
         self.init(bigInt.uInt64Value)
     }
 
@@ -114,9 +116,11 @@ extension UnsignedInteger where Self: ConstructibleFromJSValue {
         if let number = value.number {
             return Self(exactly: number.rounded(.towardZero))
         }
+#if !hasFeature(Embedded)
         if let bigInt = value.bigInt as? JSBigIntExtended {
             return Self(exactly: bigInt)
         }
+#endif
         return nil
     }
 }
