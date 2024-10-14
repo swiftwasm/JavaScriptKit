@@ -1,7 +1,11 @@
 #ifndef _CJavaScriptKit_h
 #define _CJavaScriptKit_h
 
+#if __Embedded
+#include <stddef.h>
+#else
 #include <stdlib.h>
+#endif
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -25,10 +29,15 @@ typedef enum __attribute__((enum_extensibility(closed))) {
   JavaScriptValueKindBigInt = 8,
 } JavaScriptValueKind;
 
+#if __Embedded
+// something about the bit field widths is not working with embedded
+typedef unsigned short JavaScriptValueKindAndFlags;
+#else
 typedef struct {
   JavaScriptValueKind kind: 31;
   bool isException: 1;
 } JavaScriptValueKindAndFlags;
+#endif
 
 typedef unsigned JavaScriptPayload1;
 typedef double JavaScriptPayload2;

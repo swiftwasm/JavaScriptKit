@@ -15,7 +15,7 @@ import _CJavaScriptKit
 /// The lifetime of this object is managed by the JavaScript and Swift runtime bridge library with
 /// reference counting system.
 @dynamicMemberLookup
-public class JSObject: Equatable {
+public class JSObject: _JSObjectProtocol, Equatable {
     @_spi(JSObject_id)
     public var id: JavaScriptObjectRef
     @_spi(JSObject_id)
@@ -23,6 +23,7 @@ public class JSObject: Equatable {
         self.id = id
     }
 
+#if !hasFeature(Embedded)
     /// Returns the `name` member method binding this object as `this` context.
     ///
     /// e.g.
@@ -65,6 +66,7 @@ public class JSObject: Equatable {
     public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue)? {
         self[name]
     }
+#endif
 
     /// A convenience method of `subscript(_ name: String) -> JSValue`
     /// to access the member through Dynamic Member Lookup.
@@ -105,6 +107,7 @@ public class JSObject: Equatable {
         set { setJSValue(this: self, symbol: name, value: newValue) }
     }
 
+#if !hasFeature(Embedded)
     /// A modifier to call methods as throwing methods capturing `this`
     ///
     ///
@@ -125,6 +128,7 @@ public class JSObject: Equatable {
     public var throwing: JSThrowingObject {
         JSThrowingObject(self)
     }
+#endif
 
     /// Return `true` if this value is an instance of the passed `constructor` function.
     /// - Parameter constructor: The constructor function to check.
@@ -197,6 +201,7 @@ extension JSObject: Hashable {
     }
 }
 
+#if !hasFeature(Embedded)
 /// A `JSObject` wrapper that enables throwing method calls capturing `this`.
 /// Exceptions produced by JavaScript functions will be thrown as `JSValue`.
 @dynamicMemberLookup
@@ -224,3 +229,36 @@ public class JSThrowingObject {
         self[name]
     }
 }
+#endif
+
+/// Internal protocol to support generic arguments for `JSObject`.
+/// 
+/// In Swift Embedded, non-final classes cannot have generic methods.
+public protocol _JSObjectProtocol: JSObject {
+}
+
+#if hasFeature(Embedded)
+// NOTE: once embedded supports variadic generics, we can remove these overloads
+public extension _JSObjectProtocol {
+    @_disfavoredOverload
+    subscript(dynamicMember name: String) -> (() -> JSValue)? {
+        self[name].function.map { function in 
+            { function(this: self) }
+        }
+    }
+
+    @_disfavoredOverload
+    subscript<A0: ConvertibleToJSValue>(dynamicMember name: String) -> ((A0) -> JSValue)? {
+        self[name].function.map { function in 
+            { function(this: self, $0) }
+        }
+    }
+
+    @_disfavoredOverload
+    subscript<A0: ConvertibleToJSValue, A1: ConvertibleToJSValue>(dynamicMember name: String) -> ((A0, A1) -> JSValue)? {
+        self[name].function.map { function in 
+            { function(this: self, $0, $1) }
+        }
+    }
+}
+#endif

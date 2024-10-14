@@ -4,6 +4,9 @@ import PackageDescription
 
 let package = Package(
     name: "Basic",
+    platforms: [
+        .macOS(.v14)
+    ],
     dependencies: [.package(name: "JavaScriptKit", path: "../../")],
     targets: [
         .executableTarget(

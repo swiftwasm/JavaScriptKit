@@ -101,11 +101,13 @@ public enum JSValue: Equatable {
 }
 
 public extension JSValue {
+#if !hasFeature(Embedded)
     /// An unsafe convenience method of `JSObject.subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
     /// - Precondition: `self` must be a JavaScript Object and specified member should be a callable object.
     subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue) {
         object![dynamicMember: name]!
     }
+#endif
 
     /// An unsafe convenience method of `JSObject.subscript(_ index: Int) -> JSValue`
     /// - Precondition: `self` must be a JavaScript Object.
@@ -268,3 +270,22 @@ extension JSValue: CustomStringConvertible {
         JSObject.global.String.function!(self).string!
     }
 }
+
+#if hasFeature(Embedded)
+public extension JSValue {
+    @_disfavoredOverload
+    subscript(dynamicMember name: String) -> (() -> JSValue) { 
+        object![dynamicMember: name]!
+    }
+
+    @_disfavoredOverload
+    subscript<A0: ConvertibleToJSValue>(dynamicMember name: String) -> ((A0) -> JSValue) {
+        object![dynamicMember: name]!
+    }
+
+    @_disfavoredOverload
+    subscript<A0: ConvertibleToJSValue, A1: ConvertibleToJSValue>(dynamicMember name: String) -> ((A0, A1) -> JSValue) {
+        object![dynamicMember: name]!
+    }
+}
+#endif
