@@ -136,7 +136,7 @@ public class JSFunction: JSObject, _JSFunctionProtocol {
                 id, argv, Int32(argc),
                 &payload1, &payload2
             )
-            let kindAndFlags = valueKindAndFlagsFromBits(resultBitPattern)
+            let kindAndFlags = JavaScriptValueKindAndFlags(bitPattern: resultBitPattern)
             assert(!kindAndFlags.isException)
             let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
             return result
@@ -153,7 +153,7 @@ public class JSFunction: JSObject, _JSFunctionProtocol {
                 id, argv, Int32(argc),
                 &payload1, &payload2
             )
-            let kindAndFlags = valueKindAndFlagsFromBits(resultBitPattern)
+            let kindAndFlags = JavaScriptValueKindAndFlags(bitPattern: resultBitPattern)
             #if !hasFeature(Embedded)
             assert(!kindAndFlags.isException)
             #endif
@@ -241,25 +241,15 @@ public extension _JSFunctionProtocol {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue])
     }
 }
+#endif
 
-// C bit fields seem to not work with Embedded
-// in "normal mode" this is defined as a C struct
-private struct JavaScriptValueKindAndFlags {
-    let errorBit: UInt32 = 1 << 32
+internal struct JavaScriptValueKindAndFlags {
+    static var errorBit: UInt32 { 1 << 31 }
     let kind: JavaScriptValueKind
     let isException: Bool
 
     init(bitPattern: UInt32) {
-        self.kind = JavaScriptValueKind(rawValue: bitPattern & ~errorBit)!
-        self.isException = (bitPattern & errorBit) != 0
+        self.kind = JavaScriptValueKind(rawValue: bitPattern & ~Self.errorBit)!
+        self.isException = (bitPattern & Self.errorBit) != 0
     }
-}
-#endif
-
-private func valueKindAndFlagsFromBits(_ bits: UInt32) -> JavaScriptValueKindAndFlags {
-    #if hasFeature(Embedded)
-    JavaScriptValueKindAndFlags(bitPattern: bits)
-    #else 
-    unsafeBitCast(bits, to: JavaScriptValueKindAndFlags.self)
-    #endif
 }
