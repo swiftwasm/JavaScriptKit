@@ -1,7 +1,7 @@
 import _CJavaScriptBigIntSupport
 @_spi(JSObject_id) import JavaScriptKit
 
-extension JSBigInt: JSBigIntExtended {
+extension JSBigInt: JavaScriptKit.JSBigIntExtended {
     public var int64Value: Int64 {
         swjs_bigint_to_i64(id, true)
     }
