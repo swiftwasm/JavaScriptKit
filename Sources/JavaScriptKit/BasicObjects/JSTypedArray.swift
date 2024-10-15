@@ -47,7 +47,7 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     /// - Parameter array: The array that will be copied to create a new instance of TypedArray
     public convenience init(_ array: [Element]) {
         let jsArrayRef = array.withUnsafeBufferPointer { ptr in
-            swjs_create_typed_array(Self.constructor!.id, ptr.baseAddress!, Int32(array.count))
+            swjs_create_typed_array(Self.constructor!.id, ptr.baseAddress, Int32(array.count))
         }
         self.init(unsafelyWrapping: JSObject(id: jsArrayRef))
     }
