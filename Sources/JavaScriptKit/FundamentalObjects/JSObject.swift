@@ -15,7 +15,7 @@ import _CJavaScriptKit
 /// The lifetime of this object is managed by the JavaScript and Swift runtime bridge library with
 /// reference counting system.
 @dynamicMemberLookup
-public class JSObject: _JSObjectProtocol, Equatable {
+public class JSObject: Equatable {
     @_spi(JSObject_id)
     public var id: JavaScriptObjectRef
     @_spi(JSObject_id)
@@ -231,15 +231,10 @@ public class JSThrowingObject {
 }
 #endif
 
-/// Internal protocol to support generic arguments for `JSObject`.
-/// 
-/// In Swift Embedded, non-final classes cannot have generic methods.
-public protocol _JSObjectProtocol: JSObject {
-}
 
 #if hasFeature(Embedded)
 // NOTE: once embedded supports variadic generics, we can remove these overloads
-public extension _JSObjectProtocol {
+public extension JSObject {
     @_disfavoredOverload
     subscript(dynamicMember name: String) -> (() -> JSValue)? {
         self[name].function.map { function in 
