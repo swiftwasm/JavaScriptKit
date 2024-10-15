@@ -105,8 +105,8 @@ IMPORT_JS_FUNCTION(swjs_set_prop, void, (const JavaScriptObjectRef _this,
 /// @return A `JavaScriptValueKind` bits represented as 32bit integer for the returned value.
 IMPORT_JS_FUNCTION(swjs_get_prop, uint32_t, (const JavaScriptObjectRef _this,
                                              const JavaScriptObjectRef prop,
-                                             JavaScriptPayload1 *payload1,
-                                             JavaScriptPayload2 *payload2))
+                                             JavaScriptPayload1 * _Nonnull payload1,
+                                             JavaScriptPayload2 * _Nonnull payload2))
 
 /// Sets a value of `_this` JavaScript object.
 ///
@@ -131,8 +131,8 @@ IMPORT_JS_FUNCTION(swjs_set_subscript, void, (const JavaScriptObjectRef _this,
 /// get a value of `_this` JavaScript object.
 IMPORT_JS_FUNCTION(swjs_get_subscript, uint32_t, (const JavaScriptObjectRef _this,
                                                   const int index,
-                                                  JavaScriptPayload1 *payload1,
-                                                  JavaScriptPayload2 *payload2))
+                                                  JavaScriptPayload1 * _Nonnull payload1,
+                                                  JavaScriptPayload2 * _Nonnull payload2))
 
 /// Encodes the `str_obj` to bytes sequence and returns the length of bytes.
 ///
@@ -140,20 +140,20 @@ IMPORT_JS_FUNCTION(swjs_get_subscript, uint32_t, (const JavaScriptObjectRef _thi
 /// @param bytes_result A result pointer of bytes sequence representation in JavaScript.
 ///                    This value will be used to load the actual bytes using `_load_string`.
 /// @result The length of bytes sequence. This value will be used to allocate Swift side string buffer to load the actual bytes.
-IMPORT_JS_FUNCTION(swjs_encode_string, int, (const JavaScriptObjectRef str_obj, JavaScriptObjectRef *bytes_result))
+IMPORT_JS_FUNCTION(swjs_encode_string, int, (const JavaScriptObjectRef str_obj, JavaScriptObjectRef * _Nonnull bytes_result))
 
 /// Decodes the given bytes sequence into JavaScript string object.
 ///
 /// @param bytes_ptr A `uint8_t` byte sequence to decode.
 /// @param length The length of `bytes_ptr`.
 /// @result The decoded JavaScript string object.
-IMPORT_JS_FUNCTION(swjs_decode_string, JavaScriptObjectRef, (const unsigned char *bytes_ptr, const int length))
+IMPORT_JS_FUNCTION(swjs_decode_string, JavaScriptObjectRef, (const unsigned char * _Nonnull bytes_ptr, const int length))
 
 /// Loads the actual bytes sequence of `bytes` into `buffer` which is a Swift side memory address.
 ///
 /// @param bytes A bytes sequence representation in JavaScript to load. This value should be derived from `_encode_string`.
 /// @param buffer A Swift side string buffer to load the bytes.
-IMPORT_JS_FUNCTION(swjs_load_string, void, (const JavaScriptObjectRef bytes, unsigned char *buffer))
+IMPORT_JS_FUNCTION(swjs_load_string, void, (const JavaScriptObjectRef bytes, unsigned char * _Nonnull buffer))
 
 /// Converts the provided Int64 or UInt64 to a BigInt in slow path by splitting 64bit integer to two 32bit integers
 /// to avoid depending on [JS-BigInt-integration](https://github.com/WebAssembly/JS-BigInt-integration) feature
@@ -172,10 +172,10 @@ IMPORT_JS_FUNCTION(swjs_i64_to_bigint_slow, JavaScriptObjectRef, (unsigned int l
 /// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
 /// @return A `JavaScriptValueKindAndFlags` bits represented as 32bit integer for the returned value.
 IMPORT_JS_FUNCTION(swjs_call_function, uint32_t, (const JavaScriptObjectRef ref,
-                                                  const RawJSValue *argv,
+                                                  const RawJSValue * _Nullable argv,
                                                   const int argc,
-                                                  JavaScriptPayload1 *result_payload1,
-                                                  JavaScriptPayload2 *result_payload2))
+                                                  JavaScriptPayload1 * _Nonnull result_payload1,
+                                                  JavaScriptPayload2 * _Nonnull result_payload2))
 
 /// Calls JavaScript function with given arguments list without capturing any exception
 ///
@@ -186,10 +186,10 @@ IMPORT_JS_FUNCTION(swjs_call_function, uint32_t, (const JavaScriptObjectRef ref,
 /// @param result_payload2 A result pointer of second payload of JavaScript value of returned result or thrown exception.
 /// @return A `JavaScriptValueKindAndFlags` bits represented as 32bit integer for the returned value.
 IMPORT_JS_FUNCTION(swjs_call_function_no_catch, uint32_t, (const JavaScriptObjectRef ref,
-                                                           const RawJSValue *argv,
+                                                           const RawJSValue * _Nullable argv,
                                                            const int argc,
-                                                           JavaScriptPayload1 *result_payload1,
-                                                           JavaScriptPayload2 *result_payload2))
+                                                           JavaScriptPayload1 * _Nonnull result_payload1,
+                                                           JavaScriptPayload2 * _Nonnull result_payload2))
 
 /// Calls JavaScript function with given arguments list and given `_this`.
 ///
@@ -202,10 +202,10 @@ IMPORT_JS_FUNCTION(swjs_call_function_no_catch, uint32_t, (const JavaScriptObjec
 /// @return A `JavaScriptValueKindAndFlags` bits represented as 32bit integer for the returned value.
 IMPORT_JS_FUNCTION(swjs_call_function_with_this, uint32_t, (const JavaScriptObjectRef _this,
                                                             const JavaScriptObjectRef func_ref,
-                                                            const RawJSValue *argv,
+                                                            const RawJSValue * _Nullable argv,
                                                             const int argc,
-                                                            JavaScriptPayload1 *result_payload1,
-                                                            JavaScriptPayload2 *result_payload2))
+                                                            JavaScriptPayload1 * _Nonnull result_payload1,
+                                                            JavaScriptPayload2 * _Nonnull result_payload2))
 
 /// Calls JavaScript function with given arguments list and given `_this` without capturing any exception.
 ///
@@ -218,10 +218,10 @@ IMPORT_JS_FUNCTION(swjs_call_function_with_this, uint32_t, (const JavaScriptObje
 /// @return A `JavaScriptValueKindAndFlags` bits represented as 32bit integer for the returned value.
 IMPORT_JS_FUNCTION(swjs_call_function_with_this_no_catch, uint32_t, (const JavaScriptObjectRef _this,
                                                                      const JavaScriptObjectRef func_ref,
-                                                                     const RawJSValue *argv,
+                                                                     const RawJSValue * _Nullable argv,
                                                                      const int argc,
-                                                                     JavaScriptPayload1 *result_payload1,
-                                                                     JavaScriptPayload2 *result_payload2))
+                                                                     JavaScriptPayload1 * _Nonnull result_payload1,
+                                                                     JavaScriptPayload2 * _Nonnull result_payload2))
 
 /// Calls JavaScript object constructor with given arguments list.
 ///
@@ -230,7 +230,7 @@ IMPORT_JS_FUNCTION(swjs_call_function_with_this_no_catch, uint32_t, (const JavaS
 /// @param argc The length of `argv``.
 /// @returns A reference to the constructed object.
 IMPORT_JS_FUNCTION(swjs_call_new, JavaScriptObjectRef, (const JavaScriptObjectRef ref,
-                                                        const RawJSValue *argv,
+                                                        const RawJSValue * _Nullable argv,
                                                         const int argc))
 
 /// Calls JavaScript object constructor with given arguments list.
@@ -243,11 +243,11 @@ IMPORT_JS_FUNCTION(swjs_call_new, JavaScriptObjectRef, (const JavaScriptObjectRe
 /// @param exception_payload2 A result pointer of second payload of JavaScript value of thrown exception.
 /// @returns A reference to the constructed object.
 IMPORT_JS_FUNCTION(swjs_call_throwing_new, JavaScriptObjectRef, (const JavaScriptObjectRef ref,
-                                                                 const RawJSValue *argv,
+                                                                 const RawJSValue * _Nullable argv,
                                                                  const int argc,
-                                                                 JavaScriptRawValueKindAndFlags *exception_kind,
-                                                                 JavaScriptPayload1 *exception_payload1,
-                                                                 JavaScriptPayload2 *exception_payload2))
+                                                                 JavaScriptRawValueKindAndFlags * _Nonnull exception_kind,
+                                                                 JavaScriptPayload1 * _Nonnull exception_payload1,
+                                                                 JavaScriptPayload2 * _Nonnull exception_payload2))
 
 /// Acts like JavaScript `instanceof` operator.
 ///
@@ -276,14 +276,14 @@ IMPORT_JS_FUNCTION(swjs_create_function, JavaScriptObjectRef, (const JavaScriptH
 /// @param length The length of `elements_ptr`
 /// @returns A reference to the constructed typed array
 IMPORT_JS_FUNCTION(swjs_create_typed_array, JavaScriptObjectRef, (const JavaScriptObjectRef constructor,
-                                                                  const void *elements_ptr,
+                                                                  const void * _Nullable elements_ptr,
                                                                   const int length))
 
 /// Copies the byte contents of a typed array into a Swift side memory buffer.
 ///
 /// @param ref A JavaScript typed array object.
 /// @param buffer A Swift side buffer into which to copy the bytes.
-IMPORT_JS_FUNCTION(swjs_load_typed_array, void, (const JavaScriptObjectRef ref, unsigned char *buffer))
+IMPORT_JS_FUNCTION(swjs_load_typed_array, void, (const JavaScriptObjectRef ref, unsigned char * _Nonnull buffer))
 
 /// Decrements reference count of `ref` retained by `SwiftRuntimeHeap` in JavaScript side.
 ///

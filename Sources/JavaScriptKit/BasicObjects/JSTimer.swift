@@ -27,7 +27,11 @@ public final class JSTimer {
             case .oneshot(let closure):
                 closure.release()
             case .repeating(let closure):
+#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
                 closure.release()
+#else
+                break  // no-op
+#endif
             }
         }
     }
