@@ -10,7 +10,7 @@ import _CJavaScriptKit
 /// alert("Hello, world")
 /// ```
 ///
-public class JSFunction: JSObject, _JSFunctionProtocol {
+public class JSFunction: JSObject {
 #if !hasFeature(Embedded)
     /// Call this function with given `arguments` and binding given `this` as context.
     /// - Parameters:
@@ -163,14 +163,9 @@ public class JSFunction: JSObject, _JSFunctionProtocol {
     }
 }
 
-/// Internal protocol to support generic arguments for `JSFunction`.
-/// 
-/// In Swift Embedded, non-final classes cannot have generic methods.
-public protocol _JSFunctionProtocol: JSFunction {}
-
 #if hasFeature(Embedded)
 // NOTE: once embedded supports variadic generics, we can remove these overloads
-public extension _JSFunctionProtocol {
+public extension JSFunction {
 
     @discardableResult
     func callAsFunction(this: JSObject) -> JSValue {
