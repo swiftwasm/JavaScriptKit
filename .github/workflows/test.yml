@@ -86,3 +86,19 @@ jobs:
       - run: swift build
         env:
           DEVELOPER_DIR: /Applications/${{ matrix.xcode }}.app/Contents/Developer/
+
+  embedded-build:
+    name: Build for embedded target
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        entry:
+          - os: ubuntu-22.04
+            toolchain: DEVELOPMENT-SNAPSHOT-2024-09-25-a
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/install-swift
+        with:
+          swift-dir: development/ubuntu2204
+          swift-version: swift-${{ matrix.entry.toolchain }}
+      - run: ./Examples/Embedded/build.sh
