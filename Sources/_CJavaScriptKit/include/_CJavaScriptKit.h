@@ -29,15 +29,7 @@ typedef enum __attribute__((enum_extensibility(closed))) {
   JavaScriptValueKindBigInt = 8,
 } JavaScriptValueKind;
 
-#if __Embedded
-// something about the bit field widths is not working with embedded
-typedef unsigned short JavaScriptValueKindAndFlags;
-#else
-typedef struct {
-  JavaScriptValueKind kind: 31;
-  bool isException: 1;
-} JavaScriptValueKindAndFlags;
-#endif
+typedef uint32_t JavaScriptRawValueKindAndFlags;
 
 typedef unsigned JavaScriptPayload1;
 typedef double JavaScriptPayload2;
@@ -253,7 +245,7 @@ IMPORT_JS_FUNCTION(swjs_call_new, JavaScriptObjectRef, (const JavaScriptObjectRe
 IMPORT_JS_FUNCTION(swjs_call_throwing_new, JavaScriptObjectRef, (const JavaScriptObjectRef ref,
                                                                  const RawJSValue *argv,
                                                                  const int argc,
-                                                                 JavaScriptValueKindAndFlags *exception_kind,
+                                                                 JavaScriptRawValueKindAndFlags *exception_kind,
                                                                  JavaScriptPayload1 *exception_payload1,
                                                                  JavaScriptPayload2 *exception_payload2))
 

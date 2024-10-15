@@ -42,13 +42,14 @@ public class JSThrowingFunction {
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
 
-                var exceptionKind = JavaScriptValueKindAndFlags()
+                var exceptionRawKind = JavaScriptRawValueKindAndFlags()
                 var exceptionPayload1 = JavaScriptPayload1()
                 var exceptionPayload2 = JavaScriptPayload2()
                 let resultObj = swjs_call_throwing_new(
                     self.base.id, argv, Int32(argc),
-                    &exceptionKind, &exceptionPayload1, &exceptionPayload2
+                    &exceptionRawKind, &exceptionPayload1, &exceptionPayload2
                 )
+                let exceptionKind = JavaScriptValueKindAndFlags(bitPattern: exceptionRawKind)
                 if exceptionKind.isException {
                     let exception = RawJSValue(kind: exceptionKind.kind, payload1: exceptionPayload1, payload2: exceptionPayload2)
                     return .failure(exception.jsValue)
@@ -70,7 +71,7 @@ private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSV
         rawValues.withUnsafeBufferPointer { bufferPointer -> (JSValue, Bool) in
             let argv = bufferPointer.baseAddress
             let argc = bufferPointer.count
-            var kindAndFlags = JavaScriptValueKindAndFlags()
+            let kindAndFlags: JavaScriptValueKindAndFlags
             var payload1 = JavaScriptPayload1()
             var payload2 = JavaScriptPayload2()
             if let thisId = this?.id {
@@ -78,13 +79,13 @@ private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSV
                     thisId, id, argv, Int32(argc),
                     &payload1, &payload2
                 )
-                kindAndFlags = unsafeBitCast(resultBitPattern, to: JavaScriptValueKindAndFlags.self)
+                kindAndFlags = JavaScriptValueKindAndFlags(bitPattern: resultBitPattern)
             } else {
                 let resultBitPattern = swjs_call_function(
                     id, argv, Int32(argc),
                     &payload1, &payload2
                 )
-                kindAndFlags = unsafeBitCast(resultBitPattern, to: JavaScriptValueKindAndFlags.self)
+                kindAndFlags = JavaScriptValueKindAndFlags(bitPattern: resultBitPattern)
             }
             let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
             return (result.jsValue, kindAndFlags.isException)
