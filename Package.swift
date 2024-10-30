@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.8
 
 import PackageDescription
 import Foundation
@@ -19,11 +19,21 @@ let package = Package(
             name: "JavaScriptKit",
             dependencies: ["_CJavaScriptKit"], 
             resources: shouldBuildForEmbedded ? [] : [.copy("Runtime")],
+            cSettings: shouldBuildForEmbedded ? [
+                    .unsafeFlags(["-fdeclspec"]),
+                    .define("__Embedded"),
+                ] : nil,
             swiftSettings: shouldBuildForEmbedded 
-                ? [.unsafeFlags(["-Xfrontend", "-emit-empty-object-file"])] 
-                : []
+                ? [
+                    .enableExperimentalFeature("Embedded"),
+                    .enableExperimentalFeature("Extern"),
+                    .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"])
+                ] : nil,
         ),
-        .target(name: "_CJavaScriptKit"),
+        .target(
+            name: "_CJavaScriptKit",
+            cSettings: shouldBuildForEmbedded ? [.define("__Embedded")] : nil
+        ),
         .target(
             name: "JavaScriptBigIntSupport",
             dependencies: ["_CJavaScriptBigIntSupport", "JavaScriptKit"]

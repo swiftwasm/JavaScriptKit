@@ -16,7 +16,8 @@ let package = Package(
                 .product(name: "dlmalloc", package: "swift-dlmalloc")
             ],
             cSettings: [
-                .unsafeFlags(["-fdeclspec"])
+                .unsafeFlags(["-fdeclspec"]),
+                .define("__Embedded"),
             ],
             swiftSettings: [
                 .enableExperimentalFeature("Embedded"),
@@ -29,7 +30,8 @@ let package = Package(
             linkerSettings: [
                 .unsafeFlags([
                     "-Xclang-linker", "-nostdlib",
-                    "-Xlinker", "--no-entry"
+                    "-Xlinker", "--no-entry",
+                    "-Xlinker", "--export-if-defined=__main_argc_argv"
                 ])
             ]
         )
