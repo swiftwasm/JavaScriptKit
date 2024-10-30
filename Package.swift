@@ -26,7 +26,7 @@ let package = Package(
                     .enableExperimentalFeature("Embedded"),
                     .enableExperimentalFeature("Extern"),
                     .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"])
-                ] : nil,
+                ] : nil
         ),
         .target(name: "_CJavaScriptKit"),
         .target(
