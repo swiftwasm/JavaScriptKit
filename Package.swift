@@ -19,8 +19,7 @@ let package = Package(
             dependencies: ["_CJavaScriptKit"], 
             resources: shouldBuildForEmbedded ? [] : [.copy("Runtime")],
             cSettings: shouldBuildForEmbedded ? [
-                    .unsafeFlags(["-fdeclspec"]),
-                    .define("__Embedded"),
+                    .unsafeFlags(["-fdeclspec"])
                 ] : nil,
             swiftSettings: shouldBuildForEmbedded 
                 ? [
@@ -29,10 +28,7 @@ let package = Package(
                     .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"])
                 ] : nil,
         ),
-        .target(
-            name: "_CJavaScriptKit",
-            cSettings: shouldBuildForEmbedded ? [.define("__Embedded")] : nil
-        ),
+        .target(name: "_CJavaScriptKit"),
         .target(
             name: "JavaScriptBigIntSupport",
             dependencies: ["_CJavaScriptBigIntSupport", "JavaScriptKit"]

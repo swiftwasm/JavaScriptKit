@@ -15,10 +15,7 @@ let package = Package(
                 "JavaScriptKit",
                 .product(name: "dlmalloc", package: "swift-dlmalloc")
             ],
-            cSettings: [
-                .unsafeFlags(["-fdeclspec"]),
-                .define("__Embedded"),
-            ],
+            cSettings: [.unsafeFlags(["-fdeclspec"])],
             swiftSettings: [
                 .enableExperimentalFeature("Embedded"),
                 .enableExperimentalFeature("Extern"),
