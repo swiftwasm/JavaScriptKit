@@ -1,10 +1,10 @@
 #ifndef _CJavaScriptKit_h
 #define _CJavaScriptKit_h
 
-#if __Embedded
-#include <stddef.h>
-#else
+#if __has_include("stdlib.h")
 #include <stdlib.h>
+#else
+#include <stddef.h>
 #endif
 #include <stdbool.h>
 #include <stdint.h>

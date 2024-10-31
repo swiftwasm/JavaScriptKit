@@ -1,10 +1,9 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.8
 
 import PackageDescription
-import Foundation
 
 // NOTE: needed for embedded customizations, ideally this will not be necessary at all in the future, or can be replaced with traits
-let shouldBuildForEmbedded = ProcessInfo.processInfo.environment["JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM"].flatMap(Bool.init) ?? false
+let shouldBuildForEmbedded = Context.environment["JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM"].flatMap(Bool.init) ?? false
 
 let package = Package(
     name: "JavaScriptKit",
@@ -19,9 +18,15 @@ let package = Package(
             name: "JavaScriptKit",
             dependencies: ["_CJavaScriptKit"], 
             resources: shouldBuildForEmbedded ? [] : [.copy("Runtime")],
+            cSettings: shouldBuildForEmbedded ? [
+                    .unsafeFlags(["-fdeclspec"])
+                ] : nil,
             swiftSettings: shouldBuildForEmbedded 
-                ? [.unsafeFlags(["-Xfrontend", "-emit-empty-object-file"])] 
-                : []
+                ? [
+                    .enableExperimentalFeature("Embedded"),
+                    .enableExperimentalFeature("Extern"),
+                    .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"])
+                ] : nil
         ),
         .target(name: "_CJavaScriptKit"),
         .target(

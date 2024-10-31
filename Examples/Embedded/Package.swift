@@ -15,9 +15,7 @@ let package = Package(
                 "JavaScriptKit",
                 .product(name: "dlmalloc", package: "swift-dlmalloc")
             ],
-            cSettings: [
-                .unsafeFlags(["-fdeclspec"])
-            ],
+            cSettings: [.unsafeFlags(["-fdeclspec"])],
             swiftSettings: [
                 .enableExperimentalFeature("Embedded"),
                 .enableExperimentalFeature("Extern"),
@@ -29,7 +27,8 @@ let package = Package(
             linkerSettings: [
                 .unsafeFlags([
                     "-Xclang-linker", "-nostdlib",
-                    "-Xlinker", "--no-entry"
+                    "-Xlinker", "--no-entry",
+                    "-Xlinker", "--export-if-defined=__main_argc_argv"
                 ])
             ]
         )
