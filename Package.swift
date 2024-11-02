@@ -44,6 +44,9 @@ let package = Package(
                 "JavaScriptEventLoop",
                 "JavaScriptKit",
                 "JavaScriptEventLoopTestSupport",
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("Extern")
             ]
         ),
         .target(name: "_CJavaScriptEventLoop"),
