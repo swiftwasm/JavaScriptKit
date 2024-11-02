@@ -23,22 +23,33 @@ jobs:
           - { os: ubuntu-20.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: MicroWASI }
           - { os: ubuntu-20.04, toolchain: wasm-5.10.0-RELEASE, wasi-backend: MicroWASI }
           - os: ubuntu-22.04
-            toolchain: DEVELOPMENT-SNAPSHOT-2024-06-13-a
+            toolchain:
+              download-url: https://download.swift.org/swift-6.0.2-release/ubuntu2204/swift-6.0.2-RELEASE/swift-6.0.2-RELEASE-ubuntu22.04.tar.gz
             swift-sdk:
-              id: DEVELOPMENT-SNAPSHOT-2024-06-14-a-wasm32-unknown-wasi
-              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-06-14-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-06-14-a-wasm32-unknown-wasi.artifactbundle.zip"
+              id: 6.0-SNAPSHOT-2024-10-29-a-wasm32-unknown-wasi
+              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.0-SNAPSHOT-2024-10-29-a/swift-wasm-6.0-SNAPSHOT-2024-10-29-a-wasm32-unknown-wasi.artifactbundle.zip"
+              checksum: "434ce886e3e7a3ce56b2dd3b8cb7421810546a7b6305ccf39c130b4cb68de929"
             wasi-backend: Node
           - os: ubuntu-22.04
-            toolchain: DEVELOPMENT-SNAPSHOT-2024-06-13-a
+            toolchain:
+              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a-ubuntu22.04.tar.gz
             swift-sdk:
-              id: DEVELOPMENT-SNAPSHOT-2024-06-14-a-wasm32-unknown-wasip1-threads
-              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-06-14-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-06-14-a-wasm32-unknown-wasip1-threads.artifactbundle.zip"
+              id: DEVELOPMENT-SNAPSHOT-2024-10-31-a-wasm32-unknown-wasi
+              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-10-31-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-10-31-a-wasm32-unknown-wasi.artifactbundle.zip"
+              checksum: "e42546397786ea6eaec2d9c07f9118a6f3428784cf3df3840a369f19700c1a69"
+            wasi-backend: Node
+          - os: ubuntu-22.04
+            toolchain:
+              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a-ubuntu22.04.tar.gz
+            swift-sdk:
+              id: DEVELOPMENT-SNAPSHOT-2024-10-31-a-wasm32-unknown-wasip1-threads
+              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-10-31-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-10-31-a-wasm32-unknown-wasip1-threads.artifactbundle.zip"
+              checksum: "17dbbe61af6ca09c92ee2d68a56d5716530428e28c4c8358aa860cc4fcdc91ae"
             wasi-backend: Node
 
     runs-on: ${{ matrix.entry.os }}
     env:
       JAVASCRIPTKIT_WASI_BACKEND: ${{ matrix.entry.wasi-backend }}
-      SWIFT_VERSION: ${{ matrix.entry.toolchain }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -52,12 +63,11 @@ jobs:
       - uses: ./.github/actions/install-swift
         if: ${{ matrix.entry.swift-sdk }}
         with:
-          swift-dir: development/ubuntu2204
-          swift-version: swift-${{ matrix.entry.toolchain }}
+          download-url: ${{ matrix.entry.toolchain.download-url }}
       - name: Install Swift SDK
         if: ${{ matrix.entry.swift-sdk }}
         run: |
-          swift sdk install "${{ matrix.entry.swift-sdk.download-url }}"
+          swift sdk install "${{ matrix.entry.swift-sdk.download-url }}" --checksum "${{ matrix.entry.swift-sdk.checksum }}"
           echo "SWIFT_SDK_ID=${{ matrix.entry.swift-sdk.id }}" >> $GITHUB_ENV
       - run: make bootstrap
       - run: make test
@@ -94,11 +104,11 @@ jobs:
       matrix:
         entry:
           - os: ubuntu-22.04
-            toolchain: DEVELOPMENT-SNAPSHOT-2024-09-25-a
+            toolchain:
+              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a-ubuntu22.04.tar.gz
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/install-swift
         with:
-          swift-dir: development/ubuntu2204
-          swift-version: swift-${{ matrix.entry.toolchain }}
+          download-url: ${{ matrix.entry.toolchain.download-url }}
       - run: ./Examples/Embedded/build.sh

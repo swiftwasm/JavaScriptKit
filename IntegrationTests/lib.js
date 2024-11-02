@@ -177,7 +177,7 @@ export const startWasiTask = async (wasmPath, wasiConstructorKey = selectWASIBac
         // We don't have JS API to get memory descriptor of imported memory
         // at this moment, so we assume 256 pages (16MB) memory is enough
         // large for initial memory size.
-        const memory = new WebAssembly.Memory({ initial: 256, maximum: 16384, shared: true })
+        const memory = new WebAssembly.Memory({ initial: 1024, maximum: 16384, shared: true })
         importObject["env"] = { memory };
         importObject["wasi"] = {
           "thread-spawn": (startArg) => {
