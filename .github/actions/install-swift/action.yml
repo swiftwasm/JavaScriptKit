@@ -1,9 +1,8 @@
+name: 'Install Swift toolchain'
+description: 'Install Swift toolchain tarball from URL'
 inputs:
-  swift-dir:
-    description: The directory name part of the distribution URL
-    required: true
-  swift-version:
-    description: Git tag indicating the Swift version
+  download-url:
+    description: 'URL to download Swift toolchain tarball'
     required: true
 
 runs:
@@ -33,12 +32,6 @@ runs:
         zlib1g-dev
         curl
 
-    - name: Download Swift
+    - name: Install Swift
       shell: bash
-      run: curl -fLO https://download.swift.org/${{ inputs.swift-dir }}/${{ inputs.swift-version }}/${{ inputs.swift-version }}-ubuntu22.04.tar.gz
-      working-directory: ${{ env.RUNNER_TEMP }}
-
-    - name: Unarchive and Install Swift
-      shell: bash
-      run: sudo tar -xf ${{ inputs.swift-version }}-ubuntu22.04.tar.gz --strip-components=2 -C /usr/local
-      working-directory: ${{ env.RUNNER_TEMP }}
+      run: curl -fL ${{ inputs.download-url }} | sudo tar xfz - --strip-components=2 -C /usr/local
