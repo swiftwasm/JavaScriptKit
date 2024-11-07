@@ -26,9 +26,9 @@ jobs:
             toolchain:
               download-url: https://download.swift.org/swift-6.0.2-release/ubuntu2204/swift-6.0.2-RELEASE/swift-6.0.2-RELEASE-ubuntu22.04.tar.gz
             swift-sdk:
-              id: 6.0-SNAPSHOT-2024-10-29-a-wasm32-unknown-wasi
-              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.0-SNAPSHOT-2024-10-29-a/swift-wasm-6.0-SNAPSHOT-2024-10-29-a-wasm32-unknown-wasi.artifactbundle.zip"
-              checksum: "434ce886e3e7a3ce56b2dd3b8cb7421810546a7b6305ccf39c130b4cb68de929"
+              id: 6.0.2-RELEASE-wasm32-unknown-wasi
+              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.0.2-RELEASE/swift-wasm-6.0.2-RELEASE-wasm32-unknown-wasi.artifactbundle.zip"
+              checksum: "6ffedb055cb9956395d9f435d03d53ebe9f6a8d45106b979d1b7f53358e1dcb4"
             wasi-backend: Node
           - os: ubuntu-22.04
             toolchain:
