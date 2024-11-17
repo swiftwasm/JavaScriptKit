@@ -116,6 +116,7 @@ public extension JSValue {
         nonmutating set { self.object![name] = newValue }
     }
 
+#if !hasFeature(Embedded)
     /// An unsafe convenience method of `JSObject.subscript(_ index: String) -> JSValue`
     /// - Precondition: `self` must be a JavaScript Object.
     @_disfavoredOverload
@@ -123,6 +124,7 @@ public extension JSValue {
         get { self.object![name] }
         nonmutating set { self.object![name] = newValue.jsValue }
     }
+#endif
 
     /// An unsafe convenience method of `JSObject.subscript(_ index: Int) -> JSValue`
     /// - Precondition: `self` must be a JavaScript Object.
