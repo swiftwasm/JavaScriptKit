@@ -150,5 +150,19 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         }
         executor.terminate()
     }
+
+/*
+    func testDeinitJSObjectOnDifferentThread() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+
+        var object: JSObject? = JSObject.global.Object.function!.new()
+        let task = Task(executorPreference: executor) {
+            object = nil
+            _ = object
+        }
+        await task.value
+        executor.terminate()
+    }
+*/
 }
 #endif

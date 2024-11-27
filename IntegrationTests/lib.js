@@ -128,6 +128,7 @@ class ThreadRegistry {
 
         worker.on("error", (error) => {
             console.error(`Worker thread ${tid} error:`, error);
+            throw error;
         });
         this.workers.set(tid, worker);
         worker.postMessage({ selfFilePath, module, programName, memory, tid, startArg });
