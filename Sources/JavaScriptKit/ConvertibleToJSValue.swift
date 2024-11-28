@@ -85,8 +85,10 @@ extension JSObject: JSValueCompatible {
     // from `JSFunction`
 }
 
-private let objectConstructor = JSObject.global.Object.function!
-private let arrayConstructor = JSObject.global.Array.function!
+private let _objectConstructor = LazyThreadLocal(initialize: { JSObject.global.Object.function! })
+private var objectConstructor: JSFunction { _objectConstructor.wrappedValue }
+private let _arrayConstructor = LazyThreadLocal(initialize: { JSObject.global.Array.function! })
+private var arrayConstructor: JSFunction { _arrayConstructor.wrappedValue }
 
 #if !hasFeature(Embedded)
 extension Dictionary where Value == ConvertibleToJSValue, Key == String {

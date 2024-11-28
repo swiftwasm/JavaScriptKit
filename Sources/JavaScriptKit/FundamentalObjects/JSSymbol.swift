@@ -1,6 +1,7 @@
 import _CJavaScriptKit
 
-private let Symbol = JSObject.global.Symbol.function!
+private let _Symbol = LazyThreadLocal(initialize: { JSObject.global.Symbol.function! })
+private var Symbol: JSFunction { _Symbol.wrappedValue }
 
 /// A wrapper around [the JavaScript `Symbol`
 /// class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Symbol)

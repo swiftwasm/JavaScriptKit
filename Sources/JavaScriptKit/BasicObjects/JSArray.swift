@@ -93,9 +93,9 @@ extension JSArray: RandomAccessCollection {
     }
 }
 
-private let alwaysTrue = JSClosure { _ in .boolean(true) }
+private let alwaysTrue = LazyThreadLocal(initialize: { JSClosure { _ in .boolean(true) } })
 private func getObjectValuesLength(_ object: JSObject) -> Int {
-    let values = object.filter!(alwaysTrue).object!
+    let values = object.filter!(alwaysTrue.wrappedValue).object!
     return Int(values.length.number!)
 }
 
