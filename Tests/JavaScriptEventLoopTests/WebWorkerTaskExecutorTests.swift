@@ -38,6 +38,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
 
     func testAwaitInsideTask() async throws {
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        defer { executor.terminate() }
 
         let task = Task(executorPreference: executor) {
             await Task.yield()
@@ -46,8 +47,6 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         }
         let taskRunOnMainThread = try await task.value
         XCTAssertFalse(taskRunOnMainThread)
-
-        executor.terminate()
     }
 
     func testSleepInsideTask() async throws {
@@ -170,6 +169,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         let result = await task.value
         XCTAssertEqual(result, 100)
         XCTAssertEqual(Check.value, 42)
+        executor.terminate()
     }
 
     func testLazyThreadLocalPerThreadInitialization() async throws {
@@ -198,6 +198,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         let result = await task.value
         XCTAssertEqual(result, 100)
         XCTAssertEqual(Check.countOfInitialization, 2)
+        executor.terminate()
     }
 
     func testJSValueDecoderOnWorker() async throws {
@@ -211,10 +212,10 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
             let prop_3: Bool
             let prop_7: Float
             let prop_8: String
+            let prop_9: [String]
         }
 
-        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
-        let task = Task(executorPreference: executor) {
+        func decodeJob() throws {
             let json = """
             {
                 "prop_1": {
@@ -223,20 +224,46 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
                 "prop_2": 100,
                 "prop_3": true,
                 "prop_7": 3.14,
-                "prop_8": "Hello, World!"
+                "prop_8": "Hello, World!",
+                "prop_9": ["a", "b", "c"]
             }
             """
             let object = JSObject.global.JSON.parse(json)
             let decoder = JSValueDecoder()
-            let decoded = try decoder.decode(DecodeMe.self, from: object)
-            return decoded
+            let result = try decoder.decode(DecodeMe.self, from: object)
+            XCTAssertEqual(result.prop_1.nested_prop, 42)
+            XCTAssertEqual(result.prop_2, 100)
+            XCTAssertEqual(result.prop_3, true)
+            XCTAssertEqual(result.prop_7, 3.14)
+            XCTAssertEqual(result.prop_8, "Hello, World!")
+            XCTAssertEqual(result.prop_9, ["a", "b", "c"])
         }
-        let result = try await task.value
-        XCTAssertEqual(result.prop_1.nested_prop, 42)
-        XCTAssertEqual(result.prop_2, 100)
-        XCTAssertEqual(result.prop_3, true)
-        XCTAssertEqual(result.prop_7, 3.14)
-        XCTAssertEqual(result.prop_8, "Hello, World!")
+        // Run the job on the main thread first to initialize the object cache
+        try decodeJob()
+
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        defer { executor.terminate() }
+        let task = Task(executorPreference: executor) {
+            // Run the job on the worker thread to test the object cache
+            // is not shared with the main thread
+            try decodeJob()
+        }
+        try await task.value
+    }
+
+    func testJSArrayCountOnWorker() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        func check() {
+            let object = JSObject.global.Array.function!.new(1, 2, 3, 4, 5)
+            let array = JSArray(object)!
+            XCTAssertEqual(array.count, 5)
+        }
+        check()
+        let task = Task(executorPreference: executor) {
+            check()
+        }
+        await task.value
+        executor.terminate()
     }
 
 /*

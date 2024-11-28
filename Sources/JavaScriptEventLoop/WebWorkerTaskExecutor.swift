@@ -200,6 +200,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
             parentTaskExecutor = executor
             // Store the thread ID to the worker. This notifies the main thread that the worker is started.
             self.tid.store(tid, ordering: .sequentiallyConsistent)
+            trace("Worker.start tid=\(tid)")
         }
 
         /// Process jobs in the queue.
@@ -212,7 +213,14 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
             guard let executor = parentTaskExecutor else {
                 preconditionFailure("The worker must be started with a parent executor.")
             }
-            assert(state.load(ordering: .sequentiallyConsistent) == .running, "Invalid state: not running")
+            do {
+                // Assert the state at the beginning of the run.
+                let state = state.load(ordering: .sequentiallyConsistent)
+                assert(
+                    state == .running || state == .terminated,
+                    "Invalid state: not running (tid=\(self.tid.load(ordering: .sequentiallyConsistent)), \(state))"
+                )
+            }
             while true {
                 // Pop a job from the queue.
                 let job = jobQueue.withLock { queue -> UnownedJob? in
@@ -247,7 +255,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
 
         /// Terminate the worker.
         func terminate() {
-            trace("Worker.terminate")
+            trace("Worker.terminate tid=\(tid.load(ordering: .sequentiallyConsistent))")
             state.store(.terminated, ordering: .sequentiallyConsistent)
             let tid = self.tid.load(ordering: .sequentiallyConsistent)
             guard tid != 0 else {
@@ -283,6 +291,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                     self.worker = worker
                 }
             }
+            trace("Executor.start")
             // Start worker threads via pthread_create.
             for worker in workers {
                 // NOTE: The context must be allocated on the heap because
