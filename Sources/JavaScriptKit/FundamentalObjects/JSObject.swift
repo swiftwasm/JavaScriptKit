@@ -206,19 +206,10 @@ public class JSObject: Equatable {
 
     // `JSObject` storage itself is immutable, and use of `JSObject.global` from other
     // threads maintains the same semantics as `globalThis` in JavaScript.
-    #if compiler(>=6.1) && _runtime(_multithreaded)
-        @LazyThreadLocal(initialize: {
-            return JSObject(id: _JS_Predef_Value_Global)
-        })
-        private static var _global: JSObject
-    #else
-        #if compiler(>=5.10)
-        nonisolated(unsafe)
-        static let _global = JSObject(id: _JS_Predef_Value_Global)
-        #else
-        static let _global = JSObject(id: _JS_Predef_Value_Global)
-        #endif
-    #endif
+    @LazyThreadLocal(initialize: {
+        return JSObject(id: _JS_Predef_Value_Global)
+    })
+    private static var _global: JSObject
 
     deinit {
         assertOnOwnerThread(hint: "deinitializing")

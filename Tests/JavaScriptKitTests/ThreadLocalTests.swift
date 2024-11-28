@@ -10,18 +10,18 @@ final class ThreadLocalTests: XCTestCase {
     func testLeak() throws {
         struct Check {
             @ThreadLocal
-            var value: MyHeapObject?
+            static var value: MyHeapObject?
             @ThreadLocal(boxing: ())
-            var value2: MyStruct?
+            static var value2: MyStruct?
         }
         weak var weakObject: MyHeapObject?
         do {
             let object = MyHeapObject()
             weakObject = object
-            let check = Check()
-            check.value = object
-            XCTAssertNotNil(check.value)
-            XCTAssertTrue(check.value === object)
+            Check.value = object
+            XCTAssertNotNil(Check.value)
+            XCTAssertTrue(Check.value === object)
+            Check.value = nil
         }
         XCTAssertNil(weakObject)
 
@@ -29,10 +29,10 @@ final class ThreadLocalTests: XCTestCase {
         do {
             let object = MyHeapObject()
             weakObject2 = object
-            let check = Check()
-            check.value2 = MyStruct(object: object)
-            XCTAssertNotNil(check.value2)
-            XCTAssertTrue(check.value2!.object === object)
+            Check.value2 = MyStruct(object: object)
+            XCTAssertNotNil(Check.value2)
+            XCTAssertTrue(Check.value2!.object === object)
+            Check.value2 = nil
         }
         XCTAssertNil(weakObject2)
     }
@@ -40,11 +40,10 @@ final class ThreadLocalTests: XCTestCase {
     func testLazyThreadLocal() throws {
         struct Check {
             @LazyThreadLocal(initialize: { MyHeapObject() })
-            var value: MyHeapObject
+            static var value: MyHeapObject
         }
-        let check = Check()
-        let object1 = check.value
-        let object2 = check.value
+        let object1 = Check.value
+        let object2 = Check.value
         XCTAssertTrue(object1 === object2)
     }
 }

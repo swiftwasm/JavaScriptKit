@@ -1,4 +1,3 @@
-#if compiler(>=6.1) && _runtime(_multithreaded)
 #if canImport(wasi_pthread)
 import wasi_pthread
 #elseif canImport(Darwin)
@@ -9,8 +8,14 @@ import Glibc
 #error("Unsupported platform")
 #endif
 
+/// A property wrapper that provides thread-local storage for a value.
+///
+/// The value is stored in a thread-local variable, which is a separate copy for each thread.
 @propertyWrapper
 final class ThreadLocal<Value>: Sendable {
+#if compiler(>=6.1) && _runtime(_multithreaded)
+    /// The wrapped value stored in the thread-local storage.
+    /// The initial value is `nil` for each thread.
     var wrappedValue: Value? {
         get {
             guard let pointer = pthread_getspecific(key) else {
@@ -34,6 +39,8 @@ final class ThreadLocal<Value>: Sendable {
     private let fromPointer: @Sendable (UnsafeMutableRawPointer) -> Value
     private let release: @Sendable (UnsafeMutableRawPointer) -> Void
 
+    /// A constructor that requires `Value` to be `AnyObject` to be
+    /// able to store the value directly in the thread-local storage.
     init() where Value: AnyObject {
         var key = pthread_key_t()
         pthread_key_create(&key, nil)
@@ -43,13 +50,15 @@ final class ThreadLocal<Value>: Sendable {
         self.release = { Unmanaged<Value>.fromOpaque($0).release() }
     }
 
-    class Box {
+    private class Box {
         let value: Value
         init(_ value: Value) {
             self.value = value
         }
     }
 
+    /// A constructor that doesn't require `Value` to be `AnyObject` but
+    /// boxing the value in heap-allocated memory.
     init(boxing _: Void) {
         var key = pthread_key_t()
         pthread_key_create(&key, nil)
@@ -65,15 +74,26 @@ final class ThreadLocal<Value>: Sendable {
         }
         self.release = { Unmanaged<Box>.fromOpaque($0).release() }
     }
+#else
+    // Fallback implementation for platforms that don't support pthread
+
+    var wrappedValue: Value?
+
+    init() where Value: AnyObject {
+        wrappedValue = nil
+    }
+    init(boxing _: Void) {
+        wrappedValue = nil
+    }
+#endif
 
     deinit {
-        if let oldPointer = pthread_getspecific(key) {
-            release(oldPointer)
-        }
-        pthread_key_delete(key)
+        preconditionFailure("ThreadLocal can only be used as an immortal storage, cannot be deallocated")
     }
 }
 
+/// A property wrapper that lazily initializes a thread-local value
+/// for each thread that accesses the value.
 @propertyWrapper
 final class LazyThreadLocal<Value>: Sendable {
     private let storage: ThreadLocal<Value>
@@ -99,5 +119,3 @@ final class LazyThreadLocal<Value>: Sendable {
         self.initialValue = initialize
     }
 }
-
-#endif
