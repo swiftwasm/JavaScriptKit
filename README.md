@@ -257,33 +257,6 @@ You can also build your project with webpack.js and a manually installed SwiftWa
 see the following sections and the [Example](https://github.com/swiftwasm/JavaScriptKit/tree/main/Example)
 directory for more information in this more advanced use case.
 
-## Manual toolchain installation
-
-This library only supports [`swiftwasm/swift`](https://github.com/swiftwasm/swift) toolchain distribution.
-The toolchain can be installed via [`swiftenv`](https://github.com/kylef/swiftenv), in
-the same way as the official Swift nightly toolchain.
-
-You have to install the toolchain manually when working on the source code of JavaScriptKit itself,
-especially if you change anything in the JavaScript runtime parts. This is because the runtime parts are
-embedded in `carton` and currently can't be replaced dynamically with the JavaScript code you've
-updated locally.
-
-Just pass a toolchain archive URL for [the latest SwiftWasm 5.6
-release](https://github.com/swiftwasm/swift/releases/tag/swift-wasm-5.6.0-RELEASE) appropriate for your platform:
-
-```sh
-$ swiftenv install "https://github.com/swiftwasm/swift/releases/download/swift-wasm-5.6.0-RELEASE/swift-wasm-5.6.0-RELEASE-macos_$(uname -m).pkg"
-```
-
-You can also use the `install-toolchain.sh` helper script that uses a hardcoded toolchain snapshot:
-
-```sh
-$ ./scripts/install-toolchain.sh
-$ swift --version
-Swift version 5.6 (swiftlang-5.6.0)
-Target: arm64-apple-darwin20.6.0
-```
-
 ## Sponsoring
 
 [Become a gold or platinum sponsor](https://github.com/sponsors/swiftwasm/) and contact maintainers to add your logo on our README on Github with a link to your site.
