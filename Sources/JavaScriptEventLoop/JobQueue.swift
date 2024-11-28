@@ -1,10 +1,6 @@
 // This file contains the job queue implementation which re-order jobs based on their priority.
-// The current implementation is much simple to be easily debugged, but should be re-implemented
-// using priority queue ideally.
 
 import _CJavaScriptEventLoop
-
-#if compiler(>=5.5)
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 struct QueueState: Sendable {
@@ -14,51 +10,66 @@ struct QueueState: Sendable {
 
 @available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)
 extension JavaScriptEventLoop {
+    private var queueLock: NSLock {
+        NSLock()
+    }
 
     func insertJobQueue(job newJob: UnownedJob) {
-        withUnsafeMutablePointer(to: &queueState.headJob) { headJobPtr in
-            var position: UnsafeMutablePointer<UnownedJob?> = headJobPtr
-            while let cur = position.pointee {
-                if cur.rawPriority < newJob.rawPriority {
-                    newJob.nextInQueue().pointee = cur
-                    position.pointee = newJob
-                    return
-                }
-                position = cur.nextInQueue()
-            }
-            newJob.nextInQueue().pointee = nil
-            position.pointee = newJob
-        }
+        queueLock.lock()
+        defer { queueLock.unlock() }
 
-        // TODO: use CAS when supporting multi-threaded environment
+        insertJob(newJob)
+
         if !queueState.isSpinning {
-            self.queueState.isSpinning = true
+            queueState.isSpinning = true
             JavaScriptEventLoop.shared.queueMicrotask {
                 self.runAllJobs()
             }
         }
     }
 
+    private func insertJob(_ newJob: UnownedJob) {
+        var current = queueState.headJob
+        var previous: UnownedJob? = nil
+
+        while let cur = current, cur.rawPriority >= newJob.rawPriority {
+            previous = cur
+            current = cur.nextInQueue().pointee
+        }
+
+        newJob.nextInQueue().pointee = current
+        if let prev = previous {
+            prev.nextInQueue().pointee = newJob
+        } else {
+            queueState.headJob = newJob
+        }
+    }
+
     func runAllJobs() {
         assert(queueState.isSpinning)
 
-        while let job = self.claimNextFromQueue() {
-            #if compiler(>=5.9)
-            job.runSynchronously(on: self.asUnownedSerialExecutor())
-            #else
-            job._runSynchronously(on: self.asUnownedSerialExecutor())
-            #endif
+        while let job = claimNextFromQueue() {
+            executeJob(job)
         }
 
         queueState.isSpinning = false
     }
 
+    private func executeJob(_ job: UnownedJob) {
+        #if compiler(>=5.9)
+        job.runSynchronously(on: self.asUnownedSerialExecutor())
+        #else
+        job._runSynchronously(on: self.asUnownedSerialExecutor())
+        #endif
+    }
+
     func claimNextFromQueue() -> UnownedJob? {
-        if let job = self.queueState.headJob {
-            self.queueState.headJob = job.nextInQueue().pointee
-            return job
-        }
-        return nil
+        queueLock.lock()
+        defer { queueLock.unlock() }
+
+        guard let job = queueState.headJob else { return nil }
+        queueState.headJob = job.nextInQueue().pointee
+        return job
     }
 }
 
@@ -75,21 +86,17 @@ fileprivate extension UnownedJob {
     var rawPriority: UInt32 { flags.priority }
 
     func nextInQueue() -> UnsafeMutablePointer<UnownedJob?> {
-        return withUnsafeMutablePointer(to: &asImpl().pointee.SchedulerPrivate.0) { rawNextJobPtr in
-            let nextJobPtr = UnsafeMutableRawPointer(rawNextJobPtr).bindMemory(to: UnownedJob?.self, capacity: 1)
-            return nextJobPtr
+        withUnsafeMutablePointer(to: &asImpl().pointee.SchedulerPrivate.0) { rawNextJobPtr in
+            UnsafeMutableRawPointer(rawNextJobPtr).bindMemory(to: UnownedJob?.self, capacity: 1)
         }
     }
-
 }
 
 fileprivate struct JobFlags {
   var bits: UInt32 = 0
 
-  var priority: UInt32 {
-    get {
-      (bits & 0xFF00) >> 8
+    var priority: UInt32 {
+        (bits & 0xFF00) >> 8
     }
-  }
 }
 #endif
