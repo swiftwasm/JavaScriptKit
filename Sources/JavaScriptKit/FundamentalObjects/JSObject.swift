@@ -1,5 +1,11 @@
 import _CJavaScriptKit
 
+#if canImport(wasi_pthread)
+    import wasi_pthread
+#else
+    import Foundation // for pthread_t on non-wasi platforms
+#endif
+
 /// `JSObject` represents an object in JavaScript and supports dynamic member lookup.
 /// Any member access like `object.foo` will dynamically request the JavaScript and Swift
 /// runtime bridge library for a member with the specified name in this object.
@@ -18,9 +24,35 @@ import _CJavaScriptKit
 public class JSObject: Equatable {
     @_spi(JSObject_id)
     public var id: JavaScriptObjectRef
+
+#if _runtime(_multithreaded)
+    private let ownerThread: pthread_t
+#endif
+
     @_spi(JSObject_id)
     public init(id: JavaScriptObjectRef) {
         self.id = id
+        self.ownerThread = pthread_self()
+    }
+
+    /// Asserts that the object is being accessed from the owner thread.
+    ///
+    /// - Parameter hint: A string to provide additional context for debugging.
+    ///
+    /// NOTE: Accessing a `JSObject` from a thread other than the thread it was created on
+    /// is a programmer error and will result in a runtime assertion failure because JavaScript
+    /// object spaces are not shared across threads backed by Web Workers.
+    private func assertOnOwnerThread(hint: @autoclosure () -> String) {
+        #if _runtime(_multithreaded)
+        precondition(pthread_equal(ownerThread, pthread_self()) != 0, "JSObject is being accessed from a thread other than the owner thread: \(hint())")
+        #endif
+    }
+
+    /// Asserts that the two objects being compared are owned by the same thread.
+    private static func assertSameOwnerThread(lhs: JSObject, rhs: JSObject, hint: @autoclosure () -> String) {
+        #if _runtime(_multithreaded)
+        precondition(pthread_equal(lhs.ownerThread, rhs.ownerThread) != 0, "JSObject is being accessed from a thread other than the owner thread: \(hint())")
+        #endif
     }
 
 #if !hasFeature(Embedded)
@@ -79,32 +111,56 @@ public class JSObject: Equatable {
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The value of the `name` member of this object.
     public subscript(_ name: String) -> JSValue {
-        get { getJSValue(this: self, name: JSString(name)) }
-        set { setJSValue(this: self, name: JSString(name), value: newValue) }
+        get {
+            assertOnOwnerThread(hint: "reading '\(name)' property")
+            return getJSValue(this: self, name: JSString(name))
+        }
+        set {
+            assertOnOwnerThread(hint: "writing '\(name)' property")
+            setJSValue(this: self, name: JSString(name), value: newValue)
+        }
     }
 
     /// Access the `name` member dynamically through JavaScript and Swift runtime bridge library.
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The value of the `name` member of this object.
     public subscript(_ name: JSString) -> JSValue {
-        get { getJSValue(this: self, name: name) }
-        set { setJSValue(this: self, name: name, value: newValue) }
+        get {
+            assertOnOwnerThread(hint: "reading '<<JSString>>' property")
+            return getJSValue(this: self, name: name)
+        }
+        set {
+            assertOnOwnerThread(hint: "writing '<<JSString>>' property")
+            setJSValue(this: self, name: name, value: newValue)
+        }
     }
 
     /// Access the `index` member dynamically through JavaScript and Swift runtime bridge library.
     /// - Parameter index: The index of this object's member to access.
     /// - Returns: The value of the `index` member of this object.
     public subscript(_ index: Int) -> JSValue {
-        get { getJSValue(this: self, index: Int32(index)) }
-        set { setJSValue(this: self, index: Int32(index), value: newValue) }
+        get {
+            assertOnOwnerThread(hint: "reading '\(index)' property")
+            return getJSValue(this: self, index: Int32(index))
+        }
+        set {
+            assertOnOwnerThread(hint: "writing '\(index)' property")
+            setJSValue(this: self, index: Int32(index), value: newValue)
+        }
     }
 
     /// Access the `symbol` member dynamically through JavaScript and Swift runtime bridge library.
     /// - Parameter symbol: The name of this object's member to access.
     /// - Returns: The value of the `name` member of this object.
     public subscript(_ name: JSSymbol) -> JSValue {
-        get { getJSValue(this: self, symbol: name) }
-        set { setJSValue(this: self, symbol: name, value: newValue) }
+        get {
+            assertOnOwnerThread(hint: "reading '<<JSSymbol>>' property")
+            return getJSValue(this: self, symbol: name)
+        }
+        set {
+            assertOnOwnerThread(hint: "writing '<<JSSymbol>>' property")
+            setJSValue(this: self, symbol: name, value: newValue)
+        }
     }
 
 #if !hasFeature(Embedded)
@@ -134,7 +190,8 @@ public class JSObject: Equatable {
     /// - Parameter constructor: The constructor function to check.
     /// - Returns: The result of `instanceof` in the JavaScript environment.
     public func isInstanceOf(_ constructor: JSFunction) -> Bool {
-        swjs_instanceof(id, constructor.id)
+        assertOnOwnerThread(hint: "calling 'isInstanceOf'")
+        return swjs_instanceof(id, constructor.id)
     }
 
     static let _JS_Predef_Value_Global: JavaScriptObjectRef = 0
@@ -145,14 +202,24 @@ public class JSObject: Equatable {
 
     // `JSObject` storage itself is immutable, and use of `JSObject.global` from other
     // threads maintains the same semantics as `globalThis` in JavaScript.
-    #if compiler(>=5.10)
-    nonisolated(unsafe)
-    static let _global = JSObject(id: _JS_Predef_Value_Global)
+    #if _runtime(_multithreaded)
+        @LazyThreadLocal(initialize: {
+            return JSObject(id: _JS_Predef_Value_Global)
+        })
+        private static var _global: JSObject
     #else
-    static let _global = JSObject(id: _JS_Predef_Value_Global)
+        #if compiler(>=5.10)
+        nonisolated(unsafe)
+        static let _global = JSObject(id: _JS_Predef_Value_Global)
+        #else
+        static let _global = JSObject(id: _JS_Predef_Value_Global)
+        #endif
     #endif
 
-    deinit { swjs_release(id) }
+    deinit {
+        assertOnOwnerThread(hint: "deinitializing")
+        swjs_release(id)
+    }
 
     /// Returns a Boolean value indicating whether two values point to same objects.
     ///
@@ -160,6 +227,7 @@ public class JSObject: Equatable {
     ///   - lhs: A object to compare.
     ///   - rhs: Another object to compare.
     public static func == (lhs: JSObject, rhs: JSObject) -> Bool {
+        assertSameOwnerThread(lhs: lhs, rhs: rhs, hint: "comparing two JSObjects for equality")
         return lhs.id == rhs.id
     }
 

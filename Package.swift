@@ -58,6 +58,11 @@ let package = Package(
             ]
         ),
         .target(name: "_CJavaScriptEventLoopTestSupport"),
+
+        .testTarget(
+            name: "JavaScriptKitTests",
+            dependencies: ["JavaScriptKit"]
+        ),
         .testTarget(
           name: "JavaScriptEventLoopTestSupportTests",
           dependencies: [
