@@ -8,7 +8,9 @@
  */
 public final class JSDate: JSBridgedClass {
     /// The constructor function used to create new `Date` objects.
-    public static let constructor = JSObject.global.Date.function
+    public static var constructor: JSFunction? { _constructor }
+    @LazyThreadLocal(initialize: { JSObject.global.Date.function })
+    private static var _constructor: JSFunction?
 
     /// The underlying JavaScript `Date` object.
     public let jsObject: JSObject

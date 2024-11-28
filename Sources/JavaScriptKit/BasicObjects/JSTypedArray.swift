@@ -47,7 +47,10 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     /// - Parameter array: The array that will be copied to create a new instance of TypedArray
     public convenience init(_ array: [Element]) {
         let jsArrayRef = array.withUnsafeBufferPointer { ptr in
-            swjs_create_typed_array(Self.constructor!.id, ptr.baseAddress, Int32(array.count))
+            // Retain the constructor function to avoid it being released before calling `swjs_create_typed_array`
+            withExtendedLifetime(Self.constructor!) { ctor in
+                swjs_create_typed_array(ctor.id, ptr.baseAddress, Int32(array.count))
+            }
         }
         self.init(unsafelyWrapping: JSObject(id: jsArrayRef))
     }
@@ -140,21 +143,27 @@ func valueForBitWidth<T>(typeName: String, bitWidth: Int, when32: T) -> T {
 }
 
 extension Int: TypedArrayElement {
-    public static var typedArrayClass: JSFunction =
+    public static var typedArrayClass: JSFunction { _typedArrayClass }
+    @LazyThreadLocal(initialize: {
         valueForBitWidth(typeName: "Int", bitWidth: Int.bitWidth, when32: JSObject.global.Int32Array).function!
+    })
+    private static var _typedArrayClass: JSFunction
 }
 
 extension UInt: TypedArrayElement {
-    public static var typedArrayClass: JSFunction =
+    public static var typedArrayClass: JSFunction { _typedArrayClass }
+    @LazyThreadLocal(initialize: {
         valueForBitWidth(typeName: "UInt", bitWidth: Int.bitWidth, when32: JSObject.global.Uint32Array).function!
+    })
+    private static var _typedArrayClass: JSFunction
 }
 
 extension Int8: TypedArrayElement {
-    public static var typedArrayClass = JSObject.global.Int8Array.function!
+    public static var typedArrayClass: JSFunction { JSObject.global.Int8Array.function! }
 }
 
 extension UInt8: TypedArrayElement {
-    public static var typedArrayClass = JSObject.global.Uint8Array.function!
+    public static var typedArrayClass: JSFunction { JSObject.global.Uint8Array.function! }
 }
 
 /// A wrapper around [the JavaScript `Uint8ClampedArray`
@@ -165,26 +174,26 @@ public class JSUInt8ClampedArray: JSTypedArray<UInt8> {
 }
 
 extension Int16: TypedArrayElement {
-    public static var typedArrayClass = JSObject.global.Int16Array.function!
+    public static var typedArrayClass: JSFunction { JSObject.global.Int16Array.function! }
 }
 
 extension UInt16: TypedArrayElement {
-    public static var typedArrayClass = JSObject.global.Uint16Array.function!
+    public static var typedArrayClass: JSFunction { JSObject.global.Uint16Array.function! }
 }
 
 extension Int32: TypedArrayElement {
-    public static var typedArrayClass = JSObject.global.Int32Array.function!
+    public static var typedArrayClass: JSFunction { JSObject.global.Int32Array.function! }
 }
 
 extension UInt32: TypedArrayElement {
-    public static var typedArrayClass = JSObject.global.Uint32Array.function!
+    public static var typedArrayClass: JSFunction { JSObject.global.Uint32Array.function! }
 }
 
 extension Float32: TypedArrayElement {
-    public static var typedArrayClass = JSObject.global.Float32Array.function!
+    public static var typedArrayClass: JSFunction { JSObject.global.Float32Array.function! }
 }
 
 extension Float64: TypedArrayElement {
-    public static var typedArrayClass = JSObject.global.Float64Array.function!
+    public static var typedArrayClass: JSFunction { JSObject.global.Float64Array.function! }
 }
 #endif

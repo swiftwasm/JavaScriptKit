@@ -22,6 +22,10 @@ import _CJavaScriptKit
 /// reference counting system.
 @dynamicMemberLookup
 public class JSObject: Equatable {
+    internal static var constructor: JSFunction { _constructor }
+    @LazyThreadLocal(initialize: { JSObject.global.Object.function! })
+    internal static var _constructor: JSFunction
+
     @_spi(JSObject_id)
     public var id: JavaScriptObjectRef
 
