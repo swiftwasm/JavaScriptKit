@@ -206,8 +206,6 @@ public class JSObject: Equatable {
     /// This allows access to the global properties and global names by accessing the `JSObject` returned.
     public static var global: JSObject { return _global }
 
-    // `JSObject` storage itself is immutable, and use of `JSObject.global` from other
-    // threads maintains the same semantics as `globalThis` in JavaScript.
     @LazyThreadLocal(initialize: {
         return JSObject(id: _JS_Predef_Value_Global)
     })

@@ -78,8 +78,11 @@ final class ThreadLocal<Value>: Sendable {
     }
 #else
     // Fallback implementation for platforms that don't support pthread
-
+    #if compiler(>=5.10)
     nonisolated(unsafe) var wrappedValue: Value?
+    #else
+    var wrappedValue: Value?
+    #endif
 
     init() where Value: AnyObject {
         wrappedValue = nil
