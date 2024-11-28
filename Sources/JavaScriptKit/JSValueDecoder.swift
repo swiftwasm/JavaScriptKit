@@ -35,9 +35,8 @@ private struct _Decoder: Decoder {
 }
 
 private enum Object {
-    static let ref = JSObject.global.Object.function!
     static func keys(_ object: JSObject) -> [String] {
-        let keys = ref.keys!(object).array!
+        let keys = JSObject.constructor.keys!(object).array!
         return keys.map { $0.string! }
     }
 }

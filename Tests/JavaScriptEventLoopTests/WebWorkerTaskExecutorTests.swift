@@ -1,7 +1,7 @@
 #if compiler(>=6.1) && _runtime(_multithreaded)
 import XCTest
-import JavaScriptKit
 import _CJavaScriptKit // For swjs_get_worker_thread_id
+@testable import JavaScriptKit
 @testable import JavaScriptEventLoop
 
 @_extern(wasm, module: "JavaScriptEventLoopTestSupportTests", name: "isMainThread")
@@ -150,5 +150,68 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         }
         executor.terminate()
     }
+
+    func testThreadLocalPerThreadValues() async throws {
+        struct Check {
+            @ThreadLocal(boxing: ())
+            static var value: Int?
+        }
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        XCTAssertNil(Check.value)
+        Check.value = 42
+        XCTAssertEqual(Check.value, 42)
+
+        let task = Task(executorPreference: executor) {
+            XCTAssertEqual(Check.value, nil)
+            Check.value = 100
+            XCTAssertEqual(Check.value, 100)
+            return Check.value
+        }
+        let result = await task.value
+        XCTAssertEqual(result, 100)
+        XCTAssertEqual(Check.value, 42)
+    }
+
+    func testLazyThreadLocalPerThreadInitialization() async throws {
+        struct Check {
+            static var valueToInitialize = 42
+            static var countOfInitialization = 0
+            @LazyThreadLocal(initialize: {
+                countOfInitialization += 1
+                return valueToInitialize
+            })
+            static var value: Int
+        }
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        XCTAssertEqual(Check.countOfInitialization, 0)
+        XCTAssertEqual(Check.value, 42)
+        XCTAssertEqual(Check.countOfInitialization, 1)
+
+        Check.valueToInitialize = 100
+
+        let task = Task(executorPreference: executor) {
+            XCTAssertEqual(Check.countOfInitialization, 1)
+            XCTAssertEqual(Check.value, 100)
+            XCTAssertEqual(Check.countOfInitialization, 2)
+            return Check.value
+        }
+        let result = await task.value
+        XCTAssertEqual(result, 100)
+        XCTAssertEqual(Check.countOfInitialization, 2)
+    }
+
+/*
+    func testDeinitJSObjectOnDifferentThread() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+
+        var object: JSObject? = JSObject.global.Object.function!.new()
+        let task = Task(executorPreference: executor) {
+            object = nil
+            _ = object
+        }
+        await task.value
+        executor.terminate()
+    }
+*/
 }
 #endif

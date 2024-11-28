@@ -47,17 +47,17 @@ public class JSSymbol: JSObject {
 }
 
 extension JSSymbol {
-    public static let asyncIterator: JSSymbol! = Symbol.asyncIterator.symbol
-    public static let hasInstance: JSSymbol! = Symbol.hasInstance.symbol
-    public static let isConcatSpreadable: JSSymbol! = Symbol.isConcatSpreadable.symbol
-    public static let iterator: JSSymbol! = Symbol.iterator.symbol
-    public static let match: JSSymbol! = Symbol.match.symbol
-    public static let matchAll: JSSymbol! = Symbol.matchAll.symbol
-    public static let replace: JSSymbol! = Symbol.replace.symbol
-    public static let search: JSSymbol! = Symbol.search.symbol
-    public static let species: JSSymbol! = Symbol.species.symbol
-    public static let split: JSSymbol! = Symbol.split.symbol
-    public static let toPrimitive: JSSymbol! = Symbol.toPrimitive.symbol
-    public static let toStringTag: JSSymbol! = Symbol.toStringTag.symbol
-    public static let unscopables: JSSymbol! = Symbol.unscopables.symbol
+    public static var asyncIterator: JSSymbol! { Symbol.asyncIterator.symbol }
+    public static var hasInstance: JSSymbol! { Symbol.hasInstance.symbol }
+    public static var isConcatSpreadable: JSSymbol! { Symbol.isConcatSpreadable.symbol }
+    public static var iterator: JSSymbol! { Symbol.iterator.symbol }
+    public static var match: JSSymbol! { Symbol.match.symbol }
+    public static var matchAll: JSSymbol! { Symbol.matchAll.symbol }
+    public static var replace: JSSymbol! { Symbol.replace.symbol }
+    public static var search: JSSymbol! { Symbol.search.symbol }
+    public static var species: JSSymbol! { Symbol.species.symbol }
+    public static var split: JSSymbol! { Symbol.split.symbol }
+    public static var toPrimitive: JSSymbol! { Symbol.toPrimitive.symbol }
+    public static var toStringTag: JSSymbol! { Symbol.toStringTag.symbol }
+    public static var unscopables: JSSymbol! { Symbol.unscopables.symbol }
 }

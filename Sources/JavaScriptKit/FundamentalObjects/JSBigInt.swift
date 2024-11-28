@@ -1,6 +1,6 @@
 import _CJavaScriptKit
 
-private let constructor = JSObject.global.BigInt.function!
+private var constructor: JSFunction { JSObject.global.BigInt.function! }
 
 /// A wrapper around [the JavaScript `BigInt`
 /// class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)
@@ -30,9 +30,9 @@ public final class JSBigInt: JSObject {
 
     public func clamped(bitSize: Int, signed: Bool) -> JSBigInt {
         if signed {
-            return constructor.asIntN!(bitSize, self).bigInt!
+            return constructor.asIntN(bitSize, self).bigInt!
         } else {
-            return constructor.asUintN!(bitSize, self).bigInt!
+            return constructor.asUintN(bitSize, self).bigInt!
         }
     }
 }

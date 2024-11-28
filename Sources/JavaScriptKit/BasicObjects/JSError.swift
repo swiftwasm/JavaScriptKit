@@ -4,7 +4,9 @@
  */
 public final class JSError: Error, JSBridgedClass {
     /// The constructor function used to create new JavaScript `Error` objects.
-    public static let constructor = JSObject.global.Error.function
+    public static var constructor: JSFunction? { _constructor }
+    @LazyThreadLocal(initialize: { JSObject.global.Error.function })
+    private static var _constructor: JSFunction?
 
     /// The underlying JavaScript `Error` object.
     public let jsObject: JSObject
