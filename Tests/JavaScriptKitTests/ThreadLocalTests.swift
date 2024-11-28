@@ -3,11 +3,16 @@ import XCTest
 
 final class ThreadLocalTests: XCTestCase {
     class MyHeapObject {}
+    struct MyStruct {
+        var object: MyHeapObject
+    }
 
     func testLeak() throws {
         struct Check {
             @ThreadLocal
             var value: MyHeapObject?
+            @ThreadLocal(boxing: ())
+            var value2: MyStruct?
         }
         weak var weakObject: MyHeapObject?
         do {
@@ -19,6 +24,17 @@ final class ThreadLocalTests: XCTestCase {
             XCTAssertTrue(check.value === object)
         }
         XCTAssertNil(weakObject)
+
+        weak var weakObject2: MyHeapObject?
+        do {
+            let object = MyHeapObject()
+            weakObject2 = object
+            let check = Check()
+            check.value2 = MyStruct(object: object)
+            XCTAssertNotNil(check.value2)
+            XCTAssertTrue(check.value2!.object === object)
+        }
+        XCTAssertNil(weakObject2)
     }
 
     func testLazyThreadLocal() throws {
