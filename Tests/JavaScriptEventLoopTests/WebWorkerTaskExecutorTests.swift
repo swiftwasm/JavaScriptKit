@@ -200,6 +200,45 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         XCTAssertEqual(Check.countOfInitialization, 2)
     }
 
+    func testJSValueDecoderOnWorker() async throws {
+        struct DecodeMe: Codable {
+            struct Prop1: Codable {
+                let nested_prop: Int
+            }
+
+            let prop_1: Prop1
+            let prop_2: Int
+            let prop_3: Bool
+            let prop_7: Float
+            let prop_8: String
+        }
+
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        let task = Task(executorPreference: executor) {
+            let json = """
+            {
+                "prop_1": {
+                    "nested_prop": 42
+                },
+                "prop_2": 100,
+                "prop_3": true,
+                "prop_7": 3.14,
+                "prop_8": "Hello, World!"
+            }
+            """
+            let object = JSObject.global.JSON.parse(json)
+            let decoder = JSValueDecoder()
+            let decoded = try decoder.decode(DecodeMe.self, from: object)
+            return decoded
+        }
+        let result = try await task.value
+        XCTAssertEqual(result.prop_1.nested_prop, 42)
+        XCTAssertEqual(result.prop_2, 100)
+        XCTAssertEqual(result.prop_3, true)
+        XCTAssertEqual(result.prop_7, 3.14)
+        XCTAssertEqual(result.prop_8, "Hello, World!")
+    }
+
 /*
     func testDeinitJSObjectOnDifferentThread() async throws {
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
