@@ -1,4 +1,4 @@
-#if _runtime(_multithreaded)
+#if compiler(>=6.1) && _runtime(_multithreaded)
 #if canImport(wasi_pthread)
 import wasi_pthread
 #elseif canImport(Darwin)

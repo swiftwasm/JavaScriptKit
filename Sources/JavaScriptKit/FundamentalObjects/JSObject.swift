@@ -29,7 +29,7 @@ public class JSObject: Equatable {
     @_spi(JSObject_id)
     public var id: JavaScriptObjectRef
 
-#if _runtime(_multithreaded)
+#if compiler(>=6.1) && _runtime(_multithreaded)
     private let ownerThread: pthread_t
 #endif
 
@@ -47,14 +47,14 @@ public class JSObject: Equatable {
     /// is a programmer error and will result in a runtime assertion failure because JavaScript
     /// object spaces are not shared across threads backed by Web Workers.
     private func assertOnOwnerThread(hint: @autoclosure () -> String) {
-        #if _runtime(_multithreaded)
+        #if compiler(>=6.1) && _runtime(_multithreaded)
         precondition(pthread_equal(ownerThread, pthread_self()) != 0, "JSObject is being accessed from a thread other than the owner thread: \(hint())")
         #endif
     }
 
     /// Asserts that the two objects being compared are owned by the same thread.
     private static func assertSameOwnerThread(lhs: JSObject, rhs: JSObject, hint: @autoclosure () -> String) {
-        #if _runtime(_multithreaded)
+        #if compiler(>=6.1) && _runtime(_multithreaded)
         precondition(pthread_equal(lhs.ownerThread, rhs.ownerThread) != 0, "JSObject is being accessed from a thread other than the owner thread: \(hint())")
         #endif
     }
@@ -206,7 +206,7 @@ public class JSObject: Equatable {
 
     // `JSObject` storage itself is immutable, and use of `JSObject.global` from other
     // threads maintains the same semantics as `globalThis` in JavaScript.
-    #if _runtime(_multithreaded)
+    #if compiler(>=6.1) && _runtime(_multithreaded)
         @LazyThreadLocal(initialize: {
             return JSObject(id: _JS_Predef_Value_Global)
         })
