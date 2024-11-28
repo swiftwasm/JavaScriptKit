@@ -1,7 +1,9 @@
 import _CJavaScriptKit
 
-#if canImport(wasi_pthread)
-    import wasi_pthread
+#if arch(wasm32)
+    #if canImport(wasi_pthread)
+        import wasi_pthread
+    #endif
 #else
     import Foundation // for pthread_t on non-wasi platforms
 #endif

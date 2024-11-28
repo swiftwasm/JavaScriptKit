@@ -1,4 +1,4 @@
-#if os(WASI)
+#if arch(wasm32)
 #if canImport(wasi_pthread)
 import wasi_pthread
 #endif
