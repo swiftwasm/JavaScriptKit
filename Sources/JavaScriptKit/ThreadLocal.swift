@@ -1,5 +1,7 @@
+#if os(WASI)
 #if canImport(wasi_pthread)
 import wasi_pthread
+#endif
 #elseif canImport(Darwin)
 import Darwin
 #elseif canImport(Glibc)
@@ -77,7 +79,7 @@ final class ThreadLocal<Value>: Sendable {
 #else
     // Fallback implementation for platforms that don't support pthread
 
-    var wrappedValue: Value?
+    nonisolated(unsafe) var wrappedValue: Value?
 
     init() where Value: AnyObject {
         wrappedValue = nil

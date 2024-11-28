@@ -9,19 +9,17 @@ final class ThreadLocalTests: XCTestCase {
 
     func testLeak() throws {
         struct Check {
-            @ThreadLocal
-            static var value: MyHeapObject?
-            @ThreadLocal(boxing: ())
-            static var value2: MyStruct?
+            static let value = ThreadLocal<MyHeapObject>()
+            static let value2 = ThreadLocal<MyStruct>(boxing: ())
         }
         weak var weakObject: MyHeapObject?
         do {
             let object = MyHeapObject()
             weakObject = object
-            Check.value = object
-            XCTAssertNotNil(Check.value)
-            XCTAssertTrue(Check.value === object)
-            Check.value = nil
+            Check.value.wrappedValue = object
+            XCTAssertNotNil(Check.value.wrappedValue)
+            XCTAssertTrue(Check.value.wrappedValue === object)
+            Check.value.wrappedValue = nil
         }
         XCTAssertNil(weakObject)
 
@@ -29,21 +27,20 @@ final class ThreadLocalTests: XCTestCase {
         do {
             let object = MyHeapObject()
             weakObject2 = object
-            Check.value2 = MyStruct(object: object)
-            XCTAssertNotNil(Check.value2)
-            XCTAssertTrue(Check.value2!.object === object)
-            Check.value2 = nil
+            Check.value2.wrappedValue = MyStruct(object: object)
+            XCTAssertNotNil(Check.value2.wrappedValue)
+            XCTAssertTrue(Check.value2.wrappedValue!.object === object)
+            Check.value2.wrappedValue = nil
         }
         XCTAssertNil(weakObject2)
     }
 
     func testLazyThreadLocal() throws {
         struct Check {
-            @LazyThreadLocal(initialize: { MyHeapObject() })
-            static var value: MyHeapObject
+            static let value = LazyThreadLocal(initialize: { MyHeapObject() })
         }
-        let object1 = Check.value
-        let object2 = Check.value
+        let object1 = Check.value.wrappedValue
+        let object2 = Check.value.wrappedValue
         XCTAssertTrue(object1 === object2)
     }
 }

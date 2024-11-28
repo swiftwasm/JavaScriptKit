@@ -36,7 +36,9 @@ public class JSObject: Equatable {
     @_spi(JSObject_id)
     public init(id: JavaScriptObjectRef) {
         self.id = id
+#if compiler(>=6.1) && _runtime(_multithreaded)
         self.ownerThread = pthread_self()
+#endif
     }
 
     /// Asserts that the object is being accessed from the owner thread.
