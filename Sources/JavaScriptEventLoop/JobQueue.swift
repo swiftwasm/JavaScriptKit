@@ -1,8 +1,8 @@
 // This file contains the job queue implementation for JavaScriptEventLoop.
-// It manages job insertion and execution based on priority.
+// It manages job insertion and execution based on priority, ensuring thread safety and performance.
 
 import _CJavaScriptEventLoop
-import Foundation
+import os.lock
 
 /// Represents the state of the job queue.
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
@@ -15,16 +15,14 @@ struct QueueState: Sendable {
 
 @available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)
 extension JavaScriptEventLoop {
-    /// A lock to synchronize queue access.
-    private var queueLock: NSLock {
-        NSLock()
-    }
+    /// A lock to synchronize queue access using `os_unfair_lock` for lightweight thread safety.
+    private static var queueLock = os_unfair_lock_s()
 
     /// Inserts a job into the queue and ensures jobs are processed.
     /// - Parameter job: The job to add to the queue.
     func insertJobQueue(job newJob: UnownedJob) {
-        queueLock.lock()
-        defer { queueLock.unlock() }
+        os_unfair_lock_lock(&JavaScriptEventLoop.queueLock)
+        defer { os_unfair_lock_unlock(&JavaScriptEventLoop.queueLock) }
 
         insertJob(newJob)
 
@@ -79,8 +77,8 @@ extension JavaScriptEventLoop {
     /// Removes and returns the next job from the queue.
     /// - Returns: The next job in the queue, or `nil` if the queue is empty.
     func claimNextFromQueue() -> UnownedJob? {
-        queueLock.lock()
-        defer { queueLock.unlock() }
+        os_unfair_lock_lock(&JavaScriptEventLoop.queueLock)
+        defer { os_unfair_lock_unlock(&JavaScriptEventLoop.queueLock) }
 
         guard let job = queueState.headJob else { return nil }
         queueState.headJob = job.nextInQueue().pointee
