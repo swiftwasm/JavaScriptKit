@@ -1,10 +1,12 @@
-#if compiler(>=6.1) && _runtime(_multithreaded) // @_expose and @_extern are only available in Swift 6.1+
+#if compiler(>=6.0) // `TaskExecutor` is available since Swift 6.0
 
 import JavaScriptKit
 import _CJavaScriptKit
 import _CJavaScriptEventLoop
 
-import Synchronization
+#if canImport(Synchronization)
+    import Synchronization
+#endif
 #if canImport(wasi_pthread)
     import wasi_pthread
     import WASILibc
@@ -282,7 +284,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
         }
 
         func start(timeout: Duration, checkInterval: Duration) async throws {
-            #if canImport(wasi_pthread)
+            #if canImport(wasi_pthread) && compiler(>=6.1) && _runtime(_multithreaded)
             class Context: @unchecked Sendable {
                 let executor: WebWorkerTaskExecutor.Executor
                 let worker: Worker
@@ -433,7 +435,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
     ///
     /// This function must be called once before using the Web Worker task executor.
     public static func installGlobalExecutor() {
-        #if canImport(wasi_pthread)
+        #if canImport(wasi_pthread) && compiler(>=6.1) && _runtime(_multithreaded)
         // Ensure this function is called only once.
         guard _mainThread == nil else { return }
 
@@ -471,7 +473,9 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
 /// Enqueue a job scheduled from a Web Worker thread to the main thread.
 /// This function is called when a job is enqueued from a Web Worker thread.
 @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+#if compiler(>=6.1) // @_expose and @_extern are only available in Swift 6.1+
 @_expose(wasm, "swjs_enqueue_main_job_from_worker")
+#endif
 func _swjs_enqueue_main_job_from_worker(_ job: UnownedJob) {
     WebWorkerTaskExecutor.traceStatsIncrement(\.receiveJobFromWorkerThread)
     JavaScriptEventLoop.shared.enqueue(ExecutorJob(job))
@@ -480,15 +484,17 @@ func _swjs_enqueue_main_job_from_worker(_ job: UnownedJob) {
 /// Wake up the worker thread.
 /// This function is called when a job is enqueued from the main thread to a worker thread.
 @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+#if compiler(>=6.1) // @_expose and @_extern are only available in Swift 6.1+
 @_expose(wasm, "swjs_wake_worker_thread")
+#endif
 func _swjs_wake_worker_thread() {
     WebWorkerTaskExecutor.Worker.currentThread!.run()
 }
-
-#endif
 
 fileprivate func trace(_ message: String) {
 #if JAVASCRIPTKIT_TRACE
     JSObject.global.process.stdout.write("[trace tid=\(swjs_get_worker_thread_id())] \(message)\n")
 #endif
 }
+
+#endif // compiler(>=6.0)
