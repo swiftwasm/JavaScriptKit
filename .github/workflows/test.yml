@@ -10,16 +10,12 @@ jobs:
       matrix:
         entry:
           # Ensure that all host can install toolchain, build project, and run tests
-          - { os: macos-12,     toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node, xcode: Xcode_13.4.1.app }
-          - { os: macos-13,     toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node, xcode: Xcode_14.3.app }
           - { os: macos-14,     toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node, xcode: Xcode_15.2.app }
           - { os: ubuntu-22.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node }
           - { os: ubuntu-22.04, toolchain: wasm-5.10.0-RELEASE, wasi-backend: Node }
 
           # Ensure that test succeeds with all toolchains and wasi backend combinations
-          - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: Node }
           - { os: ubuntu-20.04, toolchain: wasm-5.10.0-RELEASE, wasi-backend: Node }
-          - { os: ubuntu-20.04, toolchain: wasm-5.8.0-RELEASE, wasi-backend: MicroWASI }
           - { os: ubuntu-20.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: MicroWASI }
           - { os: ubuntu-20.04, toolchain: wasm-5.10.0-RELEASE, wasi-backend: MicroWASI }
           - os: ubuntu-22.04
