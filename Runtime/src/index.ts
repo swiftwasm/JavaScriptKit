@@ -536,6 +536,15 @@ export class SwiftRuntime {
             ) => {
                 const ArrayType: TypedArray =
                     this.memory.getObject(constructor_ref);
+                if (length == 0) {
+                    // The elementsPtr can be unaligned in Swift's Array
+                    // implementation when the array is empty. However,
+                    // TypedArray requires the pointer to be aligned.
+                    // So, we need to create a new empty array without
+                    // using the elementsPtr.
+                    // See https://github.com/swiftwasm/swift/issues/5599
+                    return this.memory.retain(new ArrayType());
+                }
                 const array = new ArrayType(
                     this.memory.rawMemory.buffer,
                     elementsPtr,
