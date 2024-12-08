@@ -65,5 +65,15 @@ Thank you for considering contributing to JavaScriptKit! We welcome contribution
   make test SWIFT_SDK_ID=wasm32-unknown-wasi
   ```
 
+### Editing `./Runtime` directory
+
+The `./Runtime` directory contains the JavaScript runtime that interacts with the JavaScript environment and Swift code.
+The runtime is written in TypeScript and is checked into the repository as compiled JavaScript files.
+To make changes to the runtime, you need to edit the TypeScript files and regenerate the JavaScript files by running:
+
+```bash
+make regenerate_swiftpm_resources
+```
+
 ## Support
 If you have any questions or need assistance, feel free to reach out via [GitHub Issues](https://github.com/swiftwasm/JavaScriptKit/issues) or [Discord](https://discord.gg/ashJW8T8yp).
