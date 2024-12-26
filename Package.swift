@@ -29,15 +29,22 @@ let package = Package(
                 ] : nil
         ),
         .target(name: "_CJavaScriptKit"),
+        .testTarget(
+            name: "JavaScriptKitTests",
+            dependencies: ["JavaScriptKit"]
+        ),
+
         .target(
             name: "JavaScriptBigIntSupport",
             dependencies: ["_CJavaScriptBigIntSupport", "JavaScriptKit"]
         ),
         .target(name: "_CJavaScriptBigIntSupport", dependencies: ["_CJavaScriptKit"]),
+
         .target(
             name: "JavaScriptEventLoop",
             dependencies: ["JavaScriptKit", "_CJavaScriptEventLoop"]
         ),
+        .target(name: "_CJavaScriptEventLoop"),
         .testTarget(
             name: "JavaScriptEventLoopTests",
             dependencies: [
@@ -49,7 +56,6 @@ let package = Package(
                 .enableExperimentalFeature("Extern")
             ]
         ),
-        .target(name: "_CJavaScriptEventLoop"),
         .target(
             name: "JavaScriptEventLoopTestSupport",
             dependencies: [
@@ -58,11 +64,6 @@ let package = Package(
             ]
         ),
         .target(name: "_CJavaScriptEventLoopTestSupport"),
-
-        .testTarget(
-            name: "JavaScriptKitTests",
-            dependencies: ["JavaScriptKit"]
-        ),
         .testTarget(
           name: "JavaScriptEventLoopTestSupportTests",
           dependencies: [
