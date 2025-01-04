@@ -109,18 +109,28 @@ public extension JSValue {
     }
 #endif
 
-    /// An unsafe convenience method of `JSObject.subscript(_ index: Int) -> JSValue`
+    /// An unsafe convenience method of `JSObject.subscript(_ index: String) -> JSValue`
     /// - Precondition: `self` must be a JavaScript Object.
     subscript(dynamicMember name: String) -> JSValue {
         get { self.object![name] }
-        set { self.object![name] = newValue }
+        nonmutating set { self.object![name] = newValue }
     }
+
+#if !hasFeature(Embedded)
+    /// An unsafe convenience method of `JSObject.subscript(_ index: String) -> JSValue`
+    /// - Precondition: `self` must be a JavaScript Object.
+    @_disfavoredOverload
+    subscript(dynamicMember name: String) -> ConvertibleToJSValue {
+        get { self.object![name] }
+        nonmutating set { self.object![name] = newValue.jsValue }
+    }
+#endif
 
     /// An unsafe convenience method of `JSObject.subscript(_ index: Int) -> JSValue`
     /// - Precondition: `self` must be a JavaScript Object.
     subscript(_ index: Int) -> JSValue {
         get { object![index] }
-        set { object![index] = newValue }
+        nonmutating set { object![index] = newValue }
     }
 }
 
