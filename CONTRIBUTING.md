@@ -27,11 +27,12 @@ Thank you for considering contributing to JavaScriptKit! We welcome contribution
         SWIFT_TOOLCHAIN_CHANNEL=swift-6.0.2-release;
         SWIFT_TOOLCHAIN_TAG="swift-6.0.2-RELEASE";
         SWIFT_SDK_TAG="swift-wasm-6.0.2-RELEASE";
+        SWIFT_SDK_CHECKSUM="6ffedb055cb9956395d9f435d03d53ebe9f6a8d45106b979d1b7f53358e1dcb4";
         pkg="$(mktemp -d)/InstallMe.pkg"; set -ex;
         curl -o "$pkg" "https://download.swift.org/$SWIFT_TOOLCHAIN_CHANNEL/xcode/$SWIFT_TOOLCHAIN_TAG/$SWIFT_TOOLCHAIN_TAG-osx.pkg";
         installer -pkg "$pkg" -target CurrentUserHomeDirectory;
         export TOOLCHAINS="$(plutil -extract CFBundleIdentifier raw ~/Library/Developer/Toolchains/$SWIFT_TOOLCHAIN_TAG.xctoolchain/Info.plist)";
-        swift sdk install "https://github.com/swiftwasm/swift/releases/download/$SWIFT_SDK_TAG/$SWIFT_SDK_TAG-wasm32-unknown-wasi.artifactbundle.zip";
+        swift sdk install "https://github.com/swiftwasm/swift/releases/download/$SWIFT_SDK_TAG/$SWIFT_SDK_TAG-wasm32-unknown-wasi.artifactbundle.zip" --checksum "$SWIFT_SDK_CHECKSUM";
     )
     ```
 
@@ -44,7 +45,8 @@ Thank you for considering contributing to JavaScriptKit! We welcome contribution
     ```bash
     (
         SWIFT_SDK_TAG="swift-wasm-6.0.2-RELEASE";
-        swift sdk install "https://github.com/swiftwasm/swift/releases/download/$SWIFT_SDK_TAG/$SWIFT_SDK_TAG-wasm32-unknown-wasi.artifactbundle.zip";
+        SWIFT_SDK_CHECKSUM="6ffedb055cb9956395d9f435d03d53ebe9f6a8d45106b979d1b7f53358e1dcb4";
+        swift sdk install "https://github.com/swiftwasm/swift/releases/download/$SWIFT_SDK_TAG/$SWIFT_SDK_TAG-wasm32-unknown-wasi.artifactbundle.zip" --checksum "$SWIFT_SDK_CHECKSUM";
     )
     ```
 
