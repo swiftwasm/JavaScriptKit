@@ -228,7 +228,7 @@ public extension JSFunction {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue])
     }
 
-    func new(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue, _ arg2: some ConvertibleToJSValue, arg3: some ConvertibleToJSValue) -> JSObject {
+    func new(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue, _ arg2: some ConvertibleToJSValue, _ arg3: some ConvertibleToJSValue) -> JSObject {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue])
     }
 
