@@ -164,7 +164,14 @@ public class JSFunction: JSObject {
 }
 
 #if hasFeature(Embedded)
-// NOTE: once embedded supports variadic generics, we can remove these overloads
+// Overloads of `callAsFunction(ConvertibleToJSValue...) -> JSValue`
+// for 0 through 7 arguments for Embedded Swift.
+//
+// These are required because the `ConvertibleToJSValue...` version is not
+// available in Embedded Swift due to lack of support for existentials.
+//
+// Once Embedded Swift supports parameter packs/variadic generics, we can
+// replace all variants with a single method each that takes a generic pack.
 public extension JSFunction {
 
     @discardableResult
@@ -178,13 +185,72 @@ public extension JSFunction {
     }
 
     @discardableResult
-    func callAsFunction(this: JSObject, _ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue) -> JSValue {
+    func callAsFunction(
+        this: JSObject,
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue
+    ) -> JSValue {
         invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue], this: this).jsValue
     }
 
     @discardableResult
-    func callAsFunction(this: JSObject, _ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue, _ arg2: some ConvertibleToJSValue) -> JSValue {
+    func callAsFunction(
+        this: JSObject,
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue
+    ) -> JSValue {
         invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue], this: this).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(
+        this: JSObject,
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue,
+        _ arg3: some ConvertibleToJSValue
+    ) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue], this: this).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(
+        this: JSObject,
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue,
+        _ arg3: some ConvertibleToJSValue,
+        _ arg4: some ConvertibleToJSValue
+    ) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue], this: this).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(
+        this: JSObject,
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue,
+        _ arg3: some ConvertibleToJSValue,
+        _ arg4: some ConvertibleToJSValue,
+        _ arg5: some ConvertibleToJSValue
+    ) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue], this: this).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(
+        this: JSObject,
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue,
+        _ arg3: some ConvertibleToJSValue,
+        _ arg4: some ConvertibleToJSValue,
+        _ arg5: some ConvertibleToJSValue,
+        _ arg6: some ConvertibleToJSValue
+    ) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue], this: this).jsValue
     }
 
     @discardableResult
@@ -203,13 +269,66 @@ public extension JSFunction {
     }
 
     @discardableResult
-    func callAsFunction(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue) -> JSValue {
+    func callAsFunction(
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue
+    ) -> JSValue {
         invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue]).jsValue
     }
 
     @discardableResult
-    func callAsFunction(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue, _ arg2: some ConvertibleToJSValue) -> JSValue {
+    func callAsFunction(
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue
+    ) -> JSValue {
         invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue]).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue,
+        _ arg3: some ConvertibleToJSValue
+    ) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue]).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue,
+        _ arg3: some ConvertibleToJSValue,
+        _ arg4: some ConvertibleToJSValue
+    ) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue]).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue,
+        _ arg3: some ConvertibleToJSValue,
+        _ arg4: some ConvertibleToJSValue,
+        _ arg5: some ConvertibleToJSValue
+    ) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue]).jsValue
+    }
+
+    @discardableResult
+    func callAsFunction(
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue,
+        _ arg3: some ConvertibleToJSValue,
+        _ arg4: some ConvertibleToJSValue,
+        _ arg5: some ConvertibleToJSValue,
+        _ arg6: some ConvertibleToJSValue
+    ) -> JSValue {
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue]).jsValue
     }
 
     func new() -> JSObject {
@@ -220,19 +339,60 @@ public extension JSFunction {
         new(arguments: [arg0.jsValue])
     }
 
-    func new(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue) -> JSObject {
+    func new(
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue
+    ) -> JSObject {
         new(arguments: [arg0.jsValue, arg1.jsValue])
     }
 
-    func new(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue, _ arg2: some ConvertibleToJSValue) -> JSObject {
+    func new(
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue
+    ) -> JSObject {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue])
     }
 
-    func new(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue, _ arg2: some ConvertibleToJSValue, _ arg3: some ConvertibleToJSValue) -> JSObject {
+    func new(
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue,
+        _ arg3: some ConvertibleToJSValue
+    ) -> JSObject {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue])
     }
 
-    func new(_ arg0: some ConvertibleToJSValue, _ arg1: some ConvertibleToJSValue, _ arg2: some ConvertibleToJSValue, _ arg3: some ConvertibleToJSValue, _ arg4: some ConvertibleToJSValue, _ arg5: some ConvertibleToJSValue, _ arg6: some ConvertibleToJSValue) -> JSObject {
+    func new(
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue,
+        _ arg3: some ConvertibleToJSValue,
+        _ arg4: some ConvertibleToJSValue
+    ) -> JSObject {
+        new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue])
+    }
+
+    func new(
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue,
+        _ arg3: some ConvertibleToJSValue,
+        _ arg4: some ConvertibleToJSValue,
+        _ arg5: some ConvertibleToJSValue
+    ) -> JSObject {
+        new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue])
+    }
+
+    func new(
+        _ arg0: some ConvertibleToJSValue,
+        _ arg1: some ConvertibleToJSValue,
+        _ arg2: some ConvertibleToJSValue,
+        _ arg3: some ConvertibleToJSValue,
+        _ arg4: some ConvertibleToJSValue,
+        _ arg5: some ConvertibleToJSValue,
+        _ arg6: some ConvertibleToJSValue
+    ) -> JSObject {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue])
     }
 }
