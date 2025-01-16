@@ -298,7 +298,14 @@ public class JSThrowingObject {
 
 
 #if hasFeature(Embedded)
-// NOTE: once embedded supports variadic generics, we can remove these overloads
+// Overloads of `JSObject.subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
+// for 0 through 7 arguments for Embedded Swift.
+//
+// These are required because the `ConvertibleToJSValue...` subscript is not
+// available in Embedded Swift due to lack of support for existentials.
+//
+// NOTE: Once Embedded Swift supports parameter packs/variadic generics, we can
+// replace all of these with a single method that takes a generic pack.
 public extension JSObject {
     @_disfavoredOverload
     subscript(dynamicMember name: String) -> (() -> JSValue)? {
@@ -315,9 +322,77 @@ public extension JSObject {
     }
 
     @_disfavoredOverload
-    subscript<A0: ConvertibleToJSValue, A1: ConvertibleToJSValue>(dynamicMember name: String) -> ((A0, A1) -> JSValue)? {
+    subscript<
+        A0: ConvertibleToJSValue,
+        A1: ConvertibleToJSValue
+    >(dynamicMember name: String) -> ((A0, A1) -> JSValue)? {
         self[name].function.map { function in 
             { function(this: self, $0, $1) }
+        }
+    }
+
+    @_disfavoredOverload
+    subscript<
+        A0: ConvertibleToJSValue,
+        A1: ConvertibleToJSValue,
+        A2: ConvertibleToJSValue
+    >(dynamicMember name: String) -> ((A0, A1, A2) -> JSValue)? {
+        self[name].function.map { function in
+            { function(this: self, $0, $1, $2) }
+        }
+    }
+
+    @_disfavoredOverload
+    subscript<
+        A0: ConvertibleToJSValue,
+        A1: ConvertibleToJSValue,
+        A2: ConvertibleToJSValue,
+        A3: ConvertibleToJSValue
+    >(dynamicMember name: String) -> ((A0, A1, A2, A3) -> JSValue)? {
+        self[name].function.map { function in
+            { function(this: self, $0, $1, $2, $3) }
+        }
+    }
+
+    @_disfavoredOverload
+    subscript<
+        A0: ConvertibleToJSValue,
+        A1: ConvertibleToJSValue,
+        A2: ConvertibleToJSValue,
+        A3: ConvertibleToJSValue,
+        A4: ConvertibleToJSValue
+    >(dynamicMember name: String) -> ((A0, A1, A2, A3, A4) -> JSValue)? {
+        self[name].function.map { function in
+            { function(this: self, $0, $1, $2, $3, $4) }
+        }
+    }
+
+    @_disfavoredOverload
+    subscript<
+        A0: ConvertibleToJSValue,
+        A1: ConvertibleToJSValue,
+        A2: ConvertibleToJSValue,
+        A3: ConvertibleToJSValue,
+        A4: ConvertibleToJSValue,
+        A5: ConvertibleToJSValue
+    >(dynamicMember name: String) -> ((A0, A1, A2, A3, A4, A5) -> JSValue)? {
+        self[name].function.map { function in
+            { function(this: self, $0, $1, $2, $3, $4, $5) }
+        }
+    }
+
+    @_disfavoredOverload
+    subscript<
+        A0: ConvertibleToJSValue,
+        A1: ConvertibleToJSValue,
+        A2: ConvertibleToJSValue,
+        A3: ConvertibleToJSValue,
+        A4: ConvertibleToJSValue,
+        A5: ConvertibleToJSValue,
+        A6: ConvertibleToJSValue
+    >(dynamicMember name: String) -> ((A0, A1, A2, A3, A4, A5, A6) -> JSValue)? {
+        self[name].function.map { function in
+            { function(this: self, $0, $1, $2, $3, $4, $5, $6) }
         }
     }
 }

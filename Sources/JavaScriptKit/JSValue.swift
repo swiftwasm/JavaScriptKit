@@ -272,9 +272,17 @@ extension JSValue: CustomStringConvertible {
 }
 
 #if hasFeature(Embedded)
+// Overloads of `JSValue.subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue)`
+// for 0 through 7 arguments for Embedded Swift.
+//
+// These are required because the `ConvertibleToJSValue...` subscript is not
+// available in Embedded Swift due to lack of support for existentials.
+//
+// Note: Once Embedded Swift supports parameter packs/variadic generics, we can
+// replace all of these with a single method that takes a generic pack.
 public extension JSValue {
     @_disfavoredOverload
-    subscript(dynamicMember name: String) -> (() -> JSValue) { 
+    subscript(dynamicMember name: String) -> (() -> JSValue) {
         object![dynamicMember: name]!
     }
 
@@ -284,7 +292,65 @@ public extension JSValue {
     }
 
     @_disfavoredOverload
-    subscript<A0: ConvertibleToJSValue, A1: ConvertibleToJSValue>(dynamicMember name: String) -> ((A0, A1) -> JSValue) {
+    subscript<
+        A0: ConvertibleToJSValue,
+        A1: ConvertibleToJSValue
+    >(dynamicMember name: String) -> ((A0, A1) -> JSValue) {
+        object![dynamicMember: name]!
+    }
+
+    @_disfavoredOverload
+    subscript<
+        A0: ConvertibleToJSValue,
+        A1: ConvertibleToJSValue,
+        A2: ConvertibleToJSValue
+    >(dynamicMember name: String) -> ((A0, A1, A2) -> JSValue) {
+        object![dynamicMember: name]!
+    }
+
+    @_disfavoredOverload
+    subscript<
+        A0: ConvertibleToJSValue,
+        A1: ConvertibleToJSValue,
+        A2: ConvertibleToJSValue,
+        A3: ConvertibleToJSValue
+    >(dynamicMember name: String) -> ((A0, A1, A2, A3) -> JSValue) {
+        object![dynamicMember: name]!
+    }
+
+    @_disfavoredOverload
+    subscript<
+        A0: ConvertibleToJSValue,
+        A1: ConvertibleToJSValue,
+        A2: ConvertibleToJSValue,
+        A3: ConvertibleToJSValue,
+        A4: ConvertibleToJSValue
+    >(dynamicMember name: String) -> ((A0, A1, A2, A3, A4) -> JSValue) {
+        object![dynamicMember: name]!
+    }
+
+    @_disfavoredOverload
+    subscript<
+        A0: ConvertibleToJSValue,
+        A1: ConvertibleToJSValue,
+        A2: ConvertibleToJSValue,
+        A3: ConvertibleToJSValue,
+        A4: ConvertibleToJSValue,
+        A5: ConvertibleToJSValue
+    >(dynamicMember name: String) -> ((A0, A1, A2, A3, A4, A5) -> JSValue) {
+        object![dynamicMember: name]!
+    }
+
+    @_disfavoredOverload
+    subscript<
+        A0: ConvertibleToJSValue,
+        A1: ConvertibleToJSValue,
+        A2: ConvertibleToJSValue,
+        A3: ConvertibleToJSValue,
+        A4: ConvertibleToJSValue,
+        A5: ConvertibleToJSValue,
+        A6: ConvertibleToJSValue
+    >(dynamicMember name: String) -> ((A0, A1, A2, A3, A4, A5, A6) -> JSValue) {
         object![dynamicMember: name]!
     }
 }
