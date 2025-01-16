@@ -1,95 +1,125 @@
-// This file contains the job queue implementation which re-order jobs based on their priority.
-// The current implementation is much simple to be easily debugged, but should be re-implemented
-// using priority queue ideally.
+// This file contains the job queue implementation for JavaScriptEventLoop.
+// It manages job insertion and execution based on priority, ensuring thread safety and performance.
 
 import _CJavaScriptEventLoop
+import os.lock
 
-#if compiler(>=5.5)
-
+/// Represents the state of the job queue.
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 struct QueueState: Sendable {
+    /// The head of the job queue.
     fileprivate var headJob: UnownedJob? = nil
+    /// Indicates if the queue is actively processing jobs.
     fileprivate var isSpinning: Bool = false
 }
 
 @available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)
 extension JavaScriptEventLoop {
+    /// A lock to synchronize queue access using `os_unfair_lock` for lightweight thread safety.
+    private static var queueLock = os_unfair_lock_s()
 
+    /// Inserts a job into the queue and ensures jobs are processed.
+    /// - Parameter job: The job to add to the queue.
     func insertJobQueue(job newJob: UnownedJob) {
-        withUnsafeMutablePointer(to: &queueState.headJob) { headJobPtr in
-            var position: UnsafeMutablePointer<UnownedJob?> = headJobPtr
-            while let cur = position.pointee {
-                if cur.rawPriority < newJob.rawPriority {
-                    newJob.nextInQueue().pointee = cur
-                    position.pointee = newJob
-                    return
-                }
-                position = cur.nextInQueue()
-            }
-            newJob.nextInQueue().pointee = nil
-            position.pointee = newJob
-        }
+        os_unfair_lock_lock(&JavaScriptEventLoop.queueLock)
+        defer { os_unfair_lock_unlock(&JavaScriptEventLoop.queueLock) }
 
-        // TODO: use CAS when supporting multi-threaded environment
+        insertJob(newJob)
+
         if !queueState.isSpinning {
-            self.queueState.isSpinning = true
+            queueState.isSpinning = true
             JavaScriptEventLoop.shared.queueMicrotask {
                 self.runAllJobs()
             }
         }
     }
 
-    func runAllJobs() {
-        assert(queueState.isSpinning)
+    /// Inserts a job into the queue at the correct priority position.
+    /// - Parameter job: The job to insert into the queue.
+    private func insertJob(_ newJob: UnownedJob) {
+        var current = queueState.headJob
+        var previous: UnownedJob? = nil
 
-        while let job = self.claimNextFromQueue() {
-            #if compiler(>=5.9)
-            job.runSynchronously(on: self.asUnownedSerialExecutor())
-            #else
-            job._runSynchronously(on: self.asUnownedSerialExecutor())
-            #endif
+        while let cur = current, cur.rawPriority >= newJob.rawPriority {
+            previous = cur
+            current = cur.nextInQueue().pointee
+        }
+
+        newJob.nextInQueue().pointee = current
+        if let prev = previous {
+            prev.nextInQueue().pointee = newJob
+        } else {
+            queueState.headJob = newJob
+        }
+    }
+
+    /// Processes all jobs in the queue until it is empty.
+    func runAllJobs() {
+        assert(queueState.isSpinning, "runAllJobs called while queueState.isSpinning is false.")
+
+        while let job = claimNextFromQueue() {
+            executeJob(job)
         }
 
         queueState.isSpinning = false
     }
 
+    /// Executes a specific job.
+    /// - Parameter job: The job to execute.
+    private func executeJob(_ job: UnownedJob) {
+        #if compiler(>=5.9)
+        job.runSynchronously(on: self.asUnownedSerialExecutor())
+        #else
+        job._runSynchronously(on: self.asUnownedSerialExecutor())
+        #endif
+    }
+
+    /// Removes and returns the next job from the queue.
+    /// - Returns: The next job in the queue, or `nil` if the queue is empty.
     func claimNextFromQueue() -> UnownedJob? {
-        if let job = self.queueState.headJob {
-            self.queueState.headJob = job.nextInQueue().pointee
-            return job
-        }
-        return nil
+        os_unfair_lock_lock(&JavaScriptEventLoop.queueLock)
+        defer { os_unfair_lock_unlock(&JavaScriptEventLoop.queueLock) }
+
+        guard let job = queueState.headJob else { return nil }
+        queueState.headJob = job.nextInQueue().pointee
+        return job
     }
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 fileprivate extension UnownedJob {
+    /// Converts the job to its internal implementation.
+    /// - Returns: A raw pointer to the job's internal structure.
     private func asImpl() -> UnsafeMutablePointer<_CJavaScriptEventLoop.Job> {
         unsafeBitCast(self, to: UnsafeMutablePointer<_CJavaScriptEventLoop.Job>.self)
     }
 
+    /// The job's priority flags.
     var flags: JobFlags {
         JobFlags(bits: asImpl().pointee.Flags)
     }
 
-    var rawPriority: UInt32 { flags.priority }
+    /// The raw priority value of the job.
+    var rawPriority: UInt32 {
+        flags.priority
+    }
 
+    /// Retrieves a pointer to the next job in the queue.
+    /// - Returns: A pointer to the next job, or `nil` if there are no further jobs.
     func nextInQueue() -> UnsafeMutablePointer<UnownedJob?> {
-        return withUnsafeMutablePointer(to: &asImpl().pointee.SchedulerPrivate.0) { rawNextJobPtr in
-            let nextJobPtr = UnsafeMutableRawPointer(rawNextJobPtr).bindMemory(to: UnownedJob?.self, capacity: 1)
-            return nextJobPtr
+        withUnsafeMutablePointer(to: &asImpl().pointee.SchedulerPrivate.0) { rawNextJobPtr in
+            UnsafeMutableRawPointer(rawNextJobPtr).bindMemory(to: UnownedJob?.self, capacity: 1)
         }
     }
-
 }
 
+/// Represents job flags including priority.
 fileprivate struct JobFlags {
-  var bits: UInt32 = 0
+    /// The raw bit representation of the flags.
+    var bits: UInt32 = 0
 
-  var priority: UInt32 {
-    get {
-      (bits & 0xFF00) >> 8
+    /// Extracts the priority value from the flags.
+    var priority: UInt32 {
+        (bits & 0xFF00) >> 8
     }
-  }
 }
-#endif
