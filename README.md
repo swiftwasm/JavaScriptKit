@@ -178,12 +178,14 @@ Not all of these versions are tested on regular basis though, compatibility repo
 
 ## Usage in a browser application
 
-The easiest way to get started with JavaScriptKit in your browser app is with [the `carton`
+The easiest is to start with [Examples](/Examples) which has JavaScript glue runtime.
+
+Second option is to get started with JavaScriptKit in your browser app is with [the `carton`
 bundler](https://carton.dev). Add carton to your swift package dependencies:
 
 ```diff
 dependencies: [
-+    .package(url: "https://github.com/swiftwasm/carton", from: "1.0.0"),
++    .package(url: "https://github.com/swiftwasm/carton", from: "1.1.3"),
 ],
 ```
 
@@ -252,10 +254,6 @@ Open [http://127.0.0.1:8080/](http://127.0.0.1:8080/) in your browser and a deve
 within it. You'll see `Hello, world!` output in the console. You can edit the app source code in
 your favorite editor and save it, `carton` will immediately rebuild the app and reload all
 browser tabs that have the app open.
-
-You can also build your project with webpack.js and a manually installed SwiftWasm toolchain. Please
-see the following sections and the [Example](https://github.com/swiftwasm/JavaScriptKit/tree/main/Example)
-directory for more information in this more advanced use case.
 
 ## Sponsoring
 
