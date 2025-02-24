@@ -16,5 +16,6 @@ let package = Package(
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit")
             ]
         )
-    ]
+    ],
+    swiftLanguageVersions: [.v5]
 )
