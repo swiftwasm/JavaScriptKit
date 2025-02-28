@@ -68,7 +68,10 @@
 </head>
 
 <body>
-  <script type="module" src="Sources/JavaScript/index.js"></script>
+  <script type="module">
+    import { init } from "./Bundle/index.js"
+    init(fetch(new URL("./Bundle/main.wasm", import.meta.url)));
+  </script>
   <h1>OffscreenCanvas Example</h1>
   <p>
   <div>

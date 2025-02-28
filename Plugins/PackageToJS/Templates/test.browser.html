@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <script type="module">
+        import { testBrowserInPage } from "./test.js";
+        import { defaultBrowserSetup /* #if USE_SHARED_MEMORY */, createDefaultWorkerFactory /* #endif */} from './platforms/browser.js';
+
+        const logElement = document.createElement("pre");
+        document.body.appendChild(logElement);
+
+        const processInfo = await fetch("/process-info.json").then((response) => response.json());
+        const options = await defaultBrowserSetup({
+            module: await fetch("./main.wasm"),
+            args: processInfo.args,
+            onStdoutLine: (line) => {
+                console.log(line);
+                logElement.textContent += line + "\n";
+            },
+            onStderrLine: (line) => {
+                console.warn(line);
+                logElement.textContent += line + "\n";
+            },
+/* #if USE_SHARED_MEMORY */
+            spawnWorker: createDefaultWorkerFactory(processInfo.preludeScript),
+/* #endif */
+        })
+        testBrowserInPage(options, processInfo);
+    </script>
+</body>
+
+</html>

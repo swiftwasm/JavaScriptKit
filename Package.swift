@@ -4,6 +4,7 @@ import PackageDescription
 
 // NOTE: needed for embedded customizations, ideally this will not be necessary at all in the future, or can be replaced with traits
 let shouldBuildForEmbedded = Context.environment["JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM"].flatMap(Bool.init) ?? false
+let useLegacyResourceBundling = shouldBuildForEmbedded || (Context.environment["JAVASCRIPTKIT_USE_LEGACY_RESOURCE_BUNDLING"].flatMap(Bool.init) ?? false)
 
 let package = Package(
     name: "JavaScriptKit",
@@ -12,12 +13,14 @@ let package = Package(
         .library(name: "JavaScriptEventLoop", targets: ["JavaScriptEventLoop"]),
         .library(name: "JavaScriptBigIntSupport", targets: ["JavaScriptBigIntSupport"]),
         .library(name: "JavaScriptEventLoopTestSupport", targets: ["JavaScriptEventLoopTestSupport"]),
+        .plugin(name: "PackageToJS", targets: ["PackageToJS"]),
     ],
     targets: [
         .target(
             name: "JavaScriptKit",
             dependencies: ["_CJavaScriptKit"], 
-            resources: shouldBuildForEmbedded ? [] : [.copy("Runtime")],
+            exclude: useLegacyResourceBundling ? ["Runtime"] : [],
+            resources: useLegacyResourceBundling ? [] : [.copy("Runtime")],
             cSettings: shouldBuildForEmbedded ? [
                     .unsafeFlags(["-fdeclspec"])
                 ] : nil,
@@ -70,6 +73,13 @@ let package = Package(
             "JavaScriptKit",
             "JavaScriptEventLoopTestSupport"
           ]
+        ),
+        .plugin(
+            name: "PackageToJS",
+            capability: .command(
+                intent: .custom(verb: "js", description: "Convert a Swift package to a JavaScript package")
+            ),
+            sources: ["Sources"]
         ),
     ]
 )
