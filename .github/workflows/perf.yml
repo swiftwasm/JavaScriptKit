@@ -4,13 +4,15 @@ on: [pull_request]
 
 jobs:
   perf:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    container: swift:6.0.3
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: swiftwasm/setup-swiftwasm@v1
-        with:
-          swift-version: wasm-5.9.1-RELEASE
+      - uses: swiftwasm/setup-swiftwasm@v2
+      - name: Install dependencies
+        run: |
+          apt-get update && apt-get install make nodejs npm -y
       - name: Run Benchmark
         run: |
           make bootstrap

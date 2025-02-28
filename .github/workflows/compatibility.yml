@@ -6,17 +6,15 @@ on:
 jobs:
   test:
     name: Check source code compatibility
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    container: swift:6.0.3
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: swiftwasm/setup-swiftwasm@v1
-        with:
-          swift-version: wasm-6.0.3-RELEASE
+      - uses: swiftwasm/setup-swiftwasm@v2
       - name: Run Test
         run: |
           set -eux
-          make bootstrap
           cd Examples/Basic
-          swift build --triple wasm32-unknown-wasi --static-swift-stdlib
-          swift build --triple wasm32-unknown-wasi -Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS --static-swift-stdlib
+          swift build --swift-sdk wasm32-unknown-wasi --static-swift-stdlib
+          swift build --swift-sdk wasm32-unknown-wasi -Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS --static-swift-stdlib
