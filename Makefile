@@ -1,10 +1,7 @@
 MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
-ifeq ($(SWIFT_SDK_ID),)
-SWIFT_BUILD_FLAGS := --triple wasm32-unknown-wasi
-else
+SWIFT_SDK_ID ?= wasm32-unknown-wasi
 SWIFT_BUILD_FLAGS := --swift-sdk $(SWIFT_SDK_ID)
-endif
 
 .PHONY: bootstrap
 bootstrap:

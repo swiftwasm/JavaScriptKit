@@ -9,38 +9,17 @@ jobs:
     strategy:
       matrix:
         entry:
-          # Ensure that all host can install toolchain, build project, and run tests
-          - { os: macos-14,     toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node, xcode: Xcode_15.2.app }
-          - { os: ubuntu-22.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: Node }
-          - { os: ubuntu-22.04, toolchain: wasm-5.10.0-RELEASE, wasi-backend: Node }
-
-          # Ensure that test succeeds with all toolchains and wasi backend combinations
-          - { os: ubuntu-20.04, toolchain: wasm-5.10.0-RELEASE, wasi-backend: Node }
-          - { os: ubuntu-20.04, toolchain: wasm-5.9.1-RELEASE, wasi-backend: MicroWASI }
-          - { os: ubuntu-20.04, toolchain: wasm-5.10.0-RELEASE, wasi-backend: MicroWASI }
           - os: ubuntu-22.04
             toolchain:
               download-url: https://download.swift.org/swift-6.0.2-release/ubuntu2204/swift-6.0.2-RELEASE/swift-6.0.2-RELEASE-ubuntu22.04.tar.gz
-            swift-sdk:
-              id: 6.0.2-RELEASE-wasm32-unknown-wasi
-              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.0.2-RELEASE/swift-wasm-6.0.2-RELEASE-wasm32-unknown-wasi.artifactbundle.zip"
-              checksum: "6ffedb055cb9956395d9f435d03d53ebe9f6a8d45106b979d1b7f53358e1dcb4"
             wasi-backend: Node
           - os: ubuntu-22.04
             toolchain:
               download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a-ubuntu22.04.tar.gz
-            swift-sdk:
-              id: DEVELOPMENT-SNAPSHOT-2024-10-31-a-wasm32-unknown-wasi
-              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-10-31-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-10-31-a-wasm32-unknown-wasi.artifactbundle.zip"
-              checksum: "e42546397786ea6eaec2d9c07f9118a6f3428784cf3df3840a369f19700c1a69"
             wasi-backend: Node
           - os: ubuntu-22.04
             toolchain:
               download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a-ubuntu22.04.tar.gz
-            swift-sdk:
-              id: DEVELOPMENT-SNAPSHOT-2024-10-31-a-wasm32-unknown-wasip1-threads
-              download-url: "https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-10-31-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-10-31-a-wasm32-unknown-wasip1-threads.artifactbundle.zip"
-              checksum: "17dbbe61af6ca09c92ee2d68a56d5716530428e28c4c8358aa860cc4fcdc91ae"
             wasi-backend: Node
 
     runs-on: ${{ matrix.entry.os }}
@@ -49,22 +28,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Select SDKROOT
-        if: ${{ matrix.entry.xcode }}
-        run: sudo xcode-select -s /Applications/${{ matrix.entry.xcode }}
-      - uses: swiftwasm/setup-swiftwasm@v1
-        if: ${{ matrix.entry.swift-sdk == null }}
-        with:
-          swift-version: ${{ matrix.entry.toolchain }}
       - uses: ./.github/actions/install-swift
-        if: ${{ matrix.entry.swift-sdk }}
         with:
           download-url: ${{ matrix.entry.toolchain.download-url }}
-      - name: Install Swift SDK
-        if: ${{ matrix.entry.swift-sdk }}
-        run: |
-          swift sdk install "${{ matrix.entry.swift-sdk.download-url }}" --checksum "${{ matrix.entry.swift-sdk.checksum }}"
-          echo "SWIFT_SDK_ID=${{ matrix.entry.swift-sdk.id }}" >> $GITHUB_ENV
+      - uses: swiftwasm/setup-swiftwasm@v2
+        id: setup-swiftwasm
+      - name: Configure Swift SDK
+        run: echo "SWIFT_SDK_ID=${{ steps.setup-swiftwasm.outputs.swift-sdk-id }}" >> $GITHUB_ENV
       - run: make bootstrap
       - run: make test
       - run: make unittest
