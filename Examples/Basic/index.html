@@ -3,10 +3,20 @@
 
 <head>
   <title>Getting Started</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "@bjorn3/browser_wasi_shim": "https://cdn.jsdelivr.net/npm/@bjorn3/browser_wasi_shim@0.4.1/+esm"
+      }
+    }
+  </script>
 </head>
 
 <body>
-  <script src="./index.js" type="module"></script>
+  <script type="module">
+    import { instantiate } from "./.build/plugins/PackageToJS/outputs/Package/index.js";
+    await instantiate(fetch("./.build/plugins/PackageToJS/outputs/Package/main.wasm"));
+  </script>
 </body>
 
 </html>
