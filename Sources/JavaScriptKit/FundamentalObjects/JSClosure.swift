@@ -26,7 +26,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         }
 
         // 3. Retain the given body in static storage by `funcRef`.
-        JSClosure.sharedClosures[hostFuncRef] = (self, {
+        JSClosure.sharedClosures.wrappedValue[hostFuncRef] = (self, {
             defer { self.release() }
             return body($0)
         })
@@ -42,7 +42,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
     /// Release this function resource.
     /// After calling `release`, calling this function from JavaScript will fail.
     public func release() {
-        JSClosure.sharedClosures[hostFuncRef] = nil
+        JSClosure.sharedClosures.wrappedValue[hostFuncRef] = nil
     }
 }
 
@@ -74,14 +74,8 @@ public class JSClosure: JSFunction, JSClosureProtocol {
     }
 
     // Note: Retain the closure object itself also to avoid funcRef conflicts
-    fileprivate static var sharedClosures: SharedJSClosure {
-        if let swjs_thread_local_closures {
-            return Unmanaged<SharedJSClosure>.fromOpaque(swjs_thread_local_closures).takeUnretainedValue()
-        } else {
-            let shared = SharedJSClosure()
-            swjs_thread_local_closures = Unmanaged.passRetained(shared).toOpaque()
-            return shared
-        }
+    fileprivate static let sharedClosures = LazyThreadLocal {
+        SharedJSClosure()
     }
 
     private var hostFuncRef: JavaScriptHostFuncRef = 0
@@ -110,7 +104,7 @@ public class JSClosure: JSFunction, JSClosureProtocol {
         }
 
         // 3. Retain the given body in static storage by `funcRef`.
-        Self.sharedClosures[hostFuncRef] = (self, body)
+        Self.sharedClosures.wrappedValue[hostFuncRef] = (self, body)
     }
 
     #if compiler(>=5.5) && !hasFeature(Embedded)
@@ -192,7 +186,7 @@ func _call_host_function_impl(
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
 ) -> Bool {
-    guard let (_, hostFunc) = JSClosure.sharedClosures[hostFuncRef] else {
+    guard let (_, hostFunc) = JSClosure.sharedClosures.wrappedValue[hostFuncRef] else {
         return true
     }
     let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map { $0.jsValue}
@@ -232,7 +226,7 @@ extension JSClosure {
 
 @_cdecl("_free_host_function_impl")
 func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {
-    JSClosure.sharedClosures[hostFuncRef] = nil
+    JSClosure.sharedClosures.wrappedValue[hostFuncRef] = nil
 }
 #endif
 

@@ -61,5 +61,3 @@ int swjs_library_features(void) {
 }
 #endif
 #endif
-
-_Thread_local void *swjs_thread_local_closures;
