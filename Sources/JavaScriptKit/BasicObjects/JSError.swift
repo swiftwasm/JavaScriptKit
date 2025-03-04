@@ -8,7 +8,11 @@ public final class JSError: Error, JSBridgedClass {
     private static let _constructor = LazyThreadLocal(initialize: { JSObject.global.Error.function })
 
     /// The underlying JavaScript `Error` object.
-    public let jsObject: JSObject
+    ///
+    /// NOTE: This property must be accessed from the thread that
+    ///       the thrown `Error` object was created on. Otherwise,
+    ///       it will result in a runtime assertion failure.
+    public nonisolated(unsafe) let jsObject: JSObject
 
     /// Creates a new instance of the JavaScript `Error` class with a given message.
     public init(message: String) {
