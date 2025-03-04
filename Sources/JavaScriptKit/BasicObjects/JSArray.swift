@@ -2,9 +2,8 @@
 /// class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)
 /// that exposes its properties in a type-safe and Swifty way.
 public class JSArray: JSBridgedClass {
-    public static var constructor: JSFunction? { _constructor }
-    @LazyThreadLocal(initialize: { JSObject.global.Array.function })
-    private static var _constructor: JSFunction?
+    public static var constructor: JSFunction? { _constructor.wrappedValue }
+    private static let _constructor = LazyThreadLocal(initialize: { JSObject.global.Array.function })
 
     static func isArray(_ object: JSObject) -> Bool {
         constructor!.isArray!(object).boolean!
