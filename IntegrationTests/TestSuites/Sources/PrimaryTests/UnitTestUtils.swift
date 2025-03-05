@@ -110,7 +110,7 @@ func expectThrow<T>(_ body: @autoclosure () throws -> T, file: StaticString = #f
     throw MessageError("Expect to throw an exception", file: file, line: line, column: column)
 }
 
-func wrapUnsafeThrowableFunction(_ body: @escaping () -> Void, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> Error {
+func wrapUnsafeThrowableFunction(_ body: @escaping () -> Void, file: StaticString = #file, line: UInt = #line, column: UInt = #column) throws -> JSValue {
     JSObject.global.callThrowingClosure.function!(JSClosure { _ in 
             body() 
             return .undefined
