@@ -6,6 +6,8 @@ struct PackageToJS: CommandPlugin {
     struct Options {
         /// Product to build (default: executable target if there's only one)
         var product: String?
+        /// Path to the output directory
+        var outputPath: String?
         /// Name of the package (default: lowercased Package.swift name)
         var packageName: String?
         /// Whether to explain the build plan
@@ -13,19 +15,29 @@ struct PackageToJS: CommandPlugin {
 
         static func parse(from extractor: inout ArgumentExtractor) -> Options {
             let product = extractor.extractOption(named: "product").last
+            let outputPath = extractor.extractOption(named: "output").last
             let packageName = extractor.extractOption(named: "package-name").last
             let explain = extractor.extractFlag(named: "explain")
-            return Options(product: product, packageName: packageName, explain: explain != 0)
+            return Options(
+                product: product, outputPath: outputPath, packageName: packageName,
+                explain: explain != 0
+            )
         }
 
         static func help() -> String {
             return """
-                Usage: swift package --swift-sdk <swift-sdk> plugin run PackageToJS [options]
+                Usage: swift package --swift-sdk <swift-sdk> [swift-package options] plugin run PackageToJS [options]
 
                 Options:
-                --product <product>   Product to build (default: executable target if there's only one)
-                --package-name <name> Name of the package (default: lowercased Package.swift name)
-                --explain             Whether to explain the build plan
+                  --product <product>   Product to build (default: executable target if there's only one)
+                  --output <path>  Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
+                  --package-name <name> Name of the package (default: lowercased Package.swift name)
+                  --explain             Whether to explain the build plan
+
+                Examples:
+                  $ swift package --swift-sdk wasm32-unknown-wasi plugin js
+                  $ swift package --swift-sdk wasm32-unknown-wasi plugin js --product Example
+                  $ swift package --swift-sdk wasm32-unknown-wasi -c release plugin js
                 """
         }
     }
@@ -74,26 +86,38 @@ struct PackageToJS: CommandPlugin {
 
     func performCommand(context: PluginContext, arguments: [String]) throws {
         if arguments.contains(where: { ["-h", "--help"].contains($0) }) {
-            print(Options.help())
+            printStderr(Options.help())
             return
         }
 
         var extractor = ArgumentExtractor(arguments)
         let options = Options.parse(from: &extractor)
 
+        if extractor.remainingArguments.count > 0 {
+            printStderr(
+                "Unexpected arguments: \(extractor.remainingArguments.joined(separator: " "))")
+            printStderr(Options.help())
+            exit(1)
+        }
+
         // Build products
         let (build, productName) = try buildWasm(options: options, context: context)
         guard build.succeeded else {
             for diagnostic in Self.friendlyBuildDiagnostics {
                 if let message = diagnostic(build, arguments) {
-                    fputs("\n" + message + "\n", stderr)
+                    printStderr("\n" + message)
                 }
             }
             exit(1)
         }
 
         let productArtifact = try build.findWasmArtifact(for: productName)
-        let outputDir = context.pluginWorkDirectory.appending(subpath: "Package")
+        let outputDir =
+            if let outputPath = options.outputPath {
+                URL(fileURLWithPath: outputPath)
+            } else {
+                context.pluginWorkDirectoryURL.appending(path: "Package")
+            }
         guard
             let selfPackage = findPackageInDependencies(
                 package: context.package, id: "javascriptkit")
@@ -128,7 +152,9 @@ struct PackageToJS: CommandPlugin {
             parameters.otherSwiftcFlags = [
                 "-static-stdlib", "-Xclang-linker", "-mexec-model=reactor",
             ]
-            parameters.otherLinkerFlags = ["--export-if-defined=__main_argc_argv"]
+            parameters.otherLinkerFlags = [
+                "--export-if-defined=__main_argc_argv"
+            ]
         }
         let productName = try options.product ?? deriveDefaultProduct(package: context.package)
         let build = try self.packageManager.build(.product(productName), parameters: parameters)
@@ -142,14 +168,14 @@ struct PackageToJS: CommandPlugin {
         context: PluginContext,
         wasmProductArtifact: PackageManager.BuildResult.BuiltArtifact,
         selfPackage: Package,
-        outputDir: Path
+        outputDir: URL
     ) -> MiniMake.TaskKey {
-        let selfPackageURL = selfPackage.directory
+        let selfPackageURL = selfPackage.directoryURL
         let selfPath = String(#filePath)
 
         // Prepare output directory
         let outputDirTask = make.addTask(
-            inputFiles: [selfPath], output: outputDir.string, attributes: [.silent]
+            inputFiles: [selfPath], output: outputDir.path, attributes: [.silent]
         ) {
             guard !FileManager.default.fileExists(atPath: $0.output) else { return }
             try FileManager.default.createDirectory(
@@ -169,7 +195,7 @@ struct PackageToJS: CommandPlugin {
         let wasmFilename = "main.wasm"
         let wasm = make.addTask(
             inputFiles: [selfPath, wasmProductArtifact.path.string], inputTasks: [outputDirTask],
-            output: outputDir.appending(subpath: wasmFilename).string
+            output: outputDir.appending(path: wasmFilename).path
         ) {
             try syncFile(from: wasmProductArtifact.path.string, to: $0.output)
         }
@@ -178,7 +204,7 @@ struct PackageToJS: CommandPlugin {
         // Write package.json
         let packageJSON = make.addTask(
             inputFiles: [selfPath], inputTasks: [outputDirTask],
-            output: outputDir.appending(subpath: "package.json").string
+            output: outputDir.appending(path: "package.json").path
         ) {
             let packageJSON = """
                 {
@@ -207,12 +233,12 @@ struct PackageToJS: CommandPlugin {
             ("Plugins/PackageToJS/Templates/index.d.ts", "index.d.ts"),
             ("Sources/JavaScriptKit/Runtime/index.mjs", "runtime.js"),
         ] {
-            let inputPath = selfPackageURL.appending(subpath: file).string
+            let inputPath = selfPackageURL.appending(path: file)
             let copied = make.addTask(
-                inputFiles: [selfPath, inputPath], inputTasks: [outputDirTask],
-                output: outputDir.appending(subpath: output).string
+                inputFiles: [selfPath, inputPath.path], inputTasks: [outputDirTask],
+                output: outputDir.appending(path: output).path
             ) {
-                var content = try String(contentsOfFile: inputPath)
+                var content = try String(contentsOf: inputPath)
                 for (key, value) in substitutions {
                     content = content.replacingOccurrences(of: key, with: value)
                 }
@@ -304,6 +330,10 @@ private func findPackageInDependencies(package: Package, id: Package.ID) -> Pack
         return nil
     }
     return visit(package: package)
+}
+
+private func printStderr(_ message: String) {
+    fputs(message + "\n", stderr)
 }
 
 private struct PackageToJSError: Swift.Error, CustomStringConvertible {
