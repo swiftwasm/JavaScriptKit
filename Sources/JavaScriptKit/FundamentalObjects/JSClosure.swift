@@ -15,7 +15,7 @@ public protocol JSClosureProtocol: JSValueCompatible {
 public class JSOneshotClosure: JSObject, JSClosureProtocol {
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 
-    public init(_ body: @escaping ([JSValue]) -> JSValue, file: String = #fileID, line: UInt32 = #line) {
+    public init(_ body: @escaping (sending [JSValue]) -> JSValue, file: String = #fileID, line: UInt32 = #line) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
         super.init(id: 0)
 
@@ -34,7 +34,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 
     #if compiler(>=5.5) && !hasFeature(Embedded)
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSOneshotClosure {
+    public static func async(_ body: sending @escaping (sending [JSValue]) async throws -> JSValue) -> JSOneshotClosure {
         JSOneshotClosure(makeAsyncClosure(body))
     }
     #endif
@@ -64,10 +64,10 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 public class JSClosure: JSFunction, JSClosureProtocol {
 
     class SharedJSClosure {
-        private var storage: [JavaScriptHostFuncRef: (object: JSObject, body: ([JSValue]) -> JSValue)] = [:]
+        private var storage: [JavaScriptHostFuncRef: (object: JSObject, body: (sending [JSValue]) -> JSValue)] = [:]
         init() {}
 
-        subscript(_ key: JavaScriptHostFuncRef) -> (object: JSObject, body: ([JSValue]) -> JSValue)? {
+        subscript(_ key: JavaScriptHostFuncRef) -> (object: JSObject, body: (sending [JSValue]) -> JSValue)? {
             get { storage[key] }
             set { storage[key] = newValue }
         }
@@ -93,7 +93,7 @@ public class JSClosure: JSFunction, JSClosureProtocol {
         })
     }
 
-    public init(_ body: @escaping ([JSValue]) -> JSValue, file: String = #fileID, line: UInt32 = #line) {
+    public init(_ body: @escaping (sending [JSValue]) -> JSValue, file: String = #fileID, line: UInt32 = #line) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
         super.init(id: 0)
 
@@ -109,7 +109,7 @@ public class JSClosure: JSFunction, JSClosureProtocol {
 
     #if compiler(>=5.5) && !hasFeature(Embedded)
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public static func async(_ body: @escaping ([JSValue]) async throws -> JSValue) -> JSClosure {
+    public static func async(_ body: @Sendable @escaping (sending [JSValue]) async throws -> JSValue) -> JSClosure {
         JSClosure(makeAsyncClosure(body))
     }
     #endif
@@ -125,18 +125,29 @@ public class JSClosure: JSFunction, JSClosureProtocol {
 
 #if compiler(>=5.5) && !hasFeature(Embedded)
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSValue) -> (([JSValue]) -> JSValue) {
+private func makeAsyncClosure(
+    _ body: sending @escaping (sending [JSValue]) async throws -> JSValue
+) -> ((sending [JSValue]) -> JSValue) {
     { arguments in
         JSPromise { resolver in
+            // NOTE: The context is fully transferred to the unstructured task
+            // isolation but the compiler can't prove it yet, so we need to
+            // use `@unchecked Sendable` to make it compile with the Swift 6 mode.
+            struct Context: @unchecked Sendable {
+                let resolver: (JSPromise.Result) -> Void
+                let arguments: [JSValue]
+                let body: (sending [JSValue]) async throws -> JSValue
+            }
+            let context = Context(resolver: resolver, arguments: arguments, body: body)
             Task {
                 do {
-                    let result = try await body(arguments)
-                    resolver(.success(result))
+                    let result = try await context.body(context.arguments)
+                    context.resolver(.success(result))
                 } catch {
                     if let jsError = error as? JSError {
-                        resolver(.failure(jsError.jsValue))
+                        context.resolver(.failure(jsError.jsValue))
                     } else {
-                        resolver(.failure(JSError(message: String(describing: error)).jsValue))
+                        context.resolver(.failure(JSError(message: String(describing: error)).jsValue))
                     }
                 }
             }
@@ -183,13 +194,16 @@ private func makeAsyncClosure(_ body: @escaping ([JSValue]) async throws -> JSVa
 @_cdecl("_call_host_function_impl")
 func _call_host_function_impl(
     _ hostFuncRef: JavaScriptHostFuncRef,
-    _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
+    _ argv: sending UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
 ) -> Bool {
     guard let (_, hostFunc) = JSClosure.sharedClosures.wrappedValue[hostFuncRef] else {
         return true
     }
-    let arguments = UnsafeBufferPointer(start: argv, count: Int(argc)).map { $0.jsValue}
+    var arguments: [JSValue] = []
+    for i in 0..<Int(argc) {
+        arguments.append(argv[i].jsValue)
+    }
     let result = hostFunc(arguments)
     let callbackFuncRef = JSFunction(id: callbackFuncRef)
     _ = callbackFuncRef(result)
