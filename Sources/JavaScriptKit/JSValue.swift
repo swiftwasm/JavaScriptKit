@@ -100,6 +100,13 @@ public enum JSValue: Equatable {
     }
 }
 
+/// JSValue is intentionally not `Sendable` because accessing a JSValue living in a different
+/// thread is invalid. Although there are some cases where Swift allows sending a non-Sendable
+/// values to other isolation domains, not conforming `Sendable` is still useful to prevent
+/// accidental misuse.
+@available(*, unavailable)
+extension JSValue: Sendable {}
+
 public extension JSValue {
 #if !hasFeature(Embedded)
     /// An unsafe convenience method of `JSObject.subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
