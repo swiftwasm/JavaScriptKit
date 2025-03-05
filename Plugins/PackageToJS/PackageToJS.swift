@@ -1,4 +1,4 @@
-import Foundation
+@preconcurrency import Foundation // For "stderr"
 import PackagePlugin
 
 @main
@@ -31,7 +31,7 @@ struct PackageToJS: CommandPlugin {
     }
 
     static let friendlyBuildDiagnostics:
-        [(_ build: PackageManager.BuildResult, _ arguments: [String]) -> String?] = [
+        [@Sendable (_ build: PackageManager.BuildResult, _ arguments: [String]) -> String?] = [
             (
                 // In case user misses the `--swift-sdk` option
                 { build, arguments in
