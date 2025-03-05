@@ -9,6 +9,8 @@
 
 #define SWIFT_EXPORT_FROM(LIBRARY) __attribute__((__visibility__("default")))
 
+#define SWIFT_NONISOLATED_UNSAFE __attribute__((swift_attr("nonisolated(unsafe)")))
+
 /// A schedulable unit
 /// Note that this type layout is a part of public ABI, so we expect this field layout won't break in the future versions.
 /// Current implementation refers the `swift-5.5-RELEASE` implementation.
@@ -27,13 +29,13 @@ typedef SWIFT_CC(swift) void (*swift_task_enqueueGlobal_original)(
     Job *_Nonnull job);
 
 SWIFT_EXPORT_FROM(swift_Concurrency)
-extern void *_Nullable swift_task_enqueueGlobal_hook;
+extern void *_Nullable swift_task_enqueueGlobal_hook SWIFT_NONISOLATED_UNSAFE;
 
 /// A hook to take over global enqueuing with delay.
 typedef SWIFT_CC(swift) void (*swift_task_enqueueGlobalWithDelay_original)(
     unsigned long long delay, Job *_Nonnull job);
 SWIFT_EXPORT_FROM(swift_Concurrency)
-extern void *_Nullable swift_task_enqueueGlobalWithDelay_hook;
+extern void *_Nullable swift_task_enqueueGlobalWithDelay_hook SWIFT_NONISOLATED_UNSAFE;
 
 typedef SWIFT_CC(swift) void (*swift_task_enqueueGlobalWithDeadline_original)(
     long long sec,
@@ -42,13 +44,13 @@ typedef SWIFT_CC(swift) void (*swift_task_enqueueGlobalWithDeadline_original)(
     long long tnsec,
     int clock, Job *_Nonnull job);
 SWIFT_EXPORT_FROM(swift_Concurrency)
-extern void *_Nullable swift_task_enqueueGlobalWithDeadline_hook;
+extern void *_Nullable swift_task_enqueueGlobalWithDeadline_hook SWIFT_NONISOLATED_UNSAFE;
 
 /// A hook to take over main executor enqueueing.
 typedef SWIFT_CC(swift) void (*swift_task_enqueueMainExecutor_original)(
     Job *_Nonnull job);
 SWIFT_EXPORT_FROM(swift_Concurrency)
-extern void *_Nullable swift_task_enqueueMainExecutor_hook;
+extern void *_Nullable swift_task_enqueueMainExecutor_hook SWIFT_NONISOLATED_UNSAFE;
 
 /// A hook to override the entrypoint to the main runloop used to drive the
 /// concurrency runtime and drain the main queue. This function must not return.
@@ -59,13 +61,13 @@ typedef SWIFT_CC(swift) void (*swift_task_asyncMainDrainQueue_original)();
 typedef SWIFT_CC(swift) void (*swift_task_asyncMainDrainQueue_override)(
     swift_task_asyncMainDrainQueue_original _Nullable original);
 SWIFT_EXPORT_FROM(swift_Concurrency)
-extern void *_Nullable swift_task_asyncMainDrainQueue_hook;
+extern void *_Nullable swift_task_asyncMainDrainQueue_hook SWIFT_NONISOLATED_UNSAFE;
 
 
 /// MARK: - thread local storage
 
 extern _Thread_local void * _Nullable swjs_thread_local_event_loop;
 
-extern _Thread_local void * _Nullable swjs_thread_local_task_executor_worker;
+extern _Thread_local void * _Nullable swjs_thread_local_task_executor_worker SWIFT_NONISOLATED_UNSAFE;
 
 #endif
