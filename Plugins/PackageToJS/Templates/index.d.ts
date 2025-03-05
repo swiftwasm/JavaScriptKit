@@ -36,7 +36,7 @@ export declare const MODULE_PATH: string;
  * @param imports - The imports to add
  * @param options - The options
  */
-/* export */ function createInstantiator(
+/* export */ declare function createInstantiator(
     imports: Import,
     options: {} | undefined
 ): Promise<Instantiator>
@@ -49,7 +49,7 @@ export declare const MODULE_PATH: string;
  * @param imports - The imports to add
  * @param options - The options
  */
-export function instantiate(
+export declare function instantiate(
     moduleSource: WebAssembly.Module | Response | PromiseLike<Response>,
     imports: Import,
     options: {} | undefined
