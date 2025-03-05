@@ -218,7 +218,7 @@ public extension JSPromise {
                         return JSValue.undefined
                     },
                     failure: {
-                        continuation.resume(throwing: $0)
+                        continuation.resume(throwing: JSException($0))
                         return JSValue.undefined
                     }
                 )
@@ -227,7 +227,7 @@ public extension JSPromise {
     }
 
     /// Wait for the promise to complete, returning its result or exception as a Result.
-    var result: Result<JSValue, JSValue> {
+    var result: Swift.Result<JSValue, JSException> {
         get async {
             await withUnsafeContinuation { [self] continuation in
                 self.then(
@@ -236,7 +236,7 @@ public extension JSPromise {
                         return JSValue.undefined
                     },
                     failure: {
-                        continuation.resume(returning: .failure($0))
+                        continuation.resume(returning: .failure(JSException($0)))
                         return JSValue.undefined
                     }
                 )

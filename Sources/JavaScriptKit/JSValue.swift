@@ -124,8 +124,6 @@ public extension JSValue {
     }
 }
 
-extension JSValue: Swift.Error {}
-
 public extension JSValue {
     func fromJSValue<Type>() -> Type? where Type: ConstructibleFromJSValue {
         return Type.construct(from: self)

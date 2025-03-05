@@ -144,8 +144,8 @@ private func makeAsyncClosure(
                     let result = try await context.body(context.arguments)
                     context.resolver(.success(result))
                 } catch {
-                    if let jsError = error as? JSError {
-                        context.resolver(.failure(jsError.jsValue))
+                    if let jsError = error as? JSException {
+                        context.resolver(.failure(jsError.thrownValue))
                     } else {
                         context.resolver(.failure(JSError(message: String(describing: error)).jsValue))
                     }

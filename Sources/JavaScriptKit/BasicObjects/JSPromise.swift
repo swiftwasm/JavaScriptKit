@@ -31,6 +31,14 @@ public final class JSPromise: JSBridgedClass {
         return Self(jsObject)
     }
 
+    /// The result of a promise.
+    public enum Result {
+        /// The promise resolved with a value.
+        case success(JSValue)
+        /// The promise rejected with a value.
+        case failure(JSValue)
+    }
+
     /// Creates a new `JSPromise` instance from a given `resolver` closure.
     /// The closure is passed a completion handler. Passing a successful
     /// `Result` to the completion handler will cause the promise to resolve
@@ -38,7 +46,7 @@ public final class JSPromise: JSBridgedClass {
     /// promise to reject with the corresponding value.
     /// Calling the completion handler more than once will have no effect
     /// (per the JavaScript specification).
-    public convenience init(resolver: @escaping (@escaping (Result<JSValue, JSValue>) -> Void) -> Void) {
+    public convenience init(resolver: @escaping (@escaping (Result) -> Void) -> Void) {
         let closure = JSOneshotClosure { arguments in
             // The arguments are always coming from the `Promise` constructor, so we should be
             // safe to assume their type here
