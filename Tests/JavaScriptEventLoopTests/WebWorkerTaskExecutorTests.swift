@@ -8,8 +8,8 @@ import _CJavaScriptKit // For swjs_get_worker_thread_id
 func isMainThread() -> Bool
 
 final class WebWorkerTaskExecutorTests: XCTestCase {
-    override func setUp() {
-        WebWorkerTaskExecutor.installGlobalExecutor()
+    override func setUp() async {
+        await WebWorkerTaskExecutor.installGlobalExecutor()
     }
 
     func testTaskRunOnMainThread() async throws {
@@ -152,48 +152,46 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
 
     func testThreadLocalPerThreadValues() async throws {
         struct Check {
-            @ThreadLocal(boxing: ())
-            static var value: Int?
+            static let value = ThreadLocal<Int>(boxing: ())
         }
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
-        XCTAssertNil(Check.value)
-        Check.value = 42
-        XCTAssertEqual(Check.value, 42)
+        XCTAssertNil(Check.value.wrappedValue)
+        Check.value.wrappedValue = 42
+        XCTAssertEqual(Check.value.wrappedValue, 42)
 
         let task = Task(executorPreference: executor) {
-            XCTAssertEqual(Check.value, nil)
-            Check.value = 100
-            XCTAssertEqual(Check.value, 100)
-            return Check.value
+            XCTAssertNil(Check.value.wrappedValue)
+            Check.value.wrappedValue = 100
+            XCTAssertEqual(Check.value.wrappedValue, 100)
+            return Check.value.wrappedValue
         }
         let result = await task.value
         XCTAssertEqual(result, 100)
-        XCTAssertEqual(Check.value, 42)
+        XCTAssertEqual(Check.value.wrappedValue, 42)
         executor.terminate()
     }
 
     func testLazyThreadLocalPerThreadInitialization() async throws {
         struct Check {
-            static var valueToInitialize = 42
-            static var countOfInitialization = 0
-            @LazyThreadLocal(initialize: {
+            nonisolated(unsafe) static var valueToInitialize = 42
+            nonisolated(unsafe) static var countOfInitialization = 0
+            static let value = LazyThreadLocal<Int>(initialize: {
                 countOfInitialization += 1
                 return valueToInitialize
             })
-            static var value: Int
         }
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
         XCTAssertEqual(Check.countOfInitialization, 0)
-        XCTAssertEqual(Check.value, 42)
+        XCTAssertEqual(Check.value.wrappedValue, 42)
         XCTAssertEqual(Check.countOfInitialization, 1)
 
         Check.valueToInitialize = 100
 
         let task = Task(executorPreference: executor) {
             XCTAssertEqual(Check.countOfInitialization, 1)
-            XCTAssertEqual(Check.value, 100)
+            XCTAssertEqual(Check.value.wrappedValue, 100)
             XCTAssertEqual(Check.countOfInitialization, 2)
-            return Check.value
+            return Check.value.wrappedValue
         }
         let result = await task.value
         XCTAssertEqual(result, 100)

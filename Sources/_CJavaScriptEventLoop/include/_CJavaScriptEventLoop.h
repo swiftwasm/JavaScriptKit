@@ -66,7 +66,7 @@ extern void *_Nullable swift_task_asyncMainDrainQueue_hook SWIFT_NONISOLATED_UNS
 
 /// MARK: - thread local storage
 
-extern _Thread_local void * _Nullable swjs_thread_local_event_loop;
+extern _Thread_local void * _Nullable swjs_thread_local_event_loop SWIFT_NONISOLATED_UNSAFE;
 
 extern _Thread_local void * _Nullable swjs_thread_local_task_executor_worker SWIFT_NONISOLATED_UNSAFE;
 

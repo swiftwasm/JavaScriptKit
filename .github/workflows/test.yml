@@ -13,14 +13,17 @@ jobs:
             toolchain:
               download-url: https://download.swift.org/swift-6.0.2-release/ubuntu2204/swift-6.0.2-RELEASE/swift-6.0.2-RELEASE-ubuntu22.04.tar.gz
             wasi-backend: Node
+            target: "wasm32-unknown-wasi"
           - os: ubuntu-22.04
             toolchain:
               download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a/swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a-ubuntu22.04.tar.gz
             wasi-backend: Node
+            target: "wasm32-unknown-wasi"
           - os: ubuntu-22.04
             toolchain:
               download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a/swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a-ubuntu22.04.tar.gz
             wasi-backend: Node
+            target: "wasm32-unknown-wasip1-threads"
 
     runs-on: ${{ matrix.entry.os }}
     env:
@@ -33,6 +36,8 @@ jobs:
           download-url: ${{ matrix.entry.toolchain.download-url }}
       - uses: swiftwasm/setup-swiftwasm@v2
         id: setup-swiftwasm
+        with:
+          target: ${{ matrix.entry.target }}
       - name: Configure Swift SDK
         run: echo "SWIFT_SDK_ID=${{ steps.setup-swiftwasm.outputs.swift-sdk-id }}" >> $GITHUB_ENV
       - run: make bootstrap
