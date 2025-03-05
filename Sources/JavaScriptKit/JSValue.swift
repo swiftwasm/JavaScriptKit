@@ -111,14 +111,14 @@ public extension JSValue {
 #if !hasFeature(Embedded)
     /// An unsafe convenience method of `JSObject.subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
     /// - Precondition: `self` must be a JavaScript Object and specified member should be a callable object.
-    subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue) {
+    subscript(dynamicMember name: StaticString) -> ((ConvertibleToJSValue...) -> JSValue) {
         object![dynamicMember: name]!
     }
 #endif
 
     /// An unsafe convenience method of `JSObject.subscript(_ index: Int) -> JSValue`
     /// - Precondition: `self` must be a JavaScript Object.
-    subscript(dynamicMember name: String) -> JSValue {
+    subscript(dynamicMember name: StaticString) -> JSValue {
         get { self.object![name] }
         set { self.object![name] = newValue }
     }
@@ -198,6 +198,29 @@ extension JSValue: ExpressibleByFloatLiteral {
 extension JSValue: ExpressibleByNilLiteral {
     public init(nilLiteral _: ()) {
         self = .null
+    }
+}
+
+internal func getJSValue(this: JSObject, name: StaticString) -> JSValue {
+    var rawValue = RawJSValue()
+    let rawBitPattern = name.withUTF8Buffer { buffer in
+        swjs_get_prop_with_string_key(
+            this.id, buffer.baseAddress, Int32(buffer.count),
+            &rawValue.payload1, &rawValue.payload2
+        )
+    }
+    rawValue.kind = unsafeBitCast(rawBitPattern, to: JavaScriptValueKind.self)
+    return rawValue.jsValue
+}
+
+internal func setJSValue(this: JSObject, name: StaticString, value: JSValue) {
+    value.withRawJSValue { rawValue in
+        name.withUTF8Buffer { buffer in
+            swjs_set_prop_with_string_key(
+                this.id, buffer.baseAddress, Int32(buffer.count),
+                rawValue.kind, rawValue.payload1, rawValue.payload2
+            )
+        }
     }
 }
 
