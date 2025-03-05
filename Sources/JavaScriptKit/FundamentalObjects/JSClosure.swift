@@ -221,7 +221,7 @@ func _call_host_function_impl(
 extension JSClosure {
     public func release() {
         isReleased = true
-        Self.sharedClosures[hostFuncRef] = nil
+        Self.sharedClosures.wrappedValue[hostFuncRef] = nil
     }
 }
 
