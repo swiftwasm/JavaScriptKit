@@ -104,6 +104,7 @@ struct PackageToJS: CommandPlugin {
         let allTask = constructPackagingPlan(
             make: &make, options: options, context: context, wasmProductArtifact: productArtifact,
             selfPackage: selfPackage, outputDir: outputDir)
+        print("Packaging...")
         try make.build(output: allTask)
         print("Packaging finished")
     }
@@ -215,7 +216,7 @@ struct PackageToJS: CommandPlugin {
             }
             packageInputs.append(copied)
         }
-        return make.addTask(inputTasks: packageInputs, output: "all", attributes: [.phony]) { _ in }
+        return make.addTask(inputTasks: packageInputs, output: "all", attributes: [.phony, .silent]) { _ in }
     }
 }
 

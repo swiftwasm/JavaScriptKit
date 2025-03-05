@@ -6,6 +6,8 @@ struct MiniMake {
     enum TaskAttribute {
         /// Task is phony, meaning it must be built even if its inputs are up to date
         case phony
+        /// Don't print anything when building this task
+        case silent
     }
     /// A task to build
     struct Task {
@@ -84,15 +86,16 @@ struct MiniMake {
         private static var reset: String { "\u{001B}[0m" }
 
         mutating func started(_ task: Task) {
-            self.print(task.displayName, "\(Self.green)building\(Self.reset)")
+            self.print(task, "\(Self.green)building\(Self.reset)")
         }
 
         mutating func skipped(_ task: Task) {
-            self.print(task.displayName, "\(Self.yellow)skipped\(Self.reset)")
+            self.print(task, "\(Self.yellow)skipped\(Self.reset)")
         }
 
-        private mutating func print(_ subjectPath: String, _ message: @autoclosure () -> String) {
-            Swift.print("[\(self.built + 1)/\(self.total)] \(subjectPath): \(message())")
+        private mutating func print(_ task: Task, _ message: @autoclosure () -> String) {
+            guard !task.attributes.contains(.silent) else { return }
+            Swift.print("[\(self.built + 1)/\(self.total)] \(task.displayName): \(message())")
             self.built += 1
         }
     }
@@ -102,7 +105,7 @@ struct MiniMake {
         func visit(task: Task) -> Int {
             guard !visited.contains(task.key) else { return 0 }
             visited.insert(task.key)
-            var total = 1
+            var total = task.attributes.contains(.silent) ? 0 : 1
             for want in task.wants {
                 total += visit(task: self.tasks[want]!)
             }
