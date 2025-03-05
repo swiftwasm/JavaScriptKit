@@ -153,7 +153,7 @@ struct MiniMake {
             guard !task.isDone else { return }
 
             // Build dependencies first
-            for want in task.wants {
+            for want in task.wants.sorted() {
                 try runTask(taskKey: want)
             }
 
