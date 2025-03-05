@@ -48,7 +48,7 @@ func entrypoint() async throws {
             resolve(.failure(.number(3)))
         })
         let error = try await expectAsyncThrow(await p.value)
-        let jsValue = try expectCast(error, to: JSValue.self)
+        let jsValue = try expectCast(error, to: JSException.self).thrownValue
         try expectEqual(jsValue, 3)
         try await expectEqual(p.result, .failure(.number(3)))
     }
@@ -157,7 +157,7 @@ func entrypoint() async throws {
             )
         }
         let promise2 = promise.then { _ in
-            throw JSError(message: "should not succeed")
+            throw MessageError("Should not be called", file: #file, line: #line, column: #column)
         } failure: { err in
             return err
         }

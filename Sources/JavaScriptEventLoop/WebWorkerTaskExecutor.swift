@@ -426,14 +426,15 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
 
     // MARK: Global Executor hack
 
-    private static var _mainThread: pthread_t?
-    private static var _swift_task_enqueueGlobal_hook_original: UnsafeMutableRawPointer?
-    private static var _swift_task_enqueueGlobalWithDelay_hook_original: UnsafeMutableRawPointer?
-    private static var _swift_task_enqueueGlobalWithDeadline_hook_original: UnsafeMutableRawPointer?
+    @MainActor private static var _mainThread: pthread_t?
+    @MainActor private static var _swift_task_enqueueGlobal_hook_original: UnsafeMutableRawPointer?
+    @MainActor private static var _swift_task_enqueueGlobalWithDelay_hook_original: UnsafeMutableRawPointer?
+    @MainActor private static var _swift_task_enqueueGlobalWithDeadline_hook_original: UnsafeMutableRawPointer?
 
     /// Install a global executor that forwards jobs from Web Worker threads to the main thread.
     ///
     /// This function must be called once before using the Web Worker task executor.
+    @MainActor
     public static func installGlobalExecutor() {
         #if canImport(wasi_pthread) && compiler(>=6.1) && _runtime(_multithreaded)
         // Ensure this function is called only once.

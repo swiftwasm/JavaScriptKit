@@ -37,7 +37,7 @@ public class JSThrowingFunction {
     /// - Parameter arguments: Arguments to be passed to this constructor function.
     /// - Returns: A new instance of this constructor.
     public func new(arguments: [ConvertibleToJSValue]) throws -> JSObject {
-        try arguments.withRawJSValues { rawValues -> Result<JSObject, JSValue> in
+        try arguments.withRawJSValues { rawValues -> Result<JSObject, JSException> in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 let argv = bufferPointer.baseAddress
                 let argc = bufferPointer.count
@@ -52,7 +52,7 @@ public class JSThrowingFunction {
                 let exceptionKind = JavaScriptValueKindAndFlags(bitPattern: exceptionRawKind)
                 if exceptionKind.isException {
                     let exception = RawJSValue(kind: exceptionKind.kind, payload1: exceptionPayload1, payload2: exceptionPayload2)
-                    return .failure(exception.jsValue)
+                    return .failure(JSException(exception.jsValue))
                 }
                 return .success(JSObject(id: resultObj))
             }
@@ -92,7 +92,7 @@ private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSV
         }
     }
     if isException {
-        throw result
+        throw JSException(result)
     }
     return result
 }

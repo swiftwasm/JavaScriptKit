@@ -308,9 +308,4 @@ IMPORT_JS_FUNCTION(swjs_terminate_worker_thread, void, (int tid))
 
 IMPORT_JS_FUNCTION(swjs_get_worker_thread_id, int, (void))
 
-/// MARK: - thread local storage
-
-// TODO: Rewrite closure system without global storage
-extern _Thread_local void * _Nullable swjs_thread_local_closures;
-
 #endif /* _CJavaScriptKit_h */

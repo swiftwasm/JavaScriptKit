@@ -15,11 +15,11 @@ jobs:
             wasi-backend: Node
           - os: ubuntu-22.04
             toolchain:
-              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a-ubuntu22.04.tar.gz
+              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a/swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a-ubuntu22.04.tar.gz
             wasi-backend: Node
           - os: ubuntu-22.04
             toolchain:
-              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a-ubuntu22.04.tar.gz
+              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a/swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a-ubuntu22.04.tar.gz
             wasi-backend: Node
 
     runs-on: ${{ matrix.entry.os }}
@@ -52,8 +52,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-14
-            xcode: Xcode_15.2
           - os: macos-15
             xcode: Xcode_16
     runs-on: ${{ matrix.os }}
@@ -71,7 +69,7 @@ jobs:
         entry:
           - os: ubuntu-22.04
             toolchain:
-              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a/swift-DEVELOPMENT-SNAPSHOT-2024-10-30-a-ubuntu22.04.tar.gz
+              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a/swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a-ubuntu22.04.tar.gz
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/install-swift

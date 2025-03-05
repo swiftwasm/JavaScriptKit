@@ -40,17 +40,17 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
     /// A function that queues a given closure as a microtask into JavaScript event loop.
     /// See also: https://developer.mozilla.org/en-US/docs/Web/API/HTML_DOM_API/Microtask_guide
-    public var queueMicrotask: @Sendable (@escaping () -> Void) -> Void
+    public var queueMicrotask: (@escaping () -> Void) -> Void
     /// A function that invokes a given closure after a specified number of milliseconds.
-    public var setTimeout: @Sendable (Double, @escaping () -> Void) -> Void
+    public var setTimeout: (Double, @escaping () -> Void) -> Void
 
     /// A mutable state to manage internal job queue
     /// Note that this should be guarded atomically when supporting multi-threaded environment.
     var queueState = QueueState()
 
     private init(
-        queueTask: @Sendable @escaping (@escaping () -> Void) -> Void,
-        setTimeout: @Sendable @escaping (Double, @escaping () -> Void) -> Void
+        queueTask: @escaping (@escaping () -> Void) -> Void,
+        setTimeout: @escaping (Double, @escaping () -> Void) -> Void
     ) {
         self.queueMicrotask = queueTask
         self.setTimeout = setTimeout
@@ -102,7 +102,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
         return eventLoop
     }
 
-    private static var didInstallGlobalExecutor = false
+    @MainActor private static var didInstallGlobalExecutor = false
 
     /// Set JavaScript event loop based executor to be the global executor
     /// Note that this should be called before any of the jobs are created.
@@ -110,6 +110,12 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     /// introduced officially. See also [a draft proposal for custom 
     /// executors](https://github.com/rjmccall/swift-evolution/blob/custom-executors/proposals/0000-custom-executors.md#the-default-global-concurrent-executor)
     public static func installGlobalExecutor() {
+        MainActor.assumeIsolated {
+            Self.installGlobalExecutorIsolated()
+        }
+    }
+
+    @MainActor private static func installGlobalExecutorIsolated() {
         guard !didInstallGlobalExecutor else { return }
 
         #if compiler(>=5.9)
@@ -218,7 +224,7 @@ public extension JSPromise {
                         return JSValue.undefined
                     },
                     failure: {
-                        continuation.resume(throwing: $0)
+                        continuation.resume(throwing: JSException($0))
                         return JSValue.undefined
                     }
                 )
@@ -227,7 +233,7 @@ public extension JSPromise {
     }
 
     /// Wait for the promise to complete, returning its result or exception as a Result.
-    var result: Result<JSValue, JSValue> {
+    var result: JSPromise.Result {
         get async {
             await withUnsafeContinuation { [self] continuation in
                 self.then(

@@ -263,8 +263,8 @@ try test("Closure Lifetime") {
         let c1Line = #line + 1
         let c1 = JSClosure { $0[0] }
         c1.release()
-        let error = try expectThrow(try evalClosure.throws(c1, JSValue.number(42.0))) as! JSValue
-        try expect("Error message should contains definition location", error.description.hasSuffix("PrimaryTests/main.swift:\(c1Line)"))
+        let error = try expectThrow(try evalClosure.throws(c1, JSValue.number(42.0))) as! JSException
+        try expect("Error message should contains definition location", error.thrownValue.description.hasSuffix("PrimaryTests/main.swift:\(c1Line)"))
     }
 #endif
 
@@ -275,8 +275,8 @@ try test("Closure Lifetime") {
 
     do {
         let c1 = JSClosure { _ in fatalError("Crash while closure evaluation") }
-        let error = try expectThrow(try evalClosure.throws(c1)) as! JSValue
-        try expectEqual(error.description, "RuntimeError: unreachable")
+        let error = try expectThrow(try evalClosure.throws(c1)) as! JSException
+        try expectEqual(error.thrownValue.description, "RuntimeError: unreachable")
     }
 }
 
@@ -770,32 +770,32 @@ try test("Exception") {
 
     // MARK: Throwing method calls
     let error1 = try expectThrow(try prop_9.object!.throwing.func1!())
-    try expectEqual(error1 is JSValue, true)
-    let errorObject = JSError(from: error1 as! JSValue)
+    try expectEqual(error1 is JSException, true)
+    let errorObject = JSError(from: (error1 as! JSException).thrownValue)
     try expectNotNil(errorObject)
 
     let error2 = try expectThrow(try prop_9.object!.throwing.func2!())
-    try expectEqual(error2 is JSValue, true)
-    let errorString = try expectString(error2 as! JSValue)
+    try expectEqual(error2 is JSException, true)
+    let errorString = try expectString((error2 as! JSException).thrownValue)
     try expectEqual(errorString, "String Error")
 
     let error3 = try expectThrow(try prop_9.object!.throwing.func3!())
-    try expectEqual(error3 is JSValue, true)
-    let errorNumber = try expectNumber(error3 as! JSValue)
+    try expectEqual(error3 is JSException, true)
+    let errorNumber = try expectNumber((error3 as! JSException).thrownValue)
     try expectEqual(errorNumber, 3.0)
 
     // MARK: Simple function calls
     let error4 = try expectThrow(try prop_9.func1.function!.throws())
-    try expectEqual(error4 is JSValue, true)
-    let errorObject2 = JSError(from: error4 as! JSValue)
+    try expectEqual(error4 is JSException, true)
+    let errorObject2 = JSError(from: (error4 as! JSException).thrownValue)
     try expectNotNil(errorObject2)
 
     // MARK: Throwing constructor call
     let Animal = JSObject.global.Animal.function!
     _ = try Animal.throws.new("Tama", 3, true)
     let ageError = try expectThrow(try Animal.throws.new("Tama", -3, true))
-    try expectEqual(ageError is JSValue, true)
-    let errorObject3 = JSError(from: ageError as! JSValue)
+    try expectEqual(ageError is JSException, true)
+    let errorObject3 = JSError(from: (ageError as! JSException).thrownValue)
     try expectNotNil(errorObject3)
 }
 
@@ -824,18 +824,15 @@ try test("Unhandled Exception") {
 
     // MARK: Throwing method calls
     let error1 = try wrapUnsafeThrowableFunction { _ = prop_9.object!.func1!() }
-    try expectEqual(error1 is JSValue, true)
-    let errorObject = JSError(from: error1 as! JSValue)
+    let errorObject = JSError(from: error1)
     try expectNotNil(errorObject)
 
     let error2 = try wrapUnsafeThrowableFunction { _ = prop_9.object!.func2!() }
-    try expectEqual(error2 is JSValue, true)
-    let errorString = try expectString(error2 as! JSValue)
+    let errorString = try expectString(error2)
     try expectEqual(errorString, "String Error")
 
     let error3 = try wrapUnsafeThrowableFunction { _ = prop_9.object!.func3!() }
-    try expectEqual(error3 is JSValue, true)
-    let errorNumber = try expectNumber(error3 as! JSValue)
+    let errorNumber = try expectNumber(error3)
     try expectEqual(errorNumber, 3.0)
 }
 

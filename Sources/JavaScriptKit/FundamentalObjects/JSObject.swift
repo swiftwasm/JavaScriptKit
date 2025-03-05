@@ -24,9 +24,8 @@ import _CJavaScriptKit
 /// reference counting system.
 @dynamicMemberLookup
 public class JSObject: Equatable {
-    internal static var constructor: JSFunction { _constructor }
-    @LazyThreadLocal(initialize: { JSObject.global.Object.function! })
-    internal static var _constructor: JSFunction
+    internal static var constructor: JSFunction { _constructor.wrappedValue }
+    private static let _constructor = LazyThreadLocal(initialize: { JSObject.global.Object.function! })
 
     @_spi(JSObject_id)
     public var id: JavaScriptObjectRef
@@ -206,12 +205,10 @@ public class JSObject: Equatable {
 
     /// A `JSObject` of the global scope object.
     /// This allows access to the global properties and global names by accessing the `JSObject` returned.
-    public static var global: JSObject { return _global }
-
-    @LazyThreadLocal(initialize: {
-        return JSObject(id: _JS_Predef_Value_Global)
+    public static var global: JSObject { return _global.wrappedValue }
+    private static let _global = LazyThreadLocal(initialize: {
+        JSObject(id: _JS_Predef_Value_Global)
     })
-    private static var _global: JSObject
 
     deinit {
         assertOnOwnerThread(hint: "deinitializing")

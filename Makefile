@@ -21,11 +21,18 @@ test:
 	    CONFIGURATION=release SWIFT_BUILD_FLAGS="$(SWIFT_BUILD_FLAGS)" $(MAKE) test && \
 	    CONFIGURATION=release SWIFT_BUILD_FLAGS="$(SWIFT_BUILD_FLAGS) -Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS" $(MAKE) test
 
+TEST_RUNNER := node --experimental-wasi-unstable-preview1 scripts/test-harness.mjs
 .PHONY: unittest
 unittest:
 	@echo Running unit tests
 	swift build --build-tests -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor -Xlinker --export-if-defined=main -Xlinker --export-if-defined=__main_argc_argv --static-swift-stdlib -Xswiftc -static-stdlib $(SWIFT_BUILD_FLAGS)
-	node --experimental-wasi-unstable-preview1 scripts/test-harness.mjs ./.build/debug/JavaScriptKitPackageTests.wasm
+# Swift 6.1 and later uses .xctest for XCTest bundle but earliers used .wasm
+# See https://github.com/swiftlang/swift-package-manager/pull/8254
+	if [ -f .build/debug/JavaScriptKitPackageTests.xctest ]; then \
+		$(TEST_RUNNER) .build/debug/JavaScriptKitPackageTests.xctest; \
+	else \
+		$(TEST_RUNNER) .build/debug/JavaScriptKitPackageTests.wasm; \
+	fi
 
 .PHONY: benchmark_setup
 benchmark_setup:

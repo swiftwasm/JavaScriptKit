@@ -143,19 +143,17 @@ func valueForBitWidth<T>(typeName: String, bitWidth: Int, when32: T) -> T {
 }
 
 extension Int: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { _typedArrayClass }
-    @LazyThreadLocal(initialize: {
+    public static var typedArrayClass: JSFunction { _typedArrayClass.wrappedValue }
+    private static let _typedArrayClass = LazyThreadLocal(initialize: {
         valueForBitWidth(typeName: "Int", bitWidth: Int.bitWidth, when32: JSObject.global.Int32Array).function!
     })
-    private static var _typedArrayClass: JSFunction
 }
 
 extension UInt: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { _typedArrayClass }
-    @LazyThreadLocal(initialize: {
+    public static var typedArrayClass: JSFunction { _typedArrayClass.wrappedValue }
+    private static let _typedArrayClass = LazyThreadLocal(initialize: {
         valueForBitWidth(typeName: "UInt", bitWidth: Int.bitWidth, when32: JSObject.global.Uint32Array).function!
     })
-    private static var _typedArrayClass: JSFunction
 }
 
 extension Int8: TypedArrayElement {
