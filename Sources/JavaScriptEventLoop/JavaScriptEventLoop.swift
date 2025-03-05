@@ -109,7 +109,13 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     /// This installation step will be unnecessary after custom executor are
     /// introduced officially. See also [a draft proposal for custom 
     /// executors](https://github.com/rjmccall/swift-evolution/blob/custom-executors/proposals/0000-custom-executors.md#the-default-global-concurrent-executor)
-    @MainActor public static func installGlobalExecutor() {
+    public static func installGlobalExecutor() {
+        MainActor.assumeIsolated {
+            Self.installGlobalExecutorIsolated()
+        }
+    }
+
+    @MainActor private static func installGlobalExecutorIsolated() {
         guard !didInstallGlobalExecutor else { return }
 
         #if compiler(>=5.9)
