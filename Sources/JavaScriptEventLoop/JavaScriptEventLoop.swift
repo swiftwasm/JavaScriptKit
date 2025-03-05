@@ -40,17 +40,17 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
 
     /// A function that queues a given closure as a microtask into JavaScript event loop.
     /// See also: https://developer.mozilla.org/en-US/docs/Web/API/HTML_DOM_API/Microtask_guide
-    public var queueMicrotask: @Sendable (@escaping () -> Void) -> Void
+    public var queueMicrotask: (@escaping () -> Void) -> Void
     /// A function that invokes a given closure after a specified number of milliseconds.
-    public var setTimeout: @Sendable (Double, @escaping () -> Void) -> Void
+    public var setTimeout: (Double, @escaping () -> Void) -> Void
 
     /// A mutable state to manage internal job queue
     /// Note that this should be guarded atomically when supporting multi-threaded environment.
     var queueState = QueueState()
 
     private init(
-        queueTask: @Sendable @escaping (@escaping () -> Void) -> Void,
-        setTimeout: @Sendable @escaping (Double, @escaping () -> Void) -> Void
+        queueTask: @escaping (@escaping () -> Void) -> Void,
+        setTimeout: @escaping (Double, @escaping () -> Void) -> Void
     ) {
         self.queueMicrotask = queueTask
         self.setTimeout = setTimeout
