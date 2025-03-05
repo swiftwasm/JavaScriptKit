@@ -3,34 +3,48 @@ import Foundation
 /// A simple build system
 struct MiniMake {
     /// Attributes of a task
-    enum TaskAttribute {
+    enum TaskAttribute: String, Codable {
         /// Task is phony, meaning it must be built even if its inputs are up to date
         case phony
         /// Don't print anything when building this task
         case silent
     }
-    /// A task to build
-    struct Task {
-        /// Key of the task
-        let key: TaskKey
-        /// Display name of the task
-        let displayName: String
+
+    /// Information about a task enough to capture build
+    /// graph changes
+    struct TaskInfo: Codable {
         /// Input tasks not yet built
-        var wants: Set<TaskKey>
+        let wants: [TaskKey]
         /// Set of files that must be built before this task
         let inputs: [String]
         /// Output task name
         let output: String
         /// Attributes of the task
+        let attributes: [TaskAttribute]
+    }
+
+    /// A task to build
+    struct Task {
+        let info: TaskInfo
+        /// Input tasks not yet built
+        let wants: Set<TaskKey>
+        /// Attributes of the task
         let attributes: Set<TaskAttribute>
+        /// Display name of the task
+        let displayName: String
+        /// Key of the task
+        let key: TaskKey
         /// Build operation
         let build: (Task) throws -> Void
         /// Whether the task is done
         var isDone: Bool
+
+        var inputs: [String] { self.info.inputs }
+        var output: String { self.info.output }
     }
 
     /// A task key
-    struct TaskKey: Hashable, Comparable, CustomStringConvertible {
+    struct TaskKey: Codable, Hashable, Comparable, CustomStringConvertible {
         let id: String
         var description: String { self.id }
 
@@ -41,7 +55,9 @@ struct MiniMake {
         static func < (lhs: TaskKey, rhs: TaskKey) -> Bool { lhs.id < rhs.id }
     }
 
+    /// All tasks in the build system
     private var tasks: [TaskKey: Task]
+    /// Whether to explain why tasks are built
     private var shouldExplain: Bool
     /// Current working directory at the time the build started
     private let buildCwd: String
@@ -52,11 +68,24 @@ struct MiniMake {
         self.buildCwd = FileManager.default.currentDirectoryPath
     }
 
-    mutating func addTask(inputFiles: [String] = [], inputTasks: [TaskKey] = [], output: String, attributes: Set<TaskAttribute> = [], build: @escaping (Task) throws -> Void) -> TaskKey {
+    /// Adds a task to the build system
+    mutating func addTask(inputFiles: [String] = [], inputTasks: [TaskKey] = [], output: String, attributes: [TaskAttribute] = [], build: @escaping (Task) throws -> Void) -> TaskKey {
         let displayName = output.hasPrefix(self.buildCwd) ? String(output.dropFirst(self.buildCwd.count + 1)) : output
         let taskKey = TaskKey(id: output)
-        self.tasks[taskKey] = Task(key: taskKey, displayName: displayName, wants: Set(inputTasks), inputs: inputFiles, output: output, attributes: attributes, build: build, isDone: false)
+        let info = TaskInfo(wants: inputTasks, inputs: inputFiles, output: output, attributes: attributes)
+        self.tasks[taskKey] = Task(info: info, wants: Set(inputTasks), attributes: Set(attributes), displayName: displayName, key: taskKey, build: build, isDone: false)
         return taskKey
+    }
+
+    /// Computes a stable fingerprint of the build graph
+    ///
+    /// This fingerprint must be stable across builds and must change
+    /// if the build graph changes in any way.
+    func computeFingerprint(root: TaskKey) throws -> Data {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        let tasks = self.tasks.sorted { $0.key < $1.key }.map { $0.value.info }
+        return try encoder.encode(tasks)
     }
 
     private func explain(_ message: @autoclosure () -> String) {
@@ -100,7 +129,8 @@ struct MiniMake {
         }
     }
 
-    private func computeTotalTasks(task: Task) -> Int {
+    /// Computes the total number of tasks to build used for progress display
+    private func computeTotalTasksForDisplay(task: Task) -> Int {
         var visited = Set<TaskKey>()
         func visit(task: Task) -> Int {
             guard !visited.contains(task.key) else { return 0 }
@@ -114,6 +144,14 @@ struct MiniMake {
         return visit(task: task)
     }
 
+    /// Cleans all outputs of all tasks
+    func cleanEverything() {
+        for task in self.tasks.values {
+            try? FileManager.default.removeItem(atPath: task.output)
+        }
+    }
+
+    /// Starts building
     mutating func build(output: TaskKey) throws {
         /// Returns true if any of the task's inputs have a modification date later than the task's output
         func shouldBuild(task: Task) -> Bool {
@@ -143,7 +181,7 @@ struct MiniMake {
                 return shouldBuild
             }
         }
-        var progressPrinter = ProgressPrinter(total: self.computeTotalTasks(task: self.tasks[output]!))
+        var progressPrinter = ProgressPrinter(total: self.computeTotalTasksForDisplay(task: self.tasks[output]!))
 
         func runTask(taskKey: TaskKey) throws {
             guard var task = self.tasks[taskKey] else {

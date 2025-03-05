@@ -1,4 +1,4 @@
-@preconcurrency import Foundation // For "stderr"
+@preconcurrency import Foundation  // For "stderr"
 import PackagePlugin
 
 @main
@@ -104,6 +104,7 @@ struct PackageToJS: CommandPlugin {
         let allTask = constructPackagingPlan(
             make: &make, options: options, context: context, wasmProductArtifact: productArtifact,
             selfPackage: selfPackage, outputDir: outputDir)
+        cleanIfBuildGraphChanged(root: allTask, make: make, context: context)
         print("Packaging...")
         try make.build(output: allTask)
         print("Packaging finished")
@@ -145,7 +146,11 @@ struct PackageToJS: CommandPlugin {
     ) -> MiniMake.TaskKey {
         let selfPackageURL = selfPackage.directory
         let selfPath = String(#filePath)
-        let outputDirTask = make.addTask(inputFiles: [selfPath], output: outputDir.string) {
+
+        // Prepare output directory
+        let outputDirTask = make.addTask(
+            inputFiles: [selfPath], output: outputDir.string, attributes: [.silent]
+        ) {
             guard !FileManager.default.fileExists(atPath: $0.output) else { return }
             try FileManager.default.createDirectory(
                 atPath: $0.output, withIntermediateDirectories: true, attributes: nil)
@@ -160,23 +165,21 @@ struct PackageToJS: CommandPlugin {
             try FileManager.default.copyItem(atPath: from, toPath: to)
         }
 
+        // Copy the wasm product artifact
         let wasmFilename = "main.wasm"
         let wasm = make.addTask(
             inputFiles: [selfPath, wasmProductArtifact.path.string], inputTasks: [outputDirTask],
-            output: outputDir.appending(subpath: wasmFilename).string,
-            // FIXME: This is a hack to ensure that the wasm file is always copied
-            // even when release/debug configuration is changed.
-            attributes: [.phony]
+            output: outputDir.appending(subpath: wasmFilename).string
         ) {
             try syncFile(from: wasmProductArtifact.path.string, to: $0.output)
         }
         packageInputs.append(wasm)
 
+        // Write package.json
         let packageJSON = make.addTask(
             inputFiles: [selfPath], inputTasks: [outputDirTask],
             output: outputDir.appending(subpath: "package.json").string
         ) {
-            // Write package.json
             let packageJSON = """
                 {
                     "name": "\(options.packageName ?? context.package.id.lowercased())",
@@ -195,6 +198,7 @@ struct PackageToJS: CommandPlugin {
         }
         packageInputs.append(packageJSON)
 
+        // Copy the template files
         let substitutions = [
             "@PACKAGE_TO_JS_MODULE_PATH@": wasmFilename
         ]
@@ -216,7 +220,28 @@ struct PackageToJS: CommandPlugin {
             }
             packageInputs.append(copied)
         }
-        return make.addTask(inputTasks: packageInputs, output: "all", attributes: [.phony, .silent]) { _ in }
+        return make.addTask(
+            inputTasks: packageInputs, output: "all", attributes: [.phony, .silent]
+        ) { _ in }
+    }
+
+    /// Clean if the build graph of the packaging process has changed
+    ///
+    /// This is especially important to detect user changes debug/release
+    /// configurations, which leads to placing the .wasm file in a different
+    /// path.
+    private func cleanIfBuildGraphChanged(
+        root: MiniMake.TaskKey,
+        make: MiniMake, context: PluginContext
+    ) {
+        let buildFingerprint = context.pluginWorkDirectoryURL.appending(path: "minimake.json")
+        let lastBuildFingerprint = try? Data(contentsOf: buildFingerprint)
+        let currentBuildFingerprint = try? make.computeFingerprint(root: root)
+        if lastBuildFingerprint != currentBuildFingerprint {
+            print("Build graph changed, cleaning...")
+            make.cleanEverything()
+        }
+        try? currentBuildFingerprint?.write(to: buildFingerprint)
     }
 }
 
