@@ -32,7 +32,7 @@ public final class JSPromise: JSBridgedClass {
     }
 
     /// The result of a promise.
-    public enum Result {
+    public enum Result: Equatable {
         /// The promise resolved with a value.
         case success(JSValue)
         /// The promise rejected with a value.

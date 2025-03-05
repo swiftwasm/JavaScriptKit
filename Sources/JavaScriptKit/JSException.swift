@@ -12,7 +12,7 @@
 ///     let jsErrorValue = error.thrownValue
 /// }
 /// ```
-public struct JSException: Error {
+public struct JSException: Error, Equatable {
     /// The value thrown from JavaScript.
     /// This can be any JavaScript value (error object, string, number, etc.).
     public var thrownValue: JSValue {
