@@ -69,11 +69,19 @@ struct MiniMake {
     }
 
     /// Adds a task to the build system
-    mutating func addTask(inputFiles: [String] = [], inputTasks: [TaskKey] = [], output: String, attributes: [TaskAttribute] = [], build: @escaping (Task) throws -> Void) -> TaskKey {
-        let displayName = output.hasPrefix(self.buildCwd) ? String(output.dropFirst(self.buildCwd.count + 1)) : output
+    mutating func addTask(
+        inputFiles: [String] = [], inputTasks: [TaskKey] = [], output: String,
+        attributes: [TaskAttribute] = [], build: @escaping (Task) throws -> Void
+    ) -> TaskKey {
+        let displayName =
+            output.hasPrefix(self.buildCwd)
+            ? String(output.dropFirst(self.buildCwd.count + 1)) : output
         let taskKey = TaskKey(id: output)
-        let info = TaskInfo(wants: inputTasks, inputs: inputFiles, output: output, attributes: attributes)
-        self.tasks[taskKey] = Task(info: info, wants: Set(inputTasks), attributes: Set(attributes), displayName: displayName, key: taskKey, build: build, isDone: false)
+        let info = TaskInfo(
+            wants: inputTasks, inputs: inputFiles, output: output, attributes: attributes)
+        self.tasks[taskKey] = Task(
+            info: info, wants: Set(inputTasks), attributes: Set(attributes),
+            displayName: displayName, key: taskKey, build: build, isDone: false)
         return taskKey
     }
 
@@ -163,25 +171,32 @@ struct MiniMake {
                 explain("Task \(task.output) should be built because it doesn't exist")
                 return true
             }
-            let outputMtime = try? outputURL.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
+            let outputMtime = try? outputURL.resourceValues(forKeys: [.contentModificationDateKey])
+                .contentModificationDate
             return task.inputs.contains { input in
                 let inputURL = URL(fileURLWithPath: input)
                 // Ignore directory modification times
                 var isDirectory: ObjCBool = false
-                let fileExists = FileManager.default.fileExists(atPath: input, isDirectory: &isDirectory)
+                let fileExists = FileManager.default.fileExists(
+                    atPath: input, isDirectory: &isDirectory)
                 if fileExists && isDirectory.boolValue {
                     return false
                 }
 
-                let inputMtime = try? inputURL.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
-                let shouldBuild = outputMtime == nil || inputMtime == nil || outputMtime! < inputMtime!
+                let inputMtime = try? inputURL.resourceValues(forKeys: [.contentModificationDateKey]
+                ).contentModificationDate
+                let shouldBuild =
+                    outputMtime == nil || inputMtime == nil || outputMtime! < inputMtime!
                 if shouldBuild {
-                    explain("Task \(task.output) should be re-built because \(input) is newer: \(outputMtime?.timeIntervalSince1970 ?? 0) < \(inputMtime?.timeIntervalSince1970 ?? 0)")
+                    explain(
+                        "Task \(task.output) should be re-built because \(input) is newer: \(outputMtime?.timeIntervalSince1970 ?? 0) < \(inputMtime?.timeIntervalSince1970 ?? 0)"
+                    )
                 }
                 return shouldBuild
             }
         }
-        var progressPrinter = ProgressPrinter(total: self.computeTotalTasksForDisplay(task: self.tasks[output]!))
+        var progressPrinter = ProgressPrinter(
+            total: self.computeTotalTasksForDisplay(task: self.tasks[output]!))
 
         func runTask(taskKey: TaskKey) throws {
             guard var task = self.tasks[taskKey] else {

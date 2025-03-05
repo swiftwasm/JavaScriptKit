@@ -194,10 +194,10 @@ struct PackageToJS: CommandPlugin {
         // Copy the wasm product artifact
         let wasmFilename = "main.wasm"
         let wasm = make.addTask(
-            inputFiles: [selfPath, wasmProductArtifact.path.string], inputTasks: [outputDirTask],
+            inputFiles: [selfPath, wasmProductArtifact.url.path], inputTasks: [outputDirTask],
             output: outputDir.appending(path: wasmFilename).path
         ) {
-            try syncFile(from: wasmProductArtifact.path.string, to: $0.output)
+            try syncFile(from: wasmProductArtifact.url.path, to: $0.output)
         }
         packageInputs.append(wasm)
 
@@ -238,7 +238,7 @@ struct PackageToJS: CommandPlugin {
                 inputFiles: [selfPath, inputPath.path], inputTasks: [outputDirTask],
                 output: outputDir.appending(path: output).path
             ) {
-                var content = try String(contentsOf: inputPath)
+                var content = try String(contentsOf: inputPath, encoding: .utf8)
                 for (key, value) in substitutions {
                     content = content.replacingOccurrences(of: key, with: value)
                 }
@@ -295,7 +295,7 @@ extension PackageManager.BuildResult {
         -> PackageManager.BuildResult.BuiltArtifact
     {
         let executables = self.builtArtifacts.filter {
-            $0.kind == .executable && $0.path.lastComponent == "\(product).wasm"
+            ($0.kind == .executable) && ($0.url.lastPathComponent == "\(product).wasm")
         }
         guard !executables.isEmpty else {
             throw PackageToJSError(
@@ -304,7 +304,7 @@ extension PackageManager.BuildResult {
         }
         guard executables.count == 1, let executable = executables.first else {
             throw PackageToJSError(
-                "Failed to disambiguate executable product artifacts from \(executables.map(\.path.string).joined(separator: ", "))"
+                "Failed to disambiguate executable product artifacts from \(executables.map(\.url.path).joined(separator: ", "))"
             )
         }
         return executable
