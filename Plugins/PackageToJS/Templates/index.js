@@ -48,10 +48,20 @@ export async function instantiate(
     if (moduleSource instanceof WebAssembly.Module) {
         module = moduleSource;
         instance = await WebAssembly.instantiate(module, importObject);
+    } else if (typeof Response === "function" && (moduleSource instanceof Response || moduleSource instanceof Promise)) {
+        if (typeof WebAssembly.instantiateStreaming === "function") {
+            const result = await WebAssembly.instantiateStreaming(moduleSource, importObject);
+            module = result.module;
+            instance = result.instance;
+        } else {
+            const moduleBytes = await (await moduleSource).arrayBuffer();
+            module = await WebAssembly.compile(moduleBytes);
+            instance = await WebAssembly.instantiate(module, importObject);
+        }
     } else {
-        const result = await WebAssembly.instantiateStreaming(moduleSource, importObject);
-        module = result.module;
-        instance = result.instance;
+        // @ts-expect-error: Type 'Response' is not assignable to type 'BufferSource'
+        module = await WebAssembly.compile(moduleSource);
+        instance = await WebAssembly.instantiate(module, importObject);
     }
 
     swift.setInstance(instance);

@@ -50,7 +50,7 @@ export declare const MODULE_PATH: string;
  * @param options - The options
  */
 export declare function instantiate(
-    moduleSource: WebAssembly.Module | Response | PromiseLike<Response>,
+    moduleSource: WebAssembly.Module | ArrayBufferView | ArrayBuffer | Response | PromiseLike<Response>,
     imports: Import,
     options: {} | undefined
 ): Promise<{
