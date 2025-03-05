@@ -194,7 +194,7 @@ private func makeAsyncClosure(
 @_cdecl("_call_host_function_impl")
 func _call_host_function_impl(
     _ hostFuncRef: JavaScriptHostFuncRef,
-    _ argv: sending UnsafePointer<RawJSValue>, _ argc: Int32,
+    _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
 ) -> Bool {
     guard let (_, hostFunc) = JSClosure.sharedClosures.wrappedValue[hostFuncRef] else {
