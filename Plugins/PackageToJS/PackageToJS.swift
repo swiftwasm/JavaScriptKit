@@ -40,7 +40,7 @@ struct PackageToJS: CommandPlugin {
 
                 OPTIONS:
                   --product <product>   Product to build (default: executable target if there's only one)
-                  --output <path>  Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
+                  --output <path>       Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
                   --package-name <name> Name of the package (default: lowercased Package.swift name)
                   --explain             Whether to explain the build plan
 
@@ -75,7 +75,10 @@ struct PackageToJS: CommandPlugin {
             let testLibrary = extractor.extractOption(named: "test-library").last
             let filter = extractor.extractOption(named: "filter")
             let options = Options.parse(from: &extractor)
-            return TestOptions(buildOnly: buildOnly != 0, listTests: listTests != 0, testLibrary: testLibrary, filter: filter, options: options)
+            return TestOptions(
+                buildOnly: buildOnly != 0, listTests: listTests != 0, testLibrary: testLibrary,
+                filter: filter, options: options
+            )
         }
 
         static func help() -> String {
@@ -83,7 +86,7 @@ struct PackageToJS: CommandPlugin {
                 OVERVIEW: Builds and runs tests
 
                 USAGE: swift package --swift-sdk <swift-sdk> [SwiftPM options] PackageToJS test [options]
-                
+
                 OPTIONS:
                   --build-only          Whether to build only (default: false)
 
@@ -91,6 +94,7 @@ struct PackageToJS: CommandPlugin {
                   $ swift package --swift-sdk wasm32-unknown-wasi plugin js test
                   # Just build tests, don't run them
                   $ swift package --swift-sdk wasm32-unknown-wasi plugin js test --build-only
+                  $ node .build/plugins/PackageToJS/outputs/PackageTests/bin/test.js
                 """
         }
     }
@@ -174,7 +178,8 @@ struct PackageToJS: CommandPlugin {
 
         // Build products
         let productName = try buildOptions.product ?? deriveDefaultProduct(package: context.package)
-        let build = try buildWasm(productName: productName, context: context)
+        let build = try buildWasm(
+            productName: productName, context: context, options: buildOptions.options)
         guard build.succeeded else {
             Self.reportBuildFailure(build, arguments)
             exit(1)
@@ -214,13 +219,15 @@ struct PackageToJS: CommandPlugin {
         let testOptions = TestOptions.parse(from: &extractor)
 
         if extractor.remainingArguments.count > 0 {
-            printStderr("Unexpected arguments: \(extractor.remainingArguments.joined(separator: " "))")
+            printStderr(
+                "Unexpected arguments: \(extractor.remainingArguments.joined(separator: " "))")
             printStderr(TestOptions.help())
             exit(1)
         }
 
         let productName = "\(context.package.displayName)PackageTests"
-        let build = try buildWasm(productName: productName, context: context)
+        let build = try buildWasm(
+            productName: productName, context: context, options: testOptions.options)
         guard build.succeeded else {
             Self.reportBuildFailure(build, arguments)
             exit(1)
@@ -274,9 +281,15 @@ struct PackageToJS: CommandPlugin {
             if testOptions.listTests {
                 extraArguments += ["--list-tests"]
             }
-            try runTest(testRunner: testRunner, context: context, extraArguments: extraArguments + testOptions.filter)
-            try runTest(testRunner: testRunner, context: context,
-                extraArguments: ["--testing-library", "swift-testing"] + extraArguments + testOptions.filter.flatMap { ["--filter", $0] })
+            try runTest(
+                testRunner: testRunner, context: context,
+                extraArguments: extraArguments + testOptions.filter
+            )
+            try runTest(
+                testRunner: testRunner, context: context,
+                extraArguments: ["--testing-library", "swift-testing"] + extraArguments
+                    + testOptions.filter.flatMap { ["--filter", $0] }
+            )
         }
     }
 
@@ -292,12 +305,13 @@ struct PackageToJS: CommandPlugin {
         task.currentDirectoryURL = context.pluginWorkDirectoryURL
         try task.run()
         task.waitUntilExit()
-        guard task.terminationStatus == 0 else {
+        // swift-testing returns EX_UNAVAILABLE (which is 69 in wasi-libc) for "no tests found"
+        guard task.terminationStatus == 0 || task.terminationStatus == 69 else {
             throw PackageToJSError("Test failed with status \(task.terminationStatus)")
         }
     }
 
-    private func buildWasm(productName: String, context: PluginContext) throws
+    private func buildWasm(productName: String, context: PluginContext, options: Options) throws
         -> PackageManager.BuildResult
     {
         var parameters = PackageManager.BuildParameters(
@@ -385,12 +399,7 @@ private func findPackageInDependencies(package: Package, id: Package.ID) -> Pack
     func visit(package: Package) -> Package? {
         if visited.contains(package.id) { return nil }
         visited.insert(package.id)
-        for dependency in package.dependencies {
-            let dependencyPackage = dependency.package
-            if dependencyPackage.id == id {
-                return dependencyPackage
-            }
-        }
+        if package.id == id { return package }
         for dependency in package.dependencies {
             if let found = visit(package: dependency.package) {
                 return found
