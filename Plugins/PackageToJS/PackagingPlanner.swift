@@ -3,11 +3,19 @@ import PackagePlugin
 
 /// Plans the build for packaging.
 struct PackagingPlanner {
+    /// The options of the plugin
     let options: PackageToJS.Options
+    /// The context of the plugin
     let context: PluginContext
+    /// The package that contains this plugin
     let selfPackage: Package
+    /// The path of this file itself, used to capture changes of planner code
     let selfPath: String
+    /// The directory for the final output
     let outputDir: URL
+    /// The directory for intermediate files
+    let intermediatesDir: URL
+    /// The filename of the .wasm file
     let wasmFilename = "main.wasm"
 
     init(
@@ -18,6 +26,7 @@ struct PackagingPlanner {
         self.context = context
         self.selfPackage = selfPackage
         self.outputDir = outputDir
+        self.intermediatesDir = context.pluginWorkDirectoryURL.appending(path: outputDir.lastPathComponent + ".tmp")
         self.selfPath = String(#filePath)
     }
 
@@ -98,19 +107,18 @@ struct PackagingPlanner {
 
         if let wasmOptPath = wasmOptPath, shouldOptimize {
             // Optimize the wasm in release mode
-            let tmpDir = outputDir.deletingLastPathComponent().appending(path: "\(outputDir.lastPathComponent).tmp")
-            let tmpDirTask = make.addTask(
-                inputFiles: [selfPath], output: tmpDir.path, attributes: [.silent]
+            let intermediatesDirTask = make.addTask(
+                inputFiles: [selfPath], output: intermediatesDir.path, attributes: [.silent]
             ) {
                 try Self.createDirectory(atPath: $0.output)
             }
             // If splitDebug is true, we need to place the DWARF-stripped wasm file (but "name" section remains)
             // in the output directory.
-            let stripWasmPath = (splitDebug ? outputDir : tmpDir).appending(path: wasmFilename + ".debug").path
+            let stripWasmPath = (splitDebug ? outputDir : intermediatesDir).appending(path: wasmFilename + ".debug").path
 
             // First, strip DWARF sections as their existence enables DWARF preserving mode in wasm-opt
             let stripWasm = make.addTask(
-                inputFiles: [selfPath, wasmProductArtifact.path], inputTasks: [outputDirTask, tmpDirTask],
+                inputFiles: [selfPath, wasmProductArtifact.path], inputTasks: [outputDirTask, intermediatesDirTask],
                 output: stripWasmPath
             ) {
                 print("Stripping DWARF debug info...")
