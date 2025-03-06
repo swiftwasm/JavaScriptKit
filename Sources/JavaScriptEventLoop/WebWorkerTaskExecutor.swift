@@ -434,8 +434,14 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
     /// Install a global executor that forwards jobs from Web Worker threads to the main thread.
     ///
     /// This function must be called once before using the Web Worker task executor.
-    @MainActor
     public static func installGlobalExecutor() {
+        MainActor.assumeIsolated {
+            installGlobalExecutorIsolated()
+        }
+    }
+
+    @MainActor
+    static func installGlobalExecutorIsolated() {
         #if canImport(wasi_pthread) && compiler(>=6.1) && _runtime(_multithreaded)
         // Ensure this function is called only once.
         guard _mainThread == nil else { return }
