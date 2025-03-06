@@ -37,7 +37,7 @@ struct PackagingPlanner {
     /// Construct the build plan and return the root task key
     func planBuild(
         make: inout MiniMake,
-        wasmProductArtifact: URL,
+        wasmProductArtifact: URL
     ) -> MiniMake.TaskKey {
         let (allTasks, _) = planBuildInternal(make: &make, wasmProductArtifact: wasmProductArtifact)
         return make.addTask(
@@ -47,7 +47,7 @@ struct PackagingPlanner {
 
     private func planBuildInternal(
         make: inout MiniMake,
-        wasmProductArtifact: URL,
+        wasmProductArtifact: URL
     ) -> (allTasks: [MiniMake.TaskKey], outputDirTask: MiniMake.TaskKey) {
         // Prepare output directory
         let outputDirTask = make.addTask(
@@ -109,7 +109,7 @@ struct PackagingPlanner {
     /// Construct the test build plan and return the root task key
     func planTestBuild(
         make: inout MiniMake,
-        wasmProductArtifact: URL,
+        wasmProductArtifact: URL
     ) -> (rootTask: MiniMake.TaskKey, binDir: URL) {
         var (allTasks, outputDirTask) = planBuildInternal(make: &make, wasmProductArtifact: wasmProductArtifact)
 
