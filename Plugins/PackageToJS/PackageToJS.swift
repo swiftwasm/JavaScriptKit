@@ -24,12 +24,15 @@ struct PackageToJS: CommandPlugin {
     struct BuildOptions {
         /// Product to build (default: executable target if there's only one)
         var product: String?
+        /// Whether to split debug information into a separate file (default: false)
+        var splitDebug: Bool
         var options: Options
 
         static func parse(from extractor: inout ArgumentExtractor) -> BuildOptions {
             let product = extractor.extractOption(named: "product").last
+            let splitDebug = extractor.extractFlag(named: "split-debug")
             let options = Options.parse(from: &extractor)
-            return BuildOptions(product: product, options: options)
+            return BuildOptions(product: product, splitDebug: splitDebug != 0, options: options)
         }
 
         static func help() -> String {
@@ -43,6 +46,7 @@ struct PackageToJS: CommandPlugin {
                   --output <path>       Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
                   --package-name <name> Name of the package (default: lowercased Package.swift name)
                   --explain             Whether to explain the build plan
+                  --split-debug         Whether to split debug information into a separate .wasm.debug file (default: false)
 
                 SUBCOMMANDS:
                   test  Builds and runs tests
@@ -202,7 +206,7 @@ struct PackageToJS: CommandPlugin {
             options: buildOptions.options, context: context, selfPackage: selfPackage,
             outputDir: outputDir)
         let rootTask = try planner.planBuild(
-            make: &make, wasmProductArtifact: productArtifact)
+            make: &make, splitDebug: buildOptions.splitDebug, wasmProductArtifact: productArtifact)
         cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
         print("Packaging...")
         try make.build(output: rootTask)

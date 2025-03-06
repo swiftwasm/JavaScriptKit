@@ -1,6 +1,7 @@
 import Foundation
 import PackagePlugin
 
+/// Plans the build for packaging.
 struct PackagingPlanner {
     let options: PackageToJS.Options
     let context: PluginContext
@@ -19,6 +20,8 @@ struct PackagingPlanner {
         self.outputDir = outputDir
         self.selfPath = String(#filePath)
     }
+
+    // MARK: - Primitive build operations
 
     private static func syncFile(from: String, to: String) throws {
         if FileManager.default.fileExists(atPath: to) {
@@ -46,12 +49,17 @@ struct PackagingPlanner {
         }
     }
 
+    // MARK: - Build plans
+
     /// Construct the build plan and return the root task key
     func planBuild(
         make: inout MiniMake,
+        splitDebug: Bool,
         wasmProductArtifact: URL
     ) throws -> MiniMake.TaskKey {
-        let (allTasks, _) = try planBuildInternal(make: &make, wasmProductArtifact: wasmProductArtifact)
+        let (allTasks, _) = try planBuildInternal(
+            make: &make, splitDebug: splitDebug, wasmProductArtifact: wasmProductArtifact
+        )
         return make.addTask(
             inputTasks: allTasks, output: "all", attributes: [.phony, .silent]
         ) { _ in }
@@ -59,6 +67,7 @@ struct PackagingPlanner {
 
     private func planBuildInternal(
         make: inout MiniMake,
+        splitDebug: Bool,
         wasmProductArtifact: URL
     ) throws -> (allTasks: [MiniMake.TaskKey], outputDirTask: MiniMake.TaskKey) {
         // Prepare output directory
@@ -95,14 +104,16 @@ struct PackagingPlanner {
             ) {
                 try Self.createDirectory(atPath: $0.output)
             }
-            let stripWasmPath = tmpDir.appending(path: wasmFilename + ".strip").path
+            // If splitDebug is true, we need to place the DWARF-stripped wasm file (but "name" section remains)
+            // in the output directory.
+            let stripWasmPath = (splitDebug ? outputDir : tmpDir).appending(path: wasmFilename + ".debug").path
 
             // First, strip DWARF sections as their existence enables DWARF preserving mode in wasm-opt
             let stripWasm = make.addTask(
                 inputFiles: [selfPath, wasmProductArtifact.path], inputTasks: [outputDirTask, tmpDirTask],
                 output: stripWasmPath
             ) {
-                print("Stripping debug information...")
+                print("Stripping DWARF debug info...")
                 try Self.runCommand(wasmOptPath, [wasmProductArtifact.path, "--strip-dwarf", "--debuginfo", "-o", $0.output])
             }
             // Then, run wasm-opt with all optimizations
@@ -111,7 +122,7 @@ struct PackagingPlanner {
                 output: outputDir.appending(path: wasmFilename).path
             ) {
                 print("Optimizing the wasm file...")
-                try Self.runCommand(wasmOptPath, [stripWasmPath, "--debuginfo", "-Os", "-o", $0.output])
+                try Self.runCommand(wasmOptPath, [stripWasmPath, "-Os", "-o", $0.output])
             }
         } else {
             // Copy the wasm product artifact
@@ -168,7 +179,9 @@ struct PackagingPlanner {
         make: inout MiniMake,
         wasmProductArtifact: URL
     ) throws -> (rootTask: MiniMake.TaskKey, binDir: URL) {
-        var (allTasks, outputDirTask) = try planBuildInternal(make: &make, wasmProductArtifact: wasmProductArtifact)
+        var (allTasks, outputDirTask) = try planBuildInternal(
+            make: &make, splitDebug: false, wasmProductArtifact: wasmProductArtifact
+        )
 
         let binDir = outputDir.appending(path: "bin")
         let binDirTask = make.addTask(
