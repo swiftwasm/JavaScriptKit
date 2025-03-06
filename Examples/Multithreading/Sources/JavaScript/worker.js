@@ -1,7 +1,7 @@
 import { instantiate } from "./instantiate.js"
 
 self.onmessage = async (event) => {
-  const { module, memory, tid, startArg, configuration } = event.data;
+  const { module, memory, tid, startArg } = event.data;
   const { instance, wasi, swiftRuntime } = await instantiate({
     module,
     threadChannel: {
@@ -18,8 +18,7 @@ self.onmessage = async (event) => {
       importObject["wasi"] = {
         "thread-spawn": () => { throw new Error("Cannot spawn a new thread from a worker thread"); }
       };
-    },
-    configuration
+    }
   });
 
   swiftRuntime.setInstance(instance);

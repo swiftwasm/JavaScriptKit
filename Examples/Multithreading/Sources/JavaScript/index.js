@@ -9,14 +9,12 @@ class ThreadRegistry {
   workers = new Map();
   nextTid = 1;
 
-  constructor({ configuration }) {
-    this.configuration = configuration;
-  }
+  constructor() {}
 
   spawnThread(worker, module, memory, startArg) {
     const tid = this.nextTid++;
     this.workers.set(tid, worker);
-    worker.postMessage({ module, memory, tid, startArg, configuration: this.configuration });
+    worker.postMessage({ module, memory, tid, startArg });
     return tid;
   }
 
@@ -39,8 +37,8 @@ class ThreadRegistry {
   }
 }
 
-async function start(configuration = "release") {
-  const response = await fetch(`./.build/${configuration}/MyApp.wasm`);
+async function start() {
+  const response = await fetch(`./.build/plugins/PackageToJS/outputs/Package/main.wasm`);
   const module = await WebAssembly.compileStreaming(response);
   const memoryImport = WebAssembly.Module.imports(module).find(i => i.module === "env" && i.name === "memory");
   if (!memoryImport) {
@@ -51,7 +49,7 @@ async function start(configuration = "release") {
   }
   const memoryType = memoryImport.type;
   const memory = new WebAssembly.Memory({ initial: memoryType.minimum, maximum: memoryType.maximum, shared: true });
-  const threads = new ThreadRegistry({ configuration });
+  const threads = new ThreadRegistry();
   const { instance, swiftRuntime, wasi } = await instantiate({
     module,
     threadChannel: threads,
@@ -63,8 +61,7 @@ async function start(configuration = "release") {
           return threads.spawnThread(worker, module, memory, startArg);
         }
       };
-    },
-    configuration
+    }
   });
   wasi.initialize(instance);
 
