@@ -1,30 +1,15 @@
 // @ts-check
-import { WASI, File, OpenFile, ConsoleStdout, PreopenDirectory } from '@bjorn3/browser_wasi_shim';
-// @ts-ignore
-import { SwiftRuntime } from "./runtime.js"
+import { WASI, WASIProcExit, File, OpenFile, ConsoleStdout, PreopenDirectory } from '@bjorn3/browser_wasi_shim';
+import { instantiate } from './instantiate.js';
 export const MODULE_PATH = "@PACKAGE_TO_JS_MODULE_PATH@";
 
-/** @type {import('./index.d').createInstantiator} */
-/* export */ async function createInstantiator(
-    imports,
-    options = {}
-) {
-    return {
-        addImports: () => {},
-        createExports: () => {
-            return {};
-        },
-    }
-}
-
-/** @type {import('./index.d').instantiate} */
-export async function instantiate(
+/** @type {import('./index.d').init} */
+export async function init(
     moduleSource,
     imports,
     options
 ) {
-    const instantiator = await createInstantiator(imports, options);
-    const wasi = new WASI(/* args */[MODULE_PATH], /* env */[], /* fd */[
+    const wasi = new WASI(/* args */[MODULE_PATH, ...(options?.args ?? [])], /* env */[], /* fd */[
         new OpenFile(new File([])), // stdin
         ConsoleStdout.lineBuffered((stdout) => {
             console.log(stdout);
@@ -33,44 +18,31 @@ export async function instantiate(
             console.error(stderr);
         }),
         new PreopenDirectory("/", new Map()),
-    ])
-    const swift = new SwiftRuntime();
-
-    /** @type {WebAssembly.Imports} */
-    const importObject = {
-        wasi_snapshot_preview1: wasi.wasiImport,
-        javascript_kit: swift.wasmImports,
-    };
-    instantiator.addImports(importObject);
-
-    let module;
-    let instance;
-    if (moduleSource instanceof WebAssembly.Module) {
-        module = moduleSource;
-        instance = await WebAssembly.instantiate(module, importObject);
-    } else if (typeof Response === "function" && (moduleSource instanceof Response || moduleSource instanceof Promise)) {
-        if (typeof WebAssembly.instantiateStreaming === "function") {
-            const result = await WebAssembly.instantiateStreaming(moduleSource, importObject);
-            module = result.module;
-            instance = result.instance;
-        } else {
-            const moduleBytes = await (await moduleSource).arrayBuffer();
-            module = await WebAssembly.compile(moduleBytes);
-            instance = await WebAssembly.instantiate(module, importObject);
-        }
-    } else {
-        // @ts-expect-error: Type 'Response' is not assignable to type 'BufferSource'
-        module = await WebAssembly.compile(moduleSource);
-        instance = await WebAssembly.instantiate(module, importObject);
-    }
-
-    swift.setInstance(instance);
-    // @ts-ignore: "exports" of the instance is not typed
-    wasi.initialize(instance);
+    ], { debug: false })
+    const { instance, exports, swift } = await instantiate(moduleSource, imports, {
+        wasi: wasi
+    });
     swift.main();
 
     return {
         instance,
-        exports: instantiator.createExports(instance),
+        exports,
+    }
+}
+
+/** @type {import('./index.d').runTest} */
+export async function runTest(
+    moduleSource,
+    imports,
+    options
+) {
+    try {
+        const { instance, exports } = await init(moduleSource, imports, options);
+        return { exitCode: 0 };
+    } catch (error) {
+        if (error instanceof WASIProcExit) {
+            return { exitCode: error.code };
+        }
+        throw error;
     }
 }

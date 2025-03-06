@@ -101,8 +101,8 @@ struct PackageToJS: CommandPlugin {
         }
 
         // Build products
-        let (build, productName) = try buildWasm(options: options, context: context)
-        guard build.succeeded else {
+        let (productArtifact, build) = try buildWasm(options: options, context: context)
+        guard let productArtifact = productArtifact else {
             for diagnostic in Self.friendlyBuildDiagnostics {
                 if let message = diagnostic(build, arguments) {
                     printStderr("\n" + message)
@@ -110,8 +110,6 @@ struct PackageToJS: CommandPlugin {
             }
             exit(1)
         }
-
-        let productArtifact = try build.findWasmArtifact(for: productName)
         let outputDir =
             if let outputPath = options.outputPath {
                 URL(fileURLWithPath: outputPath)
@@ -135,7 +133,7 @@ struct PackageToJS: CommandPlugin {
     }
 
     private func buildWasm(options: Options, context: PluginContext) throws -> (
-        build: PackageManager.BuildResult, productName: String
+        productArtifact: URL?, build: PackageManager.BuildResult
     ) {
         var parameters = PackageManager.BuildParameters(
             configuration: .inherit,
@@ -158,7 +156,24 @@ struct PackageToJS: CommandPlugin {
         }
         let productName = try options.product ?? deriveDefaultProduct(package: context.package)
         let build = try self.packageManager.build(.product(productName), parameters: parameters)
-        return (build, productName)
+
+        var productArtifact: URL?
+        if build.succeeded {
+            let testProductName = "\(context.package.displayName)PackageTests"
+            if productName == testProductName {
+                for fileExtension in ["wasm", "xctest"] {
+                    let path = ".build/debug/\(testProductName).\(fileExtension)"
+                    if FileManager.default.fileExists(atPath: path) {
+                        productArtifact = URL(fileURLWithPath: path)
+                        break
+                    }
+                }
+            } else {
+                productArtifact = try build.findWasmArtifact(for: productName)
+            }
+        }
+
+        return (productArtifact, build)
     }
 
     /// Construct the build plan and return the root task key
@@ -166,7 +181,7 @@ struct PackageToJS: CommandPlugin {
         make: inout MiniMake,
         options: Options,
         context: PluginContext,
-        wasmProductArtifact: PackageManager.BuildResult.BuiltArtifact,
+        wasmProductArtifact: URL,
         selfPackage: Package,
         outputDir: URL
     ) -> MiniMake.TaskKey {
@@ -194,10 +209,10 @@ struct PackageToJS: CommandPlugin {
         // Copy the wasm product artifact
         let wasmFilename = "main.wasm"
         let wasm = make.addTask(
-            inputFiles: [selfPath, wasmProductArtifact.url.path], inputTasks: [outputDirTask],
+            inputFiles: [selfPath, wasmProductArtifact.path], inputTasks: [outputDirTask],
             output: outputDir.appending(path: wasmFilename).path
         ) {
-            try syncFile(from: wasmProductArtifact.url.path, to: $0.output)
+            try syncFile(from: wasmProductArtifact.path, to: $0.output)
         }
         packageInputs.append(wasm)
 
@@ -231,6 +246,8 @@ struct PackageToJS: CommandPlugin {
         for (file, output) in [
             ("Plugins/PackageToJS/Templates/index.js", "index.js"),
             ("Plugins/PackageToJS/Templates/index.d.ts", "index.d.ts"),
+            ("Plugins/PackageToJS/Templates/instantiate.js", "instantiate.js"),
+            ("Plugins/PackageToJS/Templates/instantiate.d.ts", "instantiate.d.ts"),
             ("Sources/JavaScriptKit/Runtime/index.mjs", "runtime.js"),
         ] {
             let inputPath = selfPackageURL.appending(path: file)
@@ -291,9 +308,7 @@ internal func deriveDefaultProduct(package: Package) throws -> String {
 
 extension PackageManager.BuildResult {
     /// Find `.wasm` executable artifact
-    internal func findWasmArtifact(for product: String) throws
-        -> PackageManager.BuildResult.BuiltArtifact
-    {
+    internal func findWasmArtifact(for product: String) throws -> URL {
         let executables = self.builtArtifacts.filter {
             ($0.kind == .executable) && ($0.url.lastPathComponent == "\(product).wasm")
         }
@@ -307,7 +322,7 @@ extension PackageManager.BuildResult {
                 "Failed to disambiguate executable product artifacts from \(executables.map(\.url.path).joined(separator: ", "))"
             )
         }
-        return executable
+        return executable.url
     }
 }
 

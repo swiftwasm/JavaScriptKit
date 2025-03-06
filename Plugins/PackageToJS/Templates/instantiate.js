@@ -1,0 +1,64 @@
+// @ts-check
+// @ts-ignore
+import { SwiftRuntime } from "./runtime.js"
+
+/** @type {import('./instantiate.d').createInstantiator} */
+export async function createInstantiator(
+    imports,
+    options = {}
+) {
+    return {
+        addImports: () => {},
+        createExports: () => {
+            return {};
+        },
+    }
+}
+
+/** @type {import('./instantiate.d').instantiate} */
+export async function instantiate(
+    moduleSource,
+    imports,
+    options
+) {
+    const { wasi } = options;
+    const instantiator = await createInstantiator(imports, options);
+    const swift = new SwiftRuntime();
+
+    /** @type {WebAssembly.Imports} */
+    const importObject = {
+        javascript_kit: swift.wasmImports,
+        wasi_snapshot_preview1: wasi.wasiImport,
+    };
+    instantiator.addImports(importObject);
+
+    let module;
+    let instance;
+    if (moduleSource instanceof WebAssembly.Module) {
+        module = moduleSource;
+        instance = await WebAssembly.instantiate(module, importObject);
+    } else if (typeof Response === "function" && (moduleSource instanceof Response || moduleSource instanceof Promise)) {
+        if (typeof WebAssembly.instantiateStreaming === "function") {
+            const result = await WebAssembly.instantiateStreaming(moduleSource, importObject);
+            module = result.module;
+            instance = result.instance;
+        } else {
+            const moduleBytes = await (await moduleSource).arrayBuffer();
+            module = await WebAssembly.compile(moduleBytes);
+            instance = await WebAssembly.instantiate(module, importObject);
+        }
+    } else {
+        // @ts-expect-error: Type 'Response' is not assignable to type 'BufferSource'
+        module = await WebAssembly.compile(moduleSource);
+        instance = await WebAssembly.instantiate(module, importObject);
+    }
+
+    swift.setInstance(instance);
+    wasi.initialize(instance);
+
+    return {
+        instance,
+        swift,
+        exports: instantiator.createExports(instance),
+    }
+}
