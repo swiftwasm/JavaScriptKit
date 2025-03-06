@@ -34,12 +34,24 @@ struct PackagingPlanner {
         )
     }
 
+    private static func runCommand(_ command: URL, _ arguments: [String]) throws {
+        let task = Process()
+        task.executableURL = command
+        task.arguments = arguments
+        task.currentDirectoryURL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        try task.run()
+        task.waitUntilExit()
+        guard task.terminationStatus == 0 else {
+            throw PackageToJSError("Command failed with status \(task.terminationStatus)")
+        }
+    }
+
     /// Construct the build plan and return the root task key
     func planBuild(
         make: inout MiniMake,
         wasmProductArtifact: URL
-    ) -> MiniMake.TaskKey {
-        let (allTasks, _) = planBuildInternal(make: &make, wasmProductArtifact: wasmProductArtifact)
+    ) throws -> MiniMake.TaskKey {
+        let (allTasks, _) = try planBuildInternal(make: &make, wasmProductArtifact: wasmProductArtifact)
         return make.addTask(
             inputTasks: allTasks, output: "all", attributes: [.phony, .silent]
         ) { _ in }
@@ -48,7 +60,7 @@ struct PackagingPlanner {
     private func planBuildInternal(
         make: inout MiniMake,
         wasmProductArtifact: URL
-    ) -> (allTasks: [MiniMake.TaskKey], outputDirTask: MiniMake.TaskKey) {
+    ) throws -> (allTasks: [MiniMake.TaskKey], outputDirTask: MiniMake.TaskKey) {
         // Prepare output directory
         let outputDirTask = make.addTask(
             inputFiles: [selfPath], output: outputDir.path, attributes: [.silent]
@@ -58,12 +70,57 @@ struct PackagingPlanner {
 
         var packageInputs: [MiniMake.TaskKey] = []
 
-        // Copy the wasm product artifact
-        let wasm = make.addTask(
-            inputFiles: [selfPath, wasmProductArtifact.path], inputTasks: [outputDirTask],
-            output: outputDir.appending(path: wasmFilename).path
-        ) {
-            try Self.syncFile(from: wasmProductArtifact.path, to: $0.output)
+        // Guess the build configuration from the parent directory name of .wasm file
+        let buildConfiguration = wasmProductArtifact.deletingLastPathComponent().lastPathComponent
+        let wasm: MiniMake.TaskKey
+
+        let shouldOptimize: Bool
+        let wasmOptPath = try? which("wasm-opt")
+        if buildConfiguration == "debug" {
+            shouldOptimize = false
+        } else {
+            if wasmOptPath != nil {
+                shouldOptimize = true
+            } else {
+                print("Warning: wasm-opt not found in PATH, skipping optimizations")
+                shouldOptimize = false
+            }
+        }
+
+        if let wasmOptPath = wasmOptPath, shouldOptimize {
+            // Optimize the wasm in release mode
+            let tmpDir = outputDir.deletingLastPathComponent().appending(path: "\(outputDir.lastPathComponent).tmp")
+            let tmpDirTask = make.addTask(
+                inputFiles: [selfPath], output: tmpDir.path, attributes: [.silent]
+            ) {
+                try Self.createDirectory(atPath: $0.output)
+            }
+            let stripWasmPath = tmpDir.appending(path: wasmFilename + ".strip").path
+
+            // First, strip DWARF sections as their existence enables DWARF preserving mode in wasm-opt
+            let stripWasm = make.addTask(
+                inputFiles: [selfPath, wasmProductArtifact.path], inputTasks: [outputDirTask, tmpDirTask],
+                output: stripWasmPath
+            ) {
+                print("Stripping debug information...")
+                try Self.runCommand(wasmOptPath, [wasmProductArtifact.path, "--strip-dwarf", "--debuginfo", "-o", $0.output])
+            }
+            // Then, run wasm-opt with all optimizations
+            wasm = make.addTask(
+                inputFiles: [selfPath], inputTasks: [outputDirTask, stripWasm],
+                output: outputDir.appending(path: wasmFilename).path
+            ) {
+                print("Optimizing the wasm file...")
+                try Self.runCommand(wasmOptPath, [stripWasmPath, "--debuginfo", "-Os", "-o", $0.output])
+            }
+        } else {
+            // Copy the wasm product artifact
+            wasm = make.addTask(
+                inputFiles: [selfPath, wasmProductArtifact.path], inputTasks: [outputDirTask],
+                output: outputDir.appending(path: wasmFilename).path
+            ) {
+                try Self.syncFile(from: wasmProductArtifact.path, to: $0.output)
+            }
         }
         packageInputs.append(wasm)
 
@@ -110,8 +167,8 @@ struct PackagingPlanner {
     func planTestBuild(
         make: inout MiniMake,
         wasmProductArtifact: URL
-    ) -> (rootTask: MiniMake.TaskKey, binDir: URL) {
-        var (allTasks, outputDirTask) = planBuildInternal(make: &make, wasmProductArtifact: wasmProductArtifact)
+    ) throws -> (rootTask: MiniMake.TaskKey, binDir: URL) {
+        var (allTasks, outputDirTask) = try planBuildInternal(make: &make, wasmProductArtifact: wasmProductArtifact)
 
         let binDir = outputDir.appending(path: "bin")
         let binDirTask = make.addTask(

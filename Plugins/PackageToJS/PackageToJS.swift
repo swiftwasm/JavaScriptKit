@@ -201,7 +201,7 @@ struct PackageToJS: CommandPlugin {
         let planner = PackagingPlanner(
             options: buildOptions.options, context: context, selfPackage: selfPackage,
             outputDir: outputDir)
-        let rootTask = planner.planBuild(
+        let rootTask = try planner.planBuild(
             make: &make, wasmProductArtifact: productArtifact)
         cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
         print("Packaging...")
@@ -268,7 +268,7 @@ struct PackageToJS: CommandPlugin {
         let planner = PackagingPlanner(
             options: testOptions.options, context: context, selfPackage: selfPackage,
             outputDir: outputDir)
-        let (rootTask, binDir) = planner.planTestBuild(
+        let (rootTask, binDir) = try planner.planTestBuild(
             make: &make, wasmProductArtifact: productArtifact)
         cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
         print("Packaging tests...")
@@ -414,7 +414,7 @@ private func printStderr(_ message: String) {
     fputs(message + "\n", stderr)
 }
 
-private func which(_ executable: String) throws -> URL {
+func which(_ executable: String) throws -> URL {
     let pathSeparator: Character
     #if os(Windows)
         pathSeparator = ";"
@@ -431,7 +431,7 @@ private func which(_ executable: String) throws -> URL {
     throw PackageToJSError("Executable \(executable) not found in PATH")
 }
 
-private struct PackageToJSError: Swift.Error, CustomStringConvertible {
+struct PackageToJSError: Swift.Error, CustomStringConvertible {
     let description: String
 
     init(_ message: String) {
