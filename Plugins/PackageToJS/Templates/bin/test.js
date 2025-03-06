@@ -1,8 +1,4 @@
-import { NodeRunner, BrowserRunner } from "../test.js"
+import { NodeRunner } from "../test.js"
 
-const runners = {
-    "node": NodeRunner,
-    "browser": BrowserRunner,
-}
-const runner = new runners[process.env.TEST_RUNNER || "node"]()
+const runner = new NodeRunner()
 await runner.run()

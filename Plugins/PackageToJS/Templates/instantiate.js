@@ -2,6 +2,8 @@
 // @ts-ignore
 import { SwiftRuntime } from "./runtime.js"
 
+export const MODULE_PATH = "@PACKAGE_TO_JS_MODULE_PATH@";
+
 /** @type {import('./instantiate.d').createInstantiator} */
 export async function createInstantiator(
     imports,

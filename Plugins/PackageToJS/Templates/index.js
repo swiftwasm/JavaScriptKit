@@ -1,7 +1,6 @@
 // @ts-check
 import { WASI, WASIProcExit, File, OpenFile, ConsoleStdout, PreopenDirectory } from '@bjorn3/browser_wasi_shim';
-import { instantiate } from './instantiate.js';
-export const MODULE_PATH = "@PACKAGE_TO_JS_MODULE_PATH@";
+import { instantiate, MODULE_PATH } from './instantiate.js';
 
 /** @type {import('./index.d').init} */
 export async function init(
@@ -27,22 +26,5 @@ export async function init(
     return {
         instance,
         exports,
-    }
-}
-
-/** @type {import('./index.d').runTest} */
-export async function runTest(
-    moduleSource,
-    imports,
-    options
-) {
-    try {
-        const { instance, exports } = await init(moduleSource, imports, options);
-        return { exitCode: 0 };
-    } catch (error) {
-        if (error instanceof WASIProcExit) {
-            return { exitCode: error.code };
-        }
-        throw error;
     }
 }

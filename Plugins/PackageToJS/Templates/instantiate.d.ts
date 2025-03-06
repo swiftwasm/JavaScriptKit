@@ -6,6 +6,11 @@ export type Export = {
 }
 
 /**
+ * The path to the WebAssembly module relative to the root of the package
+ */
+export declare const MODULE_PATH: string;
+
+/**
  * Low-level interface to create an instance of a WebAssembly module
  *
  * This is used to have full control over the instantiation process

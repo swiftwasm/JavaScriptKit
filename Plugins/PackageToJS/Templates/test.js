@@ -45,10 +45,3 @@ Please ensure you are using Node.js v18.x or newer.
         swift.main()
     }
 }
-
-export class BrowserRunner {
-    constructor() { }
-
-    async run() {
-    }
-}

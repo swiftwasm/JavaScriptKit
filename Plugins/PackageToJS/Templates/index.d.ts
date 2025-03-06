@@ -1,7 +1,4 @@
-/**
- * The path to the WebAssembly module relative to the root of the package
- */
-export declare const MODULE_PATH: string;
+import type { Import, Export } from './instantiate.js'
 
 export type Options = {
     /**
@@ -26,9 +23,3 @@ export declare function init(
     instance: WebAssembly.Instance,
     exports: Export
 }>
-
-export declare function runTest(
-    moduleSource: WebAssembly.Module | ArrayBufferView | ArrayBuffer | Response | PromiseLike<Response>,
-    imports: Import,
-    options: Options | undefined
-): Promise<{ exitCode: number }>

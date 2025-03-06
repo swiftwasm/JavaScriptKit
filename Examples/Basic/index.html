@@ -14,8 +14,8 @@
 
 <body>
   <script type="module">
-    import { instantiate } from "./.build/plugins/PackageToJS/outputs/Package/index.js";
-    await instantiate(fetch("./.build/plugins/PackageToJS/outputs/Package/main.wasm"));
+    import { init } from "./.build/plugins/PackageToJS/outputs/Package/index.js";
+    await init(fetch("./.build/plugins/PackageToJS/outputs/Package/main.wasm"));
   </script>
 </body>
 
