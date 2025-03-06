@@ -4,8 +4,6 @@ import PackagePlugin
 @main
 struct PackageToJS: CommandPlugin {
     struct Options {
-        /// Product to build (default: executable target if there's only one)
-        var product: String?
         /// Path to the output directory
         var outputPath: String?
         /// Name of the package (default: lowercased Package.swift name)
@@ -14,31 +12,79 @@ struct PackageToJS: CommandPlugin {
         var explain: Bool = false
 
         static func parse(from extractor: inout ArgumentExtractor) -> Options {
-            let product = extractor.extractOption(named: "product").last
             let outputPath = extractor.extractOption(named: "output").last
             let packageName = extractor.extractOption(named: "package-name").last
             let explain = extractor.extractFlag(named: "explain")
             return Options(
-                product: product, outputPath: outputPath, packageName: packageName,
-                explain: explain != 0
+                outputPath: outputPath, packageName: packageName, explain: explain != 0
             )
+        }
+    }
+
+    struct BuildOptions {
+        /// Product to build (default: executable target if there's only one)
+        var product: String?
+        var options: Options
+
+        static func parse(from extractor: inout ArgumentExtractor) -> BuildOptions {
+            let product = extractor.extractOption(named: "product").last
+            let options = Options.parse(from: &extractor)
+            return BuildOptions(product: product, options: options)
         }
 
         static func help() -> String {
             return """
-                Usage: swift package --swift-sdk <swift-sdk> [swift-package options] plugin run PackageToJS [options]
+                OVERVIEW: Builds a JavaScript module from a Swift package.
 
-                Options:
+                USAGE: swift package --swift-sdk <swift-sdk> [SwiftPM options] PackageToJS [options] [subcommand]
+
+                OPTIONS:
                   --product <product>   Product to build (default: executable target if there's only one)
                   --output <path>  Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
                   --package-name <name> Name of the package (default: lowercased Package.swift name)
                   --explain             Whether to explain the build plan
 
-                Examples:
+                SUBCOMMANDS:
+                  test  Builds and runs tests
+
+                EXAMPLES:
                   $ swift package --swift-sdk wasm32-unknown-wasi plugin js
+                  # Build a specific product
                   $ swift package --swift-sdk wasm32-unknown-wasi plugin js --product Example
+                  # Build in release configuration
                   $ swift package --swift-sdk wasm32-unknown-wasi -c release plugin js
+
+                  # Run tests
+                  $ swift package --swift-sdk wasm32-unknown-wasi plugin js test
                 """
+        }
+    }
+
+    struct TestOptions {
+        /// Whether to only build tests, don't run them
+        var buildOnly: Bool = false
+        var options: Options
+
+        static func parse(from extractor: inout ArgumentExtractor) -> TestOptions {
+            let buildOnly = extractor.extractFlag(named: "build-only")
+            let options = Options.parse(from: &extractor)
+            return TestOptions(buildOnly: buildOnly != 0, options: options)
+        }
+
+        static func help() -> String {
+            return """
+                OVERVIEW: Builds and runs tests
+
+                USAGE: swift package --swift-sdk <swift-sdk> [SwiftPM options] PackageToJS test [options]
+                
+                OPTIONS:
+                  --build-only          Whether to build only (default: false)
+
+                EXAMPLES:
+                  $ swift package --swift-sdk wasm32-unknown-wasi plugin js test
+                  # Just build tests, don't run them
+                  $ swift package --swift-sdk wasm32-unknown-wasi plugin js test --build-only
+            """
         }
     }
 
@@ -83,58 +129,129 @@ struct PackageToJS: CommandPlugin {
                         """
                 }),
         ]
+    static private func reportBuildFailure(_ build: PackageManager.BuildResult, _ arguments: [String]) {
+        for diagnostic in Self.friendlyBuildDiagnostics {
+            if let message = diagnostic(build, arguments) {
+                printStderr("\n" + message)
+            }
+        }
+    }
 
     func performCommand(context: PluginContext, arguments: [String]) throws {
         if arguments.contains(where: { ["-h", "--help"].contains($0) }) {
-            printStderr(Options.help())
+            printStderr(BuildOptions.help())
             return
         }
 
+        if arguments.first == "test" {
+            return try performTestCommand(context: context, arguments: Array(arguments.dropFirst()))
+        }
+
+        return try performBuildCommand(context: context, arguments: arguments)
+    }
+
+    static let JAVASCRIPTKIT_PACKAGE_ID: Package.ID = "javascriptkit"
+
+    func performBuildCommand(context: PluginContext, arguments: [String]) throws {
         var extractor = ArgumentExtractor(arguments)
-        let options = Options.parse(from: &extractor)
+        let buildOptions = BuildOptions.parse(from: &extractor)
 
         if extractor.remainingArguments.count > 0 {
             printStderr(
                 "Unexpected arguments: \(extractor.remainingArguments.joined(separator: " "))")
-            printStderr(Options.help())
+            printStderr(BuildOptions.help())
             exit(1)
         }
 
         // Build products
-        let (productArtifact, build) = try buildWasm(options: options, context: context)
-        guard let productArtifact = productArtifact else {
-            for diagnostic in Self.friendlyBuildDiagnostics {
-                if let message = diagnostic(build, arguments) {
-                    printStderr("\n" + message)
-                }
-            }
+        let productName = try buildOptions.product ?? deriveDefaultProduct(package: context.package)
+        let build = try buildWasm(productName: productName, context: context)
+        guard build.succeeded else {
+            Self.reportBuildFailure(build, arguments)
             exit(1)
         }
+        let productArtifact = try build.findWasmArtifact(for: productName)
         let outputDir =
-            if let outputPath = options.outputPath {
+            if let outputPath = buildOptions.options.outputPath {
                 URL(fileURLWithPath: outputPath)
             } else {
                 context.pluginWorkDirectoryURL.appending(path: "Package")
             }
         guard
             let selfPackage = findPackageInDependencies(
-                package: context.package, id: "javascriptkit")
+                package: context.package, id: Self.JAVASCRIPTKIT_PACKAGE_ID)
         else {
             throw PackageToJSError("Failed to find JavaScriptKit in dependencies!?")
         }
-        var make = MiniMake(explain: options.explain)
-        let allTask = constructPackagingPlan(
-            make: &make, options: options, context: context, wasmProductArtifact: productArtifact,
-            selfPackage: selfPackage, outputDir: outputDir)
-        cleanIfBuildGraphChanged(root: allTask, make: make, context: context)
+        var make = MiniMake(explain: buildOptions.options.explain)
+        let planner = PackagingPlanner(
+            options: buildOptions.options, context: context, selfPackage: selfPackage, outputDir: outputDir)
+        let rootTask = planner.planBuild(
+            make: &make, wasmProductArtifact: productArtifact)
+        cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
         print("Packaging...")
-        try make.build(output: allTask)
+        try make.build(output: rootTask)
         print("Packaging finished")
     }
 
-    private func buildWasm(options: Options, context: PluginContext) throws -> (
-        productArtifact: URL?, build: PackageManager.BuildResult
-    ) {
+    func performTestCommand(context: PluginContext, arguments: [String]) throws {
+        var extractor = ArgumentExtractor(arguments)
+        let testOptions = TestOptions.parse(from: &extractor)
+
+        if extractor.remainingArguments.count > 0 {
+            printStderr("Unexpected arguments: \(extractor.remainingArguments.joined(separator: " "))")
+            printStderr(TestOptions.help())
+            exit(1)
+        }
+
+        let productName = "\(context.package.displayName)PackageTests"
+        let build = try buildWasm(productName: productName, context: context)
+        guard build.succeeded else {
+            Self.reportBuildFailure(build, arguments)
+            exit(1)
+        }
+
+        // NOTE: Find the product artifact from the default build directory
+        //       because PackageManager.BuildResult doesn't include the
+        //       product artifact for tests.
+        //       This doesn't work when `--scratch-path` is used but
+        //       we don't have a way to guess the correct path. (we can find
+        //       the path by building a dummy executable product but it's
+        //       not worth the overhead)
+        var productArtifact: URL?
+        for fileExtension in ["wasm", "xctest"] {
+            let path = ".build/debug/\(productName).\(fileExtension)"
+            if FileManager.default.fileExists(atPath: path) {
+                productArtifact = URL(fileURLWithPath: path)
+                break
+            }
+        }
+        guard let productArtifact = productArtifact else {
+            throw PackageToJSError("Failed to find '\(productName).wasm' or '\(productName).xctest'")
+        }
+        let outputDir = if let outputPath = testOptions.options.outputPath {
+            URL(fileURLWithPath: outputPath)
+        } else {
+            context.pluginWorkDirectoryURL.appending(path: "PackageTests")
+        }
+        guard
+            let selfPackage = findPackageInDependencies(
+                package: context.package, id: Self.JAVASCRIPTKIT_PACKAGE_ID)
+        else {
+            throw PackageToJSError("Failed to find JavaScriptKit in dependencies!?")
+        }
+        var make = MiniMake(explain: testOptions.options.explain)
+        let planner = PackagingPlanner(
+            options: testOptions.options, context: context, selfPackage: selfPackage, outputDir: outputDir)
+        let rootTask = planner.planTestBuild(
+            make: &make, wasmProductArtifact: productArtifact)
+        cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
+        print("Packaging tests...")
+        try make.build(output: rootTask)
+        print("Packaging tests finished")
+    }
+
+    private func buildWasm(productName: String, context: PluginContext) throws -> PackageManager.BuildResult {
         var parameters = PackageManager.BuildParameters(
             configuration: .inherit,
             logging: .concise
@@ -154,118 +271,7 @@ struct PackageToJS: CommandPlugin {
                 "--export-if-defined=__main_argc_argv"
             ]
         }
-        let productName = try options.product ?? deriveDefaultProduct(package: context.package)
-        let build = try self.packageManager.build(.product(productName), parameters: parameters)
-
-        var productArtifact: URL?
-        if build.succeeded {
-            let testProductName = "\(context.package.displayName)PackageTests"
-            if productName == testProductName {
-                for fileExtension in ["wasm", "xctest"] {
-                    let path = ".build/debug/\(testProductName).\(fileExtension)"
-                    if FileManager.default.fileExists(atPath: path) {
-                        productArtifact = URL(fileURLWithPath: path)
-                        break
-                    }
-                }
-            } else {
-                productArtifact = try build.findWasmArtifact(for: productName)
-            }
-        }
-
-        return (productArtifact, build)
-    }
-
-    /// Construct the build plan and return the root task key
-    private func constructPackagingPlan(
-        make: inout MiniMake,
-        options: Options,
-        context: PluginContext,
-        wasmProductArtifact: URL,
-        selfPackage: Package,
-        outputDir: URL
-    ) -> MiniMake.TaskKey {
-        let selfPackageURL = selfPackage.directoryURL
-        let selfPath = String(#filePath)
-
-        // Prepare output directory
-        let outputDirTask = make.addTask(
-            inputFiles: [selfPath], output: outputDir.path, attributes: [.silent]
-        ) {
-            guard !FileManager.default.fileExists(atPath: $0.output) else { return }
-            try FileManager.default.createDirectory(
-                atPath: $0.output, withIntermediateDirectories: true, attributes: nil)
-        }
-
-        var packageInputs: [MiniMake.TaskKey] = []
-
-        func syncFile(from: String, to: String) throws {
-            if FileManager.default.fileExists(atPath: to) {
-                try FileManager.default.removeItem(atPath: to)
-            }
-            try FileManager.default.copyItem(atPath: from, toPath: to)
-        }
-
-        // Copy the wasm product artifact
-        let wasmFilename = "main.wasm"
-        let wasm = make.addTask(
-            inputFiles: [selfPath, wasmProductArtifact.path], inputTasks: [outputDirTask],
-            output: outputDir.appending(path: wasmFilename).path
-        ) {
-            try syncFile(from: wasmProductArtifact.path, to: $0.output)
-        }
-        packageInputs.append(wasm)
-
-        // Write package.json
-        let packageJSON = make.addTask(
-            inputFiles: [selfPath], inputTasks: [outputDirTask],
-            output: outputDir.appending(path: "package.json").path
-        ) {
-            let packageJSON = """
-                {
-                    "name": "\(options.packageName ?? context.package.id.lowercased())",
-                    "version": "0.0.0",
-                    "type": "module",
-                    "exports": {
-                        ".": "./index.js",
-                        "./wasm": "./\(wasmFilename)"
-                    },
-                    "dependencies": {
-                        "@bjorn3/browser_wasi_shim": "^0.4.1"
-                    }
-                }
-                """
-            try packageJSON.write(toFile: $0.output, atomically: true, encoding: .utf8)
-        }
-        packageInputs.append(packageJSON)
-
-        // Copy the template files
-        let substitutions = [
-            "@PACKAGE_TO_JS_MODULE_PATH@": wasmFilename
-        ]
-        for (file, output) in [
-            ("Plugins/PackageToJS/Templates/index.js", "index.js"),
-            ("Plugins/PackageToJS/Templates/index.d.ts", "index.d.ts"),
-            ("Plugins/PackageToJS/Templates/instantiate.js", "instantiate.js"),
-            ("Plugins/PackageToJS/Templates/instantiate.d.ts", "instantiate.d.ts"),
-            ("Sources/JavaScriptKit/Runtime/index.mjs", "runtime.js"),
-        ] {
-            let inputPath = selfPackageURL.appending(path: file)
-            let copied = make.addTask(
-                inputFiles: [selfPath, inputPath.path], inputTasks: [outputDirTask],
-                output: outputDir.appending(path: output).path
-            ) {
-                var content = try String(contentsOf: inputPath, encoding: .utf8)
-                for (key, value) in substitutions {
-                    content = content.replacingOccurrences(of: key, with: value)
-                }
-                try content.write(toFile: $0.output, atomically: true, encoding: .utf8)
-            }
-            packageInputs.append(copied)
-        }
-        return make.addTask(
-            inputTasks: packageInputs, output: "all", attributes: [.phony, .silent]
-        ) { _ in }
+        return try self.packageManager.build(.product(productName), parameters: parameters)
     }
 
     /// Clean if the build graph of the packaging process has changed
