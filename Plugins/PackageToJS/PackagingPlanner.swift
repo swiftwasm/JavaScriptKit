@@ -110,7 +110,7 @@ struct PackagingPlanner {
     func planTestBuild(
         make: inout MiniMake,
         wasmProductArtifact: URL,
-    ) -> MiniMake.TaskKey {
+    ) -> (rootTask: MiniMake.TaskKey, binDir: URL) {
         var (allTasks, outputDirTask) = planBuildInternal(make: &make, wasmProductArtifact: wasmProductArtifact)
 
         let binDir = outputDir.appending(path: "bin")
@@ -133,9 +133,10 @@ struct PackagingPlanner {
                 inputs: [binDirTask]
             ))
         }
-        return make.addTask(
+        let rootTask = make.addTask(
             inputTasks: allTasks, output: "all", attributes: [.phony, .silent]
         ) { _ in }
+        return (rootTask, binDir)
     }
 
     private func planCopyTemplateFile(

@@ -62,13 +62,20 @@ struct PackageToJS: CommandPlugin {
 
     struct TestOptions {
         /// Whether to only build tests, don't run them
-        var buildOnly: Bool = false
+        var buildOnly: Bool
+        var listTests: Bool
+        var testLibrary: String?
+        var filter: [String]
+
         var options: Options
 
         static func parse(from extractor: inout ArgumentExtractor) -> TestOptions {
             let buildOnly = extractor.extractFlag(named: "build-only")
+            let listTests = extractor.extractFlag(named: "list-tests")
+            let testLibrary = extractor.extractOption(named: "test-library").last
+            let filter = extractor.extractOption(named: "filter")
             let options = Options.parse(from: &extractor)
-            return TestOptions(buildOnly: buildOnly != 0, options: options)
+            return TestOptions(buildOnly: buildOnly != 0, listTests: listTests != 0, testLibrary: testLibrary, filter: filter, options: options)
         }
 
         static func help() -> String {
@@ -84,7 +91,7 @@ struct PackageToJS: CommandPlugin {
                   $ swift package --swift-sdk wasm32-unknown-wasi plugin js test
                   # Just build tests, don't run them
                   $ swift package --swift-sdk wasm32-unknown-wasi plugin js test --build-only
-            """
+                """
         }
     }
 
@@ -129,7 +136,9 @@ struct PackageToJS: CommandPlugin {
                         """
                 }),
         ]
-    static private func reportBuildFailure(_ build: PackageManager.BuildResult, _ arguments: [String]) {
+    static private func reportBuildFailure(
+        _ build: PackageManager.BuildResult, _ arguments: [String]
+    ) {
         for diagnostic in Self.friendlyBuildDiagnostics {
             if let message = diagnostic(build, arguments) {
                 printStderr("\n" + message)
@@ -138,11 +147,6 @@ struct PackageToJS: CommandPlugin {
     }
 
     func performCommand(context: PluginContext, arguments: [String]) throws {
-        if arguments.contains(where: { ["-h", "--help"].contains($0) }) {
-            printStderr(BuildOptions.help())
-            return
-        }
-
         if arguments.first == "test" {
             return try performTestCommand(context: context, arguments: Array(arguments.dropFirst()))
         }
@@ -153,6 +157,11 @@ struct PackageToJS: CommandPlugin {
     static let JAVASCRIPTKIT_PACKAGE_ID: Package.ID = "javascriptkit"
 
     func performBuildCommand(context: PluginContext, arguments: [String]) throws {
+        if arguments.contains(where: { ["-h", "--help"].contains($0) }) {
+            printStderr(BuildOptions.help())
+            return
+        }
+
         var extractor = ArgumentExtractor(arguments)
         let buildOptions = BuildOptions.parse(from: &extractor)
 
@@ -185,7 +194,8 @@ struct PackageToJS: CommandPlugin {
         }
         var make = MiniMake(explain: buildOptions.options.explain)
         let planner = PackagingPlanner(
-            options: buildOptions.options, context: context, selfPackage: selfPackage, outputDir: outputDir)
+            options: buildOptions.options, context: context, selfPackage: selfPackage,
+            outputDir: outputDir)
         let rootTask = planner.planBuild(
             make: &make, wasmProductArtifact: productArtifact)
         cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
@@ -195,6 +205,11 @@ struct PackageToJS: CommandPlugin {
     }
 
     func performTestCommand(context: PluginContext, arguments: [String]) throws {
+        if arguments.contains(where: { ["-h", "--help"].contains($0) }) {
+            printStderr(TestOptions.help())
+            return
+        }
+
         var extractor = ArgumentExtractor(arguments)
         let testOptions = TestOptions.parse(from: &extractor)
 
@@ -227,13 +242,15 @@ struct PackageToJS: CommandPlugin {
             }
         }
         guard let productArtifact = productArtifact else {
-            throw PackageToJSError("Failed to find '\(productName).wasm' or '\(productName).xctest'")
+            throw PackageToJSError(
+                "Failed to find '\(productName).wasm' or '\(productName).xctest'")
         }
-        let outputDir = if let outputPath = testOptions.options.outputPath {
-            URL(fileURLWithPath: outputPath)
-        } else {
-            context.pluginWorkDirectoryURL.appending(path: "PackageTests")
-        }
+        let outputDir =
+            if let outputPath = testOptions.options.outputPath {
+                URL(fileURLWithPath: outputPath)
+            } else {
+                context.pluginWorkDirectoryURL.appending(path: "PackageTests")
+            }
         guard
             let selfPackage = findPackageInDependencies(
                 package: context.package, id: Self.JAVASCRIPTKIT_PACKAGE_ID)
@@ -242,16 +259,47 @@ struct PackageToJS: CommandPlugin {
         }
         var make = MiniMake(explain: testOptions.options.explain)
         let planner = PackagingPlanner(
-            options: testOptions.options, context: context, selfPackage: selfPackage, outputDir: outputDir)
-        let rootTask = planner.planTestBuild(
+            options: testOptions.options, context: context, selfPackage: selfPackage,
+            outputDir: outputDir)
+        let (rootTask, binDir) = planner.planTestBuild(
             make: &make, wasmProductArtifact: productArtifact)
         cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
         print("Packaging tests...")
         try make.build(output: rootTask)
         print("Packaging tests finished")
+
+        let testRunner = binDir.appending(path: "test.js")
+        if !testOptions.buildOnly {
+            var extraArguments: [String] = []
+            if testOptions.listTests {
+                extraArguments += ["--list-tests"]
+            }
+            try runTest(testRunner: testRunner, context: context, extraArguments: extraArguments + testOptions.filter)
+            try runTest(testRunner: testRunner, context: context,
+                extraArguments: ["--testing-library", "swift-testing"] + extraArguments + testOptions.filter.flatMap { ["--filter", $0] })
+        }
     }
 
-    private func buildWasm(productName: String, context: PluginContext) throws -> PackageManager.BuildResult {
+    private func runTest(testRunner: URL, context: PluginContext, extraArguments: [String]) throws {
+        let node = try which("node")
+        let arguments = ["--experimental-wasi-unstable-preview1", testRunner.path] + extraArguments
+        print("Running test...")
+        print("$ \(([node.path] + arguments).map { "\"\($0)\"" }.joined(separator: " "))")
+
+        let task = Process()
+        task.executableURL = node
+        task.arguments = arguments
+        task.currentDirectoryURL = context.pluginWorkDirectoryURL
+        try task.run()
+        task.waitUntilExit()
+        guard task.terminationStatus == 0 else {
+            throw PackageToJSError("Test failed with status \(task.terminationStatus)")
+        }
+    }
+
+    private func buildWasm(productName: String, context: PluginContext) throws
+        -> PackageManager.BuildResult
+    {
         var parameters = PackageManager.BuildParameters(
             configuration: .inherit,
             logging: .concise
@@ -355,6 +403,23 @@ private func findPackageInDependencies(package: Package, id: Package.ID) -> Pack
 
 private func printStderr(_ message: String) {
     fputs(message + "\n", stderr)
+}
+
+private func which(_ executable: String) throws -> URL {
+    let pathSeparator: Character
+    #if os(Windows)
+        pathSeparator = ";"
+    #else
+        pathSeparator = ":"
+    #endif
+    let paths = ProcessInfo.processInfo.environment["PATH"]!.split(separator: pathSeparator)
+    for path in paths {
+        let url = URL(fileURLWithPath: String(path)).appendingPathComponent(executable)
+        if FileManager.default.isExecutableFile(atPath: url.path) {
+            return url
+        }
+    }
+    throw PackageToJSError("Executable \(executable) not found in PATH")
 }
 
 private struct PackageToJSError: Swift.Error, CustomStringConvertible {
