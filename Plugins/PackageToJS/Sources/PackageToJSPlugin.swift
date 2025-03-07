@@ -1,5 +1,12 @@
 #if canImport(PackagePlugin)
-@preconcurrency import Foundation  // For "stderr"
+import struct Foundation.URL
+import struct Foundation.Data
+import class Foundation.Process
+import class Foundation.ProcessInfo
+import class Foundation.FileManager
+import func Foundation.fputs
+import func Foundation.exit
+@preconcurrency import var Foundation.stderr
 import PackagePlugin
 
 /// The main entry point for the PackageToJS plugin.
@@ -209,7 +216,7 @@ struct PackageToJSPlugin: CommandPlugin {
         let node = try which("node")
         let arguments = ["--experimental-wasi-unstable-preview1", testRunner.path] + extraArguments
         print("Running test...")
-        print("$ \(([node.path] + arguments).map { "\"\($0)\"" }.joined(separator: " "))")
+        logCommandExecution(node.path, arguments)
 
         let task = Process()
         task.executableURL = node

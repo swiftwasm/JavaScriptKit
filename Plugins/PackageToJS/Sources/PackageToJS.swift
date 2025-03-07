@@ -30,23 +30,6 @@ struct PackageToJS {
     }
 }
 
-func which(_ executable: String) throws -> URL {
-    let pathSeparator: Character
-    #if os(Windows)
-        pathSeparator = ";"
-    #else
-        pathSeparator = ":"
-    #endif
-    let paths = ProcessInfo.processInfo.environment["PATH"]!.split(separator: pathSeparator)
-    for path in paths {
-        let url = URL(fileURLWithPath: String(path)).appendingPathComponent(executable)
-        if FileManager.default.isExecutableFile(atPath: url.path) {
-            return url
-        }
-    }
-    throw PackageToJSError("Executable \(executable) not found in PATH")
-}
-
 struct PackageToJSError: Swift.Error, CustomStringConvertible {
     let description: String
 
@@ -296,4 +279,29 @@ struct PackagingPlanner {
             try content.write(toFile: $0.output, atomically: true, encoding: .utf8)
         }
     }
+}
+
+// MARK: - Utilities
+
+func which(_ executable: String) throws -> URL {
+    let pathSeparator: Character
+    #if os(Windows)
+        pathSeparator = ";"
+    #else
+        pathSeparator = ":"
+    #endif
+    let paths = ProcessInfo.processInfo.environment["PATH"]!.split(separator: pathSeparator)
+    for path in paths {
+        let url = URL(fileURLWithPath: String(path)).appendingPathComponent(executable)
+        if FileManager.default.isExecutableFile(atPath: url.path) {
+            return url
+        }
+    }
+    throw PackageToJSError("Executable \(executable) not found in PATH")
+}
+
+func logCommandExecution(_ command: String, _ arguments: [String]) {
+    var fullArguments = [command]
+    fullArguments.append(contentsOf: arguments)
+    print("$ \(fullArguments.map { "\"\($0)\"" }.joined(separator: " "))")
 }
