@@ -92,14 +92,14 @@ struct PackageToJSPlugin: CommandPlugin {
         // Build products
         let productName = try buildOptions.product ?? deriveDefaultProduct(package: context.package)
         let build = try buildWasm(
-            productName: productName, context: context, options: buildOptions.options)
+            productName: productName, context: context)
         guard build.succeeded else {
             reportBuildFailure(build, arguments)
             exit(1)
         }
         let productArtifact = try build.findWasmArtifact(for: productName)
         let outputDir =
-            if let outputPath = buildOptions.options.outputPath {
+            if let outputPath = buildOptions.packageOptions.outputPath {
                 URL(fileURLWithPath: outputPath)
             } else {
                 context.pluginWorkDirectoryURL.appending(path: "Package")
@@ -111,11 +111,11 @@ struct PackageToJSPlugin: CommandPlugin {
             throw PackageToJSError("Failed to find JavaScriptKit in dependencies!?")
         }
         var make = MiniMake(
-            explain: buildOptions.options.explain,
+            explain: buildOptions.packageOptions.explain,
             printProgress: self.printProgress
         )
         let planner = PackagingPlanner(
-            options: buildOptions.options, context: context, selfPackage: selfPackage,
+            options: buildOptions.packageOptions, context: context, selfPackage: selfPackage,
             outputDir: outputDir)
         let rootTask = try planner.planBuild(
             make: &make, splitDebug: buildOptions.splitDebug, wasmProductArtifact: productArtifact)
@@ -143,7 +143,7 @@ struct PackageToJSPlugin: CommandPlugin {
 
         let productName = "\(context.package.displayName)PackageTests"
         let build = try buildWasm(
-            productName: productName, context: context, options: testOptions.options)
+            productName: productName, context: context)
         guard build.succeeded else {
             reportBuildFailure(build, arguments)
             exit(1)
@@ -169,7 +169,7 @@ struct PackageToJSPlugin: CommandPlugin {
                 "Failed to find '\(productName).wasm' or '\(productName).xctest'")
         }
         let outputDir =
-            if let outputPath = testOptions.options.outputPath {
+            if let outputPath = testOptions.packageOptions.outputPath {
                 URL(fileURLWithPath: outputPath)
             } else {
                 context.pluginWorkDirectoryURL.appending(path: "PackageTests")
@@ -181,11 +181,11 @@ struct PackageToJSPlugin: CommandPlugin {
             throw PackageToJSError("Failed to find JavaScriptKit in dependencies!?")
         }
         var make = MiniMake(
-            explain: testOptions.options.explain,
+            explain: testOptions.packageOptions.explain,
             printProgress: self.printProgress
         )
         let planner = PackagingPlanner(
-            options: testOptions.options, context: context, selfPackage: selfPackage,
+            options: testOptions.packageOptions, context: context, selfPackage: selfPackage,
             outputDir: outputDir)
         let (rootTask, binDir) = try planner.planTestBuild(
             make: &make, wasmProductArtifact: productArtifact)
@@ -230,7 +230,7 @@ struct PackageToJSPlugin: CommandPlugin {
         }
     }
 
-    private func buildWasm(productName: String, context: PluginContext, options: PackageToJS.PackageOptions) throws
+    private func buildWasm(productName: String, context: PluginContext) throws
         -> PackageManager.BuildResult
     {
         var parameters = PackageManager.BuildParameters(
@@ -300,8 +300,8 @@ extension PackageToJS.BuildOptions {
     static func parse(from extractor: inout ArgumentExtractor) -> PackageToJS.BuildOptions {
         let product = extractor.extractOption(named: "product").last
         let splitDebug = extractor.extractFlag(named: "split-debug")
-        let options = PackageToJS.PackageOptions.parse(from: &extractor)
-        return PackageToJS.BuildOptions(product: product, splitDebug: splitDebug != 0, options: options)
+        let packageOptions = PackageToJS.PackageOptions.parse(from: &extractor)
+        return PackageToJS.BuildOptions(product: product, splitDebug: splitDebug != 0, packageOptions: packageOptions)
     }
 
     static func help() -> String {
@@ -338,10 +338,10 @@ extension PackageToJS.TestOptions {
         let buildOnly = extractor.extractFlag(named: "build-only")
         let listTests = extractor.extractFlag(named: "list-tests")
         let filter = extractor.extractOption(named: "filter")
-        let options = PackageToJS.PackageOptions.parse(from: &extractor)
+        let packageOptions = PackageToJS.PackageOptions.parse(from: &extractor)
         return PackageToJS.TestOptions(
             buildOnly: buildOnly != 0, listTests: listTests != 0,
-            filter: filter, options: options
+            filter: filter, packageOptions: packageOptions
         )
     }
 
