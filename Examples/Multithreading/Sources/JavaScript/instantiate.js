@@ -1,6 +1,7 @@
 import { WASI, File, OpenFile, ConsoleStdout, PreopenDirectory } from 'https://esm.run/@bjorn3/browser_wasi_shim@0.3.0';
+import { SwiftRuntime } from "../../.build/plugins/PackageToJS/outputs/Package/runtime.js"
 
-export async function instantiate({ module, addToImports, threadChannel, configuration }) {
+export async function instantiate({ module, addToImports, threadChannel }) {
   const args = ["main.wasm"]
   const env = []
   const fds = [
@@ -15,7 +16,6 @@ export async function instantiate({ module, addToImports, threadChannel, configu
   ];
   const wasi = new WASI(args, env, fds);
 
-  const { SwiftRuntime } = await import(`/.build/${configuration}/JavaScriptKit_JavaScriptKit.resources/Runtime/index.mjs`);
   const swiftRuntime = new SwiftRuntime({ sharedMemory: true, threadChannel });
   const importObject = {
     wasi_snapshot_preview1: wasi.wasiImport,
