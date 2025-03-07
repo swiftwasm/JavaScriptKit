@@ -1,14 +1,13 @@
 import Foundation
-import PackagePlugin
 
 /// Plans the build for packaging.
 struct PackagingPlanner {
     /// The options of the plugin
-    let options: PackageToJS.Options
-    /// The context of the plugin
-    let context: PluginContext
-    /// The package that contains this plugin
-    let selfPackage: Package
+    let options: PackageToJSOptions
+    /// The package ID of the package that this plugin is running on
+    let packageId: String
+    /// The directory of the package that contains this plugin
+    let selfPackageDir: URL
     /// The path of this file itself, used to capture changes of planner code
     let selfPath: String
     /// The directory for the final output
@@ -19,14 +18,17 @@ struct PackagingPlanner {
     let wasmFilename = "main.wasm"
 
     init(
-        options: PackageToJS.Options, context: PluginContext, selfPackage: Package,
+        options: PackageToJSOptions,
+        packageId: String,
+        pluginWorkDirectoryURL: URL,
+        selfPackageDir: URL,
         outputDir: URL
     ) {
         self.options = options
-        self.context = context
-        self.selfPackage = selfPackage
+        self.packageId = packageId
+        self.selfPackageDir = selfPackageDir
         self.outputDir = outputDir
-        self.intermediatesDir = context.pluginWorkDirectoryURL.appending(path: outputDir.lastPathComponent + ".tmp")
+        self.intermediatesDir = pluginWorkDirectoryURL.appending(path: outputDir.lastPathComponent + ".tmp")
         self.selfPath = String(#filePath)
     }
 
@@ -150,7 +152,7 @@ struct PackagingPlanner {
         ) {
             let packageJSON = """
                 {
-                    "name": "\(options.packageName ?? context.package.id.lowercased())",
+                    "name": "\(options.packageName ?? packageId.lowercased())",
                     "version": "0.0.0",
                     "type": "module",
                     "exports": {
@@ -224,7 +226,7 @@ struct PackagingPlanner {
         outputDirTask: MiniMake.TaskKey,
         inputs: [MiniMake.TaskKey]
     ) -> MiniMake.TaskKey {
-        let inputPath = selfPackage.directoryURL.appending(path: file)
+        let inputPath = selfPackageDir.appending(path: file)
         let substitutions = [
             "@PACKAGE_TO_JS_MODULE_PATH@": wasmFilename
         ]

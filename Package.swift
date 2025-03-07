@@ -76,7 +76,8 @@ let package = Package(
             name: "PackageToJS",
             capability: .command(
                 intent: .custom(verb: "js", description: "Convert a Swift package to a JavaScript package")
-            )
+            ),
+            sources: ["Sources"]
         ),
     ]
 )

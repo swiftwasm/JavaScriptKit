@@ -1,32 +1,36 @@
 @preconcurrency import Foundation  // For "stderr"
+
+struct PackageToJSOptions {
+    /// Path to the output directory
+    var outputPath: String?
+    /// Name of the package (default: lowercased Package.swift name)
+    var packageName: String?
+    /// Whether to explain the build plan
+    var explain: Bool = false
+}
+
+#if canImport(PackagePlugin)
 import PackagePlugin
+
+extension PackageToJSOptions {
+    static func parse(from extractor: inout ArgumentExtractor) -> PackageToJSOptions {
+        let outputPath = extractor.extractOption(named: "output").last
+        let packageName = extractor.extractOption(named: "package-name").last
+        let explain = extractor.extractFlag(named: "explain")
+        return PackageToJSOptions(
+            outputPath: outputPath, packageName: packageName, explain: explain != 0
+        )
+    }
+}
 
 @main
 struct PackageToJS: CommandPlugin {
-    struct Options {
-        /// Path to the output directory
-        var outputPath: String?
-        /// Name of the package (default: lowercased Package.swift name)
-        var packageName: String?
-        /// Whether to explain the build plan
-        var explain: Bool = false
-
-        static func parse(from extractor: inout ArgumentExtractor) -> Options {
-            let outputPath = extractor.extractOption(named: "output").last
-            let packageName = extractor.extractOption(named: "package-name").last
-            let explain = extractor.extractFlag(named: "explain")
-            return Options(
-                outputPath: outputPath, packageName: packageName, explain: explain != 0
-            )
-        }
-    }
-
     struct BuildOptions {
         /// Product to build (default: executable target if there's only one)
         var product: String?
         /// Whether to split debug information into a separate file (default: false)
         var splitDebug: Bool
-        var options: Options
+        var options: PackageToJSOptions
 
         static func parse(from extractor: inout ArgumentExtractor) -> BuildOptions {
             let product = extractor.extractOption(named: "product").last
@@ -71,7 +75,7 @@ struct PackageToJS: CommandPlugin {
         var testLibrary: String?
         var filter: [String]
 
-        var options: Options
+        var options: PackageToJSOptions
 
         static func parse(from extractor: inout ArgumentExtractor) -> TestOptions {
             let buildOnly = extractor.extractFlag(named: "build-only")
@@ -315,7 +319,7 @@ struct PackageToJS: CommandPlugin {
         }
     }
 
-    private func buildWasm(productName: String, context: PluginContext, options: Options) throws
+    private func buildWasm(productName: String, context: PluginContext, options: PackageToJSOptions) throws
         -> PackageManager.BuildResult
     {
         var parameters = PackageManager.BuildParameters(
@@ -413,6 +417,25 @@ private func findPackageInDependencies(package: Package, id: Package.ID) -> Pack
     }
     return visit(package: package)
 }
+
+extension PackagingPlanner {
+    init(
+        options: PackageToJSOptions,
+        context: PluginContext,
+        selfPackage: Package,
+        outputDir: URL
+    ) {
+        self.init(
+            options: options,
+            packageId: context.package.id,
+            pluginWorkDirectoryURL: context.pluginWorkDirectoryURL,
+            selfPackageDir: selfPackage.directoryURL,
+            outputDir: outputDir
+        )
+    }
+}
+
+#endif
 
 private func printStderr(_ message: String) {
     fputs(message + "\n", stderr)
