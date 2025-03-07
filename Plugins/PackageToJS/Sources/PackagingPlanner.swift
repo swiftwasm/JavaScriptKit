@@ -3,7 +3,7 @@ import Foundation
 /// Plans the build for packaging.
 struct PackagingPlanner {
     /// The options of the plugin
-    let options: PackageToJSOptions
+    let options: PackageToJS.Options
     /// The package ID of the package that this plugin is running on
     let packageId: String
     /// The directory of the package that contains this plugin
@@ -18,7 +18,7 @@ struct PackagingPlanner {
     let wasmFilename = "main.wasm"
 
     init(
-        options: PackageToJSOptions,
+        options: PackageToJS.Options,
         packageId: String,
         pluginWorkDirectoryURL: URL,
         selfPackageDir: URL,
