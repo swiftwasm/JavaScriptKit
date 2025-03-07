@@ -61,11 +61,17 @@ struct MiniMake {
     private var shouldExplain: Bool
     /// Current working directory at the time the build started
     private let buildCwd: String
+    /// Prints progress of the build
+    private var printProgress: ProgressPrinter.PrintProgress
 
-    init(explain: Bool = false) {
+    init(
+        explain: Bool = false,
+        printProgress: @escaping ProgressPrinter.PrintProgress
+    ) {
         self.tasks = [:]
         self.shouldExplain = explain
         self.buildCwd = FileManager.default.currentDirectoryPath
+        self.printProgress = printProgress
     }
 
     /// Adds a task to the build system
@@ -108,14 +114,19 @@ struct MiniMake {
 
     /// Prints progress of the build
     struct ProgressPrinter {
+        typealias PrintProgress = (_ subject: Task, _ total: Int, _ built: Int, _ message: String) -> Void
+
         /// Total number of tasks to build
         let total: Int
         /// Number of tasks built so far
         var built: Int
+        /// Prints progress of the build
+        var printProgress: PrintProgress
 
-        init(total: Int) {
+        init(total: Int, printProgress: @escaping PrintProgress) {
             self.total = total
             self.built = 0
+            self.printProgress = printProgress
         }
 
         private static var green: String { "\u{001B}[32m" }
@@ -132,7 +143,7 @@ struct MiniMake {
 
         private mutating func print(_ task: Task, _ message: @autoclosure () -> String) {
             guard !task.attributes.contains(.silent) else { return }
-            Swift.print("[\(self.built + 1)/\(self.total)] \(task.displayName): \(message())")
+            self.printProgress(task, self.total, self.built, message())
             self.built += 1
         }
     }
@@ -160,7 +171,7 @@ struct MiniMake {
     }
 
     /// Starts building
-    mutating func build(output: TaskKey) throws {
+    func build(output: TaskKey) throws {
         /// Returns true if any of the task's inputs have a modification date later than the task's output
         func shouldBuild(task: Task) -> Bool {
             if task.attributes.contains(.phony) {
@@ -196,10 +207,14 @@ struct MiniMake {
             }
         }
         var progressPrinter = ProgressPrinter(
-            total: self.computeTotalTasksForDisplay(task: self.tasks[output]!))
+            total: self.computeTotalTasksForDisplay(task: self.tasks[output]!),
+            printProgress: self.printProgress
+        )
+        // Make a copy of the tasks so we can mutate the state
+        var tasks = self.tasks
 
         func runTask(taskKey: TaskKey) throws {
-            guard var task = self.tasks[taskKey] else {
+            guard var task = tasks[taskKey] else {
                 violated("Task \(taskKey) not found")
                 return
             }
@@ -217,7 +232,7 @@ struct MiniMake {
                 progressPrinter.skipped(task)
             }
             task.isDone = true
-            self.tasks[taskKey] = task
+            tasks[taskKey] = task
         }
         try runTask(taskKey: output)
     }

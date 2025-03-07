@@ -205,7 +205,10 @@ struct PackageToJS: CommandPlugin {
         else {
             throw PackageToJSError("Failed to find JavaScriptKit in dependencies!?")
         }
-        var make = MiniMake(explain: buildOptions.options.explain)
+        var make = MiniMake(
+            explain: buildOptions.options.explain,
+            printProgress: self.printProgress
+        )
         let planner = PackagingPlanner(
             options: buildOptions.options, context: context, selfPackage: selfPackage,
             outputDir: outputDir)
@@ -272,7 +275,10 @@ struct PackageToJS: CommandPlugin {
         else {
             throw PackageToJSError("Failed to find JavaScriptKit in dependencies!?")
         }
-        var make = MiniMake(explain: testOptions.options.explain)
+        var make = MiniMake(
+            explain: testOptions.options.explain,
+            printProgress: self.printProgress
+        )
         let planner = PackagingPlanner(
             options: testOptions.options, context: context, selfPackage: selfPackage,
             outputDir: outputDir)
@@ -361,6 +367,10 @@ struct PackageToJS: CommandPlugin {
             make.cleanEverything()
         }
         try? currentBuildFingerprint?.write(to: buildFingerprint)
+    }
+
+    private func printProgress(task: MiniMake.Task, total: Int, built: Int, message: String) {
+        print("[\(built + 1)/\(total)] \(task.displayName): \(message)")
     }
 }
 
