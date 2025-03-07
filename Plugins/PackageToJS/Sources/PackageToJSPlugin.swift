@@ -230,7 +230,7 @@ struct PackageToJSPlugin: CommandPlugin {
         }
     }
 
-    private func buildWasm(productName: String, context: PluginContext, options: PackageToJS.Options) throws
+    private func buildWasm(productName: String, context: PluginContext, options: PackageToJS.PackageOptions) throws
         -> PackageManager.BuildResult
     {
         var parameters = PackageManager.BuildParameters(
@@ -285,12 +285,12 @@ struct PackageToJSPlugin: CommandPlugin {
 
 // MARK: - Options parsing
 
-extension PackageToJS.Options {
-    static func parse(from extractor: inout ArgumentExtractor) -> PackageToJS.Options {
+extension PackageToJS.PackageOptions {
+    static func parse(from extractor: inout ArgumentExtractor) -> PackageToJS.PackageOptions {
         let outputPath = extractor.extractOption(named: "output").last
         let packageName = extractor.extractOption(named: "package-name").last
         let explain = extractor.extractFlag(named: "explain")
-        return PackageToJS.Options(
+        return PackageToJS.PackageOptions(
             outputPath: outputPath, packageName: packageName, explain: explain != 0
         )
     }
@@ -300,7 +300,7 @@ extension PackageToJS.BuildOptions {
     static func parse(from extractor: inout ArgumentExtractor) -> PackageToJS.BuildOptions {
         let product = extractor.extractOption(named: "product").last
         let splitDebug = extractor.extractFlag(named: "split-debug")
-        let options = PackageToJS.Options.parse(from: &extractor)
+        let options = PackageToJS.PackageOptions.parse(from: &extractor)
         return PackageToJS.BuildOptions(product: product, splitDebug: splitDebug != 0, options: options)
     }
 
@@ -338,7 +338,7 @@ extension PackageToJS.TestOptions {
         let buildOnly = extractor.extractFlag(named: "build-only")
         let listTests = extractor.extractFlag(named: "list-tests")
         let filter = extractor.extractOption(named: "filter")
-        let options = PackageToJS.Options.parse(from: &extractor)
+        let options = PackageToJS.PackageOptions.parse(from: &extractor)
         return PackageToJS.TestOptions(
             buildOnly: buildOnly != 0, listTests: listTests != 0,
             filter: filter, options: options
@@ -421,7 +421,7 @@ private func findPackageInDependencies(package: Package, id: Package.ID) -> Pack
 
 extension PackagingPlanner {
     init(
-        options: PackageToJS.Options,
+        options: PackageToJS.PackageOptions,
         context: PluginContext,
         selfPackage: Package,
         outputDir: URL

@@ -1,6 +1,8 @@
 import Foundation
 
-/// A simple build system
+/// A minimal build system
+///
+/// This build system is a traditional mtime-based incremental build system.
 struct MiniMake {
     /// Attributes of a task
     enum TaskAttribute: String, Codable {

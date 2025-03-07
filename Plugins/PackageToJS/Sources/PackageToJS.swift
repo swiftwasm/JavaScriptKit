@@ -1,7 +1,7 @@
 import Foundation
 
 struct PackageToJS {
-    struct Options {
+    struct PackageOptions {
         /// Path to the output directory
         var outputPath: String?
         /// Name of the package (default: lowercased Package.swift name)
@@ -15,7 +15,8 @@ struct PackageToJS {
         var product: String?
         /// Whether to split debug information into a separate file (default: false)
         var splitDebug: Bool
-        var options: Options
+        /// The options for packaging
+        var packageOptions: PackageOptions
     }
 
     struct TestOptions {
@@ -25,8 +26,8 @@ struct PackageToJS {
         var listTests: Bool
         /// The filter to apply to the tests
         var filter: [String]
-        /// The options
-        var options: Options
+        /// The options for packaging
+        var packageOptions: PackageOptions
     }
 }
 
@@ -40,8 +41,8 @@ struct PackageToJSError: Swift.Error, CustomStringConvertible {
 
 /// Plans the build for packaging.
 struct PackagingPlanner {
-    /// The options of the plugin
-    let options: PackageToJS.Options
+    /// The options for packaging
+    let options: PackageToJS.PackageOptions
     /// The package ID of the package that this plugin is running on
     let packageId: String
     /// The directory of the package that contains this plugin
@@ -56,7 +57,7 @@ struct PackagingPlanner {
     let wasmFilename = "main.wasm"
 
     init(
-        options: PackageToJS.Options,
+        options: PackageToJS.PackageOptions,
         packageId: String,
         pluginWorkDirectoryURL: URL,
         selfPackageDir: URL,
