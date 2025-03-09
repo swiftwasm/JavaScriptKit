@@ -196,31 +196,9 @@ struct PackagingPlanner {
         }
         packageInputs.append(wasm)
 
-        // Write package.json
-        let packageJSON = make.addTask(
-            inputFiles: [selfPath], inputTasks: [outputDirTask],
-            output: outputDir.appending(path: "package.json").path
-        ) {
-            let packageJSON = """
-                {
-                    "name": "\(options.packageName ?? packageId.lowercased())",
-                    "version": "0.0.0",
-                    "type": "module",
-                    "exports": {
-                        ".": "./index.js",
-                        "./wasm": "./\(wasmFilename)"
-                    },
-                    "dependencies": {
-                        "@bjorn3/browser_wasi_shim": "^0.4.1"
-                    }
-                }
-                """
-            try packageJSON.write(toFile: $0.output, atomically: true, encoding: .utf8)
-        }
-        packageInputs.append(packageJSON)
-
         // Copy the template files
         for (file, output) in [
+            ("Plugins/PackageToJS/Templates/package.json", "package.json"),
             ("Plugins/PackageToJS/Templates/index.js", "index.js"),
             ("Plugins/PackageToJS/Templates/index.d.ts", "index.d.ts"),
             ("Plugins/PackageToJS/Templates/instantiate.js", "instantiate.js"),
@@ -278,7 +256,8 @@ struct PackagingPlanner {
     ) -> MiniMake.TaskKey {
         let inputPath = selfPackageDir.appending(path: file)
         let substitutions = [
-            "@PACKAGE_TO_JS_MODULE_PATH@": wasmFilename
+            "PACKAGE_TO_JS_MODULE_PATH": wasmFilename,
+            "PACKAGE_TO_JS_PACKAGE_NAME": options.packageName ?? packageId.lowercased(),
         ]
         let (buildConfiguration, triple) = deriveBuildConfiguration()
         let conditions = [
