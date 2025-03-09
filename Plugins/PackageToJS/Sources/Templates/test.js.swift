@@ -1,3 +1,15 @@
+extension TemplateContext {
+    var test_d_ts: String {
+        return """
+export declare class NodeRunner {
+    constructor()
+    run(): Promise<void>
+}
+"""
+    }
+
+    var test_js: String {
+        return """
 // @ts-check
 import {  MODULE_PATH, instantiate } from "./instantiate.js"
 
@@ -42,5 +54,8 @@ Please ensure you are using Node.js v18.x or newer.
             {}, { wasi }
         )
         swift.main()
+    }
+}
+"""
     }
 }
