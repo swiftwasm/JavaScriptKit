@@ -39,13 +39,6 @@ struct PackageToJSError: Swift.Error, CustomStringConvertible {
     }
 }
 
-struct TemplateContext {
-    let packageId: String
-    let packageName: String
-    let wasmFilename: String
-    let useSharedMemory: Bool
-}
-
 /// Plans the build for packaging.
 struct PackagingPlanner {
     /// The options for packaging
@@ -194,30 +187,41 @@ struct PackagingPlanner {
         }
         packageInputs.append(wasm)
 
-        // Instantiate the template files
-        for (template, output) in [
-            (\TemplateContext.package_json, "package.json"),
-            (\TemplateContext.index_js, "index.js"),
-            (\TemplateContext.index_d_ts, "index.d.ts"),
-            (\TemplateContext.instantiate_js, "instantiate.js"),
-            (\TemplateContext.instantiate_d_ts, "instantiate.d.ts"),
-        ] {
-            packageInputs.append(planCopyTemplateFile(
-                make: &make, template: template, output: output, outputDirTask: outputDirTask,
-                inputs: []
-            ))
+        // Write package.json
+        let packageJSON = make.addTask(
+            inputFiles: [selfPath], inputTasks: [outputDirTask],
+            output: outputDir.appending(path: "package.json").path
+        ) {
+            let packageJSON = """
+                {
+                    "name": "\(options.packageName ?? packageId.lowercased())",
+                    "version": "0.0.0",
+                    "type": "module",
+                    "exports": {
+                        ".": "./index.js",
+                        "./wasm": "./\(wasmFilename)"
+                    },
+                    "dependencies": {
+                        "@bjorn3/browser_wasi_shim": "^0.4.1"
+                    }
+                }
+                """
+            try packageJSON.write(toFile: $0.output, atomically: true, encoding: .utf8)
         }
-        // Copy files
+        packageInputs.append(packageJSON)
+
+        // Copy the template files
         for (file, output) in [
+            ("Plugins/PackageToJS/Templates/index.js", "index.js"),
+            ("Plugins/PackageToJS/Templates/index.d.ts", "index.d.ts"),
+            ("Plugins/PackageToJS/Templates/instantiate.js", "instantiate.js"),
+            ("Plugins/PackageToJS/Templates/instantiate.d.ts", "instantiate.d.ts"),
             ("Sources/JavaScriptKit/Runtime/index.mjs", "runtime.js"),
         ] {
-            let inputPath = selfPackageDir.appending(path: file)
-            packageInputs.append(make.addTask(
-                inputFiles: [selfPath, inputPath.path], inputTasks: [outputDirTask],
-                output: outputDir.appending(path: output).path
-            ) {
-                try Self.syncFile(from: inputPath.path, to: $0.output)
-            })
+            packageInputs.append(planCopyTemplateFile(
+                make: &make, file: file, output: output, outputDirTask: outputDirTask,
+                inputs: []
+            ))
         }
         return (packageInputs, outputDirTask)
     }
@@ -241,13 +245,13 @@ struct PackagingPlanner {
         allTasks.append(binDirTask)
 
         // Copy the template files
-        for (template, output) in [
-            (\TemplateContext.index_js, "test.js"),
-            (\TemplateContext.index_d_ts, "test.d.ts"),
-            (\TemplateContext.bin_test_js, "bin/test.js"),
+        for (file, output) in [
+            ("Plugins/PackageToJS/Templates/test.js", "test.js"),
+            ("Plugins/PackageToJS/Templates/test.d.ts", "test.d.ts"),
+            ("Plugins/PackageToJS/Templates/bin/test.js", "bin/test.js"),
         ] {
             allTasks.append(planCopyTemplateFile(
-                make: &make, template: template, output: output, outputDirTask: outputDirTask,
+                make: &make, file: file, output: output, outputDirTask: outputDirTask,
                 inputs: [binDirTask]
             ))
         }
@@ -259,20 +263,22 @@ struct PackagingPlanner {
 
     private func planCopyTemplateFile(
         make: inout MiniMake,
-        template: KeyPath<TemplateContext, String>,
+        file: String,
         output: String,
         outputDirTask: MiniMake.TaskKey,
         inputs: [MiniMake.TaskKey]
     ) -> MiniMake.TaskKey {
-        let context = TemplateContext(
-            packageId: packageId, packageName: options.packageName ?? packageId.lowercased(),
-            wasmFilename: wasmFilename, useSharedMemory: false
-        )
+        let inputPath = selfPackageDir.appending(path: file)
+        let substitutions = [
+            "@PACKAGE_TO_JS_MODULE_PATH@": wasmFilename
+        ]
         return make.addTask(
-            inputFiles: [selfPath], inputTasks: [outputDirTask] + inputs,
+            inputFiles: [selfPath, inputPath.path], inputTasks: [outputDirTask] + inputs,
             output: outputDir.appending(path: output).path
         ) {
-            let content = context[keyPath: template]
+            var content = try String(contentsOf: inputPath, encoding: .utf8)
+            let options = PreprocessOptions(substitutions: substitutions)
+            content = try preprocess(source: content, options: options)
             try content.write(toFile: $0.output, atomically: true, encoding: .utf8)
         }
     }
