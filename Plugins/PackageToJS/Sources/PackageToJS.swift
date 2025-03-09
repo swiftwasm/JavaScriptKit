@@ -85,6 +85,9 @@ struct PackagingPlanner {
             try FileManager.default.removeItem(atPath: to)
         }
         try FileManager.default.copyItem(atPath: from, toPath: to)
+        try FileManager.default.setAttributes(
+            [.modificationDate: Date()], ofItemAtPath: to
+        )
     }
 
     private static func createDirectory(atPath: String) throws {
@@ -191,31 +194,9 @@ struct PackagingPlanner {
         }
         packageInputs.append(wasm)
 
-        // Write package.json
-        let packageJSON = make.addTask(
-            inputFiles: [selfPath], inputTasks: [outputDirTask],
-            output: outputDir.appending(path: "package.json").path
-        ) {
-            let packageJSON = """
-                {
-                    "name": "\(options.packageName ?? packageId.lowercased())",
-                    "version": "0.0.0",
-                    "type": "module",
-                    "exports": {
-                        ".": "./index.js",
-                        "./wasm": "./\(wasmFilename)"
-                    },
-                    "dependencies": {
-                        "@bjorn3/browser_wasi_shim": "^0.4.1"
-                    }
-                }
-                """
-            try packageJSON.write(toFile: $0.output, atomically: true, encoding: .utf8)
-        }
-        packageInputs.append(packageJSON)
-
         // Instantiate the template files
         for (template, output) in [
+            (\TemplateContext.package_json, "package.json"),
             (\TemplateContext.index_js, "index.js"),
             (\TemplateContext.index_d_ts, "index.d.ts"),
             (\TemplateContext.instantiate_js, "instantiate.js"),
