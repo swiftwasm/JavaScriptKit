@@ -37,13 +37,23 @@ Please ensure you are using Node.js v18.x or newer.
             returnOnExit: false,
         })
         const dirname = path.dirname(fileURLToPath(import.meta.url))
+        const module = await WebAssembly.compile(await readFile(path.join(dirname, MODULE_PATH)))
+        const options = { wasi }
+        /* #if USE_SHARED_MEMORY */
+        // @ts-ignore
+        const memoryType = WebAssembly.Module.imports(module).find(i => i.module === "env" && i.name === "memory")?.type
+        const memory = new WebAssembly.Memory({
+            initial: memoryType.minimum,
+            maximum: memoryType.maximum,
+            shared: memoryType.shared,
+        })
+        options.memory = memory
+        /* #endif */
         const { swift } = await instantiate(
-            await readFile(path.join(dirname, MODULE_PATH)),
-            {}, {
-                wasi,
-                /* #if USE_SHARED_MEMORY */
-                /* #endif */
-            }
+            module,
+            {},
+            // @ts-ignore
+            options
         )
         swift.main()
     }

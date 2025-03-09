@@ -27,18 +27,24 @@ export async function instantiate(
     const { wasi } = options;
     /* #endif */
     const instantiator = await createInstantiator(imports, options);
-    const swift = new SwiftRuntime();
+    const swift = new SwiftRuntime({
+        /* #if USE_SHARED_MEMORY */
+        sharedMemory: true,
+        threadChannel: options.threadChannel,
+        /* #endif */
+    });
 
     /** @type {WebAssembly.Imports} */
     const importObject = {
         javascript_kit: swift.wasmImports,
-        /* #if IS_WASI */
+/* #if IS_WASI */
         wasi_snapshot_preview1: wasi.wasiImport,
-        /* #if USE_SHARED_MEMORY */ env: {
+/* #if USE_SHARED_MEMORY */
+        env: {
             memory: options.memory,
         },
-        /* #endif */
-        /* #endif */
+/* #endif */
+/* #endif */
     };
     instantiator.addImports(importObject);
 

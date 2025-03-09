@@ -1,3 +1,7 @@
+/* #if USE_SHARED_MEMORY */
+import type { SwiftRuntimeThreadChannel } from "./runtime.js";
+/* #endif */
+
 export type Import = {
     // TODO: Generate type from imported .d.ts files
 }
@@ -65,6 +69,7 @@ export declare function instantiate(
         /* #endif */
         /* #if USE_SHARED_MEMORY */
         memory: WebAssembly.Memory
+        threadChannel: SwiftRuntimeThreadChannel
         /* #endif */
     }
 ): Promise<{
