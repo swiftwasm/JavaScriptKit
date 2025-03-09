@@ -14,6 +14,7 @@ let package = Package(
         .library(name: "JavaScriptBigIntSupport", targets: ["JavaScriptBigIntSupport"]),
         .library(name: "JavaScriptEventLoopTestSupport", targets: ["JavaScriptEventLoopTestSupport"]),
         .plugin(name: "PackageToJS", targets: ["PackageToJS"]),
+        .plugin(name: "ImportTS", targets: ["ImportTS"]),
     ],
     targets: [
         .target(
@@ -86,6 +87,14 @@ let package = Package(
             capability: .command(
                 intent: .custom(verb: "js", description: "Convert a Swift package to a JavaScript package")
             ),
+            sources: ["Sources"]
+        ),
+        .plugin(
+            name: "ImportTS",
+            capability: .command(
+                intent: .custom(verb: "ts", description: "Import TypeScript types from a package.json")
+            ),
+            exclude: ["Sources/JavaScript"],
             sources: ["Sources"]
         ),
     ]
