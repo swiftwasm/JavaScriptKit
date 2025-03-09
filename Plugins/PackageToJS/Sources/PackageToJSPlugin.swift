@@ -116,9 +116,9 @@ struct PackageToJSPlugin: CommandPlugin {
         )
         let planner = PackagingPlanner(
             options: buildOptions.packageOptions, context: context, selfPackage: selfPackage,
-            outputDir: outputDir)
+            outputDir: outputDir, wasmProductArtifact: productArtifact)
         let rootTask = try planner.planBuild(
-            make: &make, splitDebug: buildOptions.splitDebug, wasmProductArtifact: productArtifact)
+            make: &make, splitDebug: buildOptions.splitDebug)
         cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
         print("Packaging...")
         try make.build(output: rootTask)
@@ -186,9 +186,9 @@ struct PackageToJSPlugin: CommandPlugin {
         )
         let planner = PackagingPlanner(
             options: testOptions.packageOptions, context: context, selfPackage: selfPackage,
-            outputDir: outputDir)
+            outputDir: outputDir, wasmProductArtifact: productArtifact)
         let (rootTask, binDir) = try planner.planTestBuild(
-            make: &make, wasmProductArtifact: productArtifact)
+            make: &make)
         cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
         print("Packaging tests...")
         try make.build(output: rootTask)
@@ -424,14 +424,16 @@ extension PackagingPlanner {
         options: PackageToJS.PackageOptions,
         context: PluginContext,
         selfPackage: Package,
-        outputDir: URL
+        outputDir: URL,
+        wasmProductArtifact: URL
     ) {
         self.init(
             options: options,
             packageId: context.package.id,
             pluginWorkDirectoryURL: context.pluginWorkDirectoryURL,
             selfPackageDir: selfPackage.directoryURL,
-            outputDir: outputDir
+            outputDir: outputDir,
+            wasmProductArtifact: wasmProductArtifact
         )
     }
 }

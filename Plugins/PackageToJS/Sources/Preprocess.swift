@@ -24,8 +24,8 @@ func preprocess(source: String, file: String?, options: PreprocessOptions) throw
 }
 
 struct PreprocessOptions {
-    /// The variables to replace in the source code
-    var variables: [String: Bool] = [:]
+    /// The conditions to evaluate in the source code
+    var conditions: [String: Bool] = [:]
     /// The variables to substitute in the source code
     var substitutions: [String: String] = [:]
 }
@@ -341,7 +341,7 @@ private struct Preprocessor {
             case .block(let content):
                 appendBlock(content: content)
             case .if(let condition, let then, let `else`, let position):
-                guard let condition = options.variables[condition] else {
+                guard let condition = options.conditions[condition] else {
                     throw undefinedVariableError(name: condition, at: position)
                 }
                 let blocks = condition ? then : `else`

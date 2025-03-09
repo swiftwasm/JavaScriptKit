@@ -55,13 +55,16 @@ struct PackagingPlanner {
     let intermediatesDir: URL
     /// The filename of the .wasm file
     let wasmFilename = "main.wasm"
+    /// The path to the .wasm product artifact
+    let wasmProductArtifact: URL
 
     init(
         options: PackageToJS.PackageOptions,
         packageId: String,
         pluginWorkDirectoryURL: URL,
         selfPackageDir: URL,
-        outputDir: URL
+        outputDir: URL,
+        wasmProductArtifact: URL
     ) {
         self.options = options
         self.packageId = packageId
@@ -69,6 +72,7 @@ struct PackagingPlanner {
         self.outputDir = outputDir
         self.intermediatesDir = pluginWorkDirectoryURL.appending(path: outputDir.lastPathComponent + ".tmp")
         self.selfPath = String(#filePath)
+        self.wasmProductArtifact = wasmProductArtifact
     }
 
     // MARK: - Primitive build operations
@@ -107,21 +111,26 @@ struct PackagingPlanner {
     /// Construct the build plan and return the root task key
     func planBuild(
         make: inout MiniMake,
-        splitDebug: Bool,
-        wasmProductArtifact: URL
+        splitDebug: Bool
     ) throws -> MiniMake.TaskKey {
         let (allTasks, _) = try planBuildInternal(
-            make: &make, splitDebug: splitDebug, wasmProductArtifact: wasmProductArtifact
+            make: &make, splitDebug: splitDebug
         )
         return make.addTask(
             inputTasks: allTasks, output: "all", attributes: [.phony, .silent]
         ) { _ in }
     }
 
+    func deriveBuildConfiguration() -> (configuration: String, triple: String) {
+        // e.g. path/to/.build/wasm32-unknown-wasi/debug/Basic.wasm -> ("debug", "wasm32-unknown-wasi")
+        let buildConfiguration = wasmProductArtifact.deletingLastPathComponent().lastPathComponent
+        let triple = wasmProductArtifact.deletingLastPathComponent().deletingLastPathComponent().lastPathComponent
+        return (buildConfiguration, triple)
+    }
+
     private func planBuildInternal(
         make: inout MiniMake,
-        splitDebug: Bool,
-        wasmProductArtifact: URL
+        splitDebug: Bool
     ) throws -> (allTasks: [MiniMake.TaskKey], outputDirTask: MiniMake.TaskKey) {
         // Prepare output directory
         let outputDirTask = make.addTask(
@@ -133,7 +142,7 @@ struct PackagingPlanner {
         var packageInputs: [MiniMake.TaskKey] = []
 
         // Guess the build configuration from the parent directory name of .wasm file
-        let buildConfiguration = wasmProductArtifact.deletingLastPathComponent().lastPathComponent
+        let (buildConfiguration, triple) = deriveBuildConfiguration()
         let wasm: MiniMake.TaskKey
 
         let shouldOptimize: Bool
@@ -229,10 +238,9 @@ struct PackagingPlanner {
     /// Construct the test build plan and return the root task key
     func planTestBuild(
         make: inout MiniMake,
-        wasmProductArtifact: URL
     ) throws -> (rootTask: MiniMake.TaskKey, binDir: URL) {
         var (allTasks, outputDirTask) = try planBuildInternal(
-            make: &make, splitDebug: false, wasmProductArtifact: wasmProductArtifact
+            make: &make, splitDebug: false
         )
 
         let binDir = outputDir.appending(path: "bin")
@@ -272,12 +280,16 @@ struct PackagingPlanner {
         let substitutions = [
             "@PACKAGE_TO_JS_MODULE_PATH@": wasmFilename
         ]
+        let (buildConfiguration, triple) = deriveBuildConfiguration()
+        let conditions = [
+            "USE_SHARED_MEMORY": triple == "wasm32-unknown-wasip1-threads"
+        ]
         return make.addTask(
             inputFiles: [selfPath, inputPath.path], inputTasks: [outputDirTask] + inputs,
             output: outputDir.appending(path: output).path
         ) {
             var content = try String(contentsOf: inputPath, encoding: .utf8)
-            let options = PreprocessOptions(substitutions: substitutions)
+            let options = PreprocessOptions(conditions: conditions, substitutions: substitutions)
             content = try preprocess(source: content, file: file, options: options)
             try content.write(toFile: $0.output, atomically: true, encoding: .utf8)
         }
