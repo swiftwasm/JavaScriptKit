@@ -73,6 +73,25 @@ extension Trait where Self == ConditionTrait {
                 enumerator.skipDescendants()
                 continue
             }
+
+            // Copy symbolic links
+            if let resourceValues = try? sourcePath.resourceValues(forKeys: [.isSymbolicLinkKey]),
+                resourceValues.isSymbolicLink == true
+            {
+                try FileManager.default.createDirectory(
+                    at: destinationPath.deletingLastPathComponent(),
+                    withIntermediateDirectories: true,
+                    attributes: nil
+                )
+                let linkDestination = try! FileManager.default.destinationOfSymbolicLink(atPath: sourcePath.path)
+                try FileManager.default.createSymbolicLink(
+                    atPath: destinationPath.path,
+                    withDestinationPath: linkDestination
+                )
+                enumerator.skipDescendants()
+                continue
+            }
+
             // Skip directories
             var isDirectory: ObjCBool = false
             if FileManager.default.fileExists(atPath: sourcePath.path, isDirectory: &isDirectory) {

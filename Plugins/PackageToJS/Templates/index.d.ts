@@ -1,4 +1,4 @@
-import type { Export, ModuleSource } from './instantiate.js'
+import type { Exports, Imports, ModuleSource } from './instantiate.js'
 
 export type Options = {
     /**
@@ -7,6 +7,12 @@ export type Options = {
      * If not provided, the module will be fetched from the default path.
      */
     module?: ModuleSource
+/* #if HAS_IMPORTS */
+    /**
+     * The imports to use for the module
+     */
+    imports: Imports
+/* #endif */
 }
 
 /**
@@ -17,5 +23,5 @@ export type Options = {
  */
 export declare function init(options?: Options): Promise<{
     instance: WebAssembly.Instance,
-    exports: Export
+    exports: Exports
 }>

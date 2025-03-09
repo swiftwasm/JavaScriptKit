@@ -10,3 +10,4 @@ xcuserdata/
 Examples/*/Bundle
 Examples/*/package-lock.json
 Package.resolved
+Plugins/BridgeJS/Sources/JavaScript/package-lock.json

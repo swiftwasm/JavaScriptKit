@@ -1,0 +1,55 @@
+{
+  "classes" : [
+
+  ],
+  "functions" : [
+    {
+      "abiName" : "bjs_checkInt",
+      "name" : "checkInt",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "int" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_checkFloat",
+      "name" : "checkFloat",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "float" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_checkDouble",
+      "name" : "checkDouble",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "double" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_checkBool",
+      "name" : "checkBool",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "bool" : {
+
+        }
+      }
+    }
+  ]
+}

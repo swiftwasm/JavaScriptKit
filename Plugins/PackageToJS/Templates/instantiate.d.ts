@@ -1,11 +1,12 @@
 import type { /* #if USE_SHARED_MEMORY */SwiftRuntimeThreadChannel, /* #endif */SwiftRuntime } from "./runtime.js";
 
-export type Import = {
-    // TODO: Generate type from imported .d.ts files
-}
-export type Export = {
-    // TODO: Generate type from .swift files
-}
+/* #if HAS_BRIDGE */
+// @ts-ignore
+export type { Imports, Exports } from "./bridge.js";
+/* #else */
+export type Imports = {}
+export type Exports = {}
+/* #endif */
 
 /**
  * The path to the WebAssembly module relative to the root of the package
@@ -59,10 +60,12 @@ export type InstantiateOptions = {
      * The WebAssembly module to instantiate
      */
     module: ModuleSource,
+/* #if HAS_IMPORTS */
     /**
      * The imports provided by the embedder
      */
-    imports: Import,
+    imports: Imports,
+/* #endif */
 /* #if IS_WASI */
     /**
      * The WASI implementation to use
@@ -86,7 +89,11 @@ export type InstantiateOptions = {
      * Add imports to the WebAssembly import object
      * @param imports - The imports to add
      */
-    addToCoreImports?: (imports: WebAssembly.Imports) => void
+    addToCoreImports?: (
+        imports: WebAssembly.Imports,
+        getInstance: () => WebAssembly.Instance | null,
+        getExports: () => Exports | null,
+    ) => void
 }
 
 /**
@@ -95,7 +102,7 @@ export type InstantiateOptions = {
 export declare function instantiate(options: InstantiateOptions): Promise<{
     instance: WebAssembly.Instance,
     swift: SwiftRuntime,
-    exports: Export
+    exports: Exports
 }>
 
 /**
@@ -104,5 +111,5 @@ export declare function instantiate(options: InstantiateOptions): Promise<{
 export declare function instantiateForThread(tid: number, startArg: number, options: InstantiateOptions): Promise<{
     instance: WebAssembly.Instance,
     swift: SwiftRuntime,
-    exports: Export
+    exports: Exports
 }>

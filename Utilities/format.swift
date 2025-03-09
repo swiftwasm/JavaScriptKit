@@ -63,6 +63,7 @@ let excluded: Set<String> = [
     ".index-build",
     "node_modules",
     "__Snapshots__",
+    "Generated",
     // Exclude the script itself to avoid changing its file mode.
     URL(fileURLWithPath: #filePath).lastPathComponent,
 ]
