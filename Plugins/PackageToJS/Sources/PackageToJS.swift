@@ -278,7 +278,7 @@ struct PackagingPlanner {
         ) {
             var content = try String(contentsOf: inputPath, encoding: .utf8)
             let options = PreprocessOptions(substitutions: substitutions)
-            content = try preprocess(source: content, options: options)
+            content = try preprocess(source: content, file: file, options: options)
             try content.write(toFile: $0.output, atomically: true, encoding: .utf8)
         }
     }

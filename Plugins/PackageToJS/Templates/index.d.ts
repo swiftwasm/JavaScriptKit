@@ -5,6 +5,12 @@ export type Options = {
      * The CLI arguments to pass to the WebAssembly module
      */
     args?: string[]
+    /* #if USE_SHARED_MEMORY */
+    /**
+     * The WebAssembly memory to use (must be 'shared')
+     */
+    memory: WebAssembly.Memory
+    /* #endif */
 }
 
 /**
@@ -18,7 +24,7 @@ export type Options = {
 export declare function init(
     moduleSource: WebAssembly.Module | ArrayBufferView | ArrayBuffer | Response | PromiseLike<Response>,
     imports: Import,
-    options: Options | undefined
+    options: Options
 ): Promise<{
     instance: WebAssembly.Instance,
     exports: Export

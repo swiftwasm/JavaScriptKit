@@ -31,6 +31,8 @@ export interface Instantiator {
     createExports(instance: WebAssembly.Instance): Export
 }
 
+export type InstantiateOptions = {}
+
 /**
  * Create an instantiator for the given imports
  * @param imports - The imports to add
@@ -38,7 +40,7 @@ export interface Instantiator {
  */
 export declare function createInstantiator(
     imports: Import,
-    options: Options | undefined
+    options: InstantiateOptions | undefined
 ): Promise<Instantiator>
 
 export interface WASI {
@@ -58,7 +60,10 @@ export declare function instantiate(
     moduleSource: WebAssembly.Module | ArrayBufferView | ArrayBuffer | Response | PromiseLike<Response>,
     imports: Import,
     options: {
-        wasi: WASI
+        wasi: WASI,
+        /* #if USE_SHARED_MEMORY */
+        memory: WebAssembly.Memory
+        /* #endif */
     }
 ): Promise<{
     instance: WebAssembly.Instance,

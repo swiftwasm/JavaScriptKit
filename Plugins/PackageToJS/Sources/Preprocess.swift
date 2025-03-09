@@ -16,10 +16,11 @@
 /// `@VARIABLE@` will be substituted with the value of the variable.
 ///
 /// The preprocessor will return the preprocessed source code.
-func preprocess(source: String, options: PreprocessOptions) throws -> String {
-    let tokens = try Preprocessor.tokenize(source: source)
-    let parsed = try Preprocessor.parse(tokens: tokens, source: source, options: options)
-    return try Preprocessor.preprocess(parsed: parsed, source: source, options: options)
+func preprocess(source: String, file: String?, options: PreprocessOptions) throws -> String {
+    let preprocessor = Preprocessor(source: source, file: file, options: options)
+    let tokens = try preprocessor.tokenize()
+    let parsed = try preprocessor.parse(tokens: tokens)
+    return try preprocessor.preprocess(parsed: parsed)
 }
 
 struct PreprocessOptions {
@@ -42,61 +43,117 @@ private struct Preprocessor {
         let position: String.Index
     }
 
-    struct PreprocessorError: Error {
+    struct PreprocessorError: Error, CustomStringConvertible {
+        let file: String?
         let message: String
         let source: String
         let line: Int
         let column: Int
 
-        init(message: String, source: String, line: Int, column: Int) {
+        init(file: String?, message: String, source: String, line: Int, column: Int) {
+            self.file = file
             self.message = message
             self.source = source
             self.line = line
             self.column = column
         }
 
-        init(message: String, source: String, index: String.Index) {
-            func consumeLineColumn(from index: String.Index, in source: String) -> (Int, Int) {
-                var line = 1
-                var column = 1
-                for char in source[..<index] {
-                    if char == "\n" {
-                        line += 1
-                        column = 1
-                    } else {
-                        column += 1
-                    }
+        init(file: String?, message: String, source: String, index: String.Index) {
+            let (line, column) = Self.computeLineAndColumn(from: index, in: source)
+            self.init(file: file, message: message, source: source, line: line, column: column)
+        }
+
+        /// Get the 1-indexed line and column
+        private static func computeLineAndColumn(from index: String.Index, in source: String) -> (line: Int, column: Int) {
+            var line = 1
+            var column = 1
+            for char in source[..<index] {
+                if char == "\n" {
+                    line += 1
+                    column = 1
+                } else {
+                    column += 1
                 }
-                return (line, column)
             }
-            self.message = message
-            self.source = source
-            let (line, column) = consumeLineColumn(from: index, in: source)
-            self.line = line
-            self.column = column
+            return (line, column)
         }
 
-        static func expected(
-            _ expected: CustomStringConvertible, at index: String.Index, in source: String
-        ) -> PreprocessorError {
-            return PreprocessorError(
-                message: "Expected \(expected) at \(index)", source: source, index: index)
+        var description: String {
+            let lines = source.split(separator: "\n", omittingEmptySubsequences: false)
+            let lineIndex = line - 1
+            let lineNumberWidth = "\(line + 1)".count
+
+            var description = ""
+            if let file = file {
+                description += "\(file):"
+            }
+            description += "\(line):\(column): \(message)\n"
+
+            // Show context lines
+            if lineIndex > 0 {
+                description += formatLine(number: line - 1, content: lines[lineIndex - 1], width: lineNumberWidth)
+            }
+            description += formatLine(number: line, content: lines[lineIndex], width: lineNumberWidth)
+            description += formatPointer(column: column, width: lineNumberWidth)
+            if lineIndex + 1 < lines.count {
+                description += formatLine(number: line + 1, content: lines[lineIndex + 1], width: lineNumberWidth)
+            }
+
+            return description
         }
 
-        static func unexpected(token: Token, at index: String.Index, in source: String)
-            -> PreprocessorError
-        {
-            return PreprocessorError(
-                message: "Unexpected token \(token) at \(index)", source: source, index: index)
+        private func formatLine(number: Int, content: String.SubSequence, width: Int) -> String {
+            return "\(number)".padding(toLength: width, withPad: " ", startingAt: 0) + "  | \(content)\n"
         }
 
-        static func eof(at index: String.Index, in source: String) -> PreprocessorError {
-            return PreprocessorError(
-                message: "Unexpected end of input", source: source, index: index)
+        private func formatPointer(column: Int, width: Int) -> String {
+            let padding = String(repeating: " ", count: width) + "  | " + String(repeating: " ", count: column - 1)
+            return padding + "^\n"
         }
     }
 
-    static func tokenize(source: String) throws -> [TokenInfo] {
+    let source: String
+    let file: String?
+    let options: PreprocessOptions
+
+    init(source: String, file: String?, options: PreprocessOptions) {
+        self.source = source
+        self.file = file
+        self.options = options
+    }
+
+    func unexpectedTokenError(expected: Token?, token: Token, at index: String.Index) -> PreprocessorError {
+        let message = expected.map { "Expected \($0) but got \(token)" } ?? "Unexpected token \(token)"
+        return PreprocessorError(
+            file: file,
+            message: message, source: source, index: index)
+    }
+
+    func unexpectedCharacterError(expected: CustomStringConvertible, character: Character, at index: String.Index) -> PreprocessorError {
+        return PreprocessorError(
+            file: file,
+            message: "Expected \(expected) but got \(character)", source: source, index: index)
+    }
+
+    func unexpectedDirectiveError(at index: String.Index) -> PreprocessorError {
+        return PreprocessorError(
+            file: file,
+            message: "Unexpected directive", source: source, index: index)
+    }
+
+    func eofError(at index: String.Index) -> PreprocessorError {
+        return PreprocessorError(
+            file: file,
+            message: "Unexpected end of input", source: source, index: index)
+    }
+
+    func undefinedVariableError(name: String, at index: String.Index) -> PreprocessorError {
+        return PreprocessorError(
+            file: file,
+            message: "Undefined variable \(name)", source: source, index: index)
+    }
+
+    func tokenize() throws -> [TokenInfo] {
         var cursor = source.startIndex
         var tokens: [TokenInfo] = []
 
@@ -121,7 +178,7 @@ private struct Preprocessor {
 
         func expect(_ expected: Character) throws {
             guard try peek() == expected else {
-                throw PreprocessorError.expected(expected, at: cursor, in: source)
+                throw unexpectedCharacterError(expected: expected, character: try peek(), at: cursor)
             }
             consume()
         }
@@ -131,24 +188,24 @@ private struct Preprocessor {
                 let endIndex = source.index(
                     cursor, offsetBy: expected.count, limitedBy: source.endIndex)
             else {
-                throw PreprocessorError.eof(at: cursor, in: source)
+                throw eofError(at: cursor)
             }
             guard source[cursor..<endIndex] == expected else {
-                throw PreprocessorError.expected(expected, at: cursor, in: source)
+                throw unexpectedCharacterError(expected: expected, character: try peek(), at: cursor)
             }
             consume(expected.count)
         }
 
         func peek() throws -> Character {
             guard cursor < source.endIndex else {
-                throw PreprocessorError.eof(at: cursor, in: source)
+                throw eofError(at: cursor)
             }
             return source[cursor]
         }
 
         func peek2() throws -> (Character, Character) {
             guard cursor < source.endIndex, source.index(after: cursor) < source.endIndex else {
-                throw PreprocessorError.eof(at: cursor, in: source)
+                throw eofError(at: cursor)
             }
             let char1 = source[cursor]
             let char2 = source[source.index(after: cursor)]
@@ -205,8 +262,7 @@ private struct Preprocessor {
                 try expect(" */")
             }
             guard let token = token else {
-                throw PreprocessorError(
-                    message: "Unexpected directive", source: source, index: cursor)
+                throw unexpectedDirectiveError(at: directiveStart)
             }
             addToken(token, at: directiveStart)
             bufferStart = cursor
@@ -221,9 +277,7 @@ private struct Preprocessor {
             condition: String, then: [ParseResult], else: [ParseResult], position: String.Index)
     }
 
-    static func parse(tokens: [TokenInfo], source: String, options: PreprocessOptions) throws
-        -> [ParseResult]
-    {
+    func parse(tokens: [TokenInfo]) throws -> [ParseResult] {
         var cursor = tokens.startIndex
 
         func consume() {
@@ -252,14 +306,14 @@ private struct Preprocessor {
                     }
                 }
                 guard case .endif = tokens[cursor].token else {
-                    throw PreprocessorError.unexpected(
-                        token: tokens[cursor].token, at: tokens[cursor].position, in: source)
+                    throw unexpectedTokenError(
+                        expected: .endif, token: tokens[cursor].token, at: tokens[cursor].position)
                 }
                 consume()
                 return .if(condition: condition, then: then, else: `else`, position: ifPosition)
             case .else, .endif:
-                throw PreprocessorError.unexpected(
-                    token: tokens[cursor].token, at: tokens[cursor].position, in: source)
+                throw unexpectedTokenError(
+                    expected: nil, token: tokens[cursor].token, at: tokens[cursor].position)
             }
         }
         var results: [ParseResult] = []
@@ -269,9 +323,7 @@ private struct Preprocessor {
         return results
     }
 
-    static func preprocess(parsed: [ParseResult], source: String, options: PreprocessOptions) throws
-        -> String
-    {
+    func preprocess(parsed: [ParseResult]) throws -> String {
         var result = ""
 
         func appendBlock(content: String) {
@@ -290,8 +342,7 @@ private struct Preprocessor {
                 appendBlock(content: content)
             case .if(let condition, let then, let `else`, let position):
                 guard let condition = options.variables[condition] else {
-                    throw PreprocessorError.unexpected(
-                        token: .if(condition: condition), at: position, in: source)
+                    throw undefinedVariableError(name: condition, at: position)
                 }
                 let blocks = condition ? then : `else`
                 for block in blocks {

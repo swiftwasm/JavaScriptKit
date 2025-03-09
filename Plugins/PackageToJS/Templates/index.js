@@ -19,7 +19,10 @@ export async function init(
         new PreopenDirectory("/", new Map()),
     ], { debug: false })
     const { instance, exports, swift } = await instantiate(moduleSource, imports, {
-        wasi: wasi
+        wasi,
+        /* #if USE_SHARED_MEMORY */
+        memory: options.memory,
+        /* #endif */
     });
     swift.main();
 

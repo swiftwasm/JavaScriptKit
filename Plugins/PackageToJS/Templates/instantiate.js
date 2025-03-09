@@ -31,6 +31,10 @@ export async function instantiate(
     const importObject = {
         javascript_kit: swift.wasmImports,
         wasi_snapshot_preview1: wasi.wasiImport,
+        /* #if USE_SHARED_MEMORY */ env: {
+            memory: options.memory,
+        },
+        /* #endif */
     };
     instantiator.addImports(importObject);
 

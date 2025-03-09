@@ -39,7 +39,11 @@ Please ensure you are using Node.js v18.x or newer.
         const dirname = path.dirname(fileURLToPath(import.meta.url))
         const { swift } = await instantiate(
             await readFile(path.join(dirname, MODULE_PATH)),
-            {}, { wasi }
+            {}, {
+                wasi,
+                /* #if USE_SHARED_MEMORY */
+                /* #endif */
+            }
         )
         swift.main()
     }
