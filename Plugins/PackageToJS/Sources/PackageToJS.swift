@@ -274,9 +274,8 @@ struct PackagingPlanner {
             output: outputDir.appending(path: output).path
         ) {
             var content = try String(contentsOf: inputPath, encoding: .utf8)
-            for (key, value) in substitutions {
-                content = content.replacingOccurrences(of: key, with: value)
-            }
+            let options = PreprocessOptions(substitutions: substitutions)
+            content = try preprocess(source: content, options: options)
             try content.write(toFile: $0.output, atomically: true, encoding: .utf8)
         }
     }
