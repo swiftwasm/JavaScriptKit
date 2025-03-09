@@ -282,7 +282,8 @@ struct PackagingPlanner {
         ]
         let (buildConfiguration, triple) = deriveBuildConfiguration()
         let conditions = [
-            "USE_SHARED_MEMORY": triple == "wasm32-unknown-wasip1-threads"
+            "USE_SHARED_MEMORY": triple == "wasm32-unknown-wasip1-threads",
+            "IS_WASI": triple.hasPrefix("wasm32-unknown-wasi"),
         ]
         return make.addTask(
             inputFiles: [selfPath, inputPath.path], inputTasks: [outputDirTask] + inputs,

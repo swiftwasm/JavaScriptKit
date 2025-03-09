@@ -60,7 +60,9 @@ export declare function instantiate(
     moduleSource: WebAssembly.Module | ArrayBufferView | ArrayBuffer | Response | PromiseLike<Response>,
     imports: Import,
     options: {
+        /* #if IS_WASI */
         wasi: WASI,
+        /* #endif */
         /* #if USE_SHARED_MEMORY */
         memory: WebAssembly.Memory
         /* #endif */
