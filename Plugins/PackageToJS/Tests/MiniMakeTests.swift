@@ -5,7 +5,7 @@ import Testing
 
 @Suite struct MiniMakeTests {
     // Test basic task management functionality
-    @Test func testBasicTaskManagement() throws {
+    @Test func basicTaskManagement() throws {
         try withTemporaryDirectory { tempDir in
             var make = MiniMake(printProgress: { _, _, _, _ in })
             let outputPath = tempDir.appendingPathComponent("output.txt").path
@@ -21,7 +21,7 @@ import Testing
     }
 
     // Test that task dependencies are handled correctly
-    @Test func testTaskDependencies() throws {
+    @Test func taskDependencies() throws {
         try withTemporaryDirectory { tempDir in
             var make = MiniMake(printProgress: { _, _, _, _ in })
             let input = tempDir.appendingPathComponent("input.txt").path
@@ -51,7 +51,7 @@ import Testing
     }
 
     // Test that phony tasks are always rebuilt
-    @Test func testPhonyTask() throws {
+    @Test func phonyTask() throws {
         try withTemporaryDirectory { tempDir in
             var make = MiniMake(printProgress: { _, _, _, _ in })
             let outputPath = tempDir.appendingPathComponent("phony.txt").path
@@ -71,7 +71,7 @@ import Testing
     }
 
     // Test that the same build graph produces stable fingerprints
-    @Test func testFingerprintStability() throws {
+    @Test func fingerprintStability() throws {
         var make1 = MiniMake(printProgress: { _, _, _, _ in })
         var make2 = MiniMake(printProgress: { _, _, _, _ in })
 
@@ -87,7 +87,7 @@ import Testing
     }
 
     // Test that rebuilds are controlled by timestamps
-    @Test func testTimestampBasedRebuild() throws {
+    @Test func timestampBasedRebuild() throws {
         try withTemporaryDirectory { tempDir in
             var make = MiniMake(printProgress: { _, _, _, _ in })
             let input = tempDir.appendingPathComponent("input.txt").path
@@ -118,7 +118,7 @@ import Testing
     }
 
     // Test that silent tasks execute without output
-    @Test func testSilentTask() throws {
+    @Test func silentTask() throws {
         try withTemporaryDirectory { tempDir in
             var messages: [(String, Int, Int, String)] = []
             var make = MiniMake(
@@ -146,7 +146,7 @@ import Testing
     }
 
     // Test that error cases are handled appropriately
-    @Test func testErrorWhileBuilding() throws {
+    @Test func errorWhileBuilding() throws {
         struct BuildError: Error {}
         try withTemporaryDirectory { tempDir in
             var make = MiniMake(printProgress: { _, _, _, _ in })
@@ -163,7 +163,7 @@ import Testing
     }
 
     // Test that cleanup functionality works correctly
-    @Test func testCleanup() throws {
+    @Test func cleanup() throws {
         try withTemporaryDirectory { tempDir in
             var make = MiniMake(printProgress: { _, _, _, _ in })
             let outputs = [
