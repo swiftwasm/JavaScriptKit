@@ -1,6 +1,5 @@
 // @ts-check
-import { instantiate } from "./instantiate.js"
-import { MODULE_PATH } from "./index.js"
+import {  MODULE_PATH, instantiate } from "./instantiate.js"
 
 export class NodeRunner {
     constructor() { }
