@@ -365,6 +365,8 @@ struct PackagingPlanner {
     let selfPackageDir: BuildPath
     /// The path of this file itself, used to capture changes of planner code
     let selfPath: BuildPath
+    /// The API skeletons source files
+    let skeletons: [BuildPath]
     /// The directory for the final output
     let outputDir: BuildPath
     /// The directory for intermediate files
@@ -385,6 +387,7 @@ struct PackagingPlanner {
         packageId: String,
         intermediatesDir: BuildPath,
         selfPackageDir: BuildPath,
+        skeletons: [BuildPath],
         outputDir: BuildPath,
         wasmProductArtifact: BuildPath,
         wasmFilename: String,
@@ -396,6 +399,7 @@ struct PackagingPlanner {
         self.options = options
         self.packageId = packageId
         self.selfPackageDir = selfPackageDir
+        self.skeletons = skeletons
         self.outputDir = outputDir
         self.intermediatesDir = intermediatesDir
         self.wasmFilename = wasmFilename
@@ -555,6 +559,25 @@ struct PackagingPlanner {
         )
         packageInputs.append(packageJsonTask)
 
+        if skeletons.count > 0 {
+            let bridgeJs = outputDir.appending(path: "bridge.js")
+            let bridgeDts = outputDir.appending(path: "bridge.d.ts")
+            packageInputs.append(
+                make.addTask(inputFiles: skeletons, output: bridgeJs) { _, scope in
+                    let link = try BridgeJSLink(
+                        exportedSkeletons: skeletons.map {
+                            let decoder = JSONDecoder()
+                            let data = try Data(contentsOf: URL(fileURLWithPath: scope.resolve(path: $0).path))
+                            return try decoder.decode(ExportedSkeleton.self, from: data)
+                        }
+                    )
+                    let (outputJs, outputDts) = link.link()
+                    try system.writeFile(atPath: scope.resolve(path: bridgeJs).path, content: Data(outputJs.utf8))
+                    try system.writeFile(atPath: scope.resolve(path: bridgeDts).path, content: Data(outputDts.utf8))
+                }
+            )
+        }
+
         // Copy the template files
         for (file, output) in [
             ("Plugins/PackageToJS/Templates/index.js", "index.js"),
@@ -665,6 +688,7 @@ struct PackagingPlanner {
             "USE_SHARED_MEMORY": triple == "wasm32-unknown-wasip1-threads",
             "IS_WASI": triple.hasPrefix("wasm32-unknown-wasi"),
             "USE_WASI_CDN": options.useCDN,
+            "HAS_BRIDGE": skeletons.count > 0,
         ]
         let constantSubstitutions: [String: String] = [
             "PACKAGE_TO_JS_MODULE_PATH": wasmFilename,

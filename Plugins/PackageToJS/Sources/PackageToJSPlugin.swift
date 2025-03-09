@@ -163,6 +163,8 @@ struct PackageToJSPlugin: CommandPlugin {
         // Build products
         let selfPackage = try findSelfPackage(in: context.package)
         let productName = try buildOptions.product ?? deriveDefaultProduct(package: context.package)
+        let skeletonCollector = SkeletonCollector(context: context)
+        let skeletons = skeletonCollector.collectFromProduct(name: productName)
         let build = try buildWasm(
             productName: productName,
             selfPackage: selfPackage,
@@ -188,6 +190,7 @@ struct PackageToJSPlugin: CommandPlugin {
             options: buildOptions.packageOptions,
             context: context,
             selfPackage: selfPackage,
+            skeletons: skeletons,
             outputDir: outputDir,
             wasmProductArtifact: productArtifact,
             wasmFilename: productArtifact.lastPathComponent
@@ -222,6 +225,8 @@ struct PackageToJSPlugin: CommandPlugin {
 
         let selfPackage = try findSelfPackage(in: context.package)
         let productName = "\(context.package.displayName)PackageTests"
+        let skeletonCollector = SkeletonCollector(context: context)
+        let skeletons = skeletonCollector.collectFromTests()
         let build = try buildWasm(
             productName: productName,
             selfPackage: selfPackage,
@@ -268,6 +273,7 @@ struct PackageToJSPlugin: CommandPlugin {
             options: testOptions.packageOptions,
             context: context,
             selfPackage: selfPackage,
+            skeletons: skeletons,
             outputDir: outputDir,
             wasmProductArtifact: productArtifact,
             // If the product artifact doesn't have a .wasm extension, add it
@@ -626,11 +632,74 @@ private func findPackageInDependencies(package: Package, id: Package.ID) -> Pack
     return visit(package: package)
 }
 
+class SkeletonCollector {
+    private var visitedProducts: Set<Product.ID> = []
+    private var visitedTargets: Set<Target.ID> = []
+
+    var skeletons: [URL] = []
+    let skeletonPath = "Generated/JavaScript/ExportSwiftAPI.json"
+    let context: PluginContext
+
+    init(context: PluginContext) {
+        self.context = context
+    }
+
+    func collectFromProduct(name: String) -> [URL] {
+        guard let product = context.package.products.first(where: { $0.name == name }) else {
+            return []
+        }
+        visit(product: product)
+        return skeletons
+    }
+
+    func collectFromTests() -> [URL] {
+        let tests = context.package.targets.filter {
+            guard let target = $0 as? SwiftSourceModuleTarget else { return false }
+            return target.kind == .test
+        }
+        for test in tests {
+            visit(target: test)
+        }
+        return skeletons
+    }
+
+    private func visit(product: Product) {
+        if visitedProducts.contains(product.id) { return }
+        visitedProducts.insert(product.id)
+        for target in product.targets {
+            visit(target: target)
+        }
+    }
+
+    private func visit(target: Target) {
+        if visitedTargets.contains(target.id) { return }
+        visitedTargets.insert(target.id)
+        if let target = target as? SwiftSourceModuleTarget {
+            let skeletonURL = target.directoryURL.appending(path: skeletonPath)
+            if FileManager.default.fileExists(atPath: skeletonURL.path) {
+                skeletons.append(skeletonURL)
+            }
+        }
+
+        for dependency in target.dependencies {
+            switch dependency {
+            case .product(let product):
+                visit(product: product)
+            case .target(let target):
+                visit(target: target)
+            @unknown default:
+                continue
+            }
+        }
+    }
+}
+
 extension PackagingPlanner {
     init(
         options: PackageToJS.PackageOptions,
         context: PluginContext,
         selfPackage: Package,
+        skeletons: [URL],
         outputDir: URL,
         wasmProductArtifact: URL,
         wasmFilename: String
@@ -645,6 +714,7 @@ extension PackagingPlanner {
                 absolute: context.pluginWorkDirectoryURL.appending(path: outputBaseName + ".tmp").path
             ),
             selfPackageDir: BuildPath(absolute: selfPackage.directoryURL.path),
+            skeletons: skeletons.map { BuildPath(absolute: $0.path) },
             outputDir: BuildPath(absolute: outputDir.path),
             wasmProductArtifact: BuildPath(absolute: wasmProductArtifact.path),
             wasmFilename: wasmFilename,

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Getting Started</title>
+</head>
+
+<body>
+  <script type="module">
+    import { init } from "./.build/plugins/PackageToJS/outputs/Package/index.js";
+    const { exports } = await init();
+    const apis = [
+      { name: "hello", atjs: exports.hello, closure: globalThis.helloClosure, args: [] },
+      { name: "twice", atjs: exports.twice, closure: globalThis.twiceClosure, args: [4] },
+    ]
+
+    const N = 100000;
+    const WARMUP = 10000
+    // Warm up both functions
+    for (const api of apis) {
+      for (let i = 0; i < WARMUP; i++) {
+        api.atjs(...api.args);
+        api.closure(...api.args);
+      }
+    }
+
+    const results = [];
+    
+    // Benchmark each API
+    for (const api of apis) {
+      const start1 = performance.now();
+      for (let i = 0; i < N; i++) {
+        api.closure(...api.args);
+      }
+      const end1 = performance.now();
+
+      const start2 = performance.now();
+      for (let i = 0; i < N; i++) {
+        api.atjs(...api.args);
+      }
+      const end2 = performance.now();
+      
+      results.push({
+        name: api.name,
+        closureTime: end1 - start1,
+        atjsTime: end2 - start2,
+        speedup: ((end1 - start1) / (end2 - start2)).toFixed(2)
+      });
+    }
+
+    const result = document.getElementById("result");
+    let html = `${N} times<table><tr><th>Function</th><th>@JS</th><th>JSClosure</th><th>Speedup</th></tr>`;
+    
+    for (const res of results) {
+      html += `
+        <tr>
+          <td>${res.name}</td>
+          <td>${res.atjsTime.toFixed(2)}ms</td>
+          <td>${res.closureTime.toFixed(2)}ms</td>
+          <td>${res.speedup}x</td>
+        </tr>
+      `;
+    }
+    
+    html += `</table>`;
+    result.innerHTML = html;
+
+    const code = document.getElementById("code");
+    const codeText = await fetch("./Sources/main.swift").then(res => res.text());
+    code.innerHTML = codeText;
+  </script>
+
+  <div id="result"></div>
+  <pre id="code"></pre>
+</body>
+
+</html>

@@ -1,11 +1,12 @@
 import type { /* #if USE_SHARED_MEMORY */SwiftRuntimeThreadChannel, /* #endif */SwiftRuntime } from "./runtime.js";
 
-export type Import = {
-    // TODO: Generate type from imported .d.ts files
-}
-export type Export = {
-    // TODO: Generate type from .swift files
-}
+/* #if HAS_BRIDGE */
+// @ts-ignore
+export type { Import, Export } from "./bridge.js";
+/* #else */
+export type Import = {}
+export type Export = {}
+/* #endif */
 
 /**
  * The path to the WebAssembly module relative to the root of the package
@@ -86,7 +87,11 @@ export type InstantiateOptions = {
      * Add imports to the WebAssembly import object
      * @param imports - The imports to add
      */
-    addToCoreImports?: (imports: WebAssembly.Imports) => void
+    addToCoreImports?: (
+        imports: WebAssembly.Imports,
+        getInstance: () => WebAssembly.Instance | null,
+        getExports: () => Export | null,
+    ) => void
 }
 
 /**

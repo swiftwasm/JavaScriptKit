@@ -1,0 +1,27 @@
+{
+  "classes" : [
+
+  ],
+  "functions" : [
+    {
+      "abiName" : "bjs_checkString",
+      "name" : "checkString",
+      "parameters" : [
+        {
+          "label" : "a",
+          "name" : "a",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    }
+  ]
+}

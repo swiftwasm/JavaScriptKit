@@ -1,0 +1,12 @@
+#!/usr/bin/env node
+
+const fs = require("fs");
+
+const output = process.argv[2];
+
+if (!output) {
+  console.error("No output file provided");
+  process.exit(1);
+}
+
+fs.writeFileSync(output, "");

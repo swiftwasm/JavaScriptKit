@@ -1,0 +1,71 @@
+export async function createInstantiator(options, swift) {
+    let instance;
+    let memory;
+    let bytesView;
+    const textDecoder = new TextDecoder("utf-8");
+    const textEncoder = new TextEncoder("utf-8");
+
+    let tmpRetString;
+    return {
+        /** @param {WebAssembly.Imports} importObject */
+        addImports: (importObject) => {
+            const bjs = {};
+            importObject["bjs"] = bjs;
+            bjs["return_string"] = function(ptr, len) {
+                const bytes = new Uint8Array(memory.buffer, ptr, len);
+                tmpRetString = textDecoder.decode(bytes);
+            }
+            bjs["init_memory"] = function(sourceId, bytesPtr) {
+                const source = swift.memory.getObject(sourceId);
+                const bytes = new Uint8Array(memory.buffer, bytesPtr);
+                bytes.set(source);
+            }
+        },
+        setInstance: (i) => {
+            instance = i;
+            memory = instance.exports.memory;
+        },
+        /** @param {WebAssembly.Instance} instance */
+        createExports: (instance) => {
+            const js = swift.memory.heap;
+            class SwiftObject {
+                constructor(pointer) {
+                    this.pointer = pointer;
+                    this.hasReleased = false;
+                    this.registry = new FinalizationRegistry((pointer) => {
+                        instance.exports.bjs_swift_release(pointer);
+                    });
+                    this.registry.register(this, this.pointer);
+                }
+            
+                release() {
+                    this.registry.unregister(this);
+                    instance.exports.bjs_swift_release(this.pointer);
+                }
+            }
+            class Greeter extends SwiftObject {
+                constructor(name) {
+                    const nameBytes = textEncoder.encode(name);
+                    const nameId = swift.memory.retain(nameBytes);
+                    super(instance.exports.bjs_Greeter_init(nameId, nameBytes.length));
+                    swift.memory.release(nameId);
+                }
+                greet() {
+                    instance.exports.bjs_Greeter_greet(this.pointer);
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
+                    return ret;
+                }
+                changeName(name) {
+                    const nameBytes = textEncoder.encode(name);
+                    const nameId = swift.memory.retain(nameBytes);
+                    instance.exports.bjs_Greeter_changeName(this.pointer, nameId, nameBytes.length);
+                    swift.memory.release(nameId);
+                }
+            }
+            return {
+                Greeter,
+            };
+        },
+    }
+}

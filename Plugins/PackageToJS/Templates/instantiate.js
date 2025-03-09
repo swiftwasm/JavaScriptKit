@@ -13,19 +13,28 @@ export const MEMORY_TYPE = {
 }
 /* #endif */
 
+/* #if HAS_BRIDGE */
+// @ts-ignore
+import { createInstantiator } from "./bridge.js"
+/* #else */
 /**
  * @param {import('./instantiate.d').InstantiateOptions} options
+ * @param {any} swift
  */
-async function createInstantiator(options) {
+async function createInstantiator(options, swift) {
     return {
         /** @param {WebAssembly.Imports} importObject */
         addImports: (importObject) => {},
+        /** @param {WebAssembly.Instance} instance */
+        setInstance: (instance) => {},
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             return {};
         },
     }
 }
+/* #endif */
+
 /** @type {import('./instantiate.d').instantiate} */
 export async function instantiate(
     options
@@ -58,13 +67,13 @@ async function _instantiate(
 /* #if IS_WASI */
     const { wasi } = options;
 /* #endif */
-    const instantiator = await createInstantiator(options);
     const swift = new SwiftRuntime({
 /* #if USE_SHARED_MEMORY */
         sharedMemory: true,
         threadChannel: options.threadChannel,
 /* #endif */
     });
+    const instantiator = await createInstantiator(options, swift);
 
     /** @type {WebAssembly.Imports} */
     const importObject = {
@@ -84,10 +93,11 @@ async function _instantiate(
 /* #endif */
     };
     instantiator.addImports(importObject);
-    options.addToCoreImports?.(importObject);
+    options.addToCoreImports?.(importObject, () => instance, () => exports);
 
     let module;
     let instance;
+    let exports;
     if (moduleSource instanceof WebAssembly.Module) {
         module = moduleSource;
         instance = await WebAssembly.instantiate(module, importObject);
@@ -108,10 +118,12 @@ async function _instantiate(
     }
 
     swift.setInstance(instance);
+    instantiator.setInstance(instance);
+    exports = instantiator.createExports(instance);
 
     return {
         instance,
         swift,
-        exports: instantiator.createExports(instance),
+        exports,
     }
 }
