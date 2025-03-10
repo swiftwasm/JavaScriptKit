@@ -11,6 +11,7 @@ extension JSObject {
     ///
     /// ``JSObject`` itself is not `Sendable`, but ``Transferring`` is `Sendable` because it's
     /// intended to be shared across threads.
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public struct Transferring: @unchecked Sendable {
         fileprivate struct CriticalState {
             var continuation: CheckedContinuation<JavaScriptObjectRef, Error>?
@@ -70,6 +71,7 @@ extension JSObject {
         ///     let canvas = try await transferring.receive()
         /// }
         /// ```
+        @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
         public func receive(isolation: isolated (any Actor)? = #isolation, file: StaticString = #file, line: UInt = #line) async throws -> JSObject {
             #if compiler(>=6.1) && _runtime(_multithreaded)
             swjs_request_transferring_object(
@@ -99,6 +101,7 @@ extension JSObject {
     ///
     /// - Parameter object: The ``JSObject`` to be transferred.
     /// - Returns: A ``Transferring`` instance that can be shared across threads.
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func transfer(_ object: JSObject) -> Transferring {
         return Transferring(sourceObject: object)
     }
@@ -115,6 +118,7 @@ extension JSObject {
 @_expose(wasm, "swjs_receive_object")
 @_cdecl("swjs_receive_object")
 #endif
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 func _swjs_receive_object(_ object: JavaScriptObjectRef, _ transferring: UnsafeRawPointer) {
     #if compiler(>=6.1) && _runtime(_multithreaded)
     let storage = Unmanaged<JSObject.Transferring.Storage>.fromOpaque(transferring).takeRetainedValue()
