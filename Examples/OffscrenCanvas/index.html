@@ -1,0 +1,98 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>OffscreenCanvas Example</title>
+  <style>
+    /* CSS animation container */
+    .animation-container {
+      display: flex;
+      margin-top: 20px;
+      justify-content: center;
+      overflow: hidden;
+      height: 80px;
+    }
+
+    /* Animated element */
+    .animation-box {
+      width: 50px;
+      height: 50px;
+      margin: 0 10px;
+      background-color: #3498db;
+      border-radius: 5px;
+      animation: moveBox 1s infinite alternate linear;
+      box-shadow: 0 0 10px rgba(0, 0, 150, 0.5);
+    }
+
+    /* Different colors for each box */
+    .animation-box:nth-child(2) {
+      background-color: #e74c3c;
+      animation-delay: 0.1s;
+    }
+
+    .animation-box:nth-child(3) {
+      background-color: #2ecc71;
+      animation-delay: 0.2s;
+    }
+
+    .animation-box:nth-child(4) {
+      background-color: #f39c12;
+      animation-delay: 0.3s;
+    }
+
+    .animation-box:nth-child(5) {
+      background-color: #9b59b6;
+      animation-delay: 0.4s;
+    }
+
+    /* Animation keyframes */
+    @keyframes moveBox {
+      0% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      100% {
+        transform: translateY(30px) rotate(360deg);
+      }
+    }
+
+    /* Counter animation to show main thread performance */
+    .counter {
+      width: 100%;
+      text-align: center;
+      font-size: 24px;
+      margin-top: 20px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <script type="module" src="Sources/JavaScript/index.js"></script>
+  <h1>OffscreenCanvas Example</h1>
+  <p>
+  <div>
+    <select id="renderer-select">
+      <option value="background">Background Renderer (Web Worker)</option>
+      <option value="main">Main Thread Renderer</option>
+    </select>
+    <button id="render-button">Render</button>
+    <button id="cancel-button">Cancel</button>
+  </div>
+  </p>
+
+  <h3>CSS Animation (Main Thread Performance Indicator)</h3>
+  <div class="animation-container">
+    <div class="animation-box"></div>
+    <div class="animation-box"></div>
+    <div class="animation-box"></div>
+    <div class="animation-box"></div>
+    <div class="animation-box"></div>
+  </div>
+
+  <div class="counter" id="fps-counter">FPS: 0</div>
+
+  <div id="canvas-container"></div>
+</body>
+
+</html>
