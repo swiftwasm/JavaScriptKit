@@ -111,7 +111,8 @@ public extension JSValue {
 #if !hasFeature(Embedded)
     /// An unsafe convenience method of `JSObject.subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
     /// - Precondition: `self` must be a JavaScript Object and specified member should be a callable object.
-    subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue) {
+    @_disfavoredOverload
+    subscript(dynamicMember name: String) -> DiscardableResultClosure {
         object![dynamicMember: name]!
     }
 #endif
