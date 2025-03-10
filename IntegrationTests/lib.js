@@ -79,7 +79,9 @@ export async function startWasiChildThread(event) {
     const swift = new SwiftRuntime({
         sharedMemory: true,
         threadChannel: {
-            postMessageToMainThread: parentPort.postMessage.bind(parentPort),
+            postMessageToMainThread: (message, transfer) => {
+                parentPort.postMessage(message, transfer);
+            },
             listenMessageFromMainThread: (listener) => {
                 parentPort.on("message", listener)
             }
@@ -139,9 +141,9 @@ class ThreadRegistry {
         return this.workers.get(tid);
     }
 
-    wakeUpWorkerThread(tid, message) {
+    wakeUpWorkerThread(tid, message, transfer) {
         const worker = this.workers.get(tid);
-        worker.postMessage(message);
+        worker.postMessage(message, transfer);
     }
 }
 

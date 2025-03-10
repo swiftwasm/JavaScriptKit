@@ -22,6 +22,7 @@ export interface ExportedFunctions {
 
     swjs_enqueue_main_job_from_worker(unowned_job: number): void;
     swjs_wake_worker_thread(): void;
+    swjs_receive_object(object: ref, transferring: pointer): void;
 }
 
 export interface ImportedFunctions {
@@ -112,6 +113,11 @@ export interface ImportedFunctions {
     swjs_listen_message_from_worker_thread: (tid: number) => void;
     swjs_terminate_worker_thread: (tid: number) => void;
     swjs_get_worker_thread_id: () => number;
+    swjs_request_transferring_object: (
+        object_ref: ref,
+        object_source_tid: number,
+        transferring: pointer,
+    ) => void;
 }
 
 export const enum LibraryFeatures {
@@ -133,3 +139,5 @@ export type TypedArray =
 export function assertNever(x: never, message: string) {
     throw new Error(message);
 }
+
+export const MAIN_THREAD_TID = -1;

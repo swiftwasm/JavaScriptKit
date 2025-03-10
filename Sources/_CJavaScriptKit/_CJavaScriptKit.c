@@ -59,5 +59,13 @@ __attribute__((export_name("swjs_library_features")))
 int swjs_library_features(void) {
     return _library_features();
 }
+
+int swjs_get_worker_thread_id_cached(void) {
+    _Thread_local static int tid = 0;
+    if (tid == 0) {
+        tid = swjs_get_worker_thread_id();
+    }
+    return tid;
+}
 #endif
 #endif

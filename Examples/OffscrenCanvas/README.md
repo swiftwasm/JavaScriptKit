@@ -1,4 +1,4 @@
-# Multithreading example
+# OffscreenCanvas example
 
 Install Development Snapshot toolchain `DEVELOPMENT-SNAPSHOT-2024-07-08-a` or later from [swift.org/install](https://www.swift.org/install/) and run the following commands:
 

@@ -27,9 +27,9 @@ class ThreadRegistry {
     };
   }
 
-  postMessageToWorkerThread(tid, data) {
+  postMessageToWorkerThread(tid, data, transfer) {
     const worker = this.workers.get(tid);
-    worker.postMessage(data);
+    worker.postMessage(data, transfer);
   }
 
   terminateWorkerThread(tid) {

@@ -5,9 +5,9 @@ self.onmessage = async (event) => {
   const { instance, wasi, swiftRuntime } = await instantiate({
     module,
     threadChannel: {
-      postMessageToMainThread: (message) => {
+      postMessageToMainThread: (message, transfer) => {
         // Send the job to the main thread
-        postMessage(message);
+        postMessage(message, transfer);
       },
       listenMessageFromMainThread: (listener) => {
         self.onmessage = (event) => listener(event.data);
