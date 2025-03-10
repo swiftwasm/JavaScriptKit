@@ -9,7 +9,7 @@ func isMainThread() -> Bool
 
 final class WebWorkerTaskExecutorTests: XCTestCase {
     override func setUp() async {
-        await WebWorkerTaskExecutor.installGlobalExecutor()
+        WebWorkerTaskExecutor.installGlobalExecutor()
     }
 
     func testTaskRunOnMainThread() async throws {
@@ -262,6 +262,37 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         }
         await task.value
         executor.terminate()
+    }
+
+    func testTransfer() async throws {
+        let Uint8Array = JSObject.global.Uint8Array.function!
+        let buffer = Uint8Array.new(100).buffer.object!
+        let transferring = JSObject.transfer(buffer)
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        let task = Task(executorPreference: executor) {
+            let buffer = try await transferring.receive()
+            return buffer.byteLength.number!
+        }
+        let byteLength = try await task.value
+        XCTAssertEqual(byteLength, 100)
+        // Deinit the transferring object on the thread that was created
+        withExtendedLifetime(transferring) {}
+    }
+
+    func testTransferNonTransferable() async throws {
+        let object = JSObject.global.Object.function!.new()
+        let transferring = JSObject.transfer(object)
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        let task = Task(executorPreference: executor) {
+            _ = try await transferring.receive()
+            return
+        }
+        do {
+            try await task.value
+            XCTFail("Should throw an error")
+        } catch {}
+        // Deinit the transferring object on the thread that was created
+        withExtendedLifetime(transferring) {}
     }
 
 /*
