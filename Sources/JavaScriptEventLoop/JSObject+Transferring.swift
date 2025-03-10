@@ -97,7 +97,9 @@ extension JSObject {
 
     /// Transfers the ownership of a `JSObject` to be sent to another thread.
     ///
-    /// Note that the original ``JSObject`` should not be accessed after calling this method.
+    /// - Precondition: The thread calling this method should have the ownership of the `JSObject`.
+    /// - Postcondition: The original `JSObject` is no longer owned by the thread, further access to it
+    ///   on the thread that called this method is invalid and will result in undefined behavior.
     ///
     /// - Parameter object: The ``JSObject`` to be transferred.
     /// - Returns: A ``Transferring`` instance that can be shared across threads.
