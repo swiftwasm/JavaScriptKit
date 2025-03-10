@@ -13,25 +13,39 @@ extension JSObject {
     /// intended to be shared across threads.
     public struct Transferring: @unchecked Sendable {
         fileprivate struct CriticalState {
-            var continuation: CheckedContinuation<JSObject, Error>?
+            var continuation: CheckedContinuation<JavaScriptObjectRef, Error>?
         }
         fileprivate class Storage {
-            let sourceTid: Int32
-            let idInSource: JavaScriptObjectRef
+            /// The original ``JSObject`` that is transferred.
+            ///
+            /// Retain it here to prevent it from being released before the transfer is complete.
+            let sourceObject: JSObject
             #if compiler(>=6.1) && _runtime(_multithreaded)
             let criticalState: Mutex<CriticalState> = .init(CriticalState())
             #endif
 
-            init(sourceTid: Int32, id: JavaScriptObjectRef) {
-                self.sourceTid = sourceTid
-                self.idInSource = id
+            var idInSource: JavaScriptObjectRef {
+                sourceObject.id
+            }
+
+            var sourceTid: Int32 {
+                #if compiler(>=6.1) && _runtime(_multithreaded)
+                    sourceObject.ownerTid
+                #else
+                    // On single-threaded runtime, source and destination threads are always the main thread (TID = -1).
+                    -1
+                #endif
+            }
+
+            init(sourceObject: JSObject) {
+                self.sourceObject = sourceObject
             }
         }
 
         private let storage: Storage
 
-        fileprivate init(sourceTid: Int32, id: JavaScriptObjectRef) {
-            self.init(storage: Storage(sourceTid: sourceTid, id: id))
+        fileprivate init(sourceObject: JSObject) {
+            self.init(storage: Storage(sourceObject: sourceObject))
         }
 
         fileprivate init(storage: Storage) {
@@ -63,7 +77,7 @@ extension JSObject {
                 self.storage.sourceTid,
                 Unmanaged.passRetained(self.storage).toOpaque()
             )
-            return try await withCheckedThrowingContinuation { continuation in
+            let idInDestination = try await withCheckedThrowingContinuation { continuation in
                 self.storage.criticalState.withLock { criticalState in
                     guard criticalState.continuation == nil else {
                         // This is a programming error, `receive` should be called only once.
@@ -72,6 +86,7 @@ extension JSObject {
                     criticalState.continuation = continuation
                 }
             }
+            return JSObject(id: idInDestination)
             #else
             return JSObject(id: storage.idInSource)
             #endif
@@ -85,12 +100,7 @@ extension JSObject {
     /// - Parameter object: The ``JSObject`` to be transferred.
     /// - Returns: A ``Transferring`` instance that can be shared across threads.
     public static func transfer(_ object: JSObject) -> Transferring {
-        #if compiler(>=6.1) && _runtime(_multithreaded)
-            Transferring(sourceTid: object.ownerTid, id: object.id)
-        #else
-            // On single-threaded runtime, source and destination threads are always the main thread (TID = -1).
-            Transferring(sourceTid: -1, id: object.id)
-        #endif
+        return Transferring(sourceObject: object)
     }
 }
 
@@ -110,7 +120,7 @@ func _swjs_receive_object(_ object: JavaScriptObjectRef, _ transferring: UnsafeR
     let storage = Unmanaged<JSObject.Transferring.Storage>.fromOpaque(transferring).takeRetainedValue()
     storage.criticalState.withLock { criticalState in
         assert(criticalState.continuation != nil, "JSObject.Transferring object is not yet received!?")
-        criticalState.continuation?.resume(returning: JSObject(id: object))
+        criticalState.continuation?.resume(returning: object)
     }
     #endif
 }
