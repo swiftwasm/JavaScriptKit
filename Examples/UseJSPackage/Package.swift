@@ -15,7 +15,7 @@ let package = Package(
                 "JavaScriptKit",
             ],
             plugins: [
-                .plugin(name: "ImportTS", package: "JavaScriptKit")
+                .plugin(name: "BridgeJS", package: "JavaScriptKit")
             ]
         )
     ],

@@ -1,5 +1,6 @@
 // swift-tools-version:6.0
 
+import CompilerPluginSupport
 import PackageDescription
 
 // NOTE: needed for embedded customizations, ideally this will not be necessary at all in the future, or can be replaced with traits
@@ -14,7 +15,10 @@ let package = Package(
         .library(name: "JavaScriptBigIntSupport", targets: ["JavaScriptBigIntSupport"]),
         .library(name: "JavaScriptEventLoopTestSupport", targets: ["JavaScriptEventLoopTestSupport"]),
         .plugin(name: "PackageToJS", targets: ["PackageToJS"]),
-        .plugin(name: "ImportTS", targets: ["ImportTS"]),
+        .plugin(name: "BridgeJS", targets: ["BridgeJS"]),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1"),
     ],
     targets: [
         .target(
@@ -90,12 +94,17 @@ let package = Package(
             sources: ["Sources"]
         ),
         .plugin(
-            name: "ImportTS",
-            capability: .command(
-                intent: .custom(verb: "ts", description: "Import TypeScript types from a package.json")
-            ),
+            name: "BridgeJS",
+            capability: .buildTool(),
             exclude: ["Sources/JavaScript"],
             sources: ["Sources"]
+        ),
+        .macro(
+            name: "JavaScriptKitMacros",
+            dependencies: [
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+            ]
         ),
     ]
 )

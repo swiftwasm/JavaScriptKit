@@ -3,10 +3,10 @@
 import PackageDescription
 
 let package = Package(
-    name: "ImportTS",
+    name: "BridgeJS",
     platforms: [.macOS(.v13)],
     targets: [
-        .target(name: "ImportTS"),
-        .testTarget(name: "ImportTSTests", dependencies: ["ImportTS"]),
+        .target(name: "BridgeJS"),
+        .testTarget(name: "BridgeJSTests", dependencies: ["BridgeJS"]),
     ]
 )
