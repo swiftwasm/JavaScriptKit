@@ -308,4 +308,13 @@ IMPORT_JS_FUNCTION(swjs_terminate_worker_thread, void, (int tid))
 
 IMPORT_JS_FUNCTION(swjs_get_worker_thread_id, int, (void))
 
+int swjs_get_worker_thread_id_cached(void);
+
+/// Requests transferring a JavaScript object to another worker thread.
+///
+/// This must be called from the destination thread of the transfer.
+IMPORT_JS_FUNCTION(swjs_request_transferring_object, void, (JavaScriptObjectRef object,
+                                                     int object_source_tid,
+                                                     void * _Nonnull transferring))
+
 #endif /* _CJavaScriptKit_h */
