@@ -13,7 +13,7 @@ struct BackgroundRenderer: CanvasRenderer {
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
         let transferringCanvas = JSObject.transfer(canvas)
         let renderingTask = Task(executorPreference: executor) {
-            let canvas = try await JSObject.receive(transferringCanvas)
+            let canvas = try await transferringCanvas.receive()
             try await renderAnimation(canvas: canvas, size: size)
         }
         await withTaskCancellationHandler {
