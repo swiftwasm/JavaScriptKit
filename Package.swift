@@ -12,6 +12,7 @@ let package = Package(
         .library(name: "JavaScriptEventLoop", targets: ["JavaScriptEventLoop"]),
         .library(name: "JavaScriptBigIntSupport", targets: ["JavaScriptBigIntSupport"]),
         .library(name: "JavaScriptEventLoopTestSupport", targets: ["JavaScriptEventLoopTestSupport"]),
+        .plugin(name: "PackageToJS", targets: ["PackageToJS"]),
     ],
     targets: [
         .target(
@@ -70,6 +71,13 @@ let package = Package(
             "JavaScriptKit",
             "JavaScriptEventLoopTestSupport"
           ]
+        ),
+        .plugin(
+            name: "PackageToJS",
+            capability: .command(
+                intent: .custom(verb: "js", description: "Convert a Swift package to a JavaScript package")
+            ),
+            sources: ["Sources"]
         ),
     ]
 )
