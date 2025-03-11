@@ -69,7 +69,7 @@ public struct JSTransferring<T>: @unchecked Sendable {
             self.storage.context.withLock { context in
                 guard context.continuation == nil else {
                     // This is a programming error, `receive` should be called only once.
-                    fatalError("JSObject.Transferring object is already received", file: file, line: line)
+                    fatalError("JSTransferring object is already received", file: file, line: line)
                 }
                 // The continuation will be resumed by `swjs_receive_object`.
                 context.continuation = continuation
@@ -147,7 +147,7 @@ func _swjs_receive_response(_ object: JavaScriptObjectRef, _ transferring: Unsaf
     guard let transferring = transferring else { return }
     let context = Unmanaged<_JSTransferringContext>.fromOpaque(transferring).takeRetainedValue()
     context.withLock { state in
-        assert(state.continuation != nil, "JSObject.Transferring object is not yet received!?")
+        assert(state.continuation != nil, "JSTransferring object is not yet received!?")
         state.continuation?.resume(returning: object)
     }
     #endif
@@ -169,7 +169,7 @@ func _swjs_receive_error(_ error: JavaScriptObjectRef, _ transferring: UnsafeRaw
     guard let transferring = transferring else { return }
     let context = Unmanaged<_JSTransferringContext>.fromOpaque(transferring).takeRetainedValue()
     context.withLock { state in
-        assert(state.continuation != nil, "JSObject.Transferring object is not yet received!?")
+        assert(state.continuation != nil, "JSTransferring object is not yet received!?")
         state.continuation?.resume(throwing: JSException(JSObject(id: error).jsValue))
     }
     #endif
