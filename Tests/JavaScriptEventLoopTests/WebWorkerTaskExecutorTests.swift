@@ -267,7 +267,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
     func testTransferMainToWorker() async throws {
         let Uint8Array = JSObject.global.Uint8Array.function!
         let buffer = Uint8Array.new(100).buffer.object!
-        let transferring = JSTransferring(buffer)
+        let transferring = JSSending.transfer(buffer)
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
         let task = Task(executorPreference: executor) {
             let buffer = try await transferring.receive()
@@ -282,7 +282,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         let task = Task(executorPreference: executor) {
             let Uint8Array = JSObject.global.Uint8Array.function!
             let buffer = Uint8Array.new(100).buffer.object!
-            let transferring = JSTransferring(buffer)
+            let transferring = JSSending.transfer(buffer)
             return transferring
         }
         let transferring = await task.value
@@ -292,7 +292,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
 
     func testTransferNonTransferable() async throws {
         let object = JSObject.global.Object.function!.new()
-        let transferring = JSTransferring(object)
+        let transferring = JSSending.transfer(object)
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
         let task = Task<String?, Error>(executorPreference: executor) {
             do {
@@ -315,7 +315,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         let task = Task(executorPreference: executor1) {
             let Uint8Array = JSObject.global.Uint8Array.function!
             let buffer = Uint8Array.new(100).buffer.object!
-            let transferring = JSTransferring(buffer)
+            let transferring = JSSending.transfer(buffer)
             return transferring
         }
         let transferring = await task.value

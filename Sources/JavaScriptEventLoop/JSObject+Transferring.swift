@@ -5,11 +5,11 @@ import _CJavaScriptKit
     import Synchronization
 #endif
 
-/// A temporary object intended to transfer an object from one thread to another.
+/// A temporary object intended to send an object from one thread to another.
 ///
-/// ``JSTransferring`` is `Sendable` and it's intended to be shared across threads.
+/// ``JSSending`` is `Sendable` and it's intended to be shared across threads.
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-public struct JSTransferring<T>: @unchecked Sendable {
+public struct JSSending<T>: @unchecked Sendable {
     fileprivate struct Storage {
         /// The original object that is transferred.
         ///
@@ -101,9 +101,9 @@ fileprivate final class _JSTransferringContext: Sendable {
 }
 
 
-extension JSTransferring where T == JSObject {
+extension JSSending where T == JSObject {
 
-    /// Transfers the ownership of a `JSObject` to be sent to another thread.
+    /// Sends a `JSObject` to another thread.
     ///
     /// - Precondition: The thread calling this method should have the ownership of the `JSObject`.
     /// - Postcondition: The original `JSObject` is no longer owned by the thread, further access to it
@@ -112,8 +112,8 @@ extension JSTransferring where T == JSObject {
     /// - Parameter object: The ``JSObject`` to be transferred.
     /// - Returns: A ``Transferring`` instance that can be shared across threads.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public init(_ object: JSObject) {
-        self.init(
+    public static func transfer(_ object: JSObject) -> JSSending {
+        JSSending(
             sourceObject: object,
             construct: { JSObject(id: $0) },
             deconstruct: { $0.id },
