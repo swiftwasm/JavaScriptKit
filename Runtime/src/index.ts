@@ -189,6 +189,7 @@ export class SwiftRuntime {
                 onRequest: (message) => {
                     let returnValue: ResponseMessage["data"]["response"];
                     try {
+                        // @ts-ignore
                         const result = itcInterface[message.data.request.method](...message.data.request.parameters);
                         returnValue = { ok: true, value: result };
                     } catch (error) {
@@ -524,6 +525,25 @@ export class SwiftRuntime {
 
             swjs_release: (ref: ref) => {
                 this.memory.release(ref);
+            },
+
+            swjs_release_remote: (tid: number, ref: ref) => {
+                if (!this.options.threadChannel) {
+                    throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to release objects on remote threads.");
+                }
+                const broker = getMessageBroker(this.options.threadChannel);
+                broker.request({
+                    type: "request",
+                    data: {
+                        sourceTid: this.tid ?? MAIN_THREAD_TID,
+                        targetTid: tid,
+                        context: 0,
+                        request: {
+                            method: "release",
+                            parameters: [ref],
+                        }
+                    }
+                })
             },
 
             swjs_i64_to_bigint: (value: bigint, signed: number) => {

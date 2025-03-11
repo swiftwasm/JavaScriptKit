@@ -89,6 +89,11 @@ export class ITCInterface {
         const object = this.memory.getObject(objectRef);
         return { object, transferring, transfer: [object] };
     }
+
+    release(objectRef: ref): { object: undefined, transfer: Transferable[] } {
+        this.memory.release(objectRef);
+        return { object: undefined, transfer: [] };
+    }
 }
 
 type AllRequests<Interface extends Record<string, any>> = {

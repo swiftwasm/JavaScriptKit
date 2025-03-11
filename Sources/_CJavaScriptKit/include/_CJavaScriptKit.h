@@ -290,6 +290,12 @@ IMPORT_JS_FUNCTION(swjs_load_typed_array, void, (const JavaScriptObjectRef ref, 
 /// @param ref The target JavaScript object.
 IMPORT_JS_FUNCTION(swjs_release, void, (const JavaScriptObjectRef ref))
 
+/// Decrements reference count of `ref` retained by `SwiftRuntimeHeap` in `object_tid` thread.
+///
+/// @param object_tid The TID of the thread that owns the target object.
+/// @param ref The target JavaScript object.
+IMPORT_JS_FUNCTION(swjs_release_remote, void, (int object_tid, const JavaScriptObjectRef ref))
+
 /// Yields current program control by throwing `UnsafeEventLoopYield` JavaScript exception.
 /// See note on `UnsafeEventLoopYield` for more details
 ///

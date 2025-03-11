@@ -264,7 +264,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         executor.terminate()
     }
 
-    func testTransfer() async throws {
+    func testTransferMainToWorker() async throws {
         let Uint8Array = JSObject.global.Uint8Array.function!
         let buffer = Uint8Array.new(100).buffer.object!
         let transferring = JSTransferring(buffer)
@@ -275,8 +275,19 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         }
         let byteLength = try await task.value
         XCTAssertEqual(byteLength, 100)
-        // Deinit the transferring object on the thread that was created
-        withExtendedLifetime(transferring) {}
+    }
+
+    func testTransferWorkerToMain() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        let task = Task(executorPreference: executor) {
+            let Uint8Array = JSObject.global.Uint8Array.function!
+            let buffer = Uint8Array.new(100).buffer.object!
+            let transferring = JSTransferring(buffer)
+            return transferring
+        }
+        let transferring = await task.value
+        let buffer = try await transferring.receive()
+        XCTAssertEqual(buffer.byteLength.number!, 100)
     }
 
     func testTransferNonTransferable() async throws {
@@ -296,8 +307,24 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
             return
         }
         XCTAssertTrue(jsErrorMessage.contains("Failed to serialize response message"))
-        // Deinit the transferring object on the thread that was created
-        withExtendedLifetime(transferring) {}
+    }
+
+    func testTransferBetweenWorkers() async throws {
+        let executor1 = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        let executor2 = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        let task = Task(executorPreference: executor1) {
+            let Uint8Array = JSObject.global.Uint8Array.function!
+            let buffer = Uint8Array.new(100).buffer.object!
+            let transferring = JSTransferring(buffer)
+            return transferring
+        }
+        let transferring = await task.value
+        let task2 = Task(executorPreference: executor2) {
+            let buffer = try await transferring.receive()
+            return buffer.byteLength.number!
+        }
+        let byteLength = try await task2.value
+        XCTAssertEqual(byteLength, 100)
     }
 
 /*

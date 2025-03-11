@@ -56,7 +56,7 @@ public struct JSTransferring<T>: @unchecked Sendable {
     ///
     /// ```swift
     /// let canvas = JSObject.global.document.createElement("canvas").object!
-    /// let transferring = JSObject.transfer(canvas.transferControlToOffscreen().object!)
+    /// let transferring = JSTransferring(canvas.transferControlToOffscreen().object!)
     /// let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
     /// Task(executorPreference: executor) {
     ///     let canvas = try await transferring.receive()
@@ -65,12 +65,6 @@ public struct JSTransferring<T>: @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public func receive(isolation: isolated (any Actor)? = #isolation, file: StaticString = #file, line: UInt = #line) async throws -> T {
         #if compiler(>=6.1) && _runtime(_multithreaded)
-        // The following sequence of events happens when a `JSObject` is transferred from
-        // the owner thread to the receiver thread:
-        //
-        // [Owner Thread]               [Receiver Thread]
-        //        <-----requestTransfer------ swjs_request_transferring_object    
-        //        ---------transfer---------> swjs_receive_object
         let idInDestination = try await withCheckedThrowingContinuation { continuation in
             self.storage.context.withLock { context in
                 guard context.continuation == nil else {
@@ -148,8 +142,9 @@ extension JSTransferring where T == JSObject {
 @_cdecl("swjs_receive_response")
 #endif
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-func _swjs_receive_response(_ object: JavaScriptObjectRef, _ transferring: UnsafeRawPointer) {
+func _swjs_receive_response(_ object: JavaScriptObjectRef, _ transferring: UnsafeRawPointer?) {
     #if compiler(>=6.1) && _runtime(_multithreaded)
+    guard let transferring = transferring else { return }
     let context = Unmanaged<_JSTransferringContext>.fromOpaque(transferring).takeRetainedValue()
     context.withLock { state in
         assert(state.continuation != nil, "JSObject.Transferring object is not yet received!?")
@@ -169,8 +164,9 @@ func _swjs_receive_response(_ object: JavaScriptObjectRef, _ transferring: Unsaf
 @_cdecl("swjs_receive_error")
 #endif
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-func _swjs_receive_error(_ error: JavaScriptObjectRef, _ transferring: UnsafeRawPointer) {
+func _swjs_receive_error(_ error: JavaScriptObjectRef, _ transferring: UnsafeRawPointer?) {
     #if compiler(>=6.1) && _runtime(_multithreaded)
+    guard let transferring = transferring else { return }
     let context = Unmanaged<_JSTransferringContext>.fromOpaque(transferring).takeRetainedValue()
     context.withLock { state in
         assert(state.continuation != nil, "JSObject.Transferring object is not yet received!?")

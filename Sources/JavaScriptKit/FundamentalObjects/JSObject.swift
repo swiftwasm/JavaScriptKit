@@ -203,7 +203,13 @@ public class JSObject: Equatable {
     })
 
     deinit {
-        assertOnOwnerThread(hint: "deinitializing")
+        #if compiler(>=6.1) && _runtime(_multithreaded)
+        if ownerTid != swjs_get_worker_thread_id_cached() {
+            // If the object is not owned by the current thread
+            swjs_release_remote(ownerTid, id)
+            return
+        }
+        #endif
         swjs_release(id)
     }
 

@@ -198,6 +198,10 @@ class ITCInterface {
         const object = this.memory.getObject(objectRef);
         return { object, transferring, transfer: [object] };
     }
+    release(objectRef) {
+        this.memory.release(objectRef);
+        return { object: undefined, transfer: [] };
+    }
 }
 class MessageBroker {
     constructor(selfTid, threadChannel, handlers) {
@@ -411,6 +415,7 @@ class SwiftRuntime {
                 onRequest: (message) => {
                     let returnValue;
                     try {
+                        // @ts-ignore
                         const result = itcInterface[message.data.request.method](...message.data.request.parameters);
                         returnValue = { ok: true, value: result };
                     }
@@ -611,6 +616,25 @@ class SwiftRuntime {
             },
             swjs_release: (ref) => {
                 this.memory.release(ref);
+            },
+            swjs_release_remote: (tid, ref) => {
+                var _a;
+                if (!this.options.threadChannel) {
+                    throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to release objects on remote threads.");
+                }
+                const broker = getMessageBroker(this.options.threadChannel);
+                broker.request({
+                    type: "request",
+                    data: {
+                        sourceTid: (_a = this.tid) !== null && _a !== void 0 ? _a : MAIN_THREAD_TID,
+                        targetTid: tid,
+                        context: 0,
+                        request: {
+                            method: "release",
+                            parameters: [ref],
+                        }
+                    }
+                });
             },
             swjs_i64_to_bigint: (value, signed) => {
                 return this.memory.retain(signed ? value : BigInt.asUintN(64, value));

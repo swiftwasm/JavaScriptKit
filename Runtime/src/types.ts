@@ -104,6 +104,7 @@ export interface ImportedFunctions {
     ): number;
     swjs_load_typed_array(ref: ref, buffer: pointer): void;
     swjs_release(ref: number): void;
+    swjs_release_remote(tid: number, ref: number): void;
     swjs_i64_to_bigint(value: bigint, signed: bool): ref;
     swjs_bigint_to_i64(ref: ref, signed: bool): bigint;
     swjs_i64_to_bigint_slow(lower: number, upper: number, signed: bool): ref;
