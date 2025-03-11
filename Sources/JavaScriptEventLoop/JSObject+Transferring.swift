@@ -144,16 +144,37 @@ extension JSTransferring where T == JSObject {
 ///   - object: The `JSObject` to be received.
 ///   - transferring: A pointer to the `Transferring.Storage` instance.
 #if compiler(>=6.1)  // @_expose and @_extern are only available in Swift 6.1+
-@_expose(wasm, "swjs_receive_object")
-@_cdecl("swjs_receive_object")
+@_expose(wasm, "swjs_receive_response")
+@_cdecl("swjs_receive_response")
 #endif
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-func _swjs_receive_object(_ object: JavaScriptObjectRef, _ transferring: UnsafeRawPointer) {
+func _swjs_receive_response(_ object: JavaScriptObjectRef, _ transferring: UnsafeRawPointer) {
     #if compiler(>=6.1) && _runtime(_multithreaded)
     let context = Unmanaged<_JSTransferringContext>.fromOpaque(transferring).takeRetainedValue()
     context.withLock { state in
         assert(state.continuation != nil, "JSObject.Transferring object is not yet received!?")
         state.continuation?.resume(returning: object)
+    }
+    #endif
+}
+
+/// A function that should be called when an object source thread sends an error to a
+/// destination thread.
+///
+/// - Parameters:
+///   - error: The error to be received.
+///   - transferring: A pointer to the `Transferring.Storage` instance.
+#if compiler(>=6.1)  // @_expose and @_extern are only available in Swift 6.1+
+@_expose(wasm, "swjs_receive_error")
+@_cdecl("swjs_receive_error")
+#endif
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+func _swjs_receive_error(_ error: JavaScriptObjectRef, _ transferring: UnsafeRawPointer) {
+    #if compiler(>=6.1) && _runtime(_multithreaded)
+    let context = Unmanaged<_JSTransferringContext>.fromOpaque(transferring).takeRetainedValue()
+    context.withLock { state in
+        assert(state.continuation != nil, "JSObject.Transferring object is not yet received!?")
+        state.continuation?.resume(throwing: JSException(JSObject(id: error).jsValue))
     }
     #endif
 }

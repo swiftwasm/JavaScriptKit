@@ -10,120 +10,7 @@ import {
 } from "./types.js";
 import * as JSValue from "./js-value.js";
 import { Memory } from "./memory.js";
-
-type TransferMessage = {
-    type: "transfer";
-    data: {
-        object: any;
-        transferring: pointer;
-        destinationTid: number;
-    };
-};
-
-type RequestTransferMessage = {
-    type: "requestTransfer";
-    data: {
-        objectRef: ref;
-        objectSourceTid: number;
-        transferring: pointer;
-        destinationTid: number;
-    };
-};
-
-type TransferErrorMessage = {
-    type: "transferError";
-    data: {
-        error: string;
-    };
-};
-
-type MainToWorkerMessage = {
-    type: "wake";
-} | RequestTransferMessage | TransferMessage | TransferErrorMessage;
-
-type WorkerToMainMessage = {
-    type: "job";
-    data: number;
-} | RequestTransferMessage | TransferMessage | TransferErrorMessage;
-
-/**
- * A thread channel is a set of functions that are used to communicate between
- * the main thread and the worker thread. The main thread and the worker thread
- * can send messages to each other using these functions.
- *
- * @example
- * ```javascript
- * // worker.js
- * const runtime = new SwiftRuntime({
- *   threadChannel: {
- *     postMessageToMainThread: postMessage,
- *     listenMessageFromMainThread: (listener) => {
- *       self.onmessage = (event) => {
- *         listener(event.data);
- *       };
- *     }
- *   }
- * });
- *
- * // main.js
- * const worker = new Worker("worker.js");
- * const runtime = new SwiftRuntime({
- *   threadChannel: {
- *     postMessageToWorkerThread: (tid, data) => {
- *       worker.postMessage(data);
- *     },
- *     listenMessageFromWorkerThread: (tid, listener) => {
- *       worker.onmessage = (event) => {
-           listener(event.data);
- *       };
- *     }
- *   }
- * });
- * ```
- */
-export type SwiftRuntimeThreadChannel =
-    | {
-        /**
-         * This function is used to send messages from the worker thread to the main thread.
-         * The message submitted by this function is expected to be listened by `listenMessageFromWorkerThread`.
-         * @param message The message to be sent to the main thread.
-         * @param transfer The array of objects to be transferred to the main thread.
-         */
-          postMessageToMainThread: (message: WorkerToMainMessage, transfer: any[]) => void;
-          /**
-           * This function is expected to be set in the worker thread and should listen
-           * to messages from the main thread sent by `postMessageToWorkerThread`.
-           * @param listener The listener function to be called when a message is received from the main thread.
-           */
-          listenMessageFromMainThread: (listener: (message: MainToWorkerMessage) => void) => void;
-      }
-    | {
-          /**
-           * This function is expected to be set in the main thread.
-           * The message submitted by this function is expected to be listened by `listenMessageFromMainThread`.
-           * @param tid The thread ID of the worker thread.
-           * @param message The message to be sent to the worker thread.
-           * @param transfer The array of objects to be transferred to the worker thread.
-           */
-          postMessageToWorkerThread: (tid: number, message: MainToWorkerMessage, transfer: any[]) => void;
-          /**
-           * This function is expected to be set in the main thread and should listen
-           * to messages sent by `postMessageToMainThread` from the worker thread.
-           * @param tid The thread ID of the worker thread.
-           * @param listener The listener function to be called when a message is received from the worker thread.
-           */
-          listenMessageFromWorkerThread: (
-              tid: number,
-              listener: (message: WorkerToMainMessage) => void
-          ) => void;
-
-          /**
-           * This function is expected to be set in the main thread and called
-           * when the worker thread is terminated.
-           * @param tid The thread ID of the worker thread.
-           */
-          terminateWorkerThread?: (tid: number) => void;
-      };
+import { deserializeError, MainToWorkerMessage, MessageBroker, ResponseMessage, ITCInterface, serializeError, SwiftRuntimeThreadChannel, WorkerToMainMessage } from "./itc.js";
 
 export type SwiftRuntimeOptions = {
     /**
@@ -294,6 +181,51 @@ export class SwiftRuntime {
     importObjects = () => this.wasmImports;
 
     get wasmImports(): ImportedFunctions {
+        let broker: MessageBroker | null = null;
+        const getMessageBroker = (threadChannel: SwiftRuntimeThreadChannel) => {
+            if (broker) return broker;
+            const itcInterface = new ITCInterface(this.memory);
+            const newBroker = new MessageBroker(this.tid ?? -1, threadChannel, {
+                onRequest: (message) => {
+                    let returnValue: ResponseMessage["data"]["response"];
+                    try {
+                        const result = itcInterface[message.data.request.method](...message.data.request.parameters);
+                        returnValue = { ok: true, value: result };
+                    } catch (error) {
+                        returnValue = { ok: false, error: serializeError(error) };
+                    }
+                    const responseMessage: ResponseMessage = {
+                        type: "response",
+                        data: {
+                            sourceTid: message.data.sourceTid,
+                            context: message.data.context,
+                            response: returnValue,
+                        },
+                    }
+                    try {
+                        newBroker.reply(responseMessage);
+                    } catch (error) {
+                        responseMessage.data.response = {
+                            ok: false,
+                            error: serializeError(new TypeError(`Failed to serialize response message: ${error}`))
+                        };
+                        newBroker.reply(responseMessage);
+                    }
+                },
+                onResponse: (message) => {
+                    if (message.data.response.ok) {
+                        const object = this.memory.retain(message.data.response.value.object);
+                        this.exports.swjs_receive_response(object, message.data.context);
+                    } else {
+                        const error = deserializeError(message.data.response.error);
+                        const errorObject = this.memory.retain(error);
+                        this.exports.swjs_receive_error(errorObject, message.data.context);
+                    }
+                }
+            })
+            broker = newBroker;
+            return newBroker;
+        }
         return {
             swjs_set_prop: (
                 ref: ref,
@@ -634,38 +566,18 @@ export class SwiftRuntime {
                         "listenMessageFromMainThread is not set in options given to SwiftRuntime. Please set it to listen to wake events from the main thread."
                     );
                 }
+                const broker = getMessageBroker(threadChannel);
                 threadChannel.listenMessageFromMainThread((message) => {
                     switch (message.type) {
                     case "wake":
                         this.exports.swjs_wake_worker_thread();
                         break;
-                    case "requestTransfer": {
-                        const object = this.memory.getObject(message.data.objectRef);
-                        const messageToMainThread: TransferMessage = {
-                            type: "transfer",
-                            data: {
-                                object,
-                                destinationTid: message.data.destinationTid,
-                                transferring: message.data.transferring,
-                            },
-                        };
-                        try {
-                            this.postMessageToMainThread(messageToMainThread, [object]);
-                        } catch (error) {
-                            this.postMessageToMainThread({
-                                type: "transferError",
-                                data: { error: String(error) },
-                            });
-                        }
+                    case "request": {
+                        broker.onReceivingRequest(message);
                         break;
                     }
-                    case "transfer": {
-                        const objectRef = this.memory.retain(message.data.object);
-                        this.exports.swjs_receive_object(objectRef, message.data.transferring);
-                        break;
-                    }
-                    case "transferError": {
-                        console.error(message.data.error); // TODO: Handle the error
+                    case "response": {
+                        broker.onReceivingResponse(message);
                         break;
                     }
                     default:
@@ -684,59 +596,19 @@ export class SwiftRuntime {
                         "listenMessageFromWorkerThread is not set in options given to SwiftRuntime. Please set it to listen to jobs from worker threads."
                     );
                 }
+                const broker = getMessageBroker(threadChannel);
                 threadChannel.listenMessageFromWorkerThread(
                     tid, (message) => {
                         switch (message.type) {
                         case "job":
                             this.exports.swjs_enqueue_main_job_from_worker(message.data);
                             break;
-                        case "requestTransfer": {
-                            if (message.data.objectSourceTid == MAIN_THREAD_TID) {
-                                const object = this.memory.getObject(message.data.objectRef);
-                                if (message.data.destinationTid != tid) {
-                                    throw new Error("Invariant violation: The destination tid of the transfer request must be the same as the tid of the worker thread that received the request.");
-                                }
-                                this.postMessageToWorkerThread(message.data.destinationTid, {
-                                    type: "transfer",
-                                    data: {
-                                        object,
-                                        transferring: message.data.transferring,
-                                        destinationTid: message.data.destinationTid,
-                                    },
-                                }, [object]);
-                            } else {
-                                // Proxy the transfer request to the worker thread that owns the object
-                                this.postMessageToWorkerThread(message.data.objectSourceTid, {
-                                    type: "requestTransfer",
-                                    data: {
-                                        objectRef: message.data.objectRef,
-                                        objectSourceTid: tid,
-                                        transferring: message.data.transferring,
-                                        destinationTid: message.data.destinationTid,
-                                    },
-                                });
-                            }
+                        case "request": {
+                            broker.onReceivingRequest(message);
                             break;
                         }
-                        case "transfer": {
-                            if (message.data.destinationTid == MAIN_THREAD_TID) {
-                                const objectRef = this.memory.retain(message.data.object);
-                                this.exports.swjs_receive_object(objectRef, message.data.transferring);
-                            } else {
-                                // Proxy the transfer response to the destination worker thread
-                                this.postMessageToWorkerThread(message.data.destinationTid, {
-                                    type: "transfer",
-                                    data: {
-                                        object: message.data.object,
-                                        transferring: message.data.transferring,
-                                        destinationTid: message.data.destinationTid,
-                                    },
-                                }, [message.data.object]);
-                            }
-                            break;
-                        }
-                        case "transferError": {
-                            console.error(message.data.error); // TODO: Handle the error
+                        case "response": {
+                            broker.onReceivingResponse(message);
                             break;
                         }
                         default:
@@ -761,20 +633,22 @@ export class SwiftRuntime {
                 object_source_tid: number,
                 transferring: pointer,
             ) => {
-                if (this.tid == object_source_tid) {
-                    // Fast path: The object is already in the same thread
-                    this.exports.swjs_receive_object(object_ref, transferring);
-                    return;
+                if (!this.options.threadChannel) {
+                    throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to request transferring objects.");
                 }
-                this.postMessageToMainThread({
-                    type: "requestTransfer",
+                const broker = getMessageBroker(this.options.threadChannel);
+                broker.request({
+                    type: "request",
                     data: {
-                        objectRef: object_ref,
-                        objectSourceTid: object_source_tid,
-                        transferring,
-                        destinationTid: this.tid ?? MAIN_THREAD_TID,
-                    },
-                });
+                        sourceTid: this.tid ?? MAIN_THREAD_TID,
+                        targetTid: object_source_tid,
+                        context: transferring,
+                        request: {
+                            method: "transfer",
+                            parameters: [object_ref, transferring],
+                        }
+                    }
+                })
             },
         };
     }

@@ -190,6 +190,100 @@ class Memory {
     }
 }
 
+class ITCInterface {
+    constructor(memory) {
+        this.memory = memory;
+    }
+    transfer(objectRef, transferring) {
+        const object = this.memory.getObject(objectRef);
+        return { object, transferring, transfer: [object] };
+    }
+}
+class MessageBroker {
+    constructor(selfTid, threadChannel, handlers) {
+        this.selfTid = selfTid;
+        this.threadChannel = threadChannel;
+        this.handlers = handlers;
+    }
+    request(message) {
+        if (message.data.targetTid == this.selfTid) {
+            // The request is for the current thread
+            this.handlers.onRequest(message);
+        }
+        else if ("postMessageToWorkerThread" in this.threadChannel) {
+            // The request is for another worker thread sent from the main thread
+            this.threadChannel.postMessageToWorkerThread(message.data.targetTid, message, []);
+        }
+        else if ("postMessageToMainThread" in this.threadChannel) {
+            // The request is for other worker threads or the main thread sent from a worker thread
+            this.threadChannel.postMessageToMainThread(message, []);
+        }
+        else {
+            throw new Error("unreachable");
+        }
+    }
+    reply(message) {
+        if (message.data.sourceTid == this.selfTid) {
+            // The response is for the current thread
+            this.handlers.onResponse(message);
+            return;
+        }
+        const transfer = message.data.response.ok ? message.data.response.value.transfer : [];
+        if ("postMessageToWorkerThread" in this.threadChannel) {
+            // The response is for another worker thread sent from the main thread
+            this.threadChannel.postMessageToWorkerThread(message.data.sourceTid, message, transfer);
+        }
+        else if ("postMessageToMainThread" in this.threadChannel) {
+            // The response is for other worker threads or the main thread sent from a worker thread
+            this.threadChannel.postMessageToMainThread(message, transfer);
+        }
+        else {
+            throw new Error("unreachable");
+        }
+    }
+    onReceivingRequest(message) {
+        if (message.data.targetTid == this.selfTid) {
+            this.handlers.onRequest(message);
+        }
+        else if ("postMessageToWorkerThread" in this.threadChannel) {
+            // Receive a request from a worker thread to other worker on main thread. 
+            // Proxy the request to the target worker thread.
+            this.threadChannel.postMessageToWorkerThread(message.data.targetTid, message, []);
+        }
+        else if ("postMessageToMainThread" in this.threadChannel) {
+            // A worker thread won't receive a request for other worker threads
+            throw new Error("unreachable");
+        }
+    }
+    onReceivingResponse(message) {
+        if (message.data.sourceTid == this.selfTid) {
+            this.handlers.onResponse(message);
+        }
+        else if ("postMessageToWorkerThread" in this.threadChannel) {
+            // Receive a response from a worker thread to other worker on main thread.
+            // Proxy the response to the target worker thread.
+            const transfer = message.data.response.ok ? message.data.response.value.transfer : [];
+            this.threadChannel.postMessageToWorkerThread(message.data.sourceTid, message, transfer);
+        }
+        else if ("postMessageToMainThread" in this.threadChannel) {
+            // A worker thread won't receive a response for other worker threads
+            throw new Error("unreachable");
+        }
+    }
+}
+function serializeError(error) {
+    if (error instanceof Error) {
+        return { isError: true, value: { message: error.message, name: error.name, stack: error.stack } };
+    }
+    return { isError: false, value: error };
+}
+function deserializeError(error) {
+    if (error.isError) {
+        return Object.assign(new Error(error.value.message), error.value);
+    }
+    return error.value;
+}
+
 class SwiftRuntime {
     constructor(options) {
         this.version = 708;
@@ -307,6 +401,56 @@ class SwiftRuntime {
         return output;
     }
     get wasmImports() {
+        let broker = null;
+        const getMessageBroker = (threadChannel) => {
+            var _a;
+            if (broker)
+                return broker;
+            const itcInterface = new ITCInterface(this.memory);
+            const newBroker = new MessageBroker((_a = this.tid) !== null && _a !== void 0 ? _a : -1, threadChannel, {
+                onRequest: (message) => {
+                    let returnValue;
+                    try {
+                        const result = itcInterface[message.data.request.method](...message.data.request.parameters);
+                        returnValue = { ok: true, value: result };
+                    }
+                    catch (error) {
+                        returnValue = { ok: false, error: serializeError(error) };
+                    }
+                    const responseMessage = {
+                        type: "response",
+                        data: {
+                            sourceTid: message.data.sourceTid,
+                            context: message.data.context,
+                            response: returnValue,
+                        },
+                    };
+                    try {
+                        newBroker.reply(responseMessage);
+                    }
+                    catch (error) {
+                        responseMessage.data.response = {
+                            ok: false,
+                            error: serializeError(new TypeError(`Failed to serialize response message: ${error}`))
+                        };
+                        newBroker.reply(responseMessage);
+                    }
+                },
+                onResponse: (message) => {
+                    if (message.data.response.ok) {
+                        const object = this.memory.retain(message.data.response.value.object);
+                        this.exports.swjs_receive_response(object, message.data.context);
+                    }
+                    else {
+                        const error = deserializeError(message.data.response.error);
+                        const errorObject = this.memory.retain(error);
+                        this.exports.swjs_receive_error(errorObject, message.data.context);
+                    }
+                }
+            });
+            broker = newBroker;
+            return newBroker;
+        };
         return {
             swjs_set_prop: (ref, name, kind, payload1, payload2) => {
                 const memory = this.memory;
@@ -502,39 +646,18 @@ class SwiftRuntime {
                 if (!(threadChannel && "listenMessageFromMainThread" in threadChannel)) {
                     throw new Error("listenMessageFromMainThread is not set in options given to SwiftRuntime. Please set it to listen to wake events from the main thread.");
                 }
+                const broker = getMessageBroker(threadChannel);
                 threadChannel.listenMessageFromMainThread((message) => {
                     switch (message.type) {
                         case "wake":
                             this.exports.swjs_wake_worker_thread();
                             break;
-                        case "requestTransfer": {
-                            const object = this.memory.getObject(message.data.objectRef);
-                            const messageToMainThread = {
-                                type: "transfer",
-                                data: {
-                                    object,
-                                    destinationTid: message.data.destinationTid,
-                                    transferring: message.data.transferring,
-                                },
-                            };
-                            try {
-                                this.postMessageToMainThread(messageToMainThread, [object]);
-                            }
-                            catch (error) {
-                                this.postMessageToMainThread({
-                                    type: "transferError",
-                                    data: { error: String(error) },
-                                });
-                            }
+                        case "request": {
+                            broker.onReceivingRequest(message);
                             break;
                         }
-                        case "transfer": {
-                            const objectRef = this.memory.retain(message.data.object);
-                            this.exports.swjs_receive_object(objectRef, message.data.transferring);
-                            break;
-                        }
-                        case "transferError": {
-                            console.error(message.data.error); // TODO: Handle the error
+                        case "response": {
+                            broker.onReceivingResponse(message);
                             break;
                         }
                         default:
@@ -551,60 +674,18 @@ class SwiftRuntime {
                 if (!(threadChannel && "listenMessageFromWorkerThread" in threadChannel)) {
                     throw new Error("listenMessageFromWorkerThread is not set in options given to SwiftRuntime. Please set it to listen to jobs from worker threads.");
                 }
+                const broker = getMessageBroker(threadChannel);
                 threadChannel.listenMessageFromWorkerThread(tid, (message) => {
                     switch (message.type) {
                         case "job":
                             this.exports.swjs_enqueue_main_job_from_worker(message.data);
                             break;
-                        case "requestTransfer": {
-                            if (message.data.objectSourceTid == MAIN_THREAD_TID) {
-                                const object = this.memory.getObject(message.data.objectRef);
-                                if (message.data.destinationTid != tid) {
-                                    throw new Error("Invariant violation: The destination tid of the transfer request must be the same as the tid of the worker thread that received the request.");
-                                }
-                                this.postMessageToWorkerThread(message.data.destinationTid, {
-                                    type: "transfer",
-                                    data: {
-                                        object,
-                                        transferring: message.data.transferring,
-                                        destinationTid: message.data.destinationTid,
-                                    },
-                                }, [object]);
-                            }
-                            else {
-                                // Proxy the transfer request to the worker thread that owns the object
-                                this.postMessageToWorkerThread(message.data.objectSourceTid, {
-                                    type: "requestTransfer",
-                                    data: {
-                                        objectRef: message.data.objectRef,
-                                        objectSourceTid: tid,
-                                        transferring: message.data.transferring,
-                                        destinationTid: message.data.destinationTid,
-                                    },
-                                });
-                            }
+                        case "request": {
+                            broker.onReceivingRequest(message);
                             break;
                         }
-                        case "transfer": {
-                            if (message.data.destinationTid == MAIN_THREAD_TID) {
-                                const objectRef = this.memory.retain(message.data.object);
-                                this.exports.swjs_receive_object(objectRef, message.data.transferring);
-                            }
-                            else {
-                                // Proxy the transfer response to the destination worker thread
-                                this.postMessageToWorkerThread(message.data.destinationTid, {
-                                    type: "transfer",
-                                    data: {
-                                        object: message.data.object,
-                                        transferring: message.data.transferring,
-                                        destinationTid: message.data.destinationTid,
-                                    },
-                                }, [message.data.object]);
-                            }
-                            break;
-                        }
-                        case "transferError": {
-                            console.error(message.data.error); // TODO: Handle the error
+                        case "response": {
+                            broker.onReceivingResponse(message);
                             break;
                         }
                         default:
@@ -626,19 +707,21 @@ class SwiftRuntime {
             },
             swjs_request_transferring_object: (object_ref, object_source_tid, transferring) => {
                 var _a;
-                if (this.tid == object_source_tid) {
-                    // Fast path: The object is already in the same thread
-                    this.exports.swjs_receive_object(object_ref, transferring);
-                    return;
+                if (!this.options.threadChannel) {
+                    throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to request transferring objects.");
                 }
-                this.postMessageToMainThread({
-                    type: "requestTransfer",
+                const broker = getMessageBroker(this.options.threadChannel);
+                broker.request({
+                    type: "request",
                     data: {
-                        objectRef: object_ref,
-                        objectSourceTid: object_source_tid,
-                        transferring,
-                        destinationTid: (_a = this.tid) !== null && _a !== void 0 ? _a : MAIN_THREAD_TID,
-                    },
+                        sourceTid: (_a = this.tid) !== null && _a !== void 0 ? _a : MAIN_THREAD_TID,
+                        targetTid: object_source_tid,
+                        context: transferring,
+                        request: {
+                            method: "transfer",
+                            parameters: [object_ref, transferring],
+                        }
+                    }
                 });
             },
         };

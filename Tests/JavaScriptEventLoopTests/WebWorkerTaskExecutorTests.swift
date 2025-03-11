@@ -283,14 +283,19 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         let object = JSObject.global.Object.function!.new()
         let transferring = JSTransferring(object)
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
-        let task = Task(executorPreference: executor) {
-            _ = try await transferring.receive()
+        let task = Task<String?, Error>(executorPreference: executor) {
+            do {
+                _ = try await transferring.receive()
+                return nil
+            } catch let error as JSException {
+                return error.thrownValue.description
+            }
+        }
+        guard let jsErrorMessage = try await task.value else {
+            XCTFail("Should throw an error")
             return
         }
-        do {
-            try await task.value
-            XCTFail("Should throw an error")
-        } catch {}
+        XCTAssertTrue(jsErrorMessage.contains("Failed to serialize response message"))
         // Deinit the transferring object on the thread that was created
         withExtendedLifetime(transferring) {}
     }

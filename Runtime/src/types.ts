@@ -22,7 +22,8 @@ export interface ExportedFunctions {
 
     swjs_enqueue_main_job_from_worker(unowned_job: number): void;
     swjs_wake_worker_thread(): void;
-    swjs_receive_object(object: ref, transferring: pointer): void;
+    swjs_receive_response(object: ref, transferring: pointer): void;
+    swjs_receive_error(error: ref, context: number): void;
 }
 
 export interface ImportedFunctions {
