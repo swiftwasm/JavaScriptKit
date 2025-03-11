@@ -1,5 +1,5 @@
 import { Memory } from "./memory.js";
-import { assertNever, JavaScriptValueKindAndFlags, pointer } from "./types.js";
+import { assertNever, JavaScriptValueKindAndFlags, pointer, ref } from "./types.js";
 
 export const enum Kind {
     Boolean = 0,
@@ -142,3 +142,11 @@ export const writeAndReturnKindBits = (
     }
     throw new Error("Unreachable");
 };
+
+export function decodeObjectRefs(ptr: pointer, length: number, memory: Memory): ref[] {
+    const result: ref[] = new Array(length);
+    for (let i = 0; i < length; i++) {
+        result[i] = memory.readUint32(ptr + 4 * i);
+    }
+    return result;
+}

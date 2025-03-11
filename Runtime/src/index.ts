@@ -6,95 +6,12 @@ import {
     pointer,
     TypedArray,
     ImportedFunctions,
+    MAIN_THREAD_TID,
 } from "./types.js";
 import * as JSValue from "./js-value.js";
 import { Memory } from "./memory.js";
-
-type MainToWorkerMessage = {
-    type: "wake";
-};
-
-type WorkerToMainMessage = {
-    type: "job";
-    data: number;
-};
-
-/**
- * A thread channel is a set of functions that are used to communicate between
- * the main thread and the worker thread. The main thread and the worker thread
- * can send messages to each other using these functions.
- *
- * @example
- * ```javascript
- * // worker.js
- * const runtime = new SwiftRuntime({
- *   threadChannel: {
- *     postMessageToMainThread: postMessage,
- *     listenMessageFromMainThread: (listener) => {
- *       self.onmessage = (event) => {
- *         listener(event.data);
- *       };
- *     }
- *   }
- * });
- *
- * // main.js
- * const worker = new Worker("worker.js");
- * const runtime = new SwiftRuntime({
- *   threadChannel: {
- *     postMessageToWorkerThread: (tid, data) => {
- *       worker.postMessage(data);
- *     },
- *     listenMessageFromWorkerThread: (tid, listener) => {
- *       worker.onmessage = (event) => {
-           listener(event.data);
- *       };
- *     }
- *   }
- * });
- * ```
- */
-export type SwiftRuntimeThreadChannel =
-    | {
-        /**
-         * This function is used to send messages from the worker thread to the main thread.
-         * The message submitted by this function is expected to be listened by `listenMessageFromWorkerThread`.
-         * @param message The message to be sent to the main thread.
-         */
-          postMessageToMainThread: (message: WorkerToMainMessage) => void;
-          /**
-           * This function is expected to be set in the worker thread and should listen
-           * to messages from the main thread sent by `postMessageToWorkerThread`.
-           * @param listener The listener function to be called when a message is received from the main thread.
-           */
-          listenMessageFromMainThread: (listener: (message: MainToWorkerMessage) => void) => void;
-      }
-    | {
-          /**
-           * This function is expected to be set in the main thread.
-           * The message submitted by this function is expected to be listened by `listenMessageFromMainThread`.
-           * @param tid The thread ID of the worker thread.
-           * @param message The message to be sent to the worker thread.
-           */
-          postMessageToWorkerThread: (tid: number, message: MainToWorkerMessage) => void;
-          /**
-           * This function is expected to be set in the main thread and should listen
-           * to messages sent by `postMessageToMainThread` from the worker thread.
-           * @param tid The thread ID of the worker thread.
-           * @param listener The listener function to be called when a message is received from the worker thread.
-           */
-          listenMessageFromWorkerThread: (
-              tid: number,
-              listener: (message: WorkerToMainMessage) => void
-          ) => void;
-
-          /**
-           * This function is expected to be set in the main thread and called
-           * when the worker thread is terminated.
-           * @param tid The thread ID of the worker thread.
-           */
-          terminateWorkerThread?: (tid: number) => void;
-      };
+import { deserializeError, MainToWorkerMessage, MessageBroker, ResponseMessage, ITCInterface, serializeError, SwiftRuntimeThreadChannel, WorkerToMainMessage } from "./itc.js";
+import { decodeObjectRefs } from "./js-value.js";
 
 export type SwiftRuntimeOptions = {
     /**
@@ -265,6 +182,52 @@ export class SwiftRuntime {
     importObjects = () => this.wasmImports;
 
     get wasmImports(): ImportedFunctions {
+        let broker: MessageBroker | null = null;
+        const getMessageBroker = (threadChannel: SwiftRuntimeThreadChannel) => {
+            if (broker) return broker;
+            const itcInterface = new ITCInterface(this.memory);
+            const newBroker = new MessageBroker(this.tid ?? -1, threadChannel, {
+                onRequest: (message) => {
+                    let returnValue: ResponseMessage["data"]["response"];
+                    try {
+                        // @ts-ignore
+                        const result = itcInterface[message.data.request.method](...message.data.request.parameters);
+                        returnValue = { ok: true, value: result };
+                    } catch (error) {
+                        returnValue = { ok: false, error: serializeError(error) };
+                    }
+                    const responseMessage: ResponseMessage = {
+                        type: "response",
+                        data: {
+                            sourceTid: message.data.sourceTid,
+                            context: message.data.context,
+                            response: returnValue,
+                        },
+                    }
+                    try {
+                        newBroker.reply(responseMessage);
+                    } catch (error) {
+                        responseMessage.data.response = {
+                            ok: false,
+                            error: serializeError(new TypeError(`Failed to serialize message: ${error}`))
+                        };
+                        newBroker.reply(responseMessage);
+                    }
+                },
+                onResponse: (message) => {
+                    if (message.data.response.ok) {
+                        const object = this.memory.retain(message.data.response.value.object);
+                        this.exports.swjs_receive_response(object, message.data.context);
+                    } else {
+                        const error = deserializeError(message.data.response.error);
+                        const errorObject = this.memory.retain(error);
+                        this.exports.swjs_receive_error(errorObject, message.data.context);
+                    }
+                }
+            })
+            broker = newBroker;
+            return newBroker;
+        }
         return {
             swjs_set_prop: (
                 ref: ref,
@@ -565,6 +528,25 @@ export class SwiftRuntime {
                 this.memory.release(ref);
             },
 
+            swjs_release_remote: (tid: number, ref: ref) => {
+                if (!this.options.threadChannel) {
+                    throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to release objects on remote threads.");
+                }
+                const broker = getMessageBroker(this.options.threadChannel);
+                broker.request({
+                    type: "request",
+                    data: {
+                        sourceTid: this.tid ?? MAIN_THREAD_TID,
+                        targetTid: tid,
+                        context: 0,
+                        request: {
+                            method: "release",
+                            parameters: [ref],
+                        }
+                    }
+                })
+            },
+
             swjs_i64_to_bigint: (value: bigint, signed: number) => {
                 return this.memory.retain(
                     signed ? value : BigInt.asUintN(64, value)
@@ -605,13 +587,22 @@ export class SwiftRuntime {
                         "listenMessageFromMainThread is not set in options given to SwiftRuntime. Please set it to listen to wake events from the main thread."
                     );
                 }
+                const broker = getMessageBroker(threadChannel);
                 threadChannel.listenMessageFromMainThread((message) => {
                     switch (message.type) {
                     case "wake":
                         this.exports.swjs_wake_worker_thread();
                         break;
+                    case "request": {
+                        broker.onReceivingRequest(message);
+                        break;
+                    }
+                    case "response": {
+                        broker.onReceivingResponse(message);
+                        break;
+                    }
                     default:
-                        const unknownMessage: never = message.type;
+                        const unknownMessage: never = message;
                         throw new Error(`Unknown message type: ${unknownMessage}`);
                     }
                 });
@@ -626,14 +617,23 @@ export class SwiftRuntime {
                         "listenMessageFromWorkerThread is not set in options given to SwiftRuntime. Please set it to listen to jobs from worker threads."
                     );
                 }
+                const broker = getMessageBroker(threadChannel);
                 threadChannel.listenMessageFromWorkerThread(
                     tid, (message) => {
                         switch (message.type) {
                         case "job":
                             this.exports.swjs_enqueue_main_job_from_worker(message.data);
                             break;
+                        case "request": {
+                            broker.onReceivingRequest(message);
+                            break;
+                        }
+                        case "response": {
+                            broker.onReceivingResponse(message);
+                            break;
+                        }
                         default:
-                            const unknownMessage: never = message.type;
+                            const unknownMessage: never = message;
                             throw new Error(`Unknown message type: ${unknownMessage}`);
                         }
                     },
@@ -649,27 +649,81 @@ export class SwiftRuntime {
                 // Main thread's tid is always -1
                 return this.tid || -1;
             },
+            swjs_request_sending_object: (
+                sending_object: ref,
+                transferring_objects: pointer,
+                transferring_objects_count: number,
+                object_source_tid: number,
+                sending_context: pointer,
+            ) => {
+                if (!this.options.threadChannel) {
+                    throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to request transferring objects.");
+                }
+                const broker = getMessageBroker(this.options.threadChannel);
+                const memory = this.memory;
+                const transferringObjects = decodeObjectRefs(transferring_objects, transferring_objects_count, memory);
+                broker.request({
+                    type: "request",
+                    data: {
+                        sourceTid: this.tid ?? MAIN_THREAD_TID,
+                        targetTid: object_source_tid,
+                        context: sending_context,
+                        request: {
+                            method: "send",
+                            parameters: [sending_object, transferringObjects, sending_context],
+                        }
+                    }
+                })
+            },
+            swjs_request_sending_objects: (
+                sending_objects: pointer,
+                sending_objects_count: number,
+                transferring_objects: pointer,
+                transferring_objects_count: number,
+                object_source_tid: number,
+                sending_context: pointer,
+            ) => {
+                if (!this.options.threadChannel) {
+                    throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to request transferring objects.");
+                }
+                const broker = getMessageBroker(this.options.threadChannel);
+                const memory = this.memory;
+                const sendingObjects = decodeObjectRefs(sending_objects, sending_objects_count, memory);
+                const transferringObjects = decodeObjectRefs(transferring_objects, transferring_objects_count, memory);
+                broker.request({
+                    type: "request",
+                    data: {
+                        sourceTid: this.tid ?? MAIN_THREAD_TID,
+                        targetTid: object_source_tid,
+                        context: sending_context,
+                        request: {
+                            method: "sendObjects",
+                            parameters: [sendingObjects, transferringObjects, sending_context],
+                        }
+                    }
+                })
+            },
         };
     }
 
-    private postMessageToMainThread(message: WorkerToMainMessage) {
+    private postMessageToMainThread(message: WorkerToMainMessage, transfer: any[] = []) {
         const threadChannel = this.options.threadChannel;
         if (!(threadChannel && "postMessageToMainThread" in threadChannel)) {
             throw new Error(
                 "postMessageToMainThread is not set in options given to SwiftRuntime. Please set it to send messages to the main thread."
             );
         }
-        threadChannel.postMessageToMainThread(message);
+        threadChannel.postMessageToMainThread(message, transfer);
     }
 
-    private postMessageToWorkerThread(tid: number, message: MainToWorkerMessage) {
+    private postMessageToWorkerThread(tid: number, message: MainToWorkerMessage, transfer: any[] = []) {
         const threadChannel = this.options.threadChannel;
         if (!(threadChannel && "postMessageToWorkerThread" in threadChannel)) {
             throw new Error(
                 "postMessageToWorkerThread is not set in options given to SwiftRuntime. Please set it to send messages to worker threads."
             );
         }
-        threadChannel.postMessageToWorkerThread(tid, message);
+        threadChannel.postMessageToWorkerThread(tid, message, transfer);
     }
 }
 

@@ -16,6 +16,34 @@ import _CJavaScriptEventLoop
 
 /// A task executor that runs tasks on Web Worker threads.
 ///
+/// The `WebWorkerTaskExecutor` provides a way to execute Swift tasks in parallel across multiple
+/// Web Worker threads, enabling true multi-threaded execution in WebAssembly environments.
+/// This allows CPU-intensive tasks to be offloaded from the main thread, keeping the user
+/// interface responsive.
+///
+/// ## Multithreading Model
+///
+/// Each task submitted to the executor runs on one of the available worker threads. By default, 
+/// child tasks created within a worker thread continue to run on the same worker thread,
+/// maintaining thread locality and avoiding excessive context switching.
+///
+/// ## Object Sharing Between Threads
+///
+/// When working with JavaScript objects across threads, you must use the `JSSending` API to 
+/// explicitly transfer or clone objects:
+///
+/// ```swift
+/// // Create and transfer an object to a worker thread
+/// let buffer = JSObject.global.ArrayBuffer.function!.new(1024).object!
+/// let transferring = JSSending.transfer(buffer)
+///
+/// let task = Task(executorPreference: executor) {
+///     // Receive the transferred buffer in the worker
+///     let workerBuffer = try await transferring.receive()
+///     // Use the buffer in the worker thread
+/// }
+/// ```
+///
 /// ## Prerequisites
 ///
 /// This task executor is designed to work with [wasi-threads](https://github.com/WebAssembly/wasi-threads)
@@ -24,22 +52,40 @@ import _CJavaScriptEventLoop
 /// from spawned Web Workers, and forward the message to the main thread
 /// by calling `_swjs_enqueue_main_job_from_worker`.
 ///
-/// ## Usage
+/// ## Basic Usage
 ///
 /// ```swift
-/// let executor = WebWorkerTaskExecutor(numberOfThreads: 4)
+/// // Create an executor with 4 worker threads
+/// let executor = try await WebWorkerTaskExecutor(numberOfThreads: 4)
 /// defer { executor.terminate() }
 ///
-/// await withTaskExecutorPreference(executor) {
-///   // This block runs on the Web Worker thread.
-///   await withTaskGroup(of: Int.self) { group in
-///     for i in 0..<10 {
-///       // Structured child works are executed on the Web Worker thread.
-///       group.addTask { fibonacci(of: i) }
-///     }
-///   }
+/// // Execute a task on a worker thread
+/// let task = Task(executorPreference: executor) {
+///     // This runs on a worker thread
+///     return performHeavyComputation()
 /// }
-/// ````
+/// let result = await task.value
+///
+/// // Run a block on a worker thread
+/// await withTaskExecutorPreference(executor) {
+///     // This entire block runs on a worker thread
+///     performHeavyComputation()
+/// }
+///
+/// // Execute multiple tasks in parallel
+/// await withTaskGroup(of: Int.self) { group in
+///     for i in 0..<10 {
+///         group.addTask(executorPreference: executor) {
+///             // Each task runs on a worker thread
+///             return fibonacci(i)
+///         }
+///     }
+///     
+///     for await result in group {
+///         // Process results as they complete
+///     }
+/// }
+/// ```
 ///
 /// ## Known limitations
 ///
@@ -359,36 +405,89 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
 
     private let executor: Executor
 
-    /// Create a new Web Worker task executor.
+    /// Creates a new Web Worker task executor with the specified number of worker threads.
+    ///
+    /// This initializer creates a pool of Web Worker threads that can execute Swift tasks
+    /// in parallel. The initialization is asynchronous because it waits for all worker
+    /// threads to be properly initialized before returning.
+    ///
+    /// The number of threads should typically match the number of available CPU cores
+    /// for CPU-bound workloads. For I/O-bound workloads, you might benefit from more
+    /// threads than CPU cores.
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// // Create an executor with 4 worker threads
+    /// let executor = try await WebWorkerTaskExecutor(numberOfThreads: 4)
+    ///
+    /// // Always terminate the executor when you're done with it
+    /// defer { executor.terminate() }
+    ///
+    /// // Use the executor...
+    /// ```
     ///
     /// - Parameters:
     ///   - numberOfThreads: The number of Web Worker threads to spawn.
-    ///   - timeout: The timeout to wait for all worker threads to be started.
-    ///   - checkInterval: The interval to check if all worker threads are started.
+    ///   - timeout: The maximum time to wait for all worker threads to be started. Default is 3 seconds.
+    ///   - checkInterval: The interval to check if all worker threads are started. Default is 5 microseconds.
+    /// - Throws: An error if any worker thread fails to initialize within the timeout period.
     public init(numberOfThreads: Int, timeout: Duration = .seconds(3), checkInterval: Duration = .microseconds(5)) async throws {
         self.executor = Executor(numberOfThreads: numberOfThreads)
         try await self.executor.start(timeout: timeout, checkInterval: checkInterval)
     }
 
-    /// Terminate child Web Worker threads.
-    /// Jobs enqueued to the executor after calling this method will be ignored.
+    /// Terminates all worker threads managed by this executor.
     ///
-    /// NOTE: This method must be called after all tasks that prefer this executor are done.
-    /// Otherwise, the tasks may stuck forever.
+    /// This method should be called when the executor is no longer needed to free up 
+    /// resources. After calling this method, any tasks enqueued to this executor will 
+    /// be ignored and may never complete.
+    ///
+    /// It's recommended to use a `defer` statement immediately after creating the executor
+    /// to ensure it's properly terminated when it goes out of scope.
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// do {
+    ///     let executor = try await WebWorkerTaskExecutor(numberOfThreads: 4)
+    ///     defer { executor.terminate() }
+    ///
+    ///     // Use the executor...
+    /// }
+    /// // Executor is automatically terminated when exiting the scope
+    /// ```
+    ///
+    /// - Important: This method must be called after all tasks that prefer this executor are done.
+    ///   Otherwise, the tasks may stuck forever.
     public func terminate() {
         executor.terminate()
     }
 
-    /// The number of Web Worker threads.
+    /// Returns the number of worker threads managed by this executor.
+    ///
+    /// This property reflects the value provided during initialization and doesn't change
+    /// during the lifetime of the executor.
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// let executor = try await WebWorkerTaskExecutor(numberOfThreads: 4)
+    /// print("Executor is running with \(executor.numberOfThreads) threads")
+    /// // Prints: "Executor is running with 4 threads"
+    /// ```
     public var numberOfThreads: Int {
         executor.numberOfThreads
     }
 
     // MARK: TaskExecutor conformance
 
-    /// Enqueue a job to the executor.
+    /// Enqueues a job to be executed by one of the worker threads.
     ///
-    /// NOTE: Called from the Swift Concurrency runtime.
+    /// This method is part of the `TaskExecutor` protocol and is called by the Swift
+    /// Concurrency runtime. You typically don't need to call this method directly.
+    ///
+    /// - Parameter job: The job to enqueue.
     public func enqueue(_ job: UnownedJob) {
         Self.traceStatsIncrement(\.enqueueExecutor)
         executor.enqueue(job)
@@ -431,9 +530,23 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
     @MainActor private static var _swift_task_enqueueGlobalWithDelay_hook_original: UnsafeMutableRawPointer?
     @MainActor private static var _swift_task_enqueueGlobalWithDeadline_hook_original: UnsafeMutableRawPointer?
 
-    /// Install a global executor that forwards jobs from Web Worker threads to the main thread.
+    /// Installs a global executor that forwards jobs from Web Worker threads to the main thread.
     ///
-    /// This function must be called once before using the Web Worker task executor.
+    /// This method sets up the necessary hooks to ensure proper task scheduling between
+    /// the main thread and worker threads. It must be called once (typically at application 
+    /// startup) before using any `WebWorkerTaskExecutor` instances.
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// // At application startup
+    /// WebWorkerTaskExecutor.installGlobalExecutor()
+    ///
+    /// // Later, create and use executor instances
+    /// let executor = try await WebWorkerTaskExecutor(numberOfThreads: 4)
+    /// ```
+    ///
+    /// - Important: This method must be called from the main thread.
     public static func installGlobalExecutor() {
         MainActor.assumeIsolated {
             installGlobalExecutorIsolated()

@@ -1,13 +1,5 @@
 import _CJavaScriptKit
 
-#if arch(wasm32)
-    #if canImport(wasi_pthread)
-        import wasi_pthread
-    #endif
-#else
-    import Foundation // for pthread_t on non-wasi platforms
-#endif
-
 /// `JSObject` represents an object in JavaScript and supports dynamic member lookup.
 /// Any member access like `object.foo` will dynamically request the JavaScript and Swift
 /// runtime bridge library for a member with the specified name in this object.
@@ -31,14 +23,14 @@ public class JSObject: Equatable {
     public var id: JavaScriptObjectRef
 
 #if compiler(>=6.1) && _runtime(_multithreaded)
-    private let ownerThread: pthread_t
+    package let ownerTid: Int32
 #endif
 
     @_spi(JSObject_id)
     public init(id: JavaScriptObjectRef) {
         self.id = id
 #if compiler(>=6.1) && _runtime(_multithreaded)
-        self.ownerThread = pthread_self()
+        self.ownerTid = swjs_get_worker_thread_id_cached()
 #endif
     }
 
@@ -51,14 +43,14 @@ public class JSObject: Equatable {
     /// object spaces are not shared across threads backed by Web Workers.
     private func assertOnOwnerThread(hint: @autoclosure () -> String) {
         #if compiler(>=6.1) && _runtime(_multithreaded)
-        precondition(pthread_equal(ownerThread, pthread_self()) != 0, "JSObject is being accessed from a thread other than the owner thread: \(hint())")
+        precondition(ownerTid == swjs_get_worker_thread_id_cached(), "JSObject is being accessed from a thread other than the owner thread: \(hint())")
         #endif
     }
 
     /// Asserts that the two objects being compared are owned by the same thread.
     private static func assertSameOwnerThread(lhs: JSObject, rhs: JSObject, hint: @autoclosure () -> String) {
         #if compiler(>=6.1) && _runtime(_multithreaded)
-        precondition(pthread_equal(lhs.ownerThread, rhs.ownerThread) != 0, "JSObject is being accessed from a thread other than the owner thread: \(hint())")
+        precondition(lhs.ownerTid == rhs.ownerTid, "JSObject is being accessed from a thread other than the owner thread: \(hint())")
         #endif
     }
 
@@ -211,7 +203,13 @@ public class JSObject: Equatable {
     })
 
     deinit {
-        assertOnOwnerThread(hint: "deinitializing")
+        #if compiler(>=6.1) && _runtime(_multithreaded)
+        if ownerTid != swjs_get_worker_thread_id_cached() {
+            // If the object is not owned by the current thread
+            swjs_release_remote(ownerTid, id)
+            return
+        }
+        #endif
         swjs_release(id)
     }
 

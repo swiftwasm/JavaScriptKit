@@ -22,6 +22,8 @@ export interface ExportedFunctions {
 
     swjs_enqueue_main_job_from_worker(unowned_job: number): void;
     swjs_wake_worker_thread(): void;
+    swjs_receive_response(object: ref, transferring: pointer): void;
+    swjs_receive_error(error: ref, context: number): void;
 }
 
 export interface ImportedFunctions {
@@ -102,6 +104,7 @@ export interface ImportedFunctions {
     ): number;
     swjs_load_typed_array(ref: ref, buffer: pointer): void;
     swjs_release(ref: number): void;
+    swjs_release_remote(tid: number, ref: number): void;
     swjs_i64_to_bigint(value: bigint, signed: bool): ref;
     swjs_bigint_to_i64(ref: ref, signed: bool): bigint;
     swjs_i64_to_bigint_slow(lower: number, upper: number, signed: bool): ref;
@@ -112,6 +115,21 @@ export interface ImportedFunctions {
     swjs_listen_message_from_worker_thread: (tid: number) => void;
     swjs_terminate_worker_thread: (tid: number) => void;
     swjs_get_worker_thread_id: () => number;
+    swjs_request_sending_object: (
+        sending_object: ref,
+        transferring_objects: pointer,
+        transferring_objects_count: number,
+        object_source_tid: number,
+        sending_context: pointer,
+    ) => void;
+    swjs_request_sending_objects: (
+        sending_objects: pointer,
+        sending_objects_count: number,
+        transferring_objects: pointer,
+        transferring_objects_count: number,
+        object_source_tid: number,
+        sending_context: pointer,
+    ) => void;
 }
 
 export const enum LibraryFeatures {
@@ -133,3 +151,5 @@ export type TypedArray =
 export function assertNever(x: never, message: string) {
     throw new Error(message);
 }
+
+export const MAIN_THREAD_TID = -1;
