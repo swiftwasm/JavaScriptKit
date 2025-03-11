@@ -11,9 +11,9 @@ protocol CanvasRenderer {
 struct BackgroundRenderer: CanvasRenderer {
     func render(canvas: JSObject, size: Int) async throws {
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
-        let transferringCanvas = JSObject.transfer(canvas)
+        let transfer = JSTransferring(canvas)
         let renderingTask = Task(executorPreference: executor) {
-            let canvas = try await transferringCanvas.receive()
+            let canvas = try await transfer.receive()
             try await renderAnimation(canvas: canvas, size: size)
         }
         await withTaskCancellationHandler {

@@ -267,7 +267,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
     func testTransfer() async throws {
         let Uint8Array = JSObject.global.Uint8Array.function!
         let buffer = Uint8Array.new(100).buffer.object!
-        let transferring = JSObject.transfer(buffer)
+        let transferring = JSTransferring(buffer)
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
         let task = Task(executorPreference: executor) {
             let buffer = try await transferring.receive()
@@ -281,7 +281,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
 
     func testTransferNonTransferable() async throws {
         let object = JSObject.global.Object.function!.new()
-        let transferring = JSObject.transfer(object)
+        let transferring = JSTransferring(object)
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
         let task = Task(executorPreference: executor) {
             _ = try await transferring.receive()

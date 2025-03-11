@@ -5,95 +5,109 @@ import _CJavaScriptKit
     import Synchronization
 #endif
 
-extension JSObject {
+/// A temporary object intended to transfer an object from one thread to another.
+///
+/// ``JSTransferring`` is `Sendable` and it's intended to be shared across threads.
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+public struct JSTransferring<T>: @unchecked Sendable {
+    fileprivate struct Storage {
+        /// The original object that is transferred.
+        ///
+        /// Retain it here to prevent it from being released before the transfer is complete.
+        let sourceObject: T
+        /// A function that constructs an object from a JavaScript object reference.
+        let construct: (_ id: JavaScriptObjectRef) -> T
+        /// The JavaScript object reference of the original object.
+        let idInSource: JavaScriptObjectRef
+        /// The TID of the thread that owns the original object.
+        let sourceTid: Int32
 
-    /// A temporary object intended to transfer a ``JSObject`` from one thread to another.
+        #if compiler(>=6.1) && _runtime(_multithreaded)
+        /// A shared context for transferring objects across threads.
+        let context: _JSTransferringContext = _JSTransferringContext()
+        #endif
+    }
+
+    private let storage: Storage
+
+    fileprivate init(
+        sourceObject: T,
+        construct: @escaping (_ id: JavaScriptObjectRef) -> T,
+        deconstruct: @escaping (_ object: T) -> JavaScriptObjectRef,
+        getSourceTid: @escaping (_ object: T) -> Int32
+    ) {
+        self.storage = Storage(
+            sourceObject: sourceObject,
+            construct: construct,
+            idInSource: deconstruct(sourceObject),
+            sourceTid: getSourceTid(sourceObject)
+        )
+    }
+
+    /// Receives a transferred ``JSObject`` from a thread.
     ///
-    /// ``JSObject`` itself is not `Sendable`, but ``Transferring`` is `Sendable` because it's
-    /// intended to be shared across threads.
+    /// The original ``JSObject`` is ["Transferred"](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects)
+    /// to the receiving thread.
+    ///
+    /// Note that this method should be called only once for each ``Transferring`` instance
+    /// on the receiving thread.
+    ///
+    /// ### Example
+    ///
+    /// ```swift
+    /// let canvas = JSObject.global.document.createElement("canvas").object!
+    /// let transferring = JSObject.transfer(canvas.transferControlToOffscreen().object!)
+    /// let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+    /// Task(executorPreference: executor) {
+    ///     let canvas = try await transferring.receive()
+    /// }
+    /// ```
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public struct Transferring: @unchecked Sendable {
-        fileprivate struct CriticalState {
-            var continuation: CheckedContinuation<JavaScriptObjectRef, Error>?
-        }
-        fileprivate class Storage {
-            /// The original ``JSObject`` that is transferred.
-            ///
-            /// Retain it here to prevent it from being released before the transfer is complete.
-            let sourceObject: JSObject
-            #if compiler(>=6.1) && _runtime(_multithreaded)
-            let criticalState: Mutex<CriticalState> = .init(CriticalState())
-            #endif
-
-            var idInSource: JavaScriptObjectRef {
-                sourceObject.id
+    public func receive(isolation: isolated (any Actor)? = #isolation, file: StaticString = #file, line: UInt = #line) async throws -> T {
+        #if compiler(>=6.1) && _runtime(_multithreaded)
+        // The following sequence of events happens when a `JSObject` is transferred from
+        // the owner thread to the receiver thread:
+        //
+        // [Owner Thread]               [Receiver Thread]
+        //        <-----requestTransfer------ swjs_request_transferring_object    
+        //        ---------transfer---------> swjs_receive_object
+        let idInDestination = try await withCheckedThrowingContinuation { continuation in
+            self.storage.context.withLock { context in
+                guard context.continuation == nil else {
+                    // This is a programming error, `receive` should be called only once.
+                    fatalError("JSObject.Transferring object is already received", file: file, line: line)
+                }
+                // The continuation will be resumed by `swjs_receive_object`.
+                context.continuation = continuation
             }
-
-            var sourceTid: Int32 {
-                #if compiler(>=6.1) && _runtime(_multithreaded)
-                    sourceObject.ownerTid
-                #else
-                    // On single-threaded runtime, source and destination threads are always the main thread (TID = -1).
-                    -1
-                #endif
-            }
-
-            init(sourceObject: JSObject) {
-                self.sourceObject = sourceObject
-            }
-        }
-
-        private let storage: Storage
-
-        fileprivate init(sourceObject: JSObject) {
-            self.init(storage: Storage(sourceObject: sourceObject))
-        }
-
-        fileprivate init(storage: Storage) {
-            self.storage = storage
-        }
-
-        /// Receives a transferred ``JSObject`` from a thread.
-        ///
-        /// The original ``JSObject`` is ["Transferred"](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects)
-        /// to the receiving thread.
-        ///
-        /// Note that this method should be called only once for each ``Transferring`` instance
-        /// on the receiving thread.
-        ///
-        /// ### Example
-        ///
-        /// ```swift
-        /// let canvas = JSObject.global.document.createElement("canvas").object!
-        /// let transferring = JSObject.transfer(canvas.transferControlToOffscreen().object!)
-        /// let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
-        /// Task(executorPreference: executor) {
-        ///     let canvas = try await transferring.receive()
-        /// }
-        /// ```
-        @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-        public func receive(isolation: isolated (any Actor)? = #isolation, file: StaticString = #file, line: UInt = #line) async throws -> JSObject {
-            #if compiler(>=6.1) && _runtime(_multithreaded)
             swjs_request_transferring_object(
                 self.storage.idInSource,
                 self.storage.sourceTid,
-                Unmanaged.passRetained(self.storage).toOpaque()
+                Unmanaged.passRetained(self.storage.context).toOpaque()
             )
-            let idInDestination = try await withCheckedThrowingContinuation { continuation in
-                self.storage.criticalState.withLock { criticalState in
-                    guard criticalState.continuation == nil else {
-                        // This is a programming error, `receive` should be called only once.
-                        fatalError("JSObject.Transferring object is already received", file: file, line: line)
-                    }
-                    criticalState.continuation = continuation
-                }
-            }
-            return JSObject(id: idInDestination)
-            #else
-            return JSObject(id: storage.idInSource)
-            #endif
+        }
+        return storage.construct(idInDestination)
+        #else
+        return storage.construct(storage.idInSource)
+        #endif
+    }
+}
+
+fileprivate final class _JSTransferringContext: Sendable {
+    struct State {
+        var continuation: CheckedContinuation<JavaScriptObjectRef, Error>?
+    }
+    private let state: Mutex<State> = .init(State())
+
+    func withLock<R>(_ body: (inout State) -> R) -> R {
+        return state.withLock { state in
+            body(&state)
         }
     }
+}
+
+
+extension JSTransferring where T == JSObject {
 
     /// Transfers the ownership of a `JSObject` to be sent to another thread.
     ///
@@ -104,8 +118,21 @@ extension JSObject {
     /// - Parameter object: The ``JSObject`` to be transferred.
     /// - Returns: A ``Transferring`` instance that can be shared across threads.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public static func transfer(_ object: JSObject) -> Transferring {
-        return Transferring(sourceObject: object)
+    public init(_ object: JSObject) {
+        self.init(
+            sourceObject: object,
+            construct: { JSObject(id: $0) },
+            deconstruct: { $0.id },
+            getSourceTid: {
+                #if compiler(>=6.1) && _runtime(_multithreaded)
+                    return $0.ownerTid
+                #else
+                    _ = $0
+                    // On single-threaded runtime, source and destination threads are always the main thread (TID = -1).
+                    return -1
+                #endif
+            }
+        )
     }
 }
 
@@ -123,10 +150,10 @@ extension JSObject {
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 func _swjs_receive_object(_ object: JavaScriptObjectRef, _ transferring: UnsafeRawPointer) {
     #if compiler(>=6.1) && _runtime(_multithreaded)
-    let storage = Unmanaged<JSObject.Transferring.Storage>.fromOpaque(transferring).takeRetainedValue()
-    storage.criticalState.withLock { criticalState in
-        assert(criticalState.continuation != nil, "JSObject.Transferring object is not yet received!?")
-        criticalState.continuation?.resume(returning: object)
+    let context = Unmanaged<_JSTransferringContext>.fromOpaque(transferring).takeRetainedValue()
+    context.withLock { state in
+        assert(state.continuation != nil, "JSObject.Transferring object is not yet received!?")
+        state.continuation?.resume(returning: object)
     }
     #endif
 }
