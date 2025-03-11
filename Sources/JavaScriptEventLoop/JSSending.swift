@@ -44,7 +44,10 @@ import _CJavaScriptKit
 /// ```
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public struct JSSending<T>: @unchecked Sendable {
-    fileprivate struct Storage {
+    // HACK: We need to make this Storage "class" instead of "struct" to avoid using
+    // outlined value operations in parameter-packed contexts, which leads to a
+    // compiler crash. https://github.com/swiftlang/swift/pull/79201
+    fileprivate class Storage {
         /// The original object that is sent.
         ///
         /// Retain it here to prevent it from being released before the sending is complete.
@@ -57,6 +60,20 @@ public struct JSSending<T>: @unchecked Sendable {
         let sourceTid: Int32
         /// Whether the object should be "transferred" or "cloned".
         let transferring: Bool
+
+        init(
+            sourceObject: JSObject,
+            construct: @escaping (_ object: JSObject) -> T,
+            idInSource: JavaScriptObjectRef,
+            sourceTid: Int32,
+            transferring: Bool
+        ) {
+            self.sourceObject = sourceObject
+            self.construct = construct
+            self.idInSource = idInSource
+            self.sourceTid = sourceTid
+            self.transferring = transferring
+        }
     }
 
     private let storage: Storage
