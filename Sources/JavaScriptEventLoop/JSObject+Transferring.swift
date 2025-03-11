@@ -79,6 +79,7 @@ public struct JSSending<T>: @unchecked Sendable {
     }
 }
 
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension JSSending where T == JSObject {
     private init(_ object: JSObject, transferring: Bool) {
         self.init(
@@ -165,6 +166,7 @@ extension JSSending where T == JSObject {
     }
 }
 
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension JSSending {
 
     /// Receives a sent `JSObject` from a thread.
@@ -227,6 +229,8 @@ extension JSSending {
         #endif
     }
 
+    // 6.0 and below can't compile the following without a compiler crash.
+    #if compiler(>=6.1)
     /// Receives multiple `JSSending` instances from a thread in a single operation.
     ///
     /// This method is more efficient than receiving multiple objects individually, as it
@@ -257,10 +261,12 @@ extension JSSending {
     ///   - isolation: The actor isolation context for this call, used in Swift concurrency.
     /// - Returns: A tuple containing the received objects.
     /// - Throws: `JSSendingError` if any sending operation fails, or `JSException` if a JavaScript error occurs.
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func receive<each U>(
         _ sendings: repeat JSSending<each U>,
         isolation: isolated (any Actor)? = #isolation, file: StaticString = #file, line: UInt = #line
     ) async throws -> (repeat each U) where T == (repeat each U) {
+        #if compiler(>=6.1) && _runtime(_multithreaded)
         var sendingObjects: [JavaScriptObjectRef] = []
         var transferringObjects: [JavaScriptObjectRef] = []
         var sourceTid: Int32?
@@ -302,9 +308,14 @@ extension JSSending {
             return sending.storage.construct(result.object!)
         }
         return (repeat extract(each sendings))
+        #else
+        return try await (repeat (each sendings).receive())
+        #endif
     }
+    #endif // compiler(>=6.1)
 }
 
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 fileprivate final class _JSSendingContext: Sendable {
     let continuation: CheckedContinuation<JavaScriptObjectRef, Error>
 
