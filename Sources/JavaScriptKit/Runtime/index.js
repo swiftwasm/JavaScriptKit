@@ -122,6 +122,13 @@
         }
         throw new Error("Unreachable");
     };
+    function decodeObjectRefs(ptr, length, memory) {
+        const result = new Array(length);
+        for (let i = 0; i < length; i++) {
+            result[i] = memory.readUint32(ptr + 4 * i);
+        }
+        return result;
+    }
 
     let globalVariable;
     if (typeof globalThis !== "undefined") {
@@ -200,9 +207,15 @@
         constructor(memory) {
             this.memory = memory;
         }
-        transfer(objectRef, transferring) {
-            const object = this.memory.getObject(objectRef);
-            return { object, transferring, transfer: [object] };
+        send(sendingObject, transferringObjects, sendingContext) {
+            const object = this.memory.getObject(sendingObject);
+            const transfer = transferringObjects.map(ref => this.memory.getObject(ref));
+            return { object, sendingContext, transfer };
+        }
+        sendObjects(sendingObjects, transferringObjects, sendingContext) {
+            const objects = sendingObjects.map(ref => this.memory.getObject(ref));
+            const transfer = transferringObjects.map(ref => this.memory.getObject(ref));
+            return { object: objects, sendingContext, transfer };
         }
         release(objectRef) {
             this.memory.release(objectRef);
@@ -442,7 +455,7 @@
                         catch (error) {
                             responseMessage.data.response = {
                                 ok: false,
-                                error: serializeError(new TypeError(`Failed to serialize response message: ${error}`))
+                                error: serializeError(new TypeError(`Failed to serialize message: ${error}`))
                             };
                             newBroker.reply(responseMessage);
                         }
@@ -735,21 +748,45 @@
                     // Main thread's tid is always -1
                     return this.tid || -1;
                 },
-                swjs_request_transferring_object: (object_ref, object_source_tid, transferring) => {
+                swjs_request_sending_object: (sending_object, transferring_objects, transferring_objects_count, object_source_tid, sending_context) => {
                     var _a;
                     if (!this.options.threadChannel) {
                         throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to request transferring objects.");
                     }
                     const broker = getMessageBroker(this.options.threadChannel);
+                    const memory = this.memory;
+                    const transferringObjects = decodeObjectRefs(transferring_objects, transferring_objects_count, memory);
                     broker.request({
                         type: "request",
                         data: {
                             sourceTid: (_a = this.tid) !== null && _a !== void 0 ? _a : MAIN_THREAD_TID,
                             targetTid: object_source_tid,
-                            context: transferring,
+                            context: sending_context,
                             request: {
-                                method: "transfer",
-                                parameters: [object_ref, transferring],
+                                method: "send",
+                                parameters: [sending_object, transferringObjects, sending_context],
+                            }
+                        }
+                    });
+                },
+                swjs_request_sending_objects: (sending_objects, sending_objects_count, transferring_objects, transferring_objects_count, object_source_tid, sending_context) => {
+                    var _a;
+                    if (!this.options.threadChannel) {
+                        throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to request transferring objects.");
+                    }
+                    const broker = getMessageBroker(this.options.threadChannel);
+                    const memory = this.memory;
+                    const sendingObjects = decodeObjectRefs(sending_objects, sending_objects_count, memory);
+                    const transferringObjects = decodeObjectRefs(transferring_objects, transferring_objects_count, memory);
+                    broker.request({
+                        type: "request",
+                        data: {
+                            sourceTid: (_a = this.tid) !== null && _a !== void 0 ? _a : MAIN_THREAD_TID,
+                            targetTid: object_source_tid,
+                            context: sending_context,
+                            request: {
+                                method: "sendObjects",
+                                parameters: [sendingObjects, transferringObjects, sending_context],
                             }
                         }
                     });

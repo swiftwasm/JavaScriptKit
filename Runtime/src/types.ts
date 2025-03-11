@@ -115,10 +115,20 @@ export interface ImportedFunctions {
     swjs_listen_message_from_worker_thread: (tid: number) => void;
     swjs_terminate_worker_thread: (tid: number) => void;
     swjs_get_worker_thread_id: () => number;
-    swjs_request_transferring_object: (
-        object_ref: ref,
+    swjs_request_sending_object: (
+        sending_object: ref,
+        transferring_objects: pointer,
+        transferring_objects_count: number,
         object_source_tid: number,
-        transferring: pointer,
+        sending_context: pointer,
+    ) => void;
+    swjs_request_sending_objects: (
+        sending_objects: pointer,
+        sending_objects_count: number,
+        transferring_objects: pointer,
+        transferring_objects_count: number,
+        object_source_tid: number,
+        sending_context: pointer,
     ) => void;
 }
 

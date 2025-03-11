@@ -11,6 +11,7 @@ import {
 import * as JSValue from "./js-value.js";
 import { Memory } from "./memory.js";
 import { deserializeError, MainToWorkerMessage, MessageBroker, ResponseMessage, ITCInterface, serializeError, SwiftRuntimeThreadChannel, WorkerToMainMessage } from "./itc.js";
+import { decodeObjectRefs } from "./js-value.js";
 
 export type SwiftRuntimeOptions = {
     /**
@@ -208,7 +209,7 @@ export class SwiftRuntime {
                     } catch (error) {
                         responseMessage.data.response = {
                             ok: false,
-                            error: serializeError(new TypeError(`Failed to serialize response message: ${error}`))
+                            error: serializeError(new TypeError(`Failed to serialize message: ${error}`))
                         };
                         newBroker.reply(responseMessage);
                     }
@@ -648,24 +649,56 @@ export class SwiftRuntime {
                 // Main thread's tid is always -1
                 return this.tid || -1;
             },
-            swjs_request_transferring_object: (
-                object_ref: ref,
+            swjs_request_sending_object: (
+                sending_object: ref,
+                transferring_objects: pointer,
+                transferring_objects_count: number,
                 object_source_tid: number,
-                transferring: pointer,
+                sending_context: pointer,
             ) => {
                 if (!this.options.threadChannel) {
                     throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to request transferring objects.");
                 }
                 const broker = getMessageBroker(this.options.threadChannel);
+                const memory = this.memory;
+                const transferringObjects = decodeObjectRefs(transferring_objects, transferring_objects_count, memory);
                 broker.request({
                     type: "request",
                     data: {
                         sourceTid: this.tid ?? MAIN_THREAD_TID,
                         targetTid: object_source_tid,
-                        context: transferring,
+                        context: sending_context,
                         request: {
-                            method: "transfer",
-                            parameters: [object_ref, transferring],
+                            method: "send",
+                            parameters: [sending_object, transferringObjects, sending_context],
+                        }
+                    }
+                })
+            },
+            swjs_request_sending_objects: (
+                sending_objects: pointer,
+                sending_objects_count: number,
+                transferring_objects: pointer,
+                transferring_objects_count: number,
+                object_source_tid: number,
+                sending_context: pointer,
+            ) => {
+                if (!this.options.threadChannel) {
+                    throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to request transferring objects.");
+                }
+                const broker = getMessageBroker(this.options.threadChannel);
+                const memory = this.memory;
+                const sendingObjects = decodeObjectRefs(sending_objects, sending_objects_count, memory);
+                const transferringObjects = decodeObjectRefs(transferring_objects, transferring_objects_count, memory);
+                broker.request({
+                    type: "request",
+                    data: {
+                        sourceTid: this.tid ?? MAIN_THREAD_TID,
+                        targetTid: object_source_tid,
+                        context: sending_context,
+                        request: {
+                            method: "sendObjects",
+                            parameters: [sendingObjects, transferringObjects, sending_context],
                         }
                     }
                 })

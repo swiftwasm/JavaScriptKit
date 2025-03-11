@@ -85,9 +85,16 @@ export type SwiftRuntimeThreadChannel =
 export class ITCInterface {
     constructor(private memory: Memory) {}
 
-    transfer(objectRef: ref, transferring: pointer): { object: any, transferring: pointer, transfer: Transferable[] } {
-        const object = this.memory.getObject(objectRef);
-        return { object, transferring, transfer: [object] };
+    send(sendingObject: ref, transferringObjects: ref[], sendingContext: pointer): { object: any, sendingContext: pointer, transfer: Transferable[] } {
+        const object = this.memory.getObject(sendingObject);
+        const transfer = transferringObjects.map(ref => this.memory.getObject(ref));
+        return { object, sendingContext, transfer };
+    }
+
+    sendObjects(sendingObjects: ref[], transferringObjects: ref[], sendingContext: pointer): { object: any[], sendingContext: pointer, transfer: Transferable[] } {
+        const objects = sendingObjects.map(ref => this.memory.getObject(ref));
+        const transfer = transferringObjects.map(ref => this.memory.getObject(ref));
+        return { object: objects, sendingContext, transfer };
     }
 
     release(objectRef: ref): { object: undefined, transfer: Transferable[] } {
