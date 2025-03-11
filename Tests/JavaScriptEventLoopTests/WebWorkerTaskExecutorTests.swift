@@ -318,6 +318,10 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         XCTAssertTrue(jsErrorMessage.contains("Failed to serialize message"), jsErrorMessage)
     }
 
+    /*
+    // Node.js 20 and below doesn't throw exception when transferring the same ArrayBuffer
+    // multiple times.
+    // See https://github.com/nodejs/node/commit/38dee8a1c04237bd231a01410f42e9d172f4c162
     func testTransferMultipleTimes() async throws {
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
         let Uint8Array = JSObject.global.Uint8Array.function!
@@ -344,6 +348,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         }
         XCTAssertTrue(jsErrorMessage.contains("Failed to serialize message"))
     }
+    */
 
     func testCloneMultipleTimes() async throws {
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
