@@ -1,6 +1,6 @@
 # JavaScriptKit
 
-![Run unit tests](https://github.com/swiftwasm/JavaScriptKit/workflows/Run%20unit%20tests/badge.svg?branch=main)
+[![Run unit tests](https://github.com/swiftwasm/JavaScriptKit/actions/workflows/test.yml/badge.svg)](https://github.com/swiftwasm/JavaScriptKit/actions/workflows/test.yml)
 
 Swift framework to interact with JavaScript through WebAssembly.
 
