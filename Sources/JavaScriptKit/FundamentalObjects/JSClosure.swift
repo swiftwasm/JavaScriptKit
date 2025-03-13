@@ -64,12 +64,18 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 public class JSClosure: JSFunction, JSClosureProtocol {
 
     class SharedJSClosure {
-        private var storage: [JavaScriptHostFuncRef: (object: JSObject, body: (sending [JSValue]) -> JSValue)] = [:]
+        // Note: 6.0 compilers built with assertions enabled crash when calling
+        // `removeValue(forKey:)` on a dictionary with value type containing
+        // `sending`. Wrap the value type with a struct to avoid the crash.
+        struct Entry {
+            let item: (object: JSObject, body: (sending [JSValue]) -> JSValue)
+        }
+        private var storage: [JavaScriptHostFuncRef: Entry] = [:]
         init() {}
 
         subscript(_ key: JavaScriptHostFuncRef) -> (object: JSObject, body: (sending [JSValue]) -> JSValue)? {
-            get { storage[key] }
-            set { storage[key] = newValue }
+            get { storage[key]?.item }
+            set { storage[key] = newValue.map { Entry(item: $0) } }
         }
     }
 
