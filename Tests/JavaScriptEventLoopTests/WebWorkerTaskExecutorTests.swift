@@ -7,6 +7,21 @@ import _CJavaScriptKit // For swjs_get_worker_thread_id
 @_extern(wasm, module: "JavaScriptEventLoopTestSupportTests", name: "isMainThread")
 func isMainThread() -> Bool
 
+#if canImport(wasi_pthread)
+import wasi_pthread
+/// Trick to avoid blocking the main thread. pthread_mutex_lock function is used by
+/// the Swift concurrency runtime.
+@_cdecl("pthread_mutex_lock")
+func pthread_mutex_lock(_ mutex: UnsafeMutablePointer<pthread_mutex_t>) -> Int32 {
+    // DO NOT BLOCK MAIN THREAD
+    var ret: Int32
+    repeat {
+        ret = pthread_mutex_trylock(mutex)
+    } while ret == EBUSY
+    return ret
+}
+#endif
+
 final class WebWorkerTaskExecutorTests: XCTestCase {
     override func setUp() async {
         WebWorkerTaskExecutor.installGlobalExecutor()

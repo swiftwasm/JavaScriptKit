@@ -6,7 +6,10 @@
 </head>
 
 <body>
-  <script src="./index.js" type="module"></script>
+  <script type="module">
+    import { init } from "./.build/plugins/PackageToJS/outputs/Package/index.js";
+    await init(fetch("./.build/plugins/PackageToJS/outputs/Package/main.wasm"));
+  </script>
 </body>
 
 </html>

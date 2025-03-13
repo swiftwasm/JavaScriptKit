@@ -1,1 +1,3 @@
-swift build --swift-sdk "${SWIFT_SDK_ID:-wasm32-unknown-wasip1-threads}" -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor -Xlinker --export=__main_argc_argv -c release -Xswiftc -g
+swift package --swift-sdk "${SWIFT_SDK_ID:-wasm32-unknown-wasip1-threads}" -c release \
+    plugin --allow-writing-to-package-directory \
+    js --use-cdn --output ./Bundle

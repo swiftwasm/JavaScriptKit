@@ -7,3 +7,5 @@ node_modules
 xcuserdata/
 .swiftpm
 .vscode
+Examples/*/Bundle
+Examples/*/package-lock.json
