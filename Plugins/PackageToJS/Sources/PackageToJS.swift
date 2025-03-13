@@ -242,6 +242,7 @@ struct PackagingPlanner {
             make: &make, file: "Plugins/PackageToJS/Templates/package.json", output: "package.json", outputDirTask: outputDirTask,
             inputFiles: [], inputTasks: []
         )
+        packageInputs.append(packageJsonTask)
 
         // Copy the template files
         for (file, output) in [
