@@ -914,5 +914,4 @@ try test("JSValueDecoder") {
     try expectEqual(decodedTama.isCat, true)
 }
 
-try testI64()
 Expectation.wait(expectations)

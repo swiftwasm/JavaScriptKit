@@ -42,6 +42,10 @@ let package = Package(
             dependencies: ["_CJavaScriptBigIntSupport", "JavaScriptKit"]
         ),
         .target(name: "_CJavaScriptBigIntSupport", dependencies: ["_CJavaScriptKit"]),
+        .testTarget(
+            name: "JavaScriptBigIntSupportTests",
+            dependencies: ["JavaScriptBigIntSupport", "JavaScriptKit"]
+        ),
 
         .target(
             name: "JavaScriptEventLoop",
