@@ -1,3 +1,4 @@
+#if compiler(>=6.1) && _runtime(_multithreaded)
 import XCTest
 @testable import JavaScriptEventLoop
 
@@ -30,3 +31,4 @@ final class WebWorkerDedicatedExecutorTests: XCTestCase {
         XCTAssertTrue(isMainThread())
     }
 }
+#endif
