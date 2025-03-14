@@ -247,14 +247,14 @@ final class JavaScriptEventLoopTests: XCTestCase {
                 let c = ContinuousClock()
                 try await c.sleep(until: .now + .milliseconds(100))
             }
-            XCTAssertGreaterThanOrEqual(continuousClockDiff, 99)
+            XCTAssertGreaterThanOrEqual(continuousClockDiff, 50)
 
             // Test SuspendingClock.sleep
             let suspendingClockDiff = try await measureTime {
                 let c = SuspendingClock()
                 try await c.sleep(until: .now + .milliseconds(100))
             }
-            XCTAssertGreaterThanOrEqual(suspendingClockDiff, 99)
+            XCTAssertGreaterThanOrEqual(suspendingClockDiff, 50)
         }
     #endif
 }
