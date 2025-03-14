@@ -90,9 +90,3 @@ let package = Package(
         ),
     ]
 )
-
-if Context.environment["JAVASCRIPTKIT_USE_DOCC_PLUGIN"] != nil {
-    package.dependencies.append(
-        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.0")
-    )
-}
