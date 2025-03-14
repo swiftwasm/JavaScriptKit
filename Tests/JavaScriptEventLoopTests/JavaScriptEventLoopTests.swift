@@ -2,91 +2,47 @@ import JavaScriptEventLoop
 import JavaScriptKit
 import XCTest
 
-// Helper utilities for testing
-struct MessageError: Error {
-    let message: String
-    let file: StaticString
-    let line: UInt
-    let column: UInt
-    init(_ message: String, file: StaticString, line: UInt, column: UInt) {
-        self.message = message
-        self.file = file
-        self.line = line
-        self.column = column
-    }
-}
-
-func expectGTE<T: Comparable>(
-    _ lhs: T, _ rhs: T,
-    file: StaticString = #file, line: UInt = #line, column: UInt = #column
-) throws {
-    if lhs < rhs {
-        throw MessageError(
-            "Expected \(lhs) to be greater than or equal to \(rhs)",
-            file: file, line: line, column: column
-        )
-    }
-}
-
-func expectEqual<T: Equatable>(
-    _ lhs: T, _ rhs: T,
-    file: StaticString = #file, line: UInt = #line, column: UInt = #column
-) throws {
-    if lhs != rhs {
-        throw MessageError(
-            "Expect to be equal \"\(lhs)\" and \"\(rhs)\"", file: file, line: line, column: column)
-    }
-}
-
-func expectCast<T, U>(
-    _ value: T, to type: U.Type = U.self,
-    file: StaticString = #file, line: UInt = #line, column: UInt = #column
-) throws -> U {
-    guard let value = value as? U else {
-        throw MessageError(
-            "Expect \"\(value)\" to be \(U.self)", file: file, line: line, column: column)
-    }
-    return value
-}
-
-func expectAsyncThrow<T>(
-    _ body: @autoclosure () async throws -> T, file: StaticString = #file, line: UInt = #line,
-    column: UInt = #column
-) async throws -> Error {
-    do {
-        _ = try await body()
-    } catch {
-        return error
-    }
-    throw MessageError("Expect to throw an exception", file: file, line: line, column: column)
-}
-
-func expectNotNil<T>(
-    _ value: T?, file: StaticString = #file, line: UInt = #line, column: UInt = #column
-) throws {
-    switch value {
-    case .some: return
-    case .none:
-        throw MessageError("Expect a non-nil value", file: file, line: line, column: column)
-    }
-}
-
-func performanceNow() -> Double {
-    return JSObject.global.performance.now().number!
-}
-
-func measureTime(_ block: () async throws -> Void) async rethrows -> Double {
-    let start = performanceNow()
-    try await block()
-    return performanceNow() - start
-}
-
-// Error type used in tests
-struct E: Error, Equatable {
-    let value: Int
-}
-
 final class JavaScriptEventLoopTests: XCTestCase {
+    // Helper utilities for testing
+    struct MessageError: Error {
+        let message: String
+        let file: StaticString
+        let line: UInt
+        let column: UInt
+        init(_ message: String, file: StaticString, line: UInt, column: UInt) {
+            self.message = message
+            self.file = file
+            self.line = line
+            self.column = column
+        }
+    }
+
+    func expectAsyncThrow<T>(
+        _ body: @autoclosure () async throws -> T, file: StaticString = #file, line: UInt = #line,
+        column: UInt = #column
+    ) async throws -> Error {
+        do {
+            _ = try await body()
+        } catch {
+            return error
+        }
+        throw MessageError("Expect to throw an exception", file: file, line: line, column: column)
+    }
+
+    func performanceNow() -> Double {
+        return JSObject.global.performance.now().number!
+    }
+
+    func measureTime(_ block: () async throws -> Void) async rethrows -> Double {
+        let start = performanceNow()
+        try await block()
+        return performanceNow() - start
+    }
+
+    // Error type used in tests
+    struct E: Error, Equatable {
+        let value: Int
+    }
 
     // MARK: - Task Tests
 
@@ -103,7 +59,7 @@ final class JavaScriptEventLoopTests: XCTestCase {
             throw E(value: 2)
         }
         let error = try await expectAsyncThrow(await throwingHandle.value)
-        let e = try expectCast(error, to: E.self)
+        let e = try XCTUnwrap(error as? E)
         XCTAssertEqual(e, E(value: 2))
     }
 
@@ -173,8 +129,8 @@ final class JavaScriptEventLoopTests: XCTestCase {
         let rejectedPromise = JSPromise(resolver: { resolve in
             resolve(.failure(.number(3)))
         })
-        let promiseError = try await expectAsyncThrow(await rejectedPromise.value)
-        let jsValue = try expectCast(promiseError, to: JSException.self).thrownValue
+        let promiseError = try await expectAsyncThrow(try await rejectedPromise.value)
+        let jsValue = try XCTUnwrap(promiseError as? JSException).thrownValue
         XCTAssertEqual(jsValue, .number(3))
         let rejectionResult = await rejectedPromise.result
         XCTAssertEqual(rejectionResult, .failure(.number(3)))
@@ -258,7 +214,7 @@ final class JavaScriptEventLoopTests: XCTestCase {
                 cont.resume(throwing: E(value: 2))
             }
         )
-        let errorValue = try expectCast(continuationError, to: E.self)
+        let errorValue = try XCTUnwrap(continuationError as? E)
         XCTAssertEqual(errorValue.value, 2)
     }
 
