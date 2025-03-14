@@ -24,7 +24,13 @@ test:
 .PHONY: unittest
 unittest:
 	@echo Running unit tests
-	swift package --disable-sandbox --swift-sdk "$(SWIFT_SDK_ID)" js test --prelude ./Tests/prelude.mjs
+	swift package --swift-sdk "$(SWIFT_SDK_ID)" \
+	    --disable-sandbox \
+		-Xlinker --stack-first \
+		-Xlinker --global-base=524288 \
+		-Xlinker -z \
+		-Xlinker stack-size=524288 \
+		js test --prelude ./Tests/prelude.mjs
 
 .PHONY: benchmark_setup
 benchmark_setup:

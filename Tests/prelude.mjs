@@ -1,5 +1,6 @@
 /** @type {import('./../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').Prelude["setupOptions"]} */
 export function setupOptions(options, context) {
+    Error.stackTraceLimit = 100;
     setupTestGlobals(globalThis);
     return {
         ...options,

@@ -92,5 +92,6 @@ final class JSPromiseTests: XCTestCase {
                 return JSValue.undefined
             }
         }
+        withExtendedLifetime(timer) {}
     }
 }

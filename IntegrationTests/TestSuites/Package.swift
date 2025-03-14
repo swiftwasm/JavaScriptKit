@@ -12,21 +12,12 @@ let package = Package(
     ],
     products: [
         .executable(
-            name: "ConcurrencyTests", targets: ["ConcurrencyTests"]
-        ),
-        .executable(
             name: "BenchmarkTests", targets: ["BenchmarkTests"]
         ),
     ],
     dependencies: [.package(name: "JavaScriptKit", path: "../../")],
     targets: [
         .target(name: "CHelpers"),
-        .executableTarget(
-            name: "ConcurrencyTests",
-            dependencies: [
-                .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
-            ]
-        ),
         .executableTarget(name: "BenchmarkTests", dependencies: ["JavaScriptKit", "CHelpers"]),
     ]
 )
