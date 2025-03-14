@@ -1,0 +1,31 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>WebWorker + Actor example</title>
+</head>
+
+<body>
+  <script type="module">
+    import { init } from "./Bundle/index.js"
+    init(fetch(new URL("./Bundle/main.wasm", import.meta.url)));
+  </script>
+  <h1>Full-text Search with Actor on Web Worker</h1>
+
+  <div id="container">
+    <input type="text" id="urlInput"
+      value="https://raw.githubusercontent.com/swiftlang/swift/refs/tags/swift-DEVELOPMENT-SNAPSHOT-2025-03-13-a/docs/SIL/Instructions.md"
+      placeholder="Enter URL with text to index"
+      style="width: 300px; padding: 8px; margin-right: 10px;">
+    <button id="indexButton" style="padding: 8px 15px; margin-right: 10px;">Download & Index</button>
+    <br>
+    <br>
+    <input type="text" id="searchInput" placeholder="Enter search query"
+      style="width: 300px; padding: 8px; margin-right: 10px;">
+    <button id="searchButton" style="padding: 8px 15px;">Search</button>
+    <p id="status">Ready</p>
+    <div id="results"></div>
+  </div>
+</body>
+
+</html>
