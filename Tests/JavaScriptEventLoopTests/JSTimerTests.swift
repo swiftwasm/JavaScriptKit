@@ -43,7 +43,6 @@ final class JSTimerTests: XCTestCase {
     }
 
     func testTimer() async throws {
-        let start = JSDate().valueOf()
         let timeoutMilliseconds = 5.0
         var timeout: JSTimer!
         await withCheckedContinuation { continuation in
