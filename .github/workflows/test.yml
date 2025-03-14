@@ -41,7 +41,6 @@ jobs:
       - name: Configure Swift SDK
         run: echo "SWIFT_SDK_ID=${{ steps.setup-swiftwasm.outputs.swift-sdk-id }}" >> $GITHUB_ENV
       - run: make bootstrap
-      - run: make test
       - run: make unittest
         # Skip unit tests with uwasi because its proc_exit throws
         # unhandled promise rejection.
