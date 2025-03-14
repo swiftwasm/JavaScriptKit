@@ -1,0 +1,9 @@
+$ swift package --swift-sdk $SWIFT_SDK_ID js --use-cdn
+[37/37] Linking Hello.wasm
+Build of product 'Hello' complete! (5.16s)
+Packaging...
+...
+Packaging finished
+$ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ... 
+$ open http://localhost:8000 

@@ -9,3 +9,4 @@ xcuserdata/
 .vscode
 Examples/*/Bundle
 Examples/*/package-lock.json
+/Package.resolved
