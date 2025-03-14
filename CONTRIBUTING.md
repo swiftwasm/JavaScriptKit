@@ -58,14 +58,10 @@ Thank you for considering contributing to JavaScriptKit! We welcome contribution
    ```
 
 ### Running Tests
-- Run unit tests:
-  ```bash
-  make unittest SWIFT_SDK_ID=wasm32-unknown-wasi
-  ```
-- Run integration tests:
-  ```bash
-  make test SWIFT_SDK_ID=wasm32-unknown-wasi
-  ```
+
+```bash
+make unittest SWIFT_SDK_ID=wasm32-unknown-wasi
+```
 
 ### Editing `./Runtime` directory
 

@@ -34,7 +34,10 @@ let package = Package(
         .target(name: "_CJavaScriptKit"),
         .testTarget(
             name: "JavaScriptKitTests",
-            dependencies: ["JavaScriptKit"]
+            dependencies: ["JavaScriptKit"],
+            swiftSettings: [
+                .enableExperimentalFeature("Extern")
+            ]
         ),
 
         .target(
@@ -42,6 +45,10 @@ let package = Package(
             dependencies: ["_CJavaScriptBigIntSupport", "JavaScriptKit"]
         ),
         .target(name: "_CJavaScriptBigIntSupport", dependencies: ["_CJavaScriptKit"]),
+        .testTarget(
+            name: "JavaScriptBigIntSupportTests",
+            dependencies: ["JavaScriptBigIntSupport", "JavaScriptKit"]
+        ),
 
         .target(
             name: "JavaScriptEventLoop",

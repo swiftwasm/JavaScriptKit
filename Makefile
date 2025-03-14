@@ -12,19 +12,16 @@ build:
 	swift build --triple wasm32-unknown-wasi
 	npm run build
 
-.PHONY: test
-test:
-	@echo Running integration tests
-	cd IntegrationTests && \
-	    CONFIGURATION=debug   SWIFT_BUILD_FLAGS="$(SWIFT_BUILD_FLAGS)" $(MAKE) test && \
-	    CONFIGURATION=debug   SWIFT_BUILD_FLAGS="$(SWIFT_BUILD_FLAGS) -Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS" $(MAKE) test && \
-	    CONFIGURATION=release SWIFT_BUILD_FLAGS="$(SWIFT_BUILD_FLAGS)" $(MAKE) test && \
-	    CONFIGURATION=release SWIFT_BUILD_FLAGS="$(SWIFT_BUILD_FLAGS) -Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS" $(MAKE) test
-
 .PHONY: unittest
 unittest:
 	@echo Running unit tests
-	swift package --swift-sdk "$(SWIFT_SDK_ID)" js test --prelude ./Tests/prelude.mjs
+	swift package --swift-sdk "$(SWIFT_SDK_ID)" \
+	    --disable-sandbox \
+		-Xlinker --stack-first \
+		-Xlinker --global-base=524288 \
+		-Xlinker -z \
+		-Xlinker stack-size=524288 \
+		js test --prelude ./Tests/prelude.mjs
 
 .PHONY: benchmark_setup
 benchmark_setup:

@@ -1,5 +1,5 @@
-import XCTest
 import JavaScriptKit
+import XCTest
 
 final class JSTypedArrayTests: XCTestCase {
     func testEmptyArray() {
@@ -14,5 +14,87 @@ final class JSTypedArrayTests: XCTestCase {
         _ = JSTypedArray<UInt32>([UInt32]())
         _ = JSTypedArray<Float32>([Float32]())
         _ = JSTypedArray<Float64>([Float64]())
+    }
+
+    func testTypedArray() {
+        func checkArray<T>(_ array: [T]) where T: TypedArrayElement & Equatable {
+            XCTAssertEqual(toString(JSTypedArray(array).jsValue.object!), jsStringify(array))
+            checkArrayUnsafeBytes(array)
+        }
+
+        func toString<T: JSObject>(_ object: T) -> String {
+            return object.toString!().string!
+        }
+
+        func jsStringify(_ array: [Any]) -> String {
+            array.map({ String(describing: $0) }).joined(separator: ",")
+        }
+
+        func checkArrayUnsafeBytes<T>(_ array: [T]) where T: TypedArrayElement & Equatable {
+            let copyOfArray: [T] = JSTypedArray(array).withUnsafeBytes { buffer in
+                Array(buffer)
+            }
+            XCTAssertEqual(copyOfArray, array)
+        }
+
+        let numbers = [UInt8](0...255)
+        let typedArray = JSTypedArray(numbers)
+        XCTAssertEqual(typedArray[12], 12)
+        XCTAssertEqual(numbers.count, typedArray.lengthInBytes)
+
+        let numbersSet = Set(0...255)
+        let typedArrayFromSet = JSTypedArray(numbersSet)
+        XCTAssertEqual(typedArrayFromSet.jsObject.length, 256)
+        XCTAssertEqual(typedArrayFromSet.lengthInBytes, 256 * MemoryLayout<Int>.size)
+
+        checkArray([0, .max, 127, 1] as [UInt8])
+        checkArray([0, 1, .max, .min, -1] as [Int8])
+
+        checkArray([0, .max, 255, 1] as [UInt16])
+        checkArray([0, 1, .max, .min, -1] as [Int16])
+
+        checkArray([0, .max, 255, 1] as [UInt32])
+        checkArray([0, 1, .max, .min, -1] as [Int32])
+
+        checkArray([0, .max, 255, 1] as [UInt])
+        checkArray([0, 1, .max, .min, -1] as [Int])
+
+        let float32Array: [Float32] = [
+            0, 1, .pi, .greatestFiniteMagnitude, .infinity, .leastNonzeroMagnitude,
+            .leastNormalMagnitude, 42,
+        ]
+        let jsFloat32Array = JSTypedArray(float32Array)
+        for (i, num) in float32Array.enumerated() {
+            XCTAssertEqual(num, jsFloat32Array[i])
+        }
+
+        let float64Array: [Float64] = [
+            0, 1, .pi, .greatestFiniteMagnitude, .infinity, .leastNonzeroMagnitude,
+            .leastNormalMagnitude, 42,
+        ]
+        let jsFloat64Array = JSTypedArray(float64Array)
+        for (i, num) in float64Array.enumerated() {
+            XCTAssertEqual(num, jsFloat64Array[i])
+        }
+    }
+
+    func testTypedArrayMutation() {
+        let array = JSTypedArray<Int>(length: 100)
+        for i in 0..<100 {
+            array[i] = i
+        }
+        for i in 0..<100 {
+            XCTAssertEqual(i, array[i])
+        }
+
+        func toString<T: JSObject>(_ object: T) -> String {
+            return object.toString!().string!
+        }
+
+        func jsStringify(_ array: [Any]) -> String {
+            array.map({ String(describing: $0) }).joined(separator: ",")
+        }
+
+        XCTAssertEqual(toString(array.jsValue.object!), jsStringify(Array(0..<100)))
     }
 }
