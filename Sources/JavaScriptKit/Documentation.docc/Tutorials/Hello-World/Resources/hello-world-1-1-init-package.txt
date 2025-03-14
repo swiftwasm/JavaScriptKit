@@ -1,0 +1,6 @@
+$ swift package init --name Hello --type executable
+Creating executable package: Hello
+Creating Package.swift
+Creating .gitignore
+Creating Sources/
+Creating Sources/main.swift

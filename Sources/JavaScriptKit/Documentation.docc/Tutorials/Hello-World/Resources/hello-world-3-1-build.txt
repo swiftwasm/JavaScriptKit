@@ -1,0 +1,6 @@
+$ swift package --swift-sdk $SWIFT_SDK_ID js --use-cdn
+[37/37] Linking Hello.wasm
+Build of product 'Hello' complete! (5.16s)
+Packaging...
+...
+Packaging finished

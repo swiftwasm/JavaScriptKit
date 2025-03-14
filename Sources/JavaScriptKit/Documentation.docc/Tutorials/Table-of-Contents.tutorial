@@ -1,0 +1,9 @@
+@Tutorials(name: "JavaScriptKit") {
+    @Intro(title: "Working with JavaScriptKit") {
+        JavaScriptKit is a Swift package that allows you to interact with JavaScript APIs directly from Swift code when targeting WebAssembly.
+    }
+    @Chapter(name: "Hello World") {
+        @Image(source: "image.png")
+        @TutorialReference(tutorial: "doc:Hello-World")
+    }
+}
