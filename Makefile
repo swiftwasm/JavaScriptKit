@@ -24,7 +24,7 @@ test:
 .PHONY: unittest
 unittest:
 	@echo Running unit tests
-	swift package --swift-sdk "$(SWIFT_SDK_ID)" js test --prelude ./Tests/prelude.mjs
+	swift package --disable-sandbox --swift-sdk "$(SWIFT_SDK_ID)" js test --prelude ./Tests/prelude.mjs
 
 .PHONY: benchmark_setup
 benchmark_setup:

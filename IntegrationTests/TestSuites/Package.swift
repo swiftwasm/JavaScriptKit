@@ -12,9 +12,6 @@ let package = Package(
     ],
     products: [
         .executable(
-            name: "PrimaryTests", targets: ["PrimaryTests"]
-        ),
-        .executable(
             name: "ConcurrencyTests", targets: ["ConcurrencyTests"]
         ),
         .executable(
@@ -24,11 +21,6 @@ let package = Package(
     dependencies: [.package(name: "JavaScriptKit", path: "../../")],
     targets: [
         .target(name: "CHelpers"),
-        .executableTarget(name: "PrimaryTests", dependencies: [
-            .product(name: "JavaScriptBigIntSupport", package: "JavaScriptKit"),
-            "JavaScriptKit",
-            "CHelpers",
-        ]),
         .executableTarget(
             name: "ConcurrencyTests",
             dependencies: [

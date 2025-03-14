@@ -34,7 +34,10 @@ let package = Package(
         .target(name: "_CJavaScriptKit"),
         .testTarget(
             name: "JavaScriptKitTests",
-            dependencies: ["JavaScriptKit"]
+            dependencies: ["JavaScriptKit"],
+            swiftSettings: [
+                .enableExperimentalFeature("Extern")
+            ]
         ),
 
         .target(
