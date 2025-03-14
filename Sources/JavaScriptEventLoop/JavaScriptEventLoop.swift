@@ -233,6 +233,24 @@ public extension JSPromise {
     }
 
     /// Wait for the promise to complete, returning its result or exception as a Result.
+    ///
+    /// - Note: Calling this function does not switch from the caller's isolation domain.
+    func value(isolation: isolated (any Actor)? = #isolation) async throws -> JSValue {
+        try await withUnsafeThrowingContinuation(isolation: isolation) { [self] continuation in
+            self.then(
+                success: {
+                    continuation.resume(returning: $0)
+                    return JSValue.undefined
+                },
+                failure: {
+                    continuation.resume(throwing: JSException($0))
+                    return JSValue.undefined
+                }
+            )
+        }
+    }
+
+    /// Wait for the promise to complete, returning its result or exception as a Result.
     var result: JSPromise.Result {
         get async {
             await withUnsafeContinuation { [self] continuation in

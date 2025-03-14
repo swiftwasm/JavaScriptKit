@@ -23,10 +23,6 @@ func pthread_mutex_lock(_ mutex: UnsafeMutablePointer<pthread_mutex_t>) -> Int32
 #endif
 
 final class WebWorkerTaskExecutorTests: XCTestCase {
-    override func setUp() async {
-        WebWorkerTaskExecutor.installGlobalExecutor()
-    }
-
     func testTaskRunOnMainThread() async throws {
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
 
