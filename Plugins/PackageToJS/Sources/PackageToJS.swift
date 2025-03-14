@@ -200,7 +200,7 @@ struct PackagingPlanner {
             }
             // Then, run wasm-opt with all optimizations
             wasm = make.addTask(
-                inputFiles: [selfPath], inputTasks: [outputDirTask, stripWasm],
+                inputFiles: [selfPath, stripWasmPath], inputTasks: [outputDirTask, stripWasm],
                 output: finalWasmPath
             ) {
                 print("Optimizing the wasm file...")
