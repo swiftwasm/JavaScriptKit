@@ -160,7 +160,8 @@ struct PackageToJSPlugin: CommandPlugin {
         //       not worth the overhead)
         var productArtifact: URL?
         for fileExtension in ["wasm", "xctest"] {
-            let path = ".build/debug/\(productName).\(fileExtension)"
+            let packageDir = context.package.directoryURL
+            let path = packageDir.appending(path: ".build/debug/\(productName).\(fileExtension)").path
             if FileManager.default.fileExists(atPath: path) {
                 productArtifact = URL(fileURLWithPath: path)
                 break

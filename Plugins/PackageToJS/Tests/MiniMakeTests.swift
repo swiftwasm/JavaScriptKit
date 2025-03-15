@@ -6,7 +6,7 @@ import Testing
 @Suite struct MiniMakeTests {
     // Test basic task management functionality
     @Test func basicTaskManagement() throws {
-        try withTemporaryDirectory { tempDir in
+        try withTemporaryDirectory { tempDir, _ in
             var make = MiniMake(printProgress: { _, _ in })
             let outDir = BuildPath(prefix: "OUTPUT")
 
@@ -25,7 +25,7 @@ import Testing
 
     // Test that task dependencies are handled correctly
     @Test func taskDependencies() throws {
-        try withTemporaryDirectory { tempDir in
+        try withTemporaryDirectory { tempDir, _ in
             var make = MiniMake(printProgress: { _, _ in })
             let prefix = BuildPath(prefix: "PREFIX")
             let scope = MiniMake.VariableScope(variables: [
@@ -59,7 +59,7 @@ import Testing
 
     // Test that phony tasks are always rebuilt
     @Test func phonyTask() throws {
-        try withTemporaryDirectory { tempDir in
+        try withTemporaryDirectory { tempDir, _ in
             var make = MiniMake(printProgress: { _, _ in })
             let phonyName = "phony.txt"
             let outputPath = BuildPath(prefix: "OUTPUT").appending(path: phonyName)
@@ -99,7 +99,7 @@ import Testing
 
     // Test that rebuilds are controlled by timestamps
     @Test func timestampBasedRebuild() throws {
-        try withTemporaryDirectory { tempDir in
+        try withTemporaryDirectory { tempDir, _ in
             var make = MiniMake(printProgress: { _, _ in })
             let prefix = BuildPath(prefix: "PREFIX")
             let scope = MiniMake.VariableScope(variables: [
@@ -134,7 +134,7 @@ import Testing
 
     // Test that silent tasks execute without output
     @Test func silentTask() throws {
-        try withTemporaryDirectory { tempDir in
+        try withTemporaryDirectory { tempDir, _ in
             var messages: [(String, Int, Int, String)] = []
             var make = MiniMake(
                 printProgress: { ctx, message in
@@ -167,7 +167,7 @@ import Testing
     // Test that error cases are handled appropriately
     @Test func errorWhileBuilding() throws {
         struct BuildError: Error {}
-        try withTemporaryDirectory { tempDir in
+        try withTemporaryDirectory { tempDir, _ in
             var make = MiniMake(printProgress: { _, _ in })
             let prefix = BuildPath(prefix: "PREFIX")
             let scope = MiniMake.VariableScope(variables: [
@@ -187,7 +187,7 @@ import Testing
 
     // Test that cleanup functionality works correctly
     @Test func cleanup() throws {
-        try withTemporaryDirectory { tempDir in
+        try withTemporaryDirectory { tempDir, _ in
             var make = MiniMake(printProgress: { _, _ in })
             let prefix = BuildPath(prefix: "PREFIX")
             let scope = MiniMake.VariableScope(variables: [

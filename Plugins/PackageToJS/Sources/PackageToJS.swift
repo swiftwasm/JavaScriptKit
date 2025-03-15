@@ -138,7 +138,7 @@ final class DefaultPackagingSystem: PackagingSystem {
     }
 }
 
-private func which(_ executable: String) throws -> URL {
+internal func which(_ executable: String) throws -> URL {
     let pathSeparator: Character
     #if os(Windows)
         pathSeparator = ";"
