@@ -59,8 +59,16 @@ Thank you for considering contributing to JavaScriptKit! We welcome contribution
 
 ### Running Tests
 
+Unit tests running on WebAssembly:
+
 ```bash
 make unittest SWIFT_SDK_ID=wasm32-unknown-wasi
+```
+
+Tests for `PackageToJS` plugin:
+
+```bash
+swift test --package-path ./Plugins/PackageToJS
 ```
 
 ### Editing `./Runtime` directory
