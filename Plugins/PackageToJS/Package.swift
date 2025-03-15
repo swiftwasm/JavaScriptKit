@@ -7,6 +7,10 @@ let package = Package(
     platforms: [.macOS(.v13)],
     targets: [
         .target(name: "PackageToJS"),
-        .testTarget(name: "PackageToJSTests", dependencies: ["PackageToJS"]),
+        .testTarget(
+            name: "PackageToJSTests",
+            dependencies: ["PackageToJS"],
+            exclude: ["__Snapshots__"]
+        ),
     ]
 )

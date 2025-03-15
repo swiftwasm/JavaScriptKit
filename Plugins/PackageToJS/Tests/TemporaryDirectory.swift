@@ -4,7 +4,7 @@ struct MakeTemporaryDirectoryError: Error {
     let error: CInt
 }
 
-internal func withTemporaryDirectory<T>(body: (URL) throws -> T) throws -> T {
+internal func withTemporaryDirectory<T>(body: (URL, _ retain: inout Bool) throws -> T) throws -> T {
     // Create a temporary directory using mkdtemp
     var template = FileManager.default.temporaryDirectory.appendingPathComponent("PackageToJSTests.XXXXXX").path
     return try template.withUTF8 { template in
@@ -16,9 +16,12 @@ internal func withTemporaryDirectory<T>(body: (URL) throws -> T) throws -> T {
             throw MakeTemporaryDirectoryError(error: errno)
         }
         let tempDir = URL(fileURLWithPath: String(cString: result))
+        var retain = false
         defer {
-            try? FileManager.default.removeItem(at: tempDir)
+            if !retain {
+                try? FileManager.default.removeItem(at: tempDir)
+            }
         }
-        return try body(tempDir)
+        return try body(tempDir, &retain)
     }
 }

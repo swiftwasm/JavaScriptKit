@@ -9,7 +9,7 @@ struct PackageToJS {
         /// Whether to explain the build plan
         var explain: Bool = false
         /// Whether to use CDN for dependency packages
-        var useCDN: Bool
+        var useCDN: Bool = false
     }
 
     struct BuildOptions {
@@ -39,6 +39,37 @@ struct PackageToJS {
         /// The options for packaging
         var packageOptions: PackageOptions
     }
+
+    static func deriveBuildConfiguration(wasmProductArtifact: URL) -> (configuration: String, triple: String) {
+        // e.g. path/to/.build/wasm32-unknown-wasi/debug/Basic.wasm -> ("debug", "wasm32-unknown-wasi")
+
+        // First, resolve symlink to get the actual path as SwiftPM 6.0 and earlier returns unresolved
+        // symlink path for product artifact.
+        let wasmProductArtifact = wasmProductArtifact.resolvingSymlinksInPath()
+        let buildConfiguration = wasmProductArtifact.deletingLastPathComponent().lastPathComponent
+        let triple = wasmProductArtifact.deletingLastPathComponent().deletingLastPathComponent().lastPathComponent
+        return (buildConfiguration, triple)
+    }
+
+    static func runTest(testRunner: URL, currentDirectoryURL: URL, extraArguments: [String]) throws {
+        let node = try which("node")
+        let arguments = ["--experimental-wasi-unstable-preview1", testRunner.path] + extraArguments
+        print("Running test...")
+        logCommandExecution(node.path, arguments)
+
+        let task = Process()
+        task.executableURL = node
+        task.arguments = arguments
+        task.currentDirectoryURL = currentDirectoryURL
+        try task.forwardTerminationSignals {
+            try task.run()
+            task.waitUntilExit()
+        }
+        // swift-testing returns EX_UNAVAILABLE (which is 69 in wasi-libc) for "no tests found"
+        guard task.terminationStatus == 0 || task.terminationStatus == 69 else {
+            throw PackageToJSError("Test failed with status \(task.terminationStatus)")
+        }
+    }
 }
 
 struct PackageToJSError: Swift.Error, CustomStringConvertible {
@@ -49,45 +80,24 @@ struct PackageToJSError: Swift.Error, CustomStringConvertible {
     }
 }
 
-/// Plans the build for packaging.
-struct PackagingPlanner {
-    /// The options for packaging
-    let options: PackageToJS.PackageOptions
-    /// The package ID of the package that this plugin is running on
-    let packageId: String
-    /// The directory of the package that contains this plugin
-    let selfPackageDir: URL
-    /// The path of this file itself, used to capture changes of planner code
-    let selfPath: String
-    /// The directory for the final output
-    let outputDir: URL
-    /// The directory for intermediate files
-    let intermediatesDir: URL
-    /// The filename of the .wasm file
-    let wasmFilename = "main.wasm"
-    /// The path to the .wasm product artifact
-    let wasmProductArtifact: URL
+protocol PackagingSystem {
+    func createDirectory(atPath: String) throws
+    func syncFile(from: String, to: String) throws
+    func writeFile(atPath: String, content: Data) throws
 
-    init(
-        options: PackageToJS.PackageOptions,
-        packageId: String,
-        pluginWorkDirectoryURL: URL,
-        selfPackageDir: URL,
-        outputDir: URL,
-        wasmProductArtifact: URL
-    ) {
-        self.options = options
-        self.packageId = packageId
-        self.selfPackageDir = selfPackageDir
-        self.outputDir = outputDir
-        self.intermediatesDir = pluginWorkDirectoryURL.appending(path: outputDir.lastPathComponent + ".tmp")
-        self.selfPath = String(#filePath)
-        self.wasmProductArtifact = wasmProductArtifact
+    func wasmOpt(_ arguments: [String], input: String, output: String) throws
+    func npmInstall(packageDir: String) throws
+}
+
+extension PackagingSystem {
+    func createDirectory(atPath: String) throws {
+        guard !FileManager.default.fileExists(atPath: atPath) else { return }
+        try FileManager.default.createDirectory(
+            atPath: atPath, withIntermediateDirectories: true, attributes: nil
+        )
     }
 
-    // MARK: - Primitive build operations
-
-    private static func syncFile(from: String, to: String) throws {
+    func syncFile(from: String, to: String) throws {
         if FileManager.default.fileExists(atPath: to) {
             try FileManager.default.removeItem(atPath: to)
         }
@@ -97,14 +107,41 @@ struct PackagingPlanner {
         )
     }
 
-    private static func createDirectory(atPath: String) throws {
-        guard !FileManager.default.fileExists(atPath: atPath) else { return }
-        try FileManager.default.createDirectory(
-            atPath: atPath, withIntermediateDirectories: true, attributes: nil
-        )
+    func writeFile(atPath: String, content: Data) throws {
+        do {
+            try content.write(to: URL(fileURLWithPath: atPath))
+        } catch {
+            throw PackageToJSError("Failed to write file \(atPath): \(error)")
+        }
+    }
+}
+
+final class DefaultPackagingSystem: PackagingSystem {
+
+    private let printWarning: (String) -> Void
+
+    init(printWarning: @escaping (String) -> Void) {
+        self.printWarning = printWarning
     }
 
-    private static func runCommand(_ command: URL, _ arguments: [String]) throws {
+    func npmInstall(packageDir: String) throws {
+        try runCommand(try which("npm"), ["-C", packageDir, "install"])
+    }
+
+    lazy var warnMissingWasmOpt: () = {
+        self.printWarning("Warning: wasm-opt is not installed, optimizations will not be applied")
+    }()
+
+    func wasmOpt(_ arguments: [String], input: String, output: String) throws {
+        guard let wasmOpt = try? which("wasm-opt") else {
+            _ = warnMissingWasmOpt
+            try FileManager.default.copyItem(atPath: input, toPath: output)
+            return
+        }
+        try runCommand(wasmOpt, arguments + ["-o", output, input])
+    }
+
+    private func runCommand(_ command: URL, _ arguments: [String]) throws {
         let task = Process()
         task.executableURL = command
         task.arguments = arguments
@@ -115,6 +152,73 @@ struct PackagingPlanner {
             throw PackageToJSError("Command failed with status \(task.terminationStatus)")
         }
     }
+}
+
+internal func which(_ executable: String) throws -> URL {
+    let pathSeparator: Character
+    #if os(Windows)
+        pathSeparator = ";"
+    #else
+        pathSeparator = ":"
+    #endif
+    let paths = ProcessInfo.processInfo.environment["PATH"]!.split(separator: pathSeparator)
+    for path in paths {
+        let url = URL(fileURLWithPath: String(path)).appendingPathComponent(executable)
+        if FileManager.default.isExecutableFile(atPath: url.path) {
+            return url
+        }
+    }
+    throw PackageToJSError("Executable \(executable) not found in PATH")
+}
+
+/// Plans the build for packaging.
+struct PackagingPlanner {
+    /// The options for packaging
+    let options: PackageToJS.PackageOptions
+    /// The package ID of the package that this plugin is running on
+    let packageId: String
+    /// The directory of the package that contains this plugin
+    let selfPackageDir: BuildPath
+    /// The path of this file itself, used to capture changes of planner code
+    let selfPath: BuildPath
+    /// The directory for the final output
+    let outputDir: BuildPath
+    /// The directory for intermediate files
+    let intermediatesDir: BuildPath
+    /// The filename of the .wasm file
+    let wasmFilename = "main.wasm"
+    /// The path to the .wasm product artifact
+    let wasmProductArtifact: BuildPath
+    /// The build configuration
+    let configuration: String
+    /// The target triple
+    let triple: String
+    /// The system interface to use
+    let system: any PackagingSystem
+
+    init(
+        options: PackageToJS.PackageOptions,
+        packageId: String,
+        intermediatesDir: BuildPath,
+        selfPackageDir: BuildPath,
+        outputDir: BuildPath,
+        wasmProductArtifact: BuildPath,
+        configuration: String,
+        triple: String,
+        selfPath: BuildPath = BuildPath(absolute: #filePath),
+        system: any PackagingSystem
+    ) {
+        self.options = options
+        self.packageId = packageId
+        self.selfPackageDir = selfPackageDir
+        self.outputDir = outputDir
+        self.intermediatesDir = intermediatesDir
+        self.selfPath = selfPath
+        self.wasmProductArtifact = wasmProductArtifact
+        self.configuration = configuration
+        self.triple = triple
+        self.system = system
+    }
 
     // MARK: - Build plans
 
@@ -123,23 +227,12 @@ struct PackagingPlanner {
         make: inout MiniMake,
         buildOptions: PackageToJS.BuildOptions
     ) throws -> MiniMake.TaskKey {
-        let (allTasks, _, _) = try planBuildInternal(
+        let (allTasks, _, _, _) = try planBuildInternal(
             make: &make, splitDebug: buildOptions.splitDebug, noOptimize: buildOptions.noOptimize
         )
         return make.addTask(
-            inputTasks: allTasks, output: "all", attributes: [.phony, .silent]
-        ) { _ in }
-    }
-
-    func deriveBuildConfiguration() -> (configuration: String, triple: String) {
-        // e.g. path/to/.build/wasm32-unknown-wasi/debug/Basic.wasm -> ("debug", "wasm32-unknown-wasi")
-
-        // First, resolve symlink to get the actual path as SwiftPM 6.0 and earlier returns unresolved
-        // symlink path for product artifact.
-        let wasmProductArtifact = self.wasmProductArtifact.resolvingSymlinksInPath()
-        let buildConfiguration = wasmProductArtifact.deletingLastPathComponent().lastPathComponent
-        let triple = wasmProductArtifact.deletingLastPathComponent().deletingLastPathComponent().lastPathComponent
-        return (buildConfiguration, triple)
+            inputTasks: allTasks, output: BuildPath(phony: "all"), attributes: [.phony, .silent]
+        ) { _, _ in }
     }
 
     private func planBuildInternal(
@@ -148,55 +241,49 @@ struct PackagingPlanner {
     ) throws -> (
         allTasks: [MiniMake.TaskKey],
         outputDirTask: MiniMake.TaskKey,
+        intermediatesDirTask: MiniMake.TaskKey,
         packageJsonTask: MiniMake.TaskKey
     ) {
         // Prepare output directory
         let outputDirTask = make.addTask(
-            inputFiles: [selfPath], output: outputDir.path, attributes: [.silent]
+            inputFiles: [selfPath], output: outputDir, attributes: [.silent]
         ) {
-            try Self.createDirectory(atPath: $0.output)
+            try system.createDirectory(atPath: $1.resolve(path: $0.output).path)
         }
 
         var packageInputs: [MiniMake.TaskKey] = []
 
         // Guess the build configuration from the parent directory name of .wasm file
-        let (buildConfiguration, _) = deriveBuildConfiguration()
         let wasm: MiniMake.TaskKey
 
         let shouldOptimize: Bool
-        let wasmOptPath = try? which("wasm-opt")
-        if buildConfiguration == "debug" {
+        if self.configuration == "debug" {
             shouldOptimize = false
         } else {
-            if wasmOptPath != nil {
-                shouldOptimize = !noOptimize
-            } else {
-                print("Warning: wasm-opt not found in PATH, skipping optimizations")
-                shouldOptimize = false
-            }
+            shouldOptimize = !noOptimize
         }
 
         let intermediatesDirTask = make.addTask(
-            inputFiles: [selfPath], output: intermediatesDir.path, attributes: [.silent]
+            inputFiles: [selfPath], output: intermediatesDir, attributes: [.silent]
         ) {
-            try Self.createDirectory(atPath: $0.output)
+            try system.createDirectory(atPath: $1.resolve(path: $0.output).path)
         }
 
-        let finalWasmPath = outputDir.appending(path: wasmFilename).path
+        let finalWasmPath = outputDir.appending(path: wasmFilename)
 
-        if let wasmOptPath = wasmOptPath, shouldOptimize {
+        if shouldOptimize {
             // Optimize the wasm in release mode
             // If splitDebug is true, we need to place the DWARF-stripped wasm file (but "name" section remains)
             // in the output directory.
-            let stripWasmPath = (splitDebug ? outputDir : intermediatesDir).appending(path: wasmFilename + ".debug").path
+            let stripWasmPath = (splitDebug ? outputDir : intermediatesDir).appending(path: wasmFilename + ".debug")
 
             // First, strip DWARF sections as their existence enables DWARF preserving mode in wasm-opt
             let stripWasm = make.addTask(
-                inputFiles: [selfPath, wasmProductArtifact.path], inputTasks: [outputDirTask, intermediatesDirTask],
+                inputFiles: [selfPath, wasmProductArtifact], inputTasks: [outputDirTask, intermediatesDirTask],
                 output: stripWasmPath
             ) {
                 print("Stripping DWARF debug info...")
-                try Self.runCommand(wasmOptPath, [wasmProductArtifact.path, "--strip-dwarf", "--debuginfo", "-o", $0.output])
+                try system.wasmOpt(["--strip-dwarf", "--debuginfo"], input: $1.resolve(path: wasmProductArtifact).path, output: $1.resolve(path: $0.output).path)
             }
             // Then, run wasm-opt with all optimizations
             wasm = make.addTask(
@@ -204,15 +291,15 @@ struct PackagingPlanner {
                 output: finalWasmPath
             ) {
                 print("Optimizing the wasm file...")
-                try Self.runCommand(wasmOptPath, [stripWasmPath, "-Os", "-o", $0.output])
+                try system.wasmOpt(["-Os"], input: $1.resolve(path: stripWasmPath).path, output: $1.resolve(path: $0.output).path)
             }
         } else {
             // Copy the wasm product artifact
             wasm = make.addTask(
-                inputFiles: [selfPath, wasmProductArtifact.path], inputTasks: [outputDirTask],
+                inputFiles: [selfPath, wasmProductArtifact], inputTasks: [outputDirTask],
                 output: finalWasmPath
             ) {
-                try Self.syncFile(from: wasmProductArtifact.path, to: $0.output)
+                try system.syncFile(from: $1.resolve(path: wasmProductArtifact).path, to: $1.resolve(path: $0.output).path)
             }
         }
         packageInputs.append(wasm)
@@ -220,22 +307,24 @@ struct PackagingPlanner {
         let wasmImportsPath = intermediatesDir.appending(path: "wasm-imports.json")
         let wasmImportsTask = make.addTask(
             inputFiles: [selfPath, finalWasmPath], inputTasks: [outputDirTask, intermediatesDirTask, wasm],
-            output: wasmImportsPath.path
+            output: wasmImportsPath
         ) {
-            let metadata = try parseImports(moduleBytes: Array(try Data(contentsOf: URL(fileURLWithPath: finalWasmPath))))
+            let metadata = try parseImports(
+                moduleBytes: try Data(contentsOf: URL(fileURLWithPath: $1.resolve(path: finalWasmPath).path))
+            )
             let jsonEncoder = JSONEncoder()
             jsonEncoder.outputFormatting = .prettyPrinted
             let jsonData = try jsonEncoder.encode(metadata)
-            try jsonData.write(to: URL(fileURLWithPath: $0.output))
+            try system.writeFile(atPath: $1.resolve(path: $0.output).path, content: jsonData)
         }
 
         packageInputs.append(wasmImportsTask)
 
         let platformsDir = outputDir.appending(path: "platforms")
         let platformsDirTask = make.addTask(
-            inputFiles: [selfPath], output: platformsDir.path, attributes: [.silent]
+            inputFiles: [selfPath], output: platformsDir, attributes: [.silent]
         ) {
-            try Self.createDirectory(atPath: $0.output)
+            try system.createDirectory(atPath: $1.resolve(path: $0.output).path)
         }
 
         let packageJsonTask = planCopyTemplateFile(
@@ -259,40 +348,39 @@ struct PackagingPlanner {
         ] {
             packageInputs.append(planCopyTemplateFile(
                 make: &make, file: file, output: output, outputDirTask: outputDirTask,
-                inputFiles: [wasmImportsPath.path], inputTasks: [platformsDirTask, wasmImportsTask],
-                wasmImportsPath: wasmImportsPath.path
+                inputFiles: [wasmImportsPath], inputTasks: [platformsDirTask, wasmImportsTask],
+                wasmImportsPath: wasmImportsPath
             ))
         }
-        return (packageInputs, outputDirTask, packageJsonTask)
+        return (packageInputs, outputDirTask, intermediatesDirTask, packageJsonTask)
     }
 
     /// Construct the test build plan and return the root task key
     func planTestBuild(
         make: inout MiniMake
-    ) throws -> (rootTask: MiniMake.TaskKey, binDir: URL) {
-        var (allTasks, outputDirTask, packageJsonTask) = try planBuildInternal(
+    ) throws -> (rootTask: MiniMake.TaskKey, binDir: BuildPath) {
+        var (allTasks, outputDirTask, intermediatesDirTask, packageJsonTask) = try planBuildInternal(
             make: &make, splitDebug: false, noOptimize: false
         )
 
         // Install npm dependencies used in the test harness
-        let npm = try which("npm")
         allTasks.append(make.addTask(
             inputFiles: [
                 selfPath,
-                outputDir.appending(path: "package.json").path,
-            ], inputTasks: [outputDirTask, packageJsonTask],
-            output: intermediatesDir.appending(path: "npm-install.stamp").path
+                outputDir.appending(path: "package.json"),
+            ], inputTasks: [intermediatesDirTask, packageJsonTask],
+            output: intermediatesDir.appending(path: "npm-install.stamp")
         ) {
-            try Self.runCommand(npm, ["-C", outputDir.path, "install"])
-            _ = FileManager.default.createFile(atPath: $0.output, contents: Data(), attributes: nil)
+            try system.npmInstall(packageDir: $1.resolve(path: outputDir).path)
+            try system.writeFile(atPath: $1.resolve(path: $0.output).path, content: Data())
         })
 
         let binDir = outputDir.appending(path: "bin")
         let binDirTask = make.addTask(
             inputFiles: [selfPath], inputTasks: [outputDirTask],
-            output: binDir.path
+            output: binDir
         ) {
-            try Self.createDirectory(atPath: $0.output)
+            try system.createDirectory(atPath: $1.resolve(path: $0.output).path)
         }
         allTasks.append(binDirTask)
 
@@ -309,8 +397,8 @@ struct PackagingPlanner {
             ))
         }
         let rootTask = make.addTask(
-            inputTasks: allTasks, output: "all", attributes: [.phony, .silent]
-        ) { _ in }
+            inputTasks: allTasks, output: BuildPath(phony: "all"), attributes: [.phony, .silent]
+        ) { _, _ in }
         return (rootTask, binDir)
     }
 
@@ -319,9 +407,9 @@ struct PackagingPlanner {
         file: String,
         output: String,
         outputDirTask: MiniMake.TaskKey,
-        inputFiles: [String],
+        inputFiles: [BuildPath],
         inputTasks: [MiniMake.TaskKey],
-        wasmImportsPath: String? = nil
+        wasmImportsPath: BuildPath? = nil
     ) -> MiniMake.TaskKey {
 
         struct Salt: Encodable {
@@ -330,7 +418,6 @@ struct PackagingPlanner {
         }
 
         let inputPath = selfPackageDir.appending(path: file)
-        let (_, triple) = deriveBuildConfiguration()
         let conditions = [
             "USE_SHARED_MEMORY": triple == "wasm32-unknown-wasip1-threads",
             "IS_WASI": triple.hasPrefix("wasm32-unknown-wasi"),
@@ -343,13 +430,14 @@ struct PackagingPlanner {
         let salt = Salt(conditions: conditions, substitutions: constantSubstitutions)
 
         return make.addTask(
-            inputFiles: [selfPath, inputPath.path] + inputFiles, inputTasks: [outputDirTask] + inputTasks,
-            output: outputDir.appending(path: output).path, salt: salt
+            inputFiles: [selfPath, inputPath] + inputFiles, inputTasks: [outputDirTask] + inputTasks,
+            output: outputDir.appending(path: output), salt: salt
         ) {
             var substitutions = constantSubstitutions
 
             if let wasmImportsPath = wasmImportsPath {
-                let importEntries = try JSONDecoder().decode([ImportEntry].self, from: Data(contentsOf: URL(fileURLWithPath: wasmImportsPath)))
+                let wasmImportsPath = $1.resolve(path: wasmImportsPath)
+                let importEntries = try JSONDecoder().decode([ImportEntry].self, from: Data(contentsOf: wasmImportsPath))
                 let memoryImport = importEntries.first { $0.module == "env" && $0.name == "memory" }
                 if case .memory(let type) = memoryImport?.kind {
                     substitutions["PACKAGE_TO_JS_MEMORY_INITIAL"] = "\(type.minimum)"
@@ -358,32 +446,16 @@ struct PackagingPlanner {
                 }
             }
 
+            let inputPath = $1.resolve(path: inputPath)
             var content = try String(contentsOf: inputPath, encoding: .utf8)
             let options = PreprocessOptions(conditions: conditions, substitutions: substitutions)
-            content = try preprocess(source: content, file: file, options: options)
-            try content.write(toFile: $0.output, atomically: true, encoding: .utf8)
+            content = try preprocess(source: content, file: inputPath.path, options: options)
+            try system.writeFile(atPath: $1.resolve(path: $0.output).path, content: Data(content.utf8))
         }
     }
 }
 
 // MARK: - Utilities
-
-func which(_ executable: String) throws -> URL {
-    let pathSeparator: Character
-    #if os(Windows)
-        pathSeparator = ";"
-    #else
-        pathSeparator = ":"
-    #endif
-    let paths = ProcessInfo.processInfo.environment["PATH"]!.split(separator: pathSeparator)
-    for path in paths {
-        let url = URL(fileURLWithPath: String(path)).appendingPathComponent(executable)
-        if FileManager.default.isExecutableFile(atPath: url.path) {
-            return url
-        }
-    }
-    throw PackageToJSError("Executable \(executable) not found in PATH")
-}
 
 func logCommandExecution(_ command: String, _ arguments: [String]) {
     var fullArguments = [command]
