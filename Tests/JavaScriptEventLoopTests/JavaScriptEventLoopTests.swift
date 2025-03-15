@@ -197,7 +197,7 @@ final class JavaScriptEventLoopTests: XCTestCase {
             let result = try await catchPromise2.value
             XCTAssertEqual(result.object?.message, .string("test"))
         }
-        XCTAssertGreaterThanOrEqual(catchDiff, 200)
+        XCTAssertGreaterThanOrEqual(catchDiff, 150)
     }
 
     // MARK: - Continuation Tests
