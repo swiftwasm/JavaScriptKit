@@ -38,8 +38,10 @@ jobs:
         id: setup-swiftwasm
         with:
           target: ${{ matrix.entry.target }}
-      - name: Configure Swift SDK
-        run: echo "SWIFT_SDK_ID=${{ steps.setup-swiftwasm.outputs.swift-sdk-id }}" >> $GITHUB_ENV
+      - name: Configure environment variables
+        run: |
+          echo "SWIFT_SDK_ID=${{ steps.setup-swiftwasm.outputs.swift-sdk-id }}" >> $GITHUB_ENV
+          echo "SWIFT_PATH=$(dirname $(which swiftc))" >> $GITHUB_ENV
       - run: make bootstrap
       - run: make unittest
         # Skip unit tests with uwasi because its proc_exit throws
@@ -49,6 +51,7 @@ jobs:
         run: |
           make regenerate_swiftpm_resources
           git diff --exit-code Sources/JavaScriptKit/Runtime
+      - run: swift test --package-path ./Plugins/PackageToJS
 
   native-build:
     # Check native build to make it easy to develop applications by Xcode
@@ -64,19 +67,3 @@ jobs:
       - run: swift build
         env:
           DEVELOPER_DIR: /Applications/${{ matrix.xcode }}.app/Contents/Developer/
-
-  embedded-build:
-    name: Build for embedded target
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        entry:
-          - os: ubuntu-22.04
-            toolchain:
-              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a/swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a-ubuntu22.04.tar.gz
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/install-swift
-        with:
-          download-url: ${{ matrix.entry.toolchain.download-url }}
-      - run: ./Examples/Embedded/build.sh

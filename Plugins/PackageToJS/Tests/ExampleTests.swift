@@ -135,6 +135,7 @@ extension Trait where Self == ConditionTrait {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
         try withPackage(at: "Examples/Basic") { packageDir, runSwift in
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
+            try runSwift(["package", "--swift-sdk", swiftSDKID, "-Xswiftc", "-DJAVASCRIPTKIT_WITHOUT_WEAKREFS", "js"], [:])
         }
     }
 
