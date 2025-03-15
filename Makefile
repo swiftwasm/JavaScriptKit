@@ -6,6 +6,7 @@ SWIFT_BUILD_FLAGS := --swift-sdk $(SWIFT_SDK_ID)
 .PHONY: bootstrap
 bootstrap:
 	npm ci
+	npx playwright install
 
 .PHONY: build
 build:

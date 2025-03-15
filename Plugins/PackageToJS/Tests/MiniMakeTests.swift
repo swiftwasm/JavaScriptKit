@@ -11,7 +11,6 @@ import Testing
             let outDir = BuildPath(prefix: "OUTPUT")
 
             let task = make.addTask(output: outDir.appending(path: "output.txt")) {
-                print($0.output, $1.resolve(path: $0.output).path)
                 try "Hello".write(toFile: $1.resolve(path: $0.output).path, atomically: true, encoding: .utf8)
             }
 
