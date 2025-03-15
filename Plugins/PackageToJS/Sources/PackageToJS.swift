@@ -117,12 +117,28 @@ extension PackagingSystem {
 }
 
 final class DefaultPackagingSystem: PackagingSystem {
+
+    private let printWarning: (String) -> Void
+
+    init(printWarning: @escaping (String) -> Void) {
+        self.printWarning = printWarning
+    }
+
     func npmInstall(packageDir: String) throws {
         try runCommand(try which("npm"), ["-C", packageDir, "install"])
     }
 
+    lazy var warnMissingWasmOpt: () = {
+        self.printWarning("Warning: wasm-opt is not installed, optimizations will not be applied")
+    }()
+
     func wasmOpt(_ arguments: [String], input: String, output: String) throws {
-        try runCommand(try which("wasm-opt"), arguments + ["-o", output, input])
+        guard let wasmOpt = try? which("wasm-opt") else {
+            _ = warnMissingWasmOpt
+            try FileManager.default.copyItem(atPath: input, toPath: output)
+            return
+        }
+        try runCommand(wasmOpt, arguments + ["-o", output, input])
     }
 
     private func runCommand(_ command: URL, _ arguments: [String]) throws {
@@ -190,7 +206,7 @@ struct PackagingPlanner {
         configuration: String,
         triple: String,
         selfPath: BuildPath = BuildPath(absolute: #filePath),
-        system: any PackagingSystem = DefaultPackagingSystem()
+        system: any PackagingSystem
     ) {
         self.options = options
         self.packageId = packageId
