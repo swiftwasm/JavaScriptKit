@@ -1,3 +1,5 @@
+import struct Foundation.Data
+
 /// Represents the type of value in WebAssembly
 enum ValueType: String, Codable {
     case i32
@@ -62,10 +64,10 @@ struct ImportEntry: Codable {
 
 /// Parse state for WebAssembly parsing
 private class ParseState {
-    private let moduleBytes: [UInt8]
+    private let moduleBytes: Data
     private var offset: Int
     
-    init(moduleBytes: [UInt8]) {
+    init(moduleBytes: Data) {
         self.moduleBytes = moduleBytes
         self.offset = 0
     }
@@ -158,7 +160,7 @@ enum ParseError: Error {
 /// - Parameter moduleBytes: The WebAssembly module bytes
 /// - Returns: Array of import entries
 /// - Throws: ParseError if the module bytes are invalid
-func parseImports(moduleBytes: [UInt8]) throws -> [ImportEntry] {
+func parseImports(moduleBytes: Data) throws -> [ImportEntry] {
     let parseState = ParseState(moduleBytes: moduleBytes)
     try parseMagicNumber(parseState)
     try parseVersion(parseState)

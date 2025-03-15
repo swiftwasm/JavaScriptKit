@@ -14,13 +14,13 @@ struct MiniMake {
 
     /// Information about a task enough to capture build
     /// graph changes
-    struct TaskInfo: Codable {
+    struct TaskInfo: Encodable {
         /// Input tasks not yet built
         let wants: [TaskKey]
-        /// Set of files that must be built before this task
-        let inputs: [String]
-        /// Output task name
-        let output: String
+        /// Set of file paths that must be built before this task
+        let inputs: [BuildPath]
+        /// Output file path
+        let output: BuildPath
         /// Attributes of the task
         let attributes: [TaskAttribute]
         /// Salt for the task, used to differentiate between otherwise identical tasks
@@ -30,25 +30,23 @@ struct MiniMake {
     /// A task to build
     struct Task {
         let info: TaskInfo
-        /// Input tasks not yet built
+        /// Input tasks (files and phony tasks) not yet built
         let wants: Set<TaskKey>
         /// Attributes of the task
         let attributes: Set<TaskAttribute>
-        /// Display name of the task
-        let displayName: String
         /// Key of the task
         let key: TaskKey
         /// Build operation
-        let build: (Task) throws -> Void
+        let build: (_ task: Task, _ scope: VariableScope) throws -> Void
         /// Whether the task is done
         var isDone: Bool
 
-        var inputs: [String] { self.info.inputs }
-        var output: String { self.info.output }
+        var inputs: [BuildPath] { self.info.inputs }
+        var output: BuildPath { self.info.output }
     }
 
     /// A task key
-    struct TaskKey: Codable, Hashable, Comparable, CustomStringConvertible {
+    struct TaskKey: Encodable, Hashable, Comparable, CustomStringConvertible {
         let id: String
         var description: String { self.id }
 
@@ -56,15 +54,45 @@ struct MiniMake {
             self.id = id
         }
 
+        func encode(to encoder: any Encoder) throws {
+            var container = encoder.singleValueContainer()
+            try container.encode(self.id)
+        }
+
         static func < (lhs: TaskKey, rhs: TaskKey) -> Bool { lhs.id < rhs.id }
+    }
+
+    struct VariableScope {
+        let variables: [String: String]
+
+        func resolve(path: BuildPath) -> URL {
+            var components = [String]()
+            for component in path.components {
+                switch component {
+                case .prefix(let variable):
+                    guard let value = variables[variable] else {
+                        fatalError("Build path variable \"\(variable)\" not defined!")
+                    }
+                    components.append(value)
+                case .constant(let path):
+                    components.append(path)
+                }
+            }
+            guard let first = components.first else {
+                fatalError("Build path is empty")
+            }
+            var url = URL(fileURLWithPath: first)
+            for component in components.dropFirst() {
+                url = url.appending(path: component)
+            }
+            return url
+        }
     }
 
     /// All tasks in the build system
     private var tasks: [TaskKey: Task]
     /// Whether to explain why tasks are built
     private var shouldExplain: Bool
-    /// Current working directory at the time the build started
-    private let buildCwd: String
     /// Prints progress of the build
     private var printProgress: ProgressPrinter.PrintProgress
 
@@ -74,20 +102,16 @@ struct MiniMake {
     ) {
         self.tasks = [:]
         self.shouldExplain = explain
-        self.buildCwd = FileManager.default.currentDirectoryPath
         self.printProgress = printProgress
     }
 
     /// Adds a task to the build system
     mutating func addTask(
-        inputFiles: [String] = [], inputTasks: [TaskKey] = [], output: String,
+        inputFiles: [BuildPath] = [], inputTasks: [TaskKey] = [], output: BuildPath,
         attributes: [TaskAttribute] = [], salt: (any Encodable)? = nil,
-        build: @escaping (Task) throws -> Void
+        build: @escaping (_ task: Task, _ scope: VariableScope) throws -> Void
     ) -> TaskKey {
-        let displayName =
-            output.hasPrefix(self.buildCwd)
-            ? String(output.dropFirst(self.buildCwd.count + 1)) : output
-        let taskKey = TaskKey(id: output)
+        let taskKey = TaskKey(id: output.description)
         let saltData = try! salt.map {
             let encoder = JSONEncoder()
             encoder.outputFormatting = .sortedKeys
@@ -99,7 +123,7 @@ struct MiniMake {
         )
         self.tasks[taskKey] = Task(
             info: info, wants: Set(inputTasks), attributes: Set(attributes),
-            displayName: displayName, key: taskKey, build: build, isDone: false)
+            key: taskKey, build: build, isDone: false)
         return taskKey
     }
 
@@ -107,9 +131,12 @@ struct MiniMake {
     ///
     /// This fingerprint must be stable across builds and must change
     /// if the build graph changes in any way.
-    func computeFingerprint(root: TaskKey) throws -> Data {
+    func computeFingerprint(root: TaskKey, prettyPrint: Bool = false) throws -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys
+        if prettyPrint {
+            encoder.outputFormatting.insert(.prettyPrinted)
+        }
         let tasks = self.tasks.sorted { $0.key < $1.key }.map { $0.value.info }
         return try encoder.encode(tasks)
     }
@@ -126,7 +153,13 @@ struct MiniMake {
 
     /// Prints progress of the build
     struct ProgressPrinter {
-        typealias PrintProgress = (_ subject: Task, _ total: Int, _ built: Int, _ message: String) -> Void
+        struct Context {
+            let subject: Task
+            let total: Int
+            let built: Int
+            let scope: VariableScope
+        }
+        typealias PrintProgress = (_ context: Context, _ message: String) -> Void
 
         /// Total number of tasks to build
         let total: Int
@@ -145,17 +178,17 @@ struct MiniMake {
         private static var yellow: String { "\u{001B}[33m" }
         private static var reset: String { "\u{001B}[0m" }
 
-        mutating func started(_ task: Task) {
-            self.print(task, "\(Self.green)building\(Self.reset)")
+        mutating func started(_ task: Task, scope: VariableScope) {
+            self.print(task, scope, "\(Self.green)building\(Self.reset)")
         }
 
-        mutating func skipped(_ task: Task) {
-            self.print(task, "\(Self.yellow)skipped\(Self.reset)")
+        mutating func skipped(_ task: Task, scope: VariableScope) {
+            self.print(task, scope, "\(Self.yellow)skipped\(Self.reset)")
         }
 
-        private mutating func print(_ task: Task, _ message: @autoclosure () -> String) {
+        private mutating func print(_ task: Task, _ scope: VariableScope, _ message: @autoclosure () -> String) {
             guard !task.attributes.contains(.silent) else { return }
-            self.printProgress(task, self.total, self.built, message())
+            self.printProgress(Context(subject: task, total: self.total, built: self.built, scope: scope), message())
             self.built += 1
         }
     }
@@ -176,32 +209,32 @@ struct MiniMake {
     }
 
     /// Cleans all outputs of all tasks
-    func cleanEverything() {
+    func cleanEverything(scope: VariableScope) {
         for task in self.tasks.values {
-            try? FileManager.default.removeItem(atPath: task.output)
+            try? FileManager.default.removeItem(at: scope.resolve(path: task.output))
         }
     }
 
     /// Starts building
-    func build(output: TaskKey) throws {
+    func build(output: TaskKey, scope: VariableScope) throws {
         /// Returns true if any of the task's inputs have a modification date later than the task's output
         func shouldBuild(task: Task) -> Bool {
             if task.attributes.contains(.phony) {
                 return true
             }
-            let outputURL = URL(fileURLWithPath: task.output)
-            if !FileManager.default.fileExists(atPath: task.output) {
+            let outputURL = scope.resolve(path: task.output)
+            if !FileManager.default.fileExists(atPath: outputURL.path) {
                 explain("Task \(task.output) should be built because it doesn't exist")
                 return true
             }
             let outputMtime = try? outputURL.resourceValues(forKeys: [.contentModificationDateKey])
                 .contentModificationDate
             return task.inputs.contains { input in
-                let inputURL = URL(fileURLWithPath: input)
+                let inputURL = scope.resolve(path: input)
                 // Ignore directory modification times
                 var isDirectory: ObjCBool = false
                 let fileExists = FileManager.default.fileExists(
-                    atPath: input, isDirectory: &isDirectory)
+                    atPath: inputURL.path, isDirectory: &isDirectory)
                 if fileExists && isDirectory.boolValue {
                     return false
                 }
@@ -238,14 +271,56 @@ struct MiniMake {
             }
 
             if shouldBuild(task: task) {
-                progressPrinter.started(task)
-                try task.build(task)
+                progressPrinter.started(task, scope: scope)
+                try task.build(task, scope)
             } else {
-                progressPrinter.skipped(task)
+                progressPrinter.skipped(task, scope: scope)
             }
             task.isDone = true
             tasks[taskKey] = task
         }
         try runTask(taskKey: output)
+    }
+}
+
+struct BuildPath: Encodable, Hashable, CustomStringConvertible {
+    enum Component: Hashable, CustomStringConvertible {
+        case prefix(variable: String)
+        case constant(String)
+
+        var description: String {
+            switch self {
+            case .prefix(let variable): return "$\(variable)"
+            case .constant(let path): return path
+            }
+        }
+    }
+    fileprivate let components: [Component]
+
+    var description: String { self.components.map(\.description).joined(separator: "/") }
+
+    init(phony: String) {
+        self.components = [.constant(phony)]
+    }
+
+    init(prefix: String, _ tail: String...) {
+        self.components = [.prefix(variable: prefix)] + tail.map(Component.constant)
+    }
+
+    init(absolute: String) {
+        self.components = [.constant(absolute)]
+    }
+
+    private init(components: [Component]) {
+        self.components = components
+    }
+
+    func appending(path: String) -> BuildPath {
+        return BuildPath(components: self.components + [.constant(path)])
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.description)
     }
 }

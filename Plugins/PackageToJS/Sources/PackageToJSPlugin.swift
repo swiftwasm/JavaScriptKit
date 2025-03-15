@@ -122,7 +122,8 @@ struct PackageToJSPlugin: CommandPlugin {
             make: &make, buildOptions: buildOptions)
         cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
         print("Packaging...")
-        try make.build(output: rootTask)
+        let scope = MiniMake.VariableScope(variables: [:])
+        try make.build(output: rootTask, scope: scope)
         print("Packaging finished")
     }
 
@@ -192,10 +193,11 @@ struct PackageToJSPlugin: CommandPlugin {
             make: &make)
         cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
         print("Packaging tests...")
-        try make.build(output: rootTask)
+        let scope = MiniMake.VariableScope(variables: [:])
+        try make.build(output: rootTask, scope: scope)
         print("Packaging tests finished")
 
-        let testRunner = binDir.appending(path: "test.js")
+        let testRunner = scope.resolve(path: binDir.appending(path: "test.js"))
         if !testOptions.buildOnly {
             var testJsArguments: [String] = []
             var testFrameworkArguments: [String] = []
@@ -212,35 +214,15 @@ struct PackageToJSPlugin: CommandPlugin {
             if testOptions.inspect {
                 testJsArguments += ["--inspect"]
             }
-            try runTest(
-                testRunner: testRunner, context: context,
+            try PackageToJS.runTest(
+                testRunner: testRunner, currentDirectoryURL: context.pluginWorkDirectoryURL,
                 extraArguments: testJsArguments + ["--"] + testFrameworkArguments + testOptions.filter
             )
-            try runTest(
-                testRunner: testRunner, context: context,
+            try PackageToJS.runTest(
+                testRunner: testRunner, currentDirectoryURL: context.pluginWorkDirectoryURL,
                 extraArguments: testJsArguments + ["--", "--testing-library", "swift-testing"] + testFrameworkArguments
                     + testOptions.filter.flatMap { ["--filter", $0] }
             )
-        }
-    }
-
-    private func runTest(testRunner: URL, context: PluginContext, extraArguments: [String]) throws {
-        let node = try which("node")
-        let arguments = ["--experimental-wasi-unstable-preview1", testRunner.path] + extraArguments
-        print("Running test...")
-        logCommandExecution(node.path, arguments)
-
-        let task = Process()
-        task.executableURL = node
-        task.arguments = arguments
-        task.currentDirectoryURL = context.pluginWorkDirectoryURL
-        try task.forwardTerminationSignals {
-            try task.run()
-            task.waitUntilExit()
-        }
-        // swift-testing returns EX_UNAVAILABLE (which is 69 in wasi-libc) for "no tests found"
-        guard task.terminationStatus == 0 || task.terminationStatus == 69 else {
-            throw PackageToJSError("Test failed with status \(task.terminationStatus)")
         }
     }
 
@@ -282,14 +264,18 @@ struct PackageToJSPlugin: CommandPlugin {
         let lastBuildFingerprint = try? Data(contentsOf: buildFingerprint)
         let currentBuildFingerprint = try? make.computeFingerprint(root: root)
         if lastBuildFingerprint != currentBuildFingerprint {
-            print("Build graph changed, cleaning...")
-            make.cleanEverything()
+            printStderr("Build graph changed, cleaning...")
+            make.cleanEverything(scope: MiniMake.VariableScope(variables: [:]))
         }
         try? currentBuildFingerprint?.write(to: buildFingerprint)
     }
 
-    private func printProgress(task: MiniMake.Task, total: Int, built: Int, message: String) {
-        printStderr("[\(built + 1)/\(total)] \(task.displayName): \(message)")
+    private func printProgress(context: MiniMake.ProgressPrinter.Context, message: String) {
+        let buildCwd = FileManager.default.currentDirectoryPath
+        let outputPath = context.scope.resolve(path: context.subject.output).path
+        let displayName = outputPath.hasPrefix(buildCwd)
+            ? String(outputPath.dropFirst(buildCwd.count + 1)) : outputPath
+        printStderr("[\(context.built + 1)/\(context.total)] \(displayName): \(message)")
     }
 }
 
@@ -457,13 +443,17 @@ extension PackagingPlanner {
         outputDir: URL,
         wasmProductArtifact: URL
     ) {
+        let outputBaseName = outputDir.lastPathComponent
+        let (configuration, triple) = PackageToJS.deriveBuildConfiguration(wasmProductArtifact: wasmProductArtifact)
         self.init(
             options: options,
             packageId: context.package.id,
-            pluginWorkDirectoryURL: context.pluginWorkDirectoryURL,
-            selfPackageDir: selfPackage.directoryURL,
-            outputDir: outputDir,
-            wasmProductArtifact: wasmProductArtifact
+            intermediatesDir: BuildPath(absolute: context.pluginWorkDirectoryURL.appending(path: outputBaseName + ".tmp").path),
+            selfPackageDir: BuildPath(absolute: selfPackage.directoryURL.path),
+            outputDir: BuildPath(absolute: outputDir.path),
+            wasmProductArtifact: BuildPath(absolute: wasmProductArtifact.path),
+            configuration: configuration,
+            triple: triple
         )
     }
 }
