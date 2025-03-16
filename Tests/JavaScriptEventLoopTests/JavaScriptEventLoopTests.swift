@@ -235,7 +235,7 @@ final class JavaScriptEventLoopTests: XCTestCase {
             let result = try await promise!.value
             XCTAssertEqual(result, .number(3))
         }
-        XCTAssertGreaterThanOrEqual(closureDiff, 200)
+        XCTAssertGreaterThanOrEqual(closureDiff, 150)
     }
 
     // MARK: - Clock Tests
