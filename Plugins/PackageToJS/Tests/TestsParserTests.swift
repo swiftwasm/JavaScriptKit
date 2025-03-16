@@ -3,30 +3,23 @@ import Testing
 
 @testable import PackageToJS
 
-@Suite struct TestParserTests {
+@Suite struct TestsParserTests {
     func assertFancyFormatSnapshot(
         _ input: String,
         filePath: String = #filePath, function: String = #function,
         sourceLocation: SourceLocation = #_sourceLocation
     ) throws {
-        let parser = FancyTestsParser()
+        var output = ""
+        let parser = FancyTestsParser(write: { output += $0 })
         let lines = input.split(separator: "\n", omittingEmptySubsequences: false)
 
-        class Writer: InteractiveWriter {
-            var output = ""
-            func write(_ string: String) {
-                output += string
-            }
-        }
-
-        let writer = Writer()
         for line in lines {
-            parser.onLine(String(line), writer)
+            parser.onLine(String(line))
         }
-        parser.finalize(writer)
+        parser.finalize()
         try assertSnapshot(
             filePath: filePath, function: function, sourceLocation: sourceLocation,
-            input: Data(writer.output.utf8), fileExtension: "txt",
+            input: Data(output.utf8), fileExtension: "txt",
         )
     }
 

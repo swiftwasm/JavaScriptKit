@@ -87,7 +87,7 @@ struct PackageToJS {
             try PackageToJS.runSingleTestingLibrary(
                 testRunner: testRunner, currentDirectoryURL: currentDirectoryURL,
                 extraArguments: extraArguments,
-                testParser: testOptions.verbose ? nil : FancyTestsParser(),
+                testParser: testOptions.verbose ? nil : FancyTestsParser(write: { print($0, terminator: "") }),
                 testOptions: testOptions
             )
         }
@@ -122,7 +122,7 @@ struct PackageToJS {
         testRunner: URL,
         currentDirectoryURL: URL,
         extraArguments: [String],
-        testParser: (any TestsParser)? = nil,
+        testParser: FancyTestsParser? = nil,
         testOptions: TestOptions
     ) throws {
         let node = try which("node")
@@ -136,15 +136,8 @@ struct PackageToJS {
 
         var finalize: () -> Void = {}
         if let testParser = testParser {
-            class Writer: InteractiveWriter {
-                func write(_ string: String) {
-                    print(string, terminator: "")
-                }
-            }
-
-            let writer = Writer()
             let stdoutBuffer = LineBuffer { line in
-                testParser.onLine(line, writer)
+                testParser.onLine(line)
             }
             let stdoutPipe = Pipe()
             stdoutPipe.fileHandleForReading.readabilityHandler = { handle in
@@ -156,7 +149,7 @@ struct PackageToJS {
                     stdoutBuffer.append(data)
                 }
                 stdoutBuffer.flush()
-                testParser.finalize(writer)
+                testParser.finalize()
             }
         }
 

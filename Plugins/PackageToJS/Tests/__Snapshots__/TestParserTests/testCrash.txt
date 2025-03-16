@@ -12,8 +12,8 @@ RuntimeError: unreachable
     at CounterPackageTests.xctest.$s19JavaScriptEventLoopAAC6create33_F9DB15AFB1FFBEDBFE9D13500E01F3F2LLAByFZyyyccfU0_0aB3Kit20ConvertibleToJSValue_pAE0Q0OcfU_ (wasm://wasm/CounterPackageTests.xctest-0ef3150a:wasm-function[1541]:0x9de13)
     at CounterPackageTests.xctest.$s19JavaScriptEventLoopAAC6create33_F9DB15AFB1FFBEDBFE9D13500E01F3F2LLAByFZyyyccfU0_0aB3Kit20ConvertibleToJSValue_pAE0Q0OcfU_TA (wasm://wasm/CounterPackageTests.xctest-0ef3150a:wasm-function[1540]:0x9dd8d)
 
-Test Suites: [31m1 unknown[0m, 1 total
-Tests:       [31m1 unknown[0m, 1 total
+Test Suites: [31m1 unknown[0m, [0m1 total
+Tests:       [31m1 unknown[0m, [0m1 total
 [90mRan all test suites.[0m
 
 [31mFailed test cases:[0m

@@ -4,6 +4,6 @@
 [1m[97m[42m PASSED [0m /.xctest
 [1m[97m[42m PASSED [0m All tests
 
-Test Suites: [32m1 passed[0m, 1 total
-Tests:       [32m2 passed[0m, 2 total
+Test Suites: [32m1 passed[0m, [0m1 total
+Tests:       [32m2 passed[0m, [0m2 total
 [90mRan all test suites.[0m
