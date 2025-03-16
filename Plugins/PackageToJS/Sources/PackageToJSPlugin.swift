@@ -266,7 +266,7 @@ struct PackageToJSPlugin: CommandPlugin {
     private func printProgress(context: MiniMake.ProgressPrinter.Context, message: String) {
         let buildCwd = FileManager.default.currentDirectoryPath
         let outputPath = context.scope.resolve(path: context.subject.output).path
-        let displayName = outputPath.hasPrefix(buildCwd)
+        let displayName = outputPath.hasPrefix(buildCwd + "/")
             ? String(outputPath.dropFirst(buildCwd.count + 1)) : outputPath
         printStderr("[\(context.built + 1)/\(context.total)] \(displayName): \(message)")
     }
