@@ -148,6 +148,20 @@ extension Trait where Self == ConditionTrait {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
         try withPackage(at: "Examples/Testing") { packageDir, runSwift in
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "test"], [:])
+            try withTemporaryDirectory(body: { tempDir, _ in
+                let scriptContent = """
+                const fs = require('fs');
+                const path = require('path');
+                const scriptPath = path.join(__dirname, 'test.txt');
+                fs.writeFileSync(scriptPath, 'Hello, world!');
+                """
+                try scriptContent.write(to: tempDir.appending(path: "script.js"), atomically: true, encoding: .utf8)
+                let scriptPath = tempDir.appending(path: "script.js")
+                try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "test", "-Xnode=--require=\(scriptPath.path)"], [:])
+                let testPath = tempDir.appending(path: "test.txt")
+                try #require(FileManager.default.fileExists(atPath: testPath.path), "test.txt should exist")
+                try #require(try String(contentsOf: testPath, encoding: .utf8) == "Hello, world!", "test.txt should be created by the script")
+            })
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser"], [:])
         }
     }

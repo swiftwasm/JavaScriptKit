@@ -38,6 +38,8 @@ struct PackageToJS {
         var environment: String?
         /// Whether to run tests in the browser with inspector enabled
         var inspect: Bool
+        /// The extra arguments to pass to node
+        var extraNodeArguments: [String]
         /// The options for packaging
         var packageOptions: PackageOptions
     }
@@ -82,7 +84,8 @@ struct PackageToJS {
 
             try PackageToJS.runSingleTestingLibrary(
                 testRunner: testRunner, currentDirectoryURL: currentDirectoryURL,
-                extraArguments: extraArguments
+                extraArguments: extraArguments,
+                testOptions: testOptions
             )
         }
         let swiftTestingCoverageFile = outputDir.appending(path: "SwiftTesting.profraw")
@@ -97,7 +100,8 @@ struct PackageToJS {
 
             try PackageToJS.runSingleTestingLibrary(
                 testRunner: testRunner, currentDirectoryURL: currentDirectoryURL,
-                extraArguments: extraArguments
+                extraArguments: extraArguments,
+                testOptions: testOptions
             )
         }
 
@@ -114,10 +118,11 @@ struct PackageToJS {
     static func runSingleTestingLibrary(
         testRunner: URL,
         currentDirectoryURL: URL,
-        extraArguments: [String]
+        extraArguments: [String],
+        testOptions: TestOptions
     ) throws {
         let node = try which("node")
-        let arguments = ["--experimental-wasi-unstable-preview1", testRunner.path] + extraArguments
+        let arguments = ["--experimental-wasi-unstable-preview1"] + testOptions.extraNodeArguments + [testRunner.path] + extraArguments
         print("Running test...")
         logCommandExecution(node.path, arguments)
 
