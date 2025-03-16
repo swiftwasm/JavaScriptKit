@@ -340,10 +340,13 @@ extension PackageToJS.TestOptions {
         let prelude = extractor.extractOption(named: "prelude").last
         let environment = extractor.extractOption(named: "environment").last
         let inspect = extractor.extractFlag(named: "inspect")
+        let extraNodeArguments = extractor.extractSingleDashOption(named: "Xnode")
         let packageOptions = PackageToJS.PackageOptions.parse(from: &extractor)
         var options = PackageToJS.TestOptions(
             buildOnly: buildOnly != 0, listTests: listTests != 0,
-            filter: filter, prelude: prelude, environment: environment, inspect: inspect != 0, packageOptions: packageOptions
+            filter: filter, prelude: prelude, environment: environment, inspect: inspect != 0,
+            extraNodeArguments: extraNodeArguments,
+            packageOptions: packageOptions
         )
 
         if !options.buildOnly, !options.packageOptions.useCDN {
@@ -378,6 +381,39 @@ extension PackageToJS.TestOptions {
 }
 
 // MARK: - PackagePlugin helpers
+
+extension ArgumentExtractor {
+  fileprivate mutating func extractSingleDashOption(named name: String) -> [String] {
+    let parts = remainingArguments.split(separator: "--", maxSplits: 1, omittingEmptySubsequences: false)
+    var args = Array(parts[0])
+    let literals = Array(parts.count == 2 ? parts[1] : [])
+
+    var values: [String] = []
+    var idx = 0
+    while idx < args.count {
+      var arg = args[idx]
+      if arg == "-\(name)" {
+        args.remove(at: idx)
+        if idx < args.count {
+          let val = args[idx]
+          values.append(val)
+          args.remove(at: idx)
+        }
+      }
+      else if arg.starts(with: "-\(name)=") {
+        args.remove(at: idx)
+        arg.removeFirst(2 + name.count)
+        values.append(arg)
+      }
+      else {
+        idx += 1
+      }
+    }
+
+    self = ArgumentExtractor(args + literals)
+    return values
+  }
+}
 
 /// Derive default product from the package
 /// - Returns: The name of the product to build
