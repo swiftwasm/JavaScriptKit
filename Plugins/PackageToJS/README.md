@@ -8,16 +8,18 @@ PackageToJS is a command plugin for Swift Package Manager that simplifies the pr
 
 ## Features
 
-- Build Swift packages for WebAssembly targets
-- Generate JavaScript wrapper code for Swift WebAssembly modules
-- Support for testing Swift WebAssembly code
-- Diagnostic helpers for common build issues
-- Options for optimization and debug information management
+- Build WebAssembly file and generate JavaScript wrappers
+- Test driver for Swift Testing and XCTest
+- Generated JS files can be consumed by JS bundler tools like Vite
 
 ## Requirements
 
 - Swift 6.0 or later
 - A compatible WebAssembly SDK
+
+## Relationship with Carton
+
+PackageToJS is intended to replace Carton by providing a more integrated solution for building and packaging Swift WebAssembly applications. Unlike Carton, which offers a development server and hot-reloading, PackageToJS focuses solely on compilation and JavaScript wrapper generation.
 
 ## Internal Architecture
 
