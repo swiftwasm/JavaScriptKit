@@ -19,7 +19,7 @@ import Testing
         parser.finalize()
         try assertSnapshot(
             filePath: filePath, function: function, sourceLocation: sourceLocation,
-            input: Data(output.utf8), fileExtension: "txt",
+            input: Data(output.utf8), fileExtension: "txt"
         )
     }
 
