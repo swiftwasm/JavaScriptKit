@@ -1,0 +1,14 @@
+<EXPR>:0: error: CounterTests.testThrowFailure : threw error "TestError()"
+[1m[97m[101m FAILED [0m CounterTests
+  [91m✘[0m testThrowFailure [90m(2ms)[0m
+[1m[97m[101m FAILED [0m /.xctest
+[1m[97m[101m FAILED [0m All tests
+
+Test Suites: [31m1 failed[0m, 1 total
+Tests:       [31m1 failed[0m, 1 total
+[90mRan all test suites.[0m
+
+[31mFailed test cases:[0m
+  [91m✘[0m CounterTests.testThrowFailure
+
+[33mSome tests failed. Use --verbose for raw test output.[0m

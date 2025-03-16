@@ -18,7 +18,11 @@ let package = Package(
             ]),
         .testTarget(
             name: "CounterTests",
-            dependencies: ["Counter"]
+            dependencies: [
+                "Counter",
+                // This is needed to run the tests in the JavaScript event loop
+                .product(name: "JavaScriptEventLoopTestSupport", package: "JavaScriptKit")
+            ]
         ),
     ]
 )

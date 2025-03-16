@@ -40,6 +40,8 @@ struct PackageToJS {
         var inspect: Bool
         /// The extra arguments to pass to node
         var extraNodeArguments: [String]
+        /// Whether to print verbose output
+        var verbose: Bool
         /// The options for packaging
         var packageOptions: PackageOptions
     }
@@ -85,6 +87,7 @@ struct PackageToJS {
             try PackageToJS.runSingleTestingLibrary(
                 testRunner: testRunner, currentDirectoryURL: currentDirectoryURL,
                 extraArguments: extraArguments,
+                testParser: testOptions.verbose ? nil : FancyTestsParser(),
                 testOptions: testOptions
             )
         }
@@ -119,6 +122,7 @@ struct PackageToJS {
         testRunner: URL,
         currentDirectoryURL: URL,
         extraArguments: [String],
+        testParser: (any TestsParser)? = nil,
         testOptions: TestOptions
     ) throws {
         let node = try which("node")
@@ -129,11 +133,39 @@ struct PackageToJS {
         let task = Process()
         task.executableURL = node
         task.arguments = arguments
+
+        var finalize: () -> Void = {}
+        if let testParser = testParser {
+            class Writer: InteractiveWriter {
+                func write(_ string: String) {
+                    print(string, terminator: "")
+                }
+            }
+
+            let writer = Writer()
+            let stdoutBuffer = LineBuffer { line in
+                testParser.onLine(line, writer)
+            }
+            let stdoutPipe = Pipe()
+            stdoutPipe.fileHandleForReading.readabilityHandler = { handle in
+                stdoutBuffer.append(handle.availableData)
+            }
+            task.standardOutput = stdoutPipe
+            finalize = {
+                if let data = try? stdoutPipe.fileHandleForReading.readToEnd() {
+                    stdoutBuffer.append(data)
+                }
+                stdoutBuffer.flush()
+                testParser.finalize(writer)
+            }
+        }
+
         task.currentDirectoryURL = currentDirectoryURL
         try task.forwardTerminationSignals {
             try task.run()
             task.waitUntilExit()
         }
+        finalize()
         // swift-testing returns EX_UNAVAILABLE (which is 69 in wasi-libc) for "no tests found"
         guard task.terminationStatus == 0 || task.terminationStatus == 69 else {
             throw PackageToJSError("Test failed with status \(task.terminationStatus)")
@@ -149,6 +181,39 @@ struct PackageToJS {
             logCommandExecution(llvmProfdata.path, arguments)
             try runCommand(llvmProfdata, arguments)
             print("Saved profile data to \(mergedCoverageFile.path)")
+        }
+    }
+
+    class LineBuffer: @unchecked Sendable {
+        let lock = NSLock()
+        var buffer = ""
+        let handler: (String) -> Void
+
+        init(handler: @escaping (String) -> Void) {
+            self.handler = handler
+        }
+
+        func append(_ data: Data) {
+            let string = String(data: data, encoding: .utf8) ?? ""
+            append(string)
+        }
+
+        func append(_ data: String) {
+            lock.lock()
+            defer { lock.unlock() }
+            buffer += data
+            let lines = buffer.split(separator: "\n", omittingEmptySubsequences: false)
+            for line in lines.dropLast() {
+                handler(String(line))
+            }
+            buffer = String(lines.last ?? "")
+        }
+
+        func flush() {
+            lock.lock()
+            defer { lock.unlock() }
+            handler(buffer)
+            buffer = ""
         }
     }
 }

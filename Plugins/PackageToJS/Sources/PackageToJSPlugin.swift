@@ -340,12 +340,14 @@ extension PackageToJS.TestOptions {
         let prelude = extractor.extractOption(named: "prelude").last
         let environment = extractor.extractOption(named: "environment").last
         let inspect = extractor.extractFlag(named: "inspect")
+        let verbose = extractor.extractFlag(named: "verbose")
         let extraNodeArguments = extractor.extractSingleDashOption(named: "Xnode")
         let packageOptions = PackageToJS.PackageOptions.parse(from: &extractor)
         var options = PackageToJS.TestOptions(
             buildOnly: buildOnly != 0, listTests: listTests != 0,
             filter: filter, prelude: prelude, environment: environment, inspect: inspect != 0,
             extraNodeArguments: extraNodeArguments,
+            verbose: verbose != 0,
             packageOptions: packageOptions
         )
 
@@ -369,6 +371,8 @@ extension PackageToJS.TestOptions {
               --inspect              Whether to run tests in the browser with inspector enabled
               --use-cdn              Whether to use CDN for dependency packages (default: false)
               --enable-code-coverage Whether to enable code coverage collection (default: false)
+              --verbose              Whether to print verbose output (default: false)
+              -Xnode <args>          Extra arguments to pass to Node.js
 
             EXAMPLES:
               $ swift package --swift-sdk wasm32-unknown-wasi plugin js test
