@@ -18,7 +18,7 @@ class FancyTestsParser {
         self.write = write
     }
 
-    private enum Status: Equatable {
+    private enum Status {
         case passed, failed, skipped
         case unknown(String.SubSequence?)
 
@@ -172,15 +172,13 @@ class FancyTestsParser {
     }
 
     private func flushSingleSuite(_ suite: Suite) {
-        write(suite.statusLabel)
-        write(" \(suite.name)\n")
+        write(suite.statusLabel + " " + suite.name + "\n")
         for testCase in suite.cases {
-            write("  \(testCase.statusMark) ")
+            write("  " + testCase.statusMark + " " + testCase.name)
             if let duration = testCase.duration {
-                write(
-                        "\(testCase.name) \("(\(Int(Double(duration)! * 1000))ms)", color: "[90m")\n"
-                    )  // gray
+                write(" \("(\(duration)s)", color: "[90m")")
             }
+            write("\n")
         }
     }
 

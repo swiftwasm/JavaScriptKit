@@ -1,6 +1,6 @@
 /tmp/Tests/CounterTests/CounterTests.swift:27: error: CounterTests.testAssertailure : XCTAssertEqual failed: ("1") is not equal to ("2") -
 [1m[97m[101m FAILED [0m CounterTests
-  [91m✘[0m testAssertailure [90m(1ms)[0m
+  [91m✘[0m testAssertailure [90m(0.001s)[0m
 [1m[97m[101m FAILED [0m /.xctest
 [1m[97m[101m FAILED [0m All tests
 
