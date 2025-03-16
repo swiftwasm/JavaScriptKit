@@ -19,7 +19,7 @@
       "$PLANNER_SOURCE_PATH",
       "$WASM_PRODUCT_ARTIFACT"
     ],
-    "output" : "$INTERMEDIATES\/main.wasm.debug",
+    "output" : "$INTERMEDIATES\/main.wasm.no-dwarf",
     "wants" : [
       "$OUTPUT",
       "$INTERMEDIATES"
@@ -126,12 +126,12 @@
     ],
     "inputs" : [
       "$PLANNER_SOURCE_PATH",
-      "$INTERMEDIATES\/main.wasm.debug"
+      "$INTERMEDIATES\/main.wasm.no-dwarf"
     ],
     "output" : "$OUTPUT\/main.wasm",
     "wants" : [
       "$OUTPUT",
-      "$INTERMEDIATES\/main.wasm.debug"
+      "$INTERMEDIATES\/main.wasm.no-dwarf"
     ]
   },
   {

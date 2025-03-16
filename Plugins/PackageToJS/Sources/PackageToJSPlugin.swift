@@ -294,10 +294,9 @@ extension PackageToJS.PackageOptions {
 extension PackageToJS.BuildOptions {
     static func parse(from extractor: inout ArgumentExtractor) -> PackageToJS.BuildOptions {
         let product = extractor.extractOption(named: "product").last
-        let splitDebug = extractor.extractFlag(named: "split-debug")
         let noOptimize = extractor.extractFlag(named: "no-optimize")
         let packageOptions = PackageToJS.PackageOptions.parse(from: &extractor)
-        return PackageToJS.BuildOptions(product: product, splitDebug: splitDebug != 0, noOptimize: noOptimize != 0, packageOptions: packageOptions)
+        return PackageToJS.BuildOptions(product: product, noOptimize: noOptimize != 0, packageOptions: packageOptions)
     }
 
     static func help() -> String {
@@ -311,7 +310,6 @@ extension PackageToJS.BuildOptions {
               --output <path>        Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
               --package-name <name>  Name of the package (default: lowercased Package.swift name)
               --explain              Whether to explain the build plan (default: false)
-              --split-debug          Whether to split debug information into a separate .wasm.debug file (default: false)
               --no-optimize          Whether to disable wasm-opt optimization (default: false)
               --use-cdn              Whether to use CDN for dependency packages (default: false)
               --enable-code-coverage Whether to enable code coverage collection (default: false)

@@ -17,8 +17,6 @@ struct PackageToJS {
     struct BuildOptions {
         /// Product to build (default: executable target if there's only one)
         var product: String?
-        /// Whether to split debug information into a separate file (default: false)
-        var splitDebug: Bool
         /// Whether to apply wasm-opt optimizations in release mode (default: true)
         var noOptimize: Bool
         /// The options for packaging
@@ -390,7 +388,7 @@ struct PackagingPlanner {
         buildOptions: PackageToJS.BuildOptions
     ) throws -> MiniMake.TaskKey {
         let (allTasks, _, _, _) = try planBuildInternal(
-            make: &make, splitDebug: buildOptions.splitDebug, noOptimize: buildOptions.noOptimize
+            make: &make, noOptimize: buildOptions.noOptimize
         )
         return make.addTask(
             inputTasks: allTasks, output: BuildPath(phony: "all"), attributes: [.phony, .silent]
@@ -399,7 +397,7 @@ struct PackagingPlanner {
 
     private func planBuildInternal(
         make: inout MiniMake,
-        splitDebug: Bool, noOptimize: Bool
+        noOptimize: Bool
     ) throws -> (
         allTasks: [MiniMake.TaskKey],
         outputDirTask: MiniMake.TaskKey,
@@ -435,25 +433,23 @@ struct PackagingPlanner {
 
         if shouldOptimize {
             // Optimize the wasm in release mode
-            // If splitDebug is true, we need to place the DWARF-stripped wasm file (but "name" section remains)
-            // in the output directory.
-            let stripWasmPath = (splitDebug ? outputDir : intermediatesDir).appending(path: wasmFilename + ".debug")
+            let wasmWithoutDwarfPath = intermediatesDir.appending(path: wasmFilename + ".no-dwarf")
 
             // First, strip DWARF sections as their existence enables DWARF preserving mode in wasm-opt
-            let stripWasm = make.addTask(
+            let wasmWithoutDwarf = make.addTask(
                 inputFiles: [selfPath, wasmProductArtifact], inputTasks: [outputDirTask, intermediatesDirTask],
-                output: stripWasmPath
+                output: wasmWithoutDwarfPath
             ) {
                 print("Stripping DWARF debug info...")
                 try system.wasmOpt(["--strip-dwarf", "--debuginfo"], input: $1.resolve(path: wasmProductArtifact).path, output: $1.resolve(path: $0.output).path)
             }
             // Then, run wasm-opt with all optimizations
             wasm = make.addTask(
-                inputFiles: [selfPath, stripWasmPath], inputTasks: [outputDirTask, stripWasm],
+                inputFiles: [selfPath, wasmWithoutDwarfPath], inputTasks: [outputDirTask, wasmWithoutDwarf],
                 output: finalWasmPath
             ) {
                 print("Optimizing the wasm file...")
-                try system.wasmOpt(["-Os"], input: $1.resolve(path: stripWasmPath).path, output: $1.resolve(path: $0.output).path)
+                try system.wasmOpt(["-Os", "--debuginfo"], input: $1.resolve(path: wasmWithoutDwarfPath).path, output: $1.resolve(path: $0.output).path)
             }
         } else {
             // Copy the wasm product artifact
@@ -522,7 +518,7 @@ struct PackagingPlanner {
         make: inout MiniMake
     ) throws -> (rootTask: MiniMake.TaskKey, binDir: BuildPath) {
         var (allTasks, outputDirTask, intermediatesDirTask, packageJsonTask) = try planBuildInternal(
-            make: &make, splitDebug: false, noOptimize: false
+            make: &make, noOptimize: false
         )
 
         // Install npm dependencies used in the test harness

@@ -35,12 +35,11 @@ import Testing
     }
 
     @Test(arguments: [
-        (variant: "debug", configuration: "debug", splitDebug: false, noOptimize: false),
-        (variant: "release", configuration: "release", splitDebug: false, noOptimize: false),
-        (variant: "release_split_debug", configuration: "release", splitDebug: true, noOptimize: false),
-        (variant: "release_no_optimize", configuration: "release", splitDebug: false, noOptimize: true),
+        (variant: "debug", configuration: "debug", noOptimize: false),
+        (variant: "release", configuration: "release", noOptimize: false),
+        (variant: "release_no_optimize", configuration: "release", noOptimize: true),
     ])
-    func planBuild(variant: String, configuration: String, splitDebug: Bool, noOptimize: Bool) throws {
+    func planBuild(variant: String, configuration: String, noOptimize: Bool) throws {
         let options = PackageToJS.PackageOptions()
         let system = TestPackagingSystem()
         let planner = PackagingPlanner(
@@ -60,7 +59,6 @@ import Testing
                 make: &make,
                 buildOptions: PackageToJS.BuildOptions(
                     product: "test",
-                    splitDebug: splitDebug,
                     noOptimize: noOptimize,
                     packageOptions: options
                 )
