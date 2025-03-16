@@ -109,7 +109,7 @@ struct MiniMake {
     mutating func addTask(
         inputFiles: [BuildPath] = [], inputTasks: [TaskKey] = [], output: BuildPath,
         attributes: [TaskAttribute] = [], salt: (any Encodable)? = nil,
-        build: @escaping (_ task: Task, _ scope: VariableScope) throws -> Void
+        build: @escaping (_ task: Task, _ scope: VariableScope) throws -> Void = { _, _ in }
     ) -> TaskKey {
         let taskKey = TaskKey(id: output.description)
         let saltData = try! salt.map {

@@ -394,7 +394,7 @@ struct PackagingPlanner {
         )
         return make.addTask(
             inputTasks: allTasks, output: BuildPath(phony: "all"), attributes: [.phony, .silent]
-        ) { _, _ in }
+        )
     }
 
     private func planBuildInternal(
@@ -560,7 +560,7 @@ struct PackagingPlanner {
         }
         let rootTask = make.addTask(
             inputTasks: allTasks, output: BuildPath(phony: "all"), attributes: [.phony, .silent]
-        ) { _, _ in }
+        )
         return (rootTask, binDir)
     }
 
