@@ -42,6 +42,10 @@ extension Trait where Self == ConditionTrait {
         ProcessInfo.processInfo.environment["SWIFT_SDK_ID"]
     }
 
+    static func getSwiftPath() -> String? {
+        ProcessInfo.processInfo.environment["SWIFT_PATH"]
+    }
+
     static let repoPath = URL(fileURLWithPath: #filePath)
         .deletingLastPathComponent()
         .deletingLastPathComponent()
@@ -97,7 +101,7 @@ extension Trait where Self == ConditionTrait {
                 process.executableURL = URL(
                     fileURLWithPath: "swift",
                     relativeTo: URL(
-                        fileURLWithPath: ProcessInfo.processInfo.environment["SWIFT_PATH"]!))
+                        fileURLWithPath: try #require(Self.getSwiftPath())))
                 process.arguments = args
                 process.currentDirectoryURL = destination.appending(path: path)
                 process.environment = ProcessInfo.processInfo.environment.merging(env) { _, new in
@@ -147,6 +151,30 @@ extension Trait where Self == ConditionTrait {
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser"], [:])
         }
     }
+
+    #if compiler(>=6.1)
+    @Test(.requireSwiftSDK)
+    func testingWithCoverage() throws {
+        let swiftSDKID = try #require(Self.getSwiftSDKID())
+        let swiftPath = try #require(Self.getSwiftPath())
+        try withPackage(at: "Examples/Testing") { packageDir, runSwift in
+            try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "test", "--enable-code-coverage"], [
+                "LLVM_PROFDATA_PATH": URL(fileURLWithPath: swiftPath).appending(path: "llvm-profdata").path
+            ])
+            do {
+                let llvmCov = try which("llvm-cov")
+                let process = Process()
+                process.executableURL = llvmCov
+                let profdata = packageDir.appending(path: ".build/plugins/PackageToJS/outputs/PackageTests/default.profdata")
+                let wasm = packageDir.appending(path: ".build/plugins/PackageToJS/outputs/PackageTests/main.wasm")
+                process.arguments = ["report", "-instr-profile", profdata.path, wasm.path]
+                process.standardOutput = FileHandle.nullDevice
+                try process.run()
+                process.waitUntilExit()
+            }
+        }
+    }
+    #endif
 
     @Test(.requireSwiftSDK(triple: "wasm32-unknown-wasip1-threads"))
     func multithreading() throws {

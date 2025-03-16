@@ -3,6 +3,7 @@ import { instantiate } from "../instantiate.js"
 import { testBrowser } from "../test.js"
 import { parseArgs } from "node:util"
 import path from "node:path"
+import { writeFileSync } from "node:fs"
 
 function splitArgs(args) {
     // Split arguments into two parts by "--"
@@ -31,6 +32,7 @@ const args = parseArgs({
         prelude: { type: "string" },
         environment: { type: "string" },
         inspect: { type: "boolean" },
+        "coverage-file": { type: "string" },
     },
 })
 
@@ -38,6 +40,17 @@ const harnesses = {
     node: async ({ preludeScript }) => {
         let options = await nodePlatform.defaultNodeSetup({
             args: testFrameworkArgs,
+            onExit: (code) => {
+                if (code !== 0) { return }
+                // Extract the coverage file from the wasm module
+                const filePath = "default.profraw"
+                const destinationPath = args.values["coverage-file"] ?? filePath
+                const profraw = options.wasi.extractFile?.(filePath)
+                if (profraw) {
+                    console.log(`Saved ${filePath} to ${destinationPath}`);
+                    writeFileSync(destinationPath, profraw);
+                }
+            },
             /* #if USE_SHARED_MEMORY */
             spawnWorker: nodePlatform.createDefaultWorkerFactory(preludeScript)
             /* #endif */
@@ -52,6 +65,12 @@ const harnesses = {
             await instantiate(options)
         } catch (e) {
             if (e instanceof WebAssembly.CompileError) {
+                // Check Node.js major version
+                const nodeVersion = process.version.split(".")[0]
+                const minNodeVersion = 20
+                if (nodeVersion < minNodeVersion) {
+                    console.error(`Hint: Node.js version ${nodeVersion} is not supported, please use version ${minNodeVersion} or later.`)
+                }
             }
             throw e
         }
