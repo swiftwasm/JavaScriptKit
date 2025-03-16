@@ -6,10 +6,12 @@ struct PackageToJS {
         var outputPath: String?
         /// Name of the package (default: lowercased Package.swift name)
         var packageName: String?
-        /// Whether to explain the build plan
+        /// Whether to explain the build plan (default: false)
         var explain: Bool = false
-        /// Whether to use CDN for dependency packages
+        /// Whether to use CDN for dependency packages (default: false)
         var useCDN: Bool = false
+        /// Whether to enable code coverage collection (default: false)
+        var enableCodeCoverage: Bool = false
     }
 
     struct BuildOptions {
@@ -51,7 +53,69 @@ struct PackageToJS {
         return (buildConfiguration, triple)
     }
 
-    static func runTest(testRunner: URL, currentDirectoryURL: URL, extraArguments: [String]) throws {
+    static func runTest(testRunner: URL, currentDirectoryURL: URL, outputDir: URL, testOptions: TestOptions) throws {
+        var testJsArguments: [String] = []
+        var testLibraryArguments: [String] = []
+        if testOptions.listTests {
+            testLibraryArguments += ["--list-tests"]
+        }
+        if let prelude = testOptions.prelude {
+            let preludeURL = URL(fileURLWithPath: prelude, relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath))
+            testJsArguments += ["--prelude", preludeURL.path]
+        }
+        if let environment = testOptions.environment {
+            testJsArguments += ["--environment", environment]
+        }
+        if testOptions.inspect {
+            testJsArguments += ["--inspect"]
+        }
+
+        let xctestCoverageFile = outputDir.appending(path: "XCTest.profraw")
+        do {
+            var extraArguments = testJsArguments
+            if testOptions.packageOptions.enableCodeCoverage {
+                extraArguments += ["--coverage-file", xctestCoverageFile.path]
+            }
+            extraArguments += ["--"]
+            extraArguments += testLibraryArguments
+            extraArguments += testOptions.filter
+
+            try PackageToJS.runSingleTestingLibrary(
+                testRunner: testRunner, currentDirectoryURL: currentDirectoryURL,
+                extraArguments: extraArguments
+            )
+        }
+        let swiftTestingCoverageFile = outputDir.appending(path: "SwiftTesting.profraw")
+        do {
+            var extraArguments = testJsArguments
+            if testOptions.packageOptions.enableCodeCoverage {
+                extraArguments += ["--coverage-file", swiftTestingCoverageFile.path]
+            }
+            extraArguments += ["--", "--testing-library", "swift-testing"]
+            extraArguments += testLibraryArguments
+            extraArguments += testOptions.filter.flatMap { ["--filter", $0] }
+
+            try PackageToJS.runSingleTestingLibrary(
+                testRunner: testRunner, currentDirectoryURL: currentDirectoryURL,
+                extraArguments: extraArguments
+            )
+        }
+
+        if testOptions.packageOptions.enableCodeCoverage {
+            let profrawFiles = [xctestCoverageFile, swiftTestingCoverageFile].filter { FileManager.default.fileExists(atPath: $0.path) }
+            do {
+                try PackageToJS.postProcessCoverageFiles(outputDir: outputDir, profrawFiles: profrawFiles)
+            } catch {
+                print("Warning: Failed to merge coverage files: \(error)")
+            }
+        }
+    }
+
+    static func runSingleTestingLibrary(
+        testRunner: URL,
+        currentDirectoryURL: URL,
+        extraArguments: [String]
+    ) throws {
         let node = try which("node")
         let arguments = ["--experimental-wasi-unstable-preview1", testRunner.path] + extraArguments
         print("Running test...")
@@ -68,6 +132,18 @@ struct PackageToJS {
         // swift-testing returns EX_UNAVAILABLE (which is 69 in wasi-libc) for "no tests found"
         guard task.terminationStatus == 0 || task.terminationStatus == 69 else {
             throw PackageToJSError("Test failed with status \(task.terminationStatus)")
+        }
+    }
+
+    static func postProcessCoverageFiles(outputDir: URL, profrawFiles: [URL]) throws {
+        let mergedCoverageFile = outputDir.appending(path: "default.profdata")
+        do {
+            // Merge the coverage files by llvm-profdata
+            let arguments = ["merge", "-sparse", "-output", mergedCoverageFile.path] + profrawFiles.map { $0.path }
+            let llvmProfdata = try which("llvm-profdata")
+            logCommandExecution(llvmProfdata.path, arguments)
+            try runCommand(llvmProfdata, arguments)
+            print("Saved profile data to \(mergedCoverageFile.path)")
         }
     }
 }
@@ -140,21 +216,19 @@ final class DefaultPackagingSystem: PackagingSystem {
         }
         try runCommand(wasmOpt, arguments + ["-o", output, input])
     }
-
-    private func runCommand(_ command: URL, _ arguments: [String]) throws {
-        let task = Process()
-        task.executableURL = command
-        task.arguments = arguments
-        task.currentDirectoryURL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-        try task.run()
-        task.waitUntilExit()
-        guard task.terminationStatus == 0 else {
-            throw PackageToJSError("Command failed with status \(task.terminationStatus)")
-        }
-    }
 }
 
 internal func which(_ executable: String) throws -> URL {
+    do {
+        // Check overriding environment variable
+        let envVariable = executable.uppercased().replacingOccurrences(of: "-", with: "_") + "_PATH"
+        if let path = ProcessInfo.processInfo.environment[envVariable] {
+            let url = URL(fileURLWithPath: path).appendingPathComponent(executable)
+            if FileManager.default.isExecutableFile(atPath: url.path) {
+                return url
+            }
+        }
+    }
     let pathSeparator: Character
     #if os(Windows)
         pathSeparator = ";"
@@ -169,6 +243,18 @@ internal func which(_ executable: String) throws -> URL {
         }
     }
     throw PackageToJSError("Executable \(executable) not found in PATH")
+}
+
+private func runCommand(_ command: URL, _ arguments: [String]) throws {
+    let task = Process()
+    task.executableURL = command
+    task.arguments = arguments
+    task.currentDirectoryURL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+    try task.run()
+    task.waitUntilExit()
+    guard task.terminationStatus == 0 else {
+        throw PackageToJSError("Command failed with status \(task.terminationStatus)")
+    }
 }
 
 /// Plans the build for packaging.

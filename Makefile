@@ -18,11 +18,11 @@ unittest:
 	@echo Running unit tests
 	swift package --swift-sdk "$(SWIFT_SDK_ID)" \
 	    --disable-sandbox \
-		-Xlinker --stack-first \
-		-Xlinker --global-base=524288 \
-		-Xlinker -z \
-		-Xlinker stack-size=524288 \
-		js test --prelude ./Tests/prelude.mjs
+	    -Xlinker --stack-first \
+	    -Xlinker --global-base=524288 \
+	    -Xlinker -z \
+	    -Xlinker stack-size=524288 \
+	    js test --prelude ./Tests/prelude.mjs
 
 .PHONY: benchmark_setup
 benchmark_setup:

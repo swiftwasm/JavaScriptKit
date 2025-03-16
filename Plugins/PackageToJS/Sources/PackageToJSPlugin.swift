@@ -93,7 +93,9 @@ struct PackageToJSPlugin: CommandPlugin {
         // Build products
         let productName = try buildOptions.product ?? deriveDefaultProduct(package: context.package)
         let build = try buildWasm(
-            productName: productName, context: context)
+            productName: productName, context: context,
+            enableCodeCoverage: buildOptions.packageOptions.enableCodeCoverage
+        )
         guard build.succeeded else {
             reportBuildFailure(build, arguments)
             exit(1)
@@ -145,7 +147,9 @@ struct PackageToJSPlugin: CommandPlugin {
 
         let productName = "\(context.package.displayName)PackageTests"
         let build = try buildWasm(
-            productName: productName, context: context)
+            productName: productName, context: context,
+            enableCodeCoverage: testOptions.packageOptions.enableCodeCoverage
+        )
         guard build.succeeded else {
             reportBuildFailure(build, arguments)
             exit(1)
@@ -198,36 +202,18 @@ struct PackageToJSPlugin: CommandPlugin {
         try make.build(output: rootTask, scope: scope)
         print("Packaging tests finished")
 
-        let testRunner = scope.resolve(path: binDir.appending(path: "test.js"))
         if !testOptions.buildOnly {
-            var testJsArguments: [String] = []
-            var testFrameworkArguments: [String] = []
-            if testOptions.listTests {
-                testFrameworkArguments += ["--list-tests"]
-            }
-            if let prelude = testOptions.prelude {
-                let preludeURL = URL(fileURLWithPath: prelude, relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath))
-                testJsArguments += ["--prelude", preludeURL.path]
-            }
-            if let environment = testOptions.environment {
-                testJsArguments += ["--environment", environment]
-            }
-            if testOptions.inspect {
-                testJsArguments += ["--inspect"]
-            }
+            let testRunner = scope.resolve(path: binDir.appending(path: "test.js"))
             try PackageToJS.runTest(
-                testRunner: testRunner, currentDirectoryURL: context.pluginWorkDirectoryURL,
-                extraArguments: testJsArguments + ["--"] + testFrameworkArguments + testOptions.filter
-            )
-            try PackageToJS.runTest(
-                testRunner: testRunner, currentDirectoryURL: context.pluginWorkDirectoryURL,
-                extraArguments: testJsArguments + ["--", "--testing-library", "swift-testing"] + testFrameworkArguments
-                    + testOptions.filter.flatMap { ["--filter", $0] }
+                testRunner: testRunner,
+                currentDirectoryURL: context.pluginWorkDirectoryURL,
+                outputDir: outputDir,
+                testOptions: testOptions
             )
         }
     }
 
-    private func buildWasm(productName: String, context: PluginContext) throws
+    private func buildWasm(productName: String, context: PluginContext, enableCodeCoverage: Bool) throws
         -> PackageManager.BuildResult
     {
         var parameters = PackageManager.BuildParameters(
@@ -248,6 +234,12 @@ struct PackageToJSPlugin: CommandPlugin {
             parameters.otherLinkerFlags = [
                 "--export-if-defined=__main_argc_argv"
             ]
+
+            // Enable code coverage options if requested
+            if enableCodeCoverage {
+                parameters.otherSwiftcFlags += ["-profile-coverage-mapping", "-profile-generate"]
+                parameters.otherCFlags += ["-fprofile-instr-generate", "-fcoverage-mapping"]
+            }
         }
         return try self.packageManager.build(.product(productName), parameters: parameters)
     }
@@ -292,8 +284,9 @@ extension PackageToJS.PackageOptions {
         let packageName = extractor.extractOption(named: "package-name").last
         let explain = extractor.extractFlag(named: "explain")
         let useCDN = extractor.extractFlag(named: "use-cdn")
+        let enableCodeCoverage = extractor.extractFlag(named: "enable-code-coverage")
         return PackageToJS.PackageOptions(
-            outputPath: outputPath, packageName: packageName, explain: explain != 0, useCDN: useCDN != 0
+            outputPath: outputPath, packageName: packageName, explain: explain != 0, useCDN: useCDN != 0, enableCodeCoverage: enableCodeCoverage != 0
         )
     }
 }
@@ -314,12 +307,14 @@ extension PackageToJS.BuildOptions {
             USAGE: swift package --swift-sdk <swift-sdk> [SwiftPM options] PackageToJS [options] [subcommand]
 
             OPTIONS:
-              --product <product>   Product to build (default: executable target if there's only one)
-              --output <path>       Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
-              --package-name <name> Name of the package (default: lowercased Package.swift name)
-              --explain             Whether to explain the build plan
-              --split-debug         Whether to split debug information into a separate .wasm.debug file (default: false)
-              --no-optimize         Whether to disable wasm-opt optimization (default: false)
+              --product <product>    Product to build (default: executable target if there's only one)
+              --output <path>        Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
+              --package-name <name>  Name of the package (default: lowercased Package.swift name)
+              --explain              Whether to explain the build plan (default: false)
+              --split-debug          Whether to split debug information into a separate .wasm.debug file (default: false)
+              --no-optimize          Whether to disable wasm-opt optimization (default: false)
+              --use-cdn              Whether to use CDN for dependency packages (default: false)
+              --enable-code-coverage Whether to enable code coverage collection (default: false)
 
             SUBCOMMANDS:
               test  Builds and runs tests
@@ -365,10 +360,12 @@ extension PackageToJS.TestOptions {
             USAGE: swift package --swift-sdk <swift-sdk> [SwiftPM options] PackageToJS test [options]
 
             OPTIONS:
-              --build-only          Whether to build only (default: false)
-              --prelude <path>      Path to the prelude script
-              --environment <name>  The environment to use for the tests
-              --inspect             Whether to run tests in the browser with inspector enabled
+              --build-only           Whether to build only (default: false)
+              --prelude <path>       Path to the prelude script
+              --environment <name>   The environment to use for the tests
+              --inspect              Whether to run tests in the browser with inspector enabled
+              --use-cdn              Whether to use CDN for dependency packages (default: false)
+              --enable-code-coverage Whether to enable code coverage collection (default: false)
 
             EXAMPLES:
               $ swift package --swift-sdk wasm32-unknown-wasi plugin js test

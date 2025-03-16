@@ -42,6 +42,13 @@ export interface WASI {
      * @param instance - The instance of the WebAssembly module
      */
     setInstance(instance: WebAssembly.Instance): void
+    /**
+     * Extract a file from the WASI filesystem
+     *
+     * @param path - The path to the file to extract
+     * @returns The data of the file if it was extracted, undefined otherwise
+     */
+    extractFile?(path: string): Uint8Array | undefined
 }
 
 export type ModuleSource = WebAssembly.Module | ArrayBufferView | ArrayBuffer | Response | PromiseLike<Response>

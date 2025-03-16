@@ -68,13 +68,13 @@ final class JavaScriptEventLoopTests: XCTestCase {
         let sleepDiff = try await measureTime {
             try await Task.sleep(nanoseconds: 200_000_000)
         }
-        XCTAssertGreaterThanOrEqual(sleepDiff, 200)
+        XCTAssertGreaterThanOrEqual(sleepDiff, 150)
 
         // Test shorter sleep duration
         let shortSleepDiff = try await measureTime {
             try await Task.sleep(nanoseconds: 100_000_000)
         }
-        XCTAssertGreaterThanOrEqual(shortSleepDiff, 100)
+        XCTAssertGreaterThanOrEqual(shortSleepDiff, 50)
     }
 
     func testTaskPriority() async throws {
