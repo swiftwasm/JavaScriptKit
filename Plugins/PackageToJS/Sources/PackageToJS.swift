@@ -40,6 +40,8 @@ struct PackageToJS {
         var inspect: Bool
         /// The extra arguments to pass to node
         var extraNodeArguments: [String]
+        /// Whether to print verbose output
+        var verbose: Bool
         /// The options for packaging
         var packageOptions: PackageOptions
     }
@@ -59,32 +61,36 @@ struct PackageToJS {
         var testJsArguments: [String] = []
         var testLibraryArguments: [String] = []
         if testOptions.listTests {
-            testLibraryArguments += ["--list-tests"]
+            testLibraryArguments.append("--list-tests")
         }
         if let prelude = testOptions.prelude {
             let preludeURL = URL(fileURLWithPath: prelude, relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath))
-            testJsArguments += ["--prelude", preludeURL.path]
+            testJsArguments.append("--prelude")
+            testJsArguments.append(preludeURL.path)
         }
         if let environment = testOptions.environment {
-            testJsArguments += ["--environment", environment]
+            testJsArguments.append("--environment")
+            testJsArguments.append(environment)
         }
         if testOptions.inspect {
-            testJsArguments += ["--inspect"]
+            testJsArguments.append("--inspect")
         }
 
         let xctestCoverageFile = outputDir.appending(path: "XCTest.profraw")
         do {
             var extraArguments = testJsArguments
             if testOptions.packageOptions.enableCodeCoverage {
-                extraArguments += ["--coverage-file", xctestCoverageFile.path]
+                extraArguments.append("--coverage-file")
+                extraArguments.append(xctestCoverageFile.path)
             }
-            extraArguments += ["--"]
-            extraArguments += testLibraryArguments
-            extraArguments += testOptions.filter
+            extraArguments.append("--")
+            extraArguments.append(contentsOf: testLibraryArguments)
+            extraArguments.append(contentsOf: testOptions.filter)
 
             try PackageToJS.runSingleTestingLibrary(
                 testRunner: testRunner, currentDirectoryURL: currentDirectoryURL,
                 extraArguments: extraArguments,
+                testParser: testOptions.verbose ? nil : FancyTestsParser(write: { print($0, terminator: "") }),
                 testOptions: testOptions
             )
         }
@@ -92,11 +98,17 @@ struct PackageToJS {
         do {
             var extraArguments = testJsArguments
             if testOptions.packageOptions.enableCodeCoverage {
-                extraArguments += ["--coverage-file", swiftTestingCoverageFile.path]
+                extraArguments.append("--coverage-file")
+                extraArguments.append(swiftTestingCoverageFile.path)
             }
-            extraArguments += ["--", "--testing-library", "swift-testing"]
-            extraArguments += testLibraryArguments
-            extraArguments += testOptions.filter.flatMap { ["--filter", $0] }
+            extraArguments.append("--")
+            extraArguments.append("--testing-library")
+            extraArguments.append("swift-testing")
+            extraArguments.append(contentsOf: testLibraryArguments)
+            for filter in testOptions.filter {
+                extraArguments.append("--filter")
+                extraArguments.append(filter)
+            }
 
             try PackageToJS.runSingleTestingLibrary(
                 testRunner: testRunner, currentDirectoryURL: currentDirectoryURL,
@@ -106,7 +118,7 @@ struct PackageToJS {
         }
 
         if testOptions.packageOptions.enableCodeCoverage {
-            let profrawFiles = [xctestCoverageFile, swiftTestingCoverageFile].filter { FileManager.default.fileExists(atPath: $0.path) }
+            let profrawFiles = [xctestCoverageFile.path, swiftTestingCoverageFile.path].filter { FileManager.default.fileExists(atPath: $0) }
             do {
                 try PackageToJS.postProcessCoverageFiles(outputDir: outputDir, profrawFiles: profrawFiles)
             } catch {
@@ -119,36 +131,95 @@ struct PackageToJS {
         testRunner: URL,
         currentDirectoryURL: URL,
         extraArguments: [String],
+        testParser: FancyTestsParser? = nil,
         testOptions: TestOptions
     ) throws {
         let node = try which("node")
-        let arguments = ["--experimental-wasi-unstable-preview1"] + testOptions.extraNodeArguments + [testRunner.path] + extraArguments
+        var arguments = ["--experimental-wasi-unstable-preview1"]
+        arguments.append(contentsOf: testOptions.extraNodeArguments)
+        arguments.append(testRunner.path)
+        arguments.append(contentsOf: extraArguments)
+
         print("Running test...")
         logCommandExecution(node.path, arguments)
 
         let task = Process()
         task.executableURL = node
         task.arguments = arguments
+
+        var finalize: () -> Void = {}
+        if let testParser = testParser {
+            let stdoutBuffer = LineBuffer { line in
+                testParser.onLine(line)
+            }
+            let stdoutPipe = Pipe()
+            stdoutPipe.fileHandleForReading.readabilityHandler = { handle in
+                stdoutBuffer.append(handle.availableData)
+            }
+            task.standardOutput = stdoutPipe
+            finalize = {
+                if let data = try? stdoutPipe.fileHandleForReading.readToEnd() {
+                    stdoutBuffer.append(data)
+                }
+                stdoutBuffer.flush()
+                testParser.finalize()
+            }
+        }
+
         task.currentDirectoryURL = currentDirectoryURL
         try task.forwardTerminationSignals {
             try task.run()
             task.waitUntilExit()
         }
+        finalize()
         // swift-testing returns EX_UNAVAILABLE (which is 69 in wasi-libc) for "no tests found"
-        guard task.terminationStatus == 0 || task.terminationStatus == 69 else {
+        guard [0, 69].contains(task.terminationStatus) else {
             throw PackageToJSError("Test failed with status \(task.terminationStatus)")
         }
     }
 
-    static func postProcessCoverageFiles(outputDir: URL, profrawFiles: [URL]) throws {
+    static func postProcessCoverageFiles(outputDir: URL, profrawFiles: [String]) throws {
         let mergedCoverageFile = outputDir.appending(path: "default.profdata")
         do {
             // Merge the coverage files by llvm-profdata
-            let arguments = ["merge", "-sparse", "-output", mergedCoverageFile.path] + profrawFiles.map { $0.path }
+            let arguments = ["merge", "-sparse", "-output", mergedCoverageFile.path] + profrawFiles
             let llvmProfdata = try which("llvm-profdata")
             logCommandExecution(llvmProfdata.path, arguments)
             try runCommand(llvmProfdata, arguments)
             print("Saved profile data to \(mergedCoverageFile.path)")
+        }
+    }
+
+    class LineBuffer: @unchecked Sendable {
+        let lock = NSLock()
+        var buffer = ""
+        let handler: (String) -> Void
+
+        init(handler: @escaping (String) -> Void) {
+            self.handler = handler
+        }
+
+        func append(_ data: Data) {
+            let string = String(data: data, encoding: .utf8) ?? ""
+            append(string)
+        }
+
+        func append(_ data: String) {
+            lock.lock()
+            defer { lock.unlock() }
+            buffer.append(data)
+            let lines = buffer.split(separator: "\n", omittingEmptySubsequences: false)
+            for line in lines.dropLast() {
+                handler(String(line))
+            }
+            buffer = String(lines.last ?? "")
+        }
+
+        func flush() {
+            lock.lock()
+            defer { lock.unlock() }
+            handler(buffer)
+            buffer = ""
         }
     }
 }
@@ -509,12 +580,12 @@ struct PackagingPlanner {
         }
 
         let inputPath = selfPackageDir.appending(path: file)
-        let conditions = [
+        let conditions: [String: Bool] = [
             "USE_SHARED_MEMORY": triple == "wasm32-unknown-wasip1-threads",
             "IS_WASI": triple.hasPrefix("wasm32-unknown-wasi"),
             "USE_WASI_CDN": options.useCDN,
         ]
-        let constantSubstitutions = [
+        let constantSubstitutions: [String: String] = [
             "PACKAGE_TO_JS_MODULE_PATH": wasmFilename,
             "PACKAGE_TO_JS_PACKAGE_NAME": options.packageName ?? packageId.lowercased(),
         ]
@@ -529,11 +600,13 @@ struct PackagingPlanner {
             if let wasmImportsPath = wasmImportsPath {
                 let wasmImportsPath = $1.resolve(path: wasmImportsPath)
                 let importEntries = try JSONDecoder().decode([ImportEntry].self, from: Data(contentsOf: wasmImportsPath))
-                let memoryImport = importEntries.first { $0.module == "env" && $0.name == "memory" }
+                let memoryImport = importEntries.first {
+                    $0.module == "env" && $0.name == "memory"
+                }
                 if case .memory(let type) = memoryImport?.kind {
-                    substitutions["PACKAGE_TO_JS_MEMORY_INITIAL"] = "\(type.minimum)"
-                    substitutions["PACKAGE_TO_JS_MEMORY_MAXIMUM"] = "\(type.maximum ?? type.minimum)"
-                    substitutions["PACKAGE_TO_JS_MEMORY_SHARED"] = "\(type.shared)"
+                    substitutions["PACKAGE_TO_JS_MEMORY_INITIAL"] = type.minimum.description
+                    substitutions["PACKAGE_TO_JS_MEMORY_MAXIMUM"] = (type.maximum ?? type.minimum).description
+                    substitutions["PACKAGE_TO_JS_MEMORY_SHARED"] = type.shared.description
                 }
             }
 

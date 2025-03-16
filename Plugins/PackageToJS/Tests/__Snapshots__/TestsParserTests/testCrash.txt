@@ -1,0 +1,22 @@
+CounterTests/CounterTests.swift:26: Fatal error: Crash
+wasm://wasm/CounterPackageTests.xctest-0ef3150a:1
+RuntimeError: unreachable
+    at CounterPackageTests.xctest.$ss17_assertionFailure__4file4line5flagss5NeverOs12StaticStringV_SSAHSus6UInt32VtF (wasm://wasm/CounterPackageTests.xctest-0ef3150a:wasm-function[5087]:0x1475da)
+    at CounterPackageTests.xctest.$s12CounterTestsAAC13testIncrementyyYaKFTY1_ (wasm://wasm/CounterPackageTests.xctest-0ef3150a:wasm-function[1448]:0x9a33b)
+    at CounterPackageTests.xctest.swift::runJobInEstablishedExecutorContext(swift::Job*) (wasm://wasm/CounterPackageTests.xctest-0ef3150a:wasm-function[29848]:0x58cb39)
+    at CounterPackageTests.xctest.swift_job_run (wasm://wasm/CounterPackageTests.xctest-0ef3150a:wasm-function[29863]:0x58d720)
+    at CounterPackageTests.xctest.$sScJ16runSynchronously2onySce_tF (wasm://wasm/CounterPackageTests.xctest-0ef3150a:wasm-function[1571]:0x9fe5a)
+    at CounterPackageTests.xctest.$s19JavaScriptEventLoopAAC10runAllJobsyyF (wasm://wasm/CounterPackageTests.xctest-0ef3150a:wasm-function[1675]:0xa32c4)
+    at CounterPackageTests.xctest.$s19JavaScriptEventLoopAAC14insertJobQueue3jobyScJ_tFyycfU0_ (wasm://wasm/CounterPackageTests.xctest-0ef3150a:wasm-function[1674]:0xa30b7)
+    at CounterPackageTests.xctest.$s19JavaScriptEventLoopAAC14insertJobQueue3jobyScJ_tFyycfU0_TA (wasm://wasm/CounterPackageTests.xctest-0ef3150a:wasm-function[1666]:0xa2c6b)
+    at CounterPackageTests.xctest.$s19JavaScriptEventLoopAAC6create33_F9DB15AFB1FFBEDBFE9D13500E01F3F2LLAByFZyyyccfU0_0aB3Kit20ConvertibleToJSValue_pAE0Q0OcfU_ (wasm://wasm/CounterPackageTests.xctest-0ef3150a:wasm-function[1541]:0x9de13)
+    at CounterPackageTests.xctest.$s19JavaScriptEventLoopAAC6create33_F9DB15AFB1FFBEDBFE9D13500E01F3F2LLAByFZyyyccfU0_0aB3Kit20ConvertibleToJSValue_pAE0Q0OcfU_TA (wasm://wasm/CounterPackageTests.xctest-0ef3150a:wasm-function[1540]:0x9dd8d)
+
+Test Suites: [31m1 unknown[0m, [0m1 total
+Tests:       [31m1 unknown[0m, [0m1 total
+[90mRan all test suites.[0m
+
+[31mFailed test cases:[0m
+  [97m?[0m CounterTests.testIncrement
+
+[33mSome tests failed. Use --verbose for raw test output.[0m

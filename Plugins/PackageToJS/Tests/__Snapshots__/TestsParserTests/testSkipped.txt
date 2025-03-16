@@ -1,0 +1,10 @@
+/tmp/Tests/CounterTests/CounterTests.swift:25: CounterTests.testIncrement : Test skipped - Skip it
+[1m[97m[42m PASSED [0m CounterTests
+  [97m➜[0m testIncrement [90m(0.006s)[0m
+  [92m✔[0m testIncrementTwice [90m(0.0s)[0m
+[1m[97m[42m PASSED [0m /.xctest
+[1m[97m[42m PASSED [0m All tests
+
+Test Suites: [32m1 passed[0m, [0m1 total
+Tests:       [32m1 passed[0m, [97m1 skipped[0m, [0m2 total
+[90mRan all test suites.[0m

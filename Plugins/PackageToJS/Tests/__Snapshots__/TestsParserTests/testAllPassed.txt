@@ -1,0 +1,9 @@
+[1m[97m[42m PASSED [0m CounterTests
+  [92m✔[0m testIncrement [90m(0.002s)[0m
+  [92m✔[0m testIncrementTwice [90m(0.001s)[0m
+[1m[97m[42m PASSED [0m /.xctest
+[1m[97m[42m PASSED [0m All tests
+
+Test Suites: [32m1 passed[0m, [0m1 total
+Tests:       [32m2 passed[0m, [0m2 total
+[90mRan all test suites.[0m
