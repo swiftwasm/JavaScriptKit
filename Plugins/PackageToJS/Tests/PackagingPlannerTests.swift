@@ -34,12 +34,16 @@ import Testing
         )
     }
 
+    typealias DebugInfoFormat = PackageToJS.DebugInfoFormat
+
     @Test(arguments: [
-        (variant: "debug", configuration: "debug", noOptimize: false),
-        (variant: "release", configuration: "release", noOptimize: false),
-        (variant: "release_no_optimize", configuration: "release", noOptimize: true),
+        (variant: "debug", configuration: "debug", noOptimize: false, debugInfoFormat: DebugInfoFormat.none),
+        (variant: "release", configuration: "release", noOptimize: false, debugInfoFormat: DebugInfoFormat.none),
+        (variant: "release_no_optimize", configuration: "release", noOptimize: true, debugInfoFormat: DebugInfoFormat.none),
+        (variant: "release_dwarf", configuration: "release", noOptimize: false, debugInfoFormat: DebugInfoFormat.dwarf),
+        (variant: "release_name", configuration: "release", noOptimize: false, debugInfoFormat: DebugInfoFormat.name),
     ])
-    func planBuild(variant: String, configuration: String, noOptimize: Bool) throws {
+    func planBuild(variant: String, configuration: String, noOptimize: Bool, debugInfoFormat: PackageToJS.DebugInfoFormat) throws {
         let options = PackageToJS.PackageOptions()
         let system = TestPackagingSystem()
         let planner = PackagingPlanner(
@@ -60,6 +64,7 @@ import Testing
                 buildOptions: PackageToJS.BuildOptions(
                     product: "test",
                     noOptimize: noOptimize,
+                    debugInfoFormat: debugInfoFormat,
                     packageOptions: options
                 )
             )
