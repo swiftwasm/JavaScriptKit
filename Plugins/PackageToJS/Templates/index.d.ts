@@ -1,29 +1,21 @@
-import type { Import, Export } from './instantiate.js'
+import type { Export, ModuleSource } from './instantiate.js'
 
 export type Options = {
     /**
-     * The CLI arguments to pass to the WebAssembly module
+     * The WebAssembly module to instantiate
+     *
+     * If not provided, the module will be fetched from the default path.
      */
-    args?: string[]
-/* #if USE_SHARED_MEMORY */
-    /**
-     * The WebAssembly memory to use (must be 'shared')
-     */
-    memory: WebAssembly.Memory
-/* #endif */
+    module?: ModuleSource
 }
 
 /**
- * Initialize the given WebAssembly module
+ * Instantiate and initialize the module
  *
- * This is a convenience function that creates an instantiator and instantiates the module.
- * @param moduleSource - The WebAssembly module to instantiate
- * @param imports - The imports to add
- * @param options - The options
+ * This is a convenience function for browser environments.
+ * If you need a more flexible API, see `instantiate`.
  */
-export declare function init(
-    moduleSource: WebAssembly.Module | ArrayBufferView | ArrayBuffer | Response | PromiseLike<Response>
-): Promise<{
+export declare function init(options?: Options): Promise<{
     instance: WebAssembly.Instance,
     exports: Export
 }>

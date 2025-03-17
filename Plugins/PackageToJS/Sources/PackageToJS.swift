@@ -357,7 +357,7 @@ struct PackagingPlanner {
     /// The directory for intermediate files
     let intermediatesDir: BuildPath
     /// The filename of the .wasm file
-    let wasmFilename = "main.wasm"
+    let wasmFilename: String
     /// The path to the .wasm product artifact
     let wasmProductArtifact: BuildPath
     /// The build configuration
@@ -374,6 +374,7 @@ struct PackagingPlanner {
         selfPackageDir: BuildPath,
         outputDir: BuildPath,
         wasmProductArtifact: BuildPath,
+        wasmFilename: String,
         configuration: String,
         triple: String,
         selfPath: BuildPath = BuildPath(absolute: #filePath),
@@ -384,6 +385,7 @@ struct PackagingPlanner {
         self.selfPackageDir = selfPackageDir
         self.outputDir = outputDir
         self.intermediatesDir = intermediatesDir
+        self.wasmFilename = wasmFilename
         self.selfPath = selfPath
         self.wasmProductArtifact = wasmProductArtifact
         self.configuration = configuration
