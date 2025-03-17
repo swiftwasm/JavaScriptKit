@@ -13,13 +13,6 @@ extern void *memcpy (void *__restrict, const void *__restrict, size_t);
 #include <stdbool.h>
 
 #endif
-/// The compatibility runtime library version.
-/// Notes: If you change any interface of runtime library, please increment
-/// this and `SwiftRuntime.version` in `./Runtime/src/index.ts`.
-__attribute__((export_name("swjs_library_version")))
-int swjs_library_version(void) {
-    return 708;
-}
 
 __attribute__((export_name("swjs_prepare_host_function_call")))
 void *swjs_prepare_host_function_call(const int argc) {

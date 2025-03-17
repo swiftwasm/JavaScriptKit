@@ -7,7 +7,6 @@ export type JavaScriptValueKind = number;
 export type JavaScriptValueKindAndFlags = number;
 
 export interface ExportedFunctions {
-    swjs_library_version(): number;
     swjs_library_features(): number;
     swjs_prepare_host_function_call(size: number): pointer;
     swjs_cleanup_host_function_call(argv: pointer): void;
