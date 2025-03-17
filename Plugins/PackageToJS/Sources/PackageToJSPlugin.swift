@@ -119,7 +119,9 @@ struct PackageToJSPlugin: CommandPlugin {
         )
         let planner = PackagingPlanner(
             options: buildOptions.packageOptions, context: context, selfPackage: selfPackage,
-            outputDir: outputDir, wasmProductArtifact: productArtifact)
+            outputDir: outputDir, wasmProductArtifact: productArtifact,
+            wasmFilename: productArtifact.lastPathComponent
+        )
         let rootTask = try planner.planBuild(
             make: &make, buildOptions: buildOptions)
         cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
@@ -193,7 +195,14 @@ struct PackageToJSPlugin: CommandPlugin {
         )
         let planner = PackagingPlanner(
             options: testOptions.packageOptions, context: context, selfPackage: selfPackage,
-            outputDir: outputDir, wasmProductArtifact: productArtifact)
+            outputDir: outputDir, wasmProductArtifact: productArtifact,
+            // If the product artifact doesn't have a .wasm extension, add it
+            // to deliver it with the correct MIME type when serving the test
+            // files for browser tests.
+            wasmFilename: productArtifact.lastPathComponent.hasSuffix(".wasm")
+                ? productArtifact.lastPathComponent
+                : productArtifact.lastPathComponent + ".wasm"
+        )
         let (rootTask, binDir) = try planner.planTestBuild(
             make: &make)
         cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
@@ -486,7 +495,8 @@ extension PackagingPlanner {
         context: PluginContext,
         selfPackage: Package,
         outputDir: URL,
-        wasmProductArtifact: URL
+        wasmProductArtifact: URL,
+        wasmFilename: String
     ) {
         let outputBaseName = outputDir.lastPathComponent
         let (configuration, triple) = PackageToJS.deriveBuildConfiguration(wasmProductArtifact: wasmProductArtifact)
@@ -498,7 +508,7 @@ extension PackagingPlanner {
             selfPackageDir: BuildPath(absolute: selfPackage.directoryURL.path),
             outputDir: BuildPath(absolute: outputDir.path),
             wasmProductArtifact: BuildPath(absolute: wasmProductArtifact.path),
-            wasmFilename: wasmProductArtifact.lastPathComponent,
+            wasmFilename: wasmFilename,
             configuration: configuration,
             triple: triple,
             system: system

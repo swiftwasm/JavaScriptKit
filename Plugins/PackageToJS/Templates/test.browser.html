@@ -4,6 +4,7 @@
 <body>
     <script type="module">
         import { testBrowserInPage } from "./test.js";
+        import { MODULE_PATH } from "./instantiate.js";
         import { defaultBrowserSetup /* #if USE_SHARED_MEMORY */, createDefaultWorkerFactory /* #endif */} from './platforms/browser.js';
 
         const logElement = document.createElement("pre");
@@ -11,7 +12,7 @@
 
         const processInfo = await fetch("/process-info.json").then((response) => response.json());
         const options = await defaultBrowserSetup({
-            module: await fetch("./main.wasm"),
+            module: await fetch(new URL(MODULE_PATH, import.meta.url)),
             args: processInfo.args,
             onStdoutLine: (line) => {
                 console.log(line);

@@ -182,7 +182,7 @@ extension Trait where Self == ConditionTrait {
                 let process = Process()
                 process.executableURL = llvmCov
                 let profdata = packageDir.appending(path: ".build/plugins/PackageToJS/outputs/PackageTests/default.profdata")
-                let wasm = packageDir.appending(path: ".build/plugins/PackageToJS/outputs/PackageTests/main.wasm")
+                let wasm = packageDir.appending(path: ".build/plugins/PackageToJS/outputs/PackageTests/TestingPackageTests.wasm")
                 process.arguments = ["report", "-instr-profile", profdata.path, wasm.path]
                 process.standardOutput = FileHandle.nullDevice
                 try process.run()
