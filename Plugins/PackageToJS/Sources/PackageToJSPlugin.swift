@@ -295,8 +295,16 @@ extension PackageToJS.BuildOptions {
     static func parse(from extractor: inout ArgumentExtractor) -> PackageToJS.BuildOptions {
         let product = extractor.extractOption(named: "product").last
         let noOptimize = extractor.extractFlag(named: "no-optimize")
+        let rawDebugInfoFormat = extractor.extractOption(named: "debug-info-format").last
+        var debugInfoFormat: PackageToJS.DebugInfoFormat = .none
+        if let rawDebugInfoFormat = rawDebugInfoFormat {
+            guard let format = PackageToJS.DebugInfoFormat(rawValue: rawDebugInfoFormat) else {
+                fatalError("Invalid debug info format: \(rawDebugInfoFormat), expected one of \(PackageToJS.DebugInfoFormat.allCases.map(\.rawValue).joined(separator: ", "))")
+            }
+            debugInfoFormat = format
+        }
         let packageOptions = PackageToJS.PackageOptions.parse(from: &extractor)
-        return PackageToJS.BuildOptions(product: product, noOptimize: noOptimize != 0, packageOptions: packageOptions)
+        return PackageToJS.BuildOptions(product: product, noOptimize: noOptimize != 0, debugInfoFormat: debugInfoFormat, packageOptions: packageOptions)
     }
 
     static func help() -> String {
@@ -313,6 +321,7 @@ extension PackageToJS.BuildOptions {
               --no-optimize          Whether to disable wasm-opt optimization (default: false)
               --use-cdn              Whether to use CDN for dependency packages (default: false)
               --enable-code-coverage Whether to enable code coverage collection (default: false)
+              --debug-info-format    The format of debug info to keep in the final wasm file (values: none, dwarf, name; default: none)
 
             SUBCOMMANDS:
               test  Builds and runs tests
