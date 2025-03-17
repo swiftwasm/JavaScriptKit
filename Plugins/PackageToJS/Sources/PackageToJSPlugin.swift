@@ -498,6 +498,7 @@ extension PackagingPlanner {
             selfPackageDir: BuildPath(absolute: selfPackage.directoryURL.path),
             outputDir: BuildPath(absolute: outputDir.path),
             wasmProductArtifact: BuildPath(absolute: wasmProductArtifact.path),
+            wasmFilename: wasmProductArtifact.lastPathComponent,
             configuration: configuration,
             triple: triple,
             system: system
