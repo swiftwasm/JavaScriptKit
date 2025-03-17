@@ -5,7 +5,7 @@
     <title>Swift Web App</title>
     <script type="module">
         import { init } from "./.build/plugins/PackageToJS/outputs/Package/index.js";
-        await init(fetch("./.build/plugins/PackageToJS/outputs/Package/main.wasm"));
+        init();
     </script>
 </head>
 <body>
