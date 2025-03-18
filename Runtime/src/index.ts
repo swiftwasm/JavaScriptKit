@@ -56,6 +56,14 @@ export class SwiftRuntime {
                 `
             );
         }
+        if (this.exports.swjs_library_version() != this.version) {
+            throw new Error(
+                `The versions of JavaScriptKit are incompatible.
+                WebAssembly runtime ${this.exports.swjs_library_version()} != JS runtime ${
+                    this.version
+                }`
+            );
+        }
     }
 
     main() {

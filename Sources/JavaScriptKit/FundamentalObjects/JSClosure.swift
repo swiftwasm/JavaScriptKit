@@ -197,10 +197,8 @@ private func makeAsyncClosure(
 // └─────────────────────┴──────────────────────────┘
 
 /// Returns true if the host function has been already released, otherwise false.
-@_expose(wasm, "swjs_call_host_function")
-@_cdecl("_swjs_call_host_function")
-@available(*, unavailable)
-public func _swjs_call_host_function(
+@_cdecl("_call_host_function_impl")
+func _call_host_function_impl(
     _ hostFuncRef: JavaScriptHostFuncRef,
     _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
@@ -233,10 +231,9 @@ extension JSClosure {
     }
 }
 
-@_expose(wasm, "swjs_free_host_function")
-@_cdecl("_swjs_free_host_function")
-@available(*, unavailable)
-func _swjs_free_host_function(_ hostFuncRef: JavaScriptHostFuncRef) {}
+
+@_cdecl("_free_host_function_impl")
+func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {}
 
 #else
 
@@ -247,10 +244,25 @@ extension JSClosure {
 
 }
 
-@_expose(wasm, "swjs_free_host_function")
-@_cdecl("_swjs_free_host_function")
-@available(*, unavailable)
-func _swjs_free_host_function(_ hostFuncRef: JavaScriptHostFuncRef) {
+@_cdecl("_free_host_function_impl")
+func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {
     JSClosure.sharedClosures.wrappedValue[hostFuncRef] = nil
+}
+#endif
+
+#if compiler(>=6.0) && hasFeature(Embedded)
+// cdecls currently don't work in embedded, and expose for wasm only works >=6.0
+@_expose(wasm, "swjs_call_host_function")
+public func _swjs_call_host_function(
+        _ hostFuncRef: JavaScriptHostFuncRef,
+        _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
+        _ callbackFuncRef: JavaScriptObjectRef) -> Bool {
+
+    _call_host_function_impl(hostFuncRef, argv, argc, callbackFuncRef) 
+}
+
+@_expose(wasm, "swjs_free_host_function")
+public func _swjs_free_host_function(_ hostFuncRef: JavaScriptHostFuncRef) {
+    _free_host_function_impl(hostFuncRef)
 }
 #endif
