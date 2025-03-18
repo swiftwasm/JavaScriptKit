@@ -19,16 +19,20 @@ public class JSObject: Equatable {
     internal static var constructor: JSFunction { _constructor.wrappedValue }
     private static let _constructor = LazyThreadLocal(initialize: { JSObject.global.Object.function! })
 
-    @_spi(JSObject_id)
-    public var id: JavaScriptObjectRef
+    @usableFromInline
+    internal var _id: JavaScriptObjectRef
 
 #if compiler(>=6.1) && _runtime(_multithreaded)
     package let ownerTid: Int32
 #endif
 
     @_spi(JSObject_id)
+    @inlinable
+    public var id: JavaScriptObjectRef { _id }
+
+    @_spi(JSObject_id)
     public init(id: JavaScriptObjectRef) {
-        self.id = id
+        self._id = id
 #if compiler(>=6.1) && _runtime(_multithreaded)
         self.ownerTid = swjs_get_worker_thread_id_cached()
 #endif
