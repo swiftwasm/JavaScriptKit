@@ -5,6 +5,7 @@
 @preconcurrency import class Foundation.Process
 @preconcurrency import class Foundation.ProcessInfo
 @preconcurrency import class Foundation.FileManager
+@preconcurrency import struct Foundation.CocoaError
 @preconcurrency import func Foundation.fputs
 @preconcurrency import func Foundation.exit
 @preconcurrency import var Foundation.stderr
@@ -27,10 +28,10 @@ struct PackageToJSPlugin: CommandPlugin {
                             "swift", "package", "--swift-sdk", "wasm32-unknown-wasi", "js",
                         ] + arguments
                     return """
-                        Please pass the `--swift-sdk` option to the "swift package" command.
+                        Please pass `--swift-sdk` to "swift package".
 
-                        Did you mean:
-                        \(didYouMean.joined(separator: " "))
+                        Did you mean this?
+                            \(didYouMean.joined(separator: " "))
                         """
                 }),
             (
@@ -67,22 +68,70 @@ struct PackageToJSPlugin: CommandPlugin {
                         """
                 }),
         ]
+
+    private func emitHintMessage(_ message: String) {
+        printStderr("\n" + "\u{001B}[1m\u{001B}[97mHint:\u{001B}[0m " + message)
+    }
+
     private func reportBuildFailure(
         _ build: PackageManager.BuildResult, _ arguments: [String]
     ) {
         for diagnostic in Self.friendlyBuildDiagnostics {
             if let message = diagnostic(build, arguments) {
-                printStderr("\n" + "\u{001B}[1m\u{001B}[97mHint:\u{001B}[0m " + message)
+                emitHintMessage(message)
+                return
             }
         }
     }
 
     func performCommand(context: PluginContext, arguments: [String]) throws {
-        if arguments.first == "test" {
-            return try performTestCommand(context: context, arguments: Array(arguments.dropFirst()))
-        }
+        do {
+            if arguments.first == "test" {
+                return try performTestCommand(context: context, arguments: Array(arguments.dropFirst()))
+            }
 
-        return try performBuildCommand(context: context, arguments: arguments)
+            return try performBuildCommand(context: context, arguments: arguments)
+        } catch let error as CocoaError where error.code == .fileWriteNoPermission {
+            guard let filePath = error.filePath else { throw error }
+
+            let packageDir = context.package.directoryURL
+            printStderr("\n\u{001B}[1m\u{001B}[91merror:\u{001B}[0m \(error.localizedDescription)")
+
+            if filePath.hasPrefix(packageDir.path) {
+                // Emit hint for --allow-writing-to-package-directory if the destination path
+                // is under the package directory
+                let didYouMean = [
+                    "swift", "package", "--swift-sdk", "wasm32-unknown-wasi",
+                    "plugin", "--allow-writing-to-package-directory",
+                    "js",
+                ] + arguments
+                emitHintMessage(
+                    """
+                    Please pass `--allow-writing-to-package-directory` to "swift package".
+
+                    Did you mean this?
+                        \(didYouMean.joined(separator: " "))
+                    """
+                )
+            } else {
+                // Emit hint for --allow-writing-to-directory <directory>
+                // if the destination path is outside the package directory
+                let didYouMean = [
+                    "swift", "package", "--swift-sdk", "wasm32-unknown-wasi",
+                    "plugin", "--allow-writing-to-directory", "\(filePath)",
+                    "js",
+                ] + arguments
+                emitHintMessage(
+                    """
+                    Please pass `--allow-writing-to-directory <directory>` to "swift package".
+
+                    Did you mean this?
+                        \(didYouMean.joined(separator: " "))
+                    """
+                )
+            }
+            exit(1)
+        }
     }
 
     static let JAVASCRIPTKIT_PACKAGE_ID: Package.ID = "javascriptkit"
