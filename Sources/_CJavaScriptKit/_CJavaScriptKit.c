@@ -46,13 +46,6 @@ void swjs_free_host_function(const JavaScriptHostFuncRef host_func_ref) {
     _free_host_function_impl(host_func_ref);
 }
 
-int _library_features(void);
-
-__attribute__((export_name("swjs_library_features")))
-int swjs_library_features(void) {
-    return _library_features();
-}
-
 int swjs_get_worker_thread_id_cached(void) {
     _Thread_local static int tid = 0;
     if (tid == 0) {
