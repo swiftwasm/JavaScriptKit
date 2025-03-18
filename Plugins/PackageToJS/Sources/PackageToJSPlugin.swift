@@ -333,7 +333,7 @@ extension PackageToJS.BuildOptions {
         return """
             OVERVIEW: Builds a JavaScript module from a Swift package.
 
-            USAGE: swift package --swift-sdk <swift-sdk> [SwiftPM options] PackageToJS [options] [subcommand]
+            USAGE: swift package --swift-sdk <swift-sdk> [SwiftPM options] js [options] [subcommand]
 
             OPTIONS:
               --product <product>    Product to build (default: executable target if there's only one)
@@ -349,14 +349,14 @@ extension PackageToJS.BuildOptions {
               test  Builds and runs tests
 
             EXAMPLES:
-              $ swift package --swift-sdk wasm32-unknown-wasi plugin js
+              $ swift package --swift-sdk wasm32-unknown-wasi js
               # Build a specific product
-              $ swift package --swift-sdk wasm32-unknown-wasi plugin js --product Example
+              $ swift package --swift-sdk wasm32-unknown-wasi js --product Example
               # Build in release configuration
               $ swift package --swift-sdk wasm32-unknown-wasi -c release plugin js
 
               # Run tests
-              $ swift package --swift-sdk wasm32-unknown-wasi plugin js test
+              $ swift package --swift-sdk wasm32-unknown-wasi js test
             """
     }
 }
@@ -391,7 +391,7 @@ extension PackageToJS.TestOptions {
         return """
             OVERVIEW: Builds and runs tests
 
-            USAGE: swift package --swift-sdk <swift-sdk> [SwiftPM options] PackageToJS test [options]
+            USAGE: swift package --swift-sdk <swift-sdk> [SwiftPM options] js test [options]
 
             OPTIONS:
               --build-only           Whether to build only (default: false)
@@ -404,10 +404,10 @@ extension PackageToJS.TestOptions {
               -Xnode <args>          Extra arguments to pass to Node.js
 
             EXAMPLES:
-              $ swift package --swift-sdk wasm32-unknown-wasi plugin js test
-              $ swift package --swift-sdk wasm32-unknown-wasi plugin js test --environment browser
+              $ swift package --swift-sdk wasm32-unknown-wasi js test
+              $ swift package --swift-sdk wasm32-unknown-wasi js test --environment browser
               # Just build tests, don't run them
-              $ swift package --swift-sdk wasm32-unknown-wasi plugin js test --build-only
+              $ swift package --swift-sdk wasm32-unknown-wasi js test --build-only
               $ node .build/plugins/PackageToJS/outputs/PackageTests/bin/test.js
             """
     }
