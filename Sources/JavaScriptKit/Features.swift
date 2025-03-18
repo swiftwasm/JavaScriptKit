@@ -4,6 +4,9 @@ enum LibraryFeatures {
 
 @_expose(wasm, "swjs_library_features")
 @_cdecl("_swjs_library_features")
+#if hasFeature(Embedded)
+@_used // Explicitly retain this when HSAL is applied
+#endif
 @available(*, unavailable)
 public func _swjs_library_features() -> Int32 {
     var features: Int32 = 0
