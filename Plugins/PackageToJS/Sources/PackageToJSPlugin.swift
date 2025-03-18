@@ -19,8 +19,8 @@ struct PackageToJSPlugin: CommandPlugin {
                 // In case user misses the `--swift-sdk` option
                 { build, arguments in
                     guard
-                        build.logText.contains(
-                            "ld.gold: --export-if-defined=__main_argc_argv: unknown option")
+                        build.logText.contains("ld.gold: --export-if-defined=__main_argc_argv: unknown option") ||
+                        build.logText.contains("-static-stdlib is no longer supported for Apple platforms")
                     else { return nil }
                     let didYouMean =
                         [
@@ -53,13 +53,26 @@ struct PackageToJSPlugin: CommandPlugin {
                         3. Select a matching SDK version with --swift-sdk option
                         """
                 }),
+            (
+                // In case selected toolchain is a Xcode toolchain, not OSS toolchain
+                { build, arguments in
+                    guard build.logText.contains("No available targets are compatible with triple \"wasm32-unknown-wasi\"") else {
+                        return nil
+                    }
+                    return """
+                        The selected toolchain might be an Xcode toolchain, which doesn't support WebAssembly target.
+
+                        Please use a swift.org Open Source toolchain with WebAssembly support.
+                        See https://book.swiftwasm.org/getting-started/setup.html for more information.
+                        """
+                }),
         ]
     private func reportBuildFailure(
         _ build: PackageManager.BuildResult, _ arguments: [String]
     ) {
         for diagnostic in Self.friendlyBuildDiagnostics {
             if let message = diagnostic(build, arguments) {
-                printStderr("\n" + message)
+                printStderr("\n" + "Hint: " + message)
             }
         }
     }
