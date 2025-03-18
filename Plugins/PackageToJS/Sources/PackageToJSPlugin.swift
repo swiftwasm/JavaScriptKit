@@ -72,7 +72,7 @@ struct PackageToJSPlugin: CommandPlugin {
     ) {
         for diagnostic in Self.friendlyBuildDiagnostics {
             if let message = diagnostic(build, arguments) {
-                printStderr("\n" + "Hint: " + message)
+                printStderr("\n" + "\u{001B}[1m\u{001B}[97mHint:\u{001B}[0m " + message)
             }
         }
     }
