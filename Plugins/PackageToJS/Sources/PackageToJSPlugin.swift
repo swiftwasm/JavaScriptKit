@@ -339,10 +339,10 @@ extension PackageToJS.BuildOptions {
               --product <product>    Product to build (default: executable target if there's only one)
               --output <path>        Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
               --package-name <name>  Name of the package (default: lowercased Package.swift name)
-              --explain              Whether to explain the build plan (default: false)
-              --no-optimize          Whether to disable wasm-opt optimization (default: false)
-              --use-cdn              Whether to use CDN for dependency packages (default: false)
-              --enable-code-coverage Whether to enable code coverage collection (default: false)
+              --explain              Whether to explain the build plan
+              --no-optimize          Whether to disable wasm-opt optimization
+              --use-cdn              Whether to use CDN for dependency packages
+              --enable-code-coverage Whether to enable code coverage collection
               --debug-info-format    The format of debug info to keep in the final wasm file (values: none, dwarf, name; default: none)
 
             SUBCOMMANDS:
@@ -394,13 +394,13 @@ extension PackageToJS.TestOptions {
             USAGE: swift package --swift-sdk <swift-sdk> [SwiftPM options] js test [options]
 
             OPTIONS:
-              --build-only           Whether to build only (default: false)
+              --build-only           Whether to build only
               --prelude <path>       Path to the prelude script
-              --environment <name>   The environment to use for the tests
+              --environment <name>   The environment to use for the tests (values: node, browser; default: node)
               --inspect              Whether to run tests in the browser with inspector enabled
-              --use-cdn              Whether to use CDN for dependency packages (default: false)
-              --enable-code-coverage Whether to enable code coverage collection (default: false)
-              --verbose              Whether to print verbose output (default: false)
+              --use-cdn              Whether to use CDN for dependency packages
+              --enable-code-coverage Whether to enable code coverage collection
+              --verbose              Whether to print verbose output
               -Xnode <args>          Extra arguments to pass to Node.js
 
             EXAMPLES:
