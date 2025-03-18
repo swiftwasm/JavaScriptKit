@@ -28,24 +28,6 @@ void swjs_cleanup_host_function_call(void *argv_buffer) {
 // cdecls don't work in Embedded, but @_expose(wasm) can be used with Swift >=6.0
 // the previously used `#if __Embedded` did not play well with SwiftPM (defines needed to be on every target up the chain)
 #ifdef __wasi__
-bool _call_host_function_impl(const JavaScriptHostFuncRef host_func_ref,
-                              const RawJSValue *argv, const int argc,
-                              const JavaScriptObjectRef callback_func);
-
-__attribute__((export_name("swjs_call_host_function")))
-bool swjs_call_host_function(const JavaScriptHostFuncRef host_func_ref,
-                             const RawJSValue *argv, const int argc,
-                             const JavaScriptObjectRef callback_func) {
-    return _call_host_function_impl(host_func_ref, argv, argc, callback_func);
-}
-
-void _free_host_function_impl(const JavaScriptHostFuncRef host_func_ref);
-
-__attribute__((export_name("swjs_free_host_function")))
-void swjs_free_host_function(const JavaScriptHostFuncRef host_func_ref) {
-    _free_host_function_impl(host_func_ref);
-}
-
 int swjs_get_worker_thread_id_cached(void) {
     _Thread_local static int tid = 0;
     if (tid == 0) {
