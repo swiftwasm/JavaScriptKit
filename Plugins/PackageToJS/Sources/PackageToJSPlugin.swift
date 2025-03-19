@@ -292,6 +292,7 @@ struct PackageToJSPlugin: CommandPlugin {
             logging: .concise
         )
         parameters.echoLogs = true
+        parameters.otherSwiftcFlags = ["-color-diagnostics"]
         let buildingForEmbedded =
             ProcessInfo.processInfo.environment["JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM"].flatMap(
                 Bool.init) ?? false
@@ -299,10 +300,10 @@ struct PackageToJSPlugin: CommandPlugin {
             // NOTE: We only support static linking for now, and the new SwiftDriver
             // does not infer `-static-stdlib` for WebAssembly targets intentionally
             // for future dynamic linking support.
-            parameters.otherSwiftcFlags = [
+            parameters.otherSwiftcFlags += [
                 "-static-stdlib", "-Xclang-linker", "-mexec-model=reactor",
             ]
-            parameters.otherLinkerFlags = [
+            parameters.otherLinkerFlags += [
                 "--export-if-defined=__main_argc_argv"
             ]
 
