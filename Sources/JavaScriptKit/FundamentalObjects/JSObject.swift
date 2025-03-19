@@ -70,9 +70,9 @@ public class JSObject: Equatable {
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The `name` member method binding this object as `this` context.
     @_disfavoredOverload
-    public subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)? {
+    public subscript(_ name: String) -> DiscardableResultClosure? {
         guard let function = self[name].function else { return nil }
-        return { (arguments: ConvertibleToJSValue...) in
+        return DiscardableResultClosure { arguments in
             function(this: self, arguments: arguments)
         }
     }
@@ -88,9 +88,9 @@ public class JSObject: Equatable {
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The `name` member method binding this object as `this` context.
     @_disfavoredOverload
-    public subscript(_ name: JSString) -> ((ConvertibleToJSValue...) -> JSValue)? {
+    public subscript(_ name: JSString) -> DiscardableResultClosure? {
         guard let function = self[name].function else { return nil }
-        return { (arguments: ConvertibleToJSValue...) in
+        return DiscardableResultClosure { arguments in
             function(this: self, arguments: arguments)
         }
     }
@@ -98,7 +98,7 @@ public class JSObject: Equatable {
     /// A convenience method of `subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
     /// to access the member through Dynamic Member Lookup.
     @_disfavoredOverload
-    public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue)? {
+    public subscript(dynamicMember name: String) -> DiscardableResultClosure? {
         self[name]
     }
 #endif
@@ -295,6 +295,19 @@ public class JSThrowingObject {
 }
 #endif
 
+
+#if !hasFeature(Embedded)
+/// A swift closure wrapper that can be called as function.
+/// This prevents the warnings for unused results through `@discardableResult` which means you no longer need `_ =` everywhere.
+public struct DiscardableResultClosure {
+    var closure: ([ConvertibleToJSValue]) -> JSValue
+
+    @discardableResult
+    public func callAsFunction(_ args: ConvertibleToJSValue...) -> JSValue {
+        return self.closure(args)
+    }
+}
+#endif
 
 #if hasFeature(Embedded)
 // Overloads of `JSObject.subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
