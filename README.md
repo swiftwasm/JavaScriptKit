@@ -1,12 +1,13 @@
 # JavaScriptKit
 
 [![Run unit tests](https://github.com/swiftwasm/JavaScriptKit/actions/workflows/test.yml/badge.svg)](https://github.com/swiftwasm/JavaScriptKit/actions/workflows/test.yml)
+[![](https://img.shields.io/badge/docc-read_documentation-blue)](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation)
 
 Swift framework to interact with JavaScript through WebAssembly.
 
 ## Quick Start
 
-Check out the [Hello World](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/main/tutorials/javascriptkit/hello-world) tutorial for a step-by-step guide to getting started.
+Check out the [Hello World](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/tutorials/javascriptkit/hello-world) tutorial for a step-by-step guide to getting started.
 
 ## Overview
 
