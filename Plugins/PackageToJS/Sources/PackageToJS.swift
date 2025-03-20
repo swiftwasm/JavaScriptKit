@@ -8,6 +8,8 @@ struct PackageToJS {
         var packageName: String?
         /// Whether to explain the build plan (default: false)
         var explain: Bool = false
+        /// Whether to print verbose output
+        var verbose: Bool = false
         /// Whether to use CDN for dependency packages (default: false)
         var useCDN: Bool = false
         /// Whether to enable code coverage collection (default: false)
@@ -49,8 +51,6 @@ struct PackageToJS {
         var inspect: Bool
         /// The extra arguments to pass to node
         var extraNodeArguments: [String]
-        /// Whether to print verbose output
-        var verbose: Bool
         /// The options for packaging
         var packageOptions: PackageOptions
     }
@@ -99,7 +99,7 @@ struct PackageToJS {
             try PackageToJS.runSingleTestingLibrary(
                 testRunner: testRunner, currentDirectoryURL: currentDirectoryURL,
                 extraArguments: extraArguments,
-                testParser: testOptions.verbose ? nil : FancyTestsParser(write: { print($0, terminator: "") }),
+                testParser: testOptions.packageOptions.verbose ? nil : FancyTestsParser(write: { print($0, terminator: "") }),
                 testOptions: testOptions
             )
         }
