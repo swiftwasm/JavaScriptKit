@@ -156,7 +156,7 @@ struct PackageToJSPlugin: CommandPlugin {
         let productName = try buildOptions.product ?? deriveDefaultProduct(package: context.package)
         let build = try buildWasm(
             productName: productName, context: context,
-            enableCodeCoverage: buildOptions.packageOptions.enableCodeCoverage
+            options: buildOptions.packageOptions
         )
         guard build.succeeded else {
             reportBuildFailure(build, arguments)
@@ -212,7 +212,7 @@ struct PackageToJSPlugin: CommandPlugin {
         let productName = "\(context.package.displayName)PackageTests"
         let build = try buildWasm(
             productName: productName, context: context,
-            enableCodeCoverage: testOptions.packageOptions.enableCodeCoverage
+            options: testOptions.packageOptions
         )
         guard build.succeeded else {
             reportBuildFailure(build, arguments)
@@ -284,12 +284,12 @@ struct PackageToJSPlugin: CommandPlugin {
         }
     }
 
-    private func buildWasm(productName: String, context: PluginContext, enableCodeCoverage: Bool) throws
+    private func buildWasm(productName: String, context: PluginContext, options: PackageToJS.PackageOptions) throws
         -> PackageManager.BuildResult
     {
         var parameters = PackageManager.BuildParameters(
             configuration: .inherit,
-            logging: .concise
+            logging: options.verbose ? .verbose : .concise
         )
         parameters.echoLogs = true
         parameters.otherSwiftcFlags = ["-color-diagnostics"]
@@ -308,7 +308,7 @@ struct PackageToJSPlugin: CommandPlugin {
             ]
 
             // Enable code coverage options if requested
-            if enableCodeCoverage {
+            if options.enableCodeCoverage {
                 parameters.otherSwiftcFlags += ["-profile-coverage-mapping", "-profile-generate"]
                 parameters.otherCFlags += ["-fprofile-instr-generate", "-fcoverage-mapping"]
             }
@@ -356,9 +356,10 @@ extension PackageToJS.PackageOptions {
         let packageName = extractor.extractOption(named: "package-name").last
         let explain = extractor.extractFlag(named: "explain")
         let useCDN = extractor.extractFlag(named: "use-cdn")
+        let verbose = extractor.extractFlag(named: "verbose")
         let enableCodeCoverage = extractor.extractFlag(named: "enable-code-coverage")
         return PackageToJS.PackageOptions(
-            outputPath: outputPath, packageName: packageName, explain: explain != 0, useCDN: useCDN != 0, enableCodeCoverage: enableCodeCoverage != 0
+            outputPath: outputPath, packageName: packageName, explain: explain != 0, verbose: verbose != 0, useCDN: useCDN != 0, enableCodeCoverage: enableCodeCoverage != 0
         )
     }
 }
@@ -390,6 +391,7 @@ extension PackageToJS.BuildOptions {
               --output <path>        Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
               --package-name <name>  Name of the package (default: lowercased Package.swift name)
               --explain              Whether to explain the build plan
+              --verbose              Whether to print verbose output
               --no-optimize          Whether to disable wasm-opt optimization
               --use-cdn              Whether to use CDN for dependency packages
               --enable-code-coverage Whether to enable code coverage collection
@@ -419,14 +421,12 @@ extension PackageToJS.TestOptions {
         let prelude = extractor.extractOption(named: "prelude").last
         let environment = extractor.extractOption(named: "environment").last
         let inspect = extractor.extractFlag(named: "inspect")
-        let verbose = extractor.extractFlag(named: "verbose")
         let extraNodeArguments = extractor.extractSingleDashOption(named: "Xnode")
         let packageOptions = PackageToJS.PackageOptions.parse(from: &extractor)
         var options = PackageToJS.TestOptions(
             buildOnly: buildOnly != 0, listTests: listTests != 0,
             filter: filter, prelude: prelude, environment: environment, inspect: inspect != 0,
             extraNodeArguments: extraNodeArguments,
-            verbose: verbose != 0,
             packageOptions: packageOptions
         )
 
@@ -448,9 +448,10 @@ extension PackageToJS.TestOptions {
               --prelude <path>       Path to the prelude script
               --environment <name>   The environment to use for the tests (values: node, browser; default: node)
               --inspect              Whether to run tests in the browser with inspector enabled
+              --explain              Whether to explain the build plan
+              --verbose              Whether to print verbose output
               --use-cdn              Whether to use CDN for dependency packages
               --enable-code-coverage Whether to enable code coverage collection
-              --verbose              Whether to print verbose output
               -Xnode <args>          Extra arguments to pass to Node.js
 
             EXAMPLES:
