@@ -1,5 +1,5 @@
-import XCTest
 import JavaScriptKit
+import XCTest
 
 final class JavaScriptEventLoopTestSupportTests: XCTestCase {
     func testAwaitMicrotask() async {

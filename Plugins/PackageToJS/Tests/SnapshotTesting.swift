@@ -1,11 +1,13 @@
-import Testing
 import Foundation
+import Testing
 
 func assertSnapshot(
-    filePath: String = #filePath, function: String = #function,
+    filePath: String = #filePath,
+    function: String = #function,
     sourceLocation: SourceLocation = #_sourceLocation,
     variant: String? = nil,
-    input: Data, fileExtension: String = "json"
+    input: Data,
+    fileExtension: String = "json"
 ) throws {
     let testFileName = URL(fileURLWithPath: filePath).deletingPathExtension().lastPathComponent
     let snapshotDir = URL(fileURLWithPath: filePath)
@@ -13,7 +15,8 @@ func assertSnapshot(
         .appendingPathComponent("__Snapshots__")
         .appendingPathComponent(testFileName)
     try FileManager.default.createDirectory(at: snapshotDir, withIntermediateDirectories: true)
-    let snapshotFileName: String = "\(function[..<function.firstIndex(of: "(")!])\(variant.map { "_\($0)" } ?? "").\(fileExtension)"
+    let snapshotFileName: String =
+        "\(function[..<function.firstIndex(of: "(")!])\(variant.map { "_\($0)" } ?? "").\(fileExtension)"
     let snapshotPath = snapshotDir.appendingPathComponent(snapshotFileName)
 
     if FileManager.default.fileExists(atPath: snapshotPath.path) {

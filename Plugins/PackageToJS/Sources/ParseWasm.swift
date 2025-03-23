@@ -199,7 +199,8 @@ func parseImports(moduleBytes: Data) throws -> [ImportEntry] {
                 case 0x02:  // Memory
                     let limits = try parseLimits(parseState)
                     imports.append(
-                        ImportEntry(module: module, name: name, kind: .memory(type: limits)))
+                        ImportEntry(module: module, name: name, kind: .memory(type: limits))
+                    )
 
                 case 0x03:  // Global
                     _ = try parseGlobalType(parseState)

@@ -1,15 +1,15 @@
-#if compiler(>=6.0) // `TaskExecutor` is available since Swift 6.0
+#if compiler(>=6.0)  // `TaskExecutor` is available since Swift 6.0
 
 import JavaScriptKit
 import _CJavaScriptKit
 import _CJavaScriptEventLoop
 
 #if canImport(Synchronization)
-    import Synchronization
+import Synchronization
 #endif
 #if canImport(wasi_pthread)
-    import wasi_pthread
-    import WASILibc
+import wasi_pthread
+import WASILibc
 #endif
 
 // MARK: - Web Worker Task Executor
@@ -23,13 +23,13 @@ import _CJavaScriptEventLoop
 ///
 /// ## Multithreading Model
 ///
-/// Each task submitted to the executor runs on one of the available worker threads. By default, 
+/// Each task submitted to the executor runs on one of the available worker threads. By default,
 /// child tasks created within a worker thread continue to run on the same worker thread,
 /// maintaining thread locality and avoiding excessive context switching.
 ///
 /// ## Object Sharing Between Threads
 ///
-/// When working with JavaScript objects across threads, you must use the `JSSending` API to 
+/// When working with JavaScript objects across threads, you must use the `JSSending` API to
 /// explicitly transfer or clone objects:
 ///
 /// ```swift
@@ -80,7 +80,7 @@ import _CJavaScriptEventLoop
 ///             return fibonacci(i)
 ///         }
 ///     }
-///     
+///
 ///     for await result in group {
 ///         // Process results as they complete
 ///     }
@@ -106,8 +106,8 @@ import _CJavaScriptEventLoop
 ///   // Back to the main thread.
 /// }
 /// ````
-/// 
-@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) // For `Atomic` and `TaskExecutor` types
+///
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)  // For `Atomic` and `TaskExecutor` types
 public final class WebWorkerTaskExecutor: TaskExecutor {
 
     /// A job worker dedicated to a single Web Worker thread.
@@ -199,10 +199,12 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                             // like `setTimeout` or `addEventListener`.
                             // We can run the job and subsequently spawned jobs immediately.
                             // JSPromise.resolve(JSValue.undefined).then { _ in
-                            _ = JSObject.global.queueMicrotask!(JSOneshotClosure { _ in
-                                self.run()
-                                return JSValue.undefined
-                            })
+                            _ = JSObject.global.queueMicrotask!(
+                                JSOneshotClosure { _ in
+                                    self.run()
+                                    return JSValue.undefined
+                                }
+                            )
                         } else {
                             let tid = self.tid.load(ordering: .sequentiallyConsistent)
                             swjs_wake_up_worker_thread(tid)
@@ -220,10 +222,12 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
         }
 
         func scheduleNextRun() {
-            _ = JSObject.global.queueMicrotask!(JSOneshotClosure { _ in
-                self.run()
-                return JSValue.undefined
-            })
+            _ = JSObject.global.queueMicrotask!(
+                JSOneshotClosure { _ in
+                    self.run()
+                    return JSValue.undefined
+                }
+            )
         }
 
         /// Run the worker
@@ -277,18 +281,22 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                         return job
                     }
                     // No more jobs to run now. Wait for a new job to be enqueued.
-                    let (exchanged, original) = state.compareExchange(expected: .running, desired: .idle, ordering: .sequentiallyConsistent)
+                    let (exchanged, original) = state.compareExchange(
+                        expected: .running,
+                        desired: .idle,
+                        ordering: .sequentiallyConsistent
+                    )
 
                     switch (exchanged, original) {
                     case (true, _):
                         trace("Worker.run exited \(original) -> idle")
-                        return nil // Regular case
+                        return nil  // Regular case
                     case (false, .idle):
                         preconditionFailure("unreachable: Worker/run running in multiple threads!?")
                     case (false, .running):
                         preconditionFailure("unreachable: running -> idle should return exchanged=true")
                     case (false, .terminated):
-                        return nil // The worker is terminated, exit the loop.
+                        return nil  // The worker is terminated, exit the loop.
                     }
                 }
                 guard let job else { return }
@@ -347,16 +355,21 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                 // immediately. The context must be retained until the thread is started.
                 let context = Context(executor: self, worker: worker)
                 let ptr = Unmanaged.passRetained(context).toOpaque()
-                let ret = pthread_create(nil, nil, { ptr in
-                    // Cast to a optional pointer to absorb nullability variations between platforms.
-                    let ptr: UnsafeMutableRawPointer? = ptr
-                    let context = Unmanaged<Context>.fromOpaque(ptr!).takeRetainedValue()
-                    context.worker.start(executor: context.executor)
-                    // The worker is started. Throw JS exception to unwind the call stack without
-                    // reaching the `pthread_exit`, which is called immediately after this block.
-                    swjs_unsafe_event_loop_yield()
-                    return nil
-                }, ptr)
+                let ret = pthread_create(
+                    nil,
+                    nil,
+                    { ptr in
+                        // Cast to a optional pointer to absorb nullability variations between platforms.
+                        let ptr: UnsafeMutableRawPointer? = ptr
+                        let context = Unmanaged<Context>.fromOpaque(ptr!).takeRetainedValue()
+                        context.worker.start(executor: context.executor)
+                        // The worker is started. Throw JS exception to unwind the call stack without
+                        // reaching the `pthread_exit`, which is called immediately after this block.
+                        swjs_unsafe_event_loop_yield()
+                        return nil
+                    },
+                    ptr
+                )
                 precondition(ret == 0, "Failed to create a thread")
             }
             // Wait until all worker threads are started and wire up messaging channels
@@ -432,15 +445,19 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
     ///   - timeout: The maximum time to wait for all worker threads to be started. Default is 3 seconds.
     ///   - checkInterval: The interval to check if all worker threads are started. Default is 5 microseconds.
     /// - Throws: An error if any worker thread fails to initialize within the timeout period.
-    public init(numberOfThreads: Int, timeout: Duration = .seconds(3), checkInterval: Duration = .microseconds(5)) async throws {
+    public init(
+        numberOfThreads: Int,
+        timeout: Duration = .seconds(3),
+        checkInterval: Duration = .microseconds(5)
+    ) async throws {
         self.executor = Executor(numberOfThreads: numberOfThreads)
         try await self.executor.start(timeout: timeout, checkInterval: checkInterval)
     }
 
     /// Terminates all worker threads managed by this executor.
     ///
-    /// This method should be called when the executor is no longer needed to free up 
-    /// resources. After calling this method, any tasks enqueued to this executor will 
+    /// This method should be called when the executor is no longer needed to free up
+    /// resources. After calling this method, any tasks enqueued to this executor will
     /// be ignored and may never complete.
     ///
     /// It's recommended to use a `defer` statement immediately after creating the executor
@@ -533,7 +550,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
     /// Installs a global executor that forwards jobs from Web Worker threads to the main thread.
     ///
     /// This method sets up the necessary hooks to ensure proper task scheduling between
-    /// the main thread and worker threads. It must be called once (typically at application 
+    /// the main thread and worker threads. It must be called once (typically at application
     /// startup) before using any `WebWorkerTaskExecutor` instances.
     ///
     /// ## Example
@@ -564,14 +581,18 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
 
         _swift_task_enqueueGlobal_hook_original = swift_task_enqueueGlobal_hook
 
-        typealias swift_task_enqueueGlobal_hook_Fn = @convention(thin) (UnownedJob, swift_task_enqueueGlobal_original) -> Void
+        typealias swift_task_enqueueGlobal_hook_Fn = @convention(thin) (UnownedJob, swift_task_enqueueGlobal_original)
+            -> Void
         let swift_task_enqueueGlobal_hook_impl: swift_task_enqueueGlobal_hook_Fn = { job, base in
             WebWorkerTaskExecutor.traceStatsIncrement(\.enqueueGlobal)
             // Enter this block only if the current Task has no executor preference.
             if pthread_equal(pthread_self(), WebWorkerTaskExecutor._mainThread) != 0 {
                 // If the current thread is the main thread, delegate the job
                 // execution to the original hook of JavaScriptEventLoop.
-                let original = unsafeBitCast(WebWorkerTaskExecutor._swift_task_enqueueGlobal_hook_original, to: swift_task_enqueueGlobal_hook_Fn.self)
+                let original = unsafeBitCast(
+                    WebWorkerTaskExecutor._swift_task_enqueueGlobal_hook_original,
+                    to: swift_task_enqueueGlobal_hook_Fn.self
+                )
                 original(job, base)
             } else {
                 // Notify the main thread to execute the job when a job is
@@ -583,7 +604,10 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                 swjs_send_job_to_main_thread(jobBitPattern)
             }
         }
-        swift_task_enqueueGlobal_hook = unsafeBitCast(swift_task_enqueueGlobal_hook_impl, to: UnsafeMutableRawPointer?.self)
+        swift_task_enqueueGlobal_hook = unsafeBitCast(
+            swift_task_enqueueGlobal_hook_impl,
+            to: UnsafeMutableRawPointer?.self
+        )
         #else
         fatalError("Unsupported platform")
         #endif
@@ -593,7 +617,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
 /// Enqueue a job scheduled from a Web Worker thread to the main thread.
 /// This function is called when a job is enqueued from a Web Worker thread.
 @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
-#if compiler(>=6.1) // @_expose and @_extern are only available in Swift 6.1+
+#if compiler(>=6.1)  // @_expose and @_extern are only available in Swift 6.1+
 @_expose(wasm, "swjs_enqueue_main_job_from_worker")
 #endif
 func _swjs_enqueue_main_job_from_worker(_ job: UnownedJob) {
@@ -604,17 +628,17 @@ func _swjs_enqueue_main_job_from_worker(_ job: UnownedJob) {
 /// Wake up the worker thread.
 /// This function is called when a job is enqueued from the main thread to a worker thread.
 @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
-#if compiler(>=6.1) // @_expose and @_extern are only available in Swift 6.1+
+#if compiler(>=6.1)  // @_expose and @_extern are only available in Swift 6.1+
 @_expose(wasm, "swjs_wake_worker_thread")
 #endif
 func _swjs_wake_worker_thread() {
     WebWorkerTaskExecutor.Worker.currentThread!.run()
 }
 
-fileprivate func trace(_ message: String) {
-#if JAVASCRIPTKIT_TRACE
+private func trace(_ message: String) {
+    #if JAVASCRIPTKIT_TRACE
     JSObject.global.process.stdout.write("[trace tid=\(swjs_get_worker_thread_id())] \(message)\n")
-#endif
+    #endif
 }
 
-#endif // compiler(>=6.0)
+#endif  // compiler(>=6.0)

@@ -66,7 +66,10 @@ private struct Preprocessor {
         }
 
         /// Get the 1-indexed line and column
-        private static func computeLineAndColumn(from index: String.Index, in source: String) -> (line: Int, column: Int) {
+        private static func computeLineAndColumn(
+            from index: String.Index,
+            in source: String
+        ) -> (line: Int, column: Int) {
             var line = 1
             var column = 1
             for char in source[..<index] {
@@ -128,31 +131,50 @@ private struct Preprocessor {
         let message = expected.map { "Expected \($0) but got \(token)" } ?? "Unexpected token \(token)"
         return PreprocessorError(
             file: file,
-            message: message, source: source, index: index)
+            message: message,
+            source: source,
+            index: index
+        )
     }
 
-    func unexpectedCharacterError(expected: CustomStringConvertible, character: Character, at index: String.Index) -> PreprocessorError {
+    func unexpectedCharacterError(
+        expected: CustomStringConvertible,
+        character: Character,
+        at index: String.Index
+    ) -> PreprocessorError {
         return PreprocessorError(
             file: file,
-            message: "Expected \(expected) but got \(character)", source: source, index: index)
+            message: "Expected \(expected) but got \(character)",
+            source: source,
+            index: index
+        )
     }
 
     func unexpectedDirectiveError(at index: String.Index) -> PreprocessorError {
         return PreprocessorError(
             file: file,
-            message: "Unexpected directive", source: source, index: index)
+            message: "Unexpected directive",
+            source: source,
+            index: index
+        )
     }
 
     func eofError(at index: String.Index) -> PreprocessorError {
         return PreprocessorError(
             file: file,
-            message: "Unexpected end of input", source: source, index: index)
+            message: "Unexpected end of input",
+            source: source,
+            index: index
+        )
     }
 
     func undefinedVariableError(name: String, at index: String.Index) -> PreprocessorError {
         return PreprocessorError(
             file: file,
-            message: "Undefined variable \(name)", source: source, index: index)
+            message: "Undefined variable \(name)",
+            source: source,
+            index: index
+        )
     }
 
     func tokenize() throws -> [TokenInfo] {
@@ -188,7 +210,10 @@ private struct Preprocessor {
         func expect(_ expected: String) throws {
             guard
                 let endIndex = source.index(
-                    cursor, offsetBy: expected.count, limitedBy: source.endIndex)
+                    cursor,
+                    offsetBy: expected.count,
+                    limitedBy: source.endIndex
+                )
             else {
                 throw eofError(at: cursor)
             }
@@ -281,7 +306,11 @@ private struct Preprocessor {
     enum ParseResult {
         case block(String)
         indirect case `if`(
-            condition: String, then: [ParseResult], else: [ParseResult], position: String.Index)
+            condition: String,
+            then: [ParseResult],
+            else: [ParseResult],
+            position: String.Index
+        )
     }
 
     func parse(tokens: [TokenInfo]) throws -> [ParseResult] {
@@ -314,13 +343,19 @@ private struct Preprocessor {
                 }
                 guard case .endif = tokens[cursor].token else {
                     throw unexpectedTokenError(
-                        expected: .endif, token: tokens[cursor].token, at: tokens[cursor].position)
+                        expected: .endif,
+                        token: tokens[cursor].token,
+                        at: tokens[cursor].position
+                    )
                 }
                 consume()
                 return .if(condition: condition, then: then, else: `else`, position: ifPosition)
             case .else, .endif:
                 throw unexpectedTokenError(
-                    expected: nil, token: tokens[cursor].token, at: tokens[cursor].position)
+                    expected: nil,
+                    token: tokens[cursor].token,
+                    at: tokens[cursor].position
+                )
             }
         }
         var results: [ParseResult] = []
@@ -338,9 +373,13 @@ private struct Preprocessor {
             var substitutedContent = content
             for (key, value) in options.substitutions {
                 substitutedContent = substitutedContent.replacingOccurrences(
-                    of: "@" + key + "@", with: value)
+                    of: "@" + key + "@",
+                    with: value
+                )
                 substitutedContent = substitutedContent.replacingOccurrences(
-                    of: "import.meta." + key, with: value)
+                    of: "import.meta." + key,
+                    with: value
+                )
             }
             result.append(substitutedContent)
         }

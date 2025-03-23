@@ -16,7 +16,7 @@ public struct JSException: Error, Equatable {
     /// The value thrown from JavaScript.
     /// This can be any JavaScript value (error object, string, number, etc.).
     public var thrownValue: JSValue {
-      return _thrownValue
+        return _thrownValue
     }
 
     /// The actual JavaScript value that was thrown.

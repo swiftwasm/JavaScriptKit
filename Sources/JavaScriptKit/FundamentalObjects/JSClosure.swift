@@ -26,15 +26,19 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         }
 
         // 3. Retain the given body in static storage by `funcRef`.
-        JSClosure.sharedClosures.wrappedValue[hostFuncRef] = (self, {
-            defer { self.release() }
-            return body($0)
-        })
+        JSClosure.sharedClosures.wrappedValue[hostFuncRef] = (
+            self,
+            {
+                defer { self.release() }
+                return body($0)
+            }
+        )
     }
 
     #if compiler(>=5.5) && !hasFeature(Embedded)
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public static func async(_ body: sending @escaping (sending [JSValue]) async throws -> JSValue) -> JSOneshotClosure {
+    public static func async(_ body: sending @escaping (sending [JSValue]) async throws -> JSValue) -> JSOneshotClosure
+    {
         JSOneshotClosure(makeAsyncClosure(body))
     }
     #endif
@@ -90,9 +94,14 @@ public class JSClosure: JSFunction, JSClosureProtocol {
     private var isReleased: Bool = false
     #endif
 
-    @available(*, deprecated, message: "This initializer will be removed in the next minor version update. Please use `init(_ body: @escaping ([JSValue]) -> JSValue)` and add `return .undefined` to the end of your closure")
+    @available(
+        *,
+        deprecated,
+        message:
+            "This initializer will be removed in the next minor version update. Please use `init(_ body: @escaping ([JSValue]) -> JSValue)` and add `return .undefined` to the end of your closure"
+    )
     @_disfavoredOverload
-    public convenience init(_ body: @escaping ([JSValue]) -> ()) {
+    public convenience init(_ body: @escaping ([JSValue]) -> Void) {
         self.init({
             body($0)
             return .undefined
@@ -200,7 +209,8 @@ private func makeAsyncClosure(
 @_cdecl("_call_host_function_impl")
 func _call_host_function_impl(
     _ hostFuncRef: JavaScriptHostFuncRef,
-    _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
+    _ argv: UnsafePointer<RawJSValue>,
+    _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
 ) -> Bool {
     guard let (_, hostFunc) = JSClosure.sharedClosures.wrappedValue[hostFuncRef] else {
@@ -216,7 +226,6 @@ func _call_host_function_impl(
     return false
 }
 
-
 /// [WeakRefs](https://github.com/tc39/proposal-weakrefs) are already Stage 4,
 /// but was added recently enough that older browser versions don’t support it.
 /// Build with `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS` to disable the relevant behavior.
@@ -230,7 +239,6 @@ extension JSClosure {
         Self.sharedClosures.wrappedValue[hostFuncRef] = nil
     }
 }
-
 
 @_cdecl("_free_host_function_impl")
 func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {}
@@ -254,11 +262,13 @@ func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {
 // cdecls currently don't work in embedded, and expose for wasm only works >=6.0
 @_expose(wasm, "swjs_call_host_function")
 public func _swjs_call_host_function(
-        _ hostFuncRef: JavaScriptHostFuncRef,
-        _ argv: UnsafePointer<RawJSValue>, _ argc: Int32,
-        _ callbackFuncRef: JavaScriptObjectRef) -> Bool {
+    _ hostFuncRef: JavaScriptHostFuncRef,
+    _ argv: UnsafePointer<RawJSValue>,
+    _ argc: Int32,
+    _ callbackFuncRef: JavaScriptObjectRef
+) -> Bool {
 
-    _call_host_function_impl(hostFuncRef, argv, argc, callbackFuncRef) 
+    _call_host_function_impl(hostFuncRef, argv, argc, callbackFuncRef)
 }
 
 @_expose(wasm, "swjs_free_host_function")

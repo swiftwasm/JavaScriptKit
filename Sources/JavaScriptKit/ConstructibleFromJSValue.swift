@@ -68,11 +68,11 @@ extension SignedInteger where Self: ConstructibleFromJSValue {
         if let number = value.number {
             return Self(exactly: number.rounded(.towardZero))
         }
-#if !hasFeature(Embedded)
+        #if !hasFeature(Embedded)
         if let bigInt = value.bigInt as? JSBigIntExtended {
             return Self(exactly: bigInt)
         }
-#endif
+        #endif
         return nil
     }
 }
@@ -116,11 +116,11 @@ extension UnsignedInteger where Self: ConstructibleFromJSValue {
         if let number = value.number {
             return Self(exactly: number.rounded(.towardZero))
         }
-#if !hasFeature(Embedded)
+        #if !hasFeature(Embedded)
         if let bigInt = value.bigInt as? JSBigIntExtended {
             return Self(exactly: bigInt)
         }
-#endif
+        #endif
         return nil
     }
 }

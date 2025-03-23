@@ -66,7 +66,7 @@ public struct JSString: LosslessStringConvertible, Equatable {
     public init(_ stringValue: String) {
         self.guts = Guts(from: stringValue)
     }
-    
+
     /// A Swift representation of this `JSString`.
     /// Note that this accessor may copy the JS string value into Swift side memory.
     public var description: String { guts.buffer }
@@ -87,7 +87,6 @@ extension JSString: ExpressibleByStringLiteral {
     }
 }
 
-
 // MARK: - Internal Helpers
 extension JSString {
 
@@ -97,7 +96,9 @@ extension JSString {
 
     func withRawJSValue<T>(_ body: (RawJSValue) -> T) -> T {
         let rawValue = RawJSValue(
-            kind: .string, payload1: guts.jsRef, payload2: 0
+            kind: .string,
+            payload1: guts.jsRef,
+            payload2: 0
         )
         return body(rawValue)
     }

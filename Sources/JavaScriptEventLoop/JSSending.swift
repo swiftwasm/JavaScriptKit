@@ -2,7 +2,7 @@
 import _CJavaScriptKit
 
 #if canImport(Synchronization)
-    import Synchronization
+import Synchronization
 #endif
 
 /// A temporary object intended to send a JavaScript object from one thread to another.
@@ -105,11 +105,11 @@ extension JSSending where T == JSObject {
             deconstruct: { $0 },
             getSourceTid: {
                 #if compiler(>=6.1) && _runtime(_multithreaded)
-                    return $0.ownerTid
+                return $0.ownerTid
                 #else
-                    _ = $0
-                    // On single-threaded runtime, source and destination threads are always the main thread (TID = -1).
-                    return -1
+                _ = $0
+                // On single-threaded runtime, source and destination threads are always the main thread (TID = -1).
+                return -1
                 #endif
             },
             transferring: transferring
@@ -226,7 +226,11 @@ extension JSSending {
     /// - Returns: The received object of type `T`.
     /// - Throws: `JSSendingError` if the sending operation fails, or `JSException` if a JavaScript error occurs.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public func receive(isolation: isolated (any Actor)? = #isolation, file: StaticString = #file, line: UInt = #line) async throws -> T {
+    public func receive(
+        isolation: isolated (any Actor)? = #isolation,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) async throws -> T {
         #if compiler(>=6.1) && _runtime(_multithreaded)
         let idInDestination = try await withCheckedThrowingContinuation { continuation in
             let context = _JSSendingContext(continuation: continuation)
@@ -281,7 +285,9 @@ extension JSSending {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func receive<each U>(
         _ sendings: repeat JSSending<each U>,
-        isolation: isolated (any Actor)? = #isolation, file: StaticString = #file, line: UInt = #line
+        isolation: isolated (any Actor)? = #isolation,
+        file: StaticString = #file,
+        line: UInt = #line
     ) async throws -> (repeat each U) where T == (repeat each U) {
         #if compiler(>=6.1) && _runtime(_multithreaded)
         var sendingObjects: [JavaScriptObjectRef] = []
@@ -329,11 +335,11 @@ extension JSSending {
         return try await (repeat (each sendings).receive())
         #endif
     }
-    #endif // compiler(>=6.1)
+    #endif  // compiler(>=6.1)
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-fileprivate final class _JSSendingContext: Sendable {
+private final class _JSSendingContext: Sendable {
     let continuation: CheckedContinuation<JavaScriptObjectRef, Error>
 
     init(continuation: CheckedContinuation<JavaScriptObjectRef, Error>) {

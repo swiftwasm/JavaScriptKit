@@ -22,9 +22,9 @@ public class JSObject: Equatable {
     @usableFromInline
     internal var _id: JavaScriptObjectRef
 
-#if compiler(>=6.1) && _runtime(_multithreaded)
+    #if compiler(>=6.1) && _runtime(_multithreaded)
     package let ownerTid: Int32
-#endif
+    #endif
 
     @_spi(JSObject_id)
     @inlinable
@@ -33,9 +33,9 @@ public class JSObject: Equatable {
     @_spi(JSObject_id)
     public init(id: JavaScriptObjectRef) {
         self._id = id
-#if compiler(>=6.1) && _runtime(_multithreaded)
+        #if compiler(>=6.1) && _runtime(_multithreaded)
         self.ownerTid = swjs_get_worker_thread_id_cached()
-#endif
+        #endif
     }
 
     /// Asserts that the object is being accessed from the owner thread.
@@ -47,18 +47,24 @@ public class JSObject: Equatable {
     /// object spaces are not shared across threads backed by Web Workers.
     private func assertOnOwnerThread(hint: @autoclosure () -> String) {
         #if compiler(>=6.1) && _runtime(_multithreaded)
-        precondition(ownerTid == swjs_get_worker_thread_id_cached(), "JSObject is being accessed from a thread other than the owner thread: \(hint())")
+        precondition(
+            ownerTid == swjs_get_worker_thread_id_cached(),
+            "JSObject is being accessed from a thread other than the owner thread: \(hint())"
+        )
         #endif
     }
 
     /// Asserts that the two objects being compared are owned by the same thread.
     private static func assertSameOwnerThread(lhs: JSObject, rhs: JSObject, hint: @autoclosure () -> String) {
         #if compiler(>=6.1) && _runtime(_multithreaded)
-        precondition(lhs.ownerTid == rhs.ownerTid, "JSObject is being accessed from a thread other than the owner thread: \(hint())")
+        precondition(
+            lhs.ownerTid == rhs.ownerTid,
+            "JSObject is being accessed from a thread other than the owner thread: \(hint())"
+        )
         #endif
     }
 
-#if !hasFeature(Embedded)
+    #if !hasFeature(Embedded)
     /// Returns the `name` member method binding this object as `this` context.
     ///
     /// e.g.
@@ -101,7 +107,7 @@ public class JSObject: Equatable {
     public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue)? {
         self[name]
     }
-#endif
+    #endif
 
     /// A convenience method of `subscript(_ name: String) -> JSValue`
     /// to access the member through Dynamic Member Lookup.
@@ -166,7 +172,7 @@ public class JSObject: Equatable {
         }
     }
 
-#if !hasFeature(Embedded)
+    #if !hasFeature(Embedded)
     /// A modifier to call methods as throwing methods capturing `this`
     ///
     ///
@@ -187,7 +193,7 @@ public class JSObject: Equatable {
     public var throwing: JSThrowingObject {
         JSThrowingObject(self)
     }
-#endif
+    #endif
 
     /// Return `true` if this value is an instance of the passed `constructor` function.
     /// - Parameter constructor: The constructor function to check.
@@ -230,10 +236,11 @@ public class JSObject: Equatable {
     public static func construct(from value: JSValue) -> Self? {
         switch value {
         case .boolean,
-                .string,
-                .number,
-                .null,
-                .undefined: return nil
+            .string,
+            .number,
+            .null,
+            .undefined:
+            return nil
         case .object(let object):
             return object as? Self
         case .function(let function):
@@ -295,7 +302,6 @@ public class JSThrowingObject {
 }
 #endif
 
-
 #if hasFeature(Embedded)
 // Overloads of `JSObject.subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
 // for 0 through 7 arguments for Embedded Swift.
@@ -305,33 +311,33 @@ public class JSThrowingObject {
 //
 // NOTE: Once Embedded Swift supports parameter packs/variadic generics, we can
 // replace all of these with a single method that takes a generic pack.
-public extension JSObject {
+extension JSObject {
     @_disfavoredOverload
-    subscript(dynamicMember name: String) -> (() -> JSValue)? {
-        self[name].function.map { function in 
+    public subscript(dynamicMember name: String) -> (() -> JSValue)? {
+        self[name].function.map { function in
             { function(this: self) }
         }
     }
 
     @_disfavoredOverload
-    subscript<A0: ConvertibleToJSValue>(dynamicMember name: String) -> ((A0) -> JSValue)? {
-        self[name].function.map { function in 
+    public subscript<A0: ConvertibleToJSValue>(dynamicMember name: String) -> ((A0) -> JSValue)? {
+        self[name].function.map { function in
             { function(this: self, $0) }
         }
     }
 
     @_disfavoredOverload
-    subscript<
+    public subscript<
         A0: ConvertibleToJSValue,
         A1: ConvertibleToJSValue
     >(dynamicMember name: String) -> ((A0, A1) -> JSValue)? {
-        self[name].function.map { function in 
+        self[name].function.map { function in
             { function(this: self, $0, $1) }
         }
     }
 
     @_disfavoredOverload
-    subscript<
+    public subscript<
         A0: ConvertibleToJSValue,
         A1: ConvertibleToJSValue,
         A2: ConvertibleToJSValue
@@ -342,7 +348,7 @@ public extension JSObject {
     }
 
     @_disfavoredOverload
-    subscript<
+    public subscript<
         A0: ConvertibleToJSValue,
         A1: ConvertibleToJSValue,
         A2: ConvertibleToJSValue,
@@ -354,7 +360,7 @@ public extension JSObject {
     }
 
     @_disfavoredOverload
-    subscript<
+    public subscript<
         A0: ConvertibleToJSValue,
         A1: ConvertibleToJSValue,
         A2: ConvertibleToJSValue,
@@ -367,7 +373,7 @@ public extension JSObject {
     }
 
     @_disfavoredOverload
-    subscript<
+    public subscript<
         A0: ConvertibleToJSValue,
         A1: ConvertibleToJSValue,
         A2: ConvertibleToJSValue,
@@ -381,7 +387,7 @@ public extension JSObject {
     }
 
     @_disfavoredOverload
-    subscript<
+    public subscript<
         A0: ConvertibleToJSValue,
         A1: ConvertibleToJSValue,
         A2: ConvertibleToJSValue,

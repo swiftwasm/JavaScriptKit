@@ -18,7 +18,9 @@ final class JavaScriptEventLoopTests: XCTestCase {
     }
 
     func expectAsyncThrow<T>(
-        _ body: @autoclosure () async throws -> T, file: StaticString = #file, line: UInt = #line,
+        _ body: @autoclosure () async throws -> T,
+        file: StaticString = #file,
+        line: UInt = #line,
         column: UInt = #column
     ) async throws -> Error {
         do {
@@ -241,20 +243,20 @@ final class JavaScriptEventLoopTests: XCTestCase {
     // MARK: - Clock Tests
 
     #if compiler(>=5.7)
-        func testClockSleep() async throws {
-            // Test ContinuousClock.sleep
-            let continuousClockDiff = try await measureTime {
-                let c = ContinuousClock()
-                try await c.sleep(until: .now + .milliseconds(100))
-            }
-            XCTAssertGreaterThanOrEqual(continuousClockDiff, 50)
-
-            // Test SuspendingClock.sleep
-            let suspendingClockDiff = try await measureTime {
-                let c = SuspendingClock()
-                try await c.sleep(until: .now + .milliseconds(100))
-            }
-            XCTAssertGreaterThanOrEqual(suspendingClockDiff, 50)
+    func testClockSleep() async throws {
+        // Test ContinuousClock.sleep
+        let continuousClockDiff = try await measureTime {
+            let c = ContinuousClock()
+            try await c.sleep(until: .now + .milliseconds(100))
         }
+        XCTAssertGreaterThanOrEqual(continuousClockDiff, 50)
+
+        // Test SuspendingClock.sleep
+        let suspendingClockDiff = try await measureTime {
+            let c = SuspendingClock()
+            try await c.sleep(until: .now + .milliseconds(100))
+        }
+        XCTAssertGreaterThanOrEqual(suspendingClockDiff, 50)
+    }
     #endif
 }

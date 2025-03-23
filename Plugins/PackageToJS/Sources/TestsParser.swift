@@ -186,7 +186,8 @@ class FancyTestsParser {
         write("\n")
 
         func formatCategory(
-            label: String, statuses: [Status]
+            label: String,
+            statuses: [Status]
         ) -> String {
             var passed = 0
             var skipped = 0
@@ -220,7 +221,8 @@ class FancyTestsParser {
         let suitesWithCases = suites.filter { $0.cases.count > 0 }
         write(
             formatCategory(
-                label: "Test Suites:", statuses: suitesWithCases.map(\.status)
+                label: "Test Suites:",
+                statuses: suitesWithCases.map(\.status)
             )
         )
         let allCaseStatuses = suitesWithCases.flatMap {
@@ -228,7 +230,8 @@ class FancyTestsParser {
         }
         write(
             formatCategory(
-                label: "Tests:      ", statuses: allCaseStatuses
+                label: "Tests:      ",
+                statuses: allCaseStatuses
             )
         )
 

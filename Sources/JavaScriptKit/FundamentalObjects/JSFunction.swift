@@ -11,7 +11,7 @@ import _CJavaScriptKit
 /// ```
 ///
 public class JSFunction: JSObject {
-#if !hasFeature(Embedded)
+    #if !hasFeature(Embedded)
     /// Call this function with given `arguments` and binding given `this` as context.
     /// - Parameters:
     ///   - this: The value to be passed as the `this` parameter to this function.
@@ -84,7 +84,7 @@ public class JSFunction: JSObject {
     public var `throws`: JSThrowingFunction {
         JSThrowingFunction(self)
     }
-#endif
+    #endif
 
     @discardableResult
     public func callAsFunction(arguments: [JSValue]) -> JSValue {
@@ -116,7 +116,7 @@ public class JSFunction: JSObject {
         arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0, this: this) }
     }
 
-#if !hasFeature(Embedded)
+    #if !hasFeature(Embedded)
     final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue]) -> RawJSValue {
         arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0) }
     }
@@ -124,7 +124,7 @@ public class JSFunction: JSObject {
     final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue], this: JSObject) -> RawJSValue {
         arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0, this: this) }
     }
-#endif
+    #endif
 
     final private func invokeNonThrowingJSFunction(rawValues: [RawJSValue]) -> RawJSValue {
         rawValues.withUnsafeBufferPointer { [id] bufferPointer in
@@ -133,8 +133,11 @@ public class JSFunction: JSObject {
             var payload1 = JavaScriptPayload1()
             var payload2 = JavaScriptPayload2()
             let resultBitPattern = swjs_call_function_no_catch(
-                id, argv, Int32(argc),
-                &payload1, &payload2
+                id,
+                argv,
+                Int32(argc),
+                &payload1,
+                &payload2
             )
             let kindAndFlags = JavaScriptValueKindAndFlags(bitPattern: resultBitPattern)
             assert(!kindAndFlags.isException)
@@ -149,9 +152,13 @@ public class JSFunction: JSObject {
             let argc = bufferPointer.count
             var payload1 = JavaScriptPayload1()
             var payload2 = JavaScriptPayload2()
-            let resultBitPattern = swjs_call_function_with_this_no_catch(this.id,
-                id, argv, Int32(argc),
-                &payload1, &payload2
+            let resultBitPattern = swjs_call_function_with_this_no_catch(
+                this.id,
+                id,
+                argv,
+                Int32(argc),
+                &payload1,
+                &payload2
             )
             let kindAndFlags = JavaScriptValueKindAndFlags(bitPattern: resultBitPattern)
             #if !hasFeature(Embedded)
@@ -172,20 +179,20 @@ public class JSFunction: JSObject {
 //
 // Once Embedded Swift supports parameter packs/variadic generics, we can
 // replace all variants with a single method each that takes a generic pack.
-public extension JSFunction {
+extension JSFunction {
 
     @discardableResult
-    func callAsFunction(this: JSObject) -> JSValue {
+    public func callAsFunction(this: JSObject) -> JSValue {
         invokeNonThrowingJSFunction(arguments: [], this: this).jsValue
     }
 
     @discardableResult
-    func callAsFunction(this: JSObject, _ arg0: some ConvertibleToJSValue) -> JSValue {
+    public func callAsFunction(this: JSObject, _ arg0: some ConvertibleToJSValue) -> JSValue {
         invokeNonThrowingJSFunction(arguments: [arg0.jsValue], this: this).jsValue
     }
 
     @discardableResult
-    func callAsFunction(
+    public func callAsFunction(
         this: JSObject,
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue
@@ -194,7 +201,7 @@ public extension JSFunction {
     }
 
     @discardableResult
-    func callAsFunction(
+    public func callAsFunction(
         this: JSObject,
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
@@ -204,18 +211,19 @@ public extension JSFunction {
     }
 
     @discardableResult
-    func callAsFunction(
+    public func callAsFunction(
         this: JSObject,
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
         _ arg3: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue], this: this).jsValue
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue], this: this)
+            .jsValue
     }
 
     @discardableResult
-    func callAsFunction(
+    public func callAsFunction(
         this: JSObject,
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
@@ -223,11 +231,14 @@ public extension JSFunction {
         _ arg3: some ConvertibleToJSValue,
         _ arg4: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue], this: this).jsValue
+        invokeNonThrowingJSFunction(
+            arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue],
+            this: this
+        ).jsValue
     }
 
     @discardableResult
-    func callAsFunction(
+    public func callAsFunction(
         this: JSObject,
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
@@ -236,11 +247,14 @@ public extension JSFunction {
         _ arg4: some ConvertibleToJSValue,
         _ arg5: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue], this: this).jsValue
+        invokeNonThrowingJSFunction(
+            arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue],
+            this: this
+        ).jsValue
     }
 
     @discardableResult
-    func callAsFunction(
+    public func callAsFunction(
         this: JSObject,
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
@@ -250,26 +264,31 @@ public extension JSFunction {
         _ arg5: some ConvertibleToJSValue,
         _ arg6: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue], this: this).jsValue
+        invokeNonThrowingJSFunction(
+            arguments: [
+                arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue,
+            ],
+            this: this
+        ).jsValue
     }
 
     @discardableResult
-    func callAsFunction(this: JSObject, arguments: [JSValue]) -> JSValue {
+    public func callAsFunction(this: JSObject, arguments: [JSValue]) -> JSValue {
         invokeNonThrowingJSFunction(arguments: arguments, this: this).jsValue
     }
 
     @discardableResult
-    func callAsFunction() -> JSValue {
+    public func callAsFunction() -> JSValue {
         invokeNonThrowingJSFunction(arguments: []).jsValue
     }
 
     @discardableResult
-    func callAsFunction(_ arg0: some ConvertibleToJSValue) -> JSValue {
+    public func callAsFunction(_ arg0: some ConvertibleToJSValue) -> JSValue {
         invokeNonThrowingJSFunction(arguments: [arg0.jsValue]).jsValue
     }
 
     @discardableResult
-    func callAsFunction(
+    public func callAsFunction(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue
     ) -> JSValue {
@@ -277,7 +296,7 @@ public extension JSFunction {
     }
 
     @discardableResult
-    func callAsFunction(
+    public func callAsFunction(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue
@@ -286,7 +305,7 @@ public extension JSFunction {
     }
 
     @discardableResult
-    func callAsFunction(
+    public func callAsFunction(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -296,18 +315,19 @@ public extension JSFunction {
     }
 
     @discardableResult
-    func callAsFunction(
+    public func callAsFunction(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
         _ arg3: some ConvertibleToJSValue,
         _ arg4: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue]).jsValue
+        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue])
+            .jsValue
     }
 
     @discardableResult
-    func callAsFunction(
+    public func callAsFunction(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -315,11 +335,13 @@ public extension JSFunction {
         _ arg4: some ConvertibleToJSValue,
         _ arg5: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue]).jsValue
+        invokeNonThrowingJSFunction(arguments: [
+            arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue,
+        ]).jsValue
     }
 
     @discardableResult
-    func callAsFunction(
+    public func callAsFunction(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -328,25 +350,27 @@ public extension JSFunction {
         _ arg5: some ConvertibleToJSValue,
         _ arg6: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue]).jsValue
+        invokeNonThrowingJSFunction(arguments: [
+            arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue,
+        ]).jsValue
     }
 
-    func new() -> JSObject {
+    public func new() -> JSObject {
         new(arguments: [])
     }
 
-    func new(_ arg0: some ConvertibleToJSValue) -> JSObject {
+    public func new(_ arg0: some ConvertibleToJSValue) -> JSObject {
         new(arguments: [arg0.jsValue])
     }
 
-    func new(
+    public func new(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue
     ) -> JSObject {
         new(arguments: [arg0.jsValue, arg1.jsValue])
     }
 
-    func new(
+    public func new(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue
@@ -354,7 +378,7 @@ public extension JSFunction {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue])
     }
 
-    func new(
+    public func new(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -363,7 +387,7 @@ public extension JSFunction {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue])
     }
 
-    func new(
+    public func new(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -373,7 +397,7 @@ public extension JSFunction {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue])
     }
 
-    func new(
+    public func new(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -384,7 +408,7 @@ public extension JSFunction {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue])
     }
 
-    func new(
+    public func new(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -393,7 +417,9 @@ public extension JSFunction {
         _ arg5: some ConvertibleToJSValue,
         _ arg6: some ConvertibleToJSValue
     ) -> JSObject {
-        new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue])
+        new(arguments: [
+            arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue,
+        ])
     }
 }
 #endif

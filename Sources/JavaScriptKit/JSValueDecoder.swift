@@ -121,7 +121,10 @@ private struct _KeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContainerPr
         return try T(from: _decoder(forKey: key))
     }
 
-    func nestedContainer<NestedKey>(keyedBy _: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
+    func nestedContainer<NestedKey>(
+        keyedBy _: NestedKey.Type,
+        forKey key: Key
+    ) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
         try _decoder(forKey: key).container(keyedBy: NestedKey.self)
     }
 
@@ -185,7 +188,8 @@ private struct _UnkeyedDecodingContainer: UnkeyedDecodingContainer {
         return try T(from: _decoder())
     }
 
-    mutating func nestedContainer<NestedKey>(keyedBy _: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
+    mutating func nestedContainer<NestedKey>(keyedBy _: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey>
+    where NestedKey: CodingKey {
         return try _decoder().container(keyedBy: NestedKey.self)
     }
 

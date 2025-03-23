@@ -1,11 +1,10 @@
-/** A wrapper around the [JavaScript `Date`
- class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) that
- exposes its properties in a type-safe way. This doesn't 100% match the JS API, for example
- `getMonth`/`setMonth` etc accessor methods are converted to properties, but the rest of it matches
- in the naming. Parts of the JavaScript `Date` API that are not consistent across browsers and JS
- implementations are not exposed in a type-safe manner, you should access the underlying `jsObject`
- property if you need those.
- */
+/// A wrapper around the [JavaScript `Date`
+/// class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) that
+/// exposes its properties in a type-safe way. This doesn't 100% match the JS API, for example
+/// `getMonth`/`setMonth` etc accessor methods are converted to properties, but the rest of it matches
+/// in the naming. Parts of the JavaScript `Date` API that are not consistent across browsers and JS
+/// implementations are not exposed in a type-safe manner, you should access the underlying `jsObject`
+/// property if you need those.
 public final class JSDate: JSBridgedClass {
     /// The constructor function used to create new `Date` objects.
     public static var constructor: JSFunction? { _constructor.wrappedValue }

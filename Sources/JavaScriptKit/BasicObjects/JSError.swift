@@ -1,7 +1,6 @@
-/** A wrapper around [the JavaScript `Error`
- class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) that
- exposes its properties in a type-safe way.
- */
+/// A wrapper around [the JavaScript `Error`
+/// class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) that
+/// exposes its properties in a type-safe way.
 public final class JSError: JSBridgedClass {
     /// The constructor function used to create new JavaScript `Error` objects.
     public static var constructor: JSFunction? { _constructor.wrappedValue }

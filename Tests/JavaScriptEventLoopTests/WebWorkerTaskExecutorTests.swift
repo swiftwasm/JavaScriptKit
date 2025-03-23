@@ -1,6 +1,6 @@
 #if compiler(>=6.1) && _runtime(_multithreaded)
 import XCTest
-import _CJavaScriptKit // For swjs_get_worker_thread_id
+import _CJavaScriptKit  // For swjs_get_worker_thread_id
 @testable import JavaScriptKit
 @testable import JavaScriptEventLoop
 
@@ -226,17 +226,17 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
 
         func decodeJob() throws {
             let json = """
-            {
-                "prop_1": {
-                    "nested_prop": 42
-                },
-                "prop_2": 100,
-                "prop_3": true,
-                "prop_7": 3.14,
-                "prop_8": "Hello, World!",
-                "prop_9": ["a", "b", "c"]
-            }
-            """
+                {
+                    "prop_1": {
+                        "nested_prop": 42
+                    },
+                    "prop_2": 100,
+                    "prop_3": true,
+                    "prop_7": 3.14,
+                    "prop_8": "Hello, World!",
+                    "prop_9": ["a", "b", "c"]
+                }
+                """
             let object = JSObject.global.JSON.parse(json)
             let decoder = JSValueDecoder()
             let result = try decoder.decode(DecodeMe.self, from: object)
@@ -344,7 +344,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         }
         let byteLength1 = try await task1.value
         XCTAssertEqual(byteLength1, 100)
-
+    
         let task2 = Task<String?, Never>(executorPreference: executor) {
             do {
                 _ = try await transferring.receive()
@@ -444,18 +444,18 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         XCTAssertEqual(object["test"].string!, "Hello, World!")
     }
 
-/*
-    func testDeinitJSObjectOnDifferentThread() async throws {
-        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
-
-        var object: JSObject? = JSObject.global.Object.function!.new()
-        let task = Task(executorPreference: executor) {
-            object = nil
-            _ = object
+    /*
+        func testDeinitJSObjectOnDifferentThread() async throws {
+            let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+    
+            var object: JSObject? = JSObject.global.Object.function!.new()
+            let task = Task(executorPreference: executor) {
+                object = nil
+                _ = object
+            }
+            await task.value
+            executor.terminate()
         }
-        await task.value
-        executor.terminate()
-    }
-*/
+    */
 }
 #endif

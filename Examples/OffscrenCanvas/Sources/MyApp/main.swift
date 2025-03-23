@@ -56,7 +56,8 @@ func startFPSMonitor() {
             JSClosure { _ in
                 countFrame()
                 return .undefined
-            })
+            }
+        )
     }
 
     // Start counting
@@ -107,14 +108,16 @@ func main() async throws {
                 try await onClick(renderer: renderer)
             }
             return JSValue.undefined
-        })
+        }
+    )
 
     _ = cancelButtonElement.addEventListener!(
         "click",
         JSClosure { _ in
             renderingTask?.cancel()
             return JSValue.undefined
-        })
+        }
+    )
 }
 
 Task {
@@ -122,18 +125,18 @@ Task {
 }
 
 #if canImport(wasi_pthread)
-    import wasi_pthread
-    import WASILibc
+import wasi_pthread
+import WASILibc
 
-    /// Trick to avoid blocking the main thread. pthread_mutex_lock function is used by
-    /// the Swift concurrency runtime.
-    @_cdecl("pthread_mutex_lock")
-    func pthread_mutex_lock(_ mutex: UnsafeMutablePointer<pthread_mutex_t>) -> Int32 {
-        // DO NOT BLOCK MAIN THREAD
-        var ret: Int32
-        repeat {
-            ret = pthread_mutex_trylock(mutex)
-        } while ret == EBUSY
-        return ret
-    }
+/// Trick to avoid blocking the main thread. pthread_mutex_lock function is used by
+/// the Swift concurrency runtime.
+@_cdecl("pthread_mutex_lock")
+func pthread_mutex_lock(_ mutex: UnsafeMutablePointer<pthread_mutex_t>) -> Int32 {
+    // DO NOT BLOCK MAIN THREAD
+    var ret: Int32
+    repeat {
+        ret = pthread_mutex_trylock(mutex)
+    } while ret == EBUSY
+    return ret
+}
 #endif

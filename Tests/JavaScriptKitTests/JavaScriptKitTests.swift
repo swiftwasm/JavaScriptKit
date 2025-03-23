@@ -1,5 +1,5 @@
-import XCTest
 import JavaScriptKit
+import XCTest
 
 class JavaScriptKitTests: XCTestCase {
     func testLiteralConversion() {
@@ -22,7 +22,7 @@ class JavaScriptKitTests: XCTestCase {
             setJSValue(this: global, name: prop, value: input)
             let got = getJSValue(this: global, name: prop)
             switch (got, input) {
-            case let (.number(lhs), .number(rhs)):
+            case (.number(let lhs), .number(let rhs)):
                 // Compare bitPattern because nan == nan is always false
                 XCTAssertEqual(lhs.bitPattern, rhs.bitPattern)
             default:
@@ -30,7 +30,7 @@ class JavaScriptKitTests: XCTestCase {
             }
         }
     }
-    
+
     func testObjectConversion() {
         // Notes: globalObject1 is defined in JavaScript environment
         //
@@ -47,7 +47,7 @@ class JavaScriptKitTests: XCTestCase {
         //   ...
         // }
         // ```
-        
+
         let globalObject1 = getJSValue(this: .global, name: "globalObject1")
         let globalObject1Ref = try! XCTUnwrap(globalObject1.object)
         let prop_1 = getJSValue(this: globalObject1Ref, name: "prop_1")
@@ -67,10 +67,10 @@ class JavaScriptKitTests: XCTestCase {
             let actualElement = getJSValue(this: prop_4Array, index: Int32(index))
             XCTAssertEqual(actualElement, expectedElement)
         }
-        
+
         XCTAssertEqual(getJSValue(this: globalObject1Ref, name: "undefined_prop"), .undefined)
     }
-    
+
     func testValueConstruction() {
         let globalObject1 = getJSValue(this: .global, name: "globalObject1")
         let globalObject1Ref = try! XCTUnwrap(globalObject1.object)
@@ -81,10 +81,10 @@ class JavaScriptKitTests: XCTestCase {
         let prop_7 = getJSValue(this: globalObject1Ref, name: "prop_7")
         XCTAssertEqual(Double.construct(from: prop_7), 3.14)
         XCTAssertEqual(Float.construct(from: prop_7), 3.14)
-        
+
         for source: JSValue in [
             .number(.infinity), .number(.nan),
-            .number(Double(UInt64.max).nextUp), .number(Double(Int64.min).nextDown)
+            .number(Double(UInt64.max).nextUp), .number(Double(Int64.min).nextDown),
         ] {
             XCTAssertNil(Int.construct(from: source))
             XCTAssertNil(Int8.construct(from: source))
@@ -98,7 +98,7 @@ class JavaScriptKitTests: XCTestCase {
             XCTAssertNil(UInt64.construct(from: source))
         }
     }
-    
+
     func testArrayIterator() {
         let globalObject1 = getJSValue(this: .global, name: "globalObject1")
         let globalObject1Ref = try! XCTUnwrap(globalObject1.object)
@@ -108,14 +108,14 @@ class JavaScriptKitTests: XCTestCase {
             .number(3), .number(4), .string("str_elm_1"), .null, .undefined, .number(5),
         ]
         XCTAssertEqual(Array(array1), expectedProp_4)
-        
+
         // Ensure that iterator skips empty hole as JavaScript does.
         let prop_8 = getJSValue(this: globalObject1Ref, name: "prop_8")
         let array2 = try! XCTUnwrap(prop_8.array)
         let expectedProp_8: [JSValue] = [0, 2, 3, 6]
         XCTAssertEqual(Array(array2), expectedProp_8)
     }
-    
+
     func testArrayRandomAccessCollection() {
         let globalObject1 = getJSValue(this: .global, name: "globalObject1")
         let globalObject1Ref = try! XCTUnwrap(globalObject1.object)
@@ -125,22 +125,22 @@ class JavaScriptKitTests: XCTestCase {
             .number(3), .number(4), .string("str_elm_1"), .null, .undefined, .number(5),
         ]
         XCTAssertEqual([array1[0], array1[1], array1[2], array1[3], array1[4], array1[5]], expectedProp_4)
-        
+
         // Ensure that subscript can access empty hole
         let prop_8 = getJSValue(this: globalObject1Ref, name: "prop_8")
         let array2 = try! XCTUnwrap(prop_8.array)
         let expectedProp_8: [JSValue] = [
-            0, .undefined, 2, 3, .undefined, .undefined, 6
+            0, .undefined, 2, 3, .undefined, .undefined, 6,
         ]
         XCTAssertEqual([array2[0], array2[1], array2[2], array2[3], array2[4], array2[5], array2[6]], expectedProp_8)
     }
-    
+
     func testValueDecoder() {
         struct GlobalObject1: Codable {
             struct Prop1: Codable {
                 let nested_prop: Int
             }
-            
+
             let prop_1: Prop1
             let prop_2: Int
             let prop_3: Bool
@@ -154,7 +154,7 @@ class JavaScriptKitTests: XCTestCase {
         XCTAssertEqual(globalObject1.prop_3, true)
         XCTAssertEqual(globalObject1.prop_7, 3.14)
     }
-    
+
     func testFunctionCall() {
         // Notes: globalObject1 is defined in JavaScript environment
         //
@@ -174,12 +174,12 @@ class JavaScriptKitTests: XCTestCase {
         //   ...
         // }
         // ```
-        
+
         let globalObject1 = getJSValue(this: .global, name: "globalObject1")
         let globalObject1Ref = try! XCTUnwrap(globalObject1.object)
         let prop_5 = getJSValue(this: globalObject1Ref, name: "prop_5")
         let prop_5Ref = try! XCTUnwrap(prop_5.object)
-        
+
         let func1 = try! XCTUnwrap(getJSValue(this: prop_5Ref, name: "func1").function)
         XCTAssertEqual(func1(), .undefined)
         let func2 = try! XCTUnwrap(getJSValue(this: prop_5Ref, name: "func2").function)
@@ -196,30 +196,30 @@ class JavaScriptKitTests: XCTestCase {
         XCTAssertEqual(func6(false, 1, 2), .number(2))
         XCTAssertEqual(func6(true, "OK", 2), .string("OK"))
     }
-    
+
     func testClosureLifetime() {
         let evalClosure = JSObject.global.globalObject1.eval_closure.function!
-        
+
         do {
             let c1 = JSClosure { arguments in
                 return arguments[0]
             }
             XCTAssertEqual(evalClosure(c1, JSValue.number(1.0)), .number(1.0))
-#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+            #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
             c1.release()
-#endif
+            #endif
         }
-        
+
         do {
             let array = JSObject.global.Array.function!.new()
             let c1 = JSClosure { _ in .number(3) }
             _ = array.push!(c1)
             XCTAssertEqual(array[0].function!().number, 3.0)
-#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+            #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
             c1.release()
-#endif
+            #endif
         }
-        
+
         do {
             let c1 = JSClosure { _ in .undefined }
             XCTAssertEqual(c1(), .undefined)
@@ -230,7 +230,7 @@ class JavaScriptKitTests: XCTestCase {
             XCTAssertEqual(c1(), .number(4))
         }
     }
-    
+
     func testHostFunctionRegistration() {
         // ```js
         // global.globalObject1 = {
@@ -246,24 +246,24 @@ class JavaScriptKitTests: XCTestCase {
         let globalObject1Ref = try! XCTUnwrap(globalObject1.object)
         let prop_6 = getJSValue(this: globalObject1Ref, name: "prop_6")
         let prop_6Ref = try! XCTUnwrap(prop_6.object)
-        
+
         var isHostFunc1Called = false
         let hostFunc1 = JSClosure { (_) -> JSValue in
             isHostFunc1Called = true
             return .number(1)
         }
-        
+
         setJSValue(this: prop_6Ref, name: "host_func_1", value: .object(hostFunc1))
-        
+
         let call_host_1 = getJSValue(this: prop_6Ref, name: "call_host_1")
         let call_host_1Func = try! XCTUnwrap(call_host_1.function)
         XCTAssertEqual(call_host_1Func(), .number(1))
         XCTAssertEqual(isHostFunc1Called, true)
-        
-#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+
+        #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
         hostFunc1.release()
-#endif
-        
+        #endif
+
         let evalClosure = JSObject.global.globalObject1.eval_closure.function!
         let hostFunc2 = JSClosure { (arguments) -> JSValue in
             if let input = arguments[0].number {
@@ -272,15 +272,15 @@ class JavaScriptKitTests: XCTestCase {
                 return .string(String(describing: arguments[0]))
             }
         }
-        
+
         XCTAssertEqual(evalClosure(hostFunc2, 3), .number(6))
         XCTAssertTrue(evalClosure(hostFunc2, true).string != nil)
-        
-#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+
+        #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
         hostFunc2.release()
-#endif
+        #endif
     }
-    
+
     func testNewObjectConstruction() {
         // ```js
         // global.Animal = function(name, age, isCat) {
@@ -299,14 +299,14 @@ class JavaScriptKitTests: XCTestCase {
         XCTAssertEqual(cat1.isInstanceOf(try! XCTUnwrap(getJSValue(this: .global, name: "Array").function)), false)
         let cat1Bark = try! XCTUnwrap(getJSValue(this: cat1, name: "bark").function)
         XCTAssertEqual(cat1Bark(), .string("nyan"))
-        
+
         let dog1 = objectConstructor.new("Pochi", 3, false)
         let dog1Bark = try! XCTUnwrap(getJSValue(this: dog1, name: "bark").function)
         XCTAssertEqual(dog1Bark(), .string("wan"))
     }
-    
+
     func testObjectDecoding() {
-        /* 
+        /*
          ```js
          global.objectDecodingTest = {
              obj: {},
@@ -317,7 +317,7 @@ class JavaScriptKitTests: XCTestCase {
          ```
          */
         let js: JSValue = JSObject.global.objectDecodingTest
-        
+
         // I can't use regular name like `js.object` here
         // cz its conflicting with case name and DML.
         // so I use abbreviated names
@@ -325,28 +325,28 @@ class JavaScriptKitTests: XCTestCase {
         let function: JSValue = js.fn
         let symbol: JSValue = js.sym
         let bigInt: JSValue = js.bi
-        
+
         XCTAssertNotNil(JSObject.construct(from: object))
         XCTAssertEqual(JSObject.construct(from: function).map { $0 is JSFunction }, .some(true))
         XCTAssertEqual(JSObject.construct(from: symbol).map { $0 is JSSymbol }, .some(true))
         XCTAssertEqual(JSObject.construct(from: bigInt).map { $0 is JSBigInt }, .some(true))
-        
+
         XCTAssertNil(JSFunction.construct(from: object))
         XCTAssertNotNil(JSFunction.construct(from: function))
         XCTAssertNil(JSFunction.construct(from: symbol))
         XCTAssertNil(JSFunction.construct(from: bigInt))
-        
+
         XCTAssertNil(JSSymbol.construct(from: object))
         XCTAssertNil(JSSymbol.construct(from: function))
         XCTAssertNotNil(JSSymbol.construct(from: symbol))
         XCTAssertNil(JSSymbol.construct(from: bigInt))
-        
+
         XCTAssertNil(JSBigInt.construct(from: object))
         XCTAssertNil(JSBigInt.construct(from: function))
         XCTAssertNil(JSBigInt.construct(from: symbol))
         XCTAssertNotNil(JSBigInt.construct(from: bigInt))
     }
-    
+
     func testCallFunctionWithThis() {
         // ```js
         // global.Animal = function(name, age, isCat) {
@@ -366,16 +366,16 @@ class JavaScriptKitTests: XCTestCase {
         let cat1Value = JSValue.object(cat1)
         let getIsCat = try! XCTUnwrap(getJSValue(this: cat1, name: "getIsCat").function)
         let setName = try! XCTUnwrap(getJSValue(this: cat1, name: "setName").function)
-        
+
         // Direct call without this
         XCTAssertThrowsError(try getIsCat.throws())
-        
+
         // Call with this
         let gotIsCat = getIsCat(this: cat1)
         XCTAssertEqual(gotIsCat, .boolean(true))
         XCTAssertEqual(cat1.getIsCat!(), .boolean(true))
         XCTAssertEqual(cat1Value.getIsCat(), .boolean(true))
-        
+
         // Call with this and argument
         setName(this: cat1, JSValue.string("Shiro"))
         XCTAssertEqual(getJSValue(this: cat1, name: "name"), .string("Shiro"))
@@ -384,7 +384,7 @@ class JavaScriptKitTests: XCTestCase {
         _ = cat1Value.setName("Chibi")
         XCTAssertEqual(getJSValue(this: cat1, name: "name"), .string("Chibi"))
     }
-    
+
     func testJSObjectConversion() {
         let array1 = [1, 2, 3]
         let jsArray1 = array1.jsValue.object!
@@ -392,7 +392,7 @@ class JavaScriptKitTests: XCTestCase {
         XCTAssertEqual(jsArray1[0], .number(1))
         XCTAssertEqual(jsArray1[1], .number(2))
         XCTAssertEqual(jsArray1[2], .number(3))
-        
+
         let array2: [ConvertibleToJSValue] = [1, "str", false]
         let jsArray2 = array2.jsValue.object!
         XCTAssertEqual(jsArray2.length, .number(3))
@@ -402,9 +402,9 @@ class JavaScriptKitTests: XCTestCase {
         _ = jsArray2.push!(5)
         XCTAssertEqual(jsArray2.length, .number(4))
         _ = jsArray2.push!(jsArray1)
-        
+
         XCTAssertEqual(jsArray2[4], .object(jsArray1))
-        
+
         let dict1: [String: JSValue] = [
             "prop1": 1.jsValue,
             "prop2": "foo".jsValue,
@@ -413,7 +413,7 @@ class JavaScriptKitTests: XCTestCase {
         XCTAssertEqual(jsDict1.prop1, .number(1))
         XCTAssertEqual(jsDict1.prop2, .string("foo"))
     }
-    
+
     func testObjectRefLifetime() {
         // ```js
         // global.globalObject1 = {
@@ -428,24 +428,24 @@ class JavaScriptKitTests: XCTestCase {
         //   ...
         // }
         // ```
-        
+
         let evalClosure = JSObject.global.globalObject1.eval_closure.function!
         let identity = JSClosure { $0[0] }
         let ref1 = getJSValue(this: .global, name: "globalObject1").object!
         let ref2 = evalClosure(identity, ref1).object!
         XCTAssertEqual(ref1.prop_2, .number(2))
         XCTAssertEqual(ref2.prop_2, .number(2))
-        
-#if JAVASCRIPTKIT_WITHOUT_WEAKREFS
+
+        #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
         identity.release()
-#endif
+        #endif
     }
-    
+
     func testDate() {
         let date1Milliseconds = JSDate.now()
         let date1 = JSDate(millisecondsSinceEpoch: date1Milliseconds)
         let date2 = JSDate(millisecondsSinceEpoch: date1.valueOf())
-        
+
         XCTAssertEqual(date1.valueOf(), date2.valueOf())
         XCTAssertEqual(date1.fullYear, date2.fullYear)
         XCTAssertEqual(date1.month, date2.month)
@@ -464,7 +464,7 @@ class JavaScriptKitTests: XCTestCase {
         XCTAssertEqual(date1.utcSeconds, date2.utcSeconds)
         XCTAssertEqual(date1.utcMilliseconds, date2.utcMilliseconds)
         XCTAssertEqual(date1, date2)
-        
+
         let date3 = JSDate(millisecondsSinceEpoch: 0)
         XCTAssertEqual(date3.valueOf(), 0)
         XCTAssertEqual(date3.utcFullYear, 1970)
@@ -477,10 +477,10 @@ class JavaScriptKitTests: XCTestCase {
         XCTAssertEqual(date3.utcSeconds, 0)
         XCTAssertEqual(date3.utcMilliseconds, 0)
         XCTAssertEqual(date3.toISOString(), "1970-01-01T00:00:00.000Z")
-        
+
         XCTAssertTrue(date3 < date1)
     }
-    
+
     func testError() {
         let message = "test error"
         let expectedDescription = "Error: test error"
@@ -492,21 +492,21 @@ class JavaScriptKitTests: XCTestCase {
         XCTAssertNil(JSError(from: .string("error"))?.description)
         XCTAssertEqual(JSError(from: .object(error.jsObject))?.description, expectedDescription)
     }
-    
+
     func testJSValueAccessor() {
         var globalObject1 = JSObject.global.globalObject1
         XCTAssertEqual(globalObject1.prop_1.nested_prop, .number(1))
         XCTAssertEqual(globalObject1.object!.prop_1.object!.nested_prop, .number(1))
-        
+
         XCTAssertEqual(globalObject1.prop_4[0], .number(3))
         XCTAssertEqual(globalObject1.prop_4[1], .number(4))
-        
+
         let originalProp1 = globalObject1.prop_1.object!.nested_prop
         globalObject1.prop_1.nested_prop = "bar"
         XCTAssertEqual(globalObject1.prop_1.nested_prop, .string("bar"))
         globalObject1.prop_1.nested_prop = originalProp1
     }
-    
+
     func testException() {
         // ```js
         // global.globalObject1 = {
@@ -528,33 +528,33 @@ class JavaScriptKitTests: XCTestCase {
         //
         let globalObject1 = JSObject.global.globalObject1
         let prop_9: JSValue = globalObject1.prop_9
-        
+
         // MARK: Throwing method calls
         XCTAssertThrowsError(try prop_9.object!.throwing.func1!()) { error in
             XCTAssertTrue(error is JSException)
             let errorObject = JSError(from: (error as! JSException).thrownValue)
             XCTAssertNotNil(errorObject)
         }
-        
+
         XCTAssertThrowsError(try prop_9.object!.throwing.func2!()) { error in
             XCTAssertTrue(error is JSException)
             let thrownValue = (error as! JSException).thrownValue
             XCTAssertEqual(thrownValue.string, "String Error")
         }
-        
+
         XCTAssertThrowsError(try prop_9.object!.throwing.func3!()) { error in
             XCTAssertTrue(error is JSException)
             let thrownValue = (error as! JSException).thrownValue
             XCTAssertEqual(thrownValue.number, 3.0)
         }
-        
+
         // MARK: Simple function calls
         XCTAssertThrowsError(try prop_9.func1.function!.throws()) { error in
             XCTAssertTrue(error is JSException)
             let errorObject = JSError(from: (error as! JSException).thrownValue)
             XCTAssertNotNil(errorObject)
         }
-        
+
         // MARK: Throwing constructor call
         let Animal = JSObject.global.Animal.function!
         XCTAssertNoThrow(try Animal.throws.new("Tama", 3, true))
@@ -564,16 +564,16 @@ class JavaScriptKitTests: XCTestCase {
             XCTAssertNotNil(errorObject)
         }
     }
-    
+
     func testSymbols() {
         let symbol1 = JSSymbol("abc")
         let symbol2 = JSSymbol("abc")
         XCTAssertNotEqual(symbol1, symbol2)
         XCTAssertEqual(symbol1.name, symbol2.name)
         XCTAssertEqual(symbol1.name, "abc")
-        
+
         XCTAssertEqual(JSSymbol.iterator, JSSymbol.iterator)
-        
+
         // let hasInstanceClass = {
         //   prop: function () {}
         // }.prop
@@ -584,35 +584,36 @@ class JavaScriptKitTests: XCTestCase {
         let propertyDescriptor = JSObject.global.Object.function!.new()
         propertyDescriptor.value = JSClosure { _ in .boolean(true) }.jsValue
         _ = JSObject.global.Object.function!.defineProperty!(
-            hasInstanceClass, JSSymbol.hasInstance,
+            hasInstanceClass,
+            JSSymbol.hasInstance,
             propertyDescriptor
         )
         XCTAssertEqual(hasInstanceClass[JSSymbol.hasInstance].function!().boolean, true)
         XCTAssertEqual(JSObject.global.Object.isInstanceOf(hasInstanceClass), true)
     }
-    
+
     func testJSValueDecoder() {
         struct AnimalStruct: Decodable {
             let name: String
             let age: Int
             let isCat: Bool
         }
-        
+
         let Animal = JSObject.global.Animal.function!
         let tama = try! Animal.throws.new("Tama", 3, true)
         let decoder = JSValueDecoder()
         let decodedTama = try! decoder.decode(AnimalStruct.self, from: tama.jsValue)
-        
+
         XCTAssertEqual(decodedTama.name, tama.name.string)
         XCTAssertEqual(decodedTama.name, "Tama")
-        
+
         XCTAssertEqual(decodedTama.age, tama.age.number.map(Int.init))
         XCTAssertEqual(decodedTama.age, 3)
-        
+
         XCTAssertEqual(decodedTama.isCat, tama.isCat.boolean)
         XCTAssertEqual(decodedTama.isCat, true)
     }
-    
+
     func testConvertibleToJSValue() {
         let array1 = [1, 2, 3]
         let jsArray1 = array1.jsValue.object!
@@ -620,7 +621,7 @@ class JavaScriptKitTests: XCTestCase {
         XCTAssertEqual(jsArray1[0], .number(1))
         XCTAssertEqual(jsArray1[1], .number(2))
         XCTAssertEqual(jsArray1[2], .number(3))
-        
+
         let array2: [ConvertibleToJSValue] = [1, "str", false]
         let jsArray2 = array2.jsValue.object!
         XCTAssertEqual(jsArray2.length, .number(3))
@@ -630,9 +631,9 @@ class JavaScriptKitTests: XCTestCase {
         _ = jsArray2.push!(5)
         XCTAssertEqual(jsArray2.length, .number(4))
         _ = jsArray2.push!(jsArray1)
-        
+
         XCTAssertEqual(jsArray2[4], .object(jsArray1))
-        
+
         let dict1: [String: JSValue] = [
             "prop1": 1.jsValue,
             "prop2": "foo".jsValue,

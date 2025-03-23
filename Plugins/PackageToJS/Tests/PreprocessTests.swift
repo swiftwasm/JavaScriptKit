@@ -1,15 +1,16 @@
 import Testing
+
 @testable import PackageToJS
 
 @Suite struct PreprocessTests {
     @Test func thenBlock() throws {
         let source = """
-        /* #if FOO */
-        console.log("FOO");
-        /* #else */
-        console.log("BAR");
-        /* #endif */
-        """
+            /* #if FOO */
+            console.log("FOO");
+            /* #else */
+            console.log("BAR");
+            /* #endif */
+            """
         let options = PreprocessOptions(conditions: ["FOO": true])
         let result = try preprocess(source: source, options: options)
         #expect(result == "console.log(\"FOO\");\n")
@@ -17,12 +18,12 @@ import Testing
 
     @Test func elseBlock() throws {
         let source = """
-        /* #if FOO */
-        console.log("FOO");
-        /* #else */
-        console.log("BAR");
-        /* #endif */
-        """
+            /* #if FOO */
+            console.log("FOO");
+            /* #else */
+            console.log("BAR");
+            /* #endif */
+            """
         let options = PreprocessOptions(conditions: ["FOO": false])
         let result = try preprocess(source: source, options: options)
         #expect(result == "console.log(\"BAR\");\n")
@@ -30,8 +31,8 @@ import Testing
 
     @Test func onelineIf() throws {
         let source = """
-        /* #if FOO */console.log("FOO");/* #endif */
-        """
+            /* #if FOO */console.log("FOO");/* #endif */
+            """
         let options = PreprocessOptions(conditions: ["FOO": true])
         let result = try preprocess(source: source, options: options)
         #expect(result == "console.log(\"FOO\");")
@@ -39,9 +40,9 @@ import Testing
 
     @Test func undefinedVariable() throws {
         let source = """
-        /* #if FOO */
-        /* #endif */
-        """
+            /* #if FOO */
+            /* #endif */
+            """
         let options = PreprocessOptions(conditions: [:])
         #expect(throws: Error.self) {
             try preprocess(source: source, options: options)
@@ -57,8 +58,8 @@ import Testing
 
     @Test func missingEndOfDirective() throws {
         let source = """
-        /* #if FOO
-        """
+            /* #if FOO
+            """
         #expect(throws: Error.self) {
             try preprocess(source: source, options: PreprocessOptions())
         }
@@ -72,17 +73,17 @@ import Testing
     ])
     func nestedIfDirectives(foo: Bool, bar: Bool, expected: String) throws {
         let source = """
-        /* #if FOO */
-        console.log("FOO");
-        /* #if BAR */
-        console.log("FOO & BAR");
-        /* #else */
-        console.log("FOO & !BAR");
-        /* #endif */
-        /* #else */
-        console.log("!FOO");
-        /* #endif */
-        """
+            /* #if FOO */
+            console.log("FOO");
+            /* #if BAR */
+            console.log("FOO & BAR");
+            /* #else */
+            console.log("FOO & !BAR");
+            /* #endif */
+            /* #else */
+            console.log("!FOO");
+            /* #endif */
+            """
         let options = PreprocessOptions(conditions: ["FOO": foo, "BAR": bar])
         let result = try preprocess(source: source, options: options)
         #expect(result == expected)
@@ -90,26 +91,28 @@ import Testing
 
     @Test func multipleSubstitutions() throws {
         let source = """
-        const name = "@NAME@";
-        const version = "@VERSION@";
-        """
+            const name = "@NAME@";
+            const version = "@VERSION@";
+            """
         let options = PreprocessOptions(substitutions: [
             "NAME": "MyApp",
-            "VERSION": "1.0.0"
+            "VERSION": "1.0.0",
         ])
         let result = try preprocess(source: source, options: options)
-        #expect(result == """
-        const name = "MyApp";
-        const version = "1.0.0";
-        """)
+        #expect(
+            result == """
+                const name = "MyApp";
+                const version = "1.0.0";
+                """
+        )
     }
 
     @Test func invalidVariableName() throws {
         let source = """
-        /* #if invalid-name */
-        console.log("error");
-        /* #endif */
-        """
+            /* #if invalid-name */
+            console.log("error");
+            /* #endif */
+            """
         #expect(throws: Error.self) {
             try preprocess(source: source, options: PreprocessOptions())
         }
@@ -117,10 +120,10 @@ import Testing
 
     @Test func emptyBlocks() throws {
         let source = """
-        /* #if FOO */
-        /* #else */
-        /* #endif */
-        """
+            /* #if FOO */
+            /* #else */
+            /* #endif */
+            """
         let options = PreprocessOptions(conditions: ["FOO": true])
         let result = try preprocess(source: source, options: options)
         #expect(result == "")
@@ -128,9 +131,9 @@ import Testing
 
     @Test func ignoreNonDirectiveComments() throws {
         let source = """
-        /* Normal comment */
-        /** Doc comment */
-        """
+            /* Normal comment */
+            /** Doc comment */
+            """
         let result = try preprocess(source: source, options: PreprocessOptions())
         #expect(result == source)
     }

@@ -13,11 +13,13 @@ _ = document.body.appendChild(divElement)
 
 var buttonElement = document.createElement("button")
 buttonElement.innerText = "Click me"
-buttonElement.onclick = JSValue.object(JSClosure { _ in
-    count += 1    
-    divElement.innerText = .string("Count \(count)")
-    return .undefined
-})
+buttonElement.onclick = JSValue.object(
+    JSClosure { _ in
+        count += 1
+        divElement.innerText = .string("Count \(count)")
+        return .undefined
+    }
+)
 
 _ = document.body.appendChild(buttonElement)
 

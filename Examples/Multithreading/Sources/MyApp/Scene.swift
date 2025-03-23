@@ -60,7 +60,7 @@ func createDemoScene(size: Int) -> Scene {
                         surface: .diffuse
                     )
                 )
-            )
+            ),
         ],
         lights: [
             .spherical(
@@ -83,7 +83,7 @@ func createDemoScene(size: Int) -> Scene {
                     color: Color(red: 0.8, green: 0.8, blue: 0.8),
                     intensity: 0.2
                 )
-            )
+            ),
         ],
         shadowBias: 1e-13,
         maxRecursionDepth: 10

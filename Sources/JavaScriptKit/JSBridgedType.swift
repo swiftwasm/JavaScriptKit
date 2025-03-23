@@ -5,12 +5,12 @@ public protocol JSBridgedType: JSValueCompatible, CustomStringConvertible {
     init?(from value: JSValue)
 }
 
-public extension JSBridgedType {
-    static func construct(from value: JSValue) -> Self? {
+extension JSBridgedType {
+    public static func construct(from value: JSValue) -> Self? {
         Self(from: value)
     }
 
-    var description: String { jsValue.description }
+    public var description: String { jsValue.description }
 }
 
 /// Conform to this protocol when your Swift class wraps a JavaScript class.
@@ -27,15 +27,15 @@ public protocol JSBridgedClass: JSBridgedType {
     init(unsafelyWrapping jsObject: JSObject)
 }
 
-public extension JSBridgedClass {
-    var jsValue: JSValue { jsObject.jsValue }
+extension JSBridgedClass {
+    public var jsValue: JSValue { jsObject.jsValue }
 
-    init?(from value: JSValue) {
+    public init?(from value: JSValue) {
         guard let object = value.object else { return nil }
         self.init(from: object)
     }
 
-    init?(from object: JSObject) {
+    public init?(from object: JSObject) {
         guard let constructor = Self.constructor, object.isInstanceOf(constructor) else { return nil }
         self.init(unsafelyWrapping: object)
     }

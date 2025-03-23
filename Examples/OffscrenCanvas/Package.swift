@@ -6,7 +6,7 @@ let package = Package(
     name: "Example",
     platforms: [.macOS("15"), .iOS("18"), .watchOS("11"), .tvOS("18"), .visionOS("2")],
     dependencies: [
-        .package(path: "../../"),
+        .package(path: "../../")
     ],
     targets: [
         .executableTarget(
@@ -15,6 +15,6 @@ let package = Package(
                 .product(name: "JavaScriptKit", package: "JavaScriptKit"),
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
             ]
-        ),
+        )
     ]
 )

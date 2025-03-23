@@ -7,7 +7,8 @@ let package = Package(
     products: [
         .library(
             name: "Counter",
-            targets: ["Counter"]),
+            targets: ["Counter"]
+        )
     ],
     dependencies: [.package(name: "JavaScriptKit", path: "../../")],
     targets: [
@@ -15,13 +16,14 @@ let package = Package(
             name: "Counter",
             dependencies: [
                 .product(name: "JavaScriptKit", package: "JavaScriptKit")
-            ]),
+            ]
+        ),
         .testTarget(
             name: "CounterTests",
             dependencies: [
                 "Counter",
                 // This is needed to run the tests in the JavaScript event loop
-                .product(name: "JavaScriptEventLoopTestSupport", package: "JavaScriptKit")
+                .product(name: "JavaScriptEventLoopTestSupport", package: "JavaScriptKit"),
             ]
         ),
     ]
