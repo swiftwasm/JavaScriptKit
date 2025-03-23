@@ -1,6 +1,6 @@
 import ChibiRay
-import JavaScriptKit
 import JavaScriptEventLoop
+import JavaScriptKit
 
 JavaScriptEventLoop.installGlobalExecutor()
 WebWorkerTaskExecutor.installGlobalExecutor()
@@ -8,12 +8,12 @@ WebWorkerTaskExecutor.installGlobalExecutor()
 func renderInCanvas(ctx: JSObject, image: ImageView) {
     let imageData = ctx.createImageData!(image.width, image.height).object!
     let data = imageData.data.object!
-    
+
     for y in 0..<image.height {
         for x in 0..<image.width {
             let index = (y * image.width + x) * 4
             let pixel = image[x, y]
-            data[index]     = .number(Double(pixel.red * 255))
+            data[index] = .number(Double(pixel.red * 255))
             data[index + 1] = .number(Double(pixel.green * 255))
             data[index + 2] = .number(Double(pixel.blue * 255))
             data[index + 3] = .number(Double(255))
@@ -57,7 +57,13 @@ struct Work: Sendable {
     }
 }
 
-func render(scene: Scene, ctx: JSObject, renderTimeElement: JSObject, concurrency: Int, executor: (some TaskExecutor)?) async {
+func render(
+    scene: Scene,
+    ctx: JSObject,
+    renderTimeElement: JSObject,
+    concurrency: Int,
+    executor: (some TaskExecutor)?
+) async {
 
     let imageBuffer = UnsafeMutableBufferPointer<Color>.allocate(capacity: scene.width * scene.height)
     // Initialize the buffer with black color
@@ -73,12 +79,15 @@ func render(scene: Scene, ctx: JSObject, renderTimeElement: JSObject, concurrenc
     }
 
     var checkTimer: JSValue?
-    checkTimer = JSObject.global.setInterval!(JSClosure { _ in
-        print("Checking thread work...")
-        renderInCanvas(ctx: ctx, image: imageView)
-        updateRenderTime()
-        return .undefined
-    }, 250)
+    checkTimer = JSObject.global.setInterval!(
+        JSClosure { _ in
+            print("Checking thread work...")
+            renderInCanvas(ctx: ctx, image: imageView)
+            updateRenderTime()
+            return .undefined
+        },
+        250
+    )
 
     await withTaskGroup(of: Void.self) { group in
         let yStride = scene.height / concurrency
@@ -117,10 +126,16 @@ func onClick() async throws {
 
     let scene = createDemoScene(size: size)
     let executor = background ? try await WebWorkerTaskExecutor(numberOfThreads: concurrency) : nil
-    canvasElement.width  = .number(Double(scene.width))
+    canvasElement.width = .number(Double(scene.width))
     canvasElement.height = .number(Double(scene.height))
 
-    await render(scene: scene, ctx: ctx, renderTimeElement: renderTimeElement, concurrency: concurrency, executor: executor)
+    await render(
+        scene: scene,
+        ctx: ctx,
+        renderTimeElement: renderTimeElement,
+        concurrency: concurrency,
+        executor: executor
+    )
     executor?.terminate()
     print("Render done")
 }
@@ -130,18 +145,20 @@ func main() async throws {
     let concurrencyElement = JSObject.global.document.getElementById("concurrency").object!
     concurrencyElement.value = JSObject.global.navigator.hardwareConcurrency
 
-    _ = renderButtonElement.addEventListener!("click", JSClosure { _ in
-        Task {
-            try await onClick()
+    _ = renderButtonElement.addEventListener!(
+        "click",
+        JSClosure { _ in
+            Task {
+                try await onClick()
+            }
+            return JSValue.undefined
         }
-        return JSValue.undefined
-    })
+    )
 }
 
 Task {
     try await main()
 }
-
 
 #if canImport(wasi_pthread)
 import wasi_pthread

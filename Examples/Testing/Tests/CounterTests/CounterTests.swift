@@ -1,3 +1,5 @@
+import XCTest
+
 @testable import Counter
 
 #if canImport(Testing)
@@ -17,8 +19,6 @@ import Testing
 }
 
 #endif
-
-import XCTest
 
 class CounterTests: XCTestCase {
     func testIncrement() async {

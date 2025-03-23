@@ -107,8 +107,11 @@ struct MiniMake {
 
     /// Adds a task to the build system
     mutating func addTask(
-        inputFiles: [BuildPath] = [], inputTasks: [TaskKey] = [], output: BuildPath,
-        attributes: [TaskAttribute] = [], salt: (any Encodable)? = nil,
+        inputFiles: [BuildPath] = [],
+        inputTasks: [TaskKey] = [],
+        output: BuildPath,
+        attributes: [TaskAttribute] = [],
+        salt: (any Encodable)? = nil,
         build: @escaping (_ task: Task, _ scope: VariableScope) throws -> Void = { _, _ in }
     ) -> TaskKey {
         let taskKey = TaskKey(id: output.description)
@@ -118,12 +121,20 @@ struct MiniMake {
             return try encoder.encode($0)
         }
         let info = TaskInfo(
-            wants: inputTasks, inputs: inputFiles, output: output, attributes: attributes,
+            wants: inputTasks,
+            inputs: inputFiles,
+            output: output,
+            attributes: attributes,
             salt: saltData
         )
         self.tasks[taskKey] = Task(
-            info: info, wants: Set(inputTasks), attributes: Set(attributes),
-            key: taskKey, build: build, isDone: false)
+            info: info,
+            wants: Set(inputTasks),
+            attributes: Set(attributes),
+            key: taskKey,
+            build: build,
+            isDone: false
+        )
         return taskKey
     }
 
@@ -234,7 +245,9 @@ struct MiniMake {
                 // Ignore directory modification times
                 var isDirectory: ObjCBool = false
                 let fileExists = FileManager.default.fileExists(
-                    atPath: inputURL.path, isDirectory: &isDirectory)
+                    atPath: inputURL.path,
+                    isDirectory: &isDirectory
+                )
                 if fileExists && isDirectory.boolValue {
                     return false
                 }

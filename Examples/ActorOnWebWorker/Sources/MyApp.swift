@@ -144,17 +144,21 @@ final class App {
     }
 
     private func setupEventHandlers() {
-        indexButton.onclick = .object(JSClosure { [weak self] _ in
-            guard let self else { return .undefined }
-            self.performIndex()
-            return .undefined
-        })
+        indexButton.onclick = .object(
+            JSClosure { [weak self] _ in
+                guard let self else { return .undefined }
+                self.performIndex()
+                return .undefined
+            }
+        )
 
-        searchButton.onclick = .object(JSClosure { [weak self] _ in
-            guard let self else { return .undefined }
-            self.performSearch()
-            return .undefined
-        })
+        searchButton.onclick = .object(
+            JSClosure { [weak self] _ in
+                guard let self else { return .undefined }
+                self.performSearch()
+                return .undefined
+            }
+        )
     }
 
     private func performIndex() {
@@ -221,7 +225,8 @@ final class App {
                     "padding: 10px; margin: 5px 0; background: #f5f5f5; border-left: 3px solid blue;"
                 )
                 resultItem.innerHTML = .string(
-                    "<strong>Result \(index + 1):</strong> \(result.context)")
+                    "<strong>Result \(index + 1):</strong> \(result.context)"
+                )
                 _ = resultsElement.appendChild(resultItem)
             }
         }
@@ -245,18 +250,18 @@ final class App {
 }
 
 #if canImport(wasi_pthread)
-    import wasi_pthread
-    import WASILibc
+import wasi_pthread
+import WASILibc
 
-    /// Trick to avoid blocking the main thread. pthread_mutex_lock function is used by
-    /// the Swift concurrency runtime.
-    @_cdecl("pthread_mutex_lock")
-    func pthread_mutex_lock(_ mutex: UnsafeMutablePointer<pthread_mutex_t>) -> Int32 {
-        // DO NOT BLOCK MAIN THREAD
-        var ret: Int32
-        repeat {
-            ret = pthread_mutex_trylock(mutex)
-        } while ret == EBUSY
-        return ret
-    }
+/// Trick to avoid blocking the main thread. pthread_mutex_lock function is used by
+/// the Swift concurrency runtime.
+@_cdecl("pthread_mutex_lock")
+func pthread_mutex_lock(_ mutex: UnsafeMutablePointer<pthread_mutex_t>) -> Int32 {
+    // DO NOT BLOCK MAIN THREAD
+    var ret: Int32
+    repeat {
+        ret = pthread_mutex_trylock(mutex)
+    } while ret == EBUSY
+    return ret
+}
 #endif

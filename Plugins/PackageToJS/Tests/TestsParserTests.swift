@@ -6,7 +6,8 @@ import Testing
 @Suite struct TestsParserTests {
     func assertFancyFormatSnapshot(
         _ input: String,
-        filePath: String = #filePath, function: String = #function,
+        filePath: String = #filePath,
+        function: String = #function,
         sourceLocation: SourceLocation = #_sourceLocation
     ) throws {
         var output = ""
@@ -18,8 +19,11 @@ import Testing
         }
         parser.finalize()
         try assertSnapshot(
-            filePath: filePath, function: function, sourceLocation: sourceLocation,
-            input: Data(output.utf8), fileExtension: "txt"
+            filePath: filePath,
+            function: function,
+            sourceLocation: sourceLocation,
+            input: Data(output.utf8),
+            fileExtension: "txt"
         )
     }
 

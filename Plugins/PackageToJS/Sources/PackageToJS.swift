@@ -73,7 +73,10 @@ struct PackageToJS {
             testLibraryArguments.append("--list-tests")
         }
         if let prelude = testOptions.prelude {
-            let preludeURL = URL(fileURLWithPath: prelude, relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath))
+            let preludeURL = URL(
+                fileURLWithPath: prelude,
+                relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+            )
             testJsArguments.append("--prelude")
             testJsArguments.append(preludeURL.path)
         }
@@ -97,9 +100,11 @@ struct PackageToJS {
             extraArguments.append(contentsOf: testOptions.filter)
 
             try PackageToJS.runSingleTestingLibrary(
-                testRunner: testRunner, currentDirectoryURL: currentDirectoryURL,
+                testRunner: testRunner,
+                currentDirectoryURL: currentDirectoryURL,
                 extraArguments: extraArguments,
-                testParser: testOptions.packageOptions.verbose ? nil : FancyTestsParser(write: { print($0, terminator: "") }),
+                testParser: testOptions.packageOptions.verbose
+                    ? nil : FancyTestsParser(write: { print($0, terminator: "") }),
                 testOptions: testOptions
             )
         }
@@ -120,14 +125,17 @@ struct PackageToJS {
             }
 
             try PackageToJS.runSingleTestingLibrary(
-                testRunner: testRunner, currentDirectoryURL: currentDirectoryURL,
+                testRunner: testRunner,
+                currentDirectoryURL: currentDirectoryURL,
                 extraArguments: extraArguments,
                 testOptions: testOptions
             )
         }
 
         if testOptions.packageOptions.enableCodeCoverage {
-            let profrawFiles = [xctestCoverageFile.path, swiftTestingCoverageFile.path].filter { FileManager.default.fileExists(atPath: $0) }
+            let profrawFiles = [xctestCoverageFile.path, swiftTestingCoverageFile.path].filter {
+                FileManager.default.fileExists(atPath: $0)
+            }
             do {
                 try PackageToJS.postProcessCoverageFiles(outputDir: outputDir, profrawFiles: profrawFiles)
             } catch {
@@ -254,7 +262,9 @@ extension PackagingSystem {
     func createDirectory(atPath: String) throws {
         guard !FileManager.default.fileExists(atPath: atPath) else { return }
         try FileManager.default.createDirectory(
-            atPath: atPath, withIntermediateDirectories: true, attributes: nil
+            atPath: atPath,
+            withIntermediateDirectories: true,
+            attributes: nil
         )
     }
 
@@ -264,7 +274,8 @@ extension PackagingSystem {
         }
         try FileManager.default.copyItem(atPath: from, toPath: to)
         try FileManager.default.setAttributes(
-            [.modificationDate: Date()], ofItemAtPath: to
+            [.modificationDate: Date()],
+            ofItemAtPath: to
         )
     }
 
@@ -316,9 +327,9 @@ internal func which(_ executable: String) throws -> URL {
     }
     let pathSeparator: Character
     #if os(Windows)
-        pathSeparator = ";"
+    pathSeparator = ";"
     #else
-        pathSeparator = ":"
+    pathSeparator = ":"
     #endif
     let paths = ProcessInfo.processInfo.environment["PATH"]!.split(separator: pathSeparator)
     for path in paths {
@@ -401,10 +412,14 @@ struct PackagingPlanner {
         buildOptions: PackageToJS.BuildOptions
     ) throws -> MiniMake.TaskKey {
         let (allTasks, _, _, _) = try planBuildInternal(
-            make: &make, noOptimize: buildOptions.noOptimize, debugInfoFormat: buildOptions.debugInfoFormat
+            make: &make,
+            noOptimize: buildOptions.noOptimize,
+            debugInfoFormat: buildOptions.debugInfoFormat
         )
         return make.addTask(
-            inputTasks: allTasks, output: BuildPath(phony: "all"), attributes: [.phony, .silent]
+            inputTasks: allTasks,
+            output: BuildPath(phony: "all"),
+            attributes: [.phony, .silent]
         )
     }
 
@@ -420,7 +435,9 @@ struct PackagingPlanner {
     ) {
         // Prepare output directory
         let outputDirTask = make.addTask(
-            inputFiles: [selfPath], output: outputDir, attributes: [.silent]
+            inputFiles: [selfPath],
+            output: outputDir,
+            attributes: [.silent]
         ) {
             try system.createDirectory(atPath: $1.resolve(path: $0.output).path)
         }
@@ -438,7 +455,9 @@ struct PackagingPlanner {
         }
 
         let intermediatesDirTask = make.addTask(
-            inputFiles: [selfPath], output: intermediatesDir, attributes: [.silent]
+            inputFiles: [selfPath],
+            output: intermediatesDir,
+            attributes: [.silent]
         ) {
             try system.createDirectory(atPath: $1.resolve(path: $0.output).path)
         }
@@ -458,35 +477,50 @@ struct PackagingPlanner {
                 wasmOptInputFile = intermediatesDir.appending(path: wasmFilename + ".no-dwarf")
                 // First, strip DWARF sections as their existence enables DWARF preserving mode in wasm-opt
                 wasmOptInputTask = make.addTask(
-                    inputFiles: [selfPath, wasmProductArtifact], inputTasks: [outputDirTask, intermediatesDirTask],
+                    inputFiles: [selfPath, wasmProductArtifact],
+                    inputTasks: [outputDirTask, intermediatesDirTask],
                     output: wasmOptInputFile
                 ) {
                     print("Stripping DWARF debug info...")
-                    try system.wasmOpt(["--strip-dwarf", "--debuginfo"], input: $1.resolve(path: wasmProductArtifact).path, output: $1.resolve(path: $0.output).path)
+                    try system.wasmOpt(
+                        ["--strip-dwarf", "--debuginfo"],
+                        input: $1.resolve(path: wasmProductArtifact).path,
+                        output: $1.resolve(path: $0.output).path
+                    )
                 }
             }
             // Then, run wasm-opt with all optimizations
             wasm = make.addTask(
-                inputFiles: [selfPath, wasmOptInputFile], inputTasks: [outputDirTask] + (wasmOptInputTask.map { [$0] } ?? []),
+                inputFiles: [selfPath, wasmOptInputFile],
+                inputTasks: [outputDirTask] + (wasmOptInputTask.map { [$0] } ?? []),
                 output: finalWasmPath
             ) {
                 print("Optimizing the wasm file...")
-                try system.wasmOpt(["-Os"] + (debugInfoFormat != .none ? ["--debuginfo"] : []), input: $1.resolve(path: wasmOptInputFile).path, output: $1.resolve(path: $0.output).path)
+                try system.wasmOpt(
+                    ["-Os"] + (debugInfoFormat != .none ? ["--debuginfo"] : []),
+                    input: $1.resolve(path: wasmOptInputFile).path,
+                    output: $1.resolve(path: $0.output).path
+                )
             }
         } else {
             // Copy the wasm product artifact
             wasm = make.addTask(
-                inputFiles: [selfPath, wasmProductArtifact], inputTasks: [outputDirTask],
+                inputFiles: [selfPath, wasmProductArtifact],
+                inputTasks: [outputDirTask],
                 output: finalWasmPath
             ) {
-                try system.syncFile(from: $1.resolve(path: wasmProductArtifact).path, to: $1.resolve(path: $0.output).path)
+                try system.syncFile(
+                    from: $1.resolve(path: wasmProductArtifact).path,
+                    to: $1.resolve(path: $0.output).path
+                )
             }
         }
         packageInputs.append(wasm)
 
         let wasmImportsPath = intermediatesDir.appending(path: "wasm-imports.json")
         let wasmImportsTask = make.addTask(
-            inputFiles: [selfPath, finalWasmPath], inputTasks: [outputDirTask, intermediatesDirTask, wasm],
+            inputFiles: [selfPath, finalWasmPath],
+            inputTasks: [outputDirTask, intermediatesDirTask, wasm],
             output: wasmImportsPath
         ) {
             let metadata = try parseImports(
@@ -502,14 +536,20 @@ struct PackagingPlanner {
 
         let platformsDir = outputDir.appending(path: "platforms")
         let platformsDirTask = make.addTask(
-            inputFiles: [selfPath], output: platformsDir, attributes: [.silent]
+            inputFiles: [selfPath],
+            output: platformsDir,
+            attributes: [.silent]
         ) {
             try system.createDirectory(atPath: $1.resolve(path: $0.output).path)
         }
 
         let packageJsonTask = planCopyTemplateFile(
-            make: &make, file: "Plugins/PackageToJS/Templates/package.json", output: "package.json", outputDirTask: outputDirTask,
-            inputFiles: [], inputTasks: []
+            make: &make,
+            file: "Plugins/PackageToJS/Templates/package.json",
+            output: "package.json",
+            outputDirTask: outputDirTask,
+            inputFiles: [],
+            inputTasks: []
         )
         packageInputs.append(packageJsonTask)
 
@@ -526,11 +566,17 @@ struct PackagingPlanner {
             ("Plugins/PackageToJS/Templates/platforms/node.d.ts", "platforms/node.d.ts"),
             ("Sources/JavaScriptKit/Runtime/index.mjs", "runtime.js"),
         ] {
-            packageInputs.append(planCopyTemplateFile(
-                make: &make, file: file, output: output, outputDirTask: outputDirTask,
-                inputFiles: [wasmImportsPath], inputTasks: [platformsDirTask, wasmImportsTask],
-                wasmImportsPath: wasmImportsPath
-            ))
+            packageInputs.append(
+                planCopyTemplateFile(
+                    make: &make,
+                    file: file,
+                    output: output,
+                    outputDirTask: outputDirTask,
+                    inputFiles: [wasmImportsPath],
+                    inputTasks: [platformsDirTask, wasmImportsTask],
+                    wasmImportsPath: wasmImportsPath
+                )
+            )
         }
         return (packageInputs, outputDirTask, intermediatesDirTask, packageJsonTask)
     }
@@ -540,24 +586,30 @@ struct PackagingPlanner {
         make: inout MiniMake
     ) throws -> (rootTask: MiniMake.TaskKey, binDir: BuildPath) {
         var (allTasks, outputDirTask, intermediatesDirTask, packageJsonTask) = try planBuildInternal(
-            make: &make, noOptimize: false, debugInfoFormat: .dwarf
+            make: &make,
+            noOptimize: false,
+            debugInfoFormat: .dwarf
         )
 
         // Install npm dependencies used in the test harness
-        allTasks.append(make.addTask(
-            inputFiles: [
-                selfPath,
-                outputDir.appending(path: "package.json"),
-            ], inputTasks: [intermediatesDirTask, packageJsonTask],
-            output: intermediatesDir.appending(path: "npm-install.stamp")
-        ) {
-            try system.npmInstall(packageDir: $1.resolve(path: outputDir).path)
-            try system.writeFile(atPath: $1.resolve(path: $0.output).path, content: Data())
-        })
+        allTasks.append(
+            make.addTask(
+                inputFiles: [
+                    selfPath,
+                    outputDir.appending(path: "package.json"),
+                ],
+                inputTasks: [intermediatesDirTask, packageJsonTask],
+                output: intermediatesDir.appending(path: "npm-install.stamp")
+            ) {
+                try system.npmInstall(packageDir: $1.resolve(path: outputDir).path)
+                try system.writeFile(atPath: $1.resolve(path: $0.output).path, content: Data())
+            }
+        )
 
         let binDir = outputDir.appending(path: "bin")
         let binDirTask = make.addTask(
-            inputFiles: [selfPath], inputTasks: [outputDirTask],
+            inputFiles: [selfPath],
+            inputTasks: [outputDirTask],
             output: binDir
         ) {
             try system.createDirectory(atPath: $1.resolve(path: $0.output).path)
@@ -571,13 +623,21 @@ struct PackagingPlanner {
             ("Plugins/PackageToJS/Templates/test.browser.html", "test.browser.html"),
             ("Plugins/PackageToJS/Templates/bin/test.js", "bin/test.js"),
         ] {
-            allTasks.append(planCopyTemplateFile(
-                make: &make, file: file, output: output, outputDirTask: outputDirTask,
-                inputFiles: [], inputTasks: [binDirTask]
-            ))
+            allTasks.append(
+                planCopyTemplateFile(
+                    make: &make,
+                    file: file,
+                    output: output,
+                    outputDirTask: outputDirTask,
+                    inputFiles: [],
+                    inputTasks: [binDirTask]
+                )
+            )
         }
         let rootTask = make.addTask(
-            inputTasks: allTasks, output: BuildPath(phony: "all"), attributes: [.phony, .silent]
+            inputTasks: allTasks,
+            output: BuildPath(phony: "all"),
+            attributes: [.phony, .silent]
         )
         return (rootTask, binDir)
     }
@@ -610,14 +670,19 @@ struct PackagingPlanner {
         let salt = Salt(conditions: conditions, substitutions: constantSubstitutions)
 
         return make.addTask(
-            inputFiles: [selfPath, inputPath] + inputFiles, inputTasks: [outputDirTask] + inputTasks,
-            output: outputDir.appending(path: output), salt: salt
+            inputFiles: [selfPath, inputPath] + inputFiles,
+            inputTasks: [outputDirTask] + inputTasks,
+            output: outputDir.appending(path: output),
+            salt: salt
         ) {
             var substitutions = constantSubstitutions
 
             if let wasmImportsPath = wasmImportsPath {
                 let wasmImportsPath = $1.resolve(path: wasmImportsPath)
-                let importEntries = try JSONDecoder().decode([ImportEntry].self, from: Data(contentsOf: wasmImportsPath))
+                let importEntries = try JSONDecoder().decode(
+                    [ImportEntry].self,
+                    from: Data(contentsOf: wasmImportsPath)
+                )
                 let memoryImport = importEntries.first {
                     $0.module == "env" && $0.name == "memory"
                 }

@@ -15,12 +15,15 @@ import Testing
 
         func wasmOpt(_ arguments: [String], input: String, output: String) throws {
             try FileManager.default.copyItem(
-                at: URL(fileURLWithPath: input), to: URL(fileURLWithPath: output))
+                at: URL(fileURLWithPath: input),
+                to: URL(fileURLWithPath: output)
+            )
         }
     }
 
     func snapshotBuildPlan(
-        filePath: String = #filePath, function: String = #function,
+        filePath: String = #filePath,
+        function: String = #function,
         sourceLocation: SourceLocation = #_sourceLocation,
         variant: String? = nil,
         body: (inout MiniMake) throws -> MiniMake.TaskKey
@@ -29,8 +32,11 @@ import Testing
         let rootKey = try body(&make)
         let fingerprint = try make.computeFingerprint(root: rootKey, prettyPrint: true)
         try assertSnapshot(
-            filePath: filePath, function: function, sourceLocation: sourceLocation,
-            variant: variant, input: fingerprint
+            filePath: filePath,
+            function: function,
+            sourceLocation: sourceLocation,
+            variant: variant,
+            input: fingerprint
         )
     }
 
@@ -39,11 +45,19 @@ import Testing
     @Test(arguments: [
         (variant: "debug", configuration: "debug", noOptimize: false, debugInfoFormat: DebugInfoFormat.none),
         (variant: "release", configuration: "release", noOptimize: false, debugInfoFormat: DebugInfoFormat.none),
-        (variant: "release_no_optimize", configuration: "release", noOptimize: true, debugInfoFormat: DebugInfoFormat.none),
+        (
+            variant: "release_no_optimize", configuration: "release", noOptimize: true,
+            debugInfoFormat: DebugInfoFormat.none
+        ),
         (variant: "release_dwarf", configuration: "release", noOptimize: false, debugInfoFormat: DebugInfoFormat.dwarf),
         (variant: "release_name", configuration: "release", noOptimize: false, debugInfoFormat: DebugInfoFormat.name),
     ])
-    func planBuild(variant: String, configuration: String, noOptimize: Bool, debugInfoFormat: PackageToJS.DebugInfoFormat) throws {
+    func planBuild(
+        variant: String,
+        configuration: String,
+        noOptimize: Bool,
+        debugInfoFormat: PackageToJS.DebugInfoFormat
+    ) throws {
         let options = PackageToJS.PackageOptions()
         let system = TestPackagingSystem()
         let planner = PackagingPlanner(
@@ -88,7 +102,7 @@ import Testing
             selfPath: BuildPath(prefix: "PLANNER_SOURCE_PATH"),
             system: system
         )
-        try snapshotBuildPlan() { make in
+        try snapshotBuildPlan { make in
             let (root, binDir) = try planner.planTestBuild(make: &make)
             #expect(binDir.description == "$OUTPUT/bin")
             return root

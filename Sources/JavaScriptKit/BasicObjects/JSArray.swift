@@ -98,8 +98,8 @@ private func getObjectValuesLength(_ object: JSObject) -> Int {
     return Int(values.length.number!)
 }
 
-public extension JSValue {
-    var array: JSArray? {
+extension JSValue {
+    public var array: JSArray? {
         object.flatMap(JSArray.init)
     }
 }

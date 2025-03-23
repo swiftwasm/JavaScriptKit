@@ -54,7 +54,10 @@ extension Trait where Self == ConditionTrait {
 
     static func copyRepository(to destination: URL) throws {
         try FileManager.default.createDirectory(
-            atPath: destination.path, withIntermediateDirectories: true, attributes: nil)
+            atPath: destination.path,
+            withIntermediateDirectories: true,
+            attributes: nil
+        )
         let ignore = [
             ".git",
             ".vscode",
@@ -81,7 +84,9 @@ extension Trait where Self == ConditionTrait {
             do {
                 try FileManager.default.createDirectory(
                     at: destinationPath.deletingLastPathComponent(),
-                    withIntermediateDirectories: true, attributes: nil)
+                    withIntermediateDirectories: true,
+                    attributes: nil
+                )
                 try FileManager.default.copyItem(at: sourcePath, to: destinationPath)
             } catch {
                 print("Failed to copy \(sourcePath) to \(destinationPath): \(error)")
@@ -101,7 +106,9 @@ extension Trait where Self == ConditionTrait {
                 process.executableURL = URL(
                     fileURLWithPath: "swift",
                     relativeTo: URL(
-                        fileURLWithPath: try #require(Self.getSwiftPath())))
+                        fileURLWithPath: try #require(Self.getSwiftPath())
+                    )
+                )
                 process.arguments = args
                 process.currentDirectoryURL = destination.appending(path: path)
                 process.environment = ProcessInfo.processInfo.environment.merging(env) { _, new in
@@ -141,7 +148,10 @@ extension Trait where Self == ConditionTrait {
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "--debug-info-format", "dwarf"], [:])
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "--debug-info-format", "name"], [:])
-            try runSwift(["package", "--swift-sdk", swiftSDKID, "-Xswiftc", "-DJAVASCRIPTKIT_WITHOUT_WEAKREFS", "js"], [:])
+            try runSwift(
+                ["package", "--swift-sdk", swiftSDKID, "-Xswiftc", "-DJAVASCRIPTKIT_WITHOUT_WEAKREFS", "js"],
+                [:]
+            )
         }
     }
 
@@ -152,17 +162,23 @@ extension Trait where Self == ConditionTrait {
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "test"], [:])
             try withTemporaryDirectory(body: { tempDir, _ in
                 let scriptContent = """
-                const fs = require('fs');
-                const path = require('path');
-                const scriptPath = path.join(__dirname, 'test.txt');
-                fs.writeFileSync(scriptPath, 'Hello, world!');
-                """
+                    const fs = require('fs');
+                    const path = require('path');
+                    const scriptPath = path.join(__dirname, 'test.txt');
+                    fs.writeFileSync(scriptPath, 'Hello, world!');
+                    """
                 try scriptContent.write(to: tempDir.appending(path: "script.js"), atomically: true, encoding: .utf8)
                 let scriptPath = tempDir.appending(path: "script.js")
-                try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "test", "-Xnode=--require=\(scriptPath.path)"], [:])
+                try runSwift(
+                    ["package", "--swift-sdk", swiftSDKID, "js", "test", "-Xnode=--require=\(scriptPath.path)"],
+                    [:]
+                )
                 let testPath = tempDir.appending(path: "test.txt")
                 try #require(FileManager.default.fileExists(atPath: testPath.path), "test.txt should exist")
-                try #require(try String(contentsOf: testPath, encoding: .utf8) == "Hello, world!", "test.txt should be created by the script")
+                try #require(
+                    try String(contentsOf: testPath, encoding: .utf8) == "Hello, world!",
+                    "test.txt should be created by the script"
+                )
             })
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser"], [:])
         }
@@ -174,15 +190,22 @@ extension Trait where Self == ConditionTrait {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
         let swiftPath = try #require(Self.getSwiftPath())
         try withPackage(at: "Examples/Testing") { packageDir, runSwift in
-            try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "test", "--enable-code-coverage"], [
-                "LLVM_PROFDATA_PATH": URL(fileURLWithPath: swiftPath).appending(path: "llvm-profdata").path
-            ])
+            try runSwift(
+                ["package", "--swift-sdk", swiftSDKID, "js", "test", "--enable-code-coverage"],
+                [
+                    "LLVM_PROFDATA_PATH": URL(fileURLWithPath: swiftPath).appending(path: "llvm-profdata").path
+                ]
+            )
             do {
                 let llvmCov = try which("llvm-cov")
                 let process = Process()
                 process.executableURL = llvmCov
-                let profdata = packageDir.appending(path: ".build/plugins/PackageToJS/outputs/PackageTests/default.profdata")
-                let wasm = packageDir.appending(path: ".build/plugins/PackageToJS/outputs/PackageTests/TestingPackageTests.wasm")
+                let profdata = packageDir.appending(
+                    path: ".build/plugins/PackageToJS/outputs/PackageTests/default.profdata"
+                )
+                let wasm = packageDir.appending(
+                    path: ".build/plugins/PackageToJS/outputs/PackageTests/TestingPackageTests.wasm"
+                )
                 process.arguments = ["report", "-instr-profile", profdata.path, wasm.path]
                 process.standardOutput = FileHandle.nullDevice
                 try process.run()

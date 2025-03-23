@@ -1,5 +1,5 @@
-import JavaScriptKit
 import JavaScriptEventLoop
+import JavaScriptKit
 
 let alert = JSObject.global.alert.function!
 let document = JSObject.global.document
@@ -10,10 +10,12 @@ _ = document.body.appendChild(divElement)
 
 var buttonElement = document.createElement("button")
 buttonElement.innerText = "Alert demo"
-buttonElement.onclick = .object(JSClosure { _ in
-    alert("Swift is running on browser!")
-    return .undefined
-})
+buttonElement.onclick = .object(
+    JSClosure { _ in
+        alert("Swift is running on browser!")
+        return .undefined
+    }
+)
 
 _ = document.body.appendChild(buttonElement)
 
@@ -30,19 +32,21 @@ struct Response: Decodable {
 
 var asyncButtonElement = document.createElement("button")
 asyncButtonElement.innerText = "Fetch UUID demo"
-asyncButtonElement.onclick = .object(JSClosure { _ in
-    Task {
-        do {
-            let response = try await fetch("https://httpbin.org/uuid").value
-            let json = try await JSPromise(response.json().object!)!.value
-            let parsedResponse = try JSValueDecoder().decode(Response.self, from: json)
-            alert(parsedResponse.uuid)
-        } catch {
-            print(error)
+asyncButtonElement.onclick = .object(
+    JSClosure { _ in
+        Task {
+            do {
+                let response = try await fetch("https://httpbin.org/uuid").value
+                let json = try await JSPromise(response.json().object!)!.value
+                let parsedResponse = try JSValueDecoder().decode(Response.self, from: json)
+                alert(parsedResponse.uuid)
+            } catch {
+                print(error)
+            }
         }
-    }
 
-    return .undefined
-})
+        return .undefined
+    }
+)
 
 _ = document.body.appendChild(asyncButtonElement)

@@ -2,11 +2,11 @@ import JavaScriptKit
 import _CJavaScriptEventLoop
 
 #if canImport(Synchronization)
-    import Synchronization
+import Synchronization
 #endif
 #if canImport(wasi_pthread)
-    import wasi_pthread
-    import WASILibc
+import wasi_pthread
+import WASILibc
 #endif
 
 /// A serial executor that runs on a dedicated web worker thread.
@@ -42,7 +42,9 @@ public final class WebWorkerDedicatedExecutor: SerialExecutor {
     /// - Throws: An error if any worker thread fails to initialize within the timeout period.
     public init(timeout: Duration = .seconds(3), checkInterval: Duration = .microseconds(5)) async throws {
         let underlying = try await WebWorkerTaskExecutor(
-            numberOfThreads: 1, timeout: timeout, checkInterval: checkInterval
+            numberOfThreads: 1,
+            timeout: timeout,
+            checkInterval: checkInterval
         )
         self.underlying = underlying
     }

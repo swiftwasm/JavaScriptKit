@@ -63,18 +63,18 @@ extension JavaScriptEventLoop {
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-fileprivate extension UnownedJob {
+extension UnownedJob {
     private func asImpl() -> UnsafeMutablePointer<_CJavaScriptEventLoop.Job> {
         unsafeBitCast(self, to: UnsafeMutablePointer<_CJavaScriptEventLoop.Job>.self)
     }
 
-    var flags: JobFlags {
+    fileprivate var flags: JobFlags {
         JobFlags(bits: asImpl().pointee.Flags)
     }
 
-    var rawPriority: UInt32 { flags.priority }
+    fileprivate var rawPriority: UInt32 { flags.priority }
 
-    func nextInQueue() -> UnsafeMutablePointer<UnownedJob?> {
+    fileprivate func nextInQueue() -> UnsafeMutablePointer<UnownedJob?> {
         return withUnsafeMutablePointer(to: &asImpl().pointee.SchedulerPrivate.0) { rawNextJobPtr in
             let nextJobPtr = UnsafeMutableRawPointer(rawNextJobPtr).bindMemory(to: UnownedJob?.self, capacity: 1)
             return nextJobPtr
@@ -83,13 +83,11 @@ fileprivate extension UnownedJob {
 
 }
 
-fileprivate struct JobFlags {
-  var bits: UInt32 = 0
+private struct JobFlags {
+    var bits: UInt32 = 0
 
-  var priority: UInt32 {
-    get {
-      (bits & 0xFF00) >> 8
+    var priority: UInt32 {
+        (bits & 0xFF00) >> 8
     }
-  }
 }
 #endif

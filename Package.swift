@@ -4,7 +4,8 @@ import PackageDescription
 
 // NOTE: needed for embedded customizations, ideally this will not be necessary at all in the future, or can be replaced with traits
 let shouldBuildForEmbedded = Context.environment["JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM"].flatMap(Bool.init) ?? false
-let useLegacyResourceBundling = Context.environment["JAVASCRIPTKIT_USE_LEGACY_RESOURCE_BUNDLING"].flatMap(Bool.init) ?? false
+let useLegacyResourceBundling =
+    Context.environment["JAVASCRIPTKIT_USE_LEGACY_RESOURCE_BUNDLING"].flatMap(Bool.init) ?? false
 
 let package = Package(
     name: "JavaScriptKit",
@@ -18,17 +19,18 @@ let package = Package(
     targets: [
         .target(
             name: "JavaScriptKit",
-            dependencies: ["_CJavaScriptKit"], 
+            dependencies: ["_CJavaScriptKit"],
             exclude: useLegacyResourceBundling ? [] : ["Runtime"],
             resources: useLegacyResourceBundling ? [.copy("Runtime")] : [],
-            cSettings: shouldBuildForEmbedded ? [
+            cSettings: shouldBuildForEmbedded
+                ? [
                     .unsafeFlags(["-fdeclspec"])
                 ] : nil,
-            swiftSettings: shouldBuildForEmbedded 
+            swiftSettings: shouldBuildForEmbedded
                 ? [
                     .enableExperimentalFeature("Embedded"),
                     .enableExperimentalFeature("Extern"),
-                    .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"])
+                    .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"]),
                 ] : nil
         ),
         .target(name: "_CJavaScriptKit"),
@@ -75,11 +77,11 @@ let package = Package(
         ),
         .target(name: "_CJavaScriptEventLoopTestSupport"),
         .testTarget(
-          name: "JavaScriptEventLoopTestSupportTests",
-          dependencies: [
-            "JavaScriptKit",
-            "JavaScriptEventLoopTestSupport"
-          ]
+            name: "JavaScriptEventLoopTestSupportTests",
+            dependencies: [
+                "JavaScriptKit",
+                "JavaScriptEventLoopTestSupport",
+            ]
         ),
         .plugin(
             name: "PackageToJS",

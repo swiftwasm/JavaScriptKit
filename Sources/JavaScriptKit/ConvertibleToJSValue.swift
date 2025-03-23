@@ -63,7 +63,6 @@ extension UInt32: ConvertibleToJSValue {
     public var jsValue: JSValue { .number(Double(self)) }
 }
 
-
 extension Int8: ConvertibleToJSValue {
     public var jsValue: JSValue { .number(Double(self)) }
 }
@@ -147,7 +146,7 @@ extension Optional: ConvertibleToJSValue where Wrapped: ConvertibleToJSValue {
     public var jsValue: JSValue {
         switch self {
         case .none: return .null
-        case let .some(wrapped): return wrapped.jsValue
+        case .some(let wrapped): return wrapped.jsValue
         }
     }
 }
@@ -185,7 +184,7 @@ extension Array: ConstructibleFromJSValue where Element: ConstructibleFromJSValu
         var array = [Element]()
         array.reserveCapacity(count)
 
-        for i in 0 ..< count {
+        for i in 0..<count {
             guard let value: Element = objectRef[i].fromJSValue() else { return nil }
             array.append(value)
         }
@@ -225,16 +224,16 @@ extension JSValue {
         let payload1: JavaScriptPayload1
         var payload2: JavaScriptPayload2 = 0
         switch self {
-        case let .boolean(boolValue):
+        case .boolean(let boolValue):
             kind = .boolean
             payload1 = boolValue ? 1 : 0
-        case let .number(numberValue):
+        case .number(let numberValue):
             kind = .number
             payload1 = 0
             payload2 = numberValue
-        case let .string(string):
+        case .string(let string):
             return string.withRawJSValue(body)
-        case let .object(ref):
+        case .object(let ref):
             kind = .object
             payload1 = JavaScriptPayload1(ref.id)
         case .null:
@@ -243,13 +242,13 @@ extension JSValue {
         case .undefined:
             kind = .undefined
             payload1 = 0
-        case let .function(functionRef):
+        case .function(let functionRef):
             kind = .function
             payload1 = JavaScriptPayload1(functionRef.id)
-        case let .symbol(symbolRef):
+        case .symbol(let symbolRef):
             kind = .symbol
             payload1 = JavaScriptPayload1(symbolRef.id)
-        case let .bigInt(bigIntRef):
+        case .bigInt(let bigIntRef):
             kind = .bigInt
             payload1 = JavaScriptPayload1(bigIntRef.id)
         }
@@ -264,8 +263,10 @@ extension Array where Element: ConvertibleToJSValue {
         guard self.count != 0 else { return body([]) }
 
         func _withRawJSValues(
-            _ values: Self, _ index: Int,
-            _ results: inout [RawJSValue], _ body: ([RawJSValue]) -> T
+            _ values: Self,
+            _ index: Int,
+            _ results: inout [RawJSValue],
+            _ body: ([RawJSValue]) -> T
         ) -> T {
             if index == values.count { return body(results) }
             return values[index].jsValue.withRawJSValue { (rawValue) -> T in
@@ -285,8 +286,10 @@ extension Array where Element == ConvertibleToJSValue {
         guard self.count != 0 else { return body([]) }
 
         func _withRawJSValues(
-            _ values: [ConvertibleToJSValue], _ index: Int,
-            _ results: inout [RawJSValue], _ body: ([RawJSValue]) -> T
+            _ values: [ConvertibleToJSValue],
+            _ index: Int,
+            _ results: inout [RawJSValue],
+            _ body: ([RawJSValue]) -> T
         ) -> T {
             if index == values.count { return body(results) }
             return values[index].jsValue.withRawJSValue { (rawValue) -> T in

@@ -17,7 +17,7 @@ public enum JSValue: Equatable {
     /// If not, returns `nil`.
     public var boolean: Bool? {
         switch self {
-        case let .boolean(boolean): return boolean
+        case .boolean(let boolean): return boolean
         default: return nil
         }
     }
@@ -37,7 +37,7 @@ public enum JSValue: Equatable {
     ///
     public var jsString: JSString? {
         switch self {
-        case let .string(string): return string
+        case .string(let string): return string
         default: return nil
         }
     }
@@ -46,7 +46,7 @@ public enum JSValue: Equatable {
     /// If not, returns `nil`.
     public var number: Double? {
         switch self {
-        case let .number(number): return number
+        case .number(let number): return number
         default: return nil
         }
     }
@@ -55,7 +55,7 @@ public enum JSValue: Equatable {
     /// If not, returns `nil`.
     public var object: JSObject? {
         switch self {
-        case let .object(object): return object
+        case .object(let object): return object
         default: return nil
         }
     }
@@ -64,7 +64,7 @@ public enum JSValue: Equatable {
     /// If not, returns `nil`.
     public var function: JSFunction? {
         switch self {
-        case let .function(function): return function
+        case .function(let function): return function
         default: return nil
         }
     }
@@ -73,7 +73,7 @@ public enum JSValue: Equatable {
     /// If not, returns `nil`.
     public var symbol: JSSymbol? {
         switch self {
-        case let .symbol(symbol): return symbol
+        case .symbol(let symbol): return symbol
         default: return nil
         }
     }
@@ -82,7 +82,7 @@ public enum JSValue: Equatable {
     /// If not, returns `nil`.
     public var bigInt: JSBigInt? {
         switch self {
-        case let .bigInt(bigInt): return bigInt
+        case .bigInt(let bigInt): return bigInt
         default: return nil
         }
     }
@@ -107,38 +107,38 @@ public enum JSValue: Equatable {
 @available(*, unavailable)
 extension JSValue: Sendable {}
 
-public extension JSValue {
-#if !hasFeature(Embedded)
+extension JSValue {
+    #if !hasFeature(Embedded)
     /// An unsafe convenience method of `JSObject.subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
     /// - Precondition: `self` must be a JavaScript Object and specified member should be a callable object.
-    subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue) {
+    public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue) {
         object![dynamicMember: name]!
     }
-#endif
+    #endif
 
     /// An unsafe convenience method of `JSObject.subscript(_ index: Int) -> JSValue`
     /// - Precondition: `self` must be a JavaScript Object.
-    subscript(dynamicMember name: String) -> JSValue {
+    public subscript(dynamicMember name: String) -> JSValue {
         get { self.object![name] }
         set { self.object![name] = newValue }
     }
 
     /// An unsafe convenience method of `JSObject.subscript(_ index: Int) -> JSValue`
     /// - Precondition: `self` must be a JavaScript Object.
-    subscript(_ index: Int) -> JSValue {
+    public subscript(_ index: Int) -> JSValue {
         get { object![index] }
         set { object![index] = newValue }
     }
 }
 
-public extension JSValue {
-    func fromJSValue<Type>() -> Type? where Type: ConstructibleFromJSValue {
+extension JSValue {
+    public func fromJSValue<Type>() -> Type? where Type: ConstructibleFromJSValue {
         return Type.construct(from: self)
     }
 }
 
-public extension JSValue {
-    static func string(_ value: String) -> JSValue {
+extension JSValue {
+    public static func string(_ value: String) -> JSValue {
         .string(JSString(value))
     }
 
@@ -167,12 +167,17 @@ public extension JSValue {
     /// eventListener.release()
     /// ```
     @available(*, deprecated, message: "Please create JSClosure directly and manage its lifetime manually.")
-    static func function(_ body: @escaping ([JSValue]) -> JSValue) -> JSValue {
+    public static func function(_ body: @escaping ([JSValue]) -> JSValue) -> JSValue {
         .object(JSClosure(body))
     }
 
-    @available(*, deprecated, renamed: "object", message: "JSClosure is no longer a subclass of JSFunction. Use .object(closure) instead.")
-    static func function(_ closure: JSClosure) -> JSValue {
+    @available(
+        *,
+        deprecated,
+        renamed: "object",
+        message: "JSClosure is no longer a subclass of JSFunction. Use .object(closure) instead."
+    )
+    public static func function(_ closure: JSClosure) -> JSValue {
         .object(closure)
     }
 }
@@ -204,8 +209,10 @@ extension JSValue: ExpressibleByNilLiteral {
 public func getJSValue(this: JSObject, name: JSString) -> JSValue {
     var rawValue = RawJSValue()
     let rawBitPattern = swjs_get_prop(
-        this.id, name.asInternalJSRef(),
-        &rawValue.payload1, &rawValue.payload2
+        this.id,
+        name.asInternalJSRef(),
+        &rawValue.payload1,
+        &rawValue.payload2
     )
     rawValue.kind = unsafeBitCast(rawBitPattern, to: JavaScriptValueKind.self)
     return rawValue.jsValue
@@ -220,8 +227,10 @@ public func setJSValue(this: JSObject, name: JSString, value: JSValue) {
 public func getJSValue(this: JSObject, index: Int32) -> JSValue {
     var rawValue = RawJSValue()
     let rawBitPattern = swjs_get_subscript(
-        this.id, index,
-        &rawValue.payload1, &rawValue.payload2
+        this.id,
+        index,
+        &rawValue.payload1,
+        &rawValue.payload2
     )
     rawValue.kind = unsafeBitCast(rawBitPattern, to: JavaScriptValueKind.self)
     return rawValue.jsValue
@@ -229,17 +238,23 @@ public func getJSValue(this: JSObject, index: Int32) -> JSValue {
 
 public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
     value.withRawJSValue { rawValue in
-        swjs_set_subscript(this.id, index,
-                       rawValue.kind,
-                       rawValue.payload1, rawValue.payload2)
+        swjs_set_subscript(
+            this.id,
+            index,
+            rawValue.kind,
+            rawValue.payload1,
+            rawValue.payload2
+        )
     }
 }
 
 public func getJSValue(this: JSObject, symbol: JSSymbol) -> JSValue {
     var rawValue = RawJSValue()
     let rawBitPattern = swjs_get_prop(
-        this.id, symbol.id,
-        &rawValue.payload1, &rawValue.payload2
+        this.id,
+        symbol.id,
+        &rawValue.payload1,
+        &rawValue.payload2
     )
     rawValue.kind = unsafeBitCast(rawBitPattern, to: JavaScriptValueKind.self)
     return rawValue.jsValue
@@ -251,18 +266,18 @@ public func setJSValue(this: JSObject, symbol: JSSymbol, value: JSValue) {
     }
 }
 
-public extension JSValue {
+extension JSValue {
     /// Return `true` if this value is an instance of the passed `constructor` function.
     /// Returns `false` for everything except objects and functions.
     /// - Parameter constructor: The constructor function to check.
     /// - Returns: The result of `instanceof` in the JavaScript environment.
-    func isInstanceOf(_ constructor: JSFunction) -> Bool {
+    public func isInstanceOf(_ constructor: JSFunction) -> Bool {
         switch self {
         case .boolean, .string, .number, .null, .undefined, .symbol, .bigInt:
             return false
-        case let .object(ref):
+        case .object(let ref):
             return ref.isInstanceOf(constructor)
-        case let .function(ref):
+        case .function(let ref):
             return ref.isInstanceOf(constructor)
         }
     }
@@ -285,19 +300,19 @@ extension JSValue: CustomStringConvertible {
 //
 // Note: Once Embedded Swift supports parameter packs/variadic generics, we can
 // replace all of these with a single method that takes a generic pack.
-public extension JSValue {
+extension JSValue {
     @_disfavoredOverload
-    subscript(dynamicMember name: String) -> (() -> JSValue) {
+    public subscript(dynamicMember name: String) -> (() -> JSValue) {
         object![dynamicMember: name]!
     }
 
     @_disfavoredOverload
-    subscript<A0: ConvertibleToJSValue>(dynamicMember name: String) -> ((A0) -> JSValue) {
+    public subscript<A0: ConvertibleToJSValue>(dynamicMember name: String) -> ((A0) -> JSValue) {
         object![dynamicMember: name]!
     }
 
     @_disfavoredOverload
-    subscript<
+    public subscript<
         A0: ConvertibleToJSValue,
         A1: ConvertibleToJSValue
     >(dynamicMember name: String) -> ((A0, A1) -> JSValue) {
@@ -305,7 +320,7 @@ public extension JSValue {
     }
 
     @_disfavoredOverload
-    subscript<
+    public subscript<
         A0: ConvertibleToJSValue,
         A1: ConvertibleToJSValue,
         A2: ConvertibleToJSValue
@@ -314,7 +329,7 @@ public extension JSValue {
     }
 
     @_disfavoredOverload
-    subscript<
+    public subscript<
         A0: ConvertibleToJSValue,
         A1: ConvertibleToJSValue,
         A2: ConvertibleToJSValue,
@@ -324,7 +339,7 @@ public extension JSValue {
     }
 
     @_disfavoredOverload
-    subscript<
+    public subscript<
         A0: ConvertibleToJSValue,
         A1: ConvertibleToJSValue,
         A2: ConvertibleToJSValue,
@@ -335,7 +350,7 @@ public extension JSValue {
     }
 
     @_disfavoredOverload
-    subscript<
+    public subscript<
         A0: ConvertibleToJSValue,
         A1: ConvertibleToJSValue,
         A2: ConvertibleToJSValue,
@@ -347,7 +362,7 @@ public extension JSValue {
     }
 
     @_disfavoredOverload
-    subscript<
+    public subscript<
         A0: ConvertibleToJSValue,
         A1: ConvertibleToJSValue,
         A2: ConvertibleToJSValue,

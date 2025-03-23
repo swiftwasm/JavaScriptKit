@@ -15,7 +15,7 @@ import Glibc
 /// The value is stored in a thread-local variable, which is a separate copy for each thread.
 @propertyWrapper
 final class ThreadLocal<Value>: Sendable {
-#if compiler(>=6.1) && _runtime(_multithreaded)
+    #if compiler(>=6.1) && _runtime(_multithreaded)
     /// The wrapped value stored in the thread-local storage.
     /// The initial value is `nil` for each thread.
     var wrappedValue: Value? {
@@ -76,7 +76,7 @@ final class ThreadLocal<Value>: Sendable {
         }
         self.release = { Unmanaged<Box>.fromOpaque($0).release() }
     }
-#else
+    #else
     // Fallback implementation for platforms that don't support pthread
     private class SendableBox: @unchecked Sendable {
         var value: Value? = nil
@@ -93,7 +93,7 @@ final class ThreadLocal<Value>: Sendable {
     init(boxing _: Void) {
         wrappedValue = nil
     }
-#endif
+    #endif
 
     deinit {
         preconditionFailure("ThreadLocal can only be used as an immortal storage, cannot be deallocated")

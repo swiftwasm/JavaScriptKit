@@ -27,7 +27,7 @@ public final class JSPromise: JSBridgedClass {
     /// is not an object and is not an instance of JavaScript `Promise`, this function will
     /// return `nil`.
     public static func construct(from value: JSValue) -> Self? {
-        guard case let .object(jsObject) = value else { return nil }
+        guard case .object(let jsObject) = value else { return nil }
         return Self(jsObject)
     }
 
@@ -55,9 +55,9 @@ public final class JSPromise: JSBridgedClass {
 
             resolver {
                 switch $0 {
-                case let .success(success):
+                case .success(let success):
                     resolve(success)
-                case let .failure(error):
+                case .failure(let error):
                     reject(error)
                 }
             }
@@ -66,7 +66,7 @@ public final class JSPromise: JSBridgedClass {
         self.init(unsafelyWrapping: Self.constructor!.new(closure))
     }
 
-#if !hasFeature(Embedded)
+    #if !hasFeature(Embedded)
     public static func resolve(_ value: ConvertibleToJSValue) -> JSPromise {
         self.init(unsafelyWrapping: Self.constructor!.resolve!(value).object!)
     }
@@ -74,7 +74,7 @@ public final class JSPromise: JSBridgedClass {
     public static func reject(_ reason: ConvertibleToJSValue) -> JSPromise {
         self.init(unsafelyWrapping: Self.constructor!.reject!(reason).object!)
     }
-#else
+    #else
     public static func resolve(_ value: some ConvertibleToJSValue) -> JSPromise {
         self.init(unsafelyWrapping: constructor!.resolve!(value).object!)
     }
@@ -82,9 +82,9 @@ public final class JSPromise: JSBridgedClass {
     public static func reject(_ reason: some ConvertibleToJSValue) -> JSPromise {
         self.init(unsafelyWrapping: constructor!.reject!(reason).object!)
     }
-#endif
+    #endif
 
-#if !hasFeature(Embedded)
+    #if !hasFeature(Embedded)
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
     @discardableResult
     public func then(success: @escaping (JSValue) -> ConvertibleToJSValue) -> JSPromise {
@@ -95,15 +95,15 @@ public final class JSPromise: JSBridgedClass {
     }
 
     #if compiler(>=5.5)
-        /// Schedules the `success` closure to be invoked on successful completion of `self`.
-        @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-        @discardableResult
-        public func then(success: sending @escaping (sending JSValue) async throws -> ConvertibleToJSValue) -> JSPromise {
-            let closure = JSOneshotClosure.async {
-                try await success($0[0]).jsValue
-            }
-            return JSPromise(unsafelyWrapping: jsObject.then!(closure).object!)
+    /// Schedules the `success` closure to be invoked on successful completion of `self`.
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    @discardableResult
+    public func then(success: sending @escaping (sending JSValue) async throws -> ConvertibleToJSValue) -> JSPromise {
+        let closure = JSOneshotClosure.async {
+            try await success($0[0]).jsValue
         }
+        return JSPromise(unsafelyWrapping: jsObject.then!(closure).object!)
+    }
     #endif
 
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
@@ -122,20 +122,21 @@ public final class JSPromise: JSBridgedClass {
     }
 
     #if compiler(>=5.5)
-        /// Schedules the `success` closure to be invoked on successful completion of `self`.
-        @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-        @discardableResult
-        public func then(success: sending @escaping (sending JSValue) async throws -> ConvertibleToJSValue,
-                         failure: sending @escaping (sending JSValue) async throws -> ConvertibleToJSValue) -> JSPromise
-        {
-            let successClosure = JSOneshotClosure.async {
-                try await success($0[0]).jsValue
-            }
-            let failureClosure = JSOneshotClosure.async {
-                try await failure($0[0]).jsValue
-            }
-            return JSPromise(unsafelyWrapping: jsObject.then!(successClosure, failureClosure).object!)
+    /// Schedules the `success` closure to be invoked on successful completion of `self`.
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    @discardableResult
+    public func then(
+        success: sending @escaping (sending JSValue) async throws -> ConvertibleToJSValue,
+        failure: sending @escaping (sending JSValue) async throws -> ConvertibleToJSValue
+    ) -> JSPromise {
+        let successClosure = JSOneshotClosure.async {
+            try await success($0[0]).jsValue
         }
+        let failureClosure = JSOneshotClosure.async {
+            try await failure($0[0]).jsValue
+        }
+        return JSPromise(unsafelyWrapping: jsObject.then!(successClosure, failureClosure).object!)
+    }
     #endif
 
     /// Schedules the `failure` closure to be invoked on rejected completion of `self`.
@@ -148,15 +149,16 @@ public final class JSPromise: JSBridgedClass {
     }
 
     #if compiler(>=5.5)
-        /// Schedules the `failure` closure to be invoked on rejected completion of `self`.
-        @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-        @discardableResult
-        public func `catch`(failure: sending @escaping (sending JSValue) async throws -> ConvertibleToJSValue) -> JSPromise {
-            let closure = JSOneshotClosure.async {
-                try await failure($0[0]).jsValue
-            }
-            return .init(unsafelyWrapping: jsObject.catch!(closure).object!)
+    /// Schedules the `failure` closure to be invoked on rejected completion of `self`.
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    @discardableResult
+    public func `catch`(failure: sending @escaping (sending JSValue) async throws -> ConvertibleToJSValue) -> JSPromise
+    {
+        let closure = JSOneshotClosure.async {
+            try await failure($0[0]).jsValue
         }
+        return .init(unsafelyWrapping: jsObject.catch!(closure).object!)
+    }
     #endif
 
     /// Schedules the `failure` closure to be invoked on either successful or rejected
@@ -169,5 +171,5 @@ public final class JSPromise: JSBridgedClass {
         }
         return .init(unsafelyWrapping: jsObject.finally!(closure).object!)
     }
-#endif
+    #endif
 }

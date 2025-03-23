@@ -14,9 +14,12 @@ import Testing
                 try "Hello".write(toFile: $1.resolve(path: $0.output).path, atomically: true, encoding: .utf8)
             }
 
-            try make.build(output: task, scope: MiniMake.VariableScope(variables: [
-                "OUTPUT": tempDir.path,
-            ]))
+            try make.build(
+                output: task,
+                scope: MiniMake.VariableScope(variables: [
+                    "OUTPUT": tempDir.path
+                ])
+            )
             let content = try String(contentsOfFile: tempDir.appendingPathComponent("output.txt").path, encoding: .utf8)
             #expect(content == "Hello")
         }
@@ -28,7 +31,7 @@ import Testing
             var make = MiniMake(printProgress: { _, _ in })
             let prefix = BuildPath(prefix: "PREFIX")
             let scope = MiniMake.VariableScope(variables: [
-                "PREFIX": tempDir.path,
+                "PREFIX": tempDir.path
             ])
             let input = prefix.appending(path: "input.txt")
             let intermediate = prefix.appending(path: "intermediate.txt")
@@ -39,15 +42,23 @@ import Testing
             let intermediateTask = make.addTask(inputFiles: [input], output: intermediate) { task, outputURL in
                 let content = try String(contentsOfFile: scope.resolve(path: task.inputs[0]).path, encoding: .utf8)
                 try (content + " processed").write(
-                    toFile: scope.resolve(path: task.output).path, atomically: true, encoding: .utf8)
+                    toFile: scope.resolve(path: task.output).path,
+                    atomically: true,
+                    encoding: .utf8
+                )
             }
 
             let finalTask = make.addTask(
-                inputFiles: [intermediate], inputTasks: [intermediateTask], output: output
+                inputFiles: [intermediate],
+                inputTasks: [intermediateTask],
+                output: output
             ) { task, scope in
                 let content = try String(contentsOfFile: scope.resolve(path: task.inputs[0]).path, encoding: .utf8)
                 try (content + " final").write(
-                    toFile: scope.resolve(path: task.output).path, atomically: true, encoding: .utf8)
+                    toFile: scope.resolve(path: task.output).path,
+                    atomically: true,
+                    encoding: .utf8
+                )
             }
 
             try make.build(output: finalTask, scope: scope)
@@ -67,11 +78,15 @@ import Testing
 
             let task = make.addTask(output: outputPath, attributes: [.phony]) { task, scope in
                 buildCount += 1
-                try String(buildCount).write(toFile: scope.resolve(path: task.output).path, atomically: true, encoding: .utf8)
+                try String(buildCount).write(
+                    toFile: scope.resolve(path: task.output).path,
+                    atomically: true,
+                    encoding: .utf8
+                )
             }
 
             let scope = MiniMake.VariableScope(variables: [
-                "OUTPUT": tempDir.path,
+                "OUTPUT": tempDir.path
             ])
             try make.build(output: task, scope: scope)
             try make.build(output: task, scope: scope)
@@ -102,7 +117,7 @@ import Testing
             var make = MiniMake(printProgress: { _, _ in })
             let prefix = BuildPath(prefix: "PREFIX")
             let scope = MiniMake.VariableScope(variables: [
-                "PREFIX": tempDir.path,
+                "PREFIX": tempDir.path
             ])
             let input = prefix.appending(path: "input.txt")
             let output = prefix.appending(path: "output.txt")
@@ -142,7 +157,7 @@ import Testing
             )
             let prefix = BuildPath(prefix: "PREFIX")
             let scope = MiniMake.VariableScope(variables: [
-                "PREFIX": tempDir.path,
+                "PREFIX": tempDir.path
             ])
             let silentOutputPath = prefix.appending(path: "silent.txt")
             let silentTask = make.addTask(output: silentOutputPath, attributes: [.silent]) { task, scope in
@@ -150,14 +165,21 @@ import Testing
             }
             let finalOutputPath = prefix.appending(path: "output.txt")
             let task = make.addTask(
-                inputTasks: [silentTask], output: finalOutputPath
+                inputTasks: [silentTask],
+                output: finalOutputPath
             ) { task, scope in
                 try "Hello".write(toFile: scope.resolve(path: task.output).path, atomically: true, encoding: .utf8)
             }
 
             try make.build(output: task, scope: scope)
-            #expect(FileManager.default.fileExists(atPath: scope.resolve(path: silentOutputPath).path), "Silent task should still create output file")
-            #expect(FileManager.default.fileExists(atPath: scope.resolve(path: finalOutputPath).path), "Final task should create output file")
+            #expect(
+                FileManager.default.fileExists(atPath: scope.resolve(path: silentOutputPath).path),
+                "Silent task should still create output file"
+            )
+            #expect(
+                FileManager.default.fileExists(atPath: scope.resolve(path: finalOutputPath).path),
+                "Final task should create output file"
+            )
             try #require(messages.count == 1, "Should print progress for the final task")
             #expect(messages[0] == ("$PREFIX/output.txt", 1, 0, "\u{1B}[32mbuilding\u{1B}[0m"))
         }
@@ -170,7 +192,7 @@ import Testing
             var make = MiniMake(printProgress: { _, _ in })
             let prefix = BuildPath(prefix: "PREFIX")
             let scope = MiniMake.VariableScope(variables: [
-                "PREFIX": tempDir.path,
+                "PREFIX": tempDir.path
             ])
             let output = prefix.appending(path: "error.txt")
 
@@ -190,7 +212,7 @@ import Testing
             var make = MiniMake(printProgress: { _, _ in })
             let prefix = BuildPath(prefix: "PREFIX")
             let scope = MiniMake.VariableScope(variables: [
-                "PREFIX": tempDir.path,
+                "PREFIX": tempDir.path
             ])
             let outputs = [
                 prefix.appending(path: "clean1.txt"),
@@ -200,7 +222,11 @@ import Testing
             // Create tasks and build them
             let tasks = outputs.map { output in
                 make.addTask(output: output) { task, scope in
-                    try "Content".write(toFile: scope.resolve(path: task.output).path, atomically: true, encoding: .utf8)
+                    try "Content".write(
+                        toFile: scope.resolve(path: task.output).path,
+                        atomically: true,
+                        encoding: .utf8
+                    )
                 }
             }
 
@@ -212,7 +238,8 @@ import Testing
             for output in outputs {
                 #expect(
                     FileManager.default.fileExists(atPath: scope.resolve(path: output).path),
-                    "Output file should exist before cleanup")
+                    "Output file should exist before cleanup"
+                )
             }
 
             // Clean everything
@@ -222,7 +249,8 @@ import Testing
             for output in outputs {
                 #expect(
                     !FileManager.default.fileExists(atPath: scope.resolve(path: output).path),
-                    "Output file should not exist after cleanup")
+                    "Output file should not exist after cleanup"
+                )
             }
         }
     }

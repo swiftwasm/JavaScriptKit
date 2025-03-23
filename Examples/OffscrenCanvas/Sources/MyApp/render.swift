@@ -8,12 +8,17 @@ func sleepOnThread(milliseconds: Int, isolation: isolated (any Actor)? = #isolat
             JSOneshotClosure { _ in
                 continuation.resume()
                 return JSValue.undefined
-            }, milliseconds
+            },
+            milliseconds
         )
     }
 }
 
-func renderAnimation(canvas: JSObject, size: Int, isolation: isolated (any Actor)? = #isolation)
+func renderAnimation(
+    canvas: JSObject,
+    size: Int,
+    isolation: isolated (any Actor)? = #isolation
+)
     async throws
 {
     let ctx = canvas.getContext!("2d").object!

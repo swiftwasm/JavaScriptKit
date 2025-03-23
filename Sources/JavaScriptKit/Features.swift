@@ -5,9 +5,9 @@ enum LibraryFeatures {
 @_cdecl("_library_features")
 func _library_features() -> Int32 {
     var features: Int32 = 0
-#if !JAVASCRIPTKIT_WITHOUT_WEAKREFS
+    #if !JAVASCRIPTKIT_WITHOUT_WEAKREFS
     features |= LibraryFeatures.weakRefs
-#endif
+    #endif
     return features
 }
 

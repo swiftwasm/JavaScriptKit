@@ -20,8 +20,8 @@ struct PackageToJSPlugin: CommandPlugin {
                 // In case user misses the `--swift-sdk` option
                 { build, arguments in
                     guard
-                        build.logText.contains("ld.gold: --export-if-defined=__main_argc_argv: unknown option") ||
-                        build.logText.contains("-static-stdlib is no longer supported for Apple platforms")
+                        build.logText.contains("ld.gold: --export-if-defined=__main_argc_argv: unknown option")
+                            || build.logText.contains("-static-stdlib is no longer supported for Apple platforms")
                     else { return nil }
                     let didYouMean =
                         [
@@ -57,7 +57,11 @@ struct PackageToJSPlugin: CommandPlugin {
             (
                 // In case selected toolchain is a Xcode toolchain, not OSS toolchain
                 { build, arguments in
-                    guard build.logText.contains("No available targets are compatible with triple \"wasm32-unknown-wasi\"") else {
+                    guard
+                        build.logText.contains(
+                            "No available targets are compatible with triple \"wasm32-unknown-wasi\""
+                        )
+                    else {
                         return nil
                     }
                     return """
@@ -74,7 +78,8 @@ struct PackageToJSPlugin: CommandPlugin {
     }
 
     private func reportBuildFailure(
-        _ build: PackageManager.BuildResult, _ arguments: [String]
+        _ build: PackageManager.BuildResult,
+        _ arguments: [String]
     ) {
         for diagnostic in Self.friendlyBuildDiagnostics {
             if let message = diagnostic(build, arguments) {
@@ -100,11 +105,12 @@ struct PackageToJSPlugin: CommandPlugin {
             if filePath.hasPrefix(packageDir.path) {
                 // Emit hint for --allow-writing-to-package-directory if the destination path
                 // is under the package directory
-                let didYouMean = [
-                    "swift", "package", "--swift-sdk", "wasm32-unknown-wasi",
-                    "plugin", "--allow-writing-to-package-directory",
-                    "js",
-                ] + arguments
+                let didYouMean =
+                    [
+                        "swift", "package", "--swift-sdk", "wasm32-unknown-wasi",
+                        "plugin", "--allow-writing-to-package-directory",
+                        "js",
+                    ] + arguments
                 emitHintMessage(
                     """
                     Please pass `--allow-writing-to-package-directory` to "swift package".
@@ -116,11 +122,12 @@ struct PackageToJSPlugin: CommandPlugin {
             } else {
                 // Emit hint for --allow-writing-to-directory <directory>
                 // if the destination path is outside the package directory
-                let didYouMean = [
-                    "swift", "package", "--swift-sdk", "wasm32-unknown-wasi",
-                    "plugin", "--allow-writing-to-directory", "\(filePath)",
-                    "js",
-                ] + arguments
+                let didYouMean =
+                    [
+                        "swift", "package", "--swift-sdk", "wasm32-unknown-wasi",
+                        "plugin", "--allow-writing-to-directory", "\(filePath)",
+                        "js",
+                    ] + arguments
                 emitHintMessage(
                     """
                     Please pass `--allow-writing-to-directory <directory>` to "swift package".
@@ -147,7 +154,8 @@ struct PackageToJSPlugin: CommandPlugin {
 
         if extractor.remainingArguments.count > 0 {
             printStderr(
-                "Unexpected arguments: \(extractor.remainingArguments.joined(separator: " "))")
+                "Unexpected arguments: \(extractor.remainingArguments.joined(separator: " "))"
+            )
             printStderr(PackageToJS.BuildOptions.help())
             exit(1)
         }
@@ -155,7 +163,8 @@ struct PackageToJSPlugin: CommandPlugin {
         // Build products
         let productName = try buildOptions.product ?? deriveDefaultProduct(package: context.package)
         let build = try buildWasm(
-            productName: productName, context: context,
+            productName: productName,
+            context: context,
             options: buildOptions.packageOptions
         )
         guard build.succeeded else {
@@ -171,7 +180,9 @@ struct PackageToJSPlugin: CommandPlugin {
             }
         guard
             let selfPackage = findPackageInDependencies(
-                package: context.package, id: Self.JAVASCRIPTKIT_PACKAGE_ID)
+                package: context.package,
+                id: Self.JAVASCRIPTKIT_PACKAGE_ID
+            )
         else {
             throw PackageToJSError("Failed to find JavaScriptKit in dependencies!?")
         }
@@ -180,12 +191,17 @@ struct PackageToJSPlugin: CommandPlugin {
             printProgress: self.printProgress
         )
         let planner = PackagingPlanner(
-            options: buildOptions.packageOptions, context: context, selfPackage: selfPackage,
-            outputDir: outputDir, wasmProductArtifact: productArtifact,
+            options: buildOptions.packageOptions,
+            context: context,
+            selfPackage: selfPackage,
+            outputDir: outputDir,
+            wasmProductArtifact: productArtifact,
             wasmFilename: productArtifact.lastPathComponent
         )
         let rootTask = try planner.planBuild(
-            make: &make, buildOptions: buildOptions)
+            make: &make,
+            buildOptions: buildOptions
+        )
         cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
         print("Packaging...")
         let scope = MiniMake.VariableScope(variables: [:])
@@ -204,14 +220,16 @@ struct PackageToJSPlugin: CommandPlugin {
 
         if extractor.remainingArguments.count > 0 {
             printStderr(
-                "Unexpected arguments: \(extractor.remainingArguments.joined(separator: " "))")
+                "Unexpected arguments: \(extractor.remainingArguments.joined(separator: " "))"
+            )
             printStderr(PackageToJS.TestOptions.help())
             exit(1)
         }
 
         let productName = "\(context.package.displayName)PackageTests"
         let build = try buildWasm(
-            productName: productName, context: context,
+            productName: productName,
+            context: context,
             options: testOptions.packageOptions
         )
         guard build.succeeded else {
@@ -237,7 +255,8 @@ struct PackageToJSPlugin: CommandPlugin {
         }
         guard let productArtifact = productArtifact else {
             throw PackageToJSError(
-                "Failed to find '\(productName).wasm' or '\(productName).xctest'")
+                "Failed to find '\(productName).wasm' or '\(productName).xctest'"
+            )
         }
         let outputDir =
             if let outputPath = testOptions.packageOptions.outputPath {
@@ -247,7 +266,9 @@ struct PackageToJSPlugin: CommandPlugin {
             }
         guard
             let selfPackage = findPackageInDependencies(
-                package: context.package, id: Self.JAVASCRIPTKIT_PACKAGE_ID)
+                package: context.package,
+                id: Self.JAVASCRIPTKIT_PACKAGE_ID
+            )
         else {
             throw PackageToJSError("Failed to find JavaScriptKit in dependencies!?")
         }
@@ -256,8 +277,11 @@ struct PackageToJSPlugin: CommandPlugin {
             printProgress: self.printProgress
         )
         let planner = PackagingPlanner(
-            options: testOptions.packageOptions, context: context, selfPackage: selfPackage,
-            outputDir: outputDir, wasmProductArtifact: productArtifact,
+            options: testOptions.packageOptions,
+            context: context,
+            selfPackage: selfPackage,
+            outputDir: outputDir,
+            wasmProductArtifact: productArtifact,
             // If the product artifact doesn't have a .wasm extension, add it
             // to deliver it with the correct MIME type when serving the test
             // files for browser tests.
@@ -266,7 +290,8 @@ struct PackageToJSPlugin: CommandPlugin {
                 : productArtifact.lastPathComponent + ".wasm"
         )
         let (rootTask, binDir) = try planner.planTestBuild(
-            make: &make)
+            make: &make
+        )
         cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
         print("Packaging tests...")
         let scope = MiniMake.VariableScope(variables: [:])
@@ -284,7 +309,11 @@ struct PackageToJSPlugin: CommandPlugin {
         }
     }
 
-    private func buildWasm(productName: String, context: PluginContext, options: PackageToJS.PackageOptions) throws
+    private func buildWasm(
+        productName: String,
+        context: PluginContext,
+        options: PackageToJS.PackageOptions
+    ) throws
         -> PackageManager.BuildResult
     {
         var parameters = PackageManager.BuildParameters(
@@ -295,7 +324,8 @@ struct PackageToJSPlugin: CommandPlugin {
         parameters.otherSwiftcFlags = ["-color-diagnostics"]
         let buildingForEmbedded =
             ProcessInfo.processInfo.environment["JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM"].flatMap(
-                Bool.init) ?? false
+                Bool.init
+            ) ?? false
         if !buildingForEmbedded {
             // NOTE: We only support static linking for now, and the new SwiftDriver
             // does not infer `-static-stdlib` for WebAssembly targets intentionally
@@ -323,7 +353,8 @@ struct PackageToJSPlugin: CommandPlugin {
     /// path.
     private func cleanIfBuildGraphChanged(
         root: MiniMake.TaskKey,
-        make: MiniMake, context: PluginContext
+        make: MiniMake,
+        context: PluginContext
     ) {
         let buildFingerprint = context.pluginWorkDirectoryURL.appending(path: "minimake.json")
         let lastBuildFingerprint = try? Data(contentsOf: buildFingerprint)
@@ -338,7 +369,8 @@ struct PackageToJSPlugin: CommandPlugin {
     private func printProgress(context: MiniMake.ProgressPrinter.Context, message: String) {
         let buildCwd = FileManager.default.currentDirectoryPath
         let outputPath = context.scope.resolve(path: context.subject.output).path
-        let displayName = outputPath.hasPrefix(buildCwd + "/")
+        let displayName =
+            outputPath.hasPrefix(buildCwd + "/")
             ? String(outputPath.dropFirst(buildCwd.count + 1)) : outputPath
         printStderr("[\(context.built + 1)/\(context.total)] \(displayName): \(message)")
     }
@@ -359,7 +391,12 @@ extension PackageToJS.PackageOptions {
         let verbose = extractor.extractFlag(named: "verbose")
         let enableCodeCoverage = extractor.extractFlag(named: "enable-code-coverage")
         return PackageToJS.PackageOptions(
-            outputPath: outputPath, packageName: packageName, explain: explain != 0, verbose: verbose != 0, useCDN: useCDN != 0, enableCodeCoverage: enableCodeCoverage != 0
+            outputPath: outputPath,
+            packageName: packageName,
+            explain: explain != 0,
+            verbose: verbose != 0,
+            useCDN: useCDN != 0,
+            enableCodeCoverage: enableCodeCoverage != 0
         )
     }
 }
@@ -372,12 +409,19 @@ extension PackageToJS.BuildOptions {
         var debugInfoFormat: PackageToJS.DebugInfoFormat = .none
         if let rawDebugInfoFormat = rawDebugInfoFormat {
             guard let format = PackageToJS.DebugInfoFormat(rawValue: rawDebugInfoFormat) else {
-                fatalError("Invalid debug info format: \(rawDebugInfoFormat), expected one of \(PackageToJS.DebugInfoFormat.allCases.map(\.rawValue).joined(separator: ", "))")
+                fatalError(
+                    "Invalid debug info format: \(rawDebugInfoFormat), expected one of \(PackageToJS.DebugInfoFormat.allCases.map(\.rawValue).joined(separator: ", "))"
+                )
             }
             debugInfoFormat = format
         }
         let packageOptions = PackageToJS.PackageOptions.parse(from: &extractor)
-        return PackageToJS.BuildOptions(product: product, noOptimize: noOptimize != 0, debugInfoFormat: debugInfoFormat, packageOptions: packageOptions)
+        return PackageToJS.BuildOptions(
+            product: product,
+            noOptimize: noOptimize != 0,
+            debugInfoFormat: debugInfoFormat,
+            packageOptions: packageOptions
+        )
     }
 
     static func help() -> String {
@@ -424,8 +468,12 @@ extension PackageToJS.TestOptions {
         let extraNodeArguments = extractor.extractSingleDashOption(named: "Xnode")
         let packageOptions = PackageToJS.PackageOptions.parse(from: &extractor)
         var options = PackageToJS.TestOptions(
-            buildOnly: buildOnly != 0, listTests: listTests != 0,
-            filter: filter, prelude: prelude, environment: environment, inspect: inspect != 0,
+            buildOnly: buildOnly != 0,
+            listTests: listTests != 0,
+            filter: filter,
+            prelude: prelude,
+            environment: environment,
+            inspect: inspect != 0,
             extraNodeArguments: extraNodeArguments,
             packageOptions: packageOptions
         )
@@ -467,36 +515,34 @@ extension PackageToJS.TestOptions {
 // MARK: - PackagePlugin helpers
 
 extension ArgumentExtractor {
-  fileprivate mutating func extractSingleDashOption(named name: String) -> [String] {
-    let parts = remainingArguments.split(separator: "--", maxSplits: 1, omittingEmptySubsequences: false)
-    var args = Array(parts[0])
-    let literals = Array(parts.count == 2 ? parts[1] : [])
+    fileprivate mutating func extractSingleDashOption(named name: String) -> [String] {
+        let parts = remainingArguments.split(separator: "--", maxSplits: 1, omittingEmptySubsequences: false)
+        var args = Array(parts[0])
+        let literals = Array(parts.count == 2 ? parts[1] : [])
 
-    var values: [String] = []
-    var idx = 0
-    while idx < args.count {
-      var arg = args[idx]
-      if arg == "-\(name)" {
-        args.remove(at: idx)
-        if idx < args.count {
-          let val = args[idx]
-          values.append(val)
-          args.remove(at: idx)
+        var values: [String] = []
+        var idx = 0
+        while idx < args.count {
+            var arg = args[idx]
+            if arg == "-\(name)" {
+                args.remove(at: idx)
+                if idx < args.count {
+                    let val = args[idx]
+                    values.append(val)
+                    args.remove(at: idx)
+                }
+            } else if arg.starts(with: "-\(name)=") {
+                args.remove(at: idx)
+                arg.removeFirst(2 + name.count)
+                values.append(arg)
+            } else {
+                idx += 1
+            }
         }
-      }
-      else if arg.starts(with: "-\(name)=") {
-        args.remove(at: idx)
-        arg.removeFirst(2 + name.count)
-        values.append(arg)
-      }
-      else {
-        idx += 1
-      }
-    }
 
-    self = ArgumentExtractor(args + literals)
-    return values
-  }
+        self = ArgumentExtractor(args + literals)
+        return values
+    }
 }
 
 /// Derive default product from the package
@@ -506,7 +552,8 @@ internal func deriveDefaultProduct(package: Package) throws -> String {
     let executableProducts = package.products(ofType: ExecutableProduct.self)
     guard !executableProducts.isEmpty else {
         throw PackageToJSError(
-            "Make sure there's at least one executable product in your Package.swift")
+            "Make sure there's at least one executable product in your Package.swift"
+        )
     }
     guard executableProducts.count == 1 else {
         throw PackageToJSError(
@@ -568,7 +615,9 @@ extension PackagingPlanner {
         self.init(
             options: options,
             packageId: context.package.id,
-            intermediatesDir: BuildPath(absolute: context.pluginWorkDirectoryURL.appending(path: outputBaseName + ".tmp").path),
+            intermediatesDir: BuildPath(
+                absolute: context.pluginWorkDirectoryURL.appending(path: outputBaseName + ".tmp").path
+            ),
             selfPackageDir: BuildPath(absolute: selfPackage.directoryURL.path),
             outputDir: BuildPath(absolute: outputDir.path),
             wasmProductArtifact: BuildPath(absolute: wasmProductArtifact.path),

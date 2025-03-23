@@ -1,7 +1,6 @@
 #if !hasFeature(Embedded)
 import _CJavaScriptKit
 
-
 /// A `JSFunction` wrapper that enables throwing function calls.
 /// Exceptions produced by JavaScript functions will be thrown as `JSValue`.
 public class JSThrowingFunction {
@@ -46,12 +45,20 @@ public class JSThrowingFunction {
                 var exceptionPayload1 = JavaScriptPayload1()
                 var exceptionPayload2 = JavaScriptPayload2()
                 let resultObj = swjs_call_throwing_new(
-                    self.base.id, argv, Int32(argc),
-                    &exceptionRawKind, &exceptionPayload1, &exceptionPayload2
+                    self.base.id,
+                    argv,
+                    Int32(argc),
+                    &exceptionRawKind,
+                    &exceptionPayload1,
+                    &exceptionPayload2
                 )
                 let exceptionKind = JavaScriptValueKindAndFlags(bitPattern: exceptionRawKind)
                 if exceptionKind.isException {
-                    let exception = RawJSValue(kind: exceptionKind.kind, payload1: exceptionPayload1, payload2: exceptionPayload2)
+                    let exception = RawJSValue(
+                        kind: exceptionKind.kind,
+                        payload1: exceptionPayload1,
+                        payload2: exceptionPayload2
+                    )
                     return .failure(JSException(exception.jsValue))
                 }
                 return .success(JSObject(id: resultObj))
@@ -65,7 +72,11 @@ public class JSThrowingFunction {
     }
 }
 
-private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSValue], this: JSObject?) throws -> JSValue {
+private func invokeJSFunction(
+    _ jsFunc: JSFunction,
+    arguments: [ConvertibleToJSValue],
+    this: JSObject?
+) throws -> JSValue {
     let id = jsFunc.id
     let (result, isException) = arguments.withRawJSValues { rawValues in
         rawValues.withUnsafeBufferPointer { bufferPointer -> (JSValue, Bool) in
@@ -76,14 +87,21 @@ private func invokeJSFunction(_ jsFunc: JSFunction, arguments: [ConvertibleToJSV
             var payload2 = JavaScriptPayload2()
             if let thisId = this?.id {
                 let resultBitPattern = swjs_call_function_with_this(
-                    thisId, id, argv, Int32(argc),
-                    &payload1, &payload2
+                    thisId,
+                    id,
+                    argv,
+                    Int32(argc),
+                    &payload1,
+                    &payload2
                 )
                 kindAndFlags = JavaScriptValueKindAndFlags(bitPattern: resultBitPattern)
             } else {
                 let resultBitPattern = swjs_call_function(
-                    id, argv, Int32(argc),
-                    &payload1, &payload2
+                    id,
+                    argv,
+                    Int32(argc),
+                    &payload1,
+                    &payload2
                 )
                 kindAndFlags = JavaScriptValueKindAndFlags(bitPattern: resultBitPattern)
             }

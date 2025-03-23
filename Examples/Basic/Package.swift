@@ -13,7 +13,7 @@ let package = Package(
             name: "Basic",
             dependencies: [
                 "JavaScriptKit",
-                .product(name: "JavaScriptEventLoop", package: "JavaScriptKit")
+                .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
             ]
         )
     ],
