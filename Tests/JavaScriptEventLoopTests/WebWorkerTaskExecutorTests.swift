@@ -344,7 +344,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         }
         let byteLength1 = try await task1.value
         XCTAssertEqual(byteLength1, 100)
-    
+
         let task2 = Task<String?, Never>(executorPreference: executor) {
             do {
                 _ = try await transferring.receive()
@@ -447,7 +447,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
     /*
         func testDeinitJSObjectOnDifferentThread() async throws {
             let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
-    
+
             var object: JSObject? = JSObject.global.Object.function!.new()
             let task = Task(executorPreference: executor) {
                 object = nil

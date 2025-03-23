@@ -76,5 +76,14 @@ func filesToFormat() -> [String] {
     return files
 }
 
-// Format the files in the project.
-try swiftFormat(["format", "--parallel", "--in-place", "--recursive"] + filesToFormat())
+let arguments = CommandLine.arguments[1...]
+switch arguments.first {
+case "lint":
+    try swiftFormat(["lint", "--parallel", "--recursive"] + filesToFormat())
+case "format", nil:
+    try swiftFormat(["format", "--parallel", "--in-place", "--recursive"] + filesToFormat())
+case let subcommand?:
+    print("Unknown subcommand: \(subcommand)")
+    print("Usage: format.swift lint|format")
+    exit(1)
+}

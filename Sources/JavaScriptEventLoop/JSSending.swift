@@ -367,6 +367,7 @@ public struct JSSendingError: Error, CustomStringConvertible {
 /// - Parameters:
 ///   - object: The `JSObject` to be received.
 ///   - contextPtr: A pointer to the `_JSSendingContext` instance.
+// swift-format-ignore
 #if compiler(>=6.1)  // @_expose and @_extern are only available in Swift 6.1+
 @_expose(wasm, "swjs_receive_response")
 @_cdecl("swjs_receive_response")
@@ -386,6 +387,7 @@ func _swjs_receive_response(_ object: JavaScriptObjectRef, _ contextPtr: UnsafeR
 /// - Parameters:
 ///   - error: The error to be received.
 ///   - contextPtr: A pointer to the `_JSSendingContext` instance.
+// swift-format-ignore
 #if compiler(>=6.1)  // @_expose and @_extern are only available in Swift 6.1+
 @_expose(wasm, "swjs_receive_error")
 @_cdecl("swjs_receive_error")
