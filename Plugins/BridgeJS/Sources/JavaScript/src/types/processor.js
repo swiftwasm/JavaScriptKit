@@ -9,19 +9,23 @@ import { visitNode } from './collector.js';
 /**
  * Create a TypeScript program from a d.ts file
  * @param {string} filePath - Path to the d.ts file
+ * @param {Object} deps - Dependencies
+ * @param {Object} deps.ts - TypeScript module
  * @returns {ts.Program} TypeScript program object
  */
-export function createProgram(filePath) {
+export function createProgram(filePath, deps = { ts }) {
+    const tsModule = deps.ts || ts;
+    
     const options = {
-        target: ts.ScriptTarget.ESNext,
-        module: ts.ModuleKind.ESNext,
-        moduleResolution: ts.ModuleResolutionKind.NodeJs,
+        target: tsModule.ScriptTarget.ESNext,
+        module: tsModule.ModuleKind.ESNext,
+        moduleResolution: tsModule.ModuleResolutionKind.NodeJs,
         esModuleInterop: true,
         strict: true,
     };
 
-    const host = ts.createCompilerHost(options);
-    return ts.createProgram([filePath], options, host);
+    const host = tsModule.createCompilerHost(options);
+    return tsModule.createProgram([filePath], options, host);
 }
 
 /**
@@ -31,14 +35,18 @@ export function createProgram(filePath) {
  * @param {Array} declarations - Array to collect declarations
  * @param {Map} typeCache - Cache for type information
  * @param {Map} nominalTypesMap - Map of nominal types
+ * @param {Object} deps - Dependencies
+ * @param {Object} deps.ts - TypeScript module 
  */
-export function processDeclaration(node, checker, declarations, typeCache, nominalTypesMap) {
+export function processDeclaration(node, checker, declarations, typeCache, nominalTypesMap, deps = { ts }) {
+    const tsModule = deps.ts || ts;
+    
     if (node.name) {
         let name = node.name.text;
-        let type = getNodeType(node, checker, typeCache, nominalTypesMap);
+        let type = getNodeType(node, checker, typeCache, nominalTypesMap, deps);
 
         declarations.push({
-            kind: ts.SyntaxKind[node.kind],
+            kind: tsModule.SyntaxKind[node.kind],
             name: name,
             type: type,
             location: {
@@ -46,17 +54,17 @@ export function processDeclaration(node, checker, declarations, typeCache, nomin
                 end: node.getEnd()
             }
         });
-    } else if (ts.isVariableStatement(node)) {
+    } else if (tsModule.isVariableStatement(node)) {
         // Handle variable declarations
         for (const declaration of node.declarationList.declarations) {
-            if (declaration.name && ts.isIdentifier(declaration.name)) {
+            if (declaration.name && tsModule.isIdentifier(declaration.name)) {
                 let name = declaration.name.text;
                 let type = checker.getTypeAtLocation(declaration);
 
                 declarations.push({
                     kind: "VariableDeclaration",
                     name: name,
-                    type: serializeType(type, checker, typeCache, nominalTypesMap),
+                    type: serializeType(type, checker, typeCache, nominalTypesMap, deps),
                     location: {
                         start: declaration.getStart(),
                         end: declaration.getEnd()
@@ -73,28 +81,32 @@ export function processDeclaration(node, checker, declarations, typeCache, nomin
  * @param {ts.TypeChecker} checker - TypeScript type checker
  * @param {Map} typeCache - Cache for type information
  * @param {Map} nominalTypesMap - Map of nominal types
+ * @param {Object} deps - Dependencies
+ * @param {Object} deps.ts - TypeScript module
  * @returns {Object} Serialized type information
  */
-export function getNodeType(node, checker, typeCache, nominalTypesMap) {
-    if (ts.isInterfaceDeclaration(node) || ts.isClassDeclaration(node)) {
+export function getNodeType(node, checker, typeCache, nominalTypesMap, deps = { ts }) {
+    const tsModule = deps.ts || ts;
+    
+    if (tsModule.isInterfaceDeclaration(node) || tsModule.isClassDeclaration(node)) {
         const symbol = checker.getSymbolAtLocation(node.name);
         if (symbol) {
             const type = checker.getDeclaredTypeOfSymbol(symbol);
-            return serializeType(type, checker, typeCache, nominalTypesMap);
+            return serializeType(type, checker, typeCache, nominalTypesMap, deps);
         }
-    } else if (ts.isTypeAliasDeclaration(node)) {
+    } else if (tsModule.isTypeAliasDeclaration(node)) {
         const type = checker.getTypeAtLocation(node.name);
-        return serializeType(type, checker, typeCache, nominalTypesMap);
-    } else if (ts.isEnumDeclaration(node)) {
+        return serializeType(type, checker, typeCache, nominalTypesMap, deps);
+    } else if (tsModule.isEnumDeclaration(node)) {
         const symbol = checker.getSymbolAtLocation(node.name);
         if (symbol) {
             const type = checker.getDeclaredTypeOfSymbol(symbol);
-            return serializeType(type, checker, typeCache, nominalTypesMap);
+            return serializeType(type, checker, typeCache, nominalTypesMap, deps);
         }
-    } else if (ts.isFunctionDeclaration(node)) {
+    } else if (tsModule.isFunctionDeclaration(node)) {
         const signature = checker.getSignatureFromDeclaration(node);
         if (signature) {
-            return serializeSignature(signature, checker, typeCache, nominalTypesMap);
+            return serializeSignature(signature, checker, typeCache, nominalTypesMap, deps);
         }
     }
 
@@ -105,9 +117,17 @@ export function getNodeType(node, checker, typeCache, nominalTypesMap) {
  * Process the type declarations and resolve non-nominal types
  * @param {ts.Program} program - TypeScript program
  * @param {string} inputFilePath - Path to the input file
+ * @param {Object} deps - Dependencies
+ * @param {Object} deps.ts - TypeScript module
+ * @param {Object} deps.console - Console object
+ * @param {Object} deps.collector - Collector module
  * @returns {Object} Processed type declarations
  */
-export function processTypeDeclarations(program, inputFilePath) {
+export function processTypeDeclarations(program, inputFilePath, deps = {}) {
+    const tsModule = deps.ts || ts;
+    const consoleObj = deps.console || console;
+    const collectorModule = deps.collector || { visitNode };
+    
     const checker = program.getTypeChecker();
     const sourceFiles = program.getSourceFiles().filter(
         sf => !sf.isDeclarationFile || sf.fileName === inputFilePath
@@ -128,11 +148,11 @@ export function processTypeDeclarations(program, inputFilePath) {
 
         // Visit each node in the source file
         try {
-            ts.forEachChild(sourceFile, node => {
-                visitNode(node, checker, results[sourceFile.fileName].declarations, typeCache, nominalTypesMap);
+            tsModule.forEachChild(sourceFile, node => {
+                collectorModule.visitNode(node, checker, results[sourceFile.fileName].declarations, typeCache, nominalTypesMap, deps);
             });
         } catch (error) {
-            console.error(`Error processing ${sourceFile.fileName}: ${error.message}`);
+            consoleObj.error(`Error processing ${sourceFile.fileName}: ${error.message}`);
         }
     }
 
