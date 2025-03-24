@@ -329,37 +329,35 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         XCTAssertTrue(jsErrorMessage.contains("Failed to serialize message"), jsErrorMessage)
     }
 
-    /*
-    // Node.js 20 and below doesn't throw exception when transferring the same ArrayBuffer
-    // multiple times.
-    // See https://github.com/nodejs/node/commit/38dee8a1c04237bd231a01410f42e9d172f4c162
-    func testTransferMultipleTimes() async throws {
-        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
-        let Uint8Array = JSObject.global.Uint8Array.function!
-        let buffer = Uint8Array.new(100).buffer.object!
-        let transferring = JSSending.transfer(buffer)
-        let task1 = Task(executorPreference: executor) {
-            let buffer = try await transferring.receive()
-            return buffer.byteLength.number!
-        }
-        let byteLength1 = try await task1.value
-        XCTAssertEqual(byteLength1, 100)
-
-        let task2 = Task<String?, Never>(executorPreference: executor) {
-            do {
-                _ = try await transferring.receive()
-                return nil
-            } catch {
-                return String(describing: error)
-            }
-        }
-        guard let jsErrorMessage = await task2.value else {
-            XCTFail("Should throw an error")
-            return
-        }
-        XCTAssertTrue(jsErrorMessage.contains("Failed to serialize message"))
-    }
-    */
+    // // Node.js 20 and below doesn't throw exception when transferring the same ArrayBuffer
+    // // multiple times.
+    // // See https://github.com/nodejs/node/commit/38dee8a1c04237bd231a01410f42e9d172f4c162
+    // func testTransferMultipleTimes() async throws {
+    //     let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+    //     let Uint8Array = JSObject.global.Uint8Array.function!
+    //     let buffer = Uint8Array.new(100).buffer.object!
+    //     let transferring = JSSending.transfer(buffer)
+    //     let task1 = Task(executorPreference: executor) {
+    //         let buffer = try await transferring.receive()
+    //         return buffer.byteLength.number!
+    //     }
+    //     let byteLength1 = try await task1.value
+    //     XCTAssertEqual(byteLength1, 100)
+    //
+    //     let task2 = Task<String?, Never>(executorPreference: executor) {
+    //         do {
+    //             _ = try await transferring.receive()
+    //             return nil
+    //         } catch {
+    //             return String(describing: error)
+    //         }
+    //     }
+    //     guard let jsErrorMessage = await task2.value else {
+    //         XCTFail("Should throw an error")
+    //         return
+    //     }
+    //     XCTAssertTrue(jsErrorMessage.contains("Failed to serialize message"))
+    // }
 
     func testCloneMultipleTimes() async throws {
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
@@ -444,18 +442,16 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         XCTAssertEqual(object["test"].string!, "Hello, World!")
     }
 
-    /*
-        func testDeinitJSObjectOnDifferentThread() async throws {
-            let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
-
-            var object: JSObject? = JSObject.global.Object.function!.new()
-            let task = Task(executorPreference: executor) {
-                object = nil
-                _ = object
-            }
-            await task.value
-            executor.terminate()
-        }
-    */
+    // func testDeinitJSObjectOnDifferentThread() async throws {
+    //     let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+    //
+    //     var object: JSObject? = JSObject.global.Object.function!.new()
+    //     let task = Task(executorPreference: executor) {
+    //         object = nil
+    //         _ = object
+    //     }
+    //     await task.value
+    //     executor.terminate()
+    // }
 }
 #endif
