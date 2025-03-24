@@ -8,10 +8,14 @@ import ts from 'typescript';
 import { visitNode } from './collector.js';
 
 /**
+ * @typedef {import('./index.js').TypeScript} TypeScript
+ */
+
+/**
  * Create a TypeScript program from a d.ts file
  * @param {string} filePath - Path to the d.ts file
  * @param {Object} deps - Dependencies
- * @param {Object} deps.ts - TypeScript module
+ * @param {TypeScript} deps.ts - TypeScript module
  * @returns {ts.Program} TypeScript program object
  */
 export function createProgram(filePath, deps = { ts }) {
@@ -37,7 +41,7 @@ export function createProgram(filePath, deps = { ts }) {
  * @param {Map} typeCache - Cache for type information
  * @param {Map} nominalTypesMap - Map of nominal types
  * @param {Object} deps - Dependencies
- * @param {Object} deps.ts - TypeScript module 
+ * @param {TypeScript} deps.ts - TypeScript module 
  */
 export function processDeclaration(node, checker, declarations, typeCache, nominalTypesMap, deps = { ts }) {
     const tsModule = deps.ts || ts;
@@ -146,12 +150,12 @@ export function getNodeType(node, checker, typeCache, nominalTypesMap, deps = { 
  * @param {ts.Program} program - TypeScript program
  * @param {string} inputFilePath - Path to the input file
  * @param {Object} deps - Dependencies
- * @param {Object} deps.ts - TypeScript module
+ * @param {TypeScript} deps.ts - TypeScript module
  * @param {Object} deps.console - Console object
  * @param {Object} deps.collector - Collector module
  * @returns {Object} Processed type declarations
  */
-export function processTypeDeclarations(program, inputFilePath, deps = {}) {
+export function processTypeDeclarations(program, inputFilePath, deps) {
     const tsModule = deps.ts || ts;
     const consoleObj = deps.console || console;
     const collectorModule = deps.collector || { visitNode };

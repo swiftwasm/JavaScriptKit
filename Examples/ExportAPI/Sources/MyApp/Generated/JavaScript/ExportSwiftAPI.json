@@ -1,0 +1,39 @@
+{
+  "classes" : [
+
+  ],
+  "functions" : [
+    {
+      "abiName" : "bjs_hello",
+      "name" : "hello",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_twice",
+      "name" : "twice",
+      "parameters" : [
+        {
+          "label" : "x",
+          "name" : "x",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "int" : {
+
+        }
+      }
+    }
+  ]
+}

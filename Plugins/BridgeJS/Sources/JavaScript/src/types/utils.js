@@ -34,10 +34,17 @@ export function getTypeFlags(type) {
 /**
  * Get type ID 
  * @param {ts.Type} type - The TypeScript type
- * @returns {number} The type ID
+ * @returns {number|string} A unique identifier for the type
  */
 export function getTypeId(type) {
-    return type.id;
+    // TypeScript internal API doesn't expose type.id in type definitions
+    // Generate a unique identifier based on available properties
+    if (type.symbol) {
+        return type.symbol.name;
+    }
+    
+    // Fallback to a string representation based on flags
+    return getTypeFlags(type).join('-');
 }
 
 /**

@@ -19,7 +19,7 @@ let package = Package(
                 .enableExperimentalFeature("Extern")
             ],
             plugins: [
-                .plugin(name: "BridgeJS", package: "JavaScriptKit")
+                // .plugin(name: "BridgeJS", package: "JavaScriptKit")
             ]
         )
     ],
