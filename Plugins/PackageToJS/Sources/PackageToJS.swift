@@ -567,6 +567,7 @@ struct PackagingPlanner {
             ("Plugins/PackageToJS/Templates/platforms/node.js", "platforms/node.js"),
             ("Plugins/PackageToJS/Templates/platforms/node.d.ts", "platforms/node.d.ts"),
             ("Sources/JavaScriptKit/Runtime/index.mjs", "runtime.js"),
+            ("Sources/JavaScriptKit/Runtime/index.d.ts", "runtime.d.ts"),
         ] {
             packageInputs.append(
                 planCopyTemplateFile(

@@ -251,6 +251,23 @@
     ],
     "inputs" : [
       "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Sources\/JavaScriptKit\/Runtime\/index.d.ts",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/runtime.d.ts",
+    "salt" : "eyJjb25kaXRpb25zIjp7IklTX1dBU0kiOnRydWUsIlVTRV9TSEFSRURfTUVNT1JZIjpmYWxzZSwiVVNFX1dBU0lfQ0ROIjpmYWxzZX0sInN1YnN0aXR1dGlvbnMiOnsiUEFDS0FHRV9UT19KU19NT0RVTEVfUEFUSCI6Im1haW4ud2FzbSIsIlBBQ0tBR0VfVE9fSlNfUEFDS0FHRV9OQU1FIjoidGVzdCJ9fQ==",
+    "wants" : [
+      "$OUTPUT",
+      "$OUTPUT\/platforms",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
       "$SELF_PACKAGE\/Sources\/JavaScriptKit\/Runtime\/index.mjs",
       "$INTERMEDIATES\/wasm-imports.json"
     ],
@@ -284,7 +301,8 @@
       "$OUTPUT\/platforms\/browser.worker.js",
       "$OUTPUT\/platforms\/node.js",
       "$OUTPUT\/platforms\/node.d.ts",
-      "$OUTPUT\/runtime.js"
+      "$OUTPUT\/runtime.js",
+      "$OUTPUT\/runtime.d.ts"
     ]
   }
 ]

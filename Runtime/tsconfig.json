@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
-        "declaration": true,
-        "declarationDir": "lib",
+        "declaration": false,
         "importHelpers": true,
         "module": "esnext",
         "noEmit": true,
