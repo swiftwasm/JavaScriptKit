@@ -29,24 +29,24 @@
 
     const decode = (kind, payload1, payload2, memory) => {
         switch (kind) {
-            case 0 /* Boolean */:
+            case 0 /* Kind.Boolean */:
                 switch (payload1) {
                     case 0:
                         return false;
                     case 1:
                         return true;
                 }
-            case 2 /* Number */:
+            case 2 /* Kind.Number */:
                 return payload2;
-            case 1 /* String */:
-            case 3 /* Object */:
-            case 6 /* Function */:
-            case 7 /* Symbol */:
-            case 8 /* BigInt */:
+            case 1 /* Kind.String */:
+            case 3 /* Kind.Object */:
+            case 6 /* Kind.Function */:
+            case 7 /* Kind.Symbol */:
+            case 8 /* Kind.BigInt */:
                 return memory.getObject(payload1);
-            case 4 /* Null */:
+            case 4 /* Kind.Null */:
                 return null;
-            case 5 /* Undefined */:
+            case 5 /* Kind.Undefined */:
                 return undefined;
             default:
                 assertNever(kind, `JSValue Type kind "${kind}" is not supported`);
@@ -83,7 +83,7 @@
     const writeAndReturnKindBits = (value, payload1_ptr, payload2_ptr, is_exception, memory) => {
         const exceptionBit = (is_exception ? 1 : 0) << 31;
         if (value === null) {
-            return exceptionBit | 4 /* Null */;
+            return exceptionBit | 4 /* Kind.Null */;
         }
         const writeRef = (kind) => {
             memory.writeUint32(payload1_ptr, memory.retain(value));
@@ -93,29 +93,29 @@
         switch (type) {
             case "boolean": {
                 memory.writeUint32(payload1_ptr, value ? 1 : 0);
-                return exceptionBit | 0 /* Boolean */;
+                return exceptionBit | 0 /* Kind.Boolean */;
             }
             case "number": {
                 memory.writeFloat64(payload2_ptr, value);
-                return exceptionBit | 2 /* Number */;
+                return exceptionBit | 2 /* Kind.Number */;
             }
             case "string": {
-                return writeRef(1 /* String */);
+                return writeRef(1 /* Kind.String */);
             }
             case "undefined": {
-                return exceptionBit | 5 /* Undefined */;
+                return exceptionBit | 5 /* Kind.Undefined */;
             }
             case "object": {
-                return writeRef(3 /* Object */);
+                return writeRef(3 /* Kind.Object */);
             }
             case "function": {
-                return writeRef(6 /* Function */);
+                return writeRef(6 /* Kind.Function */);
             }
             case "symbol": {
-                return writeRef(7 /* Symbol */);
+                return writeRef(7 /* Kind.Symbol */);
             }
             case "bigint": {
-                return writeRef(8 /* BigInt */);
+                return writeRef(8 /* Kind.BigInt */);
             }
             default:
                 assertNever(type, `Type "${type}" is not supported yet`);
@@ -396,7 +396,7 @@
             if (this._closureDeallocator)
                 return this._closureDeallocator;
             const features = this.exports.swjs_library_features();
-            const librarySupportsWeakRef = (features & 1 /* WeakRefs */) != 0;
+            const librarySupportsWeakRef = (features & 1 /* LibraryFeatures.WeakRefs */) != 0;
             if (librarySupportsWeakRef) {
                 this._closureDeallocator = new SwiftClosureDeallocator(this.exports);
             }
@@ -825,7 +825,5 @@
     }
 
     exports.SwiftRuntime = SwiftRuntime;
-
-    Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
