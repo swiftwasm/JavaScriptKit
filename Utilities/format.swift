@@ -10,7 +10,16 @@ import func Foundation.exit
 let projectRoot = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
 
 /// Returns the path to the executable if it is found in the PATH environment variable.
-func which(_ executable: String) -> String? {
+func which(_ executable: String) -> URL? {
+    do {
+        // Check overriding environment variable
+        let envVariable = executable.uppercased().replacingOccurrences(of: "-", with: "_") + "_PATH"
+        if let path = ProcessInfo.processInfo.environment[envVariable] {
+            if FileManager.default.isExecutableFile(atPath: path) {
+                return URL(fileURLWithPath: path)
+            }
+        }
+    }
     let pathSeparator: Character
     #if os(Windows)
     pathSeparator = ";"
@@ -21,7 +30,7 @@ func which(_ executable: String) -> String? {
     for path in paths {
         let url = URL(fileURLWithPath: String(path)).appendingPathComponent(executable)
         if FileManager.default.isExecutableFile(atPath: url.path) {
-            return url.path
+            return url
         }
     }
     return nil
@@ -33,8 +42,9 @@ func swiftFormat(_ arguments: [String]) throws {
         print("swift-format not found in PATH")
         exit(1)
     }
+    print("[Utilities/format.swift] Running \(swiftFormat.path)")
     let task = Process()
-    task.executableURL = URL(fileURLWithPath: swiftFormat)
+    task.executableURL = swiftFormat
     task.arguments = arguments
     task.currentDirectoryURL = projectRoot
     try task.run()
@@ -43,6 +53,7 @@ func swiftFormat(_ arguments: [String]) throws {
         print("swift-format failed with status \(task.terminationStatus)")
         exit(1)
     }
+    print("[Utilities/format.swift] Done")
 }
 
 /// Patterns to exclude from formatting.
