@@ -5,5 +5,14 @@
     },
     "bin": {
         "ts2swift": "./bin/ts2swift.js"
+    },
+    "scripts": {
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:coverage": "vitest run --coverage"
+    },
+    "devDependencies": {
+        "@vitest/coverage-v8": "^0.34.6",
+        "vitest": "^0.34.6"
     }
 }
