@@ -1,6 +1,4 @@
-/* #if USE_SHARED_MEMORY */
-import type { SwiftRuntimeThreadChannel, SwiftRuntime } from "./runtime.js";
-/* #endif */
+import type { /* #if USE_SHARED_MEMORY */SwiftRuntimeThreadChannel, /* #endif */SwiftRuntime } from "./runtime.js";
 
 export type Import = {
     // TODO: Generate type from imported .d.ts files
