@@ -54,14 +54,14 @@ export function isPrimitiveType(type) {
         ts.TypeFlags.Null,
         ts.TypeFlags.Undefined,
         ts.TypeFlags.Void,
-        ts.TypeFlags.Symbol,
+        ts.TypeFlags.ESSymbol,
         ts.TypeFlags.BigInt,
         ts.TypeFlags.StringLiteral,
         ts.TypeFlags.NumberLiteral,
         ts.TypeFlags.BooleanLiteral,
         ts.TypeFlags.EnumLiteral
     ];
-    
+
     return primitiveFlags.some(flag => (type.flags & flag) !== 0);
 }
 
@@ -71,13 +71,11 @@ export function isPrimitiveType(type) {
  * @returns {boolean} True if the type is nominal (has a name)
  */
 export function isNominalType(type) {
-    if (!type || !type.symbol) return false;
-    
     // Check for named types with declarations
-    const isNamed = type.symbol && type.symbol.name && type.symbol.name !== "__type";
-    
+    const isNamed = type.symbol.name !== "__type";
+
     // Check for specific symbol flags that indicate nominal types
-    const hasNominalFlag = type.symbol.flags && (
+    const hasNominalFlag = (
         !!(type.symbol.flags & ts.SymbolFlags.Class) ||
         !!(type.symbol.flags & ts.SymbolFlags.Interface) ||
         !!(type.symbol.flags & ts.SymbolFlags.TypeAlias) ||
@@ -85,6 +83,6 @@ export function isNominalType(type) {
         !!(type.symbol.flags & ts.SymbolFlags.Function) ||
         !!(type.symbol.flags & ts.SymbolFlags.Variable)
     );
-    
+
     return isNamed && hasNominalFlag;
 } 
