@@ -1,0 +1,276 @@
+#!/usr/bin/env node
+
+import ts from 'typescript';
+import * as path from 'path';
+import * as fs from 'fs';
+
+
+// Command line arguments handling
+const args = process.argv.slice(2);
+if (args.length === 0) {
+    console.error('Usage: ts2swift <d.ts file path>');
+    process.exit(1);
+}
+
+const filePath = args[0];
+if (!fs.existsSync(filePath)) {
+    console.error(`File not found: ${filePath}`);
+    process.exit(1);
+}
+
+// Create a TypeScript program from the d.ts file
+function createProgram(filePath) {
+    const options = {
+        target: ts.ScriptTarget.ESNext,
+        module: ts.ModuleKind.ESNext,
+        moduleResolution: ts.ModuleResolutionKind.NodeJs,
+        esModuleInterop: true,
+        strict: true,
+    };
+
+    const host = ts.createCompilerHost(options);
+    return ts.createProgram([filePath], options, host);
+}
+
+// Process the type declarations and resolve non-nominal types
+function processTypeDeclarations(program) {
+    const checker = program.getTypeChecker();
+    const sourceFiles = program.getSourceFiles().filter(
+        sf => !sf.isDeclarationFile || sf.fileName === filePath
+    );
+
+    const typeCache = new Map();
+    const results = {};
+
+    for (const sourceFile of sourceFiles) {
+        // Skip internal TypeScript library files
+        if (sourceFile.fileName.includes('node_modules/typescript/lib')) continue;
+
+        results[sourceFile.fileName] = {
+            fileName: sourceFile.fileName,
+            declarations: []
+        };
+
+        // Visit each node in the source file
+        ts.forEachChild(sourceFile, node => {
+            visitNode(node, checker, results[sourceFile.fileName].declarations, typeCache);
+        });
+    }
+
+    return results;
+}
+
+// Visit each node and extract type information
+function visitNode(node, checker, declarations, typeCache) {
+    if (ts.isInterfaceDeclaration(node) ||
+        ts.isTypeAliasDeclaration(node) ||
+        ts.isEnumDeclaration(node) ||
+        ts.isFunctionDeclaration(node) ||
+        ts.isClassDeclaration(node) ||
+        ts.isVariableStatement(node)) {
+
+        if (node.name) {
+            let name = node.name.text;
+            let type = getNodeType(node, checker, typeCache);
+
+            declarations.push({
+                kind: ts.SyntaxKind[node.kind],
+                name: name,
+                type: type,
+                location: {
+                    start: node.getStart(),
+                    end: node.getEnd()
+                }
+            });
+        } else if (ts.isVariableStatement(node)) {
+            // Handle variable declarations
+            for (const declaration of node.declarationList.declarations) {
+                if (declaration.name && ts.isIdentifier(declaration.name)) {
+                    let name = declaration.name.text;
+                    let type = checker.getTypeAtLocation(declaration);
+
+                    declarations.push({
+                        kind: "VariableDeclaration",
+                        name: name,
+                        type: serializeType(type, checker, typeCache),
+                        location: {
+                            start: declaration.getStart(),
+                            end: declaration.getEnd()
+                        }
+                    });
+                }
+            }
+        }
+    }
+
+    // Recursively visit child nodes
+    ts.forEachChild(node, child => visitNode(child, checker, declarations, typeCache));
+}
+
+// Get the type of a node
+function getNodeType(node, checker, typeCache) {
+    if (ts.isInterfaceDeclaration(node) || ts.isClassDeclaration(node)) {
+        const symbol = checker.getSymbolAtLocation(node.name);
+        if (symbol) {
+            const type = checker.getDeclaredTypeOfSymbol(symbol);
+            return serializeType(type, checker, typeCache);
+        }
+    } else if (ts.isTypeAliasDeclaration(node)) {
+        const type = checker.getTypeAtLocation(node.name);
+        return serializeType(type, checker, typeCache);
+    } else if (ts.isEnumDeclaration(node)) {
+        const symbol = checker.getSymbolAtLocation(node.name);
+        if (symbol) {
+            const type = checker.getDeclaredTypeOfSymbol(symbol);
+            return serializeType(type, checker, typeCache);
+        }
+    } else if (ts.isFunctionDeclaration(node)) {
+        const signature = checker.getSignatureFromDeclaration(node);
+        if (signature) {
+            return serializeSignature(signature, checker, typeCache);
+        }
+    }
+
+    return "unknown";
+}
+
+// Serialize a TypeScript type into a descriptive object
+function serializeType(type, checker, typeCache) {
+    const id = getTypeId(type);
+    
+    // Check if it's a primitive type and return it directly without further resolution
+    if (isPrimitiveType(type)) {
+        return {
+            kind: "primitive",
+            name: checker.typeToString(type),
+            flags: getTypeFlags(type)
+        };
+    }
+    
+    // Return cached type if available to handle recursive types
+    if (typeCache.has(id)) {
+        return { ref: id };
+    }
+    
+    // Create a placeholder to avoid infinite recursion
+    typeCache.set(id, { id });
+    
+    const result = {
+        id,
+        flags: getTypeFlags(type),
+        name: checker.typeToString(type)
+    };
+    
+    if (type.symbol) {
+        result.symbolName = type.symbol.name;
+        result.symbolFlags = getFlagNames(type.symbol.flags, ts.SymbolFlags);
+    }
+    
+    if (type.aliasSymbol) {
+        result.aliasSymbolName = type.aliasSymbol.name;
+    }
+
+    if (type.isUnion()) {
+        result.unionTypes = type.types.map(t => serializeType(t, checker, typeCache));
+    } else if (type.isIntersection()) {
+        result.intersectionTypes = type.types.map(t => serializeType(t, checker, typeCache));
+    }
+    
+    if (type.getCallSignatures().length) {
+        result.callSignatures = type.getCallSignatures().map(s => 
+            serializeSignature(s, checker, typeCache));
+    }
+    
+    if (type.getConstructSignatures().length) {
+        result.constructSignatures = type.getConstructSignatures().map(s => 
+            serializeSignature(s, checker, typeCache));
+    }
+    
+    if (type.getProperties().length) {
+        result.properties = type.getProperties().map(p => ({
+            name: p.name,
+            flags: getFlagNames(p.flags, ts.SymbolFlags),
+            type: serializeType(checker.getTypeOfSymbolAtLocation(p, p.valueDeclaration), checker, typeCache)
+        }));
+    }
+    
+    if (checker.isArrayType(type)) {
+        const arrayType = checker.getTypeArguments(type)[0];
+        result.arrayElementType = serializeType(arrayType, checker, typeCache);
+    }
+    
+    // Update cached value with complete information
+    typeCache.set(id, result);
+    return result;
+}
+
+// Check if a type is a primitive type
+function isPrimitiveType(type) {
+    // TypeScript primitive types have specific flags
+    const primitiveFlags = [
+        ts.TypeFlags.String,
+        ts.TypeFlags.Number,
+        ts.TypeFlags.Boolean,
+        ts.TypeFlags.Null,
+        ts.TypeFlags.Undefined,
+        ts.TypeFlags.Void,
+        ts.TypeFlags.Symbol,
+        ts.TypeFlags.BigInt,
+        ts.TypeFlags.StringLiteral,
+        ts.TypeFlags.NumberLiteral,
+        ts.TypeFlags.BooleanLiteral,
+        ts.TypeFlags.EnumLiteral
+    ];
+    
+    return primitiveFlags.some(flag => (type.flags & flag) !== 0);
+}
+
+// Serialize a function or method signature
+function serializeSignature(signature, checker, typeCache) {
+    return {
+        parameters: signature.parameters.map(p => ({
+            name: p.name,
+            type: serializeType(checker.getTypeOfSymbolAtLocation(p, p.valueDeclaration), checker, typeCache),
+            optional: !!(p.valueDeclaration && p.valueDeclaration.questionToken)
+        })),
+        returnType: serializeType(signature.getReturnType(), checker, typeCache)
+    };
+}
+
+// Get a unique identifier for a type to help with caching
+function getTypeId(type) {
+    return type.id;
+}
+
+// Get readable type flags
+function getTypeFlags(type) {
+    return getFlagNames(type.flags, ts.TypeFlags);
+}
+
+// Convert numeric flags to their string representations
+function getFlagNames(flags, flagsEnum) {
+    const result = [];
+    for (const flag in flagsEnum) {
+        if (typeof flagsEnum[flag] === 'number' && (flags & flagsEnum[flag]) !== 0) {
+            result.push(flag);
+        }
+    }
+    return result;
+}
+
+// Main function
+async function main() {
+    console.log(`Processing ${filePath}...`);
+
+    const program = createProgram(filePath);
+    const results = processTypeDeclarations(program);
+
+    // Output the results as JSON
+    console.log(JSON.stringify(results, null, 2));
+}
+
+main().catch(error => {
+    console.error('Error:', error);
+    process.exit(1);
+});
+

@@ -3,14 +3,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "UseJSPackage",
+    name: "MyApp",
     platforms: [
         .macOS(.v14)
     ],
     dependencies: [.package(name: "JavaScriptKit", path: "../../")],
     targets: [
         .executableTarget(
-            name: "UseJSPackage",
+            name: "MyApp",
             dependencies: [
                 "JavaScriptKit"
             ],
