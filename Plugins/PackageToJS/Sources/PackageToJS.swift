@@ -4,6 +4,8 @@ struct PackageToJS {
     struct PackageOptions {
         /// Path to the output directory
         var outputPath: String?
+        /// The build configuration to use (default: debug)
+        var configuration: String?
         /// Name of the package (default: lowercased Package.swift name)
         var packageName: String?
         /// Whether to explain the build plan (default: false)

@@ -316,8 +316,17 @@ struct PackageToJSPlugin: CommandPlugin {
     ) throws
         -> PackageManager.BuildResult
     {
+        let buildConfiguration: PackageManager.BuildConfiguration
+        if let configuration = options.configuration {
+            guard let _buildConfiguration = PackageManager.BuildConfiguration(rawValue: configuration) else {
+                fatalError("Invalid build configuration: \(configuration)")
+            }
+            buildConfiguration = _buildConfiguration
+        } else {
+            buildConfiguration = .debug
+        }
         var parameters = PackageManager.BuildParameters(
-            configuration: .inherit,
+            configuration: buildConfiguration,
             logging: options.verbose ? .verbose : .concise
         )
         parameters.echoLogs = true
@@ -385,6 +394,8 @@ private func printStderr(_ message: String) {
 extension PackageToJS.PackageOptions {
     static func parse(from extractor: inout ArgumentExtractor) -> PackageToJS.PackageOptions {
         let outputPath = extractor.extractOption(named: "output").last
+        let configuration: String? =
+            (extractor.extractOption(named: "configuration") + extractor.extractSingleDashOption(named: "c")).last
         let packageName = extractor.extractOption(named: "package-name").last
         let explain = extractor.extractFlag(named: "explain")
         let useCDN = extractor.extractFlag(named: "use-cdn")
@@ -392,12 +403,25 @@ extension PackageToJS.PackageOptions {
         let enableCodeCoverage = extractor.extractFlag(named: "enable-code-coverage")
         return PackageToJS.PackageOptions(
             outputPath: outputPath,
+            configuration: configuration,
             packageName: packageName,
             explain: explain != 0,
             verbose: verbose != 0,
             useCDN: useCDN != 0,
             enableCodeCoverage: enableCodeCoverage != 0
         )
+    }
+
+    static func optionsHelp() -> String {
+        return """
+              --output <path>            Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
+              -c, --configuration <name> The build configuration to use (values: debug, release; default: debug)
+              --package-name <name>      Name of the package (default: lowercased Package.swift name)
+              --use-cdn                  Whether to use CDN for dependency packages
+              --enable-code-coverage     Whether to enable code coverage collection
+              --explain                  Whether to explain the build plan
+              --verbose                  Whether to print verbose output
+            """
     }
 }
 
@@ -431,15 +455,10 @@ extension PackageToJS.BuildOptions {
             USAGE: swift package --swift-sdk <swift-sdk> [SwiftPM options] js [options] [subcommand]
 
             OPTIONS:
-              --product <product>    Product to build (default: executable target if there's only one)
-              --output <path>        Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
-              --package-name <name>  Name of the package (default: lowercased Package.swift name)
-              --explain              Whether to explain the build plan
-              --verbose              Whether to print verbose output
-              --no-optimize          Whether to disable wasm-opt optimization
-              --use-cdn              Whether to use CDN for dependency packages
-              --enable-code-coverage Whether to enable code coverage collection
-              --debug-info-format    The format of debug info to keep in the final wasm file (values: none, dwarf, name; default: none)
+              --product <product>        Product to build (default: executable target if there's only one)
+              --no-optimize              Whether to disable wasm-opt optimization
+              --debug-info-format        The format of debug info to keep in the final wasm file (values: none, dwarf, name; default: none)
+            \(PackageToJS.PackageOptions.optionsHelp())
 
             SUBCOMMANDS:
               test  Builds and runs tests
@@ -449,7 +468,7 @@ extension PackageToJS.BuildOptions {
               # Build a specific product
               $ swift package --swift-sdk wasm32-unknown-wasi js --product Example
               # Build in release configuration
-              $ swift package --swift-sdk wasm32-unknown-wasi -c release plugin js
+              $ swift package --swift-sdk wasm32-unknown-wasi js -c release
 
               # Run tests
               $ swift package --swift-sdk wasm32-unknown-wasi js test
@@ -492,15 +511,12 @@ extension PackageToJS.TestOptions {
             USAGE: swift package --swift-sdk <swift-sdk> [SwiftPM options] js test [options]
 
             OPTIONS:
-              --build-only           Whether to build only
-              --prelude <path>       Path to the prelude script
-              --environment <name>   The environment to use for the tests (values: node, browser; default: node)
-              --inspect              Whether to run tests in the browser with inspector enabled
-              --explain              Whether to explain the build plan
-              --verbose              Whether to print verbose output
-              --use-cdn              Whether to use CDN for dependency packages
-              --enable-code-coverage Whether to enable code coverage collection
-              -Xnode <args>          Extra arguments to pass to Node.js
+              --build-only               Whether to build only
+              --prelude <path>           Path to the prelude script
+              --environment <name>       The environment to use for the tests (values: node, browser; default: node)
+              --inspect                  Whether to run tests in the browser with inspector enabled
+              -Xnode <args>              Extra arguments to pass to Node.js
+            \(PackageToJS.PackageOptions.optionsHelp())
 
             EXAMPLES:
               $ swift package --swift-sdk wasm32-unknown-wasi js test

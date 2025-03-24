@@ -242,7 +242,7 @@ extension Trait where Self == ConditionTrait {
     @Test(.requireEmbeddedSwift) func embedded() throws {
         try withPackage(at: "Examples/Embedded") { packageDir, runSwift in
             try runSwift(
-                ["package", "--triple", "wasm32-unknown-none-wasm", "-c", "release", "js"],
+                ["package", "--triple", "wasm32-unknown-none-wasm", "js", "-c", "release"],
                 [
                     "JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM": "true"
                 ]
