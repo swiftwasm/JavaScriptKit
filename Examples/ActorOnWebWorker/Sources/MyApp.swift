@@ -11,7 +11,7 @@ actor SearchService {
         }
     }
 
-    let serialExecutor: any SerialExecutor
+    let serialExecutor: OwnedExecutor
 
     // Simple in-memory index: word -> positions
     var index: [String: [Int]] = [:]
@@ -21,10 +21,10 @@ actor SearchService {
     }()
 
     nonisolated var unownedExecutor: UnownedSerialExecutor {
-        return self.serialExecutor.asUnownedSerialExecutor()
+        return self.serialExecutor.unownedExecutor
     }
 
-    init(serialExecutor: any SerialExecutor) {
+    init(serialExecutor: OwnedExecutor) {
         self.serialExecutor = serialExecutor
     }
 
@@ -233,17 +233,45 @@ final class App {
     }
 }
 
+/// The fallback executor actor is used when the dedicated worker is not available.
+actor FallbackExecutorActor {}
+
+enum OwnedExecutor {
+    case dedicated(WebWorkerDedicatedExecutor)
+    case fallback(FallbackExecutorActor)
+
+    var unownedExecutor: UnownedSerialExecutor {
+        switch self {
+        case .dedicated(let executor):
+            return executor.asUnownedSerialExecutor()
+        case .fallback(let x):
+            return x.unownedExecutor
+        }
+    }
+}
+
+
 @main struct Main {
     @MainActor static var app: App?
 
     static func main() {
         JavaScriptEventLoop.installGlobalExecutor()
         WebWorkerTaskExecutor.installGlobalExecutor()
+        let useDedicatedWorker = !(JSObject.global.disableDedicatedWorker.boolean ?? false)
 
         Task {
-            // Create dedicated worker and search service
-            let dedicatedWorker = try await WebWorkerDedicatedExecutor()
-            let service = SearchService(serialExecutor: dedicatedWorker)
+            let ownedExecutor: OwnedExecutor
+            if useDedicatedWorker {
+                // Create dedicated worker
+                let dedicatedWorker = try await WebWorkerDedicatedExecutor()
+                ownedExecutor = .dedicated(dedicatedWorker)
+            } else {
+                // Fallback to main thread executor
+                let fallbackExecutor = FallbackExecutorActor()
+                ownedExecutor = .fallback(fallbackExecutor)
+            }
+            // Create the service and app
+            let service = SearchService(serialExecutor: ownedExecutor)
             app = App(service: service)
         }
     }
