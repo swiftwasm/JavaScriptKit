@@ -22,6 +22,7 @@ export function visitNode(node, checker, declarations, typeCache, nominalTypesMa
         ts.isEnumDeclaration(node) ||
         ts.isFunctionDeclaration(node) ||
         ts.isClassDeclaration(node) ||
+        ts.isModuleDeclaration(node) ||
         ts.isVariableStatement(node)) {
 
         processDeclaration(node, checker, declarations, typeCache, nominalTypesMap);

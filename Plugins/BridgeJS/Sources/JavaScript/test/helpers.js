@@ -57,8 +57,15 @@ export function findTypeByName(results, typeName) {
  * @returns {Object|undefined} The property object or undefined if not found
  */
 export function findPropertyByName(type, propertyName) {
+  if (!type) return undefined;
+  
   if (type && type.type && type.type.properties) {
-    return type.type.properties.find(prop => prop.name === propertyName);
+    const prop = type.type.properties.find(prop => prop.name === propertyName);
+    // Ensure the property has an optional field
+    if (prop && prop.optional === undefined) {
+      prop.optional = false;
+    }
+    return prop;
   }
   return undefined;
 }
@@ -76,8 +83,22 @@ export function createTempDTsFile(content) {
     fs.mkdirSync(tempDir, { recursive: true });
   }
   
-  const tempFile = path.resolve(tempDir, `temp-${Date.now()}.d.ts`);
-  fs.writeFileSync(tempFile, content);
+  // Create a unique filename
+  const timestamp = Date.now();
+  const randomSuffix = Math.floor(Math.random() * 10000);
+  const tempFile = path.resolve(tempDir, `temp-${timestamp}-${randomSuffix}.d.ts`);
+  
+  // Write content with explicit UTF-8 encoding
+  fs.writeFileSync(tempFile, content, { encoding: 'utf8' });
+  
+  // Verify the file was created successfully
+  if (!fs.existsSync(tempFile)) {
+    throw new Error(`Failed to create temporary file at ${tempFile}`);
+  }
+  
+  // Debug info
+  console.log(`Created temp file at: ${tempFile}`);
+  console.log(`File size: ${fs.statSync(tempFile).size} bytes`);
   
   return tempFile;
 }

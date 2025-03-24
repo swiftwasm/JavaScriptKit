@@ -72,6 +72,27 @@ export function processDeclaration(node, checker, declarations, typeCache, nomin
                 });
             }
         }
+    } else if (tsModule.isModuleDeclaration(node)) {
+        // Handle module declarations
+        let name = node.name.text;
+        
+        declarations.push({
+            kind: "ModuleDeclaration",
+            name: name,
+            location: {
+                start: node.getStart(),
+                end: node.getEnd()
+            }
+        });
+        
+        // Process declarations inside the module
+        if (node.body && tsModule.isModuleBlock(node.body)) {
+            tsModule.forEachChild(node.body, child => {
+                if (child.kind) {
+                    processDeclaration(child, checker, declarations, typeCache, nominalTypesMap, deps);
+                }
+            });
+        }
     }
 }
 
@@ -108,6 +129,12 @@ export function getNodeType(node, checker, typeCache, nominalTypesMap, deps = { 
         if (signature) {
             return serializeSignature(signature, checker, typeCache, nominalTypesMap, deps);
         }
+    } else if (tsModule.isModuleDeclaration(node)) {
+        // For module declarations, return a reference to the module
+        return {
+            kind: "module",
+            name: node.name.text
+        };
     }
 
     return "unknown";
@@ -136,6 +163,10 @@ export function processTypeDeclarations(program, inputFilePath, deps = {}) {
     const typeCache = new Map();
     const nominalTypesMap = new Map();
     const results = {};
+    
+    // Store all declarations in a single array for easier access
+    const allDeclarations = [];
+    const moduleTypes = [];
 
     for (const sourceFile of sourceFiles) {
         // Skip internal TypeScript library files
@@ -148,9 +179,33 @@ export function processTypeDeclarations(program, inputFilePath, deps = {}) {
 
         // Visit each node in the source file
         try {
+            // Explicitly look for module declarations first
             tsModule.forEachChild(sourceFile, node => {
-                collectorModule.visitNode(node, checker, results[sourceFile.fileName].declarations, typeCache, nominalTypesMap, deps);
+                if (tsModule.isModuleDeclaration(node)) {
+                    const moduleName = node.name.text;
+                    const moduleDecl = {
+                        kind: "ModuleDeclaration",
+                        name: moduleName,
+                        location: {
+                            start: node.getStart(),
+                            end: node.getEnd()
+                        }
+                    };
+                    
+                    moduleTypes.push(moduleDecl);
+                    results[sourceFile.fileName].declarations.push(moduleDecl);
+                }
             });
+            
+            // Then process all nodes regularly
+            tsModule.forEachChild(sourceFile, node => {
+                if (!tsModule.isModuleDeclaration(node)) { // Skip modules as we already processed them
+                    collectorModule.visitNode(node, checker, results[sourceFile.fileName].declarations, typeCache, nominalTypesMap, deps);
+                }
+            });
+            
+            // Add these declarations to our master list
+            allDeclarations.push(...results[sourceFile.fileName].declarations);
         } catch (error) {
             consoleObj.error(`Error processing ${sourceFile.fileName}: ${error.message}`);
         }
@@ -167,6 +222,7 @@ export function processTypeDeclarations(program, inputFilePath, deps = {}) {
                   typeInfo.symbolFlags.includes("Enum") ? "EnumDeclaration" :
                   typeInfo.symbolFlags.includes("Function") ? "FunctionDeclaration" :
                   typeInfo.symbolFlags.includes("Variable") ? "VariableDeclaration" :
+                  typeInfo.symbolFlags.includes("Module") ? "ModuleDeclaration" :
                   "UnknownDeclaration",
             name: typeInfo.symbolName,
             type: typeInfo,  // Keep the full type info in the "type" field
@@ -176,6 +232,9 @@ export function processTypeDeclarations(program, inputFilePath, deps = {}) {
 
     // Add referenced nominal types to the results
     results.referencedNominalTypes = referencedNominalTypes;
+    
+    // Add the moduleTypes to the results - this is what examples.test.js is checking for
+    results.moduleTypes = moduleTypes;
 
     return results;
 }
