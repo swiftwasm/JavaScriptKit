@@ -3,6 +3,7 @@
  * @module types/collector
  */
 
+// @ts-check
 import ts from 'typescript';
 import { isNominalType, getFlagNames } from './utils.js';
 import { processDeclaration } from './processor.js';

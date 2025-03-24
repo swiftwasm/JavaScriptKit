@@ -3,26 +3,20 @@
  * @module cli
  */
 
+// @ts-check
 import * as fs from 'fs';
 import { createProgram, processTypeDeclarations } from './types/processor.js';
-import { writeResults } from './utils/io.js';
 
 /**
  * Parse command-line arguments
- * @param {string[]} args - Command line arguments
- * @param {Object} deps - Dependencies
- * @param {Object} deps.fs - File system module
- * @param {Function} deps.console.error - Console error function
- * @param {Function} deps.process.exit - Process exit function
- * @returns {{filePath: string, outputPath: string}} Object containing the parsed arguments
+ * @param {string[]} args - Command-line arguments
+ * @returns {{filePath: string, outputPath?: string}} Object containing the parsed arguments
  */
-export function parseCommandLineArgs(args, deps = { fs, console, process }) {
-    if (!args) {
-        args = process.argv.slice(2);
-    }
-    
-    let filePath = '';
-    let outputPath = '';
+export function parseCommandLineArgs(args) {
+    /** @type {string | undefined} */
+    let filePath;
+    /** @type {string | undefined} */
+    let outputPath;
 
     for (let i = 0; i < args.length; i++) {
         if (args[i] === '-o' || args[i] === '--output') {
@@ -30,8 +24,8 @@ export function parseCommandLineArgs(args, deps = { fs, console, process }) {
                 outputPath = args[i + 1];
                 i++; // Skip the next arg since it's the output path
             } else {
-                deps.console.error('Error: -o option requires a file path.');
-                deps.process.exit(1);
+                console.error('Error: -o option requires a file path.');
+                process.exit(1);
             }
         } else if (!filePath) {
             filePath = args[i];
@@ -39,47 +33,38 @@ export function parseCommandLineArgs(args, deps = { fs, console, process }) {
     }
 
     if (!filePath) {
-        deps.console.error('Usage: ts2swift <d.ts file path> [-o output.json]');
-        deps.process.exit(1);
+        console.error('Usage: ts2swift <d.ts file path> [-o output.json]');
+        process.exit(1);
     }
 
-    if (!deps.fs.existsSync(filePath)) {
-        deps.console.error(`File not found: ${filePath}`);
-        deps.process.exit(1);
+    if (!fs.existsSync(filePath)) {
+        console.error(`File not found: ${filePath}`);
+        process.exit(1);
     }
 
     return { filePath, outputPath };
-} 
+}
 
 /**
- * Main function that orchestrates the entire process
- * @param {string[]} args - Command line arguments (optional)
- * @param {Object} deps - Dependencies (optional)
- * @returns {Promise<void>}
+ * Main function to run the CLI
+ * @param {string[]} args - Command-line arguments
+ * @returns {void}
  */
-export async function main(args, deps = {}) {
-    // Setup dependencies with defaults
-    const dependencies = {
-        fs: deps.fs || fs,
-        console: deps.console || console,
-        process: deps.process || process,
-        processor: deps.processor || { createProgram, processTypeDeclarations },
-        io: deps.io || { writeResults }
-    };
-    
+export function main(args) {
     // Parse command line arguments
-    const { filePath, outputPath } = parseCommandLineArgs(args, dependencies);
-    
-    dependencies.console.log(`Processing ${filePath}...`);
+    const { filePath, outputPath } = parseCommandLineArgs(args);
+
+    console.log(`Processing ${filePath}...`);
 
     // Create TypeScript program and process declarations
-    const program = dependencies.processor.createProgram(filePath);
-    const results = dependencies.processor.processTypeDeclarations(program, filePath);
+    const program = createProgram(filePath);
+    const results = processTypeDeclarations(program, filePath);
 
     // Write results to file or stdout
-    const success = dependencies.io.writeResults(results, outputPath);
-    
-    if (!success) {
-        dependencies.process.exit(1);
+    const jsonOutput = JSON.stringify(results, null, 2);
+    if (outputPath) {
+        fs.writeFileSync(outputPath, jsonOutput);
+    } else {
+        process.stdout.write(jsonOutput, "utf-8");
     }
 }

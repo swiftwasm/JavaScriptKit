@@ -1,3 +1,4 @@
+// @ts-check
 import { describe, it, expect, vi } from 'vitest';
 import { processFunctionType } from '../../../src/types/serializer.js';
 import { createTempDTsFile, cleanupTempFile } from '../../helpers.js';

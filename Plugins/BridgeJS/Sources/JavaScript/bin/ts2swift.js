@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @ts-check
 
 /**
  * Main entry point for the ts2swift tool
@@ -15,4 +16,4 @@
 
 import { main } from "../src/cli.js"
 
-main();
+main(process.argv.slice(2));

@@ -1,3 +1,4 @@
+// @ts-check
 import { describe, it, expect, vi } from 'vitest';
 import ts from 'typescript';
 import { getFlagNames, getTypeFlags, isPrimitiveType, isNominalType } from '../../../src/types/utils.js';

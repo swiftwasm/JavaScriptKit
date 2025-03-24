@@ -1,3 +1,4 @@
+// @ts-check
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { createProgram, processTypeDeclarations } from '../src/types/processor.js';
@@ -33,6 +34,12 @@ export function processFixture(fixtureName) {
  * @returns {Object|undefined} The type object or undefined if not found
  */
 export function findTypeByName(results, typeName) {
+  // First check in interface types (highest priority)
+  if (results.interfaceTypes) {
+    const foundType = results.interfaceTypes.find(type => type.name === typeName);
+    if (foundType) return foundType;
+  }
+
   // Check in referenced nominal types
   if (results.referencedNominalTypes) {
     const foundType = results.referencedNominalTypes.find(type => type.name === typeName);
@@ -95,10 +102,6 @@ export function createTempDTsFile(content) {
   if (!fs.existsSync(tempFile)) {
     throw new Error(`Failed to create temporary file at ${tempFile}`);
   }
-  
-  // Debug info
-  console.log(`Created temp file at: ${tempFile}`);
-  console.log(`File size: ${fs.statSync(tempFile).size} bytes`);
   
   return tempFile;
 }

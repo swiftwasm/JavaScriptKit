@@ -3,6 +3,7 @@
  * @module types/utils
  */
 
+// @ts-check
 import ts from 'typescript';
 
 /**

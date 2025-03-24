@@ -1,3 +1,4 @@
+// @ts-check
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { processFunctionType } from '../../../src/types/serializer.js';
 import { processFixture, findTypeByName, findPropertyByName } from '../../helpers.js';

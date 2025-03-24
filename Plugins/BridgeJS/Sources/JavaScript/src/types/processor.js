@@ -3,6 +3,7 @@
  * @module types/processor
  */
 
+// @ts-check
 import ts from 'typescript';
 import { visitNode } from './collector.js';
 
@@ -167,6 +168,7 @@ export function processTypeDeclarations(program, inputFilePath, deps = {}) {
     // Store all declarations in a single array for easier access
     const allDeclarations = [];
     const moduleTypes = [];
+    const interfaceTypes = [];
 
     for (const sourceFile of sourceFiles) {
         // Skip internal TypeScript library files
@@ -179,7 +181,7 @@ export function processTypeDeclarations(program, inputFilePath, deps = {}) {
 
         // Visit each node in the source file
         try {
-            // Explicitly look for module declarations first
+            // First pass: collect all interface and module declarations
             tsModule.forEachChild(sourceFile, node => {
                 if (tsModule.isModuleDeclaration(node)) {
                     const moduleName = node.name.text;
@@ -194,12 +196,34 @@ export function processTypeDeclarations(program, inputFilePath, deps = {}) {
                     
                     moduleTypes.push(moduleDecl);
                     results[sourceFile.fileName].declarations.push(moduleDecl);
+                } 
+                else if (tsModule.isInterfaceDeclaration(node)) {
+                    const interfaceName = node.name.text;
+                    const symbol = checker.getSymbolAtLocation(node.name);
+                    
+                    if (symbol) {
+                        const type = checker.getDeclaredTypeOfSymbol(symbol);
+                        const serializedType = serializeType(type, checker, typeCache, nominalTypesMap, deps);
+                        
+                        const interfaceDecl = {
+                            kind: "InterfaceDeclaration",
+                            name: interfaceName,
+                            type: serializedType,
+                            location: {
+                                start: node.getStart(),
+                                end: node.getEnd()
+                            }
+                        };
+                        
+                        interfaceTypes.push(interfaceDecl);
+                        results[sourceFile.fileName].declarations.push(interfaceDecl);
+                    }
                 }
             });
             
-            // Then process all nodes regularly
+            // Then process all other nodes regularly
             tsModule.forEachChild(sourceFile, node => {
-                if (!tsModule.isModuleDeclaration(node)) { // Skip modules as we already processed them
+                if (!tsModule.isModuleDeclaration(node) && !tsModule.isInterfaceDeclaration(node)) {
                     collectorModule.visitNode(node, checker, results[sourceFile.fileName].declarations, typeCache, nominalTypesMap, deps);
                 }
             });
@@ -233,8 +257,9 @@ export function processTypeDeclarations(program, inputFilePath, deps = {}) {
     // Add referenced nominal types to the results
     results.referencedNominalTypes = referencedNominalTypes;
     
-    // Add the moduleTypes to the results - this is what examples.test.js is checking for
+    // Add the moduleTypes and interfaceTypes to the results
     results.moduleTypes = moduleTypes;
+    results.interfaceTypes = interfaceTypes;
 
     return results;
 }

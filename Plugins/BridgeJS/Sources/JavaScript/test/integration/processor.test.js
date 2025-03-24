@@ -1,3 +1,4 @@
+// @ts-check
 import { describe, it, expect } from 'vitest';
 import * as path from 'path';
 import { resolveFixturePath } from '../helpers.js';
@@ -10,7 +11,7 @@ describe('TypeScript Processor Integration Tests', () => {
     
     // Act
     const program = createProgram(inputFile);
-    const result = processTypeDeclarations(program);
+    const result = processTypeDeclarations(program, inputFile);
     
     // Assert
     expect(result).toBeDefined();
@@ -86,7 +87,7 @@ describe('TypeScript Processor Integration Tests', () => {
     // We don't need to actually create the file, just process what happens when
     // there's no content to process
     const program = createProgram(emptyFile);
-    const result = processTypeDeclarations(program);
+    const result = processTypeDeclarations(program, emptyFile);
     
     // Should still return a valid but empty result
     expect(result).toBeDefined();

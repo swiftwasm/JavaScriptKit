@@ -1,3 +1,4 @@
+// @ts-check
 import { describe, it, expect } from 'vitest';
 import { createTempDTsFile, cleanupTempFile } from '../../helpers.js';
 import { createProgram, processTypeDeclarations } from '../../../src/types/processor.js';

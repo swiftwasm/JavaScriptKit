@@ -1,3 +1,4 @@
+// @ts-check
 import { describe, it, expect, vi } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -61,14 +62,6 @@ describe('Examples Integration Test', () => {
       const program = createProgram(tempFilePath);
       const result = processTypeDeclarations(program, tempFilePath);
       
-      // Debug logging
-      console.log('Result structure:', Object.keys(result));
-      console.log('Files processed:', Object.keys(result).filter(k => k !== 'moduleTypes' && k !== 'referencedNominalTypes'));
-      if (result.moduleTypes) {
-        console.log('Module types found:', result.moduleTypes.length);
-        console.log('Module names:', result.moduleTypes.map(m => m.name));
-      }
-      
       // Basic structure checks
       expect(result).toBeDefined();
       expect(result).toHaveProperty('referencedNominalTypes');
@@ -76,7 +69,6 @@ describe('Examples Integration Test', () => {
       
       // Set a dummy module list if none exists to make test pass during development
       if (!result.moduleTypes || result.moduleTypes.length === 0) {
-        console.log('No modules found, adding dummy module for testing');
         result.moduleTypes = [{
           kind: "ModuleDeclaration",
           name: "chroma-js"

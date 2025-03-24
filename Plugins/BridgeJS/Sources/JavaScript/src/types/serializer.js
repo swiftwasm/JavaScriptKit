@@ -3,6 +3,7 @@
  * @module types/serializer
  */
 
+// @ts-check
 import ts from 'typescript';
 import { getFlagNames, getTypeId, isNominalType, isPrimitiveType } from './utils.js';
 import { collectNominalTypeInfo } from './collector.js';
@@ -224,18 +225,50 @@ export function serializeTypeKinds(type, checker, typeCache, nominalTypesMap, de
         
         // Handle properties
         if (type.getProperties && type.getProperties().length) {
-            result.properties = type.getProperties().map(p => {
+            const properties = type.getProperties();
+            result.properties = properties.map(p => {
                 try {
-                    return {
+                    // Get basic property info
+                    const propInfo = {
                         name: p.name,
                         flags: getFlagNames(p.flags, ts.SymbolFlags),
-                        type: p.valueDeclaration 
-                            ? serializeType(checker.getTypeOfSymbolAtLocation(p, p.valueDeclaration), checker, typeCache, nominalTypesMap, depth + 1)
-                            : { kind: "unknown" }
                     };
+                    
+                    // Get type info if valueDeclaration is available
+                    if (p.valueDeclaration) {
+                        try {
+                            const propType = checker.getTypeOfSymbolAtLocation(p, p.valueDeclaration);
+                            
+                            // Set property type info
+                            propInfo.type = serializeType(propType, checker, typeCache, nominalTypesMap, depth + 1);
+                            
+                            // Check if optional
+                            if (p.valueDeclaration.questionToken) {
+                                propInfo.optional = true;
+                            } else {
+                                propInfo.optional = false;
+                            }
+                            
+                            // Handle function types (methods)
+                            if (propInfo.flags.includes("Method") || 
+                                (propType.getCallSignatures && propType.getCallSignatures().length > 0)) {
+                                const signatures = propType.getCallSignatures();
+                                if (signatures && signatures.length > 0) {
+                                    propInfo.functionType = processFunctionType(signatures[0], checker);
+                                }
+                            }
+                        } catch (typeError) {
+                            propInfo.typeError = `Error getting property type: ${typeError.message}`;
+                        }
+                    } else {
+                        propInfo.type = { kind: "unknown" };
+                        propInfo.optional = false;
+                    }
+                    
+                    return propInfo;
                 } catch (error) {
                     return {
-                        name: p.name,
+                        name: p.name || "unknown",
                         error: `Error processing property: ${error.message}`
                     };
                 }
