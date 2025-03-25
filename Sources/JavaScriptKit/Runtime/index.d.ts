@@ -50,6 +50,7 @@ interface ImportedFunctions {
     swjs_call_new(ref: number, argv: pointer, argc: number): number;
     swjs_call_throwing_new(ref: number, argv: pointer, argc: number, exception_kind_ptr: pointer, exception_payload1_ptr: pointer, exception_payload2_ptr: pointer): number;
     swjs_instanceof(obj_ref: ref, constructor_ref: ref): boolean;
+    swjs_value_equals(lhs_ref: ref, rhs_ref: ref): boolean;
     swjs_create_function(host_func_id: number, line: number, file: ref): number;
     swjs_create_typed_array(constructor_ref: ref, elementsPtr: pointer, length: number): number;
     swjs_load_typed_array(ref: ref, buffer: pointer): void;
