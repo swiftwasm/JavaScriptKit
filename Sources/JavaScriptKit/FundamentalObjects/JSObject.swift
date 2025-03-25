@@ -15,7 +15,7 @@ import _CJavaScriptKit
 /// The lifetime of this object is managed by the JavaScript and Swift runtime bridge library with
 /// reference counting system.
 @dynamicMemberLookup
-public class JSObject: Equatable {
+public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     internal static var constructor: JSFunction { _constructor.wrappedValue }
     private static let _constructor = LazyThreadLocal(initialize: { JSObject.global.Object.function! })
 
@@ -36,6 +36,19 @@ public class JSObject: Equatable {
         #if compiler(>=6.1) && _runtime(_multithreaded)
         self.ownerTid = swjs_get_worker_thread_id_cached()
         #endif
+    }
+
+    /// Creates an empty JavaScript object.
+    public convenience init() {
+        self.init(id: swjs_create_object())
+    }
+
+    /// Creates a new object with the key-value pairs in the dictionary literal.
+    ///
+    /// - Parameter elements: A variadic list of key-value pairs where all keys are strings
+    public convenience required init(dictionaryLiteral elements: (String, JSValue)...) {
+        self.init()
+        for (key, value) in elements { self[key] = value }
     }
 
     /// Asserts that the object is being accessed from the owner thread.

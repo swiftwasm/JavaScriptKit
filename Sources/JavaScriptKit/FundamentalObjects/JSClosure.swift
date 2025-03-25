@@ -35,6 +35,11 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         )
     }
 
+    @available(*, unavailable, message: "JSOneshotClosure does not support dictionary literal initialization")
+    public required init(dictionaryLiteral elements: (String, JSValue)...) {
+        fatalError("JSOneshotClosure does not support dictionary literal initialization")
+    }
+
     #if compiler(>=5.5) && !hasFeature(Embedded)
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(_ body: sending @escaping (sending [JSValue]) async throws -> JSValue) -> JSOneshotClosure
@@ -120,6 +125,11 @@ public class JSClosure: JSFunction, JSClosureProtocol {
 
         // 3. Retain the given body in static storage by `funcRef`.
         Self.sharedClosures.wrappedValue[hostFuncRef] = (self, body)
+    }
+
+    @available(*, unavailable, message: "JSClosure does not support dictionary literal initialization")
+    public required init(dictionaryLiteral elements: (String, JSValue)...) {
+        fatalError("JSClosure does not support dictionary literal initialization")
     }
 
     #if compiler(>=5.5) && !hasFeature(Embedded)
