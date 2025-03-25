@@ -46,18 +46,30 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     ///
     /// - Parameter array: The array that will be copied to create a new instance of TypedArray
     public convenience init(_ array: [Element]) {
-        let jsArrayRef = array.withUnsafeBufferPointer { ptr in
-            // Retain the constructor function to avoid it being released before calling `swjs_create_typed_array`
-            withExtendedLifetime(Self.constructor!) { ctor in
-                swjs_create_typed_array(ctor.id, ptr.baseAddress, Int32(array.count))
-            }
+        let object = array.withUnsafeBufferPointer { buffer in
+            Self.createTypedArray(from: buffer)
         }
-        self.init(unsafelyWrapping: JSObject(id: jsArrayRef))
+        self.init(unsafelyWrapping: object)
     }
 
     /// Convenience initializer for `Sequence`.
     public convenience init<S: Sequence>(_ sequence: S) where S.Element == Element {
         self.init(Array(sequence))
+    }
+
+    /// Initialize a new instance of TypedArray in JavaScript environment with given buffer contents.
+    ///
+    /// - Parameter buffer: The buffer that will be copied to create a new instance of TypedArray
+    public convenience init(buffer: UnsafeBufferPointer<Element>) {
+        self.init(unsafelyWrapping: Self.createTypedArray(from: buffer))
+    }
+
+    private static func createTypedArray(from buffer: UnsafeBufferPointer<Element>) -> JSObject {
+        // Retain the constructor function to avoid it being released before calling `swjs_create_typed_array`
+        let jsArrayRef = withExtendedLifetime(Self.constructor!) { ctor in
+            swjs_create_typed_array(ctor.id, buffer.baseAddress, Int32(buffer.count))
+        }
+        return JSObject(id: jsArrayRef)
     }
 
     /// Length (in bytes) of the typed array.

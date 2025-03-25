@@ -97,4 +97,16 @@ final class JSTypedArrayTests: XCTestCase {
 
         XCTAssertEqual(toString(array.jsValue.object!), jsStringify(Array(0..<100)))
     }
+
+    func testInitWithBufferPointer() {
+        let buffer = UnsafeMutableBufferPointer<Float32>.allocate(capacity: 20)
+        defer { buffer.deallocate() }
+        for i in 0..<20 {
+            buffer[i] = Float32(i)
+        }
+        let typedArray = JSTypedArray<Float32>(buffer: UnsafeBufferPointer(buffer))
+        for i in 0..<20 {
+            XCTAssertEqual(typedArray[i], Float32(i))
+        }
+    }
 }
