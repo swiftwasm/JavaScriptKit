@@ -250,7 +250,6 @@ enum OwnedExecutor {
     }
 }
 
-
 @main struct Main {
     @MainActor static var app: App?
 
