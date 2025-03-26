@@ -323,7 +323,7 @@ struct PackageToJSPlugin: CommandPlugin {
             }
             buildConfiguration = _buildConfiguration
         } else {
-            buildConfiguration = .debug
+            buildConfiguration = .inherit
         }
         var parameters = PackageManager.BuildParameters(
             configuration: buildConfiguration,
