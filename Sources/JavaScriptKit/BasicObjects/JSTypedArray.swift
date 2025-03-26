@@ -79,6 +79,11 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
         Int(jsObject["byteLength"].number!)
     }
 
+    /// Length (in elements) of the typed array.
+    public var length: Int {
+        Int(jsObject["length"].number!)
+    }
+
     /// Calls the given closure with a pointer to a copy of the underlying bytes of the
     /// array's storage.
     ///
@@ -93,18 +98,10 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     ///   argument is valid only for the duration of the closure's execution.
     /// - Returns: The return value, if any, of the `body` closure parameter.
     public func withUnsafeBytes<R>(_ body: (UnsafeBufferPointer<Element>) throws -> R) rethrows -> R {
-        let bytesLength = lengthInBytes
-        let rawBuffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: bytesLength)
-        defer { rawBuffer.deallocate() }
-        let baseAddress = rawBuffer.baseAddress!
-        swjs_load_typed_array(jsObject.id, baseAddress)
-        let length = bytesLength / MemoryLayout<Element>.size
-        let rawBaseAddress = UnsafeRawPointer(baseAddress)
-        let bufferPtr = UnsafeBufferPointer<Element>(
-            start: rawBaseAddress.assumingMemoryBound(to: Element.self),
-            count: length
-        )
-        let result = try body(bufferPtr)
+        let buffer = UnsafeMutableBufferPointer<Element>.allocate(capacity: length)
+        defer { buffer.deallocate() }
+        copyMemory(to: buffer)
+        let result = try body(UnsafeBufferPointer(buffer))
         return result
     }
 
@@ -124,21 +121,22 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     /// - Returns: The return value, if any, of the `body`async closure parameter.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public func withUnsafeBytesAsync<R>(_ body: (UnsafeBufferPointer<Element>) async throws -> R) async rethrows -> R {
-        let bytesLength = lengthInBytes
-        let rawBuffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: bytesLength)
-        defer { rawBuffer.deallocate() }
-        let baseAddress = rawBuffer.baseAddress!
-        swjs_load_typed_array(jsObject.id, baseAddress)
-        let length = bytesLength / MemoryLayout<Element>.size
-        let rawBaseAddress = UnsafeRawPointer(baseAddress)
-        let bufferPtr = UnsafeBufferPointer<Element>(
-            start: rawBaseAddress.assumingMemoryBound(to: Element.self),
-            count: length
-        )
-        let result = try await body(bufferPtr)
+        let buffer = UnsafeMutableBufferPointer<Element>.allocate(capacity: length)
+        defer { buffer.deallocate() }
+        copyMemory(to: buffer)
+        let result = try await body(UnsafeBufferPointer(buffer))
         return result
     }
     #endif
+
+    /// Copies the contents of the array to the given buffer.
+    ///
+    /// - Parameter buffer: The buffer to copy the contents of the array to.
+    ///   The buffer must have enough space to accommodate the contents of the array.
+    public func copyMemory(to buffer: UnsafeMutableBufferPointer<Element>) {
+        precondition(buffer.count >= length, "Buffer is too small to hold the contents of the array")
+        swjs_load_typed_array(jsObject.id, buffer.baseAddress!)
+    }
 }
 
 // MARK: - Int and UInt support
