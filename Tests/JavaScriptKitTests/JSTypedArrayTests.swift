@@ -109,4 +109,18 @@ final class JSTypedArrayTests: XCTestCase {
             XCTAssertEqual(typedArray[i], Float32(i))
         }
     }
+
+    func testCopyMemory() {
+        let array = JSTypedArray<Int>(length: 100)
+        for i in 0..<100 {
+            array[i] = i
+        }
+        let destination = UnsafeMutableBufferPointer<Int>.allocate(capacity: 100)
+        defer { destination.deallocate() }
+        array.copyMemory(to: destination)
+
+        for i in 0..<100 {
+            XCTAssertEqual(destination[i], i)
+        }
+    }
 }
