@@ -494,7 +494,7 @@ class JavaScriptKitTests: XCTestCase {
     }
 
     func testJSValueAccessor() {
-        var globalObject1 = JSObject.global.globalObject1
+        let globalObject1 = JSObject.global.globalObject1
         XCTAssertEqual(globalObject1.prop_1.nested_prop, .number(1))
         XCTAssertEqual(globalObject1.object!.prop_1.object!.nested_prop, .number(1))
 

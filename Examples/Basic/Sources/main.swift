@@ -4,11 +4,11 @@ import JavaScriptKit
 let alert = JSObject.global.alert.function!
 let document = JSObject.global.document
 
-var divElement = document.createElement("div")
+let divElement = document.createElement("div")
 divElement.innerText = "Hello, world"
 _ = document.body.appendChild(divElement)
 
-var buttonElement = document.createElement("button")
+let buttonElement = document.createElement("button")
 buttonElement.innerText = "Alert demo"
 buttonElement.onclick = .object(
     JSClosure { _ in
@@ -30,7 +30,7 @@ struct Response: Decodable {
     let uuid: String
 }
 
-var asyncButtonElement = document.createElement("button")
+let asyncButtonElement = document.createElement("button")
 asyncButtonElement.innerText = "Fetch UUID demo"
 asyncButtonElement.onclick = .object(
     JSClosure { _ in

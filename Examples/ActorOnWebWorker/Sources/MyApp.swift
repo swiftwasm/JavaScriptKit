@@ -120,13 +120,13 @@ final class App {
     private let alert = JSObject.global.alert.function!
 
     // UI elements
-    private var container: JSValue
-    private var urlInput: JSValue
-    private var indexButton: JSValue
-    private var searchInput: JSValue
-    private var searchButton: JSValue
-    private var statusElement: JSValue
-    private var resultsElement: JSValue
+    private let container: JSValue
+    private let urlInput: JSValue
+    private let indexButton: JSValue
+    private let searchInput: JSValue
+    private let searchButton: JSValue
+    private let statusElement: JSValue
+    private let resultsElement: JSValue
 
     // Search service
     private let service: SearchService
@@ -214,13 +214,13 @@ final class App {
         resultsElement.innerHTML = .string("")
 
         if results.isEmpty {
-            var noResults = document.createElement("p")
+            let noResults = document.createElement("p")
             noResults.innerText = .string("No results found.")
             _ = resultsElement.appendChild(noResults)
         } else {
             // Display up to 10 results
             for (index, result) in results.prefix(10).enumerated() {
-                var resultItem = document.createElement("div")
+                let resultItem = document.createElement("div")
                 resultItem.style = .string(
                     "padding: 10px; margin: 5px 0; background: #f5f5f5; border-left: 3px solid blue;"
                 )

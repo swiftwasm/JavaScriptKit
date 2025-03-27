@@ -7,11 +7,11 @@ print("Hello from WASM, document title: \(document.title.string ?? "")")
 
 var count = 0
 
-var divElement = document.createElement("div")
+let divElement = document.createElement("div")
 divElement.innerText = .string("Count \(count)")
 _ = document.body.appendChild(divElement)
 
-var clickMeElement = document.createElement("button")
+let clickMeElement = document.createElement("button")
 clickMeElement.innerText = "Click me"
 clickMeElement.onclick = JSValue.object(
     JSClosure { _ in
@@ -22,8 +22,8 @@ clickMeElement.onclick = JSValue.object(
 )
 _ = document.body.appendChild(clickMeElement)
 
-var encodeResultElement = document.createElement("pre")
-var textInputElement = document.createElement("input")
+let encodeResultElement = document.createElement("pre")
+let textInputElement = document.createElement("input")
 textInputElement.type = "text"
 textInputElement.placeholder = "Enter text to encode to UTF-8"
 textInputElement.oninput = JSValue.object(
