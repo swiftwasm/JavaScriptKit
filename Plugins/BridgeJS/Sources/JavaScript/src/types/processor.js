@@ -102,7 +102,7 @@ function processDeclaration(node, checker, results) {
         if (constructor) {
             const signature = checker.getSignatureFromDeclaration(constructor);
             if (signature) {
-                classInfo.constructor = processFunctionSignature(signature, checker);
+                classInfo.constructor = processFunctionSignature(signature, checker, "constructor");
             }
         }
 
@@ -112,7 +112,11 @@ function processDeclaration(node, checker, results) {
                 const signature = checker.getSignatureFromDeclaration(member);
                 if (signature) {
                     /** @type {import('./index.d.ts').ImportFunctionSkeleton} */
-                    const methodSignature = processFunctionSignature(signature, checker);
+                    const methodSignature = processFunctionSignature(
+                        signature, 
+                        checker, 
+                        ts.isIdentifier(member.name) ? member.name.text : String(member.name)
+                    );
                     classInfo.methods.push(methodSignature);
                 }
             }
@@ -123,7 +127,7 @@ function processDeclaration(node, checker, results) {
         const signature = checker.getSignatureFromDeclaration(node);
         if (signature) {
             /** @type {import('./index.d.ts').ImportFunctionSkeleton} */
-            const functionSignature = processFunctionSignature(signature, checker);
+            const functionSignature = processFunctionSignature(signature, checker, node.name.text);
             results.functions.push(functionSignature);
         }
     } else if (ts.isVariableStatement(node)) {
@@ -151,13 +155,16 @@ function processDeclaration(node, checker, results) {
  * Process a function signature into ImportFunctionSkeleton format
  * @param {ts.Signature} signature - The function signature
  * @param {ts.TypeChecker} checker - TypeScript type checker
+ * @param {string} functionName - The name of the function
  * @returns {import('./index.d.ts').ImportFunctionSkeleton} Processed function signature
  */
-function processFunctionSignature(signature, checker) {
+function processFunctionSignature(signature, checker, functionName) {
+    console.log("processFunctionSignature", functionName);
     if (!signature) {
+        console.log("signature is null");
         /** @type {import('./index.d.ts').ImportFunctionSkeleton} */
         return {
-            name: "unknown",
+            name: functionName,
             parameters: [],
             returnType: "void"
         };
@@ -170,11 +177,11 @@ function processFunctionSignature(signature, checker) {
 
     /** @type {import('./index.d.ts').ImportFunctionSkeleton} */
     return {
-        name: parameters[0]?.name || "unknown",
+        name: functionName,
         parameters: parameters.map(p => {
-            /** @type {ts.Node} */
-            const declaration = p.valueDeclaration || p.declarations?.[0] || p;
+            const declaration = /** @type {ts.Node} */ (p.valueDeclaration || p.declarations?.[0] || p);
             const type = checker.getTypeOfSymbolAtLocation(p, declaration);
+            // Resolve
             const typeString = checker.typeToString(type);
             const bridgeType = convertToBridgeType(typeString);
             
@@ -193,13 +200,14 @@ function processFunctionSignature(signature, checker) {
  * @returns {import('./index.d.ts').BridgeType} Bridge type
  */
 function convertToBridgeType(typeString) {
+    console.log("convertToBridgeType", typeString);
     const typeMap = {
         "number": "float",
         "string": "string",
         "boolean": "bool",
         "void": "void",
-        "any": "void",
-        "unknown": "void",
+        "any": "unknown",
+        "unknown": "unknown",
         "null": "void",
         "undefined": "void"
     };
