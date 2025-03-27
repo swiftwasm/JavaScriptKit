@@ -2,8 +2,10 @@
 import { MODULE_PATH /* #if USE_SHARED_MEMORY */, MEMORY_TYPE /* #endif */} from "../instantiate.js"
 /* #if IS_WASI */
 /* #if USE_WASI_CDN */
+// @ts-ignore
 import { WASI, File, OpenFile, ConsoleStdout, PreopenDirectory } from 'https://cdn.jsdelivr.net/npm/@bjorn3/browser_wasi_shim@0.4.1/+esm';
 /* #else */
+// @ts-ignore
 import { WASI, File, OpenFile, ConsoleStdout, PreopenDirectory } from '@bjorn3/browser_wasi_shim';
 /* #endif */
 /* #endif */
