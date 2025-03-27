@@ -67,7 +67,7 @@ let excluded: Set<String> = [
     URL(fileURLWithPath: #filePath).lastPathComponent,
 ]
 
-/// Returns a list of directories to format.
+/// Returns a list of file paths to format.
 func filesToFormat() -> [String] {
     var files: [String] = []
     let fileManager = FileManager.default
