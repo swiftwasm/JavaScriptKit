@@ -77,7 +77,7 @@ public struct JSString: LosslessStringConvertible, Equatable {
     ///   - lhs: A string to compare.
     ///   - rhs: Another string to compare.
     public static func == (lhs: JSString, rhs: JSString) -> Bool {
-        return lhs.guts.buffer == rhs.guts.buffer
+        return swjs_value_equals(lhs.guts.jsRef, rhs.guts.jsRef)
     }
 }
 

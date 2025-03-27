@@ -479,6 +479,13 @@ export class SwiftRuntime {
                 return obj instanceof constructor;
             },
 
+            swjs_value_equals: (lhs_ref: ref, rhs_ref: ref) => {
+                const memory = this.memory;
+                const lhs = memory.getObject(lhs_ref);
+                const rhs = memory.getObject(rhs_ref);
+                return lhs == rhs;
+            },
+
             swjs_create_function: (
                 host_func_id: number,
                 line: number,

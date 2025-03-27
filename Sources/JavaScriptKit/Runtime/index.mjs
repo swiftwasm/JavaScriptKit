@@ -598,6 +598,12 @@ class SwiftRuntime {
                 const constructor = memory.getObject(constructor_ref);
                 return obj instanceof constructor;
             },
+            swjs_value_equals: (lhs_ref, rhs_ref) => {
+                const memory = this.memory;
+                const lhs = memory.getObject(lhs_ref);
+                const rhs = memory.getObject(rhs_ref);
+                return lhs == rhs;
+            },
             swjs_create_function: (host_func_id, line, file) => {
                 var _a;
                 const fileString = this.memory.getObject(file);
