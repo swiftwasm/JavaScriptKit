@@ -1,7 +1,7 @@
 import type { InstantiateOptions } from "../instantiate.js"
 import type { Worker } from "node:worker_threads"
 
-export async function defaultNodeSetup(options: {
+export function defaultNodeSetup(options: {
 /* #if IS_WASI */
     args?: string[],
 /* #endif */
