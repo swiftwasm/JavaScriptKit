@@ -1,5 +1,5 @@
 // import type { createImports } from "../JavaScript/index.mjs"
-import type chroma from "chroma-js"
+// import type chroma from "chroma-js"
 
 // declare class Greeter {
 //     constructor(name: string);
@@ -7,9 +7,10 @@ import type chroma from "chroma-js"
 //     changeName(name: string): void;
 // }
 
-export type Exports = {
-    // log: (message: string) => void;
-    // chroma: typeof chroma;
-    // Greeter: typeof Greeter;
-    document: Pick<Document, "createElement" | "appendChild">
-}
+// export type Exports = {
+//     // log: (message: string) => void;
+//     // chroma: typeof chroma;
+//     // Greeter: typeof Greeter;
+// }
+
+export declare const document: Pick<Document, "createElement">

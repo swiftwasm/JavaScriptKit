@@ -30,7 +30,7 @@ export function createProgram(filePath) {
  * Process type declarations from a TypeScript program
  * @param {ts.Program} program - TypeScript program
  * @param {string} inputFilePath - Path to the input file
- * @returns {Object} Processed type declarations
+ * @returns {Object} Processed type declarations in ImportSkeleton format
  */
 export function processTypeDeclarations(program, inputFilePath) {
     const checker = program.getTypeChecker();
@@ -38,31 +38,25 @@ export function processTypeDeclarations(program, inputFilePath) {
         sf => !sf.isDeclarationFile || sf.fileName === inputFilePath
     );
 
-    const results = {};
-    const typeCache = new Map();
-    const nominalTypesMap = new Map();
+    /** @type {import('./index.d.ts').ImportSkeleton} */
+    const results = {
+        functions: [],
+        classes: []
+    };
 
     for (const sourceFile of sourceFiles) {
         if (sourceFile.fileName.includes('node_modules/typescript/lib')) continue;
 
-        results[sourceFile.fileName] = {
-            fileName: sourceFile.fileName,
-            declarations: []
-        };
-
         try {
             ts.forEachChild(sourceFile, node => {
                 if (isDeclarationNode(node)) {
-                    processDeclaration(node, checker, results[sourceFile.fileName].declarations, typeCache, nominalTypesMap);
+                    processDeclaration(node, checker, results);
                 }
             });
         } catch (error) {
             console.error(`Error processing ${sourceFile.fileName}: ${error.message}`);
         }
     }
-
-    // Add referenced nominal types to results
-    results.referencedNominalTypes = Array.from(nominalTypesMap.values());
 
     return results;
 }
@@ -86,238 +80,149 @@ function isDeclarationNode(node) {
  * Process a declaration node
  * @param {ts.Node} node - The AST node
  * @param {ts.TypeChecker} checker - TypeScript type checker
- * @param {Array} declarations - Array to collect declarations
- * @param {Map} typeCache - Cache for type information
- * @param {Map} nominalTypesMap - Map of nominal types
+ * @param {import('./index.d.ts').ImportSkeleton} results - Results object to store processed declarations
  */
-function processDeclaration(node, checker, declarations, typeCache, nominalTypesMap) {
-    if (ts.isInterfaceDeclaration(node) || 
-        ts.isClassDeclaration(node) || 
-        ts.isTypeAliasDeclaration(node) || 
-        ts.isEnumDeclaration(node) || 
-        ts.isFunctionDeclaration(node)) {
-        
-        if (node.name) {
-            const type = getNodeType(node, checker, typeCache, nominalTypesMap);
-            declarations.push({
-                kind: ts.SyntaxKind[node.kind],
-                name: node.name.text,
-                type,
-                location: {
-                    start: node.getStart(),
-                    end: node.getEnd()
+function processDeclaration(node, checker, results) {
+    if (ts.isClassDeclaration(node) && node.name) {
+        /** @type {import('./index.d.ts').ImportClassSkeleton} */
+        const classInfo = {
+            name: node.name.text,
+            constructor: {
+                name: "constructor",
+                parameters: [],
+                returnType: "void"
+            },
+            methods: []
+        };
+
+        // Process constructor
+        const constructor = node.members.find(member => 
+            ts.isConstructorDeclaration(member)
+        );
+        if (constructor) {
+            const signature = checker.getSignatureFromDeclaration(constructor);
+            if (signature) {
+                classInfo.constructor = processFunctionSignature(signature, checker);
+            }
+        }
+
+        // Process methods
+        node.members.forEach(member => {
+            if (ts.isMethodDeclaration(member) && member.name) {
+                const signature = checker.getSignatureFromDeclaration(member);
+                if (signature) {
+                    /** @type {import('./index.d.ts').ImportFunctionSkeleton} */
+                    const methodSignature = processFunctionSignature(signature, checker);
+                    classInfo.methods.push(methodSignature);
                 }
-            });
+            }
+        });
+
+        results.classes.push(classInfo);
+    } else if (ts.isFunctionDeclaration(node) && node.name) {
+        const signature = checker.getSignatureFromDeclaration(node);
+        if (signature) {
+            /** @type {import('./index.d.ts').ImportFunctionSkeleton} */
+            const functionSignature = processFunctionSignature(signature, checker);
+            results.functions.push(functionSignature);
         }
     } else if (ts.isVariableStatement(node)) {
         for (const declaration of node.declarationList.declarations) {
             if (declaration.name && ts.isIdentifier(declaration.name)) {
                 const type = checker.getTypeAtLocation(declaration);
-                declarations.push({
-                    kind: "VariableDeclaration",
-                    name: declaration.name.text,
-                    type: serializeType(type, checker, typeCache, nominalTypesMap),
-                    location: {
-                        start: declaration.getStart(),
-                        end: declaration.getEnd()
-                    }
-                });
-            }
-        }
-    } else if (ts.isModuleDeclaration(node)) {
-        declarations.push({
-            kind: "ModuleDeclaration",
-            name: node.name.text,
-            location: {
-                start: node.getStart(),
-                end: node.getEnd()
-            }
-        });
-
-        if (node.body && ts.isModuleBlock(node.body)) {
-            ts.forEachChild(node.body, child => {
-                if (isDeclarationNode(child)) {
-                    processDeclaration(child, checker, declarations, typeCache, nominalTypesMap);
+                const typeString = checker.typeToString(type);
+                const bridgeType = convertToBridgeType(typeString);
+                
+                if (bridgeType) {
+                    /** @type {import('./index.d.ts').ImportFunctionSkeleton} */
+                    const functionSignature = {
+                        name: declaration.name.text,
+                        parameters: [],
+                        returnType: bridgeType
+                    };
+                    results.functions.push(functionSignature);
                 }
-            });
+            }
         }
     }
 }
 
 /**
- * Get the type of a node
- * @param {ts.Node} node - The AST node
+ * Process a function signature into ImportFunctionSkeleton format
+ * @param {ts.Signature} signature - The function signature
  * @param {ts.TypeChecker} checker - TypeScript type checker
- * @param {Map} typeCache - Cache for type information
- * @param {Map} nominalTypesMap - Map of nominal types
- * @returns {Object} Serialized type information
+ * @returns {import('./index.d.ts').ImportFunctionSkeleton} Processed function signature
  */
-function getNodeType(node, checker, typeCache, nominalTypesMap) {
-    if (ts.isInterfaceDeclaration(node) || ts.isClassDeclaration(node)) {
-        if (node.name) {
-            const symbol = checker.getSymbolAtLocation(node.name);
-            if (symbol) {
-                const type = checker.getDeclaredTypeOfSymbol(symbol);
-                return serializeType(type, checker, typeCache, nominalTypesMap);
-            }
-        }
-    } else if (ts.isTypeAliasDeclaration(node)) {
-        if (node.name) {
-            const type = checker.getTypeAtLocation(node.name);
-            return serializeType(type, checker, typeCache, nominalTypesMap);
-        }
-    } else if (ts.isEnumDeclaration(node)) {
-        if (node.name) {
-            const symbol = checker.getSymbolAtLocation(node.name);
-            if (symbol) {
-                const type = checker.getDeclaredTypeOfSymbol(symbol);
-                return serializeType(type, checker, typeCache, nominalTypesMap);
-            }
-        }
-    } else if (ts.isFunctionDeclaration(node)) {
-        const signature = checker.getSignatureFromDeclaration(node);
-        if (signature) {
-            return serializeSignature(signature, checker, typeCache, nominalTypesMap);
-        }
+function processFunctionSignature(signature, checker) {
+    if (!signature) {
+        /** @type {import('./index.d.ts').ImportFunctionSkeleton} */
+        return {
+            name: "unknown",
+            parameters: [],
+            returnType: "void"
+        };
     }
 
-    return "unknown";
-}
+    const parameters = signature.getParameters();
+    const returnType = signature.getReturnType();
+    const returnTypeString = checker.typeToString(returnType);
+    const bridgeReturnType = convertToBridgeType(returnTypeString);
 
-/**
- * Serialize a TypeScript type
- * @param {ts.Type} type - The TypeScript type
- * @param {ts.TypeChecker} checker - TypeScript type checker
- * @param {Map} typeCache - Cache for type information
- * @param {Map} nominalTypesMap - Map of nominal types
- * @returns {Object} Serialized type information
- */
-function serializeType(type, checker, typeCache, nominalTypesMap) {
-    if (!type) return "unknown";
-
-    // Check cache first
-    const typeId = type.id;
-    if (typeCache.has(typeId)) {
-        return typeCache.get(typeId);
-    }
-
-    const result = {
-        name: checker.typeToString(type),
-        flags: getFlagNames(type.flags, ts.TypeFlags)
-    };
-
-    // Handle different type kinds
-    if (type.isUnion && type.isUnion()) {
-        result.unionTypes = type.types.map(t => serializeType(t, checker, typeCache, nominalTypesMap));
-    } else if (type.isIntersection && type.isIntersection()) {
-        result.intersectionTypes = type.types.map(t => serializeType(t, checker, typeCache, nominalTypesMap));
-    }
-
-    // Handle call signatures
-    if (type.getCallSignatures && type.getCallSignatures().length) {
-        result.callSignatures = type.getCallSignatures().map(s => 
-            serializeSignature(s, checker, typeCache, nominalTypesMap));
-    }
-
-    // Handle construct signatures
-    if (type.getConstructSignatures && type.getConstructSignatures().length) {
-        result.constructSignatures = type.getConstructSignatures().map(s => 
-            serializeSignature(s, checker, typeCache, nominalTypesMap));
-    }
-
-    // Handle properties
-    if (type.getProperties && type.getProperties().length) {
-        result.properties = type.getProperties().map(p => {
-            const propInfo = {
+    /** @type {import('./index.d.ts').ImportFunctionSkeleton} */
+    return {
+        name: parameters[0]?.name || "unknown",
+        parameters: parameters.map(p => {
+            /** @type {ts.Node} */
+            const declaration = p.valueDeclaration || p.declarations?.[0] || p;
+            const type = checker.getTypeOfSymbolAtLocation(p, declaration);
+            const typeString = checker.typeToString(type);
+            const bridgeType = convertToBridgeType(typeString);
+            
+            return {
                 name: p.name,
-                flags: getFlagNames(p.flags, ts.SymbolFlags)
+                type: bridgeType || "void"
             };
-
-            if (p.valueDeclaration) {
-                try {
-                    const propType = checker.getTypeOfSymbolAtLocation(p, p.valueDeclaration);
-                    propInfo.type = serializeType(propType, checker, typeCache, nominalTypesMap);
-                    propInfo.optional = !!p.valueDeclaration.questionToken;
-
-                    if (propInfo.flags.includes("Method") || 
-                        (propType.getCallSignatures && propType.getCallSignatures().length > 0)) {
-                        const signatures = propType.getCallSignatures();
-                        if (signatures && signatures.length > 0) {
-                            propInfo.functionType = processFunctionType(signatures[0], checker);
-                        }
-                    }
-                } catch (typeError) {
-                    propInfo.typeError = `Error getting property type: ${typeError.message}`;
-                }
-            }
-
-            return propInfo;
-        });
-    }
-
-    // Cache the result
-    typeCache.set(typeId, result);
-    return result;
-}
-
-/**
- * Serialize a function signature
- * @param {ts.Signature} signature - The function signature
- * @param {ts.TypeChecker} checker - TypeScript type checker
- * @param {Map} typeCache - Cache for type information
- * @param {Map} nominalTypesMap - Map of nominal types
- * @returns {Object} Serialized signature information
- */
-function serializeSignature(signature, checker, typeCache, nominalTypesMap) {
-    if (!signature) return null;
-
-    const parameters = signature.getParameters();
-    const returnType = signature.getReturnType();
-
-    return {
-        parameters: parameters.map(p => ({
-            name: p.name,
-            type: serializeType(checker.getTypeOfSymbolAtLocation(p, p.valueDeclaration), checker, typeCache, nominalTypesMap),
-            optional: !!p.valueDeclaration?.questionToken
-        })),
-        returnType: serializeType(returnType, checker, typeCache, nominalTypesMap)
+        }),
+        returnType: bridgeReturnType || "void"
     };
 }
 
 /**
- * Process function type information
- * @param {ts.Signature} signature - The function signature
- * @param {ts.TypeChecker} checker - TypeScript type checker
- * @returns {Object} Processed function type information
+ * Convert TypeScript type string to BridgeType
+ * @param {string} typeString - TypeScript type string
+ * @returns {import('./index.d.ts').BridgeType} Bridge type
  */
-function processFunctionType(signature, checker) {
-    if (!signature || !checker) return null;
-    
-    const parameters = signature.getParameters();
-    const returnType = signature.getReturnType();
-
-    return {
-        parameters: parameters.map(p => ({
-            name: p.name,
-            type: checker.typeToString(checker.getTypeOfSymbolAtLocation(p, p.valueDeclaration)),
-            optional: !!p.valueDeclaration?.questionToken
-        })),
-        returnType: checker.typeToString(returnType)
+function convertToBridgeType(typeString) {
+    const typeMap = {
+        "number": "float",
+        "string": "string",
+        "boolean": "bool",
+        "void": "void",
+        "any": "void",
+        "unknown": "void",
+        "null": "void",
+        "undefined": "void"
     };
-}
 
-/**
- * Get flag names from a bit flag value
- * @param {number} flags - The bit flags
- * @param {Object} flagsEnum - The enum with flag definitions
- * @returns {string[]} Array of flag names
- */
-function getFlagNames(flags, flagsEnum) {
-    const result = [];
-    for (const flag in flagsEnum) {
-        if (typeof flagsEnum[flag] === 'number' && (flags & flagsEnum[flag]) !== 0) {
-            result.push(flag);
-        }
+    // Handle array types
+    if (typeString.endsWith("[]")) {
+        return "string"; // Arrays are converted to strings in bridge
     }
-    return result;
+
+    // Handle union types
+    if (typeString.includes("|")) {
+        return "string"; // Union types are converted to strings in bridge
+    }
+
+    // Handle intersection types
+    if (typeString.includes("&")) {
+        return "string"; // Intersection types are converted to strings in bridge
+    }
+
+    // Handle function types
+    if (typeString.includes("=>")) {
+        return "void"; // Function types are converted to void in bridge
+    }
+
+    return typeMap[typeString] || "void";
 }
