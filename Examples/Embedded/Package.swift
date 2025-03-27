@@ -1,11 +1,11 @@
-// swift-tools-version:6.0
+// swift-tools-version:6.1
 
 import PackageDescription
 
 let package = Package(
     name: "Embedded",
     dependencies: [
-        .package(name: "JavaScriptKit", path: "../../"),
+        .package(name: "JavaScriptKit", path: "../../", traits: ["Embedded"]),
         .package(url: "https://github.com/swiftwasm/swift-dlmalloc", branch: "0.1.0"),
     ],
     targets: [
