@@ -161,9 +161,11 @@ struct PackageToJSPlugin: CommandPlugin {
         }
 
         // Build products
+        let selfPackage = try findSelfPackage(in: context.package)
         let productName = try buildOptions.product ?? deriveDefaultProduct(package: context.package)
         let build = try buildWasm(
             productName: productName,
+            selfPackage: selfPackage,
             context: context,
             options: buildOptions.packageOptions
         )
@@ -178,14 +180,6 @@ struct PackageToJSPlugin: CommandPlugin {
             } else {
                 context.pluginWorkDirectoryURL.appending(path: "Package")
             }
-        guard
-            let selfPackage = findPackageInDependencies(
-                package: context.package,
-                id: Self.JAVASCRIPTKIT_PACKAGE_ID
-            )
-        else {
-            throw PackageToJSError("Failed to find JavaScriptKit in dependencies!?")
-        }
         var make = MiniMake(
             explain: buildOptions.packageOptions.explain,
             printProgress: self.printProgress
@@ -226,9 +220,11 @@ struct PackageToJSPlugin: CommandPlugin {
             exit(1)
         }
 
+        let selfPackage = try findSelfPackage(in: context.package)
         let productName = "\(context.package.displayName)PackageTests"
         let build = try buildWasm(
             productName: productName,
+            selfPackage: selfPackage,
             context: context,
             options: testOptions.packageOptions
         )
@@ -264,14 +260,6 @@ struct PackageToJSPlugin: CommandPlugin {
             } else {
                 context.pluginWorkDirectoryURL.appending(path: "PackageTests")
             }
-        guard
-            let selfPackage = findPackageInDependencies(
-                package: context.package,
-                id: Self.JAVASCRIPTKIT_PACKAGE_ID
-            )
-        else {
-            throw PackageToJSError("Failed to find JavaScriptKit in dependencies!?")
-        }
         var make = MiniMake(
             explain: testOptions.packageOptions.explain,
             printProgress: self.printProgress
@@ -311,6 +299,7 @@ struct PackageToJSPlugin: CommandPlugin {
 
     private func buildWasm(
         productName: String,
+        selfPackage: Package,
         context: PluginContext,
         options: PackageToJS.PackageOptions
     ) throws
@@ -331,11 +320,7 @@ struct PackageToJSPlugin: CommandPlugin {
         )
         parameters.echoLogs = true
         parameters.otherSwiftcFlags = ["-color-diagnostics"]
-        let buildingForEmbedded =
-            ProcessInfo.processInfo.environment["JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM"].flatMap(
-                Bool.init
-            ) ?? false
-        if !buildingForEmbedded {
+        if !isBuildingForEmbedded(selfPackage: selfPackage) {
             // NOTE: We only support static linking for now, and the new SwiftDriver
             // does not infer `-static-stdlib` for WebAssembly targets intentionally
             // for future dynamic linking support.
@@ -353,6 +338,31 @@ struct PackageToJSPlugin: CommandPlugin {
             }
         }
         return try self.packageManager.build(.product(productName), parameters: parameters)
+    }
+
+    /// Check if the build is for embedded WebAssembly
+    private func isBuildingForEmbedded(selfPackage: Package) -> Bool {
+        let coreTarget = selfPackage.targets.first { $0.name == "JavaScriptKit" }
+        guard let swiftTarget = coreTarget as? SwiftSourceModuleTarget else {
+            return false
+        }
+        // SwiftPM defines "Embedded" compilation condition when `Embedded` experimental
+        // feature is enabled.
+        // TODO: This should be replaced with a proper trait-based solution in the future.
+        return swiftTarget.compilationConditions.contains("Embedded")
+    }
+
+    /// Find JavaScriptKit package in the dependencies of the given package recursively
+    private func findSelfPackage(in package: Package) throws -> Package {
+        guard
+            let selfPackage = findPackageInDependencies(
+                package: package,
+                id: Self.JAVASCRIPTKIT_PACKAGE_ID
+            )
+        else {
+            throw PackageToJSError("Failed to find JavaScriptKit in dependencies!?")
+        }
+        return selfPackage
     }
 
     /// Clean if the build graph of the packaging process has changed
