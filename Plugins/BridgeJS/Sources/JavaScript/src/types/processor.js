@@ -14,13 +14,11 @@ import { visitNode } from './collector.js';
 /**
  * Create a TypeScript program from a d.ts file
  * @param {string} filePath - Path to the d.ts file
- * @param {Object} deps - Dependencies
- * @param {TypeScript} deps.ts - TypeScript module
  * @returns {ts.Program} TypeScript program object
  */
-export function createProgram(filePath, deps = { ts }) {
-    const tsModule = deps.ts || ts;
-    
+export function createProgram(filePath) {
+    const tsModule = ts;
+
     const options = {
         target: tsModule.ScriptTarget.ESNext,
         module: tsModule.ModuleKind.ESNext,
@@ -40,15 +38,13 @@ export function createProgram(filePath, deps = { ts }) {
  * @param {Array} declarations - Array to collect declarations
  * @param {Map} typeCache - Cache for type information
  * @param {Map} nominalTypesMap - Map of nominal types
- * @param {Object} deps - Dependencies
- * @param {TypeScript} deps.ts - TypeScript module 
  */
-export function processDeclaration(node, checker, declarations, typeCache, nominalTypesMap, deps = { ts }) {
-    const tsModule = deps.ts || ts;
-    
+export function processDeclaration(node, checker, declarations, typeCache, nominalTypesMap) {
+    const tsModule = ts;
+
     if (node.name) {
         let name = node.name.text;
-        let type = getNodeType(node, checker, typeCache, nominalTypesMap, deps);
+        let type = getNodeType(node, checker, typeCache, nominalTypesMap);
 
         declarations.push({
             kind: tsModule.SyntaxKind[node.kind],
@@ -69,7 +65,7 @@ export function processDeclaration(node, checker, declarations, typeCache, nomin
                 declarations.push({
                     kind: "VariableDeclaration",
                     name: name,
-                    type: serializeType(type, checker, typeCache, nominalTypesMap, deps),
+                    type: serializeType(type, checker, typeCache, nominalTypesMap),
                     location: {
                         start: declaration.getStart(),
                         end: declaration.getEnd()
@@ -80,7 +76,7 @@ export function processDeclaration(node, checker, declarations, typeCache, nomin
     } else if (tsModule.isModuleDeclaration(node)) {
         // Handle module declarations
         let name = node.name.text;
-        
+
         declarations.push({
             kind: "ModuleDeclaration",
             name: name,
@@ -89,12 +85,12 @@ export function processDeclaration(node, checker, declarations, typeCache, nomin
                 end: node.getEnd()
             }
         });
-        
+
         // Process declarations inside the module
         if (node.body && tsModule.isModuleBlock(node.body)) {
             tsModule.forEachChild(node.body, child => {
                 if (child.kind) {
-                    processDeclaration(child, checker, declarations, typeCache, nominalTypesMap, deps);
+                    processDeclaration(child, checker, declarations, typeCache, nominalTypesMap);
                 }
             });
         }
@@ -111,28 +107,28 @@ export function processDeclaration(node, checker, declarations, typeCache, nomin
  * @param {Object} deps.ts - TypeScript module
  * @returns {Object} Serialized type information
  */
-export function getNodeType(node, checker, typeCache, nominalTypesMap, deps = { ts }) {
-    const tsModule = deps.ts || ts;
-    
+export function getNodeType(node, checker, typeCache, nominalTypesMap) {
+    const tsModule = ts;
+
     if (tsModule.isInterfaceDeclaration(node) || tsModule.isClassDeclaration(node)) {
         const symbol = checker.getSymbolAtLocation(node.name);
         if (symbol) {
             const type = checker.getDeclaredTypeOfSymbol(symbol);
-            return serializeType(type, checker, typeCache, nominalTypesMap, deps);
+            return serializeType(type, checker, typeCache, nominalTypesMap);
         }
     } else if (tsModule.isTypeAliasDeclaration(node)) {
         const type = checker.getTypeAtLocation(node.name);
-        return serializeType(type, checker, typeCache, nominalTypesMap, deps);
+        return serializeType(type, checker, typeCache, nominalTypesMap);
     } else if (tsModule.isEnumDeclaration(node)) {
         const symbol = checker.getSymbolAtLocation(node.name);
         if (symbol) {
             const type = checker.getDeclaredTypeOfSymbol(symbol);
-            return serializeType(type, checker, typeCache, nominalTypesMap, deps);
+            return serializeType(type, checker, typeCache, nominalTypesMap);
         }
     } else if (tsModule.isFunctionDeclaration(node)) {
         const signature = checker.getSignatureFromDeclaration(node);
         if (signature) {
-            return serializeSignature(signature, checker, typeCache, nominalTypesMap, deps);
+            return serializeSignature(signature, checker, typeCache, nominalTypesMap);
         }
     } else if (tsModule.isModuleDeclaration(node)) {
         // For module declarations, return a reference to the module
@@ -149,17 +145,13 @@ export function getNodeType(node, checker, typeCache, nominalTypesMap, deps = { 
  * Process the type declarations and resolve non-nominal types
  * @param {ts.Program} program - TypeScript program
  * @param {string} inputFilePath - Path to the input file
- * @param {Object} deps - Dependencies
- * @param {TypeScript} deps.ts - TypeScript module
- * @param {Object} deps.console - Console object
- * @param {Object} deps.collector - Collector module
  * @returns {Object} Processed type declarations
  */
-export function processTypeDeclarations(program, inputFilePath, deps) {
-    const tsModule = deps.ts || ts;
-    const consoleObj = deps.console || console;
-    const collectorModule = deps.collector || { visitNode };
-    
+export function processTypeDeclarations(program, inputFilePath) {
+    const tsModule = ts;
+    const consoleObj = console;
+    const collectorModule = { visitNode };
+
     const checker = program.getTypeChecker();
     const sourceFiles = program.getSourceFiles().filter(
         sf => !sf.isDeclarationFile || sf.fileName === inputFilePath
@@ -168,7 +160,7 @@ export function processTypeDeclarations(program, inputFilePath, deps) {
     const typeCache = new Map();
     const nominalTypesMap = new Map();
     const results = {};
-    
+
     // Store all declarations in a single array for easier access
     const allDeclarations = [];
     const moduleTypes = [];
@@ -197,18 +189,18 @@ export function processTypeDeclarations(program, inputFilePath, deps) {
                             end: node.getEnd()
                         }
                     };
-                    
+
                     moduleTypes.push(moduleDecl);
                     results[sourceFile.fileName].declarations.push(moduleDecl);
-                } 
+                }
                 else if (tsModule.isInterfaceDeclaration(node)) {
                     const interfaceName = node.name.text;
                     const symbol = checker.getSymbolAtLocation(node.name);
-                    
+
                     if (symbol) {
                         const type = checker.getDeclaredTypeOfSymbol(symbol);
-                        const serializedType = serializeType(type, checker, typeCache, nominalTypesMap, deps);
-                        
+                        const serializedType = serializeType(type, checker, typeCache, nominalTypesMap);
+
                         const interfaceDecl = {
                             kind: "InterfaceDeclaration",
                             name: interfaceName,
@@ -218,20 +210,20 @@ export function processTypeDeclarations(program, inputFilePath, deps) {
                                 end: node.getEnd()
                             }
                         };
-                        
+
                         interfaceTypes.push(interfaceDecl);
                         results[sourceFile.fileName].declarations.push(interfaceDecl);
                     }
                 }
             });
-            
+
             // Then process all other nodes regularly
             tsModule.forEachChild(sourceFile, node => {
                 if (!tsModule.isModuleDeclaration(node) && !tsModule.isInterfaceDeclaration(node)) {
-                    collectorModule.visitNode(node, checker, results[sourceFile.fileName].declarations, typeCache, nominalTypesMap, deps);
+                    collectorModule.visitNode(node, checker, results[sourceFile.fileName].declarations, typeCache, nominalTypesMap);
                 }
             });
-            
+
             // Add these declarations to our master list
             allDeclarations.push(...results[sourceFile.fileName].declarations);
         } catch (error) {
@@ -244,14 +236,14 @@ export function processTypeDeclarations(program, inputFilePath, deps) {
     nominalTypesMap.forEach((typeInfo) => {
         // Convert to the same format as declarations
         referencedNominalTypes.push({
-            kind: typeInfo.symbolFlags.includes("Class") ? "ClassDeclaration" : 
-                  typeInfo.symbolFlags.includes("Interface") ? "InterfaceDeclaration" :
-                  typeInfo.symbolFlags.includes("TypeAlias") ? "TypeAliasDeclaration" :
-                  typeInfo.symbolFlags.includes("Enum") ? "EnumDeclaration" :
-                  typeInfo.symbolFlags.includes("Function") ? "FunctionDeclaration" :
-                  typeInfo.symbolFlags.includes("Variable") ? "VariableDeclaration" :
-                  typeInfo.symbolFlags.includes("Module") ? "ModuleDeclaration" :
-                  "UnknownDeclaration",
+            kind: typeInfo.symbolFlags.includes("Class") ? "ClassDeclaration" :
+                typeInfo.symbolFlags.includes("Interface") ? "InterfaceDeclaration" :
+                    typeInfo.symbolFlags.includes("TypeAlias") ? "TypeAliasDeclaration" :
+                        typeInfo.symbolFlags.includes("Enum") ? "EnumDeclaration" :
+                            typeInfo.symbolFlags.includes("Function") ? "FunctionDeclaration" :
+                                typeInfo.symbolFlags.includes("Variable") ? "VariableDeclaration" :
+                                    typeInfo.symbolFlags.includes("Module") ? "ModuleDeclaration" :
+                                        "UnknownDeclaration",
             name: typeInfo.symbolName,
             type: typeInfo,  // Keep the full type info in the "type" field
             location: typeInfo.location || {}
@@ -260,7 +252,7 @@ export function processTypeDeclarations(program, inputFilePath, deps) {
 
     // Add referenced nominal types to the results
     results.referencedNominalTypes = referencedNominalTypes;
-    
+
     // Add the moduleTypes and interfaceTypes to the results
     results.moduleTypes = moduleTypes;
     results.interfaceTypes = interfaceTypes;
