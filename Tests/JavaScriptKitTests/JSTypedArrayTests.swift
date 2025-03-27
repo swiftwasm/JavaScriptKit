@@ -17,8 +17,8 @@ final class JSTypedArrayTests: XCTestCase {
     }
 
     func testTypedArray() {
-        func checkArray<T>(_ array: [T]) where T: TypedArrayElement & Equatable {
-            XCTAssertEqual(toString(JSTypedArray(array).jsValue.object!), jsStringify(array))
+        func checkArray<T>(_ array: [T]) where T: TypedArrayElement & Equatable, T.Element == T {
+            XCTAssertEqual(toString(JSTypedArray<T>(array).jsValue.object!), jsStringify(array))
             checkArrayUnsafeBytes(array)
         }
 
@@ -30,20 +30,20 @@ final class JSTypedArrayTests: XCTestCase {
             array.map({ String(describing: $0) }).joined(separator: ",")
         }
 
-        func checkArrayUnsafeBytes<T>(_ array: [T]) where T: TypedArrayElement & Equatable {
-            let copyOfArray: [T] = JSTypedArray(array).withUnsafeBytes { buffer in
+        func checkArrayUnsafeBytes<T>(_ array: [T]) where T: TypedArrayElement & Equatable, T.Element == T {
+            let copyOfArray: [T] = JSTypedArray<T>(array).withUnsafeBytes { buffer in
                 Array(buffer)
             }
             XCTAssertEqual(copyOfArray, array)
         }
 
         let numbers = [UInt8](0...255)
-        let typedArray = JSTypedArray(numbers)
+        let typedArray = JSTypedArray<UInt8>(numbers)
         XCTAssertEqual(typedArray[12], 12)
         XCTAssertEqual(numbers.count, typedArray.lengthInBytes)
 
         let numbersSet = Set(0...255)
-        let typedArrayFromSet = JSTypedArray(numbersSet)
+        let typedArrayFromSet = JSTypedArray<Int>(numbersSet)
         XCTAssertEqual(typedArrayFromSet.jsObject.length, 256)
         XCTAssertEqual(typedArrayFromSet.lengthInBytes, 256 * MemoryLayout<Int>.size)
 
@@ -63,7 +63,7 @@ final class JSTypedArrayTests: XCTestCase {
             0, 1, .pi, .greatestFiniteMagnitude, .infinity, .leastNonzeroMagnitude,
             .leastNormalMagnitude, 42,
         ]
-        let jsFloat32Array = JSTypedArray(float32Array)
+        let jsFloat32Array = JSTypedArray<Float32>(float32Array)
         for (i, num) in float32Array.enumerated() {
             XCTAssertEqual(num, jsFloat32Array[i])
         }
@@ -72,7 +72,7 @@ final class JSTypedArrayTests: XCTestCase {
             0, 1, .pi, .greatestFiniteMagnitude, .infinity, .leastNonzeroMagnitude,
             .leastNormalMagnitude, 42,
         ]
-        let jsFloat64Array = JSTypedArray(float64Array)
+        let jsFloat64Array = JSTypedArray<Float64>(float64Array)
         for (i, num) in float64Array.enumerated() {
             XCTAssertEqual(num, jsFloat64Array[i])
         }
