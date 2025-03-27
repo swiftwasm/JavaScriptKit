@@ -621,6 +621,7 @@ class SwiftRuntime {
                 // Call `.slice()` to copy the memory
                 return this.memory.retain(array.slice());
             },
+            swjs_create_object: () => { return this.memory.retain({}); },
             swjs_load_typed_array: (ref, buffer) => {
                 const memory = this.memory;
                 const typedArray = memory.getObject(ref);

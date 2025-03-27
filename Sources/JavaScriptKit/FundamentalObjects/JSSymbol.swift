@@ -24,6 +24,11 @@ public class JSSymbol: JSObject {
         super.init(id: id)
     }
 
+    @available(*, unavailable, message: "JSSymbol does not support dictionary literal initialization")
+    public required init(dictionaryLiteral elements: (String, JSValue)...) {
+        fatalError("JSSymbol does not support dictionary literal initialization")
+    }
+
     public static func `for`(key: JSString) -> JSSymbol {
         Symbol.for!(key).symbol!
     }

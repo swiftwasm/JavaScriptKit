@@ -52,6 +52,7 @@ interface ImportedFunctions {
     swjs_instanceof(obj_ref: ref, constructor_ref: ref): boolean;
     swjs_create_function(host_func_id: number, line: number, file: ref): number;
     swjs_create_typed_array(constructor_ref: ref, elementsPtr: pointer, length: number): number;
+    swjs_create_object(): number;
     swjs_load_typed_array(ref: ref, buffer: pointer): void;
     swjs_release(ref: number): void;
     swjs_release_remote(tid: number, ref: number): void;

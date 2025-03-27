@@ -517,6 +517,8 @@ export class SwiftRuntime {
                 return this.memory.retain(array.slice());
             },
 
+            swjs_create_object: () => { return this.memory.retain({}); },
+
             swjs_load_typed_array: (ref: ref, buffer: pointer) => {
                 const memory = this.memory;
                 const typedArray = memory.getObject(ref);
