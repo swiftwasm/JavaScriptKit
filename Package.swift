@@ -44,7 +44,11 @@ let package = Package(
 
         .target(
             name: "JavaScriptBigIntSupport",
-            dependencies: ["_CJavaScriptBigIntSupport", "JavaScriptKit"]
+            dependencies: ["_CJavaScriptBigIntSupport", "JavaScriptKit"],
+            swiftSettings: [
+                .enableExperimentalFeature("Embedded", .when(traits: ["Embedded"])),
+                .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"], .when(traits: ["Embedded"])),
+            ]
         ),
         .target(name: "_CJavaScriptBigIntSupport", dependencies: ["_CJavaScriptKit"]),
         .testTarget(
@@ -54,7 +58,11 @@ let package = Package(
 
         .target(
             name: "JavaScriptEventLoop",
-            dependencies: ["JavaScriptKit", "_CJavaScriptEventLoop"]
+            dependencies: ["JavaScriptKit", "_CJavaScriptEventLoop"],
+            swiftSettings: [
+                .enableExperimentalFeature("Embedded", .when(traits: ["Embedded"])),
+                .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"], .when(traits: ["Embedded"])),
+            ]
         ),
         .target(name: "_CJavaScriptEventLoop"),
         .testTarget(
