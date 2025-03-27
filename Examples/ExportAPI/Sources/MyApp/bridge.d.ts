@@ -13,7 +13,4 @@
 //     // Greeter: typeof Greeter;
 // }
 
-type Prettify<T> = {
-    [K in keyof T]: T[K];
-  } & {};
-export declare function getDocument(): Document
+export declare function getDocument(): Pick<Document, "createElement">

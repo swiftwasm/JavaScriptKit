@@ -7,34 +7,34 @@
 import ts from 'typescript';
 
 /**
+ * @typedef {{
+ *   warn: (message: string) => void,
+ * }} DiagnosticEngine
+ */
+
+/**
  * TypeScript type processor class
  */
 export class TypeProcessor {
     /**
      * Create a TypeScript program from a d.ts file
      * @param {string} filePath - Path to the d.ts file
+     * @param {ts.CompilerOptions} options - Compiler options
      * @returns {ts.Program} TypeScript program object
      */
-    static createProgram(filePath) {
-        /** @type {ts.CompilerOptions} */
-        const options = {
-            target: ts.ScriptTarget.ESNext,
-            module: ts.ModuleKind.ESNext,
-            moduleResolution: ts.ModuleResolutionKind.NodeJs,
-            esModuleInterop: true,
-            strict: true,
-            lib: ["DOM"]
-        };
-
+    static createProgram(filePath, options) {
         const host = ts.createCompilerHost(options);
         return ts.createProgram([filePath], options, host);
     }
 
     /**
      * @param {ts.TypeChecker} checker - TypeScript type checker
+     * @param {DiagnosticEngine} diagnosticEngine - Diagnostic engine
      */
-    constructor(checker) {
+    constructor(checker, diagnosticEngine) {
         this.checker = checker;
+        this.diagnosticEngine = diagnosticEngine;
+
         /** @type {Map<string, ts.Type>} */
         this.processedTypes = new Map();
         /** @type {import('./index.d.ts').ImportSkeleton} */
@@ -94,7 +94,8 @@ export class TypeProcessor {
      * @private
      */
     processDeclaration(node) {
-        if (ts.isClassDeclaration(node) && node.name) {
+        console.log("processDeclaration", "kind", ts.SyntaxKind[node.kind], "name", node.name?.text, "pos", node.pos);
+        if ((ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) && node.name) {
             /** @type {import('./index.d.ts').ImportTypeSkeleton} */
             const typeInfo = {
                 name: node.name.text,
@@ -114,23 +115,12 @@ export class TypeProcessor {
                         type: bridgeType
                     });
 
-                    // Process non-primitive types
-                    if (!this.isPrimitiveType(type)) {
-                        this.processType(type);
-                    }
-                }
-            });
-
-            // Process methods
-            node.members.forEach(member => {
-                if (ts.isMethodDeclaration(member) && member.name) {
+                    this.visitType(type, member);
+                } else if (ts.isMethodDeclaration(member) && member.name) {
                     const signature = this.checker.getSignatureFromDeclaration(member);
                     if (signature) {
                         /** @type {import('./index.d.ts').ImportMethodSkeleton} */
-                        const methodSignature = this.processFunctionSignature(
-                            signature,
-                            ts.isIdentifier(member.name) ? member.name.text : String(member.name)
-                        );
+                        const methodSignature = this.processFunctionSignature(signature, member.name.text, node);
                         typeInfo.methods.push(methodSignature);
                     }
                 }
@@ -141,7 +131,7 @@ export class TypeProcessor {
             const signature = this.checker.getSignatureFromDeclaration(node);
             if (signature) {
                 /** @type {import('./index.d.ts').ImportFunctionSkeleton} */
-                const functionSignature = this.processFunctionSignature(signature, node.name.text);
+                const functionSignature = this.processFunctionSignature(signature, node.name.text, node);
                 this.results.functions.push(functionSignature);
             }
         } else if (ts.isVariableStatement(node)) {
@@ -161,12 +151,13 @@ export class TypeProcessor {
                         this.results.functions.push(functionSignature);
                     }
 
-                    // Process non-primitive types
-                    if (!this.isPrimitiveType(type)) {
-                        this.processType(type);
-                    }
+                    this.visitType(type, declaration);
                 }
             }
+        } else {
+            const sourceFile = node.getSourceFile();
+            const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+            this.diagnosticEngine.warn(`Unknown node: ${ts.SyntaxKind[node.kind]} at ${sourceFile.fileName}:${line + 1}:${character + 1}`);
         }
     }
 
@@ -174,28 +165,17 @@ export class TypeProcessor {
      * Process a function signature into ImportFunctionSkeleton format
      * @param {ts.Signature} signature - The function signature
      * @param {string} functionName - The name of the function
+     * @param {ts.FunctionDeclaration | ts.MethodDeclaration} node - The AST node that the function appears in
      * @returns {import('./index.d.ts').ImportFunctionSkeleton} Processed function signature
      * @private
      */
-    processFunctionSignature(signature, functionName) {
-        if (!signature) {
-            /** @type {import('./index.d.ts').ImportFunctionSkeleton} */
-            return {
-                name: functionName,
-                parameters: [],
-                returnType: "void"
-            };
-        }
-
+    processFunctionSignature(signature, functionName, node) {
         const parameters = signature.getParameters();
         const returnType = signature.getReturnType();
         const returnTypeString = this.checker.typeToString(returnType);
         const bridgeReturnType = this.convertToBridgeType(returnTypeString);
 
-        // Process non-primitive return type
-        if (!this.isPrimitiveType(returnType)) {
-            this.processType(returnType);
-        }
+        this.visitType(returnType, node);
 
         /** @type {import('./index.d.ts').ImportFunctionSkeleton} */
         return {
@@ -206,10 +186,7 @@ export class TypeProcessor {
                 const typeString = this.checker.typeToString(type);
                 const bridgeType = this.convertToBridgeType(typeString);
 
-                // Process non-primitive parameter types
-                if (!this.isPrimitiveType(type)) {
-                    this.processType(type);
-                }
+                this.visitType(type, declaration);
 
                 return {
                     name: p.name,
@@ -221,14 +198,20 @@ export class TypeProcessor {
     }
 
     /**
-     * Process a TypeScript type and add it to results if it's a non-primitive type
-     * @param {ts.Type} type - The TypeScript type to process
+     * Visit a TypeScript type and add it to results if it's a non-primitive type
+     * @param {ts.Type} type - The TypeScript type to visit
+     * @param {ts.Node} node - The AST node that the type appears in
+     * @returns {boolean} True if the type was visited, false if it's not supported
      * @private
      */
-    processType(type) {
+    visitType(type, node) {
+        if (this.isPrimitiveType(type)) {
+            return true;
+        }
+
         const typeString = this.checker.typeToString(type);
         if (this.processedTypes.has(typeString)) {
-            return;
+            return true;
         }
 
         this.processedTypes.set(typeString, type);
@@ -244,7 +227,12 @@ export class TypeProcessor {
                     }
                 }
             }
+        } else {
+            const sourceFile = node.getSourceFile();
+            const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+            this.diagnosticEngine.warn(`Unsupported type: ${typeString} at ${sourceFile.fileName}:${line + 1}:${character + 1}`);
         }
+        return false;
     }
 
     /**
@@ -256,11 +244,11 @@ export class TypeProcessor {
     isPrimitiveType(type) {
         const typeString = this.checker.typeToString(type);
         const primitiveTypes = ["number", "string", "boolean", "void", "any", "unknown", "null", "undefined"];
-        return primitiveTypes.includes(typeString) || 
-               typeString.endsWith("[]") || 
-               typeString.includes("|") || 
-               typeString.includes("&") || 
-               typeString.includes("=>");
+        return primitiveTypes.includes(typeString) ||
+            typeString.endsWith("[]") ||
+            typeString.includes("|") ||
+            typeString.includes("&") ||
+            typeString.includes("=>");
     }
 
     /**
@@ -301,6 +289,6 @@ export class TypeProcessor {
             return "void"; // Function types are converted to void in bridge
         }
 
-        return typeMap[typeString] || "unknown";
+        return typeMap[typeString] || typeString;
     }
 }
