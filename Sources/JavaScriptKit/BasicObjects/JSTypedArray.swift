@@ -1,11 +1,11 @@
 //
 //  Created by Manuel Burghard. Licensed unter MIT.
 //
-#if !hasFeature(Embedded)
 import _CJavaScriptKit
 
 /// A protocol that allows a Swift numeric type to be mapped to the JavaScript TypedArray that holds integers of its type
-public protocol TypedArrayElement: ConvertibleToJSValue, ConstructibleFromJSValue {
+public protocol TypedArrayElement {
+    associatedtype Element: ConvertibleToJSValue, ConstructibleFromJSValue = Self
     /// The constructor function for the TypedArray class for this particular kind of number
     static var typedArrayClass: JSFunction { get }
 }
@@ -13,8 +13,9 @@ public protocol TypedArrayElement: ConvertibleToJSValue, ConstructibleFromJSValu
 /// A wrapper around all [JavaScript `TypedArray`
 /// classes](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
 /// that exposes their properties in a type-safe way.
-public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral where Element: TypedArrayElement {
-    public class var constructor: JSFunction? { Element.typedArrayClass }
+public final class JSTypedArray<Traits>: JSBridgedClass, ExpressibleByArrayLiteral where Traits: TypedArrayElement {
+    public typealias Element = Traits.Element
+    public class var constructor: JSFunction? { Traits.typedArrayClass }
     public var jsObject: JSObject
 
     public subscript(_ index: Int) -> Element {
@@ -176,13 +177,6 @@ extension UInt8: TypedArrayElement {
     public static var typedArrayClass: JSFunction { JSObject.global.Uint8Array.function! }
 }
 
-/// A wrapper around [the JavaScript `Uint8ClampedArray`
-/// class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)
-/// that exposes its properties in a type-safe and Swifty way.
-public class JSUInt8ClampedArray: JSTypedArray<UInt8> {
-    override public class var constructor: JSFunction? { JSObject.global.Uint8ClampedArray.function! }
-}
-
 extension Int16: TypedArrayElement {
     public static var typedArrayClass: JSFunction { JSObject.global.Int16Array.function! }
 }
@@ -206,4 +200,10 @@ extension Float32: TypedArrayElement {
 extension Float64: TypedArrayElement {
     public static var typedArrayClass: JSFunction { JSObject.global.Float64Array.function! }
 }
-#endif
+
+public enum JSUInt8Clamped: TypedArrayElement {
+    public typealias Element = UInt8
+    public static var typedArrayClass: JSFunction { JSObject.global.Uint8ClampedArray.function! }
+}
+
+public typealias JSUInt8ClampedArray = JSTypedArray<JSUInt8Clamped>
