@@ -1,11 +1,11 @@
 //
 //  Created by Manuel Burghard. Licensed unter MIT.
 //
-#if !hasFeature(Embedded)
 import _CJavaScriptKit
 
 /// A protocol that allows a Swift numeric type to be mapped to the JavaScript TypedArray that holds integers of its type
-public protocol TypedArrayElement: ConvertibleToJSValue, ConstructibleFromJSValue {
+public protocol TypedArrayElement {
+    associatedtype Element: ConvertibleToJSValue, ConstructibleFromJSValue = Self
     /// The constructor function for the TypedArray class for this particular kind of number
     static var typedArrayClass: JSFunction { get }
 }
@@ -13,8 +13,9 @@ public protocol TypedArrayElement: ConvertibleToJSValue, ConstructibleFromJSValu
 /// A wrapper around all [JavaScript `TypedArray`
 /// classes](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
 /// that exposes their properties in a type-safe way.
-public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral where Element: TypedArrayElement {
-    public class var constructor: JSFunction? { Element.typedArrayClass }
+public final class JSTypedArray<Traits>: JSBridgedClass, ExpressibleByArrayLiteral where Traits: TypedArrayElement {
+    public typealias Element = Traits.Element
+    public class var constructor: JSFunction? { Traits.typedArrayClass }
     public var jsObject: JSObject
 
     public subscript(_ index: Int) -> Element {
@@ -139,33 +140,28 @@ public class JSTypedArray<Element>: JSBridgedClass, ExpressibleByArrayLiteral wh
     }
 }
 
-// MARK: - Int and UInt support
-
-// FIXME: Should be updated to support wasm64 when that becomes available.
-func valueForBitWidth<T>(typeName: String, bitWidth: Int, when32: T) -> T {
-    if bitWidth == 32 {
-        return when32
-    } else if bitWidth == 64 {
-        fatalError("64-bit \(typeName)s are not yet supported in JSTypedArray")
-    } else {
-        fatalError(
-            "Unsupported bit width for type \(typeName): \(bitWidth) (hint: stick to fixed-size \(typeName)s to avoid this issue)"
-        )
+extension Int: TypedArrayElement {
+    public static var typedArrayClass: JSFunction {
+        #if _pointerBitWidth(_32)
+        return JSObject.global.Int32Array.function!
+        #elseif _pointerBitWidth(_64)
+        return JSObject.global.Int64Array.function!
+        #else
+        #error("Unsupported pointer width")
+        #endif
     }
 }
 
-extension Int: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { _typedArrayClass.wrappedValue }
-    private static let _typedArrayClass = LazyThreadLocal(initialize: {
-        valueForBitWidth(typeName: "Int", bitWidth: Int.bitWidth, when32: JSObject.global.Int32Array).function!
-    })
-}
-
 extension UInt: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { _typedArrayClass.wrappedValue }
-    private static let _typedArrayClass = LazyThreadLocal(initialize: {
-        valueForBitWidth(typeName: "UInt", bitWidth: Int.bitWidth, when32: JSObject.global.Uint32Array).function!
-    })
+    public static var typedArrayClass: JSFunction {
+        #if _pointerBitWidth(_32)
+        return JSObject.global.Uint32Array.function!
+        #elseif _pointerBitWidth(_64)
+        return JSObject.global.Uint64Array.function!
+        #else
+        #error("Unsupported pointer width")
+        #endif
+    }
 }
 
 extension Int8: TypedArrayElement {
@@ -174,13 +170,6 @@ extension Int8: TypedArrayElement {
 
 extension UInt8: TypedArrayElement {
     public static var typedArrayClass: JSFunction { JSObject.global.Uint8Array.function! }
-}
-
-/// A wrapper around [the JavaScript `Uint8ClampedArray`
-/// class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)
-/// that exposes its properties in a type-safe and Swifty way.
-public class JSUInt8ClampedArray: JSTypedArray<UInt8> {
-    override public class var constructor: JSFunction? { JSObject.global.Uint8ClampedArray.function! }
 }
 
 extension Int16: TypedArrayElement {
@@ -206,4 +195,10 @@ extension Float32: TypedArrayElement {
 extension Float64: TypedArrayElement {
     public static var typedArrayClass: JSFunction { JSObject.global.Float64Array.function! }
 }
-#endif
+
+public enum JSUInt8Clamped: TypedArrayElement {
+    public typealias Element = UInt8
+    public static var typedArrayClass: JSFunction { JSObject.global.Uint8ClampedArray.function! }
+}
+
+public typealias JSUInt8ClampedArray = JSTypedArray<JSUInt8Clamped>
