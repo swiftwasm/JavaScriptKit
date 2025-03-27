@@ -140,33 +140,28 @@ public final class JSTypedArray<Traits>: JSBridgedClass, ExpressibleByArrayLiter
     }
 }
 
-// MARK: - Int and UInt support
-
-// FIXME: Should be updated to support wasm64 when that becomes available.
-func valueForBitWidth<T>(typeName: String, bitWidth: Int, when32: T) -> T {
-    if bitWidth == 32 {
-        return when32
-    } else if bitWidth == 64 {
-        fatalError("64-bit \(typeName)s are not yet supported in JSTypedArray")
-    } else {
-        fatalError(
-            "Unsupported bit width for type \(typeName): \(bitWidth) (hint: stick to fixed-size \(typeName)s to avoid this issue)"
-        )
+extension Int: TypedArrayElement {
+    public static var typedArrayClass: JSFunction {
+        #if _pointerBitWidth(_32)
+        return JSObject.global.Int32Array.function!
+        #elseif _pointerBitWidth(_64)
+        return JSObject.global.Int64Array.function!
+        #else
+        #error("Unsupported pointer width")
+        #endif
     }
 }
 
-extension Int: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { _typedArrayClass.wrappedValue }
-    private static let _typedArrayClass = LazyThreadLocal(initialize: {
-        valueForBitWidth(typeName: "Int", bitWidth: Int.bitWidth, when32: JSObject.global.Int32Array).function!
-    })
-}
-
 extension UInt: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { _typedArrayClass.wrappedValue }
-    private static let _typedArrayClass = LazyThreadLocal(initialize: {
-        valueForBitWidth(typeName: "UInt", bitWidth: Int.bitWidth, when32: JSObject.global.Uint32Array).function!
-    })
+    public static var typedArrayClass: JSFunction {
+        #if _pointerBitWidth(_32)
+        return JSObject.global.Uint32Array.function!
+        #elseif _pointerBitWidth(_64)
+        return JSObject.global.Uint64Array.function!
+        #else
+        #error("Unsupported pointer width")
+        #endif
+    }
 }
 
 extension Int8: TypedArrayElement {
