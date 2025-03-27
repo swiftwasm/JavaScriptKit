@@ -261,4 +261,4 @@ declare class SwiftRuntime {
 }
 
 export { SwiftRuntime };
-export type { SwiftRuntimeOptions };
+export type { SwiftRuntimeOptions, SwiftRuntimeThreadChannel };
