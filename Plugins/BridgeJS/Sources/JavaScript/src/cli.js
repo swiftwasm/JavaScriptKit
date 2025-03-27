@@ -5,7 +5,7 @@
 
 // @ts-check
 import * as fs from 'fs';
-import { createProgram, processTypeDeclarations } from './types/processor.js';
+import { TypeProcessor } from './types/processor.js';
 import { parseArgs } from 'util';
 
 /**
@@ -36,8 +36,9 @@ export function main(args) {
     console.log(`Processing ${filePath}...`);
 
     // Create TypeScript program and process declarations
-    const program = createProgram(filePath);
-    const results = processTypeDeclarations(program, filePath);
+    const program = TypeProcessor.createProgram(filePath);
+    const processor = new TypeProcessor(program.getTypeChecker());
+    const results = processor.processTypeDeclarations(program, filePath);
 
     // Write results to file or stdout
     const jsonOutput = JSON.stringify(results, null, 2);

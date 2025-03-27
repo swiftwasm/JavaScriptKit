@@ -11,13 +11,24 @@ export type ImportFunctionSkeleton = {
     returnType: BridgeType;
 }
 
-export type ImportClassSkeleton = {
+export type ImportPropertySkeleton = {
     name: string;
-    constructor: ImportFunctionSkeleton;
-    methods: ImportFunctionSkeleton[];
+    type: BridgeType;
+}
+
+export type ImportMethodSkeleton = {
+    name: string;
+    parameters: Parameter[];
+    returnType: BridgeType;
+}
+
+export type ImportTypeSkeleton = {
+    name: string;
+    properties: ImportPropertySkeleton[];
+    methods: ImportMethodSkeleton[];
 }
 
 export type ImportSkeleton = {
     functions: ImportFunctionSkeleton[];
-    classes: ImportClassSkeleton[];
+    types: ImportTypeSkeleton[];
 }
