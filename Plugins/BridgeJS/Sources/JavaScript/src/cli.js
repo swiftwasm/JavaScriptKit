@@ -34,7 +34,13 @@ class DiagnosticEngine {
     warn(message) {
         console.warn(message);
     }
-    
+
+    /**
+     * @param {string} message
+     */
+    error(message) {
+        console.error(message);
+    }
 }
 
 /**
