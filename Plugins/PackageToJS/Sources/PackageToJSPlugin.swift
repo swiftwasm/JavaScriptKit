@@ -342,6 +342,11 @@ struct PackageToJSPlugin: CommandPlugin {
 
     /// Check if the build is for embedded WebAssembly
     private func isBuildingForEmbedded(selfPackage: Package) -> Bool {
+        if let rawValue = ProcessInfo.processInfo.environment["JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM"],
+            let value = Bool(rawValue), value
+        {
+            return true
+        }
         let coreTarget = selfPackage.targets.first { $0.name == "JavaScriptKit" }
         guard let swiftTarget = coreTarget as? SwiftSourceModuleTarget else {
             return false

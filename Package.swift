@@ -1,8 +1,9 @@
-// swift-tools-version:6.1
+// swift-tools-version:6.0
 
 import PackageDescription
 
 // NOTE: needed for embedded customizations, ideally this will not be necessary at all in the future, or can be replaced with traits
+let shouldBuildForEmbedded = Context.environment["JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM"].flatMap(Bool.init) ?? false
 let useLegacyResourceBundling =
     Context.environment["JAVASCRIPTKIT_USE_LEGACY_RESOURCE_BUNDLING"].flatMap(Bool.init) ?? false
 
@@ -15,23 +16,22 @@ let package = Package(
         .library(name: "JavaScriptEventLoopTestSupport", targets: ["JavaScriptEventLoopTestSupport"]),
         .plugin(name: "PackageToJS", targets: ["PackageToJS"]),
     ],
-    traits: [
-        "Embedded"
-    ],
     targets: [
         .target(
             name: "JavaScriptKit",
             dependencies: ["_CJavaScriptKit"],
             exclude: useLegacyResourceBundling ? [] : ["Runtime"],
             resources: useLegacyResourceBundling ? [.copy("Runtime")] : [],
-            cSettings: [
-                .unsafeFlags(["-fdeclspec"], .when(traits: ["Embedded"]))
-            ],
-            swiftSettings: [
-                .enableExperimentalFeature("Embedded", .when(traits: ["Embedded"])),
-                .enableExperimentalFeature("Extern", .when(traits: ["Embedded"])),
-                .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"], .when(traits: ["Embedded"])),
-            ]
+            cSettings: shouldBuildForEmbedded
+                ? [
+                    .unsafeFlags(["-fdeclspec"])
+                ] : nil,
+            swiftSettings: shouldBuildForEmbedded
+                ? [
+                    .enableExperimentalFeature("Embedded"),
+                    .enableExperimentalFeature("Extern"),
+                    .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"]),
+                ] : nil
         ),
         .target(name: "_CJavaScriptKit"),
         .testTarget(
@@ -45,10 +45,11 @@ let package = Package(
         .target(
             name: "JavaScriptBigIntSupport",
             dependencies: ["_CJavaScriptBigIntSupport", "JavaScriptKit"],
-            swiftSettings: [
-                .enableExperimentalFeature("Embedded", .when(traits: ["Embedded"])),
-                .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"], .when(traits: ["Embedded"])),
-            ]
+            swiftSettings: shouldBuildForEmbedded
+                ? [
+                    .enableExperimentalFeature("Embedded"),
+                    .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"]),
+                ] : []
         ),
         .target(name: "_CJavaScriptBigIntSupport", dependencies: ["_CJavaScriptKit"]),
         .testTarget(
@@ -59,10 +60,11 @@ let package = Package(
         .target(
             name: "JavaScriptEventLoop",
             dependencies: ["JavaScriptKit", "_CJavaScriptEventLoop"],
-            swiftSettings: [
-                .enableExperimentalFeature("Embedded", .when(traits: ["Embedded"])),
-                .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"], .when(traits: ["Embedded"])),
-            ]
+            swiftSettings: shouldBuildForEmbedded
+                ? [
+                    .enableExperimentalFeature("Embedded"),
+                    .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"]),
+                ] : []
         ),
         .target(name: "_CJavaScriptEventLoop"),
         .testTarget(
