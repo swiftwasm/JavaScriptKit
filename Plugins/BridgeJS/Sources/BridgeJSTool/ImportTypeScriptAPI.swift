@@ -1,6 +1,11 @@
 import SwiftBasicFormat
 import SwiftSyntax
 import SwiftSyntaxBuilder
+import class Foundation.Process
+import class Foundation.Pipe
+import struct Foundation.URL
+import struct Foundation.Data
+import class Foundation.JSONDecoder
 
 struct ImportTypeScriptAPI {
     let progress: ProgressReporting
@@ -14,6 +19,43 @@ struct ImportTypeScriptAPI {
 
     mutating func addSkeleton(_ skeleton: ImportedSkeleton) {
         self.skeletons.append(skeleton)
+    }
+
+    mutating func addSourceFile(_ sourceFile: String, tsconfigPath: String) throws {
+        let nodePath = try which("node")
+        let ts2swiftPath = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("JavaScript")
+            .appendingPathComponent("bin")
+            .appendingPathComponent("ts2swift.js")
+        let arguments = [ts2swiftPath.path, sourceFile, "--project", tsconfigPath]
+
+        progress.print("Running ts2swift...")
+        progress.print("  \(([nodePath.path] + arguments).joined(separator: " "))")
+
+        let process = Process()
+        let stdoutPipe = Pipe()
+        nonisolated(unsafe) var stdoutData = Data()
+
+        process.executableURL = nodePath
+        process.arguments = arguments
+        process.standardOutput = stdoutPipe
+
+        stdoutPipe.fileHandleForReading.readabilityHandler = { handle in
+            let data = handle.availableData
+            if data.count > 0 {
+                stdoutData.append(data)
+            }
+        }
+
+        try process.run()
+        process.waitUntilExit()
+        if process.terminationStatus != 0 {
+            throw BridgeJSToolError("ts2swift returned \(process.terminationStatus)")
+        }
+        let skeleton = try JSONDecoder().decode(ImportedSkeleton.self, from: stdoutData)
+        self.addSkeleton(skeleton)
     }
 
     func finalize() throws -> String {
@@ -99,7 +141,8 @@ struct ImportTypeScriptAPI {
         }
 
         func call(function: ImportedFunction) {
-            let call: ExprSyntax = "\(raw: function.name)(\(raw: abiParameterForwardings.map { $0.description }.joined(separator: ", ")))"
+            let call: ExprSyntax =
+                "\(raw: function.name)(\(raw: abiParameterForwardings.map { $0.description }.joined(separator: ", ")))"
             if function.returnType == .void {
                 body.append("\(raw: call)")
             } else {
@@ -123,12 +166,14 @@ struct ImportTypeScriptAPI {
                 body.append("return \(raw: returnType.swiftType)(ret)")
             case .string:
                 abiReturnType = .i32
-                body.append("""
-                return String(unsafeUninitializedCapacity: Int(ret)) { b in
-                    _init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-                    return Int(ret)
-                }
-                """)
+                body.append(
+                    """
+                    return String(unsafeUninitializedCapacity: Int(ret)) { b in
+                        _init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
+                        return Int(ret)
+                    }
+                    """
+                )
             case .jsObject:
                 body.append("return ret")
             case .swiftHeapObject(_):

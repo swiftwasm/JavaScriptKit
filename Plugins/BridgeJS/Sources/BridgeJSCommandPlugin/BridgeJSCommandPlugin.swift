@@ -82,6 +82,17 @@ struct BridgeJSCommandPlugin: CommandPlugin {
                 generatedDirectory.appending(path: "ExportSwiftAPI.swift").path,
             ] + target.sourceFiles.map(\.url.path) + remainingArguments
         )
+
+        try runBridgeJSTool(
+            context: context,
+            arguments: [
+                "import",
+                "--output-skeleton",
+                generatedJavaScriptDirectory.appending(path: "ImportTypeScriptAPI.json").path,
+                "--output-swift",
+                generatedDirectory.appending(path: "ImportTypeScriptAPI.swift").path,
+            ] + target.sourceFiles.map(\.url.path) + remainingArguments
+        )
     }
 
     private func runBridgeJSTool(context: PluginContext, arguments: [String]) throws {

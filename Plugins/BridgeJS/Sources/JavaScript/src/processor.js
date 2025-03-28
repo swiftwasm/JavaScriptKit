@@ -80,6 +80,7 @@ export class TypeProcessor {
 
             try {
                 sourceFile.forEachChild(node => {
+                    this.visitNode(node);
                 });
             } catch (error) {
                 this.diagnosticEngine.error(`Error processing ${sourceFile.fileName}: ${error.message}`);

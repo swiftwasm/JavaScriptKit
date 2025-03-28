@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "noEmit": true,
+        "allowJs": true,
+        "skipLibCheck": true,
+        "moduleResolution": "node",
+        "lib": ["DOM"]
+    },
+    "include": ["./Sources/**/*.d.ts"]
+}

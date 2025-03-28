@@ -6,6 +6,7 @@
 @preconcurrency import class Foundation.JSONEncoder
 @preconcurrency import class Foundation.FileManager
 @preconcurrency import class Foundation.JSONDecoder
+@preconcurrency import class Foundation.ProcessInfo
 import SwiftParser
 
 @main struct BridgeJSTool {
@@ -48,6 +49,7 @@ import SwiftParser
                 doubleDashOptions: [
                     "module-name": OptionRule(help: "The name of the module to import the TypeScript API into", required: true),
                     "output-swift": OptionRule(help: "The output file path for the Swift source code", required: true),
+                    "project": OptionRule(help: "The path to the TypeScript project configuration file", required: true),
                 ]
             )
             let (positionalArguments, _, doubleDashOptions) = try parser.parse(
@@ -59,6 +61,9 @@ import SwiftParser
                     let sourceURL = URL(fileURLWithPath: inputFile)
                     let skeleton = try JSONDecoder().decode(ImportedSkeleton.self, from: Data(contentsOf: sourceURL))
                     importer.addSkeleton(skeleton)
+                } else if inputFile.hasSuffix(".d.ts") {
+                    let tsconfigPath = URL(fileURLWithPath: doubleDashOptions["project"]!)
+                    try importer.addSourceFile(inputFile, tsconfigPath: tsconfigPath.path)
                 }
             }
 
@@ -140,6 +145,33 @@ import SwiftParser
             )
         }
     }
+}
+
+internal func which(_ executable: String) throws -> URL {
+    do {
+        // Check overriding environment variable
+        let envVariable = executable.uppercased().replacingOccurrences(of: "-", with: "_") + "_PATH"
+        if let path = ProcessInfo.processInfo.environment[envVariable] {
+            let url = URL(fileURLWithPath: path).appendingPathComponent(executable)
+            if FileManager.default.isExecutableFile(atPath: url.path) {
+                return url
+            }
+        }
+    }
+    let pathSeparator: Character
+    #if os(Windows)
+    pathSeparator = ";"
+    #else
+    pathSeparator = ":"
+    #endif
+    let paths = ProcessInfo.processInfo.environment["PATH"]!.split(separator: pathSeparator)
+    for path in paths {
+        let url = URL(fileURLWithPath: String(path)).appendingPathComponent(executable)
+        if FileManager.default.isExecutableFile(atPath: url.path) {
+            return url
+        }
+    }
+    throw BridgeJSToolError("Executable \(executable) not found in PATH")
 }
 
 struct BridgeJSToolError: Swift.Error, CustomStringConvertible {

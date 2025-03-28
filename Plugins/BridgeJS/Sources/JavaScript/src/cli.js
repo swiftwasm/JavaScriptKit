@@ -18,6 +18,7 @@ class DiagnosticEngine {
             getNewLine: () => ts.sys.newLine,
             getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
         };
+        this.prefix = "[ts2swift]";
     }
     
     /**
@@ -31,15 +32,25 @@ class DiagnosticEngine {
     /**
      * @param {string} message
      */
+    info(message) {
+        const color = '\x1b[32m';
+        process.stderr.write(`${color}${this.prefix}\x1b[0m ${message}\n`);
+    }
+
+    /**
+     * @param {string} message
+     */
     warn(message) {
-        console.warn(message);
+        const color = '\x1b[33m';
+        process.stderr.write(`${color}${this.prefix}\x1b[0m ${message}\n`);
     }
 
     /**
      * @param {string} message
      */
     error(message) {
-        console.error(message);
+        const color = '\x1b[31m';
+        process.stderr.write(`${color}${this.prefix}\x1b[0m ${message}\n`);
     }
 }
 
@@ -77,8 +88,9 @@ export function main(args) {
     }
 
     const filePath = options.positionals[0];
+    const diagnosticEngine = new DiagnosticEngine();
 
-    console.log(`Processing ${filePath}...`);
+    diagnosticEngine.info(`Processing ${filePath}...`);
 
     // Create TypeScript program and process declarations
     const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
@@ -87,8 +99,6 @@ export function main(args) {
         ts.sys,
         path.dirname(path.resolve(tsconfigPath))
     );
-
-    const diagnosticEngine = new DiagnosticEngine();
 
     if (configParseResult.errors.length > 0) {
         diagnosticEngine.tsDiagnose(configParseResult.errors);
