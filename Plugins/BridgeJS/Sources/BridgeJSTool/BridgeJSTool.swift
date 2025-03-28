@@ -2,8 +2,10 @@
 @preconcurrency import func Foundation.fputs
 @preconcurrency import var Foundation.stderr
 @preconcurrency import struct Foundation.URL
+@preconcurrency import struct Foundation.Data
 @preconcurrency import class Foundation.JSONEncoder
 @preconcurrency import class Foundation.FileManager
+@preconcurrency import class Foundation.JSONDecoder
 import SwiftParser
 
 @main struct BridgeJSTool {
@@ -41,7 +43,34 @@ import SwiftParser
         let progress = ProgressReporting()
         switch subcommand {
         case "import":
-            throw BridgeJSToolError("Not implemented yet")
+            let parser = ArgumentParser(
+                singleDashOptions: [:],
+                doubleDashOptions: [
+                    "module-name": OptionRule(help: "The name of the module to import the TypeScript API into", required: true),
+                    "output-swift": OptionRule(help: "The output file path for the Swift source code", required: true),
+                ]
+            )
+            let (positionalArguments, _, doubleDashOptions) = try parser.parse(
+                arguments: Array(arguments.dropFirst())
+            )
+            var importer = ImportTypeScriptAPI(progress: progress, moduleName: doubleDashOptions["module-name"]!)
+            for inputFile in positionalArguments {
+                if inputFile.hasSuffix(".json") {
+                    let sourceURL = URL(fileURLWithPath: inputFile)
+                    let skeleton = try JSONDecoder().decode(ImportedSkeleton.self, from: Data(contentsOf: sourceURL))
+                    importer.addSkeleton(skeleton)
+                }
+            }
+
+            let outputSwift = try importer.finalize()
+            let outputSwiftURL = URL(fileURLWithPath: doubleDashOptions["output-swift"]!)
+            try outputSwift.write(to: outputSwiftURL, atomically: true, encoding: .utf8)
+            progress.print(
+                """
+                Imported Swift APIs:
+                  - \(outputSwiftURL.path)
+                """
+            )
         case "export":
             let parser = ArgumentParser(
                 singleDashOptions: [:],

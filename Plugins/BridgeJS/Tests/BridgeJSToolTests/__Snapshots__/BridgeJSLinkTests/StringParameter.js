@@ -6,6 +6,7 @@ export async function createInstantiator(options, swift) {
     const textEncoder = new TextEncoder("utf-8");
 
     let tmpRetString;
+    let s2jRetBytes;
     return {
         /** @param {WebAssembly.Imports} importObject */
         addImports: (importObject) => {
@@ -19,6 +20,18 @@ export async function createInstantiator(options, swift) {
                 const source = swift.memory.getObject(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
                 bytes.set(source);
+            }
+
+            bjs["init_memory_with_result"] = function(ptr, len) {
+                new Uint8Array(memory.buffer, ptr, len).set(s2jRetBytes);
+            }
+
+            const MyApp = bjs["MyApp"] = {};
+            MyApp["returnString"] = function() {
+                const ret = options.imports.returnString();
+                const bytes = textEncoder.encode(ret);
+                s2jRetBytes = bytes;
+                return bytes.length;
             }
         },
         setInstance: (i) => {

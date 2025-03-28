@@ -1,7 +1,12 @@
-export type BridgeType = "int" | "float" | "double" | "string" | "bool" | "void" | "unknown" | {
-    kind: "named",
-    name: string;
-}
+export type BridgeType =
+    | { "int": {} }
+    | { "float": {} }
+    | { "double": {} }
+    | { "string": {} }
+    | { "bool": {} }
+    | { "jsObject": {} }
+    | { "unknown": {} }
+    | { "void": {} }
 
 export type Parameter = {
     name: string;

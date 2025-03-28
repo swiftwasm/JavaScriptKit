@@ -194,16 +194,16 @@ export class TypeProcessor {
             Error.stackTraceLimit = 100;
 
             // try {
-                sourceFile.forEachChild(node => {
-                    if (ts.isFunctionDeclaration(node)) {
-                        const func = this.processFunctionToSkeleton(node);
-                        if (func) functions.push(func);
-                    } else if (ts.isInterfaceDeclaration(node) || ts.isClassDeclaration(node) || 
-                             ts.isTypeAliasDeclaration(node) || ts.isEnumDeclaration(node)) {
-                        const type = this.processTypeToSkeleton(node);
-                        if (type) types.push(type);
-                    }
-                });
+            sourceFile.forEachChild(node => {
+                if (ts.isFunctionDeclaration(node)) {
+                    const func = this.processFunctionToSkeleton(node);
+                    if (func) functions.push(func);
+                } else if (ts.isInterfaceDeclaration(node) || ts.isClassDeclaration(node) ||
+                    ts.isTypeAliasDeclaration(node) || ts.isEnumDeclaration(node)) {
+                    const type = this.processTypeToSkeleton(node);
+                    if (type) types.push(type);
+                }
+            });
             // } catch (error) {
             //     this.diagnosticEngine.error(`Error processing ${sourceFile.fileName}: ${error.message}`);
             // }
@@ -572,27 +572,28 @@ export class TypeProcessor {
         const convert = (type) => {
             /** @type {Record<string, BridgeType>} */
             const typeMap = {
-                "number": "float",
-                "string": "string",
-                "boolean": "bool",
-                "void": "void",
-                "any": "unknown",
-                "unknown": "unknown",
-                "null": "void",
-                "undefined": "void",
-                "bigint": "int",
-                "object": "unknown",
-                "symbol": "unknown",
-                "never": "void",
+                "number": { "float": {} },
+                "string": { "string": {} },
+                "boolean": { "bool": {} },
+                "void": { "void": {} },
+                "any": { "unknown": {} },
+                "unknown": { "unknown": {} },
+                "null": { "void": {} },
+                "undefined": { "void": {} },
+                "bigint": { "int": {} },
+                "object": { "unknown": {} },
+                "symbol": { "unknown": {} },
+                "never": { "void": {} },
             };
             const typeString = this.checker.typeToString(type);
             if (typeMap[typeString]) {
                 return typeMap[typeString];
             }
             const typeName = this.deriveTypeName(type);
-            if (!typeName) return "unknown";
-            return { kind: "named", name: typeName };
-        };
+            if (!typeName) return { "unknown": {} };
+            this.diagnosticEngine.warn(`Unknown type: ${typeString}`);
+            return { "unknown": {} };
+        }
         const bridgeType = convert(type);
         this.processedTypes.set(type, bridgeType);
         return bridgeType;
@@ -641,7 +642,7 @@ export class TypeProcessor {
      */
     expendType(type) {
         const typeName = this.deriveTypeName(type);
-        if (!typeName) return "unknown";
+        if (!typeName) return { "unknown": {} };
 
         /** @type {ImportTypeSkeleton} */
         const skeleton = {
@@ -671,7 +672,8 @@ export class TypeProcessor {
             }
         }
 
-        return { kind: "named", name: typeName };
+        this.diagnosticEngine.warn(`Unknown type: ${typeName}`);
+        return { "unknown": {} };
     }
 
     /**

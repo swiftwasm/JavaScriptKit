@@ -34,3 +34,16 @@ struct ExportedSkeleton: Codable {
     let functions: [ExportedFunction]
     let classes: [ExportedClass]
 }
+
+
+// MARK: - Imported Skeleton
+
+struct ImportedFunction: Codable {
+    let name: String
+    let parameters: [Parameter]
+    let returnType: BridgeType
+}
+
+struct ImportedSkeleton: Codable {
+    let functions: [ImportedFunction]
+}
