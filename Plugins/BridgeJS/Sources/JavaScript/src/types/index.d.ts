@@ -1,4 +1,7 @@
-export type BridgeType = "int" | "float" | "double" | "string" | "bool" | "void" | "unknown"
+export type BridgeType = "int" | "float" | "double" | "string" | "bool" | "void" | "unknown" | {
+    kind: "named",
+    name: string;
+}
 
 export type Parameter = {
     name: string;

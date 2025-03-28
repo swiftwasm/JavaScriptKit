@@ -148,6 +148,13 @@ export class TypeProcessor {
         /** @type {Set<string>} */
         this.hasNoInherits = new Set();
 
+        /** @type {ImportFunctionSkeleton[]} */
+        this.functions = [];
+        /** @type {ImportTypeSkeleton[]} */
+        this.types = [];
+        /** @type {Map<ts.Type, string>} */
+        this.typeExpansions = new Map();
+
         /** @type {TyperContext} */
         this.context = {
             currentSourceFile: '',
@@ -184,8 +191,9 @@ export class TypeProcessor {
 
             this.context.currentSourceFile = sourceFile.fileName;
             this.context.currentNamespace = [];
+            Error.stackTraceLimit = 100;
 
-            try {
+            // try {
                 sourceFile.forEachChild(node => {
                     if (ts.isFunctionDeclaration(node)) {
                         const func = this.processFunctionToSkeleton(node);
@@ -196,9 +204,9 @@ export class TypeProcessor {
                         if (type) types.push(type);
                     }
                 });
-            } catch (error) {
-                this.diagnosticEngine.error(`Error processing ${sourceFile.fileName}: ${error.message}`);
-            }
+            // } catch (error) {
+            //     this.diagnosticEngine.error(`Error processing ${sourceFile.fileName}: ${error.message}`);
+            // }
         }
 
         return { functions, types };
@@ -557,7 +565,10 @@ export class TypeProcessor {
         if (maybeProcessed) {
             return maybeProcessed;
         }
-        /** @param {ts.Type} type */
+        /**
+         * @param {ts.Type} type
+         * @returns {BridgeType}
+         */
         const convert = (type) => {
             /** @type {Record<string, BridgeType>} */
             const typeMap = {
@@ -578,8 +589,9 @@ export class TypeProcessor {
             if (typeMap[typeString]) {
                 return typeMap[typeString];
             }
-            // If we don't know the type, return unknown
-            return "unknown";
+            const typeName = this.deriveTypeName(type);
+            if (!typeName) return "unknown";
+            return { kind: "named", name: typeName };
         };
         const bridgeType = convert(type);
         this.processedTypes.set(type, bridgeType);
@@ -587,12 +599,79 @@ export class TypeProcessor {
     }
 
     /**
+     * Pick the best overload from a list of signatures
+     * @param {readonly ts.Signature[]} signatures - List of signatures
+     * @returns {ts.Signature} Selected signature
+     * @private
+     */
+    pickOverload(signatures) {
+        for (const signature of signatures) {
+            if (signature.typeParameters) {
+                // Skip signatures if it has generic parameters
+                continue;
+            }
+            return signature;
+        }
+        return signatures[0];
+    }
+
+    /**
+     * Derive the type name from a type
+     * @param {ts.Type} type - TypeScript type
+     * @returns {string | undefined} Type name
+     * @private
+     */
+    deriveTypeName(type) {
+        const typeSymbol = type.getSymbol();
+        if (typeSymbol) {
+            return typeSymbol.name;
+        }
+        const aliasSymbol = type.aliasSymbol;
+        if (aliasSymbol) {
+            return aliasSymbol.name;
+        }
+        return undefined;
+    }
+
+    /**
      * Expend known non-recursive type operators like `keyof` and `typeof`
      * @param {ts.Type} type - TypeScript type
-     * @returns {ts.Type} Expanded type
+     * @returns {BridgeType} Expanded type
      * @private
      */
     expendType(type) {
+        const typeName = this.deriveTypeName(type);
+        if (!typeName) return "unknown";
+
+        /** @type {ImportTypeSkeleton} */
+        const skeleton = {
+            name: typeName,
+            properties: [],
+            methods: [],
+        };
+        this.types.push(skeleton);
+
+        for (const member of this.checker.getPropertiesOfType(type)) {
+            const type = this.checker.getTypeOfSymbol(member);
+            const maybeMethod = this.checker.getSignaturesOfType(type, ts.SignatureKind.Call);
+            if (maybeMethod.length > 0) {
+                const signature = this.pickOverload(maybeMethod);
+                const bridgeType = this.convertToBridgeType(signature.getReturnType());
+                skeleton.methods.push({
+                    name: member.name.text,
+                    parameters: [],
+                    returnType: bridgeType,
+                });
+            } else {
+                const bridgeType = this.convertToBridgeType(type);
+                skeleton.properties.push({
+                    name: member.name.text,
+                    type: bridgeType,
+                });
+            }
+        }
+
+        return { kind: "named", name: typeName };
     }
 
     /**
