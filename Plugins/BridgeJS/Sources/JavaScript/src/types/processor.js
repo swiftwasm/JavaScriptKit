@@ -6,6 +6,14 @@
 // @ts-check
 import ts from 'typescript';
 
+/** @typedef {import('./index').ImportSkeleton} ImportSkeleton */
+/** @typedef {import('./index').ImportFunctionSkeleton} ImportFunctionSkeleton */
+/** @typedef {import('./index').ImportTypeSkeleton} ImportTypeSkeleton */
+/** @typedef {import('./index').ImportPropertySkeleton} ImportPropertySkeleton */
+/** @typedef {import('./index').ImportMethodSkeleton} ImportMethodSkeleton */
+/** @typedef {import('./index').Parameter} Parameter */
+/** @typedef {import('./index').BridgeType} BridgeType */
+
 /**
  * @typedef {{
  *   warn: (message: string) => void,
@@ -78,31 +86,9 @@ import ts from 'typescript';
 /**
  * @typedef {{
  *   name: string,
- *   properties: Property[],
- *   methods: Method[],
+ *   properties: ImportPropertySkeleton[],
+ *   methods: ImportMethodSkeleton[],
  * }} Definition
- */
-
-/**
- * @typedef {{
- *   name: string,
- *   type: string,
- * }} Property
- */
-
-/**
- * @typedef {{
- *   name: string,
- *   parameters: Parameter[],
- *   returnType: string,
- * }} Method
- */
-
-/**
- * @typedef {{
- *   name: string,
- *   type: string,
- * }} Parameter
  */
 
 /**
@@ -147,7 +133,7 @@ export class TypeProcessor {
         this.diagnosticEngine = diagnosticEngine;
         this.options = options;
 
-        /** @type {Map<string, ts.Type>} */
+        /** @type {Map<ts.Type, BridgeType>} */
         this.processedTypes = new Map();
         /** @type {Map<string, Definition[]>} */
         this.definitionsMap = new Map();
@@ -181,12 +167,17 @@ export class TypeProcessor {
      * Process type declarations from a TypeScript program
      * @param {ts.Program} program - TypeScript program
      * @param {string} inputFilePath - Path to the input file
-     * @returns {Object} Processed type declarations
+     * @returns {ImportSkeleton} Processed type declarations
      */
     processTypeDeclarations(program, inputFilePath) {
         const sourceFiles = program.getSourceFiles().filter(
             sf => !sf.isDeclarationFile || sf.fileName === inputFilePath
         );
+
+        /** @type {ImportFunctionSkeleton[]} */
+        const functions = [];
+        /** @type {ImportTypeSkeleton[]} */
+        const types = [];
 
         for (const sourceFile of sourceFiles) {
             if (sourceFile.fileName.includes('node_modules/typescript/lib')) continue;
@@ -195,18 +186,100 @@ export class TypeProcessor {
             this.context.currentNamespace = [];
 
             try {
-                const sourceFileInfo = this.processSourceFile(sourceFile);
-                this.context.info.set(sourceFile.fileName, sourceFileInfo);
+                sourceFile.forEachChild(node => {
+                    if (ts.isFunctionDeclaration(node)) {
+                        const func = this.processFunctionToSkeleton(node);
+                        if (func) functions.push(func);
+                    } else if (ts.isInterfaceDeclaration(node) || ts.isClassDeclaration(node) || 
+                             ts.isTypeAliasDeclaration(node) || ts.isEnumDeclaration(node)) {
+                        const type = this.processTypeToSkeleton(node);
+                        if (type) types.push(type);
+                    }
+                });
             } catch (error) {
                 this.diagnosticEngine.error(`Error processing ${sourceFile.fileName}: ${error.message}`);
             }
         }
 
+        return { functions, types };
+    }
+
+    /**
+     * Process a function declaration into ImportFunctionSkeleton format
+     * @param {ts.FunctionDeclaration} node - The function node
+     * @returns {ImportFunctionSkeleton | null} Processed function
+     * @private
+     */
+    processFunctionToSkeleton(node) {
+        if (!node.name) return null;
+
+        const signature = this.checker.getSignatureFromDeclaration(node);
+        if (!signature) return null;
+
+        /** @type {Parameter[]} */
+        const parameters = [];
+        for (const p of signature.getParameters()) {
+            const type = this.checker.getTypeOfSymbolAtLocation(p, node);
+            const bridgeType = this.convertToBridgeType(type);
+
+            parameters.push({
+                name: p.name,
+                type: bridgeType,
+            });
+        }
+
+        const returnType = signature.getReturnType();
+        const bridgeReturnType = this.convertToBridgeType(returnType);
+
         return {
-            definitions: this.definitionsMap,
-            typeLiterals: this.typeLiteralsMap,
-            anonymousInterfaces: this.anonymousInterfacesMap,
-            unknownIdentTypes: this.unknownIdentTypes,
+            name: node.name.text,
+            parameters,
+            returnType: bridgeReturnType,
+        };
+    }
+
+    /**
+     * Process a type declaration into ImportTypeSkeleton format
+     * @param {ts.InterfaceDeclaration | ts.ClassDeclaration | ts.TypeAliasDeclaration | ts.EnumDeclaration} node - The type node
+     * @returns {ImportTypeSkeleton | null} Processed type
+     * @private
+     */
+    processTypeToSkeleton(node) {
+        if (!node.name) return null;
+
+        /** @type {ImportPropertySkeleton[]} */
+        const properties = [];
+        /** @type {ImportMethodSkeleton[]} */
+        const methods = [];
+
+        if (ts.isInterfaceDeclaration(node) || ts.isClassDeclaration(node)) {
+            for (const member of node.members) {
+                if (ts.isPropertyDeclaration(member) || ts.isPropertySignature(member)) {
+                    const property = this.processProperty(member);
+                    if (property) properties.push(property);
+                } else if (ts.isMethodDeclaration(member) || ts.isMethodSignature(member)) {
+                    const method = this.processMethod(member);
+                    if (method) methods.push(method);
+                }
+            }
+        } else if (ts.isEnumDeclaration(node)) {
+            for (const member of node.members) {
+                const type = this.checker.getTypeAtLocation(member);
+                const bridgeType = this.convertToBridgeType(type);
+
+                properties.push({
+                    name: ts.isIdentifier(member.name) ? member.name.text : String(member.name),
+                    type: bridgeType,
+                });
+            }
+        }
+        // For TypeAlias, we'll just create an empty type since it's handled differently
+        // and might need special handling depending on the use case
+
+        return {
+            name: node.name.text,
+            properties,
+            methods,
         };
     }
 
@@ -317,15 +390,14 @@ export class TypeProcessor {
     /**
      * Process a property declaration
      * @param {ts.PropertyDeclaration | ts.PropertySignature} node - The property node
-     * @returns {Property | null} Processed property
+     * @returns {ImportPropertySkeleton | null} Processed property
      * @private
      */
     processProperty(node) {
         if (!node.name) return null;
 
         const type = this.checker.getTypeAtLocation(node);
-        const typeString = this.checker.typeToString(type);
-        const bridgeType = this.convertToBridgeType(typeString);
+        const bridgeType = this.convertToBridgeType(type);
 
         return {
             name: ts.isIdentifier(node.name) ? node.name.text :
@@ -338,7 +410,7 @@ export class TypeProcessor {
     /**
      * Process a method declaration
      * @param {ts.MethodDeclaration | ts.MethodSignature} node - The method node
-     * @returns {Method | null} Processed method
+     * @returns {ImportMethodSkeleton | null} Processed method
      * @private
      */
     processMethod(node) {
@@ -350,8 +422,7 @@ export class TypeProcessor {
         const parameters = [];
         for (const p of signature.getParameters()) {
             const type = this.checker.getTypeOfSymbolAtLocation(p, node);
-            const typeString = this.checker.typeToString(type);
-            const bridgeType = this.convertToBridgeType(typeString);
+            const bridgeType = this.convertToBridgeType(type);
 
             parameters.push({
                 name: p.name,
@@ -360,8 +431,7 @@ export class TypeProcessor {
         }
 
         const returnType = signature.getReturnType();
-        const returnTypeString = this.checker.typeToString(returnType);
-        const bridgeReturnType = this.convertToBridgeType(returnTypeString);
+        const bridgeReturnType = this.convertToBridgeType(returnType);
 
         return {
             name: ts.isIdentifier(node.name) ? node.name.text : String(node.name),
@@ -377,20 +447,11 @@ export class TypeProcessor {
      * @private
      */
     processTypeAlias(node) {
-        if (!node.name) return null;
-
         const type = this.checker.getTypeAtLocation(node);
-        const typeString = this.checker.typeToString(type);
-        const bridgeType = this.convertToBridgeType(typeString);
-
         return {
             name: node.name.text,
             properties: [],
-            methods: [{
-                name: 'type',
-                parameters: [],
-                returnType: bridgeType,
-            }],
+            methods: [],
         };
     }
 
@@ -406,8 +467,7 @@ export class TypeProcessor {
         const properties = [];
         for (const member of node.members) {
             const type = this.checker.getTypeAtLocation(member);
-            const typeString = this.checker.typeToString(type);
-            const bridgeType = this.convertToBridgeType(typeString);
+            const bridgeType = this.convertToBridgeType(type);
 
             properties.push({
                 name: ts.isIdentifier(member.name) ? member.name.text : String(member.name),
@@ -437,8 +497,7 @@ export class TypeProcessor {
         const parameters = [];
         for (const p of signature.getParameters()) {
             const type = this.checker.getTypeOfSymbolAtLocation(p, node);
-            const typeString = this.checker.typeToString(type);
-            const bridgeType = this.convertToBridgeType(typeString);
+            const bridgeType = this.convertToBridgeType(type);
 
             parameters.push({
                 name: p.name,
@@ -447,8 +506,7 @@ export class TypeProcessor {
         }
 
         const returnType = signature.getReturnType();
-        const returnTypeString = this.checker.typeToString(returnType);
-        const bridgeReturnType = this.convertToBridgeType(returnTypeString);
+        const bridgeReturnType = this.convertToBridgeType(returnType);
 
         return {
             name: node.name.text,
@@ -475,8 +533,7 @@ export class TypeProcessor {
         if (!ts.isIdentifier(declaration.name)) return null;
 
         const type = this.checker.getTypeAtLocation(declaration);
-        const typeString = this.checker.typeToString(type);
-        const bridgeType = this.convertToBridgeType(typeString);
+        const bridgeType = this.convertToBridgeType(type);
 
         return {
             name: declaration.name.text,
@@ -491,43 +548,51 @@ export class TypeProcessor {
 
     /**
      * Convert TypeScript type string to BridgeType
-     * @param {string} typeString - TypeScript type string
-     * @returns {string} Bridge type
+     * @param {ts.Type} type - TypeScript type string
+     * @returns {BridgeType} Bridge type
      * @private
      */
-    convertToBridgeType(typeString) {
-        const typeMap = {
-            "number": "float",
-            "string": "string",
-            "boolean": "bool",
-            "void": "void",
-            "any": "unknown",
-            "unknown": "unknown",
-            "null": "void",
-            "undefined": "void"
+    convertToBridgeType(type) {
+        const maybeProcessed = this.processedTypes.get(type);
+        if (maybeProcessed) {
+            return maybeProcessed;
+        }
+        /** @param {ts.Type} type */
+        const convert = (type) => {
+            /** @type {Record<string, BridgeType>} */
+            const typeMap = {
+                "number": "float",
+                "string": "string",
+                "boolean": "bool",
+                "void": "void",
+                "any": "unknown",
+                "unknown": "unknown",
+                "null": "void",
+                "undefined": "void",
+                "bigint": "int",
+                "object": "unknown",
+                "symbol": "unknown",
+                "never": "void",
+            };
+            const typeString = this.checker.typeToString(type);
+            if (typeMap[typeString]) {
+                return typeMap[typeString];
+            }
+            // If we don't know the type, return unknown
+            return "unknown";
         };
+        const bridgeType = convert(type);
+        this.processedTypes.set(type, bridgeType);
+        return bridgeType;
+    }
 
-        // Handle array types
-        if (typeString.endsWith("[]")) {
-            return "string"; // Arrays are converted to strings in bridge
-        }
-
-        // Handle union types
-        if (typeString.includes("|")) {
-            return "string"; // Union types are converted to strings in bridge
-        }
-
-        // Handle intersection types
-        if (typeString.includes("&")) {
-            return "string"; // Intersection types are converted to strings in bridge
-        }
-
-        // Handle function types
-        if (typeString.includes("=>")) {
-            return "void"; // Function types are converted to void in bridge
-        }
-
-        return typeMap[typeString] || typeString;
+    /**
+     * Expend known non-recursive type operators like `keyof` and `typeof`
+     * @param {ts.Type} type - TypeScript type
+     * @returns {ts.Type} Expanded type
+     * @private
+     */
+    expendType(type) {
     }
 
     /**
@@ -548,20 +613,5 @@ export class TypeProcessor {
         }
 
         return grouped;
-    }
-
-    /**
-     * Check if a node is a declaration node
-     * @param {ts.Node} node - The AST node
-     * @returns {boolean} True if the node is a declaration
-     * @private
-     */
-    isDeclarationNode(node) {
-        return ts.isInterfaceDeclaration(node) ||
-            ts.isClassDeclaration(node) ||
-            ts.isTypeAliasDeclaration(node) ||
-            ts.isEnumDeclaration(node) ||
-            ts.isFunctionDeclaration(node) ||
-            ts.isVariableStatement(node);
     }
 }
