@@ -5,7 +5,7 @@
 
 // @ts-check
 import * as fs from 'fs';
-import { TypeProcessor } from './types/processor.js';
+import { TypeProcessor } from './processor.js';
 import { parseArgs } from 'util';
 import ts from 'typescript';
 import path from 'path';

@@ -1,6 +1,6 @@
 /**
  * TypeScript type processing functionality
- * @module types/processor
+ * @module processor
  */
 
 // @ts-check
