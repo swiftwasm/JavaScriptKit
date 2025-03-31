@@ -84,7 +84,7 @@
       @Step {
         Start a local web server to serve your application:
         This starts a simple HTTP server that serves files from your current directory.
-
+        > Note: If you are building your app with `wasm32-unknown-wasip1-threads` target, you need to enable [Cross-Origin Isolation](https://developer.mozilla.org/en-US/docs/Web/API/Window/crossOriginIsolated) for `SharedArrayBuffer`. See "Cross-Origin Isolation Requirements" in <doc:Deploying-Pages>
         @Code(name: "Console", file: "hello-world-3-2-server.txt")
       }
 
