@@ -8,11 +8,13 @@ Learn how to leverage TypeScript definitions to create type-safe bindings for Ja
 
 BridgeJS enables seamless integration between Swift and JavaScript by automatically generating Swift bindings from TypeScript declaration files (`.d.ts`). This provides type-safe access to JavaScript APIs directly from your Swift code.
 
-The key benefits of this approach include:
+The key benefits of this approach over `@dynamicMemberLookup`-based APIs include:
 
 - **Type Safety**: Catch errors at compile-time rather than runtime
 - **IDE Support**: Get autocompletion and documentation in your Swift editor
 - **Performance**: Eliminating dynamism allows us to optimize the glue code
+
+If you prefer keeping your project simple, you can continue using `@dynamicMemberLookup`-based APIs.
 
 ## Getting Started
 
