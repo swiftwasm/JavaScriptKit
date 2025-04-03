@@ -13,17 +13,19 @@ import Foundation
 /// JavaScript glue code and TypeScript definitions.
 struct ImportTS {
     let progress: ProgressReporting
-    let moduleName: String
-    private(set) var skeletons: [ImportedFileSkeleton] = []
+    private(set) var skeleton: ImportedModuleSkeleton
+    private var moduleName: String {
+        skeleton.moduleName
+    }
 
     init(progress: ProgressReporting, moduleName: String) {
         self.progress = progress
-        self.moduleName = moduleName
+        self.skeleton = ImportedModuleSkeleton(moduleName: moduleName, children: [])
     }
 
     /// Adds a skeleton to the importer's state
     mutating func addSkeleton(_ skeleton: ImportedFileSkeleton) {
-        self.skeletons.append(skeleton)
+        self.skeleton.children.append(skeleton)
     }
 
     /// Processes a TypeScript definition file and extracts its API information
@@ -69,7 +71,7 @@ struct ImportTS {
     /// Finalizes the import process and generates Swift code
     func finalize() throws -> String? {
         var decls: [DeclSyntax] = []
-        for skeleton in self.skeletons {
+        for skeleton in self.skeleton.children {
             for function in skeleton.functions {
                 let thunkDecls = try renderSwiftThunk(function, topLevelDecls: &decls)
                 decls.append(contentsOf: thunkDecls)

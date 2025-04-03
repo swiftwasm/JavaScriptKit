@@ -92,5 +92,5 @@ struct ImportedFileSkeleton: Codable {
 
 struct ImportedModuleSkeleton: Codable {
     let moduleName: String
-    let children: [ImportedFileSkeleton]
+    var children: [ImportedFileSkeleton]
 }

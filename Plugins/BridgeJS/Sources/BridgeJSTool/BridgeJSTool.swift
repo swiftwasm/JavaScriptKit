@@ -115,7 +115,6 @@ import SwiftParser
             )
             try (outputSwift ?? "").write(to: outputSwiftURL, atomically: true, encoding: .utf8)
 
-            let outputSkeletons = ImportedModuleSkeleton(moduleName: importer.moduleName, children: importer.skeletons)
             let outputSkeletonsURL = URL(fileURLWithPath: doubleDashOptions["output-skeleton"]!)
             try FileManager.default.createDirectory(
                 at: outputSkeletonsURL.deletingLastPathComponent(),
@@ -124,7 +123,7 @@ import SwiftParser
             )
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            try encoder.encode(outputSkeletons).write(to: outputSkeletonsURL)
+            try encoder.encode(importer.skeleton).write(to: outputSkeletonsURL)
 
             progress.print(
                 """
