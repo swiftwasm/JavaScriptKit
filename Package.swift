@@ -1,5 +1,6 @@
 // swift-tools-version:6.0
 
+import CompilerPluginSupport
 import PackageDescription
 
 // NOTE: needed for embedded customizations, ideally this will not be necessary at all in the future, or can be replaced with traits
@@ -9,12 +10,24 @@ let useLegacyResourceBundling =
 
 let package = Package(
     name: "JavaScriptKit",
+    platforms: [
+        .macOS(.v10_15),
+        .iOS(.v13),
+        .tvOS(.v13),
+        .watchOS(.v6),
+        .macCatalyst(.v13),
+    ],
     products: [
         .library(name: "JavaScriptKit", targets: ["JavaScriptKit"]),
         .library(name: "JavaScriptEventLoop", targets: ["JavaScriptEventLoop"]),
         .library(name: "JavaScriptBigIntSupport", targets: ["JavaScriptBigIntSupport"]),
         .library(name: "JavaScriptEventLoopTestSupport", targets: ["JavaScriptEventLoopTestSupport"]),
         .plugin(name: "PackageToJS", targets: ["PackageToJS"]),
+        .plugin(name: "BridgeJS", targets: ["BridgeJS"]),
+        .plugin(name: "BridgeJSCommandPlugin", targets: ["BridgeJSCommandPlugin"]),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..<"601.0.0")
     ],
     targets: [
         .target(
@@ -98,7 +111,40 @@ let package = Package(
             capability: .command(
                 intent: .custom(verb: "js", description: "Convert a Swift package to a JavaScript package")
             ),
-            sources: ["Sources"]
+            path: "Plugins/PackageToJS/Sources"
+        ),
+        .plugin(
+            name: "BridgeJS",
+            capability: .buildTool(),
+            dependencies: ["BridgeJSTool"],
+            path: "Plugins/BridgeJS/Sources/BridgeJSBuildPlugin"
+        ),
+        .plugin(
+            name: "BridgeJSCommandPlugin",
+            capability: .command(
+                intent: .custom(verb: "bridge-js", description: "Generate bridging code"),
+                permissions: [.writeToPackageDirectory(reason: "Generate bridging code")]
+            ),
+            dependencies: ["BridgeJSTool"],
+            path: "Plugins/BridgeJS/Sources/BridgeJSCommandPlugin"
+        ),
+        .executableTarget(
+            name: "BridgeJSTool",
+            dependencies: [
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftBasicFormat", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+            ],
+            path: "Plugins/BridgeJS/Sources/BridgeJSTool"
+        ),
+        .testTarget(
+            name: "BridgeJSRuntimeTests",
+            dependencies: ["JavaScriptKit"],
+            exclude: ["Generated/JavaScript"],
+            swiftSettings: [
+                .enableExperimentalFeature("Extern")
+            ]
         ),
     ]
 )

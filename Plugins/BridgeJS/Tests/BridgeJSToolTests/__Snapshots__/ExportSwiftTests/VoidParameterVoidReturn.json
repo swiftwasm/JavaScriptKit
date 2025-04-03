@@ -1,0 +1,19 @@
+{
+  "classes" : [
+
+  ],
+  "functions" : [
+    {
+      "abiName" : "bjs_check",
+      "name" : "check",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    }
+  ]
+}

@@ -4,13 +4,69 @@ export function setupOptions(options, context) {
     setupTestGlobals(globalThis);
     return {
         ...options,
-        addToCoreImports(importObject) {
+        addToCoreImports(importObject, getInstance, getExports) {
             options.addToCoreImports?.(importObject);
             importObject["JavaScriptEventLoopTestSupportTests"] = {
                 "isMainThread": () => context.isMainThread,
             }
+            importObject["BridgeJSRuntimeTests"] = {
+                "runJsWorks": () => {
+                    return BridgeJSRuntimeTests_runJsWorks(getInstance(), getExports());
+                },
+            }
         }
     }
+}
+
+import assert from "node:assert";
+
+/** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge.d.ts').Exports} exports */
+function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
+    for (const v of [0, 1, -1, 2147483647, -2147483648]) {
+        assert.equal(exports.roundTripInt(v), v);
+    }
+    for (const v of [
+        0.0, 1.0, -1.0,
+        NaN,
+        Infinity,
+        /* .pi */ 3.141592502593994,
+        /* .greatestFiniteMagnitude */ 3.4028234663852886e+38,
+        /* .leastNonzeroMagnitude */ 1.401298464324817e-45
+    ]) {
+        assert.equal(exports.roundTripFloat(v), v);
+    }
+    for (const v of [
+        0.0, 1.0, -1.0,
+        NaN,
+        Infinity,
+        /* .pi */ 3.141592502593994,
+        /* .greatestFiniteMagnitude */ 3.4028234663852886e+38,
+        /* .leastNonzeroMagnitude */ 1.401298464324817e-45
+    ]) {
+        assert.equal(exports.roundTripDouble(v), v);
+    }
+    for (const v of [true, false]) {
+        assert.equal(exports.roundTripBool(v), v);
+    }
+    for (const v of [
+        "Hello, world!",
+        "😄",
+        "こんにちは",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    ]) {
+        assert.equal(exports.roundTripString(v), v);
+    }
+
+    const g = new exports.Greeter("John");
+    const g2 = exports.roundTripSwiftHeapObject(g)
+    g2.release();
+
+    assert.equal(g.greet(), "Hello, John!");
+    g.changeName("Jane");
+    assert.equal(g.greet(), "Hello, Jane!");
+    exports.takeGreeter(g, "Jay");
+    assert.equal(g.greet(), "Hello, Jay!");
+    g.release();
 }
 
 function setupTestGlobals(global) {
