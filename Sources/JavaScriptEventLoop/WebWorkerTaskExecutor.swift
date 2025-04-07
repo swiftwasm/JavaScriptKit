@@ -110,6 +110,16 @@ import WASILibc
 @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)  // For `Atomic` and `TaskExecutor` types
 public final class WebWorkerTaskExecutor: TaskExecutor {
 
+    /// An error that occurs when spawning a worker thread fails.
+    public struct SpawnError: Error {
+        /// The reason for the error.
+        public let reason: String
+
+        internal init(reason: String) {
+            self.reason = reason
+        }
+    }
+
     /// A job worker dedicated to a single Web Worker thread.
     ///
     /// ## Lifetime
@@ -348,20 +358,30 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                 }
             }
             trace("Executor.start")
+
+            // Hold over-retained contexts until all worker threads are started.
+            var contexts: [Unmanaged<Context>] = []
+            defer {
+                for context in contexts {
+                    context.release()
+                }
+            }
             // Start worker threads via pthread_create.
             for worker in workers {
                 // NOTE: The context must be allocated on the heap because
                 // `pthread_create` on WASI does not guarantee the thread is started
                 // immediately. The context must be retained until the thread is started.
                 let context = Context(executor: self, worker: worker)
-                let ptr = Unmanaged.passRetained(context).toOpaque()
+                let unmanagedContext = Unmanaged.passRetained(context)
+                contexts.append(unmanagedContext)
+                let ptr = unmanagedContext.toOpaque()
                 let ret = pthread_create(
                     nil,
                     nil,
                     { ptr in
                         // Cast to a optional pointer to absorb nullability variations between platforms.
                         let ptr: UnsafeMutableRawPointer? = ptr
-                        let context = Unmanaged<Context>.fromOpaque(ptr!).takeRetainedValue()
+                        let context = Unmanaged<Context>.fromOpaque(ptr!).takeUnretainedValue()
                         context.worker.start(executor: context.executor)
                         // The worker is started. Throw JS exception to unwind the call stack without
                         // reaching the `pthread_exit`, which is called immediately after this block.
@@ -370,7 +390,10 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                     },
                     ptr
                 )
-                precondition(ret == 0, "Failed to create a thread")
+                guard ret == 0 else {
+                    let strerror = String(cString: strerror(ret))
+                    throw SpawnError(reason: "Failed to create a thread (\(ret): \(strerror))")
+                }
             }
             // Wait until all worker threads are started and wire up messaging channels
             // between the main thread and workers to notify job enqueuing events each other.
@@ -380,7 +403,9 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                 var tid: pid_t
                 repeat {
                     if workerInitStarted.duration(to: .now) > timeout {
-                        fatalError("Worker thread initialization timeout exceeded (\(timeout))")
+                        throw SpawnError(
+                            reason: "Worker thread initialization timeout exceeded (\(timeout))"
+                        )
                     }
                     tid = worker.tid.load(ordering: .sequentiallyConsistent)
                     try await clock.sleep(for: checkInterval)
