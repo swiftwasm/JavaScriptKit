@@ -16,7 +16,7 @@ build:
 .PHONY: unittest
 unittest:
 	@echo Running unit tests
-	swift package --swift-sdk "$(SWIFT_SDK_ID)" \
+	env JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1 swift package --swift-sdk "$(SWIFT_SDK_ID)" \
 	    --disable-sandbox \
 	    -Xlinker --stack-first \
 	    -Xlinker --global-base=524288 \
