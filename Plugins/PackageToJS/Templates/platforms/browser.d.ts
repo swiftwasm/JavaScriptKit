@@ -1,4 +1,4 @@
-import type { InstantiateOptions, ModuleSource } from "../instantiate.js"
+import type { InstantiateOptions, ModuleSource/* #if HAS_IMPORTS */, Imports/* #endif */ } from "../instantiate.js"
 
 export function defaultBrowserSetup(options: {
     module: ModuleSource,
@@ -6,6 +6,9 @@ export function defaultBrowserSetup(options: {
     args?: string[],
     onStdoutLine?: (line: string) => void,
     onStderrLine?: (line: string) => void,
+/* #endif */
+/* #if HAS_IMPORTS */
+    imports: Imports,
 /* #endif */
 /* #if USE_SHARED_MEMORY */
     spawnWorker: (module: WebAssembly.Module, memory: WebAssembly.Memory, startArg: any) => Worker,

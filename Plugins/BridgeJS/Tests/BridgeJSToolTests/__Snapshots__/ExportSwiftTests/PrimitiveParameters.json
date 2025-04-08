@@ -1,0 +1,54 @@
+{
+  "classes" : [
+
+  ],
+  "functions" : [
+    {
+      "abiName" : "bjs_check",
+      "name" : "check",
+      "parameters" : [
+        {
+          "label" : "a",
+          "name" : "a",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "label" : "b",
+          "name" : "b",
+          "type" : {
+            "float" : {
+
+            }
+          }
+        },
+        {
+          "label" : "c",
+          "name" : "c",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "label" : "d",
+          "name" : "d",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    }
+  ]
+}

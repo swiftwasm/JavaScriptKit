@@ -1,0 +1,1 @@
+@JS func check() {}

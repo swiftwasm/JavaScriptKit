@@ -49,8 +49,16 @@ Check out the [examples](https://github.com/swiftwasm/JavaScriptKit/tree/main/Ex
 
 - <doc:Hello-World>
 
-### Core Types
+### Articles
 
-- <doc:JSValue>
-- <doc:JSObject>
-- <doc:JSClosure>
+- <doc:Exporting-Swift-to-JavaScript>
+- <doc:Importing-TypeScript-into-Swift>
+- <doc:Deploying-Pages>
+- <doc:Ahead-of-Time-Code-Generation>
+- <doc:JavaScript-Environment-Requirements>
+
+### Core APIs
+
+- ``JSValue``
+- ``JSObject``
+- ``JS()``

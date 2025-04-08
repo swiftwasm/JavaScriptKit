@@ -1,0 +1,77 @@
+{
+  "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_Greeter_init",
+        "parameters" : [
+          {
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_Greeter_greet",
+          "name" : "greet",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Greeter_changeName",
+          "name" : "changeName",
+          "parameters" : [
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "Greeter"
+    }
+  ],
+  "functions" : [
+    {
+      "abiName" : "bjs_takeGreeter",
+      "name" : "takeGreeter",
+      "parameters" : [
+        {
+          "label" : "greeter",
+          "name" : "greeter",
+          "type" : {
+            "swiftHeapObject" : {
+              "_0" : "Greeter"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    }
+  ]
+}
