@@ -27,7 +27,7 @@ struct BridgeJSCommandPlugin: CommandPlugin {
                 Generated code will be placed in the target's 'Generated' directory.
 
                 OPTIONS:
-                    --target <target> Specify target(s) to generate bridge code for. If omitted, 
+                    --target <target> Specify target(s) to generate bridge code for. If omitted,
                                       generates for all targets with JavaScriptKit dependency.
                 """
         }

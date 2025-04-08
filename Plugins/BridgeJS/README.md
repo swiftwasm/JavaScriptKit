@@ -1,5 +1,8 @@
 # BridgeJS
 
+> Important: This feature is still experimental, and the API may change frequently. Use at your own risk
+> with `JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1` environment variable.
+
 > Note: This documentation is intended for JavaScriptKit developers, not JavaScriptKit users.
 
 ## Overview
