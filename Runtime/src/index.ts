@@ -749,4 +749,4 @@ export class SwiftRuntime {
 /// This error is thrown to unwind the call stack of the Swift program and return the control to
 /// the JavaScript side. Otherwise, the `swift_task_asyncMainDrainQueue` ends up with `abort()`
 /// because the event loop expects `exit()` call before the end of the event loop.
-class UnsafeEventLoopYield extends Error {}
+export class UnsafeEventLoopYield extends Error {}
