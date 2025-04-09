@@ -306,6 +306,7 @@ class SwiftRuntime {
         this.version = 708;
         this.textDecoder = new TextDecoder("utf-8");
         this.textEncoder = new TextEncoder(); // Only support utf-8
+        this.UnsafeEventLoopYield = UnsafeEventLoopYield;
         /** @deprecated Use `wasmImports` instead */
         this.importObjects = () => this.wasmImports;
         this._instance = null;
