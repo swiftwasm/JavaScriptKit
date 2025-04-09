@@ -1,3 +1,6 @@
+type ref = number;
+type pointer = number;
+
 declare class Memory {
     readonly rawMemory: WebAssembly.Memory;
     private readonly heap;
@@ -17,9 +20,6 @@ declare class Memory {
     writeInt64: (ptr: pointer, value: bigint) => void;
     writeFloat64: (ptr: pointer, value: number) => void;
 }
-
-type ref = number;
-type pointer = number;
 
 /**
  * A thread channel is a set of functions that are used to communicate between
@@ -189,6 +189,7 @@ declare class SwiftRuntime {
     private textEncoder;
     /** The thread ID of the current thread. */
     private tid;
+    UnsafeEventLoopYield: typeof UnsafeEventLoopYield;
     constructor(options?: SwiftRuntimeOptions);
     setInstance(instance: WebAssembly.Instance): void;
     main(): void;
@@ -208,6 +209,8 @@ declare class SwiftRuntime {
     get wasmImports(): WebAssembly.ModuleImports;
     private postMessageToMainThread;
     private postMessageToWorkerThread;
+}
+declare class UnsafeEventLoopYield extends Error {
 }
 
 export { SwiftRuntime };
