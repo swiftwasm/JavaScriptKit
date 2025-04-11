@@ -63,6 +63,7 @@ export async function instantiateForThread(
 async function _instantiate(
     options
 ) {
+    const _WebAssembly = options.WebAssembly || WebAssembly;
     const moduleSource = options.module;
 /* #if IS_WASI */
     const { wasi } = options;
@@ -98,23 +99,23 @@ async function _instantiate(
     let module;
     let instance;
     let exports;
-    if (moduleSource instanceof WebAssembly.Module) {
+    if (moduleSource instanceof _WebAssembly.Module) {
         module = moduleSource;
-        instance = await WebAssembly.instantiate(module, importObject);
+        instance = await _WebAssembly.instantiate(module, importObject);
     } else if (typeof Response === "function" && (moduleSource instanceof Response || moduleSource instanceof Promise)) {
-        if (typeof WebAssembly.instantiateStreaming === "function") {
-            const result = await WebAssembly.instantiateStreaming(moduleSource, importObject);
+        if (typeof _WebAssembly.instantiateStreaming === "function") {
+            const result = await _WebAssembly.instantiateStreaming(moduleSource, importObject);
             module = result.module;
             instance = result.instance;
         } else {
             const moduleBytes = await (await moduleSource).arrayBuffer();
-            module = await WebAssembly.compile(moduleBytes);
-            instance = await WebAssembly.instantiate(module, importObject);
+            module = await _WebAssembly.compile(moduleBytes);
+            instance = await _WebAssembly.instantiate(module, importObject);
         }
     } else {
         // @ts-expect-error: Type 'Response' is not assignable to type 'BufferSource'
-        module = await WebAssembly.compile(moduleSource);
-        instance = await WebAssembly.instantiate(module, importObject);
+        module = await _WebAssembly.compile(moduleSource);
+        instance = await _WebAssembly.instantiate(module, importObject);
     }
 
     swift.setInstance(instance);

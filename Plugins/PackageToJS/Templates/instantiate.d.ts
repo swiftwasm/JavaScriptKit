@@ -57,6 +57,11 @@ export type ModuleSource = WebAssembly.Module | ArrayBufferView | ArrayBuffer | 
  */
 export type InstantiateOptions = {
     /**
+     * The WebAssembly namespace to use for instantiation.
+     * Defaults to the globalThis.WebAssembly object.
+     */
+    WebAssembly?: typeof globalThis.WebAssembly,
+    /**
      * The WebAssembly module to instantiate
      */
     module: ModuleSource,
