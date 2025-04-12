@@ -1,8 +1,0 @@
-{
-  "private": true,
-  "type": "module",
-  "dependencies": {
-    "uwasi": "^1.2.0",
-    "javascript-kit-swift": "file:.."
-  }
-}

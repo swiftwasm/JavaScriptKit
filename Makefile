@@ -8,11 +8,6 @@ bootstrap:
 	npm ci
 	npx playwright install
 
-.PHONY: build
-build:
-	swift build --triple wasm32-unknown-wasi
-	npm run build
-
 .PHONY: unittest
 unittest:
 	@echo Running unit tests
@@ -23,18 +18,6 @@ unittest:
 	    -Xlinker -z \
 	    -Xlinker stack-size=524288 \
 	    js test --prelude ./Tests/prelude.mjs
-
-.PHONY: benchmark_setup
-benchmark_setup:
-	SWIFT_BUILD_FLAGS="$(SWIFT_BUILD_FLAGS)" CONFIGURATION=release $(MAKE) -C IntegrationTests benchmark_setup
-
-.PHONY: run_benchmark
-run_benchmark:
-	SWIFT_BUILD_FLAGS="$(SWIFT_BUILD_FLAGS)" CONFIGURATION=release $(MAKE) -s -C IntegrationTests run_benchmark
-
-.PHONY: perf-tester
-perf-tester:
-	cd ci/perf-tester && npm ci
 
 .PHONY: regenerate_swiftpm_resources
 regenerate_swiftpm_resources:
