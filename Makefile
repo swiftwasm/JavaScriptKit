@@ -22,6 +22,5 @@ unittest:
 .PHONY: regenerate_swiftpm_resources
 regenerate_swiftpm_resources:
 	npm run build
-	cp Runtime/lib/index.js Plugins/PackageToJS/Templates/runtime.js
 	cp Runtime/lib/index.mjs Plugins/PackageToJS/Templates/runtime.mjs
 	cp Runtime/lib/index.d.ts Plugins/PackageToJS/Templates/runtime.d.ts

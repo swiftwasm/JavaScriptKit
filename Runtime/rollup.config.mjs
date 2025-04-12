@@ -10,11 +10,6 @@ const config = [
                 file: "lib/index.mjs",
                 format: "esm",
             },
-            {
-                file: "lib/index.js",
-                format: "umd",
-                name: "JavaScriptKit",
-            },
         ],
         plugins: [typescript()],
     },
