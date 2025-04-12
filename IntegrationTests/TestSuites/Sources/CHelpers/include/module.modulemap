@@ -1,4 +1,0 @@
-module CHelpers {
-    header "helpers.h"
-    export *
-}
