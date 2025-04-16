@@ -2,6 +2,7 @@
 // The current implementation is much simple to be easily debugged, but should be re-implemented
 // using priority queue ideally.
 
+import _Concurrency
 import _CJavaScriptEventLoop
 
 #if compiler(>=5.5)

@@ -1,3 +1,4 @@
+import _Concurrency
 @_spi(JSObject_id) import JavaScriptKit
 import _CJavaScriptKit
 

@@ -1,5 +1,7 @@
+#if !hasFeature(Embedded)
 import JavaScriptKit
 import _CJavaScriptEventLoop
+import _Concurrency
 
 #if canImport(Synchronization)
 import Synchronization
@@ -60,3 +62,4 @@ public final class WebWorkerDedicatedExecutor: SerialExecutor {
         self.underlying.enqueue(job)
     }
 }
+#endif
