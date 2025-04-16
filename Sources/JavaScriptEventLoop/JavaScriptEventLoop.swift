@@ -1,4 +1,5 @@
 import JavaScriptKit
+import _Concurrency
 import _CJavaScriptEventLoop
 import _CJavaScriptKit
 
@@ -259,38 +260,38 @@ extension JavaScriptEventLoop {
 extension JSPromise {
     /// Wait for the promise to complete, returning (or throwing) its result.
     public var value: JSValue {
-        get async throws {
-            try await withUnsafeThrowingContinuation { [self] continuation in
+        get async throws(JSException) {
+            try await withUnsafeContinuation { [self] continuation in
                 self.then(
                     success: {
-                        continuation.resume(returning: $0)
+                        continuation.resume(returning: Swift.Result<JSValue, JSException>.success($0))
                         return JSValue.undefined
                     },
                     failure: {
-                        continuation.resume(throwing: JSException($0))
+                        continuation.resume(returning: Swift.Result<JSValue, JSException>.failure(.init($0)))
                         return JSValue.undefined
                     }
                 )
-            }
+            }.get()
         }
     }
 
     /// Wait for the promise to complete, returning its result or exception as a Result.
     ///
     /// - Note: Calling this function does not switch from the caller's isolation domain.
-    public func value(isolation: isolated (any Actor)? = #isolation) async throws -> JSValue {
-        try await withUnsafeThrowingContinuation(isolation: isolation) { [self] continuation in
+    public func value(isolation: isolated (any Actor)? = #isolation) async throws(JSException) -> JSValue {
+        try await withUnsafeContinuation(isolation: isolation) { [self] continuation in
             self.then(
                 success: {
-                    continuation.resume(returning: $0)
+                    continuation.resume(returning: Swift.Result<JSValue, JSException>.success($0))
                     return JSValue.undefined
                 },
                 failure: {
-                    continuation.resume(throwing: JSException($0))
+                    continuation.resume(returning: Swift.Result<JSValue, JSException>.failure(.init($0)))
                     return JSValue.undefined
                 }
             )
-        }
+        }.get()
     }
 
     /// Wait for the promise to complete, returning its result or exception as a Result.

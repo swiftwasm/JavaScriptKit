@@ -1,4 +1,4 @@
-#if compiler(>=6.0)  // `TaskExecutor` is available since Swift 6.0
+#if compiler(>=6.0) && !hasFeature(Embedded)  // `TaskExecutor` is available since Swift 6.0, no multi-threading for embedded Wasm yet.
 
 import JavaScriptKit
 import _CJavaScriptKit
