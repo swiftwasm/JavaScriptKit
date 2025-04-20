@@ -347,7 +347,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
             self.workers = workers
         }
 
-        func start(timeout: Duration, checkInterval: Duration) async throws {
+        func start(stackSize: Int?, timeout: Duration, checkInterval: Duration) async throws {
             #if canImport(wasi_pthread) && compiler(>=6.1) && _runtime(_multithreaded)
             class Context: @unchecked Sendable {
                 let executor: WebWorkerTaskExecutor.Executor
@@ -375,9 +375,21 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                 let unmanagedContext = Unmanaged.passRetained(context)
                 contexts.append(unmanagedContext)
                 let ptr = unmanagedContext.toOpaque()
+                var attr = pthread_attr_t()
+                pthread_attr_init(&attr)
+                // Set the stack size if specified.
+                if let stackSize {
+                    let ret = pthread_attr_setstacksize(&attr, stackSize)
+                    guard ret == 0 else {
+                        let strerror = String(cString: strerror(ret))
+                        throw SpawnError(
+                            reason: "Failed to set stack size (\(stackSize)) for thread (\(ret): \(strerror))"
+                        )
+                    }
+                }
                 let ret = pthread_create(
                     nil,
-                    nil,
+                    &attr,
                     { ptr in
                         // Cast to a optional pointer to absorb nullability variations between platforms.
                         let ptr: UnsafeMutableRawPointer? = ptr
@@ -390,6 +402,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                     },
                     ptr
                 )
+                pthread_attr_destroy(&attr)
                 guard ret == 0 else {
                     let strerror = String(cString: strerror(ret))
                     throw SpawnError(reason: "Failed to create a thread (\(ret): \(strerror))")
@@ -467,16 +480,19 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
     ///
     /// - Parameters:
     ///   - numberOfThreads: The number of Web Worker threads to spawn.
+    ///   - stackSize: The stack size for each worker thread. Default is `nil` (use the platform default stack size).
     ///   - timeout: The maximum time to wait for all worker threads to be started. Default is 3 seconds.
     ///   - checkInterval: The interval to check if all worker threads are started. Default is 5 microseconds.
     /// - Throws: An error if any worker thread fails to initialize within the timeout period.
+    /// - Note: The default stack size of wasi-libc is typically 128KB.
     public init(
         numberOfThreads: Int,
+        stackSize: Int? = nil,
         timeout: Duration = .seconds(3),
         checkInterval: Duration = .microseconds(5)
     ) async throws {
         self.executor = Executor(numberOfThreads: numberOfThreads)
-        try await self.executor.start(timeout: timeout, checkInterval: checkInterval)
+        try await self.executor.start(stackSize: stackSize, timeout: timeout, checkInterval: checkInterval)
     }
 
     /// Terminates all worker threads managed by this executor.
