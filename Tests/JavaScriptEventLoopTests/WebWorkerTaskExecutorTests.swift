@@ -122,6 +122,12 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         executor.terminate()
     }
 
+    func testThreadStackSize() async throws {
+        // Sanity check for stackSize parameter
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 3, stackSize: 512 * 1024)
+        executor.terminate()
+    }
+
     func testTaskGroupRunOnDifferentThreads() async throws {
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 2)
 

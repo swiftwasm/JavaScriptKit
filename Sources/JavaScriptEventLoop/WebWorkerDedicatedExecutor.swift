@@ -39,12 +39,19 @@ public final class WebWorkerDedicatedExecutor: SerialExecutor {
     private let underlying: WebWorkerTaskExecutor
 
     /// - Parameters:
+    ///   - stackSize: The stack size for each worker thread. Default is `nil` (use the platform default stack size).
     ///   - timeout: The maximum time to wait for all worker threads to be started. Default is 3 seconds.
     ///   - checkInterval: The interval to check if all worker threads are started. Default is 5 microseconds.
     /// - Throws: An error if any worker thread fails to initialize within the timeout period.
-    public init(timeout: Duration = .seconds(3), checkInterval: Duration = .microseconds(5)) async throws {
+    /// - Note: The default stack size of wasi-libc is typically 128KB.
+    public init(
+        stackSize: Int? = nil,
+        timeout: Duration = .seconds(3),
+        checkInterval: Duration = .microseconds(5)
+    ) async throws {
         let underlying = try await WebWorkerTaskExecutor(
             numberOfThreads: 1,
+            stackSize: stackSize,
             timeout: timeout,
             checkInterval: checkInterval
         )
