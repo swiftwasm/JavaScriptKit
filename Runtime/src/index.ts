@@ -4,7 +4,6 @@ import {
     ExportedFunctions,
     ref,
     pointer,
-    TypedArray,
     MAIN_THREAD_TID,
 } from "./types.js";
 import * as JSValue from "./js-value.js";
@@ -501,12 +500,16 @@ export class SwiftRuntime {
                 return func_ref;
             },
 
-            swjs_create_typed_array: (
+            swjs_create_typed_array: <T extends Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | BigInt64Array | BigUint64Array | Float32Array | Float64Array | Uint8ClampedArray>(
                 constructor_ref: ref,
                 elementsPtr: pointer,
                 length: number
             ) => {
-                const ArrayType: TypedArray =
+                type TypedArrayConstructor = {
+                    new (buffer: ArrayBuffer, byteOffset: number, length: number): T;
+                    new (): T;
+                };
+                const ArrayType: TypedArrayConstructor =
                     this.memory.getObject(constructor_ref);
                 if (length == 0) {
                     // The elementsPtr can be unaligned in Swift's Array
