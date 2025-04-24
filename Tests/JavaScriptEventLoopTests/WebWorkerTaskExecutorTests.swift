@@ -620,6 +620,20 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         XCTAssertEqual(object["test"].string!, "Hello, World!")
     }
 
+    func testThrowJSExceptionAcrossThreads() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        let task = Task(executorPreference: executor) {
+            _ = try JSObject.global.eval.function!.throws("throw new Error()")
+        }
+        do {
+            try await task.value
+            XCTFail()
+        } catch let error as JSException {
+            // Stringify JSException coming from worker should be allowed
+            _ = String(describing: error)
+        }
+    }
+
     // func testDeinitJSObjectOnDifferentThread() async throws {
     //     let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
     //
