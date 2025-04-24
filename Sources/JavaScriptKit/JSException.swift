@@ -25,7 +25,8 @@ public struct JSException: Error, Equatable, CustomStringConvertible {
     /// from `Error` protocol.
     private nonisolated(unsafe) let _thrownValue: JSValue
 
-    let description: String
+    /// A description of the exception.
+    public let description: String
 
     /// Initializes a new JSException instance with a value thrown from JavaScript.
     ///
