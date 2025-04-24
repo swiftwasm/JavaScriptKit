@@ -114,20 +114,17 @@ extension Trait where Self == ConditionTrait {
         }
     }
 
+    typealias RunProcess = (_ executableURL: URL, _ args: [String], _ env: [String: String]) throws -> Void
     typealias RunSwift = (_ args: [String], _ env: [String: String]) throws -> Void
 
-    func withPackage(at path: String, body: (URL, _ runSwift: RunSwift) throws -> Void) throws {
+    func withPackage(at path: String, body: (URL, _ runProcess: RunProcess, _ runSwift: RunSwift) throws -> Void) throws
+    {
         try withTemporaryDirectory { tempDir, retain in
             let destination = tempDir.appending(path: Self.repoPath.lastPathComponent)
             try Self.copyRepository(to: destination)
-            try body(destination.appending(path: path)) { args, env in
+            func runProcess(_ executableURL: URL, _ args: [String], _ env: [String: String]) throws {
                 let process = Process()
-                process.executableURL = URL(
-                    fileURLWithPath: "swift",
-                    relativeTo: URL(
-                        fileURLWithPath: try #require(Self.getSwiftPath())
-                    )
-                )
+                process.executableURL = executableURL
                 process.arguments = args
                 process.currentDirectoryURL = destination.appending(path: path)
                 process.environment = ProcessInfo.processInfo.environment.merging(env) { _, new in
@@ -157,13 +154,21 @@ extension Trait where Self == ConditionTrait {
                     """
                 )
             }
+            func runSwift(_ args: [String], _ env: [String: String]) throws {
+                let swiftExecutable = URL(
+                    fileURLWithPath: "swift",
+                    relativeTo: URL(fileURLWithPath: try #require(Self.getSwiftPath()))
+                )
+                try runProcess(swiftExecutable, args, env)
+            }
+            try body(destination.appending(path: path), runProcess, runSwift)
         }
     }
 
     @Test(.requireSwiftSDK)
     func basic() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
-        try withPackage(at: "Examples/Basic") { packageDir, runSwift in
+        try withPackage(at: "Examples/Basic") { packageDir, _, runSwift in
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "--debug-info-format", "dwarf"], [:])
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "--debug-info-format", "name"], [:])
@@ -177,7 +182,10 @@ extension Trait where Self == ConditionTrait {
     @Test(.requireSwiftSDK)
     func testing() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
-        try withPackage(at: "Examples/Testing") { packageDir, runSwift in
+        try withPackage(at: "Examples/Testing") { packageDir, runProcess, runSwift in
+            try runProcess(which("npm"), ["install"], [:])
+            try runProcess(which("npx"), ["playwright", "install", "chromium-headless-shell"], [:])
+
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "test"], [:])
             try withTemporaryDirectory(body: { tempDir, _ in
                 let scriptContent = """
@@ -208,7 +216,7 @@ extension Trait where Self == ConditionTrait {
     func testingWithCoverage() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
         let swiftPath = try #require(Self.getSwiftPath())
-        try withPackage(at: "Examples/Testing") { packageDir, runSwift in
+        try withPackage(at: "Examples/Testing") { packageDir, runProcess, runSwift in
             try runSwift(
                 ["package", "--swift-sdk", swiftSDKID, "js", "test", "--enable-code-coverage"],
                 [
@@ -216,19 +224,18 @@ extension Trait where Self == ConditionTrait {
                 ]
             )
             do {
-                let llvmCov = try which("llvm-cov")
-                let process = Process()
-                process.executableURL = llvmCov
                 let profdata = packageDir.appending(
                     path: ".build/plugins/PackageToJS/outputs/PackageTests/default.profdata"
                 )
-                let wasm = packageDir.appending(
-                    path: ".build/plugins/PackageToJS/outputs/PackageTests/TestingPackageTests.wasm"
+                let possibleWasmPaths = ["CounterPackageTests.xctest.wasm", "CounterPackageTests.wasm"].map {
+                    packageDir.appending(path: ".build/plugins/PackageToJS/outputs/PackageTests/\($0)")
+                }
+                let wasmPath = try #require(
+                    possibleWasmPaths.first(where: { FileManager.default.fileExists(atPath: $0.path) }),
+                    "No wasm file found"
                 )
-                process.arguments = ["report", "-instr-profile", profdata.path, wasm.path]
-                process.standardOutput = FileHandle.nullDevice
-                try process.run()
-                process.waitUntilExit()
+                let llvmCov = try which("llvm-cov")
+                try runProcess(llvmCov, ["report", "-instr-profile", profdata.path, wasmPath.path], [:])
             }
         }
     }
@@ -237,7 +244,7 @@ extension Trait where Self == ConditionTrait {
     @Test(.requireSwiftSDK(triple: "wasm32-unknown-wasip1-threads"))
     func multithreading() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
-        try withPackage(at: "Examples/Multithreading") { packageDir, runSwift in
+        try withPackage(at: "Examples/Multithreading") { packageDir, _, runSwift in
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
         }
     }
@@ -245,7 +252,7 @@ extension Trait where Self == ConditionTrait {
     @Test(.requireSwiftSDK(triple: "wasm32-unknown-wasip1-threads"))
     func offscreenCanvas() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
-        try withPackage(at: "Examples/OffscrenCanvas") { packageDir, runSwift in
+        try withPackage(at: "Examples/OffscrenCanvas") { packageDir, _, runSwift in
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
         }
     }
@@ -253,13 +260,13 @@ extension Trait where Self == ConditionTrait {
     @Test(.requireSwiftSDK(triple: "wasm32-unknown-wasip1-threads"))
     func actorOnWebWorker() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
-        try withPackage(at: "Examples/ActorOnWebWorker") { packageDir, runSwift in
+        try withPackage(at: "Examples/ActorOnWebWorker") { packageDir, _, runSwift in
             try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
         }
     }
 
     @Test(.requireEmbeddedSwift) func embedded() throws {
-        try withPackage(at: "Examples/Embedded") { packageDir, runSwift in
+        try withPackage(at: "Examples/Embedded") { packageDir, _, runSwift in
             try runSwift(
                 ["package", "--triple", "wasm32-unknown-none-wasm", "js", "-c", "release"],
                 [
