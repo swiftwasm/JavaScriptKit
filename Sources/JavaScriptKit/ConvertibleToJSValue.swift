@@ -220,6 +220,10 @@ extension RawJSValue: ConvertibleToJSValue {
 
 extension JSValue {
     func withRawJSValue<T>(_ body: (RawJSValue) -> T) -> T {
+        body(convertToRawJSValue())
+    }
+
+    fileprivate func convertToRawJSValue() -> RawJSValue {
         let kind: JavaScriptValueKind
         let payload1: JavaScriptPayload1
         var payload2: JavaScriptPayload2 = 0
@@ -232,7 +236,9 @@ extension JSValue {
             payload1 = 0
             payload2 = numberValue
         case .string(let string):
-            return string.withRawJSValue(body)
+            kind = .string
+            payload1 = string.asInternalJSRef()
+            payload2 = 0
         case .object(let ref):
             kind = .object
             payload1 = JavaScriptPayload1(ref.id)
@@ -252,53 +258,28 @@ extension JSValue {
             kind = .bigInt
             payload1 = JavaScriptPayload1(bigIntRef.id)
         }
-        let rawValue = RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
-        return body(rawValue)
+        return RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
     }
 }
 
 extension Array where Element: ConvertibleToJSValue {
     func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
-        // fast path for empty array
-        guard self.count != 0 else { return body([]) }
-
-        func _withRawJSValues(
-            _ values: Self,
-            _ index: Int,
-            _ results: inout [RawJSValue],
-            _ body: ([RawJSValue]) -> T
-        ) -> T {
-            if index == values.count { return body(results) }
-            return values[index].jsValue.withRawJSValue { (rawValue) -> T in
-                results.append(rawValue)
-                return _withRawJSValues(values, index + 1, &results, body)
-            }
+        let jsValues = map { $0.jsValue }
+        // Ensure the jsValues live longer than the temporary raw JS values
+        return withExtendedLifetime(jsValues) {
+            body(jsValues.map { $0.convertToRawJSValue() })
         }
-        var _results = [RawJSValue]()
-        return _withRawJSValues(self, 0, &_results, body)
     }
 }
 
 #if !hasFeature(Embedded)
 extension Array where Element == ConvertibleToJSValue {
     func withRawJSValues<T>(_ body: ([RawJSValue]) -> T) -> T {
-        // fast path for empty array
-        guard self.count != 0 else { return body([]) }
-
-        func _withRawJSValues(
-            _ values: [ConvertibleToJSValue],
-            _ index: Int,
-            _ results: inout [RawJSValue],
-            _ body: ([RawJSValue]) -> T
-        ) -> T {
-            if index == values.count { return body(results) }
-            return values[index].jsValue.withRawJSValue { (rawValue) -> T in
-                results.append(rawValue)
-                return _withRawJSValues(values, index + 1, &results, body)
-            }
+        let jsValues = map { $0.jsValue }
+        // Ensure the jsValues live longer than the temporary raw JS values
+        return withExtendedLifetime(jsValues) {
+            body(jsValues.map { $0.convertToRawJSValue() })
         }
-        var _results = [RawJSValue]()
-        return _withRawJSValues(self, 0, &_results, body)
     }
 }
 #endif
