@@ -28,18 +28,6 @@ export const enum LibraryFeatures {
     WeakRefs = 1 << 0,
 }
 
-export type TypedArray =
-    | Int8ArrayConstructor
-    | Uint8ArrayConstructor
-    | Int16ArrayConstructor
-    | Uint16ArrayConstructor
-    | Int32ArrayConstructor
-    | Uint32ArrayConstructor
-    | BigInt64ArrayConstructor
-    | BigUint64ArrayConstructor
-    | Float32ArrayConstructor
-    | Float64ArrayConstructor;
-
 export function assertNever(x: never, message: string) {
     throw new Error(message);
 }
