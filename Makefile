@@ -3,7 +3,6 @@ SWIFT_SDK_ID ?= wasm32-unknown-wasi
 .PHONY: bootstrap
 bootstrap:
 	npm ci
-	npx playwright install
 
 .PHONY: unittest
 unittest:
