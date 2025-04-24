@@ -12,7 +12,7 @@
 ///     let jsErrorValue = error.thrownValue
 /// }
 /// ```
-public struct JSException: Error, Equatable {
+public struct JSException: Error, Equatable, CustomStringConvertible {
     /// The value thrown from JavaScript.
     /// This can be any JavaScript value (error object, string, number, etc.).
     public var thrownValue: JSValue {
@@ -25,10 +25,13 @@ public struct JSException: Error, Equatable {
     /// from `Error` protocol.
     private nonisolated(unsafe) let _thrownValue: JSValue
 
+    let description: String
+
     /// Initializes a new JSException instance with a value thrown from JavaScript.
     ///
     /// Only available within the package.
     package init(_ thrownValue: JSValue) {
         self._thrownValue = thrownValue
+        self.description = "JSException(\(thrownValue))"
     }
 }
