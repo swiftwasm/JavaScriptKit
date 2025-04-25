@@ -1,4 +1,5 @@
 #if compiler(>=6.1) && _runtime(_multithreaded)
+import Synchronization
 import XCTest
 import _CJavaScriptKit  // For swjs_get_worker_thread_id
 @testable import JavaScriptKit
@@ -22,6 +23,7 @@ func pthread_mutex_lock(_ mutex: UnsafeMutablePointer<pthread_mutex_t>) -> Int32
 }
 #endif
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 final class WebWorkerTaskExecutorTests: XCTestCase {
     func testTaskRunOnMainThread() async throws {
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
@@ -95,6 +97,182 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         XCTAssertTrue(isMainThread())
 
         executor.terminate()
+    }
+
+    func testScheduleJobWithinMacroTask1() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        defer { executor.terminate() }
+
+        final class Context: @unchecked Sendable {
+            let hasEndedFirstWorkerWakeLoop = Atomic<Bool>(false)
+            let hasEnqueuedFromMain = Atomic<Bool>(false)
+            let hasReachedNextMacroTask = Atomic<Bool>(false)
+            let hasJobBEnded = Atomic<Bool>(false)
+            let hasJobCEnded = Atomic<Bool>(false)
+        }
+
+        // Scenario 1.
+        //      |         Main        |           Worker         |
+        //  |   +---------------------+--------------------------+
+        //  |   |                     | Start JS macrotask       |
+        //  |   |                     |   Start 1st wake-loop    |
+        //  |   |                     |     Enq JS microtask A   |
+        //  |   |                     |   End 1st wake-loop      |
+        //  |   |                     |   Start a JS microtask A |
+        // time | Enq job B to Worker |     [PAUSE]              |
+        //  |   |                     |     Enq Swift job C      |
+        //  |   |                     |   End JS microtask A     |
+        //  |   |                     |   Start 2nd wake-loop    |
+        //  |   |                     |     Run Swift job B      |
+        //  |   |                     |     Run Swift job C      |
+        //  |   |                     |   End 2nd wake-loop      |
+        //  v   |                     | End JS macrotask         |
+        //      +---------------------+--------------------------+
+
+        let context = Context()
+        Task {
+            while !context.hasEndedFirstWorkerWakeLoop.load(ordering: .sequentiallyConsistent) {
+                try! await Task.sleep(nanoseconds: 1_000)
+            }
+            // Enqueue job B to Worker
+            Task(executorPreference: executor) {
+                XCTAssertFalse(isMainThread())
+                XCTAssertFalse(context.hasReachedNextMacroTask.load(ordering: .sequentiallyConsistent))
+                context.hasJobBEnded.store(true, ordering: .sequentiallyConsistent)
+            }
+            XCTAssertTrue(isMainThread())
+            // Resume worker thread to let it enqueue job C
+            context.hasEnqueuedFromMain.store(true, ordering: .sequentiallyConsistent)
+        }
+
+        // Start worker
+        await Task(executorPreference: executor) {
+            // Schedule a new macrotask to detect if the current macrotask has completed
+            JSObject.global.setTimeout.function!(
+                JSOneshotClosure { _ in
+                    context.hasReachedNextMacroTask.store(true, ordering: .sequentiallyConsistent)
+                    return .undefined
+                },
+                0
+            )
+
+            // Enqueue a microtask, not managed by WebWorkerTaskExecutor
+            JSObject.global.queueMicrotask.function!(
+                JSOneshotClosure { _ in
+                    // Resume the main thread and let it enqueue job B
+                    context.hasEndedFirstWorkerWakeLoop.store(true, ordering: .sequentiallyConsistent)
+                    // Wait until the enqueue has completed
+                    while !context.hasEnqueuedFromMain.load(ordering: .sequentiallyConsistent) {}
+                    // Should be still in the same macrotask
+                    XCTAssertFalse(context.hasReachedNextMacroTask.load(ordering: .sequentiallyConsistent))
+                    // Enqueue job C
+                    Task(executorPreference: executor) {
+                        // Should be still in the same macrotask
+                        XCTAssertFalse(context.hasReachedNextMacroTask.load(ordering: .sequentiallyConsistent))
+                        // Notify that job C has completed
+                        context.hasJobCEnded.store(true, ordering: .sequentiallyConsistent)
+                    }
+                    return .undefined
+                },
+                0
+            )
+            // Wait until job B, C and the next macrotask have completed
+            while !context.hasJobBEnded.load(ordering: .sequentiallyConsistent)
+                || !context.hasJobCEnded.load(ordering: .sequentiallyConsistent)
+                || !context.hasReachedNextMacroTask.load(ordering: .sequentiallyConsistent)
+            {
+                try! await Task.sleep(nanoseconds: 1_000)
+            }
+        }.value
+    }
+
+    func testScheduleJobWithinMacroTask2() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        defer { executor.terminate() }
+
+        final class Context: @unchecked Sendable {
+            let hasEndedFirstWorkerWakeLoop = Atomic<Bool>(false)
+            let hasEnqueuedFromMain = Atomic<Bool>(false)
+            let hasReachedNextMacroTask = Atomic<Bool>(false)
+            let hasJobBEnded = Atomic<Bool>(false)
+            let hasJobCEnded = Atomic<Bool>(false)
+        }
+
+        // Scenario 2.
+        // (The order of enqueue of job B and C are reversed from Scenario 1)
+        //
+        //      |         Main        |           Worker         |
+        //  |   +---------------------+--------------------------+
+        //  |   |                     | Start JS macrotask       |
+        //  |   |                     |   Start 1st wake-loop    |
+        //  |   |                     |     Enq JS microtask A   |
+        //  |   |                     |   End 1st wake-loop      |
+        //  |   |                     |   Start a JS microtask A |
+        //  |   |                     |     Enq Swift job C      |
+        // time | Enq job B to Worker |     [PAUSE]              |
+        //  |   |                     |   End JS microtask A     |
+        //  |   |                     |   Start 2nd wake-loop    |
+        //  |   |                     |     Run Swift job B      |
+        //  |   |                     |     Run Swift job C      |
+        //  |   |                     |   End 2nd wake-loop      |
+        //  v   |                     | End JS macrotask         |
+        //      +---------------------+--------------------------+
+
+        let context = Context()
+        Task {
+            while !context.hasEndedFirstWorkerWakeLoop.load(ordering: .sequentiallyConsistent) {
+                try! await Task.sleep(nanoseconds: 1_000)
+            }
+            // Enqueue job B to Worker
+            Task(executorPreference: executor) {
+                XCTAssertFalse(isMainThread())
+                XCTAssertFalse(context.hasReachedNextMacroTask.load(ordering: .sequentiallyConsistent))
+                context.hasJobBEnded.store(true, ordering: .sequentiallyConsistent)
+            }
+            XCTAssertTrue(isMainThread())
+            // Resume worker thread to let it enqueue job C
+            context.hasEnqueuedFromMain.store(true, ordering: .sequentiallyConsistent)
+        }
+
+        // Start worker
+        await Task(executorPreference: executor) {
+            // Schedule a new macrotask to detect if the current macrotask has completed
+            JSObject.global.setTimeout.function!(
+                JSOneshotClosure { _ in
+                    context.hasReachedNextMacroTask.store(true, ordering: .sequentiallyConsistent)
+                    return .undefined
+                },
+                0
+            )
+
+            // Enqueue a microtask, not managed by WebWorkerTaskExecutor
+            JSObject.global.queueMicrotask.function!(
+                JSOneshotClosure { _ in
+                    // Enqueue job C
+                    Task(executorPreference: executor) {
+                        // Should be still in the same macrotask
+                        XCTAssertFalse(context.hasReachedNextMacroTask.load(ordering: .sequentiallyConsistent))
+                        // Notify that job C has completed
+                        context.hasJobCEnded.store(true, ordering: .sequentiallyConsistent)
+                    }
+                    // Resume the main thread and let it enqueue job B
+                    context.hasEndedFirstWorkerWakeLoop.store(true, ordering: .sequentiallyConsistent)
+                    // Wait until the enqueue has completed
+                    while !context.hasEnqueuedFromMain.load(ordering: .sequentiallyConsistent) {}
+                    // Should be still in the same macrotask
+                    XCTAssertFalse(context.hasReachedNextMacroTask.load(ordering: .sequentiallyConsistent))
+                    return .undefined
+                },
+                0
+            )
+            // Wait until job B, C and the next macrotask have completed
+            while !context.hasJobBEnded.load(ordering: .sequentiallyConsistent)
+                || !context.hasJobCEnded.load(ordering: .sequentiallyConsistent)
+                || !context.hasReachedNextMacroTask.load(ordering: .sequentiallyConsistent)
+            {
+                try! await Task.sleep(nanoseconds: 1_000)
+            }
+        }.value
     }
 
     func testTaskGroupRunOnSameThread() async throws {

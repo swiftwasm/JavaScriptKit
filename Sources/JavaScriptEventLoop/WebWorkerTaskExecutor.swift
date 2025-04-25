@@ -87,6 +87,10 @@ import WASILibc
 /// }
 /// ```
 ///
+/// ## Scheduling invariants
+///
+/// * Jobs enqueued on a worker are guaranteed to run within the same macrotask in which they were scheduled.
+///
 /// ## Known limitations
 ///
 /// Currently, the Cooperative Global Executor of Swift runtime has a bug around
@@ -135,22 +139,26 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
         ///              +---------+                +------------+
         ///       +----->|  Idle   |--[terminate]-->| Terminated |
         ///       |      +---+-----+                +------------+
-        ///       |          |
-        ///       |      [enqueue]
-        ///       |          |
-        ///  [no more job]   |
-        ///       |          v
-        ///       |      +---------+
-        ///       +------| Running |
-        ///              +---------+
+        ///       |          |  \
+        ///       |          |   \------------------+
+        ///       |          |                      |
+        ///       |      [enqueue]              [enqueue] (on other thread)
+        ///       |          |                      |
+        ///  [no more job]   |                      |
+        ///       |          v                      v
+        ///       |      +---------+           +---------+
+        ///       +------| Running |<--[wake]--|  Ready  |
+        ///              +---------+           +---------+
         ///
         enum State: UInt32, AtomicRepresentable {
             /// The worker is idle and waiting for a new job.
             case idle = 0
+            /// A wake message is sent to the worker, but it has not been received it yet
+            case ready = 1
             /// The worker is processing a job.
-            case running = 1
+            case running = 2
             /// The worker is terminated.
-            case terminated = 2
+            case terminated = 3
         }
         let state: Atomic<State> = Atomic(.idle)
         /// TODO: Rewrite it to use real queue :-)
@@ -197,32 +205,46 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
         func enqueue(_ job: UnownedJob) {
             statsIncrement(\.enqueuedJobs)
             var locked: Bool
+            let onTargetThread = Self.currentThread === self
+            // If it's on the thread and it's idle, we can directly schedule a `Worker/run` microtask.
+            let desiredState: State = onTargetThread ? .running : .ready
             repeat {
                 let result: Void? = jobQueue.withLockIfAvailable { queue in
                     queue.append(job)
+                    trace("Worker.enqueue idle -> running")
                     // Wake up the worker to process a job.
-                    switch state.exchange(.running, ordering: .sequentiallyConsistent) {
-                    case .idle:
-                        if Self.currentThread === self {
+                    trace("Worker.enqueue idle -> \(desiredState)")
+                    switch state.compareExchange(
+                        expected: .idle,
+                        desired: desiredState,
+                        ordering: .sequentiallyConsistent
+                    ) {
+                    case (true, _):
+                        if onTargetThread {
                             // Enqueueing a new job to the current worker thread, but it's idle now.
                             // This is usually the case when a continuation is resumed by JS events
                             // like `setTimeout` or `addEventListener`.
                             // We can run the job and subsequently spawned jobs immediately.
-                            // JSPromise.resolve(JSValue.undefined).then { _ in
-                            _ = JSObject.global.queueMicrotask!(
-                                JSOneshotClosure { _ in
-                                    self.run()
-                                    return JSValue.undefined
-                                }
-                            )
+                            scheduleRunWithinMacroTask()
                         } else {
                             let tid = self.tid.load(ordering: .sequentiallyConsistent)
                             swjs_wake_up_worker_thread(tid)
                         }
-                    case .running:
+                    case (false, .idle):
+                        preconditionFailure("unreachable: idle -> \(desiredState) should return exchanged=true")
+                    case (false, .ready):
+                        // A wake message is sent to the worker, but it has not been received it yet
+                        if onTargetThread {
+                            // This means the job is enqueued outside of `Worker/run` (typically triggered
+                            // JS microtasks not awaited by Swift), then schedule a `Worker/run` within
+                            // the same macrotask.
+                            state.store(.running, ordering: .sequentiallyConsistent)
+                            scheduleRunWithinMacroTask()
+                        }
+                    case (false, .running):
                         // The worker is already running, no need to wake up.
                         break
-                    case .terminated:
+                    case (false, .terminated):
                         // Will not wake up the worker because it's already terminated.
                         break
                     }
@@ -231,7 +253,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
             } while !locked
         }
 
-        func scheduleNextRun() {
+        func scheduleRunWithinMacroTask() {
             _ = JSObject.global.queueMicrotask!(
                 JSOneshotClosure { _ in
                     self.run()
@@ -265,12 +287,27 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
             trace("Worker.start tid=\(tid)")
         }
 
+        /// On receiving a wake-up message from other thread
+        func wakeUpFromOtherThread() {
+            let (exchanged, _) = state.compareExchange(
+                expected: .ready,
+                desired: .running,
+                ordering: .sequentiallyConsistent
+            )
+            guard exchanged else {
+                // `Worker/run` was scheduled on the thread before JS event loop starts
+                // a macrotask handling wake-up message.
+                return
+            }
+            run()
+        }
+
         /// Process jobs in the queue.
         ///
         /// Return when the worker has no more jobs to run or terminated.
         /// This method must be called from the worker thread after the worker
         /// is started by `start(executor:)`.
-        func run() {
+        private func run() {
             trace("Worker.run")
             guard let executor = parentTaskExecutor else {
                 preconditionFailure("The worker must be started with a parent executor.")
@@ -290,7 +327,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                         queue.removeFirst()
                         return job
                     }
-                    // No more jobs to run now. Wait for a new job to be enqueued.
+                    // No more jobs to run now.
                     let (exchanged, original) = state.compareExchange(
                         expected: .running,
                         desired: .idle,
@@ -301,7 +338,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                     case (true, _):
                         trace("Worker.run exited \(original) -> idle")
                         return nil  // Regular case
-                    case (false, .idle):
+                    case (false, .idle), (false, .ready):
                         preconditionFailure("unreachable: Worker/run running in multiple threads!?")
                     case (false, .running):
                         preconditionFailure("unreachable: running -> idle should return exchanged=true")
@@ -657,12 +694,12 @@ func _swjs_enqueue_main_job_from_worker(_ job: UnownedJob) {
 @_expose(wasm, "swjs_wake_worker_thread")
 #endif
 func _swjs_wake_worker_thread() {
-    WebWorkerTaskExecutor.Worker.currentThread!.run()
+    WebWorkerTaskExecutor.Worker.currentThread!.wakeUpFromOtherThread()
 }
 
 private func trace(_ message: String) {
     #if JAVASCRIPTKIT_TRACE
-    JSObject.global.process.stdout.write("[trace tid=\(swjs_get_worker_thread_id())] \(message)\n")
+    _ = JSObject.global.console.warn("[trace tid=\(swjs_get_worker_thread_id())] \(message)\n")
     #endif
 }
 
