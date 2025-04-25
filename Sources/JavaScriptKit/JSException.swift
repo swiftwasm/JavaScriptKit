@@ -12,7 +12,7 @@
 ///     let jsErrorValue = error.thrownValue
 /// }
 /// ```
-public struct JSException: Error, Equatable {
+public struct JSException: Error, Equatable, CustomStringConvertible {
     /// The value thrown from JavaScript.
     /// This can be any JavaScript value (error object, string, number, etc.).
     public var thrownValue: JSValue {
@@ -25,10 +25,25 @@ public struct JSException: Error, Equatable {
     /// from `Error` protocol.
     private nonisolated(unsafe) let _thrownValue: JSValue
 
+    /// A description of the exception.
+    public let description: String
+
+    /// The stack trace of the exception.
+    public let stack: String?
+
     /// Initializes a new JSException instance with a value thrown from JavaScript.
     ///
-    /// Only available within the package.
+    /// Only available within the package. This must be called on the thread where the exception object created.
     package init(_ thrownValue: JSValue) {
         self._thrownValue = thrownValue
+        // Capture the stringified representation on the object owner thread
+        // to bring useful info to the catching thread even if they are different threads.
+        if let errorObject = thrownValue.object, let stack = errorObject.stack.string {
+            self.description = "JSException(\(stack))"
+            self.stack = stack
+        } else {
+            self.description = "JSException(\(thrownValue))"
+            self.stack = nil
+        }
     }
 }
