@@ -207,6 +207,18 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     }
 
     private func unsafeEnqueue(_ job: UnownedJob) {
+        #if canImport(wasi_pthread) && compiler(>=6.1) && _runtime(_multithreaded)
+        guard swjs_get_worker_thread_id_cached() == SWJS_MAIN_THREAD_ID else {
+            // Notify the main thread to execute the job when a job is
+            // enqueued from a Web Worker thread but without an executor preference.
+            // This is usually the case when hopping back to the main thread
+            // at the end of a task.
+            let jobBitPattern = unsafeBitCast(job, to: UInt.self)
+            swjs_send_job_to_main_thread(jobBitPattern)
+            return
+        }
+        // If the current thread is the main thread, do nothing special.
+        #endif
         insertJobQueue(job: job)
     }
 

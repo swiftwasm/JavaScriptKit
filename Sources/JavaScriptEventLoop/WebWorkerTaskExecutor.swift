@@ -602,78 +602,8 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
     internal func dumpStats() {}
     #endif
 
-    // MARK: Global Executor hack
-
-    @MainActor private static var _mainThread: pthread_t?
-    @MainActor private static var _swift_task_enqueueGlobal_hook_original: UnsafeMutableRawPointer?
-    @MainActor private static var _swift_task_enqueueGlobalWithDelay_hook_original: UnsafeMutableRawPointer?
-    @MainActor private static var _swift_task_enqueueGlobalWithDeadline_hook_original: UnsafeMutableRawPointer?
-
-    /// Installs a global executor that forwards jobs from Web Worker threads to the main thread.
-    ///
-    /// This method sets up the necessary hooks to ensure proper task scheduling between
-    /// the main thread and worker threads. It must be called once (typically at application
-    /// startup) before using any `WebWorkerTaskExecutor` instances.
-    ///
-    /// ## Example
-    ///
-    /// ```swift
-    /// // At application startup
-    /// WebWorkerTaskExecutor.installGlobalExecutor()
-    ///
-    /// // Later, create and use executor instances
-    /// let executor = try await WebWorkerTaskExecutor(numberOfThreads: 4)
-    /// ```
-    ///
-    /// - Important: This method must be called from the main thread.
-    public static func installGlobalExecutor() {
-        MainActor.assumeIsolated {
-            installGlobalExecutorIsolated()
-        }
-    }
-
-    @MainActor
-    static func installGlobalExecutorIsolated() {
-        #if canImport(wasi_pthread) && compiler(>=6.1) && _runtime(_multithreaded)
-        // Ensure this function is called only once.
-        guard _mainThread == nil else { return }
-
-        _mainThread = pthread_self()
-        assert(swjs_get_worker_thread_id() == -1, "\(#function) must be called on the main thread")
-
-        _swift_task_enqueueGlobal_hook_original = swift_task_enqueueGlobal_hook
-
-        typealias swift_task_enqueueGlobal_hook_Fn = @convention(thin) (UnownedJob, swift_task_enqueueGlobal_original)
-            -> Void
-        let swift_task_enqueueGlobal_hook_impl: swift_task_enqueueGlobal_hook_Fn = { job, base in
-            WebWorkerTaskExecutor.traceStatsIncrement(\.enqueueGlobal)
-            // Enter this block only if the current Task has no executor preference.
-            if pthread_equal(pthread_self(), WebWorkerTaskExecutor._mainThread) != 0 {
-                // If the current thread is the main thread, delegate the job
-                // execution to the original hook of JavaScriptEventLoop.
-                let original = unsafeBitCast(
-                    WebWorkerTaskExecutor._swift_task_enqueueGlobal_hook_original,
-                    to: swift_task_enqueueGlobal_hook_Fn.self
-                )
-                original(job, base)
-            } else {
-                // Notify the main thread to execute the job when a job is
-                // enqueued from a Web Worker thread but without an executor preference.
-                // This is usually the case when hopping back to the main thread
-                // at the end of a task.
-                WebWorkerTaskExecutor.traceStatsIncrement(\.sendJobToMainThread)
-                let jobBitPattern = unsafeBitCast(job, to: UInt.self)
-                swjs_send_job_to_main_thread(jobBitPattern)
-            }
-        }
-        swift_task_enqueueGlobal_hook = unsafeBitCast(
-            swift_task_enqueueGlobal_hook_impl,
-            to: UnsafeMutableRawPointer?.self
-        )
-        #else
-        fatalError("Unsupported platform")
-        #endif
-    }
+    @available(*, deprecated, message: "Not needed anymore, just use `JavaScriptEventLoop.installGlobalExecutor()`.")
+    public static func installGlobalExecutor() {}
 }
 
 /// Enqueue a job scheduled from a Web Worker thread to the main thread.
