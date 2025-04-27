@@ -255,7 +255,6 @@ enum OwnedExecutor {
 
     static func main() {
         JavaScriptEventLoop.installGlobalExecutor()
-        WebWorkerTaskExecutor.installGlobalExecutor()
         let useDedicatedWorker = !(JSObject.global.disableDedicatedWorker.boolean ?? false)
 
         Task {
