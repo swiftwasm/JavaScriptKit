@@ -2,7 +2,6 @@ import JavaScriptEventLoop
 import JavaScriptKit
 
 JavaScriptEventLoop.installGlobalExecutor()
-WebWorkerTaskExecutor.installGlobalExecutor()
 
 protocol CanvasRenderer {
     func render(canvas: JSObject, size: Int) async throws

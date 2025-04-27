@@ -3,7 +3,6 @@ import JavaScriptEventLoop
 import JavaScriptKit
 
 JavaScriptEventLoop.installGlobalExecutor()
-WebWorkerTaskExecutor.installGlobalExecutor()
 
 func renderInCanvas(ctx: JSObject, image: ImageView) {
     let imageData = ctx.createImageData!(image.width, image.height).object!
