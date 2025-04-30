@@ -90,9 +90,7 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
             }
         }
         let taskRunOnMainThread = await task.value
-        // FIXME: The block passed to `MainActor.run` should run on the main thread
-        // XCTAssertTrue(taskRunOnMainThread)
-        XCTAssertFalse(taskRunOnMainThread)
+        XCTAssertTrue(taskRunOnMainThread)
         // After the task is done, back to the main thread
         XCTAssertTrue(isMainThread())
 

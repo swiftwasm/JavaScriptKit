@@ -119,13 +119,20 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     private static func installGlobalExecutorIsolated() {
         guard !didInstallGlobalExecutor else { return }
         didInstallGlobalExecutor = true
+        #if compiler(>=6.2)
+        if #available(macOS 9999, iOS 9999, watchOS 9999, tvOS 9999, visionOS 9999, *) {
+            // For Swift 6.2 and above, we can use the new `ExecutorFactory` API
+            _Concurrency._createExecutors(factory: JavaScriptEventLoop.self)
+        }
+        #else
+        // For Swift 6.1 and below, we need to install the global executor by hook API
         installByLegacyHook()
+        #endif
     }
 
-    internal func enqueue(_ job: UnownedJob, withDelay nanoseconds: UInt64) {
-        let milliseconds = nanoseconds / 1_000_000
+    internal func enqueue(_ job: UnownedJob, withDelay milliseconds: Double) {
         setTimeout(
-            Double(milliseconds),
+            milliseconds,
             {
                 #if compiler(>=5.9)
                 job.runSynchronously(on: self.asUnownedSerialExecutor())
