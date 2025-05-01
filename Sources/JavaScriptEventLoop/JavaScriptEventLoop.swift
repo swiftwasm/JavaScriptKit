@@ -2,10 +2,7 @@ import JavaScriptKit
 import _Concurrency
 import _CJavaScriptEventLoop
 import _CJavaScriptKit
-
-#if hasFeature(Embedded)
 import Synchronization
-#endif
 
 // NOTE: `@available` annotations are semantically wrong, but they make it easier to develop applications targeting WebAssembly in Xcode.
 
@@ -109,12 +106,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
         return eventLoop
     }
 
-    #if !hasFeature(Embedded)
-    @MainActor
-    private static var didInstallGlobalExecutor = false
-    #else
     private static let didInstallGlobalExecutor = Atomic<Bool>(false)
-    #endif
 
     /// Set JavaScript event loop based executor to be the global executor
     /// Note that this should be called before any of the jobs are created.
@@ -122,26 +114,13 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     /// introduced officially. See also [a draft proposal for custom
     /// executors](https://github.com/rjmccall/swift-evolution/blob/custom-executors/proposals/0000-custom-executors.md#the-default-global-concurrent-executor)
     public static func installGlobalExecutor() {
-        #if !hasFeature(Embedded)
-        MainActor.assumeIsolated {
-            Self.installGlobalExecutorIsolated()
-        }
-        #else
         Self.installGlobalExecutorIsolated()
-        #endif
     }
 
-    #if !hasFeature(Embedded)
-    @MainActor
-    #endif
     private static func installGlobalExecutorIsolated() {
-        #if !hasFeature(Embedded)
-        guard !didInstallGlobalExecutor else { return }
-        #else
         guard !didInstallGlobalExecutor.load(ordering: .sequentiallyConsistent) else {
             return
         }
-        #endif
 
         #if compiler(>=5.9)
         typealias swift_task_asyncMainDrainQueue_hook_Fn = @convention(thin) (
@@ -211,11 +190,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
             to: UnsafeMutableRawPointer?.self
         )
 
-        #if !hasFeature(Embedded)
-        didInstallGlobalExecutor = true
-        #else
         didInstallGlobalExecutor.store(true, ordering: .sequentiallyConsistent)
-        #endif
     }
 
     private func enqueue(_ job: UnownedJob, withDelay nanoseconds: UInt64) {
