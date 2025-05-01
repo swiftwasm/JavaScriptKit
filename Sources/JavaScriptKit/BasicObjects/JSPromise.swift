@@ -93,7 +93,7 @@ public final class JSPromise: JSBridgedClass {
         return JSPromise(unsafelyWrapping: jsObject.then!(closure).object!)
     }
 
-    #if compiler(>=5.5)
+    #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     @discardableResult
@@ -122,7 +122,7 @@ public final class JSPromise: JSBridgedClass {
         return JSPromise(unsafelyWrapping: jsObject.then!(successClosure, failureClosure).object!)
     }
 
-    #if compiler(>=5.5)
+    #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     @discardableResult
@@ -153,7 +153,7 @@ public final class JSPromise: JSBridgedClass {
         return .init(unsafelyWrapping: jsObject.catch!(closure).object!)
     }
 
-    #if compiler(>=5.5)
+    #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
     /// Schedules the `failure` closure to be invoked on rejected completion of `self`.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     @discardableResult
