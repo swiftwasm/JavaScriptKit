@@ -151,7 +151,7 @@ final class JavaScriptEventLoopTests: XCTestCase {
         }
         let promise2 = promise.then { result in
             try await Task.sleep(nanoseconds: 100_000_000)
-            return String(result.number!)
+            return .string(String(result.number!))
         }
         let thenDiff = try await measureTime {
             let result = try await promise2.value
@@ -171,7 +171,7 @@ final class JavaScriptEventLoopTests: XCTestCase {
                 100
             )
         }
-        let failingPromise2 = failingPromise.then { _ in
+        let failingPromise2 = failingPromise.then { _ -> JSValue in
             throw MessageError("Should not be called", file: #file, line: #line, column: #column)
         } failure: { err in
             return err

@@ -1,4 +1,7 @@
 import _CJavaScriptKit
+#if hasFeature(Embedded) && os(WASI)
+import _Concurrency
+#endif
 
 /// `JSClosureProtocol` wraps Swift closure objects for use in JavaScript. Conforming types
 /// are responsible for managing the lifetime of the closure they wrap, but can delegate that
@@ -40,7 +43,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         fatalError("JSOneshotClosure does not support dictionary literal initialization")
     }
 
-    #if compiler(>=5.5) && !hasFeature(Embedded)
+    #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(_ body: sending @escaping (sending [JSValue]) async throws -> JSValue) -> JSOneshotClosure
     {
@@ -132,7 +135,7 @@ public class JSClosure: JSFunction, JSClosureProtocol {
         fatalError("JSClosure does not support dictionary literal initialization")
     }
 
-    #if compiler(>=5.5) && !hasFeature(Embedded)
+    #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(_ body: @Sendable @escaping (sending [JSValue]) async throws -> JSValue) -> JSClosure {
         JSClosure(makeAsyncClosure(body))
@@ -148,7 +151,7 @@ public class JSClosure: JSFunction, JSClosureProtocol {
     #endif
 }
 
-#if compiler(>=5.5) && !hasFeature(Embedded)
+#if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 private func makeAsyncClosure(
     _ body: sending @escaping (sending [JSValue]) async throws -> JSValue

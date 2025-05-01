@@ -9,14 +9,14 @@ final class JSPromiseTests: XCTestCase {
             p1 = p1.then { value in
                 XCTAssertEqual(value, .null)
                 continuation.resume()
-                return JSValue.number(1.0)
+                return JSValue.number(1.0).jsValue
             }
         }
         await withCheckedContinuation { continuation in
             p1 = p1.then { value in
                 XCTAssertEqual(value, .number(1.0))
                 continuation.resume()
-                return JSPromise.resolve(JSValue.boolean(true))
+                return JSPromise.resolve(JSValue.boolean(true)).jsValue
             }
         }
         await withCheckedContinuation { continuation in
@@ -48,7 +48,7 @@ final class JSPromiseTests: XCTestCase {
             p2 = p2.then { value in
                 XCTAssertEqual(value, .boolean(true))
                 continuation.resume()
-                return JSPromise.reject(JSValue.number(2.0))
+                return JSPromise.reject(JSValue.number(2.0)).jsValue
             }
         }
         await withCheckedContinuation { continuation in
