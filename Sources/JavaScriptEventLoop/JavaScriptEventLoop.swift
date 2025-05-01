@@ -2,7 +2,6 @@ import JavaScriptKit
 import _Concurrency
 import _CJavaScriptEventLoop
 import _CJavaScriptKit
-import Synchronization
 
 // NOTE: `@available` annotations are semantically wrong, but they make it easier to develop applications targeting WebAssembly in Xcode.
 
@@ -106,7 +105,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
         return eventLoop
     }
 
-    private static let didInstallGlobalExecutor = Atomic<Bool>(false)
+    private nonisolated(unsafe) static var didInstallGlobalExecutor = false
 
     /// Set JavaScript event loop based executor to be the global executor
     /// Note that this should be called before any of the jobs are created.
@@ -118,9 +117,8 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     }
 
     private static func installGlobalExecutorIsolated() {
-        guard !didInstallGlobalExecutor.load(ordering: .sequentiallyConsistent) else {
-            return
-        }
+        guard !didInstallGlobalExecutor else { return }
+        didInstallGlobalExecutor = true
 
         #if compiler(>=5.9)
         typealias swift_task_asyncMainDrainQueue_hook_Fn = @convention(thin) (
@@ -189,8 +187,6 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
             swift_task_enqueueMainExecutor_hook_impl,
             to: UnsafeMutableRawPointer?.self
         )
-
-        didInstallGlobalExecutor.store(true, ordering: .sequentiallyConsistent)
     }
 
     private func enqueue(_ job: UnownedJob, withDelay nanoseconds: UInt64) {
