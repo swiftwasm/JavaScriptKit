@@ -86,7 +86,7 @@ public final class JSPromise: JSBridgedClass {
 
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
     @discardableResult
-    public func then(success: @escaping (JSValue) -> some ConvertibleToJSValue) -> JSPromise {
+    public func then(success: @escaping (JSValue) -> JSValue) -> JSPromise {
         let closure = JSOneshotClosure {
             success($0[0]).jsValue
         }
@@ -98,7 +98,7 @@ public final class JSPromise: JSBridgedClass {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     @discardableResult
     public func then(
-        success: sending @escaping (sending JSValue) async throws -> some ConvertibleToJSValue
+        success: sending @escaping (sending JSValue) async throws -> JSValue
     ) -> JSPromise {
         let closure = JSOneshotClosure.async {
             try await success($0[0]).jsValue
@@ -110,8 +110,8 @@ public final class JSPromise: JSBridgedClass {
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
     @discardableResult
     public func then(
-        success: @escaping (sending JSValue) -> some ConvertibleToJSValue,
-        failure: @escaping (sending JSValue) -> some ConvertibleToJSValue
+        success: @escaping (sending JSValue) -> JSValue,
+        failure: @escaping (sending JSValue) -> JSValue
     ) -> JSPromise {
         let successClosure = JSOneshotClosure {
             success($0[0]).jsValue
@@ -127,8 +127,8 @@ public final class JSPromise: JSBridgedClass {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     @discardableResult
     public func then(
-        success: sending @escaping (sending JSValue) async throws -> some ConvertibleToJSValue,
-        failure: sending @escaping (sending JSValue) async throws -> some ConvertibleToJSValue
+        success: sending @escaping (sending JSValue) async throws -> JSValue,
+        failure: sending @escaping (sending JSValue) async throws -> JSValue
     ) -> JSPromise {
         let successClosure = JSOneshotClosure.async {
             try await success($0[0]).jsValue
@@ -143,7 +143,7 @@ public final class JSPromise: JSBridgedClass {
     /// Schedules the `failure` closure to be invoked on rejected completion of `self`.
     @discardableResult
     public func `catch`(
-        failure: @escaping (sending JSValue) -> some ConvertibleToJSValue
+        failure: @escaping (sending JSValue) -> JSValue
     )
         -> JSPromise
     {
@@ -158,7 +158,7 @@ public final class JSPromise: JSBridgedClass {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     @discardableResult
     public func `catch`(
-        failure: sending @escaping (sending JSValue) async throws -> some ConvertibleToJSValue
+        failure: sending @escaping (sending JSValue) async throws -> JSValue
     ) -> JSPromise {
         let closure = JSOneshotClosure.async {
             try await failure($0[0]).jsValue
