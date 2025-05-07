@@ -412,8 +412,9 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                 let unmanagedContext = Unmanaged.passRetained(context)
                 contexts.append(unmanagedContext)
                 let ptr = unmanagedContext.toOpaque()
+                var thread = pthread_t(bitPattern: 0)
                 let ret = pthread_create(
-                    nil,
+                    &thread,
                     nil,
                     { ptr in
                         // Cast to a optional pointer to absorb nullability variations between platforms.
