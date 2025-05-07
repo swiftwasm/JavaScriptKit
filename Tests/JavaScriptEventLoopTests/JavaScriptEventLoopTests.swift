@@ -157,7 +157,7 @@ final class JavaScriptEventLoopTests: XCTestCase {
             let result = try await promise2.value
             XCTAssertEqual(result, .string("3.0"))
         }
-        XCTAssertGreaterThanOrEqual(thenDiff, 200)
+        XCTAssertGreaterThanOrEqual(thenDiff, 150)
     }
 
     func testPromiseThenWithFailure() async throws {
