@@ -52,9 +52,9 @@ const harnesses = {
                         writeFileSync(destinationPath, profraw);
                     }
                 },
-                /* #if USE_SHARED_MEMORY */
+/* #if USE_SHARED_MEMORY */
                 spawnWorker: nodePlatform.createDefaultWorkerFactory(preludeScript)
-                /* #endif */
+/* #endif */
             })
             if (preludeScript) {
                 const prelude = await import(preludeScript)
