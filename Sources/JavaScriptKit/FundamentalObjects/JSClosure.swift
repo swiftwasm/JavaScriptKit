@@ -167,19 +167,15 @@ private func makeAsyncClosure(
             struct Context: @unchecked Sendable {
                 let resolver: (JSPromise.Result) -> Void
                 let arguments: [JSValue]
-                let body: (sending [JSValue]) async throws -> JSValue
+                let body: (sending [JSValue]) async throws(JSException) -> JSValue
             }
             let context = Context(resolver: resolver, arguments: arguments, body: body)
             Task {
-                do {
+                do throws(JSException) {
                     let result = try await context.body(context.arguments)
                     context.resolver(.success(result))
                 } catch {
-                    if let jsError = error as? JSException {
-                        context.resolver(.failure(jsError.thrownValue))
-                    } else {
-                        context.resolver(.failure(JSError(message: String(describing: error)).jsValue))
-                    }
+                    context.resolver(.failure(error.thrownValue))
                 }
             }
         }.jsValue()
