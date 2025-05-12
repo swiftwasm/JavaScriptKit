@@ -98,10 +98,10 @@ public final class JSPromise: JSBridgedClass {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     @discardableResult
     public func then(
-        success: sending @escaping (sending JSValue) async throws -> JSValue
+        success: sending @escaping (sending JSValue) async throws(JSException) -> JSValue
     ) -> JSPromise {
-        let closure = JSOneshotClosure.async {
-            try await success($0[0]).jsValue
+        let closure = JSOneshotClosure.async { arguments throws(JSException) -> JSValue in
+            return try await success(arguments[0])
         }
         return JSPromise(unsafelyWrapping: jsObject.then!(closure).object!)
     }
@@ -127,14 +127,14 @@ public final class JSPromise: JSBridgedClass {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     @discardableResult
     public func then(
-        success: sending @escaping (sending JSValue) async throws -> JSValue,
-        failure: sending @escaping (sending JSValue) async throws -> JSValue
+        success: sending @escaping (sending JSValue) async throws(JSException) -> JSValue,
+        failure: sending @escaping (sending JSValue) async throws(JSException) -> JSValue
     ) -> JSPromise {
-        let successClosure = JSOneshotClosure.async {
-            try await success($0[0]).jsValue
+        let successClosure = JSOneshotClosure.async { arguments throws(JSException) -> JSValue in
+            try await success(arguments[0]).jsValue
         }
-        let failureClosure = JSOneshotClosure.async {
-            try await failure($0[0]).jsValue
+        let failureClosure = JSOneshotClosure.async { arguments throws(JSException) -> JSValue in
+            try await failure(arguments[0]).jsValue
         }
         return JSPromise(unsafelyWrapping: jsObject.then!(successClosure, failureClosure).object!)
     }
@@ -158,10 +158,10 @@ public final class JSPromise: JSBridgedClass {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     @discardableResult
     public func `catch`(
-        failure: sending @escaping (sending JSValue) async throws -> JSValue
+        failure: sending @escaping (sending JSValue) async throws(JSException) -> JSValue
     ) -> JSPromise {
-        let closure = JSOneshotClosure.async {
-            try await failure($0[0]).jsValue
+        let closure = JSOneshotClosure.async { arguments throws(JSException) -> JSValue in
+            try await failure(arguments[0]).jsValue
         }
         return .init(unsafelyWrapping: jsObject.catch!(closure).object!)
     }
