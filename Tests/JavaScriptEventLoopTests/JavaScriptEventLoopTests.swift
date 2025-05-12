@@ -150,7 +150,7 @@ final class JavaScriptEventLoopTests: XCTestCase {
             )
         }
         let promise2 = promise.then { result in
-            try await Task.sleep(nanoseconds: 100_000_000)
+            try! await Task.sleep(nanoseconds: 100_000_000)
             return .string(String(result.number!))
         }
         let thenDiff = try await measureTime {
@@ -172,7 +172,7 @@ final class JavaScriptEventLoopTests: XCTestCase {
             )
         }
         let failingPromise2 = failingPromise.then { _ -> JSValue in
-            throw MessageError("Should not be called", file: #file, line: #line, column: #column)
+            fatalError("Should not be called")
         } failure: { err in
             return err
         }
@@ -192,7 +192,7 @@ final class JavaScriptEventLoopTests: XCTestCase {
             )
         }
         let catchPromise2 = catchPromise.catch { err in
-            try await Task.sleep(nanoseconds: 100_000_000)
+            try! await Task.sleep(nanoseconds: 100_000_000)
             return err
         }
         let catchDiff = try await measureTime {
@@ -225,7 +225,7 @@ final class JavaScriptEventLoopTests: XCTestCase {
     func testAsyncJSClosure() async throws {
         // Test Async JSClosure
         let delayClosure = JSClosure.async { _ -> JSValue in
-            try await Task.sleep(nanoseconds: 200_000_000)
+            try! await Task.sleep(nanoseconds: 200_000_000)
             return JSValue.number(3)
         }
         let delayObject = JSObject.global.Object.function!.new()

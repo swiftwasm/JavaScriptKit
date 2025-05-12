@@ -45,8 +45,9 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 
     #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public static func async(_ body: sending @escaping (sending [JSValue]) async throws -> JSValue) -> JSOneshotClosure
-    {
+    public static func async(
+        _ body: sending @escaping (sending [JSValue]) async throws(JSException) -> JSValue
+    ) -> JSOneshotClosure {
         JSOneshotClosure(makeAsyncClosure(body))
     }
     #endif
@@ -137,7 +138,9 @@ public class JSClosure: JSFunction, JSClosureProtocol {
 
     #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public static func async(_ body: @Sendable @escaping (sending [JSValue]) async throws -> JSValue) -> JSClosure {
+    public static func async(
+        _ body: @Sendable @escaping (sending [JSValue]) async throws(JSException) -> JSValue
+    ) -> JSClosure {
         JSClosure(makeAsyncClosure(body))
     }
     #endif
@@ -154,7 +157,7 @@ public class JSClosure: JSFunction, JSClosureProtocol {
 #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 private func makeAsyncClosure(
-    _ body: sending @escaping (sending [JSValue]) async throws -> JSValue
+    _ body: sending @escaping (sending [JSValue]) async throws(JSException) -> JSValue
 ) -> ((sending [JSValue]) -> JSValue) {
     { arguments in
         JSPromise { resolver in

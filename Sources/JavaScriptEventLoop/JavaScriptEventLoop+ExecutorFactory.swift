@@ -4,6 +4,7 @@
 // See: https://github.com/swiftlang/swift/pull/80266
 // See: https://forums.swift.org/t/pitch-2-custom-main-and-global-executors/78437
 
+import _Concurrency
 import _CJavaScriptKit
 
 #if compiler(>=6.2)

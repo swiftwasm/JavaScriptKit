@@ -1,3 +1,4 @@
+import _Concurrency
 import _CJavaScriptEventLoop
 import _CJavaScriptKit
 
