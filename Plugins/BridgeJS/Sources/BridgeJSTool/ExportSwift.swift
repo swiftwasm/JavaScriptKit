@@ -564,6 +564,8 @@ extension BridgeType {
             self = .string
         case "Bool":
             self = .bool
+        case "Void":
+            self = .void
         default:
             return nil
         }

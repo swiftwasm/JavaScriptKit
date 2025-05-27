@@ -5,6 +5,10 @@ import JavaScriptKit
 @_extern(c)
 func runJsWorks() -> Void
 
+@JS func roundTripVoid() -> Void {
+    return
+}
+
 @JS func roundTripInt(v: Int) -> Int {
     return v
 }

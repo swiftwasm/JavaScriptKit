@@ -42,7 +42,8 @@ const harnesses = {
             let options = await nodePlatform.defaultNodeSetup({
                 args: testFrameworkArgs,
                 onExit: (code) => {
-                    if (code !== 0) {
+                    // swift-testing returns EX_UNAVAILABLE (which is 69 in wasi-libc) for "no tests found"
+                    if (code !== 0 && code !== 69) {
                         const stack = new Error().stack
                         console.error(`Test failed with exit code ${code}`)
                         console.error(stack)
