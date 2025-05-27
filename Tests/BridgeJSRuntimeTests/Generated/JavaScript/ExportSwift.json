@@ -54,6 +54,18 @@
   ],
   "functions" : [
     {
+      "abiName" : "bjs_roundTripVoid",
+      "name" : "roundTripVoid",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
       "abiName" : "bjs_roundTripInt",
       "name" : "roundTripInt",
       "parameters" : [
