@@ -93,12 +93,30 @@ export type InstantiateOptions = {
     /**
      * Add imports to the WebAssembly import object
      * @param imports - The imports to add
+     * @param context - The context object
      */
     addToCoreImports?: (
         imports: WebAssembly.Imports,
-        getInstance: () => WebAssembly.Instance | null,
-        getExports: () => Exports | null,
+        context: {
+            getInstance: () => WebAssembly.Instance | null,
+            getExports: () => Exports | null,
+            _swift: SwiftRuntime,
+        }
     ) => void
+
+    /**
+     * Instrument the WebAssembly instance
+     *
+     * @param instance - The instance of the WebAssembly module
+     * @param context - The context object
+     * @returns The instrumented instance
+     */
+    instrumentInstance?: (
+        instance: WebAssembly.Instance,
+        context: {
+            _swift: SwiftRuntime
+        }
+    ) => WebAssembly.Instance
 }
 
 /**

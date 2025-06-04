@@ -171,8 +171,8 @@ export async function testBrowserInPage(options, processInfo) {
         // Instantiate the WebAssembly file
         return await instantiate({
             ...options,
-            addToCoreImports: (imports) => {
-                options.addToCoreImports?.(imports);
+            addToCoreImports: (imports, context) => {
+                options.addToCoreImports?.(imports, context);
                 imports["wasi_snapshot_preview1"]["proc_exit"] = (code) => {
                     exitTest(code);
                     throw new ExitError(code);
