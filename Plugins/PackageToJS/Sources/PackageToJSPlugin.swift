@@ -71,6 +71,27 @@ struct PackageToJSPlugin: CommandPlugin {
                         See https://book.swiftwasm.org/getting-started/setup.html for more information.
                         """
                 }),
+            (
+                // In case the SwiftPM target using BridgeJS didn't specify `.enableExperimentalFeature("Extern")`
+                { build, arguments in
+                    guard
+                        build.logText.contains("@_extern requires '-enable-experimental-feature Extern'")
+                    else {
+                        return nil
+                    }
+                    return """
+                        The SwiftPM target using BridgeJS didn't specify `.enableExperimentalFeature("Extern")`.
+                        Please add it to the target's `swiftSettings` configuration.
+
+                        For example:
+                        ```swift
+                        dependencies: [...],
+                        swiftSettings: [
+                            .enableExperimentalFeature("Extern"),
+                        ]
+                        ```
+                        """
+                }),
         ]
 
     private func emitHintMessage(_ message: String) {
