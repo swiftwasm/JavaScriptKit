@@ -94,7 +94,11 @@ async function _instantiate(
 /* #endif */
     };
     instantiator.addImports(importObject);
-    options.addToCoreImports?.(importObject, () => instance, () => exports);
+    options.addToCoreImports?.(importObject, {
+        getInstance: () => instance,
+        getExports: () => exports,
+        _swift: swift,
+    });
 
     let module;
     let instance;
@@ -117,6 +121,7 @@ async function _instantiate(
         module = await _WebAssembly.compile(moduleSource);
         instance = await _WebAssembly.instantiate(module, importObject);
     }
+    instance = options.instrumentInstance?.(instance, { _swift: swift }) ?? instance;
 
     swift.setInstance(instance);
     instantiator.setInstance(instance);

@@ -4,8 +4,9 @@ export function setupOptions(options, context) {
     setupTestGlobals(globalThis);
     return {
         ...options,
-        addToCoreImports(importObject, getInstance, getExports) {
-            options.addToCoreImports?.(importObject);
+        addToCoreImports(importObject, importsContext) {
+            const { getInstance, getExports } = importsContext;
+            options.addToCoreImports?.(importObject, importsContext);
             importObject["JavaScriptEventLoopTestSupportTests"] = {
                 "isMainThread": () => context.isMainThread,
             }
