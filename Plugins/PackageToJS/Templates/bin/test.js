@@ -68,6 +68,19 @@ const harnesses = {
                     options = prelude.setupOptions(options, { isMainThread: true })
                 }
             }
+            process.on("beforeExit", () => {
+                // NOTE: "beforeExit" is fired when the process exits gracefully without calling `process.exit`
+                // Either XCTest or swift-testing should always call `process.exit` through `proc_exit` even
+                // if the test succeeds. So exiting gracefully means something went wrong (e.g. withUnsafeContinuation is leaked)
+                // Therefore, we exit with code 1 to indicate that the test execution failed.
+                console.error(`
+
+=================================================================================================
+Detected that the test execution ended without a termination signal from the testing framework.
+Hint: This typically means that a continuation leak occurred.
+=================================================================================================`)
+                process.exit(1)
+            })
             await instantiate(options)
         } catch (e) {
             if (e instanceof WebAssembly.CompileError) {

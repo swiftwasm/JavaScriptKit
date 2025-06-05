@@ -88,7 +88,6 @@ extension Trait where Self == ConditionTrait {
                     atPath: destinationPath.path,
                     withDestinationPath: linkDestination
                 )
-                enumerator.skipDescendants()
                 continue
             }
 
@@ -117,8 +116,11 @@ extension Trait where Self == ConditionTrait {
     typealias RunProcess = (_ executableURL: URL, _ args: [String], _ env: [String: String]) throws -> Void
     typealias RunSwift = (_ args: [String], _ env: [String: String]) throws -> Void
 
-    func withPackage(at path: String, body: (URL, _ runProcess: RunProcess, _ runSwift: RunSwift) throws -> Void) throws
-    {
+    func withPackage(
+        at path: String,
+        assertTerminationStatus: (Int32) -> Bool = { $0 == 0 },
+        body: @escaping (URL, _ runProcess: RunProcess, _ runSwift: RunSwift) throws -> Void
+    ) throws {
         try withTemporaryDirectory { tempDir, retain in
             let destination = tempDir.appending(path: Self.repoPath.lastPathComponent)
             try Self.copyRepository(to: destination)
@@ -139,11 +141,11 @@ extension Trait where Self == ConditionTrait {
 
                 try process.run()
                 process.waitUntilExit()
-                if process.terminationStatus != 0 {
+                if !assertTerminationStatus(process.terminationStatus) {
                     retain = true
                 }
                 try #require(
-                    process.terminationStatus == 0,
+                    assertTerminationStatus(process.terminationStatus),
                     """
                     Swift package should build successfully, check \(destination.appending(path: path).path) for details
                     stdout: \(stdoutPath.path)
@@ -273,6 +275,29 @@ extension Trait where Self == ConditionTrait {
                     "JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM": "true"
                 ]
             )
+        }
+    }
+
+    @Test(.requireSwiftSDK)
+    func continuationLeakInTest_XCTest() throws {
+        let swiftSDKID = try #require(Self.getSwiftSDKID())
+        try withPackage(
+            at: "Plugins/PackageToJS/Fixtures/ContinuationLeakInTest/XCTest",
+            assertTerminationStatus: { $0 != 0 }
+        ) { packageDir, _, runSwift in
+            try runSwift(["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
+        }
+    }
+
+    // TODO: Remove triple restriction once swift-testing is shipped in p1-threads SDK
+    @Test(.requireSwiftSDK(triple: "wasm32-unknown-wasi"))
+    func continuationLeakInTest_SwiftTesting() throws {
+        let swiftSDKID = try #require(Self.getSwiftSDKID())
+        try withPackage(
+            at: "Plugins/PackageToJS/Fixtures/ContinuationLeakInTest/SwiftTesting",
+            assertTerminationStatus: { $0 == 0 }
+        ) { packageDir, _, runSwift in
+            try runSwift(["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
         }
     }
 }
