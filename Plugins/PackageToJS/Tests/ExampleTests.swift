@@ -289,15 +289,17 @@ extension Trait where Self == ConditionTrait {
         }
     }
 
+    #if compiler(>=6.1)
     // TODO: Remove triple restriction once swift-testing is shipped in p1-threads SDK
     @Test(.requireSwiftSDK(triple: "wasm32-unknown-wasi"))
     func continuationLeakInTest_SwiftTesting() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
         try withPackage(
             at: "Plugins/PackageToJS/Fixtures/ContinuationLeakInTest/SwiftTesting",
-            assertTerminationStatus: { $0 == 0 }
+            assertTerminationStatus: { $0 != 0 }
         ) { packageDir, _, runSwift in
             try runSwift(["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
         }
     }
+    #endif
 }
