@@ -21,12 +21,12 @@ jobs:
             target: "wasm32-unknown-wasi"
           - os: ubuntu-22.04
             toolchain:
-              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-04-12-a/swift-DEVELOPMENT-SNAPSHOT-2025-04-12-a-ubuntu22.04.tar.gz
+              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-06-03-a/swift-DEVELOPMENT-SNAPSHOT-2025-06-03-a-ubuntu22.04.tar.gz
             wasi-backend: Node
             target: "wasm32-unknown-wasi"
           - os: ubuntu-22.04
             toolchain:
-              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-04-12-a/swift-DEVELOPMENT-SNAPSHOT-2025-04-12-a-ubuntu22.04.tar.gz
+              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-06-03-a/swift-DEVELOPMENT-SNAPSHOT-2025-06-03-a-ubuntu22.04.tar.gz
             wasi-backend: Node
             target: "wasm32-unknown-wasip1-threads"
 
