@@ -1,0 +1,77 @@
+{
+  "children" : [
+    {
+      "functions" : [
+        {
+          "name" : "jsRoundTripVoid",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "name" : "jsRoundTripNumber",
+          "parameters" : [
+            {
+              "name" : "v",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "name" : "jsRoundTripBool",
+          "parameters" : [
+            {
+              "name" : "v",
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "name" : "jsRoundTripString",
+          "parameters" : [
+            {
+              "name" : "v",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "types" : [
+
+      ]
+    }
+  ],
+  "moduleName" : "BridgeJSRuntimeTests"
+}
