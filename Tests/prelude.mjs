@@ -35,7 +35,7 @@ export function setupOptions(options, context) {
 
 import assert from "node:assert";
 
-/** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge.d.ts').Exports} exports */
+/** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     exports.roundTripVoid();
     for (const v of [0, 1, -1, 2147483647, -2147483648]) {

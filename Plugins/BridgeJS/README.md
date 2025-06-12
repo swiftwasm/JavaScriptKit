@@ -22,7 +22,7 @@ graph LR
         A.swift --> E1[[bridge-js export]]
         B.swift --> E1
         E1 --> G1[ExportSwift.swift]
-        B1[bridge.d.ts]-->I1[[bridge-js import]]
+        B1[bridge-js.d.ts]-->I1[[bridge-js import]]
         I1 --> G2[ImportTS.swift]
     end
     I1 --> G4[ImportTS.json]
@@ -32,7 +32,7 @@ graph LR
         C.swift --> E2[[bridge-js export]]
         D.swift --> E2
         E2 --> G5[ExportSwift.swift]
-        B2[bridge.d.ts]-->I2[[bridge-js import]]
+        B2[bridge-js.d.ts]-->I2[[bridge-js import]]
         I2 --> G6[ImportTS.swift]
     end
     I2 --> G8[ImportTS.json]
@@ -42,8 +42,8 @@ graph LR
     G7 --> L1
     G8 --> L1
 
-    L1 --> F1[bridge.js]
-    L1 --> F2[bridge.d.ts]
+    L1 --> F1[bridge-js.js]
+    L1 --> F2[bridge-js.d.ts]
     ModuleA -----> App[App.wasm]
     ModuleB -----> App
 

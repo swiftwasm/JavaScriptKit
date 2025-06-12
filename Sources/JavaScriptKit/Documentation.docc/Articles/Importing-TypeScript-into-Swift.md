@@ -51,7 +51,7 @@ let package = Package(
 
 ### Step 2: Create TypeScript Definitions
 
-Create a file named `bridge.d.ts` in your target source directory (e.g. `Sources/<target-name>/bridge.d.ts`). This file defines the JavaScript APIs you want to use in Swift:
+Create a file named `bridge-js.d.ts` in your target source directory (e.g. `Sources/<target-name>/bridge-js.d.ts`). This file defines the JavaScript APIs you want to use in Swift:
 
 ```typescript
 // Simple function
