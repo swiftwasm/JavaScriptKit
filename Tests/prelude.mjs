@@ -1,20 +1,34 @@
-/** @type {import('./../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').Prelude["setupOptions"]} */
+/** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptions} */
 export function setupOptions(options, context) {
     Error.stackTraceLimit = 100;
     setupTestGlobals(globalThis);
     return {
         ...options,
+        imports: {
+            "jsRoundTripVoid": () => {
+                return;
+            },
+            "jsRoundTripNumber": (v) => {
+                return v;
+            },
+            "jsRoundTripBool": (v) => {
+                return v;
+            },
+            "jsRoundTripString": (v) => {
+                return v;
+            },
+        },
         addToCoreImports(importObject, importsContext) {
             const { getInstance, getExports } = importsContext;
             options.addToCoreImports?.(importObject, importsContext);
             importObject["JavaScriptEventLoopTestSupportTests"] = {
                 "isMainThread": () => context.isMainThread,
             }
-            importObject["BridgeJSRuntimeTests"] = {
-                "runJsWorks": () => {
-                    return BridgeJSRuntimeTests_runJsWorks(getInstance(), getExports());
-                },
+            const bridgeJSRuntimeTests = importObject["BridgeJSRuntimeTests"] || {};
+            bridgeJSRuntimeTests["runJsWorks"] = () => {
+                return BridgeJSRuntimeTests_runJsWorks(getInstance(), getExports());
             }
+            importObject["BridgeJSRuntimeTests"] = bridgeJSRuntimeTests;
         }
     }
 }
