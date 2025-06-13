@@ -37,6 +37,36 @@ struct Greeter {
         self.this = JSObject(id: UInt32(bitPattern: ret))
     }
 
+    var name: String {
+        get {
+            @_extern(wasm, module: "Check", name: "bjs_Greeter_name_get")
+            func bjs_Greeter_name_get(_ self: Int32) -> Int32
+            let ret = bjs_Greeter_name_get(Int32(bitPattern: self.this.id))
+            return String(unsafeUninitializedCapacity: Int(ret)) { b in
+                _init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
+                return Int(ret)
+            }
+        }
+        nonmutating set {
+            @_extern(wasm, module: "Check", name: "bjs_Greeter_name_set")
+            func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
+            var newValue = newValue
+            let newValueId = newValue.withUTF8 { b in
+                _make_jsstring(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+            }
+            bjs_Greeter_name_set(Int32(bitPattern: self.this.id), newValueId)
+        }
+    }
+
+    var age: Double {
+        get {
+            @_extern(wasm, module: "Check", name: "bjs_Greeter_age_get")
+            func bjs_Greeter_age_get(_ self: Int32) -> Float64
+            let ret = bjs_Greeter_age_get(Int32(bitPattern: self.this.id))
+            return Double(ret)
+        }
+    }
+
     func greet() -> String {
         @_extern(wasm, module: "Check", name: "bjs_Greeter_greet")
         func bjs_Greeter_greet(_ self: Int32) -> Int32

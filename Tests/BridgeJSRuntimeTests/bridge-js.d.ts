@@ -4,7 +4,9 @@ export function jsRoundTripBool(v: boolean): boolean
 export function jsRoundTripString(v: string): string
 
 export class JsGreeter {
-    constructor(name: string);
+    name: string;
+    readonly prefix: string;
+    constructor(name: string, prefix: string);
     greet(): string;
     changeName(name: string): void;
 }

@@ -36,9 +36,15 @@ class ImportAPITests: XCTestCase {
     }
 
     func testClass() {
-        let greeter = JsGreeter("Alice")
+        let greeter = JsGreeter("Alice", "Hello")
         XCTAssertEqual(greeter.greet(), "Hello, Alice!")
         greeter.changeName("Bob")
         XCTAssertEqual(greeter.greet(), "Hello, Bob!")
+
+        greeter.name = "Charlie"
+        XCTAssertEqual(greeter.greet(), "Hello, Charlie!")
+        XCTAssertEqual(greeter.name, "Charlie")
+
+        XCTAssertEqual(greeter.prefix, "Hello")
     }
 }

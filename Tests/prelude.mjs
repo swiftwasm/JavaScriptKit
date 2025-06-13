@@ -20,12 +20,16 @@ export async function setupOptions(options, context) {
                 return v;
             },
             JsGreeter: class {
-                /** @param {string} name */
-                constructor(name) {
+                /**
+                 * @param {string} name
+                 * @param {string} prefix
+                 */
+                constructor(name, prefix) {
                     this.name = name;
+                    this.prefix = prefix;
                 }
                 greet() {
-                    return `Hello, ${this.name}!`;
+                    return `${this.prefix}, ${this.name}!`;
                 }
                 /** @param {string} name */
                 changeName(name) {
