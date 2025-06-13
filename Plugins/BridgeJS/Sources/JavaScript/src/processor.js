@@ -238,7 +238,8 @@ export class TypeProcessor {
 
         for (const member of node.members) {
             if (ts.isPropertyDeclaration(member)) {
-                // TODO
+                const property = this.visitPropertyDecl(member);
+                if (property) properties.push(property);
             } else if (ts.isMethodDeclaration(member)) {
                 const decl = this.visitFunctionLikeDecl(member);
                 if (decl) methods.push(decl);

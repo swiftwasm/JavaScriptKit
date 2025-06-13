@@ -134,6 +134,12 @@ struct BridgeJSLink {
                             target.set(tmpRetBytes);
                             tmpRetBytes = undefined;
                         }
+                        bjs["swift_js_retain"] = function(id) {
+                            return swift.memory.retainByRef(id);
+                        }
+                        bjs["swift_js_release"] = function(id) {
+                            swift.memory.release(id);
+                        }
             \(importObjectBuilders.flatMap { $0.importedLines }.map { $0.indent(count: 12) }.joined(separator: "\n"))
                     },
                     setInstance: (i) => {

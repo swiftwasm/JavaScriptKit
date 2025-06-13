@@ -3,10 +3,16 @@
 //
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
+
+@_spi(JSObject_id) import JavaScriptKit
+
 @_extern(wasm, module: "bjs", name: "return_string")
 private func _return_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
 @_extern(wasm, module: "bjs", name: "init_memory")
 private func _init_memory(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>?)
+
+@_extern(wasm, module: "bjs", name: "swift_js_retain")
+private func _swift_js_retain(_ ptr: Int32) -> Int32
 
 @_expose(wasm, "bjs_roundTripVoid")
 @_cdecl("bjs_roundTripVoid")
@@ -60,6 +66,13 @@ public func _bjs_roundTripString(vBytes: Int32, vLen: Int32) -> Void {
 public func _bjs_roundTripSwiftHeapObject(v: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     let ret = roundTripSwiftHeapObject(v: Unmanaged<Greeter>.fromOpaque(v).takeUnretainedValue())
     return Unmanaged.passRetained(ret).toOpaque()
+}
+
+@_expose(wasm, "bjs_roundTripJSObject")
+@_cdecl("bjs_roundTripJSObject")
+public func _bjs_roundTripJSObject(v: Int32) -> Int32 {
+    let ret = roundTripJSObject(v: JSObject(id: UInt32(bitPattern: v)))
+    return _swift_js_retain(Int32(bitPattern: ret.id))
 }
 
 @_expose(wasm, "bjs_takeGreeter")

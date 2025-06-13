@@ -35,6 +35,12 @@ export async function createInstantiator(options, swift) {
                 target.set(tmpRetBytes);
                 tmpRetBytes = undefined;
             }
+            bjs["swift_js_retain"] = function(id) {
+                return swift.memory.retainByRef(id);
+            }
+            bjs["swift_js_release"] = function(id) {
+                swift.memory.release(id);
+            }
 
         },
         setInstance: (i) => {

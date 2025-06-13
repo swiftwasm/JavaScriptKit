@@ -35,12 +35,32 @@ export async function createInstantiator(options, swift) {
                 target.set(tmpRetBytes);
                 tmpRetBytes = undefined;
             }
+            bjs["swift_js_retain"] = function(id) {
+                return swift.memory.retainByRef(id);
+            }
+            bjs["swift_js_release"] = function(id) {
+                swift.memory.release(id);
+            }
             const TestModule = importObject["TestModule"] = {};
             TestModule["bjs_Greeter_init"] = function bjs_Greeter_init(name) {
                 const nameObject = swift.memory.getObject(name);
                 swift.memory.release(name);
                 let ret = new options.imports.Greeter(nameObject);
                 return swift.memory.retain(ret);
+            }
+            TestModule["bjs_Greeter_name_get"] = function bjs_Greeter_name_get(self) {
+                let ret = swift.memory.getObject(self).name;
+                tmpRetBytes = textEncoder.encode(ret);
+                return tmpRetBytes.length;
+            }
+            TestModule["bjs_Greeter_name_set"] = function bjs_Greeter_name_set(self, newValue) {
+                const newValueObject = swift.memory.getObject(newValue);
+                swift.memory.release(newValue);
+                swift.memory.getObject(self).name = newValueObject;
+            }
+            TestModule["bjs_Greeter_age_get"] = function bjs_Greeter_age_get(self) {
+                let ret = swift.memory.getObject(self).age;
+                return ret;
             }
             TestModule["bjs_Greeter_greet"] = function bjs_Greeter_greet(self) {
                 let ret = swift.memory.getObject(self).greet();

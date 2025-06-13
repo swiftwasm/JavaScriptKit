@@ -12,9 +12,6 @@ private func _make_jsstring(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32
 @_extern(wasm, module: "bjs", name: "init_memory_with_result")
 private func _init_memory_with_result(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
 
-@_extern(wasm, module: "bjs", name: "free_jsobject")
-private func _free_jsobject(_ ptr: Int32) -> Void
-
 func jsRoundTripVoid() -> Void {
     @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripVoid")
     func bjs_jsRoundTripVoid() -> Void
@@ -60,15 +57,52 @@ struct JsGreeter {
         self.this = JSObject(id: UInt32(bitPattern: this))
     }
 
-    init(_ name: String) {
+    init(_ name: String, _ prefix: String) {
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_init")
-        func bjs_JsGreeter_init(_ name: Int32) -> Int32
+        func bjs_JsGreeter_init(_ name: Int32, _ prefix: Int32) -> Int32
         var name = name
         let nameId = name.withUTF8 { b in
             _make_jsstring(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
-        let ret = bjs_JsGreeter_init(nameId)
+        var prefix = prefix
+        let prefixId = prefix.withUTF8 { b in
+            _make_jsstring(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+        }
+        let ret = bjs_JsGreeter_init(nameId, prefixId)
         self.this = JSObject(id: UInt32(bitPattern: ret))
+    }
+
+    var name: String {
+        get {
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_name_get")
+            func bjs_JsGreeter_name_get(_ self: Int32) -> Int32
+            let ret = bjs_JsGreeter_name_get(Int32(bitPattern: self.this.id))
+            return String(unsafeUninitializedCapacity: Int(ret)) { b in
+                _init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
+                return Int(ret)
+            }
+        }
+        nonmutating set {
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_name_set")
+            func bjs_JsGreeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
+            var newValue = newValue
+            let newValueId = newValue.withUTF8 { b in
+                _make_jsstring(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+            }
+            bjs_JsGreeter_name_set(Int32(bitPattern: self.this.id), newValueId)
+        }
+    }
+
+    var prefix: String {
+        get {
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_prefix_get")
+            func bjs_JsGreeter_prefix_get(_ self: Int32) -> Int32
+            let ret = bjs_JsGreeter_prefix_get(Int32(bitPattern: self.this.id))
+            return String(unsafeUninitializedCapacity: Int(ret)) { b in
+                _init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
+                return Int(ret)
+            }
+        }
     }
 
     func greet() -> String {

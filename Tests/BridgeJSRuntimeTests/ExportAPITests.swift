@@ -28,6 +28,10 @@ func runJsWorks() -> Void
     return v
 }
 
+@JS func roundTripJSObject(v: JSObject) -> JSObject {
+    return v
+}
+
 @JS class Greeter {
     var name: String
 

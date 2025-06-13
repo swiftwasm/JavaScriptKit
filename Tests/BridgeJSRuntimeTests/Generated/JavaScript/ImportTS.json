@@ -79,6 +79,14 @@
 
                   }
                 }
+              },
+              {
+                "name" : "prefix",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
               }
             ]
           },
@@ -115,7 +123,24 @@
           ],
           "name" : "JsGreeter",
           "properties" : [
+            {
+              "isReadonly" : false,
+              "name" : "name",
+              "type" : {
+                "string" : {
 
+                }
+              }
+            },
+            {
+              "isReadonly" : true,
+              "name" : "prefix",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
           ]
         }
       ]

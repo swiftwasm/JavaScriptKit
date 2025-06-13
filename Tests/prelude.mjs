@@ -20,12 +20,16 @@ export async function setupOptions(options, context) {
                 return v;
             },
             JsGreeter: class {
-                /** @param {string} name */
-                constructor(name) {
+                /**
+                 * @param {string} name
+                 * @param {string} prefix
+                 */
+                constructor(name, prefix) {
                     this.name = name;
+                    this.prefix = prefix;
                 }
                 greet() {
-                    return `Hello, ${this.name}!`;
+                    return `${this.prefix}, ${this.name}!`;
                 }
                 /** @param {string} name */
                 changeName(name) {
@@ -98,6 +102,9 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     exports.takeGreeter(g, "Jay");
     assert.equal(g.greet(), "Hello, Jay!");
     g.release();
+
+    const anyObject = {};
+    assert.equal(exports.roundTripJSObject(anyObject), anyObject);
 }
 
 function setupTestGlobals(global) {
