@@ -69,7 +69,55 @@
         }
       ],
       "types" : [
+        {
+          "constructor" : {
+            "parameters" : [
+              {
+                "name" : "name",
+                "type" : {
+                  "string" : {
 
+                  }
+                }
+              }
+            ]
+          },
+          "methods" : [
+            {
+              "name" : "greet",
+              "parameters" : [
+
+              ],
+              "returnType" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "name" : "changeName",
+              "parameters" : [
+                {
+                  "name" : "name",
+                  "type" : {
+                    "string" : {
+
+                    }
+                  }
+                }
+              ],
+              "returnType" : {
+                "void" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "JsGreeter",
+          "properties" : [
+
+          ]
+        }
       ]
     }
   ],

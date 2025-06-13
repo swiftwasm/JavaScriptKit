@@ -19,6 +19,19 @@ export async function setupOptions(options, context) {
             "jsRoundTripString": (v) => {
                 return v;
             },
+            JsGreeter: class {
+                /** @param {string} name */
+                constructor(name) {
+                    this.name = name;
+                }
+                greet() {
+                    return `Hello, ${this.name}!`;
+                }
+                /** @param {string} name */
+                changeName(name) {
+                    this.name = name;
+                }
+            }
         },
         addToCoreImports(importObject, importsContext) {
             const { getInstance, getExports } = importsContext;
