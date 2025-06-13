@@ -551,7 +551,7 @@ struct BridgeJSLink {
         importObjectBuilder.appendDts([
             "\(type.name): {",
             "new\(renderTSSignature(parameters: constructor.parameters, returnType: returnType));".indent(count: 4),
-            "}"
+            "}",
         ])
     }
 
