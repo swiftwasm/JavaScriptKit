@@ -1,5 +1,7 @@
-/** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptions} */
-export function setupOptions(options, context) {
+// @ts-check
+
+/** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
+export async function setupOptions(options, context) {
     Error.stackTraceLimit = 100;
     setupTestGlobals(globalThis);
     return {

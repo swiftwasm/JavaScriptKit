@@ -157,6 +157,7 @@ export async function testBrowserInPage(options, processInfo) {
     });
 
     const { instantiate } = await import("./instantiate.js");
+    /** @type {import('./test.d.ts').SetupOptionsFn} */
     let setupOptions = (options, _) => { return options };
     if (processInfo.preludeScript) {
         const prelude = await import(processInfo.preludeScript);
