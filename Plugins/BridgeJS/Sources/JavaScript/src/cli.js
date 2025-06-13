@@ -6,7 +6,15 @@ import ts from 'typescript';
 import path from 'path';
 
 class DiagnosticEngine {
-    constructor() {
+    /**
+     * @param {string} level
+     */
+    constructor(level) {
+        const levelInfo = DiagnosticEngine.LEVELS[level];
+        if (!levelInfo) {
+            throw new Error(`Invalid log level: ${level}`);
+        }
+        this.minLevel = levelInfo.level;
         /** @type {ts.FormatDiagnosticsHost} */
         this.formattHost = {
             getCanonicalFileName: (fileName) => fileName,
@@ -23,36 +31,36 @@ class DiagnosticEngine {
         console.log(message);
     }
 
-    /**
-     * @param {string} message
-     * @param {ts.Node | undefined} node
-     */
-    info(message, node = undefined) {
-        this.printLog("info", '\x1b[32m', message, node);
+    static LEVELS = {
+        "verbose": {
+            color: '\x1b[34m',
+            level: 0,
+        },
+        "info": {
+            color: '\x1b[32m',
+            level: 1,
+        },
+        "warning": {
+            color: '\x1b[33m',
+            level: 2,
+        },
+        "error": {
+            color: '\x1b[31m',
+            level: 3,
+        },
     }
 
     /**
+     * @param {keyof typeof DiagnosticEngine.LEVELS} level
      * @param {string} message
      * @param {ts.Node | undefined} node
      */
-    warn(message, node = undefined) {
-        this.printLog("warning", '\x1b[33m', message, node);
-    }
-
-    /**
-     * @param {string} message
-     */
-    error(message) {
-        this.printLog("error", '\x1b[31m', message);
-    }
-
-    /**
-     * @param {string} level
-     * @param {string} color
-     * @param {string} message
-     * @param {ts.Node | undefined} node
-     */
-    printLog(level, color, message, node = undefined) {
+    print(level, message, node = undefined) {
+        const levelInfo = DiagnosticEngine.LEVELS[level];
+        if (levelInfo.level < this.minLevel) {
+            return;
+        }
+        const color = levelInfo.color;
         if (node) {
             const sourceFile = node.getSourceFile();
             const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
@@ -85,7 +93,11 @@ export function main(args) {
             project: {
                 type: 'string',
                 short: 'p',
-            }
+            },
+            "log-level": {
+                type: 'string',
+                default: 'info',
+            },
         },
         allowPositionals: true
     })
@@ -102,9 +114,9 @@ export function main(args) {
     }
 
     const filePath = options.positionals[0];
-    const diagnosticEngine = new DiagnosticEngine();
+    const diagnosticEngine = new DiagnosticEngine(options.values["log-level"] || "info");
 
-    diagnosticEngine.info(`Processing ${filePath}...`);
+    diagnosticEngine.print("verbose", `Processing ${filePath}...`);
 
     // Create TypeScript program and process declarations
     const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);

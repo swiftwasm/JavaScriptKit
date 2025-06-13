@@ -16,8 +16,7 @@ import ts from 'typescript';
 
 /**
  * @typedef {{
- *   warn: (message: string, node?: ts.Node) => void,
- *   error: (message: string, node?: ts.Node) => void,
+ *   print: (level: "warning" | "error", message: string, node?: ts.Node) => void,
  * }} DiagnosticEngine
  */
 
@@ -97,7 +96,7 @@ export class TypeProcessor {
                     }
                 });
             } catch (error) {
-                this.diagnosticEngine.error(`Error processing ${sourceFile.fileName}: ${error.message}`);
+                this.diagnosticEngine.print("error", `Error processing ${sourceFile.fileName}: ${error.message}`);
             }
         }
 
@@ -383,7 +382,7 @@ export class TypeProcessor {
 
             const typeName = this.deriveTypeName(type);
             if (!typeName) {
-                this.diagnosticEngine.warn(`Unknown non-nominal type: ${typeString}`, node);
+                this.diagnosticEngine.print("warning", `Unknown non-nominal type: ${typeString}`, node);
                 return { "jsObject": {} };
             }
             this.seenTypes.set(type, node);

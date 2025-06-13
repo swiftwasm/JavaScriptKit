@@ -12,10 +12,12 @@ struct BridgeJSCommandPlugin: CommandPlugin {
 
     struct Options {
         var targets: [String]
+        var verbose: Bool
 
         static func parse(extractor: inout ArgumentExtractor) -> Options {
             let targets = extractor.extractOption(named: "target")
-            return Options(targets: targets)
+            let verbose = extractor.extractFlag(named: "verbose")
+            return Options(targets: targets, verbose: verbose != 0)
         }
 
         static func help() -> String {
@@ -29,13 +31,13 @@ struct BridgeJSCommandPlugin: CommandPlugin {
                 OPTIONS:
                     --target <target> Specify target(s) to generate bridge code for. If omitted,
                                       generates for all targets with JavaScriptKit dependency.
+                    --verbose Print verbose output.
                 """
         }
     }
 
     func performCommand(context: PluginContext, arguments: [String]) throws {
         // Check for help flags to display usage information
-        // This allows users to run `swift package plugin bridge-js --help` to understand the plugin's functionality
         if arguments.contains(where: { ["-h", "--help"].contains($0) }) {
             printStderr(Options.help())
             return
@@ -45,25 +47,31 @@ struct BridgeJSCommandPlugin: CommandPlugin {
         let options = Options.parse(extractor: &extractor)
         let remainingArguments = extractor.remainingArguments
 
+        let context = Context(options: options, context: context)
+
         if options.targets.isEmpty {
-            try runOnTargets(
-                context: context,
+            try context.runOnTargets(
                 remainingArguments: remainingArguments,
                 where: { target in
                     target.hasDependency(named: Self.JAVASCRIPTKIT_PACKAGE_NAME)
                 }
             )
         } else {
-            try runOnTargets(
-                context: context,
+            try context.runOnTargets(
                 remainingArguments: remainingArguments,
                 where: { options.targets.contains($0.name) }
             )
         }
     }
 
-    private func runOnTargets(
-        context: PluginContext,
+    struct Context {
+        let options: Options
+        let context: PluginContext
+    }
+}
+
+extension BridgeJSCommandPlugin.Context {
+    func runOnTargets(
         remainingArguments: [String],
         where predicate: (SwiftSourceModuleTarget) -> Bool
     ) throws {
@@ -71,57 +79,71 @@ struct BridgeJSCommandPlugin: CommandPlugin {
             guard let target = target as? SwiftSourceModuleTarget else {
                 continue
             }
+            let configFilePath = target.directoryURL.appending(path: "bridge-js.config.json")
+            if !FileManager.default.fileExists(atPath: configFilePath.path) {
+                printVerbose("No bridge-js.config.json found for \(target.name), skipping...")
+                continue
+            }
             guard predicate(target) else {
                 continue
             }
-            try runSingleTarget(context: context, target: target, remainingArguments: remainingArguments)
+            try runSingleTarget(target: target, remainingArguments: remainingArguments)
         }
     }
 
     private func runSingleTarget(
-        context: PluginContext,
         target: SwiftSourceModuleTarget,
         remainingArguments: [String]
     ) throws {
-        Diagnostics.progress("Exporting Swift API for \(target.name)...")
+        printStderr("Generating bridge code for \(target.name)...")
+
+        printVerbose("Exporting Swift API for \(target.name)...")
 
         let generatedDirectory = target.directoryURL.appending(path: "Generated")
         let generatedJavaScriptDirectory = generatedDirectory.appending(path: "JavaScript")
 
         try runBridgeJSTool(
-            context: context,
             arguments: [
                 "export",
                 "--output-skeleton",
                 generatedJavaScriptDirectory.appending(path: "ExportSwift.json").path,
                 "--output-swift",
                 generatedDirectory.appending(path: "ExportSwift.swift").path,
+                "--verbose",
+                options.verbose ? "true" : "false",
             ]
                 + target.sourceFiles.filter {
                     !$0.url.path.hasPrefix(generatedDirectory.path + "/")
                 }.map(\.url.path) + remainingArguments
         )
 
-        try runBridgeJSTool(
-            context: context,
-            arguments: [
-                "import",
-                "--output-skeleton",
-                generatedJavaScriptDirectory.appending(path: "ImportTS.json").path,
-                "--output-swift",
-                generatedDirectory.appending(path: "ImportTS.swift").path,
-                "--module-name",
-                target.name,
-                "--project",
-                context.package.directoryURL.appending(path: "tsconfig.json").path,
-                target.directoryURL.appending(path: "bridge.d.ts").path,
-            ] + remainingArguments
-        )
+        printVerbose("Importing TypeScript API for \(target.name)...")
+
+        let bridgeDtsPath = target.directoryURL.appending(path: "bridge-js.d.ts")
+        // Execute import only if bridge-js.d.ts exists
+        if FileManager.default.fileExists(atPath: bridgeDtsPath.path) {
+            try runBridgeJSTool(
+                arguments: [
+                    "import",
+                    "--output-skeleton",
+                    generatedJavaScriptDirectory.appending(path: "ImportTS.json").path,
+                    "--output-swift",
+                    generatedDirectory.appending(path: "ImportTS.swift").path,
+                    "--verbose",
+                    options.verbose ? "true" : "false",
+                    "--module-name",
+                    target.name,
+                    "--project",
+                    context.package.directoryURL.appending(path: "tsconfig.json").path,
+                    bridgeDtsPath.path,
+                ] + remainingArguments
+            )
+        }
     }
 
-    private func runBridgeJSTool(context: PluginContext, arguments: [String]) throws {
+    private func runBridgeJSTool(arguments: [String]) throws {
         let tool = try context.tool(named: "BridgeJSTool").url
-        printStderr("$ \(tool.path) \(arguments.joined(separator: " "))")
+        printVerbose("$ \(tool.path) \(arguments.joined(separator: " "))")
         let process = Process()
         process.executableURL = tool
         process.arguments = arguments
@@ -131,6 +153,12 @@ struct BridgeJSCommandPlugin: CommandPlugin {
         }
         if process.terminationStatus != 0 {
             exit(process.terminationStatus)
+        }
+    }
+
+    private func printVerbose(_ message: String) {
+        if options.verbose {
+            printStderr(message)
         }
     }
 }

@@ -569,8 +569,8 @@ struct PackagingPlanner {
                     "BridgeJS is still an experimental feature. Set the environment variable JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1 to enable."
                 )
             }
-            let bridgeJs = outputDir.appending(path: "bridge.js")
-            let bridgeDts = outputDir.appending(path: "bridge.d.ts")
+            let bridgeJs = outputDir.appending(path: "bridge-js.js")
+            let bridgeDts = outputDir.appending(path: "bridge-js.d.ts")
             packageInputs.append(
                 make.addTask(inputFiles: exportedSkeletons + importedSkeletons, output: bridgeJs) { _, scope in
                     let link = try BridgeJSLink(

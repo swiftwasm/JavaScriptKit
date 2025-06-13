@@ -15,7 +15,7 @@ export const MEMORY_TYPE = {
 
 /* #if HAS_BRIDGE */
 // @ts-ignore
-import { createInstantiator } from "./bridge.js"
+import { createInstantiator } from "./bridge-js.js"
 /* #else */
 /**
  * @param {import('./instantiate.d').InstantiateOptions} options

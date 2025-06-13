@@ -19,7 +19,7 @@ class ExportSwift {
     private var exportedClasses: [ExportedClass] = []
     private var typeDeclResolver: TypeDeclResolver = TypeDeclResolver()
 
-    init(progress: ProgressReporting = ProgressReporting()) {
+    init(progress: ProgressReporting) {
         self.progress = progress
     }
 

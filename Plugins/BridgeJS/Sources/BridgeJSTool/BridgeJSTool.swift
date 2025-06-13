@@ -57,7 +57,6 @@ import SwiftParser
                 """
             )
         }
-        let progress = ProgressReporting()
         switch subcommand {
         case "import":
             let parser = ArgumentParser(
@@ -69,6 +68,10 @@ import SwiftParser
                     ),
                     "always-write": OptionRule(
                         help: "Always write the output files even if no APIs are imported",
+                        required: false
+                    ),
+                    "verbose": OptionRule(
+                        help: "Print verbose output",
                         required: false
                     ),
                     "output-swift": OptionRule(help: "The output file path for the Swift source code", required: true),
@@ -85,6 +88,7 @@ import SwiftParser
             let (positionalArguments, _, doubleDashOptions) = try parser.parse(
                 arguments: Array(arguments.dropFirst())
             )
+            let progress = ProgressReporting(verbose: doubleDashOptions["verbose"] == "true")
             var importer = ImportTS(progress: progress, moduleName: doubleDashOptions["module-name"]!)
             for inputFile in positionalArguments {
                 if inputFile.hasSuffix(".json") {
@@ -145,11 +149,16 @@ import SwiftParser
                         help: "Always write the output files even if no APIs are exported",
                         required: false
                     ),
+                    "verbose": OptionRule(
+                        help: "Print verbose output",
+                        required: false
+                    ),
                 ]
             )
             let (positionalArguments, _, doubleDashOptions) = try parser.parse(
                 arguments: Array(arguments.dropFirst())
             )
+            let progress = ProgressReporting(verbose: doubleDashOptions["verbose"] == "true")
             let exporter = ExportSwift(progress: progress)
             for inputFile in positionalArguments {
                 let sourceURL = URL(fileURLWithPath: inputFile)
@@ -253,7 +262,11 @@ private func printStderr(_ message: String) {
 struct ProgressReporting {
     let print: (String) -> Void
 
-    init(print: @escaping (String) -> Void = { Swift.print($0) }) {
+    init(verbose: Bool) {
+        self.init(print: verbose ? { Swift.print($0) } : { _ in })
+    }
+
+    private init(print: @escaping (String) -> Void) {
         self.print = print
     }
 

@@ -1,8 +1,8 @@
 import type { /* #if USE_SHARED_MEMORY */SwiftRuntimeThreadChannel, /* #endif */SwiftRuntime } from "./runtime.js";
 
 /* #if HAS_BRIDGE */
-export type { Imports, Exports } from "./bridge.js";
-import type { Imports, Exports } from "./bridge.js";
+export type { Imports, Exports } from "./bridge-js.js";
+import type { Imports, Exports } from "./bridge-js.js";
 /* #else */
 export type Imports = {}
 export type Exports = {}

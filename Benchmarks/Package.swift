@@ -11,7 +11,7 @@ let package = Package(
         .executableTarget(
             name: "Benchmarks",
             dependencies: ["JavaScriptKit"],
-            exclude: ["Generated/JavaScript", "bridge.d.ts"],
+            exclude: ["Generated/JavaScript", "bridge-js.d.ts"],
             swiftSettings: [
                 .enableExperimentalFeature("Extern")
             ]

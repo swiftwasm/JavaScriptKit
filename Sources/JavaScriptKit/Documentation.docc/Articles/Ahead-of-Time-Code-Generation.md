@@ -44,7 +44,15 @@ let package = Package(
 )
 ```
 
-### Step 2: Create Your Swift Code with @JS Annotations
+### Step 2: Create BridgeJS Configuration
+
+Create a `bridge-js.config.json` file in your SwiftPM target directory you want to use BridgeJS.
+
+```console
+$ echo "{}" > Sources/MyApp/bridge-js.config.json
+```
+
+### Step 3: Create Your Swift Code with @JS Annotations
 
 Write your Swift code with `@JS` annotations as usual:
 
@@ -70,12 +78,12 @@ import JavaScriptKit
 }
 ```
 
-### Step 3: Create Your TypeScript Definitions
+### Step 4: Create Your TypeScript Definitions
 
-If you're importing JavaScript APIs, create your `bridge.d.ts` file as usual:
+If you're importing JavaScript APIs, create your `bridge-js.d.ts` file as usual:
 
 ```typescript
-// Sources/MyApp/bridge.d.ts
+// Sources/MyApp/bridge-js.d.ts
 export function consoleLog(message: string): void;
 
 export interface Document {
@@ -86,7 +94,7 @@ export interface Document {
 export function getDocument(): Document;
 ```
 
-### Step 4: Generate the Bridge Code
+### Step 5: Generate the Bridge Code
 
 Run the command plugin to generate the bridge code:
 
@@ -108,7 +116,7 @@ Sources/MyApp/Generated/ImportTS.swift     # Generated code for TypeScript impor
 Sources/MyApp/Generated/JavaScript/        # Generated JSON skeletons
 ```
 
-### Step 5: Add Generated Files to Version Control
+### Step 6: Add Generated Files to Version Control
 
 Add these generated files to your version control system:
 
@@ -117,7 +125,7 @@ git add Sources/MyApp/Generated
 git commit -m "Add generated BridgeJS code"
 ```
 
-### Step 6: Build Your Package
+### Step 7: Build Your Package
 
 Now you can build your package as usual:
 
