@@ -396,6 +396,11 @@ struct BridgeJSLink {
             }
         }
 
+        func callConstructor(name: String) {
+            let call = "new options.imports.\(name)(\(parameterForwardings.joined(separator: ", ")))"
+            bodyLines.append("let ret = \(call);")
+        }
+
         func callMethod(name: String, returnType: BridgeType) {
             let call = "swift.memory.getObject(self).\(name)(\(parameterForwardings.joined(separator: ", ")))"
             if returnType == .void {
@@ -481,6 +486,13 @@ struct BridgeJSLink {
         importObjectBuilder: ImportObjectBuilder,
         type: ImportedTypeSkeleton
     ) throws {
+        if let constructor = type.constructor {
+            try renderImportedConstructor(
+                importObjectBuilder: importObjectBuilder,
+                type: type,
+                constructor: constructor
+            )
+        }
         for property in type.properties {
             let getterAbiName = property.getterAbiName(context: type)
             let (js, dts) = try renderImportedProperty(
@@ -516,6 +528,31 @@ struct BridgeJSLink {
             importObjectBuilder.assignToImportObject(name: method.abiName(context: type), function: js)
             importObjectBuilder.appendDts(dts)
         }
+    }
+
+    func renderImportedConstructor(
+        importObjectBuilder: ImportObjectBuilder,
+        type: ImportedTypeSkeleton,
+        constructor: ImportedConstructorSkeleton
+    ) throws {
+        let thunkBuilder = ImportedThunkBuilder()
+        for param in constructor.parameters {
+            thunkBuilder.liftParameter(param: param)
+        }
+        let returnType = BridgeType.jsObject(type.name)
+        thunkBuilder.callConstructor(name: type.name)
+        let returnExpr = try thunkBuilder.lowerReturnValue(returnType: returnType)
+        let abiName = constructor.abiName(context: type)
+        let funcLines = thunkBuilder.renderFunction(
+            name: abiName,
+            returnExpr: returnExpr
+        )
+        importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
+        importObjectBuilder.appendDts([
+            "\(type.name): {",
+            "new\(renderTSSignature(parameters: constructor.parameters, returnType: returnType));".indent(count: 4),
+            "}"
+        ])
     }
 
     func renderImportedProperty(
@@ -577,8 +614,8 @@ extension BridgeType {
             return "number"
         case .bool:
             return "boolean"
-        case .jsObject:
-            return "any"
+        case .jsObject(let name):
+            return name ?? "any"
         case .swiftHeapObject(let name):
             return name
         }
