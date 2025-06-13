@@ -36,6 +36,12 @@ export async function createInstantiator(options, swift) {
                 tmpRetBytes = undefined;
             }
             const TestModule = importObject["TestModule"] = {};
+            TestModule["bjs_Greeter_init"] = function bjs_Greeter_init(name) {
+                const nameObject = swift.memory.getObject(name);
+                swift.memory.release(name);
+                let ret = new options.imports.Greeter(nameObject);
+                return swift.memory.retain(ret);
+            }
             TestModule["bjs_Greeter_greet"] = function bjs_Greeter_greet(self) {
                 let ret = swift.memory.getObject(self).greet();
                 tmpRetBytes = textEncoder.encode(ret);

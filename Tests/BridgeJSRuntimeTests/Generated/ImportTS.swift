@@ -48,3 +48,47 @@ func jsRoundTripString(_ v: String) -> String {
         return Int(ret)
     }
 }
+
+struct JsGreeter {
+    let this: JSObject
+
+    init(this: JSObject) {
+        self.this = this
+    }
+
+    init(takingThis this: Int32) {
+        self.this = JSObject(id: UInt32(bitPattern: this))
+    }
+
+    init(_ name: String) {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_init")
+        func bjs_JsGreeter_init(_ name: Int32) -> Int32
+        var name = name
+        let nameId = name.withUTF8 { b in
+            _make_jsstring(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+        }
+        let ret = bjs_JsGreeter_init(nameId)
+        self.this = JSObject(id: UInt32(bitPattern: ret))
+    }
+
+    func greet() -> String {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_greet")
+        func bjs_JsGreeter_greet(_ self: Int32) -> Int32
+        let ret = bjs_JsGreeter_greet(Int32(bitPattern: self.this.id))
+        return String(unsafeUninitializedCapacity: Int(ret)) { b in
+            _init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
+            return Int(ret)
+        }
+    }
+
+    func changeName(_ name: String) -> Void {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_changeName")
+        func bjs_JsGreeter_changeName(_ self: Int32, _ name: Int32) -> Void
+        var name = name
+        let nameId = name.withUTF8 { b in
+            _make_jsstring(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+        }
+        bjs_JsGreeter_changeName(Int32(bitPattern: self.this.id), nameId)
+    }
+
+}

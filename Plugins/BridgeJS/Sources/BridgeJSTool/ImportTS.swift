@@ -237,7 +237,7 @@ struct ImportTS {
                 preconditionFailure("assignThis can only be called with a jsObject return type")
             }
             abiReturnType = .i32
-            body.append("self.this = ret")
+            body.append("self.this = JSObject(id: UInt32(bitPattern: ret))")
         }
 
         func renderImportDecl() -> DeclSyntax {

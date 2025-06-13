@@ -34,4 +34,11 @@ class ImportAPITests: XCTestCase {
             XCTAssertEqual(jsRoundTripString(v), v)
         }
     }
+
+    func testClass() {
+        let greeter = JsGreeter("Alice")
+        XCTAssertEqual(greeter.greet(), "Hello, Alice!")
+        greeter.changeName("Bob")
+        XCTAssertEqual(greeter.greet(), "Hello, Bob!")
+    }
 }

@@ -1,5 +1,7 @@
-/** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptions} */
-export function setupOptions(options, context) {
+// @ts-check
+
+/** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
+export async function setupOptions(options, context) {
     Error.stackTraceLimit = 100;
     setupTestGlobals(globalThis);
     return {
@@ -17,6 +19,19 @@ export function setupOptions(options, context) {
             "jsRoundTripString": (v) => {
                 return v;
             },
+            JsGreeter: class {
+                /** @param {string} name */
+                constructor(name) {
+                    this.name = name;
+                }
+                greet() {
+                    return `Hello, ${this.name}!`;
+                }
+                /** @param {string} name */
+                changeName(name) {
+                    this.name = name;
+                }
+            }
         },
         addToCoreImports(importObject, importsContext) {
             const { getInstance, getExports } = importsContext;

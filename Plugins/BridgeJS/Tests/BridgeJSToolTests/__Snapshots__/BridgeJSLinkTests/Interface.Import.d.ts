@@ -7,7 +7,7 @@
 export type Exports = {
 }
 export type Imports = {
-    returnAnimatable(): any;
+    returnAnimatable(): Animatable;
 }
 export function createInstantiator(options: {
     imports: Imports;

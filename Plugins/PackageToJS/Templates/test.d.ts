@@ -1,5 +1,12 @@
 import type { InstantiateOptions, instantiate } from "./instantiate";
 
+export type SetupOptionsFn = (
+    options: InstantiateOptions,
+    context: {
+        isMainThread: boolean,
+    }
+) => Promise<InstantiateOptions>
+
 export function testBrowser(
     options: {
         preludeScript?: string,

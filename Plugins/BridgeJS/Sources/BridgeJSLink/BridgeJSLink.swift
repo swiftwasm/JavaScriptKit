@@ -47,10 +47,8 @@ struct BridgeJSLink {
 
     func link() throws -> (outputJs: String, outputDts: String) {
         var exportsLines: [String] = []
-        var importedLines: [String] = []
         var classLines: [String] = []
         var dtsExportLines: [String] = []
-        var dtsImportLines: [String] = []
         var dtsClassLines: [String] = []
 
         if exportedSkeletons.contains(where: { $0.classes.count > 0 }) {
@@ -84,57 +82,18 @@ struct BridgeJSLink {
             }
         }
 
+        var importObjectBuilders: [ImportObjectBuilder] = []
         for skeletonSet in importedSkeletons {
-            importedLines.append("const \(skeletonSet.moduleName) = importObject[\"\(skeletonSet.moduleName)\"] = {};")
-            func assignToImportObject(name: String, function: [String]) {
-                var js = function
-                js[0] = "\(skeletonSet.moduleName)[\"\(name)\"] = " + js[0]
-                importedLines.append(contentsOf: js)
-            }
+            let importObjectBuilder = ImportObjectBuilder(moduleName: skeletonSet.moduleName)
             for fileSkeleton in skeletonSet.children {
                 for function in fileSkeleton.functions {
-                    let (js, dts) = try renderImportedFunction(function: function)
-                    assignToImportObject(name: function.abiName(context: nil), function: js)
-                    dtsImportLines.append(contentsOf: dts)
+                    try renderImportedFunction(importObjectBuilder: importObjectBuilder, function: function)
                 }
                 for type in fileSkeleton.types {
-                    for property in type.properties {
-                        let getterAbiName = property.getterAbiName(context: type)
-                        let (js, dts) = try renderImportedProperty(
-                            property: property,
-                            abiName: getterAbiName,
-                            emitCall: { thunkBuilder in
-                                thunkBuilder.callPropertyGetter(name: property.name, returnType: property.type)
-                                return try thunkBuilder.lowerReturnValue(returnType: property.type)
-                            }
-                        )
-                        assignToImportObject(name: getterAbiName, function: js)
-                        dtsImportLines.append(contentsOf: dts)
-
-                        if !property.isReadonly {
-                            let setterAbiName = property.setterAbiName(context: type)
-                            let (js, dts) = try renderImportedProperty(
-                                property: property,
-                                abiName: setterAbiName,
-                                emitCall: { thunkBuilder in
-                                    thunkBuilder.liftParameter(
-                                        param: Parameter(label: nil, name: "newValue", type: property.type)
-                                    )
-                                    thunkBuilder.callPropertySetter(name: property.name, returnType: property.type)
-                                    return nil
-                                }
-                            )
-                            assignToImportObject(name: setterAbiName, function: js)
-                            dtsImportLines.append(contentsOf: dts)
-                        }
-                    }
-                    for method in type.methods {
-                        let (js, dts) = try renderImportedMethod(context: type, method: method)
-                        assignToImportObject(name: method.abiName(context: type), function: js)
-                        dtsImportLines.append(contentsOf: dts)
-                    }
+                    try renderImportedType(importObjectBuilder: importObjectBuilder, type: type)
                 }
             }
+            importObjectBuilders.append(importObjectBuilder)
         }
 
         let outputJs = """
@@ -175,7 +134,7 @@ struct BridgeJSLink {
                             target.set(tmpRetBytes);
                             tmpRetBytes = undefined;
                         }
-            \(importedLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
+            \(importObjectBuilders.flatMap { $0.importedLines }.map { $0.indent(count: 12) }.joined(separator: "\n"))
                     },
                     setInstance: (i) => {
                         instance = i;
@@ -198,7 +157,7 @@ struct BridgeJSLink {
         dtsLines.append(contentsOf: dtsExportLines.map { $0.indent(count: 4) })
         dtsLines.append("}")
         dtsLines.append("export type Imports = {")
-        dtsLines.append(contentsOf: dtsImportLines.map { $0.indent(count: 4) })
+        dtsLines.append(contentsOf: importObjectBuilders.flatMap { $0.dtsImportLines }.map { $0.indent(count: 4) })
         dtsLines.append("}")
         let outputDts = """
             // NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
@@ -437,6 +396,11 @@ struct BridgeJSLink {
             }
         }
 
+        func callConstructor(name: String) {
+            let call = "new options.imports.\(name)(\(parameterForwardings.joined(separator: ", ")))"
+            bodyLines.append("let ret = \(call);")
+        }
+
         func callMethod(name: String, returnType: BridgeType) {
             let call = "swift.memory.getObject(self).\(name)(\(parameterForwardings.joined(separator: ", ")))"
             if returnType == .void {
@@ -475,7 +439,31 @@ struct BridgeJSLink {
         }
     }
 
-    func renderImportedFunction(function: ImportedFunctionSkeleton) throws -> (js: [String], dts: [String]) {
+    class ImportObjectBuilder {
+        var moduleName: String
+        var importedLines: [String] = []
+        var dtsImportLines: [String] = []
+
+        init(moduleName: String) {
+            self.moduleName = moduleName
+            importedLines.append("const \(moduleName) = importObject[\"\(moduleName)\"] = {};")
+        }
+
+        func assignToImportObject(name: String, function: [String]) {
+            var js = function
+            js[0] = "\(moduleName)[\"\(name)\"] = " + js[0]
+            importedLines.append(contentsOf: js)
+        }
+
+        func appendDts(_ lines: [String]) {
+            dtsImportLines.append(contentsOf: lines)
+        }
+    }
+
+    func renderImportedFunction(
+        importObjectBuilder: ImportObjectBuilder,
+        function: ImportedFunctionSkeleton
+    ) throws {
         let thunkBuilder = ImportedThunkBuilder()
         for param in function.parameters {
             thunkBuilder.liftParameter(param: param)
@@ -486,11 +474,85 @@ struct BridgeJSLink {
             name: function.abiName(context: nil),
             returnExpr: returnExpr
         )
-        var dtsLines: [String] = []
-        dtsLines.append(
-            "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType));"
+        importObjectBuilder.appendDts(
+            [
+                "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType));"
+            ]
         )
-        return (funcLines, dtsLines)
+        importObjectBuilder.assignToImportObject(name: function.abiName(context: nil), function: funcLines)
+    }
+
+    func renderImportedType(
+        importObjectBuilder: ImportObjectBuilder,
+        type: ImportedTypeSkeleton
+    ) throws {
+        if let constructor = type.constructor {
+            try renderImportedConstructor(
+                importObjectBuilder: importObjectBuilder,
+                type: type,
+                constructor: constructor
+            )
+        }
+        for property in type.properties {
+            let getterAbiName = property.getterAbiName(context: type)
+            let (js, dts) = try renderImportedProperty(
+                property: property,
+                abiName: getterAbiName,
+                emitCall: { thunkBuilder in
+                    thunkBuilder.callPropertyGetter(name: property.name, returnType: property.type)
+                    return try thunkBuilder.lowerReturnValue(returnType: property.type)
+                }
+            )
+            importObjectBuilder.assignToImportObject(name: getterAbiName, function: js)
+            importObjectBuilder.appendDts(dts)
+
+            if !property.isReadonly {
+                let setterAbiName = property.setterAbiName(context: type)
+                let (js, dts) = try renderImportedProperty(
+                    property: property,
+                    abiName: setterAbiName,
+                    emitCall: { thunkBuilder in
+                        thunkBuilder.liftParameter(
+                            param: Parameter(label: nil, name: "newValue", type: property.type)
+                        )
+                        thunkBuilder.callPropertySetter(name: property.name, returnType: property.type)
+                        return nil
+                    }
+                )
+                importObjectBuilder.assignToImportObject(name: setterAbiName, function: js)
+                importObjectBuilder.appendDts(dts)
+            }
+        }
+        for method in type.methods {
+            let (js, dts) = try renderImportedMethod(context: type, method: method)
+            importObjectBuilder.assignToImportObject(name: method.abiName(context: type), function: js)
+            importObjectBuilder.appendDts(dts)
+        }
+    }
+
+    func renderImportedConstructor(
+        importObjectBuilder: ImportObjectBuilder,
+        type: ImportedTypeSkeleton,
+        constructor: ImportedConstructorSkeleton
+    ) throws {
+        let thunkBuilder = ImportedThunkBuilder()
+        for param in constructor.parameters {
+            thunkBuilder.liftParameter(param: param)
+        }
+        let returnType = BridgeType.jsObject(type.name)
+        thunkBuilder.callConstructor(name: type.name)
+        let returnExpr = try thunkBuilder.lowerReturnValue(returnType: returnType)
+        let abiName = constructor.abiName(context: type)
+        let funcLines = thunkBuilder.renderFunction(
+            name: abiName,
+            returnExpr: returnExpr
+        )
+        importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
+        importObjectBuilder.appendDts([
+            "\(type.name): {",
+            "new\(renderTSSignature(parameters: constructor.parameters, returnType: returnType));".indent(count: 4),
+            "}",
+        ])
     }
 
     func renderImportedProperty(
@@ -552,8 +614,8 @@ extension BridgeType {
             return "number"
         case .bool:
             return "boolean"
-        case .jsObject:
-            return "any"
+        case .jsObject(let name):
+            return name ?? "any"
         case .swiftHeapObject(let name):
             return name
         }

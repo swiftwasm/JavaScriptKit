@@ -34,7 +34,7 @@ struct Greeter {
             _make_jsstring(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         let ret = bjs_Greeter_init(nameId)
-        self.this = ret
+        self.this = JSObject(id: UInt32(bitPattern: ret))
     }
 
     func greet() -> String {

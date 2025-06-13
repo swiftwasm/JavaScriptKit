@@ -59,7 +59,7 @@ export function createDefaultWorkerFactory(preludeScript) {
                 if (preludeScript) {
                     const prelude = await import(preludeScript);
                     if (prelude.setupOptions) {
-                        options = prelude.setupOptions(options, { isMainThread: false })
+                        options = await prelude.setupOptions(options, { isMainThread: false })
                     }
                 }
                 await instantiateForThread(tid, startArg, {

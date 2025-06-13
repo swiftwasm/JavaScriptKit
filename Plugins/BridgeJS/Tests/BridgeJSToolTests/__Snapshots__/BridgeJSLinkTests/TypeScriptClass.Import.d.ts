@@ -7,6 +7,9 @@
 export type Exports = {
 }
 export type Imports = {
+    Greeter: {
+        new(name: string): Greeter;
+    }
 }
 export function createInstantiator(options: {
     imports: Imports;

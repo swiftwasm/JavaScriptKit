@@ -65,7 +65,7 @@ const harnesses = {
             if (preludeScript) {
                 const prelude = await import(preludeScript)
                 if (prelude.setupOptions) {
-                    options = prelude.setupOptions(options, { isMainThread: true })
+                    options = await prelude.setupOptions(options, { isMainThread: true })
                 }
             }
             process.on("beforeExit", () => {
