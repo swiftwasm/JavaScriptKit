@@ -33,6 +33,10 @@ export class SwiftRuntimeHeap {
         return id;
     }
 
+    retainByRef(ref: ref) {
+        return this.retain(this.referenceHeap(ref));
+    }
+
     release(ref: ref) {
         const value = this._heapValueById.get(ref);
         const entry = this._heapEntryByValue.get(value)!;

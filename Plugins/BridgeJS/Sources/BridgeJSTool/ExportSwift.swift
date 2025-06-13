@@ -221,11 +221,9 @@ class ExportSwift {
             return nil
         }
         guard let typeDecl = typeDeclResolver.lookupType(for: identifier) else {
-            print("Failed to lookup type \(type.trimmedDescription): not found in typeDeclResolver")
             return nil
         }
         guard typeDecl.is(ClassDeclSyntax.self) || typeDecl.is(ActorDeclSyntax.self) else {
-            print("Failed to lookup type \(type.trimmedDescription): is not a class or actor")
             return nil
         }
         return .swiftHeapObject(typeDecl.name.text)
@@ -237,10 +235,16 @@ class ExportSwift {
         //
         // To update this file, just rebuild your project or run
         // `swift package bridge-js`.
+
+        @_spi(JSObject_id) import JavaScriptKit
+
         @_extern(wasm, module: "bjs", name: "return_string")
         private func _return_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
         @_extern(wasm, module: "bjs", name: "init_memory")
         private func _init_memory(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>?)
+
+        @_extern(wasm, module: "bjs", name: "swift_js_retain")
+        private func _swift_js_retain(_ ptr: Int32) -> Int32
         """
 
     func renderSwiftGlue() -> String? {
@@ -317,11 +321,19 @@ class ExportSwift {
                 )
                 abiParameterSignatures.append((bytesLabel, .i32))
                 abiParameterSignatures.append((lengthLabel, .i32))
-            case .jsObject:
+            case .jsObject(nil):
                 abiParameterForwardings.append(
                     LabeledExprSyntax(
                         label: param.label,
-                        expression: ExprSyntax("\(raw: param.name)")
+                        expression: ExprSyntax("JSObject(id: UInt32(bitPattern: \(raw: param.name)))")
+                    )
+                )
+                abiParameterSignatures.append((param.name, .i32))
+            case .jsObject(let name):
+                abiParameterForwardings.append(
+                    LabeledExprSyntax(
+                        label: param.label,
+                        expression: ExprSyntax("\(raw: name)(takingThis: UInt32(bitPattern: \(raw: param.name)))")
                     )
                 )
                 abiParameterSignatures.append((param.name, .i32))
@@ -404,10 +416,16 @@ class ExportSwift {
                     }
                     """
                 )
-            case .jsObject:
+            case .jsObject(nil):
                 body.append(
                     """
-                    return ret.id
+                    return _swift_js_retain(Int32(bitPattern: ret.id))
+                    """
+                )
+            case .jsObject(_?):
+                body.append(
+                    """
+                    return _swift_js_retain(Int32(bitPattern: ret.this.id))
                     """
                 )
             case .swiftHeapObject:
@@ -566,6 +584,8 @@ extension BridgeType {
             self = .bool
         case "Void":
             self = .void
+        case "JSObject":
+            self = .jsObject(nil)
         default:
             return nil
         }

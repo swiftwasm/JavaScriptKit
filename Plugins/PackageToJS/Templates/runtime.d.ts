@@ -8,6 +8,7 @@ declare class Memory {
     retain: (value: any) => number;
     getObject: (ref: number) => any;
     release: (ref: number) => void;
+    retainByRef: (ref: number) => number;
     bytes: () => Uint8Array<ArrayBuffer>;
     dataView: () => DataView<ArrayBuffer>;
     writeBytes: (ptr: pointer, bytes: Uint8Array) => void;

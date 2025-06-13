@@ -102,6 +102,9 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     exports.takeGreeter(g, "Jay");
     assert.equal(g.greet(), "Hello, Jay!");
     g.release();
+
+    const anyObject = {};
+    assert.equal(exports.roundTripJSObject(anyObject), anyObject);
 }
 
 function setupTestGlobals(global) {

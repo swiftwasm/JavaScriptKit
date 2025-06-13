@@ -12,9 +12,6 @@ private func _make_jsstring(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32
 @_extern(wasm, module: "bjs", name: "init_memory_with_result")
 private func _init_memory_with_result(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
 
-@_extern(wasm, module: "bjs", name: "free_jsobject")
-private func _free_jsobject(_ ptr: Int32) -> Void
-
 struct Greeter {
     let this: JSObject
 

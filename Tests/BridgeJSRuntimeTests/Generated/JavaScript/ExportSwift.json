@@ -186,6 +186,26 @@
       }
     },
     {
+      "abiName" : "bjs_roundTripJSObject",
+      "name" : "roundTripJSObject",
+      "parameters" : [
+        {
+          "label" : "v",
+          "name" : "v",
+          "type" : {
+            "jsObject" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "jsObject" : {
+
+        }
+      }
+    },
+    {
       "abiName" : "bjs_takeGreeter",
       "name" : "takeGreeter",
       "parameters" : [

@@ -13,6 +13,7 @@ export class Memory {
     retain = (value: any) => this.heap.retain(value);
     getObject = (ref: number) => this.heap.referenceHeap(ref);
     release = (ref: number) => this.heap.release(ref);
+    retainByRef = (ref: number) => this.heap.retainByRef(ref);
 
     bytes = () => new Uint8Array(this.rawMemory.buffer);
     dataView = () => new DataView(this.rawMemory.buffer);

@@ -158,6 +158,9 @@ class SwiftRuntimeHeap {
         this._heapEntryByValue.set(value, { id: id, rc: 1 });
         return id;
     }
+    retainByRef(ref) {
+        return this.retain(this.referenceHeap(ref));
+    }
     release(ref) {
         const value = this._heapValueById.get(ref);
         const entry = this._heapEntryByValue.get(value);
@@ -182,6 +185,7 @@ class Memory {
         this.retain = (value) => this.heap.retain(value);
         this.getObject = (ref) => this.heap.referenceHeap(ref);
         this.release = (ref) => this.heap.release(ref);
+        this.retainByRef = (ref) => this.heap.retainByRef(ref);
         this.bytes = () => new Uint8Array(this.rawMemory.buffer);
         this.dataView = () => new DataView(this.rawMemory.buffer);
         this.writeBytes = (ptr, bytes) => this.bytes().set(bytes, ptr);
