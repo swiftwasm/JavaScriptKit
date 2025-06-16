@@ -1,4 +1,4 @@
-import { Memory } from "./memory.js";
+import { JSObjectSpace } from "./object-heap.js";
 import { assertNever, JavaScriptValueKindAndFlags, pointer, ref } from "./types.js";
 
 export const enum Kind {
@@ -17,7 +17,7 @@ export const decode = (
     kind: Kind,
     payload1: number,
     payload2: number,
-    memory: Memory
+    objectSpace: JSObjectSpace
 ) => {
     switch (kind) {
         case Kind.Boolean:
@@ -35,7 +35,7 @@ export const decode = (
         case Kind.Function:
         case Kind.Symbol:
         case Kind.BigInt:
-            return memory.getObject(payload1);
+            return objectSpace.getObject(payload1);
 
         case Kind.Null:
             return null;
@@ -50,22 +50,19 @@ export const decode = (
 
 // Note:
 // `decodeValues` assumes that the size of RawJSValue is 16.
-export const decodeArray = (ptr: pointer, length: number, memory: Memory) => {
+export const decodeArray = (ptr: pointer, length: number, memory: DataView, objectSpace: JSObjectSpace) => {
     // fast path for empty array
     if (length === 0) {
         return [];
     }
 
     let result = [];
-    // It's safe to hold DataView here because WebAssembly.Memory.buffer won't
-    // change within this function.
-    const view = memory.dataView();
     for (let index = 0; index < length; index++) {
         const base = ptr + 16 * index;
-        const kind = view.getUint32(base, true);
-        const payload1 = view.getUint32(base + 4, true);
-        const payload2 = view.getFloat64(base + 8, true);
-        result.push(decode(kind, payload1, payload2, memory));
+        const kind = memory.getUint32(base, true);
+        const payload1 = memory.getUint32(base + 4, true);
+        const payload2 = memory.getFloat64(base + 8, true);
+        result.push(decode(kind, payload1, payload2, objectSpace));
     }
     return result;
 };
@@ -80,16 +77,18 @@ export const write = (
     payload1_ptr: pointer,
     payload2_ptr: pointer,
     is_exception: boolean,
-    memory: Memory
+    memory: DataView,
+    objectSpace: JSObjectSpace
 ) => {
     const kind = writeAndReturnKindBits(
         value,
         payload1_ptr,
         payload2_ptr,
         is_exception,
-        memory
+        memory,
+        objectSpace
     );
-    memory.writeUint32(kind_ptr, kind);
+    memory.setUint32(kind_ptr, kind, true);
 };
 
 export const writeAndReturnKindBits = (
@@ -97,7 +96,8 @@ export const writeAndReturnKindBits = (
     payload1_ptr: pointer,
     payload2_ptr: pointer,
     is_exception: boolean,
-    memory: Memory
+    memory: DataView,
+    objectSpace: JSObjectSpace
 ): JavaScriptValueKindAndFlags => {
     const exceptionBit = (is_exception ? 1 : 0) << 31;
     if (value === null) {
@@ -105,18 +105,18 @@ export const writeAndReturnKindBits = (
     }
 
     const writeRef = (kind: Kind) => {
-        memory.writeUint32(payload1_ptr, memory.retain(value));
+        memory.setUint32(payload1_ptr, objectSpace.retain(value), true);
         return exceptionBit | kind;
     };
 
     const type = typeof value;
     switch (type) {
         case "boolean": {
-            memory.writeUint32(payload1_ptr, value ? 1 : 0);
+            memory.setUint32(payload1_ptr, value ? 1 : 0, true);
             return exceptionBit | Kind.Boolean;
         }
         case "number": {
-            memory.writeFloat64(payload2_ptr, value);
+            memory.setFloat64(payload2_ptr, value, true);
             return exceptionBit | Kind.Number;
         }
         case "string": {
@@ -143,10 +143,10 @@ export const writeAndReturnKindBits = (
     throw new Error("Unreachable");
 };
 
-export function decodeObjectRefs(ptr: pointer, length: number, memory: Memory): ref[] {
+export function decodeObjectRefs(ptr: pointer, length: number, memory: DataView): ref[] {
     const result: ref[] = new Array(length);
     for (let i = 0; i < length; i++) {
-        result[i] = memory.readUint32(ptr + 4 * i);
+        result[i] = memory.getUint32(ptr + 4 * i, true);
     }
     return result;
 }

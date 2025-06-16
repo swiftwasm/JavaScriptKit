@@ -5,7 +5,7 @@ type SwiftRuntimeHeapEntry = {
     id: number;
     rc: number;
 };
-export class SwiftRuntimeHeap {
+export class JSObjectSpace {
     private _heapValueById: Map<number, any>;
     private _heapEntryByValue: Map<any, SwiftRuntimeHeapEntry>;
     private _heapNextKey: number;
@@ -34,7 +34,7 @@ export class SwiftRuntimeHeap {
     }
 
     retainByRef(ref: ref) {
-        return this.retain(this.referenceHeap(ref));
+        return this.retain(this.getObject(ref));
     }
 
     release(ref: ref) {
@@ -47,7 +47,7 @@ export class SwiftRuntimeHeap {
         this._heapValueById.delete(ref);
     }
 
-    referenceHeap(ref: ref) {
+    getObject(ref: ref) {
         const value = this._heapValueById.get(ref);
         if (value === undefined) {
             throw new ReferenceError(

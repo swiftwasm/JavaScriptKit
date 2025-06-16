@@ -1,6 +1,6 @@
 // This file defines the interface for the inter-thread communication.
 import type { ref, pointer } from "./types.js";
-import { Memory } from "./memory.js";
+import { JSObjectSpace as JSObjectSpace } from "./object-heap.js";
 
 /**
  * A thread channel is a set of functions that are used to communicate between
@@ -83,7 +83,7 @@ export type SwiftRuntimeThreadChannel =
 
 
 export class ITCInterface {
-    constructor(private memory: Memory) {}
+    constructor(private memory: JSObjectSpace) {}
 
     send(sendingObject: ref, transferringObjects: ref[], sendingContext: pointer): { object: any, sendingContext: pointer, transfer: Transferable[] } {
         const object = this.memory.getObject(sendingObject);
