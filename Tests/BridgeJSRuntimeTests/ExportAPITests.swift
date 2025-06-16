@@ -32,6 +32,14 @@ func runJsWorks() -> Void
     return v
 }
 
+struct TestError: Error {
+    let message: String
+}
+
+@JS func throwsSwiftError() throws(JSException) -> Void {
+    throw JSException(JSError(message: "TestError").jsValue)
+}
+
 @JS class Greeter {
     var name: String
 

@@ -135,3 +135,4 @@ TBD
     declare var Foo: FooConstructor;
     ```
 - [ ] Use `externref` once it's widely available
+- [ ] Test SwiftObject roundtrip

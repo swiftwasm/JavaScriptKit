@@ -111,6 +111,7 @@ struct BridgeJSLink {
 
                 let tmpRetString;
                 let tmpRetBytes;
+                let tmpRetException;
                 return {
                     /** @param {WebAssembly.Imports} importObject */
                     addImports: (importObject) => {
@@ -133,6 +134,9 @@ struct BridgeJSLink {
                             const target = new Uint8Array(memory.buffer, ptr, len);
                             target.set(tmpRetBytes);
                             tmpRetBytes = undefined;
+                        }
+                        bjs["swift_js_throw"] = function(id) {
+                            tmpRetException = swift.memory.retainByRef(id);
                         }
                         bjs["swift_js_retain"] = function(id) {
                             return swift.memory.retainByRef(id);
@@ -188,6 +192,11 @@ struct BridgeJSLink {
         var bodyLines: [String] = []
         var cleanupLines: [String] = []
         var parameterForwardings: [String] = []
+        let effects: Effects
+
+        init(effects: Effects) {
+            self.effects = effects
+        }
 
         func lowerParameter(param: Parameter) {
             switch param.type {
@@ -245,7 +254,24 @@ struct BridgeJSLink {
         }
 
         func callConstructor(abiName: String) -> String {
-            return "instance.exports.\(abiName)(\(parameterForwardings.joined(separator: ", ")))"
+            let call = "instance.exports.\(abiName)(\(parameterForwardings.joined(separator: ", ")))"
+            bodyLines.append("const ret = \(call);")
+            return "ret"
+        }
+
+        func checkExceptionLines() -> [String] {
+            guard effects.isThrows else {
+                return []
+            }
+            return [
+                "if (tmpRetException) {",
+                // TODO: Implement "take" operation
+                "    const error = swift.memory.getObject(tmpRetException);",
+                "    swift.memory.release(tmpRetException);",
+                "    tmpRetException = undefined;",
+                "    throw error;",
+                "}",
+            ]
         }
 
         func renderFunction(
@@ -261,6 +287,7 @@ struct BridgeJSLink {
             )
             funcLines.append(contentsOf: bodyLines.map { $0.indent(count: 4) })
             funcLines.append(contentsOf: cleanupLines.map { $0.indent(count: 4) })
+            funcLines.append(contentsOf: checkExceptionLines().map { $0.indent(count: 4) })
             if let returnExpr = returnExpr {
                 funcLines.append("return \(returnExpr);".indent(count: 4))
             }
@@ -274,7 +301,7 @@ struct BridgeJSLink {
     }
 
     func renderExportedFunction(function: ExportedFunction) -> (js: [String], dts: [String]) {
-        let thunkBuilder = ExportedThunkBuilder()
+        let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
         for param in function.parameters {
             thunkBuilder.lowerParameter(param: param)
         }
@@ -304,16 +331,17 @@ struct BridgeJSLink {
         jsLines.append("class \(klass.name) extends SwiftHeapObject {")
 
         if let constructor: ExportedConstructor = klass.constructor {
-            let thunkBuilder = ExportedThunkBuilder()
+            let thunkBuilder = ExportedThunkBuilder(effects: constructor.effects)
             for param in constructor.parameters {
                 thunkBuilder.lowerParameter(param: param)
             }
-            let returnExpr = thunkBuilder.callConstructor(abiName: constructor.abiName)
             var funcLines: [String] = []
             funcLines.append("constructor(\(constructor.parameters.map { $0.name }.joined(separator: ", "))) {")
+            let returnExpr = thunkBuilder.callConstructor(abiName: constructor.abiName)
             funcLines.append(contentsOf: thunkBuilder.bodyLines.map { $0.indent(count: 4) })
-            funcLines.append("super(\(returnExpr), instance.exports.bjs_\(klass.name)_deinit);".indent(count: 4))
             funcLines.append(contentsOf: thunkBuilder.cleanupLines.map { $0.indent(count: 4) })
+            funcLines.append(contentsOf: thunkBuilder.checkExceptionLines().map { $0.indent(count: 4) })
+            funcLines.append("super(\(returnExpr), instance.exports.bjs_\(klass.name)_deinit);".indent(count: 4))
             funcLines.append("}")
             jsLines.append(contentsOf: funcLines.map { $0.indent(count: 4) })
 
@@ -324,7 +352,7 @@ struct BridgeJSLink {
         }
 
         for method in klass.methods {
-            let thunkBuilder = ExportedThunkBuilder()
+            let thunkBuilder = ExportedThunkBuilder(effects: method.effects)
             thunkBuilder.lowerSelf()
             for param in method.parameters {
                 thunkBuilder.lowerParameter(param: param)

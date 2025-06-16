@@ -16,6 +16,11 @@ struct Parameter: Codable {
     let type: BridgeType
 }
 
+struct Effects: Codable {
+    var isAsync: Bool
+    var isThrows: Bool
+}
+
 // MARK: - Exported Skeleton
 
 struct ExportedFunction: Codable {
@@ -23,6 +28,7 @@ struct ExportedFunction: Codable {
     var abiName: String
     var parameters: [Parameter]
     var returnType: BridgeType
+    var effects: Effects
 }
 
 struct ExportedClass: Codable {
@@ -34,6 +40,7 @@ struct ExportedClass: Codable {
 struct ExportedConstructor: Codable {
     var abiName: String
     var parameters: [Parameter]
+    var effects: Effects
 }
 
 struct ExportedSkeleton: Codable {

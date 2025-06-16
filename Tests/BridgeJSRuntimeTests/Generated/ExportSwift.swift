@@ -13,6 +13,8 @@ private func _init_memory(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>?
 
 @_extern(wasm, module: "bjs", name: "swift_js_retain")
 private func _swift_js_retain(_ ptr: Int32) -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_throw")
+private func _swift_js_throw(_ id: Int32)
 
 @_expose(wasm, "bjs_roundTripVoid")
 @_cdecl("bjs_roundTripVoid")
@@ -73,6 +75,26 @@ public func _bjs_roundTripSwiftHeapObject(v: UnsafeMutableRawPointer) -> UnsafeM
 public func _bjs_roundTripJSObject(v: Int32) -> Int32 {
     let ret = roundTripJSObject(v: JSObject(id: UInt32(bitPattern: v)))
     return _swift_js_retain(Int32(bitPattern: ret.id))
+}
+
+@_expose(wasm, "bjs_throwsSwiftError")
+@_cdecl("bjs_throwsSwiftError")
+public func _bjs_throwsSwiftError() -> Void {
+    do {
+        try throwsSwiftError()
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: String(describing: error))
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return
+    }
 }
 
 @_expose(wasm, "bjs_takeGreeter")

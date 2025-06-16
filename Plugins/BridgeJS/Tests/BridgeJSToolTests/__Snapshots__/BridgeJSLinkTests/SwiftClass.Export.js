@@ -12,6 +12,7 @@ export async function createInstantiator(options, swift) {
 
     let tmpRetString;
     let tmpRetBytes;
+    let tmpRetException;
     return {
         /** @param {WebAssembly.Imports} importObject */
         addImports: (importObject) => {
@@ -34,6 +35,9 @@ export async function createInstantiator(options, swift) {
                 const target = new Uint8Array(memory.buffer, ptr, len);
                 target.set(tmpRetBytes);
                 tmpRetBytes = undefined;
+            }
+            bjs["swift_js_throw"] = function(id) {
+                tmpRetException = swift.memory.retainByRef(id);
             }
             bjs["swift_js_retain"] = function(id) {
                 return swift.memory.retainByRef(id);
@@ -71,8 +75,9 @@ export async function createInstantiator(options, swift) {
                 constructor(name) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
-                    super(instance.exports.bjs_Greeter_init(nameId, nameBytes.length), instance.exports.bjs_Greeter_deinit);
+                    const ret = instance.exports.bjs_Greeter_init(nameId, nameBytes.length);
                     swift.memory.release(nameId);
+                    super(ret, instance.exports.bjs_Greeter_deinit);
                 }
                 greet() {
                     instance.exports.bjs_Greeter_greet(this.pointer);

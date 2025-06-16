@@ -3,6 +3,10 @@
     {
       "constructor" : {
         "abiName" : "bjs_Greeter_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
         "parameters" : [
           {
             "label" : "name",
@@ -18,6 +22,10 @@
       "methods" : [
         {
           "abiName" : "bjs_Greeter_greet",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
           "name" : "greet",
           "parameters" : [
 
@@ -30,6 +38,10 @@
         },
         {
           "abiName" : "bjs_Greeter_changeName",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
           "name" : "changeName",
           "parameters" : [
             {
@@ -55,6 +67,10 @@
   "functions" : [
     {
       "abiName" : "bjs_roundTripVoid",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "roundTripVoid",
       "parameters" : [
 
@@ -67,6 +83,10 @@
     },
     {
       "abiName" : "bjs_roundTripInt",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "roundTripInt",
       "parameters" : [
         {
@@ -87,6 +107,10 @@
     },
     {
       "abiName" : "bjs_roundTripFloat",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "roundTripFloat",
       "parameters" : [
         {
@@ -107,6 +131,10 @@
     },
     {
       "abiName" : "bjs_roundTripDouble",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "roundTripDouble",
       "parameters" : [
         {
@@ -127,6 +155,10 @@
     },
     {
       "abiName" : "bjs_roundTripBool",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "roundTripBool",
       "parameters" : [
         {
@@ -147,6 +179,10 @@
     },
     {
       "abiName" : "bjs_roundTripString",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "roundTripString",
       "parameters" : [
         {
@@ -167,6 +203,10 @@
     },
     {
       "abiName" : "bjs_roundTripSwiftHeapObject",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "roundTripSwiftHeapObject",
       "parameters" : [
         {
@@ -187,6 +227,10 @@
     },
     {
       "abiName" : "bjs_roundTripJSObject",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "roundTripJSObject",
       "parameters" : [
         {
@@ -206,7 +250,27 @@
       }
     },
     {
+      "abiName" : "bjs_throwsSwiftError",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : true
+      },
+      "name" : "throwsSwiftError",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
       "abiName" : "bjs_takeGreeter",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "takeGreeter",
       "parameters" : [
         {

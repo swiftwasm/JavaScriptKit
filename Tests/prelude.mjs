@@ -105,6 +105,13 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 
     const anyObject = {};
     assert.equal(exports.roundTripJSObject(anyObject), anyObject);
+
+    try {
+        exports.throwsSwiftError();
+        assert.fail("Expected error");
+    } catch (error) {
+        assert.equal(error.message, "TestError");
+    }
 }
 
 function setupTestGlobals(global) {

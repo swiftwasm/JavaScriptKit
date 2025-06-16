@@ -5,6 +5,10 @@
   "functions" : [
     {
       "abiName" : "bjs_checkInt",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "checkInt",
       "parameters" : [
 
@@ -17,6 +21,10 @@
     },
     {
       "abiName" : "bjs_checkFloat",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "checkFloat",
       "parameters" : [
 
@@ -29,6 +37,10 @@
     },
     {
       "abiName" : "bjs_checkDouble",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "checkDouble",
       "parameters" : [
 
@@ -41,6 +53,10 @@
     },
     {
       "abiName" : "bjs_checkBool",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "checkBool",
       "parameters" : [
 
