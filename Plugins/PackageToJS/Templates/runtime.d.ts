@@ -1,25 +1,15 @@
 type ref = number;
 type pointer = number;
 
-declare class Memory {
-    readonly rawMemory: WebAssembly.Memory;
-    private readonly heap;
-    constructor(exports: WebAssembly.Exports);
-    retain: (value: any) => number;
-    getObject: (ref: number) => any;
-    release: (ref: number) => void;
-    retainByRef: (ref: number) => number;
-    bytes: () => Uint8Array<ArrayBuffer>;
-    dataView: () => DataView<ArrayBuffer>;
-    writeBytes: (ptr: pointer, bytes: Uint8Array) => void;
-    readUint32: (ptr: pointer) => number;
-    readUint64: (ptr: pointer) => bigint;
-    readInt64: (ptr: pointer) => bigint;
-    readFloat64: (ptr: pointer) => number;
-    writeUint32: (ptr: pointer, value: number) => void;
-    writeUint64: (ptr: pointer, value: bigint) => void;
-    writeInt64: (ptr: pointer, value: bigint) => void;
-    writeFloat64: (ptr: pointer, value: number) => void;
+declare class JSObjectSpace {
+    private _heapValueById;
+    private _heapEntryByValue;
+    private _heapNextKey;
+    constructor();
+    retain(value: any): number;
+    retainByRef(ref: ref): number;
+    release(ref: ref): void;
+    getObject(ref: ref): any;
 }
 
 /**
@@ -96,7 +86,7 @@ type SwiftRuntimeThreadChannel = {
 };
 declare class ITCInterface {
     private memory;
-    constructor(memory: Memory);
+    constructor(memory: JSObjectSpace);
     send(sendingObject: ref, transferringObjects: ref[], sendingContext: pointer): {
         object: any;
         sendingContext: pointer;
@@ -182,7 +172,7 @@ type SwiftRuntimeOptions = {
 };
 declare class SwiftRuntime {
     private _instance;
-    private _memory;
+    private readonly memory;
     private _closureDeallocator;
     private options;
     private version;
@@ -190,6 +180,9 @@ declare class SwiftRuntime {
     private textEncoder;
     /** The thread ID of the current thread. */
     private tid;
+    private getDataView;
+    private getUint8Array;
+    private wasmMemory;
     UnsafeEventLoopYield: typeof UnsafeEventLoopYield;
     constructor(options?: SwiftRuntimeOptions);
     setInstance(instance: WebAssembly.Instance): void;
@@ -202,7 +195,6 @@ declare class SwiftRuntime {
     startThread(tid: number, startArg: number): void;
     private get instance();
     private get exports();
-    private get memory();
     private get closureDeallocator();
     private callHostFunction;
     /** @deprecated Use `wasmImports` instead */

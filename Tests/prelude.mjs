@@ -110,7 +110,7 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
         exports.throwsSwiftError();
         assert.fail("Expected error");
     } catch (error) {
-        assert.equal(error.message, "TestError");
+        assert.equal(error.message, "TestError", error);
     }
 }
 
