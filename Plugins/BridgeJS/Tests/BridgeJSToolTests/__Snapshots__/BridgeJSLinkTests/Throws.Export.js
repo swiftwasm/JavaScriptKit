@@ -56,8 +56,14 @@ export async function createInstantiator(options, swift) {
             const js = swift.memory.heap;
 
             return {
-                check: function bjs_check() {
-                    instance.exports.bjs_check();
+                throwsSomething: function bjs_throwsSomething() {
+                    instance.exports.bjs_throwsSomething();
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
                 },
             };
         },

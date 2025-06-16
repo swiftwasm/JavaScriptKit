@@ -4,12 +4,12 @@
   ],
   "functions" : [
     {
-      "abiName" : "bjs_check",
+      "abiName" : "bjs_throwsSomething",
       "effects" : {
         "isAsync" : false,
-        "isThrows" : false
+        "isThrows" : true
       },
-      "name" : "check",
+      "name" : "throwsSomething",
       "parameters" : [
 
       ],

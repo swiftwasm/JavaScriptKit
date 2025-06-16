@@ -3,6 +3,10 @@
     {
       "constructor" : {
         "abiName" : "bjs_Greeter_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
         "parameters" : [
           {
             "label" : "name",
@@ -18,6 +22,10 @@
       "methods" : [
         {
           "abiName" : "bjs_Greeter_greet",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
           "name" : "greet",
           "parameters" : [
 
@@ -30,6 +38,10 @@
         },
         {
           "abiName" : "bjs_Greeter_changeName",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
           "name" : "changeName",
           "parameters" : [
             {
@@ -55,6 +67,10 @@
   "functions" : [
     {
       "abiName" : "bjs_takeGreeter",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "takeGreeter",
       "parameters" : [
         {

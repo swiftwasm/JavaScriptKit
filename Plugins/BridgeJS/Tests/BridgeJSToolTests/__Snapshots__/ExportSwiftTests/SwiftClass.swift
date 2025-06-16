@@ -13,6 +13,8 @@ private func _init_memory(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>?
 
 @_extern(wasm, module: "bjs", name: "swift_js_retain")
 private func _swift_js_retain(_ ptr: Int32) -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_throw")
+private func _swift_js_throw(_ id: Int32)
 
 @_expose(wasm, "bjs_takeGreeter")
 @_cdecl("bjs_takeGreeter")

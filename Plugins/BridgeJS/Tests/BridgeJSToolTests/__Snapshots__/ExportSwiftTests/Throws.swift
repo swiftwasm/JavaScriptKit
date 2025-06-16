@@ -16,8 +16,22 @@ private func _swift_js_retain(_ ptr: Int32) -> Int32
 @_extern(wasm, module: "bjs", name: "swift_js_throw")
 private func _swift_js_throw(_ id: Int32)
 
-@_expose(wasm, "bjs_check")
-@_cdecl("bjs_check")
-public func _bjs_check() -> Void {
-    check()
+@_expose(wasm, "bjs_throwsSomething")
+@_cdecl("bjs_throwsSomething")
+public func _bjs_throwsSomething() -> Void {
+    do {
+        try throwsSomething()
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: String(describing: error))
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return
+    }
 }

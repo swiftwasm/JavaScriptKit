@@ -155,12 +155,41 @@ class ExportSwift {
                 abiName = "bjs_\(className)_\(name)"
             }
 
+            guard let effects = collectEffects(signature: node.signature) else {
+                return nil
+            }
+
             return ExportedFunction(
                 name: name,
                 abiName: abiName,
                 parameters: parameters,
-                returnType: returnType
+                returnType: returnType,
+                effects: effects
             )
+        }
+
+        private func collectEffects(signature: FunctionSignatureSyntax) -> Effects? {
+            let isAsync = signature.effectSpecifiers?.asyncSpecifier != nil
+            var isThrows = false
+            if let throwsClause: ThrowsClauseSyntax = signature.effectSpecifiers?.throwsClause {
+                // Limit the thrown type to JSException for now
+                guard let thrownType = throwsClause.type else {
+                    diagnose(
+                        node: throwsClause,
+                        message: "Thrown type is not specified, only JSException is supported for now"
+                    )
+                    return nil
+                }
+                guard thrownType.trimmedDescription == "JSException" else {
+                    diagnose(
+                        node: throwsClause,
+                        message: "Only JSException is supported for thrown type, got \(thrownType.trimmedDescription)"
+                    )
+                    return nil
+                }
+                isThrows = true
+            }
+            return Effects(isAsync: isAsync, isThrows: isThrows)
         }
 
         override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
@@ -180,9 +209,14 @@ class ExportSwift {
                 parameters.append(Parameter(label: label, name: name, type: type))
             }
 
+            guard let effects = collectEffects(signature: node.signature) else {
+                return .skipChildren
+            }
+
             let constructor = ExportedConstructor(
                 abiName: "bjs_\(name)_init",
-                parameters: parameters
+                parameters: parameters,
+                effects: effects
             )
             exportedClasses[name]?.constructor = constructor
             return .skipChildren
@@ -245,6 +279,8 @@ class ExportSwift {
 
         @_extern(wasm, module: "bjs", name: "swift_js_retain")
         private func _swift_js_retain(_ ptr: Int32) -> Int32
+        @_extern(wasm, module: "bjs", name: "swift_js_throw")
+        private func _swift_js_throw(_ id: Int32)
         """
 
     func renderSwiftGlue() -> String? {
@@ -268,6 +304,11 @@ class ExportSwift {
         var abiParameterForwardings: [LabeledExprSyntax] = []
         var abiParameterSignatures: [(name: String, type: WasmCoreType)] = []
         var abiReturnType: WasmCoreType?
+        let effects: Effects
+
+        init(effects: Effects) {
+            self.effects = effects
+        }
 
         func liftParameter(param: Parameter) {
             switch param.type {
@@ -350,35 +391,40 @@ class ExportSwift {
             }
         }
 
-        func call(name: String, returnType: BridgeType) {
-            let retMutability = returnType == .string ? "var" : "let"
-            let callExpr: ExprSyntax =
-                "\(raw: name)(\(raw: abiParameterForwardings.map { $0.description }.joined(separator: ", ")))"
-            if returnType == .void {
-                body.append("\(raw: callExpr)")
-            } else {
-                body.append(
-                    """
-                    \(raw: retMutability) ret = \(raw: callExpr)
-                    """
+        private func renderCallStatement(callee: ExprSyntax, returnType: BridgeType) -> StmtSyntax {
+            var callExpr: ExprSyntax =
+                "\(raw: callee)(\(raw: abiParameterForwardings.map { $0.description }.joined(separator: ", ")))"
+            if effects.isAsync {
+                callExpr = ExprSyntax(AwaitExprSyntax(awaitKeyword: .keyword(.await), expression: callExpr))
+            }
+            if effects.isThrows {
+                callExpr = ExprSyntax(
+                    TryExprSyntax(
+                        tryKeyword: .keyword(.try).with(\.trailingTrivia, .space),
+                        expression: callExpr
+                    )
                 )
             }
+            let retMutability = returnType == .string ? "var" : "let"
+            if returnType == .void {
+                return StmtSyntax("\(raw: callExpr)")
+            } else {
+                return StmtSyntax("\(raw: retMutability) ret = \(raw: callExpr)")
+            }
+        }
+
+        func call(name: String, returnType: BridgeType) {
+            let stmt = renderCallStatement(callee: "\(raw: name)", returnType: returnType)
+            body.append(CodeBlockItemSyntax(item: .stmt(stmt)))
         }
 
         func callMethod(klassName: String, methodName: String, returnType: BridgeType) {
             let _selfParam = self.abiParameterForwardings.removeFirst()
-            let retMutability = returnType == .string ? "var" : "let"
-            let callExpr: ExprSyntax =
-                "\(raw: _selfParam).\(raw: methodName)(\(raw: abiParameterForwardings.map { $0.description }.joined(separator: ", ")))"
-            if returnType == .void {
-                body.append("\(raw: callExpr)")
-            } else {
-                body.append(
-                    """
-                    \(raw: retMutability) ret = \(raw: callExpr)
-                    """
-                )
-            }
+            let stmt = renderCallStatement(
+                callee: "\(raw: _selfParam).\(raw: methodName)",
+                returnType: returnType
+            )
+            body.append(CodeBlockItemSyntax(item: .stmt(stmt)))
         }
 
         func lowerReturnValue(returnType: BridgeType) {
@@ -440,19 +486,54 @@ class ExportSwift {
         }
 
         func render(abiName: String) -> DeclSyntax {
+            let body: CodeBlockItemListSyntax
+            if effects.isThrows {
+                body = """
+                    do {
+                        \(CodeBlockItemListSyntax(self.body))
+                    } catch let error {
+                        if let error = error.thrownValue.object {
+                            withExtendedLifetime(error) {
+                                _swift_js_throw(Int32(bitPattern: $0.id))
+                            }
+                        } else {
+                            let jsError = JSError(message: String(describing: error))
+                            withExtendedLifetime(jsError.jsObject) {
+                                _swift_js_throw(Int32(bitPattern: $0.id))
+                            }
+                        }
+                        \(raw: returnPlaceholderStmt())
+                    }
+                    """
+            } else {
+                body = CodeBlockItemListSyntax(self.body)
+            }
             return """
                 @_expose(wasm, "\(raw: abiName)")
                 @_cdecl("\(raw: abiName)")
                 public func _\(raw: abiName)(\(raw: parameterSignature())) -> \(raw: returnSignature()) {
-                \(CodeBlockItemListSyntax(body))
+                \(body)
                 }
                 """
         }
 
+        private func returnPlaceholderStmt() -> String {
+            switch abiReturnType {
+            case .i32: return "return 0"
+            case .i64: return "return 0"
+            case .f32: return "return 0.0"
+            case .f64: return "return 0.0"
+            case .pointer: return "return UnsafeMutableRawPointer(bitPattern: -1)"
+            case .none: return "return"
+            }
+        }
+
         func parameterSignature() -> String {
-            abiParameterSignatures.map { "\($0.name): \($0.type.swiftType)" }.joined(
-                separator: ", "
-            )
+            var nameAndType: [(name: String, abiType: String)] = []
+            for (name, type) in abiParameterSignatures {
+                nameAndType.append((name, type.swiftType))
+            }
+            return nameAndType.map { "\($0.name): \($0.abiType)" }.joined(separator: ", ")
         }
 
         func returnSignature() -> String {
@@ -461,7 +542,7 @@ class ExportSwift {
     }
 
     func renderSingleExportedFunction(function: ExportedFunction) -> DeclSyntax {
-        let builder = ExportedThunkBuilder()
+        let builder = ExportedThunkBuilder(effects: function.effects)
         for param in function.parameters {
             builder.liftParameter(param: param)
         }
@@ -520,7 +601,7 @@ class ExportSwift {
     func renderSingleExportedClass(klass: ExportedClass) -> [DeclSyntax] {
         var decls: [DeclSyntax] = []
         if let constructor = klass.constructor {
-            let builder = ExportedThunkBuilder()
+            let builder = ExportedThunkBuilder(effects: constructor.effects)
             for param in constructor.parameters {
                 builder.liftParameter(param: param)
             }
@@ -529,7 +610,7 @@ class ExportSwift {
             decls.append(builder.render(abiName: constructor.abiName))
         }
         for method in klass.methods {
-            let builder = ExportedThunkBuilder()
+            let builder = ExportedThunkBuilder(effects: method.effects)
             builder.liftParameter(
                 param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(klass.name))
             )

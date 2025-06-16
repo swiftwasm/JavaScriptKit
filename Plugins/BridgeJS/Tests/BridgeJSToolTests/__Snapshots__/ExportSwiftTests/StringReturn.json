@@ -5,6 +5,10 @@
   "functions" : [
     {
       "abiName" : "bjs_checkString",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
       "name" : "checkString",
       "parameters" : [
 
