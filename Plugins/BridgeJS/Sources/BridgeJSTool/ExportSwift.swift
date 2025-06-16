@@ -523,7 +523,7 @@ class ExportSwift {
             case .i64: return "return 0"
             case .f32: return "return 0.0"
             case .f64: return "return 0.0"
-            case .pointer: return "return UnsafeMutableRawPointer(bitPattern: -1)"
+            case .pointer: return "return UnsafeMutableRawPointer(bitPattern: -1).unsafelyUnwrapped"
             case .none: return "return"
             }
         }

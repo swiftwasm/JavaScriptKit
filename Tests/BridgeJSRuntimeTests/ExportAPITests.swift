@@ -36,9 +36,18 @@ struct TestError: Error {
     let message: String
 }
 
-@JS func throwsSwiftError() throws(JSException) -> Void {
-    throw JSException(JSError(message: "TestError").jsValue)
+@JS func throwsSwiftError(shouldThrow: Bool) throws(JSException) -> Void {
+    if shouldThrow {
+        throw JSException(JSError(message: "TestError").jsValue)
+    }
 }
+@JS func throwsWithIntResult() throws(JSException) -> Int { return 1 }
+@JS func throwsWithStringResult() throws(JSException) -> String { return "Ok" }
+@JS func throwsWithBoolResult() throws(JSException) -> Bool { return true }
+@JS func throwsWithFloatResult() throws(JSException) -> Float { return 1.0 }
+@JS func throwsWithDoubleResult() throws(JSException) -> Double { return 1.0 }
+@JS func throwsWithSwiftHeapObjectResult() throws(JSException) -> Greeter { return Greeter(name: "Test") }
+@JS func throwsWithJSObjectResult() throws(JSException) -> JSObject { return JSObject() }
 
 @JS class Greeter {
     var name: String
