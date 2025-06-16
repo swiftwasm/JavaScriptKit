@@ -4,8 +4,12 @@
   ],
   "functions" : [
     {
-      "abiName" : "bjs_main",
-      "name" : "main",
+      "abiName" : "bjs_run",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "run",
       "parameters" : [
 
       ],
