@@ -257,10 +257,130 @@
       },
       "name" : "throwsSwiftError",
       "parameters" : [
+        {
+          "label" : "shouldThrow",
+          "name" : "shouldThrow",
+          "type" : {
+            "bool" : {
 
+            }
+          }
+        }
       ],
       "returnType" : {
         "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_throwsWithIntResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : true
+      },
+      "name" : "throwsWithIntResult",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "int" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_throwsWithStringResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : true
+      },
+      "name" : "throwsWithStringResult",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_throwsWithBoolResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : true
+      },
+      "name" : "throwsWithBoolResult",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "bool" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_throwsWithFloatResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : true
+      },
+      "name" : "throwsWithFloatResult",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "float" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_throwsWithDoubleResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : true
+      },
+      "name" : "throwsWithDoubleResult",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "double" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_throwsWithSwiftHeapObjectResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : true
+      },
+      "name" : "throwsWithSwiftHeapObjectResult",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "swiftHeapObject" : {
+          "_0" : "Greeter"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_throwsWithJSObjectResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : true
+      },
+      "name" : "throwsWithJSObjectResult",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "jsObject" : {
 
         }
       }

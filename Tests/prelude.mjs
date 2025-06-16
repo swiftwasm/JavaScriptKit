@@ -107,10 +107,16 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.roundTripJSObject(anyObject), anyObject);
 
     try {
-        exports.throwsSwiftError();
+        exports.throwsSwiftError(true);
         assert.fail("Expected error");
     } catch (error) {
         assert.equal(error.message, "TestError", error);
+    }
+
+    try {
+        exports.throwsSwiftError(false);
+    } catch (error) {
+        assert.fail("Expected no error");
     }
 }
 

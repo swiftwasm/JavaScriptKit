@@ -79,9 +79,9 @@ public func _bjs_roundTripJSObject(v: Int32) -> Int32 {
 
 @_expose(wasm, "bjs_throwsSwiftError")
 @_cdecl("bjs_throwsSwiftError")
-public func _bjs_throwsSwiftError() -> Void {
+public func _bjs_throwsSwiftError(shouldThrow: Int32) -> Void {
     do {
-        try throwsSwiftError()
+        try throwsSwiftError(shouldThrow: shouldThrow == 1)
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {
@@ -94,6 +94,155 @@ public func _bjs_throwsSwiftError() -> Void {
             }
         }
         return
+    }
+}
+
+@_expose(wasm, "bjs_throwsWithIntResult")
+@_cdecl("bjs_throwsWithIntResult")
+public func _bjs_throwsWithIntResult() -> Int32 {
+    do {
+        let ret = try throwsWithIntResult()
+        return Int32(ret)
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: String(describing: error))
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return 0
+    }
+}
+
+@_expose(wasm, "bjs_throwsWithStringResult")
+@_cdecl("bjs_throwsWithStringResult")
+public func _bjs_throwsWithStringResult() -> Void {
+    do {
+        var ret = try throwsWithStringResult()
+        return ret.withUTF8 { ptr in
+                _return_string(ptr.baseAddress, Int32(ptr.count))
+            }
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: String(describing: error))
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return
+    }
+}
+
+@_expose(wasm, "bjs_throwsWithBoolResult")
+@_cdecl("bjs_throwsWithBoolResult")
+public func _bjs_throwsWithBoolResult() -> Int32 {
+    do {
+        let ret = try throwsWithBoolResult()
+        return Int32(ret ? 1 : 0)
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: String(describing: error))
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return 0
+    }
+}
+
+@_expose(wasm, "bjs_throwsWithFloatResult")
+@_cdecl("bjs_throwsWithFloatResult")
+public func _bjs_throwsWithFloatResult() -> Float32 {
+    do {
+        let ret = try throwsWithFloatResult()
+        return Float32(ret)
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: String(describing: error))
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return 0.0
+    }
+}
+
+@_expose(wasm, "bjs_throwsWithDoubleResult")
+@_cdecl("bjs_throwsWithDoubleResult")
+public func _bjs_throwsWithDoubleResult() -> Float64 {
+    do {
+        let ret = try throwsWithDoubleResult()
+        return Float64(ret)
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: String(describing: error))
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return 0.0
+    }
+}
+
+@_expose(wasm, "bjs_throwsWithSwiftHeapObjectResult")
+@_cdecl("bjs_throwsWithSwiftHeapObjectResult")
+public func _bjs_throwsWithSwiftHeapObjectResult() -> UnsafeMutableRawPointer {
+    do {
+        let ret = try throwsWithSwiftHeapObjectResult()
+        return Unmanaged.passRetained(ret).toOpaque()
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: String(describing: error))
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return UnsafeMutableRawPointer(bitPattern: -1).unsafelyUnwrapped
+    }
+}
+
+@_expose(wasm, "bjs_throwsWithJSObjectResult")
+@_cdecl("bjs_throwsWithJSObjectResult")
+public func _bjs_throwsWithJSObjectResult() -> Int32 {
+    do {
+        let ret = try throwsWithJSObjectResult()
+        return _swift_js_retain(Int32(bitPattern: ret.id))
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: String(describing: error))
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return 0
     }
 }
 
