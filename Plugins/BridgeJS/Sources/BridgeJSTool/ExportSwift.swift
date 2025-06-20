@@ -272,6 +272,7 @@ class ExportSwift {
 
         @_spi(JSObject_id) import JavaScriptKit
 
+        #if arch(wasm32)
         @_extern(wasm, module: "bjs", name: "return_string")
         private func _return_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
         @_extern(wasm, module: "bjs", name: "init_memory")
@@ -281,6 +282,7 @@ class ExportSwift {
         private func _swift_js_retain(_ ptr: Int32) -> Int32
         @_extern(wasm, module: "bjs", name: "swift_js_throw")
         private func _swift_js_throw(_ id: Int32)
+        #endif
         """
 
     func renderSwiftGlue() -> String? {
@@ -512,7 +514,11 @@ class ExportSwift {
                 @_expose(wasm, "\(raw: abiName)")
                 @_cdecl("\(raw: abiName)")
                 public func _\(raw: abiName)(\(raw: parameterSignature())) -> \(raw: returnSignature()) {
+                    #if arch(wasm32)
                 \(body)
+                    #else
+                    fatalError("Only available on WebAssembly")
+                    #endif
                 }
                 """
         }

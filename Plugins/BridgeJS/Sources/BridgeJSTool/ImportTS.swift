@@ -241,29 +241,42 @@ struct ImportTS {
         }
 
         func renderImportDecl() -> DeclSyntax {
-            return DeclSyntax(
-                FunctionDeclSyntax(
-                    attributes: AttributeListSyntax(itemsBuilder: {
-                        "@_extern(wasm, module: \"\(raw: moduleName)\", name: \"\(raw: abiName)\")"
-                    }).with(\.trailingTrivia, .newline),
-                    name: .identifier(abiName),
-                    signature: FunctionSignatureSyntax(
-                        parameterClause: FunctionParameterClauseSyntax(parametersBuilder: {
-                            for param in abiParameterSignatures {
-                                FunctionParameterSyntax(
-                                    firstName: .wildcardToken(),
-                                    secondName: .identifier(param.name),
-                                    type: IdentifierTypeSyntax(name: .identifier(param.type.swiftType))
-                                )
-                            }
-                        }),
-                        returnClause: ReturnClauseSyntax(
-                            arrow: .arrowToken(),
-                            type: IdentifierTypeSyntax(name: .identifier(abiReturnType.map { $0.swiftType } ?? "Void"))
-                        )
+            let baseDecl = FunctionDeclSyntax(
+                funcKeyword: .keyword(.func).with(\.trailingTrivia, .space),
+                name: .identifier(abiName),
+                signature: FunctionSignatureSyntax(
+                    parameterClause: FunctionParameterClauseSyntax(parametersBuilder: {
+                        for param in abiParameterSignatures {
+                            FunctionParameterSyntax(
+                                firstName: .wildcardToken().with(\.trailingTrivia, .space),
+                                secondName: .identifier(param.name),
+                                type: IdentifierTypeSyntax(name: .identifier(param.type.swiftType))
+                            )
+                        }
+                    }),
+                    returnClause: ReturnClauseSyntax(
+                        arrow: .arrowToken(),
+                        type: IdentifierTypeSyntax(name: .identifier(abiReturnType.map { $0.swiftType } ?? "Void"))
                     )
                 )
             )
+            var externDecl = baseDecl
+            externDecl.attributes = AttributeListSyntax(itemsBuilder: {
+                "@_extern(wasm, module: \"\(raw: moduleName)\", name: \"\(raw: abiName)\")"
+            }).with(\.trailingTrivia, .newline)
+            var stubDecl = baseDecl
+            stubDecl.body = CodeBlockSyntax {
+                """
+                fatalError("Only available on WebAssembly")
+                """
+            }
+            return """
+                #if arch(wasm32)
+                \(externDecl)
+                #else
+                \(stubDecl)
+                #endif
+                """
         }
 
         func renderThunkDecl(name: String, parameters: [Parameter], returnType: BridgeType) -> DeclSyntax {
@@ -328,11 +341,23 @@ struct ImportTS {
 
         @_spi(JSObject_id) import JavaScriptKit
 
+        #if arch(wasm32)
         @_extern(wasm, module: "bjs", name: "make_jsstring")
-        private func _make_jsstring(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32
+        func _make_jsstring(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32
+        #else
+        func _make_jsstring(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
 
+        #if arch(wasm32)
         @_extern(wasm, module: "bjs", name: "init_memory_with_result")
-        private func _init_memory_with_result(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
+        func _init_memory_with_result(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
+        #else
+        func _init_memory_with_result(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
         """
 
     func renderSwiftThunk(
