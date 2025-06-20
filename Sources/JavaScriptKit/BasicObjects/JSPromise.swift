@@ -23,6 +23,10 @@ public final class JSPromise: JSBridgedClass {
         self.init(from: jsObject)
     }
 
+    @_spi(JSObject_id) public convenience init(takingThis: Int32) {
+        self.init(unsafelyWrapping: JSObject(id: UInt32(bitPattern: takingThis)))
+    }
+
     /// Creates a new `JSPromise` instance from a given JavaScript `Promise` object. If `value`
     /// is not an object and is not an instance of JavaScript `Promise`, this function will
     /// return `nil`.
@@ -64,6 +68,33 @@ public final class JSPromise: JSBridgedClass {
             return .undefined
         }
         self.init(unsafelyWrapping: Self.constructor!.new(closure))
+    }
+
+    public static func async(body: @escaping () async throws(JSException) -> Void) -> JSPromise {
+        self.async { () throws(JSException) -> JSValue in
+            try await body()
+            return .undefined
+        }
+    }
+    public static func async(body: @escaping () async throws(JSException) -> JSValue) -> JSPromise {
+        JSPromise { resolver in
+            // NOTE: The context is fully transferred to the unstructured task
+            // isolation but the compiler can't prove it yet, so we need to
+            // use `@unchecked Sendable` to make it compile with the Swift 6 mode.
+            struct Context: @unchecked Sendable {
+                let resolver: (JSPromise.Result) -> Void
+                let body: () async throws(JSException) -> JSValue
+            }
+            let context = Context(resolver: resolver, body: body)
+            Task {
+                do throws(JSException) {
+                    let result = try await context.body()
+                    context.resolver(.success(result))
+                } catch {
+                    context.resolver(.failure(error.thrownValue))
+                }
+            }
+        }
     }
 
     #if !hasFeature(Embedded)

@@ -66,6 +66,17 @@
 
             }
           }
+        },
+        {
+          "name" : "runAsyncWorks",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "jsObject" : {
+              "_0" : "JSPromise"
+            }
+          }
         }
       ],
       "types" : [

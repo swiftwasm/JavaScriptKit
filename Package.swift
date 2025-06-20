@@ -140,7 +140,7 @@ let package = Package(
         ),
         .testTarget(
             name: "BridgeJSRuntimeTests",
-            dependencies: ["JavaScriptKit"],
+            dependencies: ["JavaScriptKit", "JavaScriptEventLoop"],
             exclude: ["Generated/JavaScript"],
             swiftSettings: [
                 .enableExperimentalFeature("Extern")

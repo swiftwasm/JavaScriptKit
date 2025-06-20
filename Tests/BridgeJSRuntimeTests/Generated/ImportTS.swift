@@ -82,6 +82,19 @@ func jsRoundTripString(_ v: String) -> String {
     }
 }
 
+func runAsyncWorks() -> JSPromise {
+    #if arch(wasm32)
+    @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_runAsyncWorks")
+    func bjs_runAsyncWorks() -> Int32
+    #else
+    func bjs_runAsyncWorks() -> Int32 {
+        fatalError("Only available on WebAssembly")
+    }
+    #endif
+    let ret = bjs_runAsyncWorks()
+    return JSPromise(takingThis: ret)
+}
+
 struct JsGreeter {
     let this: JSObject
 

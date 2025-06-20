@@ -160,24 +160,16 @@ private func makeAsyncClosure(
     _ body: sending @escaping (sending [JSValue]) async throws(JSException) -> JSValue
 ) -> ((sending [JSValue]) -> JSValue) {
     { arguments in
-        JSPromise { resolver in
-            // NOTE: The context is fully transferred to the unstructured task
-            // isolation but the compiler can't prove it yet, so we need to
-            // use `@unchecked Sendable` to make it compile with the Swift 6 mode.
-            struct Context: @unchecked Sendable {
-                let resolver: (JSPromise.Result) -> Void
-                let arguments: [JSValue]
-                let body: (sending [JSValue]) async throws(JSException) -> JSValue
-            }
-            let context = Context(resolver: resolver, arguments: arguments, body: body)
-            Task {
-                do throws(JSException) {
-                    let result = try await context.body(context.arguments)
-                    context.resolver(.success(result))
-                } catch {
-                    context.resolver(.failure(error.thrownValue))
-                }
-            }
+        // NOTE: The context is fully transferred to the unstructured task
+        // isolation but the compiler can't prove it yet, so we need to
+        // use `@unchecked Sendable` to make it compile with the Swift 6 mode.
+        struct Context: @unchecked Sendable {
+            let arguments: [JSValue]
+            let body: (sending [JSValue]) async throws(JSException) -> JSValue
+        }
+        let context = Context(arguments: arguments, body: body)
+        return JSPromise.async { () async throws(JSException) -> JSValue in
+            try await context.body(context.arguments)
         }.jsValue()
     }
 }

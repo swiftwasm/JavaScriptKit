@@ -397,7 +397,9 @@ class ExportSwift {
             var callExpr: ExprSyntax =
                 "\(raw: callee)(\(raw: abiParameterForwardings.map { $0.description }.joined(separator: ", ")))"
             if effects.isAsync {
-                callExpr = ExprSyntax(AwaitExprSyntax(awaitKeyword: .keyword(.await), expression: callExpr))
+                callExpr = ExprSyntax(
+                    AwaitExprSyntax(awaitKeyword: .keyword(.await).with(\.trailingTrivia, .space), expression: callExpr)
+                )
             }
             if effects.isThrows {
                 callExpr = ExprSyntax(
@@ -407,6 +409,12 @@ class ExportSwift {
                     )
                 )
             }
+
+
+            if effects.isAsync, returnType != .void {
+                return StmtSyntax("return \(raw: callExpr).jsValue")
+            }
+
             let retMutability = returnType == .string ? "var" : "let"
             if returnType == .void {
                 return StmtSyntax("\(raw: callExpr)")
@@ -430,6 +438,15 @@ class ExportSwift {
         }
 
         func lowerReturnValue(returnType: BridgeType) {
+            if effects.isAsync {
+                // Async functions always return a Promise, which is a JSObject
+                _lowerReturnValue(returnType: .jsObject(nil))
+            } else {
+                _lowerReturnValue(returnType: returnType)
+            }
+        }
+
+        private func _lowerReturnValue(returnType: BridgeType) {
             switch returnType {
             case .void:
                 abiReturnType = nil
@@ -448,6 +465,12 @@ class ExportSwift {
             case .swiftHeapObject:
                 // UnsafeMutableRawPointer is returned as an i32 pointer
                 abiReturnType = .pointer
+            }
+
+            if effects.isAsync {
+                // The return value of async function (T of `(...) async -> T`) is
+                // handled by the JSPromise.async, so we don't need to do anything here.
+                return
             }
 
             switch returnType {
@@ -489,7 +512,14 @@ class ExportSwift {
 
         func render(abiName: String) -> DeclSyntax {
             let body: CodeBlockItemListSyntax
-            if effects.isThrows {
+            if effects.isAsync {
+                body = """
+                    let ret = JSPromise.async {
+                        \(CodeBlockItemListSyntax(self.body))
+                    }.jsObject
+                    return _swift_js_retain(Int32(bitPattern: ret.id))
+                """
+            } else if effects.isThrows {
                 body = """
                     do {
                         \(CodeBlockItemListSyntax(self.body))

@@ -1,5 +1,6 @@
 import XCTest
 import JavaScriptKit
+import JavaScriptEventLoop
 
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "runJsWorks")
 @_extern(c)
@@ -49,6 +50,15 @@ struct TestError: Error {
 @JS func throwsWithSwiftHeapObjectResult() throws(JSException) -> Greeter { return Greeter(name: "Test") }
 @JS func throwsWithJSObjectResult() throws(JSException) -> JSObject { return JSObject() }
 
+@JS func asyncRoundTripVoid() async -> Void { return }
+@JS func asyncRoundTripInt(v: Int) async -> Int { return v }
+@JS func asyncRoundTripFloat(v: Float) async -> Float { return v }
+@JS func asyncRoundTripDouble(v: Double) async -> Double { return v }
+@JS func asyncRoundTripBool(v: Bool) async -> Bool { return v }
+@JS func asyncRoundTripString(v: String) async -> String { return v }
+@JS func asyncRoundTripSwiftHeapObject(v: Greeter) async -> Greeter { return v }
+@JS func asyncRoundTripJSObject(v: JSObject) async -> JSObject { return v }
+
 @JS class Greeter {
     var name: String
 
@@ -82,5 +92,9 @@ class ExportAPITests: XCTestCase {
         }
         runJsWorks()
         XCTAssertTrue(hasDeinitGreeter)
+    }
+
+    func testAllAsync() async throws {
+        _ = try await runAsyncWorks().value()
     }
 }

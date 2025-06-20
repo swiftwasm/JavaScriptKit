@@ -113,10 +113,13 @@ struct BridgeJSLink {
                 let tmpRetBytes;
                 let tmpRetException;
                 return {
-                    /** @param {WebAssembly.Imports} importObject */
-                    addImports: (importObject) => {
+                    /**
+                     * @param {WebAssembly.Imports} importObject
+                     */
+                    addImports: (importObject, importsContext) => {
                         const bjs = {};
                         importObject["bjs"] = bjs;
+                        const imports = options.getImports(importsContext);
                         bjs["return_string"] = function(ptr, len) {
                             const bytes = new Uint8Array(memory.buffer, ptr, len);
                             tmpRetString = textDecoder.decode(bytes);
@@ -223,6 +226,14 @@ struct BridgeJSLink {
         }
 
         func call(abiName: String, returnType: BridgeType) -> String? {
+            if effects.isAsync {
+                return _call(abiName: abiName, returnType: .jsObject(nil))
+            } else {
+                return _call(abiName: abiName, returnType: returnType)
+            }
+        }
+
+        private func _call(abiName: String, returnType: BridgeType) -> String? {
             let call = "instance.exports.\(abiName)(\(parameterForwardings.joined(separator: ", ")))"
             var returnExpr: String?
 
@@ -296,8 +307,14 @@ struct BridgeJSLink {
         }
     }
 
-    private func renderTSSignature(parameters: [Parameter], returnType: BridgeType) -> String {
-        return "(\(parameters.map { "\($0.name): \($0.type.tsType)" }.joined(separator: ", "))): \(returnType.tsType)"
+    private func renderTSSignature(parameters: [Parameter], returnType: BridgeType, effects: Effects) -> String {
+        let returnTypeWithEffect: String
+        if effects.isAsync {
+            returnTypeWithEffect = "Promise<\(returnType.tsType)>"
+        } else {
+            returnTypeWithEffect = returnType.tsType
+        }
+        return "(\(parameters.map { "\($0.name): \($0.type.tsType)" }.joined(separator: ", "))): \(returnTypeWithEffect)"
     }
 
     func renderExportedFunction(function: ExportedFunction) -> (js: [String], dts: [String]) {
@@ -315,7 +332,7 @@ struct BridgeJSLink {
         )
         var dtsLines: [String] = []
         dtsLines.append(
-            "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType));"
+            "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
         )
 
         return (funcLines, dtsLines)
@@ -346,7 +363,7 @@ struct BridgeJSLink {
             jsLines.append(contentsOf: funcLines.map { $0.indent(count: 4) })
 
             dtsExportEntryLines.append(
-                "new\(renderTSSignature(parameters: constructor.parameters, returnType: .swiftHeapObject(klass.name)));"
+                "new\(renderTSSignature(parameters: constructor.parameters, returnType: .swiftHeapObject(klass.name), effects: constructor.effects));"
                     .indent(count: 4)
             )
         }
@@ -368,7 +385,7 @@ struct BridgeJSLink {
                 ).map { $0.indent(count: 4) }
             )
             dtsTypeLines.append(
-                "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType));"
+                "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                     .indent(count: 4)
             )
         }
@@ -422,7 +439,7 @@ struct BridgeJSLink {
         }
 
         func call(name: String, returnType: BridgeType) {
-            let call = "options.imports.\(name)(\(parameterForwardings.joined(separator: ", ")))"
+            let call = "imports.\(name)(\(parameterForwardings.joined(separator: ", ")))"
             if returnType == .void {
                 bodyLines.append("\(call);")
             } else {
@@ -431,7 +448,7 @@ struct BridgeJSLink {
         }
 
         func callConstructor(name: String) {
-            let call = "new options.imports.\(name)(\(parameterForwardings.joined(separator: ", ")))"
+            let call = "new imports.\(name)(\(parameterForwardings.joined(separator: ", ")))"
             bodyLines.append("let ret = \(call);")
         }
 
@@ -508,9 +525,10 @@ struct BridgeJSLink {
             name: function.abiName(context: nil),
             returnExpr: returnExpr
         )
+        let effects = Effects(isAsync: false, isThrows: false)
         importObjectBuilder.appendDts(
             [
-                "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType));"
+                "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: effects));"
             ]
         )
         importObjectBuilder.assignToImportObject(name: function.abiName(context: nil), function: funcLines)
@@ -584,7 +602,8 @@ struct BridgeJSLink {
         importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
         importObjectBuilder.appendDts([
             "\(type.name): {",
-            "new\(renderTSSignature(parameters: constructor.parameters, returnType: returnType));".indent(count: 4),
+            "new\(renderTSSignature(parameters: constructor.parameters, returnType: returnType, effects: Effects(isAsync: false, isThrows: false)));"
+                .indent(count: 4),
             "}",
         ])
     }
