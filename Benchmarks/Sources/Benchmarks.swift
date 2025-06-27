@@ -1,4 +1,6 @@
 import JavaScriptKit
+import JavaScriptFoundationCompat
+import Foundation
 
 class Benchmark {
     init(_ title: String) {
@@ -72,6 +74,24 @@ class Benchmark {
         propertyAccess.testSuite("Read String") {
             for _ in 0..<1_000_000 {
                 _ = object.jsString.string
+            }
+        }
+    }
+
+    do {
+        let conversion = Benchmark("Conversion")
+        let data = Data(repeating: 0, count: 10_000)
+        conversion.testSuite("Data to JSTypedArray") {
+            for _ in 0..<1_000_000 {
+                _ = data.jsTypedArray
+            }
+        }
+
+        let uint8Array = data.jsTypedArray
+
+        conversion.testSuite("JSTypedArray to Data") {
+            for _ in 0..<1_000_000 {
+                _ = Data.construct(from: uint8Array)
             }
         }
     }

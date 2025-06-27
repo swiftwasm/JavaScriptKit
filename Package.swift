@@ -21,6 +21,7 @@ let package = Package(
         .library(name: "JavaScriptKit", targets: ["JavaScriptKit"]),
         .library(name: "JavaScriptEventLoop", targets: ["JavaScriptEventLoop"]),
         .library(name: "JavaScriptBigIntSupport", targets: ["JavaScriptBigIntSupport"]),
+        .library(name: "JavaScriptFoundationCompat", targets: ["JavaScriptFoundationCompat"]),
         .library(name: "JavaScriptEventLoopTestSupport", targets: ["JavaScriptEventLoopTestSupport"]),
         .plugin(name: "PackageToJS", targets: ["PackageToJS"]),
         .plugin(name: "BridgeJS", targets: ["BridgeJS"]),
@@ -104,6 +105,18 @@ let package = Package(
             dependencies: [
                 "JavaScriptKit",
                 "JavaScriptEventLoopTestSupport",
+            ]
+        ),
+        .target(
+            name: "JavaScriptFoundationCompat",
+            dependencies: [
+                "JavaScriptKit"
+            ]
+        ),
+        .testTarget(
+            name: "JavaScriptFoundationCompatTests",
+            dependencies: [
+                "JavaScriptFoundationCompat"
             ]
         ),
         .plugin(
