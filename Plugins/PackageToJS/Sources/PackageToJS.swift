@@ -583,7 +583,8 @@ struct PackagingPlanner {
                             let decoder = JSONDecoder()
                             let data = try Data(contentsOf: URL(fileURLWithPath: scope.resolve(path: $0).path))
                             return try decoder.decode(ImportedModuleSkeleton.self, from: data)
-                        }
+                        },
+                        sharedMemory: Self.isSharedMemoryEnabled(triple: triple)
                     )
                     let (outputJs, outputDts) = try link.link()
                     try system.writeFile(atPath: scope.resolve(path: bridgeJs).path, content: Data(outputJs.utf8))
@@ -699,7 +700,7 @@ struct PackagingPlanner {
 
         let inputPath = selfPackageDir.appending(path: file)
         let conditions: [String: Bool] = [
-            "USE_SHARED_MEMORY": triple == "wasm32-unknown-wasip1-threads",
+            "USE_SHARED_MEMORY": Self.isSharedMemoryEnabled(triple: triple),
             "IS_WASI": triple.hasPrefix("wasm32-unknown-wasi"),
             "USE_WASI_CDN": options.useCDN,
             "HAS_BRIDGE": exportedSkeletons.count > 0 || importedSkeletons.count > 0,
@@ -741,6 +742,10 @@ struct PackagingPlanner {
             content = try preprocess(source: content, file: inputPath.path, options: options)
             try system.writeFile(atPath: $1.resolve(path: $0.output).path, content: Data(content.utf8))
         }
+    }
+
+    private static func isSharedMemoryEnabled(triple: String) -> Bool {
+        return triple == "wasm32-unknown-wasip1-threads"
     }
 }
 

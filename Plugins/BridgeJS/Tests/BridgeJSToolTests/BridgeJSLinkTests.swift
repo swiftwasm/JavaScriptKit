@@ -55,7 +55,7 @@ import Testing
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let outputSkeletonData = try encoder.encode(outputSkeleton)
-        var bridgeJSLink = BridgeJSLink()
+        var bridgeJSLink = BridgeJSLink(sharedMemory: false)
         try bridgeJSLink.addExportedSkeletonFile(data: outputSkeletonData)
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Export")
     }
@@ -73,7 +73,7 @@ import Testing
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let outputSkeletonData = try encoder.encode(importTS.skeleton)
 
-        var bridgeJSLink = BridgeJSLink()
+        var bridgeJSLink = BridgeJSLink(sharedMemory: false)
         try bridgeJSLink.addImportedSkeletonFile(data: outputSkeletonData)
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Import")
     }
