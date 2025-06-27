@@ -4,6 +4,17 @@ struct BridgeJSLink {
     /// The exported skeletons
     var exportedSkeletons: [ExportedSkeleton] = []
     var importedSkeletons: [ImportedModuleSkeleton] = []
+    let sharedMemory: Bool
+
+    init(
+        exportedSkeletons: [ExportedSkeleton] = [],
+        importedSkeletons: [ImportedModuleSkeleton] = [],
+        sharedMemory: Bool
+    ) {
+        self.exportedSkeletons = exportedSkeletons
+        self.importedSkeletons = importedSkeletons
+        self.sharedMemory = sharedMemory
+    }
 
     mutating func addExportedSkeletonFile(data: Data) throws {
         let skeleton = try JSONDecoder().decode(ExportedSkeleton.self, from: data)
@@ -118,7 +129,7 @@ struct BridgeJSLink {
                         const bjs = {};
                         importObject["bjs"] = bjs;
                         bjs["return_string"] = function(ptr, len) {
-                            const bytes = new Uint8Array(memory.buffer, ptr, len);
+                            const bytes = new Uint8Array(memory.buffer, ptr, len)\(sharedMemory ? ".slice()" : "");
                             tmpRetString = textDecoder.decode(bytes);
                         }
                         bjs["init_memory"] = function(sourceId, bytesPtr) {
@@ -127,7 +138,7 @@ struct BridgeJSLink {
                             bytes.set(source);
                         }
                         bjs["make_jsstring"] = function(ptr, len) {
-                            const bytes = new Uint8Array(memory.buffer, ptr, len);
+                            const bytes = new Uint8Array(memory.buffer, ptr, len)\(sharedMemory ? ".slice()" : "");
                             return swift.memory.retain(textDecoder.decode(bytes));
                         }
                         bjs["init_memory_with_result"] = function(ptr, len) {
