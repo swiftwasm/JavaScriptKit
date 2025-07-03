@@ -308,7 +308,12 @@ class SwiftRuntime {
             // Cache the DataView as it's not a cheap operation
             let cachedDataView = new DataView(wasmMemory.buffer);
             let cachedUint8Array = new Uint8Array(wasmMemory.buffer);
-            if (typeof SharedArrayBuffer !== "undefined" && wasmMemory.buffer instanceof SharedArrayBuffer) {
+            // Check the constructor name of the buffer to determine if it's backed by a SharedArrayBuffer.
+            // We can't reference SharedArrayBuffer directly here because:
+            // 1. It may not be available in the global scope if the context is not cross-origin isolated.
+            // 2. The underlying buffer may be still backed by SAB even if the context is not cross-origin
+            //    isolated (e.g. localhost on Chrome on Android).
+            if (Object.getPrototypeOf(wasmMemory.buffer).constructor.name === "SharedArrayBuffer") {
                 // When the wasm memory is backed by a SharedArrayBuffer, growing the memory
                 // doesn't invalidate the data view by setting the byte length to 0. Instead,
                 // the data view points to an old buffer after growing the memory. So we have
