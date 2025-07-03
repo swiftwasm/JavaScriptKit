@@ -796,8 +796,9 @@ class SwiftRuntime {
                     throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to request transferring objects.");
                 }
                 const broker = getMessageBroker(this.options.threadChannel);
-                const sendingObjects = decodeObjectRefs(sending_objects, sending_objects_count, this.getDataView());
-                const transferringObjects = decodeObjectRefs(transferring_objects, transferring_objects_count, this.getDataView());
+                const dataView = this.getDataView();
+                const sendingObjects = decodeObjectRefs(sending_objects, sending_objects_count, dataView);
+                const transferringObjects = decodeObjectRefs(transferring_objects, transferring_objects_count, dataView);
                 broker.request({
                     type: "request",
                     data: {
