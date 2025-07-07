@@ -628,9 +628,10 @@ func _swjs_wake_worker_thread() {
     WebWorkerTaskExecutor.Worker.currentThread!.wakeUpFromOtherThread()
 }
 
-private func trace(_ message: String) {
+@inline(__always)
+private func trace(_ message: @autoclosure () -> String) {
     #if JAVASCRIPTKIT_TRACE
-    _ = JSObject.global.console.warn("[trace tid=\(swjs_get_worker_thread_id())] \(message)\n")
+    _ = JSObject.global.console.warn("[trace tid=\(swjs_get_worker_thread_id())] \(message())\n")
     #endif
 }
 
