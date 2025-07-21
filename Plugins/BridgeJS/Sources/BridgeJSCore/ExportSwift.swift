@@ -1,7 +1,6 @@
 import SwiftBasicFormat
 import SwiftSyntax
 import SwiftSyntaxBuilder
-import class Foundation.FileManager
 
 /// Exports Swift functions and classes to JavaScript
 ///
@@ -34,7 +33,7 @@ class ExportSwift {
 
         let errors = try parseSingleFile(sourceFile)
         if errors.count > 0 {
-            throw BridgeJSToolError(
+            throw BridgeJSCoreError(
                 errors.map { $0.formattedDescription(fileName: inputFilePath) }
                     .joined(separator: "\n")
             )

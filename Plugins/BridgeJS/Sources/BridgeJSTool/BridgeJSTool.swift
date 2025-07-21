@@ -1,12 +1,19 @@
 @preconcurrency import func Foundation.exit
 @preconcurrency import func Foundation.fputs
+@preconcurrency import func Foundation.kill
 @preconcurrency import var Foundation.stderr
+@preconcurrency import var Foundation.SIGINT
+@preconcurrency import var Foundation.SIGTERM
 @preconcurrency import struct Foundation.URL
 @preconcurrency import struct Foundation.Data
 @preconcurrency import class Foundation.JSONEncoder
 @preconcurrency import class Foundation.FileManager
 @preconcurrency import class Foundation.JSONDecoder
 @preconcurrency import class Foundation.ProcessInfo
+@preconcurrency import class Foundation.Process
+@preconcurrency import class Foundation.Pipe
+import protocol Dispatch.DispatchSourceSignal
+import class Dispatch.DispatchSource
 import SwiftParser
 
 /// BridgeJS Tool
@@ -247,6 +254,74 @@ internal func which(_ executable: String) throws -> URL {
     throw BridgeJSToolError("Executable \(executable) not found in PATH")
 }
 
+extension ImportTS {
+    /// Processes a TypeScript definition file and extracts its API information
+    mutating func addSourceFile(_ sourceFile: String, tsconfigPath: String) throws {
+        let nodePath = try which("node")
+        let ts2skeletonPath = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("JavaScript")
+            .appendingPathComponent("bin")
+            .appendingPathComponent("ts2skeleton.js")
+        let arguments = [ts2skeletonPath.path, sourceFile, "--project", tsconfigPath]
+
+        progress.print("Running ts2skeleton...")
+        progress.print("  \(([nodePath.path] + arguments).joined(separator: " "))")
+
+        let process = Process()
+        let stdoutPipe = Pipe()
+        nonisolated(unsafe) var stdoutData = Data()
+
+        process.executableURL = nodePath
+        process.arguments = arguments
+        process.standardOutput = stdoutPipe
+
+        stdoutPipe.fileHandleForReading.readabilityHandler = { handle in
+            let data = handle.availableData
+            if data.count > 0 {
+                stdoutData.append(data)
+            }
+        }
+        try process.forwardTerminationSignals {
+            try process.run()
+            process.waitUntilExit()
+        }
+
+        if process.terminationStatus != 0 {
+            throw BridgeJSCoreError("ts2skeleton returned \(process.terminationStatus)")
+        }
+        let skeleton = try JSONDecoder().decode(ImportedFileSkeleton.self, from: stdoutData)
+        self.addSkeleton(skeleton)
+    }
+}
+
+extension Foundation.Process {
+    // Monitor termination/interrruption signals to forward them to child process
+    func setSignalForwarding(_ signalNo: Int32) -> DispatchSourceSignal {
+        let signalSource = DispatchSource.makeSignalSource(signal: signalNo)
+        signalSource.setEventHandler { [self] in
+            signalSource.cancel()
+            kill(processIdentifier, signalNo)
+        }
+        signalSource.resume()
+        return signalSource
+    }
+
+    func forwardTerminationSignals(_ body: () throws -> Void) rethrows {
+        let sources = [
+            setSignalForwarding(SIGINT),
+            setSignalForwarding(SIGTERM),
+        ]
+        defer {
+            for source in sources {
+                source.cancel()
+            }
+        }
+        try body()
+    }
+}
+
 struct BridgeJSToolError: Swift.Error, CustomStringConvertible {
     let description: String
 
@@ -257,26 +332,6 @@ struct BridgeJSToolError: Swift.Error, CustomStringConvertible {
 
 private func printStderr(_ message: String) {
     fputs(message + "\n", stderr)
-}
-
-struct ProgressReporting {
-    let print: (String) -> Void
-
-    init(verbose: Bool) {
-        self.init(print: verbose ? { Swift.print($0) } : { _ in })
-    }
-
-    private init(print: @escaping (String) -> Void) {
-        self.print = print
-    }
-
-    static var silent: ProgressReporting {
-        return ProgressReporting(print: { _ in })
-    }
-
-    func print(_ message: String) {
-        self.print(message)
-    }
 }
 
 // MARK: - Minimal Argument Parsing

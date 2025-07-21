@@ -1,7 +1,6 @@
 import SwiftBasicFormat
 import SwiftSyntax
 import SwiftSyntaxBuilder
-import Foundation
 
 /// Imports TypeScript declarations and generates Swift bridge code
 ///
@@ -26,46 +25,6 @@ struct ImportTS {
     /// Adds a skeleton to the importer's state
     mutating func addSkeleton(_ skeleton: ImportedFileSkeleton) {
         self.skeleton.children.append(skeleton)
-    }
-
-    /// Processes a TypeScript definition file and extracts its API information
-    mutating func addSourceFile(_ sourceFile: String, tsconfigPath: String) throws {
-        let nodePath = try which("node")
-        let ts2skeletonPath = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("JavaScript")
-            .appendingPathComponent("bin")
-            .appendingPathComponent("ts2skeleton.js")
-        let arguments = [ts2skeletonPath.path, sourceFile, "--project", tsconfigPath]
-
-        progress.print("Running ts2skeleton...")
-        progress.print("  \(([nodePath.path] + arguments).joined(separator: " "))")
-
-        let process = Process()
-        let stdoutPipe = Pipe()
-        nonisolated(unsafe) var stdoutData = Data()
-
-        process.executableURL = nodePath
-        process.arguments = arguments
-        process.standardOutput = stdoutPipe
-
-        stdoutPipe.fileHandleForReading.readabilityHandler = { handle in
-            let data = handle.availableData
-            if data.count > 0 {
-                stdoutData.append(data)
-            }
-        }
-        try process.forwardTerminationSignals {
-            try process.run()
-            process.waitUntilExit()
-        }
-
-        if process.terminationStatus != 0 {
-            throw BridgeJSToolError("ts2skeleton returned \(process.terminationStatus)")
-        }
-        let skeleton = try JSONDecoder().decode(ImportedFileSkeleton.self, from: stdoutData)
-        self.addSkeleton(skeleton)
     }
 
     /// Finalizes the import process and generates Swift code
@@ -178,7 +137,7 @@ struct ImportTS {
                 )
                 abiParameterSignatures.append((param.name, .i32))
             case .swiftHeapObject(_):
-                throw BridgeJSToolError("swiftHeapObject is not supported in imported signatures")
+                throw BridgeJSCoreError("swiftHeapObject is not supported in imported signatures")
             case .void:
                 break
             }
@@ -226,7 +185,7 @@ struct ImportTS {
                     body.append("return JSObject(id: UInt32(bitPattern: ret))")
                 }
             case .swiftHeapObject(_):
-                throw BridgeJSToolError("swiftHeapObject is not supported in imported signatures")
+                throw BridgeJSCoreError("swiftHeapObject is not supported in imported signatures")
             case .void:
                 break
             }
@@ -527,31 +486,5 @@ struct ImportTS {
         }
         let lines = documentation.split { $0.isNewline }
         return Trivia(pieces: lines.flatMap { [TriviaPiece.docLineComment("/// \($0)"), .newlines(1)] })
-    }
-}
-
-extension Foundation.Process {
-    // Monitor termination/interrruption signals to forward them to child process
-    func setSignalForwarding(_ signalNo: Int32) -> DispatchSourceSignal {
-        let signalSource = DispatchSource.makeSignalSource(signal: signalNo)
-        signalSource.setEventHandler { [self] in
-            signalSource.cancel()
-            kill(processIdentifier, signalNo)
-        }
-        signalSource.resume()
-        return signalSource
-    }
-
-    func forwardTerminationSignals(_ body: () throws -> Void) rethrows {
-        let sources = [
-            setSignalForwarding(SIGINT),
-            setSignalForwarding(SIGTERM),
-        ]
-        defer {
-            for source in sources {
-                source.cancel()
-            }
-        }
-        try body()
     }
 }

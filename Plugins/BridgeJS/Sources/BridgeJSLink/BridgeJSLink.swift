@@ -1,4 +1,5 @@
-import Foundation
+import class Foundation.JSONDecoder
+import struct Foundation.Data
 
 struct BridgeJSLink {
     /// The exported skeletons
