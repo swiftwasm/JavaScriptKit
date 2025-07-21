@@ -54,7 +54,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         priority: TaskPriority? = nil,
         file: String = #fileID,
         line: UInt32 = #line,
-        _ body: sending @escaping (sending [JSValue]) async throws(JSException) -> JSValue
+        _ body: @escaping (sending [JSValue]) async throws(JSException) -> JSValue
     ) -> JSOneshotClosure {
         JSOneshotClosure(file: file, line: line, makeAsyncClosure(priority: priority, body))
     }
@@ -71,7 +71,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         priority: TaskPriority? = nil,
         file: String = #fileID,
         line: UInt32 = #line,
-        _ body: @Sendable @escaping (sending [JSValue]) async throws(JSException) -> JSValue
+        _ body: @escaping (sending [JSValue]) async throws(JSException) -> JSValue
     ) -> JSOneshotClosure {
         JSOneshotClosure(
             file: file,
@@ -176,7 +176,7 @@ public class JSClosure: JSFunction, JSClosureProtocol {
         priority: TaskPriority? = nil,
         file: String = #fileID,
         line: UInt32 = #line,
-        _ body: sending @escaping @isolated(any) (sending [JSValue]) async throws(JSException) -> JSValue
+        _ body: @escaping @isolated(any) (sending [JSValue]) async throws(JSException) -> JSValue
     ) -> JSClosure {
         JSClosure(file: file, line: line, makeAsyncClosure(priority: priority, body))
     }
@@ -193,7 +193,7 @@ public class JSClosure: JSFunction, JSClosureProtocol {
         priority: TaskPriority? = nil,
         file: String = #fileID,
         line: UInt32 = #line,
-        _ body: sending @escaping (sending [JSValue]) async throws(JSException) -> JSValue
+        _ body: @escaping (sending [JSValue]) async throws(JSException) -> JSValue
     ) -> JSClosure {
         JSClosure(file: file, line: line, makeAsyncClosure(executorPreference: taskExecutor, priority: priority, body))
     }
@@ -212,7 +212,7 @@ public class JSClosure: JSFunction, JSClosureProtocol {
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 private func makeAsyncClosure(
     priority: TaskPriority?,
-    _ body: sending @escaping @isolated(any) (sending [JSValue]) async throws(JSException) -> JSValue
+    _ body: @escaping @isolated(any) (sending [JSValue]) async throws(JSException) -> JSValue
 ) -> ((sending [JSValue]) -> JSValue) {
     { arguments in
         JSPromise { resolver in
@@ -241,7 +241,7 @@ private func makeAsyncClosure(
 private func makeAsyncClosure(
     executorPreference taskExecutor: (any TaskExecutor)?,
     priority: TaskPriority?,
-    _ body: sending @escaping (sending [JSValue]) async throws(JSException) -> JSValue
+    _ body: @escaping (sending [JSValue]) async throws(JSException) -> JSValue
 ) -> ((sending [JSValue]) -> JSValue) {
     { arguments in
         JSPromise { resolver in
