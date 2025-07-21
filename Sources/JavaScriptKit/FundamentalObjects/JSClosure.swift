@@ -52,7 +52,8 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(
         priority: TaskPriority? = nil,
-        file: String = #fileID, line: UInt32 = #line,
+        file: String = #fileID,
+        line: UInt32 = #line,
         _ body: sending @escaping (sending [JSValue]) async throws(JSException) -> JSValue
     ) -> JSOneshotClosure {
         JSOneshotClosure(file: file, line: line, makeAsyncClosure(priority: priority, body))
@@ -68,10 +69,15 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
     public static func async(
         executorPreference taskExecutor: (any TaskExecutor)? = nil,
         priority: TaskPriority? = nil,
-        file: String = #fileID, line: UInt32 = #line,
+        file: String = #fileID,
+        line: UInt32 = #line,
         _ body: @Sendable @escaping (sending [JSValue]) async throws(JSException) -> JSValue
     ) -> JSOneshotClosure {
-        JSOneshotClosure(file: file, line: line, makeAsyncClosure(executorPreference: taskExecutor, priority: priority, body))
+        JSOneshotClosure(
+            file: file,
+            line: line,
+            makeAsyncClosure(executorPreference: taskExecutor, priority: priority, body)
+        )
     }
     #endif
 
@@ -168,7 +174,8 @@ public class JSClosure: JSFunction, JSClosureProtocol {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(
         priority: TaskPriority? = nil,
-        file: String = #fileID, line: UInt32 = #line,
+        file: String = #fileID,
+        line: UInt32 = #line,
         _ body: sending @escaping @isolated(any) (sending [JSValue]) async throws(JSException) -> JSValue
     ) -> JSClosure {
         JSClosure(file: file, line: line, makeAsyncClosure(priority: priority, body))
@@ -184,7 +191,8 @@ public class JSClosure: JSFunction, JSClosureProtocol {
     public static func async(
         executorPreference taskExecutor: (any TaskExecutor)? = nil,
         priority: TaskPriority? = nil,
-        file: String = #fileID, line: UInt32 = #line,
+        file: String = #fileID,
+        line: UInt32 = #line,
         _ body: sending @escaping (sending [JSValue]) async throws(JSException) -> JSValue
     ) -> JSClosure {
         JSClosure(file: file, line: line, makeAsyncClosure(executorPreference: taskExecutor, priority: priority, body))
