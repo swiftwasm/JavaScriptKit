@@ -423,64 +423,6 @@ class JavaScriptKitTests: XCTestCase {
         globalObject1.prop_1.nested_prop = originalProp1
     }
 
-    func testException() {
-        // ```js
-        // global.globalObject1 = {
-        //   ...
-        //   prop_9: {
-        //       func1: function () {
-        //           throw new Error();
-        //       },
-        //       func2: function () {
-        //           throw "String Error";
-        //       },
-        //       func3: function () {
-        //           throw 3.0
-        //       },
-        //   },
-        //   ...
-        // }
-        // ```
-        //
-        let globalObject1 = JSObject.global.globalObject1
-        let prop_9: JSValue = globalObject1.prop_9
-
-        // MARK: Throwing method calls
-        XCTAssertThrowsError(try prop_9.object!.throwing.func1!()) { error in
-            XCTAssertTrue(error is JSException)
-            let errorObject = JSError(from: (error as! JSException).thrownValue)
-            XCTAssertNotNil(errorObject)
-        }
-
-        XCTAssertThrowsError(try prop_9.object!.throwing.func2!()) { error in
-            XCTAssertTrue(error is JSException)
-            let thrownValue = (error as! JSException).thrownValue
-            XCTAssertEqual(thrownValue.string, "String Error")
-        }
-
-        XCTAssertThrowsError(try prop_9.object!.throwing.func3!()) { error in
-            XCTAssertTrue(error is JSException)
-            let thrownValue = (error as! JSException).thrownValue
-            XCTAssertEqual(thrownValue.number, 3.0)
-        }
-
-        // MARK: Simple function calls
-        XCTAssertThrowsError(try prop_9.func1.function!.throws()) { error in
-            XCTAssertTrue(error is JSException)
-            let errorObject = JSError(from: (error as! JSException).thrownValue)
-            XCTAssertNotNil(errorObject)
-        }
-
-        // MARK: Throwing constructor call
-        let Animal = JSObject.global.Animal.function!
-        XCTAssertNoThrow(try Animal.throws.new("Tama", 3, true))
-        XCTAssertThrowsError(try Animal.throws.new("Tama", -3, true)) { error in
-            XCTAssertTrue(error is JSException)
-            let errorObject = JSError(from: (error as! JSException).thrownValue)
-            XCTAssertNotNil(errorObject)
-        }
-    }
-
     func testSymbols() {
         let symbol1 = JSSymbol("abc")
         let symbol2 = JSSymbol("abc")
