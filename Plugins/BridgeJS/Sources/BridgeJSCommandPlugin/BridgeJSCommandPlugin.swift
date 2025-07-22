@@ -106,9 +106,9 @@ extension BridgeJSCommandPlugin.Context {
             arguments: [
                 "export",
                 "--output-skeleton",
-                generatedJavaScriptDirectory.appending(path: "ExportSwift.json").path,
+                generatedJavaScriptDirectory.appending(path: "BridgeJS.ExportSwift.json").path,
                 "--output-swift",
-                generatedDirectory.appending(path: "ExportSwift.swift").path,
+                generatedDirectory.appending(path: "BridgeJS.ExportSwift.swift").path,
                 "--verbose",
                 options.verbose ? "true" : "false",
             ]
@@ -126,9 +126,9 @@ extension BridgeJSCommandPlugin.Context {
                 arguments: [
                     "import",
                     "--output-skeleton",
-                    generatedJavaScriptDirectory.appending(path: "ImportTS.json").path,
+                    generatedJavaScriptDirectory.appending(path: "BridgeJS.ImportTS.json").path,
                     "--output-swift",
-                    generatedDirectory.appending(path: "ImportTS.swift").path,
+                    generatedDirectory.appending(path: "BridgeJS.ImportTS.swift").path,
                     "--verbose",
                     options.verbose ? "true" : "false",
                     "--module-name",
