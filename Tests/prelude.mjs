@@ -159,17 +159,6 @@ function setupTestGlobals(global) {
         },
         prop_7: 3.14,
         prop_8: [0, , 2, 3, , , 6],
-        prop_9: {
-            func1: function () {
-                throw new Error();
-            },
-            func2: function () {
-                throw "String Error";
-            },
-            func3: function () {
-                throw 3.0;
-            },
-        },
         eval_closure: function (fn) {
             return fn(arguments[1]);
         },

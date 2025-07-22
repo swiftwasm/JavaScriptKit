@@ -46,4 +46,12 @@ public struct JSException: Error, Equatable, CustomStringConvertible {
             self.stack = nil
         }
     }
+
+    /// Initializes a new JavaScript `Error` instance with a message and prepare it to be thrown.
+    ///
+    /// - Parameters:
+    ///   - message: The message to throw.
+    public init(message: String) {
+        self.init(JSError(message: message).jsValue)
+    }
 }
