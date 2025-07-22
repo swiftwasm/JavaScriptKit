@@ -74,9 +74,13 @@ struct PackageToJSPlugin: CommandPlugin {
             (
                 // In case the SwiftPM target using BridgeJS didn't specify `.enableExperimentalFeature("Extern")`
                 { build, arguments in
-                    guard
-                        build.logText.contains("@_extern requires '-enable-experimental-feature Extern'")
-                    else {
+                    let possibleMessages: [String] = [
+                        "@_extern requires '-enable-experimental-feature Extern'",
+                        // Swift 6.2 and later quotes attributes in diagnostics
+                        // https://github.com/swiftlang/swift/pull/80593
+                        "'@_extern' requires '-enable-experimental-feature Extern'",
+                    ]
+                    guard possibleMessages.contains(where: build.logText.contains) else {
                         return nil
                     }
                     return """
