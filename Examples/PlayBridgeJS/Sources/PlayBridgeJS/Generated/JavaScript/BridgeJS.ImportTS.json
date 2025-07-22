@@ -1,0 +1,48 @@
+{
+  "children" : [
+    {
+      "functions" : [
+        {
+          "name" : "createTS2Skeleton",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "jsObject" : {
+              "_0" : "TS2Skeleton"
+            }
+          }
+        }
+      ],
+      "types" : [
+        {
+          "methods" : [
+            {
+              "name" : "convert",
+              "parameters" : [
+                {
+                  "name" : "ts",
+                  "type" : {
+                    "string" : {
+
+                    }
+                  }
+                }
+              ],
+              "returnType" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "TS2Skeleton",
+          "properties" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "moduleName" : "PlayBridgeJS"
+}

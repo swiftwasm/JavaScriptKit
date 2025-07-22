@@ -1,0 +1,124 @@
+{
+  "classes" : [
+    {
+      "methods" : [
+        {
+          "abiName" : "bjs_PlayBridgeJSOutput_outputJs",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "outputJs",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_PlayBridgeJSOutput_outputDts",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "outputDts",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_PlayBridgeJSOutput_importSwiftGlue",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "importSwiftGlue",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_PlayBridgeJSOutput_exportSwiftGlue",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "exportSwiftGlue",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "PlayBridgeJSOutput"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_PlayBridgeJS_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_PlayBridgeJS_update",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : true
+          },
+          "name" : "update",
+          "parameters" : [
+            {
+              "label" : "swiftSource",
+              "name" : "swiftSource",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "dtsSource",
+              "name" : "dtsSource",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "swiftHeapObject" : {
+              "_0" : "PlayBridgeJSOutput"
+            }
+          }
+        }
+      ],
+      "name" : "PlayBridgeJS"
+    }
+  ],
+  "functions" : [
+
+  ]
+}
