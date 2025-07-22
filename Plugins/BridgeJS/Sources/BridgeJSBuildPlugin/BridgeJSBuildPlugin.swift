@@ -24,8 +24,8 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
     }
 
     private func createExportSwiftCommand(context: PluginContext, target: SwiftSourceModuleTarget) throws -> Command {
-        let outputSwiftPath = context.pluginWorkDirectoryURL.appending(path: "ExportSwift.swift")
-        let outputSkeletonPath = context.pluginWorkDirectoryURL.appending(path: "ExportSwift.json")
+        let outputSwiftPath = context.pluginWorkDirectoryURL.appending(path: "BridgeJS.ExportSwift.swift")
+        let outputSkeletonPath = context.pluginWorkDirectoryURL.appending(path: "BridgeJS.ExportSwift.json")
         let inputSwiftFiles = target.sourceFiles.filter {
             !$0.url.path.hasPrefix(context.pluginWorkDirectoryURL.path + "/")
         }
@@ -58,8 +58,8 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
     }
 
     private func createImportTSCommand(context: PluginContext, target: SwiftSourceModuleTarget) throws -> Command? {
-        let outputSwiftPath = context.pluginWorkDirectoryURL.appending(path: "ImportTS.swift")
-        let outputSkeletonPath = context.pluginWorkDirectoryURL.appending(path: "ImportTS.json")
+        let outputSwiftPath = context.pluginWorkDirectoryURL.appending(path: "BridgeJS.ImportTS.swift")
+        let outputSkeletonPath = context.pluginWorkDirectoryURL.appending(path: "BridgeJS.ImportTS.json")
         let inputTSFile = target.directoryURL.appending(path: "bridge-js.d.ts")
         guard FileManager.default.fileExists(atPath: inputTSFile.path) else {
             return nil

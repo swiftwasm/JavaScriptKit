@@ -667,8 +667,8 @@ class SkeletonCollector {
 
     var exportedSkeletons: [URL] = []
     var importedSkeletons: [URL] = []
-    let exportedSkeletonFile = "ExportSwift.json"
-    let importedSkeletonFile = "ImportTS.json"
+    let exportedSkeletonFile = "BridgeJS.ExportSwift.json"
+    let importedSkeletonFile = "BridgeJS.ImportTS.json"
     let context: PluginContext
 
     init(context: PluginContext) {
@@ -709,7 +709,7 @@ class SkeletonCollector {
             let directories = [
                 target.directoryURL.appending(path: "Generated/JavaScript"),
                 // context.pluginWorkDirectoryURL: ".build/plugins/PackageToJS/outputs/"
-                // .build/plugins/outputs/exportswift/MyApp/destination/BridgeJS/ExportSwift.json
+                // .build/plugins/outputs/exportswift/MyApp/destination/BridgeJS/BridgeJS.ExportSwift.json
                 context.pluginWorkDirectoryURL.deletingLastPathComponent().deletingLastPathComponent()
                     .appending(path: "outputs/\(package.id)/\(target.name)/destination/BridgeJS"),
             ]
