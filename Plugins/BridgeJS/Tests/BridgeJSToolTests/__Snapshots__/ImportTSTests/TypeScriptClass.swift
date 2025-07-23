@@ -17,7 +17,7 @@ struct Greeter {
         self.this = JSObject(id: UInt32(bitPattern: this))
     }
 
-    init(_ name: String) {
+    init(_ name: String) throws(JSException) {
         #if arch(wasm32)
         @_extern(wasm, module: "Check", name: "bjs_Greeter_init")
         func bjs_Greeter_init(_ name: Int32) -> Int32
@@ -35,7 +35,7 @@ struct Greeter {
     }
 
     var name: String {
-        get {
+        get throws(JSException) {
             #if arch(wasm32)
             @_extern(wasm, module: "Check", name: "bjs_Greeter_name_get")
             func bjs_Greeter_name_get(_ self: Int32) -> Int32
@@ -50,25 +50,26 @@ struct Greeter {
                 return Int(ret)
             }
         }
-        nonmutating set {
-            #if arch(wasm32)
-            @_extern(wasm, module: "Check", name: "bjs_Greeter_name_set")
-            func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
-            #else
-            func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
-                fatalError("Only available on WebAssembly")
-            }
-            #endif
-            var newValue = newValue
-            let newValueId = newValue.withUTF8 { b in
-                _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-            }
-            bjs_Greeter_name_set(Int32(bitPattern: self.this.id), newValueId)
+    }
+
+    func setName(_ newValue: String) throws(JSException) -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "Check", name: "bjs_Greeter_name_set")
+        func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
+        #else
+        func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
+            fatalError("Only available on WebAssembly")
         }
+        #endif
+        var newValue = newValue
+        let newValueId = newValue.withUTF8 { b in
+            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+        }
+        bjs_Greeter_name_set(Int32(bitPattern: self.this.id), newValueId)
     }
 
     var age: Double {
-        get {
+        get throws(JSException) {
             #if arch(wasm32)
             @_extern(wasm, module: "Check", name: "bjs_Greeter_age_get")
             func bjs_Greeter_age_get(_ self: Int32) -> Float64

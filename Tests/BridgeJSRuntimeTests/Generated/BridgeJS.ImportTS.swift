@@ -75,7 +75,7 @@ struct JsGreeter {
         self.this = JSObject(id: UInt32(bitPattern: this))
     }
 
-    init(_ name: String, _ prefix: String) {
+    init(_ name: String, _ prefix: String) throws(JSException) {
         #if arch(wasm32)
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_init")
         func bjs_JsGreeter_init(_ name: Int32, _ prefix: Int32) -> Int32
@@ -97,7 +97,7 @@ struct JsGreeter {
     }
 
     var name: String {
-        get {
+        get throws(JSException) {
             #if arch(wasm32)
             @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_name_get")
             func bjs_JsGreeter_name_get(_ self: Int32) -> Int32
@@ -112,25 +112,26 @@ struct JsGreeter {
                 return Int(ret)
             }
         }
-        nonmutating set {
-            #if arch(wasm32)
-            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_name_set")
-            func bjs_JsGreeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
-            #else
-            func bjs_JsGreeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
-                fatalError("Only available on WebAssembly")
-            }
-            #endif
-            var newValue = newValue
-            let newValueId = newValue.withUTF8 { b in
-                _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-            }
-            bjs_JsGreeter_name_set(Int32(bitPattern: self.this.id), newValueId)
+    }
+
+    func setName(_ newValue: String) throws(JSException) -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_name_set")
+        func bjs_JsGreeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
+        #else
+        func bjs_JsGreeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
+            fatalError("Only available on WebAssembly")
         }
+        #endif
+        var newValue = newValue
+        let newValueId = newValue.withUTF8 { b in
+            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+        }
+        bjs_JsGreeter_name_set(Int32(bitPattern: self.this.id), newValueId)
     }
 
     var prefix: String {
-        get {
+        get throws(JSException) {
             #if arch(wasm32)
             @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_prefix_get")
             func bjs_JsGreeter_prefix_get(_ self: Int32) -> Int32

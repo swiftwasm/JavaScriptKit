@@ -2,11 +2,11 @@ import XCTest
 import JavaScriptKit
 
 class ImportAPITests: XCTestCase {
-    func testRoundTripVoid() {
-        jsRoundTripVoid()
+    func testRoundTripVoid() throws {
+        try jsRoundTripVoid()
     }
 
-    func testRoundTripNumber() {
+    func testRoundTripNumber() throws {
         for v in [
             0, 1, -1,
             Double(Int32.max), Double(Int32.min),
@@ -17,34 +17,34 @@ class ImportAPITests: XCTestCase {
             Double.infinity,
             Double.pi,
         ] {
-            XCTAssertEqual(jsRoundTripNumber(v), v)
+            try XCTAssertEqual(jsRoundTripNumber(v), v)
         }
 
-        XCTAssert(jsRoundTripNumber(Double.nan).isNaN)
+        try XCTAssert(jsRoundTripNumber(Double.nan).isNaN)
     }
 
-    func testRoundTripBool() {
+    func testRoundTripBool() throws {
         for v in [true, false] {
-            XCTAssertEqual(jsRoundTripBool(v), v)
+            try XCTAssertEqual(jsRoundTripBool(v), v)
         }
     }
 
-    func testRoundTripString() {
+    func testRoundTripString() throws {
         for v in ["", "Hello, world!", "🧑‍🧑‍🧒"] {
-            XCTAssertEqual(jsRoundTripString(v), v)
+            try XCTAssertEqual(jsRoundTripString(v), v)
         }
     }
 
-    func testClass() {
-        let greeter = JsGreeter("Alice", "Hello")
-        XCTAssertEqual(greeter.greet(), "Hello, Alice!")
-        greeter.changeName("Bob")
-        XCTAssertEqual(greeter.greet(), "Hello, Bob!")
+    func testClass() throws {
+        let greeter = try JsGreeter("Alice", "Hello")
+        XCTAssertEqual(try greeter.greet(), "Hello, Alice!")
+        try greeter.changeName("Bob")
+        XCTAssertEqual(try greeter.greet(), "Hello, Bob!")
 
-        greeter.name = "Charlie"
-        XCTAssertEqual(greeter.greet(), "Hello, Charlie!")
-        XCTAssertEqual(greeter.name, "Charlie")
+        try greeter.setName("Charlie")
+        XCTAssertEqual(try greeter.greet(), "Hello, Charlie!")
+        XCTAssertEqual(try greeter.name, "Charlie")
 
-        XCTAssertEqual(greeter.prefix, "Hello")
+        XCTAssertEqual(try greeter.prefix, "Hello")
     }
 }
