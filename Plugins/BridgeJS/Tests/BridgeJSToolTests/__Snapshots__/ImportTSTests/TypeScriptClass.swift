@@ -17,7 +17,7 @@ struct Greeter {
         self.this = JSObject(id: UInt32(bitPattern: this))
     }
 
-    init(_ name: String) {
+    init(_ name: String) throws(JSException) {
         #if arch(wasm32)
         @_extern(wasm, module: "Check", name: "bjs_Greeter_init")
         func bjs_Greeter_init(_ name: Int32) -> Int32
@@ -31,11 +31,14 @@ struct Greeter {
             _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         let ret = bjs_Greeter_init(nameId)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
         self.this = JSObject(id: UInt32(bitPattern: ret))
     }
 
     var name: String {
-        get {
+        get throws(JSException) {
             #if arch(wasm32)
             @_extern(wasm, module: "Check", name: "bjs_Greeter_name_get")
             func bjs_Greeter_name_get(_ self: Int32) -> Int32
@@ -45,30 +48,37 @@ struct Greeter {
             }
             #endif
             let ret = bjs_Greeter_name_get(Int32(bitPattern: self.this.id))
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return String(unsafeUninitializedCapacity: Int(ret)) { b in
                 _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
                 return Int(ret)
             }
         }
-        nonmutating set {
-            #if arch(wasm32)
-            @_extern(wasm, module: "Check", name: "bjs_Greeter_name_set")
-            func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
-            #else
-            func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
-                fatalError("Only available on WebAssembly")
-            }
-            #endif
-            var newValue = newValue
-            let newValueId = newValue.withUTF8 { b in
-                _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-            }
-            bjs_Greeter_name_set(Int32(bitPattern: self.this.id), newValueId)
+    }
+
+    func setName(_ newValue: String) throws(JSException) -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "Check", name: "bjs_Greeter_name_set")
+        func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
+        #else
+        func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
+        var newValue = newValue
+        let newValueId = newValue.withUTF8 { b in
+            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+        }
+        bjs_Greeter_name_set(Int32(bitPattern: self.this.id), newValueId)
+        if let error = _swift_js_take_exception() {
+            throw error
         }
     }
 
     var age: Double {
-        get {
+        get throws(JSException) {
             #if arch(wasm32)
             @_extern(wasm, module: "Check", name: "bjs_Greeter_age_get")
             func bjs_Greeter_age_get(_ self: Int32) -> Float64
@@ -78,11 +88,14 @@ struct Greeter {
             }
             #endif
             let ret = bjs_Greeter_age_get(Int32(bitPattern: self.this.id))
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return Double(ret)
         }
     }
 
-    func greet() -> String {
+    func greet() throws(JSException) -> String {
         #if arch(wasm32)
         @_extern(wasm, module: "Check", name: "bjs_Greeter_greet")
         func bjs_Greeter_greet(_ self: Int32) -> Int32
@@ -92,13 +105,16 @@ struct Greeter {
         }
         #endif
         let ret = bjs_Greeter_greet(Int32(bitPattern: self.this.id))
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
         return String(unsafeUninitializedCapacity: Int(ret)) { b in
             _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
             return Int(ret)
         }
     }
 
-    func changeName(_ name: String) -> Void {
+    func changeName(_ name: String) throws(JSException) -> Void {
         #if arch(wasm32)
         @_extern(wasm, module: "Check", name: "bjs_Greeter_changeName")
         func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) -> Void
@@ -112,6 +128,9 @@ struct Greeter {
             _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         bjs_Greeter_changeName(Int32(bitPattern: self.this.id), nameId)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
     }
 
 }

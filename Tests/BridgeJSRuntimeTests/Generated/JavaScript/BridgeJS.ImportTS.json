@@ -66,6 +66,78 @@
 
             }
           }
+        },
+        {
+          "name" : "jsThrowOrVoid",
+          "parameters" : [
+            {
+              "name" : "shouldThrow",
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "name" : "jsThrowOrNumber",
+          "parameters" : [
+            {
+              "name" : "shouldThrow",
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "name" : "jsThrowOrBool",
+          "parameters" : [
+            {
+              "name" : "shouldThrow",
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "name" : "jsThrowOrString",
+          "parameters" : [
+            {
+              "name" : "shouldThrow",
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
         }
       ],
       "types" : [

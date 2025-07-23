@@ -118,6 +118,7 @@ struct BridgeJSLink {
             export async function createInstantiator(options, swift) {
                 let instance;
                 let memory;
+                let setException;
                 const textDecoder = new TextDecoder("utf-8");
                 const textEncoder = new TextEncoder("utf-8");
 
@@ -161,6 +162,9 @@ struct BridgeJSLink {
                     setInstance: (i) => {
                         instance = i;
                         memory = instance.exports.memory;
+                        setException = (error) => {
+                            instance.exports._swift_js_exception.value = swift.memory.retain(error)
+                        }
                     },
                     /** @param {WebAssembly.Instance} instance */
                     createExports: (instance) => {
@@ -419,16 +423,24 @@ struct BridgeJSLink {
 
         func renderFunction(
             name: String,
-            returnExpr: String?
+            returnExpr: String?,
+            returnType: BridgeType
         ) -> [String] {
             var funcLines: [String] = []
             funcLines.append(
                 "function \(name)(\(parameterNames.joined(separator: ", "))) {"
             )
-            funcLines.append(contentsOf: bodyLines.map { $0.indent(count: 4) })
+            funcLines.append("try {".indent(count: 4))
+            funcLines.append(contentsOf: bodyLines.map { $0.indent(count: 8) })
             if let returnExpr = returnExpr {
-                funcLines.append("return \(returnExpr);".indent(count: 4))
+                funcLines.append("return \(returnExpr);".indent(count: 8))
             }
+            funcLines.append("} catch (error) {".indent(count: 4))
+            funcLines.append("setException(error);".indent(count: 8))
+            if let abiReturnType = returnType.abiReturnType {
+                funcLines.append("return \(abiReturnType.placeholderValue)".indent(count: 8))
+            }
+            funcLines.append("}".indent(count: 4))
             funcLines.append("}")
             return funcLines
         }
@@ -518,7 +530,8 @@ struct BridgeJSLink {
         let returnExpr = try thunkBuilder.lowerReturnValue(returnType: function.returnType)
         let funcLines = thunkBuilder.renderFunction(
             name: function.abiName(context: nil),
-            returnExpr: returnExpr
+            returnExpr: returnExpr,
+            returnType: function.returnType
         )
         importObjectBuilder.appendDts(
             [
@@ -591,7 +604,8 @@ struct BridgeJSLink {
         let abiName = constructor.abiName(context: type)
         let funcLines = thunkBuilder.renderFunction(
             name: abiName,
-            returnExpr: returnExpr
+            returnExpr: returnExpr,
+            returnType: returnType
         )
         importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
         importObjectBuilder.appendDts([
@@ -611,7 +625,8 @@ struct BridgeJSLink {
         let returnExpr = try emitCall(thunkBuilder)
         let funcLines = thunkBuilder.renderFunction(
             name: abiName,
-            returnExpr: returnExpr
+            returnExpr: returnExpr,
+            returnType: property.type
         )
         return (funcLines, [])
     }
@@ -629,7 +644,8 @@ struct BridgeJSLink {
         let returnExpr = try thunkBuilder.lowerReturnValue(returnType: method.returnType)
         let funcLines = thunkBuilder.renderFunction(
             name: method.abiName(context: context),
-            returnExpr: returnExpr
+            returnExpr: returnExpr,
+            returnType: method.returnType
         )
         return (funcLines, [])
     }
@@ -664,6 +680,14 @@ extension BridgeType {
             return name ?? "any"
         case .swiftHeapObject(let name):
             return name
+        }
+    }
+}
+
+extension WasmCoreType {
+    fileprivate var placeholderValue: String {
+        switch self {
+        case .i32, .i64, .f32, .f64, .pointer: return "0"
         }
     }
 }

@@ -6,7 +6,7 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-func checkNumber() -> Double {
+func checkNumber() throws(JSException) -> Double {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkNumber")
     func bjs_checkNumber() -> Float64
@@ -16,10 +16,13 @@ func checkNumber() -> Double {
     }
     #endif
     let ret = bjs_checkNumber()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
     return Double(ret)
 }
 
-func checkBoolean() -> Bool {
+func checkBoolean() throws(JSException) -> Bool {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkBoolean")
     func bjs_checkBoolean() -> Int32
@@ -29,5 +32,8 @@ func checkBoolean() -> Bool {
     }
     #endif
     let ret = bjs_checkBoolean()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
     return ret == 1
 }

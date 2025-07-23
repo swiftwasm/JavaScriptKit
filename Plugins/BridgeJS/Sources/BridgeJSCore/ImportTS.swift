@@ -151,6 +151,7 @@ struct ImportTS {
             } else {
                 body.append("let ret = \(raw: call)")
             }
+            body.append("if let error = _swift_js_take_exception() { throw error }")
         }
 
         func liftReturnValue(returnType: BridgeType) throws {
@@ -253,6 +254,7 @@ struct ImportTS {
                                 )
                             }
                         }),
+                        effectSpecifiers: ImportTS.buildFunctionEffect(throws: true, async: false),
                         returnClause: ReturnClauseSyntax(
                             arrow: .arrowToken(),
                             type: IdentifierTypeSyntax(name: .identifier(returnType.swiftType))
@@ -280,7 +282,8 @@ struct ImportTS {
                                     )
                                 }
                             }
-                        )
+                        ),
+                        effectSpecifiers: ImportTS.buildFunctionEffect(throws: true, async: false)
                     ),
                     bodyBuilder: {
                         self.renderImportDecl()
@@ -364,6 +367,7 @@ struct ImportTS {
             try builder.liftReturnValue(returnType: property.type)
             return AccessorDeclSyntax(
                 accessorSpecifier: .keyword(.get),
+                effectSpecifiers: Self.buildAccessorEffect(throws: true, async: false),
                 body: CodeBlockSyntax {
                     builder.renderImportDecl()
                     builder.body
@@ -371,31 +375,25 @@ struct ImportTS {
             )
         }
 
-        func renderSetterDecl(property: ImportedPropertySkeleton) throws -> AccessorDeclSyntax {
+        func renderSetterDecl(property: ImportedPropertySkeleton) throws -> DeclSyntax {
             let builder = ImportedThunkBuilder(
                 moduleName: moduleName,
                 abiName: property.setterAbiName(context: type)
             )
+            let newValue = Parameter(label: nil, name: "newValue", type: property.type)
             try builder.lowerParameter(param: Parameter(label: nil, name: "self", type: .jsObject(name)))
-            try builder.lowerParameter(param: Parameter(label: nil, name: "newValue", type: property.type))
+            try builder.lowerParameter(param: newValue)
             builder.call(returnType: .void)
-            return AccessorDeclSyntax(
-                modifier: DeclModifierSyntax(name: .keyword(.nonmutating)),
-                accessorSpecifier: .keyword(.set),
-                body: CodeBlockSyntax {
-                    builder.renderImportDecl()
-                    builder.body
-                }
+            return builder.renderThunkDecl(
+                name: "set\(property.name.capitalizedFirstLetter())",
+                parameters: [newValue],
+                returnType: .void
             )
         }
 
         func renderPropertyDecl(property: ImportedPropertySkeleton) throws -> [DeclSyntax] {
-            var accessorDecls: [AccessorDeclSyntax] = []
-            accessorDecls.append(try renderGetterDecl(property: property))
-            if !property.isReadonly {
-                accessorDecls.append(try renderSetterDecl(property: property))
-            }
-            return [
+            let accessorDecls: [AccessorDeclSyntax] = [try renderGetterDecl(property: property)]
+            var decls: [DeclSyntax] = [
                 DeclSyntax(
                     VariableDeclSyntax(
                         leadingTrivia: Self.renderDocumentation(documentation: property.documentation),
@@ -418,6 +416,10 @@ struct ImportTS {
                     )
                 )
             ]
+            if !property.isReadonly {
+                decls.append(try renderSetterDecl(property: property))
+            }
+            return decls
         }
         let classDecl = try StructDeclSyntax(
             leadingTrivia: Self.renderDocumentation(documentation: type.documentation),
@@ -468,5 +470,37 @@ struct ImportTS {
         }
         let lines = documentation.split { $0.isNewline }
         return Trivia(pieces: lines.flatMap { [TriviaPiece.docLineComment("/// \($0)"), .newlines(1)] })
+    }
+
+    static func buildFunctionEffect(throws: Bool, async: Bool) -> FunctionEffectSpecifiersSyntax {
+        return FunctionEffectSpecifiersSyntax(
+            asyncSpecifier: `async` ? .keyword(.async) : nil,
+            throwsClause: `throws`
+                ? ThrowsClauseSyntax(
+                    throwsSpecifier: .keyword(.throws),
+                    leftParen: .leftParenToken(),
+                    type: IdentifierTypeSyntax(name: .identifier("JSException")),
+                    rightParen: .rightParenToken()
+                ) : nil
+        )
+    }
+    static func buildAccessorEffect(throws: Bool, async: Bool) -> AccessorEffectSpecifiersSyntax {
+        return AccessorEffectSpecifiersSyntax(
+            asyncSpecifier: `async` ? .keyword(.async) : nil,
+            throwsClause: `throws`
+                ? ThrowsClauseSyntax(
+                    throwsSpecifier: .keyword(.throws),
+                    leftParen: .leftParenToken(),
+                    type: IdentifierTypeSyntax(name: .identifier("JSException")),
+                    rightParen: .rightParenToken()
+                ) : nil
+        )
+    }
+}
+
+extension String {
+    func capitalizedFirstLetter() -> String {
+        guard !isEmpty else { return self }
+        return prefix(1).uppercased() + dropFirst()
     }
 }

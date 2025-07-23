@@ -129,7 +129,7 @@ public func _bjs_throwsWithIntResult() -> Int32 {
     #if arch(wasm32)
     do {
         let ret = try throwsWithIntResult()
-    return Int32(ret)
+        return Int32(ret)
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {
@@ -154,7 +154,7 @@ public func _bjs_throwsWithStringResult() -> Void {
     #if arch(wasm32)
     do {
         var ret = try throwsWithStringResult()
-    return ret.withUTF8 { ptr in
+        return ret.withUTF8 { ptr in
             _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
         }
     } catch let error {
@@ -181,7 +181,7 @@ public func _bjs_throwsWithBoolResult() -> Int32 {
     #if arch(wasm32)
     do {
         let ret = try throwsWithBoolResult()
-    return Int32(ret ? 1 : 0)
+        return Int32(ret ? 1 : 0)
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {
@@ -206,7 +206,7 @@ public func _bjs_throwsWithFloatResult() -> Float32 {
     #if arch(wasm32)
     do {
         let ret = try throwsWithFloatResult()
-    return Float32(ret)
+        return Float32(ret)
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {
@@ -231,7 +231,7 @@ public func _bjs_throwsWithDoubleResult() -> Float64 {
     #if arch(wasm32)
     do {
         let ret = try throwsWithDoubleResult()
-    return Float64(ret)
+        return Float64(ret)
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {
@@ -256,7 +256,7 @@ public func _bjs_throwsWithSwiftHeapObjectResult() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     do {
         let ret = try throwsWithSwiftHeapObjectResult()
-    return Unmanaged.passRetained(ret).toOpaque()
+        return Unmanaged.passRetained(ret).toOpaque()
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {
@@ -281,7 +281,7 @@ public func _bjs_throwsWithJSObjectResult() -> Int32 {
     #if arch(wasm32)
     do {
         let ret = try throwsWithJSObjectResult()
-    return _swift_js_retain(Int32(bitPattern: ret.id))
+        return _swift_js_retain(Int32(bitPattern: ret.id))
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {

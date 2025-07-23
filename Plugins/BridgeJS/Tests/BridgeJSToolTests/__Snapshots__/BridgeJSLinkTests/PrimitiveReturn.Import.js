@@ -7,6 +7,7 @@
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
+    let setException;
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
 
@@ -47,17 +48,30 @@ export async function createInstantiator(options, swift) {
             }
             const TestModule = importObject["TestModule"] = {};
             TestModule["bjs_checkNumber"] = function bjs_checkNumber() {
-                let ret = options.imports.checkNumber();
-                return ret;
+                try {
+                    let ret = options.imports.checkNumber();
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
             }
             TestModule["bjs_checkBoolean"] = function bjs_checkBoolean() {
-                let ret = options.imports.checkBoolean();
-                return ret !== 0;
+                try {
+                    let ret = options.imports.checkBoolean();
+                    return ret !== 0;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
             }
         },
         setInstance: (i) => {
             instance = i;
             memory = instance.exports.memory;
+            setException = (error) => {
+                instance.exports._swift_js_exception.value = swift.memory.retain(error)
+            }
         },
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {

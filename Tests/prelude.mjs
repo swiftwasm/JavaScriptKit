@@ -19,6 +19,29 @@ export async function setupOptions(options, context) {
             "jsRoundTripString": (v) => {
                 return v;
             },
+            "jsThrowOrVoid": (shouldThrow) => {
+                if (shouldThrow) {
+                    throw new Error("TestError");
+                }
+            },
+            "jsThrowOrNumber": (shouldThrow) => {
+                if (shouldThrow) {
+                    throw new Error("TestError");
+                }
+                return 1;
+            },
+            "jsThrowOrBool": (shouldThrow) => {
+                if (shouldThrow) {
+                    throw new Error("TestError");
+                }
+                return true;
+            },
+            "jsThrowOrString": (shouldThrow) => {
+                if (shouldThrow) {
+                    throw new Error("TestError");
+                }
+                return "Hello, world!";
+            },
             JsGreeter: class {
                 /**
                  * @param {string} name

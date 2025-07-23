@@ -6,7 +6,7 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-func checkString() -> String {
+func checkString() throws(JSException) -> String {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkString")
     func bjs_checkString() -> Int32
@@ -16,6 +16,9 @@ func checkString() -> String {
     }
     #endif
     let ret = bjs_checkString()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
     return String(unsafeUninitializedCapacity: Int(ret)) { b in
         _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
         return Int(ret)

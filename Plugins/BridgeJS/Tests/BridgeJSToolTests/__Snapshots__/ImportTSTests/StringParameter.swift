@@ -6,7 +6,7 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-func checkString(_ a: String) -> Void {
+func checkString(_ a: String) throws(JSException) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkString")
     func bjs_checkString(_ a: Int32) -> Void
@@ -20,9 +20,12 @@ func checkString(_ a: String) -> Void {
         _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
     }
     bjs_checkString(aId)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
-func checkStringWithLength(_ a: String, _ b: Double) -> Void {
+func checkStringWithLength(_ a: String, _ b: Double) throws(JSException) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkStringWithLength")
     func bjs_checkStringWithLength(_ a: Int32, _ b: Float64) -> Void
@@ -36,4 +39,7 @@ func checkStringWithLength(_ a: String, _ b: Double) -> Void {
         _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
     }
     bjs_checkStringWithLength(aId, b)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }

@@ -1,5 +1,7 @@
+import _CJavaScriptKit
+
 #if !arch(wasm32)
-private func _onlyAvailableOnWasm() -> Never {
+@usableFromInline func _onlyAvailableOnWasm() -> Never {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -57,3 +59,16 @@ private func _onlyAvailableOnWasm() -> Never {
     _onlyAvailableOnWasm()
 }
 #endif
+
+@_spi(BridgeJS) @_transparent public func _swift_js_take_exception() -> JSException? {
+    #if arch(wasm32)
+    let value = _swift_js_exception_get()
+    if _fastPath(value == 0) {
+        return nil
+    }
+    _swift_js_exception_set(0)
+    return JSException(JSObject(id: UInt32(bitPattern: value)).jsValue)
+    #else
+    _onlyAvailableOnWasm()
+    #endif
+}

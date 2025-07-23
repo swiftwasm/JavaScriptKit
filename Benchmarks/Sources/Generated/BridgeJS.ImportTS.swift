@@ -6,7 +6,7 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-func benchmarkHelperNoop() -> Void {
+func benchmarkHelperNoop() throws(JSException) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkHelperNoop")
     func bjs_benchmarkHelperNoop() -> Void
@@ -16,9 +16,12 @@ func benchmarkHelperNoop() -> Void {
     }
     #endif
     bjs_benchmarkHelperNoop()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
-func benchmarkHelperNoopWithNumber(_ n: Double) -> Void {
+func benchmarkHelperNoopWithNumber(_ n: Double) throws(JSException) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkHelperNoopWithNumber")
     func bjs_benchmarkHelperNoopWithNumber(_ n: Float64) -> Void
@@ -28,9 +31,12 @@ func benchmarkHelperNoopWithNumber(_ n: Double) -> Void {
     }
     #endif
     bjs_benchmarkHelperNoopWithNumber(n)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
-func benchmarkRunner(_ name: String, _ body: JSObject) -> Void {
+func benchmarkRunner(_ name: String, _ body: JSObject) throws(JSException) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkRunner")
     func bjs_benchmarkRunner(_ name: Int32, _ body: Int32) -> Void
@@ -44,4 +50,7 @@ func benchmarkRunner(_ name: String, _ body: JSObject) -> Void {
         _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
     }
     bjs_benchmarkRunner(nameId, Int32(bitPattern: body.id))
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }

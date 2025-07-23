@@ -1,4 +1,6 @@
+#include <stdint.h>
 #include "_CJavaScriptKit.h"
+#include "WasmGlobalMacros.h"
 #if __wasm32__
 # ifndef __wasi__
 # if __has_include("malloc.h")
@@ -60,6 +62,9 @@ int swjs_library_features(void) {
     return _library_features();
 }
 # endif
+
+WASM_GLOBAL_DEFINE_STORAGE(_swift_js_exception, i32)
+WASM_EXPORT_NAME(_swift_js_exception, _swift_js_exception)
 #endif
 
 int swjs_get_worker_thread_id_cached(void) {

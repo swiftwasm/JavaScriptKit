@@ -6,7 +6,7 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-func createTS2Skeleton() -> TS2Skeleton {
+func createTS2Skeleton() throws(JSException) -> TS2Skeleton {
     #if arch(wasm32)
     @_extern(wasm, module: "PlayBridgeJS", name: "bjs_createTS2Skeleton")
     func bjs_createTS2Skeleton() -> Int32
@@ -16,6 +16,9 @@ func createTS2Skeleton() -> TS2Skeleton {
     }
     #endif
     let ret = bjs_createTS2Skeleton()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
     return TS2Skeleton(takingThis: ret)
 }
 
@@ -30,7 +33,7 @@ struct TS2Skeleton {
         self.this = JSObject(id: UInt32(bitPattern: this))
     }
 
-    func convert(_ ts: String) -> String {
+    func convert(_ ts: String) throws(JSException) -> String {
         #if arch(wasm32)
         @_extern(wasm, module: "PlayBridgeJS", name: "bjs_TS2Skeleton_convert")
         func bjs_TS2Skeleton_convert(_ self: Int32, _ ts: Int32) -> Int32
@@ -44,6 +47,9 @@ struct TS2Skeleton {
             _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         let ret = bjs_TS2Skeleton_convert(Int32(bitPattern: self.this.id), tsId)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
         return String(unsafeUninitializedCapacity: Int(ret)) { b in
             _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
             return Int(ret)

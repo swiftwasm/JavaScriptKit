@@ -7,6 +7,7 @@
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
+    let setException;
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
 
@@ -47,39 +48,68 @@ export async function createInstantiator(options, swift) {
             }
             const TestModule = importObject["TestModule"] = {};
             TestModule["bjs_Greeter_init"] = function bjs_Greeter_init(name) {
-                const nameObject = swift.memory.getObject(name);
-                swift.memory.release(name);
-                let ret = new options.imports.Greeter(nameObject);
-                return swift.memory.retain(ret);
+                try {
+                    const nameObject = swift.memory.getObject(name);
+                    swift.memory.release(name);
+                    let ret = new options.imports.Greeter(nameObject);
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
             }
             TestModule["bjs_Greeter_name_get"] = function bjs_Greeter_name_get(self) {
-                let ret = swift.memory.getObject(self).name;
-                tmpRetBytes = textEncoder.encode(ret);
-                return tmpRetBytes.length;
+                try {
+                    let ret = swift.memory.getObject(self).name;
+                    tmpRetBytes = textEncoder.encode(ret);
+                    return tmpRetBytes.length;
+                } catch (error) {
+                    setException(error);
+                }
             }
             TestModule["bjs_Greeter_name_set"] = function bjs_Greeter_name_set(self, newValue) {
-                const newValueObject = swift.memory.getObject(newValue);
-                swift.memory.release(newValue);
-                swift.memory.getObject(self).name = newValueObject;
+                try {
+                    const newValueObject = swift.memory.getObject(newValue);
+                    swift.memory.release(newValue);
+                    swift.memory.getObject(self).name = newValueObject;
+                } catch (error) {
+                    setException(error);
+                }
             }
             TestModule["bjs_Greeter_age_get"] = function bjs_Greeter_age_get(self) {
-                let ret = swift.memory.getObject(self).age;
-                return ret;
+                try {
+                    let ret = swift.memory.getObject(self).age;
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
             }
             TestModule["bjs_Greeter_greet"] = function bjs_Greeter_greet(self) {
-                let ret = swift.memory.getObject(self).greet();
-                tmpRetBytes = textEncoder.encode(ret);
-                return tmpRetBytes.length;
+                try {
+                    let ret = swift.memory.getObject(self).greet();
+                    tmpRetBytes = textEncoder.encode(ret);
+                    return tmpRetBytes.length;
+                } catch (error) {
+                    setException(error);
+                }
             }
             TestModule["bjs_Greeter_changeName"] = function bjs_Greeter_changeName(self, name) {
-                const nameObject = swift.memory.getObject(name);
-                swift.memory.release(name);
-                swift.memory.getObject(self).changeName(nameObject);
+                try {
+                    const nameObject = swift.memory.getObject(name);
+                    swift.memory.release(name);
+                    swift.memory.getObject(self).changeName(nameObject);
+                } catch (error) {
+                    setException(error);
+                }
             }
         },
         setInstance: (i) => {
             instance = i;
             memory = instance.exports.memory;
+            setException = (error) => {
+                instance.exports._swift_js_exception.value = swift.memory.retain(error)
+            }
         },
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {

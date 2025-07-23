@@ -2,11 +2,11 @@ import XCTest
 import JavaScriptKit
 
 class ImportAPITests: XCTestCase {
-    func testRoundTripVoid() {
-        jsRoundTripVoid()
+    func testRoundTripVoid() throws {
+        try jsRoundTripVoid()
     }
 
-    func testRoundTripNumber() {
+    func testRoundTripNumber() throws {
         for v in [
             0, 1, -1,
             Double(Int32.max), Double(Int32.min),
@@ -17,34 +17,71 @@ class ImportAPITests: XCTestCase {
             Double.infinity,
             Double.pi,
         ] {
-            XCTAssertEqual(jsRoundTripNumber(v), v)
+            try XCTAssertEqual(jsRoundTripNumber(v), v)
         }
 
-        XCTAssert(jsRoundTripNumber(Double.nan).isNaN)
+        try XCTAssert(jsRoundTripNumber(Double.nan).isNaN)
     }
 
-    func testRoundTripBool() {
+    func testRoundTripBool() throws {
         for v in [true, false] {
-            XCTAssertEqual(jsRoundTripBool(v), v)
+            try XCTAssertEqual(jsRoundTripBool(v), v)
         }
     }
 
-    func testRoundTripString() {
+    func testRoundTripString() throws {
         for v in ["", "Hello, world!", "🧑‍🧑‍🧒"] {
-            XCTAssertEqual(jsRoundTripString(v), v)
+            try XCTAssertEqual(jsRoundTripString(v), v)
         }
     }
 
-    func testClass() {
-        let greeter = JsGreeter("Alice", "Hello")
-        XCTAssertEqual(greeter.greet(), "Hello, Alice!")
-        greeter.changeName("Bob")
-        XCTAssertEqual(greeter.greet(), "Hello, Bob!")
+    func ensureThrows<T>(_ f: (Bool) throws(JSException) -> T) throws {
+        do {
+            _ = try f(true)
+            XCTFail("Expected exception")
+        } catch {
+            XCTAssertTrue(error.description.contains("TestError"))
+        }
+    }
+    func ensureDoesNotThrow<T>(_ f: (Bool) throws(JSException) -> T, _ assertValue: (T) -> Void) throws {
+        do {
+            let result = try f(false)
+            assertValue(result)
+        } catch {
+            XCTFail("Expected no exception")
+        }
+    }
 
-        greeter.name = "Charlie"
-        XCTAssertEqual(greeter.greet(), "Hello, Charlie!")
-        XCTAssertEqual(greeter.name, "Charlie")
+    func testThrowOrVoid() throws {
+        try ensureThrows(jsThrowOrVoid)
+        try ensureDoesNotThrow(jsThrowOrVoid, { _ in })
+    }
 
-        XCTAssertEqual(greeter.prefix, "Hello")
+    func testThrowOrNumber() throws {
+        try ensureThrows(jsThrowOrNumber)
+        try ensureDoesNotThrow(jsThrowOrNumber, { XCTAssertEqual($0, 1) })
+    }
+
+    func testThrowOrBool() throws {
+        try ensureThrows(jsThrowOrBool)
+        try ensureDoesNotThrow(jsThrowOrBool, { XCTAssertEqual($0, true) })
+    }
+
+    func testThrowOrString() throws {
+        try ensureThrows(jsThrowOrString)
+        try ensureDoesNotThrow(jsThrowOrString, { XCTAssertEqual($0, "Hello, world!") })
+    }
+
+    func testClass() throws {
+        let greeter = try JsGreeter("Alice", "Hello")
+        XCTAssertEqual(try greeter.greet(), "Hello, Alice!")
+        try greeter.changeName("Bob")
+        XCTAssertEqual(try greeter.greet(), "Hello, Bob!")
+
+        try greeter.setName("Charlie")
+        XCTAssertEqual(try greeter.greet(), "Hello, Charlie!")
+        XCTAssertEqual(try greeter.name, "Charlie")
+
+        XCTAssertEqual(try greeter.prefix, "Hello")
     }
 }

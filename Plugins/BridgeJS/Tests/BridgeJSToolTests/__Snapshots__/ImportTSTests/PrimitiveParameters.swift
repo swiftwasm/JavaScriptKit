@@ -6,7 +6,7 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-func check(_ a: Double, _ b: Bool) -> Void {
+func check(_ a: Double, _ b: Bool) throws(JSException) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_check")
     func bjs_check(_ a: Float64, _ b: Int32) -> Void
@@ -16,4 +16,7 @@ func check(_ a: Double, _ b: Bool) -> Void {
     }
     #endif
     bjs_check(a, Int32(b ? 1 : 0))
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }

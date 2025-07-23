@@ -22,6 +22,11 @@ let package = Package(
                 .product(name: "SwiftBasicFormat", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
             ],
+            exclude: [
+                "bridge-js.d.ts",
+                "bridge-js.config.json",
+                "Generated/JavaScript",
+            ],
             swiftSettings: [
                 .enableExperimentalFeature("Extern")
             ],

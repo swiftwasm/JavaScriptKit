@@ -6,7 +6,7 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-func checkArray(_ a: JSObject) -> Void {
+func checkArray(_ a: JSObject) throws(JSException) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkArray")
     func bjs_checkArray(_ a: Int32) -> Void
@@ -16,9 +16,12 @@ func checkArray(_ a: JSObject) -> Void {
     }
     #endif
     bjs_checkArray(Int32(bitPattern: a.id))
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
-func checkArrayWithLength(_ a: JSObject, _ b: Double) -> Void {
+func checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkArrayWithLength")
     func bjs_checkArrayWithLength(_ a: Int32, _ b: Float64) -> Void
@@ -28,9 +31,12 @@ func checkArrayWithLength(_ a: JSObject, _ b: Double) -> Void {
     }
     #endif
     bjs_checkArrayWithLength(Int32(bitPattern: a.id), b)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
-func checkArray(_ a: JSObject) -> Void {
+func checkArray(_ a: JSObject) throws(JSException) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkArray")
     func bjs_checkArray(_ a: Int32) -> Void
@@ -40,4 +46,7 @@ func checkArray(_ a: JSObject) -> Void {
     }
     #endif
     bjs_checkArray(Int32(bitPattern: a.id))
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
