@@ -27,10 +27,12 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     #endif
 
     @_spi(JSObject_id)
+    @_spi(BridgeJS)
     @inlinable
     public var id: JavaScriptObjectRef { _id }
 
     @_spi(JSObject_id)
+    @_spi(BridgeJS)
     public init(id: JavaScriptObjectRef) {
         self._id = id
         #if compiler(>=6.1) && _runtime(_multithreaded)

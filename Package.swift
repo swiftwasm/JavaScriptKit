@@ -40,12 +40,14 @@ let package = Package(
                 ? [
                     .unsafeFlags(["-fdeclspec"])
                 ] : nil,
-            swiftSettings: shouldBuildForEmbedded
-                ? [
-                    .enableExperimentalFeature("Embedded"),
-                    .enableExperimentalFeature("Extern"),
-                    .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"]),
-                ] : nil
+            swiftSettings: [
+                .enableExperimentalFeature("Extern")
+            ]
+                + (shouldBuildForEmbedded
+                    ? [
+                        .enableExperimentalFeature("Embedded"),
+                        .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"]),
+                    ] : [])
         ),
         .target(name: "_CJavaScriptKit"),
         .testTarget(

@@ -269,19 +269,7 @@ class ExportSwift {
         // To update this file, just rebuild your project or run
         // `swift package bridge-js`.
 
-        @_spi(JSObject_id) import JavaScriptKit
-
-        #if arch(wasm32)
-        @_extern(wasm, module: "bjs", name: "return_string")
-        private func _return_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
-        @_extern(wasm, module: "bjs", name: "init_memory")
-        private func _init_memory(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>?)
-
-        @_extern(wasm, module: "bjs", name: "swift_js_retain")
-        private func _swift_js_retain(_ ptr: Int32) -> Int32
-        @_extern(wasm, module: "bjs", name: "swift_js_throw")
-        private func _swift_js_throw(_ id: Int32)
-        #endif
+        @_spi(BridgeJS) import JavaScriptKit
         """
 
     func renderSwiftGlue() -> String? {
@@ -309,6 +297,15 @@ class ExportSwift {
 
         init(effects: Effects) {
             self.effects = effects
+        }
+
+        private func append(_ item: CodeBlockItemSyntax) {
+            var item = item
+            // Add a newline for items after the first one
+            if !self.body.isEmpty {
+                item = item.with(\.leadingTrivia, .newline)
+            }
+            self.body.append(item)
         }
 
         func liftParameter(param: Parameter) {
@@ -350,11 +347,11 @@ class ExportSwift {
                 let lengthLabel = "\(param.name)Len"
                 let prepare: CodeBlockItemSyntax = """
                     let \(raw: param.name) = String(unsafeUninitializedCapacity: Int(\(raw: lengthLabel))) { b in
-                        _init_memory(\(raw: bytesLabel), b.baseAddress.unsafelyUnwrapped)
+                        _swift_js_init_memory(\(raw: bytesLabel), b.baseAddress.unsafelyUnwrapped)
                         return Int(\(raw: lengthLabel))
                     }
                     """
-                body.append(prepare)
+                append(prepare)
                 abiParameterForwardings.append(
                     LabeledExprSyntax(
                         label: param.label,
@@ -392,7 +389,7 @@ class ExportSwift {
             }
         }
 
-        private func renderCallStatement(callee: ExprSyntax, returnType: BridgeType) -> StmtSyntax {
+        private func renderCallStatement(callee: ExprSyntax, returnType: BridgeType) -> CodeBlockItemSyntax {
             var callExpr: ExprSyntax =
                 "\(raw: callee)(\(raw: abiParameterForwardings.map { $0.description }.joined(separator: ", ")))"
             if effects.isAsync {
@@ -408,24 +405,24 @@ class ExportSwift {
             }
             let retMutability = returnType == .string ? "var" : "let"
             if returnType == .void {
-                return StmtSyntax("\(raw: callExpr)")
+                return CodeBlockItemSyntax(item: .init(ExpressionStmtSyntax(expression: callExpr)))
             } else {
-                return StmtSyntax("\(raw: retMutability) ret = \(raw: callExpr)")
+                return CodeBlockItemSyntax(item: .init(DeclSyntax("\(raw: retMutability) ret = \(raw: callExpr)")))
             }
         }
 
         func call(name: String, returnType: BridgeType) {
-            let stmt = renderCallStatement(callee: "\(raw: name)", returnType: returnType)
-            body.append(CodeBlockItemSyntax(item: .stmt(stmt)))
+            let item = renderCallStatement(callee: "\(raw: name)", returnType: returnType)
+            append(item)
         }
 
         func callMethod(klassName: String, methodName: String, returnType: BridgeType) {
             let _selfParam = self.abiParameterForwardings.removeFirst()
-            let stmt = renderCallStatement(
+            let item = renderCallStatement(
                 callee: "\(raw: _selfParam).\(raw: methodName)",
                 returnType: returnType
             )
-            body.append(CodeBlockItemSyntax(item: .stmt(stmt)))
+            append(item)
         }
 
         func lowerReturnValue(returnType: BridgeType) {
@@ -452,25 +449,25 @@ class ExportSwift {
             switch returnType {
             case .void: break
             case .int, .float, .double:
-                body.append("return \(raw: abiReturnType!.swiftType)(ret)")
+                append("return \(raw: abiReturnType!.swiftType)(ret)")
             case .bool:
-                body.append("return Int32(ret ? 1 : 0)")
+                append("return Int32(ret ? 1 : 0)")
             case .string:
-                body.append(
+                append(
                     """
                     return ret.withUTF8 { ptr in
-                        _return_string(ptr.baseAddress, Int32(ptr.count))
+                        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
                     }
                     """
                 )
             case .jsObject(nil):
-                body.append(
+                append(
                     """
                     return _swift_js_retain(Int32(bitPattern: ret.id))
                     """
                 )
             case .jsObject(_?):
-                body.append(
+                append(
                     """
                     return _swift_js_retain(Int32(bitPattern: ret.this.id))
                     """
@@ -478,7 +475,7 @@ class ExportSwift {
             case .swiftHeapObject:
                 // Perform a manual retain on the object, which will be balanced by a
                 // release called via FinalizationRegistry
-                body.append(
+                append(
                     """
                     return Unmanaged.passRetained(ret).toOpaque()
                     """
@@ -581,7 +578,7 @@ class ExportSwift {
     /// @_cdecl("bjs_Greeter_init")
     /// public func _bjs_Greeter_init(nameBytes: Int32, nameLen: Int32) -> UnsafeMutableRawPointer {
     ///     let name = String(unsafeUninitializedCapacity: Int(nameLen)) { b in
-    ///         _init_memory(nameBytes, b.baseAddress.unsafelyUnwrapped)
+    ///         _swift_js_init_memory(nameBytes, b.baseAddress.unsafelyUnwrapped)
     ///         return Int(nameLen)
     ///     }
     ///     let ret = Greeter(name: name)
@@ -594,7 +591,7 @@ class ExportSwift {
     ///     let _self = Unmanaged<Greeter>.fromOpaque(pointer).takeUnretainedValue()
     ///     var ret = _self.greet()
     ///     return ret.withUTF8 { ptr in
-    ///         _return_string(ptr.baseAddress, Int32(ptr.count))
+    ///         _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
     ///     }
     /// }
     /// @_expose(wasm, "bjs_Greeter_deinit")
