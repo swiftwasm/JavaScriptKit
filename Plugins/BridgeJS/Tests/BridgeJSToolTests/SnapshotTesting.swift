@@ -24,14 +24,15 @@ func assertSnapshot(
         let existingSnapshot = try String(contentsOf: snapshotPath, encoding: .utf8)
         let ok = existingSnapshot == String(data: input, encoding: .utf8)!
         let actualFilePath = snapshotPath.path + ".actual"
+        let updateSnapshots = ProcessInfo.processInfo.environment["UPDATE_SNAPSHOTS"] != nil
         func buildComment() -> Comment {
             "Snapshot mismatch: \(actualFilePath) \(snapshotPath.path)"
         }
-        if !ok {
-            try input.write(to: URL(fileURLWithPath: actualFilePath))
-        }
-        if ProcessInfo.processInfo.environment["UPDATE_SNAPSHOTS"] == nil {
+        if !updateSnapshots {
             #expect(ok, buildComment(), sourceLocation: sourceLocation)
+            if !ok {
+                try input.write(to: URL(fileURLWithPath: actualFilePath))
+            }
         } else {
             try input.write(to: snapshotPath)
         }
