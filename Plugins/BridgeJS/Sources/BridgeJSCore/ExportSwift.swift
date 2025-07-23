@@ -245,9 +245,11 @@ class ExportSwift {
         let collector = APICollector(parent: self)
         collector.walk(sourceFile)
         exportedFunctions.append(contentsOf: collector.exportedFunctions)
-        exportedClasses.append(contentsOf: collector.exportedClassNames.map {
-            collector.exportedClassByName[$0]!
-        })
+        exportedClasses.append(
+            contentsOf: collector.exportedClassNames.map {
+                collector.exportedClassByName[$0]!
+            }
+        )
         return collector.errors
     }
 

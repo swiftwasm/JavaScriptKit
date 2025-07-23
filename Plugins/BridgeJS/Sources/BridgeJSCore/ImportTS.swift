@@ -480,7 +480,7 @@ struct ImportTS {
                     leftParen: .leftParenToken(),
                     type: IdentifierTypeSyntax(name: .identifier("JSException")),
                     rightParen: .rightParenToken()
-                ) : nil,
+                ) : nil
         )
     }
     static func buildAccessorEffect(throws: Bool, async: Bool) -> AccessorEffectSpecifiersSyntax {
@@ -492,7 +492,7 @@ struct ImportTS {
                     leftParen: .leftParenToken(),
                     type: IdentifierTypeSyntax(name: .identifier("JSException")),
                     rightParen: .rightParenToken()
-                ) : nil,
+                ) : nil
         )
     }
 }
