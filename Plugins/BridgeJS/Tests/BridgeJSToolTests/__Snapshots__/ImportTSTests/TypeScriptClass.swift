@@ -4,25 +4,7 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-@_spi(JSObject_id) import JavaScriptKit
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "make_jsstring")
-func _make_jsstring(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32
-#else
-func _make_jsstring(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "init_memory_with_result")
-func _init_memory_with_result(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
-#else
-func _init_memory_with_result(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
-    fatalError("Only available on WebAssembly")
-}
-#endif
+@_spi(BridgeJS) import JavaScriptKit
 
 struct Greeter {
     let this: JSObject
@@ -46,7 +28,7 @@ struct Greeter {
         #endif
         var name = name
         let nameId = name.withUTF8 { b in
-            _make_jsstring(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         let ret = bjs_Greeter_init(nameId)
         self.this = JSObject(id: UInt32(bitPattern: ret))
@@ -64,7 +46,7 @@ struct Greeter {
             #endif
             let ret = bjs_Greeter_name_get(Int32(bitPattern: self.this.id))
             return String(unsafeUninitializedCapacity: Int(ret)) { b in
-                _init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
+                _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
                 return Int(ret)
             }
         }
@@ -79,7 +61,7 @@ struct Greeter {
             #endif
             var newValue = newValue
             let newValueId = newValue.withUTF8 { b in
-                _make_jsstring(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+                _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
             }
             bjs_Greeter_name_set(Int32(bitPattern: self.this.id), newValueId)
         }
@@ -111,7 +93,7 @@ struct Greeter {
         #endif
         let ret = bjs_Greeter_greet(Int32(bitPattern: self.this.id))
         return String(unsafeUninitializedCapacity: Int(ret)) { b in
-            _init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
+            _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
             return Int(ret)
         }
     }
@@ -127,7 +109,7 @@ struct Greeter {
         #endif
         var name = name
         let nameId = name.withUTF8 { b in
-            _make_jsstring(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         bjs_Greeter_changeName(Int32(bitPattern: self.this.id), nameId)
     }

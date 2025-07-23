@@ -1,6 +1,54 @@
 {
   "classes" : [
     {
+      "constructor" : {
+        "abiName" : "bjs_PlayBridgeJS_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_PlayBridgeJS_update",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : true
+          },
+          "name" : "update",
+          "parameters" : [
+            {
+              "label" : "swiftSource",
+              "name" : "swiftSource",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "dtsSource",
+              "name" : "dtsSource",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "swiftHeapObject" : {
+              "_0" : "PlayBridgeJSOutput"
+            }
+          }
+        }
+      ],
+      "name" : "PlayBridgeJS"
+    },
+    {
       "methods" : [
         {
           "abiName" : "bjs_PlayBridgeJSOutput_outputJs",
@@ -68,54 +116,6 @@
         }
       ],
       "name" : "PlayBridgeJSOutput"
-    },
-    {
-      "constructor" : {
-        "abiName" : "bjs_PlayBridgeJS_init",
-        "effects" : {
-          "isAsync" : false,
-          "isThrows" : false
-        },
-        "parameters" : [
-
-        ]
-      },
-      "methods" : [
-        {
-          "abiName" : "bjs_PlayBridgeJS_update",
-          "effects" : {
-            "isAsync" : false,
-            "isThrows" : true
-          },
-          "name" : "update",
-          "parameters" : [
-            {
-              "label" : "swiftSource",
-              "name" : "swiftSource",
-              "type" : {
-                "string" : {
-
-                }
-              }
-            },
-            {
-              "label" : "dtsSource",
-              "name" : "dtsSource",
-              "type" : {
-                "string" : {
-
-                }
-              }
-            }
-          ],
-          "returnType" : {
-            "swiftHeapObject" : {
-              "_0" : "PlayBridgeJSOutput"
-            }
-          }
-        }
-      ],
-      "name" : "PlayBridgeJS"
     }
   ],
   "functions" : [

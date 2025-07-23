@@ -4,25 +4,7 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-@_spi(JSObject_id) import JavaScriptKit
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "make_jsstring")
-func _make_jsstring(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32
-#else
-func _make_jsstring(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "init_memory_with_result")
-func _init_memory_with_result(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
-#else
-func _init_memory_with_result(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
-    fatalError("Only available on WebAssembly")
-}
-#endif
+@_spi(BridgeJS) import JavaScriptKit
 
 func createTS2Skeleton() -> TS2Skeleton {
     #if arch(wasm32)
@@ -59,11 +41,11 @@ struct TS2Skeleton {
         #endif
         var ts = ts
         let tsId = ts.withUTF8 { b in
-            _make_jsstring(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         let ret = bjs_TS2Skeleton_convert(Int32(bitPattern: self.this.id), tsId)
         return String(unsafeUninitializedCapacity: Int(ret)) { b in
-            _init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
+            _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
             return Int(ret)
         }
     }
