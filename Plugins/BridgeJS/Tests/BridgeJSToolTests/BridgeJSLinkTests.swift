@@ -3,9 +3,6 @@ import SwiftSyntax
 import SwiftParser
 import Testing
 
-@testable import BridgeJSLink
-@testable import BridgeJSTool
-
 @Suite struct BridgeJSLinkTests {
     private func snapshot(
         bridgeJSLink: BridgeJSLink,

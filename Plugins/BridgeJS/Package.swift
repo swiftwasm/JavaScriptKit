@@ -2,6 +2,13 @@
 
 import PackageDescription
 
+let coreDependencies: [Target.Dependency] = [
+    .product(name: "SwiftParser", package: "swift-syntax"),
+    .product(name: "SwiftSyntax", package: "swift-syntax"),
+    .product(name: "SwiftBasicFormat", package: "swift-syntax"),
+    .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+]
+
 let package = Package(
     name: "BridgeJS",
     platforms: [.macOS(.v13)],
@@ -10,19 +17,13 @@ let package = Package(
     ],
     targets: [
         .target(name: "BridgeJSBuildPlugin"),
-        .target(name: "BridgeJSLink"),
         .executableTarget(
             name: "BridgeJSTool",
-            dependencies: [
-                .product(name: "SwiftParser", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftBasicFormat", package: "swift-syntax"),
-                .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
-            ]
+            dependencies: coreDependencies
         ),
         .testTarget(
             name: "BridgeJSToolTests",
-            dependencies: ["BridgeJSTool", "BridgeJSLink"],
+            dependencies: coreDependencies,
             exclude: ["__Snapshots__", "Inputs"]
         ),
     ]
