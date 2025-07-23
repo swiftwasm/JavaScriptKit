@@ -159,7 +159,7 @@ import SwiftParser
             )
             let progress = ProgressReporting(verbose: doubleDashOptions["verbose"] == "true")
             let exporter = ExportSwift(progress: progress)
-            for inputFile in positionalArguments {
+            for inputFile in positionalArguments.sorted() {
                 let sourceURL = URL(fileURLWithPath: inputFile)
                 guard sourceURL.pathExtension == "swift" else { continue }
                 let sourceContent = try String(contentsOf: sourceURL, encoding: .utf8)

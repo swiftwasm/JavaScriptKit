@@ -56,7 +56,9 @@ class ExportSwift {
 
     fileprivate final class APICollector: SyntaxAnyVisitor {
         var exportedFunctions: [ExportedFunction] = []
-        var exportedClasses: [String: ExportedClass] = [:]
+        /// The names of the exported classes, in the order they were written in the source file
+        var exportedClassNames: [String] = []
+        var exportedClassByName: [String: ExportedClass] = [:]
         var errors: [DiagnosticError] = []
 
         enum State {
@@ -114,7 +116,7 @@ class ExportSwift {
                 return .skipChildren
             case .classBody(let name):
                 if let exportedFunction = visitFunction(node: node) {
-                    exportedClasses[name]?.methods.append(exportedFunction)
+                    exportedClassByName[name]?.methods.append(exportedFunction)
                 }
                 return .skipChildren
             }
@@ -217,7 +219,7 @@ class ExportSwift {
                 parameters: parameters,
                 effects: effects
             )
-            exportedClasses[name]?.constructor = constructor
+            exportedClassByName[name]?.constructor = constructor
             return .skipChildren
         }
 
@@ -226,11 +228,12 @@ class ExportSwift {
             stateStack.push(state: .classBody(name: name))
 
             guard node.attributes.hasJSAttribute() else { return .skipChildren }
-            exportedClasses[name] = ExportedClass(
+            exportedClassByName[name] = ExportedClass(
                 name: name,
                 constructor: nil,
                 methods: []
             )
+            exportedClassNames.append(name)
             return .visitChildren
         }
         override func visitPost(_ node: ClassDeclSyntax) {
@@ -242,7 +245,9 @@ class ExportSwift {
         let collector = APICollector(parent: self)
         collector.walk(sourceFile)
         exportedFunctions.append(contentsOf: collector.exportedFunctions)
-        exportedClasses.append(contentsOf: collector.exportedClasses.values)
+        exportedClasses.append(contentsOf: collector.exportedClassNames.map {
+            collector.exportedClassByName[$0]!
+        })
         return collector.errors
     }
 
