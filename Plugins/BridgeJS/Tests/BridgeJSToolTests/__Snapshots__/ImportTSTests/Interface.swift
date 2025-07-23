@@ -9,9 +9,9 @@
 func returnAnimatable() -> Animatable {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_returnAnimatable")
-    func bjs_returnAnimatable() -> Int32
+    func bjs_returnAnimatable() throws -> Int32
     #else
-    func bjs_returnAnimatable() -> Int32 {
+    func bjs_returnAnimatable() throws -> Int32 {
         fatalError("Only available on WebAssembly")
     }
     #endif
@@ -33,9 +33,9 @@ struct Animatable {
     func animate(_ keyframes: JSObject, _ options: JSObject) -> JSObject {
         #if arch(wasm32)
         @_extern(wasm, module: "Check", name: "bjs_Animatable_animate")
-        func bjs_Animatable_animate(_ self: Int32, _ keyframes: Int32, _ options: Int32) -> Int32
+        func bjs_Animatable_animate(_ self: Int32, _ keyframes: Int32, _ options: Int32) throws -> Int32
         #else
-        func bjs_Animatable_animate(_ self: Int32, _ keyframes: Int32, _ options: Int32) -> Int32 {
+        func bjs_Animatable_animate(_ self: Int32, _ keyframes: Int32, _ options: Int32) throws -> Int32 {
             fatalError("Only available on WebAssembly")
         }
         #endif
@@ -46,9 +46,9 @@ struct Animatable {
     func getAnimations(_ options: JSObject) -> JSObject {
         #if arch(wasm32)
         @_extern(wasm, module: "Check", name: "bjs_Animatable_getAnimations")
-        func bjs_Animatable_getAnimations(_ self: Int32, _ options: Int32) -> Int32
+        func bjs_Animatable_getAnimations(_ self: Int32, _ options: Int32) throws -> Int32
         #else
-        func bjs_Animatable_getAnimations(_ self: Int32, _ options: Int32) -> Int32 {
+        func bjs_Animatable_getAnimations(_ self: Int32, _ options: Int32) throws -> Int32 {
             fatalError("Only available on WebAssembly")
         }
         #endif

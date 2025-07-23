@@ -20,9 +20,9 @@ struct Greeter {
     init(_ name: String) {
         #if arch(wasm32)
         @_extern(wasm, module: "Check", name: "bjs_Greeter_init")
-        func bjs_Greeter_init(_ name: Int32) -> Int32
+        func bjs_Greeter_init(_ name: Int32) throws -> Int32
         #else
-        func bjs_Greeter_init(_ name: Int32) -> Int32 {
+        func bjs_Greeter_init(_ name: Int32) throws -> Int32 {
             fatalError("Only available on WebAssembly")
         }
         #endif
@@ -38,9 +38,9 @@ struct Greeter {
         get {
             #if arch(wasm32)
             @_extern(wasm, module: "Check", name: "bjs_Greeter_name_get")
-            func bjs_Greeter_name_get(_ self: Int32) -> Int32
+            func bjs_Greeter_name_get(_ self: Int32) throws -> Int32
             #else
-            func bjs_Greeter_name_get(_ self: Int32) -> Int32 {
+            func bjs_Greeter_name_get(_ self: Int32) throws -> Int32 {
                 fatalError("Only available on WebAssembly")
             }
             #endif
@@ -53,9 +53,9 @@ struct Greeter {
         nonmutating set {
             #if arch(wasm32)
             @_extern(wasm, module: "Check", name: "bjs_Greeter_name_set")
-            func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
+            func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) throws -> Void
             #else
-            func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
+            func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) throws -> Void {
                 fatalError("Only available on WebAssembly")
             }
             #endif
@@ -71,9 +71,9 @@ struct Greeter {
         get {
             #if arch(wasm32)
             @_extern(wasm, module: "Check", name: "bjs_Greeter_age_get")
-            func bjs_Greeter_age_get(_ self: Int32) -> Float64
+            func bjs_Greeter_age_get(_ self: Int32) throws -> Float64
             #else
-            func bjs_Greeter_age_get(_ self: Int32) -> Float64 {
+            func bjs_Greeter_age_get(_ self: Int32) throws -> Float64 {
                 fatalError("Only available on WebAssembly")
             }
             #endif
@@ -85,9 +85,9 @@ struct Greeter {
     func greet() -> String {
         #if arch(wasm32)
         @_extern(wasm, module: "Check", name: "bjs_Greeter_greet")
-        func bjs_Greeter_greet(_ self: Int32) -> Int32
+        func bjs_Greeter_greet(_ self: Int32) throws -> Int32
         #else
-        func bjs_Greeter_greet(_ self: Int32) -> Int32 {
+        func bjs_Greeter_greet(_ self: Int32) throws -> Int32 {
             fatalError("Only available on WebAssembly")
         }
         #endif
@@ -101,9 +101,9 @@ struct Greeter {
     func changeName(_ name: String) -> Void {
         #if arch(wasm32)
         @_extern(wasm, module: "Check", name: "bjs_Greeter_changeName")
-        func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) -> Void
+        func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) throws -> Void
         #else
-        func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) -> Void {
+        func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) throws -> Void {
             fatalError("Only available on WebAssembly")
         }
         #endif

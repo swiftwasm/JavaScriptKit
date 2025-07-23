@@ -9,9 +9,9 @@
 func check(_ a: Double, _ b: Bool) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_check")
-    func bjs_check(_ a: Float64, _ b: Int32) -> Void
+    func bjs_check(_ a: Float64, _ b: Int32) throws -> Void
     #else
-    func bjs_check(_ a: Float64, _ b: Int32) -> Void {
+    func bjs_check(_ a: Float64, _ b: Int32) throws -> Void {
         fatalError("Only available on WebAssembly")
     }
     #endif

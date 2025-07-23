@@ -213,6 +213,9 @@ struct ImportTS {
                             )
                         }
                     }),
+                    effectSpecifiers: FunctionEffectSpecifiersSyntax(
+                        throwsClause: ThrowsClauseSyntax(throwsSpecifier: .keyword(.throws))
+                    ),
                     returnClause: ReturnClauseSyntax(
                         arrow: .arrowToken(),
                         type: IdentifierTypeSyntax(name: .identifier(abiReturnType.map { $0.swiftType } ?? "Void"))

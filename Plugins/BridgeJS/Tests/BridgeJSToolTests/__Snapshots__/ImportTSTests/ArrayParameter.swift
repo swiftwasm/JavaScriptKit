@@ -9,9 +9,9 @@
 func checkArray(_ a: JSObject) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkArray")
-    func bjs_checkArray(_ a: Int32) -> Void
+    func bjs_checkArray(_ a: Int32) throws -> Void
     #else
-    func bjs_checkArray(_ a: Int32) -> Void {
+    func bjs_checkArray(_ a: Int32) throws -> Void {
         fatalError("Only available on WebAssembly")
     }
     #endif
@@ -21,9 +21,9 @@ func checkArray(_ a: JSObject) -> Void {
 func checkArrayWithLength(_ a: JSObject, _ b: Double) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkArrayWithLength")
-    func bjs_checkArrayWithLength(_ a: Int32, _ b: Float64) -> Void
+    func bjs_checkArrayWithLength(_ a: Int32, _ b: Float64) throws -> Void
     #else
-    func bjs_checkArrayWithLength(_ a: Int32, _ b: Float64) -> Void {
+    func bjs_checkArrayWithLength(_ a: Int32, _ b: Float64) throws -> Void {
         fatalError("Only available on WebAssembly")
     }
     #endif
@@ -33,9 +33,9 @@ func checkArrayWithLength(_ a: JSObject, _ b: Double) -> Void {
 func checkArray(_ a: JSObject) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkArray")
-    func bjs_checkArray(_ a: Int32) -> Void
+    func bjs_checkArray(_ a: Int32) throws -> Void
     #else
-    func bjs_checkArray(_ a: Int32) -> Void {
+    func bjs_checkArray(_ a: Int32) throws -> Void {
         fatalError("Only available on WebAssembly")
     }
     #endif

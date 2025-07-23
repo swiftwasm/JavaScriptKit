@@ -9,9 +9,9 @@
 func checkNumber() -> Double {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkNumber")
-    func bjs_checkNumber() -> Float64
+    func bjs_checkNumber() throws -> Float64
     #else
-    func bjs_checkNumber() -> Float64 {
+    func bjs_checkNumber() throws -> Float64 {
         fatalError("Only available on WebAssembly")
     }
     #endif
@@ -22,9 +22,9 @@ func checkNumber() -> Double {
 func checkBoolean() -> Bool {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkBoolean")
-    func bjs_checkBoolean() -> Int32
+    func bjs_checkBoolean() throws -> Int32
     #else
-    func bjs_checkBoolean() -> Int32 {
+    func bjs_checkBoolean() throws -> Int32 {
         fatalError("Only available on WebAssembly")
     }
     #endif

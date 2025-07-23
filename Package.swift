@@ -151,7 +151,8 @@ let package = Package(
                 .product(name: "SwiftBasicFormat", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
             ],
-            path: "Plugins/BridgeJS/Sources/BridgeJSTool"
+            path: "Plugins/BridgeJS/Sources/BridgeJSTool",
+            exclude: ["TS2Skeleton/JavaScript"]
         ),
         .testTarget(
             name: "BridgeJSRuntimeTests",
@@ -159,7 +160,7 @@ let package = Package(
             exclude: [
                 "bridge-js.config.json",
                 "bridge-js.d.ts",
-                "Generated/JavaScript"
+                "Generated/JavaScript",
             ],
             swiftSettings: [
                 .enableExperimentalFeature("Extern")
