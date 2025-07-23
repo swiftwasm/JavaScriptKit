@@ -16,6 +16,9 @@ func benchmarkHelperNoop() throws(JSException) -> Void {
     }
     #endif
     bjs_benchmarkHelperNoop()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
 func benchmarkHelperNoopWithNumber(_ n: Double) throws(JSException) -> Void {
@@ -28,6 +31,9 @@ func benchmarkHelperNoopWithNumber(_ n: Double) throws(JSException) -> Void {
     }
     #endif
     bjs_benchmarkHelperNoopWithNumber(n)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
 func benchmarkRunner(_ name: String, _ body: JSObject) throws(JSException) -> Void {
@@ -44,4 +50,7 @@ func benchmarkRunner(_ name: String, _ body: JSObject) throws(JSException) -> Vo
         _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
     }
     bjs_benchmarkRunner(nameId, Int32(bitPattern: body.id))
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }

@@ -433,25 +433,7 @@ class ExportSwift {
         }
 
         func lowerReturnValue(returnType: BridgeType) {
-            switch returnType {
-            case .void:
-                abiReturnType = nil
-            case .bool:
-                abiReturnType = .i32
-            case .int:
-                abiReturnType = .i32
-            case .float:
-                abiReturnType = .f32
-            case .double:
-                abiReturnType = .f64
-            case .string:
-                abiReturnType = nil
-            case .jsObject:
-                abiReturnType = .i32
-            case .swiftHeapObject:
-                // UnsafeMutableRawPointer is returned as an i32 pointer
-                abiReturnType = .pointer
-            }
+            abiReturnType = returnType.abiReturnType
 
             switch returnType {
             case .void: break

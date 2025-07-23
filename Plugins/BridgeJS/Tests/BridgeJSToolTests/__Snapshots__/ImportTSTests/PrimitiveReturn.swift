@@ -16,6 +16,9 @@ func checkNumber() throws(JSException) -> Double {
     }
     #endif
     let ret = bjs_checkNumber()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
     return Double(ret)
 }
 
@@ -29,5 +32,8 @@ func checkBoolean() throws(JSException) -> Bool {
     }
     #endif
     let ret = bjs_checkBoolean()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
     return ret == 1
 }

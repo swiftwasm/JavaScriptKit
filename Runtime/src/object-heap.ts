@@ -12,13 +12,13 @@ export class JSObjectSpace {
 
     constructor() {
         this._heapValueById = new Map();
-        this._heapValueById.set(0, globalVariable);
+        this._heapValueById.set(1, globalVariable);
 
         this._heapEntryByValue = new Map();
-        this._heapEntryByValue.set(globalVariable, { id: 0, rc: 1 });
+        this._heapEntryByValue.set(globalVariable, { id: 1, rc: 1 });
 
-        // Note: 0 is preserved for global
-        this._heapNextKey = 1;
+        // Note: 0 is preserved for invalid references, 1 is preserved for globalThis
+        this._heapNextKey = 2;
     }
 
     retain(value: any) {

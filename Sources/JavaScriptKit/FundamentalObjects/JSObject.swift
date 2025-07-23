@@ -218,7 +218,7 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
         return swjs_instanceof(id, constructor.id)
     }
 
-    static let _JS_Predef_Value_Global: JavaScriptObjectRef = 0
+    static let _JS_Predef_Value_Global: JavaScriptObjectRef = 1
 
     /// A `JSObject` of the global scope object.
     /// This allows access to the global properties and global names by accessing the `JSObject` returned.

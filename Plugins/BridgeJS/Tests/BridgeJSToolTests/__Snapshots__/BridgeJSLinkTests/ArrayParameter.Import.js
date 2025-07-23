@@ -7,6 +7,7 @@
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
+    let setException;
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
 
@@ -47,18 +48,33 @@ export async function createInstantiator(options, swift) {
             }
             const TestModule = importObject["TestModule"] = {};
             TestModule["bjs_checkArray"] = function bjs_checkArray(a) {
-                options.imports.checkArray(swift.memory.getObject(a));
+                try {
+                    options.imports.checkArray(swift.memory.getObject(a));
+                } catch (error) {
+                    setException(error);
+                }
             }
             TestModule["bjs_checkArrayWithLength"] = function bjs_checkArrayWithLength(a, b) {
-                options.imports.checkArrayWithLength(swift.memory.getObject(a), b);
+                try {
+                    options.imports.checkArrayWithLength(swift.memory.getObject(a), b);
+                } catch (error) {
+                    setException(error);
+                }
             }
             TestModule["bjs_checkArray"] = function bjs_checkArray(a) {
-                options.imports.checkArray(swift.memory.getObject(a));
+                try {
+                    options.imports.checkArray(swift.memory.getObject(a));
+                } catch (error) {
+                    setException(error);
+                }
             }
         },
         setInstance: (i) => {
             instance = i;
             memory = instance.exports.memory;
+            setException = (error) => {
+                instance.exports._swift_js_exception.value = swift.memory.retain(error)
+            }
         },
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {

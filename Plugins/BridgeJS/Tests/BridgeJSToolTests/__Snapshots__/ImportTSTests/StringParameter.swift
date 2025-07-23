@@ -20,6 +20,9 @@ func checkString(_ a: String) throws(JSException) -> Void {
         _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
     }
     bjs_checkString(aId)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
 func checkStringWithLength(_ a: String, _ b: Double) throws(JSException) -> Void {
@@ -36,4 +39,7 @@ func checkStringWithLength(_ a: String, _ b: Double) throws(JSException) -> Void
         _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
     }
     bjs_checkStringWithLength(aId, b)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }

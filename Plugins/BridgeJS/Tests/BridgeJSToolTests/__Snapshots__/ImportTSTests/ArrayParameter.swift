@@ -16,6 +16,9 @@ func checkArray(_ a: JSObject) throws(JSException) -> Void {
     }
     #endif
     bjs_checkArray(Int32(bitPattern: a.id))
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
 func checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> Void {
@@ -28,6 +31,9 @@ func checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> Voi
     }
     #endif
     bjs_checkArrayWithLength(Int32(bitPattern: a.id), b)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
 func checkArray(_ a: JSObject) throws(JSException) -> Void {
@@ -40,4 +46,7 @@ func checkArray(_ a: JSObject) throws(JSException) -> Void {
     }
     #endif
     bjs_checkArray(Int32(bitPattern: a.id))
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }

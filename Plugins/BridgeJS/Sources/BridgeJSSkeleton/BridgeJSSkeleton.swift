@@ -101,3 +101,20 @@ struct ImportedModuleSkeleton: Codable {
     let moduleName: String
     var children: [ImportedFileSkeleton]
 }
+
+extension BridgeType {
+    var abiReturnType: WasmCoreType? {
+        switch self {
+        case .void: return nil
+        case .bool: return .i32
+        case .int: return .i32
+        case .float: return .f32
+        case .double: return .f64
+        case .string: return nil
+        case .jsObject: return .i32
+        case .swiftHeapObject:
+            // UnsafeMutableRawPointer is returned as an i32 pointer
+            return .pointer
+        }
+    }
+}

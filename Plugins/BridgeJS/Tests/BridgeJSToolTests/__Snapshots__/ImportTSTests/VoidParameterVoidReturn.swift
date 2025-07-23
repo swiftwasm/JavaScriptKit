@@ -16,4 +16,7 @@ func check() throws(JSException) -> Void {
     }
     #endif
     bjs_check()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }

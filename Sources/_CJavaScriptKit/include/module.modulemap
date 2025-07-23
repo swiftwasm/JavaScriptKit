@@ -1,4 +1,5 @@
 module _CJavaScriptKit {
     header "_CJavaScriptKit.h"
+    header "BridgeJSInstrincics.h"
     export *
 }

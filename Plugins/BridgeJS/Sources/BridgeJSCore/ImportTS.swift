@@ -151,6 +151,7 @@ struct ImportTS {
             } else {
                 body.append("let ret = \(raw: call)")
             }
+            body.append("if let error = _swift_js_take_exception() { throw error }")
         }
 
         func liftReturnValue(returnType: BridgeType) throws {

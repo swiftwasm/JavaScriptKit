@@ -31,6 +31,9 @@ struct Greeter {
             _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         let ret = bjs_Greeter_init(nameId)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
         self.this = JSObject(id: UInt32(bitPattern: ret))
     }
 
@@ -45,6 +48,9 @@ struct Greeter {
             }
             #endif
             let ret = bjs_Greeter_name_get(Int32(bitPattern: self.this.id))
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return String(unsafeUninitializedCapacity: Int(ret)) { b in
                 _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
                 return Int(ret)
@@ -66,6 +72,9 @@ struct Greeter {
             _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         bjs_Greeter_name_set(Int32(bitPattern: self.this.id), newValueId)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
     }
 
     var age: Double {
@@ -79,6 +88,9 @@ struct Greeter {
             }
             #endif
             let ret = bjs_Greeter_age_get(Int32(bitPattern: self.this.id))
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return Double(ret)
         }
     }
@@ -93,6 +105,9 @@ struct Greeter {
         }
         #endif
         let ret = bjs_Greeter_greet(Int32(bitPattern: self.this.id))
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
         return String(unsafeUninitializedCapacity: Int(ret)) { b in
             _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
             return Int(ret)
@@ -113,6 +128,9 @@ struct Greeter {
             _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         bjs_Greeter_changeName(Int32(bitPattern: self.this.id), nameId)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
     }
 
 }

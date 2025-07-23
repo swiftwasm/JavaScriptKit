@@ -16,4 +16,7 @@ func checkSimple(_ a: Double) throws(JSException) -> Void {
     }
     #endif
     bjs_checkSimple(a)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }

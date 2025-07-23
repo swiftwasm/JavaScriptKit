@@ -7,6 +7,7 @@
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
+    let setException;
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
 
@@ -47,21 +48,39 @@ export async function createInstantiator(options, swift) {
             }
             const TestModule = importObject["TestModule"] = {};
             TestModule["bjs_returnAnimatable"] = function bjs_returnAnimatable() {
-                let ret = options.imports.returnAnimatable();
-                return swift.memory.retain(ret);
+                try {
+                    let ret = options.imports.returnAnimatable();
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
             }
             TestModule["bjs_Animatable_animate"] = function bjs_Animatable_animate(self, keyframes, options) {
-                let ret = swift.memory.getObject(self).animate(swift.memory.getObject(keyframes), swift.memory.getObject(options));
-                return swift.memory.retain(ret);
+                try {
+                    let ret = swift.memory.getObject(self).animate(swift.memory.getObject(keyframes), swift.memory.getObject(options));
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
             }
             TestModule["bjs_Animatable_getAnimations"] = function bjs_Animatable_getAnimations(self, options) {
-                let ret = swift.memory.getObject(self).getAnimations(swift.memory.getObject(options));
-                return swift.memory.retain(ret);
+                try {
+                    let ret = swift.memory.getObject(self).getAnimations(swift.memory.getObject(options));
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
             }
         },
         setInstance: (i) => {
             instance = i;
             memory = instance.exports.memory;
+            setException = (error) => {
+                instance.exports._swift_js_exception.value = swift.memory.retain(error)
+            }
         },
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {

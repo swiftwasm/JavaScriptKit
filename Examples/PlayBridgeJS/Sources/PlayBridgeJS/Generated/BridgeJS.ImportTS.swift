@@ -16,6 +16,9 @@ func createTS2Skeleton() throws(JSException) -> TS2Skeleton {
     }
     #endif
     let ret = bjs_createTS2Skeleton()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
     return TS2Skeleton(takingThis: ret)
 }
 
@@ -44,6 +47,9 @@ struct TS2Skeleton {
             _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         let ret = bjs_TS2Skeleton_convert(Int32(bitPattern: self.this.id), tsId)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
         return String(unsafeUninitializedCapacity: Int(ret)) { b in
             _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
             return Int(ret)

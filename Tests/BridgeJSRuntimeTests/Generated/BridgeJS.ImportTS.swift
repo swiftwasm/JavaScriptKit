@@ -16,6 +16,9 @@ func jsRoundTripVoid() throws(JSException) -> Void {
     }
     #endif
     bjs_jsRoundTripVoid()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
 func jsRoundTripNumber(_ v: Double) throws(JSException) -> Double {
@@ -28,6 +31,9 @@ func jsRoundTripNumber(_ v: Double) throws(JSException) -> Double {
     }
     #endif
     let ret = bjs_jsRoundTripNumber(v)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
     return Double(ret)
 }
 
@@ -41,6 +47,9 @@ func jsRoundTripBool(_ v: Bool) throws(JSException) -> Bool {
     }
     #endif
     let ret = bjs_jsRoundTripBool(Int32(v ? 1 : 0))
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
     return ret == 1
 }
 
@@ -58,6 +67,75 @@ func jsRoundTripString(_ v: String) throws(JSException) -> String {
         _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
     }
     let ret = bjs_jsRoundTripString(vId)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String(unsafeUninitializedCapacity: Int(ret)) { b in
+        _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
+        return Int(ret)
+    }
+}
+
+func jsThrowOrVoid(_ shouldThrow: Bool) throws(JSException) -> Void {
+    #if arch(wasm32)
+    @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsThrowOrVoid")
+    func bjs_jsThrowOrVoid(_ shouldThrow: Int32) -> Void
+    #else
+    func bjs_jsThrowOrVoid(_ shouldThrow: Int32) -> Void {
+        fatalError("Only available on WebAssembly")
+    }
+    #endif
+    bjs_jsThrowOrVoid(Int32(shouldThrow ? 1 : 0))
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func jsThrowOrNumber(_ shouldThrow: Bool) throws(JSException) -> Double {
+    #if arch(wasm32)
+    @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsThrowOrNumber")
+    func bjs_jsThrowOrNumber(_ shouldThrow: Int32) -> Float64
+    #else
+    func bjs_jsThrowOrNumber(_ shouldThrow: Int32) -> Float64 {
+        fatalError("Only available on WebAssembly")
+    }
+    #endif
+    let ret = bjs_jsThrowOrNumber(Int32(shouldThrow ? 1 : 0))
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double(ret)
+}
+
+func jsThrowOrBool(_ shouldThrow: Bool) throws(JSException) -> Bool {
+    #if arch(wasm32)
+    @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsThrowOrBool")
+    func bjs_jsThrowOrBool(_ shouldThrow: Int32) -> Int32
+    #else
+    func bjs_jsThrowOrBool(_ shouldThrow: Int32) -> Int32 {
+        fatalError("Only available on WebAssembly")
+    }
+    #endif
+    let ret = bjs_jsThrowOrBool(Int32(shouldThrow ? 1 : 0))
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return ret == 1
+}
+
+func jsThrowOrString(_ shouldThrow: Bool) throws(JSException) -> String {
+    #if arch(wasm32)
+    @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsThrowOrString")
+    func bjs_jsThrowOrString(_ shouldThrow: Int32) -> Int32
+    #else
+    func bjs_jsThrowOrString(_ shouldThrow: Int32) -> Int32 {
+        fatalError("Only available on WebAssembly")
+    }
+    #endif
+    let ret = bjs_jsThrowOrString(Int32(shouldThrow ? 1 : 0))
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
     return String(unsafeUninitializedCapacity: Int(ret)) { b in
         _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
         return Int(ret)
@@ -93,6 +171,9 @@ struct JsGreeter {
             _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         let ret = bjs_JsGreeter_init(nameId, prefixId)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
         self.this = JSObject(id: UInt32(bitPattern: ret))
     }
 
@@ -107,6 +188,9 @@ struct JsGreeter {
             }
             #endif
             let ret = bjs_JsGreeter_name_get(Int32(bitPattern: self.this.id))
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return String(unsafeUninitializedCapacity: Int(ret)) { b in
                 _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
                 return Int(ret)
@@ -128,6 +212,9 @@ struct JsGreeter {
             _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         bjs_JsGreeter_name_set(Int32(bitPattern: self.this.id), newValueId)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
     }
 
     var prefix: String {
@@ -141,6 +228,9 @@ struct JsGreeter {
             }
             #endif
             let ret = bjs_JsGreeter_prefix_get(Int32(bitPattern: self.this.id))
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return String(unsafeUninitializedCapacity: Int(ret)) { b in
                 _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
                 return Int(ret)
@@ -158,6 +248,9 @@ struct JsGreeter {
         }
         #endif
         let ret = bjs_JsGreeter_greet(Int32(bitPattern: self.this.id))
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
         return String(unsafeUninitializedCapacity: Int(ret)) { b in
             _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
             return Int(ret)
@@ -178,6 +271,9 @@ struct JsGreeter {
             _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
         }
         bjs_JsGreeter_changeName(Int32(bitPattern: self.this.id), nameId)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
     }
 
 }

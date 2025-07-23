@@ -16,4 +16,7 @@ func check(_ a: Double, _ b: Bool) throws(JSException) -> Void {
     }
     #endif
     bjs_check(a, Int32(b ? 1 : 0))
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }

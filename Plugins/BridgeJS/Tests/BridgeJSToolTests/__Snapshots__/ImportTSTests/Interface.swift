@@ -16,6 +16,9 @@ func returnAnimatable() throws(JSException) -> Animatable {
     }
     #endif
     let ret = bjs_returnAnimatable()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
     return Animatable(takingThis: ret)
 }
 
@@ -40,6 +43,9 @@ struct Animatable {
         }
         #endif
         let ret = bjs_Animatable_animate(Int32(bitPattern: self.this.id), Int32(bitPattern: keyframes.id), Int32(bitPattern: options.id))
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
         return JSObject(id: UInt32(bitPattern: ret))
     }
 
@@ -53,6 +59,9 @@ struct Animatable {
         }
         #endif
         let ret = bjs_Animatable_getAnimations(Int32(bitPattern: self.this.id), Int32(bitPattern: options.id))
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
         return JSObject(id: UInt32(bitPattern: ret))
     }
 

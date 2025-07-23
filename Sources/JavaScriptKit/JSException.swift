@@ -34,6 +34,7 @@ public struct JSException: Error, Equatable, CustomStringConvertible {
     /// Initializes a new JSException instance with a value thrown from JavaScript.
     ///
     /// Only available within the package. This must be called on the thread where the exception object created.
+    @usableFromInline
     package init(_ thrownValue: JSValue) {
         self._thrownValue = thrownValue
         // Capture the stringified representation on the object owner thread

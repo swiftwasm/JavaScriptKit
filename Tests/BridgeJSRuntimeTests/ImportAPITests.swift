@@ -35,6 +35,43 @@ class ImportAPITests: XCTestCase {
         }
     }
 
+    func ensureThrows<T>(_ f: (Bool) throws(JSException) -> T) throws {
+        do {
+            _ = try f(true)
+            XCTFail("Expected exception")
+        } catch {
+            XCTAssertTrue(error.description.contains("TestError"))
+        }
+    }
+    func ensureDoesNotThrow<T>(_ f: (Bool) throws(JSException) -> T, _ assertValue: (T) -> Void) throws {
+        do {
+            let result = try f(false)
+            assertValue(result)
+        } catch {
+            XCTFail("Expected no exception")
+        }
+    }
+
+    func testThrowOrVoid() throws {
+        try ensureThrows(jsThrowOrVoid)
+        try ensureDoesNotThrow(jsThrowOrVoid, { _ in })
+    }
+
+    func testThrowOrNumber() throws {
+        try ensureThrows(jsThrowOrNumber)
+        try ensureDoesNotThrow(jsThrowOrNumber, { XCTAssertEqual($0, 1) })
+    }
+
+    func testThrowOrBool() throws {
+        try ensureThrows(jsThrowOrBool)
+        try ensureDoesNotThrow(jsThrowOrBool, { XCTAssertEqual($0, true) })
+    }
+
+    func testThrowOrString() throws {
+        try ensureThrows(jsThrowOrString)
+        try ensureDoesNotThrow(jsThrowOrString, { XCTAssertEqual($0, "Hello, world!") })
+    }
+
     func testClass() throws {
         let greeter = try JsGreeter("Alice", "Hello")
         XCTAssertEqual(try greeter.greet(), "Hello, Alice!")
