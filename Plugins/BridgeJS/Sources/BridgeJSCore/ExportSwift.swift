@@ -299,6 +299,15 @@ class ExportSwift {
             self.effects = effects
         }
 
+        private func append(_ item: CodeBlockItemSyntax) {
+            var item = item
+            // Add a newline for items after the first one
+            if !self.body.isEmpty {
+                item = item.with(\.leadingTrivia, .newline)
+            }
+            self.body.append(item)
+        }
+
         func liftParameter(param: Parameter) {
             switch param.type {
             case .bool:
@@ -342,7 +351,7 @@ class ExportSwift {
                         return Int(\(raw: lengthLabel))
                     }
                     """
-                body.append(prepare)
+                append(prepare)
                 abiParameterForwardings.append(
                     LabeledExprSyntax(
                         label: param.label,
@@ -404,7 +413,7 @@ class ExportSwift {
 
         func call(name: String, returnType: BridgeType) {
             let item = renderCallStatement(callee: "\(raw: name)", returnType: returnType)
-            body.append(item)
+            append(item)
         }
 
         func callMethod(klassName: String, methodName: String, returnType: BridgeType) {
@@ -413,7 +422,7 @@ class ExportSwift {
                 callee: "\(raw: _selfParam).\(raw: methodName)",
                 returnType: returnType
             )
-            body.append(item)
+            append(item)
         }
 
         func lowerReturnValue(returnType: BridgeType) {
@@ -440,11 +449,11 @@ class ExportSwift {
             switch returnType {
             case .void: break
             case .int, .float, .double:
-                body.append("return \(raw: abiReturnType!.swiftType)(ret)")
+                append("return \(raw: abiReturnType!.swiftType)(ret)")
             case .bool:
-                body.append("return Int32(ret ? 1 : 0)")
+                append("return Int32(ret ? 1 : 0)")
             case .string:
-                body.append(
+                append(
                     """
                     return ret.withUTF8 { ptr in
                         _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
@@ -452,13 +461,13 @@ class ExportSwift {
                     """
                 )
             case .jsObject(nil):
-                body.append(
+                append(
                     """
                     return _swift_js_retain(Int32(bitPattern: ret.id))
                     """
                 )
             case .jsObject(_?):
-                body.append(
+                append(
                     """
                     return _swift_js_retain(Int32(bitPattern: ret.this.id))
                     """
@@ -466,7 +475,7 @@ class ExportSwift {
             case .swiftHeapObject:
                 // Perform a manual retain on the object, which will be balanced by a
                 // release called via FinalizationRegistry
-                body.append(
+                append(
                     """
                     return Unmanaged.passRetained(ret).toOpaque()
                     """
