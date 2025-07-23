@@ -88,3 +88,36 @@ jobs:
             echo "::error::The formatting changed some files. Please run \`./Utilities/format.swift\` and commit the changes."
             exit 1
           }
+  build-examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/install-swift
+        with:
+          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a-ubuntu22.04.tar.gz
+      - uses: swiftwasm/setup-swiftwasm@v2
+        id: setup-wasm32-unknown-wasi
+        with: { target: wasm32-unknown-wasi }
+      - uses: swiftwasm/setup-swiftwasm@v2
+        id: setup-wasm32-unknown-wasip1-threads
+        with: { target: wasm32-unknown-wasip1-threads }
+      - run: ./Utilities/build-examples.sh
+        env:
+          SWIFT_SDK_ID_wasm32_unknown_wasip1_threads: ${{ steps.setup-wasm32-unknown-wasip1-threads.outputs.swift-sdk-id }}
+          SWIFT_SDK_ID_wasm32_unknown_wasi: ${{ steps.setup-wasm32-unknown-wasi.outputs.swift-sdk-id }}
+      - name: Upload static files as artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: Examples/
+  deploy-examples:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build-examples
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

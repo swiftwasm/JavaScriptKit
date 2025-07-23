@@ -1,3 +1,3 @@
 #!/bin/bash
-set -ex
-swift package --swift-sdk "DEVELOPMENT-SNAPSHOT-2025-06-17-a-wasm32-unknown-wasi" -c "${1:-debug}" js --use-cdn
+set -euxo pipefail
+env JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1 swift package --swift-sdk "${SWIFT_SDK_ID_wasm32_unknown_wasi:-${SWIFT_SDK_ID:-wasm32-unknown-wasi}}" -c "${1:-debug}" js --use-cdn
