@@ -26,12 +26,12 @@ public func _bjs_PlayBridgeJS_update(_self: UnsafeMutableRawPointer, swiftSource
             _swift_js_init_memory(swiftSourceBytes, b.baseAddress.unsafelyUnwrapped)
             return Int(swiftSourceLen)
         }
-    let dtsSource = String(unsafeUninitializedCapacity: Int(dtsSourceLen)) { b in
+        let dtsSource = String(unsafeUninitializedCapacity: Int(dtsSourceLen)) { b in
             _swift_js_init_memory(dtsSourceBytes, b.baseAddress.unsafelyUnwrapped)
             return Int(dtsSourceLen)
         }
-    let ret = try Unmanaged<PlayBridgeJS>.fromOpaque(_self).takeUnretainedValue().update(swiftSource: swiftSource, dtsSource: dtsSource)
-    return Unmanaged.passRetained(ret).toOpaque()
+        let ret = try Unmanaged<PlayBridgeJS>.fromOpaque(_self).takeUnretainedValue().update(swiftSource: swiftSource, dtsSource: dtsSource)
+        return Unmanaged.passRetained(ret).toOpaque()
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {

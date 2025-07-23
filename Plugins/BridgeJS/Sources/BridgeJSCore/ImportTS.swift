@@ -213,9 +213,6 @@ struct ImportTS {
                             )
                         }
                     }),
-                    effectSpecifiers: FunctionEffectSpecifiersSyntax(
-                        throwsClause: ThrowsClauseSyntax(throwsSpecifier: .keyword(.throws))
-                    ),
                     returnClause: ReturnClauseSyntax(
                         arrow: .arrowToken(),
                         type: IdentifierTypeSyntax(name: .identifier(abiReturnType.map { $0.swiftType } ?? "Void"))
@@ -256,6 +253,7 @@ struct ImportTS {
                                 )
                             }
                         }),
+                        effectSpecifiers: ImportTS.buildFunctionEffect(throws: true, async: false),
                         returnClause: ReturnClauseSyntax(
                             arrow: .arrowToken(),
                             type: IdentifierTypeSyntax(name: .identifier(returnType.swiftType))
@@ -471,5 +469,18 @@ struct ImportTS {
         }
         let lines = documentation.split { $0.isNewline }
         return Trivia(pieces: lines.flatMap { [TriviaPiece.docLineComment("/// \($0)"), .newlines(1)] })
+    }
+
+    static func buildFunctionEffect(throws: Bool, async: Bool) -> FunctionEffectSpecifiersSyntax {
+        return FunctionEffectSpecifiersSyntax(
+            asyncSpecifier: `async` ? .keyword(.async) : nil,
+            throwsClause: `throws`
+                ? ThrowsClauseSyntax(
+                    throwsSpecifier: .keyword(.throws),
+                    leftParen: .leftParenToken(),
+                    type: IdentifierTypeSyntax(name: .identifier("JSException")),
+                    rightParen: .rightParenToken()
+                ) : nil,
+        )
     }
 }

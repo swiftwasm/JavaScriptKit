@@ -6,36 +6,36 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-func checkArray(_ a: JSObject) -> Void {
+func checkArray(_ a: JSObject) throws(JSException) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkArray")
-    func bjs_checkArray(_ a: Int32) throws -> Void
+    func bjs_checkArray(_ a: Int32) -> Void
     #else
-    func bjs_checkArray(_ a: Int32) throws -> Void {
+    func bjs_checkArray(_ a: Int32) -> Void {
         fatalError("Only available on WebAssembly")
     }
     #endif
     bjs_checkArray(Int32(bitPattern: a.id))
 }
 
-func checkArrayWithLength(_ a: JSObject, _ b: Double) -> Void {
+func checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkArrayWithLength")
-    func bjs_checkArrayWithLength(_ a: Int32, _ b: Float64) throws -> Void
+    func bjs_checkArrayWithLength(_ a: Int32, _ b: Float64) -> Void
     #else
-    func bjs_checkArrayWithLength(_ a: Int32, _ b: Float64) throws -> Void {
+    func bjs_checkArrayWithLength(_ a: Int32, _ b: Float64) -> Void {
         fatalError("Only available on WebAssembly")
     }
     #endif
     bjs_checkArrayWithLength(Int32(bitPattern: a.id), b)
 }
 
-func checkArray(_ a: JSObject) -> Void {
+func checkArray(_ a: JSObject) throws(JSException) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkArray")
-    func bjs_checkArray(_ a: Int32) throws -> Void
+    func bjs_checkArray(_ a: Int32) -> Void
     #else
-    func bjs_checkArray(_ a: Int32) throws -> Void {
+    func bjs_checkArray(_ a: Int32) -> Void {
         fatalError("Only available on WebAssembly")
     }
     #endif

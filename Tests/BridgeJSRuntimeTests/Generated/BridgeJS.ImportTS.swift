@@ -6,7 +6,7 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-func jsRoundTripVoid() -> Void {
+func jsRoundTripVoid() throws(JSException) -> Void {
     #if arch(wasm32)
     @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripVoid")
     func bjs_jsRoundTripVoid() -> Void
@@ -18,7 +18,7 @@ func jsRoundTripVoid() -> Void {
     bjs_jsRoundTripVoid()
 }
 
-func jsRoundTripNumber(_ v: Double) -> Double {
+func jsRoundTripNumber(_ v: Double) throws(JSException) -> Double {
     #if arch(wasm32)
     @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripNumber")
     func bjs_jsRoundTripNumber(_ v: Float64) -> Float64
@@ -31,7 +31,7 @@ func jsRoundTripNumber(_ v: Double) -> Double {
     return Double(ret)
 }
 
-func jsRoundTripBool(_ v: Bool) -> Bool {
+func jsRoundTripBool(_ v: Bool) throws(JSException) -> Bool {
     #if arch(wasm32)
     @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripBool")
     func bjs_jsRoundTripBool(_ v: Int32) -> Int32
@@ -44,7 +44,7 @@ func jsRoundTripBool(_ v: Bool) -> Bool {
     return ret == 1
 }
 
-func jsRoundTripString(_ v: String) -> String {
+func jsRoundTripString(_ v: String) throws(JSException) -> String {
     #if arch(wasm32)
     @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripString")
     func bjs_jsRoundTripString(_ v: Int32) -> Int32
@@ -147,7 +147,7 @@ struct JsGreeter {
         }
     }
 
-    func greet() -> String {
+    func greet() throws(JSException) -> String {
         #if arch(wasm32)
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_greet")
         func bjs_JsGreeter_greet(_ self: Int32) -> Int32
@@ -163,7 +163,7 @@ struct JsGreeter {
         }
     }
 
-    func changeName(_ name: String) -> Void {
+    func changeName(_ name: String) throws(JSException) -> Void {
         #if arch(wasm32)
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_changeName")
         func bjs_JsGreeter_changeName(_ self: Int32, _ name: Int32) -> Void

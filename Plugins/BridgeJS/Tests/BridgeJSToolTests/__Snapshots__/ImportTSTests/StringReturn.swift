@@ -6,12 +6,12 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-func checkString() -> String {
+func checkString() throws(JSException) -> String {
     #if arch(wasm32)
     @_extern(wasm, module: "Check", name: "bjs_checkString")
-    func bjs_checkString() throws -> Int32
+    func bjs_checkString() -> Int32
     #else
-    func bjs_checkString() throws -> Int32 {
+    func bjs_checkString() -> Int32 {
         fatalError("Only available on WebAssembly")
     }
     #endif

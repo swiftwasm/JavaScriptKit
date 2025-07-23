@@ -6,7 +6,7 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-func createTS2Skeleton() -> TS2Skeleton {
+func createTS2Skeleton() throws(JSException) -> TS2Skeleton {
     #if arch(wasm32)
     @_extern(wasm, module: "PlayBridgeJS", name: "bjs_createTS2Skeleton")
     func bjs_createTS2Skeleton() -> Int32
@@ -30,7 +30,7 @@ struct TS2Skeleton {
         self.this = JSObject(id: UInt32(bitPattern: this))
     }
 
-    func convert(_ ts: String) -> String {
+    func convert(_ ts: String) throws(JSException) -> String {
         #if arch(wasm32)
         @_extern(wasm, module: "PlayBridgeJS", name: "bjs_TS2Skeleton_convert")
         func bjs_TS2Skeleton_convert(_ self: Int32, _ ts: Int32) -> Int32
