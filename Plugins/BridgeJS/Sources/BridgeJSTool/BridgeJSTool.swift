@@ -6,7 +6,6 @@
 @preconcurrency import class Foundation.JSONEncoder
 @preconcurrency import class Foundation.FileManager
 @preconcurrency import class Foundation.JSONDecoder
-@preconcurrency import class Foundation.ProcessInfo
 import SwiftParser
 
 /// BridgeJS Tool
@@ -220,33 +219,6 @@ import SwiftParser
     }
 }
 
-internal func which(_ executable: String) throws -> URL {
-    do {
-        // Check overriding environment variable
-        let envVariable = executable.uppercased().replacingOccurrences(of: "-", with: "_") + "_PATH"
-        if let path = ProcessInfo.processInfo.environment[envVariable] {
-            let url = URL(fileURLWithPath: path).appendingPathComponent(executable)
-            if FileManager.default.isExecutableFile(atPath: url.path) {
-                return url
-            }
-        }
-    }
-    let pathSeparator: Character
-    #if os(Windows)
-    pathSeparator = ";"
-    #else
-    pathSeparator = ":"
-    #endif
-    let paths = ProcessInfo.processInfo.environment["PATH"]!.split(separator: pathSeparator)
-    for path in paths {
-        let url = URL(fileURLWithPath: String(path)).appendingPathComponent(executable)
-        if FileManager.default.isExecutableFile(atPath: url.path) {
-            return url
-        }
-    }
-    throw BridgeJSToolError("Executable \(executable) not found in PATH")
-}
-
 struct BridgeJSToolError: Swift.Error, CustomStringConvertible {
     let description: String
 
@@ -257,26 +229,6 @@ struct BridgeJSToolError: Swift.Error, CustomStringConvertible {
 
 private func printStderr(_ message: String) {
     fputs(message + "\n", stderr)
-}
-
-struct ProgressReporting {
-    let print: (String) -> Void
-
-    init(verbose: Bool) {
-        self.init(print: verbose ? { Swift.print($0) } : { _ in })
-    }
-
-    private init(print: @escaping (String) -> Void) {
-        self.print = print
-    }
-
-    static var silent: ProgressReporting {
-        return ProgressReporting(print: { _ in })
-    }
-
-    func print(_ message: String) {
-        self.print(message)
-    }
 }
 
 // MARK: - Minimal Argument Parsing
