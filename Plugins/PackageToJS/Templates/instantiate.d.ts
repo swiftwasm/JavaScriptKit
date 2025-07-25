@@ -1,4 +1,6 @@
-import type { /* #if USE_SHARED_MEMORY */SwiftRuntimeThreadChannel, /* #endif */SwiftRuntime } from "./runtime.js";
+/* #if USE_SHARED_MEMORY */
+import type { SwiftRuntimeThreadChannel } from "./runtime.js";
+/* #endif */
 
 /* #if HAS_BRIDGE */
 export type { Imports, Exports } from "./bridge-js.js";
@@ -48,6 +50,12 @@ export interface WASI {
      * @returns The data of the file if it was extracted, undefined otherwise
      */
     extractFile?(path: string): Uint8Array | undefined
+}
+
+export type SwiftRuntime = {
+    UnsafeEventLoopYield: { [Symbol.hasInstance]: (value: unknown) => boolean }
+    main(): void;
+    startThread(tid: number, startArg: number): void;
 }
 
 export type ModuleSource = WebAssembly.Module | ArrayBufferView | ArrayBuffer | Response | PromiseLike<Response>
