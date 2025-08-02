@@ -5,6 +5,7 @@
 @preconcurrency import class Foundation.FileManager
 @preconcurrency import struct Foundation.URL
 @preconcurrency import struct Foundation.Data
+@preconcurrency import struct Foundation.ObjCBool
 @preconcurrency import func Foundation.kill
 @preconcurrency import var Foundation.SIGINT
 @preconcurrency import var Foundation.SIGTERM
@@ -12,12 +13,17 @@ import protocol Dispatch.DispatchSourceSignal
 import class Dispatch.DispatchSource
 
 internal func which(_ executable: String) throws -> URL {
+    func checkCandidate(_ candidate: URL) -> Bool {
+        var isDirectory: ObjCBool = false
+        let fileExists = FileManager.default.fileExists(atPath: candidate.path, isDirectory: &isDirectory)
+        return fileExists && !isDirectory.boolValue && FileManager.default.isExecutableFile(atPath: candidate.path)
+    }
     do {
         // Check overriding environment variable
         let envVariable = executable.uppercased().replacingOccurrences(of: "-", with: "_") + "_PATH"
         if let path = ProcessInfo.processInfo.environment[envVariable] {
             let url = URL(fileURLWithPath: path).appendingPathComponent(executable)
-            if FileManager.default.isExecutableFile(atPath: url.path) {
+            if checkCandidate(url) {
                 return url
             }
         }
@@ -31,7 +37,7 @@ internal func which(_ executable: String) throws -> URL {
     let paths = ProcessInfo.processInfo.environment["PATH"]!.split(separator: pathSeparator)
     for path in paths {
         let url = URL(fileURLWithPath: String(path)).appendingPathComponent(executable)
-        if FileManager.default.isExecutableFile(atPath: url.path) {
+        if checkCandidate(url) {
             return url
         }
     }

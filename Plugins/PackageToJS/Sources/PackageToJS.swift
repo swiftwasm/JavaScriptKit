@@ -317,12 +317,17 @@ final class DefaultPackagingSystem: PackagingSystem {
 }
 
 internal func which(_ executable: String) throws -> URL {
+    func checkCandidate(_ candidate: URL) -> Bool {
+        var isDirectory: ObjCBool = false
+        let fileExists = FileManager.default.fileExists(atPath: candidate.path, isDirectory: &isDirectory)
+        return fileExists && !isDirectory.boolValue && FileManager.default.isExecutableFile(atPath: candidate.path)
+    }
     do {
         // Check overriding environment variable
         let envVariable = executable.uppercased().replacingOccurrences(of: "-", with: "_") + "_PATH"
         if let path = ProcessInfo.processInfo.environment[envVariable] {
             let url = URL(fileURLWithPath: path).appendingPathComponent(executable)
-            if FileManager.default.isExecutableFile(atPath: url.path) {
+            if checkCandidate(url) {
                 return url
             }
         }
@@ -336,7 +341,7 @@ internal func which(_ executable: String) throws -> URL {
     let paths = ProcessInfo.processInfo.environment["PATH"]!.split(separator: pathSeparator)
     for path in paths {
         let url = URL(fileURLWithPath: String(path)).appendingPathComponent(executable)
-        if FileManager.default.isExecutableFile(atPath: url.path) {
+        if checkCandidate(url) {
             return url
         }
     }
