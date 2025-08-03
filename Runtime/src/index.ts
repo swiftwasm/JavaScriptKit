@@ -224,7 +224,7 @@ export class SwiftRuntime {
         );
         if (alreadyReleased) {
             throw new Error(
-                `The JSClosure has been already released by Swift side. The closure is created at ${file}:${line}`
+                `The JSClosure has been already released by Swift side. The closure is created at ${file}:${line} @${host_func_id}`
             );
         }
         this.exports.swjs_cleanup_host_function_call(argv);

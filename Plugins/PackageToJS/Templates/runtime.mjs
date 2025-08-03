@@ -443,7 +443,7 @@ class SwiftRuntime {
         });
         const alreadyReleased = this.exports.swjs_call_host_function(host_func_id, argv, argc, callback_func_ref);
         if (alreadyReleased) {
-            throw new Error(`The JSClosure has been already released by Swift side. The closure is created at ${file}:${line}`);
+            throw new Error(`The JSClosure has been already released by Swift side. The closure is created at ${file}:${line} @${host_func_id}`);
         }
         this.exports.swjs_cleanup_host_function_call(argv);
         return output;
