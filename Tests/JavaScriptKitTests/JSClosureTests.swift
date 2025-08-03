@@ -1,4 +1,4 @@
-import JavaScriptKit
+@_spi(JSObject_id) import JavaScriptKit
 import XCTest
 
 class JSClosureTests: XCTestCase {
@@ -84,5 +84,70 @@ class JSClosureTests: XCTestCase {
         #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
         hostFunc2.release()
         #endif
+    }
+
+    func testRegressionTestForMisDeallocation() async throws {
+        // Use Node.js's `--expose-gc` flag to enable manual garbage collection.
+        guard let gc = JSObject.global.gc.function else {
+            throw XCTSkip("Missing --expose-gc flag")
+        }
+
+        // Step 1: Create many JSClosure instances
+        let obj = JSObject()
+        var closurePointers: Set<UInt32> = []
+        let numberOfSourceClosures = 10_000
+
+        do {
+            var closures: [JSClosure] = []
+            for i in 0..<numberOfSourceClosures {
+                let closure = JSClosure { _ in .undefined }
+                obj["c\(i)"] = closure.jsValue
+                closures.append(closure)
+                // Store
+                closurePointers.insert(UInt32(UInt(bitPattern: Unmanaged.passUnretained(closure).toOpaque())))
+
+                // To avoid all JSClosures having a common address diffs, randomly allocate a new object.
+                if Bool.random() {
+                    _ = JSObject()
+                }
+            }
+        }
+
+        // Step 2: Create many JSObject to make JSObject.id close to Swift heap object address
+        let minClosurePointer = closurePointers.min() ?? 0
+        let maxClosurePointer = closurePointers.max() ?? 0
+        while true {
+            let obj = JSObject()
+            if minClosurePointer == obj.id {
+                break
+            }
+        }
+
+        // Step 3: Create JSClosure instances and find the one with JSClosure.id == &closurePointers[x]
+        do {
+            while true {
+                let c = JSClosure { _ in .undefined }
+                if closurePointers.contains(c.id) || c.id > maxClosurePointer {
+                    break
+                }
+                // To avoid all JSClosures having a common JSObject.id diffs, randomly allocate a new JS object.
+                if Bool.random() {
+                    _ = JSObject()
+                }
+            }
+        }
+
+        // Step 4: Trigger garbage collection to call the finalizer of the conflicting JSClosure instance
+        for _ in 0..<100 {
+            gc()
+            // Tick the event loop to allow the garbage collector to run finalizers
+            // registered by FinalizationRegistry.
+            try await Task.sleep(for: .milliseconds(0))
+        }
+
+        // Step 5: Verify that the JSClosure instances are still alive and can be called
+        for i in 0..<numberOfSourceClosures {
+            _ = obj["c\(i)"].function!()
+        }
     }
 }
