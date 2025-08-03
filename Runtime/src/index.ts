@@ -557,6 +557,18 @@ export class SwiftRuntime {
                 return func_ref;
             },
 
+            swjs_create_oneshot_function: (
+                host_func_id: number,
+                line: number,
+                file: ref
+            ) => {
+                const fileString = this.memory.getObject(file) as string;
+                const func = (...args: any[]) =>
+                    this.callHostFunction(host_func_id, line, fileString, args);
+                const func_ref = this.memory.retain(func);
+                return func_ref;
+            },
+
             swjs_create_typed_array: <T extends Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | BigInt64Array | BigUint64Array | Float32Array | Float64Array | Uint8ClampedArray>(
                 constructor_ref: ref,
                 elementsPtr: pointer,
