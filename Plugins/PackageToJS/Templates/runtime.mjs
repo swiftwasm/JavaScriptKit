@@ -635,7 +635,7 @@ class SwiftRuntime {
                 const fileString = this.memory.getObject(file);
                 const func = (...args) => this.callHostFunction(host_func_id, line, fileString, args);
                 const func_ref = this.memory.retain(func);
-                (_a = this.closureDeallocator) === null || _a === void 0 ? void 0 : _a.track(func, func_ref);
+                (_a = this.closureDeallocator) === null || _a === void 0 ? void 0 : _a.track(func, host_func_id);
                 return func_ref;
             },
             swjs_create_typed_array: (constructor_ref, elementsPtr, length) => {

@@ -553,7 +553,7 @@ export class SwiftRuntime {
                 const func = (...args: any[]) =>
                     this.callHostFunction(host_func_id, line, fileString, args);
                 const func_ref = this.memory.retain(func);
-                this.closureDeallocator?.track(func, func_ref);
+                this.closureDeallocator?.track(func, host_func_id);
                 return func_ref;
             },
 
