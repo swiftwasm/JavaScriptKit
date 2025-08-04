@@ -33,10 +33,7 @@ void swjs_cleanup_host_function_call(void *argv_buffer) {
     free(argv_buffer);
 }
 
-// NOTE: This __wasi__ check is a hack for Embedded compatibility (assuming that if __wasi__ is defined, we are not building for Embedded)
-// cdecls don't work in Embedded, but @_expose(wasm) can be used with Swift >=6.0
-// the previously used `#if __Embedded` did not play well with SwiftPM (defines needed to be on every target up the chain)
-# ifdef __wasi__
+# if defined(__wasi__) && !defined(__EMBEDDED_SWIFT__)
 bool _call_host_function_impl(const JavaScriptHostFuncRef host_func_ref,
                               const RawJSValue *argv, const int argc,
                               const JavaScriptObjectRef callback_func);
