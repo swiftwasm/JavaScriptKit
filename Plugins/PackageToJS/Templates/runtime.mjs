@@ -443,7 +443,7 @@ class SwiftRuntime {
         });
         const alreadyReleased = this.exports.swjs_call_host_function(host_func_id, argv, argc, callback_func_ref);
         if (alreadyReleased) {
-            throw new Error(`The JSClosure has been already released by Swift side. The closure is created at ${file}:${line}`);
+            throw new Error(`The JSClosure has been already released by Swift side. The closure is created at ${file}:${line} @${host_func_id}`);
         }
         this.exports.swjs_cleanup_host_function_call(argv);
         return output;
@@ -635,7 +635,13 @@ class SwiftRuntime {
                 const fileString = this.memory.getObject(file);
                 const func = (...args) => this.callHostFunction(host_func_id, line, fileString, args);
                 const func_ref = this.memory.retain(func);
-                (_a = this.closureDeallocator) === null || _a === void 0 ? void 0 : _a.track(func, func_ref);
+                (_a = this.closureDeallocator) === null || _a === void 0 ? void 0 : _a.track(func, host_func_id);
+                return func_ref;
+            },
+            swjs_create_oneshot_function: (host_func_id, line, file) => {
+                const fileString = this.memory.getObject(file);
+                const func = (...args) => this.callHostFunction(host_func_id, line, fileString, args);
+                const func_ref = this.memory.retain(func);
                 return func_ref;
             },
             swjs_create_typed_array: (constructor_ref, elementsPtr, length) => {

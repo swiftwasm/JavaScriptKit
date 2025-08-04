@@ -278,6 +278,16 @@ IMPORT_JS_FUNCTION(swjs_create_function, JavaScriptObjectRef, (const JavaScriptH
                                                                unsigned int line,
                                                                JavaScriptObjectRef file))
 
+/// Creates a oneshot JavaScript thunk function that calls Swift side closure.
+///
+/// @param host_func_id The target Swift side function called by the created thunk function.
+/// @param line The line where the function is created. Will be used for diagnostics
+/// @param file The file name where the function is created. Will be used for diagnostics
+/// @returns A reference to the newly-created JavaScript thunk function
+IMPORT_JS_FUNCTION(swjs_create_oneshot_function, JavaScriptObjectRef, (const JavaScriptHostFuncRef host_func_id,
+                                                                       unsigned int line,
+                                                                       JavaScriptObjectRef file))
+
 /// Instantiates a new `TypedArray` object with given elements
 /// This is used to provide an efficient way to create `TypedArray`.
 ///

@@ -224,7 +224,7 @@ export class SwiftRuntime {
         );
         if (alreadyReleased) {
             throw new Error(
-                `The JSClosure has been already released by Swift side. The closure is created at ${file}:${line}`
+                `The JSClosure has been already released by Swift side. The closure is created at ${file}:${line} @${host_func_id}`
             );
         }
         this.exports.swjs_cleanup_host_function_call(argv);
@@ -553,7 +553,19 @@ export class SwiftRuntime {
                 const func = (...args: any[]) =>
                     this.callHostFunction(host_func_id, line, fileString, args);
                 const func_ref = this.memory.retain(func);
-                this.closureDeallocator?.track(func, func_ref);
+                this.closureDeallocator?.track(func, host_func_id);
+                return func_ref;
+            },
+
+            swjs_create_oneshot_function: (
+                host_func_id: number,
+                line: number,
+                file: ref
+            ) => {
+                const fileString = this.memory.getObject(file) as string;
+                const func = (...args: any[]) =>
+                    this.callHostFunction(host_func_id, line, fileString, args);
+                const func_ref = this.memory.retain(func);
                 return func_ref;
             },
 

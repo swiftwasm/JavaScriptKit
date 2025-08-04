@@ -13,7 +13,7 @@ unittest:
 	    -Xlinker --global-base=524288 \
 	    -Xlinker -z \
 	    -Xlinker stack-size=524288 \
-	    js test --prelude ./Tests/prelude.mjs
+	    js test --prelude ./Tests/prelude.mjs -Xnode --expose-gc
 
 .PHONY: regenerate_swiftpm_resources
 regenerate_swiftpm_resources:

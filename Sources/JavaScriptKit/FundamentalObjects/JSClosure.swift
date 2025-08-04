@@ -25,7 +25,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         // 2. Create a new JavaScript function which calls the given Swift function.
         hostFuncRef = JavaScriptHostFuncRef(bitPattern: ObjectIdentifier(self))
         _id = withExtendedLifetime(JSString(file)) { file in
-            swjs_create_function(hostFuncRef, line, file.asInternalJSRef())
+            swjs_create_oneshot_function(hostFuncRef, line, file.asInternalJSRef())
         }
 
         // 3. Retain the given body in static storage by `funcRef`.
