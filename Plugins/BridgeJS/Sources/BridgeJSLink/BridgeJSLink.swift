@@ -69,6 +69,8 @@ struct BridgeJSLink {
         var dtsClassLines: [String] = []
         var namespacedFunctions: [ExportedFunction] = []
         var namespacedClasses: [ExportedClass] = []
+        var enumConstantLines: [String] = []
+        var dtsEnumLines: [String] = []
 
         if exportedSkeletons.contains(where: { $0.classes.count > 0 }) {
             classLines.append(
@@ -93,6 +95,15 @@ struct BridgeJSLink {
 
                 if klass.namespace != nil {
                     namespacedClasses.append(klass)
+                }
+            }
+
+            if !skeleton.enums.isEmpty {
+                for enumDef in skeleton.enums {
+                    let (jsEnum, dtsEnum) = try renderExportedEnum(enumDef)
+                    enumConstantLines.append(contentsOf: jsEnum)
+                    exportsLines.append("\(enumDef.name),")
+                    dtsEnumLines.append(contentsOf: dtsEnum)
                 }
             }
 
@@ -135,6 +146,7 @@ struct BridgeJSLink {
             .map { $0.indent(count: 12) }.joined(separator: "\n")
             exportsSection = """
                 \(classLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
+                \(enumConstantLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
                             const exports = {
                 \(exportsLines.map { $0.indent(count: 16) }.joined(separator: "\n"))
                             };
@@ -147,6 +159,7 @@ struct BridgeJSLink {
         } else {
             exportsSection = """
                 \(classLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
+                \(enumConstantLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
                             return {
                 \(exportsLines.map { $0.indent(count: 16) }.joined(separator: "\n"))
                             };
@@ -227,6 +240,7 @@ struct BridgeJSLink {
         var dtsLines: [String] = []
         dtsLines.append(contentsOf: namespaceDeclarations())
         dtsLines.append(contentsOf: dtsClassLines)
+        dtsLines.append(contentsOf: dtsEnumLines)
         dtsLines.append(contentsOf: generateImportedTypeDefinitions())
         dtsLines.append("export type Exports = {")
         dtsLines.append(contentsOf: dtsExportLines.map { $0.indent(count: 4) })
@@ -437,6 +451,29 @@ struct BridgeJSLink {
                 cleanupLines.append("swift.memory.release(\(bytesIdLabel));")
                 parameterForwardings.append(bytesIdLabel)
                 parameterForwardings.append("\(bytesLabel).length")
+            case .caseEnum(_):
+                // Case enum: JavaScript receives a number (0,1,2...), pass directly to WASM
+                parameterForwardings.append("\(param.name) | 0")
+            case .rawValueEnum(_, let rawType):
+                switch rawType {
+                case "String":
+                    let bytesLabel = "\(param.name)Bytes"
+                    let bytesIdLabel = "\(param.name)Id"
+                    bodyLines.append("const \(bytesLabel) = textEncoder.encode(\(param.name));")
+                    bodyLines.append("const \(bytesIdLabel) = swift.memory.retain(\(bytesLabel));")
+                    cleanupLines.append("swift.memory.release(\(bytesIdLabel));")
+                    parameterForwardings.append(bytesIdLabel)
+                    parameterForwardings.append("\(bytesLabel).length")
+                case "Bool":
+                    parameterForwardings.append("\(param.name) ? 1 : 0")
+                default:
+                    parameterForwardings.append("\(param.name)")
+                }
+            case .associatedValueEnum:
+                parameterForwardings.append("0")
+                parameterForwardings.append("0")
+            case .namespaceEnum:
+                break
             case .jsObject:
                 parameterForwardings.append("swift.memory.retain(\(param.name))")
             case .swiftHeapObject:
@@ -468,6 +505,30 @@ struct BridgeJSLink {
                 bodyLines.append("const ret = tmpRetString;")
                 bodyLines.append("tmpRetString = undefined;")
                 returnExpr = "ret"
+            case .caseEnum(_):
+                // Case enum: WASM returns Int32, use directly as JavaScript number
+                bodyLines.append("const ret = \(call);")
+                returnExpr = "ret"
+            case .rawValueEnum(_, let rawType):
+                switch rawType {
+                case "String":
+                    bodyLines.append("\(call);")
+                    bodyLines.append("const ret = tmpRetString;")
+                    bodyLines.append("tmpRetString = undefined;")
+                    returnExpr = "ret"
+                case "Bool":
+                    bodyLines.append("const ret = \(call);")
+                    returnExpr = "ret !== 0"
+                default:
+                    bodyLines.append("const ret = \(call);")
+                    returnExpr = "ret"
+                }
+            case .associatedValueEnum:
+                bodyLines.append("\(call);")
+                returnExpr = "\"\""
+            case .namespaceEnum:
+                bodyLines.append("\(call);")
+                returnExpr = "undefined"
             case .int, .float, .double:
                 bodyLines.append("const ret = \(call);")
                 returnExpr = "ret"
@@ -539,6 +600,86 @@ struct BridgeJSLink {
         }
         return
             "(\(parameters.map { "\($0.name): \($0.type.tsType)" }.joined(separator: ", "))): \(returnTypeWithEffect)"
+    }
+
+    func renderExportedEnum(_ enumDef: ExportedEnum) throws -> (js: [String], dts: [String]) {
+        var jsLines: [String] = []
+        var dtsLines: [String] = []
+
+        switch enumDef.enumType {
+        case .simple:
+            jsLines.append("const \(enumDef.name) = {")
+            for (index, enumCase) in enumDef.cases.enumerated() {
+                let caseName = enumCase.name.capitalizedFirstLetter
+                jsLines.append("    \(caseName): \(index),".indent(count: 0))
+            }
+            jsLines.append("};")
+            jsLines.append("")
+
+            dtsLines.append("export const \(enumDef.name): {")
+            for (index, enumCase) in enumDef.cases.enumerated() {
+                let caseName = enumCase.name.capitalizedFirstLetter
+                dtsLines.append("    readonly \(caseName): \(index);")
+            }
+            dtsLines.append("};")
+            dtsLines.append("export type \(enumDef.name) = typeof \(enumDef.name)[keyof typeof \(enumDef.name)];")
+            dtsLines.append("")
+        case .rawValue:
+            guard let rawType = enumDef.rawType else {
+                throw BridgeJSLinkError(message: "Raw value enum \(enumDef.name) is missing rawType")
+            }
+
+            jsLines.append("const \(enumDef.name) = {")
+            for enumCase in enumDef.cases {
+                let caseName = enumCase.name.capitalizedFirstLetter
+                let rawValue = enumCase.rawValue ?? enumCase.name
+                let formattedValue: String
+
+                switch rawType {
+                case "String":
+                    formattedValue = "\"\(rawValue)\""
+                case "Bool":
+                    formattedValue = rawValue.lowercased() == "true" ? "true" : "false"
+                case "Float", "Double":
+                    formattedValue = rawValue
+                default:
+                    formattedValue = rawValue
+                }
+
+                jsLines.append("\(caseName): \(formattedValue),".indent(count: 4))
+            }
+            jsLines.append("};")
+            jsLines.append("")
+
+            dtsLines.append("export const \(enumDef.name): {")
+            for enumCase in enumDef.cases {
+                let caseName = enumCase.name.capitalizedFirstLetter
+                let rawValue = enumCase.rawValue ?? enumCase.name
+                let formattedValue: String
+
+                switch rawType {
+                case "String":
+                    formattedValue = "\"\(rawValue)\""
+                case "Bool":
+                    formattedValue = rawValue.lowercased() == "true" ? "true" : "false"
+                case "Float", "Double":
+                    formattedValue = rawValue
+                default:
+                    formattedValue = rawValue
+                }
+
+                dtsLines.append("    readonly \(caseName): \(formattedValue);")
+            }
+            dtsLines.append("};")
+            dtsLines.append("export type \(enumDef.name) = typeof \(enumDef.name)[keyof typeof \(enumDef.name)];")
+            dtsLines.append("")
+
+        case .associatedValue, .namespace:
+            jsLines.append("// TODO: Implement \(enumDef.enumType) enum: \(enumDef.name)")
+            dtsLines.append("// TODO: Implement \(enumDef.enumType) enum: \(enumDef.name)")
+        }
+
+        return (jsLines, dtsLines)
     }
 
     func renderExportedFunction(function: ExportedFunction) -> (js: [String], dts: [String]) {
@@ -698,6 +839,24 @@ struct BridgeJSLink {
                 bodyLines.append("const \(stringObjectName) = swift.memory.getObject(\(param.name));")
                 bodyLines.append("swift.memory.release(\(param.name));")
                 parameterForwardings.append(stringObjectName)
+            case .caseEnum(_):
+                parameterForwardings.append(param.name)
+            case .rawValueEnum(_, let rawType):
+                switch rawType {
+                case "String":
+                    let stringObjectName = "\(param.name)Object"
+                    bodyLines.append("const \(stringObjectName) = swift.memory.getObject(\(param.name));")
+                    bodyLines.append("swift.memory.release(\(param.name));")
+                    parameterForwardings.append(stringObjectName)
+                case "Bool":
+                    parameterForwardings.append("\(param.name) !== 0")
+                default:
+                    parameterForwardings.append(param.name)
+                }
+            case .associatedValueEnum:
+                parameterForwardings.append("\"\"")
+            case .namespaceEnum:
+                break
             case .jsObject:
                 parameterForwardings.append("swift.memory.getObject(\(param.name))")
             default:
@@ -769,6 +928,22 @@ struct BridgeJSLink {
             case .string:
                 bodyLines.append("tmpRetBytes = textEncoder.encode(ret);")
                 return "tmpRetBytes.length"
+            case .caseEnum(_):
+                return "ret"
+            case .rawValueEnum(_, let rawType):
+                switch rawType {
+                case "String":
+                    bodyLines.append("tmpRetBytes = textEncoder.encode(ret);")
+                    return "tmpRetBytes.length"
+                case "Bool":
+                    return "ret ? 1 : 0"
+                default:
+                    return "ret"
+                }
+            case .associatedValueEnum:
+                return "0"
+            case .namespaceEnum:
+                return "0"
             case .int, .float, .double:
                 return "ret"
             case .bool:
@@ -947,6 +1122,11 @@ extension String {
     func indent(count: Int) -> String {
         return String(repeating: " ", count: count) + self
     }
+
+    var capitalizedFirstLetter: String {
+        guard !isEmpty else { return self }
+        return prefix(1).uppercased() + dropFirst()
+    }
 }
 
 extension BridgeType {
@@ -967,6 +1147,14 @@ extension BridgeType {
         case .jsObject(let name):
             return name ?? "any"
         case .swiftHeapObject(let name):
+            return name
+        case .caseEnum(let name):
+            return name
+        case .rawValueEnum(let name, _):
+            return name
+        case .associatedValueEnum(let name):
+            return name
+        case .namespaceEnum(let name):
             return name
         }
     }

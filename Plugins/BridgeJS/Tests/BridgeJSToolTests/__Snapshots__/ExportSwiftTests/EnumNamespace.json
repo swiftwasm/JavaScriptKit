@@ -1,0 +1,39 @@
+{
+  "classes" : [
+
+  ],
+  "enums" : [
+    {
+      "cases" : [
+
+      ],
+      "name" : "Utils",
+      "nestedTypes" : [
+        "Converter"
+      ]
+    },
+    {
+      "cases" : [
+
+      ],
+      "name" : "Networking",
+      "nestedTypes" : [
+        "Method"
+      ]
+    },
+    {
+      "cases" : [
+
+      ],
+      "name" : "Configuration",
+      "nestedTypes" : [
+        "LogLevel",
+        "Port"
+      ]
+    }
+  ],
+  "functions" : [
+
+  ],
+  "moduleName" : "TestModule"
+}

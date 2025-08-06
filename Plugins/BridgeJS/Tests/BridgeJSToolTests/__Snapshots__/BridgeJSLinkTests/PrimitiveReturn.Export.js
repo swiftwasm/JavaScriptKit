@@ -63,6 +63,7 @@ export async function createInstantiator(options, swift) {
         createExports: (instance) => {
             const js = swift.memory.heap;
 
+
             return {
                 checkInt: function bjs_checkInt() {
                     const ret = instance.exports.bjs_checkInt();

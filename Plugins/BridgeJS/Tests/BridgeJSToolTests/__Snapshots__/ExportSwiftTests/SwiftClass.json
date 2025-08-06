@@ -64,6 +64,9 @@
       "name" : "Greeter"
     }
   ],
+  "enums" : [
+
+  ],
   "functions" : [
     {
       "abiName" : "bjs_takeGreeter",

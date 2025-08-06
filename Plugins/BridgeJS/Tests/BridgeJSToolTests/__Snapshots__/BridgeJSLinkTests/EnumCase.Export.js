@@ -50,28 +50,7 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
 
-            const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
-            TestModule["bjs_checkArray"] = function bjs_checkArray(a) {
-                try {
-                    imports.checkArray(swift.memory.getObject(a));
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_checkArrayWithLength"] = function bjs_checkArrayWithLength(a, b) {
-                try {
-                    imports.checkArrayWithLength(swift.memory.getObject(a), b);
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_checkArray"] = function bjs_checkArray(a) {
-                try {
-                    imports.checkArray(swift.memory.getObject(a));
-                } catch (error) {
-                    setException(error);
-                }
-            }
+
         },
         setInstance: (i) => {
             instance = i;
@@ -84,9 +63,33 @@ export async function createInstantiator(options, swift) {
         createExports: (instance) => {
             const js = swift.memory.heap;
 
-
+            const Direction = {
+                North: 0,
+                South: 1,
+                East: 2,
+                West: 3,
+            };
+            
+            const Status = {
+                Loading: 0,
+                Success: 1,
+                Error: 2,
+            };
+            
             return {
-
+                Direction,
+                Status,
+                setDirection: function bjs_setDirection(direction) {
+                    instance.exports.bjs_setDirection(direction | 0);
+                },
+                getDirection: function bjs_getDirection() {
+                    const ret = instance.exports.bjs_getDirection();
+                    return ret;
+                },
+                processDirection: function bjs_processDirection(input) {
+                    const ret = instance.exports.bjs_processDirection(input | 0);
+                    return ret;
+                },
             };
         },
     }

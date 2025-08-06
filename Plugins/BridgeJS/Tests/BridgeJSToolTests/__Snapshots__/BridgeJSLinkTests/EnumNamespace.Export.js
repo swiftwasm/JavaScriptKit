@@ -50,28 +50,7 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
 
-            const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
-            TestModule["bjs_checkArray"] = function bjs_checkArray(a) {
-                try {
-                    imports.checkArray(swift.memory.getObject(a));
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_checkArrayWithLength"] = function bjs_checkArrayWithLength(a, b) {
-                try {
-                    imports.checkArrayWithLength(swift.memory.getObject(a), b);
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_checkArray"] = function bjs_checkArray(a) {
-                try {
-                    imports.checkArray(swift.memory.getObject(a));
-                } catch (error) {
-                    setException(error);
-                }
-            }
+
         },
         setInstance: (i) => {
             instance = i;
@@ -84,9 +63,13 @@ export async function createInstantiator(options, swift) {
         createExports: (instance) => {
             const js = swift.memory.heap;
 
-
+            // TODO: Implement namespace enum: Utils
+            // TODO: Implement namespace enum: Networking
+            // TODO: Implement namespace enum: Configuration
             return {
-
+                Utils,
+                Networking,
+                Configuration,
             };
         },
     }

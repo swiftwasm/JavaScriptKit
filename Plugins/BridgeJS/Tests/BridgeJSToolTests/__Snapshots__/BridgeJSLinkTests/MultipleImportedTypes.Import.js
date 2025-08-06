@@ -194,6 +194,7 @@ export async function createInstantiator(options, swift) {
         createExports: (instance) => {
             const js = swift.memory.heap;
 
+
             return {
 
             };

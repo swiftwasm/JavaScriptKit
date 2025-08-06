@@ -112,6 +112,9 @@
       ]
     }
   ],
+  "enums" : [
+
+  ],
   "functions" : [
     {
       "abiName" : "bjs_plainFunction",

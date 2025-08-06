@@ -123,6 +123,8 @@ public struct ImportTS {
                     )
                 )
                 abiParameterSignatures.append((param.name, .i32))
+            case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
+                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
             case .jsObject(_?):
                 abiParameterSignatures.append((param.name, .i32))
                 abiParameterForwardings.append(
@@ -181,6 +183,8 @@ public struct ImportTS {
                     }
                     """
                 )
+            case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
+                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
             case .jsObject(let name):
                 abiReturnType = .i32
                 if let name = name {
