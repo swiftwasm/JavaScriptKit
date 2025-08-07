@@ -29,18 +29,21 @@ struct ExportedFunction: Codable {
     var parameters: [Parameter]
     var returnType: BridgeType
     var effects: Effects
+    var namespace: [String]?
 }
 
 struct ExportedClass: Codable {
     var name: String
     var constructor: ExportedConstructor?
     var methods: [ExportedFunction]
+    var namespace: [String]?
 }
 
 struct ExportedConstructor: Codable {
     var abiName: String
     var parameters: [Parameter]
     var effects: Effects
+    var namespace: [String]?
 }
 
 struct ExportedSkeleton: Codable {
