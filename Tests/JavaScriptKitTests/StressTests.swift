@@ -80,8 +80,8 @@ final class StressTests: XCTestCase {
                 successCount = i + 1
 
                 // Test closure immediately to ensure it works under memory pressure
-                let result = closure([JSValue.number(10)])
-                XCTAssertEqual(result.number, 110.0)  // 100 (capturedData.count) + 10
+                let result = closure()
+                XCTAssertEqual(result.number, 100.0)  // capturedData.count
 
                 // More frequent GC to stress the system
                 if i % 500 == 0 {
@@ -96,8 +96,8 @@ final class StressTests: XCTestCase {
         // Test random closures still work after extreme memory pressure
         for _ in 0..<min(100, closures.count) {
             let randomIndex = Int.random(in: 0..<closures.count)
-            let result = closures[randomIndex]([JSValue.number(5)])
-            XCTAssertTrue(result.number! > 5)  // Should be 5 + capturedData.count (100+)
+            let result = closures[randomIndex]()
+            XCTAssertEqual(result.number, 100.0)  // capturedData.count
         }
 
         #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
@@ -152,7 +152,7 @@ final class StressTests: XCTestCase {
                 }
 
                 // Allocate closures with increasing complexity
-                for i in 0..<closuresThisCycle {
+                for _ in 0..<closuresThisCycle {
                     let heavyData = String(repeating: "data", count: cycle + 100)
                     let closure = JSClosure { arguments in
                         // Force retention of heavy data
@@ -173,7 +173,7 @@ final class StressTests: XCTestCase {
                 XCTAssertNotNil(cycleObjects[0]["large_array"].object)
             }
             if !cycleClosure.isEmpty {
-                let result = cycleClosure[0](arguments: [])
+                let result = cycleClosure[0]()
                 XCTAssertNotNil(result.string)
             }
 
