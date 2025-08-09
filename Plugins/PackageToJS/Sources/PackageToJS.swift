@@ -293,9 +293,11 @@ extension PackagingSystem {
 final class DefaultPackagingSystem: PackagingSystem {
 
     private let printWarning: (String) -> Void
+    private let which: (String) throws -> URL
 
-    init(printWarning: @escaping (String) -> Void) {
+    init(printWarning: @escaping (String) -> Void, which: @escaping (String) throws -> URL = which(_:)) {
         self.printWarning = printWarning
+        self.which = which
     }
 
     func npmInstall(packageDir: String) throws {
@@ -309,6 +311,10 @@ final class DefaultPackagingSystem: PackagingSystem {
     func wasmOpt(_ arguments: [String], input: String, output: String) throws {
         guard let wasmOpt = try? which("wasm-opt") else {
             _ = warnMissingWasmOpt
+            // Remove existing output file if it exists (to match wasm-opt behavior)
+            if FileManager.default.fileExists(atPath: output) {
+                try FileManager.default.removeItem(atPath: output)
+            }
             try FileManager.default.copyItem(atPath: input, toPath: output)
             return
         }
