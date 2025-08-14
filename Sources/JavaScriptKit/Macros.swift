@@ -24,27 +24,16 @@
 /// }
 /// ```
 ///
-/// When you build your project with the BridgeJS plugin, these declarations will be
-/// accessible from JavaScript, and TypeScript declaration files (`.d.ts`) will be
-/// automatically generated to provide type safety.
+/// If you prefer to access through namespace-based syntax, you can use `namespace` parameter
 ///
-/// For detailed usage information, see the article <doc:Exporting-Swift-to-JavaScript>.
-///
-/// - Important: This feature is still experimental. No API stability is guaranteed, and the API may change in future releases.
-@attached(peer)
-public macro JS() = Builtin.ExternalMacro
-
-/// A macro that exposes Swift functions, classes, and methods to JavaScript.
-/// Additionally defines namespaces defined by `namespace` parameter
-///
-/// Apply this macro to Swift declarations that you want to make callable from JavaScript:
+/// Example:
 ///
 /// ```swift
 /// // Export a function to JavaScript with a custom namespace
 /// @JS("__Swift.Foundation.UUID") public func create() -> String {
 ///     UUID().uuidString
 /// }
-/// 
+///
 /// // Export a class with a custom namespace (note that each method needs to specify the namespace)
 /// @JS("Utils.Greeters") class Greeter {
 ///     var name: String
@@ -52,11 +41,11 @@ public macro JS() = Builtin.ExternalMacro
 ///     @JS("Utils.Greeters") init(name: String) {
 ///         self.name = name
 ///     }
-///     
+///
 ///     @JS("Utils.Greeters") func greet() -> String {
 ///         return "Hello, " + self.name + "!"
 ///     }
-///     
+///
 ///     @JS("Utils.Greeters") func changeName(name: String) {
 ///         self.name = name
 ///     }
@@ -93,9 +82,15 @@ public macro JS() = Builtin.ExternalMacro
 /// const uuid = new globalThis.__Swift.Foundation.UUID.create(); // "1A83F0E0-F7F2-4FD1-8873-01A68CF79AF4"
 /// ```
 ///
+/// When you build your project with the BridgeJS plugin, these declarations will be
+/// accessible from JavaScript, and TypeScript declaration files (`.d.ts`) will be
+/// automatically generated to provide type safety.
+///
+/// For detailed usage information, see the article <doc:Exporting-Swift-to-JavaScript>.
+///
 /// - Parameter namespace: A dot-separated string that defines the namespace hierarchy in JavaScript.
 ///                        Each segment becomes a nested object in the resulting JavaScript structure.
 ///
 /// - Important: This feature is still experimental. No API stability is guaranteed, and the API may change in future releases.
 @attached(peer)
-public macro JS(_ namespace: String) = Builtin.ExternalMacro
+public macro JS(namespace: String? = nil) = Builtin.ExternalMacro
