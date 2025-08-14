@@ -30,12 +30,12 @@
 ///
 /// ```swift
 /// // Export a function to JavaScript with a custom namespace
-/// @JS("__Swift.Foundation.UUID") public func create() -> String {
+/// @JS(namespace: "__Swift.Foundation.UUID") public func create() -> String {
 ///     UUID().uuidString
 /// }
 ///
 /// // Export a class with a custom namespace (note that only top level macro needs to specify the namespace)
-/// @JS("Utils.Greeters") class Greeter {
+/// @JS(namespace: "Utils.Greeters") class Greeter {
 ///     var name: String
 ///
 ///     @JS init(name: String) {
