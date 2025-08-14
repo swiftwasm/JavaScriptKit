@@ -34,19 +34,19 @@
 ///     UUID().uuidString
 /// }
 ///
-/// // Export a class with a custom namespace (note that each method needs to specify the namespace)
+/// // Export a class with a custom namespace (note that only top level macro needs to specify the namespace)
 /// @JS("Utils.Greeters") class Greeter {
 ///     var name: String
 ///
-///     @JS("Utils.Greeters") init(name: String) {
+///     @JS init(name: String) {
 ///         self.name = name
 ///     }
 ///
-///     @JS("Utils.Greeters") func greet() -> String {
+///     @JS func greet() -> String {
 ///         return "Hello, " + self.name + "!"
 ///     }
 ///
-///     @JS("Utils.Greeters") func changeName(name: String) {
+///     @JS func changeName(name: String) {
 ///         self.name = name
 ///     }
 /// }

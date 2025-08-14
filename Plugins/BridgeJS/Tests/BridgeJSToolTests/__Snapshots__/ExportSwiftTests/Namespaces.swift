@@ -19,6 +19,19 @@ public func _bjs_plainFunction() -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_namespacedFunction")
+@_cdecl("bjs_namespacedFunction")
+public func _bjs_namespacedFunction() -> Void {
+    #if arch(wasm32)
+    var ret = namespacedFunction()
+    return ret.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_Greeter_init")
 @_cdecl("bjs_Greeter_init")
 public func _bjs_Greeter_init(nameBytes: Int32, nameLen: Int32) -> UnsafeMutableRawPointer {
@@ -42,20 +55,6 @@ public func _bjs_Greeter_greet(_self: UnsafeMutableRawPointer) -> Void {
     return ret.withUTF8 { ptr in
         _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
     }
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_Greeter_changeName")
-@_cdecl("bjs_Greeter_changeName")
-public func _bjs_Greeter_changeName(_self: UnsafeMutableRawPointer, nameBytes: Int32, nameLen: Int32) -> Void {
-    #if arch(wasm32)
-    let name = String(unsafeUninitializedCapacity: Int(nameLen)) { b in
-        _swift_js_init_memory(nameBytes, b.baseAddress.unsafelyUnwrapped)
-        return Int(nameLen)
-    }
-    Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().changeName(name: name)
     #else
     fatalError("Only available on WebAssembly")
     #endif

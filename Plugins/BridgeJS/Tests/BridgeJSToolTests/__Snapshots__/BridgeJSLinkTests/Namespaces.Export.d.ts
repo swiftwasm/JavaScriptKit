@@ -20,11 +20,15 @@ declare global {
             class Greeter {
                 constructor(name: string);
                 greet(): string;
-                changeName(name: string): void;
             }
             class UUID {
                 uuidString(): string;
             }
+        }
+    }
+    namespace MyModule {
+        namespace Utils {
+            function namespacedFunction(): string;
         }
     }
 }
@@ -38,7 +42,6 @@ export interface SwiftHeapObject {
 }
 export interface Greeter extends SwiftHeapObject {
     greet(): string;
-    changeName(name: string): void;
 }
 export interface Converter extends SwiftHeapObject {
     toString(value: number): string;
@@ -56,6 +59,7 @@ export type Exports = {
     UUID: {
     }
     plainFunction(): string;
+    namespacedFunction(): string;
 }
 export type Imports = {
 }

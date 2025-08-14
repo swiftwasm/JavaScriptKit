@@ -89,12 +89,6 @@ export async function createInstantiator(options, swift) {
                     tmpRetString = undefined;
                     return ret;
                 }
-                changeName(name) {
-                    const nameBytes = textEncoder.encode(name);
-                    const nameId = swift.memory.retain(nameBytes);
-                    instance.exports.bjs_Greeter_changeName(this.pointer, nameId, nameBytes.length);
-                    swift.memory.release(nameId);
-                }
             }
             class Converter extends SwiftHeapObject {
                 constructor() {
@@ -126,8 +120,20 @@ export async function createInstantiator(options, swift) {
                     tmpRetString = undefined;
                     return ret;
                 },
+                namespacedFunction: function bjs_namespacedFunction() {
+                    instance.exports.bjs_namespacedFunction();
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
+                    return ret;
+                },
             };
 
+            if (typeof globalThis.MyModule === 'undefined') {
+                globalThis.MyModule = {};
+            }
+            if (typeof globalThis.MyModule.Utils === 'undefined') {
+                globalThis.MyModule.Utils = {};
+            }
             if (typeof globalThis.Utils === 'undefined') {
                 globalThis.Utils = {};
             }
@@ -143,6 +149,7 @@ export async function createInstantiator(options, swift) {
             globalThis.__Swift.Foundation.Greeter = exports.Greeter;
             globalThis.Utils.Converters.Converter = exports.Converter;
             globalThis.__Swift.Foundation.UUID = exports.UUID;
+            globalThis.MyModule.Utils.namespacedFunction = exports.namespacedFunction;
 
             return exports;
         },

@@ -27,43 +27,11 @@
             "isThrows" : false
           },
           "name" : "greet",
-          "namespace" : [
-            "__Swift",
-            "Foundation"
-          ],
           "parameters" : [
 
           ],
           "returnType" : {
             "string" : {
-
-            }
-          }
-        },
-        {
-          "abiName" : "bjs_Greeter_changeName",
-          "effects" : {
-            "isAsync" : false,
-            "isThrows" : false
-          },
-          "name" : "changeName",
-          "namespace" : [
-            "__Swift",
-            "Foundation"
-          ],
-          "parameters" : [
-            {
-              "label" : "name",
-              "name" : "name",
-              "type" : {
-                "string" : {
-
-                }
-              }
-            }
-          ],
-          "returnType" : {
-            "void" : {
 
             }
           }
@@ -94,10 +62,6 @@
             "isThrows" : false
           },
           "name" : "toString",
-          "namespace" : [
-            "Utils",
-            "Converters"
-          ],
           "parameters" : [
             {
               "label" : "value",
@@ -131,10 +95,6 @@
             "isThrows" : false
           },
           "name" : "uuidString",
-          "namespace" : [
-            "__Swift",
-            "Foundation"
-          ],
           "parameters" : [
 
           ],
@@ -160,6 +120,26 @@
         "isThrows" : false
       },
       "name" : "plainFunction",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_namespacedFunction",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "namespacedFunction",
+      "namespace" : [
+        "MyModule",
+        "Utils"
+      ],
       "parameters" : [
 
       ],

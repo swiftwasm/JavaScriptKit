@@ -130,6 +130,14 @@ class ExportSwift {
             let name = node.name.text
             let namespace = extractNamespace(from: jsAttribute)
             
+            if namespace != nil, case .classBody = state {
+                diagnose(
+                    node: jsAttribute,
+                    message: "Namespace is only needed in top-level declaration",
+                    hint: "Remove the namespace from @JS attribute or move this function to top-level"
+                )
+            }
+            
             var parameters: [Parameter] = []
             for param in node.signature.parameterClause.parameters {
                 guard let type = self.parent.lookupType(for: param.type) else {
@@ -214,6 +222,17 @@ class ExportSwift {
                 diagnose(node: node, message: "@JS init must be inside a @JS class")
                 return .skipChildren
             }
+            
+            if let jsAttribute = node.attributes.firstJSAttribute,
+               let namespace = extractNamespace(from: jsAttribute),
+               namespace != nil {
+                diagnose(
+                    node: jsAttribute,
+                    message: "Namespace is not supported for initializer declarations",
+                    hint: "Remove the namespace from @JS attribute"
+                )
+            }
+            
             var parameters: [Parameter] = []
             for param in node.signature.parameterClause.parameters {
                 guard let type = self.parent.lookupType(for: param.type) else {
