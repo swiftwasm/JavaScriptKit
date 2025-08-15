@@ -123,6 +123,13 @@ export async function createInstantiator(options, swift) {
                 }
             }
             class UUID extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return new UUID(ptr, instance.exports.bjs_UUID_deinit);
+                }
+                
+                constructor(pointer, deinit) {
+                    super(pointer, deinit);
+                }
                 uuidString() {
                     instance.exports.bjs_UUID_uuidString(this.pointer);
                     const ret = tmpRetString;
