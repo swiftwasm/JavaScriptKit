@@ -62,6 +62,8 @@ struct BridgeJSLink {
         var classLines: [String] = []
         var dtsExportLines: [String] = []
         var dtsClassLines: [String] = []
+        var namespacedFunctions: [ExportedFunction] = []
+        var namespacedClasses: [ExportedClass] = []
 
         if exportedSkeletons.contains(where: { $0.classes.count > 0 }) {
             classLines.append(
@@ -83,10 +85,19 @@ struct BridgeJSLink {
                 exportsLines.append("\(klass.name),")
                 dtsExportLines.append(contentsOf: dtsExportEntry)
                 dtsClassLines.append(contentsOf: dtsType)
+
+                if klass.namespace != nil {
+                    namespacedClasses.append(klass)
+                }
             }
 
             for function in skeleton.functions {
                 var (js, dts) = renderExportedFunction(function: function)
+
+                if function.namespace != nil {
+                    namespacedFunctions.append(function)
+                }
+
                 js[0] = "\(function.name): " + js[0]
                 js[js.count - 1] += ","
                 exportsLines.append(contentsOf: js)
@@ -106,6 +117,36 @@ struct BridgeJSLink {
                 }
             }
             importObjectBuilders.append(importObjectBuilder)
+        }
+
+        let hasNamespacedItems = !namespacedFunctions.isEmpty || !namespacedClasses.isEmpty
+
+        let exportsSection: String
+        if hasNamespacedItems {
+            let namespaceSetupCode = renderGlobalNamespace(
+                namespacedFunctions: namespacedFunctions,
+                namespacedClasses: namespacedClasses
+            )
+            .map { $0.indent(count: 12) }.joined(separator: "\n")
+            exportsSection = """
+                \(classLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
+                            const exports = {
+                \(exportsLines.map { $0.indent(count: 16) }.joined(separator: "\n"))
+                            };
+
+                \(namespaceSetupCode)
+
+                            return exports;
+                        },
+                """
+        } else {
+            exportsSection = """
+                \(classLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
+                            return {
+                \(exportsLines.map { $0.indent(count: 16) }.joined(separator: "\n"))
+                            };
+                        },
+                """
         }
 
         let outputJs = """
@@ -169,15 +210,13 @@ struct BridgeJSLink {
                     /** @param {WebAssembly.Instance} instance */
                     createExports: (instance) => {
                         const js = swift.memory.heap;
-            \(classLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
-                        return {
-            \(exportsLines.map { $0.indent(count: 16) }.joined(separator: "\n"))
-                        };
-                    },
+            \(exportsSection)
                 }
             }
             """
+
         var dtsLines: [String] = []
+        dtsLines.append(contentsOf: namespaceDeclarations())
         dtsLines.append(contentsOf: dtsClassLines)
         dtsLines.append("export type Exports = {")
         dtsLines.append(contentsOf: dtsExportLines.map { $0.indent(count: 4) })
@@ -202,6 +241,102 @@ struct BridgeJSLink {
             }>;
             """
         return (outputJs, outputDts)
+    }
+
+    private func namespaceDeclarations() -> [String] {
+        var dtsLines: [String] = []
+        var namespaceFunctions: [String: [ExportedFunction]] = [:]
+        var namespaceClasses: [String: [ExportedClass]] = [:]
+
+        for skeleton in exportedSkeletons {
+            for function in skeleton.functions {
+                if let namespace = function.namespace {
+                    let namespaceKey = namespace.joined(separator: ".")
+                    if namespaceFunctions[namespaceKey] == nil {
+                        namespaceFunctions[namespaceKey] = []
+                    }
+                    namespaceFunctions[namespaceKey]?.append(function)
+                }
+            }
+
+            for klass in skeleton.classes {
+                if let classNamespace = klass.namespace {
+                    let namespaceKey = classNamespace.joined(separator: ".")
+                    if namespaceClasses[namespaceKey] == nil {
+                        namespaceClasses[namespaceKey] = []
+                    }
+                    namespaceClasses[namespaceKey]?.append(klass)
+                }
+            }
+        }
+
+        guard !namespaceFunctions.isEmpty || !namespaceClasses.isEmpty else { return dtsLines }
+
+        dtsLines.append("export {};")
+        dtsLines.append("")
+        dtsLines.append("declare global {")
+
+        let identBaseSize = 4
+
+        for (namespacePath, classes) in namespaceClasses.sorted(by: { $0.key < $1.key }) {
+            let parts = namespacePath.split(separator: ".").map(String.init)
+
+            for i in 0..<parts.count {
+                dtsLines.append("namespace \(parts[i]) {".indent(count: identBaseSize * (i + 1)))
+            }
+
+            for klass in classes {
+                dtsLines.append("class \(klass.name) {".indent(count: identBaseSize * (parts.count + 1)))
+
+                if let constructor = klass.constructor {
+                    let constructorSignature =
+                        "constructor(\(constructor.parameters.map { "\($0.name): \($0.type.tsType)" }.joined(separator: ", ")));"
+                    dtsLines.append("\(constructorSignature)".indent(count: identBaseSize * (parts.count + 2)))
+                }
+
+                for method in klass.methods {
+                    let methodSignature =
+                        "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType));"
+                    dtsLines.append("\(methodSignature)".indent(count: identBaseSize * (parts.count + 2)))
+                }
+
+                dtsLines.append("}".indent(count: identBaseSize * (parts.count + 1)))
+            }
+
+            for i in (0..<parts.count).reversed() {
+                dtsLines.append("}".indent(count: identBaseSize * (i + 1)))
+            }
+        }
+
+        for (namespacePath, functions) in namespaceFunctions.sorted(by: { $0.key < $1.key }) {
+            let parts = namespacePath.split(separator: ".").map(String.init)
+
+            var namespaceExists = false
+            if namespaceClasses[namespacePath] != nil {
+                namespaceExists = true
+            } else {
+                for i in 0..<parts.count {
+                    dtsLines.append("namespace \(parts[i]) {".indent(count: identBaseSize * (i + 1)))
+                }
+            }
+
+            for function in functions {
+                let signature =
+                    "function \(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType));"
+                dtsLines.append("\(signature)".indent(count: identBaseSize * (parts.count + 1)))
+            }
+
+            if !namespaceExists {
+                for i in (0..<parts.count).reversed() {
+                    dtsLines.append("}".indent(count: identBaseSize * (i + 1)))
+                }
+            }
+        }
+
+        dtsLines.append("}")
+        dtsLines.append("")
+
+        return dtsLines
     }
 
     class ExportedThunkBuilder {
@@ -394,6 +529,53 @@ struct BridgeJSLink {
         dtsExportEntryLines.append("}")
 
         return (jsLines, dtsTypeLines, dtsExportEntryLines)
+    }
+
+    func renderGlobalNamespace(namespacedFunctions: [ExportedFunction], namespacedClasses: [ExportedClass]) -> [String]
+    {
+        var lines: [String] = []
+        var uniqueNamespaces: [String] = []
+        var seen = Set<String>()
+
+        let functionNamespacePaths: Set<[String]> = Set(
+            namespacedFunctions
+                .compactMap { $0.namespace }
+        )
+        let classNamespacePaths: Set<[String]> = Set(
+            namespacedClasses
+                .compactMap { $0.namespace }
+        )
+
+        let allNamespacePaths =
+            functionNamespacePaths
+            .union(classNamespacePaths)
+
+        allNamespacePaths.forEach { namespacePath in
+            namespacePath.makeIterator().enumerated().forEach { (index, _) in
+                let path = namespacePath[0...index].joined(separator: ".")
+                if seen.insert(path).inserted {
+                    uniqueNamespaces.append(path)
+                }
+            }
+        }
+
+        uniqueNamespaces.sorted().forEach { namespace in
+            lines.append("if (typeof globalThis.\(namespace) === 'undefined') {")
+            lines.append("    globalThis.\(namespace) = {};")
+            lines.append("}")
+        }
+
+        namespacedClasses.forEach { klass in
+            let namespacePath: String = klass.namespace?.joined(separator: ".") ?? ""
+            lines.append("globalThis.\(namespacePath).\(klass.name) = exports.\(klass.name);")
+        }
+
+        namespacedFunctions.forEach { function in
+            let namespacePath: String = function.namespace?.joined(separator: ".") ?? ""
+            lines.append("globalThis.\(namespacePath).\(function.name) = exports.\(function.name);")
+        }
+
+        return lines
     }
 
     class ImportedThunkBuilder {

@@ -123,10 +123,21 @@ class ExportSwift {
         }
 
         private func visitFunction(node: FunctionDeclSyntax) -> ExportedFunction? {
-            guard node.attributes.hasJSAttribute() else {
+            guard let jsAttribute = node.attributes.firstJSAttribute else {
                 return nil
             }
+
             let name = node.name.text
+            let namespace = extractNamespace(from: jsAttribute)
+
+            if namespace != nil, case .classBody = state {
+                diagnose(
+                    node: jsAttribute,
+                    message: "Namespace is only needed in top-level declaration",
+                    hint: "Remove the namespace from @JS attribute or move this function to top-level"
+                )
+            }
+
             var parameters: [Parameter] = []
             for param in node.signature.parameterClause.parameters {
                 guard let type = self.parent.lookupType(for: param.type) else {
@@ -165,7 +176,8 @@ class ExportSwift {
                 abiName: abiName,
                 parameters: parameters,
                 returnType: returnType,
-                effects: effects
+                effects: effects,
+                namespace: namespace
             )
         }
 
@@ -193,12 +205,40 @@ class ExportSwift {
             return Effects(isAsync: isAsync, isThrows: isThrows)
         }
 
+        private func extractNamespace(
+            from jsAttribute: AttributeSyntax
+        ) -> [String]? {
+            guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self) else {
+                return nil
+            }
+
+            guard let namespaceArg = arguments.first(where: { $0.label?.text == "namespace" }),
+                let stringLiteral = namespaceArg.expression.as(StringLiteralExprSyntax.self),
+                let namespaceString = stringLiteral.segments.first?.as(StringSegmentSyntax.self)?.content.text
+            else {
+                return nil
+            }
+
+            return namespaceString.split(separator: ".").map(String.init)
+        }
+
         override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
             guard node.attributes.hasJSAttribute() else { return .skipChildren }
             guard case .classBody(let name) = state else {
                 diagnose(node: node, message: "@JS init must be inside a @JS class")
                 return .skipChildren
             }
+
+            if let jsAttribute = node.attributes.firstJSAttribute,
+                extractNamespace(from: jsAttribute) != nil
+            {
+                diagnose(
+                    node: jsAttribute,
+                    message: "Namespace is not supported for initializer declarations",
+                    hint: "Remove the namespace from @JS attribute"
+                )
+            }
+
             var parameters: [Parameter] = []
             for param in node.signature.parameterClause.parameters {
                 guard let type = self.parent.lookupType(for: param.type) else {
@@ -225,13 +265,17 @@ class ExportSwift {
 
         override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
             let name = node.name.text
+
             stateStack.push(state: .classBody(name: name))
 
-            guard node.attributes.hasJSAttribute() else { return .skipChildren }
+            guard let jsAttribute = node.attributes.firstJSAttribute else { return .skipChildren }
+
+            let namespace = extractNamespace(from: jsAttribute)
             exportedClassByName[name] = ExportedClass(
                 name: name,
                 constructor: nil,
-                methods: []
+                methods: [],
+                namespace: namespace
             )
             exportedClassNames.append(name)
             return .visitChildren
@@ -635,9 +679,13 @@ class ExportSwift {
 
 extension AttributeListSyntax {
     fileprivate func hasJSAttribute() -> Bool {
-        return first(where: {
+        firstJSAttribute != nil
+    }
+
+    fileprivate var firstJSAttribute: AttributeSyntax? {
+        first(where: {
             $0.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "JS"
-        }) != nil
+        })?.as(AttributeSyntax.self)
     }
 }
 

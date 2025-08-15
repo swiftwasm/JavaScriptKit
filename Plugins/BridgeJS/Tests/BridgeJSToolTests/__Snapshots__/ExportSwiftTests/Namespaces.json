@@ -1,0 +1,153 @@
+{
+  "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_Greeter_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_Greeter_greet",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "greet",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "Greeter",
+      "namespace" : [
+        "__Swift",
+        "Foundation"
+      ]
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_Converter_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_Converter_toString",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "toString",
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "Converter",
+      "namespace" : [
+        "Utils",
+        "Converters"
+      ]
+    },
+    {
+      "methods" : [
+        {
+          "abiName" : "bjs_UUID_uuidString",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "uuidString",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "UUID",
+      "namespace" : [
+        "__Swift",
+        "Foundation"
+      ]
+    }
+  ],
+  "functions" : [
+    {
+      "abiName" : "bjs_plainFunction",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "plainFunction",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_namespacedFunction",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "namespacedFunction",
+      "namespace" : [
+        "MyModule",
+        "Utils"
+      ],
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    }
+  ]
+}
