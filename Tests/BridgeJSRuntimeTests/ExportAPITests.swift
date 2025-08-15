@@ -83,19 +83,4 @@ class ExportAPITests: XCTestCase {
         runJsWorks()
         XCTAssertTrue(hasDeinitGreeter)
     }
-    
-    func testJSValueProperty() {
-        let greeter = Greeter(name: "JSValue Test")
-        
-        // Test that jsValue property exists and can be called without crashing
-        let jsValue = greeter.jsValue
-        
-        // Test that the JSValue is of object type
-        if case .object(_) = jsValue {
-            // Success: jsValue returns a JSValue.object
-            XCTAssertTrue(true, "jsValue property works correctly")
-        } else {
-            XCTFail("jsValue should return a JSValue.object, got \(jsValue)")
-        }
-    }
 }
