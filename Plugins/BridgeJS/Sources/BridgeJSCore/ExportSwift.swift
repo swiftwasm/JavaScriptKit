@@ -338,8 +338,27 @@ public class ExportSwift {
         for klass in exportedClasses {
             decls.append(contentsOf: renderSingleExportedClass(klass: klass))
         }
+
+        // Add jsValue extensions for exported classes
+        for klass in exportedClasses {
+            decls.append(renderClassJSValueExtension(klass: klass))
+        }
+
         let format = BasicFormat()
         return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
+    }
+
+    func renderClassJSValueExtension(klass: ExportedClass) -> DeclSyntax {
+        return """
+            extension \(raw: klass.name) {
+                var jsValue: JSValue {
+                    // Create a JSObject that wraps the Swift heap object pointer
+                    // This follows the same pattern as the generated thunk code
+                    let pointer = Unmanaged.passRetained(self).toOpaque()
+                    return .object(JSObject(id: UInt32(bitPattern: Int32(Int(bitPattern: pointer)))))
+                }
+            }
+            """
     }
 
     class ExportedThunkBuilder {

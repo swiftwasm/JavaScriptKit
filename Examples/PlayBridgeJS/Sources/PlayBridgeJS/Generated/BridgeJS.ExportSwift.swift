@@ -113,3 +113,21 @@ public func _bjs_PlayBridgeJSOutput_exportSwiftGlue(_self: UnsafeMutableRawPoint
 public func _bjs_PlayBridgeJSOutput_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<PlayBridgeJSOutput>.fromOpaque(pointer).release()
 }
+
+extension PlayBridgeJS {
+    var jsValue: JSValue {
+        // Create a JSObject that wraps the Swift heap object pointer
+        // This follows the same pattern as the generated thunk code
+        let pointer = Unmanaged.passRetained(self).toOpaque()
+        return .object(JSObject(id: UInt32(bitPattern: Int32(Int(bitPattern: pointer)))))
+    }
+}
+
+extension PlayBridgeJSOutput {
+    var jsValue: JSValue {
+        // Create a JSObject that wraps the Swift heap object pointer
+        // This follows the same pattern as the generated thunk code
+        let pointer = Unmanaged.passRetained(self).toOpaque()
+        return .object(JSObject(id: UInt32(bitPattern: Int32(Int(bitPattern: pointer)))))
+    }
+}
