@@ -88,6 +88,24 @@ jobs:
             echo "::error::The formatting changed some files. Please run \`./Utilities/format.swift\` and commit the changes."
             exit 1
           }
+
+  check-bridgejs-generated:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/install-swift
+        with:
+          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a-ubuntu22.04.tar.gz
+      - run: make bootstrap
+      - run: ./Utilities/bridge-js-generate.sh
+      - name: Check if BridgeJS generated files are up-to-date
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git diff --exit-code || {
+            echo "::error::BridgeJS generated files are out of date. Please run \`./Utilities/bridge-js-generate.sh\` and commit the changes."
+            exit 1
+          }
+
   build-examples:
     runs-on: ubuntu-latest
     steps:
