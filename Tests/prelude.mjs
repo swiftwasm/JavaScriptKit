@@ -115,7 +115,7 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
         assert.equal(exports.roundTripString(v), v);
     }
 
-    const g = new exports.Greeter("John");
+    const g = exports.Greeter.init("John");
     assert.equal(g.greet(), "Hello, John!");
     g.changeName("Jane");
     assert.equal(g.greet(), "Hello, Jane!");
