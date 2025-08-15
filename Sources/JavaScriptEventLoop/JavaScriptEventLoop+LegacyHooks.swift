@@ -7,9 +7,10 @@ extension JavaScriptEventLoop {
 
     static func installByLegacyHook() {
         #if compiler(>=5.9)
-        typealias swift_task_asyncMainDrainQueue_hook_Fn = @convention(thin) (
-            swift_task_asyncMainDrainQueue_original, swift_task_asyncMainDrainQueue_override
-        ) -> Void
+        typealias swift_task_asyncMainDrainQueue_hook_Fn =
+            @convention(thin) (
+                swift_task_asyncMainDrainQueue_original, swift_task_asyncMainDrainQueue_override
+            ) -> Void
         let swift_task_asyncMainDrainQueue_hook_impl: swift_task_asyncMainDrainQueue_hook_Fn = { _, _ in
             swjs_unsafe_event_loop_yield()
         }
@@ -19,7 +20,8 @@ extension JavaScriptEventLoop {
         )
         #endif
 
-        typealias swift_task_enqueueGlobal_hook_Fn = @convention(thin) (UnownedJob, swift_task_enqueueGlobal_original)
+        typealias swift_task_enqueueGlobal_hook_Fn =
+            @convention(thin) (UnownedJob, swift_task_enqueueGlobal_original)
             -> Void
         let swift_task_enqueueGlobal_hook_impl: swift_task_enqueueGlobal_hook_Fn = { job, original in
             JavaScriptEventLoop.shared.unsafeEnqueue(job)
@@ -29,9 +31,10 @@ extension JavaScriptEventLoop {
             to: UnsafeMutableRawPointer?.self
         )
 
-        typealias swift_task_enqueueGlobalWithDelay_hook_Fn = @convention(thin) (
-            UInt64, UnownedJob, swift_task_enqueueGlobalWithDelay_original
-        ) -> Void
+        typealias swift_task_enqueueGlobalWithDelay_hook_Fn =
+            @convention(thin) (
+                UInt64, UnownedJob, swift_task_enqueueGlobalWithDelay_original
+            ) -> Void
         let swift_task_enqueueGlobalWithDelay_hook_impl: swift_task_enqueueGlobalWithDelay_hook_Fn = {
             nanoseconds,
             job,
@@ -45,9 +48,10 @@ extension JavaScriptEventLoop {
         )
 
         #if compiler(>=5.7)
-        typealias swift_task_enqueueGlobalWithDeadline_hook_Fn = @convention(thin) (
-            Int64, Int64, Int64, Int64, Int32, UnownedJob, swift_task_enqueueGlobalWithDelay_original
-        ) -> Void
+        typealias swift_task_enqueueGlobalWithDeadline_hook_Fn =
+            @convention(thin) (
+                Int64, Int64, Int64, Int64, Int32, UnownedJob, swift_task_enqueueGlobalWithDelay_original
+            ) -> Void
         let swift_task_enqueueGlobalWithDeadline_hook_impl: swift_task_enqueueGlobalWithDeadline_hook_Fn = {
             sec,
             nsec,
@@ -64,9 +68,10 @@ extension JavaScriptEventLoop {
         )
         #endif
 
-        typealias swift_task_enqueueMainExecutor_hook_Fn = @convention(thin) (
-            UnownedJob, swift_task_enqueueMainExecutor_original
-        ) -> Void
+        typealias swift_task_enqueueMainExecutor_hook_Fn =
+            @convention(thin) (
+                UnownedJob, swift_task_enqueueMainExecutor_original
+            ) -> Void
         let swift_task_enqueueMainExecutor_hook_impl: swift_task_enqueueMainExecutor_hook_Fn = { job, original in
             JavaScriptEventLoop.shared.unsafeEnqueue(job)
         }
