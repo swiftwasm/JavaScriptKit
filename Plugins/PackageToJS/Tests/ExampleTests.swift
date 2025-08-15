@@ -14,14 +14,29 @@ extension Trait where Self == ConditionTrait {
 
     static func requireSwiftSDK(triple: String) -> ConditionTrait {
         .enabled(
-            if: ProcessInfo.processInfo.environment["SWIFT_SDK_ID"] != nil
-                && ProcessInfo.processInfo.environment["SWIFT_PATH"] != nil
-                && ProcessInfo.processInfo.environment["SWIFT_SDK_ID"]!.hasSuffix(triple),
+            if: {
+                guard let swiftSDKID = ProcessInfo.processInfo.environment["SWIFT_SDK_ID"],
+                    ProcessInfo.processInfo.environment["SWIFT_PATH"] != nil
+                else {
+                    return false
+                }
+                func sanityCheckCompatibility(triple: String) -> Bool {
+                    return swiftSDKID.hasSuffix(triple)
+                }
+                // For compatibility with old SDKs, we check wasm32-unknown-wasi as well when
+                // wasm32-unknown-wasip1 is requested.
+                if triple == "wasm32-unknown-wasip1" {
+                    if sanityCheckCompatibility(triple: "wasm32-unknown-wasi") {
+                        return true
+                    }
+                }
+                return sanityCheckCompatibility(triple: triple)
+            }(),
             "Requires SWIFT_SDK_ID and SWIFT_PATH environment variables"
         )
     }
 
-    static var requireEmbeddedSwift: ConditionTrait {
+    static func requireEmbeddedSwiftInToolchain(triple: String) -> ConditionTrait {
         // Check if $SWIFT_PATH/../lib/swift/embedded/wasm32-unknown-none-wasm/ exists
         return .enabled(
             if: {
@@ -29,10 +44,46 @@ extension Trait where Self == ConditionTrait {
                     return false
                 }
                 let embeddedPath = URL(fileURLWithPath: swiftPath).deletingLastPathComponent()
-                    .appending(path: "lib/swift/embedded/wasm32-unknown-none-wasm")
+                    .appending(path: "lib/swift/embedded/\(triple)")
                 return FileManager.default.fileExists(atPath: embeddedPath.path)
             }(),
             "Requires embedded Swift SDK under $SWIFT_PATH/../lib/swift/embedded"
+        )
+    }
+
+    static func requireEmbeddedSwiftInSwiftSDK() -> ConditionTrait {
+        // Check if ${SWIFT_SDK_ID}-embedded is available
+        return .enabled(
+            if: {
+                /// Check if the Swift SDK with the given ID is available.
+                func isSwiftSDKAvailable(_ id: String, swiftPath: String) -> Bool {
+                    let swiftExecutable = URL(
+                        fileURLWithPath: "swift",
+                        relativeTo: URL(fileURLWithPath: swiftPath)
+                    )
+                    let process = Process()
+                    process.executableURL = swiftExecutable
+                    let arguments = ["sdk", "configure", "--show-configuration", id]
+                    process.arguments = arguments
+                    process.standardOutput = FileHandle.nullDevice
+                    process.standardError = FileHandle.nullDevice
+                    do {
+                        try process.run()
+                        process.waitUntilExit()
+                        return process.terminationStatus == 0
+                    } catch {
+                        return false
+                    }
+                }
+                guard let swiftPath = ProcessInfo.processInfo.environment["SWIFT_PATH"],
+                    let swiftSDKID = ProcessInfo.processInfo.environment["SWIFT_SDK_ID"]
+                else {
+                    return false
+                }
+                let embeddedSDKID = "\(swiftSDKID)-embedded"
+                return isSwiftSDKAvailable(embeddedSDKID, swiftPath: swiftPath)
+            }(),
+            "Requires SWIFT_SDK_ID to contain 'embedded'"
         )
     }
 }
@@ -44,6 +95,11 @@ extension Trait where Self == ConditionTrait {
 
     static func getSwiftPath() -> String? {
         ProcessInfo.processInfo.environment["SWIFT_PATH"]
+    }
+
+    static func getEmbeddedSwiftSDKID() -> String? {
+        guard let swiftSDKID = getSwiftSDKID() else { return nil }
+        return "\(swiftSDKID)-embedded"
     }
 
     static let repoPath = URL(fileURLWithPath: #filePath)
@@ -220,7 +276,7 @@ extension Trait where Self == ConditionTrait {
         let swiftPath = try #require(Self.getSwiftPath())
         try withPackage(at: "Examples/Testing") { packageDir, runProcess, runSwift in
             try runSwift(
-                ["package", "--swift-sdk", swiftSDKID, "js", "test", "--enable-code-coverage"],
+                ["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "--enable-code-coverage"],
                 [
                     "LLVM_PROFDATA_PATH": URL(fileURLWithPath: swiftPath).appending(path: "llvm-profdata").path
                 ]
@@ -267,10 +323,24 @@ extension Trait where Self == ConditionTrait {
         }
     }
 
-    @Test(.requireEmbeddedSwift) func embedded() throws {
+    @Test(.requireEmbeddedSwiftInToolchain(triple: "wasm32-unknown-none-wasm"))
+    func embeddedWasmUnknownNone() throws {
         try withPackage(at: "Examples/Embedded") { packageDir, _, runSwift in
             try runSwift(
                 ["package", "--triple", "wasm32-unknown-none-wasm", "js", "-c", "release"],
+                [
+                    "JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM": "true"
+                ]
+            )
+        }
+    }
+
+    @Test(.requireEmbeddedSwiftInSwiftSDK())
+    func embeddedWasmUnknownWasi() throws {
+        let swiftSDKID = try #require(Self.getEmbeddedSwiftSDKID())
+        try withPackage(at: "Examples/Embedded") { packageDir, _, runSwift in
+            try runSwift(
+                ["package", "--swift-sdk", swiftSDKID, "js", "-c", "release"],
                 [
                     "JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM": "true"
                 ]
