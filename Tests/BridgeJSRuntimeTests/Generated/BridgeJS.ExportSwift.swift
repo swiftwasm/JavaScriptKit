@@ -314,6 +314,28 @@ public func _bjs_takeGreeter(g: UnsafeMutableRawPointer, nameBytes: Int32, nameL
     #endif
 }
 
+@_expose(wasm, "bjs_createCalculator")
+@_cdecl("bjs_createCalculator")
+public func _bjs_createCalculator() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = createCalculator()
+    return Unmanaged.passRetained(ret).toOpaque()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_useCalculator")
+@_cdecl("bjs_useCalculator")
+public func _bjs_useCalculator(calc: UnsafeMutableRawPointer, x: Int32, y: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = useCalculator(calc: Unmanaged<Calculator>.fromOpaque(calc).takeUnretainedValue(), x: Int(x), y: Int(y))
+    return Int32(ret)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_Greeter_init")
 @_cdecl("bjs_Greeter_init")
 public func _bjs_Greeter_init(nameBytes: Int32, nameLen: Int32) -> UnsafeMutableRawPointer {
@@ -360,4 +382,32 @@ public func _bjs_Greeter_changeName(_self: UnsafeMutableRawPointer, nameBytes: I
 @_cdecl("bjs_Greeter_deinit")
 public func _bjs_Greeter_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<Greeter>.fromOpaque(pointer).release()
+}
+
+@_expose(wasm, "bjs_Calculator_square")
+@_cdecl("bjs_Calculator_square")
+public func _bjs_Calculator_square(_self: UnsafeMutableRawPointer, value: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = Unmanaged<Calculator>.fromOpaque(_self).takeUnretainedValue().square(value: Int(value))
+    return Int32(ret)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Calculator_add")
+@_cdecl("bjs_Calculator_add")
+public func _bjs_Calculator_add(_self: UnsafeMutableRawPointer, a: Int32, b: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = Unmanaged<Calculator>.fromOpaque(_self).takeUnretainedValue().add(a: Int(a), b: Int(b))
+    return Int32(ret)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Calculator_deinit")
+@_cdecl("bjs_Calculator_deinit")
+public func _bjs_Calculator_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<Calculator>.fromOpaque(pointer).release()
 }

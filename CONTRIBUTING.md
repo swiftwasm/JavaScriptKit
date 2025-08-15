@@ -71,6 +71,18 @@ Tests for `PackageToJS` plugin:
 swift test --package-path ./Plugins/PackageToJS
 ```
 
+Tests for `BridgeJS` plugin:
+
+```bash
+swift test --package-path ./Plugins/BridgeJS
+```
+
+To update snapshot test files when expected output changes:
+
+```bash
+UPDATE_SNAPSHOTS=1 swift test --package-path ./Plugins/BridgeJS
+```
+
 ### Editing `./Runtime` directory
 
 The `./Runtime` directory contains the JavaScript runtime that interacts with the JavaScript environment and Swift code.

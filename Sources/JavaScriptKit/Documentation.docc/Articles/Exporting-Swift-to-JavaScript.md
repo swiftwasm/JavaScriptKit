@@ -133,7 +133,7 @@ In JavaScript:
 import { init } from "./.build/plugins/PackageToJS/outputs/Package/index.js";
 const { exports } = await init({});
 
-const cart = new exports.ShoppingCart();
+const cart = exports.ShoppingCart.init();
 cart.addItem("Laptop", 999.99, 1);
 cart.addItem("Mouse", 24.99, 2);
 console.log(`Items in cart: ${cart.getItemCount()}`);
@@ -158,7 +158,7 @@ export interface ShoppingCart extends SwiftHeapObject {
 
 export type Exports = {
     ShoppingCart: {
-        new(): ShoppingCart;
+        init(): ShoppingCart;
     }
 }
 ```
@@ -175,8 +175,8 @@ You can export functions to specific namespaces by providing a namespace paramet
 import JavaScriptKit
 
 // Export a function to a custom namespace
-@JS(namespace: "MyModule.Utils") func namespacedFunction() -> String { 
-    return "namespaced" 
+@JS(namespace: "MyModule.Utils") func namespacedFunction() -> String {
+    return "namespaced"
 }
 ```
 

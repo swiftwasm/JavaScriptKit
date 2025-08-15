@@ -60,6 +60,10 @@ export async function createInstantiator(options, swift) {
             const js = swift.memory.heap;
             /// Represents a Swift heap object like a class instance or an actor instance.
             class SwiftHeapObject {
+                static __construct(ptr, deinit) {
+                    return new SwiftHeapObject(ptr, deinit);
+                }
+            
                 constructor(pointer, deinit) {
                     this.pointer = pointer;
                     this.hasReleased = false;
@@ -76,12 +80,20 @@ export async function createInstantiator(options, swift) {
                 }
             }
             class Greeter extends SwiftHeapObject {
-                constructor(name) {
+                static __construct(ptr) {
+                    return new Greeter(ptr, instance.exports.bjs_Greeter_deinit);
+                }
+                
+                constructor(pointer, deinit) {
+                    super(pointer, deinit);
+                }
+                
+                static init(name) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
                     const ret = instance.exports.bjs_Greeter_init(nameId, nameBytes.length);
                     swift.memory.release(nameId);
-                    super(ret, instance.exports.bjs_Greeter_deinit);
+                    return Greeter.__construct(ret);
                 }
                 greet() {
                     instance.exports.bjs_Greeter_greet(this.pointer);
@@ -91,9 +103,17 @@ export async function createInstantiator(options, swift) {
                 }
             }
             class Converter extends SwiftHeapObject {
-                constructor() {
+                static __construct(ptr) {
+                    return new Converter(ptr, instance.exports.bjs_Converter_deinit);
+                }
+                
+                constructor(pointer, deinit) {
+                    super(pointer, deinit);
+                }
+                
+                static init() {
                     const ret = instance.exports.bjs_Converter_init();
-                    super(ret, instance.exports.bjs_Converter_deinit);
+                    return Converter.__construct(ret);
                 }
                 toString(value) {
                     instance.exports.bjs_Converter_toString(this.pointer, value);
@@ -103,6 +123,13 @@ export async function createInstantiator(options, swift) {
                 }
             }
             class UUID extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return new UUID(ptr, instance.exports.bjs_UUID_deinit);
+                }
+                
+                constructor(pointer, deinit) {
+                    super(pointer, deinit);
+                }
                 uuidString() {
                     instance.exports.bjs_UUID_uuidString(this.pointer);
                     const ret = tmpRetString;

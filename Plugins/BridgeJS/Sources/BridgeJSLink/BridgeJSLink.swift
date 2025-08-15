@@ -43,6 +43,10 @@ struct BridgeJSLink {
     let swiftHeapObjectClassJs = """
         /// Represents a Swift heap object like a class instance or an actor instance.
         class SwiftHeapObject {
+            static __construct(ptr, deinit) {
+                return new SwiftHeapObject(ptr, deinit);
+            }
+
             constructor(pointer, deinit) {
                 this.pointer = pointer;
                 this.hasReleased = false;
@@ -401,7 +405,7 @@ struct BridgeJSLink {
                 bodyLines.append("swift.memory.release(retId);")
                 returnExpr = "ret"
             case .swiftHeapObject(let name):
-                bodyLines.append("const ret = new \(name)(\(call));")
+                bodyLines.append("const ret = \(name).__construct(\(call));")
                 returnExpr = "ret"
             }
             return returnExpr
@@ -484,23 +488,37 @@ struct BridgeJSLink {
         dtsExportEntryLines.append("\(klass.name): {")
         jsLines.append("class \(klass.name) extends SwiftHeapObject {")
 
+        // Always add __construct and constructor methods for all classes
+        var constructorLines: [String] = []
+        constructorLines.append("static __construct(ptr) {")
+        constructorLines.append(
+            "return new \(klass.name)(ptr, instance.exports.bjs_\(klass.name)_deinit);".indent(count: 4)
+        )
+        constructorLines.append("}")
+        constructorLines.append("")
+        constructorLines.append("constructor(pointer, deinit) {")
+        constructorLines.append("super(pointer, deinit);".indent(count: 4))
+        constructorLines.append("}")
+        jsLines.append(contentsOf: constructorLines.map { $0.indent(count: 4) })
+
         if let constructor: ExportedConstructor = klass.constructor {
             let thunkBuilder = ExportedThunkBuilder(effects: constructor.effects)
             for param in constructor.parameters {
                 thunkBuilder.lowerParameter(param: param)
             }
             var funcLines: [String] = []
-            funcLines.append("constructor(\(constructor.parameters.map { $0.name }.joined(separator: ", "))) {")
+            funcLines.append("")
+            funcLines.append("static init(\(constructor.parameters.map { $0.name }.joined(separator: ", "))) {")
             let returnExpr = thunkBuilder.callConstructor(abiName: constructor.abiName)
             funcLines.append(contentsOf: thunkBuilder.bodyLines.map { $0.indent(count: 4) })
             funcLines.append(contentsOf: thunkBuilder.cleanupLines.map { $0.indent(count: 4) })
             funcLines.append(contentsOf: thunkBuilder.checkExceptionLines().map { $0.indent(count: 4) })
-            funcLines.append("super(\(returnExpr), instance.exports.bjs_\(klass.name)_deinit);".indent(count: 4))
+            funcLines.append("return \(klass.name).__construct(\(returnExpr));".indent(count: 4))
             funcLines.append("}")
             jsLines.append(contentsOf: funcLines.map { $0.indent(count: 4) })
 
             dtsExportEntryLines.append(
-                "new\(renderTSSignature(parameters: constructor.parameters, returnType: .swiftHeapObject(klass.name)));"
+                "init\(renderTSSignature(parameters: constructor.parameters, returnType: .swiftHeapObject(klass.name)));"
                     .indent(count: 4)
             )
         }

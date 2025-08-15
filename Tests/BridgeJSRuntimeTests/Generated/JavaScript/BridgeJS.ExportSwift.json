@@ -62,6 +62,68 @@
         }
       ],
       "name" : "Greeter"
+    },
+    {
+      "methods" : [
+        {
+          "abiName" : "bjs_Calculator_square",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "square",
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Calculator_add",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "add",
+          "parameters" : [
+            {
+              "label" : "a",
+              "name" : "a",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "label" : "b",
+              "name" : "b",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "Calculator"
     }
   ],
   "functions" : [
@@ -414,6 +476,64 @@
       ],
       "returnType" : {
         "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_createCalculator",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "createCalculator",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "swiftHeapObject" : {
+          "_0" : "Calculator"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_useCalculator",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "useCalculator",
+      "parameters" : [
+        {
+          "label" : "calc",
+          "name" : "calc",
+          "type" : {
+            "swiftHeapObject" : {
+              "_0" : "Calculator"
+            }
+          }
+        },
+        {
+          "label" : "x",
+          "name" : "x",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "label" : "y",
+          "name" : "y",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "int" : {
 
         }
       }
