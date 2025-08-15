@@ -128,6 +128,14 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 
     g.release();
 
+    // Test class without @JS init constructor
+    const calc = exports.createCalculator();
+    assert.equal(calc.square(5), 25);
+    assert.equal(calc.add(3, 4), 7);
+    assert.equal(exports.useCalculator(calc, 3, 10), 19); // 3^2 + 10 = 19
+    
+    calc.release();
+
     const anyObject = {};
     assert.equal(exports.roundTripJSObject(anyObject), anyObject);
 
