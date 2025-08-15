@@ -116,14 +116,16 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     }
 
     const g = new exports.Greeter("John");
-    const g2 = exports.roundTripSwiftHeapObject(g)
-    g2.release();
-
     assert.equal(g.greet(), "Hello, John!");
     g.changeName("Jane");
     assert.equal(g.greet(), "Hello, Jane!");
     exports.takeGreeter(g, "Jay");
     assert.equal(g.greet(), "Hello, Jay!");
+
+    const g2 = exports.roundTripSwiftHeapObject(g)
+    assert.equal(g2.greet(), "Hello, Jay!");
+    g2.release();
+
     g.release();
 
     const anyObject = {};
