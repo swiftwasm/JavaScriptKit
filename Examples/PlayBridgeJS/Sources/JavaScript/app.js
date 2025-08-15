@@ -52,7 +52,7 @@ export class BridgeJSPlayground {
                     createTS2Skeleton: this.createTS2Skeleton
                 }
             });
-            this.playBridgeJS = new exports.PlayBridgeJS();
+            this.playBridgeJS = exports.PlayBridgeJS.init();
             console.log('BridgeJS initialized successfully');
         } catch (error) {
             console.error('Failed to initialize BridgeJS:', error);
