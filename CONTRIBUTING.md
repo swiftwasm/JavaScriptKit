@@ -81,5 +81,24 @@ To make changes to the runtime, you need to edit the TypeScript files and regene
 make regenerate_swiftpm_resources
 ```
 
+### Working with BridgeJS
+
+BridgeJS is a Swift Package Manager plugin that automatically generates Swift bindings from TypeScript definitions. This repository contains pre-generated files created by BridgeJS in AoT (Ahead of Time) mode that are checked into version control.
+
+To update these pre-generated files, use the utility script:
+
+```bash
+./Utilities/bridge-js-generate.sh
+```
+
+This script runs the BridgeJS plugin in AoT mode (`swift package bridge-js`) on several SwiftPM packages in this repository.
+
+Run this script when you've made changes to:
+- TypeScript definitions
+- BridgeJS configuration
+- BridgeJS code generator itself
+
+These changes require updating the pre-generated Swift bindings committed to the repository.
+
 ## Support
 If you have any questions or need assistance, feel free to reach out via [GitHub Issues](https://github.com/swiftwasm/JavaScriptKit/issues) or [Discord](https://discord.gg/ashJW8T8yp).
