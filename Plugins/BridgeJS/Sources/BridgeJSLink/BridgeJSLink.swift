@@ -491,7 +491,9 @@ struct BridgeJSLink {
         // Always add __construct and constructor methods for all classes
         var constructorLines: [String] = []
         constructorLines.append("static __construct(ptr) {")
-        constructorLines.append("return new \(klass.name)(ptr, instance.exports.bjs_\(klass.name)_deinit);".indent(count: 4))
+        constructorLines.append(
+            "return new \(klass.name)(ptr, instance.exports.bjs_\(klass.name)_deinit);".indent(count: 4)
+        )
         constructorLines.append("}")
         constructorLines.append("")
         constructorLines.append("constructor(pointer, deinit) {")

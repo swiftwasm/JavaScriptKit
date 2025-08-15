@@ -74,18 +74,18 @@ struct TestError: Error {
     g.changeName(name: name)
 }
 
-// Test class without @JS init constructor  
+// Test class without @JS init constructor
 @JS class Calculator {
     nonisolated(unsafe) static var onDeinit: () -> Void = {}
-    
+
     @JS func square(value: Int) -> Int {
         return value * value
     }
-    
+
     @JS func add(a: Int, b: Int) -> Int {
         return a + b
     }
-    
+
     deinit {
         Self.onDeinit()
     }
@@ -99,22 +99,21 @@ struct TestError: Error {
     return calc.add(a: calc.square(value: x), b: y)
 }
 
-
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false
         var hasDeinitCalculator = false
-        
+
         Greeter.onDeinit = {
             hasDeinitGreeter = true
         }
-        
+
         Calculator.onDeinit = {
             hasDeinitCalculator = true
         }
-        
+
         runJsWorks()
-        
+
         XCTAssertTrue(hasDeinitGreeter, "Greeter (with @JS init) should have been deinitialized")
         XCTAssertTrue(hasDeinitCalculator, "Calculator (without @JS init) should have been deinitialized")
     }
