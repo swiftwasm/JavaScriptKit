@@ -225,6 +225,7 @@ struct BridgeJSLink {
         var dtsLines: [String] = []
         dtsLines.append(contentsOf: namespaceDeclarations())
         dtsLines.append(contentsOf: dtsClassLines)
+        dtsLines.append(contentsOf: generateImportedTypeDefinitions())
         dtsLines.append("export type Exports = {")
         dtsLines.append(contentsOf: dtsExportLines.map { $0.indent(count: 4) })
         dtsLines.append("}")
@@ -248,6 +249,38 @@ struct BridgeJSLink {
             }>;
             """
         return (outputJs, outputDts)
+    }
+
+    private func generateImportedTypeDefinitions() -> [String] {
+        var typeDefinitions: [String] = []
+
+        for skeletonSet in importedSkeletons {
+            for fileSkeleton in skeletonSet.children {
+                for type in fileSkeleton.types {
+                    typeDefinitions.append("export interface \(type.name) {")
+
+                    // Add methods
+                    for method in type.methods {
+                        let methodSignature =
+                            "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType));"
+                        typeDefinitions.append(methodSignature.indent(count: 4))
+                    }
+
+                    // Add properties
+                    for property in type.properties {
+                        let propertySignature =
+                            property.isReadonly
+                            ? "readonly \(property.name): \(property.type.tsType);"
+                            : "\(property.name): \(property.type.tsType);"
+                        typeDefinitions.append(propertySignature.indent(count: 4))
+                    }
+
+                    typeDefinitions.append("}")
+                }
+            }
+        }
+
+        return typeDefinitions
     }
 
     private func namespaceDeclarations() -> [String] {

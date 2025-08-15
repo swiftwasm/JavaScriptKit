@@ -4,18 +4,20 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export interface Greeter {
-    greet(): string;
-    changeName(name: string): void;
-    name: string;
-    readonly age: number;
+export interface TypeScriptProcessor {
+    convert(ts: string): string;
+    validate(ts: string): boolean;
+    readonly version: string;
+}
+export interface CodeGenerator {
+    generate(input: any): string;
+    readonly outputFormat: string;
 }
 export type Exports = {
 }
 export type Imports = {
-    Greeter: {
-        new(name: string): Greeter;
-    }
+    createTS2Skeleton(): TypeScriptProcessor;
+    createCodeGenerator(format: string): CodeGenerator;
 }
 export function createInstantiator(options: {
     imports: Imports;

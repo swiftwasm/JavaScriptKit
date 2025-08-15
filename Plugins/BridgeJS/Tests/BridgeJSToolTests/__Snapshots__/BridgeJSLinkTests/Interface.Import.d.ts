@@ -4,6 +4,10 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export interface Animatable {
+    animate(keyframes: any, options: any): any;
+    getAnimations(options: any): any;
+}
 export type Exports = {
 }
 export type Imports = {
