@@ -2,6 +2,8 @@ import Foundation
 import SwiftSyntax
 import SwiftParser
 import Testing
+@testable import BridgeJSLink
+@testable import BridgeJSCore
 
 @Suite struct BridgeJSLinkTests {
     private func snapshot(

@@ -2,111 +2,167 @@
 
 // MARK: - Types
 
-enum BridgeType: Codable, Equatable {
+public enum BridgeType: Codable, Equatable {
     case int, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
 }
 
-enum WasmCoreType: String, Codable {
+public enum WasmCoreType: String, Codable {
     case i32, i64, f32, f64, pointer
 }
 
-struct Parameter: Codable {
-    let label: String?
-    let name: String
-    let type: BridgeType
+public struct Parameter: Codable {
+    public let label: String?
+    public let name: String
+    public let type: BridgeType
+
+    public init(label: String?, name: String, type: BridgeType) {
+        self.label = label
+        self.name = name
+        self.type = type
+    }
 }
 
-struct Effects: Codable {
-    var isAsync: Bool
-    var isThrows: Bool
+public struct Effects: Codable {
+    public var isAsync: Bool
+    public var isThrows: Bool
+
+    public init(isAsync: Bool, isThrows: Bool) {
+        self.isAsync = isAsync
+        self.isThrows = isThrows
+    }
 }
 
 // MARK: - Exported Skeleton
 
-struct ExportedFunction: Codable {
-    var name: String
-    var abiName: String
-    var parameters: [Parameter]
-    var returnType: BridgeType
-    var effects: Effects
-    var namespace: [String]?
+public struct ExportedFunction: Codable {
+    public var name: String
+    public var abiName: String
+    public var parameters: [Parameter]
+    public var returnType: BridgeType
+    public var effects: Effects
+    public var namespace: [String]?
+
+    public init(
+        name: String,
+        abiName: String,
+        parameters: [Parameter],
+        returnType: BridgeType,
+        effects: Effects,
+        namespace: [String]? = nil
+    ) {
+        self.name = name
+        self.abiName = abiName
+        self.parameters = parameters
+        self.returnType = returnType
+        self.effects = effects
+        self.namespace = namespace
+    }
 }
 
-struct ExportedClass: Codable {
-    var name: String
-    var constructor: ExportedConstructor?
-    var methods: [ExportedFunction]
-    var namespace: [String]?
+public struct ExportedClass: Codable {
+    public var name: String
+    public var constructor: ExportedConstructor?
+    public var methods: [ExportedFunction]
+    public var namespace: [String]?
+
+    public init(
+        name: String,
+        constructor: ExportedConstructor? = nil,
+        methods: [ExportedFunction],
+        namespace: [String]? = nil
+    ) {
+        self.name = name
+        self.constructor = constructor
+        self.methods = methods
+        self.namespace = namespace
+    }
 }
 
-struct ExportedConstructor: Codable {
-    var abiName: String
-    var parameters: [Parameter]
-    var effects: Effects
-    var namespace: [String]?
+public struct ExportedConstructor: Codable {
+    public var abiName: String
+    public var parameters: [Parameter]
+    public var effects: Effects
+    public var namespace: [String]?
+
+    public init(abiName: String, parameters: [Parameter], effects: Effects, namespace: [String]? = nil) {
+        self.abiName = abiName
+        self.parameters = parameters
+        self.effects = effects
+        self.namespace = namespace
+    }
 }
 
-struct ExportedSkeleton: Codable {
-    let functions: [ExportedFunction]
-    let classes: [ExportedClass]
+public struct ExportedSkeleton: Codable {
+    public let functions: [ExportedFunction]
+    public let classes: [ExportedClass]
+
+    public init(functions: [ExportedFunction], classes: [ExportedClass]) {
+        self.functions = functions
+        self.classes = classes
+    }
 }
 
 // MARK: - Imported Skeleton
 
-struct ImportedFunctionSkeleton: Codable {
-    let name: String
-    let parameters: [Parameter]
-    let returnType: BridgeType
-    let documentation: String?
+public struct ImportedFunctionSkeleton: Codable {
+    public let name: String
+    public let parameters: [Parameter]
+    public let returnType: BridgeType
+    public let documentation: String?
 
-    func abiName(context: ImportedTypeSkeleton?) -> String {
+    public func abiName(context: ImportedTypeSkeleton?) -> String {
         return context.map { "bjs_\($0.name)_\(name)" } ?? "bjs_\(name)"
     }
 }
 
-struct ImportedConstructorSkeleton: Codable {
-    let parameters: [Parameter]
+public struct ImportedConstructorSkeleton: Codable {
+    public let parameters: [Parameter]
 
-    func abiName(context: ImportedTypeSkeleton) -> String {
+    public func abiName(context: ImportedTypeSkeleton) -> String {
         return "bjs_\(context.name)_init"
     }
 }
 
-struct ImportedPropertySkeleton: Codable {
-    let name: String
-    let isReadonly: Bool
-    let type: BridgeType
-    let documentation: String?
+public struct ImportedPropertySkeleton: Codable {
+    public let name: String
+    public let isReadonly: Bool
+    public let type: BridgeType
+    public let documentation: String?
 
-    func getterAbiName(context: ImportedTypeSkeleton) -> String {
+    public func getterAbiName(context: ImportedTypeSkeleton) -> String {
         return "bjs_\(context.name)_\(name)_get"
     }
 
-    func setterAbiName(context: ImportedTypeSkeleton) -> String {
+    public func setterAbiName(context: ImportedTypeSkeleton) -> String {
         return "bjs_\(context.name)_\(name)_set"
     }
 }
 
-struct ImportedTypeSkeleton: Codable {
-    let name: String
-    let constructor: ImportedConstructorSkeleton?
-    let methods: [ImportedFunctionSkeleton]
-    let properties: [ImportedPropertySkeleton]
-    let documentation: String?
+public struct ImportedTypeSkeleton: Codable {
+    public let name: String
+    public let constructor: ImportedConstructorSkeleton?
+    public let methods: [ImportedFunctionSkeleton]
+    public let properties: [ImportedPropertySkeleton]
+    public let documentation: String?
 }
 
-struct ImportedFileSkeleton: Codable {
-    let functions: [ImportedFunctionSkeleton]
-    let types: [ImportedTypeSkeleton]
+public struct ImportedFileSkeleton: Codable {
+    public let functions: [ImportedFunctionSkeleton]
+    public let types: [ImportedTypeSkeleton]
 }
 
-struct ImportedModuleSkeleton: Codable {
-    let moduleName: String
-    var children: [ImportedFileSkeleton]
+public struct ImportedModuleSkeleton: Codable {
+    public let moduleName: String
+    public var children: [ImportedFileSkeleton]
+
+    public init(moduleName: String, children: [ImportedFileSkeleton]) {
+        self.moduleName = moduleName
+        self.children = children
+    }
 }
 
 extension BridgeType {
-    var abiReturnType: WasmCoreType? {
+    public var abiReturnType: WasmCoreType? {
         switch self {
         case .void: return nil
         case .bool: return .i32

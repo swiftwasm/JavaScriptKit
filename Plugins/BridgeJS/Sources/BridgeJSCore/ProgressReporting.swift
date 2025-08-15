@@ -1,7 +1,7 @@
-struct ProgressReporting {
+public struct ProgressReporting {
     let print: (String) -> Void
 
-    init(verbose: Bool) {
+    public init(verbose: Bool) {
         self.init(print: verbose ? { Swift.print($0) } : { _ in })
     }
 
@@ -9,11 +9,11 @@ struct ProgressReporting {
         self.print = print
     }
 
-    static var silent: ProgressReporting {
+    public static var silent: ProgressReporting {
         return ProgressReporting(print: { _ in })
     }
 
-    func print(_ message: String) {
+    public func print(_ message: String) {
         self.print(message)
     }
 }

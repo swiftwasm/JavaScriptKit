@@ -1,5 +1,7 @@
 import Testing
 import Foundation
+@testable import BridgeJSCore
+@testable import TS2Skeleton
 
 @Suite struct ImportTSTests {
     static let inputsDirectory = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent(
