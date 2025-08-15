@@ -151,7 +151,7 @@ let package = Package(
                 .product(name: "SwiftBasicFormat", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
             ],
-            exclude: ["TS2Skeleton/JavaScript"]
+            exclude: ["TS2Skeleton/JavaScript", "README.md"]
         ),
         .testTarget(
             name: "BridgeJSRuntimeTests",
