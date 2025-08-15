@@ -2,13 +2,6 @@
 
 import PackageDescription
 
-let coreDependencies: [Target.Dependency] = [
-    .product(name: "SwiftParser", package: "swift-syntax"),
-    .product(name: "SwiftSyntax", package: "swift-syntax"),
-    .product(name: "SwiftBasicFormat", package: "swift-syntax"),
-    .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
-]
-
 let package = Package(
     name: "BridgeJS",
     platforms: [.macOS(.v13)],
@@ -19,11 +12,42 @@ let package = Package(
         .target(name: "BridgeJSBuildPlugin"),
         .executableTarget(
             name: "BridgeJSTool",
-            dependencies: coreDependencies
+            dependencies: [
+                "BridgeJSCore",
+                "TS2Skeleton",
+            ]
         ),
+        .target(
+            name: "TS2Skeleton",
+            dependencies: [
+                "BridgeJSCore",
+                "BridgeJSSkeleton",
+            ]
+        ),
+        .target(
+            name: "BridgeJSCore",
+            dependencies: [
+                "BridgeJSSkeleton",
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftBasicFormat", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+            ]
+        ),
+        .target(name: "BridgeJSSkeleton"),
+
+        .target(
+            name: "BridgeJSLink",
+            dependencies: ["BridgeJSSkeleton"]
+        ),
+
         .testTarget(
             name: "BridgeJSToolTests",
-            dependencies: coreDependencies,
+            dependencies: [
+                "BridgeJSCore",
+                "BridgeJSLink",
+                "TS2Skeleton",
+            ],
             exclude: ["__Snapshots__", "Inputs"]
         ),
     ]

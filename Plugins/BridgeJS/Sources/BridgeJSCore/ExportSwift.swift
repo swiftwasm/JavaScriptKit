@@ -1,6 +1,9 @@
 import SwiftBasicFormat
 import SwiftSyntax
 import SwiftSyntaxBuilder
+#if canImport(BridgeJSSkeleton)
+import BridgeJSSkeleton
+#endif
 
 /// Exports Swift functions and classes to JavaScript
 ///
@@ -11,14 +14,14 @@ import SwiftSyntaxBuilder
 ///
 /// The generated skeletons will be used by ``BridgeJSLink`` to generate
 /// JavaScript glue code and TypeScript definitions.
-class ExportSwift {
+public class ExportSwift {
     let progress: ProgressReporting
 
     private var exportedFunctions: [ExportedFunction] = []
     private var exportedClasses: [ExportedClass] = []
     private var typeDeclResolver: TypeDeclResolver = TypeDeclResolver()
 
-    init(progress: ProgressReporting) {
+    public init(progress: ProgressReporting) {
         self.progress = progress
     }
 
@@ -27,7 +30,7 @@ class ExportSwift {
     /// - Parameters:
     ///   - sourceFile: The parsed Swift source file to process
     ///   - inputFilePath: The file path for error reporting
-    func addSourceFile(_ sourceFile: SourceFileSyntax, _ inputFilePath: String) throws {
+    public func addSourceFile(_ sourceFile: SourceFileSyntax, _ inputFilePath: String) throws {
         progress.print("Processing \(inputFilePath)")
         typeDeclResolver.addSourceFile(sourceFile)
 
@@ -44,7 +47,7 @@ class ExportSwift {
     ///
     /// - Returns: A tuple containing the generated Swift code and a skeleton
     /// describing the exported APIs
-    func finalize() throws -> (outputSwift: String, outputSkeleton: ExportedSkeleton)? {
+    public func finalize() throws -> (outputSwift: String, outputSkeleton: ExportedSkeleton)? {
         guard let outputSwift = renderSwiftGlue() else {
             return nil
         }

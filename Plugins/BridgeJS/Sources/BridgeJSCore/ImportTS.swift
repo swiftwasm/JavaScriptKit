@@ -1,6 +1,9 @@
 import SwiftBasicFormat
 import SwiftSyntax
 import SwiftSyntaxBuilder
+#if canImport(BridgeJSSkeleton)
+import BridgeJSSkeleton
+#endif
 
 /// Imports TypeScript declarations and generates Swift bridge code
 ///
@@ -10,25 +13,25 @@ import SwiftSyntaxBuilder
 ///
 /// The generated skeletons will be used by ``BridgeJSLink`` to generate
 /// JavaScript glue code and TypeScript definitions.
-struct ImportTS {
-    let progress: ProgressReporting
-    private(set) var skeleton: ImportedModuleSkeleton
+public struct ImportTS {
+    public let progress: ProgressReporting
+    public private(set) var skeleton: ImportedModuleSkeleton
     private var moduleName: String {
         skeleton.moduleName
     }
 
-    init(progress: ProgressReporting, moduleName: String) {
+    public init(progress: ProgressReporting, moduleName: String) {
         self.progress = progress
         self.skeleton = ImportedModuleSkeleton(moduleName: moduleName, children: [])
     }
 
     /// Adds a skeleton to the importer's state
-    mutating func addSkeleton(_ skeleton: ImportedFileSkeleton) {
+    public mutating func addSkeleton(_ skeleton: ImportedFileSkeleton) {
         self.skeleton.children.append(skeleton)
     }
 
     /// Finalizes the import process and generates Swift code
-    func finalize() throws -> String? {
+    public func finalize() throws -> String? {
         var decls: [DeclSyntax] = []
         for skeleton in self.skeleton.children {
             for function in skeleton.functions {

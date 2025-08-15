@@ -12,6 +12,13 @@
 import protocol Dispatch.DispatchSourceSignal
 import class Dispatch.DispatchSource
 
+#if canImport(BridgeJSCore)
+import BridgeJSCore
+#endif
+#if canImport(BridgeJSSkeleton)
+import BridgeJSSkeleton
+#endif
+
 internal func which(_ executable: String) throws -> URL {
     func checkCandidate(_ candidate: URL) -> Bool {
         var isDirectory: ObjCBool = false
@@ -46,7 +53,7 @@ internal func which(_ executable: String) throws -> URL {
 
 extension ImportTS {
     /// Processes a TypeScript definition file and extracts its API information
-    mutating func addSourceFile(_ sourceFile: String, tsconfigPath: String) throws {
+    public mutating func addSourceFile(_ sourceFile: String, tsconfigPath: String) throws {
         let nodePath = try which("node")
         let ts2skeletonPath = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

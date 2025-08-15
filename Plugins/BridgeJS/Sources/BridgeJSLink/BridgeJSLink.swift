@@ -1,5 +1,8 @@
 import class Foundation.JSONDecoder
 import struct Foundation.Data
+#if canImport(BridgeJSSkeleton)
+import BridgeJSSkeleton
+#endif
 
 struct BridgeJSLink {
     /// The exported skeletons

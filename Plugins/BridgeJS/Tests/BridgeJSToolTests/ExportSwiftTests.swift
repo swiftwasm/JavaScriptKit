@@ -3,6 +3,8 @@ import SwiftSyntax
 import SwiftParser
 import Testing
 
+@testable import BridgeJSCore
+
 @Suite struct ExportSwiftTests {
     private func snapshot(
         swiftAPI: ExportSwift,

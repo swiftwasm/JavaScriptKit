@@ -8,6 +8,16 @@
 @preconcurrency import class Foundation.JSONDecoder
 import SwiftParser
 
+#if canImport(BridgeJSCore)
+import BridgeJSCore
+#endif
+#if canImport(BridgeJSSkeleton)
+import BridgeJSSkeleton
+#endif
+#if canImport(TS2Skeleton)
+import TS2Skeleton
+#endif
+
 /// BridgeJS Tool
 ///
 /// A command-line tool to generate Swift-JavaScript bridge code for WebAssembly applications.
