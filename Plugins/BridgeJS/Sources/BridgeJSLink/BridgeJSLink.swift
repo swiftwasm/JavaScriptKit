@@ -253,24 +253,24 @@ struct BridgeJSLink {
     private func renderSwiftClassWrappers() -> [String] {
         var wrapperLines: [String] = []
         var modulesByName: [String: [ExportedClass]] = [:]
-        
+
         // Group classes by their module name
         for skeleton in exportedSkeletons {
             if skeleton.classes.isEmpty { continue }
-            
+
             if modulesByName[skeleton.moduleName] == nil {
                 modulesByName[skeleton.moduleName] = []
             }
             modulesByName[skeleton.moduleName]?.append(contentsOf: skeleton.classes)
         }
-        
+
         // Generate wrapper functions for each module
         for (moduleName, classes) in modulesByName {
             wrapperLines.append("// Wrapper functions for module: \(moduleName)")
             wrapperLines.append("if (!importObject[\"\(moduleName)\"]) {")
             wrapperLines.append("    importObject[\"\(moduleName)\"] = {};")
             wrapperLines.append("}")
-            
+
             for klass in classes {
                 let wrapperFunctionName = "bjs_\(klass.name)_wrap"
                 wrapperLines.append("importObject[\"\(moduleName)\"][\"\(wrapperFunctionName)\"] = function(pointer) {")
@@ -279,7 +279,7 @@ struct BridgeJSLink {
                 wrapperLines.append("};")
             }
         }
-        
+
         return wrapperLines
     }
 
@@ -770,7 +770,9 @@ struct BridgeJSLink {
 
         init(moduleName: String) {
             self.moduleName = moduleName
-            importedLines.append("const \(moduleName) = importObject[\"\(moduleName)\"] = importObject[\"\(moduleName)\"] || {};")
+            importedLines.append(
+                "const \(moduleName) = importObject[\"\(moduleName)\"] = importObject[\"\(moduleName)\"] || {};"
+            )
         }
 
         func assignToImportObject(name: String, function: [String]) {

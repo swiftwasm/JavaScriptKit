@@ -55,7 +55,11 @@ public class ExportSwift {
         }
         return (
             outputSwift: outputSwift,
-            outputSkeleton: ExportedSkeleton(moduleName: moduleName, functions: exportedFunctions, classes: exportedClasses)
+            outputSkeleton: ExportedSkeleton(
+                moduleName: moduleName,
+                functions: exportedFunctions,
+                classes: exportedClasses
+            )
         )
     }
 
