@@ -323,30 +323,30 @@ extension Trait where Self == ConditionTrait {
         }
     }
 
+    #if compiler(>=6.2)
     @Test(.requireEmbeddedSwiftInToolchain(triple: "wasm32-unknown-none-wasm"))
     func embeddedWasmUnknownNone() throws {
         try withPackage(at: "Examples/Embedded") { packageDir, _, runSwift in
             try runSwift(
                 ["package", "--triple", "wasm32-unknown-none-wasm", "js", "-c", "release"],
-                [
-                    "JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM": "true"
-                ]
+                [:]
             )
         }
     }
+    #endif
 
+    #if compiler(>=6.2)
     @Test(.requireEmbeddedSwiftInSwiftSDK())
     func embeddedWasmUnknownWasi() throws {
         let swiftSDKID = try #require(Self.getEmbeddedSwiftSDKID())
         try withPackage(at: "Examples/Embedded") { packageDir, _, runSwift in
             try runSwift(
                 ["package", "--swift-sdk", swiftSDKID, "js", "-c", "release"],
-                [
-                    "JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM": "true"
-                ]
+                [:]
             )
         }
     }
+    #endif
 
     @Test(.requireSwiftSDK)
     func continuationLeakInTest_XCTest() throws {
