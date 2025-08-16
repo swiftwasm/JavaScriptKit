@@ -22,7 +22,8 @@ let package = Package(
             dependencies: [
                 "BridgeJSCore",
                 "BridgeJSSkeleton",
-            ]
+            ],
+            exclude: ["JavaScript"]
         ),
         .target(
             name: "BridgeJSCore",

@@ -255,7 +255,10 @@ extension Trait where Self == ConditionTrait {
                 try scriptContent.write(to: tempDir.appending(path: "script.js"), atomically: true, encoding: .utf8)
                 let scriptPath = tempDir.appending(path: "script.js")
                 try runSwift(
-                    ["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "-Xnode=--require=\(scriptPath.path)"],
+                    [
+                        "package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test",
+                        "-Xnode=--require=\(scriptPath.path)",
+                    ],
                     [:]
                 )
                 let testPath = tempDir.appending(path: "test.txt")
@@ -265,7 +268,10 @@ extension Trait where Self == ConditionTrait {
                     "test.txt should be created by the script"
                 )
             })
-            try runSwift(["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser"], [:])
+            try runSwift(
+                ["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser"],
+                [:]
+            )
         }
     }
 
