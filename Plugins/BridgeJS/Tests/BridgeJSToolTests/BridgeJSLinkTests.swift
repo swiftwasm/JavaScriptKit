@@ -46,7 +46,7 @@ import Testing
     func snapshotExport(input: String) throws {
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let swiftAPI = ExportSwift(progress: .silent)
+        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule")
         try swiftAPI.addSourceFile(sourceFile, input)
         let name = url.deletingPathExtension().lastPathComponent
 

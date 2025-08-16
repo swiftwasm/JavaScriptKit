@@ -42,6 +42,8 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
             executable: try context.tool(named: "BridgeJSTool").url,
             arguments: [
                 "export",
+                "--module-name",
+                target.name,
                 "--output-skeleton",
                 outputSkeletonPath.path,
                 "--output-swift",

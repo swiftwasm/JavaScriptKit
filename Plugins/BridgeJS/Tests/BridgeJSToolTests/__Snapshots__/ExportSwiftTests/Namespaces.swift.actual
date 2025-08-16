@@ -68,9 +68,9 @@ public func _bjs_Greeter_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension Greeter: ConvertibleToJSValue {
     var jsValue: JSValue {
-        @_extern(wasm, module: "TestModule", name: "bjs_Greeter_wrap")
+        @_extern(wasm, module: "JavaScriptKit", name: "bjs_Greeter_wrap")
         func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
-        return .object(JSObject(id: UInt32(bitPattern: _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+        return JSObject(id: UInt32(bitPattern: _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque())))
     }
 }
 
@@ -106,9 +106,9 @@ public func _bjs_Converter_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension Converter: ConvertibleToJSValue {
     var jsValue: JSValue {
-        @_extern(wasm, module: "TestModule", name: "bjs_Converter_wrap")
+        @_extern(wasm, module: "JavaScriptKit", name: "bjs_Converter_wrap")
         func _bjs_Converter_wrap(_: UnsafeMutableRawPointer) -> Int32
-        return .object(JSObject(id: UInt32(bitPattern: _bjs_Converter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+        return JSObject(id: UInt32(bitPattern: _bjs_Converter_wrap(Unmanaged.passRetained(self).toOpaque())))
     }
 }
 
@@ -133,8 +133,8 @@ public func _bjs_UUID_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension UUID: ConvertibleToJSValue {
     var jsValue: JSValue {
-        @_extern(wasm, module: "TestModule", name: "bjs_UUID_wrap")
+        @_extern(wasm, module: "JavaScriptKit", name: "bjs_UUID_wrap")
         func _bjs_UUID_wrap(_: UnsafeMutableRawPointer) -> Int32
-        return .object(JSObject(id: UInt32(bitPattern: _bjs_UUID_wrap(Unmanaged.passRetained(self).toOpaque()))))
+        return JSObject(id: UInt32(bitPattern: _bjs_UUID_wrap(Unmanaged.passRetained(self).toOpaque())))
     }
 }

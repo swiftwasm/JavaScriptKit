@@ -336,6 +336,39 @@ public func _bjs_useCalculator(calc: UnsafeMutableRawPointer, x: Int32, y: Int32
     #endif
 }
 
+@_expose(wasm, "bjs_testGreeterToJSValue")
+@_cdecl("bjs_testGreeterToJSValue")
+public func _bjs_testGreeterToJSValue() -> Int32 {
+    #if arch(wasm32)
+    let ret = testGreeterToJSValue()
+    return _swift_js_retain(Int32(bitPattern: ret.id))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testCalculatorToJSValue")
+@_cdecl("bjs_testCalculatorToJSValue")
+public func _bjs_testCalculatorToJSValue() -> Int32 {
+    #if arch(wasm32)
+    let ret = testCalculatorToJSValue()
+    return _swift_js_retain(Int32(bitPattern: ret.id))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testSwiftClassAsJSValue")
+@_cdecl("bjs_testSwiftClassAsJSValue")
+public func _bjs_testSwiftClassAsJSValue(greeter: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = testSwiftClassAsJSValue(greeter: Unmanaged<Greeter>.fromOpaque(greeter).takeUnretainedValue())
+    return _swift_js_retain(Int32(bitPattern: ret.id))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_Greeter_init")
 @_cdecl("bjs_Greeter_init")
 public func _bjs_Greeter_init(nameBytes: Int32, nameLen: Int32) -> UnsafeMutableRawPointer {
@@ -384,6 +417,14 @@ public func _bjs_Greeter_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<Greeter>.fromOpaque(pointer).release()
 }
 
+extension Greeter: ConvertibleToJSValue {
+    var jsValue: JSValue {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Greeter_wrap")
+        func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
 @_expose(wasm, "bjs_Calculator_square")
 @_cdecl("bjs_Calculator_square")
 public func _bjs_Calculator_square(_self: UnsafeMutableRawPointer, value: Int32) -> Int32 {
@@ -410,4 +451,12 @@ public func _bjs_Calculator_add(_self: UnsafeMutableRawPointer, a: Int32, b: Int
 @_cdecl("bjs_Calculator_deinit")
 public func _bjs_Calculator_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<Calculator>.fromOpaque(pointer).release()
+}
+
+extension Calculator: ConvertibleToJSValue {
+    var jsValue: JSValue {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Calculator_wrap")
+        func _bjs_Calculator_wrap(_: UnsafeMutableRawPointer) -> Int32
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_Calculator_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
 }

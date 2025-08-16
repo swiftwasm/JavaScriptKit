@@ -47,6 +47,7 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
 
+
         },
         setInstance: (i) => {
             instance = i;

@@ -149,6 +149,10 @@ import TS2Skeleton
             let parser = ArgumentParser(
                 singleDashOptions: [:],
                 doubleDashOptions: [
+                    "module-name": OptionRule(
+                        help: "The name of the module for external function references",
+                        required: true
+                    ),
                     "output-skeleton": OptionRule(
                         help: "The output file path for the skeleton of the exported Swift APIs",
                         required: true
@@ -168,7 +172,7 @@ import TS2Skeleton
                 arguments: Array(arguments.dropFirst())
             )
             let progress = ProgressReporting(verbose: doubleDashOptions["verbose"] == "true")
-            let exporter = ExportSwift(progress: progress)
+            let exporter = ExportSwift(progress: progress, moduleName: doubleDashOptions["module-name"]!)
             for inputFile in positionalArguments.sorted() {
                 let sourceURL = URL(fileURLWithPath: inputFile)
                 guard sourceURL.pathExtension == "swift" else { continue }

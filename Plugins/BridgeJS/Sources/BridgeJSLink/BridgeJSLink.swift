@@ -203,6 +203,7 @@ struct BridgeJSLink {
                         bjs["swift_js_release"] = function(id) {
                             swift.memory.release(id);
                         }
+            \(renderSwiftClassWrappers().map { $0.indent(count: 12) }.joined(separator: "\n"))
             \(importObjectBuilders.flatMap { $0.importedLines }.map { $0.indent(count: 12) }.joined(separator: "\n"))
                     },
                     setInstance: (i) => {
@@ -247,6 +248,39 @@ struct BridgeJSLink {
             }>;
             """
         return (outputJs, outputDts)
+    }
+
+    private func renderSwiftClassWrappers() -> [String] {
+        var wrapperLines: [String] = []
+        var modulesByName: [String: [ExportedClass]] = [:]
+
+        // Group classes by their module name
+        for skeleton in exportedSkeletons {
+            if skeleton.classes.isEmpty { continue }
+
+            if modulesByName[skeleton.moduleName] == nil {
+                modulesByName[skeleton.moduleName] = []
+            }
+            modulesByName[skeleton.moduleName]?.append(contentsOf: skeleton.classes)
+        }
+
+        // Generate wrapper functions for each module
+        for (moduleName, classes) in modulesByName {
+            wrapperLines.append("// Wrapper functions for module: \(moduleName)")
+            wrapperLines.append("if (!importObject[\"\(moduleName)\"]) {")
+            wrapperLines.append("    importObject[\"\(moduleName)\"] = {};")
+            wrapperLines.append("}")
+
+            for klass in classes {
+                let wrapperFunctionName = "bjs_\(klass.name)_wrap"
+                wrapperLines.append("importObject[\"\(moduleName)\"][\"\(wrapperFunctionName)\"] = function(pointer) {")
+                wrapperLines.append("    const obj = \(klass.name).__construct(pointer);")
+                wrapperLines.append("    return swift.memory.retain(obj);")
+                wrapperLines.append("};")
+            }
+        }
+
+        return wrapperLines
     }
 
     private func generateImportedTypeDefinitions() -> [String] {
@@ -736,7 +770,9 @@ struct BridgeJSLink {
 
         init(moduleName: String) {
             self.moduleName = moduleName
-            importedLines.append("const \(moduleName) = importObject[\"\(moduleName)\"] = {};")
+            importedLines.append(
+                "const \(moduleName) = importObject[\"\(moduleName)\"] = importObject[\"\(moduleName)\"] || {};"
+            )
         }
 
         func assignToImportObject(name: String, function: [String]) {

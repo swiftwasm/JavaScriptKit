@@ -56,6 +56,14 @@ public func _bjs_PlayBridgeJS_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<PlayBridgeJS>.fromOpaque(pointer).release()
 }
 
+extension PlayBridgeJS: ConvertibleToJSValue {
+    var jsValue: JSValue {
+        @_extern(wasm, module: "PlayBridgeJS", name: "bjs_PlayBridgeJS_wrap")
+        func _bjs_PlayBridgeJS_wrap(_: UnsafeMutableRawPointer) -> Int32
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_PlayBridgeJS_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
 @_expose(wasm, "bjs_PlayBridgeJSOutput_outputJs")
 @_cdecl("bjs_PlayBridgeJSOutput_outputJs")
 public func _bjs_PlayBridgeJSOutput_outputJs(_self: UnsafeMutableRawPointer) -> Void {
@@ -112,4 +120,12 @@ public func _bjs_PlayBridgeJSOutput_exportSwiftGlue(_self: UnsafeMutableRawPoint
 @_cdecl("bjs_PlayBridgeJSOutput_deinit")
 public func _bjs_PlayBridgeJSOutput_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<PlayBridgeJSOutput>.fromOpaque(pointer).release()
+}
+
+extension PlayBridgeJSOutput: ConvertibleToJSValue {
+    var jsValue: JSValue {
+        @_extern(wasm, module: "PlayBridgeJS", name: "bjs_PlayBridgeJSOutput_wrap")
+        func _bjs_PlayBridgeJSOutput_wrap(_: UnsafeMutableRawPointer) -> Int32
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_PlayBridgeJSOutput_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
 }

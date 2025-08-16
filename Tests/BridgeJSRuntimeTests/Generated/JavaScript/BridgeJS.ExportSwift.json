@@ -537,6 +537,63 @@
 
         }
       }
+    },
+    {
+      "abiName" : "bjs_testGreeterToJSValue",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "testGreeterToJSValue",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "jsObject" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testCalculatorToJSValue",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "testCalculatorToJSValue",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "jsObject" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testSwiftClassAsJSValue",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "testSwiftClassAsJSValue",
+      "parameters" : [
+        {
+          "label" : "greeter",
+          "name" : "greeter",
+          "type" : {
+            "swiftHeapObject" : {
+              "_0" : "Greeter"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "jsObject" : {
+
+        }
+      }
     }
-  ]
+  ],
+  "moduleName" : "BridgeJSRuntimeTests"
 }

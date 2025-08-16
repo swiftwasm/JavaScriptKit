@@ -17,7 +17,7 @@ import class Foundation.JSONDecoder
     }
 
     func _update(swiftSource: String, dtsSource: String) throws -> PlayBridgeJSOutput {
-        let exportSwift = ExportSwift(progress: .silent)
+        let exportSwift = ExportSwift(progress: .silent, moduleName: "Playground")
         let sourceFile = Parser.parse(source: swiftSource)
         try exportSwift.addSourceFile(sourceFile, "Playground.swift")
         let exportResult = try exportSwift.finalize()
