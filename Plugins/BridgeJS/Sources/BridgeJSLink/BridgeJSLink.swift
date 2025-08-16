@@ -43,18 +43,16 @@ struct BridgeJSLink {
     let swiftHeapObjectClassJs = """
         /// Represents a Swift heap object like a class instance or an actor instance.
         class SwiftHeapObject {
-            static __construct(ptr, deinit) {
-                return new SwiftHeapObject(ptr, deinit);
-            }
-
-            constructor(pointer, deinit) {
-                this.pointer = pointer;
-                this.hasReleased = false;
-                this.deinit = deinit;
-                this.registry = new FinalizationRegistry((pointer) => {
+            static __wrap(pointer, deinit, prototype) {
+                const obj = Object.create(prototype);
+                obj.pointer = pointer;
+                obj.hasReleased = false;
+                obj.deinit = deinit;
+                obj.registry = new FinalizationRegistry((pointer) => {
                     deinit(pointer);
                 });
-                this.registry.register(this, this.pointer);
+                obj.registry.register(this, obj.pointer);
+                return obj;
             }
 
             release() {
@@ -525,13 +523,11 @@ struct BridgeJSLink {
         var constructorLines: [String] = []
         constructorLines.append("static __construct(ptr) {")
         constructorLines.append(
-            "return new \(klass.name)(ptr, instance.exports.bjs_\(klass.name)_deinit);".indent(count: 4)
+            "return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_\(klass.name)_deinit, \(klass.name).prototype);"
+                .indent(count: 4)
         )
         constructorLines.append("}")
         constructorLines.append("")
-        constructorLines.append("constructor(pointer, deinit) {")
-        constructorLines.append("super(pointer, deinit);".indent(count: 4))
-        constructorLines.append("}")
         jsLines.append(contentsOf: constructorLines.map { $0.indent(count: 4) })
 
         if let constructor: ExportedConstructor = klass.constructor {
@@ -541,7 +537,7 @@ struct BridgeJSLink {
             }
             var funcLines: [String] = []
             funcLines.append("")
-            funcLines.append("static init(\(constructor.parameters.map { $0.name }.joined(separator: ", "))) {")
+            funcLines.append("constructor(\(constructor.parameters.map { $0.name }.joined(separator: ", "))) {")
             let returnExpr = thunkBuilder.callConstructor(abiName: constructor.abiName)
             funcLines.append(contentsOf: thunkBuilder.bodyLines.map { $0.indent(count: 4) })
             funcLines.append(contentsOf: thunkBuilder.cleanupLines.map { $0.indent(count: 4) })
@@ -551,7 +547,7 @@ struct BridgeJSLink {
             jsLines.append(contentsOf: funcLines.map { $0.indent(count: 4) })
 
             dtsExportEntryLines.append(
-                "init\(renderTSSignature(parameters: constructor.parameters, returnType: .swiftHeapObject(klass.name)));"
+                "constructor\(renderTSSignature(parameters: constructor.parameters, returnType: .swiftHeapObject(klass.name)));"
                     .indent(count: 4)
             )
         }
