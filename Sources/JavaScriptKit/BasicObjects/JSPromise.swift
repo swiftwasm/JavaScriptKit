@@ -23,6 +23,10 @@ public final class JSPromise: JSBridgedClass {
         self.init(from: jsObject)
     }
 
+    @_spi(BridgeJS) public convenience init(takingThis: Int32) {
+        self.init(unsafelyWrapping: JSObject(id: UInt32(bitPattern: takingThis)))
+    }
+
     /// Creates a new `JSPromise` instance from a given JavaScript `Promise` object. If `value`
     /// is not an object and is not an instance of JavaScript `Promise`, this function will
     /// return `nil`.
@@ -65,6 +69,44 @@ public final class JSPromise: JSBridgedClass {
         }
         self.init(unsafelyWrapping: Self.constructor!.new(closure))
     }
+
+    #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
+    /// Creates a new `JSPromise` instance from a given async closure.
+    ///
+    /// - Parameter body: The async closure to execute.
+    /// - Returns: A new `JSPromise` instance.
+    public static func async(body: @escaping @isolated(any) () async throws(JSException) -> Void) -> JSPromise {
+        self.async { () throws(JSException) -> JSValue in
+            try await body()
+            return .undefined
+        }
+    }
+
+    /// Creates a new `JSPromise` instance from a given async closure.
+    ///
+    /// - Parameter body: The async closure to execute.
+    /// - Returns: A new `JSPromise` instance.
+    public static func async(body: @escaping @isolated(any) () async throws(JSException) -> JSValue) -> JSPromise {
+        JSPromise { resolver in
+            // NOTE: The context is fully transferred to the unstructured task
+            // isolation but the compiler can't prove it yet, so we need to
+            // use `@unchecked Sendable` to make it compile with the Swift 6 mode.
+            struct Context: @unchecked Sendable {
+                let resolver: (JSPromise.Result) -> Void
+                let body: () async throws(JSException) -> JSValue
+            }
+            let context = Context(resolver: resolver, body: body)
+            Task {
+                do throws(JSException) {
+                    let result = try await context.body()
+                    context.resolver(.success(result))
+                } catch {
+                    context.resolver(.failure(error.thrownValue))
+                }
+            }
+        }
+    }
+    #endif
 
     #if !hasFeature(Embedded)
     public static func resolve(_ value: ConvertibleToJSValue) -> JSPromise {

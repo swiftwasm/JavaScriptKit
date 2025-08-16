@@ -142,6 +142,22 @@ func jsThrowOrString(_ shouldThrow: Bool) throws(JSException) -> String {
     }
 }
 
+func runAsyncWorks() throws(JSException) -> JSPromise {
+    #if arch(wasm32)
+    @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_runAsyncWorks")
+    func bjs_runAsyncWorks() -> Int32
+    #else
+    func bjs_runAsyncWorks() -> Int32 {
+        fatalError("Only available on WebAssembly")
+    }
+    #endif
+    let ret = bjs_runAsyncWorks()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSPromise(takingThis: ret)
+}
+
 struct JsGreeter {
     let this: JSObject
 

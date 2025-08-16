@@ -11,7 +11,7 @@ export type Options = {
     /**
      * The imports to use for the module
      */
-    imports: Imports
+    getImports: () => Imports
 /* #endif */
 }
 

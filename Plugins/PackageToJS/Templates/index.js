@@ -8,7 +8,7 @@ export async function init(_options) {
     const options = _options || {
 /* #if HAS_IMPORTS */
         /** @returns {import('./instantiate.d').Imports} */
-        get imports() { (() => { throw new Error("No imports provided") })() }
+        getImports() { (() => { throw new Error("No imports provided") })() }
 /* #endif */
     };
     let module = options.module;
@@ -18,7 +18,7 @@ export async function init(_options) {
     const instantiateOptions = await defaultBrowserSetup({
         module,
 /* #if HAS_IMPORTS */
-        imports: options.imports,
+        getImports: () => options.getImports(),
 /* #endif */
 /* #if USE_SHARED_MEMORY */
         spawnWorker: createDefaultWorkerFactory()

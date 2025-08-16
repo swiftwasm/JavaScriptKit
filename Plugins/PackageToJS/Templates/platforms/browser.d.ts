@@ -8,7 +8,7 @@ export function defaultBrowserSetup(options: {
     onStderrLine?: (line: string) => void,
 /* #endif */
 /* #if HAS_IMPORTS */
-    imports: Imports,
+    getImports: () => Imports,
 /* #endif */
 /* #if USE_SHARED_MEMORY */
     spawnWorker: (module: WebAssembly.Module, memory: WebAssembly.Memory, startArg: any) => Worker,

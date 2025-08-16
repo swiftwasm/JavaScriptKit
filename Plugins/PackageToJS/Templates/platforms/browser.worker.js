@@ -13,6 +13,6 @@ self.onmessage = async (event) => {
     await instantiateForThread(tid, startArg, {
         ...options,
         module, memory,
-        imports: {},
+        getImports() { return {} },
     })
 }
