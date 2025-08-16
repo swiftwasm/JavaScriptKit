@@ -46,7 +46,8 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_release"] = function(id) {
                 swift.memory.release(id);
             }
-            const TestModule = importObject["TestModule"] = {};
+
+            const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_checkArray"] = function bjs_checkArray(a) {
                 try {
                     options.imports.checkArray(swift.memory.getObject(a));

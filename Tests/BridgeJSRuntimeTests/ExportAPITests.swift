@@ -99,6 +99,20 @@ struct TestError: Error {
     return calc.add(a: calc.square(value: x), b: y)
 }
 
+@JS func testGreeterToJSValue() -> JSObject {
+    let greeter = Greeter(name: "Test")
+    return greeter.jsValue.object!
+}
+
+@JS func testCalculatorToJSValue() -> JSObject {
+    let calc = Calculator()
+    return calc.jsValue.object!
+}
+
+@JS func testSwiftClassAsJSValue(greeter: Greeter) -> JSObject {
+    return greeter.jsValue.object!
+}
+
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false

@@ -16,13 +16,15 @@ import BridgeJSSkeleton
 /// JavaScript glue code and TypeScript definitions.
 public class ExportSwift {
     let progress: ProgressReporting
+    let moduleName: String
 
     private var exportedFunctions: [ExportedFunction] = []
     private var exportedClasses: [ExportedClass] = []
     private var typeDeclResolver: TypeDeclResolver = TypeDeclResolver()
 
-    public init(progress: ProgressReporting) {
+    public init(progress: ProgressReporting, moduleName: String) {
         self.progress = progress
+        self.moduleName = moduleName
     }
 
     /// Processes a Swift source file to find declarations marked with @JS
@@ -53,7 +55,7 @@ public class ExportSwift {
         }
         return (
             outputSwift: outputSwift,
-            outputSkeleton: ExportedSkeleton(functions: exportedFunctions, classes: exportedClasses)
+            outputSkeleton: ExportedSkeleton(moduleName: moduleName, functions: exportedFunctions, classes: exportedClasses)
         )
     }
 
@@ -676,7 +678,40 @@ public class ExportSwift {
             )
         }
 
+        // Generate ConvertibleToJSValue extension
+        decls.append(renderConvertibleToJSValueExtension(klass: klass))
+
         return decls
+    }
+
+    /// Generates a ConvertibleToJSValue extension for the exported class
+    ///
+    /// # Example
+    ///
+    /// For a class named `Greeter`, this generates:
+    ///
+    /// ```swift
+    /// extension Greeter: ConvertibleToJSValue {
+    ///     var jsValue: JSValue {
+    ///         @_extern(wasm, module: "MyModule", name: "bjs_Greeter_wrap")
+    ///         func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+    ///         return JSObject(id: UInt32(bitPattern: _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque())))
+    ///     }
+    /// }
+    /// ```
+    func renderConvertibleToJSValueExtension(klass: ExportedClass) -> DeclSyntax {
+        let wrapFunctionName = "_bjs_\(klass.name)_wrap"
+        let externFunctionName = "bjs_\(klass.name)_wrap"
+
+        return """
+            extension \(raw: klass.name): ConvertibleToJSValue {
+                var jsValue: JSValue {
+                    @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: externFunctionName)")
+                    func \(raw: wrapFunctionName)(_: UnsafeMutableRawPointer) -> Int32
+                    return .object(JSObject(id: UInt32(bitPattern: \(raw: wrapFunctionName)(Unmanaged.passRetained(self).toOpaque()))))
+                }
+            }
+            """
     }
 }
 

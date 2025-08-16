@@ -46,7 +46,8 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_release"] = function(id) {
                 swift.memory.release(id);
             }
-            const TestModule = importObject["TestModule"] = {};
+
+            const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_createTS2Skeleton"] = function bjs_createTS2Skeleton() {
                 try {
                     let ret = options.imports.createTS2Skeleton();

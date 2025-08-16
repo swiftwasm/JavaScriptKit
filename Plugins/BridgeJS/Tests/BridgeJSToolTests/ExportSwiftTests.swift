@@ -47,7 +47,7 @@ import Testing
 
     @Test(arguments: collectInputs())
     func snapshot(input: String) throws {
-        let swiftAPI = ExportSwift(progress: .silent)
+        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule")
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
         try swiftAPI.addSourceFile(sourceFile, input)

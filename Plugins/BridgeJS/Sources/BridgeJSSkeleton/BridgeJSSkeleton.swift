@@ -93,10 +93,12 @@ public struct ExportedConstructor: Codable {
 }
 
 public struct ExportedSkeleton: Codable {
+    public let moduleName: String
     public let functions: [ExportedFunction]
     public let classes: [ExportedClass]
 
-    public init(functions: [ExportedFunction], classes: [ExportedClass]) {
+    public init(moduleName: String, functions: [ExportedFunction], classes: [ExportedClass]) {
+        self.moduleName = moduleName
         self.functions = functions
         self.classes = classes
     }

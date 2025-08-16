@@ -46,6 +46,22 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_release"] = function(id) {
                 swift.memory.release(id);
             }
+            // Wrapper functions for module: TestModule
+            if (!importObject["TestModule"]) {
+                importObject["TestModule"] = {};
+            }
+            importObject["TestModule"]["bjs_Greeter_wrap"] = function(pointer) {
+                const obj = Greeter.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
+            importObject["TestModule"]["bjs_Converter_wrap"] = function(pointer) {
+                const obj = Converter.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
+            importObject["TestModule"]["bjs_UUID_wrap"] = function(pointer) {
+                const obj = UUID.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
 
         },
         setInstance: (i) => {
