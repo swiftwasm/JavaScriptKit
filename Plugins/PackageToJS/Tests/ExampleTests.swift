@@ -244,7 +244,7 @@ extension Trait where Self == ConditionTrait {
             try runProcess(which("npm"), ["install"], [:])
             try runProcess(which("npx"), ["playwright", "install", "chromium-headless-shell"], [:])
 
-            try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "test"], [:])
+            try runSwift(["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
             try withTemporaryDirectory(body: { tempDir, _ in
                 let scriptContent = """
                     const fs = require('fs');
@@ -255,7 +255,7 @@ extension Trait where Self == ConditionTrait {
                 try scriptContent.write(to: tempDir.appending(path: "script.js"), atomically: true, encoding: .utf8)
                 let scriptPath = tempDir.appending(path: "script.js")
                 try runSwift(
-                    ["package", "--swift-sdk", swiftSDKID, "js", "test", "-Xnode=--require=\(scriptPath.path)"],
+                    ["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "-Xnode=--require=\(scriptPath.path)"],
                     [:]
                 )
                 let testPath = tempDir.appending(path: "test.txt")
@@ -265,7 +265,7 @@ extension Trait where Self == ConditionTrait {
                     "test.txt should be created by the script"
                 )
             })
-            try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser"], [:])
+            try runSwift(["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser"], [:])
         }
     }
 
