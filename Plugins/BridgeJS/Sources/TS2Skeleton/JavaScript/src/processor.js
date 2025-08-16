@@ -162,6 +162,7 @@ export class TypeProcessor {
             parameters,
             returnType: bridgeReturnType,
             documentation,
+            effects: { isAsync: false },
         };
     }
 
@@ -341,6 +342,10 @@ export class TypeProcessor {
      * @private
      */
     visitType(type, node) {
+        // Treat A<B> and A<C> as the same type
+        if (isTypeReference(type)) {
+            type = type.target;
+        }
         const maybeProcessed = this.processedTypes.get(type);
         if (maybeProcessed) {
             return maybeProcessed;
@@ -364,8 +369,13 @@ export class TypeProcessor {
                 "object": { "jsObject": {} },
                 "symbol": { "jsObject": {} },
                 "never": { "void": {} },
+                "Promise": {
+                    "jsObject": {
+                        "_0": "JSPromise"
+                    }
+                },
             };
-            const typeString = this.checker.typeToString(type);
+            const typeString = type.getSymbol()?.name ?? this.checker.typeToString(type);
             if (typeMap[typeString]) {
                 return typeMap[typeString];
             }
@@ -377,7 +387,7 @@ export class TypeProcessor {
             if (this.checker.isTypeAssignableTo(type, this.checker.getStringType())) {
                 return { "string": {} };
             }
-            if (type.getFlags() & ts.TypeFlags.TypeParameter) {
+            if (type.isTypeParameter()) {
                 return { "jsObject": {} };
             }
 
@@ -411,4 +421,25 @@ export class TypeProcessor {
         }
         return undefined;
     }
+}
+
+/**
+ * @param {ts.Type} type
+ * @returns {type is ts.ObjectType}
+ */
+function isObjectType(type) {
+    // @ts-ignore
+    return typeof type.objectFlags === "number";
+}
+
+/**
+ *
+ * @param {ts.Type} type
+ * @returns {type is ts.TypeReference}
+ */
+function isTypeReference(type) {
+    return (
+        isObjectType(type) &&
+        (type.objectFlags & ts.ObjectFlags.Reference) !== 0
+    );
 }

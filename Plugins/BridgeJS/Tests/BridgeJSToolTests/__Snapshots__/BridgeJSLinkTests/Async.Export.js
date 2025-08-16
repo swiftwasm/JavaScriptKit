@@ -50,25 +50,7 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
 
-            const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
-            TestModule["bjs_checkString"] = function bjs_checkString(a) {
-                try {
-                    const aObject = swift.memory.getObject(a);
-                    swift.memory.release(a);
-                    imports.checkString(aObject);
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_checkStringWithLength"] = function bjs_checkStringWithLength(a, b) {
-                try {
-                    const aObject = swift.memory.getObject(a);
-                    swift.memory.release(a);
-                    imports.checkStringWithLength(aObject, b);
-                } catch (error) {
-                    setException(error);
-                }
-            }
+
         },
         setInstance: (i) => {
             instance = i;
@@ -82,7 +64,51 @@ export async function createInstantiator(options, swift) {
             const js = swift.memory.heap;
 
             return {
-
+                asyncReturnVoid: function bjs_asyncReturnVoid() {
+                    const retId = instance.exports.bjs_asyncReturnVoid();
+                    const ret = swift.memory.getObject(retId);
+                    swift.memory.release(retId);
+                    return ret;
+                },
+                asyncRoundTripInt: function bjs_asyncRoundTripInt(v) {
+                    const retId = instance.exports.bjs_asyncRoundTripInt(v);
+                    const ret = swift.memory.getObject(retId);
+                    swift.memory.release(retId);
+                    return ret;
+                },
+                asyncRoundTripString: function bjs_asyncRoundTripString(v) {
+                    const vBytes = textEncoder.encode(v);
+                    const vId = swift.memory.retain(vBytes);
+                    const retId = instance.exports.bjs_asyncRoundTripString(vId, vBytes.length);
+                    const ret = swift.memory.getObject(retId);
+                    swift.memory.release(retId);
+                    swift.memory.release(vId);
+                    return ret;
+                },
+                asyncRoundTripBool: function bjs_asyncRoundTripBool(v) {
+                    const retId = instance.exports.bjs_asyncRoundTripBool(v);
+                    const ret = swift.memory.getObject(retId);
+                    swift.memory.release(retId);
+                    return ret;
+                },
+                asyncRoundTripFloat: function bjs_asyncRoundTripFloat(v) {
+                    const retId = instance.exports.bjs_asyncRoundTripFloat(v);
+                    const ret = swift.memory.getObject(retId);
+                    swift.memory.release(retId);
+                    return ret;
+                },
+                asyncRoundTripDouble: function bjs_asyncRoundTripDouble(v) {
+                    const retId = instance.exports.bjs_asyncRoundTripDouble(v);
+                    const ret = swift.memory.getObject(retId);
+                    swift.memory.release(retId);
+                    return ret;
+                },
+                asyncRoundTripJSObject: function bjs_asyncRoundTripJSObject(v) {
+                    const retId = instance.exports.bjs_asyncRoundTripJSObject(swift.memory.retain(v));
+                    const ret = swift.memory.getObject(retId);
+                    swift.memory.release(retId);
+                    return ret;
+                },
             };
         },
     }
