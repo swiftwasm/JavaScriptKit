@@ -51,10 +51,10 @@ export interface UUID extends SwiftHeapObject {
 }
 export type Exports = {
     Greeter: {
-        init(name: string): Greeter;
+        constructor(name: string): Greeter;
     }
     Converter: {
-        init(): Converter;
+        constructor(): Converter;
     }
     UUID: {
     }

@@ -60,18 +60,16 @@ export async function createInstantiator(options, swift) {
             const js = swift.memory.heap;
             /// Represents a Swift heap object like a class instance or an actor instance.
             class SwiftHeapObject {
-                static __construct(ptr, deinit) {
-                    return new SwiftHeapObject(ptr, deinit);
-                }
-            
-                constructor(pointer, deinit) {
-                    this.pointer = pointer;
-                    this.hasReleased = false;
-                    this.deinit = deinit;
-                    this.registry = new FinalizationRegistry((pointer) => {
+                static __wrap(pointer, deinit, prototype) {
+                    const obj = Object.create(prototype);
+                    obj.pointer = pointer;
+                    obj.hasReleased = false;
+                    obj.deinit = deinit;
+                    obj.registry = new FinalizationRegistry((pointer) => {
                         deinit(pointer);
                     });
-                    this.registry.register(this, this.pointer);
+                    obj.registry.register(this, obj.pointer);
+                    return obj;
                 }
             
                 release() {
@@ -81,14 +79,11 @@ export async function createInstantiator(options, swift) {
             }
             class Greeter extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return new Greeter(ptr, instance.exports.bjs_Greeter_deinit);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Greeter_deinit, Greeter.prototype);
                 }
                 
-                constructor(pointer, deinit) {
-                    super(pointer, deinit);
-                }
                 
-                static init(name) {
+                constructor(name) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
                     const ret = instance.exports.bjs_Greeter_init(nameId, nameBytes.length);
@@ -104,14 +99,11 @@ export async function createInstantiator(options, swift) {
             }
             class Converter extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return new Converter(ptr, instance.exports.bjs_Converter_deinit);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Converter_deinit, Converter.prototype);
                 }
                 
-                constructor(pointer, deinit) {
-                    super(pointer, deinit);
-                }
                 
-                static init() {
+                constructor() {
                     const ret = instance.exports.bjs_Converter_init();
                     return Converter.__construct(ret);
                 }
@@ -124,12 +116,9 @@ export async function createInstantiator(options, swift) {
             }
             class UUID extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return new UUID(ptr, instance.exports.bjs_UUID_deinit);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_UUID_deinit, UUID.prototype);
                 }
                 
-                constructor(pointer, deinit) {
-                    super(pointer, deinit);
-                }
                 uuidString() {
                     instance.exports.bjs_UUID_uuidString(this.pointer);
                     const ret = tmpRetString;
