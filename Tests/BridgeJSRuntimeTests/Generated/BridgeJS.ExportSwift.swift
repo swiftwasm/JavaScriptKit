@@ -300,6 +300,114 @@ public func _bjs_throwsWithJSObjectResult() -> Int32 {
     #endif
 }
 
+@_expose(wasm, "bjs_asyncRoundTripVoid")
+@_cdecl("bjs_asyncRoundTripVoid")
+public func _bjs_asyncRoundTripVoid() -> Int32 {
+    #if arch(wasm32)
+    let ret = JSPromise.async {
+        await asyncRoundTripVoid()
+    } .jsObject
+    return _swift_js_retain(Int32(bitPattern: ret.id))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripInt")
+@_cdecl("bjs_asyncRoundTripInt")
+public func _bjs_asyncRoundTripInt(v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = JSPromise.async {
+        return await asyncRoundTripInt(v: Int(v)).jsValue
+    } .jsObject
+    return _swift_js_retain(Int32(bitPattern: ret.id))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripFloat")
+@_cdecl("bjs_asyncRoundTripFloat")
+public func _bjs_asyncRoundTripFloat(v: Float32) -> Int32 {
+    #if arch(wasm32)
+    let ret = JSPromise.async {
+        return await asyncRoundTripFloat(v: v).jsValue
+    } .jsObject
+    return _swift_js_retain(Int32(bitPattern: ret.id))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripDouble")
+@_cdecl("bjs_asyncRoundTripDouble")
+public func _bjs_asyncRoundTripDouble(v: Float64) -> Int32 {
+    #if arch(wasm32)
+    let ret = JSPromise.async {
+        return await asyncRoundTripDouble(v: v).jsValue
+    } .jsObject
+    return _swift_js_retain(Int32(bitPattern: ret.id))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripBool")
+@_cdecl("bjs_asyncRoundTripBool")
+public func _bjs_asyncRoundTripBool(v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = JSPromise.async {
+        return await asyncRoundTripBool(v: v == 1).jsValue
+    } .jsObject
+    return _swift_js_retain(Int32(bitPattern: ret.id))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripString")
+@_cdecl("bjs_asyncRoundTripString")
+public func _bjs_asyncRoundTripString(vBytes: Int32, vLen: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = JSPromise.async {
+        let v = String(unsafeUninitializedCapacity: Int(vLen)) { b in
+            _swift_js_init_memory(vBytes, b.baseAddress.unsafelyUnwrapped)
+            return Int(vLen)
+        }
+        return await asyncRoundTripString(v: v).jsValue
+    } .jsObject
+    return _swift_js_retain(Int32(bitPattern: ret.id))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripSwiftHeapObject")
+@_cdecl("bjs_asyncRoundTripSwiftHeapObject")
+public func _bjs_asyncRoundTripSwiftHeapObject(v: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = JSPromise.async {
+        return await asyncRoundTripSwiftHeapObject(v: Unmanaged<Greeter>.fromOpaque(v).takeUnretainedValue()).jsValue
+    } .jsObject
+    return _swift_js_retain(Int32(bitPattern: ret.id))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripJSObject")
+@_cdecl("bjs_asyncRoundTripJSObject")
+public func _bjs_asyncRoundTripJSObject(v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = JSPromise.async {
+        return await asyncRoundTripJSObject(v: JSObject(id: UInt32(bitPattern: v))).jsValue
+    } .jsObject
+    return _swift_js_retain(Int32(bitPattern: ret.id))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_takeGreeter")
 @_cdecl("bjs_takeGreeter")
 public func _bjs_takeGreeter(g: UnsafeMutableRawPointer, nameBytes: Int32, nameLen: Int32) -> Void {

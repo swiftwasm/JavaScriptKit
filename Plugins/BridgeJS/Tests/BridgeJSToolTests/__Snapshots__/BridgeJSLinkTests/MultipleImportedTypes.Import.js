@@ -15,10 +15,13 @@ export async function createInstantiator(options, swift) {
     let tmpRetBytes;
     let tmpRetException;
     return {
-        /** @param {WebAssembly.Imports} importObject */
-        addImports: (importObject) => {
+        /**
+         * @param {WebAssembly.Imports} importObject
+         */
+        addImports: (importObject, importsContext) => {
             const bjs = {};
             importObject["bjs"] = bjs;
+            const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 tmpRetString = textDecoder.decode(bytes);
@@ -50,7 +53,7 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_createDatabaseConnection"] = function bjs_createDatabaseConnection(config) {
                 try {
-                    let ret = options.imports.createDatabaseConnection(swift.memory.getObject(config));
+                    let ret = imports.createDatabaseConnection(swift.memory.getObject(config));
                     return swift.memory.retain(ret);
                 } catch (error) {
                     setException(error);
@@ -61,7 +64,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     const levelObject = swift.memory.getObject(level);
                     swift.memory.release(level);
-                    let ret = options.imports.createLogger(levelObject);
+                    let ret = imports.createLogger(levelObject);
                     return swift.memory.retain(ret);
                 } catch (error) {
                     setException(error);
@@ -70,7 +73,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_getConfigManager"] = function bjs_getConfigManager() {
                 try {
-                    let ret = options.imports.getConfigManager();
+                    let ret = imports.getConfigManager();
                     return swift.memory.retain(ret);
                 } catch (error) {
                     setException(error);

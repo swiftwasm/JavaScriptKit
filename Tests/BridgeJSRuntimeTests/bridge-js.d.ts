@@ -14,3 +14,5 @@ export class JsGreeter {
     greet(): string;
     changeName(name: string): void;
 }
+
+export function runAsyncWorks(): Promise<void>;

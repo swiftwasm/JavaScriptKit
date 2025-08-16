@@ -15,10 +15,13 @@ export async function createInstantiator(options, swift) {
     let tmpRetBytes;
     let tmpRetException;
     return {
-        /** @param {WebAssembly.Imports} importObject */
-        addImports: (importObject) => {
+        /**
+         * @param {WebAssembly.Imports} importObject
+         */
+        addImports: (importObject, importsContext) => {
             const bjs = {};
             importObject["bjs"] = bjs;
+            const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 tmpRetString = textDecoder.decode(bytes);
@@ -50,7 +53,7 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_checkString"] = function bjs_checkString() {
                 try {
-                    let ret = options.imports.checkString();
+                    let ret = imports.checkString();
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {

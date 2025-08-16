@@ -15,10 +15,13 @@ export async function createInstantiator(options, swift) {
     let tmpRetBytes;
     let tmpRetException;
     return {
-        /** @param {WebAssembly.Imports} importObject */
-        addImports: (importObject) => {
+        /**
+         * @param {WebAssembly.Imports} importObject
+         */
+        addImports: (importObject, importsContext) => {
             const bjs = {};
             importObject["bjs"] = bjs;
+            const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 tmpRetString = textDecoder.decode(bytes);
@@ -50,7 +53,7 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_checkNumber"] = function bjs_checkNumber() {
                 try {
-                    let ret = options.imports.checkNumber();
+                    let ret = imports.checkNumber();
                     return ret;
                 } catch (error) {
                     setException(error);
@@ -59,7 +62,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_checkBoolean"] = function bjs_checkBoolean() {
                 try {
-                    let ret = options.imports.checkBoolean();
+                    let ret = imports.checkBoolean();
                     return ret !== 0;
                 } catch (error) {
                     setException(error);

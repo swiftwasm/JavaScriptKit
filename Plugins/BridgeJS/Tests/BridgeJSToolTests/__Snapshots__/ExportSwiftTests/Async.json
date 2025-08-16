@@ -1,0 +1,168 @@
+{
+  "classes" : [
+
+  ],
+  "functions" : [
+    {
+      "abiName" : "bjs_asyncReturnVoid",
+      "effects" : {
+        "isAsync" : true,
+        "isThrows" : false
+      },
+      "name" : "asyncReturnVoid",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_asyncRoundTripInt",
+      "effects" : {
+        "isAsync" : true,
+        "isThrows" : false
+      },
+      "name" : "asyncRoundTripInt",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "v",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "int" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_asyncRoundTripString",
+      "effects" : {
+        "isAsync" : true,
+        "isThrows" : false
+      },
+      "name" : "asyncRoundTripString",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "v",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_asyncRoundTripBool",
+      "effects" : {
+        "isAsync" : true,
+        "isThrows" : false
+      },
+      "name" : "asyncRoundTripBool",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "v",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "bool" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_asyncRoundTripFloat",
+      "effects" : {
+        "isAsync" : true,
+        "isThrows" : false
+      },
+      "name" : "asyncRoundTripFloat",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "v",
+          "type" : {
+            "float" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "float" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_asyncRoundTripDouble",
+      "effects" : {
+        "isAsync" : true,
+        "isThrows" : false
+      },
+      "name" : "asyncRoundTripDouble",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "v",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "double" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_asyncRoundTripJSObject",
+      "effects" : {
+        "isAsync" : true,
+        "isThrows" : false
+      },
+      "name" : "asyncRoundTripJSObject",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "v",
+          "type" : {
+            "jsObject" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "jsObject" : {
+
+        }
+      }
+    }
+  ],
+  "moduleName" : "TestModule"
+}

@@ -15,10 +15,13 @@ export async function createInstantiator(options, swift) {
     let tmpRetBytes;
     let tmpRetException;
     return {
-        /** @param {WebAssembly.Imports} importObject */
-        addImports: (importObject) => {
+        /**
+         * @param {WebAssembly.Imports} importObject
+         */
+        addImports: (importObject, importsContext) => {
             const bjs = {};
             importObject["bjs"] = bjs;
+            const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 tmpRetString = textDecoder.decode(bytes);
@@ -50,7 +53,7 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_createTS2Skeleton"] = function bjs_createTS2Skeleton() {
                 try {
-                    let ret = options.imports.createTS2Skeleton();
+                    let ret = imports.createTS2Skeleton();
                     return swift.memory.retain(ret);
                 } catch (error) {
                     setException(error);
@@ -61,7 +64,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     const formatObject = swift.memory.getObject(format);
                     swift.memory.release(format);
-                    let ret = options.imports.createCodeGenerator(formatObject);
+                    let ret = imports.createCodeGenerator(formatObject);
                     return swift.memory.retain(ret);
                 } catch (error) {
                     setException(error);
