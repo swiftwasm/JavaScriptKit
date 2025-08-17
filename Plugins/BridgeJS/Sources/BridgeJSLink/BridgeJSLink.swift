@@ -599,7 +599,7 @@ struct BridgeJSLink {
             jsLines.append(contentsOf: funcLines.map { $0.indent(count: 4) })
 
             dtsExportEntryLines.append(
-                "constructor\(renderTSSignature(parameters: constructor.parameters, returnType: .swiftHeapObject(klass.name), effects: constructor.effects));"
+                "new\(renderTSSignature(parameters: constructor.parameters, returnType: .swiftHeapObject(klass.name), effects: constructor.effects));"
                     .indent(count: 4)
             )
         }

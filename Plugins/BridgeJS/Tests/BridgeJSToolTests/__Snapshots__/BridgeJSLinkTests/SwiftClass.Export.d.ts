@@ -17,7 +17,7 @@ export interface Greeter extends SwiftHeapObject {
 }
 export type Exports = {
     Greeter: {
-        constructor(name: string): Greeter;
+        new(name: string): Greeter;
     }
     takeGreeter(greeter: Greeter): void;
 }
