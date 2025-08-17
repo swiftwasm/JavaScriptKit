@@ -4,6 +4,8 @@ Configure BridgeJS behavior using bridge-js.config.json and bridge-js.config.loc
 
 ## Overview
 
+> Important: This feature is still experimental. No API stability is guaranteed, and the API may change in future releases.
+
 BridgeJS supports configuration through JSON configuration files that allow you to customize various aspects of the build process and tool behavior.
 
 The configuration system supports two complementary files:

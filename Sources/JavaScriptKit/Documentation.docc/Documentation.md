@@ -51,15 +51,18 @@ Check out the [examples](https://github.com/swiftwasm/JavaScriptKit/tree/main/Ex
 
 ### Articles
 
-- <doc:Exporting-Swift-to-JavaScript>
-- <doc:Importing-TypeScript-into-Swift>
-- <doc:BridgeJS-Configuration>
 - <doc:Deploying-Pages>
-- <doc:Ahead-of-Time-Code-Generation>
 - <doc:JavaScript-Environment-Requirements>
+
+### BridgeJS
+
+- <doc:Importing-TypeScript-into-Swift>
+- <doc:Exporting-Swift-to-JavaScript>
+- <doc:BridgeJS-Configuration>
+- <doc:Ahead-of-Time-Code-Generation>
 
 ### Core APIs
 
 - ``JSValue``
 - ``JSObject``
-- ``JS()``
+- ``JS(namespace:)``
