@@ -1,4 +1,12 @@
+// @ts-check
+
+/**
+ * The editor system for the BridgeJS Playground.
+ */
 export class EditorSystem {
+    /**
+     * Creates a new instance of the EditorSystem.
+     */
     constructor() {
         this.editors = new Map();
         this.config = {
@@ -70,7 +78,9 @@ export class EditorSystem {
 
     async loadMonaco() {
         return new Promise((resolve) => {
+            // @ts-ignore
             require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@0.45.0/min/vs' } });
+            // @ts-ignore
             require(['vs/editor/editor.main'], resolve);
         });
     }
@@ -98,12 +108,15 @@ export class EditorSystem {
                 return;
             }
 
+            // @ts-ignore
             const model = monaco.editor.createModel(
                 config.placeholder,
                 config.language,
+                // @ts-ignore
                 monaco.Uri.parse(config.modelUri)
             );
 
+            // @ts-ignore
             const editor = monaco.editor.create(element, {
                 ...commonOptions,
                 value: config.placeholder,
@@ -140,7 +153,6 @@ export class EditorSystem {
         }
 
         this.updateTabStates();
-        this.updateLayout();
     }
 
     updateTabStates() {
@@ -183,6 +195,15 @@ export class EditorSystem {
         };
     }
 
+    /**
+     * Sets the inputs for the editor system.
+     * @param {{swift: string, dts: string}} sampleCode - The sample code to set the inputs to.
+     */
+    setInputs({ swift, dts }) {
+        this.editors.get('swift')?.setValue(swift);
+        this.editors.get('dts')?.setValue(dts);
+    }
+
     updateOutputs(result) {
         const outputMap = {
             'import-glue': () => result.importSwiftGlue(),
@@ -198,36 +219,6 @@ export class EditorSystem {
                 editor.setValue(content || `// No ${key} output generated`);
             }
         });
-    }
-
-    loadSampleCode() {
-        const sampleSwift = `import JavaScriptKit
-
-@JS public func calculateTotal(price: Double, quantity: Int) -> Double {
-    return price * Double(quantity)
-}
-
-@JS class ShoppingCart {
-    private var items: [(name: String, price: Double, quantity: Int)] = []
-
-    @JS init() {}
-
-    @JS public func addItem(name: String, price: Double, quantity: Int) {
-        items.append((name, price, quantity))
-    }
-
-    @JS public func getTotal() -> Double {
-        return items.reduce(0) { $0 + $1.price * Double($1.quantity) }
-    }
-}`;
-
-        const sampleDts = `export type Console = {
-    log: (message: string) => void;
-}
-export function console(): Console;`;
-
-        this.editors.get('swift')?.setValue(sampleSwift);
-        this.editors.get('dts')?.setValue(sampleDts);
     }
 
     addChangeListeners(callback) {

@@ -1,22 +1,48 @@
-// BridgeJS Playground Main Application
+// @ts-check
 import { EditorSystem } from './editor.js';
 import ts from 'typescript';
 import { TypeProcessor } from './processor.js';
 
+/**
+ * @typedef {import('../../.build/plugins/PackageToJS/outputs/Package/bridge-js.js').PlayBridgeJS} PlayBridgeJS
+ */
+
+/**
+ * The main controller for the BridgeJS Playground.
+ */
 export class BridgeJSPlayground {
+    /**
+     * Creates a new instance of the BridgeJSPlayground.
+     */
     constructor() {
         this.editorSystem = new EditorSystem();
+        /** @type {PlayBridgeJS | null} */
         this.playBridgeJS = null;
+        /** @type {ReturnType<typeof setTimeout> | null} */
         this.generateTimeout = null;
+        /** @type {boolean} */
         this.isInitialized = false;
 
-        // DOM Elements
-        this.errorDisplay = document.getElementById('errorDisplay');
-        this.errorMessage = document.getElementById('errorMessage');
+        const errorDisplay = document.getElementById('errorDisplay');
+        if (!errorDisplay) {
+            throw new Error('Error display element not found');
+        }
+        /** @type {HTMLElement} */
+        this.errorDisplay = errorDisplay;
+
+        const errorMessage = document.getElementById('errorMessage');
+        if (!errorMessage) {
+            throw new Error('Error message element not found');
+        }
+        /** @type {HTMLElement} */
+        this.errorMessage = errorMessage;
     }
 
-    // Initialize the application
-    async initialize() {
+    /**
+     * Initializes the application.
+     * @param {{swift: string, dts: string}} sampleCode - The sample code to initialize the application with.
+     */
+    async initialize(sampleCode) {
         if (this.isInitialized) {
             return;
         }
@@ -32,7 +58,7 @@ export class BridgeJSPlayground {
             this.setupEventListeners();
 
             // Load sample code
-            this.editorSystem.loadSampleCode();
+            this.editorSystem.setInputs(sampleCode)
 
             this.isInitialized = true;
             console.log('BridgeJS Playground initialized successfully');
@@ -126,7 +152,9 @@ export class BridgeJSPlayground {
         }
     }
 
-    // Generate code through BridgeJS
+    /**
+     * Generates code through BridgeJS.
+     */
     async generateCode() {
         if (!this.playBridgeJS) {
             this.showError('BridgeJS is not initialized');
@@ -154,13 +182,18 @@ export class BridgeJSPlayground {
         }
     }
 
-    // Show error message
+    /**
+     * Shows an error message.
+     * @param {string} message - The message to show.
+     */
     showError(message) {
         this.errorMessage.textContent = message;
         this.errorDisplay.classList.add('show');
     }
 
-    // Hide error message
+    /**
+     * Hides the error message.
+     */
     hideError() {
         this.errorDisplay.classList.remove('show');
     }
