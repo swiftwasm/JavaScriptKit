@@ -19,7 +19,10 @@ import BridgeJSCore
 import BridgeJSSkeleton
 #endif
 
-internal func which(_ executable: String) throws -> URL {
+internal func which(
+    _ executable: String,
+    environment: [String: String] = ProcessInfo.processInfo.environment
+) throws -> URL {
     func checkCandidate(_ candidate: URL) -> Bool {
         var isDirectory: ObjCBool = false
         let fileExists = FileManager.default.fileExists(atPath: candidate.path, isDirectory: &isDirectory)
@@ -27,9 +30,9 @@ internal func which(_ executable: String) throws -> URL {
     }
     do {
         // Check overriding environment variable
-        let envVariable = executable.uppercased().replacingOccurrences(of: "-", with: "_") + "_PATH"
-        if let path = ProcessInfo.processInfo.environment[envVariable] {
-            let url = URL(fileURLWithPath: path).appendingPathComponent(executable)
+        let envVariable = "JAVASCRIPTKIT_" + executable.uppercased().replacingOccurrences(of: "-", with: "_") + "_EXEC"
+        if let executablePath = environment[envVariable] {
+            let url = URL(fileURLWithPath: executablePath)
             if checkCandidate(url) {
                 return url
             }
@@ -41,7 +44,7 @@ internal func which(_ executable: String) throws -> URL {
     #else
     pathSeparator = ":"
     #endif
-    let paths = ProcessInfo.processInfo.environment["PATH"]!.split(separator: pathSeparator)
+    let paths = environment["PATH"]?.split(separator: pathSeparator) ?? []
     for path in paths {
         let url = URL(fileURLWithPath: String(path)).appendingPathComponent(executable)
         if checkCandidate(url) {
