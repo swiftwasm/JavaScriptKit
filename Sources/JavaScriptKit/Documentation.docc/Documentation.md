@@ -53,6 +53,7 @@ Check out the [examples](https://github.com/swiftwasm/JavaScriptKit/tree/main/Ex
 
 - <doc:Exporting-Swift-to-JavaScript>
 - <doc:Importing-TypeScript-into-Swift>
+- <doc:BridgeJS-Configuration>
 - <doc:Deploying-Pages>
 - <doc:Ahead-of-Time-Code-Generation>
 - <doc:JavaScript-Environment-Requirements>

@@ -3,9 +3,11 @@
 @preconcurrency import var Foundation.stderr
 @preconcurrency import struct Foundation.URL
 @preconcurrency import struct Foundation.Data
+@preconcurrency import struct Foundation.ObjCBool
 @preconcurrency import class Foundation.JSONEncoder
 @preconcurrency import class Foundation.FileManager
 @preconcurrency import class Foundation.JSONDecoder
+@preconcurrency import class Foundation.ProcessInfo
 import SwiftParser
 
 #if canImport(BridgeJSCore)
@@ -50,7 +52,7 @@ import TS2Skeleton
         do {
             try run()
         } catch {
-            printStderr("Error: \(error)")
+            printStderr("error: \(error)")
             exit(1)
         }
     }
@@ -83,6 +85,10 @@ import TS2Skeleton
                         help: "Print verbose output",
                         required: false
                     ),
+                    "target-dir": OptionRule(
+                        help: "The SwiftPM package target directory",
+                        required: true
+                    ),
                     "output-swift": OptionRule(help: "The output file path for the Swift source code", required: true),
                     "output-skeleton": OptionRule(
                         help: "The output file path for the skeleton of the imported TypeScript APIs",
@@ -99,6 +105,9 @@ import TS2Skeleton
             )
             let progress = ProgressReporting(verbose: doubleDashOptions["verbose"] == "true")
             var importer = ImportTS(progress: progress, moduleName: doubleDashOptions["module-name"]!)
+            let targetDirectory = URL(fileURLWithPath: doubleDashOptions["target-dir"]!)
+            let config = try BridgeJSConfig.load(targetDirectory: targetDirectory)
+            let nodePath: URL = try config.findTool("node", targetDirectory: targetDirectory)
             for inputFile in positionalArguments {
                 if inputFile.hasSuffix(".json") {
                     let sourceURL = URL(fileURLWithPath: inputFile)
@@ -109,7 +118,7 @@ import TS2Skeleton
                     importer.addSkeleton(skeleton)
                 } else if inputFile.hasSuffix(".d.ts") {
                     let tsconfigPath = URL(fileURLWithPath: doubleDashOptions["project"]!)
-                    try importer.addSourceFile(inputFile, tsconfigPath: tsconfigPath.path)
+                    try importer.addSourceFile(inputFile, tsconfigPath: tsconfigPath.path, nodePath: nodePath)
                 }
             }
 

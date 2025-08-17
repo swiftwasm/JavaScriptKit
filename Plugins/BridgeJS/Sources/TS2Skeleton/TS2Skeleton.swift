@@ -22,7 +22,7 @@ import BridgeJSSkeleton
 internal func which(
     _ executable: String,
     environment: [String: String] = ProcessInfo.processInfo.environment
-) throws -> URL {
+) -> URL? {
     func checkCandidate(_ candidate: URL) -> Bool {
         var isDirectory: ObjCBool = false
         let fileExists = FileManager.default.fileExists(atPath: candidate.path, isDirectory: &isDirectory)
@@ -51,13 +51,38 @@ internal func which(
             return url
         }
     }
-    throw BridgeJSCoreError("Executable \(executable) not found in PATH")
+    return nil
+}
+
+extension BridgeJSConfig {
+    /// Find a tool from the system PATH, using environment variable override, or bridge-js.config.json
+    public func findTool(_ name: String, targetDirectory: URL) throws -> URL {
+        if let tool = tools?[name] {
+            return URL(fileURLWithPath: tool)
+        }
+        if let url = which(name) {
+            return url
+        }
+
+        // Emit a helpful error message with a suggestion to create a local config override.
+        throw BridgeJSCoreError(
+            """
+            Executable "\(name)" not found in PATH. \
+            Hint: Try setting the JAVASCRIPTKIT_\(name.uppercased().replacingOccurrences(of: "-", with: "_"))_EXEC environment variable, \
+            or create a local config override with:
+              echo '{ "tools": { "\(name)": "'$(which \(name))'" } }' > \(targetDirectory.appendingPathComponent("bridge-js.config.local.json").path)
+            """
+        )
+    }
 }
 
 extension ImportTS {
     /// Processes a TypeScript definition file and extracts its API information
-    public mutating func addSourceFile(_ sourceFile: String, tsconfigPath: String) throws {
-        let nodePath = try which("node")
+    public mutating func addSourceFile(
+        _ sourceFile: String,
+        tsconfigPath: String,
+        nodePath: URL
+    ) throws {
         let ts2skeletonPath = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .appendingPathComponent("JavaScript")

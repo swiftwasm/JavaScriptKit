@@ -12,3 +12,4 @@ Examples/*/package-lock.json
 Package.resolved
 Plugins/BridgeJS/Sources/JavaScript/package-lock.json
 Plugins/BridgeJS/Tests/BridgeJSToolTests/__Snapshots__/**/*.actual
+bridge-js.config.local.json

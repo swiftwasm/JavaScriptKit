@@ -4,6 +4,7 @@ import SwiftParser
 import Testing
 @testable import BridgeJSLink
 @testable import BridgeJSCore
+@testable import TS2Skeleton
 
 @Suite struct BridgeJSLinkTests {
     private func snapshot(
@@ -65,7 +66,8 @@ import Testing
         let tsconfigPath = url.deletingLastPathComponent().appendingPathComponent("tsconfig.json")
 
         var importTS = ImportTS(progress: .silent, moduleName: "TestModule")
-        try importTS.addSourceFile(url.path, tsconfigPath: tsconfigPath.path)
+        let nodePath = try #require(which("node"))
+        try importTS.addSourceFile(url.path, tsconfigPath: tsconfigPath.path, nodePath: nodePath)
         let name = url.deletingPathExtension().deletingPathExtension().lastPathComponent
 
         let encoder = JSONEncoder()

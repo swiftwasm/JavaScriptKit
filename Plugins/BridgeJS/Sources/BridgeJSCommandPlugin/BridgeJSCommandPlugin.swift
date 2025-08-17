@@ -127,6 +127,8 @@ extension BridgeJSCommandPlugin.Context {
             try runBridgeJSTool(
                 arguments: [
                     "import",
+                    "--target-dir",
+                    target.directoryURL.path,
                     "--output-skeleton",
                     generatedJavaScriptDirectory.appending(path: "BridgeJS.ImportTS.json").path,
                     "--output-swift",

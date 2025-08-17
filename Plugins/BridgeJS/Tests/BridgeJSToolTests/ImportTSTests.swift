@@ -18,8 +18,9 @@ import Foundation
     func snapshot(input: String) throws {
         var api = ImportTS(progress: .silent, moduleName: "Check")
         let url = Self.inputsDirectory.appendingPathComponent(input)
+        let nodePath = try #require(which("node"))
         let tsconfigPath = url.deletingLastPathComponent().appendingPathComponent("tsconfig.json")
-        try api.addSourceFile(url.path, tsconfigPath: tsconfigPath.path)
+        try api.addSourceFile(url.path, tsconfigPath: tsconfigPath.path, nodePath: nodePath)
         let outputSwift = try #require(try api.finalize())
         let name = url.deletingPathExtension().deletingPathExtension().deletingPathExtension().lastPathComponent
         try assertSnapshot(
