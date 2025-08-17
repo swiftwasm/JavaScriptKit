@@ -2,6 +2,7 @@
 import { EditorSystem } from './editor.js';
 import ts from 'typescript';
 import { TypeProcessor } from './processor.js';
+import { CodeShareManager } from './code-share.js';
 
 /**
  * @typedef {import('../../.build/plugins/PackageToJS/outputs/Package/bridge-js.js').PlayBridgeJS} PlayBridgeJS
@@ -23,19 +24,20 @@ export class BridgeJSPlayground {
         /** @type {boolean} */
         this.isInitialized = false;
 
-        const errorDisplay = document.getElementById('errorDisplay');
-        if (!errorDisplay) {
-            throw new Error('Error display element not found');
-        }
-        /** @type {HTMLElement} */
-        this.errorDisplay = errorDisplay;
-
-        const errorMessage = document.getElementById('errorMessage');
-        if (!errorMessage) {
-            throw new Error('Error message element not found');
-        }
-        /** @type {HTMLElement} */
-        this.errorMessage = errorMessage;
+        /** @type {HTMLDivElement} */
+        this.errorDisplay = /** @type {HTMLDivElement} */ (document.getElementById('errorDisplay'));
+        /** @type {HTMLDivElement} */
+        this.errorMessage = /** @type {HTMLDivElement} */ (document.getElementById('errorMessage'));
+        /** @type {HTMLButtonElement} */
+        this.shareButton = /** @type {HTMLButtonElement} */ (document.getElementById('shareButton'));
+        /** @type {HTMLDialogElement} */
+        this.shareDialog = /** @type {HTMLDialogElement} */ (document.getElementById('shareDialog'));
+        /** @type {HTMLInputElement} */
+        this.shareUrlInput = /** @type {HTMLInputElement} */ (document.getElementById('shareUrl'));
+        /** @type {HTMLButtonElement} */
+        this.copyButton = /** @type {HTMLButtonElement} */ (document.getElementById('copyButton'));
+        /** @type {HTMLButtonElement} */
+        this.closeShareDialogButton = /** @type {HTMLButtonElement} */ (document.getElementById('closeShareDialog'));
     }
 
     /**
@@ -57,8 +59,14 @@ export class BridgeJSPlayground {
             // Set up event listeners
             this.setupEventListeners();
 
-            // Load sample code
-            this.editorSystem.setInputs(sampleCode)
+            // Check for shared code in URL
+            const sharedCode = await CodeShareManager.extractCodeFromUrl();
+            if (sharedCode) {
+                this.editorSystem.setInputs(sharedCode);
+            } else {
+                // Load sample code
+                this.editorSystem.setInputs(sampleCode);
+            }
 
             this.isInitialized = true;
             console.log('BridgeJS Playground initialized successfully');
@@ -97,6 +105,69 @@ export class BridgeJSPlayground {
                 clearTimeout(this.generateTimeout);
             }
             this.generateTimeout = setTimeout(() => this.generateCode(), 300);
+        });
+
+        // Set up share functionality
+        this.setupShareListeners();
+    }
+
+    // Set up share-related event listeners
+    setupShareListeners() {
+        // Show share dialog
+        this.shareButton.addEventListener('click', async () => {
+            try {
+                const inputs = this.editorSystem.getInputs();
+                const shareUrl = await CodeShareManager.generateShareUrl(inputs);
+                this.shareUrlInput.value = shareUrl;
+                this.shareDialog.classList.remove('hidden');
+                this.shareUrlInput.select();
+            } catch (error) {
+                console.error('Failed to generate share URL:', error);
+                this.showError('Failed to generate share URL: ' + error.message);
+            }
+        });
+
+        // Copy share URL
+        this.copyButton.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(this.shareUrlInput.value);
+
+                const originalText = this.copyButton.textContent;
+                this.copyButton.textContent = 'Copied!';
+                this.copyButton.classList.add('copied');
+
+                setTimeout(() => {
+                    this.copyButton.textContent = originalText;
+                    this.copyButton.classList.remove('copied');
+                }, 2000);
+            } catch (error) {
+                console.error('Failed to copy URL:', error);
+                this.shareUrlInput.select();
+            }
+        });
+
+        // Close share dialog
+        this.closeShareDialogButton.addEventListener('click', () => {
+            this.shareDialog.classList.add('hidden');
+        });
+
+        // Close dialog when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!this.shareDialog.classList.contains('hidden')) {
+                const dialogContent = this.shareDialog.querySelector('.share-dialog-content');
+                const target = event.target;
+                if (dialogContent && target instanceof Node && !dialogContent.contains(target) &&
+                    this.shareButton && !this.shareButton.contains(target)) {
+                    this.shareDialog.classList.add('hidden');
+                }
+            }
+        });
+
+        // Close dialog with Escape key
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !this.shareDialog.classList.contains('hidden')) {
+                this.shareDialog.classList.add('hidden');
+            }
         });
     }
 

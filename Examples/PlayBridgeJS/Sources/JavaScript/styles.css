@@ -83,6 +83,116 @@ body {
     font-weight: 400;
 }
 
+.share-controls {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.share-button {
+    padding: 10px 20px;
+    border: none;
+    background-color: var(--color-button-background);
+    color: var(--color-button-text);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.share-button:hover {
+    background-color: var(--color-button-background-hover);
+}
+
+.share-dialog {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    margin-top: 8px;
+    min-width: 400px;
+    max-width: 90vw;
+}
+
+.share-dialog.hidden {
+    display: none;
+}
+
+.share-dialog-content {
+    background-color: var(--color-fill);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.share-dialog-content h3 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.share-url-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.share-url-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    background-color: var(--color-fill-secondary);
+    color: var(--color-text);
+}
+
+.copy-button {
+    padding: 10px 16px;
+    border: none;
+    background-color: var(--color-figure-green);
+    color: var(--color-fill);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: opacity 0.2s ease;
+}
+
+.copy-button:hover {
+    opacity: 0.8;
+}
+
+.copy-button.copied {
+    background-color: var(--color-figure-blue);
+}
+
+.share-dialog-actions {
+    text-align: center;
+}
+
+.close-button {
+    padding: 8px 16px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-fill);
+    color: var(--color-text);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.close-button:hover {
+    background-color: var(--color-fill-secondary);
+}
+
 .error-display {
     margin-bottom: 24px;
     padding: 16px;
@@ -265,5 +375,25 @@ body {
 
     .section-header h2 {
         font-size: 18px;
+    }
+
+    .share-dialog {
+        min-width: 320px;
+        max-width: calc(100vw - 24px);
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .share-dialog-content {
+        padding: 16px;
+    }
+
+    .share-url-container {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .share-url-input {
+        font-size: 12px;
     }
 }
