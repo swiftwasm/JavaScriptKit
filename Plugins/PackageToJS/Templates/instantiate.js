@@ -23,8 +23,11 @@ import { createInstantiator } from "./bridge-js.js"
  */
 async function createInstantiator(options, swift) {
     return {
-        /** @param {WebAssembly.Imports} importObject */
-        addImports: (importObject) => {},
+        /**
+         * @param {WebAssembly.Imports} importObject
+         * @param {unknown} importsContext
+         */
+        addImports: (importObject, importsContext) => {},
         /** @param {WebAssembly.Instance} instance */
         setInstance: (instance) => {},
         /** @param {WebAssembly.Instance} instance */
@@ -93,12 +96,13 @@ async function _instantiate(
 /* #endif */
 /* #endif */
     };
-    instantiator.addImports(importObject);
-    options.addToCoreImports?.(importObject, {
+    const importsContext = {
         getInstance: () => instance,
         getExports: () => exports,
         _swift: swift,
-    });
+    };
+    instantiator.addImports(importObject, importsContext);
+    options.addToCoreImports?.(importObject, importsContext);
 
     let module;
     let instance;

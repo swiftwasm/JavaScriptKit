@@ -65,7 +65,7 @@ export function createDefaultWorkerFactory(preludeScript) {
                 await instantiateForThread(tid, startArg, {
                     ...options,
                     module, memory,
-                    imports: {},
+                    getImports() { return {} },
                 })
             })
             `,
@@ -139,7 +139,7 @@ export async function defaultNodeSetup(options) {
 
     return {
         module,
-        imports: {},
+        getImports() { return {} },
 /* #if IS_WASI */
         wasi: Object.assign(wasi, {
             setInstance(instance) {

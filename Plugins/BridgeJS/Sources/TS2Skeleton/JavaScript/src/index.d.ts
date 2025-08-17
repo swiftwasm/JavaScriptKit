@@ -12,10 +12,15 @@ export type Parameter = {
     type: BridgeType;
 }
 
+export type Effects = {
+    isAsync: boolean;
+}
+
 export type ImportFunctionSkeleton = {
     name: string;
     parameters: Parameter[];
     returnType: BridgeType;
+    effects: Effects;
     documentation: string | undefined;
 }
 

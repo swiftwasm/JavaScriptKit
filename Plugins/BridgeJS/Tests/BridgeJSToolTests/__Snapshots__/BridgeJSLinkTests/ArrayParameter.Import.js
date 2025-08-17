@@ -15,10 +15,13 @@ export async function createInstantiator(options, swift) {
     let tmpRetBytes;
     let tmpRetException;
     return {
-        /** @param {WebAssembly.Imports} importObject */
-        addImports: (importObject) => {
+        /**
+         * @param {WebAssembly.Imports} importObject
+         */
+        addImports: (importObject, importsContext) => {
             const bjs = {};
             importObject["bjs"] = bjs;
+            const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 tmpRetString = textDecoder.decode(bytes);
@@ -50,21 +53,21 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_checkArray"] = function bjs_checkArray(a) {
                 try {
-                    options.imports.checkArray(swift.memory.getObject(a));
+                    imports.checkArray(swift.memory.getObject(a));
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_checkArrayWithLength"] = function bjs_checkArrayWithLength(a, b) {
                 try {
-                    options.imports.checkArrayWithLength(swift.memory.getObject(a), b);
+                    imports.checkArrayWithLength(swift.memory.getObject(a), b);
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_checkArray"] = function bjs_checkArray(a) {
                 try {
-                    options.imports.checkArray(swift.memory.getObject(a));
+                    imports.checkArray(swift.memory.getObject(a));
                 } catch (error) {
                     setException(error);
                 }

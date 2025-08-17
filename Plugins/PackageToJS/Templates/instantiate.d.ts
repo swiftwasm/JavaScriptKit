@@ -75,9 +75,13 @@ export type InstantiateOptions = {
     module: ModuleSource,
 /* #if HAS_IMPORTS */
     /**
-     * The imports provided by the embedder
+     * The function to get the imports provided by the embedder
      */
-    imports: Imports,
+    getImports: (importsContext: {
+        getInstance: () => WebAssembly.Instance | null,
+        getExports: () => Exports | null,
+        _swift: SwiftRuntime,
+    }) => Imports,
 /* #endif */
 /* #if IS_WASI */
     /**

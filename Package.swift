@@ -155,7 +155,7 @@ let package = Package(
         ),
         .testTarget(
             name: "BridgeJSRuntimeTests",
-            dependencies: ["JavaScriptKit"],
+            dependencies: ["JavaScriptKit", "JavaScriptEventLoop"],
             exclude: [
                 "bridge-js.config.json",
                 "bridge-js.d.ts",

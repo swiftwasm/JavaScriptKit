@@ -62,7 +62,7 @@ interface Document {
     // Properties
     title: string;
     readonly body: HTMLElement;
- 
+
     // Methods
     getElementById(id: string): HTMLElement;
     createElement(tagName: string): HTMLElement;
@@ -96,7 +96,7 @@ struct Document {
 struct HTMLElement {
     var innerText: String { get set }
     var className: String { get set }
-    
+
     func appendChild(_ child: HTMLElement)
 }
 
@@ -161,11 +161,13 @@ import { init } from "./.build/plugins/PackageToJS/outputs/Package/index.js";
 
 // Initialize the WebAssembly module with JavaScript implementations
 const { exports } = await init({
-    imports: {
-        consoleLog: (message) => {
-            console.log(message);
-        },
-        getDocument: () => document,
+    getImports() {
+        return {
+            consoleLog: (message) => {
+                console.log(message);
+            },
+            getDocument: () => document,
+        }
     }
 });
 

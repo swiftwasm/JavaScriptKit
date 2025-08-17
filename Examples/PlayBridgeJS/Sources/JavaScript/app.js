@@ -48,8 +48,10 @@ export class BridgeJSPlayground {
             // Import the BridgeJS module
             const { init } = await import("../../.build/plugins/PackageToJS/outputs/Package/index.js");
             const { exports } = await init({
-                imports: {
-                    createTS2Skeleton: this.createTS2Skeleton
+                getImports() {
+                    return {
+                        createTS2Skeleton: this.createTS2Skeleton
+                    }
                 }
             });
             this.playBridgeJS = new exports.PlayBridgeJS();

@@ -6,59 +6,69 @@ export async function setupOptions(options, context) {
     setupTestGlobals(globalThis);
     return {
         ...options,
-        imports: {
-            "jsRoundTripVoid": () => {
-                return;
-            },
-            "jsRoundTripNumber": (v) => {
-                return v;
-            },
-            "jsRoundTripBool": (v) => {
-                return v;
-            },
-            "jsRoundTripString": (v) => {
-                return v;
-            },
-            "jsThrowOrVoid": (shouldThrow) => {
-                if (shouldThrow) {
-                    throw new Error("TestError");
+        getImports: (importsContext) => {
+            return {
+                "jsRoundTripVoid": () => {
+                    return;
+                },
+                "jsRoundTripNumber": (v) => {
+                    return v;
+                },
+                "jsRoundTripBool": (v) => {
+                    return v;
+                },
+                "jsRoundTripString": (v) => {
+                    return v;
+                },
+                "jsThrowOrVoid": (shouldThrow) => {
+                    if (shouldThrow) {
+                        throw new Error("TestError");
+                    }
+                },
+                "jsThrowOrNumber": (shouldThrow) => {
+                    if (shouldThrow) {
+                        throw new Error("TestError");
+                    }
+                    return 1;
+                },
+                "jsThrowOrBool": (shouldThrow) => {
+                    if (shouldThrow) {
+                        throw new Error("TestError");
+                    }
+                    return true;
+                },
+                "jsThrowOrString": (shouldThrow) => {
+                    if (shouldThrow) {
+                        throw new Error("TestError");
+                    }
+                    return "Hello, world!";
+                },
+                JsGreeter: class {
+                    /**
+                     * @param {string} name
+                     * @param {string} prefix
+                     */
+                    constructor(name, prefix) {
+                        this.name = name;
+                        this.prefix = prefix;
+                    }
+                    greet() {
+                        return `${this.prefix}, ${this.name}!`;
+                    }
+                    /** @param {string} name */
+                    changeName(name) {
+                        this.name = name;
+                    }
+                },
+                runAsyncWorks: async () => {
+                    const exports = importsContext.getExports();
+                    if (!exports) {
+                        throw new Error("No exports!?");
+                    }
+                    BridgeJSRuntimeTests_runAsyncWorks(exports);
+                    return;
                 }
-            },
-            "jsThrowOrNumber": (shouldThrow) => {
-                if (shouldThrow) {
-                    throw new Error("TestError");
-                }
-                return 1;
-            },
-            "jsThrowOrBool": (shouldThrow) => {
-                if (shouldThrow) {
-                    throw new Error("TestError");
-                }
-                return true;
-            },
-            "jsThrowOrString": (shouldThrow) => {
-                if (shouldThrow) {
-                    throw new Error("TestError");
-                }
-                return "Hello, world!";
-            },
-            JsGreeter: class {
-                /**
-                 * @param {string} name
-                 * @param {string} prefix
-                 */
-                constructor(name, prefix) {
-                    this.name = name;
-                    this.prefix = prefix;
-                }
-                greet() {
-                    return `${this.prefix}, ${this.name}!`;
-                }
-                /** @param {string} name */
-                changeName(name) {
-                    this.name = name;
-                }
-            }
+            };
         },
         addToCoreImports(importObject, importsContext) {
             const { getInstance, getExports } = importsContext;
@@ -68,7 +78,11 @@ export async function setupOptions(options, context) {
             }
             const bridgeJSRuntimeTests = importObject["BridgeJSRuntimeTests"] || {};
             bridgeJSRuntimeTests["runJsWorks"] = () => {
-                return BridgeJSRuntimeTests_runJsWorks(getInstance(), getExports());
+                const exports = getExports();
+                if (!exports) {
+                    throw new Error("No exports!?");
+                }
+                return BridgeJSRuntimeTests_runJsWorks(getInstance(), exports);
             }
             importObject["BridgeJSRuntimeTests"] = bridgeJSRuntimeTests;
         }
@@ -133,7 +147,7 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(calc.square(5), 25);
     assert.equal(calc.add(3, 4), 7);
     assert.equal(exports.useCalculator(calc, 3, 10), 19); // 3^2 + 10 = 19
-    
+
     calc.release();
 
     const anyObject = {};
@@ -151,6 +165,11 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     } catch (error) {
         assert.fail("Expected no error");
     }
+}
+
+/** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
+async function BridgeJSRuntimeTests_runAsyncWorks(exports) {
+    await exports.asyncRoundTripVoid();
 }
 
 function setupTestGlobals(global) {
