@@ -79,6 +79,8 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
             executable: try context.tool(named: "BridgeJSTool").url,
             arguments: [
                 "import",
+                "--target-dir",
+                target.directoryURL.path,
                 "--output-skeleton",
                 outputSkeletonPath.path,
                 "--output-swift",

@@ -25,7 +25,7 @@ import Foundation
 
             let environment = ["PATH": tempDir.path]
 
-            let result = try which("testexec", environment: environment)
+            let result = try #require(which("testexec", environment: environment))
 
             #expect(result.path == execFile.path)
         }
@@ -48,7 +48,7 @@ import Foundation
                 let pathEnv = "\(tempDir1.path)\(Self.pathSeparator)\(tempDir2.path)"
                 let environment = ["PATH": pathEnv]
 
-                let result = try which("testexec", environment: environment)
+                let result = try #require(which("testexec", environment: environment))
 
                 // Should return the first one found
                 #expect(result.path == exec1.path)
@@ -69,7 +69,7 @@ import Foundation
                 "JAVASCRIPTKIT_NODE_EXEC": customExec.path,
             ]
 
-            let result = try which("node", environment: environment)
+            let result = try #require(which("node", environment: environment))
 
             #expect(result.path == customExec.path)
         }
@@ -86,7 +86,7 @@ import Foundation
                 "JAVASCRIPTKIT_MY_EXEC_EXEC": customExec.path,
             ]
 
-            let result = try which("my-exec", environment: environment)
+            let result = try #require(which("my-exec", environment: environment))
 
             #expect(result.path == customExec.path)
         }
@@ -109,7 +109,7 @@ import Foundation
                     "JAVASCRIPTKIT_TESTEXEC_EXEC": envExec.path,
                 ]
 
-                let result = try which("testexec", environment: environment)
+                let result = try #require(which("testexec", environment: environment))
 
                 // Should prefer environment variable over PATH
                 #expect(result.path == envExec.path)
@@ -122,9 +122,7 @@ import Foundation
     @Test func whichThrowsWhenExecutableNotFound() throws {
         let environment = ["PATH": "/nonexistent\(Self.pathSeparator)/also/nonexistent"]
 
-        #expect(throws: BridgeJSCoreError.self) {
-            _ = try which("nonexistent_executable_12345", environment: environment)
-        }
+        #expect(which("nonexistent_executable_12345", environment: environment) == nil)
     }
 
     @Test func whichThrowsWhenEnvironmentPathIsInvalid() throws {
@@ -137,9 +135,7 @@ import Foundation
                 "JAVASCRIPTKIT_NOTEXECUTABLE_EXEC": nonExecFile.path,
             ]
 
-            #expect(throws: BridgeJSCoreError.self) {
-                _ = try which("notexecutable", environment: environment)
-            }
+            #expect(which("notexecutable", environment: environment) == nil)
         }
     }
 
@@ -150,9 +146,7 @@ import Foundation
                 "JAVASCRIPTKIT_TESTEXEC_EXEC": tempDir.path,
             ]
 
-            #expect(throws: BridgeJSCoreError.self) {
-                _ = try which("testexec", environment: environment)
-            }
+            #expect(which("testexec", environment: environment) == nil)
         }
     }
 
@@ -161,17 +155,13 @@ import Foundation
     @Test func whichHandlesEmptyPath() throws {
         let environment = ["PATH": ""]
 
-        #expect(throws: BridgeJSCoreError.self) {
-            _ = try which("anyexec", environment: environment)
-        }
+        #expect(which("anyexec", environment: environment) == nil)
     }
 
     @Test func whichHandlesMissingPathEnvironment() throws {
         let environment: [String: String] = [:]
 
-        #expect(throws: BridgeJSCoreError.self) {
-            _ = try which("anyexec", environment: environment)
-        }
+        #expect(which("anyexec", environment: environment) == nil)
     }
 
     @Test func whichIgnoresNonExecutableFiles() throws {
@@ -182,9 +172,7 @@ import Foundation
 
             let environment = ["PATH": tempDir.path]
 
-            #expect(throws: BridgeJSCoreError.self) {
-                _ = try which("testfile", environment: environment)
-            }
+            #expect(which("testfile", environment: environment) == nil)
         }
     }
 }
