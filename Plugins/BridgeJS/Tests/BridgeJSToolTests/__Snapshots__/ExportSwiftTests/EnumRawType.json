@@ -28,10 +28,8 @@
         }
       ],
       "name" : "Theme",
-      "nestedTypes" : [
-
-      ],
-      "rawType" : "String"
+      "rawType" : "String",
+      "swiftCallName" : "Theme"
     },
     {
       "cases" : [
@@ -51,10 +49,8 @@
         }
       ],
       "name" : "FeatureFlag",
-      "nestedTypes" : [
-
-      ],
-      "rawType" : "Bool"
+      "rawType" : "Bool",
+      "swiftCallName" : "FeatureFlag"
     },
     {
       "cases" : [
@@ -81,10 +77,8 @@
         }
       ],
       "name" : "HttpStatus",
-      "nestedTypes" : [
-
-      ],
-      "rawType" : "Int"
+      "rawType" : "Int",
+      "swiftCallName" : "HttpStatus"
     },
     {
       "cases" : [
@@ -125,10 +119,8 @@
         }
       ],
       "name" : "Priority",
-      "nestedTypes" : [
-
-      ],
-      "rawType" : "Int32"
+      "rawType" : "Int32",
+      "swiftCallName" : "Priority"
     },
     {
       "cases" : [
@@ -162,10 +154,8 @@
         }
       ],
       "name" : "FileSize",
-      "nestedTypes" : [
-
-      ],
-      "rawType" : "Int64"
+      "rawType" : "Int64",
+      "swiftCallName" : "FileSize"
     },
     {
       "cases" : [
@@ -192,10 +182,8 @@
         }
       ],
       "name" : "UserId",
-      "nestedTypes" : [
-
-      ],
-      "rawType" : "UInt"
+      "rawType" : "UInt",
+      "swiftCallName" : "UserId"
     },
     {
       "cases" : [
@@ -222,10 +210,8 @@
         }
       ],
       "name" : "TokenId",
-      "nestedTypes" : [
-
-      ],
-      "rawType" : "UInt32"
+      "rawType" : "UInt32",
+      "swiftCallName" : "TokenId"
     },
     {
       "cases" : [
@@ -252,10 +238,8 @@
         }
       ],
       "name" : "SessionId",
-      "nestedTypes" : [
-
-      ],
-      "rawType" : "UInt64"
+      "rawType" : "UInt64",
+      "swiftCallName" : "SessionId"
     },
     {
       "cases" : [
@@ -282,10 +266,8 @@
         }
       ],
       "name" : "Precision",
-      "nestedTypes" : [
-
-      ],
-      "rawType" : "Float"
+      "rawType" : "Float",
+      "swiftCallName" : "Precision"
     },
     {
       "cases" : [
@@ -319,33 +301,8 @@
         }
       ],
       "name" : "Ratio",
-      "nestedTypes" : [
-
-      ],
-      "rawType" : "Double"
-    },
-    {
-      "cases" : [
-        {
-          "associatedValues" : [
-
-          ],
-          "name" : "enabled",
-          "rawValue" : "true"
-        },
-        {
-          "associatedValues" : [
-
-          ],
-          "name" : "disabled",
-          "rawValue" : "false"
-        }
-      ],
-      "name" : "FeatureFlag",
-      "nestedTypes" : [
-
-      ],
-      "rawType" : "Bool"
+      "rawType" : "Double",
+      "swiftCallName" : "Ratio"
     }
   ],
   "functions" : [

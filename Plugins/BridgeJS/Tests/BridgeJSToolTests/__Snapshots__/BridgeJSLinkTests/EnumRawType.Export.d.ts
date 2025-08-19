@@ -77,12 +77,6 @@ export const Ratio: {
 };
 export type Ratio = typeof Ratio[keyof typeof Ratio];
 
-export const FeatureFlag: {
-    readonly Enabled: true;
-    readonly Disabled: false;
-};
-export type FeatureFlag = typeof FeatureFlag[keyof typeof FeatureFlag];
-
 export type Exports = {
     setTheme(theme: Theme): void;
     getTheme(): Theme;

@@ -5,3 +5,111 @@
 // `swift package bridge-js`.
 
 @_spi(BridgeJS) import JavaScriptKit
+
+@_expose(wasm, "bjs_Converter_init")
+@_cdecl("bjs_Converter_init")
+public func _bjs_Converter_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = Utils.Converter()
+    return Unmanaged.passRetained(ret).toOpaque()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Converter_toString")
+@_cdecl("bjs_Converter_toString")
+public func _bjs_Converter_toString(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+    #if arch(wasm32)
+    var ret = Unmanaged<Utils.Converter>.fromOpaque(_self).takeUnretainedValue().toString(value: Int(value))
+    return ret.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Converter_deinit")
+@_cdecl("bjs_Converter_deinit")
+public func _bjs_Converter_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<Utils.Converter>.fromOpaque(pointer).release()
+}
+
+extension Utils.Converter: ConvertibleToJSValue {
+    var jsValue: JSValue {
+        @_extern(wasm, module: "TestModule", name: "bjs_Converter_wrap")
+        func _bjs_Converter_wrap(_: UnsafeMutableRawPointer) -> Int32
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_Converter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+@_expose(wasm, "bjs_HTTPServer_init")
+@_cdecl("bjs_HTTPServer_init")
+public func _bjs_HTTPServer_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = Networking.API.HTTPServer()
+    return Unmanaged.passRetained(ret).toOpaque()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_HTTPServer_call")
+@_cdecl("bjs_HTTPServer_call")
+public func _bjs_HTTPServer_call(_self: UnsafeMutableRawPointer, method: Int32) -> Void {
+    #if arch(wasm32)
+    Unmanaged<Networking.API.HTTPServer>.fromOpaque(_self).takeUnretainedValue().call(_: Networking.API.Method(rawValue: Int(method))!)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_HTTPServer_deinit")
+@_cdecl("bjs_HTTPServer_deinit")
+public func _bjs_HTTPServer_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<Networking.API.HTTPServer>.fromOpaque(pointer).release()
+}
+
+extension Networking.API.HTTPServer: ConvertibleToJSValue {
+    var jsValue: JSValue {
+        @_extern(wasm, module: "TestModule", name: "bjs_HTTPServer_wrap")
+        func _bjs_HTTPServer_wrap(_: UnsafeMutableRawPointer) -> Int32
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_HTTPServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+@_expose(wasm, "bjs_TestServer_init")
+@_cdecl("bjs_TestServer_init")
+public func _bjs_TestServer_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = Internal.TestServer()
+    return Unmanaged.passRetained(ret).toOpaque()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_TestServer_call")
+@_cdecl("bjs_TestServer_call")
+public func _bjs_TestServer_call(_self: UnsafeMutableRawPointer, method: Int32) -> Void {
+    #if arch(wasm32)
+    Unmanaged<Internal.TestServer>.fromOpaque(_self).takeUnretainedValue().call(_: Internal.SupportedMethod(rawValue: Int(method))!)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_TestServer_deinit")
+@_cdecl("bjs_TestServer_deinit")
+public func _bjs_TestServer_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<Internal.TestServer>.fromOpaque(pointer).release()
+}
+
+extension Internal.TestServer: ConvertibleToJSValue {
+    var jsValue: JSValue {
+        @_extern(wasm, module: "TestModule", name: "bjs_TestServer_wrap")
+        func _bjs_TestServer_wrap(_: UnsafeMutableRawPointer) -> Int32
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_TestServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}

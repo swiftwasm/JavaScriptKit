@@ -2,22 +2,49 @@
 
 // MARK: - Types
 
-public enum Constants {
-    public static let supportedRawTypes = [
-        "String", "Bool", "Int", "Int32", "Int64", "UInt", "UInt32", "UInt64", "Float", "Double",
-    ]
-}
-
 public enum BridgeType: Codable, Equatable {
     case int, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
     case caseEnum(String)
-    case rawValueEnum(String, String)
+    case rawValueEnum(String, SwiftEnumRawType)
     case associatedValueEnum(String)
     case namespaceEnum(String)
 }
 
 public enum WasmCoreType: String, Codable {
     case i32, i64, f32, f64, pointer
+}
+
+/// Represents supported Swift enum raw types with their WASM ABI properties
+public enum SwiftEnumRawType: String, CaseIterable, Codable {
+    case string = "String"
+    case bool = "Bool"
+    case int = "Int"
+    case int32 = "Int32"
+    case int64 = "Int64"
+    case uint = "UInt"
+    case uint32 = "UInt32"
+    case uint64 = "UInt64"
+    case float = "Float"
+    case double = "Double"
+
+    public var wasmCoreType: WasmCoreType? {
+        switch self {
+        case .string:
+            return nil  // String has special handling with UTF-8 bytes and length
+        case .bool, .int, .int32, .uint, .uint32:
+            return .i32
+        case .int64, .uint64:
+            return .i64
+        case .float:
+            return .f32
+        case .double:
+            return .f64
+        }
+    }
+
+    public static func from(_ rawTypeString: String) -> SwiftEnumRawType? {
+        return Self.allCases.first { $0.rawValue == rawTypeString }
+    }
 }
 
 public struct Parameter: Codable {
@@ -72,11 +99,10 @@ public struct EnumCase: Codable, Equatable {
 
 public struct ExportedEnum: Codable, Equatable {
     public let name: String
+    public let swiftCallName: String
     public let cases: [EnumCase]
     public let rawType: String?
     public let namespace: [String]?
-    public let nestedTypes: [String]
-
     public var enumType: EnumType {
         if cases.isEmpty {
             return .namespace
@@ -87,12 +113,18 @@ public struct ExportedEnum: Codable, Equatable {
         }
     }
 
-    public init(name: String, cases: [EnumCase], rawType: String?, namespace: [String]?, nestedTypes: [String]) {
+    public init(
+        name: String,
+        swiftCallName: String,
+        cases: [EnumCase],
+        rawType: String?,
+        namespace: [String]?
+    ) {
         self.name = name
+        self.swiftCallName = swiftCallName
         self.cases = cases
         self.rawType = rawType
         self.namespace = namespace
-        self.nestedTypes = nestedTypes
     }
 }
 
@@ -132,17 +164,20 @@ public struct ExportedFunction: Codable {
 
 public struct ExportedClass: Codable {
     public var name: String
+    public var swiftCallName: String
     public var constructor: ExportedConstructor?
     public var methods: [ExportedFunction]
     public var namespace: [String]?
 
     public init(
         name: String,
+        swiftCallName: String,
         constructor: ExportedConstructor? = nil,
         methods: [ExportedFunction],
         namespace: [String]? = nil
     ) {
         self.name = name
+        self.swiftCallName = swiftCallName
         self.constructor = constructor
         self.methods = methods
         self.namespace = namespace
@@ -254,58 +289,11 @@ extension BridgeType {
         case .caseEnum:
             return .i32
         case .rawValueEnum(_, let rawType):
-            switch rawType {
-            case "String":
-                return nil  // String uses special handling
-            case "Bool", "Int", "Int32", "UInt", "UInt32":
-                return .i32
-            case "Int64", "UInt64":
-                return .i64
-            case "Float":
-                return .f32
-            case "Double":
-                return .f64
-            default:
-                return nil
-            }
+            return rawType.wasmCoreType
         case .associatedValueEnum:
             return nil
         case .namespaceEnum:
             return nil
-        }
-    }
-
-    /// Returns the Swift type name for this bridge type
-    var swiftTypeName: String {
-        switch self {
-        case .void: return "Void"
-        case .bool: return "Bool"
-        case .int: return "Int"
-        case .float: return "Float"
-        case .double: return "Double"
-        case .string: return "String"
-        case .jsObject(let name): return name ?? "JSObject"
-        case .swiftHeapObject(let name): return name
-        case .caseEnum(let name): return name
-        case .rawValueEnum(let name, _): return name
-        case .associatedValueEnum(let name): return name
-        case .namespaceEnum(let name): return name
-        }
-    }
-
-    /// Returns the TypeScript type name for this bridge type
-    var tsTypeName: String {
-        switch self {
-        case .void: return "void"
-        case .bool: return "boolean"
-        case .int, .float, .double: return "number"
-        case .string: return "string"
-        case .jsObject(let name): return name ?? "any"
-        case .swiftHeapObject(let name): return name
-        case .caseEnum(let name): return name
-        case .rawValueEnum(let name, _): return name
-        case .associatedValueEnum(let name): return name
-        case .namespaceEnum(let name): return name
         }
     }
 }

@@ -126,11 +126,6 @@ export async function createInstantiator(options, swift) {
                 Pi: 3.14159,
             };
             
-            const FeatureFlag = {
-                Enabled: true,
-                Disabled: false,
-            };
-            
             return {
                 Theme,
                 FeatureFlag,
@@ -142,7 +137,6 @@ export async function createInstantiator(options, swift) {
                 SessionId,
                 Precision,
                 Ratio,
-                FeatureFlag,
                 setTheme: function bjs_setTheme(theme) {
                     const themeBytes = textEncoder.encode(theme);
                     const themeId = swift.memory.retain(themeBytes);

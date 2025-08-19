@@ -31,9 +31,7 @@
         }
       ],
       "name" : "Direction",
-      "nestedTypes" : [
-
-      ]
+      "swiftCallName" : "Direction"
     },
     {
       "cases" : [
@@ -57,9 +55,7 @@
         }
       ],
       "name" : "Status",
-      "nestedTypes" : [
-
-      ]
+      "swiftCallName" : "Status"
     }
   ],
   "functions" : [

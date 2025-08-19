@@ -49,7 +49,22 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_release"] = function(id) {
                 swift.memory.release(id);
             }
-
+            // Wrapper functions for module: TestModule
+            if (!importObject["TestModule"]) {
+                importObject["TestModule"] = {};
+            }
+            importObject["TestModule"]["bjs_Converter_wrap"] = function(pointer) {
+                const obj = Converter.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
+            importObject["TestModule"]["bjs_HTTPServer_wrap"] = function(pointer) {
+                const obj = HTTPServer.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
+            importObject["TestModule"]["bjs_TestServer_wrap"] = function(pointer) {
+                const obj = TestServer.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
 
         },
         setInstance: (i) => {
@@ -62,15 +77,132 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-
-            // TODO: Implement namespace enum: Utils
-            // TODO: Implement namespace enum: Networking
-            // TODO: Implement namespace enum: Configuration
-            return {
-                Utils,
-                Networking,
-                Configuration,
+            /// Represents a Swift heap object like a class instance or an actor instance.
+            class SwiftHeapObject {
+                static __wrap(pointer, deinit, prototype) {
+                    const obj = Object.create(prototype);
+                    obj.pointer = pointer;
+                    obj.hasReleased = false;
+                    obj.deinit = deinit;
+                    obj.registry = new FinalizationRegistry((pointer) => {
+                        deinit(pointer);
+                    });
+                    obj.registry.register(this, obj.pointer);
+                    return obj;
+                }
+            
+                release() {
+                    this.registry.unregister(this);
+                    this.deinit(this.pointer);
+                }
+            }
+            class Converter extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Converter_deinit, Converter.prototype);
+                }
+                
+                
+                constructor() {
+                    const ret = instance.exports.bjs_Converter_init();
+                    return Converter.__construct(ret);
+                }
+                toString(value) {
+                    instance.exports.bjs_Converter_toString(this.pointer, value);
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
+                    return ret;
+                }
+            }
+            class HTTPServer extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_HTTPServer_deinit, HTTPServer.prototype);
+                }
+                
+                
+                constructor() {
+                    const ret = instance.exports.bjs_HTTPServer_init();
+                    return HTTPServer.__construct(ret);
+                }
+                call(method) {
+                    instance.exports.bjs_HTTPServer_call(this.pointer, method | 0);
+                }
+            }
+            class TestServer extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_TestServer_deinit, TestServer.prototype);
+                }
+                
+                
+                constructor() {
+                    const ret = instance.exports.bjs_TestServer_init();
+                    return TestServer.__construct(ret);
+                }
+                call(method) {
+                    instance.exports.bjs_TestServer_call(this.pointer, method | 0);
+                }
+            }
+            const Method = {
+                Get: 0,
+                Post: 1,
+                Put: 2,
+                Delete: 3,
             };
+            
+            const LogLevel = {
+                Debug: "debug",
+                Info: "info",
+                Warning: "warning",
+                Error: "error",
+            };
+            
+            const Port = {
+                Http: 80,
+                Https: 443,
+                Development: 3000,
+            };
+            
+            const SupportedMethod = {
+                Get: 0,
+                Post: 1,
+            };
+            
+            const exports = {
+                Converter,
+                HTTPServer,
+                TestServer,
+                Method,
+                LogLevel,
+                Port,
+                SupportedMethod,
+            };
+
+            if (typeof globalThis.Configuration === 'undefined') {
+                globalThis.Configuration = {};
+            }
+            if (typeof globalThis.Networking === 'undefined') {
+                globalThis.Networking = {};
+            }
+            if (typeof globalThis.Networking.API === 'undefined') {
+                globalThis.Networking.API = {};
+            }
+            if (typeof globalThis.Networking.APIV2 === 'undefined') {
+                globalThis.Networking.APIV2 = {};
+            }
+            if (typeof globalThis.Networking.APIV2.Internal === 'undefined') {
+                globalThis.Networking.APIV2.Internal = {};
+            }
+            if (typeof globalThis.Utils === 'undefined') {
+                globalThis.Utils = {};
+            }
+            globalThis.Utils.Converter = exports.Converter;
+            globalThis.Networking.API.HTTPServer = exports.HTTPServer;
+            globalThis.Networking.APIV2.Internal.TestServer = exports.TestServer;
+            globalThis.Networking.API.Method = exports.Method;
+            globalThis.Configuration.LogLevel = exports.LogLevel;
+            globalThis.Configuration.Port = exports.Port;
+            globalThis.Networking.APIV2.Internal.SupportedMethod = exports.SupportedMethod;
+
+            return exports;
         },
     }
 }

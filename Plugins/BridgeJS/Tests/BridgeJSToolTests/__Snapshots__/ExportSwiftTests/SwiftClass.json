@@ -61,7 +61,8 @@
           }
         }
       ],
-      "name" : "Greeter"
+      "name" : "Greeter",
+      "swiftCallName" : "Greeter"
     }
   ],
   "enums" : [

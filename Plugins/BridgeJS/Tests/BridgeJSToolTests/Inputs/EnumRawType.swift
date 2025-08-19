@@ -61,11 +61,6 @@
     case pi = 3.14159
 }
 
-@JS enum FeatureFlag: Bool {
-    case enabled = true
-    case disabled = false
-}
-
 @JS func setTheme(_ theme: Theme)
 @JS func getTheme() -> Theme
 

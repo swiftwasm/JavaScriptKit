@@ -1,6 +1,137 @@
 {
   "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_Converter_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
 
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_Converter_toString",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "toString",
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "Converter",
+      "namespace" : [
+        "Utils"
+      ],
+      "swiftCallName" : "Utils.Converter"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_HTTPServer_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_HTTPServer_call",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "call",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "method",
+              "type" : {
+                "caseEnum" : {
+                  "_0" : "Networking.API.Method"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "HTTPServer",
+      "namespace" : [
+        "Networking",
+        "API"
+      ],
+      "swiftCallName" : "Networking.API.HTTPServer"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_TestServer_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_TestServer_call",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "call",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "method",
+              "type" : {
+                "caseEnum" : {
+                  "_0" : "Internal.SupportedMethod"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "TestServer",
+      "namespace" : [
+        "Networking",
+        "APIV2",
+        "Internal"
+      ],
+      "swiftCallName" : "Internal.TestServer"
+    }
   ],
   "enums" : [
     {
@@ -8,28 +139,133 @@
 
       ],
       "name" : "Utils",
-      "nestedTypes" : [
-        "Converter"
-      ]
+      "swiftCallName" : "Utils"
     },
     {
       "cases" : [
+        {
+          "associatedValues" : [
 
+          ],
+          "name" : "get"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "post"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "put"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "delete"
+        }
       ],
-      "name" : "Networking",
-      "nestedTypes" : [
-        "Method"
-      ]
+      "name" : "Method",
+      "namespace" : [
+        "Networking",
+        "API"
+      ],
+      "swiftCallName" : "Networking.API.Method"
     },
     {
       "cases" : [
+        {
+          "associatedValues" : [
 
+          ],
+          "name" : "debug",
+          "rawValue" : "debug"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "info",
+          "rawValue" : "info"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "warning",
+          "rawValue" : "warning"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "error",
+          "rawValue" : "error"
+        }
       ],
-      "name" : "Configuration",
-      "nestedTypes" : [
-        "LogLevel",
-        "Port"
-      ]
+      "name" : "LogLevel",
+      "namespace" : [
+        "Configuration"
+      ],
+      "rawType" : "String",
+      "swiftCallName" : "Configuration.LogLevel"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "http",
+          "rawValue" : "80"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "https",
+          "rawValue" : "443"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "development",
+          "rawValue" : "3000"
+        }
+      ],
+      "name" : "Port",
+      "namespace" : [
+        "Configuration"
+      ],
+      "rawType" : "Int",
+      "swiftCallName" : "Configuration.Port"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "get"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "post"
+        }
+      ],
+      "name" : "SupportedMethod",
+      "namespace" : [
+        "Networking",
+        "APIV2",
+        "Internal"
+      ],
+      "swiftCallName" : "Internal.SupportedMethod"
     }
   ],
   "functions" : [
