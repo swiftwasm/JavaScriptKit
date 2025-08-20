@@ -19,10 +19,19 @@ export const Status: {
 };
 export type Status = typeof Status[keyof typeof Status];
 
+export enum TSDirection {
+    North = 0,
+    South = 1,
+    East = 2,
+    West = 3,
+}
+
 export type Exports = {
     setDirection(direction: Direction): void;
     getDirection(): Direction;
     processDirection(input: Direction): Status;
+    setTSDirection(direction: TSDirection): void;
+    getTSDirection(): TSDirection;
 }
 export type Imports = {
 }

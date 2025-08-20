@@ -69,12 +69,24 @@ export async function createInstantiator(options, swift) {
                 Auto: "auto",
             };
             
+            const TSTheme = {
+                Light: "light",
+                Dark: "dark",
+                Auto: "auto",
+            };
+            
             const FeatureFlag = {
                 Enabled: true,
                 Disabled: false,
             };
             
             const HttpStatus = {
+                Ok: 200,
+                NotFound: 404,
+                ServerError: 500,
+            };
+            
+            const TSHttpStatus = {
                 Ok: 200,
                 NotFound: 404,
                 ServerError: 500,
@@ -128,8 +140,10 @@ export async function createInstantiator(options, swift) {
             
             return {
                 Theme,
+                TSTheme,
                 FeatureFlag,
                 HttpStatus,
+                TSHttpStatus,
                 Priority,
                 FileSize,
                 UserId,
@@ -149,6 +163,18 @@ export async function createInstantiator(options, swift) {
                     tmpRetString = undefined;
                     return ret;
                 },
+                setTSTheme: function bjs_setTSTheme(theme) {
+                    const themeBytes = textEncoder.encode(theme);
+                    const themeId = swift.memory.retain(themeBytes);
+                    instance.exports.bjs_setTSTheme(themeId, themeBytes.length);
+                    swift.memory.release(themeId);
+                },
+                getTSTheme: function bjs_getTSTheme() {
+                    instance.exports.bjs_getTSTheme();
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
+                    return ret;
+                },
                 setFeatureFlag: function bjs_setFeatureFlag(flag) {
                     instance.exports.bjs_setFeatureFlag(flag ? 1 : 0);
                 },
@@ -161,6 +187,13 @@ export async function createInstantiator(options, swift) {
                 },
                 getHttpStatus: function bjs_getHttpStatus() {
                     const ret = instance.exports.bjs_getHttpStatus();
+                    return ret;
+                },
+                setTSHttpStatus: function bjs_setTSHttpStatus(status) {
+                    instance.exports.bjs_setTSHttpStatus(status);
+                },
+                getTSHttpStatus: function bjs_getTSHttpStatus() {
+                    const ret = instance.exports.bjs_getTSHttpStatus();
                     return ret;
                 },
                 setPriority: function bjs_setPriority(priority) {

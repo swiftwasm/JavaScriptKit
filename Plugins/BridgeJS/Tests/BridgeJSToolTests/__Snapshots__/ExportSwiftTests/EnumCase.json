@@ -30,6 +30,7 @@
           "name" : "west"
         }
       ],
+      "emitStyle" : "const",
       "name" : "Direction",
       "swiftCallName" : "Direction"
     },
@@ -54,8 +55,40 @@
           "name" : "error"
         }
       ],
+      "emitStyle" : "const",
       "name" : "Status",
       "swiftCallName" : "Status"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "north"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "south"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "east"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "west"
+        }
+      ],
+      "emitStyle" : "tsEnum",
+      "name" : "TSDirection",
+      "swiftCallName" : "TSDirection"
     }
   ],
   "functions" : [
@@ -120,6 +153,46 @@
       "returnType" : {
         "caseEnum" : {
           "_0" : "Status"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setTSDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setTSDirection",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "direction",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "TSDirection"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getTSDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getTSDirection",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "TSDirection"
         }
       }
     }

@@ -114,7 +114,6 @@ export async function createInstantiator(options, swift) {
                     swift.memory.release(nameId);
                 }
             }
-
             return {
                 Greeter,
                 takeGreeter: function bjs_takeGreeter(greeter) {

@@ -27,9 +27,39 @@
           "rawValue" : "auto"
         }
       ],
+      "emitStyle" : "const",
       "name" : "Theme",
       "rawType" : "String",
       "swiftCallName" : "Theme"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "light",
+          "rawValue" : "light"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "dark",
+          "rawValue" : "dark"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "auto",
+          "rawValue" : "auto"
+        }
+      ],
+      "emitStyle" : "tsEnum",
+      "name" : "TSTheme",
+      "rawType" : "String",
+      "swiftCallName" : "TSTheme"
     },
     {
       "cases" : [
@@ -48,6 +78,7 @@
           "rawValue" : "false"
         }
       ],
+      "emitStyle" : "const",
       "name" : "FeatureFlag",
       "rawType" : "Bool",
       "swiftCallName" : "FeatureFlag"
@@ -76,9 +107,39 @@
           "rawValue" : "500"
         }
       ],
+      "emitStyle" : "const",
       "name" : "HttpStatus",
       "rawType" : "Int",
       "swiftCallName" : "HttpStatus"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "ok",
+          "rawValue" : "200"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "notFound",
+          "rawValue" : "404"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "serverError",
+          "rawValue" : "500"
+        }
+      ],
+      "emitStyle" : "tsEnum",
+      "name" : "TSHttpStatus",
+      "rawType" : "Int",
+      "swiftCallName" : "TSHttpStatus"
     },
     {
       "cases" : [
@@ -118,6 +179,7 @@
           "rawValue" : "5"
         }
       ],
+      "emitStyle" : "const",
       "name" : "Priority",
       "rawType" : "Int32",
       "swiftCallName" : "Priority"
@@ -153,6 +215,7 @@
           "rawValue" : "1048576"
         }
       ],
+      "emitStyle" : "const",
       "name" : "FileSize",
       "rawType" : "Int64",
       "swiftCallName" : "FileSize"
@@ -181,6 +244,7 @@
           "rawValue" : "9999"
         }
       ],
+      "emitStyle" : "const",
       "name" : "UserId",
       "rawType" : "UInt",
       "swiftCallName" : "UserId"
@@ -209,6 +273,7 @@
           "rawValue" : "67890"
         }
       ],
+      "emitStyle" : "const",
       "name" : "TokenId",
       "rawType" : "UInt32",
       "swiftCallName" : "TokenId"
@@ -237,6 +302,7 @@
           "rawValue" : "1234567890"
         }
       ],
+      "emitStyle" : "const",
       "name" : "SessionId",
       "rawType" : "UInt64",
       "swiftCallName" : "SessionId"
@@ -265,6 +331,7 @@
           "rawValue" : "0.001"
         }
       ],
+      "emitStyle" : "const",
       "name" : "Precision",
       "rawType" : "Float",
       "swiftCallName" : "Precision"
@@ -300,6 +367,7 @@
           "rawValue" : "3.14159"
         }
       ],
+      "emitStyle" : "const",
       "name" : "Ratio",
       "rawType" : "Double",
       "swiftCallName" : "Ratio"
@@ -344,6 +412,48 @@
       "returnType" : {
         "rawValueEnum" : {
           "_0" : "Theme",
+          "_1" : "String"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setTSTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setTSTheme",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "theme",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "TSTheme",
+              "_1" : "String"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getTSTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getTSTheme",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "TSTheme",
           "_1" : "String"
         }
       }
@@ -428,6 +538,48 @@
       "returnType" : {
         "rawValueEnum" : {
           "_0" : "HttpStatus",
+          "_1" : "Int"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setTSHttpStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setTSHttpStatus",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "status",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "TSHttpStatus",
+              "_1" : "Int"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getTSHttpStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getTSHttpStatus",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "TSHttpStatus",
           "_1" : "Int"
         }
       }

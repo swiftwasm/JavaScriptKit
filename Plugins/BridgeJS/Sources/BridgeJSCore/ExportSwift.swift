@@ -267,6 +267,24 @@ public class ExportSwift {
             return namespaceString.split(separator: ".").map(String.init)
         }
 
+        private func extractEnumStyle(
+            from jsAttribute: AttributeSyntax
+        ) -> EnumEmitStyle? {
+            guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
+                let styleArg = arguments.first(where: { $0.label?.text == "enumStyle" })
+            else {
+                return nil
+            }
+            let text = styleArg.expression.trimmedDescription
+            if text.contains("tsEnum") {
+                return .tsEnum
+            }
+            if text.contains("const") {
+                return .const
+            }
+            return nil
+        }
+
         override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
             guard node.attributes.hasJSAttribute() else { return .skipChildren }
             guard case .classBody(let className, _) = state else {
@@ -318,9 +336,6 @@ public class ExportSwift {
             let name = node.name.text
 
             guard let jsAttribute = node.attributes.firstJSAttribute else {
-                if case .enumBody(_) = state {
-                    return .skipChildren
-                }
                 return .skipChildren
             }
 
@@ -355,14 +370,14 @@ public class ExportSwift {
         }
 
         override func visitPost(_ node: ClassDeclSyntax) {
-            stateStack.pop()
+            // Make sure we pop the state stack only if we're in a class body state (meaning we successfully pushed)
+            if case .classBody(_, _) = stateStack.current {
+                stateStack.pop()
+            }
         }
 
         override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
             guard node.attributes.hasJSAttribute() else {
-                if case .enumBody(_) = state {
-                    return .skipChildren
-                }
                 return .skipChildren
             }
 
@@ -402,6 +417,10 @@ public class ExportSwift {
             guard let jsAttribute = node.attributes.firstJSAttribute,
                 let enumName = currentEnum.name
             else {
+                // Only pop if we have a valid enum that was processed
+                if case .enumBody(_) = stateStack.current {
+                    stateStack.pop()
+                }
                 return
             }
 
@@ -415,13 +434,26 @@ public class ExportSwift {
                 effectiveNamespace = computedNamespace
             }
 
+            let emitStyle = extractEnumStyle(from: jsAttribute) ?? .const
+            if case .tsEnum = emitStyle,
+                let raw = currentEnum.rawType,
+                let rawEnum = SwiftEnumRawType.from(raw), rawEnum == .bool
+            {
+                diagnose(
+                    node: jsAttribute,
+                    message: "TypeScript enum style is not supported for Bool raw-value enums",
+                    hint: "Use enumStyle: .const or change the raw type to String or a numeric type"
+                )
+            }
+
             let swiftCallName = ExportSwift.computeSwiftCallName(for: node, itemName: enumName)
             let exportedEnum = ExportedEnum(
                 name: enumName,
                 swiftCallName: swiftCallName,
                 cases: currentEnum.cases,
                 rawType: currentEnum.rawType,
-                namespace: effectiveNamespace
+                namespace: effectiveNamespace,
+                emitStyle: emitStyle
             )
             exportedEnumByName[enumName] = exportedEnum
             exportedEnumNames.append(enumName)
@@ -614,6 +646,11 @@ public class ExportSwift {
             return nil
         }
         decls.append(Self.prelude)
+
+        for enumDef in exportedEnums where enumDef.enumType == .simple {
+            decls.append(renderCaseEnumHelpers(enumDef))
+        }
+
         for function in exportedFunctions {
             decls.append(renderSingleExportedFunction(function: function))
         }
@@ -622,6 +659,32 @@ public class ExportSwift {
         }
         let format = BasicFormat()
         return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
+    }
+
+    func renderCaseEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
+        let typeName = enumDef.swiftCallName
+        var initCases: [String] = []
+        var valueCases: [String] = []
+        for (index, c) in enumDef.cases.enumerated() {
+            initCases.append("case \(index): self = .\(c.name)")
+            valueCases.append("case .\(c.name): return \(index)")
+        }
+        let initSwitch = (["switch bridgeJSRawValue {"] + initCases + ["default: return nil", "}"]).joined(
+            separator: "\n"
+        )
+        let valueSwitch = (["switch self {"] + valueCases + ["}"]).joined(separator: "\n")
+
+        return """
+            extension \(raw: typeName) {
+                init?(bridgeJSRawValue: Int32) {
+                    \(raw: initSwitch)
+                }
+
+                var bridgeJSRawValue: Int32 {
+                    \(raw: valueSwitch)
+                }
+            }
+            """
     }
 
     class ExportedThunkBuilder {
@@ -700,7 +763,7 @@ public class ExportSwift {
                 abiParameterForwardings.append(
                     LabeledExprSyntax(
                         label: param.label,
-                        expression: ExprSyntax("\(raw: enumName)(rawValue: Int(\(raw: param.name)))!")
+                        expression: ExprSyntax("\(raw: enumName)(bridgeJSRawValue: \(raw: param.name))!")
                     )
                 )
                 abiParameterSignatures.append((param.name, .i32))
@@ -770,7 +833,6 @@ public class ExportSwift {
                 )
                 abiParameterSignatures.append((param.name, .i32))
             case .swiftHeapObject:
-                // UnsafeMutableRawPointer is passed as an i32 pointer
                 let objectExpr: ExprSyntax =
                     "Unmanaged<\(raw: param.type.swiftType)>.fromOpaque(\(raw: param.name)).takeUnretainedValue()"
                 abiParameterForwardings.append(
@@ -885,7 +947,7 @@ public class ExportSwift {
                 )
             case .caseEnum:
                 abiReturnType = .i32
-                append("return Int32(ret.rawValue)")
+                append("return ret.bridgeJSRawValue")
             case .rawValueEnum(_, let rawType):
                 if rawType == .string {
                     append(

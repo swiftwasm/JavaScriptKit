@@ -63,7 +63,6 @@ export async function createInstantiator(options, swift) {
         createExports: (instance) => {
             const js = swift.memory.heap;
 
-
             return {
                 checkString: function bjs_checkString(a) {
                     const aBytes = textEncoder.encode(a);

@@ -138,6 +138,7 @@
       "cases" : [
 
       ],
+      "emitStyle" : "const",
       "name" : "Utils",
       "swiftCallName" : "Utils"
     },
@@ -168,6 +169,7 @@
           "name" : "delete"
         }
       ],
+      "emitStyle" : "const",
       "name" : "Method",
       "namespace" : [
         "Networking",
@@ -206,6 +208,7 @@
           "rawValue" : "error"
         }
       ],
+      "emitStyle" : "const",
       "name" : "LogLevel",
       "namespace" : [
         "Configuration"
@@ -237,6 +240,7 @@
           "rawValue" : "3000"
         }
       ],
+      "emitStyle" : "const",
       "name" : "Port",
       "namespace" : [
         "Configuration"
@@ -259,6 +263,7 @@
           "name" : "post"
         }
       ],
+      "emitStyle" : "const",
       "name" : "SupportedMethod",
       "namespace" : [
         "Networking",

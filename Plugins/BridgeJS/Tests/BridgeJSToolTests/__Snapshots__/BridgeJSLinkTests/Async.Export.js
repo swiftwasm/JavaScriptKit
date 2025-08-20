@@ -63,7 +63,6 @@ export async function createInstantiator(options, swift) {
         createExports: (instance) => {
             const js = swift.memory.heap;
 
-
             return {
                 asyncReturnVoid: function bjs_asyncReturnVoid() {
                     const retId = instance.exports.bjs_asyncReturnVoid();

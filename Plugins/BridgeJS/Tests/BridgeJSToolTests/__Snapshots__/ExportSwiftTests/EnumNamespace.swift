@@ -6,6 +6,58 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
+extension Networking.API.Method {
+    init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .get
+        case 1:
+            self = .post
+        case 2:
+            self = .put
+        case 3:
+            self = .delete
+        default:
+            return nil
+        }
+    }
+
+    var bridgeJSRawValue: Int32 {
+        switch self {
+        case .get:
+            return 0
+        case .post:
+            return 1
+        case .put:
+            return 2
+        case .delete:
+            return 3
+        }
+    }
+}
+
+extension Internal.SupportedMethod {
+    init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .get
+        case 1:
+            self = .post
+        default:
+            return nil
+        }
+    }
+
+    var bridgeJSRawValue: Int32 {
+        switch self {
+        case .get:
+            return 0
+        case .post:
+            return 1
+        }
+    }
+}
+
 @_expose(wasm, "bjs_Converter_init")
 @_cdecl("bjs_Converter_init")
 public func _bjs_Converter_init() -> UnsafeMutableRawPointer {
@@ -59,7 +111,7 @@ public func _bjs_HTTPServer_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_HTTPServer_call")
 public func _bjs_HTTPServer_call(_self: UnsafeMutableRawPointer, method: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<Networking.API.HTTPServer>.fromOpaque(_self).takeUnretainedValue().call(_: Networking.API.Method(rawValue: Int(method))!)
+    Unmanaged<Networking.API.HTTPServer>.fromOpaque(_self).takeUnretainedValue().call(_: Networking.API.Method(bridgeJSRawValue: method)!)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -94,7 +146,7 @@ public func _bjs_TestServer_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_TestServer_call")
 public func _bjs_TestServer_call(_self: UnsafeMutableRawPointer, method: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<Internal.TestServer>.fromOpaque(_self).takeUnretainedValue().call(_: Internal.SupportedMethod(rawValue: Int(method))!)
+    Unmanaged<Internal.TestServer>.fromOpaque(_self).takeUnretainedValue().call(_: Internal.SupportedMethod(bridgeJSRawValue: method)!)
     #else
     fatalError("Only available on WebAssembly")
     #endif

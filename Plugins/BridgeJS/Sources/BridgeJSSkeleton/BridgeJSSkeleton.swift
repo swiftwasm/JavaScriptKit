@@ -14,7 +14,6 @@ public enum WasmCoreType: String, Codable {
     case i32, i64, f32, f64, pointer
 }
 
-/// Represents supported Swift enum raw types with their WASM ABI properties
 public enum SwiftEnumRawType: String, CaseIterable, Codable {
     case string = "String"
     case bool = "Bool"
@@ -30,7 +29,7 @@ public enum SwiftEnumRawType: String, CaseIterable, Codable {
     public var wasmCoreType: WasmCoreType? {
         switch self {
         case .string:
-            return nil  // String has special handling with UTF-8 bytes and length
+            return nil
         case .bool, .int, .int32, .uint, .uint32:
             return .i32
         case .int64, .uint64:
@@ -97,12 +96,18 @@ public struct EnumCase: Codable, Equatable {
     }
 }
 
+public enum EnumEmitStyle: String, Codable {
+    case const
+    case tsEnum
+}
+
 public struct ExportedEnum: Codable, Equatable {
     public let name: String
     public let swiftCallName: String
     public let cases: [EnumCase]
     public let rawType: String?
     public let namespace: [String]?
+    public let emitStyle: EnumEmitStyle
     public var enumType: EnumType {
         if cases.isEmpty {
             return .namespace
@@ -118,13 +123,15 @@ public struct ExportedEnum: Codable, Equatable {
         swiftCallName: String,
         cases: [EnumCase],
         rawType: String?,
-        namespace: [String]?
+        namespace: [String]?,
+        emitStyle: EnumEmitStyle
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
         self.cases = cases
         self.rawType = rawType
         self.namespace = namespace
+        self.emitStyle = emitStyle
     }
 }
 

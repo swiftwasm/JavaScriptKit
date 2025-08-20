@@ -4,12 +4,24 @@
     case auto = "auto"
 }
 
+@JS(enumStyle: .tsEnum) enum TSTheme: String {
+    case light = "light"
+    case dark = "dark"
+    case auto = "auto"
+}
+
 @JS enum FeatureFlag: Bool {
     case enabled = true
     case disabled = false
 }
 
 @JS enum HttpStatus: Int {
+    case ok = 200
+    case notFound = 404
+    case serverError = 500
+}
+
+@JS(enumStyle: .tsEnum) enum TSHttpStatus: Int {
     case ok = 200
     case notFound = 404
     case serverError = 500
@@ -64,11 +76,17 @@
 @JS func setTheme(_ theme: Theme)
 @JS func getTheme() -> Theme
 
+@JS func setTSTheme(_ theme: TSTheme)
+@JS func getTSTheme() -> TSTheme
+
 @JS func setFeatureFlag(_ flag: FeatureFlag)
 @JS func getFeatureFlag() -> FeatureFlag
 
 @JS func setHttpStatus(_ status: HttpStatus)
 @JS func getHttpStatus() -> HttpStatus
+
+@JS func setTSHttpStatus(_ status: TSHttpStatus)
+@JS func getTSHttpStatus() -> TSHttpStatus
 
 @JS func setPriority(_ priority: Priority)
 @JS func getPriority() -> Priority

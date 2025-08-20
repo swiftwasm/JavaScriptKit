@@ -63,7 +63,6 @@ export async function createInstantiator(options, swift) {
         createExports: (instance) => {
             const js = swift.memory.heap;
 
-
             return {
                 throwsSomething: function bjs_throwsSomething() {
                     instance.exports.bjs_throwsSomething();

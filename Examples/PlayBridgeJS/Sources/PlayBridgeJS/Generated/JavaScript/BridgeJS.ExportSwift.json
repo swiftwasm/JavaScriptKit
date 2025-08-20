@@ -46,7 +46,8 @@
           }
         }
       ],
-      "name" : "PlayBridgeJS"
+      "name" : "PlayBridgeJS",
+      "swiftCallName" : "PlayBridgeJS"
     },
     {
       "methods" : [
@@ -115,8 +116,12 @@
           }
         }
       ],
-      "name" : "PlayBridgeJSOutput"
+      "name" : "PlayBridgeJSOutput",
+      "swiftCallName" : "PlayBridgeJSOutput"
     }
+  ],
+  "enums" : [
+
   ],
   "functions" : [
 

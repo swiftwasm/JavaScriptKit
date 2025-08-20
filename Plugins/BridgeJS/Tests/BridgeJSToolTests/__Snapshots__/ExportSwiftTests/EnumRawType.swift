@@ -33,6 +33,33 @@ public func _bjs_getTheme() -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_setTSTheme")
+@_cdecl("bjs_setTSTheme")
+public func _bjs_setTSTheme(themeBytes: Int32, themeLen: Int32) -> Void {
+    #if arch(wasm32)
+    let theme = String(unsafeUninitializedCapacity: Int(themeLen)) { b in
+        _swift_js_init_memory(themeBytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(themeLen)
+    }
+    setTSTheme(_: TSTheme(rawValue: theme)!)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_getTSTheme")
+@_cdecl("bjs_getTSTheme")
+public func _bjs_getTSTheme() -> Void {
+    #if arch(wasm32)
+    let ret = getTSTheme()
+    return ret.rawValue.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_setFeatureFlag")
 @_cdecl("bjs_setFeatureFlag")
 public func _bjs_setFeatureFlag(flag: Int32) -> Void {
@@ -69,6 +96,27 @@ public func _bjs_setHttpStatus(status: Int32) -> Void {
 public func _bjs_getHttpStatus() -> Int32 {
     #if arch(wasm32)
     let ret = getHttpStatus()
+    return Int32(ret.rawValue)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_setTSHttpStatus")
+@_cdecl("bjs_setTSHttpStatus")
+public func _bjs_setTSHttpStatus(status: Int32) -> Void {
+    #if arch(wasm32)
+    setTSHttpStatus(_: TSHttpStatus(rawValue: Int(status))!)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_getTSHttpStatus")
+@_cdecl("bjs_getTSHttpStatus")
+public func _bjs_getTSHttpStatus() -> Int32 {
+    #if arch(wasm32)
+    let ret = getTSHttpStatus()
     return Int32(ret.rawValue)
     #else
     fatalError("Only available on WebAssembly")

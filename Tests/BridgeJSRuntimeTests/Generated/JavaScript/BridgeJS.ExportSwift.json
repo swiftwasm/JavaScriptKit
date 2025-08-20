@@ -61,7 +61,8 @@
           }
         }
       ],
-      "name" : "Greeter"
+      "name" : "Greeter",
+      "swiftCallName" : "Greeter"
     },
     {
       "methods" : [
@@ -123,8 +124,12 @@
           }
         }
       ],
-      "name" : "Calculator"
+      "name" : "Calculator",
+      "swiftCallName" : "Calculator"
     }
+  ],
+  "enums" : [
+
   ],
   "functions" : [
     {

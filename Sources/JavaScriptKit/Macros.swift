@@ -1,3 +1,11 @@
+/// Controls how Swift enums annotated with `@JS` are emitted to TypeScript.
+/// - `const`: Emit the current BridgeJS style: a `const` object with literal members plus a type alias.
+/// - `tsEnum`: Emit a TypeScript `enum` declaration (only valid for simple enums and raw-value enums with String or numeric raw types).
+public enum JSEnumStyle: String {
+    case const
+    case tsEnum
+}
+
 /// A macro that exposes Swift functions, classes, and methods to JavaScript.
 ///
 /// Apply this macro to Swift declarations that you want to make callable from JavaScript:
@@ -90,7 +98,12 @@
 ///
 /// - Parameter namespace: A dot-separated string that defines the namespace hierarchy in JavaScript.
 ///                        Each segment becomes a nested object in the resulting JavaScript structure.
+/// - Parameter enumStyle: Controls how enums are emitted to TypeScript for this declaration:
+///                        use `.const` (default) to emit a const object + type alias,
+///                        or `.tsEnum` to emit a TypeScript `enum`.
+///                        `.tsEnum` is supported for case enums and raw-value enums with String or numeric raw types.
+///                        Bool raw-value enums are not supported with `.tsEnum` and will produce an error.
 ///
 /// - Important: This feature is still experimental. No API stability is guaranteed, and the API may change in future releases.
 @attached(peer)
-public macro JS(namespace: String? = nil) = Builtin.ExternalMacro
+public macro JS(namespace: String? = nil, enumStyle: JSEnumStyle = .const) = Builtin.ExternalMacro

@@ -145,7 +145,6 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
             }
-
             const exports = {
                 Greeter,
                 Converter,

@@ -6,11 +6,97 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
+extension Direction {
+    init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .north
+        case 1:
+            self = .south
+        case 2:
+            self = .east
+        case 3:
+            self = .west
+        default:
+            return nil
+        }
+    }
+
+    var bridgeJSRawValue: Int32 {
+        switch self {
+        case .north:
+            return 0
+        case .south:
+            return 1
+        case .east:
+            return 2
+        case .west:
+            return 3
+        }
+    }
+}
+
+extension Status {
+    init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .loading
+        case 1:
+            self = .success
+        case 2:
+            self = .error
+        default:
+            return nil
+        }
+    }
+
+    var bridgeJSRawValue: Int32 {
+        switch self {
+        case .loading:
+            return 0
+        case .success:
+            return 1
+        case .error:
+            return 2
+        }
+    }
+}
+
+extension TSDirection {
+    init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .north
+        case 1:
+            self = .south
+        case 2:
+            self = .east
+        case 3:
+            self = .west
+        default:
+            return nil
+        }
+    }
+
+    var bridgeJSRawValue: Int32 {
+        switch self {
+        case .north:
+            return 0
+        case .south:
+            return 1
+        case .east:
+            return 2
+        case .west:
+            return 3
+        }
+    }
+}
+
 @_expose(wasm, "bjs_setDirection")
 @_cdecl("bjs_setDirection")
 public func _bjs_setDirection(direction: Int32) -> Void {
     #if arch(wasm32)
-    setDirection(_: Direction(rawValue: Int(direction))!)
+    setDirection(_: Direction(bridgeJSRawValue: direction)!)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -21,7 +107,7 @@ public func _bjs_setDirection(direction: Int32) -> Void {
 public func _bjs_getDirection() -> Int32 {
     #if arch(wasm32)
     let ret = getDirection()
-    return Int32(ret.rawValue)
+    return ret.bridgeJSRawValue
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -31,8 +117,29 @@ public func _bjs_getDirection() -> Int32 {
 @_cdecl("bjs_processDirection")
 public func _bjs_processDirection(input: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = processDirection(_: Direction(rawValue: Int(input))!)
-    return Int32(ret.rawValue)
+    let ret = processDirection(_: Direction(bridgeJSRawValue: input)!)
+    return ret.bridgeJSRawValue
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_setTSDirection")
+@_cdecl("bjs_setTSDirection")
+public func _bjs_setTSDirection(direction: Int32) -> Void {
+    #if arch(wasm32)
+    setTSDirection(_: TSDirection(bridgeJSRawValue: direction)!)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_getTSDirection")
+@_cdecl("bjs_getTSDirection")
+public func _bjs_getTSDirection() -> Int32 {
+    #if arch(wasm32)
+    let ret = getTSDirection()
+    return ret.bridgeJSRawValue
     #else
     fatalError("Only available on WebAssembly")
     #endif

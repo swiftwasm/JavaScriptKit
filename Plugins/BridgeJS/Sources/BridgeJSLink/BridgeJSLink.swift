@@ -159,25 +159,32 @@ struct BridgeJSLink {
                 namespacedEnums: namespacedEnums
             )
             .map { $0.indent(count: 12) }.joined(separator: "\n")
+
+            let enumSection =
+                enumConstantLines.isEmpty
+                ? "" : enumConstantLines.map { $0.indent(count: 12) }.joined(separator: "\n") + "\n"
+
             exportsSection = """
                 \(classLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
-                \(enumConstantLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
-                            const exports = {
+                \(enumSection)\("const exports = {".indent(count: 12))
                 \(exportsLines.map { $0.indent(count: 16) }.joined(separator: "\n"))
-                            };
+                \("};".indent(count: 12))
 
                 \(namespaceSetupCode)
 
-                            return exports;
+                \("return exports;".indent(count: 12))
                         },
                 """
         } else {
+            let enumSection =
+                enumConstantLines.isEmpty
+                ? "" : enumConstantLines.map { $0.indent(count: 12) }.joined(separator: "\n") + "\n"
+
             exportsSection = """
                 \(classLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
-                \(enumConstantLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
-                            return {
+                \(enumSection)\("return {".indent(count: 12))
                 \(exportsLines.map { $0.indent(count: 16) }.joined(separator: "\n"))
-                            };
+                \("};".indent(count: 12))
                         },
                 """
         }
@@ -521,6 +528,7 @@ struct BridgeJSLink {
     func renderExportedEnum(_ enumDefinition: ExportedEnum) throws -> (js: [String], dts: [String]) {
         var jsLines: [String] = []
         var dtsLines: [String] = []
+        let style: EnumEmitStyle = enumDefinition.emitStyle
 
         switch enumDefinition.enumType {
         case .simple:
@@ -533,16 +541,27 @@ struct BridgeJSLink {
             jsLines.append("")
 
             if enumDefinition.namespace == nil {
-                dtsLines.append("export const \(enumDefinition.name): {")
-                for (index, enumCase) in enumDefinition.cases.enumerated() {
-                    let caseName = enumCase.name.capitalizedFirstLetter
-                    dtsLines.append("    readonly \(caseName): \(index);")
+                switch style {
+                case .tsEnum:
+                    dtsLines.append("export enum \(enumDefinition.name) {")
+                    for (index, enumCase) in enumDefinition.cases.enumerated() {
+                        let caseName = enumCase.name.capitalizedFirstLetter
+                        dtsLines.append("    \(caseName) = \(index),")
+                    }
+                    dtsLines.append("}")
+                    dtsLines.append("")
+                case .const:
+                    dtsLines.append("export const \(enumDefinition.name): {")
+                    for (index, enumCase) in enumDefinition.cases.enumerated() {
+                        let caseName = enumCase.name.capitalizedFirstLetter
+                        dtsLines.append("    readonly \(caseName): \(index);")
+                    }
+                    dtsLines.append("};")
+                    dtsLines.append(
+                        "export type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                    )
+                    dtsLines.append("")
                 }
-                dtsLines.append("};")
-                dtsLines.append(
-                    "export type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
-                )
-                dtsLines.append("")
             }
         case .rawValue:
             guard let rawType = enumDefinition.rawType else {
@@ -576,30 +595,49 @@ struct BridgeJSLink {
             jsLines.append("")
 
             if enumDefinition.namespace == nil {
-                dtsLines.append("export const \(enumDefinition.name): {")
-                for enumCase in enumDefinition.cases {
-                    let caseName = enumCase.name.capitalizedFirstLetter
-                    let rawValue = enumCase.rawValue ?? enumCase.name
-                    let formattedValue: String
-
-                    switch rawType {
-                    case "String":
-                        formattedValue = "\"\(rawValue)\""
-                    case "Bool":
-                        formattedValue = rawValue.lowercased() == "true" ? "true" : "false"
-                    case "Float", "Double":
-                        formattedValue = rawValue
-                    default:
-                        formattedValue = rawValue
+                switch style {
+                case .tsEnum:
+                    dtsLines.append("export enum \(enumDefinition.name) {")
+                    for enumCase in enumDefinition.cases {
+                        let caseName = enumCase.name.capitalizedFirstLetter
+                        let rawValue = enumCase.rawValue ?? enumCase.name
+                        let formattedValue: String
+                        switch rawType {
+                        case "String": formattedValue = "\"\(rawValue)\""
+                        case "Bool": formattedValue = rawValue.lowercased() == "true" ? "true" : "false"
+                        case "Float", "Double": formattedValue = rawValue
+                        default: formattedValue = rawValue
+                        }
+                        dtsLines.append("    \(caseName) = \(formattedValue),")
                     }
+                    dtsLines.append("}")
+                    dtsLines.append("")
+                case .const:
+                    dtsLines.append("export const \(enumDefinition.name): {")
+                    for enumCase in enumDefinition.cases {
+                        let caseName = enumCase.name.capitalizedFirstLetter
+                        let rawValue = enumCase.rawValue ?? enumCase.name
+                        let formattedValue: String
 
-                    dtsLines.append("    readonly \(caseName): \(formattedValue);")
+                        switch rawType {
+                        case "String":
+                            formattedValue = "\"\(rawValue)\""
+                        case "Bool":
+                            formattedValue = rawValue.lowercased() == "true" ? "true" : "false"
+                        case "Float", "Double":
+                            formattedValue = rawValue
+                        default:
+                            formattedValue = rawValue
+                        }
+
+                        dtsLines.append("    readonly \(caseName): \(formattedValue);")
+                    }
+                    dtsLines.append("};")
+                    dtsLines.append(
+                        "export type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                    )
+                    dtsLines.append("")
                 }
-                dtsLines.append("};")
-                dtsLines.append(
-                    "export type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
-                )
-                dtsLines.append("")
             }
 
         case .associatedValue:
@@ -1119,52 +1157,89 @@ struct BridgeJSLink {
 
                     let sortedEnums = childNode.content.enums.sorted { $0.name < $1.name }
                     for enumDefinition in sortedEnums {
+                        let style: EnumEmitStyle = enumDefinition.emitStyle
                         switch enumDefinition.enumType {
                         case .simple:
-                            dtsLines.append(
-                                "const \(enumDefinition.name): {".indent(count: identBaseSize * contentDepth)
-                            )
-                            for (index, enumCase) in enumDefinition.cases.enumerated() {
-                                let caseName = enumCase.name.capitalizedFirstLetter
+                            switch style {
+                            case .tsEnum:
                                 dtsLines.append(
-                                    "readonly \(caseName): \(index);".indent(count: identBaseSize * (contentDepth + 1))
+                                    "enum \(enumDefinition.name) {".indent(count: identBaseSize * contentDepth)
+                                )
+                                for (index, enumCase) in enumDefinition.cases.enumerated() {
+                                    let caseName = enumCase.name.capitalizedFirstLetter
+                                    dtsLines.append(
+                                        "\(caseName) = \(index),".indent(count: identBaseSize * (contentDepth + 1))
+                                    )
+                                }
+                                dtsLines.append("}".indent(count: identBaseSize * contentDepth))
+                            case .const:
+                                dtsLines.append(
+                                    "const \(enumDefinition.name): {".indent(count: identBaseSize * contentDepth)
+                                )
+                                for (index, enumCase) in enumDefinition.cases.enumerated() {
+                                    let caseName = enumCase.name.capitalizedFirstLetter
+                                    dtsLines.append(
+                                        "readonly \(caseName): \(index);".indent(
+                                            count: identBaseSize * (contentDepth + 1)
+                                        )
+                                    )
+                                }
+                                dtsLines.append("};".indent(count: identBaseSize * contentDepth))
+                                dtsLines.append(
+                                    "type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                                        .indent(count: identBaseSize * contentDepth)
                                 )
                             }
-                            dtsLines.append("};".indent(count: identBaseSize * contentDepth))
-                            dtsLines.append(
-                                "type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
-                                    .indent(
-                                        count: identBaseSize * contentDepth
-                                    )
-                            )
                         case .rawValue:
                             guard let rawType = enumDefinition.rawType else { continue }
-                            dtsLines.append(
-                                "const \(enumDefinition.name): {".indent(count: identBaseSize * contentDepth)
-                            )
-                            for enumCase in enumDefinition.cases {
-                                let caseName = enumCase.name.capitalizedFirstLetter
-                                let rawValue = enumCase.rawValue ?? enumCase.name
-                                let formattedValue: String
-                                switch rawType {
-                                case "String": formattedValue = "\"\(rawValue)\""
-                                case "Bool": formattedValue = rawValue.lowercased() == "true" ? "true" : "false"
-                                case "Float", "Double": formattedValue = rawValue
-                                default: formattedValue = rawValue
-                                }
+                            switch style {
+                            case .tsEnum:
                                 dtsLines.append(
-                                    "readonly \(caseName): \(formattedValue);".indent(
-                                        count: identBaseSize * (contentDepth + 1)
+                                    "enum \(enumDefinition.name) {".indent(count: identBaseSize * contentDepth)
+                                )
+                                for enumCase in enumDefinition.cases {
+                                    let caseName = enumCase.name.capitalizedFirstLetter
+                                    let rawValue = enumCase.rawValue ?? enumCase.name
+                                    let formattedValue: String
+                                    switch rawType {
+                                    case "String": formattedValue = "\"\(rawValue)\""
+                                    case "Bool": formattedValue = rawValue.lowercased() == "true" ? "true" : "false"
+                                    case "Float", "Double": formattedValue = rawValue
+                                    default: formattedValue = rawValue
+                                    }
+                                    dtsLines.append(
+                                        "\(caseName) = \(formattedValue),".indent(
+                                            count: identBaseSize * (contentDepth + 1)
+                                        )
                                     )
+                                }
+                                dtsLines.append("}".indent(count: identBaseSize * contentDepth))
+                            case .const:
+                                dtsLines.append(
+                                    "const \(enumDefinition.name): {".indent(count: identBaseSize * contentDepth)
+                                )
+                                for enumCase in enumDefinition.cases {
+                                    let caseName = enumCase.name.capitalizedFirstLetter
+                                    let rawValue = enumCase.rawValue ?? enumCase.name
+                                    let formattedValue: String
+                                    switch rawType {
+                                    case "String": formattedValue = "\"\(rawValue)\""
+                                    case "Bool": formattedValue = rawValue.lowercased() == "true" ? "true" : "false"
+                                    case "Float", "Double": formattedValue = rawValue
+                                    default: formattedValue = rawValue
+                                    }
+                                    dtsLines.append(
+                                        "readonly \(caseName): \(formattedValue);".indent(
+                                            count: identBaseSize * (contentDepth + 1)
+                                        )
+                                    )
+                                }
+                                dtsLines.append("};".indent(count: identBaseSize * contentDepth))
+                                dtsLines.append(
+                                    "type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                                        .indent(count: identBaseSize * contentDepth)
                                 )
                             }
-                            dtsLines.append("};".indent(count: identBaseSize * contentDepth))
-                            dtsLines.append(
-                                "type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
-                                    .indent(
-                                        count: identBaseSize * contentDepth
-                                    )
-                            )
                         case .associatedValue, .namespace:
                             continue
                         }

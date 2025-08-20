@@ -11,6 +11,12 @@ export const Theme: {
 };
 export type Theme = typeof Theme[keyof typeof Theme];
 
+export enum TSTheme {
+    Light = "light",
+    Dark = "dark",
+    Auto = "auto",
+}
+
 export const FeatureFlag: {
     readonly Enabled: true;
     readonly Disabled: false;
@@ -23,6 +29,12 @@ export const HttpStatus: {
     readonly ServerError: 500;
 };
 export type HttpStatus = typeof HttpStatus[keyof typeof HttpStatus];
+
+export enum TSHttpStatus {
+    Ok = 200,
+    NotFound = 404,
+    ServerError = 500,
+}
 
 export const Priority: {
     readonly Lowest: 1;
@@ -80,10 +92,14 @@ export type Ratio = typeof Ratio[keyof typeof Ratio];
 export type Exports = {
     setTheme(theme: Theme): void;
     getTheme(): Theme;
+    setTSTheme(theme: TSTheme): void;
+    getTSTheme(): TSTheme;
     setFeatureFlag(flag: FeatureFlag): void;
     getFeatureFlag(): FeatureFlag;
     setHttpStatus(status: HttpStatus): void;
     getHttpStatus(): HttpStatus;
+    setTSHttpStatus(status: TSHttpStatus): void;
+    getTSHttpStatus(): TSHttpStatus;
     setPriority(priority: Priority): void;
     getPriority(): Priority;
     setFileSize(size: FileSize): void;

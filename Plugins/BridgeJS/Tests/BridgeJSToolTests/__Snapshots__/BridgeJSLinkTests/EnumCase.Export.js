@@ -76,9 +76,17 @@ export async function createInstantiator(options, swift) {
                 Error: 2,
             };
             
+            const TSDirection = {
+                North: 0,
+                South: 1,
+                East: 2,
+                West: 3,
+            };
+            
             return {
                 Direction,
                 Status,
+                TSDirection,
                 setDirection: function bjs_setDirection(direction) {
                     instance.exports.bjs_setDirection(direction | 0);
                 },
@@ -88,6 +96,13 @@ export async function createInstantiator(options, swift) {
                 },
                 processDirection: function bjs_processDirection(input) {
                     const ret = instance.exports.bjs_processDirection(input | 0);
+                    return ret;
+                },
+                setTSDirection: function bjs_setTSDirection(direction) {
+                    instance.exports.bjs_setTSDirection(direction | 0);
+                },
+                getTSDirection: function bjs_getTSDirection() {
+                    const ret = instance.exports.bjs_getTSDirection();
                     return ret;
                 },
             };
