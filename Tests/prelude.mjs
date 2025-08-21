@@ -135,16 +135,144 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 
     const g = new exports.Greeter("John");
     assert.equal(g.greet(), "Hello, John!");
-    g.changeName("Jane");
+
+    // Test property getters
+    assert.equal(g.name, "John");
+    assert.equal(g.prefix, "Hello");
+
+    // Test property setters
+    g.name = "Jane";
+    assert.equal(g.name, "Jane");
     assert.equal(g.greet(), "Hello, Jane!");
-    exports.takeGreeter(g, "Jay");
+
+    // Test readonly property (should still be readable)
+    assert.equal(g.prefix, "Hello");
+
+    // Test method-based name change still works
+    g.changeName("Jay");
+    assert.equal(g.name, "Jay");
     assert.equal(g.greet(), "Hello, Jay!");
 
+    // Test that property changes via JS are reflected in Swift methods
+    g.name = "Alice";
+    assert.equal(g.greet(), "Hello, Alice!");
+    exports.takeGreeter(g, "Bob");
+    assert.equal(g.name, "Bob");
+    assert.equal(g.greet(), "Hello, Bob!");
+
     const g2 = exports.roundTripSwiftHeapObject(g)
-    assert.equal(g2.greet(), "Hello, Jay!");
+    assert.equal(g2.greet(), "Hello, Bob!");
+    assert.equal(g2.name, "Bob");
+    assert.equal(g2.prefix, "Hello");
     g2.release();
 
     g.release();
+
+    // Test PropertyHolder with various types
+    const testObj = { testProp: "test" };
+    const sibling = new exports.SimplePropertyHolder(999);
+    const ph = new exports.PropertyHolder(
+        123,        // intValue
+        3.14,       // floatValue
+        2.718,      // doubleValue
+        true,       // boolValue
+        "test",     // stringValue
+        testObj,    // jsObject
+        sibling     // sibling
+    );
+
+    // Test primitive property getters
+    assert.equal(ph.intValue, 123);
+    assert.equal(ph.floatValue, 3.140000104904175); // Float32 precision
+    assert.equal(ph.doubleValue, 2.718);
+    assert.equal(ph.boolValue, true);
+    assert.equal(ph.stringValue, "test");
+
+    // Test readonly property getters
+    assert.equal(ph.readonlyInt, 42);
+    assert.equal(ph.readonlyFloat, 3.140000104904175); // Float32 precision
+    assert.equal(ph.readonlyDouble, 2.718281828);
+    assert.equal(ph.readonlyBool, true);
+    assert.equal(ph.readonlyString, "constant");
+
+    // Test JSObject property
+    assert.equal(ph.jsObject, testObj);
+
+    // Test SwiftHeapObject property (sibling should be a SimplePropertyHolder with value 999)
+    assert.equal(ph.sibling.value, 999);
+
+    // Test primitive property setters
+    ph.intValue = 456;
+    ph.floatValue = 6.28;
+    ph.doubleValue = 1.414;
+    ph.boolValue = false;
+    ph.stringValue = "updated";
+
+    assert.equal(ph.intValue, 456);
+    assert.equal(ph.floatValue, 6.280000209808350); // Float32 precision
+    assert.equal(ph.doubleValue, 1.414);
+    assert.equal(ph.boolValue, false);
+    assert.equal(ph.stringValue, "updated");
+
+    // Test JSObject property setter
+    const newObj = { newProp: "new" };
+    ph.jsObject = newObj;
+    assert.equal(ph.jsObject, newObj);
+
+    // Test SwiftHeapObject property with different object
+    const ph2 = exports.createPropertyHolder(999, 1.1, 2.2, false, "other", testObj);
+    const newSibling = new exports.SimplePropertyHolder(123);
+    ph.sibling = newSibling;
+    assert.equal(ph.sibling.value, 123);
+
+    // Test lazy property
+    assert.equal(ph.lazyValue, "computed lazily");
+    ph.lazyValue = "modified lazy";
+    assert.equal(ph.lazyValue, "modified lazy");
+    
+    // Test computed read-write property
+    assert.equal(ph.computedReadWrite, "Value: 456");
+    ph.computedReadWrite = "Value: 777";
+    assert.equal(ph.intValue, 777); // Should have parsed and set intValue
+    assert.equal(ph.computedReadWrite, "Value: 777");
+    
+    // Test computed readonly property  
+    assert.equal(ph.computedReadonly, 1554); // intValue * 2 = 777 * 2
+    
+    // Test property with observers
+    // Sync observedProperty to match current intValue, then reset counters for clean test
+    ph.observedProperty = 777; // Sync with current intValue after computed property changed it
+    exports.resetObserverCounts(); // Reset counters to start fresh test
+    
+    // Set property from JavaScript and verify observers are called
+    ph.observedProperty = 100;
+    assert.equal(ph.observedProperty, 100);
+    let afterSetStats = exports.getObserverStats();
+    
+    // Verify willSet and didSet were called
+    // The stats should show: willSet:1,didSet:1,willSetOld:777,willSetNew:100,didSetOld:777,didSetNew:100
+    assert(afterSetStats.includes("willSet:1"), `willSet should be called once, got: ${afterSetStats}`);
+    assert(afterSetStats.includes("didSet:1"), `didSet should be called once, got: ${afterSetStats}`);
+    assert(afterSetStats.includes("willSetOld:777"), `willSet should see old value 777, got: ${afterSetStats}`);
+    assert(afterSetStats.includes("willSetNew:100"), `willSet should see new value 100, got: ${afterSetStats}`);
+    assert(afterSetStats.includes("didSetOld:777"), `didSet should see old value 777, got: ${afterSetStats}`);
+    assert(afterSetStats.includes("didSetNew:100"), `didSet should see new value 100, got: ${afterSetStats}`);
+    
+    // Set property to a different value and verify observers are called again
+    ph.observedProperty = 200;
+    assert.equal(ph.observedProperty, 200);
+    let afterSecondSetStats = exports.getObserverStats();
+    
+    // Now should be: willSet:2,didSet:2,willSetOld:100,willSetNew:200,didSetOld:100,didSetNew:200
+    assert(afterSecondSetStats.includes("willSet:2"), `willSet should be called twice, got: ${afterSecondSetStats}`);
+    assert(afterSecondSetStats.includes("didSet:2"), `didSet should be called twice, got: ${afterSecondSetStats}`);
+    assert(afterSecondSetStats.includes("willSetOld:100"), `willSet should see old value 100 on second call, got: ${afterSecondSetStats}`);
+    assert(afterSecondSetStats.includes("willSetNew:200"), `willSet should see new value 200 on second call, got: ${afterSecondSetStats}`);
+    assert(afterSecondSetStats.includes("didSetOld:100"), `didSet should see old value 100 on second call, got: ${afterSecondSetStats}`);
+    assert(afterSecondSetStats.includes("didSetNew:200"), `didSet should see new value 200 on second call, got: ${afterSecondSetStats}`);
+
+    ph.release();
+    ph2.release();
 
     // Test class without @JS init constructor
     const calc = exports.createCalculator();

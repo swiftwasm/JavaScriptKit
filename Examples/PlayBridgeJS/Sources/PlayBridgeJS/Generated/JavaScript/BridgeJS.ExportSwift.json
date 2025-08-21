@@ -47,6 +47,9 @@
         }
       ],
       "name" : "PlayBridgeJS",
+      "properties" : [
+
+      ],
       "swiftCallName" : "PlayBridgeJS"
     },
     {
@@ -117,6 +120,9 @@
         }
       ],
       "name" : "PlayBridgeJSOutput",
+      "properties" : [
+
+      ],
       "swiftCallName" : "PlayBridgeJSOutput"
     }
   ],

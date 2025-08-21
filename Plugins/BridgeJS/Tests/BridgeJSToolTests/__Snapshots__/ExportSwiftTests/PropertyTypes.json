@@ -1,0 +1,334 @@
+{
+  "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_PropertyHolder_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "intValue",
+            "name" : "intValue",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "label" : "floatValue",
+            "name" : "floatValue",
+            "type" : {
+              "float" : {
+
+              }
+            }
+          },
+          {
+            "label" : "doubleValue",
+            "name" : "doubleValue",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "label" : "boolValue",
+            "name" : "boolValue",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "label" : "stringValue",
+            "name" : "stringValue",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "label" : "jsObject",
+            "name" : "jsObject",
+            "type" : {
+              "jsObject" : {
+
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_PropertyHolder_getAllValues",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "getAllValues",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "PropertyHolder",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "name" : "intValue",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "floatValue",
+          "type" : {
+            "float" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "doubleValue",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "boolValue",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "stringValue",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "name" : "readonlyInt",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "name" : "readonlyFloat",
+          "type" : {
+            "float" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "name" : "readonlyDouble",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "name" : "readonlyBool",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "name" : "readonlyString",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "jsObject",
+          "type" : {
+            "jsObject" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "sibling",
+          "type" : {
+            "swiftHeapObject" : {
+              "_0" : "PropertyHolder"
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "lazyValue",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "name" : "computedReadonly",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "computedReadWrite",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "observedProperty",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "PropertyHolder"
+    }
+  ],
+  "enums" : [
+
+  ],
+  "functions" : [
+    {
+      "abiName" : "bjs_createPropertyHolder",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "createPropertyHolder",
+      "parameters" : [
+        {
+          "label" : "intValue",
+          "name" : "intValue",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "label" : "floatValue",
+          "name" : "floatValue",
+          "type" : {
+            "float" : {
+
+            }
+          }
+        },
+        {
+          "label" : "doubleValue",
+          "name" : "doubleValue",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "label" : "boolValue",
+          "name" : "boolValue",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "label" : "stringValue",
+          "name" : "stringValue",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "label" : "jsObject",
+          "name" : "jsObject",
+          "type" : {
+            "jsObject" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "swiftHeapObject" : {
+          "_0" : "PropertyHolder"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testPropertyHolder",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "testPropertyHolder",
+      "parameters" : [
+        {
+          "label" : "holder",
+          "name" : "holder",
+          "type" : {
+            "swiftHeapObject" : {
+              "_0" : "PropertyHolder"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    }
+  ],
+  "moduleName" : "TestModule"
+}

@@ -41,6 +41,9 @@
       "namespace" : [
         "Utils"
       ],
+      "properties" : [
+
+      ],
       "swiftCallName" : "Utils.Converter"
     },
     {
@@ -84,6 +87,9 @@
       "namespace" : [
         "Networking",
         "API"
+      ],
+      "properties" : [
+
       ],
       "swiftCallName" : "Networking.API.HTTPServer"
     },
@@ -129,6 +135,9 @@
         "Networking",
         "APIV2",
         "Internal"
+      ],
+      "properties" : [
+
       ],
       "swiftCallName" : "Internal.TestServer"
     }

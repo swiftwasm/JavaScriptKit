@@ -1,5 +1,5 @@
 @JS class Greeter {
-    var name: String
+    @JS var name: String
 
     @JS init(name: String) {
         self.name = name
