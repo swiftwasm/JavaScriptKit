@@ -1,0 +1,201 @@
+{
+  "classes" : [
+
+  ],
+  "enums" : [
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "north"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "south"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "east"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "west"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Direction",
+      "swiftCallName" : "Direction"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "loading"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "error"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Status",
+      "swiftCallName" : "Status"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "north"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "south"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "east"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "west"
+        }
+      ],
+      "emitStyle" : "tsEnum",
+      "name" : "TSDirection",
+      "swiftCallName" : "TSDirection"
+    }
+  ],
+  "functions" : [
+    {
+      "abiName" : "bjs_setDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setDirection",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "direction",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "Direction"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getDirection",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "Direction"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_processDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "processDirection",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "Direction"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "Status"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setTSDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setTSDirection",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "direction",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "TSDirection"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getTSDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getTSDirection",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "TSDirection"
+        }
+      }
+    }
+  ],
+  "moduleName" : "TestModule"
+}

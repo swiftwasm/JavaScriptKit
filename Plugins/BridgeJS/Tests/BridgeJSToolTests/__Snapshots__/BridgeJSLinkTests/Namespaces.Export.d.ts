@@ -7,6 +7,11 @@
 export {};
 
 declare global {
+    namespace MyModule {
+        namespace Utils {
+            namespacedFunction(): string;
+        }
+    }
     namespace Utils {
         namespace Converters {
             class Converter {
@@ -24,11 +29,6 @@ declare global {
             class UUID {
                 uuidString(): string;
             }
-        }
-    }
-    namespace MyModule {
-        namespace Utils {
-            function namespacedFunction(): string;
         }
     }
 }

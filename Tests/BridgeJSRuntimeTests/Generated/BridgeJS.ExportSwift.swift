@@ -6,6 +6,144 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
+extension Direction {
+    init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .north
+        case 1:
+            self = .south
+        case 2:
+            self = .east
+        case 3:
+            self = .west
+        default:
+            return nil
+        }
+    }
+
+    var bridgeJSRawValue: Int32 {
+        switch self {
+        case .north:
+            return 0
+        case .south:
+            return 1
+        case .east:
+            return 2
+        case .west:
+            return 3
+        }
+    }
+}
+
+extension Status {
+    init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .loading
+        case 1:
+            self = .success
+        case 2:
+            self = .error
+        default:
+            return nil
+        }
+    }
+
+    var bridgeJSRawValue: Int32 {
+        switch self {
+        case .loading:
+            return 0
+        case .success:
+            return 1
+        case .error:
+            return 2
+        }
+    }
+}
+
+extension TSDirection {
+    init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .north
+        case 1:
+            self = .south
+        case 2:
+            self = .east
+        case 3:
+            self = .west
+        default:
+            return nil
+        }
+    }
+
+    var bridgeJSRawValue: Int32 {
+        switch self {
+        case .north:
+            return 0
+        case .south:
+            return 1
+        case .east:
+            return 2
+        case .west:
+            return 3
+        }
+    }
+}
+
+extension Networking.API.Method {
+    init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .get
+        case 1:
+            self = .post
+        case 2:
+            self = .put
+        case 3:
+            self = .delete
+        default:
+            return nil
+        }
+    }
+
+    var bridgeJSRawValue: Int32 {
+        switch self {
+        case .get:
+            return 0
+        case .post:
+            return 1
+        case .put:
+            return 2
+        case .delete:
+            return 3
+        }
+    }
+}
+
+extension Internal.SupportedMethod {
+    init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .get
+        case 1:
+            self = .post
+        default:
+            return nil
+        }
+    }
+
+    var bridgeJSRawValue: Int32 {
+        switch self {
+        case .get:
+            return 0
+        case .post:
+            return 1
+        }
+    }
+}
+
 @_expose(wasm, "bjs_roundTripVoid")
 @_cdecl("bjs_roundTripVoid")
 public func _bjs_roundTripVoid() -> Void {
@@ -477,6 +615,162 @@ public func _bjs_testSwiftClassAsJSValue(greeter: UnsafeMutableRawPointer) -> In
     #endif
 }
 
+@_expose(wasm, "bjs_setDirection")
+@_cdecl("bjs_setDirection")
+public func _bjs_setDirection(direction: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = setDirection(_: Direction(bridgeJSRawValue: direction)!)
+    return ret.bridgeJSRawValue
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_getDirection")
+@_cdecl("bjs_getDirection")
+public func _bjs_getDirection() -> Int32 {
+    #if arch(wasm32)
+    let ret = getDirection()
+    return ret.bridgeJSRawValue
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_processDirection")
+@_cdecl("bjs_processDirection")
+public func _bjs_processDirection(input: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = processDirection(_: Direction(bridgeJSRawValue: input)!)
+    return ret.bridgeJSRawValue
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_setTheme")
+@_cdecl("bjs_setTheme")
+public func _bjs_setTheme(themeBytes: Int32, themeLen: Int32) -> Void {
+    #if arch(wasm32)
+    let theme = String(unsafeUninitializedCapacity: Int(themeLen)) { b in
+        _swift_js_init_memory(themeBytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(themeLen)
+    }
+    let ret = setTheme(_: Theme(rawValue: theme)!)
+    var rawValue = ret.rawValue
+    return rawValue.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_getTheme")
+@_cdecl("bjs_getTheme")
+public func _bjs_getTheme() -> Void {
+    #if arch(wasm32)
+    let ret = getTheme()
+    var rawValue = ret.rawValue
+    return rawValue.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_setHttpStatus")
+@_cdecl("bjs_setHttpStatus")
+public func _bjs_setHttpStatus(status: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = setHttpStatus(_: HttpStatus(rawValue: Int(status))!)
+    return Int32(ret.rawValue)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_getHttpStatus")
+@_cdecl("bjs_getHttpStatus")
+public func _bjs_getHttpStatus() -> Int32 {
+    #if arch(wasm32)
+    let ret = getHttpStatus()
+    return Int32(ret.rawValue)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_processTheme")
+@_cdecl("bjs_processTheme")
+public func _bjs_processTheme(themeBytes: Int32, themeLen: Int32) -> Int32 {
+    #if arch(wasm32)
+    let theme = String(unsafeUninitializedCapacity: Int(themeLen)) { b in
+        _swift_js_init_memory(themeBytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(themeLen)
+    }
+    let ret = processTheme(_: Theme(rawValue: theme)!)
+    return Int32(ret.rawValue)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_setTSDirection")
+@_cdecl("bjs_setTSDirection")
+public func _bjs_setTSDirection(direction: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = setTSDirection(_: TSDirection(bridgeJSRawValue: direction)!)
+    return ret.bridgeJSRawValue
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_getTSDirection")
+@_cdecl("bjs_getTSDirection")
+public func _bjs_getTSDirection() -> Int32 {
+    #if arch(wasm32)
+    let ret = getTSDirection()
+    return ret.bridgeJSRawValue
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_setTSTheme")
+@_cdecl("bjs_setTSTheme")
+public func _bjs_setTSTheme(themeBytes: Int32, themeLen: Int32) -> Void {
+    #if arch(wasm32)
+    let theme = String(unsafeUninitializedCapacity: Int(themeLen)) { b in
+        _swift_js_init_memory(themeBytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(themeLen)
+    }
+    let ret = setTSTheme(_: TSTheme(rawValue: theme)!)
+    var rawValue = ret.rawValue
+    return rawValue.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_getTSTheme")
+@_cdecl("bjs_getTSTheme")
+public func _bjs_getTSTheme() -> Void {
+    #if arch(wasm32)
+    let ret = getTSTheme()
+    var rawValue = ret.rawValue
+    return rawValue.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_Greeter_init")
 @_cdecl("bjs_Greeter_init")
 public func _bjs_Greeter_init(nameBytes: Int32, nameLen: Int32) -> UnsafeMutableRawPointer {
@@ -566,5 +860,113 @@ extension Calculator: ConvertibleToJSValue {
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Calculator_wrap")
         func _bjs_Calculator_wrap(_: UnsafeMutableRawPointer) -> Int32
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Calculator_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+@_expose(wasm, "bjs_Converter_init")
+@_cdecl("bjs_Converter_init")
+public func _bjs_Converter_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = Utils.Converter()
+    return Unmanaged.passRetained(ret).toOpaque()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Converter_toString")
+@_cdecl("bjs_Converter_toString")
+public func _bjs_Converter_toString(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+    #if arch(wasm32)
+    var ret = Unmanaged<Utils.Converter>.fromOpaque(_self).takeUnretainedValue().toString(value: Int(value))
+    return ret.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Converter_deinit")
+@_cdecl("bjs_Converter_deinit")
+public func _bjs_Converter_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<Utils.Converter>.fromOpaque(pointer).release()
+}
+
+extension Utils.Converter: ConvertibleToJSValue {
+    var jsValue: JSValue {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Converter_wrap")
+        func _bjs_Converter_wrap(_: UnsafeMutableRawPointer) -> Int32
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_Converter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+@_expose(wasm, "bjs_HTTPServer_init")
+@_cdecl("bjs_HTTPServer_init")
+public func _bjs_HTTPServer_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = Networking.API.HTTPServer()
+    return Unmanaged.passRetained(ret).toOpaque()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_HTTPServer_call")
+@_cdecl("bjs_HTTPServer_call")
+public func _bjs_HTTPServer_call(_self: UnsafeMutableRawPointer, method: Int32) -> Void {
+    #if arch(wasm32)
+    Unmanaged<Networking.API.HTTPServer>.fromOpaque(_self).takeUnretainedValue().call(_: Networking.API.Method(bridgeJSRawValue: method)!)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_HTTPServer_deinit")
+@_cdecl("bjs_HTTPServer_deinit")
+public func _bjs_HTTPServer_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<Networking.API.HTTPServer>.fromOpaque(pointer).release()
+}
+
+extension Networking.API.HTTPServer: ConvertibleToJSValue {
+    var jsValue: JSValue {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_HTTPServer_wrap")
+        func _bjs_HTTPServer_wrap(_: UnsafeMutableRawPointer) -> Int32
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_HTTPServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+@_expose(wasm, "bjs_TestServer_init")
+@_cdecl("bjs_TestServer_init")
+public func _bjs_TestServer_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = Internal.TestServer()
+    return Unmanaged.passRetained(ret).toOpaque()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_TestServer_call")
+@_cdecl("bjs_TestServer_call")
+public func _bjs_TestServer_call(_self: UnsafeMutableRawPointer, method: Int32) -> Void {
+    #if arch(wasm32)
+    Unmanaged<Internal.TestServer>.fromOpaque(_self).takeUnretainedValue().call(_: Internal.SupportedMethod(bridgeJSRawValue: method)!)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_TestServer_deinit")
+@_cdecl("bjs_TestServer_deinit")
+public func _bjs_TestServer_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<Internal.TestServer>.fromOpaque(pointer).release()
+}
+
+extension Internal.TestServer: ConvertibleToJSValue {
+    var jsValue: JSValue {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_TestServer_wrap")
+        func _bjs_TestServer_wrap(_: UnsafeMutableRawPointer) -> Int32
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_TestServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }

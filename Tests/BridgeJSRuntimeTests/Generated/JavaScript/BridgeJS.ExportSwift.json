@@ -61,7 +61,8 @@
           }
         }
       ],
-      "name" : "Greeter"
+      "name" : "Greeter",
+      "swiftCallName" : "Greeter"
     },
     {
       "methods" : [
@@ -123,7 +124,454 @@
           }
         }
       ],
-      "name" : "Calculator"
+      "name" : "Calculator",
+      "swiftCallName" : "Calculator"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_Converter_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_Converter_toString",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "toString",
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "Converter",
+      "namespace" : [
+        "Utils"
+      ],
+      "swiftCallName" : "Utils.Converter"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_HTTPServer_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_HTTPServer_call",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "call",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "method",
+              "type" : {
+                "caseEnum" : {
+                  "_0" : "Networking.API.Method"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "HTTPServer",
+      "namespace" : [
+        "Networking",
+        "API"
+      ],
+      "swiftCallName" : "Networking.API.HTTPServer"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_TestServer_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_TestServer_call",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "call",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "method",
+              "type" : {
+                "caseEnum" : {
+                  "_0" : "Internal.SupportedMethod"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "TestServer",
+      "namespace" : [
+        "Networking",
+        "APIV2",
+        "Internal"
+      ],
+      "swiftCallName" : "Internal.TestServer"
+    }
+  ],
+  "enums" : [
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "north"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "south"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "east"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "west"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Direction",
+      "swiftCallName" : "Direction"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "loading"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "error"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Status",
+      "swiftCallName" : "Status"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "light",
+          "rawValue" : "light"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "dark",
+          "rawValue" : "dark"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "auto",
+          "rawValue" : "auto"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Theme",
+      "rawType" : "String",
+      "swiftCallName" : "Theme"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "ok",
+          "rawValue" : "200"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "notFound",
+          "rawValue" : "404"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "serverError",
+          "rawValue" : "500"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "HttpStatus",
+      "rawType" : "Int",
+      "swiftCallName" : "HttpStatus"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "north"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "south"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "east"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "west"
+        }
+      ],
+      "emitStyle" : "tsEnum",
+      "name" : "TSDirection",
+      "swiftCallName" : "TSDirection"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "light",
+          "rawValue" : "light"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "dark",
+          "rawValue" : "dark"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "auto",
+          "rawValue" : "auto"
+        }
+      ],
+      "emitStyle" : "tsEnum",
+      "name" : "TSTheme",
+      "rawType" : "String",
+      "swiftCallName" : "TSTheme"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Utils",
+      "swiftCallName" : "Utils"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "get"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "post"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "put"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "delete"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Method",
+      "namespace" : [
+        "Networking",
+        "API"
+      ],
+      "swiftCallName" : "Networking.API.Method"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "debug",
+          "rawValue" : "debug"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "info",
+          "rawValue" : "info"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "warning",
+          "rawValue" : "warning"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "error",
+          "rawValue" : "error"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "LogLevel",
+      "namespace" : [
+        "Configuration"
+      ],
+      "rawType" : "String",
+      "swiftCallName" : "Configuration.LogLevel"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "http",
+          "rawValue" : "80"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "https",
+          "rawValue" : "443"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "development",
+          "rawValue" : "3000"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Port",
+      "namespace" : [
+        "Configuration"
+      ],
+      "rawType" : "Int",
+      "swiftCallName" : "Configuration.Port"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "get"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "post"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "SupportedMethod",
+      "namespace" : [
+        "Networking",
+        "APIV2",
+        "Internal"
+      ],
+      "swiftCallName" : "Internal.SupportedMethod"
     }
   ],
   "functions" : [
@@ -775,6 +1223,265 @@
       "returnType" : {
         "jsObject" : {
 
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setDirection",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "direction",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "Direction"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "Direction"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getDirection",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "Direction"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_processDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "processDirection",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "Direction"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "Status"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setTheme",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "theme",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "Theme",
+              "_1" : "String"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "Theme",
+          "_1" : "String"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getTheme",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "Theme",
+          "_1" : "String"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setHttpStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setHttpStatus",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "status",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "HttpStatus",
+              "_1" : "Int"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "HttpStatus",
+          "_1" : "Int"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getHttpStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getHttpStatus",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "HttpStatus",
+          "_1" : "Int"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_processTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "processTheme",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "theme",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "Theme",
+              "_1" : "String"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "HttpStatus",
+          "_1" : "Int"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setTSDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setTSDirection",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "direction",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "TSDirection"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "TSDirection"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getTSDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getTSDirection",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "TSDirection"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setTSTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setTSTheme",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "theme",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "TSTheme",
+              "_1" : "String"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "TSTheme",
+          "_1" : "String"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getTSTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getTSTheme",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "TSTheme",
+          "_1" : "String"
         }
       }
     }

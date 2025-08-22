@@ -69,6 +69,11 @@ struct BridgeJSLink {
         var dtsClassLines: [String] = []
         var namespacedFunctions: [ExportedFunction] = []
         var namespacedClasses: [ExportedClass] = []
+        var namespacedEnums: [ExportedEnum] = []
+        var enumConstantLines: [String] = []
+        var dtsEnumLines: [String] = []
+        var topLevelEnumLines: [String] = []
+        var topLevelDtsEnumLines: [String] = []
 
         if exportedSkeletons.contains(where: { $0.classes.count > 0 }) {
             classLines.append(
@@ -93,6 +98,35 @@ struct BridgeJSLink {
 
                 if klass.namespace != nil {
                     namespacedClasses.append(klass)
+                }
+            }
+
+            if !skeleton.enums.isEmpty {
+                for enumDefinition in skeleton.enums {
+                    let (jsEnum, dtsEnum) = try renderExportedEnum(enumDefinition)
+
+                    switch enumDefinition.enumType {
+                    case .namespace:
+                        break
+                    case .simple, .rawValue:
+                        var exportedJsEnum = jsEnum
+                        if !exportedJsEnum.isEmpty && exportedJsEnum[0].hasPrefix("const ") {
+                            exportedJsEnum[0] = "export " + exportedJsEnum[0]
+                        }
+                        topLevelEnumLines.append(contentsOf: exportedJsEnum)
+                        topLevelDtsEnumLines.append(contentsOf: dtsEnum)
+
+                        if enumDefinition.namespace != nil {
+                            namespacedEnums.append(enumDefinition)
+                        }
+                    case .associatedValue:
+                        enumConstantLines.append(contentsOf: jsEnum)
+                        exportsLines.append("\(enumDefinition.name),")
+                        if enumDefinition.namespace != nil {
+                            namespacedEnums.append(enumDefinition)
+                        }
+                        dtsEnumLines.append(contentsOf: dtsEnum)
+                    }
                 }
             }
 
@@ -124,35 +158,62 @@ struct BridgeJSLink {
             importObjectBuilders.append(importObjectBuilder)
         }
 
-        let hasNamespacedItems = !namespacedFunctions.isEmpty || !namespacedClasses.isEmpty
+        let hasNamespacedItems = !namespacedFunctions.isEmpty || !namespacedClasses.isEmpty || !namespacedEnums.isEmpty
+
+        let namespaceBuilder = NamespaceBuilder()
+        let namespaceDeclarationsLines = namespaceBuilder.namespaceDeclarations(
+            exportedSkeletons: exportedSkeletons,
+            renderTSSignatureCallback: { parameters, returnType, effects in
+                self.renderTSSignature(parameters: parameters, returnType: returnType, effects: effects)
+            }
+        )
 
         let exportsSection: String
         if hasNamespacedItems {
-            let namespaceSetupCode = renderGlobalNamespace(
+            let namespacedEnumsForExports = namespacedEnums.filter { $0.enumType == .associatedValue }
+            let namespaceSetupCode = namespaceBuilder.renderGlobalNamespace(
                 namespacedFunctions: namespacedFunctions,
-                namespacedClasses: namespacedClasses
+                namespacedClasses: namespacedClasses,
+                namespacedEnums: namespacedEnumsForExports
             )
             .map { $0.indent(count: 12) }.joined(separator: "\n")
+
+            let enumSection =
+                enumConstantLines.isEmpty
+                ? "" : enumConstantLines.map { $0.indent(count: 12) }.joined(separator: "\n") + "\n"
+
             exportsSection = """
                 \(classLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
-                            const exports = {
+                \(enumSection)\("const exports = {".indent(count: 12))
                 \(exportsLines.map { $0.indent(count: 16) }.joined(separator: "\n"))
-                            };
+                \("};".indent(count: 12))
 
                 \(namespaceSetupCode)
 
-                            return exports;
+                \("return exports;".indent(count: 12))
                         },
                 """
         } else {
+            let enumSection =
+                enumConstantLines.isEmpty
+                ? "" : enumConstantLines.map { $0.indent(count: 12) }.joined(separator: "\n") + "\n"
+
             exportsSection = """
                 \(classLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
-                            return {
+                \(enumSection)\("return {".indent(count: 12))
                 \(exportsLines.map { $0.indent(count: 16) }.joined(separator: "\n"))
-                            };
+                \("};".indent(count: 12))
                         },
                 """
         }
+
+        let topLevelEnumsSection = topLevelEnumLines.isEmpty ? "" : topLevelEnumLines.joined(separator: "\n") + "\n\n"
+
+        let topLevelNamespaceCode = namespaceBuilder.renderTopLevelEnumNamespaceAssignments(
+            namespacedEnums: namespacedEnums
+        )
+        let namespaceAssignmentsSection =
+            topLevelNamespaceCode.isEmpty ? "" : topLevelNamespaceCode.joined(separator: "\n") + "\n\n"
 
         let outputJs = """
             // NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
@@ -161,7 +222,7 @@ struct BridgeJSLink {
             // To update this file, just rebuild your project or run
             // `swift package bridge-js`.
 
-            export async function createInstantiator(options, swift) {
+            \(topLevelEnumsSection)\(namespaceAssignmentsSection)export async function createInstantiator(options, swift) {
                 let instance;
                 let memory;
                 let setException;
@@ -225,8 +286,9 @@ struct BridgeJSLink {
             """
 
         var dtsLines: [String] = []
-        dtsLines.append(contentsOf: namespaceDeclarations())
+        dtsLines.append(contentsOf: namespaceDeclarationsLines)
         dtsLines.append(contentsOf: dtsClassLines)
+        dtsLines.append(contentsOf: dtsEnumLines)
         dtsLines.append(contentsOf: generateImportedTypeDefinitions())
         dtsLines.append("export type Exports = {")
         dtsLines.append(contentsOf: dtsExportLines.map { $0.indent(count: 4) })
@@ -234,6 +296,9 @@ struct BridgeJSLink {
         dtsLines.append("export type Imports = {")
         dtsLines.append(contentsOf: importObjectBuilders.flatMap { $0.dtsImportLines }.map { $0.indent(count: 4) })
         dtsLines.append("}")
+        let topLevelDtsEnumsSection =
+            topLevelDtsEnumLines.isEmpty ? "" : topLevelDtsEnumLines.joined(separator: "\n") + "\n"
+
         let outputDts = """
             // NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
             // DO NOT EDIT.
@@ -241,7 +306,7 @@ struct BridgeJSLink {
             // To update this file, just rebuild your project or run
             // `swift package bridge-js`.
 
-            \(dtsLines.joined(separator: "\n"))
+            \(topLevelDtsEnumsSection)\(dtsLines.joined(separator: "\n"))
             export function createInstantiator(options: {
                 imports: Imports;
             }, swift: any): Promise<{
@@ -318,102 +383,6 @@ struct BridgeJSLink {
         return typeDefinitions
     }
 
-    private func namespaceDeclarations() -> [String] {
-        var dtsLines: [String] = []
-        var namespaceFunctions: [String: [ExportedFunction]] = [:]
-        var namespaceClasses: [String: [ExportedClass]] = [:]
-
-        for skeleton in exportedSkeletons {
-            for function in skeleton.functions {
-                if let namespace = function.namespace {
-                    let namespaceKey = namespace.joined(separator: ".")
-                    if namespaceFunctions[namespaceKey] == nil {
-                        namespaceFunctions[namespaceKey] = []
-                    }
-                    namespaceFunctions[namespaceKey]?.append(function)
-                }
-            }
-
-            for klass in skeleton.classes {
-                if let classNamespace = klass.namespace {
-                    let namespaceKey = classNamespace.joined(separator: ".")
-                    if namespaceClasses[namespaceKey] == nil {
-                        namespaceClasses[namespaceKey] = []
-                    }
-                    namespaceClasses[namespaceKey]?.append(klass)
-                }
-            }
-        }
-
-        guard !namespaceFunctions.isEmpty || !namespaceClasses.isEmpty else { return dtsLines }
-
-        dtsLines.append("export {};")
-        dtsLines.append("")
-        dtsLines.append("declare global {")
-
-        let identBaseSize = 4
-
-        for (namespacePath, classes) in namespaceClasses.sorted(by: { $0.key < $1.key }) {
-            let parts = namespacePath.split(separator: ".").map(String.init)
-
-            for i in 0..<parts.count {
-                dtsLines.append("namespace \(parts[i]) {".indent(count: identBaseSize * (i + 1)))
-            }
-
-            for klass in classes {
-                dtsLines.append("class \(klass.name) {".indent(count: identBaseSize * (parts.count + 1)))
-
-                if let constructor = klass.constructor {
-                    let constructorSignature =
-                        "constructor(\(constructor.parameters.map { "\($0.name): \($0.type.tsType)" }.joined(separator: ", ")));"
-                    dtsLines.append("\(constructorSignature)".indent(count: identBaseSize * (parts.count + 2)))
-                }
-
-                for method in klass.methods {
-                    let methodSignature =
-                        "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
-                    dtsLines.append("\(methodSignature)".indent(count: identBaseSize * (parts.count + 2)))
-                }
-
-                dtsLines.append("}".indent(count: identBaseSize * (parts.count + 1)))
-            }
-
-            for i in (0..<parts.count).reversed() {
-                dtsLines.append("}".indent(count: identBaseSize * (i + 1)))
-            }
-        }
-
-        for (namespacePath, functions) in namespaceFunctions.sorted(by: { $0.key < $1.key }) {
-            let parts = namespacePath.split(separator: ".").map(String.init)
-
-            var namespaceExists = false
-            if namespaceClasses[namespacePath] != nil {
-                namespaceExists = true
-            } else {
-                for i in 0..<parts.count {
-                    dtsLines.append("namespace \(parts[i]) {".indent(count: identBaseSize * (i + 1)))
-                }
-            }
-
-            for function in functions {
-                let signature =
-                    "function \(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
-                dtsLines.append("\(signature)".indent(count: identBaseSize * (parts.count + 1)))
-            }
-
-            if !namespaceExists {
-                for i in (0..<parts.count).reversed() {
-                    dtsLines.append("}".indent(count: identBaseSize * (i + 1)))
-                }
-            }
-        }
-
-        dtsLines.append("}")
-        dtsLines.append("")
-
-        return dtsLines
-    }
-
     class ExportedThunkBuilder {
         var bodyLines: [String] = []
         var cleanupLines: [String] = []
@@ -437,6 +406,28 @@ struct BridgeJSLink {
                 cleanupLines.append("swift.memory.release(\(bytesIdLabel));")
                 parameterForwardings.append(bytesIdLabel)
                 parameterForwardings.append("\(bytesLabel).length")
+            case .caseEnum(_):
+                parameterForwardings.append("\(param.name) | 0")
+            case .rawValueEnum(_, let rawType):
+                switch rawType {
+                case .string:
+                    let bytesLabel = "\(param.name)Bytes"
+                    let bytesIdLabel = "\(param.name)Id"
+                    bodyLines.append("const \(bytesLabel) = textEncoder.encode(\(param.name));")
+                    bodyLines.append("const \(bytesIdLabel) = swift.memory.retain(\(bytesLabel));")
+                    cleanupLines.append("swift.memory.release(\(bytesIdLabel));")
+                    parameterForwardings.append(bytesIdLabel)
+                    parameterForwardings.append("\(bytesLabel).length")
+                case .bool:
+                    parameterForwardings.append("\(param.name) ? 1 : 0")
+                default:
+                    parameterForwardings.append("\(param.name)")
+                }
+            case .associatedValueEnum:
+                parameterForwardings.append("0")
+                parameterForwardings.append("0")
+            case .namespaceEnum:
+                break
             case .jsObject:
                 parameterForwardings.append("swift.memory.retain(\(param.name))")
             case .swiftHeapObject:
@@ -468,6 +459,28 @@ struct BridgeJSLink {
                 bodyLines.append("const ret = tmpRetString;")
                 bodyLines.append("tmpRetString = undefined;")
                 returnExpr = "ret"
+            case .caseEnum(_):
+                bodyLines.append("const ret = \(call);")
+                returnExpr = "ret"
+            case .rawValueEnum(_, let rawType):
+                switch rawType {
+                case .string:
+                    bodyLines.append("\(call);")
+                    bodyLines.append("const ret = tmpRetString;")
+                    bodyLines.append("tmpRetString = undefined;")
+                    returnExpr = "ret"
+                case .bool:
+                    bodyLines.append("const ret = \(call);")
+                    returnExpr = "ret !== 0"
+                default:
+                    bodyLines.append("const ret = \(call);")
+                    returnExpr = "ret"
+                }
+            case .associatedValueEnum:
+                bodyLines.append("\(call);")
+                returnExpr = "\"\""
+            case .namespaceEnum:
+                break
             case .int, .float, .double:
                 bodyLines.append("const ret = \(call);")
                 returnExpr = "ret"
@@ -539,6 +552,131 @@ struct BridgeJSLink {
         }
         return
             "(\(parameters.map { "\($0.name): \($0.type.tsType)" }.joined(separator: ", "))): \(returnTypeWithEffect)"
+    }
+
+    func renderExportedEnum(_ enumDefinition: ExportedEnum) throws -> (js: [String], dts: [String]) {
+        var jsLines: [String] = []
+        var dtsLines: [String] = []
+        let style: EnumEmitStyle = enumDefinition.emitStyle
+
+        switch enumDefinition.enumType {
+        case .simple:
+            jsLines.append("const \(enumDefinition.name) = {")
+            for (index, enumCase) in enumDefinition.cases.enumerated() {
+                let caseName = enumCase.name.capitalizedFirstLetter
+                jsLines.append("\(caseName): \(index),".indent(count: 4))
+            }
+            jsLines.append("};")
+            jsLines.append("")
+
+            if enumDefinition.namespace == nil {
+                switch style {
+                case .tsEnum:
+                    dtsLines.append("export enum \(enumDefinition.name) {")
+                    for (index, enumCase) in enumDefinition.cases.enumerated() {
+                        let caseName = enumCase.name.capitalizedFirstLetter
+                        dtsLines.append("\(caseName) = \(index),".indent(count: 4))
+                    }
+                    dtsLines.append("}")
+                    dtsLines.append("")
+                case .const:
+                    dtsLines.append("export const \(enumDefinition.name): {")
+                    for (index, enumCase) in enumDefinition.cases.enumerated() {
+                        let caseName = enumCase.name.capitalizedFirstLetter
+                        dtsLines.append("readonly \(caseName): \(index);".indent(count: 4))
+                    }
+                    dtsLines.append("};")
+                    dtsLines.append(
+                        "export type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                    )
+                    dtsLines.append("")
+                }
+            }
+        case .rawValue:
+            guard let rawType = enumDefinition.rawType else {
+                throw BridgeJSLinkError(message: "Raw value enum \(enumDefinition.name) is missing rawType")
+            }
+
+            jsLines.append("const \(enumDefinition.name) = {")
+            for enumCase in enumDefinition.cases {
+                let caseName = enumCase.name.capitalizedFirstLetter
+                let rawValue = enumCase.rawValue ?? enumCase.name
+                let formattedValue: String
+
+                if let rawTypeEnum = SwiftEnumRawType.from(rawType) {
+                    switch rawTypeEnum {
+                    case .string:
+                        formattedValue = "\"\(rawValue)\""
+                    case .bool:
+                        formattedValue = rawValue.lowercased() == "true" ? "true" : "false"
+                    case .float, .double:
+                        formattedValue = rawValue
+                    default:
+                        formattedValue = rawValue
+                    }
+                } else {
+                    formattedValue = rawValue
+                }
+
+                jsLines.append("\(caseName): \(formattedValue),".indent(count: 4))
+            }
+            jsLines.append("};")
+            jsLines.append("")
+
+            if enumDefinition.namespace == nil {
+                switch style {
+                case .tsEnum:
+                    dtsLines.append("export enum \(enumDefinition.name) {")
+                    for enumCase in enumDefinition.cases {
+                        let caseName = enumCase.name.capitalizedFirstLetter
+                        let rawValue = enumCase.rawValue ?? enumCase.name
+                        let formattedValue: String
+                        switch rawType {
+                        case "String": formattedValue = "\"\(rawValue)\""
+                        case "Bool": formattedValue = rawValue.lowercased() == "true" ? "true" : "false"
+                        case "Float", "Double": formattedValue = rawValue
+                        default: formattedValue = rawValue
+                        }
+                        dtsLines.append("\(caseName) = \(formattedValue),".indent(count: 4))
+                    }
+                    dtsLines.append("}")
+                    dtsLines.append("")
+                case .const:
+                    dtsLines.append("export const \(enumDefinition.name): {")
+                    for enumCase in enumDefinition.cases {
+                        let caseName = enumCase.name.capitalizedFirstLetter
+                        let rawValue = enumCase.rawValue ?? enumCase.name
+                        let formattedValue: String
+
+                        switch rawType {
+                        case "String":
+                            formattedValue = "\"\(rawValue)\""
+                        case "Bool":
+                            formattedValue = rawValue.lowercased() == "true" ? "true" : "false"
+                        case "Float", "Double":
+                            formattedValue = rawValue
+                        default:
+                            formattedValue = rawValue
+                        }
+
+                        dtsLines.append("readonly \(caseName): \(formattedValue);".indent(count: 4))
+                    }
+                    dtsLines.append("};")
+                    dtsLines.append(
+                        "export type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                    )
+                    dtsLines.append("")
+                }
+            }
+
+        case .associatedValue:
+            jsLines.append("// TODO: Implement \(enumDefinition.enumType) enum: \(enumDefinition.name)")
+            dtsLines.append("// TODO: Implement \(enumDefinition.enumType) enum: \(enumDefinition.name)")
+        case .namespace:
+            break
+        }
+
+        return (jsLines, dtsLines)
     }
 
     func renderExportedFunction(function: ExportedFunction) -> (js: [String], dts: [String]) {
@@ -633,8 +771,11 @@ struct BridgeJSLink {
         return (jsLines, dtsTypeLines, dtsExportEntryLines)
     }
 
-    func renderGlobalNamespace(namespacedFunctions: [ExportedFunction], namespacedClasses: [ExportedClass]) -> [String]
-    {
+    func renderGlobalNamespace(
+        namespacedFunctions: [ExportedFunction],
+        namespacedClasses: [ExportedClass],
+        namespacedEnums: [ExportedEnum]
+    ) -> [String] {
         var lines: [String] = []
         var uniqueNamespaces: [String] = []
         var seen = Set<String>()
@@ -647,10 +788,15 @@ struct BridgeJSLink {
             namespacedClasses
                 .compactMap { $0.namespace }
         )
+        let enumNamespacePaths: Set<[String]> = Set(
+            namespacedEnums
+                .compactMap { $0.namespace }
+        )
 
         let allNamespacePaths =
             functionNamespacePaths
             .union(classNamespacePaths)
+            .union(enumNamespacePaths)
 
         allNamespacePaths.forEach { namespacePath in
             namespacePath.makeIterator().enumerated().forEach { (index, _) in
@@ -663,13 +809,20 @@ struct BridgeJSLink {
 
         uniqueNamespaces.sorted().forEach { namespace in
             lines.append("if (typeof globalThis.\(namespace) === 'undefined') {")
-            lines.append("    globalThis.\(namespace) = {};")
+            lines.append("globalThis.\(namespace) = {};".indent(count: 4))
             lines.append("}")
         }
 
         namespacedClasses.forEach { klass in
             let namespacePath: String = klass.namespace?.joined(separator: ".") ?? ""
             lines.append("globalThis.\(namespacePath).\(klass.name) = exports.\(klass.name);")
+        }
+
+        namespacedEnums.forEach { enumDefinition in
+            if enumDefinition.enumType == .associatedValue {
+                let namespacePath: String = enumDefinition.namespace?.joined(separator: ".") ?? ""
+                lines.append("globalThis.\(namespacePath).\(enumDefinition.name) = exports.\(enumDefinition.name);")
+            }
         }
 
         namespacedFunctions.forEach { function in
@@ -698,6 +851,24 @@ struct BridgeJSLink {
                 bodyLines.append("const \(stringObjectName) = swift.memory.getObject(\(param.name));")
                 bodyLines.append("swift.memory.release(\(param.name));")
                 parameterForwardings.append(stringObjectName)
+            case .caseEnum(_):
+                parameterForwardings.append(param.name)
+            case .rawValueEnum(_, let rawType):
+                switch rawType {
+                case .string:
+                    let stringObjectName = "\(param.name)Object"
+                    bodyLines.append("const \(stringObjectName) = swift.memory.getObject(\(param.name));")
+                    bodyLines.append("swift.memory.release(\(param.name));")
+                    parameterForwardings.append(stringObjectName)
+                case .bool:
+                    parameterForwardings.append("\(param.name) !== 0")
+                default:
+                    parameterForwardings.append(param.name)
+                }
+            case .associatedValueEnum:
+                parameterForwardings.append("\"\"")
+            case .namespaceEnum:
+                break
             case .jsObject:
                 parameterForwardings.append("swift.memory.getObject(\(param.name))")
             default:
@@ -769,6 +940,22 @@ struct BridgeJSLink {
             case .string:
                 bodyLines.append("tmpRetBytes = textEncoder.encode(ret);")
                 return "tmpRetBytes.length"
+            case .caseEnum(_):
+                return "ret"
+            case .rawValueEnum(_, let rawType):
+                switch rawType {
+                case .string:
+                    bodyLines.append("tmpRetBytes = textEncoder.encode(ret);")
+                    return "tmpRetBytes.length"
+                case .bool:
+                    return "ret ? 1 : 0"
+                default:
+                    return "ret"
+                }
+            case .associatedValueEnum:
+                return nil
+            case .namespaceEnum:
+                return nil
             case .int, .float, .double:
                 return "ret"
             case .bool:
@@ -801,6 +988,351 @@ struct BridgeJSLink {
 
         func appendDts(_ lines: [String]) {
             dtsImportLines.append(contentsOf: lines)
+        }
+    }
+
+    struct NamespaceBuilder {
+
+        /// Generates JavaScript code for setting up global namespace structure
+        ///
+        /// This function creates the necessary JavaScript code to properly expose namespaced
+        /// functions, classes, and enums on the global object (globalThis). It ensures that
+        /// nested namespace paths are created correctly and that all exported items are
+        /// accessible through their full namespace paths.
+        ///
+        /// For example, if you have @JS("Utils.Math") func add() it will generate code that
+        /// makes globalThis.Utils.Math.add accessible.
+        ///
+        /// - Parameters:
+        ///   - namespacedFunctions: Functions annotated with @JS("namespace.path")
+        ///   - namespacedClasses: Classes annotated with @JS("namespace.path")
+        ///   - namespacedEnums: Enums annotated with @JS("namespace.path")
+        /// - Returns: Array of JavaScript code lines that set up the global namespace structure
+        func renderGlobalNamespace(
+            namespacedFunctions: [ExportedFunction],
+            namespacedClasses: [ExportedClass],
+            namespacedEnums: [ExportedEnum]
+        ) -> [String] {
+            var lines: [String] = []
+            var uniqueNamespaces: [String] = []
+            var seen = Set<String>()
+
+            let functionNamespacePaths: Set<[String]> = Set(
+                namespacedFunctions
+                    .compactMap { $0.namespace }
+            )
+            let classNamespacePaths: Set<[String]> = Set(
+                namespacedClasses
+                    .compactMap { $0.namespace }
+            )
+            let enumNamespacePaths: Set<[String]> = Set(
+                namespacedEnums
+                    .compactMap { $0.namespace }
+            )
+
+            let allNamespacePaths =
+                functionNamespacePaths
+                .union(classNamespacePaths)
+                .union(enumNamespacePaths)
+
+            allNamespacePaths.forEach { namespacePath in
+                namespacePath.makeIterator().enumerated().forEach { (index, _) in
+                    let path = namespacePath[0...index].joined(separator: ".")
+                    if seen.insert(path).inserted {
+                        uniqueNamespaces.append(path)
+                    }
+                }
+            }
+
+            uniqueNamespaces.sorted().forEach { namespace in
+                lines.append("if (typeof globalThis.\(namespace) === 'undefined') {")
+                lines.append("globalThis.\(namespace) = {};".indent(count: 4))
+                lines.append("}")
+            }
+
+            namespacedClasses.forEach { klass in
+                let namespacePath: String = klass.namespace?.joined(separator: ".") ?? ""
+                lines.append("globalThis.\(namespacePath).\(klass.name) = exports.\(klass.name);")
+            }
+
+            namespacedEnums.forEach { enumDefinition in
+                let namespacePath: String = enumDefinition.namespace?.joined(separator: ".") ?? ""
+                lines.append("globalThis.\(namespacePath).\(enumDefinition.name) = exports.\(enumDefinition.name);")
+            }
+
+            namespacedFunctions.forEach { function in
+                let namespacePath: String = function.namespace?.joined(separator: ".") ?? ""
+                lines.append("globalThis.\(namespacePath).\(function.name) = exports.\(function.name);")
+            }
+
+            return lines
+        }
+
+        func renderTopLevelEnumNamespaceAssignments(namespacedEnums: [ExportedEnum]) -> [String] {
+            let topLevelNamespacedEnums = namespacedEnums.filter { $0.enumType == .simple || $0.enumType == .rawValue }
+
+            guard !topLevelNamespacedEnums.isEmpty else { return [] }
+
+            var lines: [String] = []
+            var uniqueNamespaces: [String] = []
+            var seen = Set<String>()
+
+            for enumDef in topLevelNamespacedEnums {
+                guard let namespacePath = enumDef.namespace else { continue }
+                namespacePath.enumerated().forEach { (index, _) in
+                    let path = namespacePath[0...index].joined(separator: ".")
+                    if !seen.contains(path) {
+                        seen.insert(path)
+                        uniqueNamespaces.append(path)
+                    }
+                }
+            }
+
+            for namespace in uniqueNamespaces {
+                lines.append("if (typeof globalThis.\(namespace) === 'undefined') {")
+                lines.append("globalThis.\(namespace) = {};".indent(count: 4))
+                lines.append("}")
+            }
+
+            if !lines.isEmpty {
+                lines.append("")
+            }
+
+            for enumDef in topLevelNamespacedEnums {
+                let namespacePath = enumDef.namespace?.joined(separator: ".") ?? ""
+                lines.append("globalThis.\(namespacePath).\(enumDef.name) = \(enumDef.name);")
+            }
+
+            return lines
+        }
+
+        private struct NamespaceContent {
+            var functions: [ExportedFunction] = []
+            var classes: [ExportedClass] = []
+            var enums: [ExportedEnum] = []
+        }
+
+        private final class NamespaceNode {
+            let name: String
+            var children: [String: NamespaceNode] = [:]
+            var content: NamespaceContent = NamespaceContent()
+
+            init(name: String) {
+                self.name = name
+            }
+
+            func addChild(_ childName: String) -> NamespaceNode {
+                if let existing = children[childName] {
+                    return existing
+                }
+                let newChild = NamespaceNode(name: childName)
+                children[childName] = newChild
+                return newChild
+            }
+        }
+
+        /// Generates TypeScript declarations for all namespaces
+        ///
+        /// This function enables properly grouping all Swift code within given namespaces
+        /// regardless of location in Swift input files. It uses a tree-based structure to
+        /// properly create unique namespace declarations that avoid namespace duplication in TS and generate
+        /// predictable declarations in sorted order.
+        ///
+        /// The function collects all namespaced items (functions, classes, enums) from the
+        /// exported skeletons and builds a hierarchical namespace tree. It then traverses
+        /// this tree to generate TypeScript namespace declarations that mirror the Swift
+        /// namespace structure.
+        /// - Parameters:
+        ///   - exportedSkeletons: Exported Swift structures to generate namespaces for
+        ///   - renderTSSignatureCallback: closure to generate TS signature that aligns with rest of codebase
+        /// - Returns: Array of TypeScript declaration lines defining the global namespace structure
+        func namespaceDeclarations(
+            exportedSkeletons: [ExportedSkeleton],
+            renderTSSignatureCallback: @escaping ([Parameter], BridgeType, Effects) -> String
+        ) -> [String] {
+            var dtsLines: [String] = []
+
+            let rootNode = NamespaceNode(name: "")
+
+            for skeleton in exportedSkeletons {
+                for function in skeleton.functions {
+                    if let namespace = function.namespace {
+                        var currentNode = rootNode
+                        for part in namespace {
+                            currentNode = currentNode.addChild(part)
+                        }
+                        currentNode.content.functions.append(function)
+                    }
+                }
+
+                for klass in skeleton.classes {
+                    if let classNamespace = klass.namespace {
+                        var currentNode = rootNode
+                        for part in classNamespace {
+                            currentNode = currentNode.addChild(part)
+                        }
+                        currentNode.content.classes.append(klass)
+                    }
+                }
+
+                for enumDefinition in skeleton.enums {
+                    if let enumNamespace = enumDefinition.namespace, enumDefinition.enumType != .namespace {
+                        var currentNode = rootNode
+                        for part in enumNamespace {
+                            currentNode = currentNode.addChild(part)
+                        }
+                        currentNode.content.enums.append(enumDefinition)
+                    }
+                }
+            }
+
+            guard !rootNode.children.isEmpty else {
+                return dtsLines
+            }
+
+            dtsLines.append("export {};")
+            dtsLines.append("")
+            dtsLines.append("declare global {")
+
+            let identBaseSize = 4
+
+            func generateNamespaceDeclarations(node: NamespaceNode, depth: Int) {
+                let sortedChildren = node.children.sorted { $0.key < $1.key }
+
+                for (childName, childNode) in sortedChildren {
+                    dtsLines.append("namespace \(childName) {".indent(count: identBaseSize * depth))
+
+                    let contentDepth = depth + 1
+
+                    let sortedClasses = childNode.content.classes.sorted { $0.name < $1.name }
+                    for klass in sortedClasses {
+                        dtsLines.append("class \(klass.name) {".indent(count: identBaseSize * contentDepth))
+
+                        if let constructor = klass.constructor {
+                            let constructorSignature =
+                                "constructor(\(constructor.parameters.map { "\($0.name): \($0.type.tsType)" }.joined(separator: ", ")));"
+                            dtsLines.append("\(constructorSignature)".indent(count: identBaseSize * (contentDepth + 1)))
+                        }
+
+                        let sortedMethods = klass.methods.sorted { $0.name < $1.name }
+                        for method in sortedMethods {
+                            let methodSignature =
+                                "\(method.name)\(renderTSSignatureCallback(method.parameters, method.returnType, method.effects));"
+                            dtsLines.append("\(methodSignature)".indent(count: identBaseSize * (contentDepth + 1)))
+                        }
+
+                        dtsLines.append("}".indent(count: identBaseSize * contentDepth))
+                    }
+
+                    let sortedEnums = childNode.content.enums.sorted { $0.name < $1.name }
+                    for enumDefinition in sortedEnums {
+                        let style: EnumEmitStyle = enumDefinition.emitStyle
+                        switch enumDefinition.enumType {
+                        case .simple:
+                            switch style {
+                            case .tsEnum:
+                                dtsLines.append(
+                                    "enum \(enumDefinition.name) {".indent(count: identBaseSize * contentDepth)
+                                )
+                                for (index, enumCase) in enumDefinition.cases.enumerated() {
+                                    let caseName = enumCase.name.capitalizedFirstLetter
+                                    dtsLines.append(
+                                        "\(caseName) = \(index),".indent(count: identBaseSize * (contentDepth + 1))
+                                    )
+                                }
+                                dtsLines.append("}".indent(count: identBaseSize * contentDepth))
+                            case .const:
+                                dtsLines.append(
+                                    "const \(enumDefinition.name): {".indent(count: identBaseSize * contentDepth)
+                                )
+                                for (index, enumCase) in enumDefinition.cases.enumerated() {
+                                    let caseName = enumCase.name.capitalizedFirstLetter
+                                    dtsLines.append(
+                                        "readonly \(caseName): \(index);".indent(
+                                            count: identBaseSize * (contentDepth + 1)
+                                        )
+                                    )
+                                }
+                                dtsLines.append("};".indent(count: identBaseSize * contentDepth))
+                                dtsLines.append(
+                                    "type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                                        .indent(count: identBaseSize * contentDepth)
+                                )
+                            }
+                        case .rawValue:
+                            guard let rawType = enumDefinition.rawType else { continue }
+                            switch style {
+                            case .tsEnum:
+                                dtsLines.append(
+                                    "enum \(enumDefinition.name) {".indent(count: identBaseSize * contentDepth)
+                                )
+                                for enumCase in enumDefinition.cases {
+                                    let caseName = enumCase.name.capitalizedFirstLetter
+                                    let rawValue = enumCase.rawValue ?? enumCase.name
+                                    let formattedValue: String
+                                    switch rawType {
+                                    case "String": formattedValue = "\"\(rawValue)\""
+                                    case "Bool": formattedValue = rawValue.lowercased() == "true" ? "true" : "false"
+                                    case "Float", "Double": formattedValue = rawValue
+                                    default: formattedValue = rawValue
+                                    }
+                                    dtsLines.append(
+                                        "\(caseName) = \(formattedValue),".indent(
+                                            count: identBaseSize * (contentDepth + 1)
+                                        )
+                                    )
+                                }
+                                dtsLines.append("}".indent(count: identBaseSize * contentDepth))
+                            case .const:
+                                dtsLines.append(
+                                    "const \(enumDefinition.name): {".indent(count: identBaseSize * contentDepth)
+                                )
+                                for enumCase in enumDefinition.cases {
+                                    let caseName = enumCase.name.capitalizedFirstLetter
+                                    let rawValue = enumCase.rawValue ?? enumCase.name
+                                    let formattedValue: String
+                                    switch rawType {
+                                    case "String": formattedValue = "\"\(rawValue)\""
+                                    case "Bool": formattedValue = rawValue.lowercased() == "true" ? "true" : "false"
+                                    case "Float", "Double": formattedValue = rawValue
+                                    default: formattedValue = rawValue
+                                    }
+                                    dtsLines.append(
+                                        "readonly \(caseName): \(formattedValue);".indent(
+                                            count: identBaseSize * (contentDepth + 1)
+                                        )
+                                    )
+                                }
+                                dtsLines.append("};".indent(count: identBaseSize * contentDepth))
+                                dtsLines.append(
+                                    "type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                                        .indent(count: identBaseSize * contentDepth)
+                                )
+                            }
+                        case .associatedValue, .namespace:
+                            continue
+                        }
+                    }
+
+                    let sortedFunctions = childNode.content.functions.sorted { $0.name < $1.name }
+                    for function in sortedFunctions {
+                        let signature =
+                            "\(function.name)\(renderTSSignatureCallback(function.parameters, function.returnType, function.effects));"
+                        dtsLines.append("\(signature)".indent(count: identBaseSize * contentDepth))
+                    }
+
+                    generateNamespaceDeclarations(node: childNode, depth: contentDepth)
+
+                    dtsLines.append("}".indent(count: identBaseSize * depth))
+                }
+            }
+
+            generateNamespaceDeclarations(node: rootNode, depth: 1)
+
+            dtsLines.append("}")
+            dtsLines.append("")
+
+            return dtsLines
         }
     }
 
@@ -949,6 +1481,13 @@ extension String {
     }
 }
 
+fileprivate extension String {
+    var capitalizedFirstLetter: String {
+        guard !isEmpty else { return self }
+        return prefix(1).uppercased() + dropFirst()
+    }
+}
+
 extension BridgeType {
     var tsType: String {
         switch self {
@@ -967,6 +1506,14 @@ extension BridgeType {
         case .jsObject(let name):
             return name ?? "any"
         case .swiftHeapObject(let name):
+            return name
+        case .caseEnum(let name):
+            return name
+        case .rawValueEnum(let name, _):
+            return name
+        case .associatedValueEnum(let name):
+            return name
+        case .namespaceEnum(let name):
             return name
         }
     }

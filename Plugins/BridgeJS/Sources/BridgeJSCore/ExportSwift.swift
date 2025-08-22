@@ -20,6 +20,7 @@ public class ExportSwift {
 
     private var exportedFunctions: [ExportedFunction] = []
     private var exportedClasses: [ExportedClass] = []
+    private var exportedEnums: [ExportedEnum] = []
     private var typeDeclResolver: TypeDeclResolver = TypeDeclResolver()
 
     public init(progress: ProgressReporting, moduleName: String) {
@@ -58,7 +59,8 @@ public class ExportSwift {
             outputSkeleton: ExportedSkeleton(
                 moduleName: moduleName,
                 functions: exportedFunctions,
-                classes: exportedClasses
+                classes: exportedClasses,
+                enums: exportedEnums
             )
         )
     }
@@ -68,11 +70,32 @@ public class ExportSwift {
         /// The names of the exported classes, in the order they were written in the source file
         var exportedClassNames: [String] = []
         var exportedClassByName: [String: ExportedClass] = [:]
+        /// The names of the exported enums, in the order they were written in the source file
+        var exportedEnumNames: [String] = []
+        var exportedEnumByName: [String: ExportedEnum] = [:]
         var errors: [DiagnosticError] = []
+
+        /// Creates a unique key for a class by combining name and namespace
+        private func classKey(name: String, namespace: [String]?) -> String {
+            if let namespace = namespace, !namespace.isEmpty {
+                return "\(namespace.joined(separator: ".")).\(name)"
+            } else {
+                return name
+            }
+        }
+
+        /// Temporary storage for enum data during visitor traversal since EnumCaseDeclSyntax lacks parent context
+        struct CurrentEnum {
+            var name: String?
+            var cases: [EnumCase] = []
+            var rawType: String?
+        }
+        var currentEnum = CurrentEnum()
 
         enum State {
             case topLevel
-            case classBody(name: String)
+            case classBody(name: String, key: String)
+            case enumBody(name: String)
         }
 
         struct StateStack {
@@ -119,14 +142,21 @@ public class ExportSwift {
         override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
             switch state {
             case .topLevel:
-                if let exportedFunction = visitFunction(node: node) {
+                if let exportedFunction = visitFunction(
+                    node: node
+                ) {
                     exportedFunctions.append(exportedFunction)
                 }
                 return .skipChildren
-            case .classBody(let name):
-                if let exportedFunction = visitFunction(node: node) {
-                    exportedClassByName[name]?.methods.append(exportedFunction)
+            case .classBody(_, let classKey):
+                if let exportedFunction = visitFunction(
+                    node: node
+                ) {
+                    exportedClassByName[classKey]?.methods.append(exportedFunction)
                 }
+                return .skipChildren
+            case .enumBody:
+                diagnose(node: node, message: "Functions are not supported inside enums")
                 return .skipChildren
             }
         }
@@ -172,8 +202,14 @@ public class ExportSwift {
             switch state {
             case .topLevel:
                 abiName = "bjs_\(name)"
-            case .classBody(let className):
+            case .classBody(let className, _):
                 abiName = "bjs_\(className)_\(name)"
+            case .enumBody:
+                abiName = ""
+                diagnose(
+                    node: node,
+                    message: "Functions are not supported inside enums"
+                )
             }
 
             guard let effects = collectEffects(signature: node.signature) else {
@@ -231,10 +267,32 @@ public class ExportSwift {
             return namespaceString.split(separator: ".").map(String.init)
         }
 
+        private func extractEnumStyle(
+            from jsAttribute: AttributeSyntax
+        ) -> EnumEmitStyle? {
+            guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
+                let styleArg = arguments.first(where: { $0.label?.text == "enumStyle" })
+            else {
+                return nil
+            }
+            let text = styleArg.expression.trimmedDescription
+            if text.contains("tsEnum") {
+                return .tsEnum
+            }
+            if text.contains("const") {
+                return .const
+            }
+            return nil
+        }
+
         override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
             guard node.attributes.hasJSAttribute() else { return .skipChildren }
-            guard case .classBody(let name) = state else {
-                diagnose(node: node, message: "@JS init must be inside a @JS class")
+            guard case .classBody(let className, _) = state else {
+                if case .enumBody(_) = state {
+                    diagnose(node: node, message: "Initializers are not supported inside enums")
+                } else {
+                    diagnose(node: node, message: "@JS init must be inside a @JS class")
+                }
                 return .skipChildren
             }
 
@@ -264,33 +322,225 @@ public class ExportSwift {
             }
 
             let constructor = ExportedConstructor(
-                abiName: "bjs_\(name)_init",
+                abiName: "bjs_\(className)_init",
                 parameters: parameters,
                 effects: effects
             )
-            exportedClassByName[name]?.constructor = constructor
+            if case .classBody(_, let classKey) = state {
+                exportedClassByName[classKey]?.constructor = constructor
+            }
             return .skipChildren
         }
 
         override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
             let name = node.name.text
 
-            stateStack.push(state: .classBody(name: name))
+            guard let jsAttribute = node.attributes.firstJSAttribute else {
+                return .skipChildren
+            }
 
-            guard let jsAttribute = node.attributes.firstJSAttribute else { return .skipChildren }
+            let attributeNamespace = extractNamespace(from: jsAttribute)
+            let computedNamespace = computeNamespace(for: node)
 
-            let namespace = extractNamespace(from: jsAttribute)
-            exportedClassByName[name] = ExportedClass(
+            if computedNamespace != nil && attributeNamespace != nil {
+                diagnose(
+                    node: jsAttribute,
+                    message: "Nested classes cannot specify their own namespace",
+                    hint: "Remove the namespace from @JS attribute - nested classes inherit namespace from parent"
+                )
+                return .skipChildren
+            }
+
+            let effectiveNamespace = computedNamespace ?? attributeNamespace
+
+            let swiftCallName = ExportSwift.computeSwiftCallName(for: node, itemName: name)
+            let exportedClass = ExportedClass(
                 name: name,
+                swiftCallName: swiftCallName,
                 constructor: nil,
                 methods: [],
-                namespace: namespace
+                namespace: effectiveNamespace
             )
-            exportedClassNames.append(name)
+            let uniqueKey = classKey(name: name, namespace: effectiveNamespace)
+
+            stateStack.push(state: .classBody(name: name, key: uniqueKey))
+            exportedClassByName[uniqueKey] = exportedClass
+            exportedClassNames.append(uniqueKey)
             return .visitChildren
         }
+
         override func visitPost(_ node: ClassDeclSyntax) {
+            // Make sure we pop the state stack only if we're in a class body state (meaning we successfully pushed)
+            if case .classBody(_, _) = stateStack.current {
+                stateStack.pop()
+            }
+        }
+
+        override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
+            guard node.attributes.hasJSAttribute() else {
+                return .skipChildren
+            }
+
+            guard let jsAttribute = node.attributes.firstJSAttribute else {
+                return .skipChildren
+            }
+
+            let name = node.name.text
+
+            let rawType: String? = node.inheritanceClause?.inheritedTypes.first { inheritedType in
+                let typeName = inheritedType.type.trimmedDescription
+                return Constants.supportedRawTypes.contains(typeName)
+            }?.type.trimmedDescription
+
+            let attributeNamespace = extractNamespace(from: jsAttribute)
+            let computedNamespace = computeNamespace(for: node)
+
+            if computedNamespace != nil && attributeNamespace != nil {
+                diagnose(
+                    node: jsAttribute,
+                    message: "Nested enums cannot specify their own namespace",
+                    hint: "Remove the namespace from @JS attribute - nested enums inherit namespace from parent"
+                )
+                return .skipChildren
+            }
+
+            currentEnum.name = name
+            currentEnum.cases = []
+            currentEnum.rawType = rawType
+
+            stateStack.push(state: .enumBody(name: name))
+
+            return .visitChildren
+        }
+
+        override func visitPost(_ node: EnumDeclSyntax) {
+            guard let jsAttribute = node.attributes.firstJSAttribute,
+                let enumName = currentEnum.name
+            else {
+                // Only pop if we have a valid enum that was processed
+                if case .enumBody(_) = stateStack.current {
+                    stateStack.pop()
+                }
+                return
+            }
+
+            let attributeNamespace = extractNamespace(from: jsAttribute)
+            let computedNamespace = computeNamespace(for: node)
+
+            let effectiveNamespace: [String]?
+            if computedNamespace == nil && attributeNamespace != nil {
+                effectiveNamespace = attributeNamespace
+            } else {
+                effectiveNamespace = computedNamespace
+            }
+
+            let emitStyle = extractEnumStyle(from: jsAttribute) ?? .const
+            if case .tsEnum = emitStyle,
+                let raw = currentEnum.rawType,
+                let rawEnum = SwiftEnumRawType.from(raw), rawEnum == .bool
+            {
+                diagnose(
+                    node: jsAttribute,
+                    message: "TypeScript enum style is not supported for Bool raw-value enums",
+                    hint: "Use enumStyle: .const or change the raw type to String or a numeric type"
+                )
+            }
+
+            let swiftCallName = ExportSwift.computeSwiftCallName(for: node, itemName: enumName)
+            let exportedEnum = ExportedEnum(
+                name: enumName,
+                swiftCallName: swiftCallName,
+                cases: currentEnum.cases,
+                rawType: currentEnum.rawType,
+                namespace: effectiveNamespace,
+                emitStyle: emitStyle
+            )
+            exportedEnumByName[enumName] = exportedEnum
+            exportedEnumNames.append(enumName)
+
+            currentEnum = CurrentEnum()
             stateStack.pop()
+        }
+
+        override func visit(_ node: EnumCaseDeclSyntax) -> SyntaxVisitorContinueKind {
+            for element in node.elements {
+                let caseName = element.name.text
+                let rawValue: String?
+                var associatedValues: [AssociatedValue] = []
+
+                if currentEnum.rawType != nil {
+                    if let stringLiteral = element.rawValue?.value.as(StringLiteralExprSyntax.self) {
+                        rawValue = stringLiteral.segments.first?.as(StringSegmentSyntax.self)?.content.text
+                    } else if let boolLiteral = element.rawValue?.value.as(BooleanLiteralExprSyntax.self) {
+                        rawValue = boolLiteral.literal.text
+                    } else if let intLiteral = element.rawValue?.value.as(IntegerLiteralExprSyntax.self) {
+                        rawValue = intLiteral.literal.text
+                    } else if let floatLiteral = element.rawValue?.value.as(FloatLiteralExprSyntax.self) {
+                        rawValue = floatLiteral.literal.text
+                    } else {
+                        rawValue = nil
+                    }
+                } else {
+                    rawValue = nil
+                }
+                if let parameterClause = element.parameterClause {
+                    for param in parameterClause.parameters {
+                        guard let bridgeType = parent.lookupType(for: param.type) else {
+                            diagnose(
+                                node: param.type,
+                                message: "Unsupported associated value type: \(param.type.trimmedDescription)",
+                                hint: "Only primitive types and types defined in the same module are allowed"
+                            )
+                            continue
+                        }
+
+                        let label = param.firstName?.text
+                        associatedValues.append(AssociatedValue(label: label, type: bridgeType))
+                    }
+                }
+                let enumCase = EnumCase(
+                    name: caseName,
+                    rawValue: rawValue,
+                    associatedValues: associatedValues
+                )
+
+                currentEnum.cases.append(enumCase)
+            }
+
+            return .visitChildren
+        }
+
+        /// Computes namespace by walking up the AST hierarchy to find parent namespace enums
+        /// If parent enum is a namespace enum (no cases) then it will be used as part of namespace for given node
+        ///
+        ///
+        /// Method allows for explicit namespace for top level enum, it will be used as base namespace and will concat enum name
+        private func computeNamespace(for node: some SyntaxProtocol) -> [String]? {
+            var namespace: [String] = []
+            var currentNode: Syntax? = node.parent
+
+            while let parent = currentNode {
+                if let enumDecl = parent.as(EnumDeclSyntax.self),
+                    enumDecl.attributes.hasJSAttribute()
+                {
+                    let isNamespaceEnum = !enumDecl.memberBlock.members.contains { member in
+                        member.decl.is(EnumCaseDeclSyntax.self)
+                    }
+                    if isNamespaceEnum {
+                        namespace.insert(enumDecl.name.text, at: 0)
+
+                        if let jsAttribute = enumDecl.attributes.firstJSAttribute,
+                            let explicitNamespace = extractNamespace(from: jsAttribute)
+                        {
+                            namespace = explicitNamespace + namespace
+                            break
+                        }
+                    }
+                }
+                currentNode = parent.parent
+            }
+
+            return namespace.isEmpty ? nil : namespace
         }
     }
 
@@ -303,7 +553,34 @@ public class ExportSwift {
                 collector.exportedClassByName[$0]!
             }
         )
+        exportedEnums.append(
+            contentsOf: collector.exportedEnumNames.map {
+                collector.exportedEnumByName[$0]!
+            }
+        )
         return collector.errors
+    }
+
+    /// Computes the full Swift call name by walking up the AST hierarchy to find all parent enums
+    /// This generates the qualified name needed for Swift code generation (e.g., "Networking.API.HTTPServer")
+    private static func computeSwiftCallName(for node: some SyntaxProtocol, itemName: String) -> String {
+        var swiftPath: [String] = []
+        var currentNode: Syntax? = node.parent
+
+        while let parent = currentNode {
+            if let enumDecl = parent.as(EnumDeclSyntax.self),
+                enumDecl.attributes.hasJSAttribute()
+            {
+                swiftPath.insert(enumDecl.name.text, at: 0)
+            }
+            currentNode = parent.parent
+        }
+
+        if swiftPath.isEmpty {
+            return itemName
+        } else {
+            return swiftPath.joined(separator: ".") + "." + itemName
+        }
     }
 
     func lookupType(for type: TypeSyntax) -> BridgeType? {
@@ -313,9 +590,40 @@ public class ExportSwift {
         guard let identifier = type.as(IdentifierTypeSyntax.self) else {
             return nil
         }
+
         guard let typeDecl = typeDeclResolver.lookupType(for: identifier) else {
             return nil
         }
+        if let enumDecl = typeDecl.as(EnumDeclSyntax.self) {
+            let enumName = enumDecl.name.text
+            if let existingEnum = exportedEnums.first(where: { $0.name == enumName }) {
+                switch existingEnum.enumType {
+                case .simple:
+                    return .caseEnum(existingEnum.swiftCallName)
+                case .rawValue:
+                    let rawType = SwiftEnumRawType.from(existingEnum.rawType!)!
+                    return .rawValueEnum(existingEnum.swiftCallName, rawType)
+                case .associatedValue:
+                    return .associatedValueEnum(existingEnum.swiftCallName)
+                case .namespace:
+                    return .namespaceEnum(existingEnum.swiftCallName)
+                }
+            }
+            let swiftCallName = ExportSwift.computeSwiftCallName(for: enumDecl, itemName: enumDecl.name.text)
+            let rawTypeString = enumDecl.inheritanceClause?.inheritedTypes.first { inheritedType in
+                let typeName = inheritedType.type.trimmedDescription
+                return Constants.supportedRawTypes.contains(typeName)
+            }?.type.trimmedDescription
+
+            if let rawTypeString = rawTypeString,
+                let rawType = SwiftEnumRawType.from(rawTypeString)
+            {
+                return .rawValueEnum(swiftCallName, rawType)
+            } else {
+                return .caseEnum(swiftCallName)
+            }
+        }
+
         guard typeDecl.is(ClassDeclSyntax.self) || typeDecl.is(ActorDeclSyntax.self) else {
             return nil
         }
@@ -334,10 +642,15 @@ public class ExportSwift {
 
     func renderSwiftGlue() -> String? {
         var decls: [DeclSyntax] = []
-        guard exportedFunctions.count > 0 || exportedClasses.count > 0 else {
+        guard exportedFunctions.count > 0 || exportedClasses.count > 0 || exportedEnums.count > 0 else {
             return nil
         }
         decls.append(Self.prelude)
+
+        for enumDef in exportedEnums where enumDef.enumType == .simple {
+            decls.append(renderCaseEnumHelpers(enumDef))
+        }
+
         for function in exportedFunctions {
             decls.append(renderSingleExportedFunction(function: function))
         }
@@ -346,6 +659,32 @@ public class ExportSwift {
         }
         let format = BasicFormat()
         return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
+    }
+
+    func renderCaseEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
+        let typeName = enumDef.swiftCallName
+        var initCases: [String] = []
+        var valueCases: [String] = []
+        for (index, c) in enumDef.cases.enumerated() {
+            initCases.append("case \(index): self = .\(c.name)")
+            valueCases.append("case .\(c.name): return \(index)")
+        }
+        let initSwitch = (["switch bridgeJSRawValue {"] + initCases + ["default: return nil", "}"]).joined(
+            separator: "\n"
+        )
+        let valueSwitch = (["switch self {"] + valueCases + ["}"]).joined(separator: "\n")
+
+        return """
+            extension \(raw: typeName) {
+                init?(bridgeJSRawValue: Int32) {
+                    \(raw: initSwitch)
+                }
+
+                var bridgeJSRawValue: Int32 {
+                    \(raw: valueSwitch)
+                }
+            }
+            """
     }
 
     class ExportedThunkBuilder {
@@ -420,6 +759,63 @@ public class ExportSwift {
                 )
                 abiParameterSignatures.append((bytesLabel, .i32))
                 abiParameterSignatures.append((lengthLabel, .i32))
+            case .caseEnum(let enumName):
+                abiParameterForwardings.append(
+                    LabeledExprSyntax(
+                        label: param.label,
+                        expression: ExprSyntax("\(raw: enumName)(bridgeJSRawValue: \(raw: param.name))!")
+                    )
+                )
+                abiParameterSignatures.append((param.name, .i32))
+            case .rawValueEnum(let enumName, let rawType):
+                if rawType == .string {
+                    let bytesLabel = "\(param.name)Bytes"
+                    let lengthLabel = "\(param.name)Len"
+                    let prepare: CodeBlockItemSyntax = """
+                        let \(raw: param.name) = String(unsafeUninitializedCapacity: Int(\(raw: lengthLabel))) { b in
+                            _swift_js_init_memory(\(raw: bytesLabel), b.baseAddress.unsafelyUnwrapped)
+                            return Int(\(raw: lengthLabel))
+                        }
+                        """
+                    append(prepare)
+                    abiParameterForwardings.append(
+                        LabeledExprSyntax(
+                            label: param.label,
+                            expression: ExprSyntax("\(raw: enumName)(rawValue: \(raw: param.name))!")
+                        )
+                    )
+                    abiParameterSignatures.append((bytesLabel, .i32))
+                    abiParameterSignatures.append((lengthLabel, .i32))
+                } else {
+                    let conversionExpr: String
+                    switch rawType {
+                    case .bool:
+                        conversionExpr = "\(enumName)(rawValue: \(param.name) != 0)!"
+                    case .uint, .uint32, .uint64:
+                        if rawType == .uint64 {
+                            conversionExpr =
+                                "\(enumName)(rawValue: \(rawType.rawValue)(bitPattern: Int64(\(param.name))))!"
+                        } else {
+                            conversionExpr = "\(enumName)(rawValue: \(rawType.rawValue)(bitPattern: \(param.name)))!"
+                        }
+                    default:
+                        conversionExpr = "\(enumName)(rawValue: \(rawType.rawValue)(\(param.name)))!"
+                    }
+
+                    abiParameterForwardings.append(
+                        LabeledExprSyntax(
+                            label: param.label,
+                            expression: ExprSyntax(stringLiteral: conversionExpr)
+                        )
+                    )
+                    if let wasmType = rawType.wasmCoreType {
+                        abiParameterSignatures.append((param.name, wasmType))
+                    }
+                }
+            case .associatedValueEnum(_):
+                break
+            case .namespaceEnum:
+                break
             case .jsObject(nil):
                 abiParameterForwardings.append(
                     LabeledExprSyntax(
@@ -437,7 +833,6 @@ public class ExportSwift {
                 )
                 abiParameterSignatures.append((param.name, .i32))
             case .swiftHeapObject:
-                // UnsafeMutableRawPointer is passed as an i32 pointer
                 let objectExpr: ExprSyntax =
                     "Unmanaged<\(raw: param.type.swiftType)>.fromOpaque(\(raw: param.name)).takeUnretainedValue()"
                 abiParameterForwardings.append(
@@ -470,7 +865,12 @@ public class ExportSwift {
                 return CodeBlockItemSyntax(item: .init(StmtSyntax("return \(raw: callExpr).jsValue")))
             }
 
-            let retMutability = returnType == .string ? "var" : "let"
+            let retMutability: String
+            if returnType == .string {
+                retMutability = "var"
+            } else {
+                retMutability = "let"
+            }
             if returnType == .void {
                 return CodeBlockItemSyntax(item: .init(ExpressionStmtSyntax(expression: callExpr)))
             } else {
@@ -520,6 +920,14 @@ public class ExportSwift {
             case .swiftHeapObject:
                 // UnsafeMutableRawPointer is returned as an i32 pointer
                 abiReturnType = .pointer
+            case .caseEnum:
+                abiReturnType = .i32
+            case .rawValueEnum(_, let rawType):
+                abiReturnType = rawType == .string ? nil : rawType.wasmCoreType
+            case .associatedValueEnum:
+                abiReturnType = nil
+            case .namespaceEnum:
+                abiReturnType = nil
             }
 
             if effects.isAsync {
@@ -542,6 +950,37 @@ public class ExportSwift {
                     }
                     """
                 )
+            case .caseEnum:
+                abiReturnType = .i32
+                append("return ret.bridgeJSRawValue")
+            case .rawValueEnum(_, let rawType):
+                if rawType == .string {
+                    append(
+                        """
+                        var rawValue = ret.rawValue
+                        return rawValue.withUTF8 { ptr in
+                            _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                        }
+                        """
+                    )
+                } else {
+                    switch rawType {
+                    case .bool:
+                        append("return Int32(ret.rawValue ? 1 : 0)")
+                    case .int, .int32, .uint, .uint32:
+                        append("return Int32(ret.rawValue)")
+                    case .int64, .uint64:
+                        append("return Int64(ret.rawValue)")
+                    case .float:
+                        append("return Float32(ret.rawValue)")
+                    case .double:
+                        append("return Float64(ret.rawValue)")
+                    default:
+                        append("return Int32(ret.rawValue)")
+                    }
+                }
+            case .associatedValueEnum: break;
+            case .namespaceEnum: break;
             case .jsObject(nil):
                 append(
                     """
@@ -691,25 +1130,26 @@ public class ExportSwift {
     /// ```
     func renderSingleExportedClass(klass: ExportedClass) -> [DeclSyntax] {
         var decls: [DeclSyntax] = []
+
         if let constructor = klass.constructor {
             let builder = ExportedThunkBuilder(effects: constructor.effects)
             for param in constructor.parameters {
                 builder.liftParameter(param: param)
             }
-            builder.call(name: klass.name, returnType: .swiftHeapObject(klass.name))
-            builder.lowerReturnValue(returnType: .swiftHeapObject(klass.name))
+            builder.call(name: klass.swiftCallName, returnType: BridgeType.swiftHeapObject(klass.name))
+            builder.lowerReturnValue(returnType: BridgeType.swiftHeapObject(klass.name))
             decls.append(builder.render(abiName: constructor.abiName))
         }
         for method in klass.methods {
             let builder = ExportedThunkBuilder(effects: method.effects)
             builder.liftParameter(
-                param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(klass.name))
+                param: Parameter(label: nil, name: "_self", type: BridgeType.swiftHeapObject(klass.swiftCallName))
             )
             for param in method.parameters {
                 builder.liftParameter(param: param)
             }
             builder.callMethod(
-                klassName: klass.name,
+                klassName: klass.swiftCallName,
                 methodName: method.name,
                 returnType: method.returnType
             )
@@ -723,7 +1163,7 @@ public class ExportSwift {
                 @_expose(wasm, "bjs_\(raw: klass.name)_deinit")
                 @_cdecl("bjs_\(raw: klass.name)_deinit")
                 public func _bjs_\(raw: klass.name)_deinit(pointer: UnsafeMutableRawPointer) {
-                    Unmanaged<\(raw: klass.name)>.fromOpaque(pointer).release()
+                    Unmanaged<\(raw: klass.swiftCallName)>.fromOpaque(pointer).release()
                 }
                 """
             )
@@ -755,7 +1195,7 @@ public class ExportSwift {
         let externFunctionName = "bjs_\(klass.name)_wrap"
 
         return """
-            extension \(raw: klass.name): ConvertibleToJSValue {
+            extension \(raw: klass.swiftCallName): ConvertibleToJSValue {
                 var jsValue: JSValue {
                     @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: externFunctionName)")
                     func \(raw: wrapFunctionName)(_: UnsafeMutableRawPointer) -> Int32
@@ -764,6 +1204,10 @@ public class ExportSwift {
             }
             """
     }
+}
+
+fileprivate enum Constants {
+    static let supportedRawTypes = SwiftEnumRawType.allCases.map { $0.rawValue }
 }
 
 extension AttributeListSyntax {
@@ -825,6 +1269,10 @@ extension BridgeType {
         case .jsObject(let name?): return name
         case .swiftHeapObject(let name): return name
         case .void: return "Void"
+        case .caseEnum(let name): return name
+        case .rawValueEnum(let name, _): return name
+        case .associatedValueEnum(let name): return name
+        case .namespaceEnum(let name): return name
         }
     }
 }

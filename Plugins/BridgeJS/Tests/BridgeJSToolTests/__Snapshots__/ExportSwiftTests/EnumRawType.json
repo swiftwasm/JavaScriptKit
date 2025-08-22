@@ -1,0 +1,1003 @@
+{
+  "classes" : [
+
+  ],
+  "enums" : [
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "light",
+          "rawValue" : "light"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "dark",
+          "rawValue" : "dark"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "auto",
+          "rawValue" : "auto"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Theme",
+      "rawType" : "String",
+      "swiftCallName" : "Theme"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "light",
+          "rawValue" : "light"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "dark",
+          "rawValue" : "dark"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "auto",
+          "rawValue" : "auto"
+        }
+      ],
+      "emitStyle" : "tsEnum",
+      "name" : "TSTheme",
+      "rawType" : "String",
+      "swiftCallName" : "TSTheme"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "enabled",
+          "rawValue" : "true"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "disabled",
+          "rawValue" : "false"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "FeatureFlag",
+      "rawType" : "Bool",
+      "swiftCallName" : "FeatureFlag"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "ok",
+          "rawValue" : "200"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "notFound",
+          "rawValue" : "404"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "serverError",
+          "rawValue" : "500"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "HttpStatus",
+      "rawType" : "Int",
+      "swiftCallName" : "HttpStatus"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "ok",
+          "rawValue" : "200"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "notFound",
+          "rawValue" : "404"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "serverError",
+          "rawValue" : "500"
+        }
+      ],
+      "emitStyle" : "tsEnum",
+      "name" : "TSHttpStatus",
+      "rawType" : "Int",
+      "swiftCallName" : "TSHttpStatus"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "lowest",
+          "rawValue" : "1"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "low",
+          "rawValue" : "2"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "medium",
+          "rawValue" : "3"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "high",
+          "rawValue" : "4"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "highest",
+          "rawValue" : "5"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Priority",
+      "rawType" : "Int32",
+      "swiftCallName" : "Priority"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "tiny",
+          "rawValue" : "1024"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "small",
+          "rawValue" : "10240"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "medium",
+          "rawValue" : "102400"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "large",
+          "rawValue" : "1048576"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "FileSize",
+      "rawType" : "Int64",
+      "swiftCallName" : "FileSize"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "guest",
+          "rawValue" : "0"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "user",
+          "rawValue" : "1000"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "admin",
+          "rawValue" : "9999"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "UserId",
+      "rawType" : "UInt",
+      "swiftCallName" : "UserId"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "invalid",
+          "rawValue" : "0"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "session",
+          "rawValue" : "12345"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "refresh",
+          "rawValue" : "67890"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "TokenId",
+      "rawType" : "UInt32",
+      "swiftCallName" : "TokenId"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "none",
+          "rawValue" : "0"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "active",
+          "rawValue" : "9876543210"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "expired",
+          "rawValue" : "1234567890"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "SessionId",
+      "rawType" : "UInt64",
+      "swiftCallName" : "SessionId"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "rough",
+          "rawValue" : "0.1"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "normal",
+          "rawValue" : "0.01"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "fine",
+          "rawValue" : "0.001"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Precision",
+      "rawType" : "Float",
+      "swiftCallName" : "Precision"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "quarter",
+          "rawValue" : "0.25"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "half",
+          "rawValue" : "0.5"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "golden",
+          "rawValue" : "1.618"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "pi",
+          "rawValue" : "3.14159"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Ratio",
+      "rawType" : "Double",
+      "swiftCallName" : "Ratio"
+    }
+  ],
+  "functions" : [
+    {
+      "abiName" : "bjs_setTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setTheme",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "theme",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "Theme",
+              "_1" : "String"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getTheme",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "Theme",
+          "_1" : "String"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setTSTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setTSTheme",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "theme",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "TSTheme",
+              "_1" : "String"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getTSTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getTSTheme",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "TSTheme",
+          "_1" : "String"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setFeatureFlag",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setFeatureFlag",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "flag",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "FeatureFlag",
+              "_1" : "Bool"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getFeatureFlag",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getFeatureFlag",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "FeatureFlag",
+          "_1" : "Bool"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setHttpStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setHttpStatus",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "status",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "HttpStatus",
+              "_1" : "Int"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getHttpStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getHttpStatus",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "HttpStatus",
+          "_1" : "Int"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setTSHttpStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setTSHttpStatus",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "status",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "TSHttpStatus",
+              "_1" : "Int"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getTSHttpStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getTSHttpStatus",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "TSHttpStatus",
+          "_1" : "Int"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setPriority",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setPriority",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "priority",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "Priority",
+              "_1" : "Int32"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getPriority",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getPriority",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "Priority",
+          "_1" : "Int32"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setFileSize",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setFileSize",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "size",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "FileSize",
+              "_1" : "Int64"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getFileSize",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getFileSize",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "FileSize",
+          "_1" : "Int64"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setUserId",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setUserId",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "id",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "UserId",
+              "_1" : "UInt"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getUserId",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getUserId",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "UserId",
+          "_1" : "UInt"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setTokenId",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setTokenId",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "token",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "TokenId",
+              "_1" : "UInt32"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getTokenId",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getTokenId",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "TokenId",
+          "_1" : "UInt32"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setSessionId",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setSessionId",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "session",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "SessionId",
+              "_1" : "UInt64"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getSessionId",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getSessionId",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "SessionId",
+          "_1" : "UInt64"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setPrecision",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setPrecision",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "precision",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "Precision",
+              "_1" : "Float"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getPrecision",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getPrecision",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "Precision",
+          "_1" : "Float"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setRatio",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setRatio",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "ratio",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "Ratio",
+              "_1" : "Double"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getRatio",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getRatio",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "Ratio",
+          "_1" : "Double"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_setFeatureFlag",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "setFeatureFlag",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "featureFlag",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "FeatureFlag",
+              "_1" : "Bool"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getFeatureFlag",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getFeatureFlag",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "FeatureFlag",
+          "_1" : "Bool"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_processTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "processTheme",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "theme",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "Theme",
+              "_1" : "String"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "HttpStatus",
+          "_1" : "Int"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_convertPriority",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "convertPriority",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "status",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "HttpStatus",
+              "_1" : "Int"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "Priority",
+          "_1" : "Int32"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_validateSession",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "validateSession",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "session",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "SessionId",
+              "_1" : "UInt64"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "Theme",
+          "_1" : "String"
+        }
+      }
+    }
+  ],
+  "moduleName" : "TestModule"
+}

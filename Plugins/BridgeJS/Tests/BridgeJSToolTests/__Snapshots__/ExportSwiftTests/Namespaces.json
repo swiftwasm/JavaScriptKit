@@ -41,7 +41,8 @@
       "namespace" : [
         "__Swift",
         "Foundation"
-      ]
+      ],
+      "swiftCallName" : "Greeter"
     },
     {
       "constructor" : {
@@ -84,7 +85,8 @@
       "namespace" : [
         "Utils",
         "Converters"
-      ]
+      ],
+      "swiftCallName" : "Converter"
     },
     {
       "methods" : [
@@ -109,8 +111,12 @@
       "namespace" : [
         "__Swift",
         "Foundation"
-      ]
+      ],
+      "swiftCallName" : "UUID"
     }
+  ],
+  "enums" : [
+
   ],
   "functions" : [
     {

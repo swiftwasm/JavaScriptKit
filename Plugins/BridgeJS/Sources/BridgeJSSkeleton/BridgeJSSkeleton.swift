@@ -4,10 +4,46 @@
 
 public enum BridgeType: Codable, Equatable {
     case int, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
+    case caseEnum(String)
+    case rawValueEnum(String, SwiftEnumRawType)
+    case associatedValueEnum(String)
+    case namespaceEnum(String)
 }
 
 public enum WasmCoreType: String, Codable {
     case i32, i64, f32, f64, pointer
+}
+
+public enum SwiftEnumRawType: String, CaseIterable, Codable {
+    case string = "String"
+    case bool = "Bool"
+    case int = "Int"
+    case int32 = "Int32"
+    case int64 = "Int64"
+    case uint = "UInt"
+    case uint32 = "UInt32"
+    case uint64 = "UInt64"
+    case float = "Float"
+    case double = "Double"
+
+    public var wasmCoreType: WasmCoreType? {
+        switch self {
+        case .string:
+            return nil
+        case .bool, .int, .int32, .uint, .uint32:
+            return .i32
+        case .int64, .uint64:
+            return .i64
+        case .float:
+            return .f32
+        case .double:
+            return .f64
+        }
+    }
+
+    public static func from(_ rawTypeString: String) -> SwiftEnumRawType? {
+        return Self.allCases.first { $0.rawValue == rawTypeString }
+    }
 }
 
 public struct Parameter: Codable {
@@ -30,6 +66,80 @@ public struct Effects: Codable {
         self.isAsync = isAsync
         self.isThrows = isThrows
     }
+}
+
+// MARK: - Enum Skeleton
+
+public struct AssociatedValue: Codable, Equatable {
+    public let label: String?
+    public let type: BridgeType
+
+    public init(label: String?, type: BridgeType) {
+        self.label = label
+        self.type = type
+    }
+}
+
+public struct EnumCase: Codable, Equatable {
+    public let name: String
+    public let rawValue: String?
+    public let associatedValues: [AssociatedValue]
+
+    public var isSimple: Bool {
+        associatedValues.isEmpty
+    }
+
+    public init(name: String, rawValue: String?, associatedValues: [AssociatedValue]) {
+        self.name = name
+        self.rawValue = rawValue
+        self.associatedValues = associatedValues
+    }
+}
+
+public enum EnumEmitStyle: String, Codable {
+    case const
+    case tsEnum
+}
+
+public struct ExportedEnum: Codable, Equatable {
+    public let name: String
+    public let swiftCallName: String
+    public let cases: [EnumCase]
+    public let rawType: String?
+    public let namespace: [String]?
+    public let emitStyle: EnumEmitStyle
+    public var enumType: EnumType {
+        if cases.isEmpty {
+            return .namespace
+        } else if cases.allSatisfy(\.isSimple) {
+            return rawType != nil ? .rawValue : .simple
+        } else {
+            return .associatedValue
+        }
+    }
+
+    public init(
+        name: String,
+        swiftCallName: String,
+        cases: [EnumCase],
+        rawType: String?,
+        namespace: [String]?,
+        emitStyle: EnumEmitStyle
+    ) {
+        self.name = name
+        self.swiftCallName = swiftCallName
+        self.cases = cases
+        self.rawType = rawType
+        self.namespace = namespace
+        self.emitStyle = emitStyle
+    }
+}
+
+public enum EnumType: String, Codable {
+    case simple  // enum Direction { case north, south, east }
+    case rawValue  // enum Mode: String { case light = "light" }
+    case associatedValue  // enum Result { case success(String), failure(Int) }
+    case namespace  // enum Utils { } (empty, used as namespace)
 }
 
 // MARK: - Exported Skeleton
@@ -61,17 +171,20 @@ public struct ExportedFunction: Codable {
 
 public struct ExportedClass: Codable {
     public var name: String
+    public var swiftCallName: String
     public var constructor: ExportedConstructor?
     public var methods: [ExportedFunction]
     public var namespace: [String]?
 
     public init(
         name: String,
+        swiftCallName: String,
         constructor: ExportedConstructor? = nil,
         methods: [ExportedFunction],
         namespace: [String]? = nil
     ) {
         self.name = name
+        self.swiftCallName = swiftCallName
         self.constructor = constructor
         self.methods = methods
         self.namespace = namespace
@@ -96,11 +209,13 @@ public struct ExportedSkeleton: Codable {
     public let moduleName: String
     public let functions: [ExportedFunction]
     public let classes: [ExportedClass]
+    public let enums: [ExportedEnum]
 
-    public init(moduleName: String, functions: [ExportedFunction], classes: [ExportedClass]) {
+    public init(moduleName: String, functions: [ExportedFunction], classes: [ExportedClass], enums: [ExportedEnum]) {
         self.moduleName = moduleName
         self.functions = functions
         self.classes = classes
+        self.enums = enums
     }
 }
 
@@ -163,6 +278,8 @@ public struct ImportedModuleSkeleton: Codable {
     }
 }
 
+// MARK: - BridgeType extension
+
 extension BridgeType {
     public var abiReturnType: WasmCoreType? {
         switch self {
@@ -176,6 +293,14 @@ extension BridgeType {
         case .swiftHeapObject:
             // UnsafeMutableRawPointer is returned as an i32 pointer
             return .pointer
+        case .caseEnum:
+            return .i32
+        case .rawValueEnum(_, let rawType):
+            return rawType.wasmCoreType
+        case .associatedValueEnum:
+            return nil
+        case .namespaceEnum:
+            return nil
         }
     }
 }
