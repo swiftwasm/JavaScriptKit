@@ -18,7 +18,7 @@ public class JSFunction: JSObject {
     ///   - arguments: Arguments to be passed to this function.
     /// - Returns: The result of this call.
     @discardableResult
-    public func callAsFunction(this: JSObject, arguments: [ConvertibleToJSValue]) -> JSValue {
+    override public func callAsFunction(this: JSObject, arguments: [ConvertibleToJSValue]) -> JSValue {
         invokeNonThrowingJSFunction(arguments: arguments, this: this).jsValue
     }
 
@@ -27,20 +27,20 @@ public class JSFunction: JSObject {
     ///   - arguments: Arguments to be passed to this function.
     /// - Returns: The result of this call.
     @discardableResult
-    public func callAsFunction(arguments: [ConvertibleToJSValue]) -> JSValue {
+    override public func callAsFunction(arguments: [ConvertibleToJSValue]) -> JSValue {
         invokeNonThrowingJSFunction(arguments: arguments).jsValue
     }
 
     /// A variadic arguments version of `callAsFunction`.
     @discardableResult
-    public func callAsFunction(this: JSObject, _ arguments: ConvertibleToJSValue...) -> JSValue {
-        self(this: this, arguments: arguments)
+    override public func callAsFunction(this: JSObject, _ arguments: ConvertibleToJSValue...) -> JSValue {
+        self.callAsFunction(this: this, arguments: arguments)
     }
 
     /// A variadic arguments version of `callAsFunction`.
     @discardableResult
-    public func callAsFunction(_ arguments: ConvertibleToJSValue...) -> JSValue {
-        self(arguments: arguments)
+    override public func callAsFunction(_ arguments: ConvertibleToJSValue...) -> JSValue {
+        self.callAsFunction(arguments: arguments)
     }
 
     /// Instantiate an object from this function as a constructor.
@@ -53,7 +53,7 @@ public class JSFunction: JSObject {
     ///
     /// - Parameter arguments: Arguments to be passed to this constructor function.
     /// - Returns: A new instance of this constructor.
-    public func new(arguments: [ConvertibleToJSValue]) -> JSObject {
+    override public func new(arguments: [ConvertibleToJSValue]) -> JSObject {
         arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 JSObject(id: swjs_call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
@@ -62,7 +62,7 @@ public class JSFunction: JSObject {
     }
 
     /// A variadic arguments version of `new`.
-    public func new(_ arguments: ConvertibleToJSValue...) -> JSObject {
+    override public func new(_ arguments: ConvertibleToJSValue...) -> JSObject {
         new(arguments: arguments)
     }
 
@@ -87,11 +87,11 @@ public class JSFunction: JSObject {
     #endif
 
     @discardableResult
-    public func callAsFunction(arguments: [JSValue]) -> JSValue {
+    override public func callAsFunction(arguments: [JSValue]) -> JSValue {
         invokeNonThrowingJSFunction(arguments: arguments).jsValue
     }
 
-    public func new(arguments: [JSValue]) -> JSObject {
+    override public func new(arguments: [JSValue]) -> JSObject {
         arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 JSObject(id: swjs_call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
@@ -107,67 +107,6 @@ public class JSFunction: JSObject {
     override public var jsValue: JSValue {
         .function(self)
     }
-
-    final func invokeNonThrowingJSFunction(arguments: [JSValue]) -> RawJSValue {
-        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0) }
-    }
-
-    final func invokeNonThrowingJSFunction(arguments: [JSValue], this: JSObject) -> RawJSValue {
-        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0, this: this) }
-    }
-
-    #if !hasFeature(Embedded)
-    final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue]) -> RawJSValue {
-        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0) }
-    }
-
-    final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue], this: JSObject) -> RawJSValue {
-        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0, this: this) }
-    }
-    #endif
-
-    final private func invokeNonThrowingJSFunction(rawValues: [RawJSValue]) -> RawJSValue {
-        rawValues.withUnsafeBufferPointer { [id] bufferPointer in
-            let argv = bufferPointer.baseAddress
-            let argc = bufferPointer.count
-            var payload1 = JavaScriptPayload1()
-            var payload2 = JavaScriptPayload2()
-            let resultBitPattern = swjs_call_function_no_catch(
-                id,
-                argv,
-                Int32(argc),
-                &payload1,
-                &payload2
-            )
-            let kindAndFlags = JavaScriptValueKindAndFlags(bitPattern: resultBitPattern)
-            assert(!kindAndFlags.isException)
-            let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
-            return result
-        }
-    }
-
-    final private func invokeNonThrowingJSFunction(rawValues: [RawJSValue], this: JSObject) -> RawJSValue {
-        rawValues.withUnsafeBufferPointer { [id] bufferPointer in
-            let argv = bufferPointer.baseAddress
-            let argc = bufferPointer.count
-            var payload1 = JavaScriptPayload1()
-            var payload2 = JavaScriptPayload2()
-            let resultBitPattern = swjs_call_function_with_this_no_catch(
-                this.id,
-                id,
-                argv,
-                Int32(argc),
-                &payload1,
-                &payload2
-            )
-            let kindAndFlags = JavaScriptValueKindAndFlags(bitPattern: resultBitPattern)
-            #if !hasFeature(Embedded)
-            assert(!kindAndFlags.isException)
-            #endif
-            let result = RawJSValue(kind: kindAndFlags.kind, payload1: payload1, payload2: payload2)
-            return result
-        }
-    }
 }
 
 #if hasFeature(Embedded)
@@ -182,17 +121,17 @@ public class JSFunction: JSObject {
 extension JSFunction {
 
     @discardableResult
-    public func callAsFunction(this: JSObject) -> JSValue {
+    override public func callAsFunction(this: JSObject) -> JSValue {
         invokeNonThrowingJSFunction(arguments: [], this: this).jsValue
     }
 
     @discardableResult
-    public func callAsFunction(this: JSObject, _ arg0: some ConvertibleToJSValue) -> JSValue {
+    override public func callAsFunction(this: JSObject, _ arg0: some ConvertibleToJSValue) -> JSValue {
         invokeNonThrowingJSFunction(arguments: [arg0.jsValue], this: this).jsValue
     }
 
     @discardableResult
-    public func callAsFunction(
+    override public func callAsFunction(
         this: JSObject,
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue
@@ -201,7 +140,7 @@ extension JSFunction {
     }
 
     @discardableResult
-    public func callAsFunction(
+    override public func callAsFunction(
         this: JSObject,
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
@@ -211,7 +150,7 @@ extension JSFunction {
     }
 
     @discardableResult
-    public func callAsFunction(
+    override public func callAsFunction(
         this: JSObject,
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
@@ -223,7 +162,7 @@ extension JSFunction {
     }
 
     @discardableResult
-    public func callAsFunction(
+    override public func callAsFunction(
         this: JSObject,
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
@@ -238,7 +177,7 @@ extension JSFunction {
     }
 
     @discardableResult
-    public func callAsFunction(
+    override public func callAsFunction(
         this: JSObject,
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
@@ -254,7 +193,7 @@ extension JSFunction {
     }
 
     @discardableResult
-    public func callAsFunction(
+    override public func callAsFunction(
         this: JSObject,
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
@@ -273,22 +212,22 @@ extension JSFunction {
     }
 
     @discardableResult
-    public func callAsFunction(this: JSObject, arguments: [JSValue]) -> JSValue {
+    override public func callAsFunction(this: JSObject, arguments: [JSValue]) -> JSValue {
         invokeNonThrowingJSFunction(arguments: arguments, this: this).jsValue
     }
 
     @discardableResult
-    public func callAsFunction() -> JSValue {
+    override public func callAsFunction() -> JSValue {
         invokeNonThrowingJSFunction(arguments: []).jsValue
     }
 
     @discardableResult
-    public func callAsFunction(_ arg0: some ConvertibleToJSValue) -> JSValue {
+    override public func callAsFunction(_ arg0: some ConvertibleToJSValue) -> JSValue {
         invokeNonThrowingJSFunction(arguments: [arg0.jsValue]).jsValue
     }
 
     @discardableResult
-    public func callAsFunction(
+    override public func callAsFunction(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue
     ) -> JSValue {
@@ -296,7 +235,7 @@ extension JSFunction {
     }
 
     @discardableResult
-    public func callAsFunction(
+    override public func callAsFunction(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue
@@ -305,7 +244,7 @@ extension JSFunction {
     }
 
     @discardableResult
-    public func callAsFunction(
+    override public func callAsFunction(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -315,7 +254,7 @@ extension JSFunction {
     }
 
     @discardableResult
-    public func callAsFunction(
+    override public func callAsFunction(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -327,7 +266,7 @@ extension JSFunction {
     }
 
     @discardableResult
-    public func callAsFunction(
+    override public func callAsFunction(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -341,7 +280,7 @@ extension JSFunction {
     }
 
     @discardableResult
-    public func callAsFunction(
+    override public func callAsFunction(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -355,22 +294,22 @@ extension JSFunction {
         ]).jsValue
     }
 
-    public func new() -> JSObject {
+    override public func new() -> JSObject {
         new(arguments: [])
     }
 
-    public func new(_ arg0: some ConvertibleToJSValue) -> JSObject {
+    override public func new(_ arg0: some ConvertibleToJSValue) -> JSObject {
         new(arguments: [arg0.jsValue])
     }
 
-    public func new(
+    override public func new(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue
     ) -> JSObject {
         new(arguments: [arg0.jsValue, arg1.jsValue])
     }
 
-    public func new(
+    override public func new(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue
@@ -378,7 +317,7 @@ extension JSFunction {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue])
     }
 
-    public func new(
+    override public func new(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -387,7 +326,7 @@ extension JSFunction {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue])
     }
 
-    public func new(
+    override public func new(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -397,7 +336,7 @@ extension JSFunction {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue])
     }
 
-    public func new(
+    override public func new(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
@@ -408,7 +347,7 @@ extension JSFunction {
         new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue])
     }
 
-    public func new(
+    override public func new(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue,
