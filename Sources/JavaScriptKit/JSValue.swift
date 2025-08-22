@@ -65,6 +65,7 @@ public enum JSValue: Equatable {
     public var function: JSFunction? {
         switch self {
         case .function(let function): return function
+        case .object(let object as JSFunction): return object
         default: return nil
         }
     }

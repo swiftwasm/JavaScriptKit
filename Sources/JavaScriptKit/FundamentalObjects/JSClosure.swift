@@ -166,7 +166,7 @@ public class JSClosure: JSObject, JSClosureProtocol {
     }
 
     override public var jsValue: JSValue {
-        .function(JSFunction(id: self.id))
+        .object(self)
     }
 
     #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))

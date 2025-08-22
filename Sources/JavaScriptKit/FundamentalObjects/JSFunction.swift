@@ -105,7 +105,7 @@ public class JSFunction: JSObject {
     }
 
     override public var jsValue: JSValue {
-        .function(self)
+        .object(self)
     }
 }
 

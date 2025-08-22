@@ -209,7 +209,7 @@ extension RawJSValue: ConvertibleToJSValue {
         case .undefined:
             return .undefined
         case .function:
-            return .function(JSFunction(id: UInt32(payload1)))
+            return .object(JSFunction(id: UInt32(payload1)))
         case .symbol:
             return .symbol(JSSymbol(id: UInt32(payload1)))
         case .bigInt:
