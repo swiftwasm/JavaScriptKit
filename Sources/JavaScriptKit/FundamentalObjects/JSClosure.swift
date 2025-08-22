@@ -103,7 +103,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 /// button.removeEventListener!("click", JSValue.function(eventListener))
 /// ```
 ///
-public class JSClosure: JSFunction, JSClosureProtocol {
+public class JSClosure: JSObject, JSClosureProtocol {
 
     class SharedJSClosure {
         // Note: 6.0 compilers built with assertions enabled crash when calling
@@ -163,6 +163,10 @@ public class JSClosure: JSFunction, JSClosureProtocol {
     @available(*, unavailable, message: "JSClosure does not support dictionary literal initialization")
     public required init(dictionaryLiteral elements: (String, JSValue)...) {
         fatalError("JSClosure does not support dictionary literal initialization")
+    }
+
+    override public var jsValue: JSValue {
+        .function(JSFunction(id: self.id))
     }
 
     #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
