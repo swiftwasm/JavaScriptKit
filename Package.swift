@@ -28,7 +28,7 @@ let package = Package(
         .plugin(name: "BridgeJSCommandPlugin", targets: ["BridgeJSCommandPlugin"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..<"601.0.0")
+        .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0" ..< "602.0.0")
     ],
     targets: [
         .target(
