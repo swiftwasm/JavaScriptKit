@@ -4,6 +4,82 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export const Theme = {
+    Light: "light",
+    Dark: "dark",
+    Auto: "auto",
+};
+
+export const TSTheme = {
+    Light: "light",
+    Dark: "dark",
+    Auto: "auto",
+};
+
+export const FeatureFlag = {
+    Enabled: true,
+    Disabled: false,
+};
+
+export const HttpStatus = {
+    Ok: 200,
+    NotFound: 404,
+    ServerError: 500,
+};
+
+export const TSHttpStatus = {
+    Ok: 200,
+    NotFound: 404,
+    ServerError: 500,
+};
+
+export const Priority = {
+    Lowest: 1,
+    Low: 2,
+    Medium: 3,
+    High: 4,
+    Highest: 5,
+};
+
+export const FileSize = {
+    Tiny: 1024,
+    Small: 10240,
+    Medium: 102400,
+    Large: 1048576,
+};
+
+export const UserId = {
+    Guest: 0,
+    User: 1000,
+    Admin: 9999,
+};
+
+export const TokenId = {
+    Invalid: 0,
+    Session: 12345,
+    Refresh: 67890,
+};
+
+export const SessionId = {
+    None: 0,
+    Active: 9876543210,
+    Expired: 1234567890,
+};
+
+export const Precision = {
+    Rough: 0.1,
+    Normal: 0.01,
+    Fine: 0.001,
+};
+
+export const Ratio = {
+    Quarter: 0.25,
+    Half: 0.5,
+    Golden: 1.618,
+    Pi: 3.14159,
+};
+
+
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -63,94 +139,7 @@ export async function createInstantiator(options, swift) {
         createExports: (instance) => {
             const js = swift.memory.heap;
 
-            const Theme = {
-                Light: "light",
-                Dark: "dark",
-                Auto: "auto",
-            };
-            
-            const TSTheme = {
-                Light: "light",
-                Dark: "dark",
-                Auto: "auto",
-            };
-            
-            const FeatureFlag = {
-                Enabled: true,
-                Disabled: false,
-            };
-            
-            const HttpStatus = {
-                Ok: 200,
-                NotFound: 404,
-                ServerError: 500,
-            };
-            
-            const TSHttpStatus = {
-                Ok: 200,
-                NotFound: 404,
-                ServerError: 500,
-            };
-            
-            const Priority = {
-                Lowest: 1,
-                Low: 2,
-                Medium: 3,
-                High: 4,
-                Highest: 5,
-            };
-            
-            const FileSize = {
-                Tiny: 1024,
-                Small: 10240,
-                Medium: 102400,
-                Large: 1048576,
-            };
-            
-            const UserId = {
-                Guest: 0,
-                User: 1000,
-                Admin: 9999,
-            };
-            
-            const TokenId = {
-                Invalid: 0,
-                Session: 12345,
-                Refresh: 67890,
-            };
-            
-            const SessionId = {
-                None: 0,
-                Active: 9876543210,
-                Expired: 1234567890,
-            };
-            
-            const Precision = {
-                Rough: 0.1,
-                Normal: 0.01,
-                Fine: 0.001,
-            };
-            
-            const Ratio = {
-                Quarter: 0.25,
-                Half: 0.5,
-                Golden: 1.618,
-                Pi: 3.14159,
-            };
-            
             return {
-                Theme,
-                TSTheme,
-                FeatureFlag,
-                HttpStatus,
-                TSHttpStatus,
-                Priority,
-                FileSize,
-                UserId,
-                TokenId,
-                SessionId,
-                Precision,
-                Ratio,
                 setTheme: function bjs_setTheme(theme) {
                     const themeBytes = textEncoder.encode(theme);
                     const themeId = swift.memory.retain(themeBytes);

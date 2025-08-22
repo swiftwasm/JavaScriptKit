@@ -25,7 +25,8 @@ public func _bjs_setTheme(themeBytes: Int32, themeLen: Int32) -> Void {
 public func _bjs_getTheme() -> Void {
     #if arch(wasm32)
     let ret = getTheme()
-    return ret.rawValue.withUTF8 { ptr in
+    var rawValue = ret.rawValue
+    return rawValue.withUTF8 { ptr in
         _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
     }
     #else
@@ -52,7 +53,8 @@ public func _bjs_setTSTheme(themeBytes: Int32, themeLen: Int32) -> Void {
 public func _bjs_getTSTheme() -> Void {
     #if arch(wasm32)
     let ret = getTSTheme()
-    return ret.rawValue.withUTF8 { ptr in
+    var rawValue = ret.rawValue
+    return rawValue.withUTF8 { ptr in
         _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
     }
     #else
@@ -322,7 +324,8 @@ public func _bjs_convertPriority(status: Int32) -> Int32 {
 public func _bjs_validateSession(session: Int64) -> Void {
     #if arch(wasm32)
     let ret = validateSession(_: SessionId(rawValue: UInt64(bitPattern: Int64(session)))!)
-    return ret.rawValue.withUTF8 { ptr in
+    var rawValue = ret.rawValue
+    return rawValue.withUTF8 { ptr in
         _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
     }
     #else

@@ -4,6 +4,53 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export const Method = {
+    Get: 0,
+    Post: 1,
+    Put: 2,
+    Delete: 3,
+};
+
+export const LogLevel = {
+    Debug: "debug",
+    Info: "info",
+    Warning: "warning",
+    Error: "error",
+};
+
+export const Port = {
+    Http: 80,
+    Https: 443,
+    Development: 3000,
+};
+
+export const SupportedMethod = {
+    Get: 0,
+    Post: 1,
+};
+
+
+if (typeof globalThis.Networking === 'undefined') {
+    globalThis.Networking = {};
+}
+if (typeof globalThis.Networking.API === 'undefined') {
+    globalThis.Networking.API = {};
+}
+if (typeof globalThis.Configuration === 'undefined') {
+    globalThis.Configuration = {};
+}
+if (typeof globalThis.Networking.APIV2 === 'undefined') {
+    globalThis.Networking.APIV2 = {};
+}
+if (typeof globalThis.Networking.APIV2.Internal === 'undefined') {
+    globalThis.Networking.APIV2.Internal = {};
+}
+
+globalThis.Networking.API.Method = Method;
+globalThis.Configuration.LogLevel = LogLevel;
+globalThis.Configuration.Port = Port;
+globalThis.Networking.APIV2.Internal.SupportedMethod = SupportedMethod;
+
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -141,44 +188,12 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_TestServer_call(this.pointer, method | 0);
                 }
             }
-            const Method = {
-                Get: 0,
-                Post: 1,
-                Put: 2,
-                Delete: 3,
-            };
-            
-            const LogLevel = {
-                Debug: "debug",
-                Info: "info",
-                Warning: "warning",
-                Error: "error",
-            };
-            
-            const Port = {
-                Http: 80,
-                Https: 443,
-                Development: 3000,
-            };
-            
-            const SupportedMethod = {
-                Get: 0,
-                Post: 1,
-            };
-            
             const exports = {
                 Converter,
                 HTTPServer,
                 TestServer,
-                Method,
-                LogLevel,
-                Port,
-                SupportedMethod,
             };
 
-            if (typeof globalThis.Configuration === 'undefined') {
-                globalThis.Configuration = {};
-            }
             if (typeof globalThis.Networking === 'undefined') {
                 globalThis.Networking = {};
             }
@@ -197,10 +212,6 @@ export async function createInstantiator(options, swift) {
             globalThis.Utils.Converter = exports.Converter;
             globalThis.Networking.API.HTTPServer = exports.HTTPServer;
             globalThis.Networking.APIV2.Internal.TestServer = exports.TestServer;
-            globalThis.Networking.API.Method = exports.Method;
-            globalThis.Configuration.LogLevel = exports.LogLevel;
-            globalThis.Configuration.Port = exports.Port;
-            globalThis.Networking.APIV2.Internal.SupportedMethod = exports.SupportedMethod;
 
             return exports;
         },

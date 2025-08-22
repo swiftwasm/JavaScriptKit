@@ -21,7 +21,7 @@
         // Invalid to declare @JS(namespace) here as it would be conflicting with nesting
         @JS class HTTPServer {
             @JS init() {}
-            @JS func call(_ method: Method)
+            @JS func call(_ method: Method) {}
         }
     }
 }
@@ -49,7 +49,7 @@ enum Internal {
     }
     @JS class TestServer {
         @JS init() {}
-        @JS func call(_ method: SupportedMethod)
+        @JS func call(_ method: SupportedMethod) {}
     }
 }
 

@@ -123,6 +123,153 @@ struct TestError: Error {
     return greeter.jsValue.object!
 }
 
+// MARK: - Enum Tests
+
+@JS enum Direction {
+    case north
+    case south
+    case east
+    case west
+}
+
+@JS enum Status {
+    case loading
+    case success
+    case error
+}
+
+@JS enum Theme: String {
+    case light = "light"
+    case dark = "dark"
+    case auto = "auto"
+}
+
+@JS enum HttpStatus: Int {
+    case ok = 200
+    case notFound = 404
+    case serverError = 500
+}
+
+@JS(enumStyle: .tsEnum) enum TSDirection {
+    case north
+    case south
+    case east
+    case west
+}
+
+@JS(enumStyle: .tsEnum) enum TSTheme: String {
+    case light = "light"
+    case dark = "dark"
+    case auto = "auto"
+}
+
+@JS func setDirection(_ direction: Direction) -> Direction {
+    return direction
+}
+
+@JS func getDirection() -> Direction {
+    return .north
+}
+
+@JS func processDirection(_ input: Direction) -> Status {
+    switch input {
+    case .north, .south: return .success
+    case .east, .west: return .loading
+    }
+}
+
+@JS func setTheme(_ theme: Theme) -> Theme {
+    return theme
+}
+
+@JS func getTheme() -> Theme {
+    return .light
+}
+
+@JS func setHttpStatus(_ status: HttpStatus) -> HttpStatus {
+    return status
+}
+
+@JS func getHttpStatus() -> HttpStatus {
+    return .ok
+}
+
+@JS func processTheme(_ theme: Theme) -> HttpStatus {
+    switch theme {
+    case .light: return .ok
+    case .dark: return .notFound
+    case .auto: return .serverError
+    }
+}
+
+@JS func setTSDirection(_ direction: TSDirection) -> TSDirection {
+    return direction
+}
+
+@JS func getTSDirection() -> TSDirection {
+    return .north
+}
+
+@JS func setTSTheme(_ theme: TSTheme) -> TSTheme {
+    return theme
+}
+
+@JS func getTSTheme() -> TSTheme {
+    return .light
+}
+
+@JS enum Utils {
+    @JS class Converter {
+        @JS init() {}
+
+        @JS func toString(value: Int) -> String {
+            return String(value)
+        }
+    }
+}
+
+@JS enum Networking {
+    @JS enum API {
+        @JS enum Method {
+            case get
+            case post
+            case put
+            case delete
+        }
+        @JS class HTTPServer {
+            @JS init() {}
+            @JS func call(_ method: Method) {}
+        }
+    }
+}
+
+@JS enum Configuration {
+    @JS enum LogLevel: String {
+        case debug = "debug"
+        case info = "info"
+        case warning = "warning"
+        case error = "error"
+    }
+
+    @JS enum Port: Int {
+        case http = 80
+        case https = 443
+        case development = 3000
+    }
+}
+
+@JS(namespace: "Networking.APIV2")
+enum Internal {
+    @JS enum SupportedMethod {
+        case get
+        case post
+    }
+    @JS class TestServer {
+        @JS init() {}
+        @JS func call(_ method: SupportedMethod) {}
+    }
+}
+
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false

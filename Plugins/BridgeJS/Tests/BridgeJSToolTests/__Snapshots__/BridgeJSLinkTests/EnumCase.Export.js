@@ -4,6 +4,27 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export const Direction = {
+    North: 0,
+    South: 1,
+    East: 2,
+    West: 3,
+};
+
+export const Status = {
+    Loading: 0,
+    Success: 1,
+    Error: 2,
+};
+
+export const TSDirection = {
+    North: 0,
+    South: 1,
+    East: 2,
+    West: 3,
+};
+
+
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -63,30 +84,7 @@ export async function createInstantiator(options, swift) {
         createExports: (instance) => {
             const js = swift.memory.heap;
 
-            const Direction = {
-                North: 0,
-                South: 1,
-                East: 2,
-                West: 3,
-            };
-            
-            const Status = {
-                Loading: 0,
-                Success: 1,
-                Error: 2,
-            };
-            
-            const TSDirection = {
-                North: 0,
-                South: 1,
-                East: 2,
-                West: 3,
-            };
-            
             return {
-                Direction,
-                Status,
-                TSDirection,
                 setDirection: function bjs_setDirection(direction) {
                     instance.exports.bjs_setDirection(direction | 0);
                 },

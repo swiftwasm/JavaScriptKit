@@ -1,5 +1,9 @@
 // @ts-check
 
+import { 
+    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme 
+} from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
+
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
 export async function setupOptions(options, context) {
     Error.stackTraceLimit = 100;
@@ -165,6 +169,89 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     } catch (error) {
         assert.fail("Expected no error");
     }
+
+    assert.equal(Direction.North, 0);
+    assert.equal(Direction.South, 1);
+    assert.equal(Direction.East, 2);
+    assert.equal(Direction.West, 3);
+    assert.equal(Status.Loading, 0);
+    assert.equal(Status.Success, 1);
+    assert.equal(Status.Error, 2);
+
+    assert.equal(exports.setDirection(Direction.North), Direction.North);
+    assert.equal(exports.setDirection(Direction.South), Direction.South);
+    assert.equal(exports.getDirection(), Direction.North);
+    assert.equal(exports.processDirection(Direction.North), Status.Success);
+    assert.equal(exports.processDirection(Direction.East), Status.Loading);
+
+    assert.equal(Theme.Light, "light");
+    assert.equal(Theme.Dark, "dark");
+    assert.equal(Theme.Auto, "auto");
+    assert.equal(HttpStatus.Ok, 200);
+    assert.equal(HttpStatus.NotFound, 404);
+    assert.equal(HttpStatus.ServerError, 500);
+
+    assert.equal(exports.setTheme(Theme.Light), Theme.Light);
+    assert.equal(exports.setTheme(Theme.Dark), Theme.Dark);
+    assert.equal(exports.getTheme(), Theme.Light);
+    assert.equal(exports.setHttpStatus(HttpStatus.Ok), HttpStatus.Ok);
+    assert.equal(exports.getHttpStatus(), HttpStatus.Ok);
+    assert.equal(exports.processTheme(Theme.Light), HttpStatus.Ok);
+    assert.equal(exports.processTheme(Theme.Dark), HttpStatus.NotFound);
+
+    assert.equal(TSDirection.North, 0);
+    assert.equal(TSDirection.South, 1);
+    assert.equal(TSDirection.East, 2);
+    assert.equal(TSDirection.West, 3);
+    assert.equal(TSTheme.Light, "light");
+    assert.equal(TSTheme.Dark, "dark");
+    assert.equal(TSTheme.Auto, "auto");
+
+    assert.equal(exports.setTSDirection(TSDirection.North), TSDirection.North);
+    assert.equal(exports.getTSDirection(), TSDirection.North);
+    assert.equal(exports.setTSTheme(TSTheme.Light), TSTheme.Light);
+    assert.equal(exports.getTSTheme(), TSTheme.Light);
+
+    assert.equal(globalThis.Networking.API.Method.Get, 0);
+    assert.equal(globalThis.Networking.API.Method.Post, 1);
+    assert.equal(globalThis.Networking.API.Method.Put, 2);
+    assert.equal(globalThis.Networking.API.Method.Delete, 3);
+    assert.equal(globalThis.Configuration.LogLevel.Debug, "debug");
+    assert.equal(globalThis.Configuration.LogLevel.Info, "info");
+    assert.equal(globalThis.Configuration.LogLevel.Warning, "warning");
+    assert.equal(globalThis.Configuration.LogLevel.Error, "error");
+    assert.equal(globalThis.Configuration.Port.Http, 80);
+    assert.equal(globalThis.Configuration.Port.Https, 443);
+    assert.equal(globalThis.Configuration.Port.Development, 3000);
+    assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethod.Get, 0);
+    assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethod.Post, 1);
+
+    const converter = new exports.Converter();
+    assert.equal(converter.toString(42), "42");
+    assert.equal(converter.toString(123), "123");
+    converter.release();
+
+    const httpServer = new exports.HTTPServer();
+    httpServer.call(globalThis.Networking.API.Method.Get);
+    httpServer.call(globalThis.Networking.API.Method.Post);
+    httpServer.release();
+
+    const testServer = new exports.TestServer();
+    testServer.call(globalThis.Networking.APIV2.Internal.SupportedMethod.Get);
+    testServer.call(globalThis.Networking.APIV2.Internal.SupportedMethod.Post);
+    testServer.release();
+
+    const globalConverter = new globalThis.Utils.Converter();
+    assert.equal(globalConverter.toString(99), "99");
+    globalConverter.release();
+
+    const globalHttpServer = new globalThis.Networking.API.HTTPServer();
+    globalHttpServer.call(globalThis.Networking.API.Method.Get);
+    globalHttpServer.release();
+
+    const globalTestServer = new globalThis.Networking.APIV2.Internal.TestServer();
+    globalTestServer.call(globalThis.Networking.APIV2.Internal.SupportedMethod.Post);
+    globalTestServer.release();
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

@@ -505,7 +505,7 @@ public struct ImportTS {
     }
 }
 
-extension String {
+fileprivate extension String {
     func capitalizedFirstLetter() -> String {
         guard !isEmpty else { return self }
         return prefix(1).uppercased() + dropFirst()

@@ -865,7 +865,12 @@ public class ExportSwift {
                 return CodeBlockItemSyntax(item: .init(StmtSyntax("return \(raw: callExpr).jsValue")))
             }
 
-            let retMutability = returnType == .string ? "var" : "let"
+            let retMutability: String
+            if returnType == .string {
+                retMutability = "var"
+            } else {
+                retMutability = "let"
+            }
             if returnType == .void {
                 return CodeBlockItemSyntax(item: .init(ExpressionStmtSyntax(expression: callExpr)))
             } else {
@@ -952,7 +957,8 @@ public class ExportSwift {
                 if rawType == .string {
                     append(
                         """
-                        return ret.rawValue.withUTF8 { ptr in
+                        var rawValue = ret.rawValue
+                        return rawValue.withUTF8 { ptr in
                             _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
                         }
                         """
