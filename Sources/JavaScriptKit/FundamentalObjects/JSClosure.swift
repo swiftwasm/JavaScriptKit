@@ -103,6 +103,9 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 /// button.removeEventListener!("click", JSValue.function(eventListener))
 /// ```
 ///
+/// - Note: JSClosure now inherits from JSObject directly instead of JSFunction,
+///   providing a consistent and unified object model that aligns with JavaScript's
+///   dynamic callability semantics.
 public class JSClosure: JSObject, JSClosureProtocol {
 
     class SharedJSClosure {

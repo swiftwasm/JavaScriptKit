@@ -10,6 +10,9 @@ import _CJavaScriptKit
 /// alert("Hello, world")
 /// ```
 ///
+/// - Note: In a future version, JSFunction will be unified with JSObject.
+///   Consider using JSObject directly for new code, as all objects in JavaScript
+///   can potentially be callable. JSFunction functionality is now available on JSObject.
 public class JSFunction: JSObject {
     #if !hasFeature(Embedded)
     /// Call this function with given `arguments` and binding given `this` as context.
