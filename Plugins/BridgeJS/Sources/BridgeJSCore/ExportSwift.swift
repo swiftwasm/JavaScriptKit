@@ -446,6 +446,31 @@ public class ExportSwift {
                 )
             }
 
+            if currentEnum.cases.contains(where: { !$0.associatedValues.isEmpty }) {
+                for c in currentEnum.cases {
+                    let count = c.associatedValues.count
+                    if count > 1 {
+                        diagnose(
+                            node: node,
+                            message: "Multiple associated values are not supported yet",
+                            hint: "Use a single primitive payload (String, Int, Float, Double, Bool)"
+                        )
+                    } else if count == 1, let only = c.associatedValues.first {
+                        switch only.type {
+                        case .string, .int, .float, .double, .bool:
+                            break
+                        default:
+                            diagnose(
+                                node: node,
+                                message: "Unsupported associated value type: \(only.type.swiftType)",
+                                hint:
+                                    "Only primitive types (String, Int, Float, Double, Bool) are supported in associated-value enums for now"
+                            )
+                        }
+                    }
+                }
+            }
+
             let swiftCallName = ExportSwift.computeSwiftCallName(for: node, itemName: enumName)
             let exportedEnum = ExportedEnum(
                 name: enumName,
@@ -620,7 +645,21 @@ public class ExportSwift {
             {
                 return .rawValueEnum(swiftCallName, rawType)
             } else {
-                return .caseEnum(swiftCallName)
+                let hasAssociatedValues =
+                    enumDecl.memberBlock.members.contains { member in
+                        guard let caseDecl = member.decl.as(EnumCaseDeclSyntax.self) else { return false }
+                        return caseDecl.elements.contains { element in
+                            if let params = element.parameterClause?.parameters {
+                                return !params.isEmpty
+                            }
+                            return false
+                        }
+                    }
+                if hasAssociatedValues {
+                    return .associatedValueEnum(swiftCallName)
+                } else {
+                    return .caseEnum(swiftCallName)
+                }
             }
         }
 
@@ -649,6 +688,10 @@ public class ExportSwift {
 
         for enumDef in exportedEnums where enumDef.enumType == .simple {
             decls.append(renderCaseEnumHelpers(enumDef))
+        }
+
+        for enumDef in exportedEnums where enumDef.enumType == .associatedValue {
+            decls.append(renderAssociatedValueEnumHelpers(enumDef))
         }
 
         for function in exportedFunctions {
@@ -812,8 +855,21 @@ public class ExportSwift {
                         abiParameterSignatures.append((param.name, wasmType))
                     }
                 }
-            case .associatedValueEnum(_):
-                break
+            case .associatedValueEnum(let enumName):
+                let tag = "\(param.name)Tag"
+                let a = "\(param.name)A"
+                let b = "\(param.name)B"
+                abiParameterForwardings.append(
+                    LabeledExprSyntax(
+                        label: param.label,
+                        expression: ExprSyntax(
+                            "\(raw: enumName)(bridgeJSTag: \(raw: tag), a: \(raw: a), b: \(raw: b))!"
+                        )
+                    )
+                )
+                abiParameterSignatures.append((tag, .i32))
+                abiParameterSignatures.append((a, .i32))
+                abiParameterSignatures.append((b, .i32))
             case .namespaceEnum:
                 break
             case .jsObject(nil):
@@ -979,8 +1035,9 @@ public class ExportSwift {
                         append("return Int32(ret.rawValue)")
                     }
                 }
-            case .associatedValueEnum: break;
-            case .namespaceEnum: break;
+            case .associatedValueEnum:
+                append("ret.bridgeJSReturn()")
+            case .namespaceEnum: break
             case .jsObject(nil):
                 append(
                     """
@@ -1275,4 +1332,124 @@ extension BridgeType {
         case .namespaceEnum(let name): return name
         }
     }
+}
+
+func renderAssociatedValueEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
+    let typeName = enumDef.swiftCallName
+
+    func payloadInitCase(index: Int, name: String, av: AssociatedValue) -> String {
+        let labelPrefix = av.label.map { "\($0): " } ?? ""
+        switch av.type {
+        case .string:
+            return """
+                case \(index):
+                    let s = String(unsafeUninitializedCapacity: Int(b)) { buf in
+                        _swift_js_init_memory(a, buf.baseAddress.unsafelyUnwrapped)
+                        return Int(b)
+                    }
+                    self = .\(name)(\(labelPrefix)s)
+                """
+        case .int:
+            return "case \(index): self = .\(name)(\(labelPrefix)Int(a))"
+        case .bool:
+            return "case \(index): self = .\(name)(\(labelPrefix)(a != 0))"
+        case .float:
+            return "case \(index): self = .\(name)(\(labelPrefix)Float(bitPattern: UInt32(bitPattern: a)))"
+        case .double:
+            return """
+                case \(index):
+                    let bits = UInt64(UInt32(bitPattern: a)) | (UInt64(UInt32(bitPattern: b)) << 32)
+                    self = .\(name)(\(labelPrefix)Double(bitPattern: bits))
+                """
+        default:
+            return "case \(index): return nil"
+        }
+    }
+
+    var initCases: [String] = []
+    for (i, c) in enumDef.cases.enumerated() {
+        if let av = c.associatedValues.first {
+            initCases.append(payloadInitCase(index: i, name: c.name, av: av))
+        } else {
+            initCases.append("case \(i): self = .\(c.name)")
+        }
+    }
+    let initSwitch = (["switch bridgeJSTag {"] + initCases + ["default: return nil", "}"]).joined(separator: "\n")
+
+    func payloadReturnCase(index: Int, name: String, av: AssociatedValue) -> String {
+        switch av.type {
+        case .string:
+            return """
+                case .\(name)(let value):
+                    _swift_js_return_tag(Int32(\(index)))
+                    var ret = value
+                    ret.withUTF8 { ptr in
+                        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                    }
+                """
+        case .int:
+            return """
+                case .\(name)(let value):
+                    _swift_js_return_tag(Int32(\(index)))
+                    _swift_js_return_int(Int32(value))
+                """
+        case .bool:
+            return """
+                case .\(name)(let value):
+                    _swift_js_return_tag(Int32(\(index)))
+                    _swift_js_return_int(value ? 1 : 0)
+                """
+        case .float:
+            return """
+                case .\(name)(let value):
+                    _swift_js_return_tag(Int32(\(index)))
+                    _swift_js_return_f32(value)
+                """
+        case .double:
+            return """
+                case .\(name)(let value):
+                    _swift_js_return_tag(Int32(\(index)))
+                    _swift_js_return_f64(value)
+                """
+        default:
+            return ""
+        }
+    }
+
+    var returnCases: [String] = []
+    for (i, c) in enumDef.cases.enumerated() {
+        if let av = c.associatedValues.first {
+            returnCases.append(payloadReturnCase(index: i, name: c.name, av: av))
+        } else {
+            returnCases.append(
+                """
+                case .\(c.name):
+                    _swift_js_return_tag(Int32(\(i)))
+                """
+            )
+        }
+    }
+    let returnSwitch = (["switch self {"] + returnCases + ["}"]).joined(separator: "\n")
+
+    return """
+        extension \(raw: typeName) {
+            init?(bridgeJSTag: Int32, a: Int32, b: Int32) {
+                \(raw: initSwitch)
+            }
+
+            func bridgeJSReturn() {
+                @_extern(wasm, module: "bjs", name: "swift_js_return_tag")
+                func _swift_js_return_tag(_: Int32)
+                @_extern(wasm, module: "bjs", name: "swift_js_return_string")
+                func _swift_js_return_string(_: UnsafePointer<UInt8>?, _: Int32)
+                @_extern(wasm, module: "bjs", name: "swift_js_return_int")
+                func _swift_js_return_int(_: Int32)
+                @_extern(wasm, module: "bjs", name: "swift_js_return_f32")
+                func _swift_js_return_f32(_: Float32)
+                @_extern(wasm, module: "bjs", name: "swift_js_return_f64")
+                func _swift_js_return_f64(_: Float64)
+                \(raw: returnSwitch)
+            }
+        }
+        """
 }

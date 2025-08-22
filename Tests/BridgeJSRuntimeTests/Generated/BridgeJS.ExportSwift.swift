@@ -144,6 +144,67 @@ extension Internal.SupportedMethod {
     }
 }
 
+extension APIResult {
+    init?(bridgeJSTag: Int32, a: Int32, b: Int32) {
+        switch bridgeJSTag {
+        case 0:
+            let s = String(unsafeUninitializedCapacity: Int(b)) { buf in
+                _swift_js_init_memory(a, buf.baseAddress.unsafelyUnwrapped)
+                return Int(b)
+            }
+            self = .success(s)
+        case 1:
+            self = .failure(Int(a))
+        case 2:
+            self = .flag((a != 0))
+        case 3:
+            self = .rate(Float(bitPattern: UInt32(bitPattern: a)))
+        case 4:
+            let bits = UInt64(UInt32(bitPattern: a)) | (UInt64(UInt32(bitPattern: b)) << 32)
+            self = .precise(Double(bitPattern: bits))
+        case 5:
+            self = .info
+        default:
+            return nil
+        }
+    }
+
+    func bridgeJSReturn() {
+        @_extern(wasm, module: "bjs", name: "swift_js_return_tag")
+        func _swift_js_return_tag(_: Int32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_string")
+        func _swift_js_return_string(_: UnsafePointer<UInt8>?, _: Int32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_int")
+        func _swift_js_return_int(_: Int32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_f32")
+        func _swift_js_return_f32(_: Float32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_f64")
+        func _swift_js_return_f64(_: Float64)
+        switch self {
+        case .success(let value):
+            _swift_js_return_tag(Int32(0))
+            var ret = value
+            ret.withUTF8 { ptr in
+                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+            }
+        case .failure(let value):
+            _swift_js_return_tag(Int32(1))
+            _swift_js_return_int(Int32(value))
+        case .flag(let value):
+            _swift_js_return_tag(Int32(2))
+            _swift_js_return_int(value ? 1 : 0)
+        case .rate(let value):
+            _swift_js_return_tag(Int32(3))
+            _swift_js_return_f32(value)
+        case .precise(let value):
+            _swift_js_return_tag(Int32(4))
+            _swift_js_return_f64(value)
+        case .info:
+            _swift_js_return_tag(Int32(5))
+        }
+    }
+}
+
 @_expose(wasm, "bjs_roundTripVoid")
 @_cdecl("bjs_roundTripVoid")
 public func _bjs_roundTripVoid() -> Void {
@@ -766,6 +827,87 @@ public func _bjs_getTSTheme() -> Void {
     return rawValue.withUTF8 { ptr in
         _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
     }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_echoAPIResult")
+@_cdecl("bjs_echoAPIResult")
+public func _bjs_echoAPIResult(resultTag: Int32, resultA: Int32, resultB: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = echoAPIResult(result: APIResult(bridgeJSTag: resultTag, a: resultA, b: resultB)!)
+    ret.bridgeJSReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeAPIResultSuccess")
+@_cdecl("bjs_makeAPIResultSuccess")
+public func _bjs_makeAPIResultSuccess(valueBytes: Int32, valueLen: Int32) -> Void {
+    #if arch(wasm32)
+    let value = String(unsafeUninitializedCapacity: Int(valueLen)) { b in
+        _swift_js_init_memory(valueBytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(valueLen)
+    }
+    let ret = makeAPIResultSuccess(_: value)
+    ret.bridgeJSReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeAPIResultFailure")
+@_cdecl("bjs_makeAPIResultFailure")
+public func _bjs_makeAPIResultFailure(value: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = makeAPIResultFailure(_: Int(value))
+    ret.bridgeJSReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeAPIResultInfo")
+@_cdecl("bjs_makeAPIResultInfo")
+public func _bjs_makeAPIResultInfo() -> Void {
+    #if arch(wasm32)
+    let ret = makeAPIResultInfo()
+    ret.bridgeJSReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeAPIResultFlag")
+@_cdecl("bjs_makeAPIResultFlag")
+public func _bjs_makeAPIResultFlag(value: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = makeAPIResultFlag(_: value == 1)
+    ret.bridgeJSReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeAPIResultRate")
+@_cdecl("bjs_makeAPIResultRate")
+public func _bjs_makeAPIResultRate(value: Float32) -> Void {
+    #if arch(wasm32)
+    let ret = makeAPIResultRate(_: value)
+    ret.bridgeJSReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeAPIResultPrecise")
+@_cdecl("bjs_makeAPIResultPrecise")
+public func _bjs_makeAPIResultPrecise(value: Float64) -> Void {
+    #if arch(wasm32)
+    let ret = makeAPIResultPrecise(_: value)
+    ret.bridgeJSReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

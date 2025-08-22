@@ -1,0 +1,123 @@
+{
+  "classes" : [
+
+  ],
+  "enums" : [
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "failure"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "flag"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "float" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "rate"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "precise"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "info"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "APIResult",
+      "swiftCallName" : "APIResult"
+    }
+  ],
+  "functions" : [
+    {
+      "abiName" : "bjs_handle",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "handle",
+      "parameters" : [
+        {
+          "label" : "result",
+          "name" : "result",
+          "type" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getResult",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    }
+  ],
+  "moduleName" : "TestModule"
+}

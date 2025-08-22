@@ -90,6 +90,11 @@ export async function createInstantiator(options, swift) {
     let tmpRetString;
     let tmpRetBytes;
     let tmpRetException;
+    let tmpRetTag;
+    let tmpRetInt;
+    let tmpRetF32;
+    let tmpRetF64;
+
     return {
         /**
          * @param {WebAssembly.Imports} importObject
@@ -124,6 +129,18 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_release"] = function(id) {
                 swift.memory.release(id);
+            }
+            bjs["swift_js_return_tag"] = function(tag) {
+                tmpRetTag = tag | 0;
+            }
+            bjs["swift_js_return_int"] = function(v) {
+                tmpRetInt = v | 0;
+            }
+            bjs["swift_js_return_f32"] = function(v) {
+                tmpRetF32 = Math.fround(v);
+            }
+            bjs["swift_js_return_f64"] = function(v) {
+                tmpRetF64 = v;
             }
 
 

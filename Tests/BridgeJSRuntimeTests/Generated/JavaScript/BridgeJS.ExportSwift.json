@@ -572,6 +572,79 @@
         "Internal"
       ],
       "swiftCallName" : "Internal.SupportedMethod"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "failure"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "flag"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "float" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "rate"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "precise"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "info"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "APIResult",
+      "swiftCallName" : "APIResult"
     }
   ],
   "functions" : [
@@ -1482,6 +1555,166 @@
         "rawValueEnum" : {
           "_0" : "TSTheme",
           "_1" : "String"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_echoAPIResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "echoAPIResult",
+      "parameters" : [
+        {
+          "label" : "result",
+          "name" : "result",
+          "type" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPIResultSuccess",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPIResultSuccess",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "value",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPIResultFailure",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPIResultFailure",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "value",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPIResultInfo",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPIResultInfo",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPIResultFlag",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPIResultFlag",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "value",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPIResultRate",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPIResultRate",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "value",
+          "type" : {
+            "float" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPIResultPrecise",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPIResultPrecise",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "value",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
         }
       }
     }

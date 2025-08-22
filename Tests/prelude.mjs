@@ -1,7 +1,7 @@
 // @ts-check
 
 import { 
-    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme 
+    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme, APIResult
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
@@ -252,6 +252,35 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     const globalTestServer = new globalThis.Networking.APIV2.Internal.TestServer();
     globalTestServer.call(globalThis.Networking.APIV2.Internal.SupportedMethod.Post);
     globalTestServer.release();
+    
+    const s1 = { tag: APIResult.Tag.Success, value: "Cześć 🙋‍♂️" };
+    const f1 = { tag: APIResult.Tag.Failure, value: 42 };
+    const i1 = { tag: APIResult.Tag.Info };
+    
+    assert.deepEqual(exports.echoAPIResult(s1), s1);
+    assert.deepEqual(exports.echoAPIResult(f1), f1);
+    assert.deepEqual(exports.echoAPIResult(i1), i1);
+
+    assert.deepEqual(exports.makeAPIResultSuccess("ok"), { tag: APIResult.Tag.Success, value: "ok" });
+    assert.deepEqual(exports.makeAPIResultFailure(123), { tag: APIResult.Tag.Failure, value: 123 });
+    assert.deepEqual(exports.makeAPIResultInfo(), { tag: APIResult.Tag.Info });
+    
+    const bTrue = { tag: APIResult.Tag.Flag, value: true };
+    const bFalse = { tag: APIResult.Tag.Flag, value: false };
+    assert.deepEqual(exports.echoAPIResult(bTrue), bTrue);
+    assert.deepEqual(exports.echoAPIResult(bFalse), bFalse);
+    assert.deepEqual(exports.makeAPIResultFlag(true), bTrue);
+    assert.deepEqual(exports.makeAPIResultFlag(false), bFalse);
+    
+    const rVal = 3.25;
+    const r1 = { tag: APIResult.Tag.Rate, value: rVal };
+    assert.deepEqual(exports.echoAPIResult(r1), r1);
+    assert.deepEqual(exports.makeAPIResultRate(rVal), r1);
+    
+    const pVal = 3.141592653589793;
+    const p1 = { tag: APIResult.Tag.Precise, value: pVal };
+    assert.deepEqual(exports.echoAPIResult(p1), p1);
+    assert.deepEqual(exports.makeAPIResultPrecise(pVal), p1);
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

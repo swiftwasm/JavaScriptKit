@@ -270,6 +270,43 @@ enum Internal {
     }
 }
 
+@JS enum APIResult {
+    case success(String)
+    case failure(Int)
+    case flag(Bool)
+    case rate(Float)
+    case precise(Double)
+    case info
+}
+
+@JS func echoAPIResult(result: APIResult) -> APIResult {
+    return result
+}
+
+@JS func makeAPIResultSuccess(_ value: String) -> APIResult {
+    return .success(value)
+}
+
+@JS func makeAPIResultFailure(_ value: Int) -> APIResult {
+    return .failure(value)
+}
+
+@JS func makeAPIResultInfo() -> APIResult {
+    return .info
+}
+
+@JS func makeAPIResultFlag(_ value: Bool) -> APIResult {
+    return .flag(value)
+}
+
+@JS func makeAPIResultRate(_ value: Float) -> APIResult {
+    return .rate(value)
+}
+
+@JS func makeAPIResultPrecise(_ value: Double) -> APIResult {
+    return .precise(value)
+}
+
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false
