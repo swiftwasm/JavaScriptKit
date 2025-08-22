@@ -25,6 +25,7 @@ public class ExportSwift {
     private var exportedClasses: [ExportedClass] = []
     private var exportedEnums: [ExportedEnum] = []
     private var typeDeclResolver: TypeDeclResolver = TypeDeclResolver()
+    private let enumCodegen: EnumCodegen = EnumCodegen()
 
     public init(progress: ProgressReporting, moduleName: String) {
         self.progress = progress
@@ -524,6 +525,31 @@ public class ExportSwift {
                 )
             }
 
+            if currentEnum.cases.contains(where: { !$0.associatedValues.isEmpty }) {
+                if case .tsEnum = emitStyle {
+                    diagnose(
+                        node: jsAttribute,
+                        message: "TypeScript enum style is not supported for associated value enums",
+                        hint: "Use enumStyle: .const in order to map associated-value enums"
+                    )
+                }
+                for enumCase in currentEnum.cases {
+                    for associatedValue in enumCase.associatedValues {
+                        switch associatedValue.type {
+                        case .string, .int, .float, .double, .bool:
+                            break
+                        default:
+                            diagnose(
+                                node: node,
+                                message: "Unsupported associated value type: \(associatedValue.type.swiftType)",
+                                hint:
+                                    "Only primitive types (String, Int, Float, Double, Bool) are supported in associated-value enums"
+                            )
+                        }
+                    }
+                }
+            }
+
             let swiftCallName = ExportSwift.computeSwiftCallName(for: node, itemName: enumName)
             let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
                 for: node,
@@ -753,10 +779,15 @@ public class ExportSwift {
         decls.append(Self.prelude)
 
         for enumDef in exportedEnums {
-            if enumDef.enumType == .simple {
-                decls.append(renderCaseEnumHelpers(enumDef))
-            } else {
+            switch enumDef.enumType {
+            case .simple:
+                decls.append(enumCodegen.renderCaseEnumHelpers(enumDef))
+            case .rawValue:
                 decls.append("extension \(raw: enumDef.swiftCallName): _BridgedSwiftEnumNoPayload {}")
+            case .associatedValue:
+                decls.append(enumCodegen.renderAssociatedValueEnumHelpers(enumDef))
+            case .namespace:
+                ()
             }
         }
 
@@ -768,45 +799,6 @@ public class ExportSwift {
         }
         let format = BasicFormat()
         return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
-    }
-
-    func renderCaseEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
-        let typeName = enumDef.swiftCallName
-        var initCases: [String] = []
-        var valueCases: [String] = []
-        for (index, c) in enumDef.cases.enumerated() {
-            initCases.append("case \(index): self = .\(c.name)")
-            valueCases.append("case .\(c.name): return \(index)")
-        }
-        let initSwitch = (["switch bridgeJSRawValue {"] + initCases + ["default: return nil", "}"]).joined(
-            separator: "\n"
-        )
-        let valueSwitch = (["switch self {"] + valueCases + ["}"]).joined(separator: "\n")
-
-        return """
-            extension \(raw: typeName) {
-                @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
-                    return bridgeJSRawValue
-                }
-                @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> \(raw: typeName) {
-                    return \(raw: typeName)(bridgeJSRawValue: value)!
-                }
-                @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> \(raw: typeName) {
-                    return \(raw: typeName)(bridgeJSRawValue: value)!
-                }
-                @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
-                    return bridgeJSRawValue
-                }
-
-                private init?(bridgeJSRawValue: Int32) {
-                    \(raw: initSwitch)
-                }
-
-                private var bridgeJSRawValue: Int32 {
-                    \(raw: valueSwitch)
-                }
-            }
-            """
     }
 
     class ExportedThunkBuilder {
@@ -1003,6 +995,159 @@ public class ExportSwift {
 
         func returnSignature() -> String {
             return abiReturnType?.swiftType ?? "Void"
+        }
+    }
+
+    private struct EnumCodegen {
+        func renderCaseEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
+            let typeName = enumDef.swiftCallName
+            var initCases: [String] = []
+            var valueCases: [String] = []
+            for (index, enumCase) in enumDef.cases.enumerated() {
+                initCases.append("case \(index): self = .\(enumCase.name)")
+                valueCases.append("case .\(enumCase.name): return \(index)")
+            }
+            let initSwitch = (["switch bridgeJSRawValue {"] + initCases + ["default: return nil", "}"]).joined(
+                separator: "\n"
+            )
+            let valueSwitch = (["switch self {"] + valueCases + ["}"]).joined(separator: "\n")
+
+            return """
+                extension \(raw: typeName) {
+                    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+                        return bridgeJSRawValue
+                    }
+                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> \(raw: typeName) {
+                        return \(raw: typeName)(bridgeJSRawValue: value)!
+                    }
+                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> \(raw: typeName) {
+                        return \(raw: typeName)(bridgeJSRawValue: value)!
+                    }
+                    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+                        return bridgeJSRawValue
+                    }
+
+                    private init?(bridgeJSRawValue: Int32) {
+                        \(raw: initSwitch)
+                    }
+
+                    private var bridgeJSRawValue: Int32 {
+                        \(raw: valueSwitch)
+                    }
+                }
+                """
+        }
+
+        func renderAssociatedValueEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
+            let typeName = enumDef.swiftCallName
+            return """
+                private extension \(raw: typeName) {
+                    static func bridgeJSLiftParameter(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> \(raw: typeName) {
+                        let params: [UInt8] = .init(unsafeUninitializedCapacity: Int(paramsLen)) { buf, initializedCount in
+                            _swift_js_init_memory(paramsId, buf.baseAddress.unsafelyUnwrapped)
+                            initializedCount = Int(paramsLen)
+                        }
+                        return params.withUnsafeBytes { raw in
+                            var reader = _BJSBinaryReader(raw: raw)
+                            switch caseId {
+                            \(raw: generateBinaryLiftSwitchCases(enumDef: enumDef).joined(separator: "\n"))
+                            default: fatalError("Unknown \(raw: typeName) case ID: \\(caseId)")
+                            }
+                        }
+                    }
+
+                    func bridgeJSLowerReturn() {
+                        switch self {
+                        \(raw: generateReturnSwitchCases(enumDef: enumDef).joined(separator: "\n"))
+                        }
+                    }
+                }
+                """
+        }
+
+        private func generateBinaryLiftSwitchCases(enumDef: ExportedEnum) -> [String] {
+            var cases: [String] = []
+            for (caseIndex, enumCase) in enumDef.cases.enumerated() {
+                if enumCase.associatedValues.isEmpty {
+                    cases.append("case \(caseIndex): return .\(enumCase.name)")
+                } else {
+                    var lines: [String] = []
+                    lines.append("case \(caseIndex):")
+                    lines.append("reader.readParamCount(expected: \(enumCase.associatedValues.count))")
+                    var argList: [String] = []
+
+                    for (paramIndex, associatedValue) in enumCase.associatedValues.enumerated() {
+                        let paramName = associatedValue.label ?? "param\(paramIndex)"
+                        argList.append(paramName)
+
+                        switch associatedValue.type {
+                        case .string:
+                            lines.append("reader.expectTag(.string)")
+                            lines.append("let \(paramName) = reader.readString()")
+                        case .int:
+                            lines.append("reader.expectTag(.int32)")
+                            lines.append("let \(paramName) = Int(reader.readInt32())")
+                        case .bool:
+                            lines.append("reader.expectTag(.bool)")
+                            lines.append("let \(paramName) = Int32(reader.readUInt8()) != 0")
+                        case .float:
+                            lines.append("reader.expectTag(.float32)")
+                            lines.append("let \(paramName) = reader.readFloat32()")
+                        case .double:
+                            lines.append("reader.expectTag(.float64)")
+                            lines.append("let \(paramName) = reader.readFloat64()")
+                        default:
+                            lines.append("reader.expectTag(.int32)")
+                            lines.append("let \(paramName) = reader.readInt32()")
+                        }
+                    }
+
+                    lines.append("return .\(enumCase.name)(\(argList.joined(separator: ", ")))")
+                    cases.append(lines.joined(separator: "\n"))
+                }
+            }
+            return cases
+        }
+
+        private func generateReturnSwitchCases(enumDef: ExportedEnum) -> [String] {
+            var cases: [String] = []
+            for (caseIndex, enumCase) in enumDef.cases.enumerated() {
+                if enumCase.associatedValues.isEmpty {
+                    cases.append("case .\(enumCase.name):")
+                    cases.append("_swift_js_return_tag(Int32(\(caseIndex)))")
+                } else {
+                    var bodyLines: [String] = []
+                    bodyLines.append("_swift_js_return_tag(Int32(\(caseIndex)))")
+                    for (index, associatedValue) in enumCase.associatedValues.enumerated() {
+                        let paramName = associatedValue.label ?? "param\(index)"
+                        switch associatedValue.type {
+                        case .string:
+                            bodyLines.append("var __bjs_\(paramName) = \(paramName)")
+                            bodyLines.append("__bjs_\(paramName).withUTF8 { ptr in")
+                            bodyLines.append("_swift_js_return_string(ptr.baseAddress, Int32(ptr.count))")
+                            bodyLines.append("}")
+                        case .int:
+                            bodyLines.append("_swift_js_return_int(Int32(\(paramName)))")
+                        case .bool:
+                            bodyLines.append("_swift_js_return_bool(\(paramName) ? 1 : 0)")
+                        case .float:
+                            bodyLines.append("_swift_js_return_f32(\(paramName))")
+                        case .double:
+                            bodyLines.append("_swift_js_return_f64(\(paramName))")
+                        default:
+                            bodyLines.append(
+                                "preconditionFailure(\"BridgeJS: unsupported associated value type in generated code\")"
+                            )
+                        }
+                    }
+                    let pattern = enumCase.associatedValues.enumerated()
+                        .map { index, associatedValue in "let \(associatedValue.label ?? "param\(index)")" }
+                        .joined(separator: ", ")
+                    cases.append("case .\(enumCase.name)(\(pattern)):")
+                    cases.append(contentsOf: bodyLines)
+                }
+            }
+            return cases
         }
     }
 
@@ -1264,6 +1409,9 @@ extension BridgeType {
         static let swiftHeapObject = LiftingIntrinsicInfo(parameters: [("value", .pointer)])
         static let void = LiftingIntrinsicInfo(parameters: [])
         static let caseEnum = LiftingIntrinsicInfo(parameters: [("value", .i32)])
+        static let associatedValueEnum = LiftingIntrinsicInfo(parameters: [
+            ("caseId", .i32), ("paramsId", .i32), ("paramsLen", .i32),
+        ])
     }
 
     func liftParameterInfo() throws -> LiftingIntrinsicInfo {
@@ -1291,7 +1439,7 @@ extension BridgeType {
             case .uint64: return .int
             }
         case .associatedValueEnum:
-            throw BridgeJSCoreError("Associated value enums are not supported to pass as parameters")
+            return .associatedValueEnum
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
         }
@@ -1310,6 +1458,7 @@ extension BridgeType {
         static let void = LoweringIntrinsicInfo(returnType: nil)
         static let caseEnum = LoweringIntrinsicInfo(returnType: .i32)
         static let rawValueEnum = LoweringIntrinsicInfo(returnType: .i32)
+        static let associatedValueEnum = LoweringIntrinsicInfo(returnType: nil)
     }
 
     func loweringReturnInfo() throws -> LoweringIntrinsicInfo {
@@ -1337,7 +1486,7 @@ extension BridgeType {
             case .uint64: return .int
             }
         case .associatedValueEnum:
-            throw BridgeJSCoreError("Associated value enums are not supported to pass as parameters")
+            return .associatedValueEnum
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
         }

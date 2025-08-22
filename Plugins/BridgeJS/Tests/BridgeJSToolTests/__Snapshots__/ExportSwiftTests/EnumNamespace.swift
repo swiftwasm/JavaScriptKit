@@ -6,9 +6,6 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-extension Utils: _BridgedSwiftEnumNoPayload {
-}
-
 extension Networking.API.Method {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         return bridgeJSRawValue

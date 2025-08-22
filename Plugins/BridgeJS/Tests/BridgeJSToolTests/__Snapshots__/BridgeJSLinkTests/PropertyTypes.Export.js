@@ -10,10 +10,17 @@ export async function createInstantiator(options, swift) {
     let setException;
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
-
     let tmpRetString;
     let tmpRetBytes;
     let tmpRetException;
+    let tmpRetTag;
+    let tmpRetStrings = [];
+    let tmpRetInts = [];
+    let tmpRetF32s = [];
+    let tmpRetF64s = [];
+    let tmpRetBools = [];
+    
+
     return {
         /**
          * @param {WebAssembly.Imports} importObject
@@ -24,7 +31,9 @@ export async function createInstantiator(options, swift) {
             const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
-                tmpRetString = textDecoder.decode(bytes);
+                const value = textDecoder.decode(bytes);
+                tmpRetString = value;
+                tmpRetStrings.push(value);
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
@@ -49,6 +58,30 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_release"] = function(id) {
                 swift.memory.release(id);
             }
+            bjs["swift_js_return_tag"] = function(tag) {
+                tmpRetTag = tag | 0;
+                tmpRetString = undefined;
+                tmpRetStrings = [];
+                tmpRetInts = [];
+                tmpRetF32s = [];
+                tmpRetF64s = [];
+                tmpRetBools = [];
+            }
+            bjs["swift_js_return_int"] = function(v) {
+                const value = v | 0;
+                tmpRetInts.push(value);
+            }
+            bjs["swift_js_return_f32"] = function(v) {
+                const value = Math.fround(v);
+                tmpRetF32s.push(value);
+            }
+            bjs["swift_js_return_f64"] = function(v) {
+                tmpRetF64s.push(v);
+            }
+            bjs["swift_js_return_bool"] = function(v) {
+                const value = v !== 0;
+                tmpRetBools.push(value);
+            }
             // Wrapper functions for module: TestModule
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
@@ -62,6 +95,7 @@ export async function createInstantiator(options, swift) {
         setInstance: (i) => {
             instance = i;
             memory = instance.exports.memory;
+            
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
             }

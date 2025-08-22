@@ -302,6 +302,143 @@ enum Internal {
     return method
 }
 
+@JS enum APIResult {
+    case success(String)
+    case failure(Int)
+    case flag(Bool)
+    case rate(Float)
+    case precise(Double)
+    case info
+}
+
+@JS func echoAPIResult(result: APIResult) -> APIResult {
+    return result
+}
+
+@JS func makeAPIResultSuccess(_ value: String) -> APIResult {
+    return .success(value)
+}
+
+@JS func makeAPIResultFailure(_ value: Int) -> APIResult {
+    return .failure(value)
+}
+
+@JS func makeAPIResultInfo() -> APIResult {
+    return .info
+}
+
+@JS func makeAPIResultFlag(_ value: Bool) -> APIResult {
+    return .flag(value)
+}
+
+@JS func makeAPIResultRate(_ value: Float) -> APIResult {
+    return .rate(value)
+}
+
+@JS func makeAPIResultPrecise(_ value: Double) -> APIResult {
+    return .precise(value)
+}
+
+@JS
+enum ComplexResult {
+    case success(String)
+    case error(String, Int)
+    case location(Double, Double, String)
+    case status(Bool, Int, String)
+    case coordinates(Double, Double, Double)
+    case comprehensive(Bool, Bool, Int, Int, Double, Double, String, String, String)
+    case info
+}
+
+@JS func echoComplexResult(result: ComplexResult) -> ComplexResult {
+    return result
+}
+
+@JS func makeComplexResultSuccess(_ value: String) -> ComplexResult {
+    return .success(value)
+}
+
+@JS func makeComplexResultError(_ message: String, _ code: Int) -> ComplexResult {
+    return .error(message, code)
+}
+
+@JS func makeComplexResultLocation(_ lat: Double, _ lng: Double, _ name: String) -> ComplexResult {
+    return .location(lat, lng, name)
+}
+
+@JS func makeComplexResultStatus(_ active: Bool, _ code: Int, _ message: String) -> ComplexResult {
+    return .status(active, code, message)
+}
+
+@JS func makeComplexResultCoordinates(_ x: Double, _ y: Double, _ z: Double) -> ComplexResult {
+    return .coordinates(x, y, z)
+}
+
+@JS func makeComplexResultComprehensive(
+    _ flag1: Bool,
+    _ flag2: Bool,
+    _ count1: Int,
+    _ count2: Int,
+    _ value1: Double,
+    _ value2: Double,
+    _ text1: String,
+    _ text2: String,
+    _ text3: String
+) -> ComplexResult {
+    return .comprehensive(flag1, flag2, count1, count2, value1, value2, text1, text2, text3)
+}
+
+@JS func makeComplexResultInfo() -> ComplexResult {
+    return .info
+}
+
+@JS func roundtripComplexResult(_ result: ComplexResult) -> ComplexResult {
+    return result
+}
+
+@JS enum Utilities {
+    @JS enum Result {
+        case success(String)
+        case failure(String, Int)
+        case status(Bool, Int, String)
+    }
+}
+
+@JS enum API {
+    @JS enum NetworkingResult {
+        case success(String)
+        case failure(String, Int)
+    }
+}
+
+@JS func makeUtilitiesResultSuccess(_ message: String) -> Utilities.Result {
+    return .success(message)
+}
+
+@JS func makeUtilitiesResultFailure(_ error: String, _ code: Int) -> Utilities.Result {
+    return .failure(error, code)
+}
+
+@JS func makeUtilitiesResultStatus(_ active: Bool, _ code: Int, _ message: String) -> Utilities.Result {
+    return .status(active, code, message)
+}
+
+@JS func makeAPINetworkingResultSuccess(_ message: String) -> API.NetworkingResult {
+    return .success(message)
+}
+
+@JS func makeAPINetworkingResultFailure(_ error: String, _ code: Int) -> API.NetworkingResult {
+    return .failure(error, code)
+}
+
+@JS func roundtripUtilitiesResult(_ result: Utilities.Result) -> Utilities.Result {
+    return result
+}
+
+@JS func roundtripAPINetworkingResult(_ result: API.NetworkingResult) -> API.NetworkingResult {
+    return result
+}
+
 // MARK: - Property Tests
 
 // Simple class for SwiftHeapObject property testing

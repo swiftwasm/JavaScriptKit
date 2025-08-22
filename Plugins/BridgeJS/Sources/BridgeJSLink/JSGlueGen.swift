@@ -15,6 +15,12 @@ final class JSGlueVariableScope {
     static let reservedStorageToReturnException = "tmpRetException"
     static let reservedTextEncoder = "textEncoder"
     static let reservedTextDecoder = "textDecoder"
+    static let reservedTmpRetTag = "tmpRetTag"
+    static let reservedTmpRetStrings = "tmpRetStrings"
+    static let reservedTmpRetInts = "tmpRetInts"
+    static let reservedTmpRetF32s = "tmpRetF32s"
+    static let reservedTmpRetF64s = "tmpRetF64s"
+    static let reservedTmpRetBools = "tmpRetBools"
 
     private var variables: Set<String> = [
         reservedSwift,
@@ -24,6 +30,12 @@ final class JSGlueVariableScope {
         reservedStorageToReturnException,
         reservedTextEncoder,
         reservedTextDecoder,
+        reservedTmpRetTag,
+        reservedTmpRetStrings,
+        reservedTmpRetInts,
+        reservedTmpRetF32s,
+        reservedTmpRetF64s,
+        reservedTmpRetBools,
     ]
 
     /// Returns a unique variable name in the scope based on the given name hint.
@@ -194,6 +206,37 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
+    static func associatedEnumLowerParameter(enumBase: String) -> IntrinsicJSFragment {
+        IntrinsicJSFragment(
+            parameters: ["value"],
+            printCode: { arguments, scope, printer, cleanup in
+                let value = arguments[0]
+                let caseIdName = "\(value)CaseId"
+                let paramsIdName = "\(value)ParamsId"
+                let paramsLenName = "\(value)ParamsLen"
+                let cleanupName = "\(value)Cleanup"
+                printer.write(
+                    "const { caseId: \(caseIdName), paramsId: \(paramsIdName), paramsLen: \(paramsLenName), cleanup: \(cleanupName) } = enumHelpers.\(enumBase).lower(\(value));"
+                )
+                cleanup.write("if (\(cleanupName)) { \(cleanupName)(); }")
+                return [caseIdName, paramsIdName, paramsLenName]
+            }
+        )
+    }
+
+    static func associatedEnumLiftReturn(enumBase: String) -> IntrinsicJSFragment {
+        IntrinsicJSFragment(
+            parameters: [],
+            printCode: { _, scope, printer, _ in
+                let retName = scope.variable("ret")
+                printer.write(
+                    "const \(retName) = enumHelpers.\(enumBase).raise(\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetBools));"
+                )
+                return [retName]
+            }
+        )
+    }
+
     // MARK: - ExportSwift
 
     /// Returns a fragment that lowers a JS value to Wasm core values for parameters
@@ -211,10 +254,9 @@ struct IntrinsicJSFragment: Sendable {
             case .string: return .stringLowerParameter
             default: return .identity
             }
-        case .associatedValueEnum(let string):
-            throw BridgeJSLinkError(
-                message: "Associated value enums are not supported to be passed as parameters: \(string)"
-            )
+        case .associatedValueEnum(let fullName):
+            let base = fullName.components(separatedBy: ".").last ?? fullName
+            return .associatedEnumLowerParameter(enumBase: base)
         case .namespaceEnum(let string):
             throw BridgeJSLinkError(message: "Namespace enums are not supported to be passed as parameters: \(string)")
         }
@@ -236,10 +278,9 @@ struct IntrinsicJSFragment: Sendable {
             case .bool: return .boolLiftReturn
             default: return .identity
             }
-        case .associatedValueEnum(let string):
-            throw BridgeJSLinkError(
-                message: "Associated value enums are not supported to be returned from functions: \(string)"
-            )
+        case .associatedValueEnum(let fullName):
+            let base = fullName.components(separatedBy: ".").last ?? fullName
+            return .associatedEnumLiftReturn(enumBase: base)
         case .namespaceEnum(let string):
             throw BridgeJSLinkError(
                 message: "Namespace enums are not supported to be returned from functions: \(string)"

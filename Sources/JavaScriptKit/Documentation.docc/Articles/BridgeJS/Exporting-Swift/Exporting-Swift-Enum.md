@@ -405,4 +405,138 @@ enum Helper {
 
 #### Associated Value Enums
 
-Associated value enums are not currently supported, but are planned for future releases.
+Associated value enums are supported and allow you to pass data along with each enum case. BridgeJS generates TypeScript discriminated union types. Associated values are encoded into a binary format for efficient transfer between JavaScript and WebAssembly
+
+**Swift Definition:**
+
+```swift
+@JS
+enum APIResult {
+    case success(String)
+    case failure(Int)
+    case flag(Bool)
+    case rate(Float)
+    case precise(Double)
+    case info
+}
+
+@JS
+enum ComplexResult {
+    case success(String)
+    case error(String, Int)
+    case status(Bool, Int, String)
+    case coordinates(Double, Double, Double)
+    case comprehensive(Bool, Bool, Int, Int, Double, Double, String, String, String)
+    case info
+}
+
+@JS func handle(result: APIResult)
+@JS func getResult() -> APIResult
+```
+
+**Generated TypeScript Declaration:**
+
+```typescript
+export const APIResult: {
+    readonly Tag: {
+        readonly Success: 0;
+        readonly Failure: 1;
+        readonly Flag: 2;
+        readonly Rate: 3;
+        readonly Precise: 4;
+        readonly Info: 5;
+    };
+};
+
+export type APIResult =
+  { tag: typeof APIResult.Tag.Success; param0: string } | 
+  { tag: typeof APIResult.Tag.Failure; param0: number } | 
+  { tag: typeof APIResult.Tag.Flag; param0: boolean } | 
+  { tag: typeof APIResult.Tag.Rate; param0: number } | 
+  { tag: typeof APIResult.Tag.Precise; param0: number } | 
+  { tag: typeof APIResult.Tag.Info }
+
+export const ComplexResult: {
+    readonly Tag: {
+        readonly Success: 0;
+        readonly Error: 1;
+        readonly Status: 2;
+        readonly Coordinates: 3;
+        readonly Comprehensive: 4;
+        readonly Info: 5;
+    };
+};
+
+export type ComplexResult =
+  { tag: typeof ComplexResult.Tag.Success; param0: string } | 
+  { tag: typeof ComplexResult.Tag.Error; param0: string; param1: number } | 
+  { tag: typeof ComplexResult.Tag.Status; param0: boolean; param1: number; param2: string } | 
+  { tag: typeof ComplexResult.Tag.Coordinates; param0: number; param1: number; param2: number } | 
+  { tag: typeof ComplexResult.Tag.Comprehensive; param0: boolean; param1: boolean; param2: number; param3: number; param4: number; param5: number; param6: string; param7: string; param8: string } | 
+  { tag: typeof ComplexResult.Tag.Info }
+```
+
+**Usage in TypeScript:**
+
+```typescript
+const successResult: APIResult = { 
+    tag: exports.APIResult.Tag.Success, 
+    param0: "Operation completed successfully" 
+};
+
+const errorResult: ComplexResult = {
+    tag: exports.ComplexResult.Tag.Error,
+    param0: "Network timeout",
+    param1: 503
+};
+
+const statusResult: ComplexResult = {
+    tag: exports.ComplexResult.Tag.Status,
+    param0: true,
+    param1: 200,
+    param2: "OK"
+};
+
+exports.handle(successResult);
+exports.handle(errorResult);
+
+const result: APIResult = exports.getResult();
+
+// Pattern matching with discriminated unions
+function processResult(result: APIResult) {
+    switch (result.tag) {
+        case exports.APIResult.Tag.Success:
+            console.log("Success:", result.param0); // TypeScript knows param0 is string
+            break;
+        case exports.APIResult.Tag.Failure:
+            console.log("Failure code:", result.param0); // TypeScript knows param0 is number
+            break;
+        case exports.APIResult.Tag.Flag:
+            console.log("Flag value:", result.param0); // TypeScript knows param0 is boolean
+            break;
+        case exports.APIResult.Tag.Info:
+            console.log("Info case has no associated data");
+            break;
+        // TypeScript will warn about missing cases
+    }
+}
+```
+
+**Supported Features:**
+
+| Swift Feature | Status |
+|:--------------|:-------|
+| Associated values: `String` | ✅ |
+| Associated values: `Int` | ✅ |
+| Associated values: `Bool` | ✅ |
+| Associated values: `Float` | ✅ |
+| Associated values: `Double` | ✅ |
+| Associated values: Custom classes/structs | ❌ |
+| Associated values: Other enums | ❌ |
+| Associated values: Arrays/Collections | ❌ |
+| Associated values: Optionals | ❌ |
+| Use as exported function parameters | ✅ |
+| Use as exported function return values | ✅ |
+| Use as imported function parameters | ❌ |
+| Use as imported function return values | ❌ |
+| Namespace support | ✅ |
