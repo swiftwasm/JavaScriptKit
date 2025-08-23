@@ -3,6 +3,9 @@ import struct Foundation.Data
 #if canImport(BridgeJSSkeleton)
 import BridgeJSSkeleton
 #endif
+#if canImport(BridgeJSUtilities)
+import BridgeJSUtilities
+#endif
 
 struct BridgeJSLink {
     /// The exported skeletons
@@ -1453,13 +1456,6 @@ struct BridgeJSLinkError: Error {
 extension String {
     func indent(count: Int) -> String {
         return String(repeating: " ", count: count) + self
-    }
-}
-
-fileprivate extension String {
-    var capitalizedFirstLetter: String {
-        guard !isEmpty else { return self }
-        return prefix(1).uppercased() + dropFirst()
     }
 }
 

@@ -4,6 +4,9 @@ import SwiftSyntaxBuilder
 #if canImport(BridgeJSSkeleton)
 import BridgeJSSkeleton
 #endif
+#if canImport(BridgeJSUtilities)
+import BridgeJSUtilities
+#endif
 
 /// Imports TypeScript declarations and generates Swift bridge code
 ///
