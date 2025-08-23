@@ -54,7 +54,7 @@ func getConfigManager() throws(JSException) -> ConfigManager {
     return ConfigManager.bridgeJSLiftReturn(ret)
 }
 
-struct DatabaseConnection: _BridgedJSClass {
+struct DatabaseConnection: _JSBridgedClass {
     let jsObject: JSObject
 
     init(unsafelyWrapping jsObject: JSObject) {
@@ -145,7 +145,7 @@ struct DatabaseConnection: _BridgedJSClass {
 
 }
 
-struct Logger: _BridgedJSClass {
+struct Logger: _JSBridgedClass {
     let jsObject: JSObject
 
     init(unsafelyWrapping jsObject: JSObject) {
@@ -202,7 +202,7 @@ struct Logger: _BridgedJSClass {
 
 }
 
-struct ConfigManager: _BridgedJSClass {
+struct ConfigManager: _JSBridgedClass {
     let jsObject: JSObject
 
     init(unsafelyWrapping jsObject: JSObject) {

@@ -38,7 +38,7 @@ func createCodeGenerator(_ format: String) throws(JSException) -> CodeGenerator 
     return CodeGenerator.bridgeJSLiftReturn(ret)
 }
 
-struct TypeScriptProcessor: _BridgedJSClass {
+struct TypeScriptProcessor: _JSBridgedClass {
     let jsObject: JSObject
 
     init(unsafelyWrapping jsObject: JSObject) {
@@ -97,7 +97,7 @@ struct TypeScriptProcessor: _BridgedJSClass {
 
 }
 
-struct CodeGenerator: _BridgedJSClass {
+struct CodeGenerator: _JSBridgedClass {
     let jsObject: JSObject
 
     init(unsafelyWrapping jsObject: JSObject) {

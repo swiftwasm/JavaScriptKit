@@ -6,7 +6,7 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-struct Greeter: _BridgedJSClass {
+struct Greeter: _JSBridgedClass {
     let jsObject: JSObject
 
     init(unsafelyWrapping jsObject: JSObject) {

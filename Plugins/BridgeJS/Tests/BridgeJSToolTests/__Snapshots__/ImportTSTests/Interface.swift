@@ -22,7 +22,7 @@ func returnAnimatable() throws(JSException) -> Animatable {
     return Animatable.bridgeJSLiftReturn(ret)
 }
 
-struct Animatable: _BridgedJSClass {
+struct Animatable: _JSBridgedClass {
     let jsObject: JSObject
 
     init(unsafelyWrapping jsObject: JSObject) {
