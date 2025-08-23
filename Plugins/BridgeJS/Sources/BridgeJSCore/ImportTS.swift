@@ -73,7 +73,7 @@ public struct ImportTS {
                 abiParameterForwardings.append(
                     LabeledExprSyntax(
                         label: param.label,
-                        expression: ExprSyntax("Int32(\(raw: param.name) ? 1 : 0)")
+                        expression: ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
                     )
                 )
                 abiParameterSignatures.append((param.name, .i32))
@@ -102,24 +102,10 @@ public struct ImportTS {
                 )
                 abiParameterSignatures.append((param.name, .f64))
             case .string:
-                let stringIdName = "\(param.name)Id"
-                body.append(
-                    """
-                    var \(raw: param.name) = \(raw: param.name)
-
-                    """
-                )
-                body.append(
-                    """
-                    let \(raw: stringIdName) = \(raw: param.name).withUTF8 { b in
-                        _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-                    }
-                    """
-                )
                 abiParameterForwardings.append(
                     LabeledExprSyntax(
                         label: param.label,
-                        expression: ExprSyntax("\(raw: stringIdName)")
+                        expression: ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
                     )
                 )
                 abiParameterSignatures.append((param.name, .i32))
@@ -130,14 +116,14 @@ public struct ImportTS {
                 abiParameterForwardings.append(
                     LabeledExprSyntax(
                         label: param.label,
-                        expression: ExprSyntax("Int32(bitPattern: \(raw: param.name).this.id)")
+                        expression: ExprSyntax("\(raw: param.name).this.bridgeJSLowerParameter()")
                     )
                 )
             case .jsObject(nil):
                 abiParameterForwardings.append(
                     LabeledExprSyntax(
                         label: param.label,
-                        expression: ExprSyntax("Int32(bitPattern: \(raw: param.name).id)")
+                        expression: ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
                     )
                 )
                 abiParameterSignatures.append((param.name, .i32))
@@ -163,7 +149,7 @@ public struct ImportTS {
             switch returnType {
             case .bool:
                 abiReturnType = .i32
-                body.append("return ret == 1")
+                body.append("return \(raw: returnType.swiftType).bridgeJSLiftReturn(ret)")
             case .int:
                 abiReturnType = .i32
                 body.append("return \(raw: returnType.swiftType)(ret)")
@@ -175,14 +161,7 @@ public struct ImportTS {
                 body.append("return \(raw: returnType.swiftType)(ret)")
             case .string:
                 abiReturnType = .i32
-                body.append(
-                    """
-                    return String(unsafeUninitializedCapacity: Int(ret)) { b in
-                        _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-                        return Int(ret)
-                    }
-                    """
-                )
+                body.append("return \(raw: returnType.swiftType).bridgeJSLiftReturn(ret)")
             case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
             case .jsObject(let name):
@@ -190,7 +169,7 @@ public struct ImportTS {
                 if let name = name {
                     body.append("return \(raw: name)(takingThis: ret)")
                 } else {
-                    body.append("return JSObject(id: UInt32(bitPattern: ret))")
+                    body.append("return JSObject.bridgeJSLiftReturn(ret)")
                 }
             case .swiftHeapObject(_):
                 throw BridgeJSCoreError("swiftHeapObject is not supported in imported signatures")

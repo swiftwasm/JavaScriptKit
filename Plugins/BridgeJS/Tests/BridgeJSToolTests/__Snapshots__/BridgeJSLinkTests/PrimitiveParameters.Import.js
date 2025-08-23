@@ -53,7 +53,7 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_check"] = function bjs_check(a, b) {
                 try {
-                    imports.check(a, b);
+                    imports.check(a, b !== 0);
                 } catch (error) {
                     setException(error);
                 }

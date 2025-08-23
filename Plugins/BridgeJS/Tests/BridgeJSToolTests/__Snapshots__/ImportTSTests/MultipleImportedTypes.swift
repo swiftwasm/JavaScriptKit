@@ -15,7 +15,7 @@ func createDatabaseConnection(_ config: JSObject) throws(JSException) -> Databas
         fatalError("Only available on WebAssembly")
     }
     #endif
-    let ret = bjs_createDatabaseConnection(Int32(bitPattern: config.id))
+    let ret = bjs_createDatabaseConnection(config.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -31,11 +31,7 @@ func createLogger(_ level: String) throws(JSException) -> Logger {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    var level = level
-    let levelId = level.withUTF8 { b in
-        _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-    }
-    let ret = bjs_createLogger(levelId)
+    let ret = bjs_createLogger(level.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -79,11 +75,11 @@ struct DatabaseConnection {
                 fatalError("Only available on WebAssembly")
             }
             #endif
-            let ret = bjs_DatabaseConnection_isConnected_get(Int32(bitPattern: self.this.id))
+            let ret = bjs_DatabaseConnection_isConnected_get(self.this.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
             }
-            return ret == 1
+            return Bool.bridgeJSLiftReturn(ret)
         }
     }
 
@@ -97,7 +93,7 @@ struct DatabaseConnection {
                 fatalError("Only available on WebAssembly")
             }
             #endif
-            let ret = bjs_DatabaseConnection_connectionTimeout_get(Int32(bitPattern: self.this.id))
+            let ret = bjs_DatabaseConnection_connectionTimeout_get(self.this.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -114,7 +110,7 @@ struct DatabaseConnection {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        bjs_DatabaseConnection_connectionTimeout_set(Int32(bitPattern: self.this.id), newValue)
+        bjs_DatabaseConnection_connectionTimeout_set(self.this.bridgeJSLowerParameter(), newValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -129,11 +125,7 @@ struct DatabaseConnection {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        var url = url
-        let urlId = url.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-        }
-        bjs_DatabaseConnection_connect(Int32(bitPattern: self.this.id), urlId)
+        bjs_DatabaseConnection_connect(self.this.bridgeJSLowerParameter(), url.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -148,15 +140,11 @@ struct DatabaseConnection {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        var query = query
-        let queryId = query.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-        }
-        let ret = bjs_DatabaseConnection_execute(Int32(bitPattern: self.this.id), queryId)
+        let ret = bjs_DatabaseConnection_execute(self.this.bridgeJSLowerParameter(), query.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
-        return JSObject(id: UInt32(bitPattern: ret))
+        return JSObject.bridgeJSLiftReturn(ret)
     }
 
 }
@@ -182,14 +170,11 @@ struct Logger {
                 fatalError("Only available on WebAssembly")
             }
             #endif
-            let ret = bjs_Logger_level_get(Int32(bitPattern: self.this.id))
+            let ret = bjs_Logger_level_get(self.this.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
             }
-            return String(unsafeUninitializedCapacity: Int(ret)) { b in
-                _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-                return Int(ret)
-            }
+            return String.bridgeJSLiftReturn(ret)
         }
     }
 
@@ -202,11 +187,7 @@ struct Logger {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        var message = message
-        let messageId = message.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-        }
-        bjs_Logger_log(Int32(bitPattern: self.this.id), messageId)
+        bjs_Logger_log(self.this.bridgeJSLowerParameter(), message.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -221,11 +202,7 @@ struct Logger {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        var message = message
-        let messageId = message.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-        }
-        bjs_Logger_error(Int32(bitPattern: self.this.id), messageId, Int32(bitPattern: error.id))
+        bjs_Logger_error(self.this.bridgeJSLowerParameter(), message.bridgeJSLowerParameter(), error.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -254,14 +231,11 @@ struct ConfigManager {
                 fatalError("Only available on WebAssembly")
             }
             #endif
-            let ret = bjs_ConfigManager_configPath_get(Int32(bitPattern: self.this.id))
+            let ret = bjs_ConfigManager_configPath_get(self.this.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
             }
-            return String(unsafeUninitializedCapacity: Int(ret)) { b in
-                _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-                return Int(ret)
-            }
+            return String.bridgeJSLiftReturn(ret)
         }
     }
 
@@ -274,15 +248,11 @@ struct ConfigManager {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        var key = key
-        let keyId = key.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-        }
-        let ret = bjs_ConfigManager_get(Int32(bitPattern: self.this.id), keyId)
+        let ret = bjs_ConfigManager_get(self.this.bridgeJSLowerParameter(), key.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
-        return JSObject(id: UInt32(bitPattern: ret))
+        return JSObject.bridgeJSLiftReturn(ret)
     }
 
     func set(_ key: String, _ value: JSObject) throws(JSException) -> Void {
@@ -294,11 +264,7 @@ struct ConfigManager {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        var key = key
-        let keyId = key.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-        }
-        bjs_ConfigManager_set(Int32(bitPattern: self.this.id), keyId, Int32(bitPattern: value.id))
+        bjs_ConfigManager_set(self.this.bridgeJSLowerParameter(), key.bridgeJSLowerParameter(), value.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }

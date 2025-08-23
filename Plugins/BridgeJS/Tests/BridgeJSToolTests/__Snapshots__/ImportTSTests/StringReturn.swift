@@ -19,8 +19,5 @@ func checkString() throws(JSException) -> String {
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return String(unsafeUninitializedCapacity: Int(ret)) { b in
-        _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-        return Int(ret)
-    }
+    return String.bridgeJSLiftReturn(ret)
 }

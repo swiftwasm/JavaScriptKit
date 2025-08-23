@@ -73,10 +73,8 @@ public func _bjs_Converter_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_Converter_toString")
 public func _bjs_Converter_toString(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
     #if arch(wasm32)
-    var ret = Unmanaged<Utils.Converter>.fromOpaque(_self).takeUnretainedValue().toString(value: Int(value))
-    return ret.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    let ret = Unmanaged<Utils.Converter>.fromOpaque(_self).takeUnretainedValue().toString(value: Int.bridgeJSLiftParameter(value))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

@@ -10,10 +10,8 @@
 @_cdecl("bjs_plainFunction")
 public func _bjs_plainFunction() -> Void {
     #if arch(wasm32)
-    var ret = plainFunction()
-    return ret.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    let ret = plainFunction()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -23,10 +21,8 @@ public func _bjs_plainFunction() -> Void {
 @_cdecl("bjs_namespacedFunction")
 public func _bjs_namespacedFunction() -> Void {
     #if arch(wasm32)
-    var ret = namespacedFunction()
-    return ret.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    let ret = namespacedFunction()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -36,11 +32,7 @@ public func _bjs_namespacedFunction() -> Void {
 @_cdecl("bjs_Greeter_init")
 public func _bjs_Greeter_init(nameBytes: Int32, nameLen: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let name = String(unsafeUninitializedCapacity: Int(nameLen)) { b in
-        _swift_js_init_memory(nameBytes, b.baseAddress.unsafelyUnwrapped)
-        return Int(nameLen)
-    }
-    let ret = Greeter(name: name)
+    let ret = Greeter(name: String.bridgeJSLiftParameter(nameBytes, nameLen))
     return Unmanaged.passRetained(ret).toOpaque()
     #else
     fatalError("Only available on WebAssembly")
@@ -51,10 +43,8 @@ public func _bjs_Greeter_init(nameBytes: Int32, nameLen: Int32) -> UnsafeMutable
 @_cdecl("bjs_Greeter_greet")
 public func _bjs_Greeter_greet(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    var ret = Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().greet()
-    return ret.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    let ret = Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().greet()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -89,10 +79,8 @@ public func _bjs_Converter_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_Converter_toString")
 public func _bjs_Converter_toString(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
     #if arch(wasm32)
-    var ret = Unmanaged<Converter>.fromOpaque(_self).takeUnretainedValue().toString(value: Int(value))
-    return ret.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    let ret = Unmanaged<Converter>.fromOpaque(_self).takeUnretainedValue().toString(value: Int.bridgeJSLiftParameter(value))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -116,10 +104,8 @@ extension Converter: ConvertibleToJSValue {
 @_cdecl("bjs_UUID_uuidString")
 public func _bjs_UUID_uuidString(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    var ret = Unmanaged<UUID>.fromOpaque(_self).takeUnretainedValue().uuidString()
-    return ret.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    let ret = Unmanaged<UUID>.fromOpaque(_self).takeUnretainedValue().uuidString()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

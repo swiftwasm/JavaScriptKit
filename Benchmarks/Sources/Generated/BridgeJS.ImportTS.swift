@@ -45,11 +45,7 @@ func benchmarkRunner(_ name: String, _ body: JSObject) throws(JSException) -> Vo
         fatalError("Only available on WebAssembly")
     }
     #endif
-    var name = name
-    let nameId = name.withUTF8 { b in
-        _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-    }
-    bjs_benchmarkRunner(nameId, Int32(bitPattern: body.id))
+    bjs_benchmarkRunner(name.bridgeJSLowerParameter(), body.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }

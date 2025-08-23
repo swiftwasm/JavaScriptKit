@@ -782,10 +782,14 @@ public class ExportSwift {
             parameters.append(param)
             switch param.type {
             case .bool:
-                liftedParameterExprs.append(ExprSyntax("\(raw: param.name) == 1"))
+                liftedParameterExprs.append(
+                    ExprSyntax("\(raw: param.type.swiftType).bridgeJSLiftParameter(\(raw: param.name))")
+                )
                 abiParameterSignatures.append((param.name, .i32))
             case .int:
-                liftedParameterExprs.append(ExprSyntax("\(raw: param.type.swiftType)(\(raw: param.name))"))
+                liftedParameterExprs.append(
+                    ExprSyntax("\(raw: param.type.swiftType).bridgeJSLiftParameter(\(raw: param.name))")
+                )
                 abiParameterSignatures.append((param.name, .i32))
             case .float:
                 liftedParameterExprs.append(ExprSyntax("\(raw: param.name)"))
@@ -796,14 +800,11 @@ public class ExportSwift {
             case .string:
                 let bytesLabel = "\(param.name)Bytes"
                 let lengthLabel = "\(param.name)Len"
-                let prepare: CodeBlockItemSyntax = """
-                    let \(raw: param.name) = String(unsafeUninitializedCapacity: Int(\(raw: lengthLabel))) { b in
-                        _swift_js_init_memory(\(raw: bytesLabel), b.baseAddress.unsafelyUnwrapped)
-                        return Int(\(raw: lengthLabel))
-                    }
-                    """
-                append(prepare)
-                liftedParameterExprs.append(ExprSyntax("\(raw: param.name)"))
+                liftedParameterExprs.append(
+                    ExprSyntax(
+                        "\(raw: param.type.swiftType).bridgeJSLiftParameter(\(raw: bytesLabel), \(raw: lengthLabel))"
+                    )
+                )
                 abiParameterSignatures.append((bytesLabel, .i32))
                 abiParameterSignatures.append((lengthLabel, .i32))
             case .caseEnum(let enumName):
@@ -813,21 +814,19 @@ public class ExportSwift {
                 if rawType == .string {
                     let bytesLabel = "\(param.name)Bytes"
                     let lengthLabel = "\(param.name)Len"
-                    let prepare: CodeBlockItemSyntax = """
-                        let \(raw: param.name) = String(unsafeUninitializedCapacity: Int(\(raw: lengthLabel))) { b in
-                            _swift_js_init_memory(\(raw: bytesLabel), b.baseAddress.unsafelyUnwrapped)
-                            return Int(\(raw: lengthLabel))
-                        }
-                        """
-                    append(prepare)
-                    liftedParameterExprs.append(ExprSyntax("\(raw: enumName)(rawValue: \(raw: param.name))!"))
+                    liftedParameterExprs.append(
+                        ExprSyntax(
+                            "\(raw: enumName)(rawValue: String.bridgeJSLiftParameter(\(raw: bytesLabel), \(raw: lengthLabel)))!"
+                        )
+                    )
                     abiParameterSignatures.append((bytesLabel, .i32))
                     abiParameterSignatures.append((lengthLabel, .i32))
                 } else {
                     let conversionExpr: String
                     switch rawType {
                     case .bool:
-                        conversionExpr = "\(enumName)(rawValue: \(param.name) != 0)!"
+                        conversionExpr =
+                            "\(enumName)(rawValue: \(param.type.swiftType).bridgeJSLiftParameter(\(param.name)))"
                     case .uint, .uint32, .uint64:
                         if rawType == .uint64 {
                             conversionExpr =
@@ -848,12 +847,9 @@ public class ExportSwift {
                 break
             case .namespaceEnum:
                 break
-            case .jsObject(nil):
-                liftedParameterExprs.append(ExprSyntax("JSObject(id: UInt32(bitPattern: \(raw: param.name)))"))
-                abiParameterSignatures.append((param.name, .i32))
             case .jsObject(let name):
                 liftedParameterExprs.append(
-                    ExprSyntax("\(raw: name)(takingThis: UInt32(bitPattern: \(raw: param.name)))")
+                    ExprSyntax("\(raw: name ?? "JSObject").bridgeJSLiftParameter(\(raw: param.name))")
                 )
                 abiParameterSignatures.append((param.name, .i32))
             case .swiftHeapObject:
@@ -896,16 +892,10 @@ public class ExportSwift {
                 return CodeBlockItemSyntax(item: .init(StmtSyntax("return \(raw: callExpr).jsValue")))
             }
 
-            let retMutability: String
-            if returnType == .string {
-                retMutability = "var"
-            } else {
-                retMutability = "let"
-            }
             if returnType == .void {
                 return CodeBlockItemSyntax(item: .init(ExpressionStmtSyntax(expression: callExpr)))
             } else {
-                return CodeBlockItemSyntax(item: .init(DeclSyntax("\(raw: retMutability) ret = \(raw: callExpr)")))
+                return CodeBlockItemSyntax(item: .init(DeclSyntax("let ret = \(raw: callExpr)")))
             }
         }
 
@@ -925,11 +915,10 @@ public class ExportSwift {
 
         func callPropertyGetter(klassName: String, propertyName: String, returnType: BridgeType) {
             let (_, selfExpr) = removeFirstLiftedParameter()
-            let retMutability = returnType == .string ? "var" : "let"
             if returnType == .void {
                 append("\(raw: selfExpr).\(raw: propertyName)")
             } else {
-                append("\(raw: retMutability) ret = \(raw: selfExpr).\(raw: propertyName)")
+                append("let ret = \(raw: selfExpr).\(raw: propertyName)")
             }
         }
 
@@ -988,15 +977,9 @@ public class ExportSwift {
             case .int, .float, .double:
                 append("return \(raw: abiReturnType!.swiftType)(ret)")
             case .bool:
-                append("return Int32(ret ? 1 : 0)")
+                append("return ret.bridgeJSLowerReturn()")
             case .string:
-                append(
-                    """
-                    return ret.withUTF8 { ptr in
-                        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-                    }
-                    """
-                )
+                append("return ret.bridgeJSLowerReturn()")
             case .caseEnum:
                 abiReturnType = .i32
                 append("return ret.bridgeJSRawValue")
@@ -1004,10 +987,7 @@ public class ExportSwift {
                 if rawType == .string {
                     append(
                         """
-                        var rawValue = ret.rawValue
-                        return rawValue.withUTF8 { ptr in
-                            _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-                        }
+                        return ret.rawValue.bridgeJSLowerReturn()
                         """
                     )
                 } else {
@@ -1028,18 +1008,8 @@ public class ExportSwift {
                 }
             case .associatedValueEnum: break;
             case .namespaceEnum: break;
-            case .jsObject(nil):
-                append(
-                    """
-                    return _swift_js_retain(Int32(bitPattern: ret.id))
-                    """
-                )
-            case .jsObject(_?):
-                append(
-                    """
-                    return _swift_js_retain(Int32(bitPattern: ret.this.id))
-                    """
-                )
+            case .jsObject:
+                append("return ret.bridgeJSLowerReturn()")
             case .swiftHeapObject:
                 // Perform a manual retain on the object, which will be balanced by a
                 // release called via FinalizationRegistry
@@ -1058,7 +1028,7 @@ public class ExportSwift {
                         let ret = JSPromise.async {
                             \(CodeBlockItemListSyntax(self.body))
                         }.jsObject
-                        return _swift_js_retain(Int32(bitPattern: ret.id))
+                        return ret.bridgeJSLowerReturn()
                     """
             } else if effects.isThrows {
                 body = """

@@ -46,11 +46,11 @@ func jsRoundTripBool(_ v: Bool) throws(JSException) -> Bool {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    let ret = bjs_jsRoundTripBool(Int32(v ? 1 : 0))
+    let ret = bjs_jsRoundTripBool(v.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return ret == 1
+    return Bool.bridgeJSLiftReturn(ret)
 }
 
 func jsRoundTripString(_ v: String) throws(JSException) -> String {
@@ -62,18 +62,11 @@ func jsRoundTripString(_ v: String) throws(JSException) -> String {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    var v = v
-    let vId = v.withUTF8 { b in
-        _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-    }
-    let ret = bjs_jsRoundTripString(vId)
+    let ret = bjs_jsRoundTripString(v.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return String(unsafeUninitializedCapacity: Int(ret)) { b in
-        _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-        return Int(ret)
-    }
+    return String.bridgeJSLiftReturn(ret)
 }
 
 func jsThrowOrVoid(_ shouldThrow: Bool) throws(JSException) -> Void {
@@ -85,7 +78,7 @@ func jsThrowOrVoid(_ shouldThrow: Bool) throws(JSException) -> Void {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    bjs_jsThrowOrVoid(Int32(shouldThrow ? 1 : 0))
+    bjs_jsThrowOrVoid(shouldThrow.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -100,7 +93,7 @@ func jsThrowOrNumber(_ shouldThrow: Bool) throws(JSException) -> Double {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    let ret = bjs_jsThrowOrNumber(Int32(shouldThrow ? 1 : 0))
+    let ret = bjs_jsThrowOrNumber(shouldThrow.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -116,11 +109,11 @@ func jsThrowOrBool(_ shouldThrow: Bool) throws(JSException) -> Bool {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    let ret = bjs_jsThrowOrBool(Int32(shouldThrow ? 1 : 0))
+    let ret = bjs_jsThrowOrBool(shouldThrow.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return ret == 1
+    return Bool.bridgeJSLiftReturn(ret)
 }
 
 func jsThrowOrString(_ shouldThrow: Bool) throws(JSException) -> String {
@@ -132,14 +125,11 @@ func jsThrowOrString(_ shouldThrow: Bool) throws(JSException) -> String {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    let ret = bjs_jsThrowOrString(Int32(shouldThrow ? 1 : 0))
+    let ret = bjs_jsThrowOrString(shouldThrow.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return String(unsafeUninitializedCapacity: Int(ret)) { b in
-        _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-        return Int(ret)
-    }
+    return String.bridgeJSLiftReturn(ret)
 }
 
 func runAsyncWorks() throws(JSException) -> JSPromise {
@@ -178,15 +168,7 @@ struct JsGreeter {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        var name = name
-        let nameId = name.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-        }
-        var prefix = prefix
-        let prefixId = prefix.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-        }
-        let ret = bjs_JsGreeter_init(nameId, prefixId)
+        let ret = bjs_JsGreeter_init(name.bridgeJSLowerParameter(), prefix.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -203,14 +185,11 @@ struct JsGreeter {
                 fatalError("Only available on WebAssembly")
             }
             #endif
-            let ret = bjs_JsGreeter_name_get(Int32(bitPattern: self.this.id))
+            let ret = bjs_JsGreeter_name_get(self.this.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
             }
-            return String(unsafeUninitializedCapacity: Int(ret)) { b in
-                _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-                return Int(ret)
-            }
+            return String.bridgeJSLiftReturn(ret)
         }
     }
 
@@ -223,11 +202,7 @@ struct JsGreeter {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        var newValue = newValue
-        let newValueId = newValue.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-        }
-        bjs_JsGreeter_name_set(Int32(bitPattern: self.this.id), newValueId)
+        bjs_JsGreeter_name_set(self.this.bridgeJSLowerParameter(), newValue.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -243,14 +218,11 @@ struct JsGreeter {
                 fatalError("Only available on WebAssembly")
             }
             #endif
-            let ret = bjs_JsGreeter_prefix_get(Int32(bitPattern: self.this.id))
+            let ret = bjs_JsGreeter_prefix_get(self.this.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
             }
-            return String(unsafeUninitializedCapacity: Int(ret)) { b in
-                _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-                return Int(ret)
-            }
+            return String.bridgeJSLiftReturn(ret)
         }
     }
 
@@ -263,14 +235,11 @@ struct JsGreeter {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        let ret = bjs_JsGreeter_greet(Int32(bitPattern: self.this.id))
+        let ret = bjs_JsGreeter_greet(self.this.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
-        return String(unsafeUninitializedCapacity: Int(ret)) { b in
-            _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-            return Int(ret)
-        }
+        return String.bridgeJSLiftReturn(ret)
     }
 
     func changeName(_ name: String) throws(JSException) -> Void {
@@ -282,11 +251,7 @@ struct JsGreeter {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        var name = name
-        let nameId = name.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-        }
-        bjs_JsGreeter_changeName(Int32(bitPattern: self.this.id), nameId)
+        bjs_JsGreeter_changeName(self.this.bridgeJSLowerParameter(), name.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }

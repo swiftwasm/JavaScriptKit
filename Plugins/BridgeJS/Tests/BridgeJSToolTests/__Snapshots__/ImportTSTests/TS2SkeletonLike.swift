@@ -31,11 +31,7 @@ func createCodeGenerator(_ format: String) throws(JSException) -> CodeGenerator 
         fatalError("Only available on WebAssembly")
     }
     #endif
-    var format = format
-    let formatId = format.withUTF8 { b in
-        _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-    }
-    let ret = bjs_createCodeGenerator(formatId)
+    let ret = bjs_createCodeGenerator(format.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -63,14 +59,11 @@ struct TypeScriptProcessor {
                 fatalError("Only available on WebAssembly")
             }
             #endif
-            let ret = bjs_TypeScriptProcessor_version_get(Int32(bitPattern: self.this.id))
+            let ret = bjs_TypeScriptProcessor_version_get(self.this.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
             }
-            return String(unsafeUninitializedCapacity: Int(ret)) { b in
-                _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-                return Int(ret)
-            }
+            return String.bridgeJSLiftReturn(ret)
         }
     }
 
@@ -83,18 +76,11 @@ struct TypeScriptProcessor {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        var ts = ts
-        let tsId = ts.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-        }
-        let ret = bjs_TypeScriptProcessor_convert(Int32(bitPattern: self.this.id), tsId)
+        let ret = bjs_TypeScriptProcessor_convert(self.this.bridgeJSLowerParameter(), ts.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
-        return String(unsafeUninitializedCapacity: Int(ret)) { b in
-            _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-            return Int(ret)
-        }
+        return String.bridgeJSLiftReturn(ret)
     }
 
     func validate(_ ts: String) throws(JSException) -> Bool {
@@ -106,15 +92,11 @@ struct TypeScriptProcessor {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        var ts = ts
-        let tsId = ts.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-        }
-        let ret = bjs_TypeScriptProcessor_validate(Int32(bitPattern: self.this.id), tsId)
+        let ret = bjs_TypeScriptProcessor_validate(self.this.bridgeJSLowerParameter(), ts.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
-        return ret == 1
+        return Bool.bridgeJSLiftReturn(ret)
     }
 
 }
@@ -140,14 +122,11 @@ struct CodeGenerator {
                 fatalError("Only available on WebAssembly")
             }
             #endif
-            let ret = bjs_CodeGenerator_outputFormat_get(Int32(bitPattern: self.this.id))
+            let ret = bjs_CodeGenerator_outputFormat_get(self.this.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
             }
-            return String(unsafeUninitializedCapacity: Int(ret)) { b in
-                _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-                return Int(ret)
-            }
+            return String.bridgeJSLiftReturn(ret)
         }
     }
 
@@ -160,14 +139,11 @@ struct CodeGenerator {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        let ret = bjs_CodeGenerator_generate(Int32(bitPattern: self.this.id), Int32(bitPattern: input.id))
+        let ret = bjs_CodeGenerator_generate(self.this.bridgeJSLowerParameter(), input.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
-        return String(unsafeUninitializedCapacity: Int(ret)) { b in
-            _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-            return Int(ret)
-        }
+        return String.bridgeJSLiftReturn(ret)
     }
 
 }

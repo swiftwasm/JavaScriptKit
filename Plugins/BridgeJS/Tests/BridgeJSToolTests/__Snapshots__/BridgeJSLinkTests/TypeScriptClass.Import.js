@@ -55,8 +55,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     const nameObject = swift.memory.getObject(name);
                     swift.memory.release(name);
-                    let ret = new imports.Greeter(nameObject);
-                    return swift.memory.retain(ret);
+                    return swift.memory.retain(new imports.Greeter(nameObject));
                 } catch (error) {
                     setException(error);
                     return 0

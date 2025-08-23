@@ -82,7 +82,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_asyncRoundTripBool"] = function bjs_asyncRoundTripBool(v) {
                 try {
-                    let ret = imports.asyncRoundTripBool(v);
+                    let ret = imports.asyncRoundTripBool(v !== 0);
                     return swift.memory.retain(ret);
                 } catch (error) {
                     setException(error);

@@ -10,11 +10,7 @@
 @_cdecl("bjs_checkString")
 public func _bjs_checkString(aBytes: Int32, aLen: Int32) -> Void {
     #if arch(wasm32)
-    let a = String(unsafeUninitializedCapacity: Int(aLen)) { b in
-        _swift_js_init_memory(aBytes, b.baseAddress.unsafelyUnwrapped)
-        return Int(aLen)
-    }
-    checkString(a: a)
+    checkString(a: String.bridgeJSLiftParameter(aBytes, aLen))
     #else
     fatalError("Only available on WebAssembly")
     #endif

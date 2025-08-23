@@ -20,11 +20,7 @@ public func _bjs_takeGreeter(greeter: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Greeter_init")
 public func _bjs_Greeter_init(nameBytes: Int32, nameLen: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let name = String(unsafeUninitializedCapacity: Int(nameLen)) { b in
-        _swift_js_init_memory(nameBytes, b.baseAddress.unsafelyUnwrapped)
-        return Int(nameLen)
-    }
-    let ret = Greeter(name: name)
+    let ret = Greeter(name: String.bridgeJSLiftParameter(nameBytes, nameLen))
     return Unmanaged.passRetained(ret).toOpaque()
     #else
     fatalError("Only available on WebAssembly")
@@ -35,10 +31,8 @@ public func _bjs_Greeter_init(nameBytes: Int32, nameLen: Int32) -> UnsafeMutable
 @_cdecl("bjs_Greeter_greet")
 public func _bjs_Greeter_greet(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    var ret = Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().greet()
-    return ret.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    let ret = Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().greet()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -48,11 +42,7 @@ public func _bjs_Greeter_greet(_self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Greeter_changeName")
 public func _bjs_Greeter_changeName(_self: UnsafeMutableRawPointer, nameBytes: Int32, nameLen: Int32) -> Void {
     #if arch(wasm32)
-    let name = String(unsafeUninitializedCapacity: Int(nameLen)) { b in
-        _swift_js_init_memory(nameBytes, b.baseAddress.unsafelyUnwrapped)
-        return Int(nameLen)
-    }
-    Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().changeName(name: name)
+    Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().changeName(name: String.bridgeJSLiftParameter(nameBytes, nameLen))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -62,10 +52,8 @@ public func _bjs_Greeter_changeName(_self: UnsafeMutableRawPointer, nameBytes: I
 @_cdecl("bjs_Greeter_name_get")
 public func _bjs_Greeter_name_get(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    var ret = Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().name
-    return ret.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    let ret = Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().name
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -75,11 +63,7 @@ public func _bjs_Greeter_name_get(_self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Greeter_name_set")
 public func _bjs_Greeter_name_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLen: Int32) -> Void {
     #if arch(wasm32)
-    let value = String(unsafeUninitializedCapacity: Int(valueLen)) { b in
-        _swift_js_init_memory(valueBytes, b.baseAddress.unsafelyUnwrapped)
-        return Int(valueLen)
-    }
-    Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().name = value
+    Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().name = String.bridgeJSLiftParameter(valueBytes, valueLen)
     #else
     fatalError("Only available on WebAssembly")
     #endif

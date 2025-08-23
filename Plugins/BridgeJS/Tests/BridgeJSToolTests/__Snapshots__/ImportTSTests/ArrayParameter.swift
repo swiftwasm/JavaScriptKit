@@ -15,7 +15,7 @@ func checkArray(_ a: JSObject) throws(JSException) -> Void {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    bjs_checkArray(Int32(bitPattern: a.id))
+    bjs_checkArray(a.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -30,7 +30,7 @@ func checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> Voi
         fatalError("Only available on WebAssembly")
     }
     #endif
-    bjs_checkArrayWithLength(Int32(bitPattern: a.id), b)
+    bjs_checkArrayWithLength(a.bridgeJSLowerParameter(), b)
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -45,7 +45,7 @@ func checkArray(_ a: JSObject) throws(JSException) -> Void {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    bjs_checkArray(Int32(bitPattern: a.id))
+    bjs_checkArray(a.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }

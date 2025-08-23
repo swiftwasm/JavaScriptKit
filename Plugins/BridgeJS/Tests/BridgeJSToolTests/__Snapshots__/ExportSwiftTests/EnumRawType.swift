@@ -10,11 +10,7 @@
 @_cdecl("bjs_setTheme")
 public func _bjs_setTheme(themeBytes: Int32, themeLen: Int32) -> Void {
     #if arch(wasm32)
-    let theme = String(unsafeUninitializedCapacity: Int(themeLen)) { b in
-        _swift_js_init_memory(themeBytes, b.baseAddress.unsafelyUnwrapped)
-        return Int(themeLen)
-    }
-    setTheme(_: Theme(rawValue: theme)!)
+    setTheme(_: Theme(rawValue: String.bridgeJSLiftParameter(themeBytes, themeLen))!)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -25,10 +21,7 @@ public func _bjs_setTheme(themeBytes: Int32, themeLen: Int32) -> Void {
 public func _bjs_getTheme() -> Void {
     #if arch(wasm32)
     let ret = getTheme()
-    var rawValue = ret.rawValue
-    return rawValue.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    return ret.rawValue.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -38,11 +31,7 @@ public func _bjs_getTheme() -> Void {
 @_cdecl("bjs_setTSTheme")
 public func _bjs_setTSTheme(themeBytes: Int32, themeLen: Int32) -> Void {
     #if arch(wasm32)
-    let theme = String(unsafeUninitializedCapacity: Int(themeLen)) { b in
-        _swift_js_init_memory(themeBytes, b.baseAddress.unsafelyUnwrapped)
-        return Int(themeLen)
-    }
-    setTSTheme(_: TSTheme(rawValue: theme)!)
+    setTSTheme(_: TSTheme(rawValue: String.bridgeJSLiftParameter(themeBytes, themeLen))!)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -53,10 +42,7 @@ public func _bjs_setTSTheme(themeBytes: Int32, themeLen: Int32) -> Void {
 public func _bjs_getTSTheme() -> Void {
     #if arch(wasm32)
     let ret = getTSTheme()
-    var rawValue = ret.rawValue
-    return rawValue.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    return ret.rawValue.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -66,7 +52,7 @@ public func _bjs_getTSTheme() -> Void {
 @_cdecl("bjs_setFeatureFlag")
 public func _bjs_setFeatureFlag(flag: Int32) -> Void {
     #if arch(wasm32)
-    setFeatureFlag(_: FeatureFlag(rawValue: flag != 0)!)
+    setFeatureFlag(_: FeatureFlag(rawValue: FeatureFlag.bridgeJSLiftParameter(flag)))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -276,7 +262,7 @@ public func _bjs_getRatio() -> Float64 {
 @_cdecl("bjs_setFeatureFlag")
 public func _bjs_setFeatureFlag(featureFlag: Int32) -> Void {
     #if arch(wasm32)
-    setFeatureFlag(_: FeatureFlag(rawValue: featureFlag != 0)!)
+    setFeatureFlag(_: FeatureFlag(rawValue: FeatureFlag.bridgeJSLiftParameter(featureFlag)))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -297,11 +283,7 @@ public func _bjs_getFeatureFlag() -> Int32 {
 @_cdecl("bjs_processTheme")
 public func _bjs_processTheme(themeBytes: Int32, themeLen: Int32) -> Int32 {
     #if arch(wasm32)
-    let theme = String(unsafeUninitializedCapacity: Int(themeLen)) { b in
-        _swift_js_init_memory(themeBytes, b.baseAddress.unsafelyUnwrapped)
-        return Int(themeLen)
-    }
-    let ret = processTheme(_: Theme(rawValue: theme)!)
+    let ret = processTheme(_: Theme(rawValue: String.bridgeJSLiftParameter(themeBytes, themeLen))!)
     return Int32(ret.rawValue)
     #else
     fatalError("Only available on WebAssembly")
@@ -324,10 +306,7 @@ public func _bjs_convertPriority(status: Int32) -> Int32 {
 public func _bjs_validateSession(session: Int64) -> Void {
     #if arch(wasm32)
     let ret = validateSession(_: SessionId(rawValue: UInt64(bitPattern: Int64(session)))!)
-    var rawValue = ret.rawValue
-    return rawValue.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    return ret.rawValue.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

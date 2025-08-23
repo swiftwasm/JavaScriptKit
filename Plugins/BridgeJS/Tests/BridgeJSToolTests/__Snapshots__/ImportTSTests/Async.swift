@@ -47,11 +47,7 @@ func asyncRoundTripString(_ v: String) throws(JSException) -> JSPromise {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    var v = v
-    let vId = v.withUTF8 { b in
-        _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-    }
-    let ret = bjs_asyncRoundTripString(vId)
+    let ret = bjs_asyncRoundTripString(v.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -67,7 +63,7 @@ func asyncRoundTripBool(_ v: Bool) throws(JSException) -> JSPromise {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    let ret = bjs_asyncRoundTripBool(Int32(v ? 1 : 0))
+    let ret = bjs_asyncRoundTripBool(v.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -115,7 +111,7 @@ func asyncRoundTripJSObject(_ v: JSObject) throws(JSException) -> JSPromise {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    let ret = bjs_asyncRoundTripJSObject(Int32(bitPattern: v.id))
+    let ret = bjs_asyncRoundTripJSObject(v.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }

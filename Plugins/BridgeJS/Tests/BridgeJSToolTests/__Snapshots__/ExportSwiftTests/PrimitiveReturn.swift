@@ -44,7 +44,7 @@ public func _bjs_checkDouble() -> Float64 {
 public func _bjs_checkBool() -> Int32 {
     #if arch(wasm32)
     let ret = checkBool()
-    return Int32(ret ? 1 : 0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
