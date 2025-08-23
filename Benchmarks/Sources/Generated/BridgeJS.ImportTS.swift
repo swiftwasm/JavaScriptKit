@@ -30,7 +30,7 @@ func benchmarkHelperNoopWithNumber(_ n: Double) throws(JSException) -> Void {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    bjs_benchmarkHelperNoopWithNumber(n)
+    bjs_benchmarkHelperNoopWithNumber(n.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }

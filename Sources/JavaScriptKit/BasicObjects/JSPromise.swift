@@ -23,10 +23,6 @@ public final class JSPromise: JSBridgedClass {
         self.init(from: jsObject)
     }
 
-    @_spi(BridgeJS) public convenience init(takingThis: Int32) {
-        self.init(unsafelyWrapping: JSObject(id: UInt32(bitPattern: takingThis)))
-    }
-
     /// Creates a new `JSPromise` instance from a given JavaScript `Promise` object. If `value`
     /// is not an object and is not an instance of JavaScript `Promise`, this function will
     /// return `nil`.

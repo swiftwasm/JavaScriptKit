@@ -19,7 +19,7 @@ func asyncReturnVoid() throws(JSException) -> JSPromise {
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return JSPromise(takingThis: ret)
+    return JSPromise.bridgeJSLiftReturn(ret)
 }
 
 func asyncRoundTripInt(_ v: Double) throws(JSException) -> JSPromise {
@@ -31,11 +31,11 @@ func asyncRoundTripInt(_ v: Double) throws(JSException) -> JSPromise {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    let ret = bjs_asyncRoundTripInt(v)
+    let ret = bjs_asyncRoundTripInt(v.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return JSPromise(takingThis: ret)
+    return JSPromise.bridgeJSLiftReturn(ret)
 }
 
 func asyncRoundTripString(_ v: String) throws(JSException) -> JSPromise {
@@ -51,7 +51,7 @@ func asyncRoundTripString(_ v: String) throws(JSException) -> JSPromise {
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return JSPromise(takingThis: ret)
+    return JSPromise.bridgeJSLiftReturn(ret)
 }
 
 func asyncRoundTripBool(_ v: Bool) throws(JSException) -> JSPromise {
@@ -67,7 +67,7 @@ func asyncRoundTripBool(_ v: Bool) throws(JSException) -> JSPromise {
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return JSPromise(takingThis: ret)
+    return JSPromise.bridgeJSLiftReturn(ret)
 }
 
 func asyncRoundTripFloat(_ v: Double) throws(JSException) -> JSPromise {
@@ -79,11 +79,11 @@ func asyncRoundTripFloat(_ v: Double) throws(JSException) -> JSPromise {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    let ret = bjs_asyncRoundTripFloat(v)
+    let ret = bjs_asyncRoundTripFloat(v.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return JSPromise(takingThis: ret)
+    return JSPromise.bridgeJSLiftReturn(ret)
 }
 
 func asyncRoundTripDouble(_ v: Double) throws(JSException) -> JSPromise {
@@ -95,11 +95,11 @@ func asyncRoundTripDouble(_ v: Double) throws(JSException) -> JSPromise {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    let ret = bjs_asyncRoundTripDouble(v)
+    let ret = bjs_asyncRoundTripDouble(v.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return JSPromise(takingThis: ret)
+    return JSPromise.bridgeJSLiftReturn(ret)
 }
 
 func asyncRoundTripJSObject(_ v: JSObject) throws(JSException) -> JSPromise {
@@ -115,5 +115,5 @@ func asyncRoundTripJSObject(_ v: JSObject) throws(JSException) -> JSPromise {
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return JSPromise(takingThis: ret)
+    return JSPromise.bridgeJSLiftReturn(ret)
 }

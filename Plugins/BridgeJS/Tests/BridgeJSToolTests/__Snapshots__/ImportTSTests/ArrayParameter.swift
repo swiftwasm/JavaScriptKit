@@ -30,7 +30,7 @@ func checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> Voi
         fatalError("Only available on WebAssembly")
     }
     #endif
-    bjs_checkArrayWithLength(a.bridgeJSLowerParameter(), b)
+    bjs_checkArrayWithLength(a.bridgeJSLowerParameter(), b.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }

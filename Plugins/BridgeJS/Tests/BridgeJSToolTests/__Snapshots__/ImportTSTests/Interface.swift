@@ -19,18 +19,14 @@ func returnAnimatable() throws(JSException) -> Animatable {
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return Animatable(takingThis: ret)
+    return Animatable.bridgeJSLiftReturn(ret)
 }
 
-struct Animatable {
-    let this: JSObject
+struct Animatable: _BridgedJSClass {
+    let jsObject: JSObject
 
-    init(this: JSObject) {
-        self.this = this
-    }
-
-    init(takingThis this: Int32) {
-        self.this = JSObject(id: UInt32(bitPattern: this))
+    init(unsafelyWrapping jsObject: JSObject) {
+        self.jsObject = jsObject
     }
 
     func animate(_ keyframes: JSObject, _ options: JSObject) throws(JSException) -> JSObject {
@@ -42,7 +38,7 @@ struct Animatable {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        let ret = bjs_Animatable_animate(self.this.bridgeJSLowerParameter(), keyframes.bridgeJSLowerParameter(), options.bridgeJSLowerParameter())
+        let ret = bjs_Animatable_animate(self.bridgeJSLowerParameter(), keyframes.bridgeJSLowerParameter(), options.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -58,7 +54,7 @@ struct Animatable {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        let ret = bjs_Animatable_getAnimations(self.this.bridgeJSLowerParameter(), options.bridgeJSLowerParameter())
+        let ret = bjs_Animatable_getAnimations(self.bridgeJSLowerParameter(), options.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }

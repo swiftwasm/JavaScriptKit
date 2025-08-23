@@ -293,6 +293,20 @@ extension _BridgedSwiftHeapObject {
     }
 }
 
+extension _JSBridgedClass {
+    // MARK: ImportTS
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 { jsObject.bridgeJSLowerParameter() }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ id: Int32) -> Self {
+        Self(unsafelyWrapping: JSObject.bridgeJSLiftReturn(id))
+    }
+
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ id: Int32) -> Self {
+        Self(unsafelyWrapping: JSObject.bridgeJSLiftParameter(id))
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 { jsObject.bridgeJSLowerReturn() }
+}
+
 /// A protocol that Swift enum types that do not have a payload can conform to.
 ///
 /// The conformance is automatically synthesized by the BridgeJS code generator.

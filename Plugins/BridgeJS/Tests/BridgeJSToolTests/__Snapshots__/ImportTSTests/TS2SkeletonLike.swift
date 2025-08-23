@@ -19,7 +19,7 @@ func createTS2Skeleton() throws(JSException) -> TypeScriptProcessor {
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return TypeScriptProcessor(takingThis: ret)
+    return TypeScriptProcessor.bridgeJSLiftReturn(ret)
 }
 
 func createCodeGenerator(_ format: String) throws(JSException) -> CodeGenerator {
@@ -35,18 +35,14 @@ func createCodeGenerator(_ format: String) throws(JSException) -> CodeGenerator 
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return CodeGenerator(takingThis: ret)
+    return CodeGenerator.bridgeJSLiftReturn(ret)
 }
 
-struct TypeScriptProcessor {
-    let this: JSObject
+struct TypeScriptProcessor: _BridgedJSClass {
+    let jsObject: JSObject
 
-    init(this: JSObject) {
-        self.this = this
-    }
-
-    init(takingThis this: Int32) {
-        self.this = JSObject(id: UInt32(bitPattern: this))
+    init(unsafelyWrapping jsObject: JSObject) {
+        self.jsObject = jsObject
     }
 
     var version: String {
@@ -59,7 +55,7 @@ struct TypeScriptProcessor {
                 fatalError("Only available on WebAssembly")
             }
             #endif
-            let ret = bjs_TypeScriptProcessor_version_get(self.this.bridgeJSLowerParameter())
+            let ret = bjs_TypeScriptProcessor_version_get(self.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -76,7 +72,7 @@ struct TypeScriptProcessor {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        let ret = bjs_TypeScriptProcessor_convert(self.this.bridgeJSLowerParameter(), ts.bridgeJSLowerParameter())
+        let ret = bjs_TypeScriptProcessor_convert(self.bridgeJSLowerParameter(), ts.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -92,7 +88,7 @@ struct TypeScriptProcessor {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        let ret = bjs_TypeScriptProcessor_validate(self.this.bridgeJSLowerParameter(), ts.bridgeJSLowerParameter())
+        let ret = bjs_TypeScriptProcessor_validate(self.bridgeJSLowerParameter(), ts.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -101,15 +97,11 @@ struct TypeScriptProcessor {
 
 }
 
-struct CodeGenerator {
-    let this: JSObject
+struct CodeGenerator: _BridgedJSClass {
+    let jsObject: JSObject
 
-    init(this: JSObject) {
-        self.this = this
-    }
-
-    init(takingThis this: Int32) {
-        self.this = JSObject(id: UInt32(bitPattern: this))
+    init(unsafelyWrapping jsObject: JSObject) {
+        self.jsObject = jsObject
     }
 
     var outputFormat: String {
@@ -122,7 +114,7 @@ struct CodeGenerator {
                 fatalError("Only available on WebAssembly")
             }
             #endif
-            let ret = bjs_CodeGenerator_outputFormat_get(self.this.bridgeJSLowerParameter())
+            let ret = bjs_CodeGenerator_outputFormat_get(self.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -139,7 +131,7 @@ struct CodeGenerator {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        let ret = bjs_CodeGenerator_generate(self.this.bridgeJSLowerParameter(), input.bridgeJSLowerParameter())
+        let ret = bjs_CodeGenerator_generate(self.bridgeJSLowerParameter(), input.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }

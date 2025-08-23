@@ -6,15 +6,11 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-struct Greeter {
-    let this: JSObject
+struct Greeter: _BridgedJSClass {
+    let jsObject: JSObject
 
-    init(this: JSObject) {
-        self.this = this
-    }
-
-    init(takingThis this: Int32) {
-        self.this = JSObject(id: UInt32(bitPattern: this))
+    init(unsafelyWrapping jsObject: JSObject) {
+        self.jsObject = jsObject
     }
 
     init(_ name: String) throws(JSException) {
@@ -30,7 +26,7 @@ struct Greeter {
         if let error = _swift_js_take_exception() {
             throw error
         }
-        self.this = JSObject(id: UInt32(bitPattern: ret))
+        self.jsObject = JSObject(id: UInt32(bitPattern: ret))
     }
 
     var name: String {
@@ -43,7 +39,7 @@ struct Greeter {
                 fatalError("Only available on WebAssembly")
             }
             #endif
-            let ret = bjs_Greeter_name_get(self.this.bridgeJSLowerParameter())
+            let ret = bjs_Greeter_name_get(self.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -60,7 +56,7 @@ struct Greeter {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        bjs_Greeter_name_set(self.this.bridgeJSLowerParameter(), newValue.bridgeJSLowerParameter())
+        bjs_Greeter_name_set(self.bridgeJSLowerParameter(), newValue.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -76,11 +72,11 @@ struct Greeter {
                 fatalError("Only available on WebAssembly")
             }
             #endif
-            let ret = bjs_Greeter_age_get(self.this.bridgeJSLowerParameter())
+            let ret = bjs_Greeter_age_get(self.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
             }
-            return Double(ret)
+            return Double.bridgeJSLiftReturn(ret)
         }
     }
 
@@ -93,7 +89,7 @@ struct Greeter {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        let ret = bjs_Greeter_greet(self.this.bridgeJSLowerParameter())
+        let ret = bjs_Greeter_greet(self.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -109,7 +105,7 @@ struct Greeter {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        bjs_Greeter_changeName(self.this.bridgeJSLowerParameter(), name.bridgeJSLowerParameter())
+        bjs_Greeter_changeName(self.bridgeJSLowerParameter(), name.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
