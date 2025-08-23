@@ -60,7 +60,8 @@ struct TestError: Error {
 @JS func asyncRoundTripJSObject(v: JSObject) async -> JSObject { return v }
 
 @JS class Greeter {
-    var name: String
+    @JS var name: String
+    @JS let prefix: String = "Hello"
 
     nonisolated(unsafe) static var onDeinit: () -> Void = {}
 
@@ -69,7 +70,7 @@ struct TestError: Error {
     }
 
     @JS func greet() -> String {
-        return "Hello, \(name)!"
+        return "\(prefix), \(name)!"
     }
     @JS func changeName(name: String) {
         self.name = name
@@ -270,6 +271,145 @@ enum Internal {
     }
 }
 
+// MARK: - Property Tests
+
+// Simple class for SwiftHeapObject property testing
+@JS class SimplePropertyHolder {
+    @JS var value: Int
+
+    @JS init(value: Int) {
+        self.value = value
+    }
+}
+
+// Test class for various property types
+@JS class PropertyHolder {
+    // Primitive properties
+    @JS var intValue: Int
+    @JS var floatValue: Float
+    @JS var doubleValue: Double
+    @JS var boolValue: Bool
+    @JS var stringValue: String
+
+    // Readonly primitive properties
+    @JS let readonlyInt: Int = 42
+    @JS let readonlyFloat: Float = 3.14
+    @JS let readonlyDouble: Double = 2.718281828
+    @JS let readonlyBool: Bool = true
+    @JS let readonlyString: String = "constant"
+
+    // JSObject property
+    @JS var jsObject: JSObject
+
+    // SwiftHeapObject property
+    @JS var sibling: SimplePropertyHolder
+
+    // Lazy stored property
+    @JS lazy var lazyValue: String = "computed lazily"
+
+    // Computed property with getter only (readonly)
+    @JS var computedReadonly: Int {
+        return intValue * 2
+    }
+
+    // Computed property with getter and setter
+    @JS var computedReadWrite: String {
+        get {
+            return "Value: \(intValue)"
+        }
+        set {
+            // Parse the number from "Value: X" format
+            if let range = newValue.range(of: "Value: "),
+                let number = Int(String(newValue[range.upperBound...]))
+            {
+                intValue = number
+            }
+        }
+    }
+
+    // Property with property observers
+    @JS var observedProperty: Int {
+        willSet {
+            Self.willSetCallCount += 1
+            Self.lastWillSetOldValue = self.observedProperty
+            Self.lastWillSetNewValue = newValue
+        }
+        didSet {
+            Self.didSetCallCount += 1
+            Self.lastDidSetOldValue = oldValue
+            Self.lastDidSetNewValue = self.observedProperty
+        }
+    }
+
+    // Static properties to track observer calls
+    nonisolated(unsafe) static var willSetCallCount: Int = 0
+    nonisolated(unsafe) static var didSetCallCount: Int = 0
+    nonisolated(unsafe) static var lastWillSetOldValue: Int = 0
+    nonisolated(unsafe) static var lastWillSetNewValue: Int = 0
+    nonisolated(unsafe) static var lastDidSetOldValue: Int = 0
+    nonisolated(unsafe) static var lastDidSetNewValue: Int = 0
+
+    @JS init(
+        intValue: Int,
+        floatValue: Float,
+        doubleValue: Double,
+        boolValue: Bool,
+        stringValue: String,
+        jsObject: JSObject,
+        sibling: SimplePropertyHolder
+    ) {
+        self.intValue = intValue
+        self.floatValue = floatValue
+        self.doubleValue = doubleValue
+        self.boolValue = boolValue
+        self.stringValue = stringValue
+        self.jsObject = jsObject
+        self.sibling = sibling
+        self.observedProperty = intValue  // Initialize observed property
+    }
+
+    @JS func getAllValues() -> String {
+        return "int:\(intValue),float:\(floatValue),double:\(doubleValue),bool:\(boolValue),string:\(stringValue)"
+    }
+}
+
+@JS func createPropertyHolder(
+    intValue: Int,
+    floatValue: Float,
+    doubleValue: Double,
+    boolValue: Bool,
+    stringValue: String,
+    jsObject: JSObject
+) -> PropertyHolder {
+    let sibling = SimplePropertyHolder(value: 999)
+    return PropertyHolder(
+        intValue: intValue,
+        floatValue: floatValue,
+        doubleValue: doubleValue,
+        boolValue: boolValue,
+        stringValue: stringValue,
+        jsObject: jsObject,
+        sibling: sibling
+    )
+}
+
+@JS func testPropertyHolder(holder: PropertyHolder) -> String {
+    return holder.getAllValues()
+}
+
+@JS func resetObserverCounts() {
+    PropertyHolder.willSetCallCount = 0
+    PropertyHolder.didSetCallCount = 0
+    PropertyHolder.lastWillSetOldValue = 0
+    PropertyHolder.lastWillSetNewValue = 0
+    PropertyHolder.lastDidSetOldValue = 0
+    PropertyHolder.lastDidSetNewValue = 0
+}
+
+@JS func getObserverStats() -> String {
+    return
+        "willSet:\(PropertyHolder.willSetCallCount),didSet:\(PropertyHolder.didSetCallCount),willSetOld:\(PropertyHolder.lastWillSetOldValue),willSetNew:\(PropertyHolder.lastWillSetNewValue),didSetOld:\(PropertyHolder.lastDidSetOldValue),didSetNew:\(PropertyHolder.lastDidSetNewValue)"
+}
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false

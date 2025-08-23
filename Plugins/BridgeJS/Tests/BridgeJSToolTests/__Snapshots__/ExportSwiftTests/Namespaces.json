@@ -42,6 +42,9 @@
         "__Swift",
         "Foundation"
       ],
+      "properties" : [
+
+      ],
       "swiftCallName" : "Greeter"
     },
     {
@@ -86,6 +89,9 @@
         "Utils",
         "Converters"
       ],
+      "properties" : [
+
+      ],
       "swiftCallName" : "Converter"
     },
     {
@@ -111,6 +117,9 @@
       "namespace" : [
         "__Swift",
         "Foundation"
+      ],
+      "properties" : [
+
       ],
       "swiftCallName" : "UUID"
     }

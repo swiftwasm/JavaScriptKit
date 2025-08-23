@@ -332,6 +332,75 @@ public class ExportSwift {
             return .skipChildren
         }
 
+        override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
+            guard node.attributes.hasJSAttribute() else { return .skipChildren }
+            guard case .classBody(let className, let classKey) = state else {
+                diagnose(node: node, message: "@JS var must be inside a @JS class")
+                return .skipChildren
+            }
+
+            if let jsAttribute = node.attributes.firstJSAttribute,
+                extractNamespace(from: jsAttribute) != nil
+            {
+                diagnose(
+                    node: jsAttribute,
+                    message: "Namespace is not supported for property declarations",
+                    hint: "Remove the namespace from @JS attribute"
+                )
+            }
+
+            // Process each binding (variable declaration)
+            for binding in node.bindings {
+                guard let pattern = binding.pattern.as(IdentifierPatternSyntax.self) else {
+                    diagnose(node: binding.pattern, message: "Complex patterns not supported for @JS properties")
+                    continue
+                }
+
+                let propertyName = pattern.identifier.text
+
+                guard let typeAnnotation = binding.typeAnnotation else {
+                    diagnose(node: binding, message: "@JS property must have explicit type annotation")
+                    continue
+                }
+
+                guard let propertyType = self.parent.lookupType(for: typeAnnotation.type) else {
+                    diagnoseUnsupportedType(node: typeAnnotation.type, type: typeAnnotation.type.trimmedDescription)
+                    continue
+                }
+
+                // Check if property is readonly
+                let isLet = node.bindingSpecifier.tokenKind == .keyword(.let)
+                let isGetterOnly = node.bindings.contains(where: {
+                    switch $0.accessorBlock?.accessors {
+                    case .accessors(let accessors):
+                        // Has accessors - check if it only has a getter (no setter, willSet, or didSet)
+                        return !accessors.contains(where: { accessor in
+                            let tokenKind = accessor.accessorSpecifier.tokenKind
+                            return tokenKind == .keyword(.set) || tokenKind == .keyword(.willSet)
+                                || tokenKind == .keyword(.didSet)
+                        })
+                    case .getter:
+                        // Has only a getter block
+                        return true
+                    case nil:
+                        // No accessor block - this is a stored property, not readonly
+                        return false
+                    }
+                })
+                let isReadonly = isLet || isGetterOnly
+
+                let exportedProperty = ExportedProperty(
+                    name: propertyName,
+                    type: propertyType,
+                    isReadonly: isReadonly
+                )
+
+                exportedClassByName[classKey]?.properties.append(exportedProperty)
+            }
+
+            return .skipChildren
+        }
+
         override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
             let name = node.name.text
 
@@ -359,6 +428,7 @@ public class ExportSwift {
                 swiftCallName: swiftCallName,
                 constructor: nil,
                 methods: [],
+                properties: [],
                 namespace: effectiveNamespace
             )
             let uniqueKey = classKey(name: name, namespace: effectiveNamespace)
@@ -689,7 +759,8 @@ public class ExportSwift {
 
     class ExportedThunkBuilder {
         var body: [CodeBlockItemSyntax] = []
-        var abiParameterForwardings: [LabeledExprSyntax] = []
+        var liftedParameterExprs: [ExprSyntax] = []
+        var parameters: [Parameter] = []
         var abiParameterSignatures: [(name: String, type: WasmCoreType)] = []
         var abiReturnType: WasmCoreType?
         let effects: Effects
@@ -708,38 +779,19 @@ public class ExportSwift {
         }
 
         func liftParameter(param: Parameter) {
+            parameters.append(param)
             switch param.type {
             case .bool:
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("\(raw: param.name) == 1")
-                    )
-                )
+                liftedParameterExprs.append(ExprSyntax("\(raw: param.name) == 1"))
                 abiParameterSignatures.append((param.name, .i32))
             case .int:
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("\(raw: param.type.swiftType)(\(raw: param.name))")
-                    )
-                )
+                liftedParameterExprs.append(ExprSyntax("\(raw: param.type.swiftType)(\(raw: param.name))"))
                 abiParameterSignatures.append((param.name, .i32))
             case .float:
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("\(raw: param.name)")
-                    )
-                )
+                liftedParameterExprs.append(ExprSyntax("\(raw: param.name)"))
                 abiParameterSignatures.append((param.name, .f32))
             case .double:
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("\(raw: param.name)")
-                    )
-                )
+                liftedParameterExprs.append(ExprSyntax("\(raw: param.name)"))
                 abiParameterSignatures.append((param.name, .f64))
             case .string:
                 let bytesLabel = "\(param.name)Bytes"
@@ -751,21 +803,11 @@ public class ExportSwift {
                     }
                     """
                 append(prepare)
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("\(raw: param.name)")
-                    )
-                )
+                liftedParameterExprs.append(ExprSyntax("\(raw: param.name)"))
                 abiParameterSignatures.append((bytesLabel, .i32))
                 abiParameterSignatures.append((lengthLabel, .i32))
             case .caseEnum(let enumName):
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("\(raw: enumName)(bridgeJSRawValue: \(raw: param.name))!")
-                    )
-                )
+                liftedParameterExprs.append(ExprSyntax("\(raw: enumName)(bridgeJSRawValue: \(raw: param.name))!"))
                 abiParameterSignatures.append((param.name, .i32))
             case .rawValueEnum(let enumName, let rawType):
                 if rawType == .string {
@@ -778,12 +820,7 @@ public class ExportSwift {
                         }
                         """
                     append(prepare)
-                    abiParameterForwardings.append(
-                        LabeledExprSyntax(
-                            label: param.label,
-                            expression: ExprSyntax("\(raw: enumName)(rawValue: \(raw: param.name))!")
-                        )
-                    )
+                    liftedParameterExprs.append(ExprSyntax("\(raw: enumName)(rawValue: \(raw: param.name))!"))
                     abiParameterSignatures.append((bytesLabel, .i32))
                     abiParameterSignatures.append((lengthLabel, .i32))
                 } else {
@@ -802,12 +839,7 @@ public class ExportSwift {
                         conversionExpr = "\(enumName)(rawValue: \(rawType.rawValue)(\(param.name)))!"
                     }
 
-                    abiParameterForwardings.append(
-                        LabeledExprSyntax(
-                            label: param.label,
-                            expression: ExprSyntax(stringLiteral: conversionExpr)
-                        )
-                    )
+                    liftedParameterExprs.append(ExprSyntax(stringLiteral: conversionExpr))
                     if let wasmType = rawType.wasmCoreType {
                         abiParameterSignatures.append((param.name, wasmType))
                     }
@@ -817,36 +849,35 @@ public class ExportSwift {
             case .namespaceEnum:
                 break
             case .jsObject(nil):
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("JSObject(id: UInt32(bitPattern: \(raw: param.name)))")
-                    )
-                )
+                liftedParameterExprs.append(ExprSyntax("JSObject(id: UInt32(bitPattern: \(raw: param.name)))"))
                 abiParameterSignatures.append((param.name, .i32))
             case .jsObject(let name):
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("\(raw: name)(takingThis: UInt32(bitPattern: \(raw: param.name)))")
-                    )
+                liftedParameterExprs.append(
+                    ExprSyntax("\(raw: name)(takingThis: UInt32(bitPattern: \(raw: param.name)))")
                 )
                 abiParameterSignatures.append((param.name, .i32))
             case .swiftHeapObject:
                 let objectExpr: ExprSyntax =
                     "Unmanaged<\(raw: param.type.swiftType)>.fromOpaque(\(raw: param.name)).takeUnretainedValue()"
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(label: param.label, expression: objectExpr)
-                )
+                liftedParameterExprs.append(objectExpr)
                 abiParameterSignatures.append((param.name, .pointer))
             case .void:
                 break
             }
         }
 
+        private func removeFirstLiftedParameter() -> (parameter: Parameter, expr: ExprSyntax) {
+            let parameter = parameters.removeFirst()
+            let expr = liftedParameterExprs.removeFirst()
+            return (parameter, expr)
+        }
+
         private func renderCallStatement(callee: ExprSyntax, returnType: BridgeType) -> CodeBlockItemSyntax {
+            let labeledParams = zip(parameters, liftedParameterExprs).map { param, expr in
+                LabeledExprSyntax(label: param.label, expression: expr)
+            }
             var callExpr: ExprSyntax =
-                "\(raw: callee)(\(raw: abiParameterForwardings.map { $0.description }.joined(separator: ", ")))"
+                "\(raw: callee)(\(raw: labeledParams.map { $0.description }.joined(separator: ", ")))"
             if effects.isAsync {
                 callExpr = ExprSyntax(
                     AwaitExprSyntax(awaitKeyword: .keyword(.await).with(\.trailingTrivia, .space), expression: callExpr)
@@ -884,12 +915,28 @@ public class ExportSwift {
         }
 
         func callMethod(klassName: String, methodName: String, returnType: BridgeType) {
-            let _selfParam = self.abiParameterForwardings.removeFirst()
+            let (_, selfExpr) = removeFirstLiftedParameter()
             let item = renderCallStatement(
-                callee: "\(raw: _selfParam).\(raw: methodName)",
+                callee: "\(raw: selfExpr).\(raw: methodName)",
                 returnType: returnType
             )
             append(item)
+        }
+
+        func callPropertyGetter(klassName: String, propertyName: String, returnType: BridgeType) {
+            let (_, selfExpr) = removeFirstLiftedParameter()
+            let retMutability = returnType == .string ? "var" : "let"
+            if returnType == .void {
+                append("\(raw: selfExpr).\(raw: propertyName)")
+            } else {
+                append("\(raw: retMutability) ret = \(raw: selfExpr).\(raw: propertyName)")
+            }
+        }
+
+        func callPropertySetter(klassName: String, propertyName: String) {
+            let (_, selfExpr) = removeFirstLiftedParameter()
+            let (_, newValueExpr) = removeFirstLiftedParameter()
+            append("\(raw: selfExpr).\(raw: propertyName) = \(raw: newValueExpr)")
         }
 
         func lowerReturnValue(returnType: BridgeType) {
@@ -1155,6 +1202,39 @@ public class ExportSwift {
             )
             builder.lowerReturnValue(returnType: method.returnType)
             decls.append(builder.render(abiName: method.abiName))
+        }
+
+        // Generate property getters and setters
+        for property in klass.properties {
+            // Generate getter
+            let getterBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+            getterBuilder.liftParameter(
+                param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(klass.name))
+            )
+            getterBuilder.callPropertyGetter(
+                klassName: klass.name,
+                propertyName: property.name,
+                returnType: property.type
+            )
+            getterBuilder.lowerReturnValue(returnType: property.type)
+            decls.append(getterBuilder.render(abiName: property.getterAbiName(className: klass.name)))
+
+            // Generate setter if property is not readonly
+            if !property.isReadonly {
+                let setterBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+                setterBuilder.liftParameter(
+                    param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(klass.name))
+                )
+                setterBuilder.liftParameter(
+                    param: Parameter(label: "value", name: "value", type: property.type)
+                )
+                setterBuilder.callPropertySetter(
+                    klassName: klass.name,
+                    propertyName: property.name
+                )
+                setterBuilder.lowerReturnValue(returnType: .void)
+                decls.append(setterBuilder.render(abiName: property.setterAbiName(className: klass.name)))
+            }
         }
 
         do {

@@ -524,13 +524,12 @@ struct BridgeJSLink {
         func renderFunction(
             name: String,
             parameters: [Parameter],
-            returnType: BridgeType,
             returnExpr: String?,
-            isMethod: Bool
+            declarationPrefixKeyword: String?
         ) -> [String] {
             var funcLines: [String] = []
             funcLines.append(
-                "\(isMethod ? "" : "function ")\(name)(\(parameters.map { $0.name }.joined(separator: ", "))) {"
+                "\(declarationPrefixKeyword.map { "\($0) "} ?? "")\(name)(\(parameters.map { $0.name }.joined(separator: ", "))) {"
             )
             funcLines.append(contentsOf: bodyLines.map { $0.indent(count: 4) })
             funcLines.append(contentsOf: cleanupLines.map { $0.indent(count: 4) })
@@ -688,9 +687,8 @@ struct BridgeJSLink {
         let funcLines = thunkBuilder.renderFunction(
             name: function.abiName,
             parameters: function.parameters,
-            returnType: function.returnType,
             returnExpr: returnExpr,
-            isMethod: false
+            declarationPrefixKeyword: "function"
         )
         var dtsLines: [String] = []
         dtsLines.append(
@@ -753,9 +751,8 @@ struct BridgeJSLink {
                 contentsOf: thunkBuilder.renderFunction(
                     name: method.name,
                     parameters: method.parameters,
-                    returnType: method.returnType,
                     returnExpr: returnExpr,
-                    isMethod: true
+                    declarationPrefixKeyword: nil
                 ).map { $0.indent(count: 4) }
             )
             dtsTypeLines.append(
@@ -763,6 +760,52 @@ struct BridgeJSLink {
                     .indent(count: 4)
             )
         }
+
+        // Generate property getters and setters
+        for property in klass.properties {
+            // Generate getter
+            let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+            getterThunkBuilder.lowerSelf()
+            let getterReturnExpr = getterThunkBuilder.call(
+                abiName: property.getterAbiName(className: klass.name),
+                returnType: property.type
+            )
+            jsLines.append(
+                contentsOf: getterThunkBuilder.renderFunction(
+                    name: property.name,
+                    parameters: [],
+                    returnExpr: getterReturnExpr,
+                    declarationPrefixKeyword: "get"
+                ).map { $0.indent(count: 4) }
+            )
+
+            // Generate setter if not readonly
+            if !property.isReadonly {
+                let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+                setterThunkBuilder.lowerSelf()
+                setterThunkBuilder.lowerParameter(param: Parameter(label: "value", name: "value", type: property.type))
+                _ = setterThunkBuilder.call(
+                    abiName: property.setterAbiName(className: klass.name),
+                    returnType: .void
+                )
+                jsLines.append(
+                    contentsOf: setterThunkBuilder.renderFunction(
+                        name: property.name,
+                        parameters: [.init(label: nil, name: "value", type: property.type)],
+                        returnExpr: nil,
+                        declarationPrefixKeyword: "set"
+                    ).map { $0.indent(count: 4) }
+                )
+            }
+
+            // Add TypeScript property definition
+            let readonly = property.isReadonly ? "readonly " : ""
+            dtsTypeLines.append(
+                "\(readonly)\(property.name): \(property.type.tsType);"
+                    .indent(count: 4)
+            )
+        }
+
         jsLines.append("}")
 
         dtsTypeLines.append("}")

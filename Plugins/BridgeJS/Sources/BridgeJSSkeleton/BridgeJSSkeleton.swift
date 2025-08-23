@@ -174,6 +174,7 @@ public struct ExportedClass: Codable {
     public var swiftCallName: String
     public var constructor: ExportedConstructor?
     public var methods: [ExportedFunction]
+    public var properties: [ExportedProperty]
     public var namespace: [String]?
 
     public init(
@@ -181,12 +182,14 @@ public struct ExportedClass: Codable {
         swiftCallName: String,
         constructor: ExportedConstructor? = nil,
         methods: [ExportedFunction],
+        properties: [ExportedProperty] = [],
         namespace: [String]? = nil
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
         self.constructor = constructor
         self.methods = methods
+        self.properties = properties
         self.namespace = namespace
     }
 }
@@ -202,6 +205,26 @@ public struct ExportedConstructor: Codable {
         self.parameters = parameters
         self.effects = effects
         self.namespace = namespace
+    }
+}
+
+public struct ExportedProperty: Codable {
+    public var name: String
+    public var type: BridgeType
+    public var isReadonly: Bool
+
+    public init(name: String, type: BridgeType, isReadonly: Bool = false) {
+        self.name = name
+        self.type = type
+        self.isReadonly = isReadonly
+    }
+
+    public func getterAbiName(className: String) -> String {
+        return "bjs_\(className)_\(name)_get"
+    }
+
+    public func setterAbiName(className: String) -> String {
+        return "bjs_\(className)_\(name)_set"
     }
 }
 

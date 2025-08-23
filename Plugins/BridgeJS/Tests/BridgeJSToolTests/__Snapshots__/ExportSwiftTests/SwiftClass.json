@@ -62,6 +62,17 @@
         }
       ],
       "name" : "Greeter",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
       "swiftCallName" : "Greeter"
     }
   ],

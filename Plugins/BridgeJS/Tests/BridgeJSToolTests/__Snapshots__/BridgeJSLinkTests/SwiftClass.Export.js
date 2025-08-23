@@ -113,6 +113,18 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_Greeter_changeName(this.pointer, nameId, nameBytes.length);
                     swift.memory.release(nameId);
                 }
+                get name() {
+                    instance.exports.bjs_Greeter_name_get(this.pointer);
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
+                    return ret;
+                }
+                set name(value) {
+                    const valueBytes = textEncoder.encode(value);
+                    const valueId = swift.memory.retain(valueBytes);
+                    instance.exports.bjs_Greeter_name_set(this.pointer, valueId, valueBytes.length);
+                    swift.memory.release(valueId);
+                }
             }
             return {
                 Greeter,
