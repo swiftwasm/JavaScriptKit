@@ -72,7 +72,7 @@ class JSClosureAsyncTests: XCTestCase {
         )!.value()
         XCTAssertEqual(result, 42.0)
     }
-    
+
     func testAsyncOneshotClosureWithPriority() async throws {
         let priority = UnsafeSendableBox<TaskPriority?>(nil)
         let closure = JSOneshotClosure.async(priority: .high) { _ in
@@ -83,7 +83,7 @@ class JSClosureAsyncTests: XCTestCase {
         XCTAssertEqual(result, 42.0)
         XCTAssertEqual(priority.value, .high)
     }
-    
+
     @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
     func testAsyncOneshotClosureWithTaskExecutor() async throws {
         let executor = AnyTaskExecutor()
@@ -93,7 +93,7 @@ class JSClosureAsyncTests: XCTestCase {
         let result = try await JSPromise(from: closure.function!())!.value()
         XCTAssertEqual(result, 42.0)
     }
-    
+
     @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
     func testAsyncOneshotClosureWithTaskExecutorPreference() async throws {
         let executor = AnyTaskExecutor()

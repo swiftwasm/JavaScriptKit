@@ -39,19 +39,24 @@ import { JSObjectSpace as JSObjectSpace } from "./object-heap.js";
  */
 export type SwiftRuntimeThreadChannel =
     | {
-        /**
-         * This function is used to send messages from the worker thread to the main thread.
-         * The message submitted by this function is expected to be listened by `listenMessageFromWorkerThread`.
-         * @param message The message to be sent to the main thread.
-         * @param transfer The array of objects to be transferred to the main thread.
-         */
-          postMessageToMainThread: (message: WorkerToMainMessage, transfer: any[]) => void;
+          /**
+           * This function is used to send messages from the worker thread to the main thread.
+           * The message submitted by this function is expected to be listened by `listenMessageFromWorkerThread`.
+           * @param message The message to be sent to the main thread.
+           * @param transfer The array of objects to be transferred to the main thread.
+           */
+          postMessageToMainThread: (
+              message: WorkerToMainMessage,
+              transfer: any[],
+          ) => void;
           /**
            * This function is expected to be set in the worker thread and should listen
            * to messages from the main thread sent by `postMessageToWorkerThread`.
            * @param listener The listener function to be called when a message is received from the main thread.
            */
-          listenMessageFromMainThread: (listener: (message: MainToWorkerMessage) => void) => void;
+          listenMessageFromMainThread: (
+              listener: (message: MainToWorkerMessage) => void,
+          ) => void;
       }
     | {
           /**
@@ -61,7 +66,11 @@ export type SwiftRuntimeThreadChannel =
            * @param message The message to be sent to the worker thread.
            * @param transfer The array of objects to be transferred to the worker thread.
            */
-          postMessageToWorkerThread: (tid: number, message: MainToWorkerMessage, transfer: any[]) => void;
+          postMessageToWorkerThread: (
+              tid: number,
+              message: MainToWorkerMessage,
+              transfer: any[],
+          ) => void;
           /**
            * This function is expected to be set in the main thread and should listen
            * to messages sent by `postMessageToMainThread` from the worker thread.
@@ -70,7 +79,7 @@ export type SwiftRuntimeThreadChannel =
            */
           listenMessageFromWorkerThread: (
               tid: number,
-              listener: (message: WorkerToMainMessage) => void
+              listener: (message: WorkerToMainMessage) => void,
           ) => void;
 
           /**
@@ -81,23 +90,34 @@ export type SwiftRuntimeThreadChannel =
           terminateWorkerThread?: (tid: number) => void;
       };
 
-
 export class ITCInterface {
     constructor(private memory: JSObjectSpace) {}
 
-    send(sendingObject: ref, transferringObjects: ref[], sendingContext: pointer): { object: any, sendingContext: pointer, transfer: Transferable[] } {
+    send(
+        sendingObject: ref,
+        transferringObjects: ref[],
+        sendingContext: pointer,
+    ): { object: any; sendingContext: pointer; transfer: Transferable[] } {
         const object = this.memory.getObject(sendingObject);
-        const transfer = transferringObjects.map(ref => this.memory.getObject(ref));
+        const transfer = transferringObjects.map((ref) =>
+            this.memory.getObject(ref),
+        );
         return { object, sendingContext, transfer };
     }
 
-    sendObjects(sendingObjects: ref[], transferringObjects: ref[], sendingContext: pointer): { object: any[], sendingContext: pointer, transfer: Transferable[] } {
-        const objects = sendingObjects.map(ref => this.memory.getObject(ref));
-        const transfer = transferringObjects.map(ref => this.memory.getObject(ref));
+    sendObjects(
+        sendingObjects: ref[],
+        transferringObjects: ref[],
+        sendingContext: pointer,
+    ): { object: any[]; sendingContext: pointer; transfer: Transferable[] } {
+        const objects = sendingObjects.map((ref) => this.memory.getObject(ref));
+        const transfer = transferringObjects.map((ref) =>
+            this.memory.getObject(ref),
+        );
         return { object: objects, sendingContext, transfer };
     }
 
-    release(objectRef: ref): { object: undefined, transfer: Transferable[] } {
+    release(objectRef: ref): { object: undefined; transfer: Transferable[] } {
         this.memory.release(objectRef);
         return { object: undefined, transfer: [] };
     }
@@ -105,16 +125,18 @@ export class ITCInterface {
 
 type AllRequests<Interface extends Record<string, any>> = {
     [K in keyof Interface]: {
-        method: K,
-        parameters: Parameters<Interface[K]>,
-    }
-}
+        method: K;
+        parameters: Parameters<Interface[K]>;
+    };
+};
 
-type ITCRequest<Interface extends Record<string, any>> = AllRequests<Interface>[keyof AllRequests<Interface>];
+type ITCRequest<Interface extends Record<string, any>> =
+    AllRequests<Interface>[keyof AllRequests<Interface>];
 type AllResponses<Interface extends Record<string, any>> = {
-    [K in keyof Interface]: ReturnType<Interface[K]>
-}
-type ITCResponse<Interface extends Record<string, any>> = AllResponses<Interface>[keyof AllResponses<Interface>];
+    [K in keyof Interface]: ReturnType<Interface[K]>;
+};
+type ITCResponse<Interface extends Record<string, any>> =
+    AllResponses<Interface>[keyof AllResponses<Interface>];
 
 export type RequestMessage = {
     type: "request";
@@ -127,10 +149,12 @@ export type RequestMessage = {
         context: pointer;
         /** The request content */
         request: ITCRequest<ITCInterface>;
-    }
-}
+    };
+};
 
-type SerializedError = { isError: true; value: Error } | { isError: false; value: unknown }
+type SerializedError =
+    | { isError: true; value: Error }
+    | { isError: false; value: unknown };
 
 export type ResponseMessage = {
     type: "response";
@@ -140,36 +164,42 @@ export type ResponseMessage = {
         /** The context pointer of the request */
         context: pointer;
         /** The response content */
-        response: {
-            ok: true,
-            value: ITCResponse<ITCInterface>;
-        } | {
-            ok: false,
-            error: SerializedError;
-        };
-    }
-}
+        response:
+            | {
+                  ok: true;
+                  value: ITCResponse<ITCInterface>;
+              }
+            | {
+                  ok: false;
+                  error: SerializedError;
+              };
+    };
+};
 
-export type MainToWorkerMessage = {
-    type: "wake";
-} | RequestMessage | ResponseMessage;
+export type MainToWorkerMessage =
+    | {
+          type: "wake";
+      }
+    | RequestMessage
+    | ResponseMessage;
 
-export type WorkerToMainMessage = {
-    type: "job";
-    data: number;
-} | RequestMessage | ResponseMessage;
-
+export type WorkerToMainMessage =
+    | {
+          type: "job";
+          data: number;
+      }
+    | RequestMessage
+    | ResponseMessage;
 
 export class MessageBroker {
     constructor(
         private selfTid: number,
         private threadChannel: SwiftRuntimeThreadChannel,
         private handlers: {
-            onRequest: (message: RequestMessage) => void,
-            onResponse: (message: ResponseMessage) => void,
-        }
-    ) {
-    }
+            onRequest: (message: RequestMessage) => void;
+            onResponse: (message: ResponseMessage) => void;
+        },
+    ) {}
 
     request(message: RequestMessage) {
         if (message.data.targetTid == this.selfTid) {
@@ -177,7 +207,11 @@ export class MessageBroker {
             this.handlers.onRequest(message);
         } else if ("postMessageToWorkerThread" in this.threadChannel) {
             // The request is for another worker thread sent from the main thread
-            this.threadChannel.postMessageToWorkerThread(message.data.targetTid, message, []);
+            this.threadChannel.postMessageToWorkerThread(
+                message.data.targetTid,
+                message,
+                [],
+            );
         } else if ("postMessageToMainThread" in this.threadChannel) {
             // The request is for other worker threads or the main thread sent from a worker thread
             this.threadChannel.postMessageToMainThread(message, []);
@@ -192,10 +226,16 @@ export class MessageBroker {
             this.handlers.onResponse(message);
             return;
         }
-        const transfer = message.data.response.ok ? message.data.response.value.transfer : [];
+        const transfer = message.data.response.ok
+            ? message.data.response.value.transfer
+            : [];
         if ("postMessageToWorkerThread" in this.threadChannel) {
             // The response is for another worker thread sent from the main thread
-            this.threadChannel.postMessageToWorkerThread(message.data.sourceTid, message, transfer);
+            this.threadChannel.postMessageToWorkerThread(
+                message.data.sourceTid,
+                message,
+                transfer,
+            );
         } else if ("postMessageToMainThread" in this.threadChannel) {
             // The response is for other worker threads or the main thread sent from a worker thread
             this.threadChannel.postMessageToMainThread(message, transfer);
@@ -208,9 +248,13 @@ export class MessageBroker {
         if (message.data.targetTid == this.selfTid) {
             this.handlers.onRequest(message);
         } else if ("postMessageToWorkerThread" in this.threadChannel) {
-            // Receive a request from a worker thread to other worker on main thread. 
+            // Receive a request from a worker thread to other worker on main thread.
             // Proxy the request to the target worker thread.
-            this.threadChannel.postMessageToWorkerThread(message.data.targetTid, message, []);
+            this.threadChannel.postMessageToWorkerThread(
+                message.data.targetTid,
+                message,
+                [],
+            );
         } else if ("postMessageToMainThread" in this.threadChannel) {
             // A worker thread won't receive a request for other worker threads
             throw new Error("unreachable");
@@ -223,8 +267,14 @@ export class MessageBroker {
         } else if ("postMessageToWorkerThread" in this.threadChannel) {
             // Receive a response from a worker thread to other worker on main thread.
             // Proxy the response to the target worker thread.
-            const transfer = message.data.response.ok ? message.data.response.value.transfer : [];
-            this.threadChannel.postMessageToWorkerThread(message.data.sourceTid, message, transfer);
+            const transfer = message.data.response.ok
+                ? message.data.response.value.transfer
+                : [];
+            this.threadChannel.postMessageToWorkerThread(
+                message.data.sourceTid,
+                message,
+                transfer,
+            );
         } else if ("postMessageToMainThread" in this.threadChannel) {
             // A worker thread won't receive a response for other worker threads
             throw new Error("unreachable");
@@ -234,7 +284,14 @@ export class MessageBroker {
 
 export function serializeError(error: unknown): SerializedError {
     if (error instanceof Error) {
-        return { isError: true, value: { message: error.message, name: error.name, stack: error.stack } };
+        return {
+            isError: true,
+            value: {
+                message: error.message,
+                name: error.name,
+                stack: error.stack,
+            },
+        };
     }
     return { isError: false, value: error };
 }

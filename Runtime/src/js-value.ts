@@ -1,5 +1,10 @@
 import { JSObjectSpace } from "./object-heap.js";
-import { assertNever, JavaScriptValueKindAndFlags, pointer, ref } from "./types.js";
+import {
+    assertNever,
+    JavaScriptValueKindAndFlags,
+    pointer,
+    ref,
+} from "./types.js";
 
 export const enum Kind {
     Boolean = 0,
@@ -17,7 +22,7 @@ export const decode = (
     kind: Kind,
     payload1: number,
     payload2: number,
-    objectSpace: JSObjectSpace
+    objectSpace: JSObjectSpace,
 ) => {
     switch (kind) {
         case Kind.Boolean:
@@ -50,7 +55,12 @@ export const decode = (
 
 // Note:
 // `decodeValues` assumes that the size of RawJSValue is 16.
-export const decodeArray = (ptr: pointer, length: number, memory: DataView, objectSpace: JSObjectSpace) => {
+export const decodeArray = (
+    ptr: pointer,
+    length: number,
+    memory: DataView,
+    objectSpace: JSObjectSpace,
+) => {
     // fast path for empty array
     if (length === 0) {
         return [];
@@ -78,7 +88,7 @@ export const write = (
     payload2_ptr: pointer,
     is_exception: boolean,
     memory: DataView,
-    objectSpace: JSObjectSpace
+    objectSpace: JSObjectSpace,
 ) => {
     const kind = writeAndReturnKindBits(
         value,
@@ -86,7 +96,7 @@ export const write = (
         payload2_ptr,
         is_exception,
         memory,
-        objectSpace
+        objectSpace,
     );
     memory.setUint32(kind_ptr, kind, true);
 };
@@ -97,7 +107,7 @@ export const writeAndReturnKindBits = (
     payload2_ptr: pointer,
     is_exception: boolean,
     memory: DataView,
-    objectSpace: JSObjectSpace
+    objectSpace: JSObjectSpace,
 ): JavaScriptValueKindAndFlags => {
     const exceptionBit = (is_exception ? 1 : 0) << 31;
     if (value === null) {
@@ -143,7 +153,11 @@ export const writeAndReturnKindBits = (
     throw new Error("Unreachable");
 };
 
-export function decodeObjectRefs(ptr: pointer, length: number, memory: DataView): ref[] {
+export function decodeObjectRefs(
+    ptr: pointer,
+    length: number,
+    memory: DataView,
+): ref[] {
     const result: ref[] = new Array(length);
     for (let i = 0; i < length; i++) {
         result[i] = memory.getUint32(ptr + 4 * i, true);

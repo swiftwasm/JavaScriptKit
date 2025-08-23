@@ -7,7 +7,16 @@ import {
     MAIN_THREAD_TID,
 } from "./types.js";
 import * as JSValue from "./js-value.js";
-import { deserializeError, MainToWorkerMessage, MessageBroker, ResponseMessage, ITCInterface, serializeError, SwiftRuntimeThreadChannel, WorkerToMainMessage } from "./itc.js";
+import {
+    deserializeError,
+    MainToWorkerMessage,
+    MessageBroker,
+    ResponseMessage,
+    ITCInterface,
+    serializeError,
+    SwiftRuntimeThreadChannel,
+    WorkerToMainMessage,
+} from "./itc.js";
 import { decodeObjectRefs } from "./js-value.js";
 import { JSObjectSpace } from "./object-heap.js";
 export { SwiftRuntimeThreadChannel };
@@ -36,8 +45,8 @@ export class SwiftRuntime {
     private textEncoder = new TextEncoder(); // Only support utf-8
     /** The thread ID of the current thread. */
     private tid: number | null;
-    private getDataView: (() => DataView);
-    private getUint8Array: (() => Uint8Array);
+    private getDataView: () => DataView;
+    private getUint8Array: () => Uint8Array;
     private wasmMemory: WebAssembly.Memory | null;
 
     UnsafeEventLoopYield = UnsafeEventLoopYield;
@@ -49,10 +58,14 @@ export class SwiftRuntime {
         this.tid = null;
         this.options = options || {};
         this.getDataView = () => {
-            throw new Error("Please call setInstance() before using any JavaScriptKit APIs from Swift.");
+            throw new Error(
+                "Please call setInstance() before using any JavaScriptKit APIs from Swift.",
+            );
         };
         this.getUint8Array = () => {
-            throw new Error("Please call setInstance() before using any JavaScriptKit APIs from Swift.");
+            throw new Error(
+                "Please call setInstance() before using any JavaScriptKit APIs from Swift.",
+            );
         };
         this.wasmMemory = null;
     }
@@ -70,7 +83,10 @@ export class SwiftRuntime {
             // 1. It may not be available in the global scope if the context is not cross-origin isolated.
             // 2. The underlying buffer may be still backed by SAB even if the context is not cross-origin
             //    isolated (e.g. localhost on Chrome on Android).
-            if (Object.getPrototypeOf(wasmMemory.buffer).constructor.name === "SharedArrayBuffer") {
+            if (
+                Object.getPrototypeOf(wasmMemory.buffer).constructor.name ===
+                "SharedArrayBuffer"
+            ) {
                 // When the wasm memory is backed by a SharedArrayBuffer, growing the memory
                 // doesn't invalidate the data view by setting the byte length to 0. Instead,
                 // the data view points to an old buffer after growing the memory. So we have
@@ -105,14 +121,16 @@ export class SwiftRuntime {
             }
             this.wasmMemory = wasmMemory;
         } else {
-            throw new Error("instance.exports.memory is not a WebAssembly.Memory!?");
+            throw new Error(
+                "instance.exports.memory is not a WebAssembly.Memory!?",
+            );
         }
         if (typeof (this.exports as any)._start === "function") {
             throw new Error(
                 `JavaScriptKit supports only WASI reactor ABI.
                 Please make sure you are building with:
                 -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor
-                `
+                `,
             );
         }
         if (this.exports.swjs_library_version() != this.version) {
@@ -120,7 +138,7 @@ export class SwiftRuntime {
                 `The versions of JavaScriptKit are incompatible.
                 WebAssembly runtime ${this.exports.swjs_library_version()} != JS runtime ${
                     this.version
-                }`
+                }`,
             );
         }
     }
@@ -159,7 +177,7 @@ export class SwiftRuntime {
                 instance.exports.wasi_thread_start(tid, startArg);
             } else {
                 throw new Error(
-                    `The WebAssembly module is not built for wasm32-unknown-wasip1-threads target.`
+                    `The WebAssembly module is not built for wasm32-unknown-wasip1-threads target.`,
                 );
             }
         } catch (error) {
@@ -190,7 +208,7 @@ export class SwiftRuntime {
             (features & LibraryFeatures.WeakRefs) != 0;
         if (librarySupportsWeakRef) {
             this._closureDeallocator = new SwiftClosureDeallocator(
-                this.exports
+                this.exports,
             );
         }
         return this._closureDeallocator;
@@ -200,7 +218,7 @@ export class SwiftRuntime {
         host_func_id: number,
         line: number,
         file: string,
-        args: any[]
+        args: any[],
     ) {
         const argc = args.length;
         const argv = this.exports.swjs_prepare_host_function_call(argc);
@@ -209,7 +227,15 @@ export class SwiftRuntime {
         for (let index = 0; index < args.length; index++) {
             const argument = args[index];
             const base = argv + 16 * index;
-            JSValue.write(argument, base, base + 4, base + 8, false, dataView, memory);
+            JSValue.write(
+                argument,
+                base,
+                base + 4,
+                base + 8,
+                false,
+                dataView,
+                memory,
+            );
         }
         let output: any;
         // This ref is released by the swjs_call_host_function implementation
@@ -220,11 +246,11 @@ export class SwiftRuntime {
             host_func_id,
             argv,
             argc,
-            callback_func_ref
+            callback_func_ref,
         );
         if (alreadyReleased) {
             throw new Error(
-                `The JSClosure has been already released by Swift side. The closure is created at ${file}:${line} @${host_func_id}`
+                `The JSClosure has been already released by Swift side. The closure is created at ${file}:${line} @${host_func_id}`,
             );
         }
         this.exports.swjs_cleanup_host_function_call(argv);
@@ -244,10 +270,15 @@ export class SwiftRuntime {
                     let returnValue: ResponseMessage["data"]["response"];
                     try {
                         // @ts-ignore
-                        const result = itcInterface[message.data.request.method](...message.data.request.parameters);
+                        const result = itcInterface[
+                            message.data.request.method
+                        ](...message.data.request.parameters);
                         returnValue = { ok: true, value: result };
                     } catch (error) {
-                        returnValue = { ok: false, error: serializeError(error) };
+                        returnValue = {
+                            ok: false,
+                            error: serializeError(error),
+                        };
                     }
                     const responseMessage: ResponseMessage = {
                         type: "response",
@@ -256,38 +287,52 @@ export class SwiftRuntime {
                             context: message.data.context,
                             response: returnValue,
                         },
-                    }
+                    };
                     try {
                         newBroker.reply(responseMessage);
                     } catch (error) {
                         responseMessage.data.response = {
                             ok: false,
-                            error: serializeError(new TypeError(`Failed to serialize message: ${error}`))
+                            error: serializeError(
+                                new TypeError(
+                                    `Failed to serialize message: ${error}`,
+                                ),
+                            ),
                         };
                         newBroker.reply(responseMessage);
                     }
                 },
                 onResponse: (message) => {
                     if (message.data.response.ok) {
-                        const object = this.memory.retain(message.data.response.value.object);
-                        this.exports.swjs_receive_response(object, message.data.context);
+                        const object = this.memory.retain(
+                            message.data.response.value.object,
+                        );
+                        this.exports.swjs_receive_response(
+                            object,
+                            message.data.context,
+                        );
                     } else {
-                        const error = deserializeError(message.data.response.error);
+                        const error = deserializeError(
+                            message.data.response.error,
+                        );
                         const errorObject = this.memory.retain(error);
-                        this.exports.swjs_receive_error(errorObject, message.data.context);
+                        this.exports.swjs_receive_error(
+                            errorObject,
+                            message.data.context,
+                        );
                     }
-                }
-            })
+                },
+            });
             broker = newBroker;
             return newBroker;
-        }
+        };
         return {
             swjs_set_prop: (
                 ref: ref,
                 name: ref,
                 kind: JSValue.Kind,
                 payload1: number,
-                payload2: number
+                payload2: number,
             ) => {
                 const memory = this.memory;
                 const obj = memory.getObject(ref);
@@ -299,7 +344,7 @@ export class SwiftRuntime {
                 ref: ref,
                 name: ref,
                 payload1_ptr: pointer,
-                payload2_ptr: pointer
+                payload2_ptr: pointer,
             ) => {
                 const memory = this.memory;
                 const obj = memory.getObject(ref);
@@ -311,7 +356,7 @@ export class SwiftRuntime {
                     payload2_ptr,
                     false,
                     this.getDataView(),
-                    this.memory
+                    this.memory,
                 );
             },
 
@@ -320,7 +365,7 @@ export class SwiftRuntime {
                 index: number,
                 kind: JSValue.Kind,
                 payload1: number,
-                payload2: number
+                payload2: number,
             ) => {
                 const memory = this.memory;
                 const obj = memory.getObject(ref);
@@ -331,7 +376,7 @@ export class SwiftRuntime {
                 ref: ref,
                 index: number,
                 payload1_ptr: pointer,
-                payload2_ptr: pointer
+                payload2_ptr: pointer,
             ) => {
                 const obj = this.memory.getObject(ref);
                 const result = obj[index];
@@ -341,7 +386,7 @@ export class SwiftRuntime {
                     payload2_ptr,
                     false,
                     this.getDataView(),
-                    this.memory
+                    this.memory,
                 );
             },
 
@@ -352,22 +397,25 @@ export class SwiftRuntime {
                 this.getDataView().setUint32(bytes_ptr_result, bytes_ptr, true);
                 return bytes.length;
             },
-            swjs_decode_string: (
+            swjs_decode_string:
                 // NOTE: TextDecoder can't decode typed arrays backed by SharedArrayBuffer
                 this.options.sharedMemory == true
-                ? ((bytes_ptr: pointer, length: number) => {
-                    const bytes = this.getUint8Array()
-                        .slice(bytes_ptr, bytes_ptr + length);
-                    const string = this.textDecoder.decode(bytes);
-                    return this.memory.retain(string);
-                })
-                : ((bytes_ptr: pointer, length: number) => {
-                    const bytes = this.getUint8Array()
-                        .subarray(bytes_ptr, bytes_ptr + length);
-                    const string = this.textDecoder.decode(bytes);
-                    return this.memory.retain(string);
-                })
-            ),
+                    ? (bytes_ptr: pointer, length: number) => {
+                          const bytes = this.getUint8Array().slice(
+                              bytes_ptr,
+                              bytes_ptr + length,
+                          );
+                          const string = this.textDecoder.decode(bytes);
+                          return this.memory.retain(string);
+                      }
+                    : (bytes_ptr: pointer, length: number) => {
+                          const bytes = this.getUint8Array().subarray(
+                              bytes_ptr,
+                              bytes_ptr + length,
+                          );
+                          const string = this.textDecoder.decode(bytes);
+                          return this.memory.retain(string);
+                      },
             swjs_load_string: (ref: ref, buffer: pointer) => {
                 const bytes = this.memory.getObject(ref);
                 this.getUint8Array().set(bytes, buffer);
@@ -378,13 +426,18 @@ export class SwiftRuntime {
                 argv: pointer,
                 argc: number,
                 payload1_ptr: pointer,
-                payload2_ptr: pointer
+                payload2_ptr: pointer,
             ) => {
                 const memory = this.memory;
                 const func = memory.getObject(ref);
                 let result = undefined;
                 try {
-                    const args = JSValue.decodeArray(argv, argc, this.getDataView(), memory);
+                    const args = JSValue.decodeArray(
+                        argv,
+                        argc,
+                        this.getDataView(),
+                        memory,
+                    );
                     result = func(...args);
                 } catch (error) {
                     return JSValue.writeAndReturnKindBits(
@@ -393,7 +446,7 @@ export class SwiftRuntime {
                         payload2_ptr,
                         true,
                         this.getDataView(),
-                        this.memory
+                        this.memory,
                     );
                 }
                 return JSValue.writeAndReturnKindBits(
@@ -402,7 +455,7 @@ export class SwiftRuntime {
                     payload2_ptr,
                     false,
                     this.getDataView(),
-                    this.memory
+                    this.memory,
                 );
             },
             swjs_call_function_no_catch: (
@@ -410,11 +463,16 @@ export class SwiftRuntime {
                 argv: pointer,
                 argc: number,
                 payload1_ptr: pointer,
-                payload2_ptr: pointer
+                payload2_ptr: pointer,
             ) => {
                 const memory = this.memory;
                 const func = memory.getObject(ref);
-                const args = JSValue.decodeArray(argv, argc, this.getDataView(), memory);
+                const args = JSValue.decodeArray(
+                    argv,
+                    argc,
+                    this.getDataView(),
+                    memory,
+                );
                 const result = func(...args);
                 return JSValue.writeAndReturnKindBits(
                     result,
@@ -422,7 +480,7 @@ export class SwiftRuntime {
                     payload2_ptr,
                     false,
                     this.getDataView(),
-                    this.memory
+                    this.memory,
                 );
             },
 
@@ -432,14 +490,19 @@ export class SwiftRuntime {
                 argv: pointer,
                 argc: number,
                 payload1_ptr: pointer,
-                payload2_ptr: pointer
+                payload2_ptr: pointer,
             ) => {
                 const memory = this.memory;
                 const obj = memory.getObject(obj_ref);
                 const func = memory.getObject(func_ref);
                 let result: any;
                 try {
-                    const args = JSValue.decodeArray(argv, argc, this.getDataView(), memory);
+                    const args = JSValue.decodeArray(
+                        argv,
+                        argc,
+                        this.getDataView(),
+                        memory,
+                    );
                     result = func.apply(obj, args);
                 } catch (error) {
                     return JSValue.writeAndReturnKindBits(
@@ -448,7 +511,7 @@ export class SwiftRuntime {
                         payload2_ptr,
                         true,
                         this.getDataView(),
-                        this.memory
+                        this.memory,
                     );
                 }
                 return JSValue.writeAndReturnKindBits(
@@ -457,7 +520,7 @@ export class SwiftRuntime {
                     payload2_ptr,
                     false,
                     this.getDataView(),
-                    this.memory
+                    this.memory,
                 );
             },
             swjs_call_function_with_this_no_catch: (
@@ -466,13 +529,18 @@ export class SwiftRuntime {
                 argv: pointer,
                 argc: number,
                 payload1_ptr: pointer,
-                payload2_ptr: pointer
+                payload2_ptr: pointer,
             ) => {
                 const memory = this.memory;
                 const obj = memory.getObject(obj_ref);
                 const func = memory.getObject(func_ref);
                 let result = undefined;
-                const args = JSValue.decodeArray(argv, argc, this.getDataView(), memory);
+                const args = JSValue.decodeArray(
+                    argv,
+                    argc,
+                    this.getDataView(),
+                    memory,
+                );
                 result = func.apply(obj, args);
                 return JSValue.writeAndReturnKindBits(
                     result,
@@ -480,14 +548,19 @@ export class SwiftRuntime {
                     payload2_ptr,
                     false,
                     this.getDataView(),
-                    this.memory
+                    this.memory,
                 );
             },
 
             swjs_call_new: (ref: ref, argv: pointer, argc: number) => {
                 const memory = this.memory;
                 const constructor = memory.getObject(ref);
-                const args = JSValue.decodeArray(argv, argc, this.getDataView(), memory);
+                const args = JSValue.decodeArray(
+                    argv,
+                    argc,
+                    this.getDataView(),
+                    memory,
+                );
                 const instance = new constructor(...args);
                 return this.memory.retain(instance);
             },
@@ -497,13 +570,18 @@ export class SwiftRuntime {
                 argc: number,
                 exception_kind_ptr: pointer,
                 exception_payload1_ptr: pointer,
-                exception_payload2_ptr: pointer
+                exception_payload2_ptr: pointer,
             ) => {
                 let memory = this.memory;
                 const constructor = memory.getObject(ref);
                 let result: any;
                 try {
-                    const args = JSValue.decodeArray(argv, argc, this.getDataView(), memory);
+                    const args = JSValue.decodeArray(
+                        argv,
+                        argc,
+                        this.getDataView(),
+                        memory,
+                    );
                     result = new constructor(...args);
                 } catch (error) {
                     JSValue.write(
@@ -513,7 +591,7 @@ export class SwiftRuntime {
                         exception_payload2_ptr,
                         true,
                         this.getDataView(),
-                        this.memory
+                        this.memory,
                     );
                     return -1;
                 }
@@ -525,7 +603,7 @@ export class SwiftRuntime {
                     exception_payload2_ptr,
                     false,
                     this.getDataView(),
-                    memory
+                    memory,
                 );
                 return memory.retain(result);
             },
@@ -547,7 +625,7 @@ export class SwiftRuntime {
             swjs_create_function: (
                 host_func_id: number,
                 line: number,
-                file: ref
+                file: ref,
             ) => {
                 const fileString = this.memory.getObject(file) as string;
                 const func = (...args: any[]) =>
@@ -560,7 +638,7 @@ export class SwiftRuntime {
             swjs_create_oneshot_function: (
                 host_func_id: number,
                 line: number,
-                file: ref
+                file: ref,
             ) => {
                 const fileString = this.memory.getObject(file) as string;
                 const func = (...args: any[]) =>
@@ -569,13 +647,30 @@ export class SwiftRuntime {
                 return func_ref;
             },
 
-            swjs_create_typed_array: <T extends Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | BigInt64Array | BigUint64Array | Float32Array | Float64Array | Uint8ClampedArray>(
+            swjs_create_typed_array: <
+                T extends
+                    | Int8Array
+                    | Uint8Array
+                    | Int16Array
+                    | Uint16Array
+                    | Int32Array
+                    | Uint32Array
+                    | BigInt64Array
+                    | BigUint64Array
+                    | Float32Array
+                    | Float64Array
+                    | Uint8ClampedArray,
+            >(
                 constructor_ref: ref,
                 elementsPtr: pointer,
-                length: number
+                length: number,
             ) => {
                 type TypedArrayConstructor = {
-                    new (buffer: ArrayBuffer, byteOffset: number, length: number): T;
+                    new (
+                        buffer: ArrayBuffer,
+                        byteOffset: number,
+                        length: number,
+                    ): T;
                     new (): T;
                 };
                 const ArrayType: TypedArrayConstructor =
@@ -592,13 +687,15 @@ export class SwiftRuntime {
                 const array = new ArrayType(
                     this.wasmMemory!.buffer,
                     elementsPtr,
-                    length
+                    length,
                 );
                 // Call `.slice()` to copy the memory
                 return this.memory.retain(array.slice());
             },
 
-            swjs_create_object: () => { return this.memory.retain({}); },
+            swjs_create_object: () => {
+                return this.memory.retain({});
+            },
 
             swjs_load_typed_array: (ref: ref, buffer: pointer) => {
                 const memory = this.memory;
@@ -613,7 +710,9 @@ export class SwiftRuntime {
 
             swjs_release_remote: (tid: number, ref: ref) => {
                 if (!this.options.threadChannel) {
-                    throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to release objects on remote threads.");
+                    throw new Error(
+                        "threadChannel is not set in options given to SwiftRuntime. Please set it to release objects on remote threads.",
+                    );
                 }
                 const broker = getMessageBroker(this.options.threadChannel);
                 broker.request({
@@ -625,20 +724,22 @@ export class SwiftRuntime {
                         request: {
                             method: "release",
                             parameters: [ref],
-                        }
-                    }
-                })
+                        },
+                    },
+                });
             },
 
             swjs_i64_to_bigint: (value: bigint, signed: number) => {
                 return this.memory.retain(
-                    signed ? value : BigInt.asUintN(64, value)
+                    signed ? value : BigInt.asUintN(64, value),
                 );
             },
             swjs_bigint_to_i64: (ref: ref, signed: number) => {
                 const object = this.memory.getObject(ref);
                 if (typeof object !== "bigint") {
-                    throw new Error(`Expected a BigInt, but got ${typeof object}`);
+                    throw new Error(
+                        `Expected a BigInt, but got ${typeof object}`,
+                    );
                 }
                 if (signed) {
                     return object;
@@ -649,63 +750,46 @@ export class SwiftRuntime {
                     return BigInt.asIntN(64, object);
                 }
             },
-            swjs_i64_to_bigint_slow: (lower: number, upper: number, signed: number) => {
+            swjs_i64_to_bigint_slow: (
+                lower: number,
+                upper: number,
+                signed: number,
+            ) => {
                 const value =
                     BigInt.asUintN(32, BigInt(lower)) +
                     (BigInt.asUintN(32, BigInt(upper)) << BigInt(32));
                 return this.memory.retain(
-                    signed ? BigInt.asIntN(64, value) : BigInt.asUintN(64, value)
+                    signed
+                        ? BigInt.asIntN(64, value)
+                        : BigInt.asUintN(64, value),
                 );
             },
             swjs_unsafe_event_loop_yield: () => {
                 throw new UnsafeEventLoopYield();
             },
             swjs_send_job_to_main_thread: (unowned_job: number) => {
-                this.postMessageToMainThread({ type: "job", data: unowned_job });
+                this.postMessageToMainThread({
+                    type: "job",
+                    data: unowned_job,
+                });
             },
             swjs_listen_message_from_main_thread: () => {
                 const threadChannel = this.options.threadChannel;
-                if (!(threadChannel && "listenMessageFromMainThread" in threadChannel)) {
+                if (
+                    !(
+                        threadChannel &&
+                        "listenMessageFromMainThread" in threadChannel
+                    )
+                ) {
                     throw new Error(
-                        "listenMessageFromMainThread is not set in options given to SwiftRuntime. Please set it to listen to wake events from the main thread."
+                        "listenMessageFromMainThread is not set in options given to SwiftRuntime. Please set it to listen to wake events from the main thread.",
                     );
                 }
                 const broker = getMessageBroker(threadChannel);
                 threadChannel.listenMessageFromMainThread((message) => {
                     switch (message.type) {
-                    case "wake":
-                        this.exports.swjs_wake_worker_thread();
-                        break;
-                    case "request": {
-                        broker.onReceivingRequest(message);
-                        break;
-                    }
-                    case "response": {
-                        broker.onReceivingResponse(message);
-                        break;
-                    }
-                    default:
-                        const unknownMessage: never = message;
-                        throw new Error(`Unknown message type: ${unknownMessage}`);
-                    }
-                });
-            },
-            swjs_wake_up_worker_thread: (tid: number) => {
-                this.postMessageToWorkerThread(tid, { type: "wake" });
-            },
-            swjs_listen_message_from_worker_thread: (tid: number) => {
-                const threadChannel = this.options.threadChannel;
-                if (!(threadChannel && "listenMessageFromWorkerThread" in threadChannel)) {
-                    throw new Error(
-                        "listenMessageFromWorkerThread is not set in options given to SwiftRuntime. Please set it to listen to jobs from worker threads."
-                    );
-                }
-                const broker = getMessageBroker(threadChannel);
-                threadChannel.listenMessageFromWorkerThread(
-                    tid, (message) => {
-                        switch (message.type) {
-                        case "job":
-                            this.exports.swjs_enqueue_main_job_from_worker(message.data);
+                        case "wake":
+                            this.exports.swjs_wake_worker_thread();
                             break;
                         case "request": {
                             broker.onReceivingRequest(message);
@@ -717,10 +801,50 @@ export class SwiftRuntime {
                         }
                         default:
                             const unknownMessage: never = message;
-                            throw new Error(`Unknown message type: ${unknownMessage}`);
+                            throw new Error(
+                                `Unknown message type: ${unknownMessage}`,
+                            );
+                    }
+                });
+            },
+            swjs_wake_up_worker_thread: (tid: number) => {
+                this.postMessageToWorkerThread(tid, { type: "wake" });
+            },
+            swjs_listen_message_from_worker_thread: (tid: number) => {
+                const threadChannel = this.options.threadChannel;
+                if (
+                    !(
+                        threadChannel &&
+                        "listenMessageFromWorkerThread" in threadChannel
+                    )
+                ) {
+                    throw new Error(
+                        "listenMessageFromWorkerThread is not set in options given to SwiftRuntime. Please set it to listen to jobs from worker threads.",
+                    );
+                }
+                const broker = getMessageBroker(threadChannel);
+                threadChannel.listenMessageFromWorkerThread(tid, (message) => {
+                    switch (message.type) {
+                        case "job":
+                            this.exports.swjs_enqueue_main_job_from_worker(
+                                message.data,
+                            );
+                            break;
+                        case "request": {
+                            broker.onReceivingRequest(message);
+                            break;
                         }
-                    },
-                );
+                        case "response": {
+                            broker.onReceivingResponse(message);
+                            break;
+                        }
+                        default:
+                            const unknownMessage: never = message;
+                            throw new Error(
+                                `Unknown message type: ${unknownMessage}`,
+                            );
+                    }
+                });
             },
             swjs_terminate_worker_thread: (tid: number) => {
                 const threadChannel = this.options.threadChannel;
@@ -740,10 +864,16 @@ export class SwiftRuntime {
                 sending_context: pointer,
             ) => {
                 if (!this.options.threadChannel) {
-                    throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to request transferring objects.");
+                    throw new Error(
+                        "threadChannel is not set in options given to SwiftRuntime. Please set it to request transferring objects.",
+                    );
                 }
                 const broker = getMessageBroker(this.options.threadChannel);
-                const transferringObjects = decodeObjectRefs(transferring_objects, transferring_objects_count, this.getDataView());
+                const transferringObjects = decodeObjectRefs(
+                    transferring_objects,
+                    transferring_objects_count,
+                    this.getDataView(),
+                );
                 broker.request({
                     type: "request",
                     data: {
@@ -752,10 +882,14 @@ export class SwiftRuntime {
                         context: sending_context,
                         request: {
                             method: "send",
-                            parameters: [sending_object, transferringObjects, sending_context],
-                        }
-                    }
-                })
+                            parameters: [
+                                sending_object,
+                                transferringObjects,
+                                sending_context,
+                            ],
+                        },
+                    },
+                });
             },
             swjs_request_sending_objects: (
                 sending_objects: pointer,
@@ -766,12 +900,22 @@ export class SwiftRuntime {
                 sending_context: pointer,
             ) => {
                 if (!this.options.threadChannel) {
-                    throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to request transferring objects.");
+                    throw new Error(
+                        "threadChannel is not set in options given to SwiftRuntime. Please set it to request transferring objects.",
+                    );
                 }
                 const broker = getMessageBroker(this.options.threadChannel);
                 const dataView = this.getDataView();
-                const sendingObjects = decodeObjectRefs(sending_objects, sending_objects_count, dataView);
-                const transferringObjects = decodeObjectRefs(transferring_objects, transferring_objects_count, dataView);
+                const sendingObjects = decodeObjectRefs(
+                    sending_objects,
+                    sending_objects_count,
+                    dataView,
+                );
+                const transferringObjects = decodeObjectRefs(
+                    transferring_objects,
+                    transferring_objects_count,
+                    dataView,
+                );
                 broker.request({
                     type: "request",
                     data: {
@@ -780,29 +924,40 @@ export class SwiftRuntime {
                         context: sending_context,
                         request: {
                             method: "sendObjects",
-                            parameters: [sendingObjects, transferringObjects, sending_context],
-                        }
-                    }
-                })
+                            parameters: [
+                                sendingObjects,
+                                transferringObjects,
+                                sending_context,
+                            ],
+                        },
+                    },
+                });
             },
         };
     }
 
-    private postMessageToMainThread(message: WorkerToMainMessage, transfer: any[] = []) {
+    private postMessageToMainThread(
+        message: WorkerToMainMessage,
+        transfer: any[] = [],
+    ) {
         const threadChannel = this.options.threadChannel;
         if (!(threadChannel && "postMessageToMainThread" in threadChannel)) {
             throw new Error(
-                "postMessageToMainThread is not set in options given to SwiftRuntime. Please set it to send messages to the main thread."
+                "postMessageToMainThread is not set in options given to SwiftRuntime. Please set it to send messages to the main thread.",
             );
         }
         threadChannel.postMessageToMainThread(message, transfer);
     }
 
-    private postMessageToWorkerThread(tid: number, message: MainToWorkerMessage, transfer: any[] = []) {
+    private postMessageToWorkerThread(
+        tid: number,
+        message: MainToWorkerMessage,
+        transfer: any[] = [],
+    ) {
         const threadChannel = this.options.threadChannel;
         if (!(threadChannel && "postMessageToWorkerThread" in threadChannel)) {
             throw new Error(
-                "postMessageToWorkerThread is not set in options given to SwiftRuntime. Please set it to send messages to worker threads."
+                "postMessageToWorkerThread is not set in options given to SwiftRuntime. Please set it to send messages to worker threads.",
             );
         }
         threadChannel.postMessageToWorkerThread(tid, message, transfer);

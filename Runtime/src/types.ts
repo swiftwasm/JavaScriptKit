@@ -13,7 +13,7 @@ export interface ExportedFunctions {
         host_func_id: number,
         argv: pointer,
         argc: number,
-        callback_func_ref: ref
+        callback_func_ref: ref,
     ): bool;
 
     swjs_free_host_function(host_func_id: number): void;
