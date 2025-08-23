@@ -8,9 +8,9 @@
 
 @_expose(wasm, "bjs_checkString")
 @_cdecl("bjs_checkString")
-public func _bjs_checkString(aBytes: Int32, aLen: Int32) -> Void {
+public func _bjs_checkString(aBytes: Int32, aLength: Int32) -> Void {
     #if arch(wasm32)
-    checkString(a: String.bridgeJSLiftParameter(aBytes, aLen))
+    checkString(a: String.bridgeJSLiftParameter(aBytes, aLength))
     #else
     fatalError("Only available on WebAssembly")
     #endif

@@ -79,7 +79,24 @@ import _CJavaScriptKit
 //
 // See JSGlueGen.swift in BridgeJSLink for JS-side lowering/lifting implementation.
 
-extension Bool {
+/// A protocol that Swift types that can be lowered into a single Wasm core type.
+public protocol _BridgedSwiftTypeLoweredIntoWasmCoreType {
+    associatedtype WasmCoreType
+}
+
+/// A protocol that Swift types that can appear as parameters or return values on
+/// The conformance is automatically synthesized by the BridgeJS code generator.
+public protocol _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
+    associatedtype WasmCoreType
+    // MARK: ImportTS
+    consuming func bridgeJSLowerParameter() -> WasmCoreType
+    static func bridgeJSLiftReturn(_ value: WasmCoreType) -> Self
+    // MARK: ExportSwift
+    static func bridgeJSLiftParameter(_ value: WasmCoreType) -> Self
+    consuming func bridgeJSLowerReturn() -> WasmCoreType
+}
+
+extension Bool: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
     // MARK: ImportTS
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         self ? 1 : 0
@@ -96,7 +113,7 @@ extension Bool {
     }
 }
 
-extension Int {
+extension Int: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
     // MARK: ImportTS
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         Int32(self)
@@ -110,6 +127,40 @@ extension Int {
     }
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
         Int32(self)
+    }
+}
+
+extension Float: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
+    // MARK: ImportTS
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Float32 {
+        Float32(self)
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Float32) -> Float {
+        Float(value)
+    }
+    // MARK: ExportSwift
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Float32) -> Float {
+        Float(value)
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Float32 {
+        Float32(self)
+    }
+}
+
+extension Double: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
+    // MARK: ImportTS
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Float64 {
+        Float64(self)
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Float64) -> Double {
+        Double(value)
+    }
+    // MARK: ExportSwift
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Float64) -> Double {
+        Double(value)
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Float64 {
+        Float64(self)
     }
 }
 
@@ -211,5 +262,71 @@ extension JSObject {
         }
         #endif
         return _swift_js_retain(Int32(bitPattern: self.id))
+    }
+}
+
+/// A protocol that Swift heap objects exposed to JavaScript via `@JS class` must conform to.
+///
+/// The conformance is automatically synthesized by the BridgeJS code generator.
+public protocol _BridgedSwiftHeapObject: AnyObject {}
+
+/// Define the lowering/lifting for `_BridgedSwiftHeapObject`
+extension _BridgedSwiftHeapObject {
+
+    // MARK: ImportTS
+    @available(*, unavailable, message: "Swift heap objects are not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Void {}
+    @available(
+        *,
+        unavailable,
+        message: "Swift heap objects are not supported to be returned from imported JS functions"
+    )
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer) -> Void {}
+
+    // MARK: ExportSwift
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ pointer: UnsafeMutableRawPointer) -> Self {
+        Unmanaged<Self>.fromOpaque(pointer).takeUnretainedValue()
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> UnsafeMutableRawPointer {
+        // Perform a manual retain on the object, which will be balanced by a release called via FinalizationRegistry
+        return Unmanaged.passRetained(self).toOpaque()
+    }
+}
+
+/// A protocol that Swift enum types that do not have a payload can conform to.
+///
+/// The conformance is automatically synthesized by the BridgeJS code generator.
+public protocol _BridgedSwiftEnumNoPayload {}
+
+extension _BridgedSwiftEnumNoPayload where Self: RawRepresentable, RawValue == String {
+    // MARK: ImportTS
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 { rawValue.bridgeJSLowerParameter() }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ bytesCount: Int32) -> Self {
+        Self(rawValue: .bridgeJSLiftReturn(bytesCount))!
+    }
+
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ bytes: Int32, _ count: Int32) -> Self {
+        Self(rawValue: .bridgeJSLiftParameter(bytes, count))!
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void { rawValue.bridgeJSLowerReturn() }
+}
+
+extension _BridgedSwiftEnumNoPayload
+where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
+    // MARK: ImportTS
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> RawValue.WasmCoreType {
+        rawValue.bridgeJSLowerParameter()
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ value: RawValue.WasmCoreType) -> Self {
+        Self(rawValue: .bridgeJSLiftReturn(value))!
+    }
+
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ value: RawValue.WasmCoreType) -> Self {
+        Self(rawValue: .bridgeJSLiftParameter(value))!
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> RawValue.WasmCoreType {
+        rawValue.bridgeJSLowerReturn()
     }
 }

@@ -2,6 +2,7 @@
 import XCTest
 @testable import JavaScriptEventLoop
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 final class WebWorkerDedicatedExecutorTests: XCTestCase {
     actor MyActor {
         let executor: WebWorkerDedicatedExecutor

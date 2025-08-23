@@ -11,7 +11,7 @@
 public func _bjs_PlayBridgeJS_init() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = PlayBridgeJS()
-    return Unmanaged.passRetained(ret).toOpaque()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -19,11 +19,11 @@ public func _bjs_PlayBridgeJS_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_PlayBridgeJS_update")
 @_cdecl("bjs_PlayBridgeJS_update")
-public func _bjs_PlayBridgeJS_update(_self: UnsafeMutableRawPointer, swiftSourceBytes: Int32, swiftSourceLen: Int32, dtsSourceBytes: Int32, dtsSourceLen: Int32) -> UnsafeMutableRawPointer {
+public func _bjs_PlayBridgeJS_update(_self: UnsafeMutableRawPointer, swiftSourceBytes: Int32, swiftSourceLength: Int32, dtsSourceBytes: Int32, dtsSourceLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     do {
-        let ret = try Unmanaged<PlayBridgeJS>.fromOpaque(_self).takeUnretainedValue().update(swiftSource: String.bridgeJSLiftParameter(swiftSourceBytes, swiftSourceLen), dtsSource: String.bridgeJSLiftParameter(dtsSourceBytes, dtsSourceLen))
-        return Unmanaged.passRetained(ret).toOpaque()
+        let ret = try PlayBridgeJS.bridgeJSLiftParameter(_self).update(swiftSource: String.bridgeJSLiftParameter(swiftSourceBytes, swiftSourceLength), dtsSource: String.bridgeJSLiftParameter(dtsSourceBytes, dtsSourceLength))
+        return ret.bridgeJSLowerReturn()
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {
@@ -48,10 +48,16 @@ public func _bjs_PlayBridgeJS_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<PlayBridgeJS>.fromOpaque(pointer).release()
 }
 
-extension PlayBridgeJS: ConvertibleToJSValue {
+extension PlayBridgeJS: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
+        #if arch(wasm32)
         @_extern(wasm, module: "PlayBridgeJS", name: "bjs_PlayBridgeJS_wrap")
         func _bjs_PlayBridgeJS_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_PlayBridgeJS_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_PlayBridgeJS_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
@@ -60,7 +66,7 @@ extension PlayBridgeJS: ConvertibleToJSValue {
 @_cdecl("bjs_PlayBridgeJSOutput_outputJs")
 public func _bjs_PlayBridgeJSOutput_outputJs(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Unmanaged<PlayBridgeJSOutput>.fromOpaque(_self).takeUnretainedValue().outputJs()
+    let ret = PlayBridgeJSOutput.bridgeJSLiftParameter(_self).outputJs()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -71,7 +77,7 @@ public func _bjs_PlayBridgeJSOutput_outputJs(_self: UnsafeMutableRawPointer) -> 
 @_cdecl("bjs_PlayBridgeJSOutput_outputDts")
 public func _bjs_PlayBridgeJSOutput_outputDts(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Unmanaged<PlayBridgeJSOutput>.fromOpaque(_self).takeUnretainedValue().outputDts()
+    let ret = PlayBridgeJSOutput.bridgeJSLiftParameter(_self).outputDts()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -82,7 +88,7 @@ public func _bjs_PlayBridgeJSOutput_outputDts(_self: UnsafeMutableRawPointer) ->
 @_cdecl("bjs_PlayBridgeJSOutput_importSwiftGlue")
 public func _bjs_PlayBridgeJSOutput_importSwiftGlue(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Unmanaged<PlayBridgeJSOutput>.fromOpaque(_self).takeUnretainedValue().importSwiftGlue()
+    let ret = PlayBridgeJSOutput.bridgeJSLiftParameter(_self).importSwiftGlue()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -93,7 +99,7 @@ public func _bjs_PlayBridgeJSOutput_importSwiftGlue(_self: UnsafeMutableRawPoint
 @_cdecl("bjs_PlayBridgeJSOutput_exportSwiftGlue")
 public func _bjs_PlayBridgeJSOutput_exportSwiftGlue(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Unmanaged<PlayBridgeJSOutput>.fromOpaque(_self).takeUnretainedValue().exportSwiftGlue()
+    let ret = PlayBridgeJSOutput.bridgeJSLiftParameter(_self).exportSwiftGlue()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -106,10 +112,16 @@ public func _bjs_PlayBridgeJSOutput_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<PlayBridgeJSOutput>.fromOpaque(pointer).release()
 }
 
-extension PlayBridgeJSOutput: ConvertibleToJSValue {
+extension PlayBridgeJSOutput: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
+        #if arch(wasm32)
         @_extern(wasm, module: "PlayBridgeJS", name: "bjs_PlayBridgeJSOutput_wrap")
         func _bjs_PlayBridgeJSOutput_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_PlayBridgeJSOutput_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_PlayBridgeJSOutput_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }

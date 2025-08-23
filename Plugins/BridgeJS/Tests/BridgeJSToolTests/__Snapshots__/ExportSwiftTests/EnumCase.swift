@@ -7,7 +7,20 @@
 @_spi(BridgeJS) import JavaScriptKit
 
 extension Direction {
-    init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> Direction {
+        return Direction(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> Direction {
+        return Direction(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSRawValue
+    }
+
+    private init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .north
@@ -22,7 +35,7 @@ extension Direction {
         }
     }
 
-    var bridgeJSRawValue: Int32 {
+    private var bridgeJSRawValue: Int32 {
         switch self {
         case .north:
             return 0
@@ -37,7 +50,20 @@ extension Direction {
 }
 
 extension Status {
-    init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> Status {
+        return Status(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> Status {
+        return Status(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSRawValue
+    }
+
+    private init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .loading
@@ -50,7 +76,7 @@ extension Status {
         }
     }
 
-    var bridgeJSRawValue: Int32 {
+    private var bridgeJSRawValue: Int32 {
         switch self {
         case .loading:
             return 0
@@ -63,7 +89,20 @@ extension Status {
 }
 
 extension TSDirection {
-    init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> TSDirection {
+        return TSDirection(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> TSDirection {
+        return TSDirection(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSRawValue
+    }
+
+    private init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .north
@@ -78,7 +117,7 @@ extension TSDirection {
         }
     }
 
-    var bridgeJSRawValue: Int32 {
+    private var bridgeJSRawValue: Int32 {
         switch self {
         case .north:
             return 0
@@ -96,7 +135,7 @@ extension TSDirection {
 @_cdecl("bjs_setDirection")
 public func _bjs_setDirection(direction: Int32) -> Void {
     #if arch(wasm32)
-    setDirection(_: Direction(bridgeJSRawValue: direction)!)
+    setDirection(_: Direction.bridgeJSLiftParameter(direction))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -107,7 +146,7 @@ public func _bjs_setDirection(direction: Int32) -> Void {
 public func _bjs_getDirection() -> Int32 {
     #if arch(wasm32)
     let ret = getDirection()
-    return ret.bridgeJSRawValue
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -117,8 +156,8 @@ public func _bjs_getDirection() -> Int32 {
 @_cdecl("bjs_processDirection")
 public func _bjs_processDirection(input: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = processDirection(_: Direction(bridgeJSRawValue: input)!)
-    return ret.bridgeJSRawValue
+    let ret = processDirection(_: Direction.bridgeJSLiftParameter(input))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -128,7 +167,7 @@ public func _bjs_processDirection(input: Int32) -> Int32 {
 @_cdecl("bjs_setTSDirection")
 public func _bjs_setTSDirection(direction: Int32) -> Void {
     #if arch(wasm32)
-    setTSDirection(_: TSDirection(bridgeJSRawValue: direction)!)
+    setTSDirection(_: TSDirection.bridgeJSLiftParameter(direction))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -139,7 +178,7 @@ public func _bjs_setTSDirection(direction: Int32) -> Void {
 public func _bjs_getTSDirection() -> Int32 {
     #if arch(wasm32)
     let ret = getTSDirection()
-    return ret.bridgeJSRawValue
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

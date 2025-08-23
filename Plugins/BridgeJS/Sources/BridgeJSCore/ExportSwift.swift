@@ -51,7 +51,7 @@ public class ExportSwift {
     /// - Returns: A tuple containing the generated Swift code and a skeleton
     /// describing the exported APIs
     public func finalize() throws -> (outputSwift: String, outputSkeleton: ExportedSkeleton)? {
-        guard let outputSwift = renderSwiftGlue() else {
+        guard let outputSwift = try renderSwiftGlue() else {
             return nil
         }
         return (
@@ -710,22 +710,26 @@ public class ExportSwift {
         @_spi(BridgeJS) import JavaScriptKit
         """
 
-    func renderSwiftGlue() -> String? {
+    func renderSwiftGlue() throws -> String? {
         var decls: [DeclSyntax] = []
         guard exportedFunctions.count > 0 || exportedClasses.count > 0 || exportedEnums.count > 0 else {
             return nil
         }
         decls.append(Self.prelude)
 
-        for enumDef in exportedEnums where enumDef.enumType == .simple {
-            decls.append(renderCaseEnumHelpers(enumDef))
+        for enumDef in exportedEnums {
+            if enumDef.enumType == .simple {
+                decls.append(renderCaseEnumHelpers(enumDef))
+            } else {
+                decls.append("extension \(raw: enumDef.swiftCallName): _BridgedSwiftEnumNoPayload {}")
+            }
         }
 
         for function in exportedFunctions {
-            decls.append(renderSingleExportedFunction(function: function))
+            decls.append(try renderSingleExportedFunction(function: function))
         }
         for klass in exportedClasses {
-            decls.append(contentsOf: renderSingleExportedClass(klass: klass))
+            decls.append(contentsOf: try renderSingleExportedClass(klass: klass))
         }
         let format = BasicFormat()
         return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
@@ -746,11 +750,24 @@ public class ExportSwift {
 
         return """
             extension \(raw: typeName) {
-                init?(bridgeJSRawValue: Int32) {
+                @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+                    return bridgeJSRawValue
+                }
+                @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> \(raw: typeName) {
+                    return \(raw: typeName)(bridgeJSRawValue: value)!
+                }
+                @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> \(raw: typeName) {
+                    return \(raw: typeName)(bridgeJSRawValue: value)!
+                }
+                @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+                    return bridgeJSRawValue
+                }
+
+                private init?(bridgeJSRawValue: Int32) {
                     \(raw: initSwitch)
                 }
 
-                var bridgeJSRawValue: Int32 {
+                private var bridgeJSRawValue: Int32 {
                     \(raw: valueSwitch)
                 }
             }
@@ -778,87 +795,22 @@ public class ExportSwift {
             self.body.append(item)
         }
 
-        func liftParameter(param: Parameter) {
+        func liftParameter(param: Parameter) throws {
             parameters.append(param)
-            switch param.type {
-            case .bool:
-                liftedParameterExprs.append(
-                    ExprSyntax("\(raw: param.type.swiftType).bridgeJSLiftParameter(\(raw: param.name))")
+            let liftingInfo = try param.type.liftParameterInfo()
+            let argumentsToLift: [String]
+            if liftingInfo.parameters.count == 1 {
+                argumentsToLift = [param.name]
+            } else {
+                argumentsToLift = liftingInfo.parameters.map { (name, _) in param.name + name.capitalizedFirstLetter }
+            }
+            liftedParameterExprs.append(
+                ExprSyntax(
+                    "\(raw: param.type.swiftType).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
                 )
-                abiParameterSignatures.append((param.name, .i32))
-            case .int:
-                liftedParameterExprs.append(
-                    ExprSyntax("\(raw: param.type.swiftType).bridgeJSLiftParameter(\(raw: param.name))")
-                )
-                abiParameterSignatures.append((param.name, .i32))
-            case .float:
-                liftedParameterExprs.append(ExprSyntax("\(raw: param.name)"))
-                abiParameterSignatures.append((param.name, .f32))
-            case .double:
-                liftedParameterExprs.append(ExprSyntax("\(raw: param.name)"))
-                abiParameterSignatures.append((param.name, .f64))
-            case .string:
-                let bytesLabel = "\(param.name)Bytes"
-                let lengthLabel = "\(param.name)Len"
-                liftedParameterExprs.append(
-                    ExprSyntax(
-                        "\(raw: param.type.swiftType).bridgeJSLiftParameter(\(raw: bytesLabel), \(raw: lengthLabel))"
-                    )
-                )
-                abiParameterSignatures.append((bytesLabel, .i32))
-                abiParameterSignatures.append((lengthLabel, .i32))
-            case .caseEnum(let enumName):
-                liftedParameterExprs.append(ExprSyntax("\(raw: enumName)(bridgeJSRawValue: \(raw: param.name))!"))
-                abiParameterSignatures.append((param.name, .i32))
-            case .rawValueEnum(let enumName, let rawType):
-                if rawType == .string {
-                    let bytesLabel = "\(param.name)Bytes"
-                    let lengthLabel = "\(param.name)Len"
-                    liftedParameterExprs.append(
-                        ExprSyntax(
-                            "\(raw: enumName)(rawValue: String.bridgeJSLiftParameter(\(raw: bytesLabel), \(raw: lengthLabel)))!"
-                        )
-                    )
-                    abiParameterSignatures.append((bytesLabel, .i32))
-                    abiParameterSignatures.append((lengthLabel, .i32))
-                } else {
-                    let conversionExpr: String
-                    switch rawType {
-                    case .bool:
-                        conversionExpr =
-                            "\(enumName)(rawValue: \(param.type.swiftType).bridgeJSLiftParameter(\(param.name)))"
-                    case .uint, .uint32, .uint64:
-                        if rawType == .uint64 {
-                            conversionExpr =
-                                "\(enumName)(rawValue: \(rawType.rawValue)(bitPattern: Int64(\(param.name))))!"
-                        } else {
-                            conversionExpr = "\(enumName)(rawValue: \(rawType.rawValue)(bitPattern: \(param.name)))!"
-                        }
-                    default:
-                        conversionExpr = "\(enumName)(rawValue: \(rawType.rawValue)(\(param.name)))!"
-                    }
-
-                    liftedParameterExprs.append(ExprSyntax(stringLiteral: conversionExpr))
-                    if let wasmType = rawType.wasmCoreType {
-                        abiParameterSignatures.append((param.name, wasmType))
-                    }
-                }
-            case .associatedValueEnum(_):
-                break
-            case .namespaceEnum:
-                break
-            case .jsObject(let name):
-                liftedParameterExprs.append(
-                    ExprSyntax("\(raw: name ?? "JSObject").bridgeJSLiftParameter(\(raw: param.name))")
-                )
-                abiParameterSignatures.append((param.name, .i32))
-            case .swiftHeapObject:
-                let objectExpr: ExprSyntax =
-                    "Unmanaged<\(raw: param.type.swiftType)>.fromOpaque(\(raw: param.name)).takeUnretainedValue()"
-                liftedParameterExprs.append(objectExpr)
-                abiParameterSignatures.append((param.name, .pointer))
-            case .void:
-                break
+            )
+            for (name, type) in zip(argumentsToLift, liftingInfo.parameters.map { $0.type }) {
+                abiParameterSignatures.append((name, type))
             }
         }
 
@@ -928,97 +880,28 @@ public class ExportSwift {
             append("\(raw: selfExpr).\(raw: propertyName) = \(raw: newValueExpr)")
         }
 
-        func lowerReturnValue(returnType: BridgeType) {
+        func lowerReturnValue(returnType: BridgeType) throws {
             if effects.isAsync {
                 // Async functions always return a Promise, which is a JSObject
-                _lowerReturnValue(returnType: .jsObject(nil))
+                try _lowerReturnValue(returnType: .jsObject(nil))
             } else {
-                _lowerReturnValue(returnType: returnType)
+                try _lowerReturnValue(returnType: returnType)
             }
         }
 
-        private func _lowerReturnValue(returnType: BridgeType) {
-            switch returnType {
-            case .void:
-                abiReturnType = nil
-            case .bool:
-                abiReturnType = .i32
-            case .int:
-                abiReturnType = .i32
-            case .float:
-                abiReturnType = .f32
-            case .double:
-                abiReturnType = .f64
-            case .string:
-                abiReturnType = nil
-            case .jsObject:
-                abiReturnType = .i32
-            case .swiftHeapObject:
-                // UnsafeMutableRawPointer is returned as an i32 pointer
-                abiReturnType = .pointer
-            case .caseEnum:
-                abiReturnType = .i32
-            case .rawValueEnum(_, let rawType):
-                abiReturnType = rawType == .string ? nil : rawType.wasmCoreType
-            case .associatedValueEnum:
-                abiReturnType = nil
-            case .namespaceEnum:
-                abiReturnType = nil
+        private func _lowerReturnValue(returnType: BridgeType) throws {
+            let loweringInfo = try returnType.loweringReturnInfo()
+            abiReturnType = loweringInfo.returnType
+            if returnType == .void {
+                return
             }
-
             if effects.isAsync {
                 // The return value of async function (T of `(...) async -> T`) is
                 // handled by the JSPromise.async, so we don't need to do anything here.
                 return
             }
 
-            switch returnType {
-            case .void: break
-            case .int, .float, .double:
-                append("return \(raw: abiReturnType!.swiftType)(ret)")
-            case .bool:
-                append("return ret.bridgeJSLowerReturn()")
-            case .string:
-                append("return ret.bridgeJSLowerReturn()")
-            case .caseEnum:
-                abiReturnType = .i32
-                append("return ret.bridgeJSRawValue")
-            case .rawValueEnum(_, let rawType):
-                if rawType == .string {
-                    append(
-                        """
-                        return ret.rawValue.bridgeJSLowerReturn()
-                        """
-                    )
-                } else {
-                    switch rawType {
-                    case .bool:
-                        append("return Int32(ret.rawValue ? 1 : 0)")
-                    case .int, .int32, .uint, .uint32:
-                        append("return Int32(ret.rawValue)")
-                    case .int64, .uint64:
-                        append("return Int64(ret.rawValue)")
-                    case .float:
-                        append("return Float32(ret.rawValue)")
-                    case .double:
-                        append("return Float64(ret.rawValue)")
-                    default:
-                        append("return Int32(ret.rawValue)")
-                    }
-                }
-            case .associatedValueEnum: break;
-            case .namespaceEnum: break;
-            case .jsObject:
-                append("return ret.bridgeJSLowerReturn()")
-            case .swiftHeapObject:
-                // Perform a manual retain on the object, which will be balanced by a
-                // release called via FinalizationRegistry
-                append(
-                    """
-                    return Unmanaged.passRetained(ret).toOpaque()
-                    """
-                )
-            }
+            append("return ret.bridgeJSLowerReturn()")
         }
 
         func render(abiName: String) -> DeclSyntax {
@@ -1088,13 +971,13 @@ public class ExportSwift {
         }
     }
 
-    func renderSingleExportedFunction(function: ExportedFunction) -> DeclSyntax {
+    func renderSingleExportedFunction(function: ExportedFunction) throws -> DeclSyntax {
         let builder = ExportedThunkBuilder(effects: function.effects)
         for param in function.parameters {
-            builder.liftParameter(param: param)
+            try builder.liftParameter(param: param)
         }
         builder.call(name: function.name, returnType: function.returnType)
-        builder.lowerReturnValue(returnType: function.returnType)
+        try builder.lowerReturnValue(returnType: function.returnType)
         return builder.render(abiName: function.abiName)
     }
 
@@ -1145,32 +1028,32 @@ public class ExportSwift {
     ///     Unmanaged<Greeter>.fromOpaque(pointer).release()
     /// }
     /// ```
-    func renderSingleExportedClass(klass: ExportedClass) -> [DeclSyntax] {
+    func renderSingleExportedClass(klass: ExportedClass) throws -> [DeclSyntax] {
         var decls: [DeclSyntax] = []
 
         if let constructor = klass.constructor {
             let builder = ExportedThunkBuilder(effects: constructor.effects)
             for param in constructor.parameters {
-                builder.liftParameter(param: param)
+                try builder.liftParameter(param: param)
             }
             builder.call(name: klass.swiftCallName, returnType: BridgeType.swiftHeapObject(klass.name))
-            builder.lowerReturnValue(returnType: BridgeType.swiftHeapObject(klass.name))
+            try builder.lowerReturnValue(returnType: BridgeType.swiftHeapObject(klass.name))
             decls.append(builder.render(abiName: constructor.abiName))
         }
         for method in klass.methods {
             let builder = ExportedThunkBuilder(effects: method.effects)
-            builder.liftParameter(
+            try builder.liftParameter(
                 param: Parameter(label: nil, name: "_self", type: BridgeType.swiftHeapObject(klass.swiftCallName))
             )
             for param in method.parameters {
-                builder.liftParameter(param: param)
+                try builder.liftParameter(param: param)
             }
             builder.callMethod(
                 klassName: klass.swiftCallName,
                 methodName: method.name,
                 returnType: method.returnType
             )
-            builder.lowerReturnValue(returnType: method.returnType)
+            try builder.lowerReturnValue(returnType: method.returnType)
             decls.append(builder.render(abiName: method.abiName))
         }
 
@@ -1178,7 +1061,7 @@ public class ExportSwift {
         for property in klass.properties {
             // Generate getter
             let getterBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
-            getterBuilder.liftParameter(
+            try getterBuilder.liftParameter(
                 param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(klass.name))
             )
             getterBuilder.callPropertyGetter(
@@ -1186,23 +1069,23 @@ public class ExportSwift {
                 propertyName: property.name,
                 returnType: property.type
             )
-            getterBuilder.lowerReturnValue(returnType: property.type)
+            try getterBuilder.lowerReturnValue(returnType: property.type)
             decls.append(getterBuilder.render(abiName: property.getterAbiName(className: klass.name)))
 
             // Generate setter if property is not readonly
             if !property.isReadonly {
                 let setterBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
-                setterBuilder.liftParameter(
+                try setterBuilder.liftParameter(
                     param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(klass.name))
                 )
-                setterBuilder.liftParameter(
+                try setterBuilder.liftParameter(
                     param: Parameter(label: "value", name: "value", type: property.type)
                 )
                 setterBuilder.callPropertySetter(
                     klassName: klass.name,
                     propertyName: property.name
                 )
-                setterBuilder.lowerReturnValue(returnType: .void)
+                try setterBuilder.lowerReturnValue(returnType: .void)
                 decls.append(setterBuilder.render(abiName: property.setterAbiName(className: klass.name)))
             }
         }
@@ -1232,7 +1115,7 @@ public class ExportSwift {
     /// For a class named `Greeter`, this generates:
     ///
     /// ```swift
-    /// extension Greeter: ConvertibleToJSValue {
+    /// extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     ///     var jsValue: JSValue {
     ///         @_extern(wasm, module: "MyModule", name: "bjs_Greeter_wrap")
     ///         func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
@@ -1245,10 +1128,16 @@ public class ExportSwift {
         let externFunctionName = "bjs_\(klass.name)_wrap"
 
         return """
-            extension \(raw: klass.swiftCallName): ConvertibleToJSValue {
+            extension \(raw: klass.swiftCallName): ConvertibleToJSValue, _BridgedSwiftHeapObject {
                 var jsValue: JSValue {
+                    #if arch(wasm32)
                     @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: externFunctionName)")
                     func \(raw: wrapFunctionName)(_: UnsafeMutableRawPointer) -> Int32
+                    #else
+                    func \(raw: wrapFunctionName)(_: UnsafeMutableRawPointer) -> Int32 {
+                        fatalError("Only available on WebAssembly")
+                    }
+                    #endif
                     return .object(JSObject(id: UInt32(bitPattern: \(raw: wrapFunctionName)(Unmanaged.passRetained(self).toOpaque()))))
                 }
             }
@@ -1323,6 +1212,97 @@ extension BridgeType {
         case .rawValueEnum(let name, _): return name
         case .associatedValueEnum(let name): return name
         case .namespaceEnum(let name): return name
+        }
+    }
+
+    struct LiftingIntrinsicInfo: Sendable {
+        let parameters: [(name: String, type: WasmCoreType)]
+
+        static let bool = LiftingIntrinsicInfo(parameters: [("value", .i32)])
+        static let int = LiftingIntrinsicInfo(parameters: [("value", .i32)])
+        static let float = LiftingIntrinsicInfo(parameters: [("value", .f32)])
+        static let double = LiftingIntrinsicInfo(parameters: [("value", .f64)])
+        static let string = LiftingIntrinsicInfo(parameters: [("bytes", .i32), ("length", .i32)])
+        static let jsObject = LiftingIntrinsicInfo(parameters: [("value", .i32)])
+        static let swiftHeapObject = LiftingIntrinsicInfo(parameters: [("value", .pointer)])
+        static let void = LiftingIntrinsicInfo(parameters: [])
+        static let caseEnum = LiftingIntrinsicInfo(parameters: [("value", .i32)])
+    }
+
+    func liftParameterInfo() throws -> LiftingIntrinsicInfo {
+        switch self {
+        case .bool: return .bool
+        case .int: return .int
+        case .float: return .float
+        case .double: return .double
+        case .string: return .string
+        case .jsObject: return .jsObject
+        case .swiftHeapObject: return .swiftHeapObject
+        case .void: return .void
+        case .caseEnum: return .caseEnum
+        case .rawValueEnum(_, let rawType):
+            switch rawType {
+            case .bool: return .bool
+            case .int: return .int
+            case .float: return .float
+            case .double: return .double
+            case .string: return .string
+            case .int32: return .int
+            case .int64: return .int
+            case .uint: return .int
+            case .uint32: return .int
+            case .uint64: return .int
+            }
+        case .associatedValueEnum:
+            throw BridgeJSCoreError("Associated value enums are not supported to pass as parameters")
+        case .namespaceEnum:
+            throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
+        }
+    }
+
+    struct LoweringIntrinsicInfo: Sendable {
+        let returnType: WasmCoreType?
+
+        static let bool = LoweringIntrinsicInfo(returnType: .i32)
+        static let int = LoweringIntrinsicInfo(returnType: .i32)
+        static let float = LoweringIntrinsicInfo(returnType: .f32)
+        static let double = LoweringIntrinsicInfo(returnType: .f64)
+        static let string = LoweringIntrinsicInfo(returnType: nil)
+        static let jsObject = LoweringIntrinsicInfo(returnType: .i32)
+        static let swiftHeapObject = LoweringIntrinsicInfo(returnType: .pointer)
+        static let void = LoweringIntrinsicInfo(returnType: nil)
+        static let caseEnum = LoweringIntrinsicInfo(returnType: .i32)
+        static let rawValueEnum = LoweringIntrinsicInfo(returnType: .i32)
+    }
+
+    func loweringReturnInfo() throws -> LoweringIntrinsicInfo {
+        switch self {
+        case .bool: return .bool
+        case .int: return .int
+        case .float: return .float
+        case .double: return .double
+        case .string: return .string
+        case .jsObject: return .jsObject
+        case .swiftHeapObject: return .swiftHeapObject
+        case .void: return .void
+        case .caseEnum: return .caseEnum
+        case .rawValueEnum(_, let rawType):
+            switch rawType {
+            case .bool: return .bool
+            case .int: return .int
+            case .float: return .float
+            case .double: return .double
+            case .string: return .string
+            case .int32: return .int
+            case .int64: return .int
+            case .uint: return .int
+            case .uint32: return .int
+            case .uint64: return .int
+            }
+        case .associatedValueEnum:
+            throw BridgeJSCoreError("Associated value enums are not supported to pass as parameters")
+        case .namespaceEnum:
+            throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
         }
     }
 }

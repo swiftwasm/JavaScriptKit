@@ -371,7 +371,7 @@ public struct ImportTS {
             try builder.lowerParameter(param: newValue)
             builder.call(returnType: .void)
             return builder.renderThunkDecl(
-                name: "set\(property.name.capitalizedFirstLetter())",
+                name: "set\(property.name.capitalizedFirstLetter)",
                 parameters: [newValue],
                 returnType: .void
             )
@@ -481,12 +481,5 @@ public struct ImportTS {
                     rightParen: .rightParenToken()
                 ) : nil
         )
-    }
-}
-
-fileprivate extension String {
-    func capitalizedFirstLetter() -> String {
-        guard !isEmpty else { return self }
-        return prefix(1).uppercased() + dropFirst()
     }
 }

@@ -7,7 +7,20 @@
 @_spi(BridgeJS) import JavaScriptKit
 
 extension Direction {
-    init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> Direction {
+        return Direction(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> Direction {
+        return Direction(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSRawValue
+    }
+
+    private init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .north
@@ -22,7 +35,7 @@ extension Direction {
         }
     }
 
-    var bridgeJSRawValue: Int32 {
+    private var bridgeJSRawValue: Int32 {
         switch self {
         case .north:
             return 0
@@ -37,7 +50,20 @@ extension Direction {
 }
 
 extension Status {
-    init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> Status {
+        return Status(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> Status {
+        return Status(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSRawValue
+    }
+
+    private init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .loading
@@ -50,7 +76,7 @@ extension Status {
         }
     }
 
-    var bridgeJSRawValue: Int32 {
+    private var bridgeJSRawValue: Int32 {
         switch self {
         case .loading:
             return 0
@@ -62,8 +88,27 @@ extension Status {
     }
 }
 
+extension Theme: _BridgedSwiftEnumNoPayload {
+}
+
+extension HttpStatus: _BridgedSwiftEnumNoPayload {
+}
+
 extension TSDirection {
-    init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> TSDirection {
+        return TSDirection(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> TSDirection {
+        return TSDirection(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSRawValue
+    }
+
+    private init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .north
@@ -78,7 +123,7 @@ extension TSDirection {
         }
     }
 
-    var bridgeJSRawValue: Int32 {
+    private var bridgeJSRawValue: Int32 {
         switch self {
         case .north:
             return 0
@@ -92,8 +137,27 @@ extension TSDirection {
     }
 }
 
+extension TSTheme: _BridgedSwiftEnumNoPayload {
+}
+
+extension Utils: _BridgedSwiftEnumNoPayload {
+}
+
 extension Networking.API.Method {
-    init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> Networking.API.Method {
+        return Networking.API.Method(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> Networking.API.Method {
+        return Networking.API.Method(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSRawValue
+    }
+
+    private init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .get
@@ -108,7 +172,7 @@ extension Networking.API.Method {
         }
     }
 
-    var bridgeJSRawValue: Int32 {
+    private var bridgeJSRawValue: Int32 {
         switch self {
         case .get:
             return 0
@@ -122,8 +186,27 @@ extension Networking.API.Method {
     }
 }
 
+extension Configuration.LogLevel: _BridgedSwiftEnumNoPayload {
+}
+
+extension Configuration.Port: _BridgedSwiftEnumNoPayload {
+}
+
 extension Internal.SupportedMethod {
-    init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> Internal.SupportedMethod {
+        return Internal.SupportedMethod(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> Internal.SupportedMethod {
+        return Internal.SupportedMethod(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSRawValue
+    }
+
+    private init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .get
@@ -134,7 +217,7 @@ extension Internal.SupportedMethod {
         }
     }
 
-    var bridgeJSRawValue: Int32 {
+    private var bridgeJSRawValue: Int32 {
         switch self {
         case .get:
             return 0
@@ -159,7 +242,7 @@ public func _bjs_roundTripVoid() -> Void {
 public func _bjs_roundTripInt(v: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = roundTripInt(v: Int.bridgeJSLiftParameter(v))
-    return Int32(ret)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -169,8 +252,8 @@ public func _bjs_roundTripInt(v: Int32) -> Int32 {
 @_cdecl("bjs_roundTripFloat")
 public func _bjs_roundTripFloat(v: Float32) -> Float32 {
     #if arch(wasm32)
-    let ret = roundTripFloat(v: v)
-    return Float32(ret)
+    let ret = roundTripFloat(v: Float.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -180,8 +263,8 @@ public func _bjs_roundTripFloat(v: Float32) -> Float32 {
 @_cdecl("bjs_roundTripDouble")
 public func _bjs_roundTripDouble(v: Float64) -> Float64 {
     #if arch(wasm32)
-    let ret = roundTripDouble(v: v)
-    return Float64(ret)
+    let ret = roundTripDouble(v: Double.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -200,9 +283,9 @@ public func _bjs_roundTripBool(v: Int32) -> Int32 {
 
 @_expose(wasm, "bjs_roundTripString")
 @_cdecl("bjs_roundTripString")
-public func _bjs_roundTripString(vBytes: Int32, vLen: Int32) -> Void {
+public func _bjs_roundTripString(vBytes: Int32, vLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripString(v: String.bridgeJSLiftParameter(vBytes, vLen))
+    let ret = roundTripString(v: String.bridgeJSLiftParameter(vBytes, vLength))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -213,8 +296,8 @@ public func _bjs_roundTripString(vBytes: Int32, vLen: Int32) -> Void {
 @_cdecl("bjs_roundTripSwiftHeapObject")
 public func _bjs_roundTripSwiftHeapObject(v: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = roundTripSwiftHeapObject(v: Unmanaged<Greeter>.fromOpaque(v).takeUnretainedValue())
-    return Unmanaged.passRetained(ret).toOpaque()
+    let ret = roundTripSwiftHeapObject(v: Greeter.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -261,7 +344,7 @@ public func _bjs_throwsWithIntResult() -> Int32 {
     #if arch(wasm32)
     do {
         let ret = try throwsWithIntResult()
-        return Int32(ret)
+        return ret.bridgeJSLowerReturn()
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {
@@ -336,7 +419,7 @@ public func _bjs_throwsWithFloatResult() -> Float32 {
     #if arch(wasm32)
     do {
         let ret = try throwsWithFloatResult()
-        return Float32(ret)
+        return ret.bridgeJSLowerReturn()
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {
@@ -361,7 +444,7 @@ public func _bjs_throwsWithDoubleResult() -> Float64 {
     #if arch(wasm32)
     do {
         let ret = try throwsWithDoubleResult()
-        return Float64(ret)
+        return ret.bridgeJSLowerReturn()
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {
@@ -386,7 +469,7 @@ public func _bjs_throwsWithSwiftHeapObjectResult() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     do {
         let ret = try throwsWithSwiftHeapObjectResult()
-        return Unmanaged.passRetained(ret).toOpaque()
+        return ret.bridgeJSLowerReturn()
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {
@@ -461,7 +544,7 @@ public func _bjs_asyncRoundTripInt(v: Int32) -> Int32 {
 public func _bjs_asyncRoundTripFloat(v: Float32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
-        return await asyncRoundTripFloat(v: v).jsValue
+        return await asyncRoundTripFloat(v: Float.bridgeJSLiftParameter(v)).jsValue
     } .jsObject
     return ret.bridgeJSLowerReturn()
     #else
@@ -474,7 +557,7 @@ public func _bjs_asyncRoundTripFloat(v: Float32) -> Int32 {
 public func _bjs_asyncRoundTripDouble(v: Float64) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
-        return await asyncRoundTripDouble(v: v).jsValue
+        return await asyncRoundTripDouble(v: Double.bridgeJSLiftParameter(v)).jsValue
     } .jsObject
     return ret.bridgeJSLowerReturn()
     #else
@@ -497,10 +580,10 @@ public func _bjs_asyncRoundTripBool(v: Int32) -> Int32 {
 
 @_expose(wasm, "bjs_asyncRoundTripString")
 @_cdecl("bjs_asyncRoundTripString")
-public func _bjs_asyncRoundTripString(vBytes: Int32, vLen: Int32) -> Int32 {
+public func _bjs_asyncRoundTripString(vBytes: Int32, vLength: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
-        return await asyncRoundTripString(v: String.bridgeJSLiftParameter(vBytes, vLen)).jsValue
+        return await asyncRoundTripString(v: String.bridgeJSLiftParameter(vBytes, vLength)).jsValue
     } .jsObject
     return ret.bridgeJSLowerReturn()
     #else
@@ -513,7 +596,7 @@ public func _bjs_asyncRoundTripString(vBytes: Int32, vLen: Int32) -> Int32 {
 public func _bjs_asyncRoundTripSwiftHeapObject(v: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
-        return await asyncRoundTripSwiftHeapObject(v: Unmanaged<Greeter>.fromOpaque(v).takeUnretainedValue()).jsValue
+        return await asyncRoundTripSwiftHeapObject(v: Greeter.bridgeJSLiftParameter(v)).jsValue
     } .jsObject
     return ret.bridgeJSLowerReturn()
     #else
@@ -536,9 +619,9 @@ public func _bjs_asyncRoundTripJSObject(v: Int32) -> Int32 {
 
 @_expose(wasm, "bjs_takeGreeter")
 @_cdecl("bjs_takeGreeter")
-public func _bjs_takeGreeter(g: UnsafeMutableRawPointer, nameBytes: Int32, nameLen: Int32) -> Void {
+public func _bjs_takeGreeter(g: UnsafeMutableRawPointer, nameBytes: Int32, nameLength: Int32) -> Void {
     #if arch(wasm32)
-    takeGreeter(g: Unmanaged<Greeter>.fromOpaque(g).takeUnretainedValue(), name: String.bridgeJSLiftParameter(nameBytes, nameLen))
+    takeGreeter(g: Greeter.bridgeJSLiftParameter(g), name: String.bridgeJSLiftParameter(nameBytes, nameLength))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -549,7 +632,7 @@ public func _bjs_takeGreeter(g: UnsafeMutableRawPointer, nameBytes: Int32, nameL
 public func _bjs_createCalculator() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = createCalculator()
-    return Unmanaged.passRetained(ret).toOpaque()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -559,8 +642,8 @@ public func _bjs_createCalculator() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_useCalculator")
 public func _bjs_useCalculator(calc: UnsafeMutableRawPointer, x: Int32, y: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = useCalculator(calc: Unmanaged<Calculator>.fromOpaque(calc).takeUnretainedValue(), x: Int.bridgeJSLiftParameter(x), y: Int.bridgeJSLiftParameter(y))
-    return Int32(ret)
+    let ret = useCalculator(calc: Calculator.bridgeJSLiftParameter(calc), x: Int.bridgeJSLiftParameter(x), y: Int.bridgeJSLiftParameter(y))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -592,7 +675,7 @@ public func _bjs_testCalculatorToJSValue() -> Int32 {
 @_cdecl("bjs_testSwiftClassAsJSValue")
 public func _bjs_testSwiftClassAsJSValue(greeter: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = testSwiftClassAsJSValue(greeter: Unmanaged<Greeter>.fromOpaque(greeter).takeUnretainedValue())
+    let ret = testSwiftClassAsJSValue(greeter: Greeter.bridgeJSLiftParameter(greeter))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -603,8 +686,8 @@ public func _bjs_testSwiftClassAsJSValue(greeter: UnsafeMutableRawPointer) -> In
 @_cdecl("bjs_setDirection")
 public func _bjs_setDirection(direction: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = setDirection(_: Direction(bridgeJSRawValue: direction)!)
-    return ret.bridgeJSRawValue
+    let ret = setDirection(_: Direction.bridgeJSLiftParameter(direction))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -615,7 +698,7 @@ public func _bjs_setDirection(direction: Int32) -> Int32 {
 public func _bjs_getDirection() -> Int32 {
     #if arch(wasm32)
     let ret = getDirection()
-    return ret.bridgeJSRawValue
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -625,8 +708,8 @@ public func _bjs_getDirection() -> Int32 {
 @_cdecl("bjs_processDirection")
 public func _bjs_processDirection(input: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = processDirection(_: Direction(bridgeJSRawValue: input)!)
-    return ret.bridgeJSRawValue
+    let ret = processDirection(_: Direction.bridgeJSLiftParameter(input))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -634,10 +717,10 @@ public func _bjs_processDirection(input: Int32) -> Int32 {
 
 @_expose(wasm, "bjs_setTheme")
 @_cdecl("bjs_setTheme")
-public func _bjs_setTheme(themeBytes: Int32, themeLen: Int32) -> Void {
+public func _bjs_setTheme(themeBytes: Int32, themeLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = setTheme(_: Theme(rawValue: String.bridgeJSLiftParameter(themeBytes, themeLen))!)
-    return ret.rawValue.bridgeJSLowerReturn()
+    let ret = setTheme(_: Theme.bridgeJSLiftParameter(themeBytes, themeLength))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -648,7 +731,7 @@ public func _bjs_setTheme(themeBytes: Int32, themeLen: Int32) -> Void {
 public func _bjs_getTheme() -> Void {
     #if arch(wasm32)
     let ret = getTheme()
-    return ret.rawValue.bridgeJSLowerReturn()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -658,8 +741,8 @@ public func _bjs_getTheme() -> Void {
 @_cdecl("bjs_setHttpStatus")
 public func _bjs_setHttpStatus(status: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = setHttpStatus(_: HttpStatus(rawValue: Int(status))!)
-    return Int32(ret.rawValue)
+    let ret = setHttpStatus(_: HttpStatus.bridgeJSLiftParameter(status))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -670,7 +753,7 @@ public func _bjs_setHttpStatus(status: Int32) -> Int32 {
 public func _bjs_getHttpStatus() -> Int32 {
     #if arch(wasm32)
     let ret = getHttpStatus()
-    return Int32(ret.rawValue)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -678,10 +761,10 @@ public func _bjs_getHttpStatus() -> Int32 {
 
 @_expose(wasm, "bjs_processTheme")
 @_cdecl("bjs_processTheme")
-public func _bjs_processTheme(themeBytes: Int32, themeLen: Int32) -> Int32 {
+public func _bjs_processTheme(themeBytes: Int32, themeLength: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = processTheme(_: Theme(rawValue: String.bridgeJSLiftParameter(themeBytes, themeLen))!)
-    return Int32(ret.rawValue)
+    let ret = processTheme(_: Theme.bridgeJSLiftParameter(themeBytes, themeLength))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -691,8 +774,8 @@ public func _bjs_processTheme(themeBytes: Int32, themeLen: Int32) -> Int32 {
 @_cdecl("bjs_setTSDirection")
 public func _bjs_setTSDirection(direction: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = setTSDirection(_: TSDirection(bridgeJSRawValue: direction)!)
-    return ret.bridgeJSRawValue
+    let ret = setTSDirection(_: TSDirection.bridgeJSLiftParameter(direction))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -703,7 +786,7 @@ public func _bjs_setTSDirection(direction: Int32) -> Int32 {
 public func _bjs_getTSDirection() -> Int32 {
     #if arch(wasm32)
     let ret = getTSDirection()
-    return ret.bridgeJSRawValue
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -711,10 +794,10 @@ public func _bjs_getTSDirection() -> Int32 {
 
 @_expose(wasm, "bjs_setTSTheme")
 @_cdecl("bjs_setTSTheme")
-public func _bjs_setTSTheme(themeBytes: Int32, themeLen: Int32) -> Void {
+public func _bjs_setTSTheme(themeBytes: Int32, themeLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = setTSTheme(_: TSTheme(rawValue: String.bridgeJSLiftParameter(themeBytes, themeLen))!)
-    return ret.rawValue.bridgeJSLowerReturn()
+    let ret = setTSTheme(_: TSTheme.bridgeJSLiftParameter(themeBytes, themeLength))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -725,7 +808,7 @@ public func _bjs_setTSTheme(themeBytes: Int32, themeLen: Int32) -> Void {
 public func _bjs_getTSTheme() -> Void {
     #if arch(wasm32)
     let ret = getTSTheme()
-    return ret.rawValue.bridgeJSLowerReturn()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -733,10 +816,10 @@ public func _bjs_getTSTheme() -> Void {
 
 @_expose(wasm, "bjs_createPropertyHolder")
 @_cdecl("bjs_createPropertyHolder")
-public func _bjs_createPropertyHolder(intValue: Int32, floatValue: Float32, doubleValue: Float64, boolValue: Int32, stringValueBytes: Int32, stringValueLen: Int32, jsObject: Int32) -> UnsafeMutableRawPointer {
+public func _bjs_createPropertyHolder(intValue: Int32, floatValue: Float32, doubleValue: Float64, boolValue: Int32, stringValueBytes: Int32, stringValueLength: Int32, jsObject: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = createPropertyHolder(intValue: Int.bridgeJSLiftParameter(intValue), floatValue: floatValue, doubleValue: doubleValue, boolValue: Bool.bridgeJSLiftParameter(boolValue), stringValue: String.bridgeJSLiftParameter(stringValueBytes, stringValueLen), jsObject: JSObject.bridgeJSLiftParameter(jsObject))
-    return Unmanaged.passRetained(ret).toOpaque()
+    let ret = createPropertyHolder(intValue: Int.bridgeJSLiftParameter(intValue), floatValue: Float.bridgeJSLiftParameter(floatValue), doubleValue: Double.bridgeJSLiftParameter(doubleValue), boolValue: Bool.bridgeJSLiftParameter(boolValue), stringValue: String.bridgeJSLiftParameter(stringValueBytes, stringValueLength), jsObject: JSObject.bridgeJSLiftParameter(jsObject))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -746,7 +829,7 @@ public func _bjs_createPropertyHolder(intValue: Int32, floatValue: Float32, doub
 @_cdecl("bjs_testPropertyHolder")
 public func _bjs_testPropertyHolder(holder: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = testPropertyHolder(holder: Unmanaged<PropertyHolder>.fromOpaque(holder).takeUnretainedValue())
+    let ret = testPropertyHolder(holder: PropertyHolder.bridgeJSLiftParameter(holder))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -776,10 +859,10 @@ public func _bjs_getObserverStats() -> Void {
 
 @_expose(wasm, "bjs_Greeter_init")
 @_cdecl("bjs_Greeter_init")
-public func _bjs_Greeter_init(nameBytes: Int32, nameLen: Int32) -> UnsafeMutableRawPointer {
+public func _bjs_Greeter_init(nameBytes: Int32, nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = Greeter(name: String.bridgeJSLiftParameter(nameBytes, nameLen))
-    return Unmanaged.passRetained(ret).toOpaque()
+    let ret = Greeter(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -789,7 +872,7 @@ public func _bjs_Greeter_init(nameBytes: Int32, nameLen: Int32) -> UnsafeMutable
 @_cdecl("bjs_Greeter_greet")
 public func _bjs_Greeter_greet(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().greet()
+    let ret = Greeter.bridgeJSLiftParameter(_self).greet()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -798,9 +881,9 @@ public func _bjs_Greeter_greet(_self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_Greeter_changeName")
 @_cdecl("bjs_Greeter_changeName")
-public func _bjs_Greeter_changeName(_self: UnsafeMutableRawPointer, nameBytes: Int32, nameLen: Int32) -> Void {
+public func _bjs_Greeter_changeName(_self: UnsafeMutableRawPointer, nameBytes: Int32, nameLength: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().changeName(name: String.bridgeJSLiftParameter(nameBytes, nameLen))
+    Greeter.bridgeJSLiftParameter(_self).changeName(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -810,7 +893,7 @@ public func _bjs_Greeter_changeName(_self: UnsafeMutableRawPointer, nameBytes: I
 @_cdecl("bjs_Greeter_name_get")
 public func _bjs_Greeter_name_get(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().name
+    let ret = Greeter.bridgeJSLiftParameter(_self).name
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -819,9 +902,9 @@ public func _bjs_Greeter_name_get(_self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_Greeter_name_set")
 @_cdecl("bjs_Greeter_name_set")
-public func _bjs_Greeter_name_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLen: Int32) -> Void {
+public func _bjs_Greeter_name_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().name = String.bridgeJSLiftParameter(valueBytes, valueLen)
+    Greeter.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -831,7 +914,7 @@ public func _bjs_Greeter_name_set(_self: UnsafeMutableRawPointer, valueBytes: In
 @_cdecl("bjs_Greeter_prefix_get")
 public func _bjs_Greeter_prefix_get(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Unmanaged<Greeter>.fromOpaque(_self).takeUnretainedValue().prefix
+    let ret = Greeter.bridgeJSLiftParameter(_self).prefix
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -844,10 +927,16 @@ public func _bjs_Greeter_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<Greeter>.fromOpaque(pointer).release()
 }
 
-extension Greeter: ConvertibleToJSValue {
+extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
+        #if arch(wasm32)
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Greeter_wrap")
         func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
@@ -856,8 +945,8 @@ extension Greeter: ConvertibleToJSValue {
 @_cdecl("bjs_Calculator_square")
 public func _bjs_Calculator_square(_self: UnsafeMutableRawPointer, value: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = Unmanaged<Calculator>.fromOpaque(_self).takeUnretainedValue().square(value: Int.bridgeJSLiftParameter(value))
-    return Int32(ret)
+    let ret = Calculator.bridgeJSLiftParameter(_self).square(value: Int.bridgeJSLiftParameter(value))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -867,8 +956,8 @@ public func _bjs_Calculator_square(_self: UnsafeMutableRawPointer, value: Int32)
 @_cdecl("bjs_Calculator_add")
 public func _bjs_Calculator_add(_self: UnsafeMutableRawPointer, a: Int32, b: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = Unmanaged<Calculator>.fromOpaque(_self).takeUnretainedValue().add(a: Int.bridgeJSLiftParameter(a), b: Int.bridgeJSLiftParameter(b))
-    return Int32(ret)
+    let ret = Calculator.bridgeJSLiftParameter(_self).add(a: Int.bridgeJSLiftParameter(a), b: Int.bridgeJSLiftParameter(b))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -880,10 +969,16 @@ public func _bjs_Calculator_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<Calculator>.fromOpaque(pointer).release()
 }
 
-extension Calculator: ConvertibleToJSValue {
+extension Calculator: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
+        #if arch(wasm32)
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Calculator_wrap")
         func _bjs_Calculator_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_Calculator_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Calculator_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
@@ -893,7 +988,7 @@ extension Calculator: ConvertibleToJSValue {
 public func _bjs_Converter_init() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = Utils.Converter()
-    return Unmanaged.passRetained(ret).toOpaque()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -903,7 +998,7 @@ public func _bjs_Converter_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_Converter_toString")
 public func _bjs_Converter_toString(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Unmanaged<Utils.Converter>.fromOpaque(_self).takeUnretainedValue().toString(value: Int.bridgeJSLiftParameter(value))
+    let ret = Utils.Converter.bridgeJSLiftParameter(_self).toString(value: Int.bridgeJSLiftParameter(value))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -916,10 +1011,16 @@ public func _bjs_Converter_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<Utils.Converter>.fromOpaque(pointer).release()
 }
 
-extension Utils.Converter: ConvertibleToJSValue {
+extension Utils.Converter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
+        #if arch(wasm32)
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Converter_wrap")
         func _bjs_Converter_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_Converter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Converter_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
@@ -929,7 +1030,7 @@ extension Utils.Converter: ConvertibleToJSValue {
 public func _bjs_HTTPServer_init() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = Networking.API.HTTPServer()
-    return Unmanaged.passRetained(ret).toOpaque()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -939,7 +1040,7 @@ public func _bjs_HTTPServer_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_HTTPServer_call")
 public func _bjs_HTTPServer_call(_self: UnsafeMutableRawPointer, method: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<Networking.API.HTTPServer>.fromOpaque(_self).takeUnretainedValue().call(_: Networking.API.Method(bridgeJSRawValue: method)!)
+    Networking.API.HTTPServer.bridgeJSLiftParameter(_self).call(_: Networking.API.Method.bridgeJSLiftParameter(method))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -951,10 +1052,16 @@ public func _bjs_HTTPServer_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<Networking.API.HTTPServer>.fromOpaque(pointer).release()
 }
 
-extension Networking.API.HTTPServer: ConvertibleToJSValue {
+extension Networking.API.HTTPServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
+        #if arch(wasm32)
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_HTTPServer_wrap")
         func _bjs_HTTPServer_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_HTTPServer_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_HTTPServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
@@ -964,7 +1071,7 @@ extension Networking.API.HTTPServer: ConvertibleToJSValue {
 public func _bjs_TestServer_init() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = Internal.TestServer()
-    return Unmanaged.passRetained(ret).toOpaque()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -974,7 +1081,7 @@ public func _bjs_TestServer_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_TestServer_call")
 public func _bjs_TestServer_call(_self: UnsafeMutableRawPointer, method: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<Internal.TestServer>.fromOpaque(_self).takeUnretainedValue().call(_: Internal.SupportedMethod(bridgeJSRawValue: method)!)
+    Internal.TestServer.bridgeJSLiftParameter(_self).call(_: Internal.SupportedMethod.bridgeJSLiftParameter(method))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -986,10 +1093,16 @@ public func _bjs_TestServer_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<Internal.TestServer>.fromOpaque(pointer).release()
 }
 
-extension Internal.TestServer: ConvertibleToJSValue {
+extension Internal.TestServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
+        #if arch(wasm32)
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_TestServer_wrap")
         func _bjs_TestServer_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_TestServer_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_TestServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
@@ -999,7 +1112,7 @@ extension Internal.TestServer: ConvertibleToJSValue {
 public func _bjs_SimplePropertyHolder_init(value: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = SimplePropertyHolder(value: Int.bridgeJSLiftParameter(value))
-    return Unmanaged.passRetained(ret).toOpaque()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1009,8 +1122,8 @@ public func _bjs_SimplePropertyHolder_init(value: Int32) -> UnsafeMutableRawPoin
 @_cdecl("bjs_SimplePropertyHolder_value_get")
 public func _bjs_SimplePropertyHolder_value_get(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = Unmanaged<SimplePropertyHolder>.fromOpaque(_self).takeUnretainedValue().value
-    return Int32(ret)
+    let ret = SimplePropertyHolder.bridgeJSLiftParameter(_self).value
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1020,7 +1133,7 @@ public func _bjs_SimplePropertyHolder_value_get(_self: UnsafeMutableRawPointer) 
 @_cdecl("bjs_SimplePropertyHolder_value_set")
 public func _bjs_SimplePropertyHolder_value_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<SimplePropertyHolder>.fromOpaque(_self).takeUnretainedValue().value = Int.bridgeJSLiftParameter(value)
+    SimplePropertyHolder.bridgeJSLiftParameter(_self).value = Int.bridgeJSLiftParameter(value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1032,20 +1145,26 @@ public func _bjs_SimplePropertyHolder_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<SimplePropertyHolder>.fromOpaque(pointer).release()
 }
 
-extension SimplePropertyHolder: ConvertibleToJSValue {
+extension SimplePropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
+        #if arch(wasm32)
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SimplePropertyHolder_wrap")
         func _bjs_SimplePropertyHolder_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_SimplePropertyHolder_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_SimplePropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
 
 @_expose(wasm, "bjs_PropertyHolder_init")
 @_cdecl("bjs_PropertyHolder_init")
-public func _bjs_PropertyHolder_init(intValue: Int32, floatValue: Float32, doubleValue: Float64, boolValue: Int32, stringValueBytes: Int32, stringValueLen: Int32, jsObject: Int32, sibling: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_PropertyHolder_init(intValue: Int32, floatValue: Float32, doubleValue: Float64, boolValue: Int32, stringValueBytes: Int32, stringValueLength: Int32, jsObject: Int32, sibling: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = PropertyHolder(intValue: Int.bridgeJSLiftParameter(intValue), floatValue: floatValue, doubleValue: doubleValue, boolValue: Bool.bridgeJSLiftParameter(boolValue), stringValue: String.bridgeJSLiftParameter(stringValueBytes, stringValueLen), jsObject: JSObject.bridgeJSLiftParameter(jsObject), sibling: Unmanaged<SimplePropertyHolder>.fromOpaque(sibling).takeUnretainedValue())
-    return Unmanaged.passRetained(ret).toOpaque()
+    let ret = PropertyHolder(intValue: Int.bridgeJSLiftParameter(intValue), floatValue: Float.bridgeJSLiftParameter(floatValue), doubleValue: Double.bridgeJSLiftParameter(doubleValue), boolValue: Bool.bridgeJSLiftParameter(boolValue), stringValue: String.bridgeJSLiftParameter(stringValueBytes, stringValueLength), jsObject: JSObject.bridgeJSLiftParameter(jsObject), sibling: SimplePropertyHolder.bridgeJSLiftParameter(sibling))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1055,7 +1174,7 @@ public func _bjs_PropertyHolder_init(intValue: Int32, floatValue: Float32, doubl
 @_cdecl("bjs_PropertyHolder_getAllValues")
 public func _bjs_PropertyHolder_getAllValues(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().getAllValues()
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).getAllValues()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1066,8 +1185,8 @@ public func _bjs_PropertyHolder_getAllValues(_self: UnsafeMutableRawPointer) -> 
 @_cdecl("bjs_PropertyHolder_intValue_get")
 public func _bjs_PropertyHolder_intValue_get(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().intValue
-    return Int32(ret)
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).intValue
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1077,7 +1196,7 @@ public func _bjs_PropertyHolder_intValue_get(_self: UnsafeMutableRawPointer) -> 
 @_cdecl("bjs_PropertyHolder_intValue_set")
 public func _bjs_PropertyHolder_intValue_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().intValue = Int.bridgeJSLiftParameter(value)
+    PropertyHolder.bridgeJSLiftParameter(_self).intValue = Int.bridgeJSLiftParameter(value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1087,8 +1206,8 @@ public func _bjs_PropertyHolder_intValue_set(_self: UnsafeMutableRawPointer, val
 @_cdecl("bjs_PropertyHolder_floatValue_get")
 public func _bjs_PropertyHolder_floatValue_get(_self: UnsafeMutableRawPointer) -> Float32 {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().floatValue
-    return Float32(ret)
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).floatValue
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1098,7 +1217,7 @@ public func _bjs_PropertyHolder_floatValue_get(_self: UnsafeMutableRawPointer) -
 @_cdecl("bjs_PropertyHolder_floatValue_set")
 public func _bjs_PropertyHolder_floatValue_set(_self: UnsafeMutableRawPointer, value: Float32) -> Void {
     #if arch(wasm32)
-    Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().floatValue = value
+    PropertyHolder.bridgeJSLiftParameter(_self).floatValue = Float.bridgeJSLiftParameter(value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1108,8 +1227,8 @@ public func _bjs_PropertyHolder_floatValue_set(_self: UnsafeMutableRawPointer, v
 @_cdecl("bjs_PropertyHolder_doubleValue_get")
 public func _bjs_PropertyHolder_doubleValue_get(_self: UnsafeMutableRawPointer) -> Float64 {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().doubleValue
-    return Float64(ret)
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).doubleValue
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1119,7 +1238,7 @@ public func _bjs_PropertyHolder_doubleValue_get(_self: UnsafeMutableRawPointer) 
 @_cdecl("bjs_PropertyHolder_doubleValue_set")
 public func _bjs_PropertyHolder_doubleValue_set(_self: UnsafeMutableRawPointer, value: Float64) -> Void {
     #if arch(wasm32)
-    Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().doubleValue = value
+    PropertyHolder.bridgeJSLiftParameter(_self).doubleValue = Double.bridgeJSLiftParameter(value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1129,7 +1248,7 @@ public func _bjs_PropertyHolder_doubleValue_set(_self: UnsafeMutableRawPointer, 
 @_cdecl("bjs_PropertyHolder_boolValue_get")
 public func _bjs_PropertyHolder_boolValue_get(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().boolValue
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).boolValue
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1140,7 +1259,7 @@ public func _bjs_PropertyHolder_boolValue_get(_self: UnsafeMutableRawPointer) ->
 @_cdecl("bjs_PropertyHolder_boolValue_set")
 public func _bjs_PropertyHolder_boolValue_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().boolValue = Bool.bridgeJSLiftParameter(value)
+    PropertyHolder.bridgeJSLiftParameter(_self).boolValue = Bool.bridgeJSLiftParameter(value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1150,7 +1269,7 @@ public func _bjs_PropertyHolder_boolValue_set(_self: UnsafeMutableRawPointer, va
 @_cdecl("bjs_PropertyHolder_stringValue_get")
 public func _bjs_PropertyHolder_stringValue_get(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().stringValue
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).stringValue
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1159,9 +1278,9 @@ public func _bjs_PropertyHolder_stringValue_get(_self: UnsafeMutableRawPointer) 
 
 @_expose(wasm, "bjs_PropertyHolder_stringValue_set")
 @_cdecl("bjs_PropertyHolder_stringValue_set")
-public func _bjs_PropertyHolder_stringValue_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLen: Int32) -> Void {
+public func _bjs_PropertyHolder_stringValue_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().stringValue = String.bridgeJSLiftParameter(valueBytes, valueLen)
+    PropertyHolder.bridgeJSLiftParameter(_self).stringValue = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1171,8 +1290,8 @@ public func _bjs_PropertyHolder_stringValue_set(_self: UnsafeMutableRawPointer, 
 @_cdecl("bjs_PropertyHolder_readonlyInt_get")
 public func _bjs_PropertyHolder_readonlyInt_get(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().readonlyInt
-    return Int32(ret)
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).readonlyInt
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1182,8 +1301,8 @@ public func _bjs_PropertyHolder_readonlyInt_get(_self: UnsafeMutableRawPointer) 
 @_cdecl("bjs_PropertyHolder_readonlyFloat_get")
 public func _bjs_PropertyHolder_readonlyFloat_get(_self: UnsafeMutableRawPointer) -> Float32 {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().readonlyFloat
-    return Float32(ret)
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).readonlyFloat
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1193,8 +1312,8 @@ public func _bjs_PropertyHolder_readonlyFloat_get(_self: UnsafeMutableRawPointer
 @_cdecl("bjs_PropertyHolder_readonlyDouble_get")
 public func _bjs_PropertyHolder_readonlyDouble_get(_self: UnsafeMutableRawPointer) -> Float64 {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().readonlyDouble
-    return Float64(ret)
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).readonlyDouble
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1204,7 +1323,7 @@ public func _bjs_PropertyHolder_readonlyDouble_get(_self: UnsafeMutableRawPointe
 @_cdecl("bjs_PropertyHolder_readonlyBool_get")
 public func _bjs_PropertyHolder_readonlyBool_get(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().readonlyBool
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).readonlyBool
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1215,7 +1334,7 @@ public func _bjs_PropertyHolder_readonlyBool_get(_self: UnsafeMutableRawPointer)
 @_cdecl("bjs_PropertyHolder_readonlyString_get")
 public func _bjs_PropertyHolder_readonlyString_get(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().readonlyString
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).readonlyString
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1226,7 +1345,7 @@ public func _bjs_PropertyHolder_readonlyString_get(_self: UnsafeMutableRawPointe
 @_cdecl("bjs_PropertyHolder_jsObject_get")
 public func _bjs_PropertyHolder_jsObject_get(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().jsObject
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1237,7 +1356,7 @@ public func _bjs_PropertyHolder_jsObject_get(_self: UnsafeMutableRawPointer) -> 
 @_cdecl("bjs_PropertyHolder_jsObject_set")
 public func _bjs_PropertyHolder_jsObject_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().jsObject = JSObject.bridgeJSLiftParameter(value)
+    PropertyHolder.bridgeJSLiftParameter(_self).jsObject = JSObject.bridgeJSLiftParameter(value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1247,8 +1366,8 @@ public func _bjs_PropertyHolder_jsObject_set(_self: UnsafeMutableRawPointer, val
 @_cdecl("bjs_PropertyHolder_sibling_get")
 public func _bjs_PropertyHolder_sibling_get(_self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().sibling
-    return Unmanaged.passRetained(ret).toOpaque()
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).sibling
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1258,7 +1377,7 @@ public func _bjs_PropertyHolder_sibling_get(_self: UnsafeMutableRawPointer) -> U
 @_cdecl("bjs_PropertyHolder_sibling_set")
 public func _bjs_PropertyHolder_sibling_set(_self: UnsafeMutableRawPointer, value: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().sibling = Unmanaged<SimplePropertyHolder>.fromOpaque(value).takeUnretainedValue()
+    PropertyHolder.bridgeJSLiftParameter(_self).sibling = SimplePropertyHolder.bridgeJSLiftParameter(value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1268,7 +1387,7 @@ public func _bjs_PropertyHolder_sibling_set(_self: UnsafeMutableRawPointer, valu
 @_cdecl("bjs_PropertyHolder_lazyValue_get")
 public func _bjs_PropertyHolder_lazyValue_get(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().lazyValue
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).lazyValue
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1277,9 +1396,9 @@ public func _bjs_PropertyHolder_lazyValue_get(_self: UnsafeMutableRawPointer) ->
 
 @_expose(wasm, "bjs_PropertyHolder_lazyValue_set")
 @_cdecl("bjs_PropertyHolder_lazyValue_set")
-public func _bjs_PropertyHolder_lazyValue_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLen: Int32) -> Void {
+public func _bjs_PropertyHolder_lazyValue_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().lazyValue = String.bridgeJSLiftParameter(valueBytes, valueLen)
+    PropertyHolder.bridgeJSLiftParameter(_self).lazyValue = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1289,8 +1408,8 @@ public func _bjs_PropertyHolder_lazyValue_set(_self: UnsafeMutableRawPointer, va
 @_cdecl("bjs_PropertyHolder_computedReadonly_get")
 public func _bjs_PropertyHolder_computedReadonly_get(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().computedReadonly
-    return Int32(ret)
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).computedReadonly
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1300,7 +1419,7 @@ public func _bjs_PropertyHolder_computedReadonly_get(_self: UnsafeMutableRawPoin
 @_cdecl("bjs_PropertyHolder_computedReadWrite_get")
 public func _bjs_PropertyHolder_computedReadWrite_get(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().computedReadWrite
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).computedReadWrite
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1309,9 +1428,9 @@ public func _bjs_PropertyHolder_computedReadWrite_get(_self: UnsafeMutableRawPoi
 
 @_expose(wasm, "bjs_PropertyHolder_computedReadWrite_set")
 @_cdecl("bjs_PropertyHolder_computedReadWrite_set")
-public func _bjs_PropertyHolder_computedReadWrite_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLen: Int32) -> Void {
+public func _bjs_PropertyHolder_computedReadWrite_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().computedReadWrite = String.bridgeJSLiftParameter(valueBytes, valueLen)
+    PropertyHolder.bridgeJSLiftParameter(_self).computedReadWrite = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1321,8 +1440,8 @@ public func _bjs_PropertyHolder_computedReadWrite_set(_self: UnsafeMutableRawPoi
 @_cdecl("bjs_PropertyHolder_observedProperty_get")
 public func _bjs_PropertyHolder_observedProperty_get(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().observedProperty
-    return Int32(ret)
+    let ret = PropertyHolder.bridgeJSLiftParameter(_self).observedProperty
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1332,7 +1451,7 @@ public func _bjs_PropertyHolder_observedProperty_get(_self: UnsafeMutableRawPoin
 @_cdecl("bjs_PropertyHolder_observedProperty_set")
 public func _bjs_PropertyHolder_observedProperty_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
     #if arch(wasm32)
-    Unmanaged<PropertyHolder>.fromOpaque(_self).takeUnretainedValue().observedProperty = Int.bridgeJSLiftParameter(value)
+    PropertyHolder.bridgeJSLiftParameter(_self).observedProperty = Int.bridgeJSLiftParameter(value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1344,10 +1463,16 @@ public func _bjs_PropertyHolder_deinit(pointer: UnsafeMutableRawPointer) {
     Unmanaged<PropertyHolder>.fromOpaque(pointer).release()
 }
 
-extension PropertyHolder: ConvertibleToJSValue {
+extension PropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
+        #if arch(wasm32)
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_PropertyHolder_wrap")
         func _bjs_PropertyHolder_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_PropertyHolder_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_PropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }

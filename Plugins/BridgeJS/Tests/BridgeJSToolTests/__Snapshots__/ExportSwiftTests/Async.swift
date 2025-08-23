@@ -34,10 +34,10 @@ public func _bjs_asyncRoundTripInt(v: Int32) -> Int32 {
 
 @_expose(wasm, "bjs_asyncRoundTripString")
 @_cdecl("bjs_asyncRoundTripString")
-public func _bjs_asyncRoundTripString(vBytes: Int32, vLen: Int32) -> Int32 {
+public func _bjs_asyncRoundTripString(vBytes: Int32, vLength: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
-        return await asyncRoundTripString(_: String.bridgeJSLiftParameter(vBytes, vLen)).jsValue
+        return await asyncRoundTripString(_: String.bridgeJSLiftParameter(vBytes, vLength)).jsValue
     } .jsObject
     return ret.bridgeJSLowerReturn()
     #else
@@ -63,7 +63,7 @@ public func _bjs_asyncRoundTripBool(v: Int32) -> Int32 {
 public func _bjs_asyncRoundTripFloat(v: Float32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
-        return await asyncRoundTripFloat(_: v).jsValue
+        return await asyncRoundTripFloat(_: Float.bridgeJSLiftParameter(v)).jsValue
     } .jsObject
     return ret.bridgeJSLowerReturn()
     #else
@@ -76,7 +76,7 @@ public func _bjs_asyncRoundTripFloat(v: Float32) -> Int32 {
 public func _bjs_asyncRoundTripDouble(v: Float64) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
-        return await asyncRoundTripDouble(_: v).jsValue
+        return await asyncRoundTripDouble(_: Double.bridgeJSLiftParameter(v)).jsValue
     } .jsObject
     return ret.bridgeJSLowerReturn()
     #else
