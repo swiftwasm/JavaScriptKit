@@ -27,7 +27,20 @@ async function createInstantiator(options, swift) {
          * @param {WebAssembly.Imports} importObject
          * @param {unknown} importsContext
          */
-        addImports: (importObject, importsContext) => {},
+        addImports: (importObject, importsContext) => {
+            // Provide a default implementation for BridgeJS functions that are not
+            // used at runtime without BridgeJS but required to instantiate the module.
+            const unexpectedBjsCall = () => { throw new Error("Unexpected call to BridgeJS function") }
+            importObject["bjs"] = {
+                swift_js_return_string: unexpectedBjsCall,
+                swift_js_init_memory: unexpectedBjsCall,
+                swift_js_make_js_string: unexpectedBjsCall,
+                swift_js_init_memory_with_result: unexpectedBjsCall,
+                swift_js_throw: unexpectedBjsCall,
+                swift_js_retain: unexpectedBjsCall,
+                swift_js_release: unexpectedBjsCall,
+            }
+        },
         /** @param {WebAssembly.Instance} instance */
         setInstance: (instance) => {},
         /** @param {WebAssembly.Instance} instance */
