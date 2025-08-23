@@ -334,7 +334,7 @@ public class ExportSwift {
 
         override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
             guard node.attributes.hasJSAttribute() else { return .skipChildren }
-            guard case .classBody(let className, let classKey) = state else {
+            guard case .classBody(_, let classKey) = state else {
                 diagnose(node: node, message: "@JS var must be inside a @JS class")
                 return .skipChildren
             }
