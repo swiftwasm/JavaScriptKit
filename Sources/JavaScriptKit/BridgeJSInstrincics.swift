@@ -79,13 +79,7 @@ import _CJavaScriptKit
 //
 // See JSGlueGen.swift in BridgeJSLink for JS-side lowering/lifting implementation.
 
-/// A protocol that Swift types that can be lowered into a single Wasm core type.
-public protocol _BridgedSwiftTypeLoweredIntoWasmCoreType {
-    associatedtype WasmCoreType
-}
-
 /// A protocol that Swift types that can appear as parameters or return values on
-/// The conformance is automatically synthesized by the BridgeJS code generator.
 public protocol _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
     associatedtype WasmCoreType
     // MARK: ImportTS
