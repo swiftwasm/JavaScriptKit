@@ -22,13 +22,13 @@ class DiagnosticEngine {
             getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
         };
     }
-    
+
     /**
      * @param {readonly ts.Diagnostic[]} diagnostics
      */
     tsDiagnose(diagnostics) {
         const message = ts.formatDiagnosticsWithColorAndContext(diagnostics, this.formattHost);
-        console.log(message);
+        process.stderr.write(message, "utf-8");
     }
 
     static LEVELS = {
