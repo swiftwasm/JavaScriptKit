@@ -83,7 +83,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_DatabaseConnection_isConnected_get"] = function bjs_DatabaseConnection_isConnected_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).isConnected;
-                    return ret !== 0;
+                    return ret ? 1 : 0;
                 } catch (error) {
                     setException(error);
                     return 0

@@ -65,49 +65,49 @@ export async function createInstantiator(options, swift) {
 
             return {
                 asyncReturnVoid: function bjs_asyncReturnVoid() {
-                    const retId = instance.exports.bjs_asyncReturnVoid();
-                    const ret = swift.memory.getObject(retId);
-                    swift.memory.release(retId);
-                    return ret;
+                    const ret = instance.exports.bjs_asyncReturnVoid();
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
                 },
                 asyncRoundTripInt: function bjs_asyncRoundTripInt(v) {
-                    const retId = instance.exports.bjs_asyncRoundTripInt(v);
-                    const ret = swift.memory.getObject(retId);
-                    swift.memory.release(retId);
-                    return ret;
+                    const ret = instance.exports.bjs_asyncRoundTripInt(v);
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
                 },
                 asyncRoundTripString: function bjs_asyncRoundTripString(v) {
                     const vBytes = textEncoder.encode(v);
                     const vId = swift.memory.retain(vBytes);
-                    const retId = instance.exports.bjs_asyncRoundTripString(vId, vBytes.length);
-                    const ret = swift.memory.getObject(retId);
-                    swift.memory.release(retId);
+                    const ret = instance.exports.bjs_asyncRoundTripString(vId, vBytes.length);
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
                     swift.memory.release(vId);
-                    return ret;
+                    return ret1;
                 },
                 asyncRoundTripBool: function bjs_asyncRoundTripBool(v) {
-                    const retId = instance.exports.bjs_asyncRoundTripBool(v);
-                    const ret = swift.memory.getObject(retId);
-                    swift.memory.release(retId);
-                    return ret;
+                    const ret = instance.exports.bjs_asyncRoundTripBool(v);
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
                 },
                 asyncRoundTripFloat: function bjs_asyncRoundTripFloat(v) {
-                    const retId = instance.exports.bjs_asyncRoundTripFloat(v);
-                    const ret = swift.memory.getObject(retId);
-                    swift.memory.release(retId);
-                    return ret;
+                    const ret = instance.exports.bjs_asyncRoundTripFloat(v);
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
                 },
                 asyncRoundTripDouble: function bjs_asyncRoundTripDouble(v) {
-                    const retId = instance.exports.bjs_asyncRoundTripDouble(v);
-                    const ret = swift.memory.getObject(retId);
-                    swift.memory.release(retId);
-                    return ret;
+                    const ret = instance.exports.bjs_asyncRoundTripDouble(v);
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
                 },
                 asyncRoundTripJSObject: function bjs_asyncRoundTripJSObject(v) {
-                    const retId = instance.exports.bjs_asyncRoundTripJSObject(swift.memory.retain(v));
-                    const ret = swift.memory.getObject(retId);
-                    swift.memory.release(retId);
-                    return ret;
+                    const ret = instance.exports.bjs_asyncRoundTripJSObject(swift.memory.retain(v));
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
                 },
             };
         },

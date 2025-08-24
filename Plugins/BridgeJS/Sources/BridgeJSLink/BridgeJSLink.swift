@@ -3,6 +3,9 @@ import struct Foundation.Data
 #if canImport(BridgeJSSkeleton)
 import BridgeJSSkeleton
 #endif
+#if canImport(BridgeJSUtilities)
+import BridgeJSUtilities
+#endif
 
 struct BridgeJSLink {
     /// The exported skeletons
@@ -90,7 +93,7 @@ struct BridgeJSLink {
 
         for skeleton in exportedSkeletons {
             for klass in skeleton.classes {
-                let (jsType, dtsType, dtsExportEntry) = renderExportedClass(klass)
+                let (jsType, dtsType, dtsExportEntry) = try renderExportedClass(klass)
                 classLines.append(contentsOf: jsType)
                 exportsLines.append("\(klass.name),")
                 dtsExportLines.append(contentsOf: dtsExportEntry)
@@ -131,7 +134,7 @@ struct BridgeJSLink {
             }
 
             for function in skeleton.functions {
-                var (js, dts) = renderExportedFunction(function: function)
+                var (js, dts) = try renderExportedFunction(function: function)
 
                 if function.namespace != nil {
                     namespacedFunctions.append(function)
@@ -222,16 +225,16 @@ struct BridgeJSLink {
             // To update this file, just rebuild your project or run
             // `swift package bridge-js`.
 
-            \(topLevelEnumsSection)\(namespaceAssignmentsSection)export async function createInstantiator(options, swift) {
-                let instance;
-                let memory;
-                let setException;
-                const textDecoder = new TextDecoder("utf-8");
-                const textEncoder = new TextEncoder("utf-8");
+            \(topLevelEnumsSection)\(namespaceAssignmentsSection)export async function createInstantiator(options, \(JSGlueVariableScope.reservedSwift)) {
+                let \(JSGlueVariableScope.reservedInstance);
+                let \(JSGlueVariableScope.reservedMemory);
+                let \(JSGlueVariableScope.reservedSetException);
+                const \(JSGlueVariableScope.reservedTextDecoder) = new TextDecoder("utf-8");
+                const \(JSGlueVariableScope.reservedTextEncoder) = new TextEncoder("utf-8");
 
-                let tmpRetString;
-                let tmpRetBytes;
-                let tmpRetException;
+                let \(JSGlueVariableScope.reservedStorageToReturnString);
+                let \(JSGlueVariableScope.reservedStorageToReturnBytes);
+                let \(JSGlueVariableScope.reservedStorageToReturnException);
                 return {
                     /**
                      * @param {WebAssembly.Imports} importObject
@@ -241,45 +244,45 @@ struct BridgeJSLink {
                         importObject["bjs"] = bjs;
                         const imports = options.getImports(importsContext);
                         bjs["swift_js_return_string"] = function(ptr, len) {
-                            const bytes = new Uint8Array(memory.buffer, ptr, len)\(sharedMemory ? ".slice()" : "");
-                            tmpRetString = textDecoder.decode(bytes);
+                            const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len)\(sharedMemory ? ".slice()" : "");
+                            \(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);
                         }
                         bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
-                            const source = swift.memory.getObject(sourceId);
-                            const bytes = new Uint8Array(memory.buffer, bytesPtr);
+                            const source = \(JSGlueVariableScope.reservedSwift).memory.getObject(sourceId);
+                            const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, bytesPtr);
                             bytes.set(source);
                         }
                         bjs["swift_js_make_js_string"] = function(ptr, len) {
-                            const bytes = new Uint8Array(memory.buffer, ptr, len)\(sharedMemory ? ".slice()" : "");
-                            return swift.memory.retain(textDecoder.decode(bytes));
+                            const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len)\(sharedMemory ? ".slice()" : "");
+                            return \(JSGlueVariableScope.reservedSwift).memory.retain(\(JSGlueVariableScope.reservedTextDecoder).decode(bytes));
                         }
                         bjs["swift_js_init_memory_with_result"] = function(ptr, len) {
-                            const target = new Uint8Array(memory.buffer, ptr, len);
-                            target.set(tmpRetBytes);
-                            tmpRetBytes = undefined;
+                            const target = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len);
+                            target.set(\(JSGlueVariableScope.reservedStorageToReturnBytes));
+                            \(JSGlueVariableScope.reservedStorageToReturnBytes) = undefined;
                         }
                         bjs["swift_js_throw"] = function(id) {
-                            tmpRetException = swift.memory.retainByRef(id);
+                            \(JSGlueVariableScope.reservedStorageToReturnException) = \(JSGlueVariableScope.reservedSwift).memory.retainByRef(id);
                         }
                         bjs["swift_js_retain"] = function(id) {
-                            return swift.memory.retainByRef(id);
+                            return \(JSGlueVariableScope.reservedSwift).memory.retainByRef(id);
                         }
                         bjs["swift_js_release"] = function(id) {
-                            swift.memory.release(id);
+                            \(JSGlueVariableScope.reservedSwift).memory.release(id);
                         }
             \(renderSwiftClassWrappers().map { $0.indent(count: 12) }.joined(separator: "\n"))
             \(importObjectBuilders.flatMap { $0.importedLines }.map { $0.indent(count: 12) }.joined(separator: "\n"))
                     },
                     setInstance: (i) => {
-                        instance = i;
-                        memory = instance.exports.memory;
-                        setException = (error) => {
-                            instance.exports._swift_js_exception.value = swift.memory.retain(error)
+                        \(JSGlueVariableScope.reservedInstance) = i;
+                        \(JSGlueVariableScope.reservedMemory) = \(JSGlueVariableScope.reservedInstance).exports.memory;
+                        \(JSGlueVariableScope.reservedSetException) = (error) => {
+                            \(JSGlueVariableScope.reservedInstance).exports._swift_js_exception.value = \(JSGlueVariableScope.reservedSwift).memory.retain(error)
                         }
                     },
                     /** @param {WebAssembly.Instance} instance */
                     createExports: (instance) => {
-                        const js = swift.memory.heap;
+                        const js = \(JSGlueVariableScope.reservedSwift).memory.heap;
             \(exportsSection)
                 }
             }
@@ -343,7 +346,7 @@ struct BridgeJSLink {
                 let wrapperFunctionName = "bjs_\(klass.name)_wrap"
                 wrapperLines.append("importObject[\"\(moduleName)\"][\"\(wrapperFunctionName)\"] = function(pointer) {")
                 wrapperLines.append("    const obj = \(klass.name).__construct(pointer);")
-                wrapperLines.append("    return swift.memory.retain(obj);")
+                wrapperLines.append("    return \(JSGlueVariableScope.reservedSwift).memory.retain(obj);")
                 wrapperLines.append("};")
             }
         }
@@ -384,125 +387,66 @@ struct BridgeJSLink {
     }
 
     class ExportedThunkBuilder {
-        var bodyLines: [String] = []
-        var cleanupLines: [String] = []
+        var body: CodeFragmentPrinter
+        var cleanupCode: CodeFragmentPrinter
         var parameterForwardings: [String] = []
         let effects: Effects
+        let scope: JSGlueVariableScope
 
         init(effects: Effects) {
             self.effects = effects
+            self.scope = JSGlueVariableScope()
+            self.body = CodeFragmentPrinter()
+            self.cleanupCode = CodeFragmentPrinter()
         }
 
-        func lowerParameter(param: Parameter) {
-            switch param.type {
-            case .void: return
-            case .int, .float, .double, .bool:
-                parameterForwardings.append(param.name)
-            case .string:
-                let bytesLabel = "\(param.name)Bytes"
-                let bytesIdLabel = "\(param.name)Id"
-                bodyLines.append("const \(bytesLabel) = textEncoder.encode(\(param.name));")
-                bodyLines.append("const \(bytesIdLabel) = swift.memory.retain(\(bytesLabel));")
-                cleanupLines.append("swift.memory.release(\(bytesIdLabel));")
-                parameterForwardings.append(bytesIdLabel)
-                parameterForwardings.append("\(bytesLabel).length")
-            case .caseEnum(_):
-                parameterForwardings.append("\(param.name) | 0")
-            case .rawValueEnum(_, let rawType):
-                switch rawType {
-                case .string:
-                    let bytesLabel = "\(param.name)Bytes"
-                    let bytesIdLabel = "\(param.name)Id"
-                    bodyLines.append("const \(bytesLabel) = textEncoder.encode(\(param.name));")
-                    bodyLines.append("const \(bytesIdLabel) = swift.memory.retain(\(bytesLabel));")
-                    cleanupLines.append("swift.memory.release(\(bytesIdLabel));")
-                    parameterForwardings.append(bytesIdLabel)
-                    parameterForwardings.append("\(bytesLabel).length")
-                case .bool:
-                    parameterForwardings.append("\(param.name) ? 1 : 0")
-                default:
-                    parameterForwardings.append("\(param.name)")
-                }
-            case .associatedValueEnum:
-                parameterForwardings.append("0")
-                parameterForwardings.append("0")
-            case .namespaceEnum:
-                break
-            case .jsObject:
-                parameterForwardings.append("swift.memory.retain(\(param.name))")
-            case .swiftHeapObject:
-                parameterForwardings.append("\(param.name).pointer")
-            }
+        func lowerParameter(param: Parameter) throws {
+            let loweringFragment = try IntrinsicJSFragment.lowerParameter(type: param.type)
+            assert(
+                loweringFragment.parameters.count == 1,
+                "Lowering fragment should have exactly one parameter to lower"
+            )
+            let loweredValues = loweringFragment.printCode([param.name], scope, body, cleanupCode)
+            parameterForwardings.append(contentsOf: loweredValues)
         }
 
         func lowerSelf() {
             parameterForwardings.append("this.pointer")
         }
 
-        func call(abiName: String, returnType: BridgeType) -> String? {
+        func call(abiName: String, returnType: BridgeType) throws -> String? {
             if effects.isAsync {
-                return _call(abiName: abiName, returnType: .jsObject(nil))
+                return try _call(abiName: abiName, returnType: .jsObject(nil))
             } else {
-                return _call(abiName: abiName, returnType: returnType)
+                return try _call(abiName: abiName, returnType: returnType)
             }
         }
 
-        private func _call(abiName: String, returnType: BridgeType) -> String? {
+        private func _call(abiName: String, returnType: BridgeType) throws -> String? {
             let call = "instance.exports.\(abiName)(\(parameterForwardings.joined(separator: ", ")))"
-            var returnExpr: String?
-
-            switch returnType {
-            case .void:
-                bodyLines.append("\(call);")
-            case .string:
-                bodyLines.append("\(call);")
-                bodyLines.append("const ret = tmpRetString;")
-                bodyLines.append("tmpRetString = undefined;")
-                returnExpr = "ret"
-            case .caseEnum(_):
-                bodyLines.append("const ret = \(call);")
-                returnExpr = "ret"
-            case .rawValueEnum(_, let rawType):
-                switch rawType {
-                case .string:
-                    bodyLines.append("\(call);")
-                    bodyLines.append("const ret = tmpRetString;")
-                    bodyLines.append("tmpRetString = undefined;")
-                    returnExpr = "ret"
-                case .bool:
-                    bodyLines.append("const ret = \(call);")
-                    returnExpr = "ret !== 0"
-                default:
-                    bodyLines.append("const ret = \(call);")
-                    returnExpr = "ret"
-                }
-            case .associatedValueEnum:
-                bodyLines.append("\(call);")
-                returnExpr = "\"\""
-            case .namespaceEnum:
-                break
-            case .int, .float, .double:
-                bodyLines.append("const ret = \(call);")
-                returnExpr = "ret"
-            case .bool:
-                bodyLines.append("const ret = \(call) !== 0;")
-                returnExpr = "ret"
-            case .jsObject:
-                bodyLines.append("const retId = \(call);")
-                // TODO: Implement "take" operation
-                bodyLines.append("const ret = swift.memory.getObject(retId);")
-                bodyLines.append("swift.memory.release(retId);")
-                returnExpr = "ret"
-            case .swiftHeapObject(let name):
-                bodyLines.append("const ret = \(name).__construct(\(call));")
-                returnExpr = "ret"
+            let liftingFragment = try IntrinsicJSFragment.liftReturn(type: returnType)
+            assert(
+                liftingFragment.parameters.count <= 1,
+                "Lifting fragment should have at most one parameter to lift"
+            )
+            let fragmentArguments: [String]
+            if liftingFragment.parameters.isEmpty {
+                body.write("\(call);")
+                fragmentArguments = []
+            } else {
+                let returnVariable = scope.variable("ret")
+                body.write("const \(returnVariable) = \(call);")
+                fragmentArguments = [returnVariable]
             }
-            return returnExpr
+            let liftedValues = liftingFragment.printCode(fragmentArguments, scope, body, cleanupCode)
+            assert(liftedValues.count <= 1, "Lifting fragment should produce at most one value")
+            return liftedValues.first
         }
 
         func callConstructor(abiName: String) -> String {
-            let call = "instance.exports.\(abiName)(\(parameterForwardings.joined(separator: ", ")))"
-            bodyLines.append("const ret = \(call);")
+            let call =
+                "\(JSGlueVariableScope.reservedInstance).exports.\(abiName)(\(parameterForwardings.joined(separator: ", ")))"
+            body.write("const ret = \(call);")
             return "ret"
         }
 
@@ -510,12 +454,13 @@ struct BridgeJSLink {
             guard effects.isThrows else {
                 return []
             }
+            let exceptionVariable = JSGlueVariableScope.reservedStorageToReturnException
             return [
-                "if (tmpRetException) {",
+                "if (\(exceptionVariable)) {",
                 // TODO: Implement "take" operation
-                "    const error = swift.memory.getObject(tmpRetException);",
-                "    swift.memory.release(tmpRetException);",
-                "    tmpRetException = undefined;",
+                "    const error = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(exceptionVariable));",
+                "    \(JSGlueVariableScope.reservedSwift).memory.release(\(exceptionVariable));",
+                "    \(exceptionVariable) = undefined;",
                 "    throw error;",
                 "}",
             ]
@@ -531,8 +476,8 @@ struct BridgeJSLink {
             funcLines.append(
                 "\(declarationPrefixKeyword.map { "\($0) "} ?? "")\(name)(\(parameters.map { $0.name }.joined(separator: ", "))) {"
             )
-            funcLines.append(contentsOf: bodyLines.map { $0.indent(count: 4) })
-            funcLines.append(contentsOf: cleanupLines.map { $0.indent(count: 4) })
+            funcLines.append(contentsOf: body.lines.map { $0.indent(count: 4) })
+            funcLines.append(contentsOf: cleanupCode.lines.map { $0.indent(count: 4) })
             funcLines.append(contentsOf: checkExceptionLines().map { $0.indent(count: 4) })
             if let returnExpr = returnExpr {
                 funcLines.append("return \(returnExpr);".indent(count: 4))
@@ -678,12 +623,12 @@ struct BridgeJSLink {
         return (jsLines, dtsLines)
     }
 
-    func renderExportedFunction(function: ExportedFunction) -> (js: [String], dts: [String]) {
+    func renderExportedFunction(function: ExportedFunction) throws -> (js: [String], dts: [String]) {
         let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
         for param in function.parameters {
-            thunkBuilder.lowerParameter(param: param)
+            try thunkBuilder.lowerParameter(param: param)
         }
-        let returnExpr = thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
+        let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
         let funcLines = thunkBuilder.renderFunction(
             name: function.abiName,
             parameters: function.parameters,
@@ -698,7 +643,9 @@ struct BridgeJSLink {
         return (funcLines, dtsLines)
     }
 
-    func renderExportedClass(_ klass: ExportedClass) -> (js: [String], dtsType: [String], dtsExportEntry: [String]) {
+    func renderExportedClass(
+        _ klass: ExportedClass
+    ) throws -> (js: [String], dtsType: [String], dtsExportEntry: [String]) {
         var jsLines: [String] = []
         var dtsTypeLines: [String] = []
         var dtsExportEntryLines: [String] = []
@@ -721,14 +668,14 @@ struct BridgeJSLink {
         if let constructor: ExportedConstructor = klass.constructor {
             let thunkBuilder = ExportedThunkBuilder(effects: constructor.effects)
             for param in constructor.parameters {
-                thunkBuilder.lowerParameter(param: param)
+                try thunkBuilder.lowerParameter(param: param)
             }
             var funcLines: [String] = []
             funcLines.append("")
             funcLines.append("constructor(\(constructor.parameters.map { $0.name }.joined(separator: ", "))) {")
             let returnExpr = thunkBuilder.callConstructor(abiName: constructor.abiName)
-            funcLines.append(contentsOf: thunkBuilder.bodyLines.map { $0.indent(count: 4) })
-            funcLines.append(contentsOf: thunkBuilder.cleanupLines.map { $0.indent(count: 4) })
+            funcLines.append(contentsOf: thunkBuilder.body.lines.map { $0.indent(count: 4) })
+            funcLines.append(contentsOf: thunkBuilder.cleanupCode.lines.map { $0.indent(count: 4) })
             funcLines.append(contentsOf: thunkBuilder.checkExceptionLines().map { $0.indent(count: 4) })
             funcLines.append("return \(klass.name).__construct(\(returnExpr));".indent(count: 4))
             funcLines.append("}")
@@ -744,9 +691,9 @@ struct BridgeJSLink {
             let thunkBuilder = ExportedThunkBuilder(effects: method.effects)
             thunkBuilder.lowerSelf()
             for param in method.parameters {
-                thunkBuilder.lowerParameter(param: param)
+                try thunkBuilder.lowerParameter(param: param)
             }
-            let returnExpr = thunkBuilder.call(abiName: method.abiName, returnType: method.returnType)
+            let returnExpr = try thunkBuilder.call(abiName: method.abiName, returnType: method.returnType)
             jsLines.append(
                 contentsOf: thunkBuilder.renderFunction(
                     name: method.name,
@@ -766,7 +713,7 @@ struct BridgeJSLink {
             // Generate getter
             let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
             getterThunkBuilder.lowerSelf()
-            let getterReturnExpr = getterThunkBuilder.call(
+            let getterReturnExpr = try getterThunkBuilder.call(
                 abiName: property.getterAbiName(className: klass.name),
                 returnType: property.type
             )
@@ -783,8 +730,10 @@ struct BridgeJSLink {
             if !property.isReadonly {
                 let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
                 setterThunkBuilder.lowerSelf()
-                setterThunkBuilder.lowerParameter(param: Parameter(label: "value", name: "value", type: property.type))
-                _ = setterThunkBuilder.call(
+                try setterThunkBuilder.lowerParameter(
+                    param: Parameter(label: "value", name: "value", type: property.type)
+                )
+                _ = try setterThunkBuilder.call(
                     abiName: property.setterAbiName(className: klass.name),
                     returnType: .void
                 )
@@ -877,46 +826,38 @@ struct BridgeJSLink {
     }
 
     class ImportedThunkBuilder {
-        var bodyLines: [String] = []
+        let body: CodeFragmentPrinter
+        let scope: JSGlueVariableScope
+        let cleanupCode: CodeFragmentPrinter
         var parameterNames: [String] = []
         var parameterForwardings: [String] = []
+
+        init() {
+            self.body = CodeFragmentPrinter()
+            self.scope = JSGlueVariableScope()
+            self.cleanupCode = CodeFragmentPrinter()
+        }
 
         func liftSelf() {
             parameterNames.append("self")
         }
 
-        func liftParameter(param: Parameter) {
-            parameterNames.append(param.name)
-            switch param.type {
-            case .string:
-                let stringObjectName = "\(param.name)Object"
-                // TODO: Implement "take" operation
-                bodyLines.append("const \(stringObjectName) = swift.memory.getObject(\(param.name));")
-                bodyLines.append("swift.memory.release(\(param.name));")
-                parameterForwardings.append(stringObjectName)
-            case .caseEnum(_):
-                parameterForwardings.append(param.name)
-            case .rawValueEnum(_, let rawType):
-                switch rawType {
-                case .string:
-                    let stringObjectName = "\(param.name)Object"
-                    bodyLines.append("const \(stringObjectName) = swift.memory.getObject(\(param.name));")
-                    bodyLines.append("swift.memory.release(\(param.name));")
-                    parameterForwardings.append(stringObjectName)
-                case .bool:
-                    parameterForwardings.append("\(param.name) !== 0")
-                default:
-                    parameterForwardings.append(param.name)
-                }
-            case .associatedValueEnum:
-                parameterForwardings.append("\"\"")
-            case .namespaceEnum:
-                break
-            case .jsObject:
-                parameterForwardings.append("swift.memory.getObject(\(param.name))")
-            default:
-                parameterForwardings.append(param.name)
+        func liftParameter(param: Parameter) throws {
+            let liftingFragment = try IntrinsicJSFragment.liftParameter(type: param.type)
+            assert(
+                liftingFragment.parameters.count >= 1,
+                "Lifting fragment should have at least one parameter to lift"
+            )
+            let valuesToLift: [String]
+            if liftingFragment.parameters.count == 1 {
+                parameterNames.append(param.name)
+                valuesToLift = [scope.variable(param.name)]
+            } else {
+                valuesToLift = liftingFragment.parameters.map { scope.variable(param.name + $0.capitalizedFirstLetter) }
             }
+            let liftedValues = liftingFragment.printCode(valuesToLift, scope, body, cleanupCode)
+            assert(liftedValues.count == 1, "Lifting fragment should produce exactly one value")
+            parameterForwardings.append(contentsOf: liftedValues)
         }
 
         func renderFunction(
@@ -929,7 +870,7 @@ struct BridgeJSLink {
                 "function \(name)(\(parameterNames.joined(separator: ", "))) {"
             )
             funcLines.append("try {".indent(count: 4))
-            funcLines.append(contentsOf: bodyLines.map { $0.indent(count: 8) })
+            funcLines.append(contentsOf: body.lines.map { $0.indent(count: 8) })
             if let returnExpr = returnExpr {
                 funcLines.append("return \(returnExpr);".indent(count: 8))
             }
@@ -943,71 +884,69 @@ struct BridgeJSLink {
             return funcLines
         }
 
-        func call(name: String, returnType: BridgeType) {
-            let call = "imports.\(name)(\(parameterForwardings.joined(separator: ", ")))"
-            if returnType == .void {
-                bodyLines.append("\(call);")
-            } else {
-                bodyLines.append("let ret = \(call);")
-            }
+        func call(name: String, returnType: BridgeType) throws -> String? {
+            return try self.call(calleeExpr: "imports.\(name)", returnType: returnType)
         }
 
-        func callConstructor(name: String) {
+        private func call(calleeExpr: String, returnType: BridgeType) throws -> String? {
+            let callExpr = "\(calleeExpr)(\(parameterForwardings.joined(separator: ", ")))"
+            return try self.call(callExpr: callExpr, returnType: returnType)
+        }
+
+        private func call(callExpr: String, returnType: BridgeType) throws -> String? {
+            let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: returnType)
+            let returnExpr: String?
+            if loweringFragment.parameters.count == 0 {
+                body.write("\(callExpr);")
+                returnExpr = nil
+            } else {
+                let resultVariable = scope.variable("ret")
+                body.write("let \(resultVariable) = \(callExpr);")
+                returnExpr = resultVariable
+            }
+            return try lowerReturnValue(
+                returnType: returnType,
+                returnExpr: returnExpr,
+                loweringFragment: loweringFragment
+            )
+        }
+
+        func callConstructor(name: String) throws -> String? {
             let call = "new imports.\(name)(\(parameterForwardings.joined(separator: ", ")))"
-            bodyLines.append("let ret = \(call);")
+            let type: BridgeType = .jsObject(name)
+            let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: type)
+            return try lowerReturnValue(returnType: type, returnExpr: call, loweringFragment: loweringFragment)
         }
 
-        func callMethod(name: String, returnType: BridgeType) {
-            let call = "swift.memory.getObject(self).\(name)(\(parameterForwardings.joined(separator: ", ")))"
-            if returnType == .void {
-                bodyLines.append("\(call);")
-            } else {
-                bodyLines.append("let ret = \(call);")
-            }
+        func callMethod(name: String, returnType: BridgeType) throws -> String? {
+            return try call(
+                calleeExpr: "\(JSGlueVariableScope.reservedSwift).memory.getObject(self).\(name)",
+                returnType: returnType
+            )
         }
 
-        func callPropertyGetter(name: String, returnType: BridgeType) {
-            let call = "swift.memory.getObject(self).\(name)"
-            bodyLines.append("let ret = \(call);")
+        func callPropertyGetter(name: String, returnType: BridgeType) throws -> String? {
+            return try call(
+                callExpr: "\(JSGlueVariableScope.reservedSwift).memory.getObject(self).\(name)",
+                returnType: returnType
+            )
         }
 
         func callPropertySetter(name: String, returnType: BridgeType) {
-            let call = "swift.memory.getObject(self).\(name) = \(parameterForwardings.joined(separator: ", "))"
-            bodyLines.append("\(call);")
+            let call =
+                "\(JSGlueVariableScope.reservedSwift).memory.getObject(self).\(name) = \(parameterForwardings.joined(separator: ", "))"
+            body.write("\(call);")
         }
 
-        func lowerReturnValue(returnType: BridgeType) throws -> String? {
-            switch returnType {
-            case .void:
-                return nil
-            case .string:
-                bodyLines.append("tmpRetBytes = textEncoder.encode(ret);")
-                return "tmpRetBytes.length"
-            case .caseEnum(_):
-                return "ret"
-            case .rawValueEnum(_, let rawType):
-                switch rawType {
-                case .string:
-                    bodyLines.append("tmpRetBytes = textEncoder.encode(ret);")
-                    return "tmpRetBytes.length"
-                case .bool:
-                    return "ret ? 1 : 0"
-                default:
-                    return "ret"
-                }
-            case .associatedValueEnum:
-                return nil
-            case .namespaceEnum:
-                return nil
-            case .int, .float, .double:
-                return "ret"
-            case .bool:
-                return "ret !== 0"
-            case .jsObject:
-                return "swift.memory.retain(ret)"
-            case .swiftHeapObject:
-                throw BridgeJSLinkError(message: "Swift heap object is not supported in imported functions")
-            }
+        private func lowerReturnValue(
+            returnType: BridgeType,
+            returnExpr: String?,
+            loweringFragment: IntrinsicJSFragment
+        ) throws -> String? {
+            assert(loweringFragment.parameters.count <= 1, "Lowering fragment should have at most one parameter")
+            let loweredValues = loweringFragment.printCode(returnExpr.map { [$0] } ?? [], scope, body, cleanupCode)
+            assert(loweredValues.count <= 1, "Lowering fragment should produce at most one value")
+            return loweredValues.first
         }
     }
 
@@ -1385,10 +1324,9 @@ struct BridgeJSLink {
     ) throws {
         let thunkBuilder = ImportedThunkBuilder()
         for param in function.parameters {
-            thunkBuilder.liftParameter(param: param)
+            try thunkBuilder.liftParameter(param: param)
         }
-        thunkBuilder.call(name: function.name, returnType: function.returnType)
-        let returnExpr = try thunkBuilder.lowerReturnValue(returnType: function.returnType)
+        let returnExpr = try thunkBuilder.call(name: function.name, returnType: function.returnType)
         let funcLines = thunkBuilder.renderFunction(
             name: function.abiName(context: nil),
             returnExpr: returnExpr,
@@ -1420,8 +1358,7 @@ struct BridgeJSLink {
                 property: property,
                 abiName: getterAbiName,
                 emitCall: { thunkBuilder in
-                    thunkBuilder.callPropertyGetter(name: property.name, returnType: property.type)
-                    return try thunkBuilder.lowerReturnValue(returnType: property.type)
+                    return try thunkBuilder.callPropertyGetter(name: property.name, returnType: property.type)
                 }
             )
             importObjectBuilder.assignToImportObject(name: getterAbiName, function: js)
@@ -1433,7 +1370,7 @@ struct BridgeJSLink {
                     property: property,
                     abiName: setterAbiName,
                     emitCall: { thunkBuilder in
-                        thunkBuilder.liftParameter(
+                        try thunkBuilder.liftParameter(
                             param: Parameter(label: nil, name: "newValue", type: property.type)
                         )
                         thunkBuilder.callPropertySetter(name: property.name, returnType: property.type)
@@ -1458,11 +1395,10 @@ struct BridgeJSLink {
     ) throws {
         let thunkBuilder = ImportedThunkBuilder()
         for param in constructor.parameters {
-            thunkBuilder.liftParameter(param: param)
+            try thunkBuilder.liftParameter(param: param)
         }
         let returnType = BridgeType.jsObject(type.name)
-        thunkBuilder.callConstructor(name: type.name)
-        let returnExpr = try thunkBuilder.lowerReturnValue(returnType: returnType)
+        let returnExpr = try thunkBuilder.callConstructor(name: type.name)
         let abiName = constructor.abiName(context: type)
         let funcLines = thunkBuilder.renderFunction(
             name: abiName,
@@ -1501,10 +1437,9 @@ struct BridgeJSLink {
         let thunkBuilder = ImportedThunkBuilder()
         thunkBuilder.liftSelf()
         for param in method.parameters {
-            thunkBuilder.liftParameter(param: param)
+            try thunkBuilder.liftParameter(param: param)
         }
-        thunkBuilder.callMethod(name: method.name, returnType: method.returnType)
-        let returnExpr = try thunkBuilder.lowerReturnValue(returnType: method.returnType)
+        let returnExpr = try thunkBuilder.callMethod(name: method.name, returnType: method.returnType)
         let funcLines = thunkBuilder.renderFunction(
             name: method.abiName(context: context),
             returnExpr: returnExpr,
@@ -1521,13 +1456,6 @@ struct BridgeJSLinkError: Error {
 extension String {
     func indent(count: Int) -> String {
         return String(repeating: " ", count: count) + self
-    }
-}
-
-fileprivate extension String {
-    var capitalizedFirstLetter: String {
-        guard !isEmpty else { return self }
-        return prefix(1).uppercased() + dropFirst()
     }
 }
 

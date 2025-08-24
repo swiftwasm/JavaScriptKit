@@ -10,10 +10,8 @@
 @_cdecl("bjs_checkString")
 public func _bjs_checkString() -> Void {
     #if arch(wasm32)
-    var ret = checkString()
-    return ret.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    let ret = checkString()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

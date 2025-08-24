@@ -15,7 +15,7 @@ func checkSimple(_ a: Double) throws(JSException) -> Void {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    bjs_checkSimple(a)
+    bjs_checkSimple(a.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }

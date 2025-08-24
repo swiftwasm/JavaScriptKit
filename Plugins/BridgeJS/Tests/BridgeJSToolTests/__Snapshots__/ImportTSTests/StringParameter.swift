@@ -15,11 +15,7 @@ func checkString(_ a: String) throws(JSException) -> Void {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    var a = a
-    let aId = a.withUTF8 { b in
-        _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-    }
-    bjs_checkString(aId)
+    bjs_checkString(a.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -34,11 +30,7 @@ func checkStringWithLength(_ a: String, _ b: Double) throws(JSException) -> Void
         fatalError("Only available on WebAssembly")
     }
     #endif
-    var a = a
-    let aId = a.withUTF8 { b in
-        _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-    }
-    bjs_checkStringWithLength(aId, b)
+    bjs_checkStringWithLength(a.bridgeJSLowerParameter(), b.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }

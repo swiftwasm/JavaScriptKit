@@ -13,7 +13,7 @@ public func _bjs_asyncReturnVoid() -> Int32 {
     let ret = JSPromise.async {
         await asyncReturnVoid()
     } .jsObject
-    return _swift_js_retain(Int32(bitPattern: ret.id))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -24,9 +24,9 @@ public func _bjs_asyncReturnVoid() -> Int32 {
 public func _bjs_asyncRoundTripInt(v: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
-        return await asyncRoundTripInt(_: Int(v)).jsValue
+        return await asyncRoundTripInt(_: Int.bridgeJSLiftParameter(v)).jsValue
     } .jsObject
-    return _swift_js_retain(Int32(bitPattern: ret.id))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -34,16 +34,12 @@ public func _bjs_asyncRoundTripInt(v: Int32) -> Int32 {
 
 @_expose(wasm, "bjs_asyncRoundTripString")
 @_cdecl("bjs_asyncRoundTripString")
-public func _bjs_asyncRoundTripString(vBytes: Int32, vLen: Int32) -> Int32 {
+public func _bjs_asyncRoundTripString(vBytes: Int32, vLength: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
-        let v = String(unsafeUninitializedCapacity: Int(vLen)) { b in
-            _swift_js_init_memory(vBytes, b.baseAddress.unsafelyUnwrapped)
-            return Int(vLen)
-        }
-        return await asyncRoundTripString(_: v).jsValue
+        return await asyncRoundTripString(_: String.bridgeJSLiftParameter(vBytes, vLength)).jsValue
     } .jsObject
-    return _swift_js_retain(Int32(bitPattern: ret.id))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -54,9 +50,9 @@ public func _bjs_asyncRoundTripString(vBytes: Int32, vLen: Int32) -> Int32 {
 public func _bjs_asyncRoundTripBool(v: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
-        return await asyncRoundTripBool(_: v == 1).jsValue
+        return await asyncRoundTripBool(_: Bool.bridgeJSLiftParameter(v)).jsValue
     } .jsObject
-    return _swift_js_retain(Int32(bitPattern: ret.id))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -67,9 +63,9 @@ public func _bjs_asyncRoundTripBool(v: Int32) -> Int32 {
 public func _bjs_asyncRoundTripFloat(v: Float32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
-        return await asyncRoundTripFloat(_: v).jsValue
+        return await asyncRoundTripFloat(_: Float.bridgeJSLiftParameter(v)).jsValue
     } .jsObject
-    return _swift_js_retain(Int32(bitPattern: ret.id))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -80,9 +76,9 @@ public func _bjs_asyncRoundTripFloat(v: Float32) -> Int32 {
 public func _bjs_asyncRoundTripDouble(v: Float64) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
-        return await asyncRoundTripDouble(_: v).jsValue
+        return await asyncRoundTripDouble(_: Double.bridgeJSLiftParameter(v)).jsValue
     } .jsObject
-    return _swift_js_retain(Int32(bitPattern: ret.id))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -93,9 +89,9 @@ public func _bjs_asyncRoundTripDouble(v: Float64) -> Int32 {
 public func _bjs_asyncRoundTripJSObject(v: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
-        return await asyncRoundTripJSObject(_: JSObject(id: UInt32(bitPattern: v))).jsValue
+        return await asyncRoundTripJSObject(_: JSObject.bridgeJSLiftParameter(v)).jsValue
     } .jsObject
-    return _swift_js_retain(Int32(bitPattern: ret.id))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

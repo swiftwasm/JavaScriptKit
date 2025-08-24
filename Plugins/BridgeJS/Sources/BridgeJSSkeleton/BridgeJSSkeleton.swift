@@ -10,7 +10,7 @@ public enum BridgeType: Codable, Equatable {
     case namespaceEnum(String)
 }
 
-public enum WasmCoreType: String, Codable {
+public enum WasmCoreType: String, Codable, Sendable {
     case i32, i64, f32, f64, pointer
 }
 

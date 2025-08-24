@@ -171,7 +171,7 @@ export async function createInstantiator(options, swift) {
                     return HTTPServer.__construct(ret);
                 }
                 call(method) {
-                    instance.exports.bjs_HTTPServer_call(this.pointer, method | 0);
+                    instance.exports.bjs_HTTPServer_call(this.pointer, method);
                 }
             }
             class TestServer extends SwiftHeapObject {
@@ -185,7 +185,7 @@ export async function createInstantiator(options, swift) {
                     return TestServer.__construct(ret);
                 }
                 call(method) {
-                    instance.exports.bjs_TestServer_call(this.pointer, method | 0);
+                    instance.exports.bjs_TestServer_call(this.pointer, method);
                 }
             }
             const exports = {

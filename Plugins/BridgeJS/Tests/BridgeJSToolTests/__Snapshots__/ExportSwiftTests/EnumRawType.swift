@@ -6,15 +6,47 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
+extension Theme: _BridgedSwiftEnumNoPayload {
+}
+
+extension TSTheme: _BridgedSwiftEnumNoPayload {
+}
+
+extension FeatureFlag: _BridgedSwiftEnumNoPayload {
+}
+
+extension HttpStatus: _BridgedSwiftEnumNoPayload {
+}
+
+extension TSHttpStatus: _BridgedSwiftEnumNoPayload {
+}
+
+extension Priority: _BridgedSwiftEnumNoPayload {
+}
+
+extension FileSize: _BridgedSwiftEnumNoPayload {
+}
+
+extension UserId: _BridgedSwiftEnumNoPayload {
+}
+
+extension TokenId: _BridgedSwiftEnumNoPayload {
+}
+
+extension SessionId: _BridgedSwiftEnumNoPayload {
+}
+
+extension Precision: _BridgedSwiftEnumNoPayload {
+}
+
+extension Ratio: _BridgedSwiftEnumNoPayload {
+}
+
 @_expose(wasm, "bjs_setTheme")
 @_cdecl("bjs_setTheme")
-public func _bjs_setTheme(themeBytes: Int32, themeLen: Int32) -> Void {
+public func _bjs_setTheme(themeBytes: Int32, themeLength: Int32) -> Void {
     #if arch(wasm32)
-    let theme = String(unsafeUninitializedCapacity: Int(themeLen)) { b in
-        _swift_js_init_memory(themeBytes, b.baseAddress.unsafelyUnwrapped)
-        return Int(themeLen)
-    }
-    setTheme(_: Theme(rawValue: theme)!)
+    setTheme(_: Theme.bridgeJSLiftParameter(themeBytes, themeLength))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -25,10 +57,7 @@ public func _bjs_setTheme(themeBytes: Int32, themeLen: Int32) -> Void {
 public func _bjs_getTheme() -> Void {
     #if arch(wasm32)
     let ret = getTheme()
-    var rawValue = ret.rawValue
-    return rawValue.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -36,13 +65,9 @@ public func _bjs_getTheme() -> Void {
 
 @_expose(wasm, "bjs_setTSTheme")
 @_cdecl("bjs_setTSTheme")
-public func _bjs_setTSTheme(themeBytes: Int32, themeLen: Int32) -> Void {
+public func _bjs_setTSTheme(themeBytes: Int32, themeLength: Int32) -> Void {
     #if arch(wasm32)
-    let theme = String(unsafeUninitializedCapacity: Int(themeLen)) { b in
-        _swift_js_init_memory(themeBytes, b.baseAddress.unsafelyUnwrapped)
-        return Int(themeLen)
-    }
-    setTSTheme(_: TSTheme(rawValue: theme)!)
+    setTSTheme(_: TSTheme.bridgeJSLiftParameter(themeBytes, themeLength))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -53,10 +78,7 @@ public func _bjs_setTSTheme(themeBytes: Int32, themeLen: Int32) -> Void {
 public func _bjs_getTSTheme() -> Void {
     #if arch(wasm32)
     let ret = getTSTheme()
-    var rawValue = ret.rawValue
-    return rawValue.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -66,7 +88,7 @@ public func _bjs_getTSTheme() -> Void {
 @_cdecl("bjs_setFeatureFlag")
 public func _bjs_setFeatureFlag(flag: Int32) -> Void {
     #if arch(wasm32)
-    setFeatureFlag(_: FeatureFlag(rawValue: flag != 0)!)
+    setFeatureFlag(_: FeatureFlag.bridgeJSLiftParameter(flag))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -77,7 +99,7 @@ public func _bjs_setFeatureFlag(flag: Int32) -> Void {
 public func _bjs_getFeatureFlag() -> Int32 {
     #if arch(wasm32)
     let ret = getFeatureFlag()
-    return Int32(ret.rawValue ? 1 : 0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -87,7 +109,7 @@ public func _bjs_getFeatureFlag() -> Int32 {
 @_cdecl("bjs_setHttpStatus")
 public func _bjs_setHttpStatus(status: Int32) -> Void {
     #if arch(wasm32)
-    setHttpStatus(_: HttpStatus(rawValue: Int(status))!)
+    setHttpStatus(_: HttpStatus.bridgeJSLiftParameter(status))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -98,7 +120,7 @@ public func _bjs_setHttpStatus(status: Int32) -> Void {
 public func _bjs_getHttpStatus() -> Int32 {
     #if arch(wasm32)
     let ret = getHttpStatus()
-    return Int32(ret.rawValue)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -108,7 +130,7 @@ public func _bjs_getHttpStatus() -> Int32 {
 @_cdecl("bjs_setTSHttpStatus")
 public func _bjs_setTSHttpStatus(status: Int32) -> Void {
     #if arch(wasm32)
-    setTSHttpStatus(_: TSHttpStatus(rawValue: Int(status))!)
+    setTSHttpStatus(_: TSHttpStatus.bridgeJSLiftParameter(status))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -119,7 +141,7 @@ public func _bjs_setTSHttpStatus(status: Int32) -> Void {
 public func _bjs_getTSHttpStatus() -> Int32 {
     #if arch(wasm32)
     let ret = getTSHttpStatus()
-    return Int32(ret.rawValue)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -129,7 +151,7 @@ public func _bjs_getTSHttpStatus() -> Int32 {
 @_cdecl("bjs_setPriority")
 public func _bjs_setPriority(priority: Int32) -> Void {
     #if arch(wasm32)
-    setPriority(_: Priority(rawValue: Int32(priority))!)
+    setPriority(_: Priority.bridgeJSLiftParameter(priority))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -140,7 +162,7 @@ public func _bjs_setPriority(priority: Int32) -> Void {
 public func _bjs_getPriority() -> Int32 {
     #if arch(wasm32)
     let ret = getPriority()
-    return Int32(ret.rawValue)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -148,9 +170,9 @@ public func _bjs_getPriority() -> Int32 {
 
 @_expose(wasm, "bjs_setFileSize")
 @_cdecl("bjs_setFileSize")
-public func _bjs_setFileSize(size: Int64) -> Void {
+public func _bjs_setFileSize(size: Int32) -> Void {
     #if arch(wasm32)
-    setFileSize(_: FileSize(rawValue: Int64(size))!)
+    setFileSize(_: FileSize.bridgeJSLiftParameter(size))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -158,10 +180,10 @@ public func _bjs_setFileSize(size: Int64) -> Void {
 
 @_expose(wasm, "bjs_getFileSize")
 @_cdecl("bjs_getFileSize")
-public func _bjs_getFileSize() -> Int64 {
+public func _bjs_getFileSize() -> Int32 {
     #if arch(wasm32)
     let ret = getFileSize()
-    return Int64(ret.rawValue)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -171,7 +193,7 @@ public func _bjs_getFileSize() -> Int64 {
 @_cdecl("bjs_setUserId")
 public func _bjs_setUserId(id: Int32) -> Void {
     #if arch(wasm32)
-    setUserId(_: UserId(rawValue: UInt(bitPattern: id))!)
+    setUserId(_: UserId.bridgeJSLiftParameter(id))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -182,7 +204,7 @@ public func _bjs_setUserId(id: Int32) -> Void {
 public func _bjs_getUserId() -> Int32 {
     #if arch(wasm32)
     let ret = getUserId()
-    return Int32(ret.rawValue)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -192,7 +214,7 @@ public func _bjs_getUserId() -> Int32 {
 @_cdecl("bjs_setTokenId")
 public func _bjs_setTokenId(token: Int32) -> Void {
     #if arch(wasm32)
-    setTokenId(_: TokenId(rawValue: UInt32(bitPattern: token))!)
+    setTokenId(_: TokenId.bridgeJSLiftParameter(token))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -203,7 +225,7 @@ public func _bjs_setTokenId(token: Int32) -> Void {
 public func _bjs_getTokenId() -> Int32 {
     #if arch(wasm32)
     let ret = getTokenId()
-    return Int32(ret.rawValue)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -211,9 +233,9 @@ public func _bjs_getTokenId() -> Int32 {
 
 @_expose(wasm, "bjs_setSessionId")
 @_cdecl("bjs_setSessionId")
-public func _bjs_setSessionId(session: Int64) -> Void {
+public func _bjs_setSessionId(session: Int32) -> Void {
     #if arch(wasm32)
-    setSessionId(_: SessionId(rawValue: UInt64(bitPattern: Int64(session)))!)
+    setSessionId(_: SessionId.bridgeJSLiftParameter(session))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -221,10 +243,10 @@ public func _bjs_setSessionId(session: Int64) -> Void {
 
 @_expose(wasm, "bjs_getSessionId")
 @_cdecl("bjs_getSessionId")
-public func _bjs_getSessionId() -> Int64 {
+public func _bjs_getSessionId() -> Int32 {
     #if arch(wasm32)
     let ret = getSessionId()
-    return Int64(ret.rawValue)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -234,7 +256,7 @@ public func _bjs_getSessionId() -> Int64 {
 @_cdecl("bjs_setPrecision")
 public func _bjs_setPrecision(precision: Float32) -> Void {
     #if arch(wasm32)
-    setPrecision(_: Precision(rawValue: Float(precision))!)
+    setPrecision(_: Precision.bridgeJSLiftParameter(precision))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -245,7 +267,7 @@ public func _bjs_setPrecision(precision: Float32) -> Void {
 public func _bjs_getPrecision() -> Float32 {
     #if arch(wasm32)
     let ret = getPrecision()
-    return Float32(ret.rawValue)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -255,7 +277,7 @@ public func _bjs_getPrecision() -> Float32 {
 @_cdecl("bjs_setRatio")
 public func _bjs_setRatio(ratio: Float64) -> Void {
     #if arch(wasm32)
-    setRatio(_: Ratio(rawValue: Double(ratio))!)
+    setRatio(_: Ratio.bridgeJSLiftParameter(ratio))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -266,7 +288,7 @@ public func _bjs_setRatio(ratio: Float64) -> Void {
 public func _bjs_getRatio() -> Float64 {
     #if arch(wasm32)
     let ret = getRatio()
-    return Float64(ret.rawValue)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -276,7 +298,7 @@ public func _bjs_getRatio() -> Float64 {
 @_cdecl("bjs_setFeatureFlag")
 public func _bjs_setFeatureFlag(featureFlag: Int32) -> Void {
     #if arch(wasm32)
-    setFeatureFlag(_: FeatureFlag(rawValue: featureFlag != 0)!)
+    setFeatureFlag(_: FeatureFlag.bridgeJSLiftParameter(featureFlag))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -287,7 +309,7 @@ public func _bjs_setFeatureFlag(featureFlag: Int32) -> Void {
 public func _bjs_getFeatureFlag() -> Int32 {
     #if arch(wasm32)
     let ret = getFeatureFlag()
-    return Int32(ret.rawValue ? 1 : 0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -295,14 +317,10 @@ public func _bjs_getFeatureFlag() -> Int32 {
 
 @_expose(wasm, "bjs_processTheme")
 @_cdecl("bjs_processTheme")
-public func _bjs_processTheme(themeBytes: Int32, themeLen: Int32) -> Int32 {
+public func _bjs_processTheme(themeBytes: Int32, themeLength: Int32) -> Int32 {
     #if arch(wasm32)
-    let theme = String(unsafeUninitializedCapacity: Int(themeLen)) { b in
-        _swift_js_init_memory(themeBytes, b.baseAddress.unsafelyUnwrapped)
-        return Int(themeLen)
-    }
-    let ret = processTheme(_: Theme(rawValue: theme)!)
-    return Int32(ret.rawValue)
+    let ret = processTheme(_: Theme.bridgeJSLiftParameter(themeBytes, themeLength))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -312,8 +330,8 @@ public func _bjs_processTheme(themeBytes: Int32, themeLen: Int32) -> Int32 {
 @_cdecl("bjs_convertPriority")
 public func _bjs_convertPriority(status: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = convertPriority(_: HttpStatus(rawValue: Int(status))!)
-    return Int32(ret.rawValue)
+    let ret = convertPriority(_: HttpStatus.bridgeJSLiftParameter(status))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -321,13 +339,10 @@ public func _bjs_convertPriority(status: Int32) -> Int32 {
 
 @_expose(wasm, "bjs_validateSession")
 @_cdecl("bjs_validateSession")
-public func _bjs_validateSession(session: Int64) -> Void {
+public func _bjs_validateSession(session: Int32) -> Void {
     #if arch(wasm32)
-    let ret = validateSession(_: SessionId(rawValue: UInt64(bitPattern: Int64(session)))!)
-    var rawValue = ret.rawValue
-    return rawValue.withUTF8 { ptr in
-        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    }
+    let ret = validateSession(_: SessionId.bridgeJSLiftParameter(session))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

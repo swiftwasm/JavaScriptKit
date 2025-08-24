@@ -10,7 +10,7 @@
 @_cdecl("bjs_check")
 public func _bjs_check(a: Int32, b: Float32, c: Float64, d: Int32) -> Void {
     #if arch(wasm32)
-    check(a: Int(a), b: b, c: c, d: d == 1)
+    check(a: Int.bridgeJSLiftParameter(a), b: Float.bridgeJSLiftParameter(b), c: Double.bridgeJSLiftParameter(c), d: Bool.bridgeJSLiftParameter(d))
     #else
     fatalError("Only available on WebAssembly")
     #endif

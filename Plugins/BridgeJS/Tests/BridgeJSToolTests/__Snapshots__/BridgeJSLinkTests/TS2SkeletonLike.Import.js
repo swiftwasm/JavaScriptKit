@@ -96,7 +96,7 @@ export async function createInstantiator(options, swift) {
                     const tsObject = swift.memory.getObject(ts);
                     swift.memory.release(ts);
                     let ret = swift.memory.getObject(self).validate(tsObject);
-                    return ret !== 0;
+                    return ret ? 1 : 0;
                 } catch (error) {
                     setException(error);
                     return 0

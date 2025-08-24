@@ -165,7 +165,7 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 },
                 setFeatureFlag: function bjs_setFeatureFlag(flag) {
-                    instance.exports.bjs_setFeatureFlag(flag ? 1 : 0);
+                    instance.exports.bjs_setFeatureFlag(flag);
                 },
                 getFeatureFlag: function bjs_getFeatureFlag() {
                     const ret = instance.exports.bjs_getFeatureFlag();
@@ -235,7 +235,7 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 },
                 setFeatureFlag: function bjs_setFeatureFlag(featureFlag) {
-                    instance.exports.bjs_setFeatureFlag(featureFlag ? 1 : 0);
+                    instance.exports.bjs_setFeatureFlag(featureFlag);
                 },
                 getFeatureFlag: function bjs_getFeatureFlag() {
                     const ret = instance.exports.bjs_getFeatureFlag();

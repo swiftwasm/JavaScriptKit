@@ -63,7 +63,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_checkBoolean"] = function bjs_checkBoolean() {
                 try {
                     let ret = imports.checkBoolean();
-                    return ret !== 0;
+                    return ret ? 1 : 0;
                 } catch (error) {
                     setException(error);
                     return 0

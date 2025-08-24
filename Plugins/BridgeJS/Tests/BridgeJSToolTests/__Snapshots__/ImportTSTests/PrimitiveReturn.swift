@@ -19,7 +19,7 @@ func checkNumber() throws(JSException) -> Double {
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return Double(ret)
+    return Double.bridgeJSLiftReturn(ret)
 }
 
 func checkBoolean() throws(JSException) -> Bool {
@@ -35,5 +35,5 @@ func checkBoolean() throws(JSException) -> Bool {
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return ret == 1
+    return Bool.bridgeJSLiftReturn(ret)
 }

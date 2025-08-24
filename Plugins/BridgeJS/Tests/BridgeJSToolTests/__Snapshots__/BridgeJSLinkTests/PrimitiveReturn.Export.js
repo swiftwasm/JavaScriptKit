@@ -77,8 +77,8 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 },
                 checkBool: function bjs_checkBool() {
-                    const ret = instance.exports.bjs_checkBool() !== 0;
-                    return ret;
+                    const ret = instance.exports.bjs_checkBool();
+                    return ret !== 0;
                 },
             };
         },

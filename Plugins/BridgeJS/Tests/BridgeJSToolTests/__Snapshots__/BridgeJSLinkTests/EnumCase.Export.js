@@ -86,18 +86,18 @@ export async function createInstantiator(options, swift) {
 
             return {
                 setDirection: function bjs_setDirection(direction) {
-                    instance.exports.bjs_setDirection(direction | 0);
+                    instance.exports.bjs_setDirection(direction);
                 },
                 getDirection: function bjs_getDirection() {
                     const ret = instance.exports.bjs_getDirection();
                     return ret;
                 },
                 processDirection: function bjs_processDirection(input) {
-                    const ret = instance.exports.bjs_processDirection(input | 0);
+                    const ret = instance.exports.bjs_processDirection(input);
                     return ret;
                 },
                 setTSDirection: function bjs_setTSDirection(direction) {
-                    instance.exports.bjs_setTSDirection(direction | 0);
+                    instance.exports.bjs_setTSDirection(direction);
                 },
                 getTSDirection: function bjs_getTSDirection() {
                     const ret = instance.exports.bjs_getTSDirection();

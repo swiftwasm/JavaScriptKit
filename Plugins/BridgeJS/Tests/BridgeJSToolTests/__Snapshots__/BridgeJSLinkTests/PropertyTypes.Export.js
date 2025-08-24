@@ -129,8 +129,8 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_PropertyHolder_doubleValue_set(this.pointer, value);
                 }
                 get boolValue() {
-                    const ret = instance.exports.bjs_PropertyHolder_boolValue_get(this.pointer) !== 0;
-                    return ret;
+                    const ret = instance.exports.bjs_PropertyHolder_boolValue_get(this.pointer);
+                    return ret !== 0;
                 }
                 set boolValue(value) {
                     instance.exports.bjs_PropertyHolder_boolValue_set(this.pointer, value);
@@ -160,8 +160,8 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
                 get readonlyBool() {
-                    const ret = instance.exports.bjs_PropertyHolder_readonlyBool_get(this.pointer) !== 0;
-                    return ret;
+                    const ret = instance.exports.bjs_PropertyHolder_readonlyBool_get(this.pointer);
+                    return ret !== 0;
                 }
                 get readonlyString() {
                     instance.exports.bjs_PropertyHolder_readonlyString_get(this.pointer);
@@ -170,17 +170,17 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
                 get jsObject() {
-                    const retId = instance.exports.bjs_PropertyHolder_jsObject_get(this.pointer);
-                    const ret = swift.memory.getObject(retId);
-                    swift.memory.release(retId);
-                    return ret;
+                    const ret = instance.exports.bjs_PropertyHolder_jsObject_get(this.pointer);
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
                 }
                 set jsObject(value) {
                     instance.exports.bjs_PropertyHolder_jsObject_set(this.pointer, swift.memory.retain(value));
                 }
                 get sibling() {
-                    const ret = PropertyHolder.__construct(instance.exports.bjs_PropertyHolder_sibling_get(this.pointer));
-                    return ret;
+                    const ret = instance.exports.bjs_PropertyHolder_sibling_get(this.pointer);
+                    return PropertyHolder.__construct(ret);
                 }
                 set sibling(value) {
                     instance.exports.bjs_PropertyHolder_sibling_set(this.pointer, value.pointer);
@@ -226,9 +226,9 @@ export async function createInstantiator(options, swift) {
                 createPropertyHolder: function bjs_createPropertyHolder(intValue, floatValue, doubleValue, boolValue, stringValue, jsObject) {
                     const stringValueBytes = textEncoder.encode(stringValue);
                     const stringValueId = swift.memory.retain(stringValueBytes);
-                    const ret = PropertyHolder.__construct(instance.exports.bjs_createPropertyHolder(intValue, floatValue, doubleValue, boolValue, stringValueId, stringValueBytes.length, swift.memory.retain(jsObject)));
+                    const ret = instance.exports.bjs_createPropertyHolder(intValue, floatValue, doubleValue, boolValue, stringValueId, stringValueBytes.length, swift.memory.retain(jsObject));
                     swift.memory.release(stringValueId);
-                    return ret;
+                    return PropertyHolder.__construct(ret);
                 },
                 testPropertyHolder: function bjs_testPropertyHolder(holder) {
                     instance.exports.bjs_testPropertyHolder(holder.pointer);

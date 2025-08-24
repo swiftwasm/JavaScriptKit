@@ -4,6 +4,9 @@ import SwiftSyntaxBuilder
 #if canImport(BridgeJSSkeleton)
 import BridgeJSSkeleton
 #endif
+#if canImport(BridgeJSUtilities)
+import BridgeJSUtilities
+#endif
 
 /// Imports TypeScript declarations and generates Swift bridge code
 ///
@@ -68,84 +71,19 @@ public struct ImportTS {
         }
 
         func lowerParameter(param: Parameter) throws {
-            switch param.type {
-            case .bool:
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("Int32(\(raw: param.name) ? 1 : 0)")
-                    )
+            let loweringInfo = try param.type.loweringParameterInfo()
+            assert(
+                loweringInfo.loweredParameters.count == 1,
+                "For now, we require a single parameter to be lowered to a single Wasm core type"
+            )
+            let (_, type) = loweringInfo.loweredParameters[0]
+            abiParameterForwardings.append(
+                LabeledExprSyntax(
+                    label: param.label,
+                    expression: ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
                 )
-                abiParameterSignatures.append((param.name, .i32))
-            case .int:
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("\(raw: param.name)")
-                    )
-                )
-                abiParameterSignatures.append((param.name, .i32))
-            case .float:
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("\(raw: param.name)")
-                    )
-                )
-                abiParameterSignatures.append((param.name, .f32))
-            case .double:
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("\(raw: param.name)")
-                    )
-                )
-                abiParameterSignatures.append((param.name, .f64))
-            case .string:
-                let stringIdName = "\(param.name)Id"
-                body.append(
-                    """
-                    var \(raw: param.name) = \(raw: param.name)
-
-                    """
-                )
-                body.append(
-                    """
-                    let \(raw: stringIdName) = \(raw: param.name).withUTF8 { b in
-                        _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-                    }
-                    """
-                )
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("\(raw: stringIdName)")
-                    )
-                )
-                abiParameterSignatures.append((param.name, .i32))
-            case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
-                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .jsObject(_?):
-                abiParameterSignatures.append((param.name, .i32))
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("Int32(bitPattern: \(raw: param.name).this.id)")
-                    )
-                )
-            case .jsObject(nil):
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("Int32(bitPattern: \(raw: param.name).id)")
-                    )
-                )
-                abiParameterSignatures.append((param.name, .i32))
-            case .swiftHeapObject(_):
-                throw BridgeJSCoreError("swiftHeapObject is not supported in imported signatures")
-            case .void:
-                break
-            }
+            )
+            abiParameterSignatures.append((param.name, type))
         }
 
         func call(returnType: BridgeType) {
@@ -160,43 +98,12 @@ public struct ImportTS {
         }
 
         func liftReturnValue(returnType: BridgeType) throws {
-            switch returnType {
-            case .bool:
-                abiReturnType = .i32
-                body.append("return ret == 1")
-            case .int:
-                abiReturnType = .i32
-                body.append("return \(raw: returnType.swiftType)(ret)")
-            case .float:
-                abiReturnType = .f32
-                body.append("return \(raw: returnType.swiftType)(ret)")
-            case .double:
-                abiReturnType = .f64
-                body.append("return \(raw: returnType.swiftType)(ret)")
-            case .string:
-                abiReturnType = .i32
-                body.append(
-                    """
-                    return String(unsafeUninitializedCapacity: Int(ret)) { b in
-                        _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-                        return Int(ret)
-                    }
-                    """
-                )
-            case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
-                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .jsObject(let name):
-                abiReturnType = .i32
-                if let name = name {
-                    body.append("return \(raw: name)(takingThis: ret)")
-                } else {
-                    body.append("return JSObject(id: UInt32(bitPattern: ret))")
-                }
-            case .swiftHeapObject(_):
-                throw BridgeJSCoreError("swiftHeapObject is not supported in imported signatures")
-            case .void:
-                break
+            let liftingInfo = try returnType.liftingReturnInfo()
+            abiReturnType = liftingInfo.valueToLift
+            if returnType == .void {
+                return
             }
+            body.append("return \(raw: returnType.swiftType).bridgeJSLiftReturn(ret)")
         }
 
         func assignThis(returnType: BridgeType) {
@@ -204,7 +111,7 @@ public struct ImportTS {
                 preconditionFailure("assignThis can only be called with a jsObject return type")
             }
             abiReturnType = .i32
-            body.append("self.this = JSObject(id: UInt32(bitPattern: ret))")
+            body.append("self.jsObject = JSObject(id: UInt32(bitPattern: ret))")
         }
 
         func renderImportDecl() -> DeclSyntax {
@@ -392,7 +299,7 @@ public struct ImportTS {
             try builder.lowerParameter(param: newValue)
             builder.call(returnType: .void)
             return builder.renderThunkDecl(
-                name: "set\(property.name.capitalizedFirstLetter())",
+                name: "set\(property.name.capitalizedFirstLetter)",
                 parameters: [newValue],
                 returnType: .void
             )
@@ -431,25 +338,22 @@ public struct ImportTS {
         let classDecl = try StructDeclSyntax(
             leadingTrivia: Self.renderDocumentation(documentation: type.documentation),
             name: .identifier(name),
+            inheritanceClause: InheritanceClauseSyntax(
+                inheritedTypesBuilder: {
+                    InheritedTypeSyntax(type: TypeSyntax("_JSBridgedClass"))
+                }
+            ),
             memberBlockBuilder: {
                 DeclSyntax(
                     """
-                    let this: JSObject
+                    let jsObject: JSObject
                     """
                 ).with(\.trailingTrivia, .newlines(2))
 
                 DeclSyntax(
                     """
-                    init(this: JSObject) {
-                        self.this = this
-                    }
-                    """
-                ).with(\.trailingTrivia, .newlines(2))
-
-                DeclSyntax(
-                    """
-                    init(takingThis this: Int32) {
-                        self.this = JSObject(id: UInt32(bitPattern: this))
+                    init(unsafelyWrapping jsObject: JSObject) {
+                        self.jsObject = jsObject
                     }
                     """
                 ).with(\.trailingTrivia, .newlines(2))
@@ -505,9 +409,60 @@ public struct ImportTS {
     }
 }
 
-fileprivate extension String {
-    func capitalizedFirstLetter() -> String {
-        guard !isEmpty else { return self }
-        return prefix(1).uppercased() + dropFirst()
+extension BridgeType {
+    struct LoweringParameterInfo {
+        let loweredParameters: [(name: String, type: WasmCoreType)]
+
+        static let bool = LoweringParameterInfo(loweredParameters: [("value", .i32)])
+        static let int = LoweringParameterInfo(loweredParameters: [("value", .i32)])
+        static let float = LoweringParameterInfo(loweredParameters: [("value", .f32)])
+        static let double = LoweringParameterInfo(loweredParameters: [("value", .f64)])
+        static let string = LoweringParameterInfo(loweredParameters: [("value", .i32)])
+        static let jsObject = LoweringParameterInfo(loweredParameters: [("value", .i32)])
+        static let void = LoweringParameterInfo(loweredParameters: [])
+    }
+
+    func loweringParameterInfo() throws -> LoweringParameterInfo {
+        switch self {
+        case .bool: return .bool
+        case .int: return .int
+        case .float: return .float
+        case .double: return .double
+        case .string: return .string
+        case .jsObject: return .jsObject
+        case .void: return .void
+        case .swiftHeapObject:
+            throw BridgeJSCoreError("swiftHeapObject is not supported in imported signatures")
+        case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
+            throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
+        }
+    }
+
+    struct LiftingReturnInfo {
+        let valueToLift: WasmCoreType?
+
+        static let bool = LiftingReturnInfo(valueToLift: .i32)
+        static let int = LiftingReturnInfo(valueToLift: .i32)
+        static let float = LiftingReturnInfo(valueToLift: .f32)
+        static let double = LiftingReturnInfo(valueToLift: .f64)
+        static let string = LiftingReturnInfo(valueToLift: .i32)
+        static let jsObject = LiftingReturnInfo(valueToLift: .i32)
+        static let void = LiftingReturnInfo(valueToLift: nil)
+    }
+
+    func liftingReturnInfo() throws -> LiftingReturnInfo {
+        switch self {
+        case .bool: return .bool
+        case .int: return .int
+        case .float: return .float
+        case .double: return .double
+        case .string: return .string
+        case .jsObject: return .jsObject
+        case .void: return .void
+        case .swiftHeapObject:
+            throw BridgeJSCoreError("swiftHeapObject is not supported in imported signatures")
+        case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
+            throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
+        }
     }
 }

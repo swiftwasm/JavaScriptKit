@@ -11,7 +11,7 @@
 public func _bjs_checkInt() -> Int32 {
     #if arch(wasm32)
     let ret = checkInt()
-    return Int32(ret)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -22,7 +22,7 @@ public func _bjs_checkInt() -> Int32 {
 public func _bjs_checkFloat() -> Float32 {
     #if arch(wasm32)
     let ret = checkFloat()
-    return Float32(ret)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -33,7 +33,7 @@ public func _bjs_checkFloat() -> Float32 {
 public func _bjs_checkDouble() -> Float64 {
     #if arch(wasm32)
     let ret = checkDouble()
-    return Float64(ret)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -44,7 +44,7 @@ public func _bjs_checkDouble() -> Float64 {
 public func _bjs_checkBool() -> Int32 {
     #if arch(wasm32)
     let ret = checkBool()
-    return Int32(ret ? 1 : 0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

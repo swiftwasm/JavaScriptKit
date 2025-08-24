@@ -29,6 +29,7 @@ let package = Package(
             name: "BridgeJSCore",
             dependencies: [
                 "BridgeJSSkeleton",
+                "BridgeJSUtilities",
                 .product(name: "SwiftParser", package: "swift-syntax"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftBasicFormat", package: "swift-syntax"),
@@ -36,10 +37,14 @@ let package = Package(
             ]
         ),
         .target(name: "BridgeJSSkeleton"),
+        .target(name: "BridgeJSUtilities"),
 
         .target(
             name: "BridgeJSLink",
-            dependencies: ["BridgeJSSkeleton"]
+            dependencies: [
+                "BridgeJSSkeleton",
+                "BridgeJSUtilities",
+            ]
         ),
 
         .testTarget(

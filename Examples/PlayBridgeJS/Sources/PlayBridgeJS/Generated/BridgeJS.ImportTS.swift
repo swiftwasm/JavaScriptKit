@@ -19,18 +19,14 @@ func createTS2Skeleton() throws(JSException) -> TS2Skeleton {
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return TS2Skeleton(takingThis: ret)
+    return TS2Skeleton.bridgeJSLiftReturn(ret)
 }
 
-struct TS2Skeleton {
-    let this: JSObject
+struct TS2Skeleton: _JSBridgedClass {
+    let jsObject: JSObject
 
-    init(this: JSObject) {
-        self.this = this
-    }
-
-    init(takingThis this: Int32) {
-        self.this = JSObject(id: UInt32(bitPattern: this))
+    init(unsafelyWrapping jsObject: JSObject) {
+        self.jsObject = jsObject
     }
 
     func convert(_ ts: String) throws(JSException) -> String {
@@ -42,18 +38,11 @@ struct TS2Skeleton {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        var ts = ts
-        let tsId = ts.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
-        }
-        let ret = bjs_TS2Skeleton_convert(Int32(bitPattern: self.this.id), tsId)
+        let ret = bjs_TS2Skeleton_convert(self.bridgeJSLowerParameter(), ts.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
         }
-        return String(unsafeUninitializedCapacity: Int(ret)) { b in
-            _swift_js_init_memory_with_result(b.baseAddress.unsafelyUnwrapped, Int32(ret))
-            return Int(ret)
-        }
+        return String.bridgeJSLiftReturn(ret)
     }
 
 }
