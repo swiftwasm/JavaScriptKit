@@ -6,6 +6,8 @@ Learn how to leverage TypeScript definitions to create type-safe bindings for Ja
 
 > Important: This feature is still experimental. No API stability is guaranteed, and the API may change in future releases.
 
+> Tip: You can quickly preview what interfaces will be exposed on the Swift/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
+
 BridgeJS enables seamless integration between Swift and JavaScript by automatically generating Swift bindings from TypeScript declaration files (`.d.ts`). This provides type-safe access to JavaScript APIs directly from your Swift code.
 
 The key benefits of this approach over `@dynamicMemberLookup`-based APIs include:
@@ -174,3 +176,10 @@ const { exports } = await init({
 // Call the entry point of your Swift application
 exports.run();
 ```
+
+## Topics
+
+- <doc:Importing-TS-Function>
+- <doc:Importing-TS-Class>
+- <doc:Importing-TS-Interface>
+- <doc:Importing-TS-TypeAlias>
