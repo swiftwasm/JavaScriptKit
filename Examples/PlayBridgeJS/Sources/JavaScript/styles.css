@@ -221,6 +221,47 @@ body {
     word-break: break-word;
 }
 
+/* Progress bar */
+.progress {
+    margin: 16px auto 0 auto;
+    max-width: 640px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease;
+}
+
+.progress.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.progress.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.progress-track {
+    height: 8px;
+    background-color: var(--color-fill-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background-color: var(--color-figure-blue);
+    transition: width 0.2s ease;
+}
+
+.progress-label {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-secondary-label);
+}
+
 .main-content {
     flex: 1;
     display: grid;

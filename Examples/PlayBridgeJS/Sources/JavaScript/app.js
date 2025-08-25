@@ -3,6 +3,11 @@ import { EditorSystem } from './editor.js';
 import ts from 'typescript';
 import { TypeProcessor } from './processor.js';
 import { CodeShareManager } from './code-share.js';
+import {
+  createSystem,
+  createDefaultMapFromCDN,
+  createVirtualCompilerHost
+} from '@typescript/vfs';
 
 /**
  * @typedef {import('../../.build/plugins/PackageToJS/outputs/Package/bridge-js.js').PlayBridgeJS} PlayBridgeJS
@@ -38,6 +43,14 @@ export class BridgeJSPlayground {
         this.copyButton = /** @type {HTMLButtonElement} */ (document.getElementById('copyButton'));
         /** @type {HTMLButtonElement} */
         this.closeShareDialogButton = /** @type {HTMLButtonElement} */ (document.getElementById('closeShareDialog'));
+
+        // Progress UI elements
+        /** @type {HTMLDivElement | null} */
+        this.progressBar = /** @type {HTMLDivElement} */ (document.getElementById('progressBar'));
+        /** @type {HTMLDivElement | null} */
+        this.progressFill = /** @type {HTMLDivElement} */ (document.getElementById('progressFill'));
+        /** @type {HTMLDivElement | null} */
+        this.progressLabel = /** @type {HTMLDivElement} */ (document.getElementById('progressLabel'));
     }
 
     /**
@@ -50,16 +63,20 @@ export class BridgeJSPlayground {
         }
 
         try {
+            this.showProgress('Starting…', 5);
             // Initialize editor system
             await this.editorSystem.init();
+            this.setProgress('Editor ready', 30);
 
             // Initialize BridgeJS
             await this.initializeBridgeJS();
+            this.setProgress('BridgeJS ready', 70);
 
             // Set up event listeners
             this.setupEventListeners();
 
             // Check for shared code in URL
+            this.setProgress('Checking shared code…', 80);
             const sharedCode = await CodeShareManager.extractCodeFromUrl();
             if (sharedCode) {
                 this.editorSystem.setInputs(sharedCode);
@@ -67,12 +84,15 @@ export class BridgeJSPlayground {
                 // Load sample code
                 this.editorSystem.setInputs(sampleCode);
             }
-
+            this.setProgress('Finalizing…', 95);
             this.isInitialized = true;
             console.log('BridgeJS Playground initialized successfully');
+            this.setProgress('Ready', 100);
+            setTimeout(() => this.hideProgress(), 400);
         } catch (error) {
             console.error('Failed to initialize BridgeJS Playground:', error);
             this.showError('Failed to initialize application: ' + error.message);
+            this.hideProgress();
         }
     }
 
@@ -80,14 +100,16 @@ export class BridgeJSPlayground {
     async initializeBridgeJS() {
         try {
             // Import the BridgeJS module
+            this.setProgress('Loading BridgeJS…', 50);
             const { init } = await import("../../.build/plugins/PackageToJS/outputs/Package/index.js");
+            const virtualHost = await this.createTS2SkeletonFactory();
+            this.setProgress('Preparing TypeScript host…', 60);
             const { exports } = await init({
-                getImports: () => {
-                    return {
-                        createTS2Skeleton: this.createTS2Skeleton
-                    };
-                }
+                getImports: () => ({
+                    createTS2Skeleton: () => this.createTS2Skeleton(virtualHost)
+                })
             });
+            this.setProgress('Creating runtime…', 65);
             this.playBridgeJS = new exports.PlayBridgeJS();
             console.log('BridgeJS initialized successfully');
         } catch (error) {
@@ -171,32 +193,44 @@ export class BridgeJSPlayground {
         });
     }
 
-    createTS2Skeleton() {
+    async createTS2SkeletonFactory() {
+        const createVirtualHost = async () => {
+          const fsMap = await createDefaultMapFromCDN(
+            { target: ts.ScriptTarget.ES2015 },
+            ts.version,
+            true,
+            ts
+          );
+
+          const system = createSystem(fsMap);
+
+          const compilerOptions = {
+            target: ts.ScriptTarget.ES2015,
+            lib: ["es2015", "dom"],
+          };
+
+          return createVirtualCompilerHost(system, compilerOptions, ts);
+        }
+        return await createVirtualHost();
+    }
+
+    /**
+     * @param {ReturnType<typeof createVirtualCompilerHost>} virtualHost
+     */
+    createTS2Skeleton(virtualHost) {
         return {
+            /**
+             * @param {string} dtsCode
+             * @returns {string}
+             */
             convert: (dtsCode) => {
-                const virtualFilePath = "bridge-js.d.ts"
-                const virtualHost = {
-                    fileExists: fileName => fileName === virtualFilePath,
-                    readFile: fileName => dtsCode,
-                    getSourceFile: (fileName, languageVersion) => {
-                        const sourceText = dtsCode;
-                        if (sourceText === undefined) return undefined;
-                        return ts.createSourceFile(fileName, sourceText, languageVersion);
-                    },
-                    getDefaultLibFileName: options => "lib.d.ts",
-                    writeFile: (fileName, data) => {
-                        console.log(`[emit] ${fileName}:\n${data}`);
-                    },
-                    getCurrentDirectory: () => "",
-                    getDirectories: () => [],
-                    getCanonicalFileName: fileName => fileName,
-                    getNewLine: () => "\n",
-                    useCaseSensitiveFileNames: () => true
-                }
                 // Create TypeScript program from d.ts content
+                const virtualFilePath = "bridge-js.d.ts"
+                const sourceFile = ts.createSourceFile(virtualFilePath, dtsCode, ts.ScriptTarget.ES2015);
+                virtualHost.updateFile(sourceFile);
                 const tsProgram = ts.createProgram({
                     rootNames: [virtualFilePath],
-                    host: virtualHost,
+                    host: virtualHost.compilerHost,
                     options: {
                         noEmit: true,
                         declaration: true,
@@ -267,5 +301,43 @@ export class BridgeJSPlayground {
      */
     hideError() {
         this.errorDisplay.classList.remove('show');
+    }
+
+    /**
+     * Shows progress bar.
+     * @param {string} label
+     * @param {number} percent
+     */
+    showProgress(label, percent) {
+        if (this.progressBar) {
+            this.progressBar.classList.add('show');
+            this.progressBar.classList.remove('hidden');
+        }
+        this.setProgress(label, percent);
+    }
+
+    /**
+     * Updates progress label and percentage.
+     * @param {string} label
+     * @param {number} percent
+     */
+    setProgress(label, percent) {
+        if (this.progressLabel) {
+            this.progressLabel.textContent = label;
+        }
+        if (this.progressFill) {
+            const clamped = Math.max(0, Math.min(100, Number(percent) || 0));
+            this.progressFill.style.width = clamped + '%';
+        }
+    }
+
+    /**
+     * Hides progress bar.
+     */
+    hideProgress() {
+        if (this.progressBar) {
+            this.progressBar.classList.remove('show');
+            this.progressBar.classList.add('hidden');
+        }
     }
 }
