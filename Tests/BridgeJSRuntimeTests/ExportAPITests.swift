@@ -307,6 +307,38 @@ enum Internal {
     return .precise(value)
 }
 
+@JS
+enum ComplexResult {
+    case success(String)
+    case error(String, Int)
+    case status(Bool, String)
+    case info
+}
+
+@JS func echoComplexResult(result: ComplexResult) -> ComplexResult {
+    return result
+}
+
+@JS func makeComplexResultSuccess(_ value: String) -> ComplexResult {
+    return .success(value)
+}
+
+@JS func makeComplexResultError(_ message: String, _ code: Int) -> ComplexResult {
+    return .error(message, code)
+}
+
+@JS func makeComplexResultStatus(_ active: Bool, _ message: String) -> ComplexResult {
+    return .status(active, message)
+}
+
+@JS func makeComplexResultInfo() -> ComplexResult {
+    return .info
+}
+
+@JS func roundtripComplexResult(_ result: ComplexResult) -> ComplexResult {
+    return result
+}
+
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false

@@ -448,23 +448,16 @@ public class ExportSwift {
 
             if currentEnum.cases.contains(where: { !$0.associatedValues.isEmpty }) {
                 for c in currentEnum.cases {
-                    let count = c.associatedValues.count
-                    if count > 1 {
-                        diagnose(
-                            node: node,
-                            message: "Multiple associated values are not supported yet",
-                            hint: "Use a single primitive payload (String, Int, Float, Double, Bool)"
-                        )
-                    } else if count == 1, let only = c.associatedValues.first {
-                        switch only.type {
+                    for associatedValue in c.associatedValues {
+                        switch associatedValue.type {
                         case .string, .int, .float, .double, .bool:
                             break
                         default:
                             diagnose(
                                 node: node,
-                                message: "Unsupported associated value type: \(only.type.swiftType)",
+                                message: "Unsupported associated value type: \(associatedValue.type.swiftType)",
                                 hint:
-                                    "Only primitive types (String, Int, Float, Double, Bool) are supported in associated-value enums for now"
+                                    "Only primitive types (String, Int, Float, Double, Bool) are supported in associated-value enums"
                             )
                         }
                     }
@@ -856,20 +849,18 @@ public class ExportSwift {
                     }
                 }
             case .associatedValueEnum(let enumName):
-                let tag = "\(param.name)Tag"
-                let a = "\(param.name)A"
-                let b = "\(param.name)B"
+                let enumBaseName = enumName.components(separatedBy: ".").last ?? enumName
                 abiParameterForwardings.append(
                     LabeledExprSyntax(
                         label: param.label,
                         expression: ExprSyntax(
-                            "\(raw: enumName)(bridgeJSTag: \(raw: tag), a: \(raw: a), b: \(raw: b))!"
+                            "\(raw: enumBaseName).dispatchConstruct(\(raw: param.name)CaseId, \(raw: param.name)ParamsId, \(raw: param.name)ParamsLen)"
                         )
                     )
                 )
-                abiParameterSignatures.append((tag, .i32))
-                abiParameterSignatures.append((a, .i32))
-                abiParameterSignatures.append((b, .i32))
+                abiParameterSignatures.append(("\(param.name)CaseId", .i32))
+                abiParameterSignatures.append(("\(param.name)ParamsId", .i32))
+                abiParameterSignatures.append(("\(param.name)ParamsLen", .i32))
             case .namespaceEnum:
                 break
             case .jsObject(nil):
@@ -1261,6 +1252,405 @@ public class ExportSwift {
             }
             """
     }
+
+    // MARK: - Variable ABI Associated Value Enum Generation
+
+    static func renderVariableABIAssociatedValueEnum(_ enumDef: ExportedEnum) -> DeclSyntax {
+        let typeName = enumDef.swiftCallName
+        var returnCases: [String] = []
+
+        for (i, c) in enumDef.cases.enumerated() {
+            let caseName = c.name
+            let caseIndex = i
+
+            if c.associatedValues.isEmpty {
+                returnCases.append(
+                    """
+                    case .\(caseName):
+                        _swift_js_return_tag(Int32(\(caseIndex)))
+                    """
+                )
+            } else {
+                let returnCase = generateReturnCase(
+                    caseName: caseName,
+                    caseIndex: caseIndex,
+                    associatedValues: c.associatedValues
+                )
+                returnCases.append(returnCase)
+            }
+        }
+
+        let returnSwitch = (["switch self {"] + returnCases + ["}"]).joined(separator: "\n        ")
+
+        let enumBaseName = typeName.components(separatedBy: ".").last ?? typeName
+        return """
+            import Foundation
+
+            extension \(raw: typeName) {
+                func bridgeJSReturn() {
+                    @_extern(wasm, module: "bjs", name: "swift_js_return_tag")
+                    func _swift_js_return_tag(_: Int32)
+                    @_extern(wasm, module: "bjs", name: "swift_js_return_string")
+                    func _swift_js_return_string(_: UnsafePointer<UInt8>?, _: Int32)
+                    @_extern(wasm, module: "bjs", name: "swift_js_return_int")
+                    func _swift_js_return_int(_: Int32)
+                    @_extern(wasm, module: "bjs", name: "swift_js_return_f32")
+                    func _swift_js_return_f32(_: Float32)
+                    @_extern(wasm, module: "bjs", name: "swift_js_return_f64")
+                    func _swift_js_return_f64(_: Float64)
+                    \(raw: returnSwitch)
+                }
+            }
+
+            extension \(raw: enumBaseName) {
+                \(raw: generateCaseSpecificConstructors(enumDef: enumDef).joined(separator: "\n\n                "))
+                
+                static func dispatchConstruct(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> \(raw: typeName) {
+                    let paramsString = String(unsafeUninitializedCapacity: Int(paramsLen)) { buf in
+                        _swift_js_init_memory(paramsId, buf.baseAddress.unsafelyUnwrapped)
+                        return Int(paramsLen)
+                    }
+                    return dispatchConstructFromJson(caseId, paramsString)
+                }
+                
+                static func dispatchConstructFromJson(_ caseId: Int32, _ paramsJson: String) -> \(raw: typeName) {
+                    switch caseId {
+                    \(raw: generateStructuredDispatchCases(enumDef: enumDef).joined(separator: "\n                    "))
+                    default: fatalError("Unknown \(raw: enumBaseName) case ID: \\(caseId)")
+                    }
+                }
+            }
+            """
+    }
+
+    static func generateCaseSpecificConstructors(enumDef: ExportedEnum) -> [String] {
+        var constructors: [String] = []
+        let enumBaseName = enumDef.swiftCallName.components(separatedBy: ".").last ?? enumDef.swiftCallName
+
+        for (i, c) in enumDef.cases.enumerated() {
+            let caseName = c.name
+
+            if c.associatedValues.isEmpty {
+                constructors.append(
+                    """
+                    static func constructFrom\(enumBaseName)_\(i)() -> \(enumDef.swiftCallName) { 
+                        return .\(caseName) 
+                    }
+                    """
+                )
+            } else {
+                var params: [String] = []
+                var args: [String] = []
+
+                for (j, av) in c.associatedValues.enumerated() {
+                    let paramName = av.label ?? "param\(j)"
+
+                    switch av.type {
+                    case .string:
+                        params.append("\(paramName): String")
+                        args.append("\(paramName)")
+                    case .int:
+                        params.append("\(paramName): Int32")
+                        args.append("Int(\(paramName))")
+                    case .bool:
+                        params.append("\(paramName): Int32")
+                        args.append("(\(paramName) != 0)")
+                    case .float:
+                        params.append("\(paramName): Float32")
+                        args.append("\(paramName)")
+                    case .double:
+                        params.append("\(paramName): Float64")
+                        args.append("\(paramName)")
+                    default:
+                        params.append("\(paramName): Int32")
+                        args.append("\(paramName)")
+                    }
+                }
+
+                let paramList = params.joined(separator: ", ")
+                let argList = args.joined(separator: ", ")
+
+                constructors.append(
+                    """
+                    static func constructFrom\(enumBaseName)_\(i)(\(paramList)) -> \(enumDef.swiftCallName) { 
+                        return .\(caseName)(\(argList)) 
+                    }
+                    """
+                )
+            }
+        }
+
+        return constructors
+    }
+
+    static func generateDispatchCases(enumDef: ExportedEnum) -> [String] {
+        var cases: [String] = []
+        let enumBaseName = enumDef.swiftCallName.components(separatedBy: ".").last ?? enumDef.swiftCallName
+
+        for (i, c) in enumDef.cases.enumerated() {
+            if c.associatedValues.isEmpty {
+                cases.append("case \(i): return constructFrom\(enumBaseName)_\(i)()")
+            } else {
+                // For cases with parameters, we'll extract them from the pointer
+                var paramExtractions: [String] = []
+                var paramPasses: [String] = []
+                var offset = 0
+
+                for (j, av) in c.associatedValues.enumerated() {
+                    let paramName = av.label ?? "param\(j)"
+
+                    switch av.type {
+                    case .string:
+                        paramExtractions.append(
+                            "let \(paramName)_ptr = params.load(fromByteOffset: \(offset), as: UnsafePointer<UInt8>.self)"
+                        )
+                        paramExtractions.append(
+                            "let \(paramName)_len = params.load(fromByteOffset: \(offset + 8), as: Int32.self)"
+                        )
+                        paramPasses.append("\(paramName)_ptr: \(paramName)_ptr")
+                        paramPasses.append("\(paramName)_len: \(paramName)_len")
+                        offset += 16  // 8 bytes for pointer + 4 bytes for length + padding
+                    case .int:
+                        paramExtractions.append(
+                            "let \(paramName) = params.load(fromByteOffset: \(offset), as: Int32.self)"
+                        )
+                        paramPasses.append("\(paramName): \(paramName)")
+                        offset += 4
+                    case .bool:
+                        paramExtractions.append(
+                            "let \(paramName) = params.load(fromByteOffset: \(offset), as: Int32.self)"
+                        )
+                        paramPasses.append("\(paramName): \(paramName)")
+                        offset += 4
+                    case .float:
+                        paramExtractions.append(
+                            "let \(paramName) = params.load(fromByteOffset: \(offset), as: Float32.self)"
+                        )
+                        paramPasses.append("\(paramName): \(paramName)")
+                        offset += 4
+                    case .double:
+                        paramExtractions.append(
+                            "let \(paramName) = params.load(fromByteOffset: \(offset), as: Float64.self)"
+                        )
+                        paramPasses.append("\(paramName): \(paramName)")
+                        offset += 8
+                    default:
+                        paramExtractions.append(
+                            "let \(paramName) = params.load(fromByteOffset: \(offset), as: Int32.self)"
+                        )
+                        paramPasses.append("\(paramName): \(paramName)")
+                        offset += 4
+                    }
+                }
+
+                let extractionCode = paramExtractions.joined(separator: "; ")
+                let paramList = paramPasses.joined(separator: ", ")
+
+                cases.append("case \(i): \(extractionCode); return constructFrom\(enumBaseName)_\(i)(\(paramList))")
+            }
+        }
+
+        return cases
+    }
+
+    static func generateReturnCase(caseName: String, caseIndex: Int, associatedValues: [AssociatedValue]) -> String {
+        var returnStatements: [String] = []
+        returnStatements.append("_swift_js_return_tag(Int32(\(caseIndex)))")
+
+        for (i, av) in associatedValues.enumerated() {
+            let paramName = av.label ?? "param\(i)"
+
+            switch av.type {
+            case .string:
+                returnStatements.append(
+                    """
+                    var mutable\(paramName.capitalized) = \(paramName)
+                    mutable\(paramName.capitalized).withUTF8 { ptr in
+                        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                    }
+                    """
+                )
+            case .int:
+                returnStatements.append("_swift_js_return_int(Int32(\(paramName)))")
+            case .bool:
+                returnStatements.append("_swift_js_return_int(\(paramName) ? 1 : 0)")
+            case .float:
+                returnStatements.append("_swift_js_return_f32(\(paramName))")
+            case .double:
+                returnStatements.append("_swift_js_return_f64(\(paramName))")
+            default:
+                returnStatements.append("_swift_js_return_int(0)")
+            }
+        }
+
+        let returnCode = returnStatements.joined(separator: "\n            ")
+        return """
+            case .\(caseName)(let \(associatedValues.enumerated().map { av in av.1.label ?? "param\(av.0)" }.joined(separator: ", let "))):
+                \(returnCode)
+            """
+    }
+
+    static func generateStructuredDispatchCases(enumDef: ExportedEnum) -> [String] {
+        var cases: [String] = []
+        let enumBaseName = enumDef.swiftCallName.components(separatedBy: ".").last ?? enumDef.swiftCallName
+
+        for (i, c) in enumDef.cases.enumerated() {
+            if c.associatedValues.isEmpty {
+                cases.append("case \(i): return constructFrom\(enumBaseName)_\(i)()")
+            } else {
+                // Parse JSON parameters and call constructor
+                var paramExtractions: [String] = []
+                var paramPasses: [String] = []
+
+                for (j, av) in c.associatedValues.enumerated() {
+                    let paramName = av.label ?? "param\(j)"
+
+                    switch av.type {
+                    case .string:
+                        paramExtractions.append("let \(paramName) = params[\"\(paramName)\"] as! String")
+                        paramPasses.append("\(paramName): \(paramName)")
+                    case .int:
+                        paramExtractions.append("let \(paramName) = params[\"\(paramName)\"] as! Int32")
+                        paramPasses.append("\(paramName): \(paramName)")
+                    case .bool:
+                        paramExtractions.append("let \(paramName) = Int32(params[\"\(paramName)\"] as! Bool ? 1 : 0)")
+                        paramPasses.append("\(paramName): \(paramName)")
+                    case .float:
+                        paramExtractions.append("let \(paramName) = params[\"\(paramName)\"] as! Float32")
+                        paramPasses.append("\(paramName): \(paramName)")
+                    case .double:
+                        paramExtractions.append("let \(paramName) = params[\"\(paramName)\"] as! Float64")
+                        paramPasses.append("\(paramName): \(paramName)")
+                    default:
+                        paramExtractions.append("let \(paramName) = params[\"\(paramName)\"] as! Int32")
+                        paramPasses.append("\(paramName): \(paramName)")
+                    }
+                }
+
+                let extractionCode = paramExtractions.joined(separator: "; ")
+                let paramList = paramPasses.joined(separator: ", ")
+
+                cases.append(
+                    """
+                    case \(i): 
+                        guard let data = paramsJson.data(using: .utf8),
+                              let params = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                            fatalError("Failed to parse parameters JSON")
+                        }
+                        \(extractionCode)
+                        return constructFrom\(enumBaseName)_\(i)(\(paramList))
+                    """
+                )
+            }
+        }
+
+        return cases
+    }
+
+    static func generateConstructorCall(
+        enumType: String,
+        caseName: String,
+        associatedValues: [AssociatedValue]
+    ) -> String {
+        var params: [String] = []
+
+        // For simplicity, we'll handle the most common case: single parameter using (a, b) as needed
+        if associatedValues.count == 1 {
+            let av = associatedValues[0]
+            let paramName = av.label ?? "param0"
+
+            switch av.type {
+            case .string:
+                params.append("\(paramName)_ptr: UnsafePointer<UInt8>(bitPattern: UInt(a)).unsafelyUnwrapped")
+                params.append("\(paramName)_len: b")
+            case .int:
+                params.append("\(paramName): a")
+            case .bool:
+                params.append("\(paramName): (a != 0)")
+            case .float:
+                params.append("\(paramName): Float32(bitPattern: UInt32(a))")
+            case .double:
+                params.append("\(paramName): Double(bitPattern: UInt64(a) | (UInt64(b) << 32))")
+            default:
+                params.append("\(paramName): a")
+            }
+        } else {
+            // For multiple parameters, this is more complex - for now, use fatalError
+            return "fatalError(\"Multiple parameter cases not yet implemented for \\\(caseName)\")"
+        }
+
+        return "\(enumType).create\(caseName)(\(params.joined(separator: ", ")))"
+    }
+
+    static func renderCaseSpecificConstructor(
+        enumType: String,
+        caseIndex: Int,
+        caseName: String,
+        associatedValues: [AssociatedValue]
+    ) -> (constructorFunc: String, returnCase: String) {
+
+        // Generate case-specific constructor function with native WASM parameters
+        var constructorParams: [String] = []
+        var constructorArgs: [String] = []
+        var returnStatements: [String] = []
+
+        for (i, av) in associatedValues.enumerated() {
+            let paramName = av.label ?? "param\(i)"
+            let labelPrefix = av.label.map { "\($0): " } ?? ""
+
+            switch av.type {
+            case .string:
+                constructorParams.append("\(paramName)_ptr: UnsafePointer<UInt8>")
+                constructorParams.append("\(paramName)_len: Int32")
+                constructorArgs.append(
+                    "\(labelPrefix)String(unsafeUninitializedCapacity: Int(\(paramName)_len)) { buf in _swift_js_init_memory(Int32(bitPattern: \(paramName)_ptr), buf.baseAddress.unsafelyUnwrapped); return Int(\(paramName)_len) }"
+                )
+                returnStatements.append(
+                    """
+                    var mutable\(paramName.capitalized) = \(paramName)
+                    mutable\(paramName.capitalized).withUTF8 { ptr in
+                        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                    }
+                    """
+                )
+            case .int:
+                constructorParams.append("\(paramName): Int32")
+                constructorArgs.append("\(labelPrefix)Int(\(paramName))")
+                returnStatements.append("_swift_js_return_int(Int32(\(paramName)))")
+            case .bool:
+                constructorParams.append("\(paramName): Int32")
+                constructorArgs.append("\(labelPrefix)(\(paramName) != 0)")
+                returnStatements.append("_swift_js_return_int(\(paramName) ? 1 : 0)")
+            case .float:
+                constructorParams.append("\(paramName): Float32")
+                constructorArgs.append("\(labelPrefix)\(paramName)")
+                returnStatements.append("_swift_js_return_f32(\(paramName))")
+            case .double:
+                constructorParams.append("\(paramName): Float64")
+                constructorArgs.append("\(labelPrefix)\(paramName)")
+                returnStatements.append("_swift_js_return_f64(\(paramName))")
+            default:
+                constructorParams.append("\(paramName): Int32")
+                constructorArgs.append("\(labelPrefix)/* unsupported type */")
+                returnStatements.append("// Unsupported type for \(paramName)")
+            }
+        }
+
+        // Generate the case-specific constructor function
+        let constructorFunc = """
+            static func create\(caseName.capitalized)(\(constructorParams.joined(separator: ", "))) -> \(enumType) {
+                return .\(caseName)(\(constructorArgs.joined(separator: ", ")))
+            }
+            """
+
+        let returnCase = """
+            case .\(caseName)(\(associatedValues.enumerated().map { i, av in "let \(av.label ?? "param\(i)")" }.joined(separator: ", "))):
+                _swift_js_return_tag(Int32(\(caseIndex)))
+                \(returnStatements.joined(separator: "\n                "))
+            """
+
+        return (constructorFunc, returnCase)
+    }
 }
 
 fileprivate enum Constants {
@@ -1335,121 +1725,6 @@ extension BridgeType {
 }
 
 func renderAssociatedValueEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
-    let typeName = enumDef.swiftCallName
-
-    func payloadInitCase(index: Int, name: String, av: AssociatedValue) -> String {
-        let labelPrefix = av.label.map { "\($0): " } ?? ""
-        switch av.type {
-        case .string:
-            return """
-                case \(index):
-                    let s = String(unsafeUninitializedCapacity: Int(b)) { buf in
-                        _swift_js_init_memory(a, buf.baseAddress.unsafelyUnwrapped)
-                        return Int(b)
-                    }
-                    self = .\(name)(\(labelPrefix)s)
-                """
-        case .int:
-            return "case \(index): self = .\(name)(\(labelPrefix)Int(a))"
-        case .bool:
-            return "case \(index): self = .\(name)(\(labelPrefix)(a != 0))"
-        case .float:
-            return "case \(index): self = .\(name)(\(labelPrefix)Float(bitPattern: UInt32(bitPattern: a)))"
-        case .double:
-            return """
-                case \(index):
-                    let bits = UInt64(UInt32(bitPattern: a)) | (UInt64(UInt32(bitPattern: b)) << 32)
-                    self = .\(name)(\(labelPrefix)Double(bitPattern: bits))
-                """
-        default:
-            return "case \(index): return nil"
-        }
-    }
-
-    var initCases: [String] = []
-    for (i, c) in enumDef.cases.enumerated() {
-        if let av = c.associatedValues.first {
-            initCases.append(payloadInitCase(index: i, name: c.name, av: av))
-        } else {
-            initCases.append("case \(i): self = .\(c.name)")
-        }
-    }
-    let initSwitch = (["switch bridgeJSTag {"] + initCases + ["default: return nil", "}"]).joined(separator: "\n")
-
-    func payloadReturnCase(index: Int, name: String, av: AssociatedValue) -> String {
-        switch av.type {
-        case .string:
-            return """
-                case .\(name)(let value):
-                    _swift_js_return_tag(Int32(\(index)))
-                    var ret = value
-                    ret.withUTF8 { ptr in
-                        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-                    }
-                """
-        case .int:
-            return """
-                case .\(name)(let value):
-                    _swift_js_return_tag(Int32(\(index)))
-                    _swift_js_return_int(Int32(value))
-                """
-        case .bool:
-            return """
-                case .\(name)(let value):
-                    _swift_js_return_tag(Int32(\(index)))
-                    _swift_js_return_int(value ? 1 : 0)
-                """
-        case .float:
-            return """
-                case .\(name)(let value):
-                    _swift_js_return_tag(Int32(\(index)))
-                    _swift_js_return_f32(value)
-                """
-        case .double:
-            return """
-                case .\(name)(let value):
-                    _swift_js_return_tag(Int32(\(index)))
-                    _swift_js_return_f64(value)
-                """
-        default:
-            return ""
-        }
-    }
-
-    var returnCases: [String] = []
-    for (i, c) in enumDef.cases.enumerated() {
-        if let av = c.associatedValues.first {
-            returnCases.append(payloadReturnCase(index: i, name: c.name, av: av))
-        } else {
-            returnCases.append(
-                """
-                case .\(c.name):
-                    _swift_js_return_tag(Int32(\(i)))
-                """
-            )
-        }
-    }
-    let returnSwitch = (["switch self {"] + returnCases + ["}"]).joined(separator: "\n")
-
-    return """
-        extension \(raw: typeName) {
-            init?(bridgeJSTag: Int32, a: Int32, b: Int32) {
-                \(raw: initSwitch)
-            }
-
-            func bridgeJSReturn() {
-                @_extern(wasm, module: "bjs", name: "swift_js_return_tag")
-                func _swift_js_return_tag(_: Int32)
-                @_extern(wasm, module: "bjs", name: "swift_js_return_string")
-                func _swift_js_return_string(_: UnsafePointer<UInt8>?, _: Int32)
-                @_extern(wasm, module: "bjs", name: "swift_js_return_int")
-                func _swift_js_return_int(_: Int32)
-                @_extern(wasm, module: "bjs", name: "swift_js_return_f32")
-                func _swift_js_return_f32(_: Float32)
-                @_extern(wasm, module: "bjs", name: "swift_js_return_f64")
-                func _swift_js_return_f64(_: Float64)
-                \(raw: returnSwitch)
-            }
-        }
-        """
+    // Use Variable ABI approach for all associated value enums
+    return ExportSwift.renderVariableABIAssociatedValueEnum(enumDef)
 }

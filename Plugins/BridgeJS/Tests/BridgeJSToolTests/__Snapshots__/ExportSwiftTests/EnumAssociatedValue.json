@@ -75,6 +75,69 @@
       "emitStyle" : "const",
       "name" : "APIResult",
       "swiftCallName" : "APIResult"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "error"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "status"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "info"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "ComplexResult",
+      "swiftCallName" : "ComplexResult"
     }
   ],
   "functions" : [
@@ -115,6 +178,46 @@
       "returnType" : {
         "associatedValueEnum" : {
           "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_handleComplex",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "handleComplex",
+      "parameters" : [
+        {
+          "label" : "result",
+          "name" : "result",
+          "type" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getComplexResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "getComplexResult",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
         }
       }
     }

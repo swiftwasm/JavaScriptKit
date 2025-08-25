@@ -208,8 +208,9 @@ struct BridgeJSLink {
         let namespaceAssignmentsSection =
             topLevelNamespaceCode.isEmpty ? "" : topLevelNamespaceCode.joined(separator: "\n") + "\n\n"
         let enumHelpers = renderEnumHelperAssignments()
-        let enumHelpersSection = enumHelpers.isEmpty ? "" : "\n\n" + enumHelpers.map { $0.indent(count: 12) }.joined(separator: "\n")
-        
+        let enumHelpersSection =
+            enumHelpers.isEmpty ? "" : "\n\n" + enumHelpers.map { $0.indent(count: 12) }.joined(separator: "\n")
+
         let outputJs = """
             // NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
             // DO NOT EDIT.
@@ -455,15 +456,17 @@ struct BridgeJSLink {
                 }
             case .associatedValueEnum(let enumName):
                 let helperBase = enumName.components(separatedBy: ".").last ?? enumName
-                let tagName = "\(param.name)Tag"
-                let aName = "\(param.name)A"
-                let bName = "\(param.name)B"
+                let caseIdName = "\(param.name)CaseId"
+                let paramsIdName = "\(param.name)ParamsId"
+                let paramsLenName = "\(param.name)ParamsLen"
                 let cleanupName = "\(param.name)Cleanup"
                 bodyLines.append(
-                    "const { tag: \(tagName), a: \(aName), b: \(bName), cleanup: \(cleanupName) } = globalThis.__bjs_lower_\(helperBase)(\(param.name));"
+                    "const { caseId: \(caseIdName), paramsId: \(paramsIdName), paramsLen: \(paramsLenName), cleanup: \(cleanupName) } = globalThis.__bjs_lower_\(helperBase)(\(param.name));"
                 )
                 cleanupLines.append("if (\(cleanupName)) { \(cleanupName)(); }")
-                parameterForwardings.append(contentsOf: [tagName, aName, bName])
+                parameterForwardings.append(caseIdName)
+                parameterForwardings.append(paramsIdName)
+                parameterForwardings.append(paramsLenName)
             case .namespaceEnum:
                 break
             case .jsObject:
@@ -724,20 +727,6 @@ struct BridgeJSLink {
                 jsLines.append("")
                 jsLines.append("// Helper factory for \(base) enum")
                 jsLines.append("const __bjs_create\(base)Helpers = () => {")
-                jsLines.append("const f32buf = new ArrayBuffer(4);".indent(count: 4))
-                jsLines.append("const f32dv = new DataView(f32buf);".indent(count: 4))
-                jsLines.append("const f64buf = new ArrayBuffer(8);".indent(count: 4))
-                jsLines.append("const f64dv = new DataView(f64buf);".indent(count: 4))
-                jsLines.append("")
-                jsLines.append(
-                    "const f32ToI32 = (v) => { f32dv.setFloat32(0, Math.fround(v), true); return f32dv.getInt32(0, true); };"
-                        .indent(count: 4)
-                )
-                jsLines.append(
-                    "const f64ToI32x2 = (v) => { f64dv.setFloat64(0, v, true); return [f64dv.getInt32(0, true), f64dv.getInt32(4, true)]; };"
-                        .indent(count: 4)
-                )
-                jsLines.append("")
                 jsLines.append("return (textEncoder, swift) => ({".indent(count: 4))
                 jsLines.append("lower: (value) => {".indent(count: 8))
                 jsLines.append("const t = value.tag;".indent(count: 12))
@@ -745,45 +734,49 @@ struct BridgeJSLink {
                 for (index, enumCase) in enumDefinition.cases.enumerated() {
                     let caseName = enumCase.name.capitalizedFirstLetter
                     if enumCase.associatedValues.isEmpty {
+                        jsLines.append("case \(base).Tag.\(caseName): {".indent(count: 16))
+                        jsLines.append("const paramsBytes = textEncoder.encode(\"{}\");".indent(count: 20))
+                        jsLines.append("const paramsId = swift.memory.retain(paramsBytes);".indent(count: 20))
                         jsLines.append(
-                            "case \(base).Tag.\(caseName): return { tag: \(index), a: 0, b: 0 };".indent(count: 16)
+                            "return { caseId: \(index), paramsId: paramsId, paramsLen: paramsBytes.length, cleanup: () => { swift.memory.release(paramsId); } };"
+                                .indent(count: 20)
                         )
-                    } else if let av = enumCase.associatedValues.first {
-                        switch av.type {
-                        case .string:
-                            jsLines.append("case \(base).Tag.\(caseName): {".indent(count: 16))
-                            jsLines.append("const bytes = textEncoder.encode(value.value);".indent(count: 20))
-                            jsLines.append("const id = swift.memory.retain(bytes);".indent(count: 20))
-                            jsLines.append(
-                                "return { tag: \(index), a: id, b: bytes.length, cleanup: () => swift.memory.release(id) };"
-                                    .indent(count: 20)
-                            )
-                            jsLines.append("}".indent(count: 16))
-                        case .bool:
-                            jsLines.append(
-                                "case \(base).Tag.\(caseName): return { tag: \(index), a: (value.value ? 1 : 0), b: 0 };"
-                                    .indent(count: 16)
-                            )
-                        case .int:
-                            jsLines.append(
-                                "case \(base).Tag.\(caseName): return { tag: \(index), a: (value.value | 0), b: 0 };"
-                                    .indent(count: 16)
-                            )
-                        case .float:
-                            jsLines.append(
-                                "case \(base).Tag.\(caseName): return { tag: \(index), a: f32ToI32(value.value), b: 0 };"
-                                    .indent(count: 16)
-                            )
-                        case .double:
-                            jsLines.append("case \(base).Tag.\(caseName): {".indent(count: 16))
-                            jsLines.append("const [lo, hi] = f64ToI32x2(value.value);".indent(count: 20))
-                            jsLines.append("return { tag: \(index), a: lo, b: hi };".indent(count: 20))
-                            jsLines.append("}".indent(count: 16))
-                        default:
-                            jsLines.append(
-                                "case \(base).Tag.\(caseName): return { tag: \(index), a: 0, b: 0 };".indent(count: 16)
-                            )
+                        jsLines.append("}".indent(count: 16))
+                    } else {
+                        jsLines.append("case \(base).Tag.\(caseName): {".indent(count: 16))
+
+                        var parameterObject: [String] = []
+
+                        for (i, av) in enumCase.associatedValues.enumerated() {
+                            let fieldName = av.label ?? "param\(i)"
+                            switch av.type {
+                            case .string:
+                                parameterObject.append("\"\(fieldName)\": value.\(fieldName)")
+                            case .int:
+                                parameterObject.append("\"\(fieldName)\": (value.\(fieldName) | 0)")
+                            case .bool:
+                                parameterObject.append("\"\(fieldName)\": value.\(fieldName)")
+                            case .float:
+                                parameterObject.append("\"\(fieldName)\": Math.fround(value.\(fieldName))")
+                            case .double:
+                                parameterObject.append("\"\(fieldName)\": value.\(fieldName)")
+                            default:
+                                parameterObject.append("\"\(fieldName)\": 0")
+                            }
                         }
+
+                        jsLines.append(
+                            "const paramsObj = { \(parameterObject.joined(separator: ", ")) };".indent(count: 20)
+                        )
+                        jsLines.append("const paramsJson = JSON.stringify(paramsObj);".indent(count: 20))
+                        jsLines.append("const paramsBytes = textEncoder.encode(paramsJson);".indent(count: 20))
+                        jsLines.append("const paramsId = swift.memory.retain(paramsBytes);".indent(count: 20))
+                        jsLines.append(
+                            "return { caseId: \(index), paramsId: paramsId, paramsLen: paramsBytes.length, cleanup: () => { swift.memory.release(paramsId); } };"
+                                .indent(count: 20)
+                        )
+
+                        jsLines.append("}".indent(count: 16))
                     }
                 }
                 jsLines.append("default: throw new Error(\"Unknown \(base) tag: \" + String(t));".indent(count: 16))
@@ -798,39 +791,28 @@ struct BridgeJSLink {
                     let caseName = enumCase.name.capitalizedFirstLetter
                     if enumCase.associatedValues.isEmpty {
                         jsLines.append("case \(index): return { tag: \(base).Tag.\(caseName) };".indent(count: 16))
-                    } else if let av = enumCase.associatedValues.first {
-                        switch av.type {
-                        case .string:
-                            jsLines.append(
-                                "case \(index): return { tag: \(base).Tag.\(caseName), value: tmpRetString };".indent(
-                                    count: 16
-                                )
-                            )
-                        case .bool:
-                            jsLines.append(
-                                "case \(index): return { tag: \(base).Tag.\(caseName), value: (tmpRetInt !== 0) };"
-                                    .indent(count: 16)
-                            )
-                        case .int:
-                            jsLines.append(
-                                "case \(index): return { tag: \(base).Tag.\(caseName), value: tmpRetInt | 0 };".indent(
-                                    count: 16
-                                )
-                            )
-                        case .float:
-                            jsLines.append(
-                                "case \(index): return { tag: \(base).Tag.\(caseName), value: Math.fround(tmpRetF32) };"
-                                    .indent(count: 20)
-                            )
-                        case .double:
-                            jsLines.append(
-                                "case \(index): return { tag: \(base).Tag.\(caseName), value: tmpRetF64 };".indent(
-                                    count: 16
-                                )
-                            )
-                        default:
-                            jsLines.append("case \(index): return { tag: \(base).Tag.\(caseName) };".indent(count: 16))
+                    } else {
+                        var fields: [String] = ["tag: \(base).Tag.\(caseName)"]
+
+                        for (i, av) in enumCase.associatedValues.enumerated() {
+                            let fieldName = av.label ?? "param\(i)"
+                            switch av.type {
+                            case .string:
+                                fields.append("\(fieldName): tmpRetString")
+                            case .bool:
+                                fields.append("\(fieldName): (tmpRetInt !== 0)")
+                            case .int:
+                                fields.append("\(fieldName): tmpRetInt | 0")
+                            case .float:
+                                fields.append("\(fieldName): Math.fround(tmpRetF32)")
+                            case .double:
+                                fields.append("\(fieldName): tmpRetF64")
+                            default:
+                                fields.append("\(fieldName): undefined")
+                            }
                         }
+
+                        jsLines.append("case \(index): return { \(fields.joined(separator: ", ")) };".indent(count: 16))
                     }
                 }
                 jsLines.append(
@@ -858,15 +840,20 @@ struct BridgeJSLink {
                     let caseName = enumCase.name.capitalizedFirstLetter
                     if enumCase.associatedValues.isEmpty {
                         unionParts.append("{ tag: typeof \(enumDefinition.name).Tag.\(caseName) }")
-                    } else if let av = enumCase.associatedValues.first {
-                        let ts: String
-                        switch av.type {
-                        case .string: ts = "string"
-                        case .bool: ts = "boolean"
-                        case .int, .float, .double: ts = "number"
-                        default: ts = "never"
+                    } else {
+                        var fields: [String] = ["tag: typeof \(enumDefinition.name).Tag.\(caseName)"]
+                        for (i, av) in enumCase.associatedValues.enumerated() {
+                            let fieldName = av.label ?? "param\(i)"
+                            let ts: String
+                            switch av.type {
+                            case .string: ts = "string"
+                            case .bool: ts = "boolean"
+                            case .int, .float, .double: ts = "number"
+                            default: ts = "never"
+                            }
+                            fields.append("\(fieldName): \(ts)")
                         }
-                        unionParts.append("{ tag: typeof \(enumDefinition.name).Tag.\(caseName); value: \(ts) }")
+                        unionParts.append("{ \(fields.joined(separator: "; ")) }")
                     }
                 }
                 dtsBuf.append("export type \(enumDefinition.name) =")

@@ -1,7 +1,7 @@
 // @ts-check
 
-import { 
-    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme, APIResult
+import {
+    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme, APIResult, ComplexResult
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
@@ -252,35 +252,55 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     const globalTestServer = new globalThis.Networking.APIV2.Internal.TestServer();
     globalTestServer.call(globalThis.Networking.APIV2.Internal.SupportedMethod.Post);
     globalTestServer.release();
-    
-    const s1 = { tag: APIResult.Tag.Success, value: "Cześć 🙋‍♂️" };
-    const f1 = { tag: APIResult.Tag.Failure, value: 42 };
+
+    const s1 = { tag: APIResult.Tag.Success, param0: "Cześć 🙋‍♂️" };
+    const f1 = { tag: APIResult.Tag.Failure, param0: 42 };
     const i1 = { tag: APIResult.Tag.Info };
-    
+
     assert.deepEqual(exports.echoAPIResult(s1), s1);
     assert.deepEqual(exports.echoAPIResult(f1), f1);
     assert.deepEqual(exports.echoAPIResult(i1), i1);
 
-    assert.deepEqual(exports.makeAPIResultSuccess("ok"), { tag: APIResult.Tag.Success, value: "ok" });
-    assert.deepEqual(exports.makeAPIResultFailure(123), { tag: APIResult.Tag.Failure, value: 123 });
+
+    assert.deepEqual(exports.makeAPIResultSuccess("Test"), { tag: APIResult.Tag.Success, param0: "Test" });
+    assert.deepEqual(exports.makeAPIResultSuccess("ok"), { tag: APIResult.Tag.Success, param0: "ok" });
+    assert.deepEqual(exports.makeAPIResultFailure(123), { tag: APIResult.Tag.Failure, param0: 123 });
     assert.deepEqual(exports.makeAPIResultInfo(), { tag: APIResult.Tag.Info });
-    
-    const bTrue = { tag: APIResult.Tag.Flag, value: true };
-    const bFalse = { tag: APIResult.Tag.Flag, value: false };
-    assert.deepEqual(exports.echoAPIResult(bTrue), bTrue);
-    assert.deepEqual(exports.echoAPIResult(bFalse), bFalse);
+
+    const bTrue = { tag: APIResult.Tag.Flag, param0: true };
+    const bFalse = { tag: APIResult.Tag.Flag, param0: false };
     assert.deepEqual(exports.makeAPIResultFlag(true), bTrue);
     assert.deepEqual(exports.makeAPIResultFlag(false), bFalse);
-    
+
     const rVal = 3.25;
-    const r1 = { tag: APIResult.Tag.Rate, value: rVal };
+    const r1 = { tag: APIResult.Tag.Rate, param0: rVal };
     assert.deepEqual(exports.echoAPIResult(r1), r1);
     assert.deepEqual(exports.makeAPIResultRate(rVal), r1);
-    
+
     const pVal = 3.141592653589793;
-    const p1 = { tag: APIResult.Tag.Precise, value: pVal };
+    const p1 = { tag: APIResult.Tag.Precise, param0: pVal };
     assert.deepEqual(exports.echoAPIResult(p1), p1);
     assert.deepEqual(exports.makeAPIResultPrecise(pVal), p1);
+
+    const cs1 = { tag: ComplexResult.Tag.Success, param0: "All good!" };
+    const ce1 = { tag: ComplexResult.Tag.Error, param0: "Network error", param1: 503 };
+    const cst1 = { tag: ComplexResult.Tag.Status, param0: true, param1: "OK" };
+    const ci1 = { tag: ComplexResult.Tag.Info };
+
+    assert.deepEqual(exports.echoComplexResult(cs1), cs1);
+    assert.deepEqual(exports.echoComplexResult(ce1), ce1);
+    assert.deepEqual(exports.echoComplexResult(cst1), cst1);
+    assert.deepEqual(exports.echoComplexResult(ci1), ci1);
+
+    assert.deepEqual(exports.roundtripComplexResult(cs1), cs1);
+    assert.deepEqual(exports.roundtripComplexResult(ce1), ce1);
+    assert.deepEqual(exports.roundtripComplexResult(cst1), cst1);
+    assert.deepEqual(exports.roundtripComplexResult(ci1), ci1);
+
+    assert.deepEqual(exports.makeComplexResultSuccess("Great!"), { tag: ComplexResult.Tag.Success, param0: "Great!" });
+    assert.deepEqual(exports.makeComplexResultError("Timeout", 408), { tag: ComplexResult.Tag.Error, param0: "Timeout", param1: 408 });
+    assert.deepEqual(exports.makeComplexResultStatus(false, "Internal Server Error"), { tag: ComplexResult.Tag.Status, param0: false, param1: "Internal Server Error" });
+    assert.deepEqual(exports.makeComplexResultInfo(), { tag: ComplexResult.Tag.Info });
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

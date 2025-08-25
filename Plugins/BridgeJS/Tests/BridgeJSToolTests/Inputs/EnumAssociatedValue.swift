@@ -10,3 +10,14 @@ enum APIResult {
 
 @JS func handle(result: APIResult)
 @JS func getResult() -> APIResult
+
+@JS
+enum ComplexResult {
+    case success(String)
+    case error(String, Int)
+    case status(Bool, String)
+    case info
+}
+
+@JS func handleComplex(result: ComplexResult)
+@JS func getComplexResult() -> ComplexResult

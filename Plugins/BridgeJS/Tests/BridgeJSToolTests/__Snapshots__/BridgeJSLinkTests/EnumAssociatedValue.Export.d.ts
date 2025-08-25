@@ -16,11 +16,25 @@ export const APIResult: {
 };
 
 export type APIResult =
-  { tag: typeof APIResult.Tag.Success; value: string } | { tag: typeof APIResult.Tag.Failure; value: number } | { tag: typeof APIResult.Tag.Flag; value: boolean } | { tag: typeof APIResult.Tag.Rate; value: number } | { tag: typeof APIResult.Tag.Precise; value: number } | { tag: typeof APIResult.Tag.Info }
+  { tag: typeof APIResult.Tag.Success; param0: string } | { tag: typeof APIResult.Tag.Failure; param0: number } | { tag: typeof APIResult.Tag.Flag; param0: boolean } | { tag: typeof APIResult.Tag.Rate; param0: number } | { tag: typeof APIResult.Tag.Precise; param0: number } | { tag: typeof APIResult.Tag.Info }
+
+export const ComplexResult: {
+    readonly Tag: {
+        readonly Success: 0;
+        readonly Error: 1;
+        readonly Status: 2;
+        readonly Info: 3;
+    };
+};
+
+export type ComplexResult =
+  { tag: typeof ComplexResult.Tag.Success; param0: string } | { tag: typeof ComplexResult.Tag.Error; param0: string; param1: number } | { tag: typeof ComplexResult.Tag.Status; param0: boolean; param1: string } | { tag: typeof ComplexResult.Tag.Info }
 
 export type Exports = {
     handle(result: APIResult): void;
     getResult(): APIResult;
+    handleComplex(result: ComplexResult): void;
+    getComplexResult(): ComplexResult;
 }
 export type Imports = {
 }

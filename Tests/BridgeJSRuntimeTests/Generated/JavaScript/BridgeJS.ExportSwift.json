@@ -645,6 +645,69 @@
       "emitStyle" : "const",
       "name" : "APIResult",
       "swiftCallName" : "APIResult"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "error"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "status"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "info"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "ComplexResult",
+      "swiftCallName" : "ComplexResult"
     }
   ],
   "functions" : [
@@ -1715,6 +1778,160 @@
       "returnType" : {
         "associatedValueEnum" : {
           "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_echoComplexResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "echoComplexResult",
+      "parameters" : [
+        {
+          "label" : "result",
+          "name" : "result",
+          "type" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeComplexResultSuccess",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeComplexResultSuccess",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "value",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeComplexResultError",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeComplexResultError",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "message",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "code",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeComplexResultStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeComplexResultStatus",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "active",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "message",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeComplexResultInfo",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeComplexResultInfo",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundtripComplexResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundtripComplexResult",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "result",
+          "type" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
         }
       }
     }
