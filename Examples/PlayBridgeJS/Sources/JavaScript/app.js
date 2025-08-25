@@ -3,6 +3,11 @@ import { EditorSystem } from './editor.js';
 import ts from 'typescript';
 import { TypeProcessor } from './processor.js';
 import { CodeShareManager } from './code-share.js';
+import {
+  createSystem,
+  createDefaultMapFromCDN,
+  createVirtualCompilerHost
+} from '@typescript/vfs';
 
 /**
  * @typedef {import('../../.build/plugins/PackageToJS/outputs/Package/bridge-js.js').PlayBridgeJS} PlayBridgeJS
@@ -81,12 +86,11 @@ export class BridgeJSPlayground {
         try {
             // Import the BridgeJS module
             const { init } = await import("../../.build/plugins/PackageToJS/outputs/Package/index.js");
+            const virtualHost = await this.createTS2SkeletonFactory();
             const { exports } = await init({
-                getImports: () => {
-                    return {
-                        createTS2Skeleton: this.createTS2Skeleton
-                    };
-                }
+                getImports: () => ({
+                    createTS2Skeleton: () => this.createTS2Skeleton(virtualHost)
+                })
             });
             this.playBridgeJS = new exports.PlayBridgeJS();
             console.log('BridgeJS initialized successfully');
@@ -171,32 +175,44 @@ export class BridgeJSPlayground {
         });
     }
 
-    createTS2Skeleton() {
+    async createTS2SkeletonFactory() {
+        const createVirtualHost = async () => {
+          const fsMap = await createDefaultMapFromCDN(
+            { target: ts.ScriptTarget.ES2015 },
+            ts.version,
+            true,
+            ts
+          );
+
+          const system = createSystem(fsMap);
+
+          const compilerOptions = {
+            target: ts.ScriptTarget.ES2015,
+            lib: ["es2015", "dom"],
+          };
+
+          return createVirtualCompilerHost(system, compilerOptions, ts);
+        }
+        return await createVirtualHost();
+    }
+
+    /**
+     * @param {ReturnType<typeof createVirtualCompilerHost>} virtualHost
+     */
+    createTS2Skeleton(virtualHost) {
         return {
+            /**
+             * @param {string} dtsCode
+             * @returns {string}
+             */
             convert: (dtsCode) => {
-                const virtualFilePath = "bridge-js.d.ts"
-                const virtualHost = {
-                    fileExists: fileName => fileName === virtualFilePath,
-                    readFile: fileName => dtsCode,
-                    getSourceFile: (fileName, languageVersion) => {
-                        const sourceText = dtsCode;
-                        if (sourceText === undefined) return undefined;
-                        return ts.createSourceFile(fileName, sourceText, languageVersion);
-                    },
-                    getDefaultLibFileName: options => "lib.d.ts",
-                    writeFile: (fileName, data) => {
-                        console.log(`[emit] ${fileName}:\n${data}`);
-                    },
-                    getCurrentDirectory: () => "",
-                    getDirectories: () => [],
-                    getCanonicalFileName: fileName => fileName,
-                    getNewLine: () => "\n",
-                    useCaseSensitiveFileNames: () => true
-                }
                 // Create TypeScript program from d.ts content
+                const virtualFilePath = "bridge-js.d.ts"
+                const sourceFile = ts.createSourceFile(virtualFilePath, dtsCode, ts.ScriptTarget.ES2015);
+                virtualHost.updateFile(sourceFile);
                 const tsProgram = ts.createProgram({
                     rootNames: [virtualFilePath],
-                    host: virtualHost,
+                    host: virtualHost.compilerHost,
                     options: {
                         noEmit: true,
                         declaration: true,
