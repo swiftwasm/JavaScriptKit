@@ -15,7 +15,7 @@ enum APIResult {
 enum ComplexResult {
     case success(String)
     case error(String, Int)
-    case status(Bool, String)
+    case status(Bool, Int, String)
     case info
 }
 

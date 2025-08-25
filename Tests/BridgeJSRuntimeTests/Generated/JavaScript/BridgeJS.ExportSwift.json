@@ -683,7 +683,40 @@
           "associatedValues" : [
             {
               "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "location"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
                 "bool" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
 
                 }
               }
@@ -1863,6 +1896,48 @@
       }
     },
     {
+      "abiName" : "bjs_makeComplexResultLocation",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeComplexResultLocation",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "lat",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "lng",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
       "abiName" : "bjs_makeComplexResultStatus",
       "effects" : {
         "isAsync" : false,
@@ -1875,6 +1950,15 @@
           "name" : "active",
           "type" : {
             "bool" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "code",
+          "type" : {
+            "int" : {
 
             }
           }

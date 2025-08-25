@@ -311,7 +311,8 @@ enum Internal {
 enum ComplexResult {
     case success(String)
     case error(String, Int)
-    case status(Bool, String)
+    case location(Double, Double, String)
+    case status(Bool, Int, String)
     case info
 }
 
@@ -327,8 +328,12 @@ enum ComplexResult {
     return .error(message, code)
 }
 
-@JS func makeComplexResultStatus(_ active: Bool, _ message: String) -> ComplexResult {
-    return .status(active, message)
+@JS func makeComplexResultLocation(_ lat: Double, _ lng: Double, _ name: String) -> ComplexResult {
+    return .location(lat, lng, name)
+}
+
+@JS func makeComplexResultStatus(_ active: Bool, _ code: Int, _ message: String) -> ComplexResult {
+    return .status(active, code, message)
 }
 
 @JS func makeComplexResultInfo() -> ComplexResult {

@@ -226,12 +226,18 @@ struct BridgeJSLink {
                 const textEncoder = new TextEncoder("utf-8");
 
                 let tmpRetString;
-                let tmpRetBytes;
-                let tmpRetException;
-                let tmpRetTag;
                 let tmpRetInt;
                 let tmpRetF32;
                 let tmpRetF64;
+                let tmpRetBytes;
+                let tmpRetException;
+                let tmpRetTag;
+                
+                let tmpRetStrings = [];
+                let tmpRetInts = [];
+                let tmpRetF32s = [];
+                let tmpRetF64s = [];
+                let tmpRetBools = [];
 
                 return {
                     /**
@@ -243,7 +249,9 @@ struct BridgeJSLink {
                         const imports = options.getImports(importsContext);
                         bjs["swift_js_return_string"] = function(ptr, len) {
                             const bytes = new Uint8Array(memory.buffer, ptr, len)\(sharedMemory ? ".slice()" : "");
-                            tmpRetString = textDecoder.decode(bytes);
+                            const value = textDecoder.decode(bytes);
+                            tmpRetString = value;
+                            tmpRetStrings.push(value);
                         }
                         bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                             const source = swift.memory.getObject(sourceId);
@@ -270,15 +278,33 @@ struct BridgeJSLink {
                         }
                         bjs["swift_js_return_tag"] = function(tag) {
                             tmpRetTag = tag | 0;
+                            tmpRetString = undefined;
+                            tmpRetInt = undefined;
+                            tmpRetF32 = undefined;
+                            tmpRetF64 = undefined;
+                            tmpRetStrings = [];
+                            tmpRetInts = [];
+                            tmpRetF32s = [];
+                            tmpRetF64s = [];
+                            tmpRetBools = [];
                         }
                         bjs["swift_js_return_int"] = function(v) {
-                            tmpRetInt = v | 0;
+                            const value = v | 0;
+                            tmpRetInt = value;
+                            tmpRetInts.push(value);
                         }
                         bjs["swift_js_return_f32"] = function(v) {
-                            tmpRetF32 = Math.fround(v);
+                            const value = Math.fround(v);
+                            tmpRetF32 = value;
+                            tmpRetF32s.push(value);
                         }
                         bjs["swift_js_return_f64"] = function(v) {
                             tmpRetF64 = v;
+                            tmpRetF64s.push(v);
+                        }
+                        bjs["swift_js_return_bool"] = function(v) {
+                            const value = v !== 0;
+                            tmpRetBools.push(value);
                         }
             \(renderSwiftClassWrappers().map { $0.indent(count: 12) }.joined(separator: "\n"))
             \(importObjectBuilders.flatMap { $0.importedLines }.map { $0.indent(count: 12) }.joined(separator: "\n"))
@@ -340,7 +366,7 @@ struct BridgeJSLink {
                 lines.append("const \(base)Helpers = __bjs_create\(base)Helpers()(textEncoder, swift);")
                 lines.append("globalThis.__bjs_lower_\(base) = (value) => \(base)Helpers.lower(value);")
                 lines.append(
-                    "globalThis.__bjs_raise_\(base) = () => \(base)Helpers.raise(tmpRetTag, tmpRetString, tmpRetInt, tmpRetF32, tmpRetF64);"
+                    "globalThis.__bjs_raise_\(base) = () => \(base)Helpers.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetBools);"
                 )
                 lines.append("")
             }
@@ -783,7 +809,7 @@ struct BridgeJSLink {
                 jsLines.append("}".indent(count: 12))
                 jsLines.append("},".indent(count: 8))
                 jsLines.append(
-                    "raise: (tmpRetTag, tmpRetString, tmpRetInt, tmpRetF32, tmpRetF64) => {".indent(count: 8)
+                    "raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetBools) => {".indent(count: 8)
                 )
                 jsLines.append("const tag = tmpRetTag | 0;".indent(count: 12))
                 jsLines.append("switch (tag) {".indent(count: 12))
@@ -794,19 +820,30 @@ struct BridgeJSLink {
                     } else {
                         var fields: [String] = ["tag: \(base).Tag.\(caseName)"]
 
+                        var stringIndex = 0
+                        var intIndex = 0
+                        var f32Index = 0
+                        var f64Index = 0
+                        var boolIndex = 0
+                        
                         for (i, av) in enumCase.associatedValues.enumerated() {
                             let fieldName = av.label ?? "param\(i)"
                             switch av.type {
                             case .string:
-                                fields.append("\(fieldName): tmpRetString")
+                                fields.append("\(fieldName): tmpRetStrings[\(stringIndex)]")
+                                stringIndex += 1
                             case .bool:
-                                fields.append("\(fieldName): (tmpRetInt !== 0)")
+                                fields.append("\(fieldName): tmpRetBools[\(boolIndex)]")
+                                boolIndex += 1
                             case .int:
-                                fields.append("\(fieldName): tmpRetInt | 0")
+                                fields.append("\(fieldName): tmpRetInts[\(intIndex)]")
+                                intIndex += 1
                             case .float:
-                                fields.append("\(fieldName): Math.fround(tmpRetF32)")
+                                fields.append("\(fieldName): tmpRetF32s[\(f32Index)]")
+                                f32Index += 1
                             case .double:
-                                fields.append("\(fieldName): tmpRetF64")
+                                fields.append("\(fieldName): tmpRetF64s[\(f64Index)]")
+                                f64Index += 1
                             default:
                                 fields.append("\(fieldName): undefined")
                             }

@@ -59,12 +59,18 @@ export async function createInstantiator(options, swift) {
     const textEncoder = new TextEncoder("utf-8");
 
     let tmpRetString;
-    let tmpRetBytes;
-    let tmpRetException;
-    let tmpRetTag;
     let tmpRetInt;
     let tmpRetF32;
     let tmpRetF64;
+    let tmpRetBytes;
+    let tmpRetException;
+    let tmpRetTag;
+    
+    let tmpRetStrings = [];
+    let tmpRetInts = [];
+    let tmpRetF32s = [];
+    let tmpRetF64s = [];
+    let tmpRetBools = [];
 
     return {
         /**
@@ -76,7 +82,9 @@ export async function createInstantiator(options, swift) {
             const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
-                tmpRetString = textDecoder.decode(bytes);
+                const value = textDecoder.decode(bytes);
+                tmpRetString = value;
+                tmpRetStrings.push(value);
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
@@ -103,15 +111,33 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_return_tag"] = function(tag) {
                 tmpRetTag = tag | 0;
+                tmpRetString = undefined;
+                tmpRetInt = undefined;
+                tmpRetF32 = undefined;
+                tmpRetF64 = undefined;
+                tmpRetStrings = [];
+                tmpRetInts = [];
+                tmpRetF32s = [];
+                tmpRetF64s = [];
+                tmpRetBools = [];
             }
             bjs["swift_js_return_int"] = function(v) {
-                tmpRetInt = v | 0;
+                const value = v | 0;
+                tmpRetInt = value;
+                tmpRetInts.push(value);
             }
             bjs["swift_js_return_f32"] = function(v) {
-                tmpRetF32 = Math.fround(v);
+                const value = Math.fround(v);
+                tmpRetF32 = value;
+                tmpRetF32s.push(value);
             }
             bjs["swift_js_return_f64"] = function(v) {
                 tmpRetF64 = v;
+                tmpRetF64s.push(v);
+            }
+            bjs["swift_js_return_bool"] = function(v) {
+                const value = v !== 0;
+                tmpRetBools.push(value);
             }
             // Wrapper functions for module: TestModule
             if (!importObject["TestModule"]) {

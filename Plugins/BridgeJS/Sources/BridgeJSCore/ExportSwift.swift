@@ -1298,6 +1298,8 @@ public class ExportSwift {
                     func _swift_js_return_f32(_: Float32)
                     @_extern(wasm, module: "bjs", name: "swift_js_return_f64")
                     func _swift_js_return_f64(_: Float64)
+                    @_extern(wasm, module: "bjs", name: "swift_js_return_bool")
+                    func _swift_js_return_bool(_: Int32)
                     \(raw: returnSwitch)
                 }
             }
@@ -1473,7 +1475,7 @@ public class ExportSwift {
             case .int:
                 returnStatements.append("_swift_js_return_int(Int32(\(paramName)))")
             case .bool:
-                returnStatements.append("_swift_js_return_int(\(paramName) ? 1 : 0)")
+                returnStatements.append("_swift_js_return_bool(\(paramName) ? 1 : 0)")
             case .float:
                 returnStatements.append("_swift_js_return_f32(\(paramName))")
             case .double:

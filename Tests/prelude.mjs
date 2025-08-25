@@ -284,22 +284,26 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 
     const cs1 = { tag: ComplexResult.Tag.Success, param0: "All good!" };
     const ce1 = { tag: ComplexResult.Tag.Error, param0: "Network error", param1: 503 };
-    const cst1 = { tag: ComplexResult.Tag.Status, param0: true, param1: "OK" };
+    const cl1 = { tag: ComplexResult.Tag.Location, param0: 37.7749, param1: -122.4194, param2: "San Francisco" };
+    const cst1 = { tag: ComplexResult.Tag.Status, param0: true, param1: 200, param2: "OK" };
     const ci1 = { tag: ComplexResult.Tag.Info };
 
     assert.deepEqual(exports.echoComplexResult(cs1), cs1);
     assert.deepEqual(exports.echoComplexResult(ce1), ce1);
+    assert.deepEqual(exports.echoComplexResult(cl1), cl1);
     assert.deepEqual(exports.echoComplexResult(cst1), cst1);
     assert.deepEqual(exports.echoComplexResult(ci1), ci1);
 
     assert.deepEqual(exports.roundtripComplexResult(cs1), cs1);
     assert.deepEqual(exports.roundtripComplexResult(ce1), ce1);
+    assert.deepEqual(exports.roundtripComplexResult(cl1), cl1);
     assert.deepEqual(exports.roundtripComplexResult(cst1), cst1);
     assert.deepEqual(exports.roundtripComplexResult(ci1), ci1);
 
     assert.deepEqual(exports.makeComplexResultSuccess("Great!"), { tag: ComplexResult.Tag.Success, param0: "Great!" });
     assert.deepEqual(exports.makeComplexResultError("Timeout", 408), { tag: ComplexResult.Tag.Error, param0: "Timeout", param1: 408 });
-    assert.deepEqual(exports.makeComplexResultStatus(false, "Internal Server Error"), { tag: ComplexResult.Tag.Status, param0: false, param1: "Internal Server Error" });
+    assert.deepEqual(exports.makeComplexResultLocation(40.7128, -74.0060, "New York"), { tag: ComplexResult.Tag.Location, param0: 40.7128, param1: -74.0060, param2: "New York" });
+    assert.deepEqual(exports.makeComplexResultStatus(false, 500, "Internal Server Error"), { tag: ComplexResult.Tag.Status, param0: false, param1: 500, param2: "Internal Server Error" });
     assert.deepEqual(exports.makeComplexResultInfo(), { tag: ComplexResult.Tag.Info });
 }
 

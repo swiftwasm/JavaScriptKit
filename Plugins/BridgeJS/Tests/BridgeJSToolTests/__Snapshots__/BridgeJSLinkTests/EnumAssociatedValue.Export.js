@@ -65,14 +65,14 @@ const __bjs_createAPIResultHelpers = () => {
                 default: throw new Error("Unknown APIResult tag: " + String(t));
             }
         },
-        raise: (tmpRetTag, tmpRetString, tmpRetInt, tmpRetF32, tmpRetF64) => {
+        raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetBools) => {
             const tag = tmpRetTag | 0;
             switch (tag) {
-                case 0: return { tag: APIResult.Tag.Success, param0: tmpRetString };
-                case 1: return { tag: APIResult.Tag.Failure, param0: tmpRetInt | 0 };
-                case 2: return { tag: APIResult.Tag.Flag, param0: (tmpRetInt !== 0) };
-                case 3: return { tag: APIResult.Tag.Rate, param0: Math.fround(tmpRetF32) };
-                case 4: return { tag: APIResult.Tag.Precise, param0: tmpRetF64 };
+                case 0: return { tag: APIResult.Tag.Success, param0: tmpRetStrings[0] };
+                case 1: return { tag: APIResult.Tag.Failure, param0: tmpRetInts[0] };
+                case 2: return { tag: APIResult.Tag.Flag, param0: tmpRetBools[0] };
+                case 3: return { tag: APIResult.Tag.Rate, param0: tmpRetF32s[0] };
+                case 4: return { tag: APIResult.Tag.Precise, param0: tmpRetF64s[0] };
                 case 5: return { tag: APIResult.Tag.Info };
                 default: throw new Error("Unknown APIResult tag returned from Swift: " + String(tag));
             }
@@ -110,7 +110,7 @@ const __bjs_createComplexResultHelpers = () => {
                     return { caseId: 1, paramsId: paramsId, paramsLen: paramsBytes.length, cleanup: () => { swift.memory.release(paramsId); } };
                 }
                 case ComplexResult.Tag.Status: {
-                    const paramsObj = { "param0": value.param0, "param1": value.param1 };
+                    const paramsObj = { "param0": value.param0, "param1": (value.param1 | 0), "param2": value.param2 };
                     const paramsJson = JSON.stringify(paramsObj);
                     const paramsBytes = textEncoder.encode(paramsJson);
                     const paramsId = swift.memory.retain(paramsBytes);
@@ -124,12 +124,12 @@ const __bjs_createComplexResultHelpers = () => {
                 default: throw new Error("Unknown ComplexResult tag: " + String(t));
             }
         },
-        raise: (tmpRetTag, tmpRetString, tmpRetInt, tmpRetF32, tmpRetF64) => {
+        raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetBools) => {
             const tag = tmpRetTag | 0;
             switch (tag) {
-                case 0: return { tag: ComplexResult.Tag.Success, param0: tmpRetString };
-                case 1: return { tag: ComplexResult.Tag.Error, param0: tmpRetString, param1: tmpRetInt | 0 };
-                case 2: return { tag: ComplexResult.Tag.Status, param0: (tmpRetInt !== 0), param1: tmpRetString };
+                case 0: return { tag: ComplexResult.Tag.Success, param0: tmpRetStrings[0] };
+                case 1: return { tag: ComplexResult.Tag.Error, param0: tmpRetStrings[0], param1: tmpRetInts[0] };
+                case 2: return { tag: ComplexResult.Tag.Status, param0: tmpRetBools[0], param1: tmpRetInts[0], param2: tmpRetStrings[0] };
                 case 3: return { tag: ComplexResult.Tag.Info };
                 default: throw new Error("Unknown ComplexResult tag returned from Swift: " + String(tag));
             }
@@ -145,12 +145,18 @@ export async function createInstantiator(options, swift) {
     const textEncoder = new TextEncoder("utf-8");
 
     let tmpRetString;
-    let tmpRetBytes;
-    let tmpRetException;
-    let tmpRetTag;
     let tmpRetInt;
     let tmpRetF32;
     let tmpRetF64;
+    let tmpRetBytes;
+    let tmpRetException;
+    let tmpRetTag;
+    
+    let tmpRetStrings = [];
+    let tmpRetInts = [];
+    let tmpRetF32s = [];
+    let tmpRetF64s = [];
+    let tmpRetBools = [];
 
     return {
         /**
@@ -162,7 +168,9 @@ export async function createInstantiator(options, swift) {
             const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
-                tmpRetString = textDecoder.decode(bytes);
+                const value = textDecoder.decode(bytes);
+                tmpRetString = value;
+                tmpRetStrings.push(value);
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
@@ -189,15 +197,33 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_return_tag"] = function(tag) {
                 tmpRetTag = tag | 0;
+                tmpRetString = undefined;
+                tmpRetInt = undefined;
+                tmpRetF32 = undefined;
+                tmpRetF64 = undefined;
+                tmpRetStrings = [];
+                tmpRetInts = [];
+                tmpRetF32s = [];
+                tmpRetF64s = [];
+                tmpRetBools = [];
             }
             bjs["swift_js_return_int"] = function(v) {
-                tmpRetInt = v | 0;
+                const value = v | 0;
+                tmpRetInt = value;
+                tmpRetInts.push(value);
             }
             bjs["swift_js_return_f32"] = function(v) {
-                tmpRetF32 = Math.fround(v);
+                const value = Math.fround(v);
+                tmpRetF32 = value;
+                tmpRetF32s.push(value);
             }
             bjs["swift_js_return_f64"] = function(v) {
                 tmpRetF64 = v;
+                tmpRetF64s.push(v);
+            }
+            bjs["swift_js_return_bool"] = function(v) {
+                const value = v !== 0;
+                tmpRetBools.push(value);
             }
 
 
@@ -209,12 +235,12 @@ export async function createInstantiator(options, swift) {
             // Set up APIResult enum helpers
             const APIResultHelpers = __bjs_createAPIResultHelpers()(textEncoder, swift);
             globalThis.__bjs_lower_APIResult = (value) => APIResultHelpers.lower(value);
-            globalThis.__bjs_raise_APIResult = () => APIResultHelpers.raise(tmpRetTag, tmpRetString, tmpRetInt, tmpRetF32, tmpRetF64);
+            globalThis.__bjs_raise_APIResult = () => APIResultHelpers.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetBools);
             
             // Set up ComplexResult enum helpers
             const ComplexResultHelpers = __bjs_createComplexResultHelpers()(textEncoder, swift);
             globalThis.__bjs_lower_ComplexResult = (value) => ComplexResultHelpers.lower(value);
-            globalThis.__bjs_raise_ComplexResult = () => ComplexResultHelpers.raise(tmpRetTag, tmpRetString, tmpRetInt, tmpRetF32, tmpRetF64);
+            globalThis.__bjs_raise_ComplexResult = () => ComplexResultHelpers.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetBools);
             
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)

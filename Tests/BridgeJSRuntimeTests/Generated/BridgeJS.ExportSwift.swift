@@ -158,6 +158,8 @@ extension APIResult {
         func _swift_js_return_f32(_: Float32)
         @_extern(wasm, module: "bjs", name: "swift_js_return_f64")
         func _swift_js_return_f64(_: Float64)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_bool")
+        func _swift_js_return_bool(_: Int32)
         switch self {
         case .success(let param0):
     _swift_js_return_tag(Int32(0))
@@ -170,7 +172,7 @@ mutableParam0.withUTF8 { ptr in
             _swift_js_return_int(Int32(param0))
         case .flag(let param0):
     _swift_js_return_tag(Int32(2))
-            _swift_js_return_int(param0 ? 1 : 0)
+            _swift_js_return_bool(param0 ? 1 : 0)
         case .rate(let param0):
     _swift_js_return_tag(Int32(3))
             _swift_js_return_f32(param0)
@@ -273,6 +275,8 @@ extension ComplexResult {
         func _swift_js_return_f32(_: Float32)
         @_extern(wasm, module: "bjs", name: "swift_js_return_f64")
         func _swift_js_return_f64(_: Float64)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_bool")
+        func _swift_js_return_bool(_: Int32)
         switch self {
         case .success(let param0):
     _swift_js_return_tag(Int32(0))
@@ -287,15 +291,24 @@ mutableParam0.withUTF8 { ptr in
     _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
 }
             _swift_js_return_int(Int32(param1))
-        case .status(let param0, let param1):
+        case .location(let param0, let param1, let param2):
     _swift_js_return_tag(Int32(2))
-            _swift_js_return_int(param0 ? 1 : 0)
-            var mutableParam1 = param1
-mutableParam1.withUTF8 { ptr in
+            _swift_js_return_f64(param0)
+            _swift_js_return_f64(param1)
+            var mutableParam2 = param2
+mutableParam2.withUTF8 { ptr in
+    _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+}
+        case .status(let param0, let param1, let param2):
+    _swift_js_return_tag(Int32(3))
+            _swift_js_return_bool(param0 ? 1 : 0)
+            _swift_js_return_int(Int32(param1))
+            var mutableParam2 = param2
+mutableParam2.withUTF8 { ptr in
     _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
 }
         case .info:
-    _swift_js_return_tag(Int32(3))
+    _swift_js_return_tag(Int32(4))
         }
     }
 }
@@ -309,11 +322,15 @@ extension ComplexResult {
     return .error(param0, Int(param1)) 
 }
 
-                static func constructFromComplexResult_2(param0: Int32, param1: String) -> ComplexResult { 
-    return .status((param0 != 0), param1) 
+                static func constructFromComplexResult_2(param0: Float64, param1: Float64, param2: String) -> ComplexResult { 
+    return .location(param0, param1, param2) 
 }
 
-                static func constructFromComplexResult_3() -> ComplexResult { 
+                static func constructFromComplexResult_3(param0: Int32, param1: Int32, param2: String) -> ComplexResult { 
+    return .status((param0 != 0), Int(param1), param2) 
+}
+
+                static func constructFromComplexResult_4() -> ComplexResult { 
     return .info 
 }
     
@@ -346,9 +363,16 @@ extension ComplexResult {
           let params = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
         fatalError("Failed to parse parameters JSON")
     }
-    let param0 = Int32(params["param0"] as! Bool ? 1 : 0); let param1 = params["param1"] as! String
-    return constructFromComplexResult_2(param0: param0, param1: param1)
-                    case 3: return constructFromComplexResult_3()
+    let param0 = params["param0"] as! Float64; let param1 = params["param1"] as! Float64; let param2 = params["param2"] as! String
+    return constructFromComplexResult_2(param0: param0, param1: param1, param2: param2)
+                    case 3: 
+    guard let data = paramsJson.data(using: .utf8),
+          let params = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+        fatalError("Failed to parse parameters JSON")
+    }
+    let param0 = Int32(params["param0"] as! Bool ? 1 : 0); let param1 = params["param1"] as! Int32; let param2 = params["param2"] as! String
+    return constructFromComplexResult_3(param0: param0, param1: param1, param2: param2)
+                    case 4: return constructFromComplexResult_4()
         default: fatalError("Unknown ComplexResult case ID: \(caseId)")
         }
     }
@@ -1103,15 +1127,30 @@ public func _bjs_makeComplexResultError(messageBytes: Int32, messageLen: Int32, 
     #endif
 }
 
+@_expose(wasm, "bjs_makeComplexResultLocation")
+@_cdecl("bjs_makeComplexResultLocation")
+public func _bjs_makeComplexResultLocation(lat: Float64, lng: Float64, nameBytes: Int32, nameLen: Int32) -> Void {
+    #if arch(wasm32)
+    let name = String(unsafeUninitializedCapacity: Int(nameLen)) { b in
+        _swift_js_init_memory(nameBytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(nameLen)
+    }
+    let ret = makeComplexResultLocation(_: lat, _: lng, _: name)
+    ret.bridgeJSReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_makeComplexResultStatus")
 @_cdecl("bjs_makeComplexResultStatus")
-public func _bjs_makeComplexResultStatus(active: Int32, messageBytes: Int32, messageLen: Int32) -> Void {
+public func _bjs_makeComplexResultStatus(active: Int32, code: Int32, messageBytes: Int32, messageLen: Int32) -> Void {
     #if arch(wasm32)
     let message = String(unsafeUninitializedCapacity: Int(messageLen)) { b in
         _swift_js_init_memory(messageBytes, b.baseAddress.unsafelyUnwrapped)
         return Int(messageLen)
     }
-    let ret = makeComplexResultStatus(_: active == 1, _: message)
+    let ret = makeComplexResultStatus(_: active == 1, _: Int(code), _: message)
     ret.bridgeJSReturn()
     #else
     fatalError("Only available on WebAssembly")

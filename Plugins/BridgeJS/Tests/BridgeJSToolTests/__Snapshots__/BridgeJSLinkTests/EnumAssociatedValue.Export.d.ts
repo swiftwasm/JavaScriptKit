@@ -28,7 +28,7 @@ export const ComplexResult: {
 };
 
 export type ComplexResult =
-  { tag: typeof ComplexResult.Tag.Success; param0: string } | { tag: typeof ComplexResult.Tag.Error; param0: string; param1: number } | { tag: typeof ComplexResult.Tag.Status; param0: boolean; param1: string } | { tag: typeof ComplexResult.Tag.Info }
+  { tag: typeof ComplexResult.Tag.Success; param0: string } | { tag: typeof ComplexResult.Tag.Error; param0: string; param1: number } | { tag: typeof ComplexResult.Tag.Status; param0: boolean; param1: number; param2: string } | { tag: typeof ComplexResult.Tag.Info }
 
 export type Exports = {
     handle(result: APIResult): void;
