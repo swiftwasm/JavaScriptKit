@@ -24,6 +24,10 @@ export const TSDirection = {
     West: 3,
 };
 
+export const PublicStatus = {
+    Success: 0,
+};
+
 
 export async function createInstantiator(options, swift) {
     let instance;

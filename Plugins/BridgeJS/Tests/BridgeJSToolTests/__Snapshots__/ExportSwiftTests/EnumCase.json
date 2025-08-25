@@ -89,6 +89,20 @@
       "emitStyle" : "tsEnum",
       "name" : "TSDirection",
       "swiftCallName" : "TSDirection"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "success"
+        }
+      ],
+      "emitStyle" : "const",
+      "explicitAccessControl" : "public",
+      "name" : "PublicStatus",
+      "swiftCallName" : "PublicStatus"
     }
   ],
   "functions" : [

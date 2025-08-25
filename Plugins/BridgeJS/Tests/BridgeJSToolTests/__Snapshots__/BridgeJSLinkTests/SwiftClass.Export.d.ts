@@ -16,9 +16,17 @@ export interface Greeter extends SwiftHeapObject {
     changeName(name: string): void;
     name: string;
 }
+export interface PublicGreeter extends SwiftHeapObject {
+}
+export interface PackageGreeter extends SwiftHeapObject {
+}
 export type Exports = {
     Greeter: {
         new(name: string): Greeter;
+    }
+    PublicGreeter: {
+    }
+    PackageGreeter: {
     }
     takeGreeter(greeter: Greeter): void;
 }

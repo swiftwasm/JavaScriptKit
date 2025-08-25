@@ -15,3 +15,6 @@
 @JS func takeGreeter(greeter: Greeter) {
     print(greeter.greet())
 }
+
+@JS public class PublicGreeter {}
+@JS package class PackageGreeter {}

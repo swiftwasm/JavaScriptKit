@@ -104,6 +104,7 @@ public enum EnumEmitStyle: String, Codable {
 public struct ExportedEnum: Codable, Equatable {
     public let name: String
     public let swiftCallName: String
+    public let explicitAccessControl: String?
     public let cases: [EnumCase]
     public let rawType: String?
     public let namespace: [String]?
@@ -121,6 +122,7 @@ public struct ExportedEnum: Codable, Equatable {
     public init(
         name: String,
         swiftCallName: String,
+        explicitAccessControl: String?,
         cases: [EnumCase],
         rawType: String?,
         namespace: [String]?,
@@ -128,6 +130,7 @@ public struct ExportedEnum: Codable, Equatable {
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
+        self.explicitAccessControl = explicitAccessControl
         self.cases = cases
         self.rawType = rawType
         self.namespace = namespace
@@ -172,6 +175,7 @@ public struct ExportedFunction: Codable {
 public struct ExportedClass: Codable {
     public var name: String
     public var swiftCallName: String
+    public var explicitAccessControl: String?
     public var constructor: ExportedConstructor?
     public var methods: [ExportedFunction]
     public var properties: [ExportedProperty]
@@ -180,6 +184,7 @@ public struct ExportedClass: Codable {
     public init(
         name: String,
         swiftCallName: String,
+        explicitAccessControl: String?,
         constructor: ExportedConstructor? = nil,
         methods: [ExportedFunction],
         properties: [ExportedProperty] = [],
@@ -187,6 +192,7 @@ public struct ExportedClass: Codable {
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
+        self.explicitAccessControl = explicitAccessControl
         self.constructor = constructor
         self.methods = methods
         self.properties = properties

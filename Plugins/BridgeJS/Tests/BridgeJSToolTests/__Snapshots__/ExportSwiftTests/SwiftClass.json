@@ -74,6 +74,28 @@
         }
       ],
       "swiftCallName" : "Greeter"
+    },
+    {
+      "explicitAccessControl" : "public",
+      "methods" : [
+
+      ],
+      "name" : "PublicGreeter",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "PublicGreeter"
+    },
+    {
+      "explicitAccessControl" : "package",
+      "methods" : [
+
+      ],
+      "name" : "PackageGreeter",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "PackageGreeter"
     }
   ],
   "enums" : [
