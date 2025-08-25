@@ -142,6 +142,10 @@ export class TypeProcessor {
      */
     visitFunctionLikeDecl(node) {
         if (!node.name) return null;
+        const name = node.name.getText();
+        if (!isValidSwiftDeclName(name)) {
+            return null;
+        }
 
         const signature = this.checker.getSignatureFromDeclaration(node);
         if (!signature) return null;
@@ -158,7 +162,7 @@ export class TypeProcessor {
         const documentation = this.getFullJSDocText(node);
 
         return {
-            name: node.name.getText(),
+            name,
             parameters,
             returnType: bridgeReturnType,
             documentation,
@@ -206,11 +210,17 @@ export class TypeProcessor {
      */
     visitPropertyDecl(node) {
         if (!node.name) return null;
+
+        const propertyName = node.name.getText();
+        if (!isValidSwiftDeclName(propertyName)) {
+            return null;
+        }
+
         const type = this.checker.getTypeAtLocation(node)
         const bridgeType = this.visitType(type, node);
         const isReadonly = node.modifiers?.some(m => m.kind === ts.SyntaxKind.ReadonlyKeyword) ?? false;
         const documentation = this.getFullJSDocText(node);
-        return { name: node.name.getText(), type: bridgeType, isReadonly, documentation };
+        return { name: propertyName, type: bridgeType, isReadonly, documentation };
     }
 
     /**
@@ -225,7 +235,7 @@ export class TypeProcessor {
     }
 
     /**
-     * @param {ts.ClassDeclaration} node 
+     * @param {ts.ClassDeclaration} node
      * @returns {ImportTypeSkeleton | null}
      */
     visitClassDecl(node) {
@@ -442,4 +452,16 @@ function isTypeReference(type) {
         isObjectType(type) &&
         (type.objectFlags & ts.ObjectFlags.Reference) !== 0
     );
+}
+
+/**
+ * Check if a declaration name is valid for Swift generation
+ * @param {string} name - Declaration name to check
+ * @returns {boolean} True if the name is valid for Swift
+ * @private
+ */
+export function isValidSwiftDeclName(name) {
+    // https://docs.swift.org/swift-book/documentation/the-swift-programming-language/lexicalstructure/
+    const swiftIdentifierRegex = /^[_\p{ID_Start}][\p{ID_Continue}\u{200C}\u{200D}]*$/u;
+    return swiftIdentifierRegex.test(name);
 }
