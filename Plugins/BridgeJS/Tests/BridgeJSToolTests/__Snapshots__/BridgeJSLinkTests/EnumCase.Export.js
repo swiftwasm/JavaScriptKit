@@ -33,9 +33,6 @@ export async function createInstantiator(options, swift) {
     const textEncoder = new TextEncoder("utf-8");
 
     let tmpRetString;
-    let tmpRetInt;
-    let tmpRetF32;
-    let tmpRetF64;
     let tmpRetBytes;
     let tmpRetException;
     let tmpRetTag;
@@ -86,9 +83,6 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_return_tag"] = function(tag) {
                 tmpRetTag = tag | 0;
                 tmpRetString = undefined;
-                tmpRetInt = undefined;
-                tmpRetF32 = undefined;
-                tmpRetF64 = undefined;
                 tmpRetStrings = [];
                 tmpRetInts = [];
                 tmpRetF32s = [];
@@ -97,16 +91,13 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_return_int"] = function(v) {
                 const value = v | 0;
-                tmpRetInt = value;
                 tmpRetInts.push(value);
             }
             bjs["swift_js_return_f32"] = function(v) {
                 const value = Math.fround(v);
-                tmpRetF32 = value;
                 tmpRetF32s.push(value);
             }
             bjs["swift_js_return_f64"] = function(v) {
-                tmpRetF64 = v;
                 tmpRetF64s.push(v);
             }
             bjs["swift_js_return_bool"] = function(v) {
@@ -129,18 +120,18 @@ export async function createInstantiator(options, swift) {
 
             return {
                 setDirection: function bjs_setDirection(direction) {
-                    instance.exports.bjs_setDirection(direction | 0);
+                    instance.exports.bjs_setDirection(direction);
                 },
                 getDirection: function bjs_getDirection() {
                     const ret = instance.exports.bjs_getDirection();
                     return ret;
                 },
                 processDirection: function bjs_processDirection(input) {
-                    const ret = instance.exports.bjs_processDirection(input | 0);
+                    const ret = instance.exports.bjs_processDirection(input);
                     return ret;
                 },
                 setTSDirection: function bjs_setTSDirection(direction) {
-                    instance.exports.bjs_setTSDirection(direction | 0);
+                    instance.exports.bjs_setTSDirection(direction);
                 },
                 getTSDirection: function bjs_getTSDirection() {
                     const ret = instance.exports.bjs_getTSDirection();

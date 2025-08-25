@@ -109,4 +109,26 @@ class TypeDeclResolver {
     func lookupType(fullyQualified: QualifiedName) -> TypeDecl? {
         return typeDeclByQualifiedName[fullyQualified]
     }
+
+    /// Resolves a type usage (identifier or member type) to its declaration node
+    func resolve(_ type: TypeSyntax) -> TypeDecl? {
+        if let id = type.as(IdentifierTypeSyntax.self) {
+            return lookupType(for: id)
+        }
+        if let components = qualifiedComponents(from: type) {
+            return lookupType(fullyQualified: components)
+        }
+        return nil
+    }
+
+    private func qualifiedComponents(from type: TypeSyntax) -> QualifiedName? {
+        if let m = type.as(MemberTypeSyntax.self) {
+            guard let base = qualifiedComponents(from: TypeSyntax(m.baseType)) else { return nil }
+            return base + [m.name.text]
+        } else if let id = type.as(IdentifierTypeSyntax.self) {
+            return [id.name.text]
+        } else {
+            return nil
+        }
+    }
 }

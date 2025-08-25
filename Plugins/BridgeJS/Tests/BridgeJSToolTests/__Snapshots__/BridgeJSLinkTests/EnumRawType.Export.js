@@ -88,9 +88,6 @@ export async function createInstantiator(options, swift) {
     const textEncoder = new TextEncoder("utf-8");
 
     let tmpRetString;
-    let tmpRetInt;
-    let tmpRetF32;
-    let tmpRetF64;
     let tmpRetBytes;
     let tmpRetException;
     let tmpRetTag;
@@ -141,9 +138,6 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_return_tag"] = function(tag) {
                 tmpRetTag = tag | 0;
                 tmpRetString = undefined;
-                tmpRetInt = undefined;
-                tmpRetF32 = undefined;
-                tmpRetF64 = undefined;
                 tmpRetStrings = [];
                 tmpRetInts = [];
                 tmpRetF32s = [];
@@ -152,16 +146,13 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_return_int"] = function(v) {
                 const value = v | 0;
-                tmpRetInt = value;
                 tmpRetInts.push(value);
             }
             bjs["swift_js_return_f32"] = function(v) {
                 const value = Math.fround(v);
-                tmpRetF32 = value;
                 tmpRetF32s.push(value);
             }
             bjs["swift_js_return_f64"] = function(v) {
-                tmpRetF64 = v;
                 tmpRetF64s.push(v);
             }
             bjs["swift_js_return_bool"] = function(v) {

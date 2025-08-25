@@ -6,6 +6,107 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
+fileprivate enum _BJSParamType: UInt8 {
+    case string = 1
+    case int32 = 2
+    case bool = 3
+    case float32 = 4
+    case float64 = 5
+}
+
+fileprivate struct _BJSBinaryReader {
+    let raw: UnsafeRawBufferPointer
+    var offset: Int = 0
+
+    @inline(__always)
+    mutating func readUInt8() -> UInt8 {
+        let b = raw[offset]
+        offset += 1
+        return b
+    }
+
+    @inline(__always)
+    mutating func readUInt32() -> UInt32 {
+        var v = UInt32(0)
+        withUnsafeMutableBytes(of: &v) { dst in
+            dst.copyBytes(from: UnsafeRawBufferPointer(rebasing: raw[offset..<(offset + 4)]))
+        }
+        offset += 4
+        return UInt32(littleEndian: v)
+    }
+
+    @inline(__always)
+    mutating func readInt32() -> Int32 {
+        var v = Int32(0)
+        withUnsafeMutableBytes(of: &v) { dst in
+            dst.copyBytes(from: UnsafeRawBufferPointer(rebasing: raw[offset..<(offset + 4)]))
+        }
+        offset += 4
+        return Int32(littleEndian: v)
+    }
+
+    @inline(__always)
+    mutating func readFloat32() -> Float32 {
+        var bits = UInt32(0)
+        withUnsafeMutableBytes(of: &bits) { dst in
+            dst.copyBytes(from: UnsafeRawBufferPointer(rebasing: raw[offset..<(offset + 4)]))
+        }
+        offset += 4
+        return Float32(bitPattern: UInt32(littleEndian: bits))
+    }
+
+    @inline(__always)
+    mutating func readFloat64() -> Float64 {
+        var bits = UInt64(0)
+        withUnsafeMutableBytes(of: &bits) { dst in
+            dst.copyBytes(from: UnsafeRawBufferPointer(rebasing: raw[offset..<(offset + 8)]))
+        }
+        offset += 8
+        return Float64(bitPattern: UInt64(littleEndian: bits))
+    }
+
+    @inline(__always)
+    mutating func readString() -> String {
+        let len = Int(readUInt32())
+        let s = String(decoding: UnsafeBufferPointer(
+            start: raw.baseAddress!.advanced(by: offset).assumingMemoryBound(to: UInt8.self),
+            count: len
+        ), as: UTF8.self)
+        offset += len
+        return s
+    }
+
+    @inline(__always)
+    mutating func expectTag(_ expected: _BJSParamType) {
+        let rawTag = readUInt8()
+        guard let got = _BJSParamType(rawValue: rawTag), got == expected else {
+            preconditionFailure("BridgeJS: mismatched enum param tag. Expected \(expected) got \(String(describing: _BJSParamType(rawValue: rawTag)))")
+        }
+    }
+
+    @inline(__always)
+    mutating func readParamCount(expected: Int) {
+        let count = Int(readUInt32())
+        precondition(count == expected, "BridgeJS: mismatched enum param count. Expected \(expected) got \(count)")
+    }
+}
+
+@_extern(wasm, module: "bjs", name: "swift_js_init_memory")
+func _swift_js_init_memory(_: Int32, _: UnsafeMutablePointer<UInt8>)
+
+@_extern(wasm, module: "bjs", name: "swift_js_return_tag")
+func _swift_js_return_tag(_: Int32)
+@_extern(wasm, module: "bjs", name: "swift_js_return_string")
+func _swift_js_return_string(_: UnsafePointer<UInt8>?, _: Int32)
+@_extern(wasm, module: "bjs", name: "swift_js_return_int")
+func _swift_js_return_int(_: Int32)
+@_extern(wasm, module: "bjs", name: "swift_js_return_f32")
+func _swift_js_return_f32(_: Float32)
+@_extern(wasm, module: "bjs", name: "swift_js_return_f64")
+func _swift_js_return_f64(_: Float64)
+@_extern(wasm, module: "bjs", name: "swift_js_return_bool")
+func _swift_js_return_bool(_: Int32)
+
 extension Direction {
     init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
@@ -144,236 +245,318 @@ extension Internal.SupportedMethod {
     }
 }
 
-import Foundation
+private extension APIResult {
+    static func bridgeJSLiftParameter(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> APIResult {
+        let params: [UInt8] = .init(unsafeUninitializedCapacity: Int(paramsLen)) { buf, initializedCount in
+            _swift_js_init_memory(paramsId, buf.baseAddress.unsafelyUnwrapped)
+            initializedCount = Int(paramsLen)
+        }
+        return params.withUnsafeBytes { raw in
+            var reader = _BJSBinaryReader(raw: raw)
+            switch caseId {
+            case 0:
+                        reader.readParamCount(expected: 1)
+                        reader.expectTag(.string)
+                        let param0 = reader.readString()
+                        return .success(param0)
+                        case 1:
+                        reader.readParamCount(expected: 1)
+                        reader.expectTag(.int32)
+                        let param0 = Int(reader.readInt32())
+                        return .failure(param0)
+                        case 2:
+                        reader.readParamCount(expected: 1)
+                        reader.expectTag(.bool)
+                        let param0 = Int32(reader.readUInt8()) != 0
+                        return .flag(param0)
+                        case 3:
+                        reader.readParamCount(expected: 1)
+                        reader.expectTag(.float32)
+                        let param0 = reader.readFloat32()
+                        return .rate(param0)
+                        case 4:
+                        reader.readParamCount(expected: 1)
+                        reader.expectTag(.float64)
+                        let param0 = reader.readFloat64()
+                        return .precise(param0)
+                        case 5:
+                return .info
+            default:
+                fatalError("Unknown APIResult case ID: \(caseId)")
+            }
+        }
+    }
 
-extension APIResult {
-    func bridgeJSReturn() {
-        @_extern(wasm, module: "bjs", name: "swift_js_return_tag")
-        func _swift_js_return_tag(_: Int32)
-        @_extern(wasm, module: "bjs", name: "swift_js_return_string")
-        func _swift_js_return_string(_: UnsafePointer<UInt8>?, _: Int32)
-        @_extern(wasm, module: "bjs", name: "swift_js_return_int")
-        func _swift_js_return_int(_: Int32)
-        @_extern(wasm, module: "bjs", name: "swift_js_return_f32")
-        func _swift_js_return_f32(_: Float32)
-        @_extern(wasm, module: "bjs", name: "swift_js_return_f64")
-        func _swift_js_return_f64(_: Float64)
-        @_extern(wasm, module: "bjs", name: "swift_js_return_bool")
-        func _swift_js_return_bool(_: Int32)
+    func bridgeJSLowerReturn() {
         switch self {
         case .success(let param0):
     _swift_js_return_tag(Int32(0))
-            var mutableParam0 = param0
-mutableParam0.withUTF8 { ptr in
-    _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-}
-        case .failure(let param0):
+                        var __bjs_param0 = param0
+    __bjs_param0.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+                    case .failure(let param0):
     _swift_js_return_tag(Int32(1))
-            _swift_js_return_int(Int32(param0))
-        case .flag(let param0):
+                        _swift_js_return_int(Int32(param0))
+                    case .flag(let param0):
     _swift_js_return_tag(Int32(2))
-            _swift_js_return_bool(param0 ? 1 : 0)
-        case .rate(let param0):
+                        _swift_js_return_bool(param0 ? 1 : 0)
+                    case .rate(let param0):
     _swift_js_return_tag(Int32(3))
-            _swift_js_return_f32(param0)
-        case .precise(let param0):
+                        _swift_js_return_f32(param0)
+                    case .precise(let param0):
     _swift_js_return_tag(Int32(4))
-            _swift_js_return_f64(param0)
-        case .info:
+                        _swift_js_return_f64(param0)
+                    case .info:
     _swift_js_return_tag(Int32(5))
         }
     }
 }
 
-extension APIResult {
-    static func constructFromAPIResult_0(param0: String) -> APIResult { 
-    return .success(param0) 
-}
-
-                static func constructFromAPIResult_1(param0: Int32) -> APIResult { 
-    return .failure(Int(param0)) 
-}
-
-                static func constructFromAPIResult_2(param0: Int32) -> APIResult { 
-    return .flag((param0 != 0)) 
-}
-
-                static func constructFromAPIResult_3(param0: Float32) -> APIResult { 
-    return .rate(param0) 
-}
-
-                static func constructFromAPIResult_4(param0: Float64) -> APIResult { 
-    return .precise(param0) 
-}
-
-                static func constructFromAPIResult_5() -> APIResult { 
-    return .info 
-}
-    
-    static func dispatchConstruct(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> APIResult {
-        let paramsString = String(unsafeUninitializedCapacity: Int(paramsLen)) { buf in
+private extension ComplexResult {
+    static func bridgeJSLiftParameter(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> ComplexResult {
+        let params: [UInt8] = .init(unsafeUninitializedCapacity: Int(paramsLen)) { buf, initializedCount in
             _swift_js_init_memory(paramsId, buf.baseAddress.unsafelyUnwrapped)
-            return Int(paramsLen)
+            initializedCount = Int(paramsLen)
         }
-        return dispatchConstructFromJson(caseId, paramsString)
-    }
-    
-    static func dispatchConstructFromJson(_ caseId: Int32, _ paramsJson: String) -> APIResult {
-        switch caseId {
-        case 0: 
-    guard let data = paramsJson.data(using: .utf8),
-          let params = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-        fatalError("Failed to parse parameters JSON")
-    }
-    let param0 = params["param0"] as! String
-    return constructFromAPIResult_0(param0: param0)
-                    case 1: 
-    guard let data = paramsJson.data(using: .utf8),
-          let params = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-        fatalError("Failed to parse parameters JSON")
-    }
-    let param0 = params["param0"] as! Int32
-    return constructFromAPIResult_1(param0: param0)
-                    case 2: 
-    guard let data = paramsJson.data(using: .utf8),
-          let params = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-        fatalError("Failed to parse parameters JSON")
-    }
-    let param0 = Int32(params["param0"] as! Bool ? 1 : 0)
-    return constructFromAPIResult_2(param0: param0)
-                    case 3: 
-    guard let data = paramsJson.data(using: .utf8),
-          let params = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-        fatalError("Failed to parse parameters JSON")
-    }
-    let param0 = params["param0"] as! Float32
-    return constructFromAPIResult_3(param0: param0)
-                    case 4: 
-    guard let data = paramsJson.data(using: .utf8),
-          let params = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-        fatalError("Failed to parse parameters JSON")
-    }
-    let param0 = params["param0"] as! Float64
-    return constructFromAPIResult_4(param0: param0)
-                    case 5: return constructFromAPIResult_5()
-        default: fatalError("Unknown APIResult case ID: \(caseId)")
+        return params.withUnsafeBytes { raw in
+            var reader = _BJSBinaryReader(raw: raw)
+            switch caseId {
+            case 0:
+                        reader.readParamCount(expected: 1)
+                        reader.expectTag(.string)
+                        let param0 = reader.readString()
+                        return .success(param0)
+                        case 1:
+                        reader.readParamCount(expected: 2)
+                        reader.expectTag(.string)
+                        let param0 = reader.readString()
+                        reader.expectTag(.int32)
+                        let param1 = Int(reader.readInt32())
+                        return .error(param0, param1)
+                        case 2:
+                        reader.readParamCount(expected: 3)
+                        reader.expectTag(.float64)
+                        let param0 = reader.readFloat64()
+                        reader.expectTag(.float64)
+                        let param1 = reader.readFloat64()
+                        reader.expectTag(.string)
+                        let param2 = reader.readString()
+                        return .location(param0, param1, param2)
+                        case 3:
+                        reader.readParamCount(expected: 3)
+                        reader.expectTag(.bool)
+                        let param0 = Int32(reader.readUInt8()) != 0
+                        reader.expectTag(.int32)
+                        let param1 = Int(reader.readInt32())
+                        reader.expectTag(.string)
+                        let param2 = reader.readString()
+                        return .status(param0, param1, param2)
+                        case 4:
+                        reader.readParamCount(expected: 3)
+                        reader.expectTag(.float64)
+                        let param0 = reader.readFloat64()
+                        reader.expectTag(.float64)
+                        let param1 = reader.readFloat64()
+                        reader.expectTag(.float64)
+                        let param2 = reader.readFloat64()
+                        return .coordinates(param0, param1, param2)
+                        case 5:
+                        reader.readParamCount(expected: 9)
+                        reader.expectTag(.bool)
+                        let param0 = Int32(reader.readUInt8()) != 0
+                        reader.expectTag(.bool)
+                        let param1 = Int32(reader.readUInt8()) != 0
+                        reader.expectTag(.int32)
+                        let param2 = Int(reader.readInt32())
+                        reader.expectTag(.int32)
+                        let param3 = Int(reader.readInt32())
+                        reader.expectTag(.float64)
+                        let param4 = reader.readFloat64()
+                        reader.expectTag(.float64)
+                        let param5 = reader.readFloat64()
+                        reader.expectTag(.string)
+                        let param6 = reader.readString()
+                        reader.expectTag(.string)
+                        let param7 = reader.readString()
+                        reader.expectTag(.string)
+                        let param8 = reader.readString()
+                        return .comprehensive(param0, param1, param2, param3, param4, param5, param6, param7, param8)
+                        case 6:
+                return .info
+            default:
+                fatalError("Unknown ComplexResult case ID: \(caseId)")
+            }
         }
     }
-}
 
-import Foundation
-
-extension ComplexResult {
-    func bridgeJSReturn() {
-        @_extern(wasm, module: "bjs", name: "swift_js_return_tag")
-        func _swift_js_return_tag(_: Int32)
-        @_extern(wasm, module: "bjs", name: "swift_js_return_string")
-        func _swift_js_return_string(_: UnsafePointer<UInt8>?, _: Int32)
-        @_extern(wasm, module: "bjs", name: "swift_js_return_int")
-        func _swift_js_return_int(_: Int32)
-        @_extern(wasm, module: "bjs", name: "swift_js_return_f32")
-        func _swift_js_return_f32(_: Float32)
-        @_extern(wasm, module: "bjs", name: "swift_js_return_f64")
-        func _swift_js_return_f64(_: Float64)
-        @_extern(wasm, module: "bjs", name: "swift_js_return_bool")
-        func _swift_js_return_bool(_: Int32)
+    func bridgeJSLowerReturn() {
         switch self {
         case .success(let param0):
     _swift_js_return_tag(Int32(0))
-            var mutableParam0 = param0
-mutableParam0.withUTF8 { ptr in
-    _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-}
-        case .error(let param0, let param1):
+                        var __bjs_param0 = param0
+    __bjs_param0.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+                    case .error(let param0, let param1):
     _swift_js_return_tag(Int32(1))
-            var mutableParam0 = param0
-mutableParam0.withUTF8 { ptr in
-    _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-}
-            _swift_js_return_int(Int32(param1))
-        case .location(let param0, let param1, let param2):
+                        var __bjs_param0 = param0
+    __bjs_param0.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+                        _swift_js_return_int(Int32(param1))
+                    case .location(let param0, let param1, let param2):
     _swift_js_return_tag(Int32(2))
-            _swift_js_return_f64(param0)
-            _swift_js_return_f64(param1)
-            var mutableParam2 = param2
-mutableParam2.withUTF8 { ptr in
-    _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-}
-        case .status(let param0, let param1, let param2):
+                        _swift_js_return_f64(param0)
+                        _swift_js_return_f64(param1)
+                        var __bjs_param2 = param2
+    __bjs_param2.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+                    case .status(let param0, let param1, let param2):
     _swift_js_return_tag(Int32(3))
-            _swift_js_return_bool(param0 ? 1 : 0)
-            _swift_js_return_int(Int32(param1))
-            var mutableParam2 = param2
-mutableParam2.withUTF8 { ptr in
-    _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-}
-        case .info:
+                        _swift_js_return_bool(param0 ? 1 : 0)
+                        _swift_js_return_int(Int32(param1))
+                        var __bjs_param2 = param2
+    __bjs_param2.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+                    case .coordinates(let param0, let param1, let param2):
     _swift_js_return_tag(Int32(4))
+                        _swift_js_return_f64(param0)
+                        _swift_js_return_f64(param1)
+                        _swift_js_return_f64(param2)
+                    case .comprehensive(let param0, let param1, let param2, let param3, let param4, let param5, let param6, let param7, let param8):
+    _swift_js_return_tag(Int32(5))
+                        _swift_js_return_bool(param0 ? 1 : 0)
+                        _swift_js_return_bool(param1 ? 1 : 0)
+                        _swift_js_return_int(Int32(param2))
+                        _swift_js_return_int(Int32(param3))
+                        _swift_js_return_f64(param4)
+                        _swift_js_return_f64(param5)
+                        var __bjs_param6 = param6
+    __bjs_param6.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+                        var __bjs_param7 = param7
+    __bjs_param7.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+                        var __bjs_param8 = param8
+    __bjs_param8.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+                    case .info:
+    _swift_js_return_tag(Int32(6))
         }
     }
 }
 
-extension ComplexResult {
-    static func constructFromComplexResult_0(param0: String) -> ComplexResult { 
-    return .success(param0) 
-}
-
-                static func constructFromComplexResult_1(param0: String, param1: Int32) -> ComplexResult { 
-    return .error(param0, Int(param1)) 
-}
-
-                static func constructFromComplexResult_2(param0: Float64, param1: Float64, param2: String) -> ComplexResult { 
-    return .location(param0, param1, param2) 
-}
-
-                static func constructFromComplexResult_3(param0: Int32, param1: Int32, param2: String) -> ComplexResult { 
-    return .status((param0 != 0), Int(param1), param2) 
-}
-
-                static func constructFromComplexResult_4() -> ComplexResult { 
-    return .info 
-}
-    
-    static func dispatchConstruct(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> ComplexResult {
-        let paramsString = String(unsafeUninitializedCapacity: Int(paramsLen)) { buf in
+private extension Utilities.Result {
+    static func bridgeJSLiftParameter(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> Utilities.Result {
+        let params: [UInt8] = .init(unsafeUninitializedCapacity: Int(paramsLen)) { buf, initializedCount in
             _swift_js_init_memory(paramsId, buf.baseAddress.unsafelyUnwrapped)
-            return Int(paramsLen)
+            initializedCount = Int(paramsLen)
         }
-        return dispatchConstructFromJson(caseId, paramsString)
+        return params.withUnsafeBytes { raw in
+            var reader = _BJSBinaryReader(raw: raw)
+            switch caseId {
+            case 0:
+                        reader.readParamCount(expected: 1)
+                        reader.expectTag(.string)
+                        let param0 = reader.readString()
+                        return .success(param0)
+                        case 1:
+                        reader.readParamCount(expected: 2)
+                        reader.expectTag(.string)
+                        let param0 = reader.readString()
+                        reader.expectTag(.int32)
+                        let param1 = Int(reader.readInt32())
+                        return .failure(param0, param1)
+                        case 2:
+                        reader.readParamCount(expected: 3)
+                        reader.expectTag(.bool)
+                        let param0 = Int32(reader.readUInt8()) != 0
+                        reader.expectTag(.int32)
+                        let param1 = Int(reader.readInt32())
+                        reader.expectTag(.string)
+                        let param2 = reader.readString()
+                        return .status(param0, param1, param2)
+            default:
+                fatalError("Unknown Utilities.Result case ID: \(caseId)")
+            }
+        }
     }
-    
-    static func dispatchConstructFromJson(_ caseId: Int32, _ paramsJson: String) -> ComplexResult {
-        switch caseId {
-        case 0: 
-    guard let data = paramsJson.data(using: .utf8),
-          let params = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-        fatalError("Failed to parse parameters JSON")
+
+    func bridgeJSLowerReturn() {
+        switch self {
+        case .success(let param0):
+    _swift_js_return_tag(Int32(0))
+                        var __bjs_param0 = param0
+    __bjs_param0.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
     }
-    let param0 = params["param0"] as! String
-    return constructFromComplexResult_0(param0: param0)
-                    case 1: 
-    guard let data = paramsJson.data(using: .utf8),
-          let params = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-        fatalError("Failed to parse parameters JSON")
+                    case .failure(let param0, let param1):
+    _swift_js_return_tag(Int32(1))
+                        var __bjs_param0 = param0
+    __bjs_param0.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
     }
-    let param0 = params["param0"] as! String; let param1 = params["param1"] as! Int32
-    return constructFromComplexResult_1(param0: param0, param1: param1)
-                    case 2: 
-    guard let data = paramsJson.data(using: .utf8),
-          let params = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-        fatalError("Failed to parse parameters JSON")
+                        _swift_js_return_int(Int32(param1))
+                    case .status(let param0, let param1, let param2):
+    _swift_js_return_tag(Int32(2))
+                        _swift_js_return_bool(param0 ? 1 : 0)
+                        _swift_js_return_int(Int32(param1))
+                        var __bjs_param2 = param2
+    __bjs_param2.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
     }
-    let param0 = params["param0"] as! Float64; let param1 = params["param1"] as! Float64; let param2 = params["param2"] as! String
-    return constructFromComplexResult_2(param0: param0, param1: param1, param2: param2)
-                    case 3: 
-    guard let data = paramsJson.data(using: .utf8),
-          let params = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-        fatalError("Failed to parse parameters JSON")
+        }
     }
-    let param0 = Int32(params["param0"] as! Bool ? 1 : 0); let param1 = params["param1"] as! Int32; let param2 = params["param2"] as! String
-    return constructFromComplexResult_3(param0: param0, param1: param1, param2: param2)
-                    case 4: return constructFromComplexResult_4()
-        default: fatalError("Unknown ComplexResult case ID: \(caseId)")
+}
+
+private extension API.NetworkingResult {
+    static func bridgeJSLiftParameter(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> API.NetworkingResult {
+        let params: [UInt8] = .init(unsafeUninitializedCapacity: Int(paramsLen)) { buf, initializedCount in
+            _swift_js_init_memory(paramsId, buf.baseAddress.unsafelyUnwrapped)
+            initializedCount = Int(paramsLen)
+        }
+        return params.withUnsafeBytes { raw in
+            var reader = _BJSBinaryReader(raw: raw)
+            switch caseId {
+            case 0:
+                        reader.readParamCount(expected: 1)
+                        reader.expectTag(.string)
+                        let param0 = reader.readString()
+                        return .success(param0)
+                        case 1:
+                        reader.readParamCount(expected: 2)
+                        reader.expectTag(.string)
+                        let param0 = reader.readString()
+                        reader.expectTag(.int32)
+                        let param1 = Int(reader.readInt32())
+                        return .failure(param0, param1)
+            default:
+                fatalError("Unknown API.NetworkingResult case ID: \(caseId)")
+            }
+        }
+    }
+
+    func bridgeJSLowerReturn() {
+        switch self {
+        case .success(let param0):
+    _swift_js_return_tag(Int32(0))
+                        var __bjs_param0 = param0
+    __bjs_param0.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+                    case .failure(let param0, let param1):
+    _swift_js_return_tag(Int32(1))
+                        var __bjs_param0 = param0
+    __bjs_param0.withUTF8 { ptr in
+        _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+    }
+                        _swift_js_return_int(Int32(param1))
         }
     }
 }
@@ -1009,8 +1192,8 @@ public func _bjs_getTSTheme() -> Void {
 @_cdecl("bjs_echoAPIResult")
 public func _bjs_echoAPIResult(resultCaseId: Int32, resultParamsId: Int32, resultParamsLen: Int32) -> Void {
     #if arch(wasm32)
-    let ret = echoAPIResult(result: APIResult.dispatchConstruct(resultCaseId, resultParamsId, resultParamsLen))
-    ret.bridgeJSReturn()
+    let ret = echoAPIResult(result: APIResult.bridgeJSLiftParameter(resultCaseId, resultParamsId, resultParamsLen))
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1025,7 +1208,7 @@ public func _bjs_makeAPIResultSuccess(valueBytes: Int32, valueLen: Int32) -> Voi
         return Int(valueLen)
     }
     let ret = makeAPIResultSuccess(_: value)
-    ret.bridgeJSReturn()
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1036,7 +1219,7 @@ public func _bjs_makeAPIResultSuccess(valueBytes: Int32, valueLen: Int32) -> Voi
 public func _bjs_makeAPIResultFailure(value: Int32) -> Void {
     #if arch(wasm32)
     let ret = makeAPIResultFailure(_: Int(value))
-    ret.bridgeJSReturn()
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1047,7 +1230,7 @@ public func _bjs_makeAPIResultFailure(value: Int32) -> Void {
 public func _bjs_makeAPIResultInfo() -> Void {
     #if arch(wasm32)
     let ret = makeAPIResultInfo()
-    ret.bridgeJSReturn()
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1058,7 +1241,7 @@ public func _bjs_makeAPIResultInfo() -> Void {
 public func _bjs_makeAPIResultFlag(value: Int32) -> Void {
     #if arch(wasm32)
     let ret = makeAPIResultFlag(_: value == 1)
-    ret.bridgeJSReturn()
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1069,7 +1252,7 @@ public func _bjs_makeAPIResultFlag(value: Int32) -> Void {
 public func _bjs_makeAPIResultRate(value: Float32) -> Void {
     #if arch(wasm32)
     let ret = makeAPIResultRate(_: value)
-    ret.bridgeJSReturn()
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1080,7 +1263,7 @@ public func _bjs_makeAPIResultRate(value: Float32) -> Void {
 public func _bjs_makeAPIResultPrecise(value: Float64) -> Void {
     #if arch(wasm32)
     let ret = makeAPIResultPrecise(_: value)
-    ret.bridgeJSReturn()
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1090,8 +1273,8 @@ public func _bjs_makeAPIResultPrecise(value: Float64) -> Void {
 @_cdecl("bjs_echoComplexResult")
 public func _bjs_echoComplexResult(resultCaseId: Int32, resultParamsId: Int32, resultParamsLen: Int32) -> Void {
     #if arch(wasm32)
-    let ret = echoComplexResult(result: ComplexResult.dispatchConstruct(resultCaseId, resultParamsId, resultParamsLen))
-    ret.bridgeJSReturn()
+    let ret = echoComplexResult(result: ComplexResult.bridgeJSLiftParameter(resultCaseId, resultParamsId, resultParamsLen))
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1106,7 +1289,7 @@ public func _bjs_makeComplexResultSuccess(valueBytes: Int32, valueLen: Int32) ->
         return Int(valueLen)
     }
     let ret = makeComplexResultSuccess(_: value)
-    ret.bridgeJSReturn()
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1121,7 +1304,7 @@ public func _bjs_makeComplexResultError(messageBytes: Int32, messageLen: Int32, 
         return Int(messageLen)
     }
     let ret = makeComplexResultError(_: message, _: Int(code))
-    ret.bridgeJSReturn()
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1136,7 +1319,7 @@ public func _bjs_makeComplexResultLocation(lat: Float64, lng: Float64, nameBytes
         return Int(nameLen)
     }
     let ret = makeComplexResultLocation(_: lat, _: lng, _: name)
-    ret.bridgeJSReturn()
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1151,7 +1334,41 @@ public func _bjs_makeComplexResultStatus(active: Int32, code: Int32, messageByte
         return Int(messageLen)
     }
     let ret = makeComplexResultStatus(_: active == 1, _: Int(code), _: message)
-    ret.bridgeJSReturn()
+    ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeComplexResultCoordinates")
+@_cdecl("bjs_makeComplexResultCoordinates")
+public func _bjs_makeComplexResultCoordinates(x: Float64, y: Float64, z: Float64) -> Void {
+    #if arch(wasm32)
+    let ret = makeComplexResultCoordinates(_: x, _: y, _: z)
+    ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeComplexResultComprehensive")
+@_cdecl("bjs_makeComplexResultComprehensive")
+public func _bjs_makeComplexResultComprehensive(flag1: Int32, flag2: Int32, count1: Int32, count2: Int32, value1: Float64, value2: Float64, text1Bytes: Int32, text1Len: Int32, text2Bytes: Int32, text2Len: Int32, text3Bytes: Int32, text3Len: Int32) -> Void {
+    #if arch(wasm32)
+    let text1 = String(unsafeUninitializedCapacity: Int(text1Len)) { b in
+        _swift_js_init_memory(text1Bytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(text1Len)
+    }
+    let text2 = String(unsafeUninitializedCapacity: Int(text2Len)) { b in
+        _swift_js_init_memory(text2Bytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(text2Len)
+    }
+    let text3 = String(unsafeUninitializedCapacity: Int(text3Len)) { b in
+        _swift_js_init_memory(text3Bytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(text3Len)
+    }
+    let ret = makeComplexResultComprehensive(_: flag1 == 1, _: flag2 == 1, _: Int(count1), _: Int(count2), _: value1, _: value2, _: text1, _: text2, _: text3)
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1162,7 +1379,7 @@ public func _bjs_makeComplexResultStatus(active: Int32, code: Int32, messageByte
 public func _bjs_makeComplexResultInfo() -> Void {
     #if arch(wasm32)
     let ret = makeComplexResultInfo()
-    ret.bridgeJSReturn()
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1172,8 +1389,105 @@ public func _bjs_makeComplexResultInfo() -> Void {
 @_cdecl("bjs_roundtripComplexResult")
 public func _bjs_roundtripComplexResult(resultCaseId: Int32, resultParamsId: Int32, resultParamsLen: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundtripComplexResult(_: ComplexResult.dispatchConstruct(resultCaseId, resultParamsId, resultParamsLen))
-    ret.bridgeJSReturn()
+    let ret = roundtripComplexResult(_: ComplexResult.bridgeJSLiftParameter(resultCaseId, resultParamsId, resultParamsLen))
+    ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeUtilitiesResultSuccess")
+@_cdecl("bjs_makeUtilitiesResultSuccess")
+public func _bjs_makeUtilitiesResultSuccess(messageBytes: Int32, messageLen: Int32) -> Void {
+    #if arch(wasm32)
+    let message = String(unsafeUninitializedCapacity: Int(messageLen)) { b in
+        _swift_js_init_memory(messageBytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(messageLen)
+    }
+    let ret = makeUtilitiesResultSuccess(_: message)
+    ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeUtilitiesResultFailure")
+@_cdecl("bjs_makeUtilitiesResultFailure")
+public func _bjs_makeUtilitiesResultFailure(errorBytes: Int32, errorLen: Int32, code: Int32) -> Void {
+    #if arch(wasm32)
+    let error = String(unsafeUninitializedCapacity: Int(errorLen)) { b in
+        _swift_js_init_memory(errorBytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(errorLen)
+    }
+    let ret = makeUtilitiesResultFailure(_: error, _: Int(code))
+    ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeUtilitiesResultStatus")
+@_cdecl("bjs_makeUtilitiesResultStatus")
+public func _bjs_makeUtilitiesResultStatus(active: Int32, code: Int32, messageBytes: Int32, messageLen: Int32) -> Void {
+    #if arch(wasm32)
+    let message = String(unsafeUninitializedCapacity: Int(messageLen)) { b in
+        _swift_js_init_memory(messageBytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(messageLen)
+    }
+    let ret = makeUtilitiesResultStatus(_: active == 1, _: Int(code), _: message)
+    ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeAPINetworkingResultSuccess")
+@_cdecl("bjs_makeAPINetworkingResultSuccess")
+public func _bjs_makeAPINetworkingResultSuccess(messageBytes: Int32, messageLen: Int32) -> Void {
+    #if arch(wasm32)
+    let message = String(unsafeUninitializedCapacity: Int(messageLen)) { b in
+        _swift_js_init_memory(messageBytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(messageLen)
+    }
+    let ret = makeAPINetworkingResultSuccess(_: message)
+    ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeAPINetworkingResultFailure")
+@_cdecl("bjs_makeAPINetworkingResultFailure")
+public func _bjs_makeAPINetworkingResultFailure(errorBytes: Int32, errorLen: Int32, code: Int32) -> Void {
+    #if arch(wasm32)
+    let error = String(unsafeUninitializedCapacity: Int(errorLen)) { b in
+        _swift_js_init_memory(errorBytes, b.baseAddress.unsafelyUnwrapped)
+        return Int(errorLen)
+    }
+    let ret = makeAPINetworkingResultFailure(_: error, _: Int(code))
+    ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundtripUtilitiesResult")
+@_cdecl("bjs_roundtripUtilitiesResult")
+public func _bjs_roundtripUtilitiesResult(resultCaseId: Int32, resultParamsId: Int32, resultParamsLen: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundtripUtilitiesResult(_: Utilities.Result.bridgeJSLiftParameter(resultCaseId, resultParamsId, resultParamsLen))
+    ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundtripAPINetworkingResult")
+@_cdecl("bjs_roundtripAPINetworkingResult")
+public func _bjs_roundtripAPINetworkingResult(resultCaseId: Int32, resultParamsId: Int32, resultParamsLen: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundtripAPINetworkingResult(_: API.NetworkingResult.bridgeJSLiftParameter(resultCaseId, resultParamsId, resultParamsLen))
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

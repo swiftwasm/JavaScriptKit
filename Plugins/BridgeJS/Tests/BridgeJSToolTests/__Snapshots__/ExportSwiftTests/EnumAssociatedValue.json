@@ -137,6 +137,100 @@
         },
         {
           "associatedValues" : [
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "coordinates"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "comprehensive"
+        },
+        {
+          "associatedValues" : [
 
           ],
           "name" : "info"
@@ -145,6 +239,114 @@
       "emitStyle" : "const",
       "name" : "ComplexResult",
       "swiftCallName" : "ComplexResult"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "failure"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "status"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Result",
+      "namespace" : [
+        "Utilities"
+      ],
+      "swiftCallName" : "Utilities.Result"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "failure"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "NetworkingResult",
+      "namespace" : [
+        "API"
+      ],
+      "swiftCallName" : "NetworkingResult"
     }
   ],
   "functions" : [
