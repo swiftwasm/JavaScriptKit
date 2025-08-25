@@ -58,6 +58,7 @@ Check out the [examples](https://github.com/swiftwasm/JavaScriptKit/tree/main/Ex
 
 - <doc:Importing-TypeScript-into-Swift>
 - <doc:Exporting-Swift-to-JavaScript>
+- <doc:Supported-Types>
 - <doc:BridgeJS-Configuration>
 - <doc:Ahead-of-Time-Code-Generation>
 
@@ -65,4 +66,4 @@ Check out the [examples](https://github.com/swiftwasm/JavaScriptKit/tree/main/Ex
 
 - ``JSValue``
 - ``JSObject``
-- ``JS(namespace:)``
+- ``JS(namespace:enumStyle:)``
