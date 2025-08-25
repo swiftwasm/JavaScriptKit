@@ -156,7 +156,7 @@ public struct ImportTS {
         func renderThunkDecl(name: String, parameters: [Parameter], returnType: BridgeType) -> DeclSyntax {
             return DeclSyntax(
                 FunctionDeclSyntax(
-                    name: .identifier(name),
+                    name: .identifier(name.backtickIfNeeded()),
                     signature: FunctionSignatureSyntax(
                         parameterClause: FunctionParameterClauseSyntax(parametersBuilder: {
                             for param in parameters {
@@ -315,7 +315,9 @@ public struct ImportTS {
                         bindingsBuilder: {
                             PatternBindingListSyntax {
                                 PatternBindingSyntax(
-                                    pattern: IdentifierPatternSyntax(identifier: .identifier(property.name)),
+                                    pattern: IdentifierPatternSyntax(
+                                        identifier: .identifier(property.name.backtickIfNeeded())
+                                    ),
                                     typeAnnotation: TypeAnnotationSyntax(
                                         type: IdentifierTypeSyntax(name: .identifier(property.type.swiftType))
                                     ),
@@ -464,5 +466,11 @@ extension BridgeType {
         case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
             throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
         }
+    }
+}
+
+extension String {
+    func backtickIfNeeded() -> String {
+        return self.isValidSwiftIdentifier(for: .variableName) ? self : "`\(self)`"
     }
 }
