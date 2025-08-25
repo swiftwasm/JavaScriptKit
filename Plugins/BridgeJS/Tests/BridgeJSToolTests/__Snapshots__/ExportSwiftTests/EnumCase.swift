@@ -131,6 +131,37 @@ extension TSDirection {
     }
 }
 
+extension PublicStatus {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> PublicStatus {
+        return PublicStatus(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> PublicStatus {
+        return PublicStatus(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSRawValue
+    }
+
+    private init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .success
+        default:
+            return nil
+        }
+    }
+
+    private var bridgeJSRawValue: Int32 {
+        switch self {
+        case .success:
+            return 0
+        }
+    }
+}
+
 @_expose(wasm, "bjs_setDirection")
 @_cdecl("bjs_setDirection")
 public func _bjs_setDirection(direction: Int32) -> Void {

@@ -26,6 +26,11 @@ export enum TSDirection {
     West = 3,
 }
 
+export const PublicStatus: {
+    readonly Success: 0;
+};
+export type PublicStatus = typeof PublicStatus[keyof typeof PublicStatus];
+
 export type Exports = {
     setDirection(direction: Direction): void;
     getDirection(): Direction;

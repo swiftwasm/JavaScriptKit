@@ -983,6 +983,66 @@ extension Calculator: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     }
 }
 
+@_expose(wasm, "bjs_InternalGreeter_deinit")
+@_cdecl("bjs_InternalGreeter_deinit")
+public func _bjs_InternalGreeter_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<InternalGreeter>.fromOpaque(pointer).release()
+}
+
+extension InternalGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    internal var jsValue: JSValue {
+        #if arch(wasm32)
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_InternalGreeter_wrap")
+        func _bjs_InternalGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_InternalGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_InternalGreeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+@_expose(wasm, "bjs_PublicGreeter_deinit")
+@_cdecl("bjs_PublicGreeter_deinit")
+public func _bjs_PublicGreeter_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<PublicGreeter>.fromOpaque(pointer).release()
+}
+
+extension PublicGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    public var jsValue: JSValue {
+        #if arch(wasm32)
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_PublicGreeter_wrap")
+        func _bjs_PublicGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_PublicGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_PublicGreeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+@_expose(wasm, "bjs_PackageGreeter_deinit")
+@_cdecl("bjs_PackageGreeter_deinit")
+public func _bjs_PackageGreeter_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<PackageGreeter>.fromOpaque(pointer).release()
+}
+
+extension PackageGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    package var jsValue: JSValue {
+        #if arch(wasm32)
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_PackageGreeter_wrap")
+        func _bjs_PackageGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_PackageGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_PackageGreeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
 @_expose(wasm, "bjs_Converter_init")
 @_cdecl("bjs_Converter_init")
 public func _bjs_Converter_init() -> UnsafeMutableRawPointer {

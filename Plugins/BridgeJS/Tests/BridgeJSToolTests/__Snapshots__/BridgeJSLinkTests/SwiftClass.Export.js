@@ -57,6 +57,14 @@ export async function createInstantiator(options, swift) {
                 const obj = Greeter.__construct(pointer);
                 return swift.memory.retain(obj);
             };
+            importObject["TestModule"]["bjs_PublicGreeter_wrap"] = function(pointer) {
+                const obj = PublicGreeter.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
+            importObject["TestModule"]["bjs_PackageGreeter_wrap"] = function(pointer) {
+                const obj = PackageGreeter.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
 
         },
         setInstance: (i) => {
@@ -126,8 +134,22 @@ export async function createInstantiator(options, swift) {
                     swift.memory.release(valueId);
                 }
             }
+            class PublicGreeter extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PublicGreeter_deinit, PublicGreeter.prototype);
+                }
+                
+            }
+            class PackageGreeter extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PackageGreeter_deinit, PackageGreeter.prototype);
+                }
+                
+            }
             return {
                 Greeter,
+                PublicGreeter,
+                PackageGreeter,
                 takeGreeter: function bjs_takeGreeter(greeter) {
                     instance.exports.bjs_takeGreeter(greeter.pointer);
                 },

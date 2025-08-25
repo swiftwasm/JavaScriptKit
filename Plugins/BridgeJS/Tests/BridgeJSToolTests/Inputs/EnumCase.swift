@@ -24,3 +24,7 @@
 
 @JS func setTSDirection(_ direction: TSDirection)
 @JS func getTSDirection() -> TSDirection
+
+@JS public enum PublicStatus {
+    case success
+}

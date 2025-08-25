@@ -102,6 +102,10 @@ struct TestError: Error {
     }
 }
 
+@JS internal class InternalGreeter {}
+@JS public class PublicGreeter {}
+@JS package class PackageGreeter {}
+
 @JS func createCalculator() -> Calculator {
     return Calculator()
 }

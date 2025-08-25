@@ -151,6 +151,39 @@
       "swiftCallName" : "Calculator"
     },
     {
+      "explicitAccessControl" : "internal",
+      "methods" : [
+
+      ],
+      "name" : "InternalGreeter",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "InternalGreeter"
+    },
+    {
+      "explicitAccessControl" : "public",
+      "methods" : [
+
+      ],
+      "name" : "PublicGreeter",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "PublicGreeter"
+    },
+    {
+      "explicitAccessControl" : "package",
+      "methods" : [
+
+      ],
+      "name" : "PackageGreeter",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "PackageGreeter"
+    },
+    {
       "constructor" : {
         "abiName" : "bjs_Converter_init",
         "effects" : {

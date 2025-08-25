@@ -88,3 +88,43 @@ extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+@_expose(wasm, "bjs_PublicGreeter_deinit")
+@_cdecl("bjs_PublicGreeter_deinit")
+public func _bjs_PublicGreeter_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<PublicGreeter>.fromOpaque(pointer).release()
+}
+
+extension PublicGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    public var jsValue: JSValue {
+        #if arch(wasm32)
+        @_extern(wasm, module: "TestModule", name: "bjs_PublicGreeter_wrap")
+        func _bjs_PublicGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_PublicGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_PublicGreeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+@_expose(wasm, "bjs_PackageGreeter_deinit")
+@_cdecl("bjs_PackageGreeter_deinit")
+public func _bjs_PackageGreeter_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<PackageGreeter>.fromOpaque(pointer).release()
+}
+
+extension PackageGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    package var jsValue: JSValue {
+        #if arch(wasm32)
+        @_extern(wasm, module: "TestModule", name: "bjs_PackageGreeter_wrap")
+        func _bjs_PackageGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_PackageGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_PackageGreeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}

@@ -426,9 +426,14 @@ public class ExportSwift {
             let effectiveNamespace = computedNamespace ?? attributeNamespace
 
             let swiftCallName = ExportSwift.computeSwiftCallName(for: node, itemName: name)
+            let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
+                for: node,
+                message: "Class visibility must be at least internal"
+            )
             let exportedClass = ExportedClass(
                 name: name,
                 swiftCallName: swiftCallName,
+                explicitAccessControl: explicitAccessControl,
                 constructor: nil,
                 methods: [],
                 properties: [],
@@ -520,9 +525,14 @@ public class ExportSwift {
             }
 
             let swiftCallName = ExportSwift.computeSwiftCallName(for: node, itemName: enumName)
+            let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
+                for: node,
+                message: "Enum visibility must be at least internal"
+            )
             let exportedEnum = ExportedEnum(
                 name: enumName,
                 swiftCallName: swiftCallName,
+                explicitAccessControl: explicitAccessControl,
                 cases: currentEnum.cases,
                 rawType: currentEnum.rawType,
                 namespace: effectiveNamespace,
@@ -614,6 +624,25 @@ public class ExportSwift {
             }
 
             return namespace.isEmpty ? nil : namespace
+        }
+
+        /// Requires the node to have at least internal access control.
+        private func computeExplicitAtLeastInternalAccessControl(
+            for node: some WithModifiersSyntax,
+            message: String
+        ) -> String? {
+            guard let accessControl = node.explicitAccessControl else {
+                return nil
+            }
+            guard accessControl.isAtLeastInternal else {
+                diagnose(
+                    node: accessControl,
+                    message: message,
+                    hint: "Use `internal`, `package` or `public` access control"
+                )
+                return nil
+            }
+            return accessControl.name.text
         }
     }
 
@@ -1130,9 +1159,11 @@ public class ExportSwift {
         let wrapFunctionName = "_bjs_\(klass.name)_wrap"
         let externFunctionName = "bjs_\(klass.name)_wrap"
 
+        // If the class has an explicit access control, we need to add it to the extension declaration.
+        let accessControl = klass.explicitAccessControl.map { "\($0) " } ?? ""
         return """
             extension \(raw: klass.swiftCallName): ConvertibleToJSValue, _BridgedSwiftHeapObject {
-                var jsValue: JSValue {
+                \(raw: accessControl)var jsValue: JSValue {
                     #if arch(wasm32)
                     @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: externFunctionName)")
                     func \(raw: wrapFunctionName)(_: UnsafeMutableRawPointer) -> Int32
@@ -1306,6 +1337,54 @@ extension BridgeType {
             throw BridgeJSCoreError("Associated value enums are not supported to pass as parameters")
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
+        }
+    }
+}
+
+extension DeclModifierSyntax {
+    var isAccessControl: Bool {
+        switch self.name.tokenKind {
+        case .keyword(.private),
+            .keyword(.fileprivate),
+            .keyword(.internal),
+            .keyword(.package),
+            .keyword(.public),
+            .keyword(.open):
+            return true
+        default:
+            return false
+        }
+    }
+
+    var isAtLeastInternal: Bool {
+        switch self.name.tokenKind {
+        case .keyword(.private): false
+        case .keyword(.fileprivate): false
+        case .keyword(.internal): true
+        case .keyword(.package): true
+        case .keyword(.public): true
+        case .keyword(.open): true
+        default: false
+        }
+    }
+
+    var isAtLeastPackage: Bool {
+        switch self.name.tokenKind {
+        case .keyword(.private): false
+        case .keyword(.fileprivate): false
+        case .keyword(.internal): true
+        case .keyword(.package): true
+        case .keyword(.public): true
+        case .keyword(.open): true
+        default: false
+        }
+    }
+}
+
+extension WithModifiersSyntax {
+    var explicitAccessControl: DeclModifierSyntax? {
+        return self.modifiers.first { modifier in
+            modifier.isAccessControl
         }
     }
 }
