@@ -43,6 +43,14 @@ export class BridgeJSPlayground {
         this.copyButton = /** @type {HTMLButtonElement} */ (document.getElementById('copyButton'));
         /** @type {HTMLButtonElement} */
         this.closeShareDialogButton = /** @type {HTMLButtonElement} */ (document.getElementById('closeShareDialog'));
+
+        // Progress UI elements
+        /** @type {HTMLDivElement | null} */
+        this.progressBar = /** @type {HTMLDivElement} */ (document.getElementById('progressBar'));
+        /** @type {HTMLDivElement | null} */
+        this.progressFill = /** @type {HTMLDivElement} */ (document.getElementById('progressFill'));
+        /** @type {HTMLDivElement | null} */
+        this.progressLabel = /** @type {HTMLDivElement} */ (document.getElementById('progressLabel'));
     }
 
     /**
@@ -55,16 +63,20 @@ export class BridgeJSPlayground {
         }
 
         try {
+            this.showProgress('Starting…', 5);
             // Initialize editor system
             await this.editorSystem.init();
+            this.setProgress('Editor ready', 30);
 
             // Initialize BridgeJS
             await this.initializeBridgeJS();
+            this.setProgress('BridgeJS ready', 70);
 
             // Set up event listeners
             this.setupEventListeners();
 
             // Check for shared code in URL
+            this.setProgress('Checking shared code…', 80);
             const sharedCode = await CodeShareManager.extractCodeFromUrl();
             if (sharedCode) {
                 this.editorSystem.setInputs(sharedCode);
@@ -72,12 +84,15 @@ export class BridgeJSPlayground {
                 // Load sample code
                 this.editorSystem.setInputs(sampleCode);
             }
-
+            this.setProgress('Finalizing…', 95);
             this.isInitialized = true;
             console.log('BridgeJS Playground initialized successfully');
+            this.setProgress('Ready', 100);
+            setTimeout(() => this.hideProgress(), 400);
         } catch (error) {
             console.error('Failed to initialize BridgeJS Playground:', error);
             this.showError('Failed to initialize application: ' + error.message);
+            this.hideProgress();
         }
     }
 
@@ -85,13 +100,16 @@ export class BridgeJSPlayground {
     async initializeBridgeJS() {
         try {
             // Import the BridgeJS module
+            this.setProgress('Loading BridgeJS…', 50);
             const { init } = await import("../../.build/plugins/PackageToJS/outputs/Package/index.js");
             const virtualHost = await this.createTS2SkeletonFactory();
+            this.setProgress('Preparing TypeScript host…', 60);
             const { exports } = await init({
                 getImports: () => ({
                     createTS2Skeleton: () => this.createTS2Skeleton(virtualHost)
                 })
             });
+            this.setProgress('Creating runtime…', 65);
             this.playBridgeJS = new exports.PlayBridgeJS();
             console.log('BridgeJS initialized successfully');
         } catch (error) {
@@ -283,5 +301,43 @@ export class BridgeJSPlayground {
      */
     hideError() {
         this.errorDisplay.classList.remove('show');
+    }
+
+    /**
+     * Shows progress bar.
+     * @param {string} label
+     * @param {number} percent
+     */
+    showProgress(label, percent) {
+        if (this.progressBar) {
+            this.progressBar.classList.add('show');
+            this.progressBar.classList.remove('hidden');
+        }
+        this.setProgress(label, percent);
+    }
+
+    /**
+     * Updates progress label and percentage.
+     * @param {string} label
+     * @param {number} percent
+     */
+    setProgress(label, percent) {
+        if (this.progressLabel) {
+            this.progressLabel.textContent = label;
+        }
+        if (this.progressFill) {
+            const clamped = Math.max(0, Math.min(100, Number(percent) || 0));
+            this.progressFill.style.width = clamped + '%';
+        }
+    }
+
+    /**
+     * Hides progress bar.
+     */
+    hideProgress() {
+        if (this.progressBar) {
+            this.progressBar.classList.remove('show');
+            this.progressBar.classList.add('hidden');
+        }
     }
 }
