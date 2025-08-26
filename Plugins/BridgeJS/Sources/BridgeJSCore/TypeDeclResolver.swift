@@ -109,4 +109,37 @@ class TypeDeclResolver {
     func lookupType(fullyQualified: QualifiedName) -> TypeDecl? {
         return typeDeclByQualifiedName[fullyQualified]
     }
+
+    /// Resolves a type usage node to the corresponding nominal type declaration collected in this resolver.
+    ///
+    /// Supported inputs:
+    /// - IdentifierTypeSyntax (e.g. `Method`) — resolved relative to the lexical scope, preferring the innermost enclosing type.
+    /// - MemberTypeSyntax (e.g. `Networking.API.Method`) — resolved by recursively building the fully qualified name.
+    ///
+    /// Resolution strategy:
+    /// 1. If the node is IdentifierTypeSyntax, call `lookupType(for:)` which attempts scope-aware qualification via `tryQualify`.
+    /// 2. Otherwise, attempt to build a fully qualified name with `qualifiedComponents(from:)` and look it up with `lookupType(fullyQualified:)`.
+    ///
+    /// - Parameter type: The SwiftSyntax node representing a type appearance in source code.
+    /// - Returns: The nominal declaration (enum/class/actor/struct) if found, otherwise nil.
+    func resolve(_ type: TypeSyntax) -> TypeDecl? {
+        if let id = type.as(IdentifierTypeSyntax.self) {
+            return lookupType(for: id)
+        }
+        if let components = qualifiedComponents(from: type) {
+            return lookupType(fullyQualified: components)
+        }
+        return nil
+    }
+
+    private func qualifiedComponents(from type: TypeSyntax) -> QualifiedName? {
+        if let m = type.as(MemberTypeSyntax.self) {
+            guard let base = qualifiedComponents(from: TypeSyntax(m.baseType)) else { return nil }
+            return base + [m.name.text]
+        } else if let id = type.as(IdentifierTypeSyntax.self) {
+            return [id.name.text]
+        } else {
+            return nil
+        }
+    }
 }

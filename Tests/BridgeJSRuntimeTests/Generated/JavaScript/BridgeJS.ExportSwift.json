@@ -1827,6 +1827,132 @@
       }
     },
     {
+      "abiName" : "bjs_echoNetworkingAPIMethod",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "echoNetworkingAPIMethod",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "method",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "Networking.API.Method"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "Networking.API.Method"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_echoConfigurationLogLevel",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "echoConfigurationLogLevel",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "level",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "Configuration.LogLevel",
+              "_1" : "String"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "Configuration.LogLevel",
+          "_1" : "String"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_echoConfigurationPort",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "echoConfigurationPort",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "port",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "Configuration.Port",
+              "_1" : "Int"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "Configuration.Port",
+          "_1" : "Int"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_processConfigurationLogLevel",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "processConfigurationLogLevel",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "level",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "Configuration.LogLevel",
+              "_1" : "String"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "Configuration.Port",
+          "_1" : "Int"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_echoInternalSupportedMethod",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "echoInternalSupportedMethod",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "method",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "Internal.SupportedMethod"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "Internal.SupportedMethod"
+        }
+      }
+    },
+    {
       "abiName" : "bjs_createPropertyHolder",
       "effects" : {
         "isAsync" : false,

@@ -223,6 +223,8 @@ struct TestError: Error {
     return .light
 }
 
+// MARK: - Namespace Enums
+
 @JS enum Utils {
     @JS class Converter {
         @JS init() {}
@@ -273,6 +275,31 @@ enum Internal {
         @JS init() {}
         @JS func call(_ method: SupportedMethod) {}
     }
+}
+
+@JS func echoNetworkingAPIMethod(_ method: Networking.API.Method) -> Networking.API.Method {
+    return method
+}
+
+@JS func echoConfigurationLogLevel(_ level: Configuration.LogLevel) -> Configuration.LogLevel {
+    return level
+}
+
+@JS func echoConfigurationPort(_ port: Configuration.Port) -> Configuration.Port {
+    return port
+}
+
+@JS func processConfigurationLogLevel(_ level: Configuration.LogLevel) -> Configuration.Port {
+    switch level {
+    case .debug: return .development
+    case .info: return .http
+    case .warning: return .https
+    case .error: return .development
+    }
+}
+
+@JS func echoInternalSupportedMethod(_ method: Internal.SupportedMethod) -> Internal.SupportedMethod {
+    return method
 }
 
 // MARK: - Property Tests
