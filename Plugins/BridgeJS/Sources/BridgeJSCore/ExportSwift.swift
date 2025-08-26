@@ -689,47 +689,50 @@ public class ExportSwift {
         if let primitive = BridgeType(swiftType: type.trimmedDescription) {
             return primitive
         }
-        guard let identifier = type.as(IdentifierTypeSyntax.self) else {
+
+        guard let typeDecl = typeDeclResolver.resolve(type) else {
             return nil
         }
 
-        guard let typeDecl = typeDeclResolver.lookupType(for: identifier) else {
-            return nil
-        }
         if let enumDecl = typeDecl.as(EnumDeclSyntax.self) {
-            let enumName = enumDecl.name.text
-            if let existingEnum = exportedEnums.first(where: { $0.name == enumName }) {
-                switch existingEnum.enumType {
-                case .simple:
-                    return .caseEnum(existingEnum.swiftCallName)
-                case .rawValue:
-                    let rawType = SwiftEnumRawType.from(existingEnum.rawType!)!
-                    return .rawValueEnum(existingEnum.swiftCallName, rawType)
-                case .associatedValue:
-                    return .associatedValueEnum(existingEnum.swiftCallName)
-                case .namespace:
-                    return .namespaceEnum(existingEnum.swiftCallName)
-                }
-            }
             let swiftCallName = ExportSwift.computeSwiftCallName(for: enumDecl, itemName: enumDecl.name.text)
             let rawTypeString = enumDecl.inheritanceClause?.inheritedTypes.first { inheritedType in
                 let typeName = inheritedType.type.trimmedDescription
                 return Constants.supportedRawTypes.contains(typeName)
             }?.type.trimmedDescription
 
-            if let rawTypeString = rawTypeString,
-                let rawType = SwiftEnumRawType.from(rawTypeString)
-            {
+            if let rawTypeString, let rawType = SwiftEnumRawType.from(rawTypeString) {
                 return .rawValueEnum(swiftCallName, rawType)
             } else {
-                return .caseEnum(swiftCallName)
+                let hasAnyCases = enumDecl.memberBlock.members.contains { member in
+                    member.decl.is(EnumCaseDeclSyntax.self)
+                }
+                if !hasAnyCases {
+                    return .namespaceEnum(swiftCallName)
+                }
+                let hasAssociatedValues =
+                    enumDecl.memberBlock.members.contains { member in
+                        guard let caseDecl = member.decl.as(EnumCaseDeclSyntax.self) else { return false }
+                        return caseDecl.elements.contains { element in
+                            if let params = element.parameterClause?.parameters {
+                                return !params.isEmpty
+                            }
+                            return false
+                        }
+                    }
+                if hasAssociatedValues {
+                    return .associatedValueEnum(swiftCallName)
+                } else {
+                    return .caseEnum(swiftCallName)
+                }
             }
         }
 
         guard typeDecl.is(ClassDeclSyntax.self) || typeDecl.is(ActorDeclSyntax.self) else {
             return nil
         }
-        return .swiftHeapObject(typeDecl.name.text)
+        let swiftCallName = ExportSwift.computeSwiftCallName(for: typeDecl, itemName: typeDecl.name.text)
+        return .swiftHeapObject(swiftCallName)
     }
 
     static let prelude: DeclSyntax = """

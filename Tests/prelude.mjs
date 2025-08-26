@@ -354,6 +354,15 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethod.Get, 0);
     assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethod.Post, 1);
 
+    assert.equal(exports.echoNetworkingAPIMethod(globalThis.Networking.API.Method.Get), globalThis.Networking.API.Method.Get);
+    assert.equal(exports.echoConfigurationLogLevel(globalThis.Configuration.LogLevel.Debug), globalThis.Configuration.LogLevel.Debug);
+    assert.equal(exports.echoConfigurationPort(globalThis.Configuration.Port.Http), globalThis.Configuration.Port.Http);
+    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Debug), globalThis.Configuration.Port.Development);
+    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Info), globalThis.Configuration.Port.Http);
+    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Warning), globalThis.Configuration.Port.Https);
+    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Error), globalThis.Configuration.Port.Development);
+    assert.equal(exports.echoInternalSupportedMethod(globalThis.Networking.APIV2.Internal.SupportedMethod.Get), globalThis.Networking.APIV2.Internal.SupportedMethod.Get);
+
     const converter = new exports.Converter();
     assert.equal(converter.toString(42), "42");
     assert.equal(converter.toString(123), "123");

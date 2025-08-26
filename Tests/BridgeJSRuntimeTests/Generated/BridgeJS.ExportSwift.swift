@@ -814,6 +814,61 @@ public func _bjs_getTSTheme() -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_echoNetworkingAPIMethod")
+@_cdecl("bjs_echoNetworkingAPIMethod")
+public func _bjs_echoNetworkingAPIMethod(method: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = echoNetworkingAPIMethod(_: Networking.API.Method.bridgeJSLiftParameter(method))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_echoConfigurationLogLevel")
+@_cdecl("bjs_echoConfigurationLogLevel")
+public func _bjs_echoConfigurationLogLevel(levelBytes: Int32, levelLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = echoConfigurationLogLevel(_: Configuration.LogLevel.bridgeJSLiftParameter(levelBytes, levelLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_echoConfigurationPort")
+@_cdecl("bjs_echoConfigurationPort")
+public func _bjs_echoConfigurationPort(port: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = echoConfigurationPort(_: Configuration.Port.bridgeJSLiftParameter(port))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_processConfigurationLogLevel")
+@_cdecl("bjs_processConfigurationLogLevel")
+public func _bjs_processConfigurationLogLevel(levelBytes: Int32, levelLength: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = processConfigurationLogLevel(_: Configuration.LogLevel.bridgeJSLiftParameter(levelBytes, levelLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_echoInternalSupportedMethod")
+@_cdecl("bjs_echoInternalSupportedMethod")
+public func _bjs_echoInternalSupportedMethod(method: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = echoInternalSupportedMethod(_: Internal.SupportedMethod.bridgeJSLiftParameter(method))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_createPropertyHolder")
 @_cdecl("bjs_createPropertyHolder")
 public func _bjs_createPropertyHolder(intValue: Int32, floatValue: Float32, doubleValue: Float64, boolValue: Int32, stringValueBytes: Int32, stringValueLength: Int32, jsObject: Int32) -> UnsafeMutableRawPointer {
