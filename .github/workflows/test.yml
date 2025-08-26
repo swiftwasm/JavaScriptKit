@@ -125,7 +125,7 @@ jobs:
           SWIFT_SDK_ID_wasm32_unknown_wasi: ${{ steps.setup-wasm32-unknown-wasi.outputs.swift-sdk-id }}
       - name: Upload static files as artifact
         id: deployment
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: Examples/
   deploy-examples:
