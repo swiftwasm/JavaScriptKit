@@ -1,3 +1,7 @@
+#if hasFeature(Embedded) && os(WASI)
+import _Concurrency
+#endif
+
 /// A wrapper around [the JavaScript `Promise` class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 public final class JSPromise: JSBridgedClass {
     /// The underlying JavaScript `Promise` object.
