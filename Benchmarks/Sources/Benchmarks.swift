@@ -51,6 +51,14 @@ class Benchmark {
     }
 }
 
+@JS class StringRoundtrip {
+    @JS init() {}
+    @JS func take(_ value: String) {}
+    @JS func make() -> String {
+        return "Hello, world"
+    }
+}
+
 @JS func run() {
 
     let call = Benchmark("Call")

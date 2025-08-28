@@ -190,3 +190,55 @@ extension EnumRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_EnumRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+@_expose(wasm, "bjs_StringRoundtrip_init")
+@_cdecl("bjs_StringRoundtrip_init")
+public func _bjs_StringRoundtrip_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = StringRoundtrip()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringRoundtrip_take")
+@_cdecl("bjs_StringRoundtrip_take")
+public func _bjs_StringRoundtrip_take(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    StringRoundtrip.bridgeJSLiftParameter(_self).take(_: String.bridgeJSLiftParameter(valueBytes, valueLength))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringRoundtrip_make")
+@_cdecl("bjs_StringRoundtrip_make")
+public func _bjs_StringRoundtrip_make(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = StringRoundtrip.bridgeJSLiftParameter(_self).make()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringRoundtrip_deinit")
+@_cdecl("bjs_StringRoundtrip_deinit")
+public func _bjs_StringRoundtrip_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<StringRoundtrip>.fromOpaque(pointer).release()
+}
+
+extension StringRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        #if arch(wasm32)
+        @_extern(wasm, module: "Benchmarks", name: "bjs_StringRoundtrip_wrap")
+        func _bjs_StringRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_StringRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_StringRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}

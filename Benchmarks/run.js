@@ -352,6 +352,18 @@ async function singleRun(results, nameFilter) {
             enumRoundtrip.makeInfo()
         }
     })
+
+    const stringRoundtrip = new exports.StringRoundtrip();
+    benchmarkRunner("StringRoundtrip/takeString", () => {
+        for (let i = 0; i < iterations; i++) {
+            stringRoundtrip.take("Hello, world")
+        }
+    })
+    benchmarkRunner("StringRoundtrip/makeString", () => {
+        for (let i = 0; i < iterations; i++) {
+            stringRoundtrip.make()
+        }
+    })
 }
 
 /**
