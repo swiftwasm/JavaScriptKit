@@ -242,7 +242,7 @@ async function singleRun(results) {
     const options = await defaultNodeSetup({})
     const { exports } = await instantiate({
         ...options,
-        imports: {
+        getImports: () => ({
             benchmarkHelperNoop: () => { },
             benchmarkHelperNoopWithNumber: (n) => { },
             benchmarkRunner: (name, body) => {
@@ -255,7 +255,7 @@ async function singleRun(results) {
                 }
                 results[name].push(duration)
             }
-        }
+        })
     });
     exports.run();
 }

@@ -14,7 +14,7 @@ class Benchmark {
             body()
             return .undefined
         }
-        benchmarkRunner("\(title)/\(name)", jsBody)
+        try! benchmarkRunner("\(title)/\(name)", jsBody)
     }
 }
 
