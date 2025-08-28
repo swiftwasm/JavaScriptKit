@@ -22,6 +22,32 @@ function updateProgress(current, total, label = '', width) {
 }
 
 /**
+ * Create a name filter function from CLI argument
+ * - Supports substring match (default)
+ * - Supports /regex/flags syntax
+ * @param {string|undefined} arg
+ * @returns {(name: string) => boolean}
+ */
+function createNameFilter(arg) {
+    if (!arg) {
+        return () => true;
+    }
+    if (arg.startsWith('/') && arg.lastIndexOf('/') > 0) {
+        const lastSlash = arg.lastIndexOf('/');
+        const pattern = arg.slice(1, lastSlash);
+        const flags = arg.slice(lastSlash + 1);
+        try {
+            const re = new RegExp(pattern, flags);
+            return (name) => re.test(name);
+        } catch (e) {
+            console.error('Invalid regular expression for --filter:', e.message);
+            process.exit(1);
+        }
+    }
+    return (name) => name.includes(arg);
+}
+
+/**
  * Calculate coefficient of variation (relative standard deviation)
  * @param {Array<number>} values - Array of measurement values
  * @returns {number} Coefficient of variation as a percentage
@@ -238,7 +264,7 @@ function saveJsonResults(filePath, data) {
  * @param {Object} results - Results object to store benchmark data
  * @returns {Promise<void>}
  */
-async function singleRun(results) {
+async function singleRun(results, nameFilter) {
     const options = await defaultNodeSetup({})
     const { exports } = await instantiate({
         ...options,
@@ -246,6 +272,9 @@ async function singleRun(results) {
             benchmarkHelperNoop: () => { },
             benchmarkHelperNoopWithNumber: (n) => { },
             benchmarkRunner: (name, body) => {
+                if (nameFilter && !nameFilter(name)) {
+                    return;
+                }
                 const startTime = performance.now();
                 body();
                 const endTime = performance.now();
@@ -266,7 +295,7 @@ async function singleRun(results) {
  * @param {Object} options - Adaptive sampling options
  * @returns {Promise<void>}
  */
-async function runUntilStable(results, options, width) {
+async function runUntilStable(results, options, width, nameFilter, filterArg) {
     const {
         minRuns = 5,
         maxRuns = 50,
@@ -285,8 +314,13 @@ async function runUntilStable(results, options, width) {
         // Update progress with estimated completion
         updateProgress(runs, maxRuns, "Benchmark Progress:", width);
 
-        await singleRun(results);
+        await singleRun(results, nameFilter);
         runs++;
+
+        if (runs === 1 && Object.keys(results).length === 0) {
+            console.error(`\nNo benchmarks matched filter: ${filterArg}`);
+            process.exit(1);
+        }
 
         // Check if we've reached minimum runs
         if (runs < minRuns) continue;
@@ -349,6 +383,7 @@ Options:
   --min-runs=NUMBER     Minimum runs for adaptive sampling (default: 5)
   --max-runs=NUMBER     Maximum runs for adaptive sampling (default: 50)
   --target-cv=NUMBER    Target coefficient of variation % (default: 5)
+  --filter=PATTERN      Filter benchmarks by name (substring or /regex/flags)
   --help                Show this help message
 `);
 }
@@ -363,7 +398,8 @@ async function main() {
             adaptive: { type: 'boolean', default: false },
             'min-runs': { type: 'string', default: '5' },
             'max-runs': { type: 'string', default: '50' },
-            'target-cv': { type: 'string', default: '5' }
+            'target-cv': { type: 'string', default: '5' },
+            filter: { type: 'string' }
         }
     });
 
@@ -374,6 +410,8 @@ async function main() {
 
     const results = {};
     const width = 30;
+    const filterArg = args.values.filter;
+    const nameFilter = createNameFilter(filterArg);
 
     if (args.values.adaptive) {
         // Adaptive sampling mode
@@ -388,7 +426,7 @@ async function main() {
             console.log(`Results will be saved to: ${args.values.output}`);
         }
 
-        await runUntilStable(results, options, width);
+        await runUntilStable(results, options, width, nameFilter, filterArg);
     } else {
         // Fixed number of runs mode
         const runs = parseInt(args.values.runs, 10);
@@ -410,7 +448,12 @@ async function main() {
         console.log("\nOverall Progress:");
         for (let i = 0; i < runs; i++) {
             updateProgress(i, runs, "Benchmark Runs:", width);
-            await singleRun(results);
+            await singleRun(results, nameFilter);
+            if (i === 0 && Object.keys(results).length === 0) {
+                process.stdout.write("\n");
+                console.error(`No benchmarks matched filter: ${filterArg}`);
+                process.exit(1);
+            }
         }
         updateProgress(runs, runs, "Benchmark Runs:", width);
         console.log("\n");
