@@ -422,8 +422,9 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
     public mutating func expectTag(_ expected: _BJSParamType) {
         let rawTag = readUInt8()
         guard let got = _BJSParamType(rawValue: rawTag), got == expected else {
+            let resultString = _BJSParamType(rawValue: rawTag).map { "\($0)" } ?? "invalid(\(rawTag))"
             preconditionFailure(
-                "BridgeJS: mismatched enum param tag. Expected \(expected) got \(String(describing: _BJSParamType(rawValue: rawTag)))"
+                "BridgeJS: mismatched enum param tag. Expected \(expected) got \(resultString))"
             )
         }
     }
