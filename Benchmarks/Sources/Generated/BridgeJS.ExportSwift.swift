@@ -7,7 +7,7 @@
 @_spi(BridgeJS) import JavaScriptKit
 
 private extension APIResult {
-    static func bridgeJSLiftParameter(_ caseId: Int32, _ arg1: Int32, _ arg2: Int32, _ arg3: Float, _ arg4: Double) -> APIResult {
+    static func bridgeJSLiftParameter(_ caseId: Int32, _ arg1: Int32, _ arg2: Int32) -> APIResult {
         switch caseId {
         case 0:
             let bytes = arg1
@@ -23,8 +23,8 @@ private extension APIResult {
             let param0 = arg1
             return .rate(Float(param0))
         case 4:
-            let param0 = arg4
-            return .precise(param0)
+            let param0 = arg1
+            return .precise(Double(param0))
         case 5:
             return .info
         default:
@@ -81,9 +81,9 @@ public func _bjs_EnumRoundtrip_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_EnumRoundtrip_take")
 @_cdecl("bjs_EnumRoundtrip_take")
-public func _bjs_EnumRoundtrip_take(_self: UnsafeMutableRawPointer, valueCaseId: Int32, valueArg1: Int32, valueArg2: Int32, valueArg3: Float, valueArg4: Double) -> Void {
+public func _bjs_EnumRoundtrip_take(_self: UnsafeMutableRawPointer, valueCaseId: Int32, valueArg1: Int32, valueArg2: Int32) -> Void {
     #if arch(wasm32)
-    EnumRoundtrip.bridgeJSLiftParameter(_self).take(_: APIResult.bridgeJSLiftParameter(valueCaseId, valueArg1, valueArg2, valueArg3, valueArg4))
+    EnumRoundtrip.bridgeJSLiftParameter(_self).take(_: APIResult.bridgeJSLiftParameter(valueCaseId, valueArg1, valueArg2))
     #else
     fatalError("Only available on WebAssembly")
     #endif
