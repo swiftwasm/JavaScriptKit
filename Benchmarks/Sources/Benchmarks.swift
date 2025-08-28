@@ -24,13 +24,13 @@ class Benchmark {
 
     call.testSuite("JavaScript function call through Wasm import") {
         for _ in 0..<20_000_000 {
-            benchmarkHelperNoop()
+            try! benchmarkHelperNoop()
         }
     }
 
     call.testSuite("JavaScript function call through Wasm import with int") {
         for _ in 0..<10_000_000 {
-            benchmarkHelperNoopWithNumber(42)
+            try! benchmarkHelperNoopWithNumber(42)
         }
     }
 
