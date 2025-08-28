@@ -10,7 +10,7 @@ import {
 } from '@typescript/vfs';
 
 /**
- * @typedef {import('../../.build/plugins/PackageToJS/outputs/Package/bridge-js.js').PlayBridgeJS} PlayBridgeJS
+ * @typedef {import('../../Bundle/bridge-js.js').PlayBridgeJS} PlayBridgeJS
  */
 
 /**
@@ -101,7 +101,7 @@ export class BridgeJSPlayground {
         try {
             // Import the BridgeJS module
             this.setProgress('Loading BridgeJS…', 50);
-            const { init } = await import("../../.build/plugins/PackageToJS/outputs/Package/index.js");
+            const { init } = await import("../../Bundle/index.js");
             const virtualHost = await this.createTS2SkeletonFactory();
             this.setProgress('Preparing TypeScript host…', 60);
             const { exports } = await init({
