@@ -3,6 +3,7 @@ import { defaultNodeSetup } from "./.build/plugins/PackageToJS/outputs/Package/p
 import fs from 'fs';
 import path from 'path';
 import { parseArgs } from "util";
+import { APIResult } from "./.build/plugins/PackageToJS/outputs/Package/bridge-js.js";
 
 /**
  * Update progress bar on the current line
@@ -266,27 +267,91 @@ function saveJsonResults(filePath, data) {
  */
 async function singleRun(results, nameFilter) {
     const options = await defaultNodeSetup({})
+    const benchmarkRunner = (name, body) => {
+        if (nameFilter && !nameFilter(name)) {
+            return;
+        }
+        const startTime = performance.now();
+        body();
+        const endTime = performance.now();
+        const duration = endTime - startTime;
+        if (!results[name]) {
+            results[name] = []
+        }
+        results[name].push(duration)
+    }
     const { exports } = await instantiate({
         ...options,
         getImports: () => ({
             benchmarkHelperNoop: () => { },
             benchmarkHelperNoopWithNumber: (n) => { },
-            benchmarkRunner: (name, body) => {
-                if (nameFilter && !nameFilter(name)) {
-                    return;
-                }
-                const startTime = performance.now();
-                body();
-                const endTime = performance.now();
-                const duration = endTime - startTime;
-                if (!results[name]) {
-                    results[name] = []
-                }
-                results[name].push(duration)
-            }
+            benchmarkRunner: benchmarkRunner
         })
     });
     exports.run();
+
+    const enumRoundtrip = new exports.EnumRoundtrip();
+    const iterations = 100_000;
+    benchmarkRunner("EnumRoundtrip/takeEnum success", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.take({ tag: APIResult.Tag.Success, param0: "Hello, world" })
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/takeEnum failure", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.take({ tag: APIResult.Tag.Failure, param0: 42 })
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/takeEnum flag", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.take({ tag: APIResult.Tag.Flag, param0: true })
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/takeEnum rate", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.take({ tag: APIResult.Tag.Rate, param0: 0.5 })
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/takeEnum precise", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.take({ tag: APIResult.Tag.Precise, param0: 0.5 })
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/takeEnum info", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.take({ tag: APIResult.Tag.Info })
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/makeSuccess", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.makeSuccess()
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/makeFailure", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.makeFailure()
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/makeFlag", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.makeFlag()
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/makeRate", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.makeRate()
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/makePrecise", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.makePrecise()
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/makeInfo", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.makeInfo()
+        }
+    })
 }
 
 /**

@@ -1,9 +1,219 @@
 {
   "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_EnumRoundtrip_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
 
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_EnumRoundtrip_take",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "take",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "value",
+              "type" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_EnumRoundtrip_makeSuccess",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeSuccess",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_EnumRoundtrip_makeFailure",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeFailure",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_EnumRoundtrip_makeFlag",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeFlag",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_EnumRoundtrip_makeRate",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeRate",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_EnumRoundtrip_makePrecise",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makePrecise",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_EnumRoundtrip_makeInfo",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeInfo",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        }
+      ],
+      "name" : "EnumRoundtrip",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "EnumRoundtrip"
+    }
   ],
   "enums" : [
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
 
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "failure"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "flag"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "float" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "rate"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "precise"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "info"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "APIResult",
+      "swiftCallName" : "APIResult"
+    }
   ],
   "functions" : [
     {

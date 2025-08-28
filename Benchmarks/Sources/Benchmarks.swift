@@ -18,6 +18,39 @@ class Benchmark {
     }
 }
 
+@JS enum APIResult {
+    case success(String)
+    case failure(Int)
+    case flag(Bool)
+    case rate(Float)
+    case precise(Double)
+    case info
+}
+
+@JS class EnumRoundtrip {
+    @JS init() {}
+
+    @JS func take(_ value: APIResult) {}
+    @JS func makeSuccess() -> APIResult {
+        return .success("Hello, world")
+    }
+    @JS func makeFailure() -> APIResult {
+        return .failure(42)
+    }
+    @JS func makeFlag() -> APIResult {
+        return .flag(true)
+    }
+    @JS func makeRate() -> APIResult {
+        return .rate(0.5)
+    }
+    @JS func makePrecise() -> APIResult {
+        return .precise(0.5)
+    }
+    @JS func makeInfo() -> APIResult {
+        return .info
+    }
+}
+
 @JS func run() {
 
     let call = Benchmark("Call")
