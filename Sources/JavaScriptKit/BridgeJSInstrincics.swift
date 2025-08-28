@@ -447,6 +447,24 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 #endif
 
 #if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_pop_param_int32")
+@_spi(BridgeJS) public func _swift_js_pop_param_int32() -> Int32
+#else
+@_spi(BridgeJS) public func _swift_js_pop_param_int32() -> Int32 {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_pop_param_float64")
+@_spi(BridgeJS) public func _swift_js_pop_param_float64() -> Float64
+#else
+@_spi(BridgeJS) public func _swift_js_pop_param_float64() -> Float64 {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_return_tag")
 @_spi(BridgeJS) public func _swift_js_return_tag(_ tag: Int32)
 #else

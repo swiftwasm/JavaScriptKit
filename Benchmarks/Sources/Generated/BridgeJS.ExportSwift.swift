@@ -7,44 +7,28 @@
 @_spi(BridgeJS) import JavaScriptKit
 
 private extension APIResult {
-    static func bridgeJSLiftParameter(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> APIResult {
-        let params: [UInt8] = .init(unsafeUninitializedCapacity: Int(paramsLen)) { buf, initializedCount in
-            _swift_js_init_memory(paramsId, buf.baseAddress.unsafelyUnwrapped)
-            initializedCount = Int(paramsLen)
-        }
-        return params.withUnsafeBytes { raw in
-            var reader = _BJSBinaryReader(raw: raw)
-            switch caseId {
-            case 0:
-                reader.readParamCount(expected: 1)
-                reader.expectTag(.string)
-                let param0 = reader.readString()
-                return .success(param0)
-            case 1:
-                reader.readParamCount(expected: 1)
-                reader.expectTag(.int32)
-                let param0 = Int(reader.readInt32())
-                return .failure(param0)
-            case 2:
-                reader.readParamCount(expected: 1)
-                reader.expectTag(.bool)
-                let param0 = Int32(reader.readUInt8()) != 0
-                return .flag(param0)
-            case 3:
-                reader.readParamCount(expected: 1)
-                reader.expectTag(.float32)
-                let param0 = reader.readFloat32()
-                return .rate(param0)
-            case 4:
-                reader.readParamCount(expected: 1)
-                reader.expectTag(.float64)
-                let param0 = reader.readFloat64()
-                return .precise(param0)
-            case 5:
-                return .info
-            default:
-                fatalError("Unknown APIResult case ID: \(caseId)")
-            }
+    static func bridgeJSLiftParameter(_ caseId: Int32) -> APIResult {
+        switch caseId {
+        case 0:
+            let bytes = _swift_js_pop_param_int32()
+            let count = _swift_js_pop_param_int32()
+            return .success(String.bridgeJSLiftParameter(bytes, count))
+        case 1:
+            let param0 = _swift_js_pop_param_int32()
+            return .failure(Int(param0))
+        case 2:
+            let param0 = _swift_js_pop_param_int32()
+            return .flag(Int32(param0) != 0)
+        case 3:
+            let param0 = _swift_js_pop_param_float64()
+            return .rate(Float(param0))
+        case 4:
+            let param0 = _swift_js_pop_param_float64()
+            return .precise(param0)
+        case 5:
+            return .info
+        default:
+            fatalError("Unknown APIResult case ID: \(caseId)")
         }
     }
 
@@ -97,9 +81,9 @@ public func _bjs_EnumRoundtrip_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_EnumRoundtrip_take")
 @_cdecl("bjs_EnumRoundtrip_take")
-public func _bjs_EnumRoundtrip_take(_self: UnsafeMutableRawPointer, valueCaseId: Int32, valueParamsId: Int32, valueParamsLen: Int32) -> Void {
+public func _bjs_EnumRoundtrip_take(_self: UnsafeMutableRawPointer, valueCaseId: Int32) -> Void {
     #if arch(wasm32)
-    EnumRoundtrip.bridgeJSLiftParameter(_self).take(_: APIResult.bridgeJSLiftParameter(valueCaseId, valueParamsId, valueParamsLen))
+    EnumRoundtrip.bridgeJSLiftParameter(_self).take(_: APIResult.bridgeJSLiftParameter(valueCaseId))
     #else
     fatalError("Only available on WebAssembly")
     #endif
