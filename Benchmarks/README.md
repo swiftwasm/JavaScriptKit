@@ -27,4 +27,11 @@ node run.js --adaptive --output=stable-results.json
 
 # Run benchmarks and compare with previous results
 node run.js --baseline=previous-results.json
+
+# Run only a subset of benchmarks
+# Substring match
+node run.js --filter=Call
+# Regex (with flags)
+node run.js --filter=/^Property access\//
+node run.js --filter=/string/i
 ```
