@@ -166,7 +166,7 @@ struct PackageToJSPlugin: CommandPlugin {
         }
     }
 
-    static let JAVASCRIPTKIT_PACKAGE_ID: Package.ID = "javascriptkit"
+    static let JAVASCRIPTKIT_PRODUCT_ID: Product.ID = "JavaScriptKit"
 
     func performBuildCommand(context: PluginContext, arguments: [String]) throws {
         if arguments.contains(where: { ["-h", "--help"].contains($0) }) {
@@ -396,7 +396,7 @@ struct PackageToJSPlugin: CommandPlugin {
         guard
             let selfPackage = findPackageInDependencies(
                 package: package,
-                id: Self.JAVASCRIPTKIT_PACKAGE_ID
+                including: Self.JAVASCRIPTKIT_PRODUCT_ID
             )
         else {
             throw PackageToJSError("Failed to find JavaScriptKit in dependencies!?")
@@ -649,12 +649,24 @@ extension PackageManager.BuildResult {
     }
 }
 
-private func findPackageInDependencies(package: Package, id: Package.ID) -> Package? {
+/// Find the package that contains the product with the given name
+/// - Parameters:
+///   - package: The package to search in
+///   - productName: The name of the product to find
+/// - Returns: The package that contains the product with the given name
+/// - Note: Why not use `Package.ID`? `Package.ID` is not always equal to the package repository name
+///   as it's derived from the directory name when the package is dependent on another package as a
+//    local package.
+private func findPackageInDependencies(package: Package, including productName: String) -> Package? {
     var visited: Set<Package.ID> = []
     func visit(package: Package) -> Package? {
         if visited.contains(package.id) { return nil }
         visited.insert(package.id)
-        if package.id == id { return package }
+        for product in package.products {
+            if product.name == productName {
+                return package
+            }
+        }
         for dependency in package.dependencies {
             if let found = visit(package: dependency.package) {
                 return found
