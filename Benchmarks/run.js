@@ -3,6 +3,7 @@ import { defaultNodeSetup } from "./.build/plugins/PackageToJS/outputs/Package/p
 import fs from 'fs';
 import path from 'path';
 import { parseArgs } from "util";
+import { APIResult, ComplexResult } from "./.build/plugins/PackageToJS/outputs/Package/bridge-js.js";
 
 /**
  * Update progress bar on the current line
@@ -288,6 +289,171 @@ async function singleRun(results, nameFilter) {
         })
     });
     exports.run();
+
+    const enumRoundtrip = new exports.EnumRoundtrip();
+    const iterations = 100_000;
+    benchmarkRunner("EnumRoundtrip/takeEnum success", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.take({ tag: APIResult.Tag.Success, param0: "Hello, world" })
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/takeEnum failure", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.take({ tag: APIResult.Tag.Failure, param0: 42 })
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/takeEnum flag", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.take({ tag: APIResult.Tag.Flag, param0: true })
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/takeEnum rate", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.take({ tag: APIResult.Tag.Rate, param0: 0.5 })
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/takeEnum precise", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.take({ tag: APIResult.Tag.Precise, param0: 0.5 })
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/takeEnum info", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.take({ tag: APIResult.Tag.Info })
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/makeSuccess", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.makeSuccess()
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/makeFailure", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.makeFailure()
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/makeFlag", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.makeFlag()
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/makeRate", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.makeRate()
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/makePrecise", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.makePrecise()
+        }
+    })
+    benchmarkRunner("EnumRoundtrip/makeInfo", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.makeInfo()
+        }
+    })
+
+    benchmarkRunner("EnumRoundtrip/roundtrip", () => {
+        for (let i = 0; i < iterations; i++) {
+            enumRoundtrip.roundtrip({ tag: APIResult.Tag.Success, param0: "Hello, world" })
+        }
+    })
+
+    const complexResultRoundtrip = new exports.ComplexResultRoundtrip();
+    
+    benchmarkRunner("ComplexResultRoundtrip/takeEnum success", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.take({ tag: ComplexResult.Tag.Success, param0: "Operation completed" })
+        }
+    })
+    benchmarkRunner("ComplexResultRoundtrip/takeEnum error", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.take({ tag: ComplexResult.Tag.Error, param0: "Network timeout", param1: 503 })
+        }
+    })
+    benchmarkRunner("ComplexResultRoundtrip/takeEnum location", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.take({ tag: ComplexResult.Tag.Location, param0: 37.7749, param1: -122.4194, param2: "San Francisco" })
+        }
+    })
+    benchmarkRunner("ComplexResultRoundtrip/takeEnum status", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.take({ tag: ComplexResult.Tag.Status, param0: true, param1: 200, param2: "OK" })
+        }
+    })
+    benchmarkRunner("ComplexResultRoundtrip/takeEnum coordinates", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.take({ tag: ComplexResult.Tag.Coordinates, param0: 10.5, param1: 20.3, param2: 30.7 })
+        }
+    })
+    benchmarkRunner("ComplexResultRoundtrip/takeEnum comprehensive", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.take({ 
+                tag: ComplexResult.Tag.Comprehensive, 
+                param0: true, param1: false, param2: 42, param3: 100, 
+                param4: 3.14, param5: 2.718, param6: "Hello", param7: "World", param8: "Test" 
+            })
+        }
+    })
+    benchmarkRunner("ComplexResultRoundtrip/takeEnum info", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.take({ tag: ComplexResult.Tag.Info })
+        }
+    })
+    
+    benchmarkRunner("ComplexResultRoundtrip/makeSuccess", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.makeSuccess()
+        }
+    })
+    benchmarkRunner("ComplexResultRoundtrip/makeError", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.makeError()
+        }
+    })
+    benchmarkRunner("ComplexResultRoundtrip/makeLocation", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.makeLocation()
+        }
+    })
+    benchmarkRunner("ComplexResultRoundtrip/makeStatus", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.makeStatus()
+        }
+    })
+    benchmarkRunner("ComplexResultRoundtrip/makeCoordinates", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.makeCoordinates()
+        }
+    })
+    benchmarkRunner("ComplexResultRoundtrip/makeComprehensive", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.makeComprehensive()
+        }
+    })
+    benchmarkRunner("ComplexResultRoundtrip/makeInfo", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.makeInfo()
+        }
+    })
+
+    benchmarkRunner("ComplexResultRoundtrip/roundtrip", () => {
+        for (let i = 0; i < iterations; i++) {
+            complexResultRoundtrip.roundtrip({ tag: ComplexResult.Tag.Success, param0: "Hello, world" })
+        }
+    })
+
+    const stringRoundtrip = new exports.StringRoundtrip();
+    benchmarkRunner("StringRoundtrip/takeString", () => {
+        for (let i = 0; i < iterations; i++) {
+            stringRoundtrip.take("Hello, world")
+        }
+    })
+    benchmarkRunner("StringRoundtrip/makeString", () => {
+        for (let i = 0; i < iterations; i++) {
+            stringRoundtrip.make()
+        }
+    })
 }
 
 /**

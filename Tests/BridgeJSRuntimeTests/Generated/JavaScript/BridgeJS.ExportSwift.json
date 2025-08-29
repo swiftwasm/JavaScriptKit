@@ -913,6 +913,377 @@
         "Internal"
       ],
       "swiftCallName" : "Internal.SupportedMethod"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "failure"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "flag"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "float" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "rate"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "precise"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "info"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "APIResult",
+      "swiftCallName" : "APIResult"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "error"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "location"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "status"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "coordinates"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "comprehensive"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "info"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "ComplexResult",
+      "swiftCallName" : "ComplexResult"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "failure"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "status"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Result",
+      "namespace" : [
+        "Utilities"
+      ],
+      "swiftCallName" : "Utilities.Result"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "failure"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "NetworkingResult",
+      "namespace" : [
+        "API"
+      ],
+      "swiftCallName" : "API.NetworkingResult"
     }
   ],
   "functions" : [
@@ -1827,12 +2198,12 @@
       }
     },
     {
-      "abiName" : "bjs_echoNetworkingAPIMethod",
+      "abiName" : "bjs_roundtripNetworkingAPIMethod",
       "effects" : {
         "isAsync" : false,
         "isThrows" : false
       },
-      "name" : "echoNetworkingAPIMethod",
+      "name" : "roundtripNetworkingAPIMethod",
       "parameters" : [
         {
           "label" : "_",
@@ -1851,12 +2222,12 @@
       }
     },
     {
-      "abiName" : "bjs_echoConfigurationLogLevel",
+      "abiName" : "bjs_roundtripConfigurationLogLevel",
       "effects" : {
         "isAsync" : false,
         "isThrows" : false
       },
-      "name" : "echoConfigurationLogLevel",
+      "name" : "roundtripConfigurationLogLevel",
       "parameters" : [
         {
           "label" : "_",
@@ -1877,12 +2248,12 @@
       }
     },
     {
-      "abiName" : "bjs_echoConfigurationPort",
+      "abiName" : "bjs_roundtripConfigurationPort",
       "effects" : {
         "isAsync" : false,
         "isThrows" : false
       },
-      "name" : "echoConfigurationPort",
+      "name" : "roundtripConfigurationPort",
       "parameters" : [
         {
           "label" : "_",
@@ -1929,12 +2300,12 @@
       }
     },
     {
-      "abiName" : "bjs_echoInternalSupportedMethod",
+      "abiName" : "bjs_roundtripInternalSupportedMethod",
       "effects" : {
         "isAsync" : false,
         "isThrows" : false
       },
-      "name" : "echoInternalSupportedMethod",
+      "name" : "roundtripInternalSupportedMethod",
       "parameters" : [
         {
           "label" : "_",
@@ -1949,6 +2320,689 @@
       "returnType" : {
         "caseEnum" : {
           "_0" : "Internal.SupportedMethod"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundtripAPIResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundtripAPIResult",
+      "parameters" : [
+        {
+          "label" : "result",
+          "name" : "result",
+          "type" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPIResultSuccess",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPIResultSuccess",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "value",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPIResultFailure",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPIResultFailure",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "value",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPIResultInfo",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPIResultInfo",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPIResultFlag",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPIResultFlag",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "value",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPIResultRate",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPIResultRate",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "value",
+          "type" : {
+            "float" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPIResultPrecise",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPIResultPrecise",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "value",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundtripComplexResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundtripComplexResult",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "result",
+          "type" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeComplexResultSuccess",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeComplexResultSuccess",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "value",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeComplexResultError",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeComplexResultError",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "message",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "code",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeComplexResultLocation",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeComplexResultLocation",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "lat",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "lng",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeComplexResultStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeComplexResultStatus",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "active",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "code",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "message",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeComplexResultCoordinates",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeComplexResultCoordinates",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "x",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "y",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "z",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeComplexResultComprehensive",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeComplexResultComprehensive",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "flag1",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "flag2",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "count1",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "count2",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "value1",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "value2",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "text1",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "text2",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "text3",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeComplexResultInfo",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeComplexResultInfo",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeUtilitiesResultSuccess",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeUtilitiesResultSuccess",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "message",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "Utilities.Result"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeUtilitiesResultFailure",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeUtilitiesResultFailure",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "error",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "code",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "Utilities.Result"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeUtilitiesResultStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeUtilitiesResultStatus",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "active",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "code",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "message",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "Utilities.Result"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPINetworkingResultSuccess",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPINetworkingResultSuccess",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "message",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "API.NetworkingResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAPINetworkingResultFailure",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAPINetworkingResultFailure",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "error",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "code",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "API.NetworkingResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundtripUtilitiesResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundtripUtilitiesResult",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "result",
+          "type" : {
+            "associatedValueEnum" : {
+              "_0" : "Utilities.Result"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "Utilities.Result"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundtripAPINetworkingResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundtripAPINetworkingResult",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "result",
+          "type" : {
+            "associatedValueEnum" : {
+              "_0" : "API.NetworkingResult"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "API.NetworkingResult"
         }
       }
     },

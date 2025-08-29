@@ -10,10 +10,19 @@ export async function createInstantiator(options, swift) {
     let setException;
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
-
     let tmpRetString;
     let tmpRetBytes;
     let tmpRetException;
+    let tmpRetTag;
+    let tmpRetStrings = [];
+    let tmpRetInts = [];
+    let tmpRetF32s = [];
+    let tmpRetF64s = [];
+    let tmpParamInts = [];
+    let tmpParamF32s = [];
+    let tmpParamF64s = [];
+    
+
     return {
         /**
          * @param {WebAssembly.Imports} importObject
@@ -48,6 +57,32 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_release"] = function(id) {
                 swift.memory.release(id);
+            }
+            bjs["swift_js_push_tag"] = function(tag) {
+                tmpRetTag = tag;
+            }
+            bjs["swift_js_push_int"] = function(v) {
+                tmpRetInts.push(v | 0);
+            }
+            bjs["swift_js_push_f32"] = function(v) {
+                tmpRetF32s.push(Math.fround(v));
+            }
+            bjs["swift_js_push_f64"] = function(v) {
+                tmpRetF64s.push(v);
+            }
+            bjs["swift_js_push_string"] = function(ptr, len) {
+                const bytes = new Uint8Array(memory.buffer, ptr, len);
+                const value = textDecoder.decode(bytes);
+                tmpRetStrings.push(value);
+            }
+            bjs["swift_js_pop_param_int32"] = function() {
+                return tmpParamInts.pop();
+            }
+            bjs["swift_js_pop_param_f32"] = function() {
+                return tmpParamF32s.pop();
+            }
+            bjs["swift_js_pop_param_f64"] = function() {
+                return tmpParamF64s.pop();
             }
 
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
@@ -124,6 +159,7 @@ export async function createInstantiator(options, swift) {
         setInstance: (i) => {
             instance = i;
             memory = instance.exports.memory;
+            
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
             }

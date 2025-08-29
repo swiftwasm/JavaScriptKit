@@ -338,3 +338,86 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
         rawValue.bridgeJSLowerReturn()
     }
 }
+
+// MARK: Wasm externs used by generated enum glue
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_init_memory")
+@_spi(BridgeJS) public func _swift_js_init_memory(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>)
+#else
+@_spi(BridgeJS) public func _swift_js_init_memory(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>) {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_push_tag")
+@_spi(BridgeJS) public func _swift_js_push_tag(_ tag: Int32)
+#else
+@_spi(BridgeJS) public func _swift_js_push_tag(_ tag: Int32) {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_push_string")
+@_spi(BridgeJS) public func _swift_js_push_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
+#else
+@_spi(BridgeJS) public func _swift_js_push_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_push_int")
+@_spi(BridgeJS) public func _swift_js_push_int(_ value: Int32)
+#else
+@_spi(BridgeJS) public func _swift_js_return_int(_ value: Int32) {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_push_f32")
+@_spi(BridgeJS) public func _swift_js_push_f32(_ value: Float32)
+#else
+@_spi(BridgeJS) public func _swift_js_push_f32(_ value: Float32) {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_push_f64")
+@_spi(BridgeJS) public func _swift_js_push_f64(_ value: Float64)
+#else
+@_spi(BridgeJS) public func _swift_js_push_f64(_ value: Float64) {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_pop_param_int32")
+@_spi(BridgeJS) public func _swift_js_pop_param_int32() -> Int32
+#else
+@_spi(BridgeJS) public func _swift_js_pop_param_int32() {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_pop_param_f32")
+@_spi(BridgeJS) public func _swift_js_pop_param_f32() -> Float32
+#else
+@_spi(BridgeJS) public func _swift_js_pop_param_f32() {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_pop_param_f64")
+@_spi(BridgeJS) public func _swift_js_pop_param_f64() -> Float64
+#else
+@_spi(BridgeJS) public func _swift_js_pop_param_f64() {
+    _onlyAvailableOnWasm()
+}
+#endif

@@ -1,9 +1,671 @@
 {
   "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_EnumRoundtrip_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
 
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_EnumRoundtrip_take",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "take",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "value",
+              "type" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_EnumRoundtrip_makeSuccess",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeSuccess",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_EnumRoundtrip_makeFailure",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeFailure",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_EnumRoundtrip_makeFlag",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeFlag",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_EnumRoundtrip_makeRate",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeRate",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_EnumRoundtrip_makePrecise",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makePrecise",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_EnumRoundtrip_makeInfo",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeInfo",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_EnumRoundtrip_roundtrip",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "roundtrip",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "result",
+              "type" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        }
+      ],
+      "name" : "EnumRoundtrip",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "EnumRoundtrip"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_ComplexResultRoundtrip_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_ComplexResultRoundtrip_take",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "take",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "value",
+              "type" : {
+                "associatedValueEnum" : {
+                  "_0" : "ComplexResult"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_ComplexResultRoundtrip_makeSuccess",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeSuccess",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_ComplexResultRoundtrip_makeError",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeError",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_ComplexResultRoundtrip_makeLocation",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeLocation",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_ComplexResultRoundtrip_makeStatus",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeStatus",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_ComplexResultRoundtrip_makeCoordinates",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeCoordinates",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_ComplexResultRoundtrip_makeComprehensive",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeComprehensive",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_ComplexResultRoundtrip_makeInfo",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "makeInfo",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_ComplexResultRoundtrip_roundtrip",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "roundtrip",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "result",
+              "type" : {
+                "associatedValueEnum" : {
+                  "_0" : "ComplexResult"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        }
+      ],
+      "name" : "ComplexResultRoundtrip",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "ComplexResultRoundtrip"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_StringRoundtrip_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_StringRoundtrip_take",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "take",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "value",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_StringRoundtrip_make",
+          "effects" : {
+            "isAsync" : false,
+            "isThrows" : false
+          },
+          "name" : "make",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "StringRoundtrip",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "StringRoundtrip"
+    }
   ],
   "enums" : [
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
 
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "failure"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "flag"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "float" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "rate"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "precise"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "info"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "APIResult",
+      "swiftCallName" : "APIResult"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "error"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "location"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "status"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "coordinates"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "comprehensive"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "info"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "ComplexResult",
+      "swiftCallName" : "ComplexResult"
+    }
   ],
   "functions" : [
     {

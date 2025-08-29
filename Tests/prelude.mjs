@@ -1,7 +1,7 @@
 // @ts-check
 
-import { 
-    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme 
+import {
+    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme, APIResult, ComplexResult
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
@@ -354,14 +354,14 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethod.Get, 0);
     assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethod.Post, 1);
 
-    assert.equal(exports.echoNetworkingAPIMethod(globalThis.Networking.API.Method.Get), globalThis.Networking.API.Method.Get);
-    assert.equal(exports.echoConfigurationLogLevel(globalThis.Configuration.LogLevel.Debug), globalThis.Configuration.LogLevel.Debug);
-    assert.equal(exports.echoConfigurationPort(globalThis.Configuration.Port.Http), globalThis.Configuration.Port.Http);
+    assert.equal(exports.roundtripNetworkingAPIMethod(globalThis.Networking.API.Method.Get), globalThis.Networking.API.Method.Get);
+    assert.equal(exports.roundtripConfigurationLogLevel(globalThis.Configuration.LogLevel.Debug), globalThis.Configuration.LogLevel.Debug);
+    assert.equal(exports.roundtripConfigurationPort(globalThis.Configuration.Port.Http), globalThis.Configuration.Port.Http);
     assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Debug), globalThis.Configuration.Port.Development);
     assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Info), globalThis.Configuration.Port.Http);
     assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Warning), globalThis.Configuration.Port.Https);
     assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Error), globalThis.Configuration.Port.Development);
-    assert.equal(exports.echoInternalSupportedMethod(globalThis.Networking.APIV2.Internal.SupportedMethod.Get), globalThis.Networking.APIV2.Internal.SupportedMethod.Get);
+    assert.equal(exports.roundtripInternalSupportedMethod(globalThis.Networking.APIV2.Internal.SupportedMethod.Get), globalThis.Networking.APIV2.Internal.SupportedMethod.Get);
 
     const converter = new exports.Converter();
     assert.equal(converter.toString(42), "42");
@@ -389,6 +389,80 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     const globalTestServer = new globalThis.Networking.APIV2.Internal.TestServer();
     globalTestServer.call(globalThis.Networking.APIV2.Internal.SupportedMethod.Post);
     globalTestServer.release();
+
+    const s1 = { tag: APIResult.Tag.Success, param0: "Cześć 🙋‍♂️" };
+    const f1 = { tag: APIResult.Tag.Failure, param0: 42 };
+    const i1 = { tag: APIResult.Tag.Info };
+
+    assert.deepEqual(exports.roundtripAPIResult(s1), s1);
+    assert.deepEqual(exports.roundtripAPIResult(f1), f1);
+    assert.deepEqual(exports.roundtripAPIResult(i1), i1);
+
+    assert.deepEqual(exports.makeAPIResultSuccess("Test"), { tag: APIResult.Tag.Success, param0: "Test" });
+    assert.deepEqual(exports.makeAPIResultSuccess("ok"), { tag: APIResult.Tag.Success, param0: "ok" });
+    assert.deepEqual(exports.makeAPIResultFailure(123), { tag: APIResult.Tag.Failure, param0: 123 });
+    assert.deepEqual(exports.makeAPIResultInfo(), { tag: APIResult.Tag.Info });
+
+    const bTrue = { tag: APIResult.Tag.Flag, param0: true };
+    const bFalse = { tag: APIResult.Tag.Flag, param0: false };
+    assert.deepEqual(exports.makeAPIResultFlag(true), bTrue);
+    assert.deepEqual(exports.makeAPIResultFlag(false), bFalse);
+
+    const rVal = 3.25;
+    const r1 = { tag: APIResult.Tag.Rate, param0: rVal };
+    assert.deepEqual(exports.roundtripAPIResult(r1), r1);
+    assert.deepEqual(exports.makeAPIResultRate(rVal), r1);
+
+    const pVal = 3.141592653589793;
+    const p1 = { tag: APIResult.Tag.Precise, param0: pVal };
+    assert.deepEqual(exports.roundtripAPIResult(p1), p1);
+    assert.deepEqual(exports.makeAPIResultPrecise(pVal), p1);
+
+    const cs1 = { tag: ComplexResult.Tag.Success, param0: "All good!" };
+    const ce1 = { tag: ComplexResult.Tag.Error, param0: "Network error", param1: 503 };
+    const cl1 = { tag: ComplexResult.Tag.Location, param0: 37.7749, param1: -122.4194, param2: "San Francisco" };
+    const cst1 = { tag: ComplexResult.Tag.Status, param0: true, param1: 200, param2: "OK" };
+    const cc1 = { tag: ComplexResult.Tag.Coordinates, param0: 10.5, param1: 20.3, param2: 30.7 };
+    const ccomp1 = { tag: ComplexResult.Tag.Comprehensive, param0: true, param1: false, param2: 42, param3: 100, param4: 3.14, param5: 2.718, param6: "Hello", param7: "World", param8: "Test" };
+    const ci1 = { tag: ComplexResult.Tag.Info };
+
+    assert.deepEqual(exports.roundtripComplexResult(cs1), cs1);
+    assert.deepEqual(exports.roundtripComplexResult(ce1), ce1);
+    assert.deepEqual(exports.roundtripComplexResult(cl1), cl1);
+    assert.deepEqual(exports.roundtripComplexResult(cst1), cst1);
+    assert.deepEqual(exports.roundtripComplexResult(cc1), cc1);
+    assert.deepEqual(exports.roundtripComplexResult(ccomp1), ccomp1);
+    assert.deepEqual(exports.roundtripComplexResult(ci1), ci1);
+
+    assert.deepEqual(exports.makeComplexResultSuccess("Great!"), { tag: ComplexResult.Tag.Success, param0: "Great!" });
+    assert.deepEqual(exports.makeComplexResultError("Timeout", 408), { tag: ComplexResult.Tag.Error, param0: "Timeout", param1: 408 });
+    assert.deepEqual(exports.makeComplexResultLocation(40.7128, -74.0060, "New York"), { tag: ComplexResult.Tag.Location, param0: 40.7128, param1: -74.0060, param2: "New York" });
+    assert.deepEqual(exports.makeComplexResultStatus(false, 500, "Internal Server Error"), { tag: ComplexResult.Tag.Status, param0: false, param1: 500, param2: "Internal Server Error" });
+    assert.deepEqual(exports.makeComplexResultCoordinates(1.1, 2.2, 3.3), { tag: ComplexResult.Tag.Coordinates, param0: 1.1, param1: 2.2, param2: 3.3 });
+    assert.deepEqual(exports.makeComplexResultComprehensive(true, false, 10, 20, 1.5, 2.5, "First", "Second", "Third"), { tag: ComplexResult.Tag.Comprehensive, param0: true, param1: false, param2: 10, param3: 20, param4: 1.5, param5: 2.5, param6: "First", param7: "Second", param8: "Third" });
+    assert.deepEqual(exports.makeComplexResultInfo(), { tag: ComplexResult.Tag.Info });
+
+    const urSuccess = { tag: globalThis.Utilities.Result.Tag.Success, param0: "Utility operation completed" };
+    const urFailure = { tag: globalThis.Utilities.Result.Tag.Failure, param0: "Utility error occurred", param1: 500 };
+    const urStatus = { tag: globalThis.Utilities.Result.Tag.Status, param0: true, param1: 200, param2: "Utility status OK" };
+
+    assert.deepEqual(exports.roundtripUtilitiesResult(urSuccess), urSuccess);
+    assert.deepEqual(exports.roundtripUtilitiesResult(urFailure), urFailure);
+    assert.deepEqual(exports.roundtripUtilitiesResult(urStatus), urStatus);
+
+    assert.deepEqual(exports.makeUtilitiesResultSuccess("Test"), { tag: globalThis.Utilities.Result.Tag.Success, param0: "Test" });
+    assert.deepEqual(exports.makeUtilitiesResultSuccess("ok"), { tag: globalThis.Utilities.Result.Tag.Success, param0: "ok" });
+    assert.deepEqual(exports.makeUtilitiesResultFailure("Error", 123), { tag: globalThis.Utilities.Result.Tag.Failure, param0: "Error", param1: 123 });
+    assert.deepEqual(exports.makeUtilitiesResultStatus(true, 200, "OK"), { tag: globalThis.Utilities.Result.Tag.Status, param0: true, param1: 200, param2: "OK" });
+
+    const nrSuccess = { tag: globalThis.API.NetworkingResult.Tag.Success, param0: "Network request successful" };
+    const nrFailure = { tag: globalThis.API.NetworkingResult.Tag.Failure, param0: "Network timeout", param1: 408 };
+
+    assert.deepEqual(exports.roundtripAPINetworkingResult(nrSuccess), nrSuccess);
+    assert.deepEqual(exports.roundtripAPINetworkingResult(nrFailure), nrFailure);
+
+    assert.deepEqual(exports.makeAPINetworkingResultSuccess("Connected"), { tag: globalThis.API.NetworkingResult.Tag.Success, param0: "Connected" });
+    assert.deepEqual(exports.makeAPINetworkingResultFailure("Timeout", 408), { tag: globalThis.API.NetworkingResult.Tag.Failure, param0: "Timeout", param1: 408 });
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

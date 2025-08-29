@@ -65,6 +65,9 @@ struct BridgeJSLink {
         }
         """
 
+    let sharedEnumHelpersJs = """
+        """
+
     func link() throws -> (outputJs: String, outputDts: String) {
         var exportsLines: [String] = []
         var classLines: [String] = []
@@ -73,8 +76,6 @@ struct BridgeJSLink {
         var namespacedFunctions: [ExportedFunction] = []
         var namespacedClasses: [ExportedClass] = []
         var namespacedEnums: [ExportedEnum] = []
-        var enumConstantLines: [String] = []
-        var dtsEnumLines: [String] = []
         var topLevelEnumLines: [String] = []
         var topLevelDtsEnumLines: [String] = []
 
@@ -123,12 +124,15 @@ struct BridgeJSLink {
                             namespacedEnums.append(enumDefinition)
                         }
                     case .associatedValue:
-                        enumConstantLines.append(contentsOf: jsEnum)
-                        exportsLines.append("\(enumDefinition.name),")
+                        var exportedJsEnum = jsEnum
+                        if !exportedJsEnum.isEmpty && exportedJsEnum[0].hasPrefix("const ") {
+                            exportedJsEnum[0] = "export " + exportedJsEnum[0]
+                        }
+                        topLevelEnumLines.append(contentsOf: exportedJsEnum)
+                        topLevelDtsEnumLines.append(contentsOf: dtsEnum)
                         if enumDefinition.namespace != nil {
                             namespacedEnums.append(enumDefinition)
                         }
-                        dtsEnumLines.append(contentsOf: dtsEnum)
                     }
                 }
             }
@@ -161,7 +165,7 @@ struct BridgeJSLink {
             importObjectBuilders.append(importObjectBuilder)
         }
 
-        let hasNamespacedItems = !namespacedFunctions.isEmpty || !namespacedClasses.isEmpty || !namespacedEnums.isEmpty
+        let hasNamespacedItems = !namespacedFunctions.isEmpty || !namespacedClasses.isEmpty
 
         let namespaceBuilder = NamespaceBuilder()
         let namespaceDeclarationsLines = namespaceBuilder.namespaceDeclarations(
@@ -173,21 +177,15 @@ struct BridgeJSLink {
 
         let exportsSection: String
         if hasNamespacedItems {
-            let namespacedEnumsForExports = namespacedEnums.filter { $0.enumType == .associatedValue }
             let namespaceSetupCode = namespaceBuilder.renderGlobalNamespace(
                 namespacedFunctions: namespacedFunctions,
-                namespacedClasses: namespacedClasses,
-                namespacedEnums: namespacedEnumsForExports
+                namespacedClasses: namespacedClasses
             )
             .map { $0.indent(count: 12) }.joined(separator: "\n")
 
-            let enumSection =
-                enumConstantLines.isEmpty
-                ? "" : enumConstantLines.map { $0.indent(count: 12) }.joined(separator: "\n") + "\n"
-
             exportsSection = """
                 \(classLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
-                \(enumSection)\("const exports = {".indent(count: 12))
+                \("const exports = {".indent(count: 12))
                 \(exportsLines.map { $0.indent(count: 16) }.joined(separator: "\n"))
                 \("};".indent(count: 12))
 
@@ -197,26 +195,30 @@ struct BridgeJSLink {
                         },
                 """
         } else {
-            let enumSection =
-                enumConstantLines.isEmpty
-                ? "" : enumConstantLines.map { $0.indent(count: 12) }.joined(separator: "\n") + "\n"
-
             exportsSection = """
                 \(classLines.map { $0.indent(count: 12) }.joined(separator: "\n"))
-                \(enumSection)\("return {".indent(count: 12))
+                \("return {".indent(count: 12))
                 \(exportsLines.map { $0.indent(count: 16) }.joined(separator: "\n"))
                 \("};".indent(count: 12))
                         },
                 """
         }
 
+        let hasAssociatedValueEnums = exportedSkeletons.contains { skeleton in
+            skeleton.enums.contains { $0.enumType == .associatedValue }
+        }
+        let sharedEnumHelpersSection = hasAssociatedValueEnums ? sharedEnumHelpersJs : ""
         let topLevelEnumsSection = topLevelEnumLines.isEmpty ? "" : topLevelEnumLines.joined(separator: "\n") + "\n\n"
-
         let topLevelNamespaceCode = namespaceBuilder.renderTopLevelEnumNamespaceAssignments(
             namespacedEnums: namespacedEnums
         )
         let namespaceAssignmentsSection =
             topLevelNamespaceCode.isEmpty ? "" : topLevelNamespaceCode.joined(separator: "\n") + "\n\n"
+
+        let enumHelpers = renderEnumHelperAssignments()
+        let enumHelpersSection =
+            enumHelpers.isEmpty ? "" : "\n\n" + enumHelpers.map { $0.indent(count: 12) }.joined(separator: "\n")
+        let enumHelpersDeclaration = hasAssociatedValueEnums ? "const enumHelpers = {};\n" : "\n"
 
         let outputJs = """
             // NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
@@ -225,16 +227,24 @@ struct BridgeJSLink {
             // To update this file, just rebuild your project or run
             // `swift package bridge-js`.
 
-            \(topLevelEnumsSection)\(namespaceAssignmentsSection)export async function createInstantiator(options, \(JSGlueVariableScope.reservedSwift)) {
+            \(sharedEnumHelpersSection)\(topLevelEnumsSection)\(namespaceAssignmentsSection)export async function createInstantiator(options, \(JSGlueVariableScope.reservedSwift)) {
                 let \(JSGlueVariableScope.reservedInstance);
                 let \(JSGlueVariableScope.reservedMemory);
                 let \(JSGlueVariableScope.reservedSetException);
                 const \(JSGlueVariableScope.reservedTextDecoder) = new TextDecoder("utf-8");
                 const \(JSGlueVariableScope.reservedTextEncoder) = new TextEncoder("utf-8");
-
                 let \(JSGlueVariableScope.reservedStorageToReturnString);
                 let \(JSGlueVariableScope.reservedStorageToReturnBytes);
                 let \(JSGlueVariableScope.reservedStorageToReturnException);
+                let \(JSGlueVariableScope.reservedTmpRetTag);
+                let \(JSGlueVariableScope.reservedTmpRetStrings) = [];
+                let \(JSGlueVariableScope.reservedTmpRetInts) = [];
+                let \(JSGlueVariableScope.reservedTmpRetF32s) = [];
+                let \(JSGlueVariableScope.reservedTmpRetF64s) = [];
+                let \(JSGlueVariableScope.reservedTmpParamInts) = [];
+                let \(JSGlueVariableScope.reservedTmpParamF32s) = [];
+                let \(JSGlueVariableScope.reservedTmpParamF64s) = [];
+                \(enumHelpersDeclaration)
                 return {
                     /**
                      * @param {WebAssembly.Imports} importObject
@@ -248,13 +258,13 @@ struct BridgeJSLink {
                             \(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);
                         }
                         bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
-                            const source = \(JSGlueVariableScope.reservedSwift).memory.getObject(sourceId);
+                            const source = \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).getObject(sourceId);
                             const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, bytesPtr);
                             bytes.set(source);
                         }
                         bjs["swift_js_make_js_string"] = function(ptr, len) {
                             const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len)\(sharedMemory ? ".slice()" : "");
-                            return \(JSGlueVariableScope.reservedSwift).memory.retain(\(JSGlueVariableScope.reservedTextDecoder).decode(bytes));
+                            return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retain(\(JSGlueVariableScope.reservedTextDecoder).decode(bytes));
                         }
                         bjs["swift_js_init_memory_with_result"] = function(ptr, len) {
                             const target = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len);
@@ -262,13 +272,39 @@ struct BridgeJSLink {
                             \(JSGlueVariableScope.reservedStorageToReturnBytes) = undefined;
                         }
                         bjs["swift_js_throw"] = function(id) {
-                            \(JSGlueVariableScope.reservedStorageToReturnException) = \(JSGlueVariableScope.reservedSwift).memory.retainByRef(id);
+                            \(JSGlueVariableScope.reservedStorageToReturnException) = \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retainByRef(id);
                         }
                         bjs["swift_js_retain"] = function(id) {
-                            return \(JSGlueVariableScope.reservedSwift).memory.retainByRef(id);
+                            return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retainByRef(id);
                         }
                         bjs["swift_js_release"] = function(id) {
                             \(JSGlueVariableScope.reservedSwift).memory.release(id);
+                        }
+                        bjs["swift_js_push_tag"] = function(tag) {
+                            \(JSGlueVariableScope.reservedTmpRetTag) = tag;
+                        }
+                        bjs["swift_js_push_int"] = function(v) {
+                            \(JSGlueVariableScope.reservedTmpRetInts).push(v | 0);
+                        }
+                        bjs["swift_js_push_f32"] = function(v) {
+                            \(JSGlueVariableScope.reservedTmpRetF32s).push(Math.fround(v));
+                        }
+                        bjs["swift_js_push_f64"] = function(v) {
+                            \(JSGlueVariableScope.reservedTmpRetF64s).push(v);
+                        }
+                        bjs["swift_js_push_string"] = function(ptr, len) {
+                            const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len)\(sharedMemory ? ".slice()" : "");
+                            const value = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);
+                            \(JSGlueVariableScope.reservedTmpRetStrings).push(value);
+                        }
+                        bjs["swift_js_pop_param_int32"] = function() {
+                            return \(JSGlueVariableScope.reservedTmpParamInts).pop();
+                        }
+                        bjs["swift_js_pop_param_f32"] = function() {
+                            return \(JSGlueVariableScope.reservedTmpParamF32s).pop();
+                        }
+                        bjs["swift_js_pop_param_f64"] = function() {
+                            return \(JSGlueVariableScope.reservedTmpParamF64s).pop();
                         }
             \(renderSwiftClassWrappers().map { $0.indent(count: 12) }.joined(separator: "\n"))
             \(importObjectBuilders.flatMap { $0.importedLines }.map { $0.indent(count: 12) }.joined(separator: "\n"))
@@ -276,6 +312,7 @@ struct BridgeJSLink {
                     setInstance: (i) => {
                         \(JSGlueVariableScope.reservedInstance) = i;
                         \(JSGlueVariableScope.reservedMemory) = \(JSGlueVariableScope.reservedInstance).exports.memory;
+                        \(enumHelpersSection)
                         \(JSGlueVariableScope.reservedSetException) = (error) => {
                             \(JSGlueVariableScope.reservedInstance).exports._swift_js_exception.value = \(JSGlueVariableScope.reservedSwift).memory.retain(error)
                         }
@@ -291,7 +328,6 @@ struct BridgeJSLink {
         var dtsLines: [String] = []
         dtsLines.append(contentsOf: namespaceDeclarationsLines)
         dtsLines.append(contentsOf: dtsClassLines)
-        dtsLines.append(contentsOf: dtsEnumLines)
         dtsLines.append(contentsOf: generateImportedTypeDefinitions())
         dtsLines.append("export type Exports = {")
         dtsLines.append(contentsOf: dtsExportLines.map { $0.indent(count: 4) })
@@ -319,6 +355,23 @@ struct BridgeJSLink {
             }>;
             """
         return (outputJs, outputDts)
+    }
+
+    private func renderEnumHelperAssignments() -> [String] {
+        var lines: [String] = []
+
+        for skeleton in exportedSkeletons {
+            for enumDef in skeleton.enums where enumDef.enumType == .associatedValue {
+                let base = enumDef.name
+                lines.append(
+                    "const \(base)Helpers = __bjs_create\(base)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift));"
+                )
+                lines.append("enumHelpers.\(base) = \(base)Helpers;")
+                lines.append("")
+            }
+        }
+
+        return lines
     }
 
     private func renderSwiftClassWrappers() -> [String] {
@@ -612,10 +665,210 @@ struct BridgeJSLink {
                     dtsLines.append("")
                 }
             }
-
         case .associatedValue:
-            jsLines.append("// TODO: Implement \(enumDefinition.enumType) enum: \(enumDefinition.name)")
-            dtsLines.append("// TODO: Implement \(enumDefinition.enumType) enum: \(enumDefinition.name)")
+            do {
+                jsLines.append("const \(enumDefinition.name) = {")
+                jsLines.append("Tag: {".indent(count: 4))
+                for (caseIndex, enumCase) in enumDefinition.cases.enumerated() {
+                    let caseName = enumCase.name.capitalizedFirstLetter
+                    jsLines.append("\(caseName): \(caseIndex),".indent(count: 8))
+                }
+                jsLines.append("}".indent(count: 4))
+                jsLines.append("};")
+                jsLines.append("")
+                jsLines.append("const __bjs_create\(enumDefinition.name)Helpers = () => {")
+                jsLines.append(
+                    "return (\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), textEncoder, swift) => ({"
+                        .indent(count: 4)
+                )
+
+                jsLines.append("lower: (value) => {".indent(count: 8))
+                jsLines.append("const enumTag = value.tag;".indent(count: 12))
+                jsLines.append("switch (enumTag) {".indent(count: 12))
+                enumDefinition.cases.forEach { enumCase in
+                    let caseName = enumCase.name.capitalizedFirstLetter
+                    if enumCase.associatedValues.isEmpty {
+                        jsLines.append("case \(enumDefinition.name).Tag.\(caseName): {".indent(count: 16))
+                        jsLines.append("const cleanup = undefined;".indent(count: 20))
+                        jsLines.append(
+                            "return { caseId: \(enumDefinition.name).Tag.\(caseName), cleanup };"
+                                .indent(count: 20)
+                        )
+                        jsLines.append("}".indent(count: 16))
+                    } else {
+                        jsLines.append("case \(enumDefinition.name).Tag.\(caseName): {".indent(count: 16))
+                        var pushLines: [String] = []
+                        var releaseIds: [String] = []
+                        let reversedValues = enumCase.associatedValues.enumerated().reversed()
+                        for (associatedValueIndex, associatedValue) in reversedValues {
+                            let prop = associatedValue.label ?? "param\(associatedValueIndex)"
+                            switch associatedValue.type {
+                            case .string:
+                                let bytesVar = "bytes_\(associatedValueIndex)"
+                                let idVar = "bytesId_\(associatedValueIndex)"
+                                pushLines.append(
+                                    "const \(bytesVar) = \(JSGlueVariableScope.reservedTextEncoder).encode(value.\(prop));"
+                                )
+                                pushLines.append(
+                                    "const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));"
+                                )
+                                pushLines.append(
+                                    "\(JSGlueVariableScope.reservedTmpParamInts).push(\(bytesVar).length);"
+                                )
+                                pushLines.append("\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar));")
+                                releaseIds.append(idVar)
+                            case .bool:
+                                pushLines.append(
+                                    "\(JSGlueVariableScope.reservedTmpParamInts).push(value.\(prop) ? 1 : 0);"
+                                )
+                            case .int:
+                                pushLines.append(
+                                    "\(JSGlueVariableScope.reservedTmpParamInts).push((value.\(prop) | 0));"
+                                )
+                            case .float:
+                                pushLines.append(
+                                    "\(JSGlueVariableScope.reservedTmpParamF32s).push(Math.fround(value.\(prop)));"
+                                )
+                            case .double:
+                                pushLines.append("\(JSGlueVariableScope.reservedTmpParamF64s).push(value.\(prop));")
+                            default:
+                                pushLines.append("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
+                            }
+                        }
+                        jsLines.append(contentsOf: pushLines.map { $0.indent(count: 20) })
+                        if releaseIds.isEmpty {
+                            jsLines.append("const cleanup = undefined;".indent(count: 20))
+                        } else {
+                            jsLines.append("const cleanup = () => {".indent(count: 20))
+                            for id in releaseIds {
+                                jsLines.append(
+                                    "\(JSGlueVariableScope.reservedSwift).memory.release(\(id));".indent(count: 24)
+                                )
+                            }
+                            jsLines.append("};".indent(count: 20))
+                        }
+                        jsLines.append(
+                            "return { caseId: \(enumDefinition.name).Tag.\(caseName), cleanup };"
+                                .indent(count: 20)
+                        )
+                        jsLines.append("}".indent(count: 16))
+                    }
+                }
+                jsLines.append(
+                    "default: throw new Error(\"Unknown \(enumDefinition.name) tag: \" + String(enumTag));".indent(
+                        count: 16
+                    )
+                )
+                jsLines.append("}".indent(count: 12))
+                jsLines.append("},".indent(count: 8))
+
+                jsLines.append(
+                    "raise: (\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s)) => {"
+                        .indent(
+                            count: 8
+                        )
+                )
+                jsLines.append("const tag = tmpRetTag | 0;".indent(count: 12))
+                jsLines.append("switch (tag) {".indent(count: 12))
+                enumDefinition.cases.forEach { enumCase in
+                    let caseName = enumCase.name.capitalizedFirstLetter
+                    if enumCase.associatedValues.isEmpty {
+                        jsLines.append(
+                            "case \(enumDefinition.name).Tag.\(caseName): return { tag: \(enumDefinition.name).Tag.\(caseName) };"
+                                .indent(count: 16)
+                        )
+                    } else {
+                        var locals: [String] = []
+                        var fieldPairs: [String] = []
+                        for (associatedValueIndex, associatedValue) in enumCase.associatedValues.enumerated().reversed()
+                        {
+                            let prop = associatedValue.label ?? "param\(associatedValueIndex)"
+                            switch associatedValue.type {
+                            case .string:
+                                let strVar = "string_\(associatedValueIndex)"
+                                locals.append("const \(strVar) = tmpRetStrings.pop();")
+                                fieldPairs.append("\(prop): \(strVar)")
+                            case .bool:
+                                let bVar = "bool_\(associatedValueIndex)"
+                                locals.append("const \(bVar) = tmpRetInts.pop();")
+                                fieldPairs.append("\(prop): \(bVar)")
+                            case .int:
+                                let iVar = "int_\(associatedValueIndex)"
+                                locals.append("const \(iVar) = tmpRetInts.pop();")
+                                fieldPairs.append("\(prop): \(iVar)")
+                            case .float:
+                                let fVar = "f32_\(associatedValueIndex)"
+                                locals.append("const \(fVar) = tmpRetF32s.pop();")
+                                fieldPairs.append("\(prop): \(fVar)")
+                            case .double:
+                                let dVar = "f64_\(associatedValueIndex)"
+                                locals.append("const \(dVar) = tmpRetF64s.pop();")
+                                fieldPairs.append("\(prop): \(dVar)")
+                            default:
+                                fieldPairs.append("\(prop): undefined")
+                            }
+                        }
+                        jsLines.append("case \(enumDefinition.name).Tag.\(caseName): {".indent(count: 16))
+                        jsLines.append(contentsOf: locals.map { $0.indent(count: 20) })
+                        jsLines.append(
+                            "return { tag: \(enumDefinition.name).Tag.\(caseName), \(fieldPairs.reversed().joined(separator: ", ")) };"
+                                .indent(count: 20)
+                        )
+                        jsLines.append("}".indent(count: 16))
+                    }
+                }
+                jsLines.append(
+                    "default: throw new Error(\"Unknown \(enumDefinition.name) tag returned from Swift: \" + String(tag));"
+                        .indent(
+                            count: 16
+                        )
+                )
+                jsLines.append("}".indent(count: 12))
+                jsLines.append("}".indent(count: 8))
+                jsLines.append("});".indent(count: 4))
+                jsLines.append("};")
+
+                if enumDefinition.namespace == nil {
+                    dtsLines.append("export const \(enumDefinition.name): {")
+                    dtsLines.append("readonly Tag: {".indent(count: 4))
+                    for (index, enumCase) in enumDefinition.cases.enumerated() {
+                        let caseName = enumCase.name.capitalizedFirstLetter
+                        dtsLines.append("readonly \(caseName): \(index);".indent(count: 8))
+                    }
+                    dtsLines.append("};".indent(count: 4))
+                    dtsLines.append("};")
+                    dtsLines.append("")
+                    var unionParts: [String] = []
+                    for enumCase in enumDefinition.cases {
+                        if enumCase.associatedValues.isEmpty {
+                            unionParts.append(
+                                "{ tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter) }"
+                            )
+                        } else {
+                            var fields: [String] = [
+                                "tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter)"
+                            ]
+                            for (associatedValueIndex, associatedValue) in enumCase.associatedValues
+                                .enumerated()
+                            {
+                                let prop = associatedValue.label ?? "param\(associatedValueIndex)"
+                                let ts: String
+                                switch associatedValue.type {
+                                case .string: ts = "string"
+                                case .bool: ts = "boolean"
+                                case .int, .float, .double: ts = "number"
+                                default: ts = "never"
+                                }
+                                fields.append("\(prop): \(ts)")
+                            }
+                            unionParts.append("{ \(fields.joined(separator: "; ")) }")
+                        }
+                    }
+                    dtsLines.append("export type \(enumDefinition.name) =")
+                    dtsLines.append("  " + unionParts.joined(separator: " | "))
+                    dtsLines.append("")
+                }
+            }
         case .namespace:
             break
         }
@@ -992,8 +1245,7 @@ struct BridgeJSLink {
         /// - Returns: Array of JavaScript code lines that set up the global namespace structure
         func renderGlobalNamespace(
             namespacedFunctions: [ExportedFunction],
-            namespacedClasses: [ExportedClass],
-            namespacedEnums: [ExportedEnum]
+            namespacedClasses: [ExportedClass]
         ) -> [String] {
             var lines: [String] = []
             var uniqueNamespaces: [String] = []
@@ -1007,15 +1259,10 @@ struct BridgeJSLink {
                 namespacedClasses
                     .compactMap { $0.namespace }
             )
-            let enumNamespacePaths: Set<[String]> = Set(
-                namespacedEnums
-                    .compactMap { $0.namespace }
-            )
 
             let allNamespacePaths =
                 functionNamespacePaths
                 .union(classNamespacePaths)
-                .union(enumNamespacePaths)
 
             allNamespacePaths.forEach { namespacePath in
                 namespacePath.makeIterator().enumerated().forEach { (index, _) in
@@ -1037,11 +1284,6 @@ struct BridgeJSLink {
                 lines.append("globalThis.\(namespacePath).\(klass.name) = exports.\(klass.name);")
             }
 
-            namespacedEnums.forEach { enumDefinition in
-                let namespacePath: String = enumDefinition.namespace?.joined(separator: ".") ?? ""
-                lines.append("globalThis.\(namespacePath).\(enumDefinition.name) = exports.\(enumDefinition.name);")
-            }
-
             namespacedFunctions.forEach { function in
                 let namespacePath: String = function.namespace?.joined(separator: ".") ?? ""
                 lines.append("globalThis.\(namespacePath).\(function.name) = exports.\(function.name);")
@@ -1051,15 +1293,13 @@ struct BridgeJSLink {
         }
 
         func renderTopLevelEnumNamespaceAssignments(namespacedEnums: [ExportedEnum]) -> [String] {
-            let topLevelNamespacedEnums = namespacedEnums.filter { $0.enumType == .simple || $0.enumType == .rawValue }
-
-            guard !topLevelNamespacedEnums.isEmpty else { return [] }
+            guard !namespacedEnums.isEmpty else { return [] }
 
             var lines: [String] = []
             var uniqueNamespaces: [String] = []
             var seen = Set<String>()
 
-            for enumDef in topLevelNamespacedEnums {
+            for enumDef in namespacedEnums {
                 guard let namespacePath = enumDef.namespace else { continue }
                 namespacePath.enumerated().forEach { (index, _) in
                     let path = namespacePath[0...index].joined(separator: ".")
@@ -1080,7 +1320,7 @@ struct BridgeJSLink {
                 lines.append("")
             }
 
-            for enumDef in topLevelNamespacedEnums {
+            for enumDef in namespacedEnums {
                 let namespacePath = enumDef.namespace?.joined(separator: ".") ?? ""
                 lines.append("globalThis.\(namespacePath).\(enumDef.name) = \(enumDef.name);")
             }
@@ -1291,7 +1531,53 @@ struct BridgeJSLink {
                                         .indent(count: identBaseSize * contentDepth)
                                 )
                             }
-                        case .associatedValue, .namespace:
+                        case .associatedValue:
+                            dtsLines.append(
+                                "const \(enumDefinition.name): {".indent(count: identBaseSize * contentDepth)
+                            )
+                            dtsLines.append("readonly Tag: {".indent(count: identBaseSize * (contentDepth + 1)))
+                            for (caseIndex, enumCase) in enumDefinition.cases.enumerated() {
+                                let caseName = enumCase.name.capitalizedFirstLetter
+                                dtsLines.append(
+                                    "readonly \(caseName): \(caseIndex);".indent(
+                                        count: identBaseSize * (contentDepth + 2)
+                                    )
+                                )
+                            }
+                            dtsLines.append("};".indent(count: identBaseSize * (contentDepth + 1)))
+                            dtsLines.append("};".indent(count: identBaseSize * contentDepth))
+
+                            var unionParts: [String] = []
+                            for enumCase in enumDefinition.cases {
+                                if enumCase.associatedValues.isEmpty {
+                                    unionParts.append(
+                                        "{ tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter) }"
+                                    )
+                                } else {
+                                    var fields: [String] = [
+                                        "tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter)"
+                                    ]
+                                    for (associatedValueIndex, associatedValue) in enumCase.associatedValues
+                                        .enumerated()
+                                    {
+                                        let prop = associatedValue.label ?? "param\(associatedValueIndex)"
+                                        let ts: String
+                                        switch associatedValue.type {
+                                        case .string: ts = "string"
+                                        case .bool: ts = "boolean"
+                                        case .int, .float, .double: ts = "number"
+                                        default: ts = "never"
+                                        }
+                                        fields.append("\(prop): \(ts)")
+                                    }
+                                    unionParts.append("{ \(fields.joined(separator: "; ")) }")
+                                }
+                            }
+                            dtsLines.append("type \(enumDefinition.name) =".indent(count: identBaseSize * contentDepth))
+                            dtsLines.append(
+                                "  " + unionParts.joined(separator: " | ").indent(count: identBaseSize * contentDepth)
+                            )
+                        case .namespace:
                             continue
                         }
                     }
