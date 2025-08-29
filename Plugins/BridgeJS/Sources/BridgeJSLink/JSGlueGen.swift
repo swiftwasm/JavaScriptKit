@@ -20,7 +20,9 @@ final class JSGlueVariableScope {
     static let reservedTmpRetInts = "tmpRetInts"
     static let reservedTmpRetF32s = "tmpRetF32s"
     static let reservedTmpRetF64s = "tmpRetF64s"
-    static let reservedTmpRetBools = "tmpRetBools"
+    static let reservedTmpParamInts = "tmpParamInts"
+    static let reservedTmpParamF32s = "tmpParamF32s"
+    static let reservedTmpParamF64s = "tmpParamF64s"
 
     private var variables: Set<String> = [
         reservedSwift,
@@ -35,7 +37,9 @@ final class JSGlueVariableScope {
         reservedTmpRetInts,
         reservedTmpRetF32s,
         reservedTmpRetF64s,
-        reservedTmpRetBools,
+        reservedTmpParamInts,
+        reservedTmpParamF32s,
+        reservedTmpParamF64s,
     ]
 
     /// Returns a unique variable name in the scope based on the given name hint.
@@ -212,14 +216,12 @@ struct IntrinsicJSFragment: Sendable {
             printCode: { arguments, scope, printer, cleanup in
                 let value = arguments[0]
                 let caseIdName = "\(value)CaseId"
-                let paramsIdName = "\(value)ParamsId"
-                let paramsLenName = "\(value)ParamsLen"
                 let cleanupName = "\(value)Cleanup"
                 printer.write(
-                    "const { caseId: \(caseIdName), paramsId: \(paramsIdName), paramsLen: \(paramsLenName), cleanup: \(cleanupName) } = enumHelpers.\(enumBase).lower(\(value));"
+                    "const { caseId: \(caseIdName), cleanup: \(cleanupName) } = enumHelpers.\(enumBase).lower(\(value));"
                 )
                 cleanup.write("if (\(cleanupName)) { \(cleanupName)(); }")
-                return [caseIdName, paramsIdName, paramsLenName]
+                return [caseIdName]
             }
         )
     }
@@ -230,7 +232,7 @@ struct IntrinsicJSFragment: Sendable {
             printCode: { _, scope, printer, _ in
                 let retName = scope.variable("ret")
                 printer.write(
-                    "const \(retName) = enumHelpers.\(enumBase).raise(\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetBools));"
+                    "const \(retName) = enumHelpers.\(enumBase).raise(\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
                 )
                 return [retName]
             }

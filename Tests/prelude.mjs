@@ -354,14 +354,14 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethod.Get, 0);
     assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethod.Post, 1);
 
-    assert.equal(exports.echoNetworkingAPIMethod(globalThis.Networking.API.Method.Get), globalThis.Networking.API.Method.Get);
-    assert.equal(exports.echoConfigurationLogLevel(globalThis.Configuration.LogLevel.Debug), globalThis.Configuration.LogLevel.Debug);
-    assert.equal(exports.echoConfigurationPort(globalThis.Configuration.Port.Http), globalThis.Configuration.Port.Http);
+    assert.equal(exports.roundtripNetworkingAPIMethod(globalThis.Networking.API.Method.Get), globalThis.Networking.API.Method.Get);
+    assert.equal(exports.roundtripConfigurationLogLevel(globalThis.Configuration.LogLevel.Debug), globalThis.Configuration.LogLevel.Debug);
+    assert.equal(exports.roundtripConfigurationPort(globalThis.Configuration.Port.Http), globalThis.Configuration.Port.Http);
     assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Debug), globalThis.Configuration.Port.Development);
     assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Info), globalThis.Configuration.Port.Http);
     assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Warning), globalThis.Configuration.Port.Https);
     assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Error), globalThis.Configuration.Port.Development);
-    assert.equal(exports.echoInternalSupportedMethod(globalThis.Networking.APIV2.Internal.SupportedMethod.Get), globalThis.Networking.APIV2.Internal.SupportedMethod.Get);
+    assert.equal(exports.roundtripInternalSupportedMethod(globalThis.Networking.APIV2.Internal.SupportedMethod.Get), globalThis.Networking.APIV2.Internal.SupportedMethod.Get);
 
     const converter = new exports.Converter();
     assert.equal(converter.toString(42), "42");
@@ -394,10 +394,9 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     const f1 = { tag: APIResult.Tag.Failure, param0: 42 };
     const i1 = { tag: APIResult.Tag.Info };
 
-    assert.deepEqual(exports.echoAPIResult(s1), s1);
-    assert.deepEqual(exports.echoAPIResult(f1), f1);
-    assert.deepEqual(exports.echoAPIResult(i1), i1);
-
+    assert.deepEqual(exports.roundtripAPIResult(s1), s1);
+    assert.deepEqual(exports.roundtripAPIResult(f1), f1);
+    assert.deepEqual(exports.roundtripAPIResult(i1), i1);
 
     assert.deepEqual(exports.makeAPIResultSuccess("Test"), { tag: APIResult.Tag.Success, param0: "Test" });
     assert.deepEqual(exports.makeAPIResultSuccess("ok"), { tag: APIResult.Tag.Success, param0: "ok" });
@@ -411,12 +410,12 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 
     const rVal = 3.25;
     const r1 = { tag: APIResult.Tag.Rate, param0: rVal };
-    assert.deepEqual(exports.echoAPIResult(r1), r1);
+    assert.deepEqual(exports.roundtripAPIResult(r1), r1);
     assert.deepEqual(exports.makeAPIResultRate(rVal), r1);
 
     const pVal = 3.141592653589793;
     const p1 = { tag: APIResult.Tag.Precise, param0: pVal };
-    assert.deepEqual(exports.echoAPIResult(p1), p1);
+    assert.deepEqual(exports.roundtripAPIResult(p1), p1);
     assert.deepEqual(exports.makeAPIResultPrecise(pVal), p1);
 
     const cs1 = { tag: ComplexResult.Tag.Success, param0: "All good!" };
@@ -426,14 +425,6 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     const cc1 = { tag: ComplexResult.Tag.Coordinates, param0: 10.5, param1: 20.3, param2: 30.7 };
     const ccomp1 = { tag: ComplexResult.Tag.Comprehensive, param0: true, param1: false, param2: 42, param3: 100, param4: 3.14, param5: 2.718, param6: "Hello", param7: "World", param8: "Test" };
     const ci1 = { tag: ComplexResult.Tag.Info };
-
-    assert.deepEqual(exports.echoComplexResult(cs1), cs1);
-    assert.deepEqual(exports.echoComplexResult(ce1), ce1);
-    assert.deepEqual(exports.echoComplexResult(cl1), cl1);
-    assert.deepEqual(exports.echoComplexResult(cst1), cst1);
-    assert.deepEqual(exports.echoComplexResult(cc1), cc1);
-    assert.deepEqual(exports.echoComplexResult(ccomp1), ccomp1);
-    assert.deepEqual(exports.echoComplexResult(ci1), ci1);
 
     assert.deepEqual(exports.roundtripComplexResult(cs1), cs1);
     assert.deepEqual(exports.roundtripComplexResult(ce1), ce1);

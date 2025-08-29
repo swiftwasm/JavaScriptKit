@@ -391,6 +391,30 @@
       }
     },
     {
+      "abiName" : "bjs_roundtripAPIResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundtripAPIResult",
+      "parameters" : [
+        {
+          "label" : "result",
+          "name" : "result",
+          "type" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "APIResult"
+        }
+      }
+    },
+    {
       "abiName" : "bjs_handleComplex",
       "effects" : {
         "isAsync" : false,
@@ -423,6 +447,30 @@
       "name" : "getComplexResult",
       "parameters" : [
 
+      ],
+      "returnType" : {
+        "associatedValueEnum" : {
+          "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundtripComplexResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundtripComplexResult",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "result",
+          "type" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        }
       ],
       "returnType" : {
         "associatedValueEnum" : {

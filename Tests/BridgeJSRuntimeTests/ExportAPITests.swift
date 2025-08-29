@@ -277,15 +277,15 @@ enum Internal {
     }
 }
 
-@JS func echoNetworkingAPIMethod(_ method: Networking.API.Method) -> Networking.API.Method {
+@JS func roundtripNetworkingAPIMethod(_ method: Networking.API.Method) -> Networking.API.Method {
     return method
 }
 
-@JS func echoConfigurationLogLevel(_ level: Configuration.LogLevel) -> Configuration.LogLevel {
+@JS func roundtripConfigurationLogLevel(_ level: Configuration.LogLevel) -> Configuration.LogLevel {
     return level
 }
 
-@JS func echoConfigurationPort(_ port: Configuration.Port) -> Configuration.Port {
+@JS func roundtripConfigurationPort(_ port: Configuration.Port) -> Configuration.Port {
     return port
 }
 
@@ -298,7 +298,7 @@ enum Internal {
     }
 }
 
-@JS func echoInternalSupportedMethod(_ method: Internal.SupportedMethod) -> Internal.SupportedMethod {
+@JS func roundtripInternalSupportedMethod(_ method: Internal.SupportedMethod) -> Internal.SupportedMethod {
     return method
 }
 
@@ -311,7 +311,7 @@ enum Internal {
     case info
 }
 
-@JS func echoAPIResult(result: APIResult) -> APIResult {
+@JS func roundtripAPIResult(result: APIResult) -> APIResult {
     return result
 }
 
@@ -350,7 +350,7 @@ enum ComplexResult {
     case info
 }
 
-@JS func echoComplexResult(result: ComplexResult) -> ComplexResult {
+@JS func roundtripComplexResult(_ result: ComplexResult) -> ComplexResult {
     return result
 }
 
@@ -390,10 +390,6 @@ enum ComplexResult {
 
 @JS func makeComplexResultInfo() -> ComplexResult {
     return .info
-}
-
-@JS func roundtripComplexResult(_ result: ComplexResult) -> ComplexResult {
-    return result
 }
 
 @JS enum Utilities {

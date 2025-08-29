@@ -1042,17 +1042,10 @@ public class ExportSwift {
             let typeName = enumDef.swiftCallName
             return """
                 private extension \(raw: typeName) {
-                    static func bridgeJSLiftParameter(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> \(raw: typeName) {
-                        let params: [UInt8] = .init(unsafeUninitializedCapacity: Int(paramsLen)) { buf, initializedCount in
-                            _swift_js_init_memory(paramsId, buf.baseAddress.unsafelyUnwrapped)
-                            initializedCount = Int(paramsLen)
-                        }
-                        return params.withUnsafeBytes { raw in
-                            var reader = _BJSBinaryReader(raw: raw)
-                            switch caseId {
-                            \(raw: generateBinaryLiftSwitchCases(enumDef: enumDef).joined(separator: "\n"))
-                            default: fatalError("Unknown \(raw: typeName) case ID: \\(caseId)")
-                            }
+                    static func bridgeJSLiftParameter(_ caseId: Int32) -> \(raw: typeName) {
+                        switch caseId {
+                        \(raw: generateStackLiftSwitchCases(enumDef: enumDef).joined(separator: "\n"))
+                        default: fatalError("Unknown \(raw: typeName) case ID: \\(caseId)")
                         }
                     }
 
@@ -1065,7 +1058,7 @@ public class ExportSwift {
                 """
         }
 
-        private func generateBinaryLiftSwitchCases(enumDef: ExportedEnum) -> [String] {
+        private func generateStackLiftSwitchCases(enumDef: ExportedEnum) -> [String] {
             var cases: [String] = []
             for (caseIndex, enumCase) in enumDef.cases.enumerated() {
                 if enumCase.associatedValues.isEmpty {
@@ -1073,35 +1066,29 @@ public class ExportSwift {
                 } else {
                     var lines: [String] = []
                     lines.append("case \(caseIndex):")
-                    lines.append("reader.readParamCount(expected: \(enumCase.associatedValues.count))")
-                    var argList: [String] = []
-
-                    for (paramIndex, associatedValue) in enumCase.associatedValues.enumerated() {
-                        let paramName = associatedValue.label ?? "param\(paramIndex)"
-                        argList.append(paramName)
-
+                    let argList = enumCase.associatedValues.map { associatedValue in
+                        let paramName: String
+                        if let label = associatedValue.label {
+                            paramName = "\(label): "
+                        } else {
+                            paramName = ""
+                        }
                         switch associatedValue.type {
                         case .string:
-                            lines.append("reader.expectTag(.string)")
-                            lines.append("let \(paramName) = reader.readString()")
+                            return
+                                "\(paramName)String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
                         case .int:
-                            lines.append("reader.expectTag(.int32)")
-                            lines.append("let \(paramName) = Int(reader.readInt32())")
+                            return "\(paramName)Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
                         case .bool:
-                            lines.append("reader.expectTag(.bool)")
-                            lines.append("let \(paramName) = Int32(reader.readUInt8()) != 0")
+                            return "\(paramName)Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
                         case .float:
-                            lines.append("reader.expectTag(.float32)")
-                            lines.append("let \(paramName) = reader.readFloat32()")
+                            return "\(paramName)Float.bridgeJSLiftParameter(_swift_js_pop_param_f32())"
                         case .double:
-                            lines.append("reader.expectTag(.float64)")
-                            lines.append("let \(paramName) = reader.readFloat64()")
+                            return "\(paramName)Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())"
                         default:
-                            lines.append("reader.expectTag(.int32)")
-                            lines.append("let \(paramName) = reader.readInt32()")
+                            return "\(paramName)Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
                         }
                     }
-
                     lines.append("return .\(enumCase.name)(\(argList.joined(separator: ", ")))")
                     cases.append(lines.joined(separator: "\n"))
                 }
@@ -1114,26 +1101,26 @@ public class ExportSwift {
             for (caseIndex, enumCase) in enumDef.cases.enumerated() {
                 if enumCase.associatedValues.isEmpty {
                     cases.append("case .\(enumCase.name):")
-                    cases.append("_swift_js_return_tag(Int32(\(caseIndex)))")
+                    cases.append("_swift_js_push_tag(Int32(\(caseIndex)))")
                 } else {
                     var bodyLines: [String] = []
-                    bodyLines.append("_swift_js_return_tag(Int32(\(caseIndex)))")
+                    bodyLines.append("_swift_js_push_tag(Int32(\(caseIndex)))")
                     for (index, associatedValue) in enumCase.associatedValues.enumerated() {
                         let paramName = associatedValue.label ?? "param\(index)"
                         switch associatedValue.type {
                         case .string:
                             bodyLines.append("var __bjs_\(paramName) = \(paramName)")
                             bodyLines.append("__bjs_\(paramName).withUTF8 { ptr in")
-                            bodyLines.append("_swift_js_return_string(ptr.baseAddress, Int32(ptr.count))")
+                            bodyLines.append("_swift_js_push_string(ptr.baseAddress, Int32(ptr.count))")
                             bodyLines.append("}")
                         case .int:
-                            bodyLines.append("_swift_js_return_int(Int32(\(paramName)))")
+                            bodyLines.append("_swift_js_push_int(Int32(\(paramName)))")
                         case .bool:
-                            bodyLines.append("_swift_js_return_bool(\(paramName) ? 1 : 0)")
+                            bodyLines.append("_swift_js_push_int(\(paramName) ? 1 : 0)")
                         case .float:
-                            bodyLines.append("_swift_js_return_f32(\(paramName))")
+                            bodyLines.append("_swift_js_push_f32(\(paramName))")
                         case .double:
-                            bodyLines.append("_swift_js_return_f64(\(paramName))")
+                            bodyLines.append("_swift_js_push_f64(\(paramName))")
                         default:
                             bodyLines.append(
                                 "preconditionFailure(\"BridgeJS: unsupported associated value type in generated code\")"
@@ -1410,7 +1397,7 @@ extension BridgeType {
         static let void = LiftingIntrinsicInfo(parameters: [])
         static let caseEnum = LiftingIntrinsicInfo(parameters: [("value", .i32)])
         static let associatedValueEnum = LiftingIntrinsicInfo(parameters: [
-            ("caseId", .i32), ("paramsId", .i32), ("paramsLen", .i32),
+            ("caseId", .i32)
         ])
     }
 

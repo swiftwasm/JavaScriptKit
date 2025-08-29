@@ -61,8 +61,10 @@ declare global {
 export type Exports = {
     handle(result: APIResult): void;
     getResult(): APIResult;
+    roundtripAPIResult(result: APIResult): APIResult;
     handleComplex(result: ComplexResult): void;
     getComplexResult(): ComplexResult;
+    roundtripComplexResult(result: ComplexResult): ComplexResult;
 }
 export type Imports = {
 }

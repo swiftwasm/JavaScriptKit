@@ -10,6 +10,9 @@ enum APIResult {
 
 @JS func handle(result: APIResult)
 @JS func getResult() -> APIResult
+@JS func roundtripAPIResult(result: APIResult) -> APIResult {
+    return result
+}
 
 @JS
 enum ComplexResult {
@@ -23,6 +26,9 @@ enum ComplexResult {
 
 @JS func handleComplex(result: ComplexResult)
 @JS func getComplexResult() -> ComplexResult
+@JS func roundtripComplexResult(_ result: ComplexResult) -> ComplexResult {
+    return result
+}
 
 @JS
 enum Utilities {

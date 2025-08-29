@@ -66,54 +66,6 @@ struct BridgeJSLink {
         """
 
     let sharedEnumHelpersJs = """
-        /// Shared helpers for encoding associated-value enums between JS and Swift.
-        const __bjs_ParamType = { STRING: 1, INT32: 2, BOOL: 3, FLOAT32: 4, FLOAT64: 5 };
-        function __bjs_encodeEnumParams(textEncoder, swift, parts) {
-            const SIZE_U8 = 1, SIZE_U32 = 4, SIZE_F32 = 4, SIZE_F64 = 8;
-            let totalLen = SIZE_U32;
-            for (const p of parts) {
-                switch (p.t) {
-                    case __bjs_ParamType.STRING: {
-                        const bytes = textEncoder.encode(p.v);
-                        p._bytes = bytes;
-                        totalLen += SIZE_U8 + SIZE_U32 + bytes.length;
-                        break;
-                    }
-                    case __bjs_ParamType.INT32: totalLen += SIZE_U8 + SIZE_U32; break;
-                    case __bjs_ParamType.BOOL: totalLen += SIZE_U8 + SIZE_U8; break;
-                    case __bjs_ParamType.FLOAT32: totalLen += SIZE_U8 + SIZE_F32; break;
-                    case __bjs_ParamType.FLOAT64: totalLen += SIZE_U8 + SIZE_F64; break;
-                    default: throw new Error("Unsupported param type tag: " + p.t);
-                }
-            }
-            const buf = new Uint8Array(totalLen);
-            const view = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
-            let off = 0;
-            view.setUint32(off, parts.length, true); off += SIZE_U32;
-            for (const p of parts) {
-                view.setUint8(off, p.t); off += SIZE_U8;
-                switch (p.t) {
-                    case __bjs_ParamType.STRING: {
-                        const b = p._bytes;
-                        view.setUint32(off, b.length, true); off += SIZE_U32;
-                        buf.set(b, off); off += b.length;
-                        break;
-                    }
-                    case __bjs_ParamType.INT32:
-                        view.setInt32(off, (p.v | 0), true); off += SIZE_U32; break;
-                    case __bjs_ParamType.BOOL:
-                        view.setUint8(off, p.v ? 1 : 0); off += SIZE_U8; break;
-                    case __bjs_ParamType.FLOAT32:
-                        view.setFloat32(off, Math.fround(p.v), true); off += SIZE_F32; break;
-                    case __bjs_ParamType.FLOAT64:
-                        view.setFloat64(off, p.v, true); off += SIZE_F64; break;
-                    default: throw new Error("Unsupported param type tag: " + p.t);
-                }
-            }
-            const paramsId = swift.memory.retain(buf);
-            return { paramsId, paramsLen: buf.length, cleanup: () => { swift.memory.release(paramsId); } };
-        }
-
         """
 
     func link() throws -> (outputJs: String, outputDts: String) {
@@ -289,7 +241,9 @@ struct BridgeJSLink {
                 let \(JSGlueVariableScope.reservedTmpRetInts) = [];
                 let \(JSGlueVariableScope.reservedTmpRetF32s) = [];
                 let \(JSGlueVariableScope.reservedTmpRetF64s) = [];
-                let \(JSGlueVariableScope.reservedTmpRetBools) = [];
+                let \(JSGlueVariableScope.reservedTmpParamInts) = [];
+                let \(JSGlueVariableScope.reservedTmpParamF32s) = [];
+                let \(JSGlueVariableScope.reservedTmpParamF64s) = [];
                 \(enumHelpersDeclaration)
                 return {
                     /**
@@ -301,18 +255,16 @@ struct BridgeJSLink {
                         const imports = options.getImports(importsContext);
                         bjs["swift_js_return_string"] = function(ptr, len) {
                             const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len)\(sharedMemory ? ".slice()" : "");
-                            const value = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);
-                            \(JSGlueVariableScope.reservedStorageToReturnString) = value;
-                            \(JSGlueVariableScope.reservedTmpRetStrings).push(value);
+                            \(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);
                         }
                         bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
-                            const source = \(JSGlueVariableScope.reservedSwift).memory.getObject(sourceId);
+                            const source = \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).getObject(sourceId);
                             const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, bytesPtr);
                             bytes.set(source);
                         }
                         bjs["swift_js_make_js_string"] = function(ptr, len) {
                             const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len)\(sharedMemory ? ".slice()" : "");
-                            return \(JSGlueVariableScope.reservedSwift).memory.retain(\(JSGlueVariableScope.reservedTextDecoder).decode(bytes));
+                            return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retain(\(JSGlueVariableScope.reservedTextDecoder).decode(bytes));
                         }
                         bjs["swift_js_init_memory_with_result"] = function(ptr, len) {
                             const target = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len);
@@ -320,37 +272,39 @@ struct BridgeJSLink {
                             \(JSGlueVariableScope.reservedStorageToReturnBytes) = undefined;
                         }
                         bjs["swift_js_throw"] = function(id) {
-                            \(JSGlueVariableScope.reservedStorageToReturnException) = \(JSGlueVariableScope.reservedSwift).memory.retainByRef(id);
+                            \(JSGlueVariableScope.reservedStorageToReturnException) = \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retainByRef(id);
                         }
                         bjs["swift_js_retain"] = function(id) {
-                            return \(JSGlueVariableScope.reservedSwift).memory.retainByRef(id);
+                            return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retainByRef(id);
                         }
                         bjs["swift_js_release"] = function(id) {
                             \(JSGlueVariableScope.reservedSwift).memory.release(id);
                         }
-                        bjs["swift_js_return_tag"] = function(tag) {
-                            \(JSGlueVariableScope.reservedTmpRetTag) = tag | 0;
-                            tmpRetString = undefined;
-                            \(JSGlueVariableScope.reservedTmpRetStrings) = [];
-                            \(JSGlueVariableScope.reservedTmpRetInts) = [];
-                            \(JSGlueVariableScope.reservedTmpRetF32s) = [];
-                            \(JSGlueVariableScope.reservedTmpRetF64s) = [];
-                            \(JSGlueVariableScope.reservedTmpRetBools) = [];
+                        bjs["swift_js_push_tag"] = function(tag) {
+                            \(JSGlueVariableScope.reservedTmpRetTag) = tag;
                         }
-                        bjs["swift_js_return_int"] = function(v) {
-                            const value = v | 0;
-                            \(JSGlueVariableScope.reservedTmpRetInts).push(value);
+                        bjs["swift_js_push_int"] = function(v) {
+                            \(JSGlueVariableScope.reservedTmpRetInts).push(v | 0);
                         }
-                        bjs["swift_js_return_f32"] = function(v) {
-                            const value = Math.fround(v);
-                            \(JSGlueVariableScope.reservedTmpRetF32s).push(value);
+                        bjs["swift_js_push_f32"] = function(v) {
+                            \(JSGlueVariableScope.reservedTmpRetF32s).push(Math.fround(v));
                         }
-                        bjs["swift_js_return_f64"] = function(v) {
+                        bjs["swift_js_push_f64"] = function(v) {
                             \(JSGlueVariableScope.reservedTmpRetF64s).push(v);
                         }
-                        bjs["swift_js_return_bool"] = function(v) {
-                            const value = v !== 0;
-                            \(JSGlueVariableScope.reservedTmpRetBools).push(value);
+                        bjs["swift_js_push_string"] = function(ptr, len) {
+                            const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len)\(sharedMemory ? ".slice()" : "");
+                            const value = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);
+                            \(JSGlueVariableScope.reservedTmpRetStrings).push(value);
+                        }
+                        bjs["swift_js_pop_param_int32"] = function() {
+                            return \(JSGlueVariableScope.reservedTmpParamInts).pop();
+                        }
+                        bjs["swift_js_pop_param_f32"] = function() {
+                            return \(JSGlueVariableScope.reservedTmpParamF32s).pop();
+                        }
+                        bjs["swift_js_pop_param_f64"] = function() {
+                            return \(JSGlueVariableScope.reservedTmpParamF64s).pop();
                         }
             \(renderSwiftClassWrappers().map { $0.indent(count: 12) }.joined(separator: "\n"))
             \(importObjectBuilders.flatMap { $0.importedLines }.map { $0.indent(count: 12) }.joined(separator: "\n"))
@@ -409,7 +363,9 @@ struct BridgeJSLink {
         for skeleton in exportedSkeletons {
             for enumDef in skeleton.enums where enumDef.enumType == .associatedValue {
                 let base = enumDef.name
-                lines.append("const \(base)Helpers = __bjs_create\(base)Helpers()(textEncoder, swift);")
+                lines.append(
+                    "const \(base)Helpers = __bjs_create\(base)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift));"
+                )
                 lines.append("enumHelpers.\(base) = \(base)Helpers;")
                 lines.append("")
             }
@@ -721,59 +677,78 @@ struct BridgeJSLink {
                 jsLines.append("};")
                 jsLines.append("")
                 jsLines.append("const __bjs_create\(enumDefinition.name)Helpers = () => {")
-                jsLines.append("return (textEncoder, swift) => ({".indent(count: 4))
+                jsLines.append(
+                    "return (\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), textEncoder, swift) => ({"
+                        .indent(count: 4)
+                )
 
                 jsLines.append("lower: (value) => {".indent(count: 8))
                 jsLines.append("const enumTag = value.tag;".indent(count: 12))
                 jsLines.append("switch (enumTag) {".indent(count: 12))
-                for (_, enumCase) in enumDefinition.cases.enumerated() {
+                enumDefinition.cases.forEach { enumCase in
                     let caseName = enumCase.name.capitalizedFirstLetter
                     if enumCase.associatedValues.isEmpty {
                         jsLines.append("case \(enumDefinition.name).Tag.\(caseName): {".indent(count: 16))
-                        jsLines.append("const parts = [];".indent(count: 20))
+                        jsLines.append("const cleanup = undefined;".indent(count: 20))
                         jsLines.append(
-                            "const { paramsId, paramsLen, cleanup } = __bjs_encodeEnumParams(textEncoder, swift, parts);"
-                                .indent(count: 20)
-                        )
-                        jsLines.append(
-                            "return { caseId: \(enumDefinition.name).Tag.\(caseName), paramsId, paramsLen, cleanup };"
+                            "return { caseId: \(enumDefinition.name).Tag.\(caseName), cleanup };"
                                 .indent(count: 20)
                         )
                         jsLines.append("}".indent(count: 16))
                     } else {
                         jsLines.append("case \(enumDefinition.name).Tag.\(caseName): {".indent(count: 16))
-                        var partLines: [String] = []
-                        for (associatedValueIndex, associatedValue) in enumCase.associatedValues.enumerated() {
+                        var pushLines: [String] = []
+                        var releaseIds: [String] = []
+                        let reversedValues = enumCase.associatedValues.enumerated().reversed()
+                        for (associatedValueIndex, associatedValue) in reversedValues {
                             let prop = associatedValue.label ?? "param\(associatedValueIndex)"
                             switch associatedValue.type {
                             case .string:
-                                partLines.append("{ t: __bjs_ParamType.STRING, v: value.\(prop) }")
-                            case .int:
-                                partLines.append("{ t: __bjs_ParamType.INT32, v: (value.\(prop) | 0) }")
+                                let bytesVar = "bytes_\(associatedValueIndex)"
+                                let idVar = "bytesId_\(associatedValueIndex)"
+                                pushLines.append(
+                                    "const \(bytesVar) = \(JSGlueVariableScope.reservedTextEncoder).encode(value.\(prop));"
+                                )
+                                pushLines.append(
+                                    "const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));"
+                                )
+                                pushLines.append(
+                                    "\(JSGlueVariableScope.reservedTmpParamInts).push(\(bytesVar).length);"
+                                )
+                                pushLines.append("\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar));")
+                                releaseIds.append(idVar)
                             case .bool:
-                                partLines.append("{ t: __bjs_ParamType.BOOL, v: value.\(prop) }")
+                                pushLines.append(
+                                    "\(JSGlueVariableScope.reservedTmpParamInts).push(value.\(prop) ? 1 : 0);"
+                                )
+                            case .int:
+                                pushLines.append(
+                                    "\(JSGlueVariableScope.reservedTmpParamInts).push((value.\(prop) | 0));"
+                                )
                             case .float:
-                                partLines.append("{ t: __bjs_ParamType.FLOAT32, v: value.\(prop) }")
+                                pushLines.append(
+                                    "\(JSGlueVariableScope.reservedTmpParamF32s).push(Math.fround(value.\(prop)));"
+                                )
                             case .double:
-                                partLines.append("{ t: __bjs_ParamType.FLOAT64, v: value.\(prop) }")
+                                pushLines.append("\(JSGlueVariableScope.reservedTmpParamF64s).push(value.\(prop));")
                             default:
-                                partLines.append("{ t: __bjs_ParamType.INT32, v: 0 }")
+                                pushLines.append("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
                             }
                         }
-                        jsLines.append("const parts = [".indent(count: 20))
-                        if !partLines.isEmpty {
-                            for (i, pl) in partLines.enumerated() {
-                                let suffix = i == partLines.count - 1 ? "" : ","
-                                jsLines.append("\(pl)\(suffix)".indent(count: 24))
+                        jsLines.append(contentsOf: pushLines.map { $0.indent(count: 20) })
+                        if releaseIds.isEmpty {
+                            jsLines.append("const cleanup = undefined;".indent(count: 20))
+                        } else {
+                            jsLines.append("const cleanup = () => {".indent(count: 20))
+                            for id in releaseIds {
+                                jsLines.append(
+                                    "\(JSGlueVariableScope.reservedSwift).memory.release(\(id));".indent(count: 24)
+                                )
                             }
+                            jsLines.append("};".indent(count: 20))
                         }
-                        jsLines.append("];".indent(count: 20))
                         jsLines.append(
-                            "const { paramsId, paramsLen, cleanup } = __bjs_encodeEnumParams(textEncoder, swift, parts);"
-                                .indent(count: 20)
-                        )
-                        jsLines.append(
-                            "return { caseId: \(enumDefinition.name).Tag.\(caseName), paramsId, paramsLen, cleanup };"
+                            "return { caseId: \(enumDefinition.name).Tag.\(caseName), cleanup };"
                                 .indent(count: 20)
                         )
                         jsLines.append("}".indent(count: 16))
@@ -788,13 +763,14 @@ struct BridgeJSLink {
                 jsLines.append("},".indent(count: 8))
 
                 jsLines.append(
-                    "raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetBools) => {".indent(
-                        count: 8
-                    )
+                    "raise: (\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s)) => {"
+                        .indent(
+                            count: 8
+                        )
                 )
                 jsLines.append("const tag = tmpRetTag | 0;".indent(count: 12))
                 jsLines.append("switch (tag) {".indent(count: 12))
-                for (_, enumCase) in enumDefinition.cases.enumerated() {
+                enumDefinition.cases.forEach { enumCase in
                     let caseName = enumCase.name.capitalizedFirstLetter
                     if enumCase.associatedValues.isEmpty {
                         jsLines.append(
@@ -802,38 +778,43 @@ struct BridgeJSLink {
                                 .indent(count: 16)
                         )
                     } else {
-                        var fields: [String] = ["tag: \(enumDefinition.name).Tag.\(caseName)"]
-                        var stringIndex = 0
-                        var intIndex = 0
-                        var f32Index = 0
-                        var f64Index = 0
-                        var boolIndex = 0
-                        for (associatedValueIndex, associatedValue) in enumCase.associatedValues.enumerated() {
+                        var locals: [String] = []
+                        var fieldPairs: [String] = []
+                        for (associatedValueIndex, associatedValue) in enumCase.associatedValues.enumerated().reversed()
+                        {
                             let prop = associatedValue.label ?? "param\(associatedValueIndex)"
                             switch associatedValue.type {
                             case .string:
-                                fields.append("\(prop): tmpRetStrings[\(stringIndex)]")
-                                stringIndex += 1
+                                let strVar = "string_\(associatedValueIndex)"
+                                locals.append("const \(strVar) = tmpRetStrings.pop();")
+                                fieldPairs.append("\(prop): \(strVar)")
                             case .bool:
-                                fields.append("\(prop): tmpRetBools[\(boolIndex)]")
-                                boolIndex += 1
+                                let bVar = "bool_\(associatedValueIndex)"
+                                locals.append("const \(bVar) = tmpRetInts.pop();")
+                                fieldPairs.append("\(prop): \(bVar)")
                             case .int:
-                                fields.append("\(prop): tmpRetInts[\(intIndex)]")
-                                intIndex += 1
+                                let iVar = "int_\(associatedValueIndex)"
+                                locals.append("const \(iVar) = tmpRetInts.pop();")
+                                fieldPairs.append("\(prop): \(iVar)")
                             case .float:
-                                fields.append("\(prop): tmpRetF32s[\(f32Index)]")
-                                f32Index += 1
+                                let fVar = "f32_\(associatedValueIndex)"
+                                locals.append("const \(fVar) = tmpRetF32s.pop();")
+                                fieldPairs.append("\(prop): \(fVar)")
                             case .double:
-                                fields.append("\(prop): tmpRetF64s[\(f64Index)]")
-                                f64Index += 1
+                                let dVar = "f64_\(associatedValueIndex)"
+                                locals.append("const \(dVar) = tmpRetF64s.pop();")
+                                fieldPairs.append("\(prop): \(dVar)")
                             default:
-                                fields.append("\(prop): undefined")
+                                fieldPairs.append("\(prop): undefined")
                             }
                         }
+                        jsLines.append("case \(enumDefinition.name).Tag.\(caseName): {".indent(count: 16))
+                        jsLines.append(contentsOf: locals.map { $0.indent(count: 20) })
                         jsLines.append(
-                            "case \(enumDefinition.name).Tag.\(caseName): return { \(fields.joined(separator: ", ")) };"
-                                .indent(count: 16)
+                            "return { tag: \(enumDefinition.name).Tag.\(caseName), \(fieldPairs.reversed().joined(separator: ", ")) };"
+                                .indent(count: 20)
                         )
+                        jsLines.append("}".indent(count: 16))
                     }
                 }
                 jsLines.append(
@@ -850,9 +831,9 @@ struct BridgeJSLink {
                 if enumDefinition.namespace == nil {
                     dtsLines.append("export const \(enumDefinition.name): {")
                     dtsLines.append("readonly Tag: {".indent(count: 4))
-                    for (caseIndex, enumCase) in enumDefinition.cases.enumerated() {
+                    for (index, enumCase) in enumDefinition.cases.enumerated() {
                         let caseName = enumCase.name.capitalizedFirstLetter
-                        dtsLines.append("readonly \(caseName): \(caseIndex);".indent(count: 8))
+                        dtsLines.append("readonly \(caseName): \(index);".indent(count: 8))
                     }
                     dtsLines.append("};".indent(count: 4))
                     dtsLines.append("};")

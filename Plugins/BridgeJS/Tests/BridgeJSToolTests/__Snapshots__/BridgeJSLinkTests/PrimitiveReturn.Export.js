@@ -18,7 +18,9 @@ export async function createInstantiator(options, swift) {
     let tmpRetInts = [];
     let tmpRetF32s = [];
     let tmpRetF64s = [];
-    let tmpRetBools = [];
+    let tmpParamInts = [];
+    let tmpParamF32s = [];
+    let tmpParamF64s = [];
     
 
     return {
@@ -31,9 +33,7 @@ export async function createInstantiator(options, swift) {
             const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
-                const value = textDecoder.decode(bytes);
-                tmpRetString = value;
-                tmpRetStrings.push(value);
+                tmpRetString = textDecoder.decode(bytes);
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
@@ -58,29 +58,31 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_release"] = function(id) {
                 swift.memory.release(id);
             }
-            bjs["swift_js_return_tag"] = function(tag) {
-                tmpRetTag = tag | 0;
-                tmpRetString = undefined;
-                tmpRetStrings = [];
-                tmpRetInts = [];
-                tmpRetF32s = [];
-                tmpRetF64s = [];
-                tmpRetBools = [];
+            bjs["swift_js_push_tag"] = function(tag) {
+                tmpRetTag = tag;
             }
-            bjs["swift_js_return_int"] = function(v) {
-                const value = v | 0;
-                tmpRetInts.push(value);
+            bjs["swift_js_push_int"] = function(v) {
+                tmpRetInts.push(v | 0);
             }
-            bjs["swift_js_return_f32"] = function(v) {
-                const value = Math.fround(v);
-                tmpRetF32s.push(value);
+            bjs["swift_js_push_f32"] = function(v) {
+                tmpRetF32s.push(Math.fround(v));
             }
-            bjs["swift_js_return_f64"] = function(v) {
+            bjs["swift_js_push_f64"] = function(v) {
                 tmpRetF64s.push(v);
             }
-            bjs["swift_js_return_bool"] = function(v) {
-                const value = v !== 0;
-                tmpRetBools.push(value);
+            bjs["swift_js_push_string"] = function(ptr, len) {
+                const bytes = new Uint8Array(memory.buffer, ptr, len);
+                const value = textDecoder.decode(bytes);
+                tmpRetStrings.push(value);
+            }
+            bjs["swift_js_pop_param_int32"] = function() {
+                return tmpParamInts.pop();
+            }
+            bjs["swift_js_pop_param_f32"] = function() {
+                return tmpParamF32s.pop();
+            }
+            bjs["swift_js_pop_param_f64"] = function() {
+                return tmpParamF64s.pop();
             }
 
 

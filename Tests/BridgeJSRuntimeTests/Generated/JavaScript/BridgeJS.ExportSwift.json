@@ -2198,12 +2198,12 @@
       }
     },
     {
-      "abiName" : "bjs_echoNetworkingAPIMethod",
+      "abiName" : "bjs_roundtripNetworkingAPIMethod",
       "effects" : {
         "isAsync" : false,
         "isThrows" : false
       },
-      "name" : "echoNetworkingAPIMethod",
+      "name" : "roundtripNetworkingAPIMethod",
       "parameters" : [
         {
           "label" : "_",
@@ -2222,12 +2222,12 @@
       }
     },
     {
-      "abiName" : "bjs_echoConfigurationLogLevel",
+      "abiName" : "bjs_roundtripConfigurationLogLevel",
       "effects" : {
         "isAsync" : false,
         "isThrows" : false
       },
-      "name" : "echoConfigurationLogLevel",
+      "name" : "roundtripConfigurationLogLevel",
       "parameters" : [
         {
           "label" : "_",
@@ -2248,12 +2248,12 @@
       }
     },
     {
-      "abiName" : "bjs_echoConfigurationPort",
+      "abiName" : "bjs_roundtripConfigurationPort",
       "effects" : {
         "isAsync" : false,
         "isThrows" : false
       },
-      "name" : "echoConfigurationPort",
+      "name" : "roundtripConfigurationPort",
       "parameters" : [
         {
           "label" : "_",
@@ -2300,12 +2300,12 @@
       }
     },
     {
-      "abiName" : "bjs_echoInternalSupportedMethod",
+      "abiName" : "bjs_roundtripInternalSupportedMethod",
       "effects" : {
         "isAsync" : false,
         "isThrows" : false
       },
-      "name" : "echoInternalSupportedMethod",
+      "name" : "roundtripInternalSupportedMethod",
       "parameters" : [
         {
           "label" : "_",
@@ -2324,12 +2324,12 @@
       }
     },
     {
-      "abiName" : "bjs_echoAPIResult",
+      "abiName" : "bjs_roundtripAPIResult",
       "effects" : {
         "isAsync" : false,
         "isThrows" : false
       },
-      "name" : "echoAPIResult",
+      "name" : "roundtripAPIResult",
       "parameters" : [
         {
           "label" : "result",
@@ -2484,15 +2484,15 @@
       }
     },
     {
-      "abiName" : "bjs_echoComplexResult",
+      "abiName" : "bjs_roundtripComplexResult",
       "effects" : {
         "isAsync" : false,
         "isThrows" : false
       },
-      "name" : "echoComplexResult",
+      "name" : "roundtripComplexResult",
       "parameters" : [
         {
-          "label" : "result",
+          "label" : "_",
           "name" : "result",
           "type" : {
             "associatedValueEnum" : {
@@ -2795,30 +2795,6 @@
       "name" : "makeComplexResultInfo",
       "parameters" : [
 
-      ],
-      "returnType" : {
-        "associatedValueEnum" : {
-          "_0" : "ComplexResult"
-        }
-      }
-    },
-    {
-      "abiName" : "bjs_roundtripComplexResult",
-      "effects" : {
-        "isAsync" : false,
-        "isThrows" : false
-      },
-      "name" : "roundtripComplexResult",
-      "parameters" : [
-        {
-          "label" : "_",
-          "name" : "result",
-          "type" : {
-            "associatedValueEnum" : {
-              "_0" : "ComplexResult"
-            }
-          }
-        }
       ],
       "returnType" : {
         "associatedValueEnum" : {

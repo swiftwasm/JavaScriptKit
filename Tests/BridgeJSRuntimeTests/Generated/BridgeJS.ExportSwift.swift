@@ -225,317 +225,203 @@ extension Internal.SupportedMethod {
 }
 
 private extension APIResult {
-    static func bridgeJSLiftParameter(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> APIResult {
-        let params: [UInt8] = .init(unsafeUninitializedCapacity: Int(paramsLen)) { buf, initializedCount in
-            _swift_js_init_memory(paramsId, buf.baseAddress.unsafelyUnwrapped)
-            initializedCount = Int(paramsLen)
-        }
-        return params.withUnsafeBytes { raw in
-            var reader = _BJSBinaryReader(raw: raw)
-            switch caseId {
-            case 0:
-                reader.readParamCount(expected: 1)
-                reader.expectTag(.string)
-                let param0 = reader.readString()
-                return .success(param0)
-            case 1:
-                reader.readParamCount(expected: 1)
-                reader.expectTag(.int32)
-                let param0 = Int(reader.readInt32())
-                return .failure(param0)
-            case 2:
-                reader.readParamCount(expected: 1)
-                reader.expectTag(.bool)
-                let param0 = Int32(reader.readUInt8()) != 0
-                return .flag(param0)
-            case 3:
-                reader.readParamCount(expected: 1)
-                reader.expectTag(.float32)
-                let param0 = reader.readFloat32()
-                return .rate(param0)
-            case 4:
-                reader.readParamCount(expected: 1)
-                reader.expectTag(.float64)
-                let param0 = reader.readFloat64()
-                return .precise(param0)
-            case 5:
-                return .info
-            default:
-                fatalError("Unknown APIResult case ID: \(caseId)")
-            }
+    static func bridgeJSLiftParameter(_ caseId: Int32) -> APIResult {
+        switch caseId {
+        case 0:
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+        case 1:
+            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+        case 2:
+            return .flag(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+        case 3:
+            return .rate(Float.bridgeJSLiftParameter(_swift_js_pop_param_f32()))
+        case 4:
+            return .precise(Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()))
+        case 5:
+            return .info
+        default:
+            fatalError("Unknown APIResult case ID: \(caseId)")
         }
     }
 
     func bridgeJSLowerReturn() {
         switch self {
         case .success(let param0):
-            _swift_js_return_tag(Int32(0))
+            _swift_js_push_tag(Int32(0))
             var __bjs_param0 = param0
             __bjs_param0.withUTF8 { ptr in
-                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
         case .failure(let param0):
-            _swift_js_return_tag(Int32(1))
-            _swift_js_return_int(Int32(param0))
+            _swift_js_push_tag(Int32(1))
+            _swift_js_push_int(Int32(param0))
         case .flag(let param0):
-            _swift_js_return_tag(Int32(2))
-            _swift_js_return_bool(param0 ? 1 : 0)
+            _swift_js_push_tag(Int32(2))
+            _swift_js_push_int(param0 ? 1 : 0)
         case .rate(let param0):
-            _swift_js_return_tag(Int32(3))
-            _swift_js_return_f32(param0)
+            _swift_js_push_tag(Int32(3))
+            _swift_js_push_f32(param0)
         case .precise(let param0):
-            _swift_js_return_tag(Int32(4))
-            _swift_js_return_f64(param0)
+            _swift_js_push_tag(Int32(4))
+            _swift_js_push_f64(param0)
         case .info:
-            _swift_js_return_tag(Int32(5))
+            _swift_js_push_tag(Int32(5))
         }
     }
 }
 
 private extension ComplexResult {
-    static func bridgeJSLiftParameter(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> ComplexResult {
-        let params: [UInt8] = .init(unsafeUninitializedCapacity: Int(paramsLen)) { buf, initializedCount in
-            _swift_js_init_memory(paramsId, buf.baseAddress.unsafelyUnwrapped)
-            initializedCount = Int(paramsLen)
-        }
-        return params.withUnsafeBytes { raw in
-            var reader = _BJSBinaryReader(raw: raw)
-            switch caseId {
-            case 0:
-                reader.readParamCount(expected: 1)
-                reader.expectTag(.string)
-                let param0 = reader.readString()
-                return .success(param0)
-            case 1:
-                reader.readParamCount(expected: 2)
-                reader.expectTag(.string)
-                let param0 = reader.readString()
-                reader.expectTag(.int32)
-                let param1 = Int(reader.readInt32())
-                return .error(param0, param1)
-            case 2:
-                reader.readParamCount(expected: 3)
-                reader.expectTag(.float64)
-                let param0 = reader.readFloat64()
-                reader.expectTag(.float64)
-                let param1 = reader.readFloat64()
-                reader.expectTag(.string)
-                let param2 = reader.readString()
-                return .location(param0, param1, param2)
-            case 3:
-                reader.readParamCount(expected: 3)
-                reader.expectTag(.bool)
-                let param0 = Int32(reader.readUInt8()) != 0
-                reader.expectTag(.int32)
-                let param1 = Int(reader.readInt32())
-                reader.expectTag(.string)
-                let param2 = reader.readString()
-                return .status(param0, param1, param2)
-            case 4:
-                reader.readParamCount(expected: 3)
-                reader.expectTag(.float64)
-                let param0 = reader.readFloat64()
-                reader.expectTag(.float64)
-                let param1 = reader.readFloat64()
-                reader.expectTag(.float64)
-                let param2 = reader.readFloat64()
-                return .coordinates(param0, param1, param2)
-            case 5:
-                reader.readParamCount(expected: 9)
-                reader.expectTag(.bool)
-                let param0 = Int32(reader.readUInt8()) != 0
-                reader.expectTag(.bool)
-                let param1 = Int32(reader.readUInt8()) != 0
-                reader.expectTag(.int32)
-                let param2 = Int(reader.readInt32())
-                reader.expectTag(.int32)
-                let param3 = Int(reader.readInt32())
-                reader.expectTag(.float64)
-                let param4 = reader.readFloat64()
-                reader.expectTag(.float64)
-                let param5 = reader.readFloat64()
-                reader.expectTag(.string)
-                let param6 = reader.readString()
-                reader.expectTag(.string)
-                let param7 = reader.readString()
-                reader.expectTag(.string)
-                let param8 = reader.readString()
-                return .comprehensive(param0, param1, param2, param3, param4, param5, param6, param7, param8)
-            case 6:
-                return .info
-            default:
-                fatalError("Unknown ComplexResult case ID: \(caseId)")
-            }
+    static func bridgeJSLiftParameter(_ caseId: Int32) -> ComplexResult {
+        switch caseId {
+        case 0:
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+        case 1:
+            return .error(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+        case 2:
+            return .location(Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+        case 3:
+            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+        case 4:
+            return .coordinates(Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()))
+        case 5:
+            return .comprehensive(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+        case 6:
+            return .info
+        default:
+            fatalError("Unknown ComplexResult case ID: \(caseId)")
         }
     }
 
     func bridgeJSLowerReturn() {
         switch self {
         case .success(let param0):
-            _swift_js_return_tag(Int32(0))
+            _swift_js_push_tag(Int32(0))
             var __bjs_param0 = param0
             __bjs_param0.withUTF8 { ptr in
-                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
         case .error(let param0, let param1):
-            _swift_js_return_tag(Int32(1))
+            _swift_js_push_tag(Int32(1))
             var __bjs_param0 = param0
             __bjs_param0.withUTF8 { ptr in
-                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_return_int(Int32(param1))
+            _swift_js_push_int(Int32(param1))
         case .location(let param0, let param1, let param2):
-            _swift_js_return_tag(Int32(2))
-            _swift_js_return_f64(param0)
-            _swift_js_return_f64(param1)
+            _swift_js_push_tag(Int32(2))
+            _swift_js_push_f64(param0)
+            _swift_js_push_f64(param1)
             var __bjs_param2 = param2
             __bjs_param2.withUTF8 { ptr in
-                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
         case .status(let param0, let param1, let param2):
-            _swift_js_return_tag(Int32(3))
-            _swift_js_return_bool(param0 ? 1 : 0)
-            _swift_js_return_int(Int32(param1))
+            _swift_js_push_tag(Int32(3))
+            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_int(Int32(param1))
             var __bjs_param2 = param2
             __bjs_param2.withUTF8 { ptr in
-                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
         case .coordinates(let param0, let param1, let param2):
-            _swift_js_return_tag(Int32(4))
-            _swift_js_return_f64(param0)
-            _swift_js_return_f64(param1)
-            _swift_js_return_f64(param2)
+            _swift_js_push_tag(Int32(4))
+            _swift_js_push_f64(param0)
+            _swift_js_push_f64(param1)
+            _swift_js_push_f64(param2)
         case .comprehensive(let param0, let param1, let param2, let param3, let param4, let param5, let param6, let param7, let param8):
-            _swift_js_return_tag(Int32(5))
-            _swift_js_return_bool(param0 ? 1 : 0)
-            _swift_js_return_bool(param1 ? 1 : 0)
-            _swift_js_return_int(Int32(param2))
-            _swift_js_return_int(Int32(param3))
-            _swift_js_return_f64(param4)
-            _swift_js_return_f64(param5)
+            _swift_js_push_tag(Int32(5))
+            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_int(param1 ? 1 : 0)
+            _swift_js_push_int(Int32(param2))
+            _swift_js_push_int(Int32(param3))
+            _swift_js_push_f64(param4)
+            _swift_js_push_f64(param5)
             var __bjs_param6 = param6
             __bjs_param6.withUTF8 { ptr in
-                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
             var __bjs_param7 = param7
             __bjs_param7.withUTF8 { ptr in
-                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
             var __bjs_param8 = param8
             __bjs_param8.withUTF8 { ptr in
-                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
         case .info:
-            _swift_js_return_tag(Int32(6))
+            _swift_js_push_tag(Int32(6))
         }
     }
 }
 
 private extension Utilities.Result {
-    static func bridgeJSLiftParameter(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> Utilities.Result {
-        let params: [UInt8] = .init(unsafeUninitializedCapacity: Int(paramsLen)) { buf, initializedCount in
-            _swift_js_init_memory(paramsId, buf.baseAddress.unsafelyUnwrapped)
-            initializedCount = Int(paramsLen)
-        }
-        return params.withUnsafeBytes { raw in
-            var reader = _BJSBinaryReader(raw: raw)
-            switch caseId {
-            case 0:
-                reader.readParamCount(expected: 1)
-                reader.expectTag(.string)
-                let param0 = reader.readString()
-                return .success(param0)
-            case 1:
-                reader.readParamCount(expected: 2)
-                reader.expectTag(.string)
-                let param0 = reader.readString()
-                reader.expectTag(.int32)
-                let param1 = Int(reader.readInt32())
-                return .failure(param0, param1)
-            case 2:
-                reader.readParamCount(expected: 3)
-                reader.expectTag(.bool)
-                let param0 = Int32(reader.readUInt8()) != 0
-                reader.expectTag(.int32)
-                let param1 = Int(reader.readInt32())
-                reader.expectTag(.string)
-                let param2 = reader.readString()
-                return .status(param0, param1, param2)
-            default:
-                fatalError("Unknown Utilities.Result case ID: \(caseId)")
-            }
+    static func bridgeJSLiftParameter(_ caseId: Int32) -> Utilities.Result {
+        switch caseId {
+        case 0:
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+        case 1:
+            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+        case 2:
+            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+        default:
+            fatalError("Unknown Utilities.Result case ID: \(caseId)")
         }
     }
 
     func bridgeJSLowerReturn() {
         switch self {
         case .success(let param0):
-            _swift_js_return_tag(Int32(0))
+            _swift_js_push_tag(Int32(0))
             var __bjs_param0 = param0
             __bjs_param0.withUTF8 { ptr in
-                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
         case .failure(let param0, let param1):
-            _swift_js_return_tag(Int32(1))
+            _swift_js_push_tag(Int32(1))
             var __bjs_param0 = param0
             __bjs_param0.withUTF8 { ptr in
-                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_return_int(Int32(param1))
+            _swift_js_push_int(Int32(param1))
         case .status(let param0, let param1, let param2):
-            _swift_js_return_tag(Int32(2))
-            _swift_js_return_bool(param0 ? 1 : 0)
-            _swift_js_return_int(Int32(param1))
+            _swift_js_push_tag(Int32(2))
+            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_int(Int32(param1))
             var __bjs_param2 = param2
             __bjs_param2.withUTF8 { ptr in
-                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
         }
     }
 }
 
 private extension API.NetworkingResult {
-    static func bridgeJSLiftParameter(_ caseId: Int32, _ paramsId: Int32, _ paramsLen: Int32) -> API.NetworkingResult {
-        let params: [UInt8] = .init(unsafeUninitializedCapacity: Int(paramsLen)) { buf, initializedCount in
-            _swift_js_init_memory(paramsId, buf.baseAddress.unsafelyUnwrapped)
-            initializedCount = Int(paramsLen)
-        }
-        return params.withUnsafeBytes { raw in
-            var reader = _BJSBinaryReader(raw: raw)
-            switch caseId {
-            case 0:
-                reader.readParamCount(expected: 1)
-                reader.expectTag(.string)
-                let param0 = reader.readString()
-                return .success(param0)
-            case 1:
-                reader.readParamCount(expected: 2)
-                reader.expectTag(.string)
-                let param0 = reader.readString()
-                reader.expectTag(.int32)
-                let param1 = Int(reader.readInt32())
-                return .failure(param0, param1)
-            default:
-                fatalError("Unknown API.NetworkingResult case ID: \(caseId)")
-            }
+    static func bridgeJSLiftParameter(_ caseId: Int32) -> API.NetworkingResult {
+        switch caseId {
+        case 0:
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+        case 1:
+            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+        default:
+            fatalError("Unknown API.NetworkingResult case ID: \(caseId)")
         }
     }
 
     func bridgeJSLowerReturn() {
         switch self {
         case .success(let param0):
-            _swift_js_return_tag(Int32(0))
+            _swift_js_push_tag(Int32(0))
             var __bjs_param0 = param0
             __bjs_param0.withUTF8 { ptr in
-                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
         case .failure(let param0, let param1):
-            _swift_js_return_tag(Int32(1))
+            _swift_js_push_tag(Int32(1))
             var __bjs_param0 = param0
             __bjs_param0.withUTF8 { ptr in
-                _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_return_int(Int32(param1))
+            _swift_js_push_int(Int32(param1))
         }
     }
 }
@@ -1127,33 +1013,33 @@ public func _bjs_getTSTheme() -> Void {
     #endif
 }
 
-@_expose(wasm, "bjs_echoNetworkingAPIMethod")
-@_cdecl("bjs_echoNetworkingAPIMethod")
-public func _bjs_echoNetworkingAPIMethod(method: Int32) -> Int32 {
+@_expose(wasm, "bjs_roundtripNetworkingAPIMethod")
+@_cdecl("bjs_roundtripNetworkingAPIMethod")
+public func _bjs_roundtripNetworkingAPIMethod(method: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = echoNetworkingAPIMethod(_: Networking.API.Method.bridgeJSLiftParameter(method))
+    let ret = roundtripNetworkingAPIMethod(_: Networking.API.Method.bridgeJSLiftParameter(method))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_echoConfigurationLogLevel")
-@_cdecl("bjs_echoConfigurationLogLevel")
-public func _bjs_echoConfigurationLogLevel(levelBytes: Int32, levelLength: Int32) -> Void {
+@_expose(wasm, "bjs_roundtripConfigurationLogLevel")
+@_cdecl("bjs_roundtripConfigurationLogLevel")
+public func _bjs_roundtripConfigurationLogLevel(levelBytes: Int32, levelLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = echoConfigurationLogLevel(_: Configuration.LogLevel.bridgeJSLiftParameter(levelBytes, levelLength))
+    let ret = roundtripConfigurationLogLevel(_: Configuration.LogLevel.bridgeJSLiftParameter(levelBytes, levelLength))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_echoConfigurationPort")
-@_cdecl("bjs_echoConfigurationPort")
-public func _bjs_echoConfigurationPort(port: Int32) -> Int32 {
+@_expose(wasm, "bjs_roundtripConfigurationPort")
+@_cdecl("bjs_roundtripConfigurationPort")
+public func _bjs_roundtripConfigurationPort(port: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = echoConfigurationPort(_: Configuration.Port.bridgeJSLiftParameter(port))
+    let ret = roundtripConfigurationPort(_: Configuration.Port.bridgeJSLiftParameter(port))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1171,22 +1057,22 @@ public func _bjs_processConfigurationLogLevel(levelBytes: Int32, levelLength: In
     #endif
 }
 
-@_expose(wasm, "bjs_echoInternalSupportedMethod")
-@_cdecl("bjs_echoInternalSupportedMethod")
-public func _bjs_echoInternalSupportedMethod(method: Int32) -> Int32 {
+@_expose(wasm, "bjs_roundtripInternalSupportedMethod")
+@_cdecl("bjs_roundtripInternalSupportedMethod")
+public func _bjs_roundtripInternalSupportedMethod(method: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = echoInternalSupportedMethod(_: Internal.SupportedMethod.bridgeJSLiftParameter(method))
+    let ret = roundtripInternalSupportedMethod(_: Internal.SupportedMethod.bridgeJSLiftParameter(method))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_echoAPIResult")
-@_cdecl("bjs_echoAPIResult")
-public func _bjs_echoAPIResult(resultCaseId: Int32, resultParamsId: Int32, resultParamsLen: Int32) -> Void {
+@_expose(wasm, "bjs_roundtripAPIResult")
+@_cdecl("bjs_roundtripAPIResult")
+public func _bjs_roundtripAPIResult(result: Int32) -> Void {
     #if arch(wasm32)
-    let ret = echoAPIResult(result: APIResult.bridgeJSLiftParameter(resultCaseId, resultParamsId, resultParamsLen))
+    let ret = roundtripAPIResult(result: APIResult.bridgeJSLiftParameter(result))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1259,11 +1145,11 @@ public func _bjs_makeAPIResultPrecise(value: Float64) -> Void {
     #endif
 }
 
-@_expose(wasm, "bjs_echoComplexResult")
-@_cdecl("bjs_echoComplexResult")
-public func _bjs_echoComplexResult(resultCaseId: Int32, resultParamsId: Int32, resultParamsLen: Int32) -> Void {
+@_expose(wasm, "bjs_roundtripComplexResult")
+@_cdecl("bjs_roundtripComplexResult")
+public func _bjs_roundtripComplexResult(result: Int32) -> Void {
     #if arch(wasm32)
-    let ret = echoComplexResult(result: ComplexResult.bridgeJSLiftParameter(resultCaseId, resultParamsId, resultParamsLen))
+    let ret = roundtripComplexResult(_: ComplexResult.bridgeJSLiftParameter(result))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1347,17 +1233,6 @@ public func _bjs_makeComplexResultInfo() -> Void {
     #endif
 }
 
-@_expose(wasm, "bjs_roundtripComplexResult")
-@_cdecl("bjs_roundtripComplexResult")
-public func _bjs_roundtripComplexResult(resultCaseId: Int32, resultParamsId: Int32, resultParamsLen: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundtripComplexResult(_: ComplexResult.bridgeJSLiftParameter(resultCaseId, resultParamsId, resultParamsLen))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
 @_expose(wasm, "bjs_makeUtilitiesResultSuccess")
 @_cdecl("bjs_makeUtilitiesResultSuccess")
 public func _bjs_makeUtilitiesResultSuccess(messageBytes: Int32, messageLength: Int32) -> Void {
@@ -1415,9 +1290,9 @@ public func _bjs_makeAPINetworkingResultFailure(errorBytes: Int32, errorLength: 
 
 @_expose(wasm, "bjs_roundtripUtilitiesResult")
 @_cdecl("bjs_roundtripUtilitiesResult")
-public func _bjs_roundtripUtilitiesResult(resultCaseId: Int32, resultParamsId: Int32, resultParamsLen: Int32) -> Void {
+public func _bjs_roundtripUtilitiesResult(result: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundtripUtilitiesResult(_: Utilities.Result.bridgeJSLiftParameter(resultCaseId, resultParamsId, resultParamsLen))
+    let ret = roundtripUtilitiesResult(_: Utilities.Result.bridgeJSLiftParameter(result))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1426,9 +1301,9 @@ public func _bjs_roundtripUtilitiesResult(resultCaseId: Int32, resultParamsId: I
 
 @_expose(wasm, "bjs_roundtripAPINetworkingResult")
 @_cdecl("bjs_roundtripAPINetworkingResult")
-public func _bjs_roundtripAPINetworkingResult(resultCaseId: Int32, resultParamsId: Int32, resultParamsLen: Int32) -> Void {
+public func _bjs_roundtripAPINetworkingResult(result: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundtripAPINetworkingResult(_: API.NetworkingResult.bridgeJSLiftParameter(resultCaseId, resultParamsId, resultParamsLen))
+    let ret = roundtripAPINetworkingResult(_: API.NetworkingResult.bridgeJSLiftParameter(result))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
