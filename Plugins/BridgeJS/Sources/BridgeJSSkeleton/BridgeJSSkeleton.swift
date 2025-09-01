@@ -44,6 +44,21 @@ public enum SwiftEnumRawType: String, CaseIterable, Codable, Sendable {
     public static func from(_ rawTypeString: String) -> SwiftEnumRawType? {
         return Self.allCases.first { $0.rawValue == rawTypeString }
     }
+
+    public static func formatValue(_ rawValue: String, rawType: String) -> String {
+        if let enumType = from(rawType) {
+            switch enumType {
+            case .string:
+                return "\"\(rawValue)\""
+            case .bool:
+                return rawValue.lowercased() == "true" ? "true" : "false"
+            case .float, .double, .int, .int32, .int64, .uint, .uint32, .uint64:
+                return rawValue
+            }
+        } else {
+            return rawValue
+        }
+    }
 }
 
 public struct Parameter: Codable {
@@ -95,12 +110,12 @@ public struct EnumCase: Codable, Equatable, Sendable {
     }
 }
 
-public enum EnumEmitStyle: String, Codable {
+public enum EnumEmitStyle: String, Codable, Sendable {
     case const
     case tsEnum
 }
 
-public struct ExportedEnum: Codable, Equatable {
+public struct ExportedEnum: Codable, Equatable, Sendable {
     public let name: String
     public let swiftCallName: String
     public let explicitAccessControl: String?
@@ -137,7 +152,7 @@ public struct ExportedEnum: Codable, Equatable {
     }
 }
 
-public enum EnumType: String, Codable {
+public enum EnumType: String, Codable, Sendable {
     case simple  // enum Direction { case north, south, east }
     case rawValue  // enum Mode: String { case light = "light" }
     case associatedValue  // enum Result { case success(String), failure(Int) }
