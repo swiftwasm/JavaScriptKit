@@ -2,7 +2,7 @@
 
 // MARK: - Types
 
-public enum BridgeType: Codable, Equatable {
+public enum BridgeType: Codable, Equatable, Sendable {
     case int, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
     case caseEnum(String)
     case rawValueEnum(String, SwiftEnumRawType)
@@ -14,7 +14,7 @@ public enum WasmCoreType: String, Codable, Sendable {
     case i32, i64, f32, f64, pointer
 }
 
-public enum SwiftEnumRawType: String, CaseIterable, Codable {
+public enum SwiftEnumRawType: String, CaseIterable, Codable, Sendable {
     case string = "String"
     case bool = "Bool"
     case int = "Int"
@@ -44,6 +44,21 @@ public enum SwiftEnumRawType: String, CaseIterable, Codable {
     public static func from(_ rawTypeString: String) -> SwiftEnumRawType? {
         return Self.allCases.first { $0.rawValue == rawTypeString }
     }
+
+    public static func formatValue(_ rawValue: String, rawType: String) -> String {
+        if let enumType = from(rawType) {
+            switch enumType {
+            case .string:
+                return "\"\(rawValue)\""
+            case .bool:
+                return rawValue.lowercased() == "true" ? "true" : "false"
+            case .float, .double, .int, .int32, .int64, .uint, .uint32, .uint64:
+                return rawValue
+            }
+        } else {
+            return rawValue
+        }
+    }
 }
 
 public struct Parameter: Codable {
@@ -70,7 +85,7 @@ public struct Effects: Codable {
 
 // MARK: - Enum Skeleton
 
-public struct AssociatedValue: Codable, Equatable {
+public struct AssociatedValue: Codable, Equatable, Sendable {
     public let label: String?
     public let type: BridgeType
 
@@ -80,7 +95,7 @@ public struct AssociatedValue: Codable, Equatable {
     }
 }
 
-public struct EnumCase: Codable, Equatable {
+public struct EnumCase: Codable, Equatable, Sendable {
     public let name: String
     public let rawValue: String?
     public let associatedValues: [AssociatedValue]
@@ -88,20 +103,19 @@ public struct EnumCase: Codable, Equatable {
     public var isSimple: Bool {
         associatedValues.isEmpty
     }
-
-    public init(name: String, rawValue: String?, associatedValues: [AssociatedValue]) {
+    public init(name: String, rawValue: String?, associatedValues: [AssociatedValue] = []) {
         self.name = name
         self.rawValue = rawValue
         self.associatedValues = associatedValues
     }
 }
 
-public enum EnumEmitStyle: String, Codable {
+public enum EnumEmitStyle: String, Codable, Sendable {
     case const
     case tsEnum
 }
 
-public struct ExportedEnum: Codable, Equatable {
+public struct ExportedEnum: Codable, Equatable, Sendable {
     public let name: String
     public let swiftCallName: String
     public let explicitAccessControl: String?
@@ -138,7 +152,7 @@ public struct ExportedEnum: Codable, Equatable {
     }
 }
 
-public enum EnumType: String, Codable {
+public enum EnumType: String, Codable, Sendable {
     case simple  // enum Direction { case north, south, east }
     case rawValue  // enum Mode: String { case light = "light" }
     case associatedValue  // enum Result { case success(String), failure(Int) }

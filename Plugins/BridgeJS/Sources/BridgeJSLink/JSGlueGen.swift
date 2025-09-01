@@ -357,4 +357,346 @@ struct IntrinsicJSFragment: Sendable {
             )
         }
     }
+
+    // MARK: - Enums Payload Fragments
+
+    /// Fragment for generating an entire associated value enum helper
+    static func associatedValueEnumHelper(enumDefinition: ExportedEnum) -> IntrinsicJSFragment {
+        return IntrinsicJSFragment(
+            parameters: ["enumName"],
+            printCode: { arguments, scope, printer, cleanup in
+                let enumName = arguments[0]
+
+                // Generate the enum tag object
+                printer.write("const \(enumName) = {")
+                printer.indent {
+                    printer.write("Tag: {")
+                    printer.indent {
+                        for (index, enumCase) in enumDefinition.cases.enumerated() {
+                            let caseName = enumCase.name.capitalizedFirstLetter
+                            printer.write("\(caseName): \(index),")
+                        }
+                    }
+                    printer.write("}")
+                }
+                printer.write("};")
+                printer.nextLine()
+
+                // Generate the helper function
+                printer.write("const __bjs_create\(enumName)Helpers = () => {")
+                printer.indent()
+                printer.write(
+                    "return (\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), textEncoder, \(JSGlueVariableScope.reservedSwift)) => ({"
+                )
+                printer.indent()
+
+                // Generate lower function
+                printer.write("lower: (value) => {")
+                printer.indent {
+                    printer.write("const enumTag = value.tag;")
+                    printer.write("switch (enumTag) {")
+                    printer.indent {
+                        let lowerPrinter = CodeFragmentPrinter()
+                        for enumCase in enumDefinition.cases {
+                            let caseName = enumCase.name.capitalizedFirstLetter
+                            let caseScope = JSGlueVariableScope()
+                            let caseCleanup = CodeFragmentPrinter()
+                            caseCleanup.indent()
+                            let fragment = IntrinsicJSFragment.associatedValuePushPayload(enumCase: enumCase)
+                            _ = fragment.printCode(["value", enumName, caseName], caseScope, lowerPrinter, caseCleanup)
+                        }
+
+                        for line in lowerPrinter.lines {
+                            printer.write(line)
+                        }
+
+                        printer.write("default: throw new Error(\"Unknown \(enumName) tag: \" + String(enumTag));")
+                    }
+                    printer.write("}")
+                }
+                printer.write("},")
+
+                // Generate raise function
+                printer.write(
+                    "raise: (\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s)) => {"
+                )
+                printer.indent {
+                    printer.write("const tag = tmpRetTag | 0;")
+                    printer.write("switch (tag) {")
+                    printer.indent {
+                        let raisePrinter = CodeFragmentPrinter()
+                        for enumCase in enumDefinition.cases {
+                            let caseName = enumCase.name.capitalizedFirstLetter
+                            let caseScope = JSGlueVariableScope()
+                            let caseCleanup = CodeFragmentPrinter()
+
+                            let fragment = IntrinsicJSFragment.associatedValuePopPayload(enumCase: enumCase)
+                            _ = fragment.printCode([enumName, caseName], caseScope, raisePrinter, caseCleanup)
+                        }
+
+                        for line in raisePrinter.lines {
+                            printer.write(line)
+                        }
+
+                        printer.write(
+                            "default: throw new Error(\"Unknown \(enumName) tag returned from Swift: \" + String(tag));"
+                        )
+                    }
+                    printer.write("}")
+                }
+                printer.write("}")
+                printer.unindent()
+                printer.write("});")
+                printer.unindent()
+                printer.write("};")
+
+                return []
+            }
+        )
+    }
+
+    static func simpleEnumHelper(enumDefinition: ExportedEnum) -> IntrinsicJSFragment {
+        return IntrinsicJSFragment(
+            parameters: ["enumName"],
+            printCode: { arguments, scope, printer, cleanup in
+                let enumName = arguments[0]
+                printer.write("const \(enumName) = {")
+                printer.indent {
+                    for (index, enumCase) in enumDefinition.cases.enumerated() {
+                        let caseName = enumCase.name.capitalizedFirstLetter
+                        printer.write("\(caseName): \(index),")
+                    }
+                }
+                printer.write("};")
+                printer.nextLine()
+
+                return []
+            }
+        )
+    }
+
+    static func rawValueEnumHelper(enumDefinition: ExportedEnum) -> IntrinsicJSFragment {
+        return IntrinsicJSFragment(
+            parameters: ["enumName"],
+            printCode: { arguments, scope, printer, cleanup in
+                let enumName = arguments[0]
+                printer.write("const \(enumName) = {")
+                printer.indent {
+                    for enumCase in enumDefinition.cases {
+                        let caseName = enumCase.name.capitalizedFirstLetter
+                        let rawValue = enumCase.rawValue ?? enumCase.name
+                        let formattedValue = SwiftEnumRawType.formatValue(
+                            rawValue,
+                            rawType: enumDefinition.rawType ?? ""
+                        )
+
+                        printer.write("\(caseName): \(formattedValue),")
+                    }
+                }
+                printer.write("};")
+                printer.nextLine()
+
+                return []
+            }
+        )
+    }
+
+    private static func associatedValuePushPayload(enumCase: EnumCase) -> IntrinsicJSFragment {
+        return IntrinsicJSFragment(
+            parameters: ["value", "enumName", "caseName"],
+            printCode: { arguments, scope, printer, cleanup in
+                let enumName = arguments[1]
+                let caseName = arguments[2]
+
+                printer.write("case \(enumName).Tag.\(caseName): {")
+
+                printer.indent {
+                    if enumCase.associatedValues.isEmpty {
+                        printer.write("const cleanup = undefined;")
+                        printer.write("return { caseId: \(enumName).Tag.\(caseName), cleanup };")
+                    } else {
+                        // Process associated values in reverse order (to match the order they'll be popped)
+                        let reversedValues = enumCase.associatedValues.enumerated().reversed()
+
+                        for (associatedValueIndex, associatedValue) in reversedValues {
+                            let prop = associatedValue.label ?? "param\(associatedValueIndex)"
+                            let fragment = IntrinsicJSFragment.associatedValuePushPayload(type: associatedValue.type)
+
+                            _ = fragment.printCode(["value.\(prop)"], scope, printer, cleanup)
+                        }
+
+                        if cleanup.lines.isEmpty {
+                            printer.write("const cleanup = undefined;")
+                        } else {
+                            printer.write("const cleanup = () => {")
+                            printer.write(contentsOf: cleanup)
+                            printer.write("};")
+                        }
+                        printer.write("return { caseId: \(enumName).Tag.\(caseName), cleanup };")
+                    }
+                }
+
+                printer.write("}")
+
+                return []
+            }
+        )
+    }
+
+    private static func associatedValuePopPayload(enumCase: EnumCase) -> IntrinsicJSFragment {
+        return IntrinsicJSFragment(
+            parameters: ["enumName", "caseName"],
+            printCode: { arguments, scope, printer, cleanup in
+                let enumName = arguments[0]
+                let caseName = arguments[1]
+
+                if enumCase.associatedValues.isEmpty {
+                    printer.write("case \(enumName).Tag.\(caseName): return { tag: \(enumName).Tag.\(caseName) };")
+                } else {
+                    var fieldPairs: [String] = []
+                    let casePrinter = CodeFragmentPrinter()
+
+                    // Process associated values in reverse order (to match the order they'll be popped)
+                    for (associatedValueIndex, associatedValue) in enumCase.associatedValues.enumerated().reversed() {
+                        let prop = associatedValue.label ?? "param\(associatedValueIndex)"
+                        let fragment = IntrinsicJSFragment.associatedValuePopPayload(type: associatedValue.type)
+
+                        let result = fragment.printCode([], scope, casePrinter, cleanup)
+                        let varName = result.first ?? "value_\(associatedValueIndex)"
+
+                        fieldPairs.append("\(prop): \(varName)")
+                    }
+
+                    printer.write("case \(enumName).Tag.\(caseName): {")
+                    printer.indent {
+                        for line in casePrinter.lines {
+                            printer.write(line)
+                        }
+                        printer.write(
+                            "return { tag: \(enumName).Tag.\(caseName), \(fieldPairs.reversed().joined(separator: ", ")) };"
+                        )
+                    }
+                    printer.write("}")
+                }
+
+                return []
+            }
+        )
+    }
+
+    private static func associatedValuePushPayload(type: BridgeType) -> IntrinsicJSFragment {
+        switch type {
+        case .string:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    let value = arguments[0]
+                    let bytesVar = scope.variable("bytes")
+                    let idVar = scope.variable("id")
+                    printer.write("const \(bytesVar) = \(JSGlueVariableScope.reservedTextEncoder).encode(\(value));")
+                    printer.write("const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));")
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(bytesVar).length);")
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar));")
+                    cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
+                    return []
+                }
+            )
+        case .bool:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(arguments[0]) ? 1 : 0);")
+                    return []
+                }
+            )
+        case .int:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push((\(arguments[0]) | 0));")
+                    return []
+                }
+            )
+        case .float:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamF32s).push(Math.fround(\(arguments[0])));")
+                    return []
+                }
+            )
+        case .double:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamF64s).push(\(arguments[0]));")
+                    return []
+                }
+            )
+        default:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    return []
+                }
+            )
+        }
+    }
+
+    private static func associatedValuePopPayload(type: BridgeType) -> IntrinsicJSFragment {
+        switch type {
+        case .string:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let strVar = scope.variable("string")
+                    printer.write("const \(strVar) = \(JSGlueVariableScope.reservedTmpRetStrings).pop();")
+                    return [strVar]
+                }
+            )
+        case .bool:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let bVar = scope.variable("bool")
+                    printer.write("const \(bVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    return [bVar]
+                }
+            )
+        case .int:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let iVar = scope.variable("int")
+                    printer.write("const \(iVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    return [iVar]
+                }
+            )
+        case .float:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let fVar = scope.variable("f32")
+                    printer.write("const \(fVar) = \(JSGlueVariableScope.reservedTmpRetF32s).pop();")
+                    return [fVar]
+                }
+            )
+        case .double:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let dVar = scope.variable("f64")
+                    printer.write("const \(dVar) = \(JSGlueVariableScope.reservedTmpRetF64s).pop();")
+                    return [dVar]
+                }
+            )
+        default:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    return ["undefined"]
+                }
+            )
+        }
+    }
 }
