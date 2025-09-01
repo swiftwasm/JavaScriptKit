@@ -666,208 +666,171 @@ struct BridgeJSLink {
                 }
             }
         case .associatedValue:
-            do {
-                jsLines.append("const \(enumDefinition.name) = {")
-                jsLines.append("Tag: {".indent(count: 4))
-                for (caseIndex, enumCase) in enumDefinition.cases.enumerated() {
-                    let caseName = enumCase.name.capitalizedFirstLetter
-                    jsLines.append("\(caseName): \(caseIndex),".indent(count: 8))
-                }
-                jsLines.append("}".indent(count: 4))
-                jsLines.append("};")
-                jsLines.append("")
-                jsLines.append("const __bjs_create\(enumDefinition.name)Helpers = () => {")
-                jsLines.append(
-                    "return (\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), textEncoder, swift) => ({"
-                        .indent(count: 4)
-                )
+            // Use the new IntrinsicJSFragment for associated value payload handling
+            jsLines.append("const \(enumDefinition.name) = {")
+            jsLines.append("Tag: {".indent(count: 4))
+            for (index, enumCase) in enumDefinition.cases.enumerated() {
+                let caseName = enumCase.name.capitalizedFirstLetter
+                jsLines.append("\(caseName): \(index),".indent(count: 8))
+            }
+            jsLines.append("}".indent(count: 4))
+            jsLines.append("};")
+            jsLines.append("")
+            jsLines.append("const __bjs_create\(enumDefinition.name)Helpers = () => {")
+            jsLines.append(
+                "return (\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), textEncoder, \(JSGlueVariableScope.reservedSwift)) => ({"
+                    .indent(
+                        count: 4
+                    )
+            )
 
-                jsLines.append("lower: (value) => {".indent(count: 8))
-                jsLines.append("const enumTag = value.tag;".indent(count: 12))
-                jsLines.append("switch (enumTag) {".indent(count: 12))
-                enumDefinition.cases.forEach { enumCase in
-                    let caseName = enumCase.name.capitalizedFirstLetter
-                    if enumCase.associatedValues.isEmpty {
-                        jsLines.append("case \(enumDefinition.name).Tag.\(caseName): {".indent(count: 16))
-                        jsLines.append("const cleanup = undefined;".indent(count: 20))
-                        jsLines.append(
-                            "return { caseId: \(enumDefinition.name).Tag.\(caseName), cleanup };"
-                                .indent(count: 20)
-                        )
-                        jsLines.append("}".indent(count: 16))
-                    } else {
-                        jsLines.append("case \(enumDefinition.name).Tag.\(caseName): {".indent(count: 16))
-                        var pushLines: [String] = []
-                        var releaseIds: [String] = []
-                        let reversedValues = enumCase.associatedValues.enumerated().reversed()
-                        for (associatedValueIndex, associatedValue) in reversedValues {
-                            let prop = associatedValue.label ?? "param\(associatedValueIndex)"
-                            switch associatedValue.type {
-                            case .string:
-                                let bytesVar = "bytes_\(associatedValueIndex)"
-                                let idVar = "bytesId_\(associatedValueIndex)"
-                                pushLines.append(
-                                    "const \(bytesVar) = \(JSGlueVariableScope.reservedTextEncoder).encode(value.\(prop));"
-                                )
-                                pushLines.append(
-                                    "const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));"
-                                )
-                                pushLines.append(
-                                    "\(JSGlueVariableScope.reservedTmpParamInts).push(\(bytesVar).length);"
-                                )
-                                pushLines.append("\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar));")
-                                releaseIds.append(idVar)
-                            case .bool:
-                                pushLines.append(
-                                    "\(JSGlueVariableScope.reservedTmpParamInts).push(value.\(prop) ? 1 : 0);"
-                                )
-                            case .int:
-                                pushLines.append(
-                                    "\(JSGlueVariableScope.reservedTmpParamInts).push((value.\(prop) | 0));"
-                                )
-                            case .float:
-                                pushLines.append(
-                                    "\(JSGlueVariableScope.reservedTmpParamF32s).push(Math.fround(value.\(prop)));"
-                                )
-                            case .double:
-                                pushLines.append("\(JSGlueVariableScope.reservedTmpParamF64s).push(value.\(prop));")
-                            default:
-                                pushLines.append("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
-                            }
-                        }
-                        jsLines.append(contentsOf: pushLines.map { $0.indent(count: 20) })
-                        if releaseIds.isEmpty {
-                            jsLines.append("const cleanup = undefined;".indent(count: 20))
-                        } else {
-                            jsLines.append("const cleanup = () => {".indent(count: 20))
-                            for id in releaseIds {
-                                jsLines.append(
-                                    "\(JSGlueVariableScope.reservedSwift).memory.release(\(id));".indent(count: 24)
-                                )
-                            }
-                            jsLines.append("};".indent(count: 20))
-                        }
-                        jsLines.append(
-                            "return { caseId: \(enumDefinition.name).Tag.\(caseName), cleanup };"
-                                .indent(count: 20)
-                        )
-                        jsLines.append("}".indent(count: 16))
+            jsLines.append("lower: (value) => {".indent(count: 8))
+            jsLines.append("const enumTag = value.tag;".indent(count: 12))
+            jsLines.append("switch (enumTag) {".indent(count: 12))
+            enumDefinition.cases.forEach { enumCase in
+                let caseName = enumCase.name.capitalizedFirstLetter
+                if enumCase.associatedValues.isEmpty {
+                    jsLines.append("case \(enumDefinition.name).Tag.\(caseName): {".indent(count: 16))
+                    jsLines.append("const cleanup = undefined;".indent(count: 20))
+                    jsLines.append(
+                        "return { caseId: \(enumDefinition.name).Tag.\(caseName), cleanup };"
+                            .indent(count: 20)
+                    )
+                    jsLines.append("}".indent(count: 16))
+                } else {
+                    let scope = JSGlueVariableScope()
+                    let cleanup = CodeFragmentPrinter()
+                    cleanup.indent()
+                    cleanup.indent()
+                    cleanup.indent()
+                    cleanup.indent()
+                    cleanup.indent()
+                    cleanup.indent()
+                    let printer = CodeFragmentPrinter()
+
+                    let reversedValues = enumCase.associatedValues.enumerated().reversed()
+
+                    for (associatedValueIndex, associatedValue) in reversedValues {
+                        let prop = associatedValue.label ?? "param\(associatedValueIndex)"
+                        let fragment = IntrinsicJSFragment.associatedValuePushPayload(type: associatedValue.type)
+
+                        _ = fragment.printCode(["value.\(prop)"], scope, printer, cleanup)
                     }
+
+                    jsLines.append("case \(enumDefinition.name).Tag.\(caseName): {".indent(count: 16))
+                    jsLines.append(contentsOf: printer.lines.map { $0.indent(count: 20) })
+                    if cleanup.lines.isEmpty {
+                        jsLines.append("const cleanup = undefined;".indent(count: 20))
+                    } else {
+                        jsLines.append("const cleanup = () => {".indent(count: 20))
+                        jsLines.append(contentsOf: cleanup.lines)
+                        jsLines.append("};".indent(count: 20))
+                    }
+                    jsLines.append(
+                        "return { caseId: \(enumDefinition.name).Tag.\(caseName), cleanup };"
+                            .indent(count: 20)
+                    )
+                    jsLines.append("}".indent(count: 16))
                 }
-                jsLines.append(
-                    "default: throw new Error(\"Unknown \(enumDefinition.name) tag: \" + String(enumTag));".indent(
+            }
+            jsLines.append(
+                "default: throw new Error(\"Unknown \(enumDefinition.name) tag: \" + String(enumTag));".indent(
+                    count: 16
+                )
+            )
+            jsLines.append("}".indent(count: 12))
+            jsLines.append("},".indent(count: 8))
+
+            jsLines.append(
+                "raise: (\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s)) => {"
+                    .indent(
+                        count: 8
+                    )
+            )
+            jsLines.append("const tag = tmpRetTag | 0;".indent(count: 12))
+            jsLines.append("switch (tag) {".indent(count: 12))
+            enumDefinition.cases.forEach { enumCase in
+                let caseName = enumCase.name.capitalizedFirstLetter
+                if enumCase.associatedValues.isEmpty {
+                    jsLines.append(
+                        "case \(enumDefinition.name).Tag.\(caseName): return { tag: \(enumDefinition.name).Tag.\(caseName) };"
+                            .indent(count: 16)
+                    )
+                } else {
+                    var fieldPairs: [String] = []
+                    let scope = JSGlueVariableScope()
+                    let printer = CodeFragmentPrinter()
+                    let cleanup = CodeFragmentPrinter()
+                    // Use the new IntrinsicJSFragment for associated value payload handling
+                    for (associatedValueIndex, associatedValue) in enumCase.associatedValues.enumerated().reversed() {
+                        let prop = associatedValue.label ?? "param\(associatedValueIndex)"
+                        let fragment = IntrinsicJSFragment.associatedValuePopPayload(type: associatedValue.type)
+
+                        let result = fragment.printCode([], scope, printer, cleanup)
+                        let varName = result.first ?? "value_\(associatedValueIndex)"
+
+                        fieldPairs.append("\(prop): \(varName)")
+                    }
+
+                    jsLines.append("case \(enumDefinition.name).Tag.\(caseName): {".indent(count: 16))
+                    jsLines.append(contentsOf: printer.lines.map { $0.indent(count: 20) })
+                    jsLines.append(
+                        "return { tag: \(enumDefinition.name).Tag.\(caseName), \(fieldPairs.reversed().joined(separator: ", ")) };"
+                            .indent(count: 20)
+                    )
+                    jsLines.append("}".indent(count: 16))
+                }
+            }
+            jsLines.append(
+                "default: throw new Error(\"Unknown \(enumDefinition.name) tag returned from Swift: \" + String(tag));"
+                    .indent(
                         count: 16
                     )
-                )
-                jsLines.append("}".indent(count: 12))
-                jsLines.append("},".indent(count: 8))
+            )
+            jsLines.append("}".indent(count: 12))
+            jsLines.append("}".indent(count: 8))
+            jsLines.append("});".indent(count: 4))
+            jsLines.append("};")
 
-                jsLines.append(
-                    "raise: (\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s)) => {"
-                        .indent(
-                            count: 8
-                        )
-                )
-                jsLines.append("const tag = tmpRetTag | 0;".indent(count: 12))
-                jsLines.append("switch (tag) {".indent(count: 12))
-                enumDefinition.cases.forEach { enumCase in
+            if enumDefinition.namespace == nil {
+                dtsLines.append("export const \(enumDefinition.name): {")
+                dtsLines.append("readonly Tag: {".indent(count: 4))
+                for (index, enumCase) in enumDefinition.cases.enumerated() {
                     let caseName = enumCase.name.capitalizedFirstLetter
+                    dtsLines.append("readonly \(caseName): \(index);".indent(count: 8))
+                }
+                dtsLines.append("};".indent(count: 4))
+                dtsLines.append("};")
+                dtsLines.append("")
+                var unionParts: [String] = []
+                for enumCase in enumDefinition.cases {
                     if enumCase.associatedValues.isEmpty {
-                        jsLines.append(
-                            "case \(enumDefinition.name).Tag.\(caseName): return { tag: \(enumDefinition.name).Tag.\(caseName) };"
-                                .indent(count: 16)
+                        unionParts.append(
+                            "{ tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter) }"
                         )
                     } else {
-                        var locals: [String] = []
-                        var fieldPairs: [String] = []
-                        for (associatedValueIndex, associatedValue) in enumCase.associatedValues.enumerated().reversed()
+                        var fields: [String] = [
+                            "tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter)"
+                        ]
+                        for (associatedValueIndex, associatedValue) in enumCase.associatedValues
+                            .enumerated()
                         {
                             let prop = associatedValue.label ?? "param\(associatedValueIndex)"
+                            let ts: String
                             switch associatedValue.type {
-                            case .string:
-                                let strVar = "string_\(associatedValueIndex)"
-                                locals.append("const \(strVar) = tmpRetStrings.pop();")
-                                fieldPairs.append("\(prop): \(strVar)")
-                            case .bool:
-                                let bVar = "bool_\(associatedValueIndex)"
-                                locals.append("const \(bVar) = tmpRetInts.pop();")
-                                fieldPairs.append("\(prop): \(bVar)")
-                            case .int:
-                                let iVar = "int_\(associatedValueIndex)"
-                                locals.append("const \(iVar) = tmpRetInts.pop();")
-                                fieldPairs.append("\(prop): \(iVar)")
-                            case .float:
-                                let fVar = "f32_\(associatedValueIndex)"
-                                locals.append("const \(fVar) = tmpRetF32s.pop();")
-                                fieldPairs.append("\(prop): \(fVar)")
-                            case .double:
-                                let dVar = "f64_\(associatedValueIndex)"
-                                locals.append("const \(dVar) = tmpRetF64s.pop();")
-                                fieldPairs.append("\(prop): \(dVar)")
-                            default:
-                                fieldPairs.append("\(prop): undefined")
+                            case .string: ts = "string"
+                            case .bool: ts = "boolean"
+                            case .int, .float, .double: ts = "number"
+                            default: ts = "never"
                             }
+                            fields.append("\(prop): \(ts)")
                         }
-                        jsLines.append("case \(enumDefinition.name).Tag.\(caseName): {".indent(count: 16))
-                        jsLines.append(contentsOf: locals.map { $0.indent(count: 20) })
-                        jsLines.append(
-                            "return { tag: \(enumDefinition.name).Tag.\(caseName), \(fieldPairs.reversed().joined(separator: ", ")) };"
-                                .indent(count: 20)
-                        )
-                        jsLines.append("}".indent(count: 16))
+                        unionParts.append("{ \(fields.joined(separator: "; ")) }")
                     }
                 }
-                jsLines.append(
-                    "default: throw new Error(\"Unknown \(enumDefinition.name) tag returned from Swift: \" + String(tag));"
-                        .indent(
-                            count: 16
-                        )
-                )
-                jsLines.append("}".indent(count: 12))
-                jsLines.append("}".indent(count: 8))
-                jsLines.append("});".indent(count: 4))
-                jsLines.append("};")
-
-                if enumDefinition.namespace == nil {
-                    dtsLines.append("export const \(enumDefinition.name): {")
-                    dtsLines.append("readonly Tag: {".indent(count: 4))
-                    for (index, enumCase) in enumDefinition.cases.enumerated() {
-                        let caseName = enumCase.name.capitalizedFirstLetter
-                        dtsLines.append("readonly \(caseName): \(index);".indent(count: 8))
-                    }
-                    dtsLines.append("};".indent(count: 4))
-                    dtsLines.append("};")
-                    dtsLines.append("")
-                    var unionParts: [String] = []
-                    for enumCase in enumDefinition.cases {
-                        if enumCase.associatedValues.isEmpty {
-                            unionParts.append(
-                                "{ tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter) }"
-                            )
-                        } else {
-                            var fields: [String] = [
-                                "tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter)"
-                            ]
-                            for (associatedValueIndex, associatedValue) in enumCase.associatedValues
-                                .enumerated()
-                            {
-                                let prop = associatedValue.label ?? "param\(associatedValueIndex)"
-                                let ts: String
-                                switch associatedValue.type {
-                                case .string: ts = "string"
-                                case .bool: ts = "boolean"
-                                case .int, .float, .double: ts = "number"
-                                default: ts = "never"
-                                }
-                                fields.append("\(prop): \(ts)")
-                            }
-                            unionParts.append("{ \(fields.joined(separator: "; ")) }")
-                        }
-                    }
-                    dtsLines.append("export type \(enumDefinition.name) =")
-                    dtsLines.append("  " + unionParts.joined(separator: " | "))
-                    dtsLines.append("")
-                }
+                dtsLines.append("export type \(enumDefinition.name) =")
+                dtsLines.append("  " + unionParts.joined(separator: " | "))
+                dtsLines.append("")
             }
         case .namespace:
             break

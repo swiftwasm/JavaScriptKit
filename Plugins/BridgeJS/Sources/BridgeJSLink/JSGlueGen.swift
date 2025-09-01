@@ -239,6 +239,129 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
+    // MARK: - Associated Value Payload Fragments
+
+    /// Fragment for pushing associated value payloads during enum lowering
+    static func associatedValuePushPayload(type: BridgeType) -> IntrinsicJSFragment {
+        switch type {
+        case .string:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    let value = arguments[0]
+                    let bytesVar = scope.variable("bytes")
+                    let idVar = scope.variable("id")
+                    printer.write("const \(bytesVar) = \(JSGlueVariableScope.reservedTextEncoder).encode(\(value));")
+                    printer.write("const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));")
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(bytesVar).length);")
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar));")
+                    cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
+                    return []
+                }
+            )
+        case .bool:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(arguments[0]) ? 1 : 0);")
+                    return []
+                }
+            )
+        case .int:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push((\(arguments[0]) | 0));")
+                    return []
+                }
+            )
+        case .float:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamF32s).push(Math.fround(\(arguments[0])));")
+                    return []
+                }
+            )
+        case .double:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamF64s).push(\(arguments[0]));")
+                    return []
+                }
+            )
+        default:
+            // For unsupported types, push a default value
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
+                    return []
+                }
+            )
+        }
+    }
+
+    /// Fragment for popping associated value payloads during enum lifting
+    static func associatedValuePopPayload(type: BridgeType) -> IntrinsicJSFragment {
+        switch type {
+        case .string:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let strVar = scope.variable("string")
+                    printer.write("const \(strVar) = \(JSGlueVariableScope.reservedTmpRetStrings).pop();")
+                    return [strVar]
+                }
+            )
+        case .bool:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let bVar = scope.variable("bool")
+                    printer.write("const \(bVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    return [bVar]
+                }
+            )
+        case .int:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let iVar = scope.variable("int")
+                    printer.write("const \(iVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    return [iVar]
+                }
+            )
+        case .float:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let fVar = scope.variable("f32")
+                    printer.write("const \(fVar) = \(JSGlueVariableScope.reservedTmpRetF32s).pop();")
+                    return [fVar]
+                }
+            )
+        case .double:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let dVar = scope.variable("f64")
+                    printer.write("const \(dVar) = \(JSGlueVariableScope.reservedTmpRetF64s).pop();")
+                    return [dVar]
+                }
+            )
+        default:
+            // For unsupported types, return undefined
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    return ["undefined"]
+                }
+            )
+        }
+    }
+
     // MARK: - ExportSwift
 
     /// Returns a fragment that lowers a JS value to Wasm core values for parameters
