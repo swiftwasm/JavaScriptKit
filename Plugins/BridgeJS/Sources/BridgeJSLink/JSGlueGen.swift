@@ -241,6 +241,45 @@ struct IntrinsicJSFragment: Sendable {
 
     // MARK: - Associated Value Payload Fragments
 
+    /// Fragment for pushing all associated value payloads for an entire enum case during enum lowering
+    static func associatedValuePushPayload(enumCase: EnumCase) -> IntrinsicJSFragment {
+        return IntrinsicJSFragment(
+            parameters: ["value", "enumName", "caseName"],
+            printCode: { arguments, scope, printer, cleanup in
+                let enumName = arguments[1]
+                let caseName = arguments[2]
+                
+                // If no associated values, return early
+                if enumCase.associatedValues.isEmpty {
+                    printer.write("const cleanup = undefined;")
+                    printer.write("return { caseId: \(enumName).Tag.\(caseName), cleanup };")
+                    return []
+                }
+                
+                // Process associated values in reverse order (to match the order they'll be popped)
+                let reversedValues = enumCase.associatedValues.enumerated().reversed()
+                
+                for (associatedValueIndex, associatedValue) in reversedValues {
+                    let prop = associatedValue.label ?? "param\(associatedValueIndex)"
+                    let fragment = IntrinsicJSFragment.associatedValuePushPayload(type: associatedValue.type)
+                    
+                    _ = fragment.printCode(["value.\(prop)"], scope, printer, cleanup)
+                }
+                
+                if cleanup.lines.isEmpty {
+                    printer.write("const cleanup = undefined;")
+                } else {
+                    printer.write("const cleanup = () => {")
+                    printer.write(contentsOf: cleanup)
+                    printer.write("};")
+                }
+                printer.write("return { caseId: \(enumName).Tag.\(caseName), cleanup };")
+                
+                return []
+            }
+        )
+    }
+    
     /// Fragment for pushing associated value payloads during enum lowering
     static func associatedValuePushPayload(type: BridgeType) -> IntrinsicJSFragment {
         switch type {
@@ -292,11 +331,9 @@ struct IntrinsicJSFragment: Sendable {
                 }
             )
         default:
-            // For unsupported types, push a default value
             return IntrinsicJSFragment(
-                parameters: ["value"],
+                parameters: [],
                 printCode: { arguments, scope, printer, cleanup in
-                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
                     return []
                 }
             )

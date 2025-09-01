@@ -700,36 +700,14 @@ struct BridgeJSLink {
                 } else {
                     let scope = JSGlueVariableScope()
                     let cleanup = CodeFragmentPrinter()
-                    cleanup.indent()
-                    cleanup.indent()
-                    cleanup.indent()
-                    cleanup.indent()
-                    cleanup.indent()
-                    cleanup.indent()
                     let printer = CodeFragmentPrinter()
+                    cleanup.indent()
 
-                    let reversedValues = enumCase.associatedValues.enumerated().reversed()
-
-                    for (associatedValueIndex, associatedValue) in reversedValues {
-                        let prop = associatedValue.label ?? "param\(associatedValueIndex)"
-                        let fragment = IntrinsicJSFragment.associatedValuePushPayload(type: associatedValue.type)
-
-                        _ = fragment.printCode(["value.\(prop)"], scope, printer, cleanup)
-                    }
+                    let fragment = IntrinsicJSFragment.associatedValuePushPayload(enumCase: enumCase)
+                    _ = fragment.printCode(["value", enumDefinition.name, caseName], scope, printer, cleanup)
 
                     jsLines.append("case \(enumDefinition.name).Tag.\(caseName): {".indent(count: 16))
                     jsLines.append(contentsOf: printer.lines.map { $0.indent(count: 20) })
-                    if cleanup.lines.isEmpty {
-                        jsLines.append("const cleanup = undefined;".indent(count: 20))
-                    } else {
-                        jsLines.append("const cleanup = () => {".indent(count: 20))
-                        jsLines.append(contentsOf: cleanup.lines)
-                        jsLines.append("};".indent(count: 20))
-                    }
-                    jsLines.append(
-                        "return { caseId: \(enumDefinition.name).Tag.\(caseName), cleanup };"
-                            .indent(count: 20)
-                    )
                     jsLines.append("}".indent(count: 16))
                 }
             }
