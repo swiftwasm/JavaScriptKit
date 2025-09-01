@@ -369,18 +369,18 @@ struct IntrinsicJSFragment: Sendable {
 
                 // Generate the enum tag object
                 printer.write("const \(enumName) = {")
-                printer.indent()
-                printer.write("Tag: {")
-                printer.indent()
-                for (index, enumCase) in enumDefinition.cases.enumerated() {
-                    let caseName = enumCase.name.capitalizedFirstLetter
-                    printer.write("\(caseName): \(index),")
+                printer.indent {
+                    printer.write("Tag: {")
+                    printer.indent {
+                        for (index, enumCase) in enumDefinition.cases.enumerated() {
+                            let caseName = enumCase.name.capitalizedFirstLetter
+                            printer.write("\(caseName): \(index),")
+                        }
+                    }
+                    printer.write("}")
                 }
-                printer.unindent()
-                printer.write("}")
-                printer.unindent()
                 printer.write("};")
-                printer.write("")
+                printer.nextLine()
 
                 // Generate the helper function
                 printer.write("const __bjs_create\(enumName)Helpers = () => {")
@@ -392,63 +392,58 @@ struct IntrinsicJSFragment: Sendable {
 
                 // Generate lower function
                 printer.write("lower: (value) => {")
-                printer.indent()
-                printer.write("const enumTag = value.tag;")
-                printer.write("switch (enumTag) {")
-                printer.indent()
+                printer.indent {
+                    printer.write("const enumTag = value.tag;")
+                    printer.write("switch (enumTag) {")
+                    printer.indent {
+                        let lowerPrinter = CodeFragmentPrinter()
+                        for enumCase in enumDefinition.cases {
+                            let caseName = enumCase.name.capitalizedFirstLetter
+                            let caseScope = JSGlueVariableScope()
+                            let caseCleanup = CodeFragmentPrinter()
+                            caseCleanup.indent()
+                            let fragment = IntrinsicJSFragment.associatedValuePushPayload(enumCase: enumCase)
+                            _ = fragment.printCode(["value", enumName, caseName], caseScope, lowerPrinter, caseCleanup)
+                        }
 
-                let lowerPrinter = CodeFragmentPrinter()
+                        for line in lowerPrinter.lines {
+                            printer.write(line)
+                        }
 
-                for enumCase in enumDefinition.cases {
-                    let caseName = enumCase.name.capitalizedFirstLetter
-                    let caseScope = JSGlueVariableScope()
-                    let caseCleanup = CodeFragmentPrinter()
-                    caseCleanup.indent()
-
-                    let fragment = IntrinsicJSFragment.associatedValuePushPayload(enumCase: enumCase)
-                    _ = fragment.printCode(["value", enumName, caseName], caseScope, lowerPrinter, caseCleanup)
+                        printer.write("default: throw new Error(\"Unknown \(enumName) tag: \" + String(enumTag));")
+                    }
+                    printer.write("}")
                 }
-
-                for line in lowerPrinter.lines {
-                    printer.write(line)
-                }
-
-                printer.write("default: throw new Error(\"Unknown \(enumName) tag: \" + String(enumTag));")
-                printer.unindent()
-                printer.write("}")
-                printer.unindent()
                 printer.write("},")
 
                 // Generate raise function
                 printer.write(
                     "raise: (\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s)) => {"
                 )
-                printer.indent()
-                printer.write("const tag = tmpRetTag | 0;")
-                printer.write("switch (tag) {")
-                printer.indent()
+                printer.indent {
+                    printer.write("const tag = tmpRetTag | 0;")
+                    printer.write("switch (tag) {")
+                    printer.indent {
+                        let raisePrinter = CodeFragmentPrinter()
+                        for enumCase in enumDefinition.cases {
+                            let caseName = enumCase.name.capitalizedFirstLetter
+                            let caseScope = JSGlueVariableScope()
+                            let caseCleanup = CodeFragmentPrinter()
 
-                let raisePrinter = CodeFragmentPrinter()
+                            let fragment = IntrinsicJSFragment.associatedValuePopPayload(enumCase: enumCase)
+                            _ = fragment.printCode([enumName, caseName], caseScope, raisePrinter, caseCleanup)
+                        }
 
-                for enumCase in enumDefinition.cases {
-                    let caseName = enumCase.name.capitalizedFirstLetter
-                    let caseScope = JSGlueVariableScope()
-                    let caseCleanup = CodeFragmentPrinter()
+                        for line in raisePrinter.lines {
+                            printer.write(line)
+                        }
 
-                    let fragment = IntrinsicJSFragment.associatedValuePopPayload(enumCase: enumCase)
-                    _ = fragment.printCode([enumName, caseName], caseScope, raisePrinter, caseCleanup)
+                        printer.write(
+                            "default: throw new Error(\"Unknown \(enumName) tag returned from Swift: \" + String(tag));"
+                        )
+                    }
+                    printer.write("}")
                 }
-
-                for line in raisePrinter.lines {
-                    printer.write(line)
-                }
-
-                printer.write(
-                    "default: throw new Error(\"Unknown \(enumName) tag returned from Swift: \" + String(tag));"
-                )
-                printer.unindent()
-                printer.write("}")
-                printer.unindent()
                 printer.write("}")
                 printer.unindent()
                 printer.write("});")
@@ -466,14 +461,14 @@ struct IntrinsicJSFragment: Sendable {
             printCode: { arguments, scope, printer, cleanup in
                 let enumName = arguments[0]
                 printer.write("const \(enumName) = {")
-                printer.indent()
-                for (index, enumCase) in enumDefinition.cases.enumerated() {
-                    let caseName = enumCase.name.capitalizedFirstLetter
-                    printer.write("\(caseName): \(index),")
+                printer.indent {
+                    for (index, enumCase) in enumDefinition.cases.enumerated() {
+                        let caseName = enumCase.name.capitalizedFirstLetter
+                        printer.write("\(caseName): \(index),")
+                    }
                 }
-                printer.unindent()
                 printer.write("};")
-                printer.write("")
+                printer.nextLine()
 
                 return []
             }
@@ -486,17 +481,20 @@ struct IntrinsicJSFragment: Sendable {
             printCode: { arguments, scope, printer, cleanup in
                 let enumName = arguments[0]
                 printer.write("const \(enumName) = {")
-                printer.indent()
-                for enumCase in enumDefinition.cases {
-                    let caseName = enumCase.name.capitalizedFirstLetter
-                    let rawValue = enumCase.rawValue ?? enumCase.name
-                    let formattedValue = SwiftEnumRawType.formatValue(rawValue, rawType: enumDefinition.rawType ?? "")
+                printer.indent {
+                    for enumCase in enumDefinition.cases {
+                        let caseName = enumCase.name.capitalizedFirstLetter
+                        let rawValue = enumCase.rawValue ?? enumCase.name
+                        let formattedValue = SwiftEnumRawType.formatValue(
+                            rawValue,
+                            rawType: enumDefinition.rawType ?? ""
+                        )
 
-                    printer.write("\(caseName): \(formattedValue),")
+                        printer.write("\(caseName): \(formattedValue),")
+                    }
                 }
-                printer.unindent()
                 printer.write("};")
-                printer.write("")
+                printer.nextLine()
 
                 return []
             }
