@@ -21,7 +21,6 @@ export async function createInstantiator(options, swift) {
     let tmpParamInts = [];
     let tmpParamF32s = [];
     let tmpParamF64s = [];
-    
 
     return {
         /**
@@ -100,12 +99,11 @@ export async function createInstantiator(options, swift) {
                 const obj = PackageGreeter.__construct(pointer);
                 return swift.memory.retain(obj);
             };
-
         },
         setInstance: (i) => {
             instance = i;
             memory = instance.exports.memory;
-            
+
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
             }
@@ -136,8 +134,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Greeter_deinit, Greeter.prototype);
                 }
-                
-                
+            
                 constructor(name) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
@@ -174,13 +171,13 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PublicGreeter_deinit, PublicGreeter.prototype);
                 }
-                
+            
             }
             class PackageGreeter extends SwiftHeapObject {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PackageGreeter_deinit, PackageGreeter.prototype);
                 }
-                
+            
             }
             return {
                 Greeter,
