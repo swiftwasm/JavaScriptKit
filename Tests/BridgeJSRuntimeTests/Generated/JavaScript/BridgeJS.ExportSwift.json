@@ -326,6 +326,76 @@
     },
     {
       "constructor" : {
+        "abiName" : "bjs_OptionalPropertyHolder_init",
+        "effects" : {
+          "isAsync" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "optionalName",
+            "name" : "optionalName",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+
+      ],
+      "name" : "OptionalPropertyHolder",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "name" : "optionalName",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "optionalAge",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "int" : {
+
+                }
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "optionalGreeter",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "swiftHeapObject" : {
+                  "_0" : "Greeter"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "OptionalPropertyHolder"
+    },
+    {
+      "constructor" : {
         "abiName" : "bjs_SimplePropertyHolder_init",
         "effects" : {
           "isAsync" : false,
@@ -3003,6 +3073,358 @@
       "returnType" : {
         "associatedValueEnum" : {
           "_0" : "API.NetworkingResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalString",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalString",
+      "parameters" : [
+        {
+          "label" : "name",
+          "name" : "name",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "string" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalInt",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalInt",
+      "parameters" : [
+        {
+          "label" : "value",
+          "name" : "value",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "int" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "int" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalBool",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalBool",
+      "parameters" : [
+        {
+          "label" : "flag",
+          "name" : "flag",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "bool" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "bool" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalFloat",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalFloat",
+      "parameters" : [
+        {
+          "label" : "number",
+          "name" : "number",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "float" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "float" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalDouble",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalDouble",
+      "parameters" : [
+        {
+          "label" : "precision",
+          "name" : "precision",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "double" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "double" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalSyntax",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalSyntax",
+      "parameters" : [
+        {
+          "label" : "name",
+          "name" : "name",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "string" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalMixSyntax",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalMixSyntax",
+      "parameters" : [
+        {
+          "label" : "name",
+          "name" : "name",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "string" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalSwiftSyntax",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalSwiftSyntax",
+      "parameters" : [
+        {
+          "label" : "name",
+          "name" : "name",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "string" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalWithSpaces",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalWithSpaces",
+      "parameters" : [
+        {
+          "label" : "value",
+          "name" : "value",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "double" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "double" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalTypeAlias",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalTypeAlias",
+      "parameters" : [
+        {
+          "label" : "age",
+          "name" : "age",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "int" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "int" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalClass",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalClass",
+      "parameters" : [
+        {
+          "label" : "value",
+          "name" : "value",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "swiftHeapObject" : {
+                  "_0" : "Greeter"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "swiftHeapObject" : {
+              "_0" : "Greeter"
+            }
+          }
         }
       }
     },

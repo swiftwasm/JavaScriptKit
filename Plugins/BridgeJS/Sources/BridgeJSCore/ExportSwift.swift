@@ -142,6 +142,14 @@ public class ExportSwift {
                 hint: "Only primitive types and types defined in the same module are allowed"
             )
         }
+        
+        private func diagnoseNestedOptional(node: some SyntaxProtocol, type: String) {
+            diagnose(
+                node: node,
+                message: "Nested optional types are not supported: \(type)",
+                hint: "Use a single optional like String? instead of String?? or Optional<Optional<T>>"
+            )
+        }
 
         override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
             switch state {
@@ -183,17 +191,32 @@ public class ExportSwift {
 
             var parameters: [Parameter] = []
             for param in node.signature.parameterClause.parameters {
-                guard let type = self.parent.lookupType(for: param.type) else {
+                let resolvedType = self.parent.lookupType(for: param.type)
+                
+                if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
+                    diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)
+                    continue
+                }
+                
+                guard let type = resolvedType else {
                     diagnoseUnsupportedType(node: param.type, type: param.type.trimmedDescription)
                     continue
                 }
+                
                 let name = param.secondName?.text ?? param.firstName.text
                 let label = param.firstName.text
                 parameters.append(Parameter(label: label, name: name, type: type))
             }
             let returnType: BridgeType
             if let returnClause = node.signature.returnClause {
-                guard let type = self.parent.lookupType(for: returnClause.type) else {
+                let resolvedType = self.parent.lookupType(for: returnClause.type)
+                
+                if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
+                    diagnoseNestedOptional(node: returnClause.type, type: returnClause.type.trimmedDescription)
+                    return nil
+                }
+                
+                guard let type = resolvedType else {
                     diagnoseUnsupportedType(node: returnClause.type, type: returnClause.type.trimmedDescription)
                     return nil
                 }
@@ -712,10 +735,53 @@ public class ExportSwift {
     }
 
     func lookupType(for type: TypeSyntax) -> BridgeType? {
-        if let primitive = BridgeType(swiftType: type.trimmedDescription) {
-            return primitive
+        // 1. Handle T? syntax (OptionalTypeSyntax)
+        if let optionalType = type.as(OptionalTypeSyntax.self) {
+            let wrappedType = optionalType.wrappedType
+            if let baseType = lookupType(for: wrappedType) {
+                return .optional(baseType)
+            }
         }
 
+        // 2. Handle Optional<T> syntax (IdentifierTypeSyntax with generic arguments)
+        if let identifierType = type.as(IdentifierTypeSyntax.self),
+           identifierType.name.text == "Optional",
+           let genericArgs = identifierType.genericArgumentClause?.arguments,
+           genericArgs.count == 1,
+           let argType = genericArgs.first?.argument {
+            if let baseType = lookupType(for: argType) {
+                return .optional(baseType)
+            }
+        }
+
+        // 3. Handle Swift.Optional<T> syntax (MemberTypeSyntax)
+        if let memberType = type.as(MemberTypeSyntax.self),
+           let baseType = memberType.baseType.as(IdentifierTypeSyntax.self),
+           baseType.name.text == "Swift",
+           memberType.name.text == "Optional",
+           let genericArgs = memberType.genericArgumentClause?.arguments,
+           genericArgs.count == 1,
+           let argType = genericArgs.first?.argument {
+            if let wrappedType = lookupType(for: argType) {
+                return .optional(wrappedType)
+            }
+        }
+
+        // 4. Handle type aliases - try to resolve through type declaration resolver first
+        if let aliasDecl = typeDeclResolver.resolveTypeAlias(type) {
+            // Recursively lookup the aliased type
+            if let resolvedType = lookupType(for: aliasDecl.initializer.value) {
+                return resolvedType
+            }
+        }
+
+        // 5. Handle primitive types before falling back to other type declarations
+        let typeName = type.trimmedDescription
+        if let primitiveType = BridgeType.primitive(swiftType: typeName) {
+            return primitiveType
+        }
+
+        // 6. Try to resolve other type declarations
         guard let typeDecl = typeDeclResolver.resolve(type) else {
             return nil
         }
@@ -831,9 +897,19 @@ public class ExportSwift {
             } else {
                 argumentsToLift = liftingInfo.parameters.map { (name, _) in param.name + name.capitalizedFirstLetter }
             }
+            
+            // For optional types, use Optional<WrappedType> syntax instead of WrappedType?
+            let typeNameForIntrinsic: String
+            switch param.type {
+            case .optional(let wrappedType):
+                typeNameForIntrinsic = "Optional<\(wrappedType.swiftType)>"
+            default:
+                typeNameForIntrinsic = param.type.swiftType
+            }
+            
             liftedParameterExprs.append(
                 ExprSyntax(
-                    "\(raw: param.type.swiftType).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
+                    "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
                 )
             )
             for (name, type) in zip(argumentsToLift, liftingInfo.parameters.map { $0.type }) {
@@ -925,6 +1001,12 @@ public class ExportSwift {
             if effects.isAsync {
                 // The return value of async function (T of `(...) async -> T`) is
                 // handled by the JSPromise.async, so we don't need to do anything here.
+                return
+            }
+
+            // Handle optional types that use special storage functions and return Void
+            if case .optional(_) = returnType {
+                append("return ret.bridgeJSLowerReturn()")
                 return
             }
 
@@ -1085,6 +1167,8 @@ public class ExportSwift {
                             return "\(paramName)Float.bridgeJSLiftParameter(_swift_js_pop_param_f32())"
                         case .double:
                             return "\(paramName)Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())"
+                        case .optional(_):
+                            return "/* Optional associated value lifting not yet implemented */nil" // Placeholder
                         default:
                             return "\(paramName)Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
                         }
@@ -1121,6 +1205,8 @@ public class ExportSwift {
                             bodyLines.append("_swift_js_push_f32(\(paramName))")
                         case .double:
                             bodyLines.append("_swift_js_push_f64(\(paramName))")
+                        case .optional(_):
+                             bodyLines.append("// Optional associated value lowering not yet implemented") // Placeholder
                         default:
                             bodyLines.append(
                                 "preconditionFailure(\"BridgeJS: unsupported associated value type in generated code\")"
@@ -1331,24 +1417,55 @@ extension AttributeListSyntax {
 }
 
 extension BridgeType {
+    // This initializer is primarily for string-based type descriptions,
+    // especially for internal and raw type lookups.
+    // For full SwiftSyntax based parsing, `ExportSwift.lookupType(for:)` should be used.
     init?(swiftType: String) {
+        // Use SwiftSyntax to parse the string into a TypeSyntax for robust optional detection
+        let typeSyntax = TypeSyntax(stringLiteral: swiftType)
+
+        // 1. Handle T? syntax (OptionalTypeSyntax)
+        if let optionalType = typeSyntax.as(OptionalTypeSyntax.self) {
+            let wrappedTypeString = optionalType.wrappedType.trimmedDescription
+            if let baseType = BridgeType(swiftType: wrappedTypeString) {
+                self = .optional(baseType)
+                return
+            }
+        }
+
+        // 2. Handle Optional<T> syntax (IdentifierTypeSyntax with generic arguments)
+        if let identifierType = typeSyntax.as(IdentifierTypeSyntax.self),
+           identifierType.name.text == "Optional",
+           let genericArgs = identifierType.genericArgumentClause?.arguments,
+           genericArgs.count == 1,
+           let argType = genericArgs.first?.argument {
+            let innerTypeString = argType.trimmedDescription
+            if let baseType = BridgeType(swiftType: innerTypeString) {
+                self = .optional(baseType)
+                return
+            }
+        }
+        
+        // Fallback to primitive type handling if not an optional
+        if let primitive = BridgeType.primitive(swiftType: swiftType) {
+            self = primitive
+            return
+        }
+
+        return nil
+    }
+
+    // Helper for direct primitive type mapping (used by init? and elsewhere)
+    fileprivate static func primitive(swiftType: String) -> BridgeType? {
         switch swiftType {
-        case "Int":
-            self = .int
-        case "Float":
-            self = .float
-        case "Double":
-            self = .double
-        case "String":
-            self = .string
-        case "Bool":
-            self = .bool
-        case "Void":
-            self = .void
-        case "JSObject":
-            self = .jsObject(nil)
-        default:
-            return nil
+        case "Int": return .int
+        case "Float": return .float
+        case "Double": return .double
+        case "String": return .string
+        case "Bool": return .bool
+        case "Void": return .void
+        case "JSObject": return .jsObject(nil)
+        default: return nil
         }
     }
 }
@@ -1377,6 +1494,7 @@ extension BridgeType {
         case .jsObject(let name?): return name
         case .swiftHeapObject(let name): return name
         case .void: return "Void"
+        case .optional(let wrappedType): return "\(wrappedType.swiftType)?"
         case .caseEnum(let name): return name
         case .rawValueEnum(let name, _): return name
         case .associatedValueEnum(let name): return name
@@ -1400,6 +1518,7 @@ extension BridgeType {
             ("caseId", .i32)
         ])
     }
+    
 
     func liftParameterInfo() throws -> LiftingIntrinsicInfo {
         switch self {
@@ -1411,6 +1530,11 @@ extension BridgeType {
         case .jsObject: return .jsObject
         case .swiftHeapObject: return .swiftHeapObject
         case .void: return .void
+        case .optional(let wrappedType):
+            // Optional parameters include optionality flag plus wrapped type parameters
+            var optionalParams: [(name: String, type: WasmCoreType)] = [("isSome", .i32)]
+            optionalParams.append(contentsOf: try wrappedType.liftParameterInfo().parameters)
+            return LiftingIntrinsicInfo(parameters: optionalParams)
         case .caseEnum: return .caseEnum
         case .rawValueEnum(_, let rawType):
             switch rawType {
@@ -1458,6 +1582,9 @@ extension BridgeType {
         case .jsObject: return .jsObject
         case .swiftHeapObject: return .swiftHeapObject
         case .void: return .void
+        case .optional(_):
+            // Optional return values use special storage functions and return void
+            return LoweringIntrinsicInfo(returnType: nil)
         case .caseEnum: return .caseEnum
         case .rawValueEnum(_, let rawType):
             switch rawType {

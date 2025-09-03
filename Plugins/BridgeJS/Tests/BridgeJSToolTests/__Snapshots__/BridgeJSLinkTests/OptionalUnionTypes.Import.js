@@ -138,6 +138,98 @@ export async function createInstantiator(options, swift) {
                     tmpRetOptionalHeapObject = pointer;
                 }
             }
+            const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
+            TestModule["bjs_testOptionalNumber"] = function bjs_testOptionalNumber(value) {
+                try {
+                    imports.testOptionalNumber(swift.memory.getObject(value));
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_testOptionalString"] = function bjs_testOptionalString(value) {
+                try {
+                    imports.testOptionalString(swift.memory.getObject(value));
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_testOptionalBool"] = function bjs_testOptionalBool(value) {
+                try {
+                    imports.testOptionalBool(swift.memory.getObject(value));
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_testOptionalReturn"] = function bjs_testOptionalReturn() {
+                try {
+                    let ret = imports.testOptionalReturn();
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_testOptionalNumberReturn"] = function bjs_testOptionalNumberReturn() {
+                try {
+                    let ret = imports.testOptionalNumberReturn();
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_testMixedOptionals"] = function bjs_testMixedOptionals(required, optional) {
+                try {
+                    const requiredObject = swift.memory.getObject(required);
+                    swift.memory.release(required);
+                    let ret = imports.testMixedOptionals(requiredObject, swift.memory.getObject(optional));
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_TestClass_init"] = function bjs_TestClass_init(param) {
+                try {
+                    return swift.memory.retain(new imports.TestClass(swift.memory.getObject(param)));
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_TestClass_optionalProperty_get"] = function bjs_TestClass_optionalProperty_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).optionalProperty;
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_TestClass_optionalProperty_set"] = function bjs_TestClass_optionalProperty_set(self, newValue) {
+                try {
+                    swift.memory.getObject(self).optionalProperty = swift.memory.getObject(newValue);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_TestClass_methodWithOptional"] = function bjs_TestClass_methodWithOptional(self, value) {
+                try {
+                    swift.memory.getObject(self).methodWithOptional(swift.memory.getObject(value));
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_TestClass_methodReturningOptional"] = function bjs_TestClass_methodReturningOptional(self) {
+                try {
+                    let ret = swift.memory.getObject(self).methodReturningOptional();
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;
@@ -151,12 +243,6 @@ export async function createInstantiator(options, swift) {
         createExports: (instance) => {
             const js = swift.memory.heap;
             return {
-                checkString: function bjs_checkString() {
-                    instance.exports.bjs_checkString();
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    return ret;
-                },
             };
         },
     }

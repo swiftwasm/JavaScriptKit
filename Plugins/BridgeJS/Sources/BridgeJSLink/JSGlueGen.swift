@@ -13,6 +13,11 @@ final class JSGlueVariableScope {
     static let reservedStorageToReturnString = "tmpRetString"
     static let reservedStorageToReturnBytes = "tmpRetBytes"
     static let reservedStorageToReturnException = "tmpRetException"
+    static let reservedStorageToReturnOptionalBool = "tmpRetOptionalBool"
+    static let reservedStorageToReturnOptionalInt = "tmpRetOptionalInt"
+    static let reservedStorageToReturnOptionalFloat = "tmpRetOptionalFloat"
+    static let reservedStorageToReturnOptionalDouble = "tmpRetOptionalDouble"
+    static let reservedStorageToReturnOptionalHeapObject = "tmpRetOptionalHeapObject"
     static let reservedTextEncoder = "textEncoder"
     static let reservedTextDecoder = "textDecoder"
     static let reservedTmpRetTag = "tmpRetTag"
@@ -30,6 +35,11 @@ final class JSGlueVariableScope {
         reservedStorageToReturnString,
         reservedStorageToReturnBytes,
         reservedStorageToReturnException,
+        reservedStorageToReturnOptionalBool,
+        reservedStorageToReturnOptionalInt,
+        reservedStorageToReturnOptionalFloat,
+        reservedStorageToReturnOptionalDouble,
+        reservedStorageToReturnOptionalHeapObject,
         reservedTextEncoder,
         reservedTextDecoder,
         reservedTmpRetTag,
@@ -250,6 +260,72 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftHeapObject:
             return .swiftHeapObjectLowerParameter
         case .void: return .void
+        case .optional(let wrappedType):
+            // Pre-compute the wrapped type fragment outside the closure
+            let wrappedFragment = try lowerParameter(type: wrappedType)
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanupCode in
+                    let value = arguments[0]
+                    let isNullVar = scope.variable("isNull")
+                    let isSomeVar = scope.variable("isSome")
+                    let resultVars = scope.variable("results")
+                    
+                    printer.write("const \(isNullVar) = (\(value) === null || \(value) === undefined);")
+                    printer.write("const \(isSomeVar) = \(isNullVar) ? 0 : 1;")
+                    printer.write("let \(resultVars) = [\(isSomeVar)];")
+                    
+                    // Handle different wrapped types with proper variable scoping
+                    switch wrappedType {
+                    case .string:
+                        // Pre-declare variables for string handling
+                        let bytesVar = scope.variable("\(value)Bytes")
+                        let idVar = scope.variable("\(value)Id")
+                        printer.write("let \(idVar);")
+                        
+                        printer.write("if (!\(isNullVar)) {")
+                        printer.indent {
+                            printer.write("const \(bytesVar) = \(JSGlueVariableScope.reservedTextEncoder).encode(\(value));")
+                            printer.write("\(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));")
+                            printer.write("\(resultVars).push(\(idVar));")
+                            printer.write("\(resultVars).push(\(bytesVar).length);")
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            printer.write("\(resultVars).push(0);") // dummy bytes ID
+                            printer.write("\(resultVars).push(0);") // dummy length
+                        }
+                        printer.write("}")
+                        
+                        // Add conditional cleanup
+                        cleanupCode.write("if (\(idVar) !== undefined) {")
+                        cleanupCode.write("    \(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
+                        cleanupCode.write("}")
+                        
+                    default:
+                        // For other non-string types, use the original delegation approach
+                        printer.write("if (!\(isNullVar)) {")
+                        printer.indent {
+                            let wrappedResults = wrappedFragment.printCode([value], scope, printer, cleanupCode)
+                            for result in wrappedResults {
+                                printer.write("\(resultVars).push(\(result));")
+                            }
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            switch wrappedType {
+                            case .int, .bool, .float, .double:
+                                printer.write("\(resultVars).push(0);")
+                            default:
+                                printer.write("\(resultVars).push(0);")
+                            }
+                        }
+                        printer.write("}")
+                    }
+                    
+                    return ["...\(resultVars)"]
+                }
+            )
         case .caseEnum: return .identity
         case .rawValueEnum(_, let rawType):
             switch rawType {
@@ -273,6 +349,43 @@ struct IntrinsicJSFragment: Sendable {
         case .jsObject: return .jsObjectLiftReturn
         case .swiftHeapObject(let name): return .swiftHeapObjectLiftReturn(name)
         case .void: return .void
+        case .optional(let wrappedType):
+            // For ExportSwift, optional returns use type-specific storage and return void
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanupCode in
+                    let resultVar = scope.variable("optResult")
+                    
+                    switch wrappedType {
+                    case .bool:
+                        printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalBool);")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalBool) = undefined;")
+                    case .int:
+                        printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalInt);")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = undefined;")
+                    case .float:
+                        printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = undefined;")
+                    case .double:
+                        printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = undefined;")
+                    case .string:
+                        printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnString);")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
+                    case .swiftHeapObject(let className):
+                        let pointerVar = scope.variable("pointer")
+                        printer.write("const \(pointerVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = undefined;")
+                        printer.write("const \(resultVar) = \(pointerVar) === null ? null : \(className).__construct(\(pointerVar));")
+                    default:
+                        // Fallback for unsupported optional types
+                        printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnString);")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
+                    }
+                    
+                    return [resultVar]
+                }
+            )
         case .caseEnum: return .identity
         case .rawValueEnum(_, let rawType):
             switch rawType {
@@ -308,6 +421,36 @@ struct IntrinsicJSFragment: Sendable {
             throw BridgeJSLinkError(
                 message: "Void can't appear in parameters of imported JS functions"
             )
+        case .optional(let wrappedType):
+            // Pre-compute the wrapped type fragment outside the closure
+            let wrappedFragment = try liftParameter(type: wrappedType)
+            return IntrinsicJSFragment(
+                parameters: ["isSome"],
+                printCode: { arguments, scope, printer, cleanupCode in
+                    let isSomeParam = arguments[0]
+                    let resultVar = scope.variable("optResult")
+                    
+                    printer.write("let \(resultVar);")
+                    printer.write("if (\(isSomeParam) === 0) {")
+                    printer.indent {
+                        printer.write("\(resultVar) = null;")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        // For non-null case, lift the wrapped type parameters
+                        let liftedResults = wrappedFragment.printCode([], scope, printer, cleanupCode)
+                        
+                        if let firstResult = liftedResults.first {
+                            printer.write("\(resultVar) = \(firstResult);")
+                        } else {
+                            printer.write("\(resultVar) = undefined;")
+                        }
+                    }
+                    printer.write("}")
+                    
+                    return [resultVar]
+                }
+            )
         case .caseEnum: return .identity
         case .rawValueEnum(_, let rawType):
             switch rawType {
@@ -340,6 +483,42 @@ struct IntrinsicJSFragment: Sendable {
                 message: "Swift heap objects are not supported to be returned from imported JS functions"
             )
         case .void: return .void
+        case .optional(let wrappedType):
+            // Pre-compute the wrapped type fragment outside the closure
+            let wrappedFragment = try lowerReturn(type: wrappedType)
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanupCode in
+                    let value = arguments[0]
+                    let isNullVar = scope.variable("isNull")
+                    let isSomeVar = scope.variable("isSome")
+                    let resultVars = scope.variable("results")
+                    
+                    printer.write("const \(isNullVar) = (\(value) === null || \(value) === undefined);")
+                    printer.write("const \(isSomeVar) = \(isNullVar) ? 0 : 1;")
+                    printer.write("let \(resultVars) = [\(isSomeVar)];")
+                    
+                    printer.write("if (!\(isNullVar)) {")
+                    printer.indent {
+                        // For non-null values, get the lowered wrapped type values
+                        let wrappedResults = wrappedFragment.printCode([value], scope, printer, cleanupCode)
+                        for result in wrappedResults {
+                            printer.write("\(resultVars).push(\(result));")
+                        }
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        // For null values, push dummy values based on wrapped type
+                        let dummyResults = wrappedFragment.printCode(["null"], scope, printer, cleanupCode)
+                        for result in dummyResults {
+                            printer.write("\(resultVars).push(\(result));")
+                        }
+                    }
+                    printer.write("}")
+                    
+                    return ["\(resultVars).slice()"]
+                }
+            )
         case .caseEnum: return .identity
         case .rawValueEnum(_, let rawType):
             switch rawType {

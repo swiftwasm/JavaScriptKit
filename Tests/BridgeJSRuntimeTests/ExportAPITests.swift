@@ -435,6 +435,63 @@ enum ComplexResult {
     return result
 }
 
+// MARK: - Optionals
+
+@JS func roundTripOptionalString(name: String?) -> String? {
+    return name
+}
+
+@JS func roundTripOptionalInt(value: Int?) -> Int? {
+    return value
+}
+
+@JS func roundTripOptionalBool(flag: Bool?) -> Bool? {
+    return flag
+}
+
+@JS func roundTripOptionalFloat(number: Float?) -> Float? {
+    return number
+}
+
+@JS func roundTripOptionalDouble(precision: Double?) -> Double? {
+    return precision
+}
+
+@JS func roundTripOptionalSyntax(name: Optional<String>) -> Optional<String> {
+    return name
+}
+
+@JS func roundTripOptionalMixSyntax(name: String?) -> Optional<String> {
+    return name
+}
+
+@JS func roundTripOptionalSwiftSyntax(name: Swift.Optional<String>) -> Swift.Optional<String> {
+    return name
+}
+
+@JS func roundTripOptionalWithSpaces(value: Optional< Double >) -> Optional< Double > {
+    return value
+}
+
+typealias OptionalAge = Int?
+@JS func roundTripOptionalTypeAlias(age: OptionalAge) -> OptionalAge {
+    return age
+}
+
+@JS func roundTripOptionalClass(value: Greeter?) -> Greeter? {
+    return value
+}
+
+@JS class OptionalPropertyHolder {
+    @JS var optionalName: String?
+    @JS var optionalAge: Int? = nil
+    @JS var optionalGreeter: Greeter? = nil
+    
+    @JS init(optionalName: String?) {
+        self.optionalName = optionalName
+    }
+}
+
 // MARK: - Property Tests
 
 // Simple class for SwiftHeapObject property testing

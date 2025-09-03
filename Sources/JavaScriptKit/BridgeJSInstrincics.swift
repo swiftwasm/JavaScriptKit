@@ -372,7 +372,7 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 @_extern(wasm, module: "bjs", name: "swift_js_push_int")
 @_spi(BridgeJS) public func _swift_js_push_int(_ value: Int32)
 #else
-@_spi(BridgeJS) public func _swift_js_return_int(_ value: Int32) {
+@_spi(BridgeJS) public func _swift_js_push_int(_ value: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
@@ -399,7 +399,7 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 @_extern(wasm, module: "bjs", name: "swift_js_pop_param_int32")
 @_spi(BridgeJS) public func _swift_js_pop_param_int32() -> Int32
 #else
-@_spi(BridgeJS) public func _swift_js_pop_param_int32() {
+@_spi(BridgeJS) public func _swift_js_pop_param_int32() -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
@@ -408,7 +408,7 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 @_extern(wasm, module: "bjs", name: "swift_js_pop_param_f32")
 @_spi(BridgeJS) public func _swift_js_pop_param_f32() -> Float32
 #else
-@_spi(BridgeJS) public func _swift_js_pop_param_f32() {
+@_spi(BridgeJS) public func _swift_js_pop_param_f32() -> Float32 {
     _onlyAvailableOnWasm()
 }
 #endif
@@ -417,7 +417,351 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 @_extern(wasm, module: "bjs", name: "swift_js_pop_param_f64")
 @_spi(BridgeJS) public func _swift_js_pop_param_f64() -> Float64
 #else
-@_spi(BridgeJS) public func _swift_js_pop_param_f64() {
+@_spi(BridgeJS) public func _swift_js_pop_param_f64() -> Float64 {
     _onlyAvailableOnWasm()
 }
 #endif
+
+// MARK: Optional Type Support
+
+extension Optional where Wrapped == Bool {
+    // MARK: ImportTS
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (Int32, Int32) {
+        switch self {
+        case .none:
+            return (0, 0)  // isSome=0, dummy value=0
+        case .some(let value):
+            return (1, value.bridgeJSLowerParameter())  // isSome=1, actual value
+        }
+    }
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Int32) -> Bool? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Bool.bridgeJSLiftReturn(wrappedValue)
+        }
+    }
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Bool? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Bool.bridgeJSLiftParameter(wrappedValue)
+        }
+    }
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_bool")
+        func _swift_js_return_optional_bool(_ isSome: Int32, _ value: Int32)
+        #else
+        /// Sets the optional bool for return value storage
+        func _swift_js_return_optional_bool(_ isSome: Int32, _ value: Int32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+        
+        switch consume self {
+        case .none:
+            _swift_js_return_optional_bool(0, 0)
+        case .some(let value):
+            _swift_js_return_optional_bool(1, value.bridgeJSLowerReturn())
+        }
+    }
+}
+
+/// Optional support for Int
+extension Optional where Wrapped == Int {
+    // MARK: ImportTS
+    
+    @_spi(BridgeJS) public func bridgeJSLowerParameter() -> (Int32, Int32) {
+        switch self {
+        case .none:
+            return (0, 0)  // isSome=0, dummy value=0
+        case .some(let value):
+            return (1, value.bridgeJSLowerParameter())  // isSome=1, actual value
+        }
+    }
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Int32) -> Int? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Int.bridgeJSLiftReturn(wrappedValue)
+        }
+    }
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Int? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Int.bridgeJSLiftParameter(wrappedValue)
+        }
+    }
+    
+    @_spi(BridgeJS) public func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_int")
+        func _swift_js_return_optional_int(_ isSome: Int32, _ value: Int32)
+        #else
+        /// Sets the optional int for return value storage
+        func _swift_js_return_optional_int(_ isSome: Int32, _ value: Int32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+        
+        switch self {
+        case .none:
+            _swift_js_return_optional_int(0, 0)
+        case .some(let value):
+            _swift_js_return_optional_int(1, value.bridgeJSLowerReturn())
+        }
+    }
+}
+extension Optional where Wrapped == String {
+    // MARK: ImportTS
+    
+    @_spi(BridgeJS) public func bridgeJSLowerParameter() -> Int32 {
+        switch self {
+        case .none:
+            return 0  // Return special sentinel value for nil string
+        case .some(let value):
+            return value.bridgeJSLowerParameter()
+        }
+    }
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32) -> String? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return String.bridgeJSLiftReturn(isSome)
+        }
+    }
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ bytes: Int32, _ count: Int32) -> String? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return String.bridgeJSLiftParameter(bytes, count)
+        }
+    }
+    
+    @_spi(BridgeJS) public func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_string")
+        func _swift_js_return_optional_string(_ isSome: Int32, _ ptr: UnsafePointer<UInt8>?, _ len: Int32)
+        #else
+        /// Write an optional string to reserved string storage to be returned to JavaScript
+        func _swift_js_return_optional_string(_ isSome: Int32, _ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+        
+        switch self {
+        case .none:
+            _swift_js_return_optional_string(0, nil, 0)
+        case .some(var value):
+            return value.withUTF8 { ptr in
+                _swift_js_return_optional_string(1, ptr.baseAddress, Int32(ptr.count))
+            }
+        }
+    }
+}
+extension Optional where Wrapped == JSObject {
+    // MARK: ImportTS
+    
+    @_spi(BridgeJS) public func bridgeJSLowerParameter() -> (Int32, Int32) {
+        switch self {
+        case .none:
+            return (0, 0)
+        case .some(let value):
+            return (1, value.bridgeJSLowerParameter())
+        }
+    }
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ objectId: Int32) -> JSObject? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return JSObject.bridgeJSLiftReturn(objectId)
+        }
+    }
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ objectId: Int32) -> JSObject? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return JSObject.bridgeJSLiftParameter(objectId)
+        }
+    }
+    
+    @_spi(BridgeJS) public func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_object")
+        func _swift_js_return_optional_object(_ isSome: Int32, _ objectId: Int32)
+        #else
+        /// Write an optional JSObject to reserved storage to be returned to JavaScript
+        func _swift_js_return_optional_object(_ isSome: Int32, _ objectId: Int32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+        
+        switch self {
+        case .none:
+            _swift_js_return_optional_object(0, 0)
+        case .some(let value):
+            let retainedId = value.bridgeJSLowerReturn()
+            _swift_js_return_optional_object(1, retainedId)
+        }
+    }
+}
+
+/// Optional support for Swift heap objects
+extension Optional where Wrapped: _BridgedSwiftHeapObject {
+    // MARK: ImportTS
+    @available(*, unavailable, message: "Optional Swift heap objects are not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Void {}
+    
+    @available(*, unavailable, message: "Optional Swift heap objects are not supported to be returned from imported JS functions")
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ pointer: UnsafeMutableRawPointer) -> Void {}
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ isSome: Int32, _ pointer: UnsafeMutableRawPointer) -> Optional<Wrapped> {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Wrapped.bridgeJSLiftParameter(pointer)
+        }
+    }
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_heap_object")
+        func _swift_js_return_optional_heap_object(_ isSome: Int32, _ pointer: UnsafeMutableRawPointer?)
+        #else
+        /// Write an optional Swift heap object to reserved storage to be returned to JavaScript
+        func _swift_js_return_optional_heap_object(_ isSome: Int32, _ pointer: UnsafeMutableRawPointer?) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+        
+        switch consume self {
+        case .none:
+            _swift_js_return_optional_heap_object(0, nil)
+        case .some(let value):
+            let retainedPointer = value.bridgeJSLowerReturn()
+            _swift_js_return_optional_heap_object(1, retainedPointer)
+        }
+    }
+}
+extension Optional where Wrapped == Float {
+    // MARK: ImportTS
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (Int32, Float32) {
+        switch self {
+        case .none:
+            return (0, 0.0)
+        case .some(let value):
+            return (1, value.bridgeJSLowerParameter())
+        }
+    }
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Float32) -> Float? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Float.bridgeJSLiftReturn(wrappedValue)
+        }
+    }
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float32) -> Float? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Float.bridgeJSLiftParameter(wrappedValue)
+        }
+    }
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_float")
+        func _swift_js_return_optional_float(_ isSome: Int32, _ value: Float32)
+        #else
+        /// Sets the optional float for return value storage
+        func _swift_js_return_optional_float(_ isSome: Int32, _ value: Float32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+        
+        switch consume self {
+        case .none:
+            _swift_js_return_optional_float(0, 0.0)
+        case .some(let value):
+            _swift_js_return_optional_float(1, value.bridgeJSLowerReturn())
+        }
+    }
+}
+
+/// Optional support for Double
+extension Optional where Wrapped == Double {
+    // MARK: ImportTS
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (Int32, Float64) {
+        switch self {
+        case .none:
+            return (0, 0.0)  // isSome=0, dummy value=0.0
+        case .some(let value):
+            return (1, value.bridgeJSLowerParameter())  // isSome=1, actual value
+        }
+    }
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Float64) -> Double? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Double.bridgeJSLiftReturn(wrappedValue)
+        }
+    }
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float64) -> Double? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Double.bridgeJSLiftParameter(wrappedValue)
+        }
+    }
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_double")
+        func _swift_js_return_optional_double(_ isSome: Int32, _ value: Float64)
+        #else
+        /// Sets the optional double for return value storage
+        func _swift_js_return_optional_double(_ isSome: Int32, _ value: Float64) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+        
+        switch consume self {
+        case .none:
+            _swift_js_return_optional_double(0, 0.0)
+        case .some(let value):
+            _swift_js_return_optional_double(1, value.bridgeJSLowerReturn())
+        }
+    }
+}
