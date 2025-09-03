@@ -29,7 +29,6 @@ export const SupportedMethod = {
     Post: 1,
 };
 
-
 if (typeof globalThis.Networking === 'undefined') {
     globalThis.Networking = {};
 }
@@ -68,7 +67,6 @@ export async function createInstantiator(options, swift) {
     let tmpParamInts = [];
     let tmpParamF32s = [];
     let tmpParamF64s = [];
-    
 
     return {
         /**
@@ -147,12 +145,11 @@ export async function createInstantiator(options, swift) {
                 const obj = TestServer.__construct(pointer);
                 return swift.memory.retain(obj);
             };
-
         },
         setInstance: (i) => {
             instance = i;
             memory = instance.exports.memory;
-            
+
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
             }
@@ -183,8 +180,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Converter_deinit, Converter.prototype);
                 }
-                
-                
+            
                 constructor() {
                     const ret = instance.exports.bjs_Converter_init();
                     return Converter.__construct(ret);
@@ -200,8 +196,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_HTTPServer_deinit, HTTPServer.prototype);
                 }
-                
-                
+            
                 constructor() {
                     const ret = instance.exports.bjs_HTTPServer_init();
                     return HTTPServer.__construct(ret);
@@ -214,8 +209,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_TestServer_deinit, TestServer.prototype);
                 }
-                
-                
+            
                 constructor() {
                     const ret = instance.exports.bjs_TestServer_init();
                     return TestServer.__construct(ret);
@@ -229,7 +223,6 @@ export async function createInstantiator(options, swift) {
                 HTTPServer,
                 TestServer,
             };
-
             if (typeof globalThis.Networking === 'undefined') {
                 globalThis.Networking = {};
             }
@@ -248,7 +241,6 @@ export async function createInstantiator(options, swift) {
             globalThis.Utils.Converter = exports.Converter;
             globalThis.Networking.API.HTTPServer = exports.HTTPServer;
             globalThis.Networking.APIV2.Internal.TestServer = exports.TestServer;
-
             return exports;
         },
     }

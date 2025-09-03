@@ -21,7 +21,6 @@ export async function createInstantiator(options, swift) {
     let tmpParamInts = [];
     let tmpParamF32s = [];
     let tmpParamF64s = [];
-    
 
     return {
         /**
@@ -84,7 +83,6 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_pop_param_f64"] = function() {
                 return tmpParamF64s.pop();
             }
-
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_createTS2Skeleton"] = function bjs_createTS2Skeleton() {
                 try {
@@ -159,7 +157,7 @@ export async function createInstantiator(options, swift) {
         setInstance: (i) => {
             instance = i;
             memory = instance.exports.memory;
-            
+
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
             }
@@ -167,9 +165,7 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-
             return {
-
             };
         },
     }

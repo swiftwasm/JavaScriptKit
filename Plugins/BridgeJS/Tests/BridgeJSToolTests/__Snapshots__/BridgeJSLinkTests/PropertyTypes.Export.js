@@ -21,7 +21,6 @@ export async function createInstantiator(options, swift) {
     let tmpParamInts = [];
     let tmpParamF32s = [];
     let tmpParamF64s = [];
-    
 
     return {
         /**
@@ -92,12 +91,11 @@ export async function createInstantiator(options, swift) {
                 const obj = PropertyHolder.__construct(pointer);
                 return swift.memory.retain(obj);
             };
-
         },
         setInstance: (i) => {
             instance = i;
             memory = instance.exports.memory;
-            
+
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
             }
@@ -128,8 +126,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PropertyHolder_deinit, PropertyHolder.prototype);
                 }
-                
-                
+            
                 constructor(intValue, floatValue, doubleValue, boolValue, stringValue, jsObject) {
                     const stringValueBytes = textEncoder.encode(stringValue);
                     const stringValueId = swift.memory.retain(stringValueBytes);

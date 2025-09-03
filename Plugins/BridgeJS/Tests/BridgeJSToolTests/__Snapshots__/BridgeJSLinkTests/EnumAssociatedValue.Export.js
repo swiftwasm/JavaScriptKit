@@ -342,7 +342,6 @@ const __bjs_createNetworkingResultHelpers = () => {
         }
     });
 };
-
 if (typeof globalThis.Utilities === 'undefined') {
     globalThis.Utilities = {};
 }
@@ -433,13 +432,10 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_pop_param_f64"] = function() {
                 return tmpParamF64s.pop();
             }
-
-
         },
         setInstance: (i) => {
             instance = i;
             memory = instance.exports.memory;
-            
 
             const APIResultHelpers = __bjs_createAPIResultHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift);
             enumHelpers.APIResult = APIResultHelpers;
@@ -460,7 +456,6 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-
             return {
                 handle: function bjs_handle(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.APIResult.lower(result);
