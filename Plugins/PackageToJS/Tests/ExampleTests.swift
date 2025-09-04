@@ -80,6 +80,14 @@ extension Trait where Self == ConditionTrait {
                 else {
                     return false
                 }
+                guard
+                    ["wasm32-unknown-wasi", "wasm32-unknown-wasip1"].contains(where: {
+                        swiftSDKID.hasSuffix($0)
+                    })
+                else {
+                    // Only non-threads SDKs are supported for embedded in Swift SDK
+                    return false
+                }
                 let embeddedSDKID = "\(swiftSDKID)-embedded"
                 return isSwiftSDKAvailable(embeddedSDKID, swiftPath: swiftPath)
             }(),
@@ -206,6 +214,7 @@ extension Trait where Self == ConditionTrait {
                     Swift package should build successfully, check \(destination.appending(path: path).path) for details
                     stdout: \(stdoutPath.path)
                     stderr: \(stderrPath.path)
+                    arguments: \(args)
 
                     \((try? String(contentsOf: stdoutPath, encoding: .utf8)) ?? "<<stdout is empty>>")
                     \((try? String(contentsOf: stderrPath, encoding: .utf8)) ?? "<<stderr is empty>>")
