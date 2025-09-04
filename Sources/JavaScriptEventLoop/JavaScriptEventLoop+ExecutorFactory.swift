@@ -27,22 +27,37 @@ extension JavaScriptEventLoop: MainExecutor {
 extension JavaScriptEventLoop: TaskExecutor {}
 
 @available(macOS 9999, iOS 9999, watchOS 9999, tvOS 9999, visionOS 9999, *)
-extension JavaScriptEventLoop: SchedulableExecutor {
+extension JavaScriptEventLoop: SchedulingExecutor {
     public func enqueue<C: Clock>(
         _ job: consuming ExecutorJob,
         after delay: C.Duration,
         tolerance: C.Duration?,
         clock: C
     ) {
-        let milliseconds = Self.delayInMilliseconds(from: delay, clock: clock)
+        let duration: Duration
+        // Handle clocks we know
+        if let _ = clock as? ContinuousClock {
+            duration = delay as! ContinuousClock.Duration
+        } else if let _ = clock as? SuspendingClock {
+            duration = delay as! SuspendingClock.Duration
+        } else {
+            // Hand-off the scheduling work to Clock implementation for unknown clocks
+            clock.enqueue(
+                job,
+                on: self,
+                at: clock.now.advanced(by: delay),
+                tolerance: tolerance
+            )
+            return
+        }
+        let milliseconds = Self.delayInMilliseconds(from: duration)
         self.enqueue(
             UnownedJob(job),
             withDelay: milliseconds
         )
     }
 
-    private static func delayInMilliseconds<C: Clock>(from duration: C.Duration, clock: C) -> Double {
-        let swiftDuration = clock.convert(from: duration)!
+    private static func delayInMilliseconds(from swiftDuration: Duration) -> Double {
         let (seconds, attoseconds) = swiftDuration.components
         return Double(seconds) * 1_000 + (Double(attoseconds) / 1_000_000_000_000_000)
     }
@@ -52,7 +67,7 @@ extension JavaScriptEventLoop: SchedulableExecutor {
 @available(macOS 9999, iOS 9999, watchOS 9999, tvOS 9999, visionOS 9999, *)
 extension JavaScriptEventLoop: ExecutorFactory {
     // Forward all operations to the current thread's JavaScriptEventLoop instance
-    final class CurrentThread: TaskExecutor, SchedulableExecutor, MainExecutor, SerialExecutor {
+    final class CurrentThread: TaskExecutor, SchedulingExecutor, MainExecutor, SerialExecutor {
         func checkIsolated() {}
 
         func enqueue(_ job: consuming ExecutorJob) {
