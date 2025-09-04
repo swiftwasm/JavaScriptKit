@@ -6,77 +6,64 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-func testOptionalNumber(_ value: JSObject) throws(JSException) -> Void {
+func roundTripOptionalNumber(_ value: JSObject) throws(JSException) -> JSObject {
     #if arch(wasm32)
-    @_extern(wasm, module: "Check", name: "bjs_testOptionalNumber")
-    func bjs_testOptionalNumber(_ value: Int32) -> Void
+    @_extern(wasm, module: "Check", name: "bjs_roundTripOptionalNumber")
+    func bjs_roundTripOptionalNumber(_ value: Int32) -> Int32
     #else
-    func bjs_testOptionalNumber(_ value: Int32) -> Void {
+    func bjs_roundTripOptionalNumber(_ value: Int32) -> Int32 {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    bjs_testOptionalNumber(value.bridgeJSLowerParameter())
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-}
-
-func testOptionalString(_ value: JSObject) throws(JSException) -> Void {
-    #if arch(wasm32)
-    @_extern(wasm, module: "Check", name: "bjs_testOptionalString")
-    func bjs_testOptionalString(_ value: Int32) -> Void
-    #else
-    func bjs_testOptionalString(_ value: Int32) -> Void {
-        fatalError("Only available on WebAssembly")
-    }
-    #endif
-    bjs_testOptionalString(value.bridgeJSLowerParameter())
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-}
-
-func testOptionalBool(_ value: JSObject) throws(JSException) -> Void {
-    #if arch(wasm32)
-    @_extern(wasm, module: "Check", name: "bjs_testOptionalBool")
-    func bjs_testOptionalBool(_ value: Int32) -> Void
-    #else
-    func bjs_testOptionalBool(_ value: Int32) -> Void {
-        fatalError("Only available on WebAssembly")
-    }
-    #endif
-    bjs_testOptionalBool(value.bridgeJSLowerParameter())
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-}
-
-func testOptionalReturn() throws(JSException) -> JSObject {
-    #if arch(wasm32)
-    @_extern(wasm, module: "Check", name: "bjs_testOptionalReturn")
-    func bjs_testOptionalReturn() -> Int32
-    #else
-    func bjs_testOptionalReturn() -> Int32 {
-        fatalError("Only available on WebAssembly")
-    }
-    #endif
-    let ret = bjs_testOptionalReturn()
+    let ret = bjs_roundTripOptionalNumber(value.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
     return JSObject.bridgeJSLiftReturn(ret)
 }
 
-func testOptionalNumberReturn() throws(JSException) -> JSObject {
+func roundTripOptionalString(_ value: JSObject) throws(JSException) -> JSObject {
     #if arch(wasm32)
-    @_extern(wasm, module: "Check", name: "bjs_testOptionalNumberReturn")
-    func bjs_testOptionalNumberReturn() -> Int32
+    @_extern(wasm, module: "Check", name: "bjs_roundTripOptionalString")
+    func bjs_roundTripOptionalString(_ value: Int32) -> Int32
     #else
-    func bjs_testOptionalNumberReturn() -> Int32 {
+    func bjs_roundTripOptionalString(_ value: Int32) -> Int32 {
         fatalError("Only available on WebAssembly")
     }
     #endif
-    let ret = bjs_testOptionalNumberReturn()
+    let ret = bjs_roundTripOptionalString(value.bridgeJSLowerParameter())
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func roundTripOptionalBool(_ value: JSObject) throws(JSException) -> JSObject {
+    #if arch(wasm32)
+    @_extern(wasm, module: "Check", name: "bjs_roundTripOptionalBool")
+    func bjs_roundTripOptionalBool(_ value: Int32) -> Int32
+    #else
+    func bjs_roundTripOptionalBool(_ value: Int32) -> Int32 {
+        fatalError("Only available on WebAssembly")
+    }
+    #endif
+    let ret = bjs_roundTripOptionalBool(value.bridgeJSLowerParameter())
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func roundTripOptionalClass(_ value: JSObject) throws(JSException) -> JSObject {
+    #if arch(wasm32)
+    @_extern(wasm, module: "Check", name: "bjs_roundTripOptionalClass")
+    func bjs_roundTripOptionalClass(_ value: Int32) -> Int32
+    #else
+    func bjs_roundTripOptionalClass(_ value: Int32) -> Int32 {
+        fatalError("Only available on WebAssembly")
+    }
+    #endif
+    let ret = bjs_roundTripOptionalClass(value.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }

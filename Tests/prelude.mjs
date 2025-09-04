@@ -484,9 +484,16 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.roundTripOptionalSwiftSyntax("Swift"), "Swift");
     assert.equal(exports.roundTripOptionalWithSpaces(null), null);
     assert.equal(exports.roundTripOptionalWithSpaces(1.618), 1.618);
-
     assert.equal(exports.roundTripOptionalTypeAlias(null), null);
     assert.equal(exports.roundTripOptionalTypeAlias(25), 25);
+    assert.equal(exports.roundTripOptionalStatus(Status.Success), Status.Success);
+    assert.equal(exports.roundTripOptionalTheme(Theme.Light), Theme.Light);
+    assert.equal(exports.roundTripOptionalHttpStatus(HttpStatus.Ok), HttpStatus.Ok);
+    assert.equal(exports.roundTripOptionalTSDirection(TSDirection.North), TSDirection.North);
+    assert.equal(exports.roundTripOptionalTSTheme(TSTheme.Light), TSTheme.Light);
+    assert.equal(exports.roundTripOptionalNetworkingAPIMethod(globalThis.Networking.API.Method.Get), globalThis.Networking.API.Method.Get);
+    assert.deepEqual(exports.roundTripOptionalAPIResult(p1), p1);
+    assert.deepEqual(exports.roundTripOptionalComplexResult(cl1), cl1);
 
     const optionalGreeter = new exports.Greeter("Schrödinger");
     const optionalGreeter2 = exports.roundTripOptionalClass(optionalGreeter);

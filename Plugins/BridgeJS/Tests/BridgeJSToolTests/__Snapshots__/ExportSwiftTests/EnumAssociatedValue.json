@@ -415,6 +415,38 @@
       }
     },
     {
+      "abiName" : "bjs_roundTripOptionalAPIResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalAPIResult",
+      "parameters" : [
+        {
+          "label" : "result",
+          "name" : "result",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        }
+      }
+    },
+    {
       "abiName" : "bjs_handleComplex",
       "effects" : {
         "isAsync" : false,
@@ -475,6 +507,102 @@
       "returnType" : {
         "associatedValueEnum" : {
           "_0" : "ComplexResult"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalComplexResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalComplexResult",
+      "parameters" : [
+        {
+          "label" : "result",
+          "name" : "result",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "ComplexResult"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalUtilitiesResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalUtilitiesResult",
+      "parameters" : [
+        {
+          "label" : "result",
+          "name" : "result",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "Utilities.Result"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "associatedValueEnum" : {
+              "_0" : "Utilities.Result"
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalNetworkingResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalNetworkingResult",
+      "parameters" : [
+        {
+          "label" : "result",
+          "name" : "result",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "NetworkingResult"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "associatedValueEnum" : {
+              "_0" : "NetworkingResult"
+            }
+          }
         }
       }
     }

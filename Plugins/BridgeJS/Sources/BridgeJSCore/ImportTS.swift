@@ -72,51 +72,18 @@ public struct ImportTS {
 
         func lowerParameter(param: Parameter) throws {
             let loweringInfo = try param.type.loweringParameterInfo()
-            
-            // Handle void parameters (empty loweredParameters array)
-            if loweringInfo.loweredParameters.isEmpty {
-                // Void parameters don't generate any ABI parameters
-                return
-            } else if loweringInfo.loweredParameters.count == 1 {
-                // Simple case: single parameter
-                let (_, type) = loweringInfo.loweredParameters[0]
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
-                    )
+            assert(
+                loweringInfo.loweredParameters.count == 1,
+                "For now, we require a single parameter to be lowered to a single Wasm core type"
+            )
+            let (_, type) = loweringInfo.loweredParameters[0]
+            abiParameterForwardings.append(
+                LabeledExprSyntax(
+                    label: param.label,
+                    expression: ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
                 )
-                abiParameterSignatures.append((param.name, type))
-            } else {
-                // Complex case: multiple parameters (e.g., optionals with isSome flag + wrapped parameters)
-                // For optional types, use Optional<WrappedType> syntax for the lowering call
-                let typeNameForLowering: String
-                switch param.type {
-                case .optional(let wrappedType):
-                    typeNameForLowering = "Optional<\(wrappedType.swiftType)>"
-                default:
-                    typeNameForLowering = param.type.swiftType
-                }
-                
-                let paramNames = loweringInfo.loweredParameters.enumerated().map { index, paramInfo in
-                    if index == 0 {
-                        return param.name + paramInfo.name.capitalizedFirstLetter
-                    } else {
-                        return param.name + paramInfo.name.capitalizedFirstLetter
-                    }
-                }
-                
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(
-                        label: param.label,
-                        expression: ExprSyntax("\(raw: typeNameForLowering).bridgeJSLowerParameter(\(raw: param.name))")
-                    )
-                )
-                
-                for (paramName, (_, type)) in zip(paramNames, loweringInfo.loweredParameters) {
-                    abiParameterSignatures.append((paramName, type))
-                }
-            }
+            )
+            abiParameterSignatures.append((param.name, type))
         }
 
         func call(returnType: BridgeType) {
@@ -136,13 +103,6 @@ public struct ImportTS {
             if returnType == .void {
                 return
             }
-            
-            // Handle optional return values that use special storage functions
-            if case .optional(_) = returnType {
-                body.append("return \(raw: returnType.swiftType).bridgeJSLiftReturn()")
-                return
-            }
-            
             body.append("return \(raw: returnType.swiftType).bridgeJSLiftReturn(ret)")
         }
 
@@ -473,16 +433,12 @@ extension BridgeType {
         case .string: return .string
         case .jsObject: return .jsObject
         case .void: return .void
-        case .optional(let wrappedType):
-            // Optional parameters include optionality flag plus wrapped type parameters
-            let wrappedInfo = try wrappedType.loweringParameterInfo()
-            var optionalParams: [(name: String, type: WasmCoreType)] = [("isSome", .i32)]
-            optionalParams.append(contentsOf: wrappedInfo.loweredParameters)
-            return LoweringParameterInfo(loweredParameters: optionalParams)
         case .swiftHeapObject:
             throw BridgeJSCoreError("swiftHeapObject is not supported in imported signatures")
         case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
             throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
+        case .optional:
+            throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
         }
     }
 
@@ -507,13 +463,12 @@ extension BridgeType {
         case .string: return .string
         case .jsObject: return .jsObject
         case .void: return .void
-        case .optional(_):
-            // Optional return values use special storage functions and return void
-            return LiftingReturnInfo(valueToLift: nil)
         case .swiftHeapObject:
             throw BridgeJSCoreError("swiftHeapObject is not supported in imported signatures")
         case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
             throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
+        case .optional:
+            throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
         }
     }
 }

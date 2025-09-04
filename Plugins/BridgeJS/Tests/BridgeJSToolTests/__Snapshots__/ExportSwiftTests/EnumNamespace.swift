@@ -6,7 +6,7 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-extension Networking.API.Method {
+extension Networking.API.Method: _BridgedSwiftCaseEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         return bridgeJSRawValue
     }
@@ -55,7 +55,7 @@ extension Configuration.LogLevel: _BridgedSwiftEnumNoPayload {
 extension Configuration.Port: _BridgedSwiftEnumNoPayload {
 }
 
-extension Internal.SupportedMethod {
+extension Internal.SupportedMethod: _BridgedSwiftCaseEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         return bridgeJSRawValue
     }

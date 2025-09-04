@@ -3397,6 +3397,268 @@
       }
     },
     {
+      "abiName" : "bjs_roundTripOptionalStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalStatus",
+      "parameters" : [
+        {
+          "label" : "value",
+          "name" : "value",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "caseEnum" : {
+                  "_0" : "Status"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "caseEnum" : {
+              "_0" : "Status"
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalTheme",
+      "parameters" : [
+        {
+          "label" : "value",
+          "name" : "value",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "Theme",
+                  "_1" : "String"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "Theme",
+              "_1" : "String"
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalHttpStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalHttpStatus",
+      "parameters" : [
+        {
+          "label" : "value",
+          "name" : "value",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "HttpStatus",
+                  "_1" : "Int"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "HttpStatus",
+              "_1" : "Int"
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalTSDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalTSDirection",
+      "parameters" : [
+        {
+          "label" : "value",
+          "name" : "value",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "caseEnum" : {
+                  "_0" : "TSDirection"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "caseEnum" : {
+              "_0" : "TSDirection"
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalTSTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalTSTheme",
+      "parameters" : [
+        {
+          "label" : "value",
+          "name" : "value",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "TSTheme",
+                  "_1" : "String"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "TSTheme",
+              "_1" : "String"
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalNetworkingAPIMethod",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalNetworkingAPIMethod",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "method",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "caseEnum" : {
+                  "_0" : "Networking.API.Method"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "caseEnum" : {
+              "_0" : "Networking.API.Method"
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalAPIResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalAPIResult",
+      "parameters" : [
+        {
+          "label" : "value",
+          "name" : "value",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalComplexResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalComplexResult",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "result",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "ComplexResult"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "associatedValueEnum" : {
+              "_0" : "ComplexResult"
+            }
+          }
+        }
+      }
+    },
+    {
       "abiName" : "bjs_roundTripOptionalClass",
       "effects" : {
         "isAsync" : false,

@@ -478,10 +478,41 @@ typealias OptionalAge = Int?
     return age
 }
 
-@JS func roundTripOptionalClass(value: Greeter?) -> Greeter? {
+@JS func roundTripOptionalStatus(value: Status?) -> Status? {
     return value
 }
 
+@JS func roundTripOptionalTheme(value: Theme?) -> Theme? {
+    return value
+}
+
+@JS func roundTripOptionalHttpStatus(value: HttpStatus?) -> HttpStatus? {
+    return value
+}
+
+@JS func roundTripOptionalTSDirection(value: TSDirection?) -> TSDirection? {
+    return value
+}
+
+@JS func roundTripOptionalTSTheme(value: TSTheme?) -> TSTheme? {
+    return value
+}
+
+@JS func roundTripOptionalNetworkingAPIMethod(_ method: Networking.API.Method?) -> Networking.API.Method? {
+    return method
+}
+
+@JS func roundTripOptionalAPIResult(value: APIResult?) -> APIResult? {
+    return value
+}
+
+@JS func roundTripOptionalComplexResult(_ result: ComplexResult?) -> ComplexResult? {
+    return result
+}
+
+@JS func roundTripOptionalClass(value: Greeter?) -> Greeter? {
+    return value
+}
 @JS class OptionalPropertyHolder {
     @JS var optionalName: String?
     @JS var optionalAge: Int? = nil

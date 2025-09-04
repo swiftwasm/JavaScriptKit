@@ -171,6 +171,38 @@
       }
     },
     {
+      "abiName" : "bjs_roundTripOptionalDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalDirection",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "caseEnum" : {
+                  "_0" : "Direction"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "caseEnum" : {
+              "_0" : "Direction"
+            }
+          }
+        }
+      }
+    },
+    {
       "abiName" : "bjs_setTSDirection",
       "effects" : {
         "isAsync" : false,
@@ -207,6 +239,38 @@
       "returnType" : {
         "caseEnum" : {
           "_0" : "TSDirection"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalTSDirection",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalTSDirection",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "caseEnum" : {
+                  "_0" : "TSDirection"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "caseEnum" : {
+              "_0" : "TSDirection"
+            }
+          }
         }
       }
     }

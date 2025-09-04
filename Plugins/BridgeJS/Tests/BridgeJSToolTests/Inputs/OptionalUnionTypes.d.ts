@@ -1,15 +1,14 @@
-export function testOptionalNumber(value: number | null): void;
-export function testOptionalString(value: string | undefined): void;
-export function testOptionalBool(value: boolean | null | undefined): void;
-export function testOptionalReturn(): string | null;
-export function testOptionalNumberReturn(): number | undefined;
-export function testMixedOptionals(required: string, optional: number | null): boolean | undefined;
+export function roundTripOptionalNumber(value: number | null): number | null;
+export function roundTripOptionalString(value: string | null): string | null;
+export function roundTripOptionalBool(value: boolean | null): boolean | null;
+export function roundTripOptionalClass(value: TestClass | null): TestClass | null;
+export function testMixedOptionals(required: string, optional: number | null): boolean | null;
 
 export class TestClass {
     optionalProperty: string | null;
 
-    constructor(param: number | undefined);
+    constructor(param: number | null);
 
     methodWithOptional(value: boolean | null): void;
-    methodReturningOptional(): string | undefined;
+    methodReturningOptional(): string | null;
 }

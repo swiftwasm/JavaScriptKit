@@ -12,11 +12,10 @@ export interface TestClass {
 export type Exports = {
 }
 export type Imports = {
-    testOptionalNumber(value: any): void;
-    testOptionalString(value: any): void;
-    testOptionalBool(value: any): void;
-    testOptionalReturn(): any;
-    testOptionalNumberReturn(): any;
+    roundTripOptionalNumber(value: any): any;
+    roundTripOptionalString(value: any): any;
+    roundTripOptionalBool(value: any): any;
+    roundTripOptionalClass(value: any): any;
     testMixedOptionals(required: string, optional: any): any;
     TestClass: {
         new(param: any): TestClass;

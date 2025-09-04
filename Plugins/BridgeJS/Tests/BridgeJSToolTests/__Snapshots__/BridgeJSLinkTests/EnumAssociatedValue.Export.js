@@ -529,6 +529,25 @@ export async function createInstantiator(options, swift) {
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
+                roundTripOptionalAPIResult: function bjs_roundTripOptionalAPIResult(result) {
+                    const isSome = result != null;
+                    let resultCaseId, resultCleanup;
+                    if (isSome) {
+                        const enumResult = enumHelpers.APIResult.lower(result);
+                        resultCaseId = enumResult.caseId;
+                        resultCleanup = enumResult.cleanup;
+                    }
+                    instance.exports.bjs_roundTripOptionalAPIResult(+isSome, isSome ? resultCaseId : 0);
+                    const isNull = (tmpRetTag === -1);
+                    let optResult;
+                    if (isNull) {
+                        optResult = null;
+                    } else {
+                        optResult = enumHelpers.APIResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    }
+                    if (resultCleanup) { resultCleanup(); }
+                    return optResult;
+                },
                 handleComplex: function bjs_handleComplex(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.ComplexResult.lower(result);
                     instance.exports.bjs_handleComplex(resultCaseId);
@@ -545,6 +564,63 @@ export async function createInstantiator(options, swift) {
                     const ret = enumHelpers.ComplexResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
+                },
+                roundTripOptionalComplexResult: function bjs_roundTripOptionalComplexResult(result) {
+                    const isSome = result != null;
+                    let resultCaseId, resultCleanup;
+                    if (isSome) {
+                        const enumResult = enumHelpers.ComplexResult.lower(result);
+                        resultCaseId = enumResult.caseId;
+                        resultCleanup = enumResult.cleanup;
+                    }
+                    instance.exports.bjs_roundTripOptionalComplexResult(+isSome, isSome ? resultCaseId : 0);
+                    const isNull = (tmpRetTag === -1);
+                    let optResult;
+                    if (isNull) {
+                        optResult = null;
+                    } else {
+                        optResult = enumHelpers.ComplexResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    }
+                    if (resultCleanup) { resultCleanup(); }
+                    return optResult;
+                },
+                roundTripOptionalUtilitiesResult: function bjs_roundTripOptionalUtilitiesResult(result) {
+                    const isSome = result != null;
+                    let resultCaseId, resultCleanup;
+                    if (isSome) {
+                        const enumResult = enumHelpers.Result.lower(result);
+                        resultCaseId = enumResult.caseId;
+                        resultCleanup = enumResult.cleanup;
+                    }
+                    instance.exports.bjs_roundTripOptionalUtilitiesResult(+isSome, isSome ? resultCaseId : 0);
+                    const isNull = (tmpRetTag === -1);
+                    let optResult;
+                    if (isNull) {
+                        optResult = null;
+                    } else {
+                        optResult = enumHelpers.Result.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    }
+                    if (resultCleanup) { resultCleanup(); }
+                    return optResult;
+                },
+                roundTripOptionalNetworkingResult: function bjs_roundTripOptionalNetworkingResult(result) {
+                    const isSome = result != null;
+                    let resultCaseId, resultCleanup;
+                    if (isSome) {
+                        const enumResult = enumHelpers.NetworkingResult.lower(result);
+                        resultCaseId = enumResult.caseId;
+                        resultCleanup = enumResult.cleanup;
+                    }
+                    instance.exports.bjs_roundTripOptionalNetworkingResult(+isSome, isSome ? resultCaseId : 0);
+                    const isNull = (tmpRetTag === -1);
+                    let optResult;
+                    if (isNull) {
+                        optResult = null;
+                    } else {
+                        optResult = enumHelpers.NetworkingResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    }
+                    if (resultCleanup) { resultCleanup(); }
+                    return optResult;
                 },
             };
         },

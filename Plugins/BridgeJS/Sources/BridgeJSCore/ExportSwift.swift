@@ -735,15 +735,14 @@ public class ExportSwift {
     }
 
     func lookupType(for type: TypeSyntax) -> BridgeType? {
-        // 1. Handle T? syntax (OptionalTypeSyntax)
+        // T?
         if let optionalType = type.as(OptionalTypeSyntax.self) {
             let wrappedType = optionalType.wrappedType
             if let baseType = lookupType(for: wrappedType) {
                 return .optional(baseType)
             }
         }
-
-        // 2. Handle Optional<T> syntax (IdentifierTypeSyntax with generic arguments)
+        // Optional<T>
         if let identifierType = type.as(IdentifierTypeSyntax.self),
            identifierType.name.text == "Optional",
            let genericArgs = identifierType.genericArgumentClause?.arguments,
@@ -753,8 +752,7 @@ public class ExportSwift {
                 return .optional(baseType)
             }
         }
-
-        // 3. Handle Swift.Optional<T> syntax (MemberTypeSyntax)
+        // Swift.Optional<T>
         if let memberType = type.as(MemberTypeSyntax.self),
            let baseType = memberType.baseType.as(IdentifierTypeSyntax.self),
            baseType.name.text == "Swift",
@@ -766,22 +764,17 @@ public class ExportSwift {
                 return .optional(wrappedType)
             }
         }
-
-        // 4. Handle type aliases - try to resolve through type declaration resolver first
         if let aliasDecl = typeDeclResolver.resolveTypeAlias(type) {
-            // Recursively lookup the aliased type
             if let resolvedType = lookupType(for: aliasDecl.initializer.value) {
                 return resolvedType
             }
         }
 
-        // 5. Handle primitive types before falling back to other type declarations
         let typeName = type.trimmedDescription
         if let primitiveType = BridgeType.primitive(swiftType: typeName) {
             return primitiveType
         }
 
-        // 6. Try to resolve other type declarations
         guard let typeDecl = typeDeclResolver.resolve(type) else {
             return nil
         }
@@ -898,7 +891,6 @@ public class ExportSwift {
                 argumentsToLift = liftingInfo.parameters.map { (name, _) in param.name + name.capitalizedFirstLetter }
             }
             
-            // For optional types, use Optional<WrappedType> syntax instead of WrappedType?
             let typeNameForIntrinsic: String
             switch param.type {
             case .optional(let wrappedType):
@@ -1004,7 +996,6 @@ public class ExportSwift {
                 return
             }
 
-            // Handle optional types that use special storage functions and return Void
             if case .optional(_) = returnType {
                 append("return ret.bridgeJSLowerReturn()")
                 return
@@ -1095,7 +1086,7 @@ public class ExportSwift {
             let valueSwitch = (["switch self {"] + valueCases + ["}"]).joined(separator: "\n")
 
             return """
-                extension \(raw: typeName) {
+                extension \(raw: typeName): _BridgedSwiftCaseEnum {
                     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
                         return bridgeJSRawValue
                     }
@@ -1123,15 +1114,15 @@ public class ExportSwift {
         func renderAssociatedValueEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
             let typeName = enumDef.swiftCallName
             return """
-                private extension \(raw: typeName) {
-                    static func bridgeJSLiftParameter(_ caseId: Int32) -> \(raw: typeName) {
+                extension \(raw: typeName): _BridgedSwiftAssociatedValueEnum {
+                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> \(raw: typeName) {
                         switch caseId {
                         \(raw: generateStackLiftSwitchCases(enumDef: enumDef).joined(separator: "\n"))
                         default: fatalError("Unknown \(raw: typeName) case ID: \\(caseId)")
                         }
                     }
 
-                    func bridgeJSLowerReturn() {
+                    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
                         switch self {
                         \(raw: generateReturnSwitchCases(enumDef: enumDef).joined(separator: "\n"))
                         }
@@ -1168,7 +1159,7 @@ public class ExportSwift {
                         case .double:
                             return "\(paramName)Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())"
                         case .optional(_):
-                            return "/* Optional associated value lifting not yet implemented */nil" // Placeholder
+                            return "nil"
                         default:
                             return "\(paramName)Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
                         }
@@ -1205,8 +1196,6 @@ public class ExportSwift {
                             bodyLines.append("_swift_js_push_f32(\(paramName))")
                         case .double:
                             bodyLines.append("_swift_js_push_f64(\(paramName))")
-                        case .optional(_):
-                             bodyLines.append("// Optional associated value lowering not yet implemented") // Placeholder
                         default:
                             bodyLines.append(
                                 "preconditionFailure(\"BridgeJS: unsupported associated value type in generated code\")"
@@ -1494,7 +1483,7 @@ extension BridgeType {
         case .jsObject(let name?): return name
         case .swiftHeapObject(let name): return name
         case .void: return "Void"
-        case .optional(let wrappedType): return "\(wrappedType.swiftType)?"
+        case .optional(let wrappedType): return "Optional<\(wrappedType.swiftType)>"
         case .caseEnum(let name): return name
         case .rawValueEnum(let name, _): return name
         case .associatedValueEnum(let name): return name
@@ -1531,7 +1520,6 @@ extension BridgeType {
         case .swiftHeapObject: return .swiftHeapObject
         case .void: return .void
         case .optional(let wrappedType):
-            // Optional parameters include optionality flag plus wrapped type parameters
             var optionalParams: [(name: String, type: WasmCoreType)] = [("isSome", .i32)]
             optionalParams.append(contentsOf: try wrappedType.liftParameterInfo().parameters)
             return LiftingIntrinsicInfo(parameters: optionalParams)
@@ -1570,6 +1558,7 @@ extension BridgeType {
         static let caseEnum = LoweringIntrinsicInfo(returnType: .i32)
         static let rawValueEnum = LoweringIntrinsicInfo(returnType: .i32)
         static let associatedValueEnum = LoweringIntrinsicInfo(returnType: nil)
+        static let optional = LoweringIntrinsicInfo(returnType: nil)
     }
 
     func loweringReturnInfo() throws -> LoweringIntrinsicInfo {
@@ -1582,9 +1571,7 @@ extension BridgeType {
         case .jsObject: return .jsObject
         case .swiftHeapObject: return .swiftHeapObject
         case .void: return .void
-        case .optional(_):
-            // Optional return values use special storage functions and return void
-            return LoweringIntrinsicInfo(returnType: nil)
+        case .optional: return .optional
         case .caseEnum: return .caseEnum
         case .rawValueEnum(_, let rawType):
             switch rawType {
@@ -1602,7 +1589,7 @@ extension BridgeType {
         case .associatedValueEnum:
             return .associatedValueEnum
         case .namespaceEnum:
-            throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
+            throw BridgeJSCoreError("Namespace enums are not supported as return types")
         }
     }
 }

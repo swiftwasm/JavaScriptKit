@@ -186,12 +186,26 @@ export async function createInstantiator(options, swift) {
                     const ret = instance.exports.bjs_processDirection(input);
                     return ret;
                 },
+                roundTripOptionalDirection: function bjs_roundTripOptionalDirection(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalDirection(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalInt;
+                    tmpRetOptionalInt = undefined;
+                    return optResult;
+                },
                 setTSDirection: function bjs_setTSDirection(direction) {
                     instance.exports.bjs_setTSDirection(direction);
                 },
                 getTSDirection: function bjs_getTSDirection() {
                     const ret = instance.exports.bjs_getTSDirection();
                     return ret;
+                },
+                roundTripOptionalTSDirection: function bjs_roundTripOptionalTSDirection(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalTSDirection(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalInt;
+                    tmpRetOptionalInt = undefined;
+                    return optResult;
                 },
             };
         },

@@ -306,6 +306,28 @@ extension _JSBridgedClass {
 /// The conformance is automatically synthesized by the BridgeJS code generator.
 public protocol _BridgedSwiftEnumNoPayload {}
 
+/// A protocol that Swift case enum types (enums without raw values or associated values) conform to.
+///
+/// The conformance is automatically synthesized by the BridgeJS code generator.
+/// Case enums are lowered to Int32 values representing their case index.
+public protocol _BridgedSwiftCaseEnum {
+    // MARK: ImportTS & ExportSwift
+    @_spi(BridgeJS) consuming func bridgeJSLowerParameter() -> Int32
+    @_spi(BridgeJS) static func bridgeJSLiftReturn(_ value: Int32) -> Self
+    @_spi(BridgeJS) static func bridgeJSLiftParameter(_ value: Int32) -> Self
+    @_spi(BridgeJS) consuming func bridgeJSLowerReturn() -> Int32
+}
+
+/// A protocol that Swift associated value enum types conform to.
+///
+/// The conformance is automatically synthesized by the BridgeJS code generator.
+/// Associated value enums use a stack-based ABI for complex data transfer.
+public protocol _BridgedSwiftAssociatedValueEnum {
+    // MARK: ImportTS & ExportSwift
+    @_spi(BridgeJS) static func bridgeJSLiftParameter(_ caseId: Int32) -> Self
+    @_spi(BridgeJS) consuming func bridgeJSLowerReturn() -> Void
+}
+
 extension _BridgedSwiftEnumNoPayload where Self: RawRepresentable, RawValue == String {
     // MARK: ImportTS
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 { rawValue.bridgeJSLowerParameter() }
@@ -430,7 +452,7 @@ extension Optional where Wrapped == Bool {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (Int32, Int32) {
         switch self {
         case .none:
-            return (0, 0)  // isSome=0, dummy value=0
+            return (0, 0)
         case .some(let value):
             return (1, value.bridgeJSLowerParameter())  // isSome=1, actual value
         }
@@ -530,7 +552,7 @@ extension Optional where Wrapped == String {
     @_spi(BridgeJS) public func bridgeJSLowerParameter() -> Int32 {
         switch self {
         case .none:
-            return 0  // Return special sentinel value for nil string
+            return 0
         case .some(let value):
             return value.bridgeJSLowerParameter()
         }
@@ -762,6 +784,251 @@ extension Optional where Wrapped == Double {
             _swift_js_return_optional_double(0, 0.0)
         case .some(let value):
             _swift_js_return_optional_double(1, value.bridgeJSLowerReturn())
+        }
+    }
+}
+
+/// Optional support for case enums
+extension Optional where Wrapped: _BridgedSwiftCaseEnum {
+    // MARK: ImportTS
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (Int32, Int32) {
+        switch self {
+        case .none:
+            return (0, 0)  // isSome=0, dummy value=0
+        case .some(let value):
+            return (1, value.bridgeJSLowerParameter())  // isSome=1, actual enum value
+        }
+    }
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Wrapped.bridgeJSLiftReturn(wrappedValue)
+        }
+    }
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Wrapped.bridgeJSLiftParameter(wrappedValue)
+        }
+    }
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_int")
+        func _swift_js_return_optional_int(_ isSome: Int32, _ value: Int32)
+        #else
+        /// Sets the optional int for return value storage
+        func _swift_js_return_optional_int(_ isSome: Int32, _ value: Int32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+        
+        switch consume self {
+        case .none:
+            _swift_js_return_optional_int(0, 0)
+        case .some(let value):
+            _swift_js_return_optional_int(1, value.bridgeJSLowerReturn())
+        }
+    }
+}
+
+public protocol _BridgedSwiftTypeLoweredIntoVoidType {
+    // MARK: ExportSwift
+    consuming func bridgeJSLowerReturn() -> Void
+}
+
+extension Optional where Wrapped: _BridgedSwiftTypeLoweredIntoVoidType {
+     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        switch consume self {
+        case .none:
+            ()
+        case .some(let value):
+            value.bridgeJSLowerReturn()
+        }
+    }
+}
+
+// MARK: Optional Raw Value Enum Support
+
+/// Optional support for String raw value enums (like Theme: String)
+extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == String {
+    // MARK: ImportTS
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+        let optionalRawValue: String? = self?.rawValue
+        return optionalRawValue.bridgeJSLowerParameter()
+    }
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32) -> Wrapped? {
+        let optionalRawValue = String?.bridgeJSLiftReturn(isSome)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ bytes: Int32, _ count: Int32) -> Wrapped? {
+        let optionalRawValue = String?.bridgeJSLiftParameter(isSome, bytes, count)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        let optionalRawValue: String? = self?.rawValue
+        optionalRawValue.bridgeJSLowerReturn()
+    }
+}
+
+/// Optional support for Int raw value enums
+extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Int {
+    // MARK: ImportTS
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (Int32, Int32) {
+        let optionalRawValue: Int? = self?.rawValue
+        return optionalRawValue.bridgeJSLowerParameter()
+    }
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
+        let optionalRawValue = Int?.bridgeJSLiftReturn(isSome, wrappedValue)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
+        let optionalRawValue = Int?.bridgeJSLiftParameter(isSome, wrappedValue)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        let optionalRawValue: Int? = self?.rawValue
+        optionalRawValue.bridgeJSLowerReturn()
+    }
+}
+
+/// Optional support for Bool raw value enums
+extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Bool {
+    // MARK: ImportTS
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (Int32, Int32) {
+        let optionalRawValue: Bool? = self?.rawValue
+        return optionalRawValue.bridgeJSLowerParameter()
+    }
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
+        let optionalRawValue = Bool?.bridgeJSLiftReturn(isSome, wrappedValue)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
+        let optionalRawValue = Bool?.bridgeJSLiftParameter(isSome, wrappedValue)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        let optionalRawValue: Bool? = self?.rawValue
+        optionalRawValue.bridgeJSLowerReturn()
+    }
+}
+
+/// Optional support for Float raw value enums
+extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Float {
+    // MARK: ImportTS
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (Int32, Float32) {
+        let optionalRawValue: Float? = self?.rawValue
+        return optionalRawValue.bridgeJSLowerParameter()
+    }
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Float32) -> Wrapped? {
+        let optionalRawValue = Float?.bridgeJSLiftReturn(isSome, wrappedValue)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float32) -> Wrapped? {
+        let optionalRawValue = Float?.bridgeJSLiftParameter(isSome, wrappedValue)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        let optionalRawValue: Float? = self?.rawValue
+        optionalRawValue.bridgeJSLowerReturn()
+    }
+}
+
+/// Optional support for Double raw value enums
+extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Double {
+    // MARK: ImportTS
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (Int32, Float64) {
+        let optionalRawValue: Double? = self?.rawValue
+        return optionalRawValue.bridgeJSLowerParameter()
+    }
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Float64) -> Wrapped? {
+        let optionalRawValue = Double?.bridgeJSLiftReturn(isSome, wrappedValue)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float64) -> Wrapped? {
+        let optionalRawValue = Double?.bridgeJSLiftParameter(isSome, wrappedValue)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        let optionalRawValue: Double? = self?.rawValue
+        optionalRawValue.bridgeJSLowerReturn()
+    }
+}
+
+// MARK: Optional Associated Value Enum Support
+
+/// Optional support for associated value enums
+extension Optional where Wrapped: _BridgedSwiftAssociatedValueEnum {
+    // MARK: ImportTS
+    @available(*, unavailable, message: "Optional associated value enums are not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+    
+    @available(*, unavailable, message: "Optional associated value enums are not supported to be returned from imported JS functions")
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ caseId: Int32) -> Wrapped? { return nil }
+    
+    // MARK: ExportSwift
+    
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ caseId: Int32) -> Wrapped? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Wrapped.bridgeJSLiftParameter(caseId)
+        }
+    }
+    
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_push_tag")
+        func _swift_js_push_tag(_ tag: Int32)
+        #else
+        /// Pushes an enum tag to the return tag storage
+        func _swift_js_push_tag(_ tag: Int32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+        
+        switch consume self {
+        case .none:
+            _swift_js_push_tag(-1)  // Use -1 as sentinel for null
+        case .some(let value):
+            value.bridgeJSLowerReturn()  // This will push to tmpRetTag and stacks
         }
     }
 }

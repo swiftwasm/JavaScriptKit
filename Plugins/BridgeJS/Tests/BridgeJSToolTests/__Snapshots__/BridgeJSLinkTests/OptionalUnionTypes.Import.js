@@ -139,39 +139,36 @@ export async function createInstantiator(options, swift) {
                 }
             }
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
-            TestModule["bjs_testOptionalNumber"] = function bjs_testOptionalNumber(value) {
+            TestModule["bjs_roundTripOptionalNumber"] = function bjs_roundTripOptionalNumber(value) {
                 try {
-                    imports.testOptionalNumber(swift.memory.getObject(value));
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_testOptionalString"] = function bjs_testOptionalString(value) {
-                try {
-                    imports.testOptionalString(swift.memory.getObject(value));
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_testOptionalBool"] = function bjs_testOptionalBool(value) {
-                try {
-                    imports.testOptionalBool(swift.memory.getObject(value));
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_testOptionalReturn"] = function bjs_testOptionalReturn() {
-                try {
-                    let ret = imports.testOptionalReturn();
+                    let ret = imports.roundTripOptionalNumber(swift.memory.getObject(value));
                     return swift.memory.retain(ret);
                 } catch (error) {
                     setException(error);
                     return 0
                 }
             }
-            TestModule["bjs_testOptionalNumberReturn"] = function bjs_testOptionalNumberReturn() {
+            TestModule["bjs_roundTripOptionalString"] = function bjs_roundTripOptionalString(value) {
                 try {
-                    let ret = imports.testOptionalNumberReturn();
+                    let ret = imports.roundTripOptionalString(swift.memory.getObject(value));
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_roundTripOptionalBool"] = function bjs_roundTripOptionalBool(value) {
+                try {
+                    let ret = imports.roundTripOptionalBool(swift.memory.getObject(value));
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_roundTripOptionalClass"] = function bjs_roundTripOptionalClass(value) {
+                try {
+                    let ret = imports.roundTripOptionalClass(swift.memory.getObject(value));
                     return swift.memory.retain(ret);
                 } catch (error) {
                     setException(error);

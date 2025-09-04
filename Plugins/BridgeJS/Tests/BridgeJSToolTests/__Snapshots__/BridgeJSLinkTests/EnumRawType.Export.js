@@ -238,6 +238,21 @@ export async function createInstantiator(options, swift) {
                     tmpRetString = undefined;
                     return ret;
                 },
+                roundTripOptionalTheme: function bjs_roundTripOptionalTheme(input) {
+                    const isSome = input != null;
+                    let inputId, inputBytes;
+                    if (isSome) {
+                        inputBytes = textEncoder.encode(input);
+                        inputId = swift.memory.retain(inputBytes);
+                    }
+                    instance.exports.bjs_roundTripOptionalTheme(+isSome, isSome ? inputId : 0, isSome ? inputBytes.length : 0);
+                    const optResult = tmpRetString;
+                    tmpRetString = undefined;
+                    if (inputId != undefined) {
+                        swift.memory.release(inputId);
+                    }
+                    return optResult;
+                },
                 setTSTheme: function bjs_setTSTheme(theme) {
                     const themeBytes = textEncoder.encode(theme);
                     const themeId = swift.memory.retain(themeBytes);
@@ -250,12 +265,34 @@ export async function createInstantiator(options, swift) {
                     tmpRetString = undefined;
                     return ret;
                 },
+                roundTripOptionalTSTheme: function bjs_roundTripOptionalTSTheme(input) {
+                    const isSome = input != null;
+                    let inputId, inputBytes;
+                    if (isSome) {
+                        inputBytes = textEncoder.encode(input);
+                        inputId = swift.memory.retain(inputBytes);
+                    }
+                    instance.exports.bjs_roundTripOptionalTSTheme(+isSome, isSome ? inputId : 0, isSome ? inputBytes.length : 0);
+                    const optResult = tmpRetString;
+                    tmpRetString = undefined;
+                    if (inputId != undefined) {
+                        swift.memory.release(inputId);
+                    }
+                    return optResult;
+                },
                 setFeatureFlag: function bjs_setFeatureFlag(flag) {
                     instance.exports.bjs_setFeatureFlag(flag);
                 },
                 getFeatureFlag: function bjs_getFeatureFlag() {
                     const ret = instance.exports.bjs_getFeatureFlag();
                     return ret !== 0;
+                },
+                roundTripOptionalFeatureFlag: function bjs_roundTripOptionalFeatureFlag(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalFeatureFlag(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalBool;
+                    tmpRetOptionalBool = undefined;
+                    return optResult;
                 },
                 setHttpStatus: function bjs_setHttpStatus(status) {
                     instance.exports.bjs_setHttpStatus(status);
@@ -264,12 +301,26 @@ export async function createInstantiator(options, swift) {
                     const ret = instance.exports.bjs_getHttpStatus();
                     return ret;
                 },
+                roundTripOptionalHttpStatus: function bjs_roundTripOptionalHttpStatus(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalHttpStatus(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalInt;
+                    tmpRetOptionalInt = undefined;
+                    return optResult;
+                },
                 setTSHttpStatus: function bjs_setTSHttpStatus(status) {
                     instance.exports.bjs_setTSHttpStatus(status);
                 },
                 getTSHttpStatus: function bjs_getTSHttpStatus() {
                     const ret = instance.exports.bjs_getTSHttpStatus();
                     return ret;
+                },
+                roundTripOptionalHttpStatus: function bjs_roundTripOptionalHttpStatus(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalHttpStatus(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalInt;
+                    tmpRetOptionalInt = undefined;
+                    return optResult;
                 },
                 setPriority: function bjs_setPriority(priority) {
                     instance.exports.bjs_setPriority(priority);
@@ -278,12 +329,26 @@ export async function createInstantiator(options, swift) {
                     const ret = instance.exports.bjs_getPriority();
                     return ret;
                 },
+                roundTripOptionalPriority: function bjs_roundTripOptionalPriority(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalPriority(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalInt;
+                    tmpRetOptionalInt = undefined;
+                    return optResult;
+                },
                 setFileSize: function bjs_setFileSize(size) {
                     instance.exports.bjs_setFileSize(size);
                 },
                 getFileSize: function bjs_getFileSize() {
                     const ret = instance.exports.bjs_getFileSize();
                     return ret;
+                },
+                roundTripOptionalFileSize: function bjs_roundTripOptionalFileSize(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalFileSize(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalInt;
+                    tmpRetOptionalInt = undefined;
+                    return optResult;
                 },
                 setUserId: function bjs_setUserId(id) {
                     instance.exports.bjs_setUserId(id);
@@ -292,12 +357,26 @@ export async function createInstantiator(options, swift) {
                     const ret = instance.exports.bjs_getUserId();
                     return ret;
                 },
+                roundTripOptionalUserId: function bjs_roundTripOptionalUserId(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalUserId(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalInt;
+                    tmpRetOptionalInt = undefined;
+                    return optResult;
+                },
                 setTokenId: function bjs_setTokenId(token) {
                     instance.exports.bjs_setTokenId(token);
                 },
                 getTokenId: function bjs_getTokenId() {
                     const ret = instance.exports.bjs_getTokenId();
                     return ret;
+                },
+                roundTripOptionalTokenId: function bjs_roundTripOptionalTokenId(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalTokenId(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalInt;
+                    tmpRetOptionalInt = undefined;
+                    return optResult;
                 },
                 setSessionId: function bjs_setSessionId(session) {
                     instance.exports.bjs_setSessionId(session);
@@ -306,12 +385,26 @@ export async function createInstantiator(options, swift) {
                     const ret = instance.exports.bjs_getSessionId();
                     return ret;
                 },
+                roundTripOptionalSessionId: function bjs_roundTripOptionalSessionId(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalSessionId(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalInt;
+                    tmpRetOptionalInt = undefined;
+                    return optResult;
+                },
                 setPrecision: function bjs_setPrecision(precision) {
                     instance.exports.bjs_setPrecision(precision);
                 },
                 getPrecision: function bjs_getPrecision() {
                     const ret = instance.exports.bjs_getPrecision();
                     return ret;
+                },
+                roundTripOptionalPrecision: function bjs_roundTripOptionalPrecision(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalPrecision(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalFloat;
+                    tmpRetOptionalFloat = undefined;
+                    return optResult;
                 },
                 setRatio: function bjs_setRatio(ratio) {
                     instance.exports.bjs_setRatio(ratio);
@@ -320,12 +413,12 @@ export async function createInstantiator(options, swift) {
                     const ret = instance.exports.bjs_getRatio();
                     return ret;
                 },
-                setFeatureFlag: function bjs_setFeatureFlag(featureFlag) {
-                    instance.exports.bjs_setFeatureFlag(featureFlag);
-                },
-                getFeatureFlag: function bjs_getFeatureFlag() {
-                    const ret = instance.exports.bjs_getFeatureFlag();
-                    return ret !== 0;
+                roundTripOptionalRatio: function bjs_roundTripOptionalRatio(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalRatio(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalDouble;
+                    tmpRetOptionalDouble = undefined;
+                    return optResult;
                 },
                 processTheme: function bjs_processTheme(theme) {
                     const themeBytes = textEncoder.encode(theme);

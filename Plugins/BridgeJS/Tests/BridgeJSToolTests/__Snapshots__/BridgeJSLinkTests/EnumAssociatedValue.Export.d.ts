@@ -62,9 +62,13 @@ export type Exports = {
     handle(result: APIResult): void;
     getResult(): APIResult;
     roundtripAPIResult(result: APIResult): APIResult;
+    roundTripOptionalAPIResult(result: APIResult | null): APIResult | null;
     handleComplex(result: ComplexResult): void;
     getComplexResult(): ComplexResult;
     roundtripComplexResult(result: ComplexResult): ComplexResult;
+    roundTripOptionalComplexResult(result: ComplexResult | null): ComplexResult | null;
+    roundTripOptionalUtilitiesResult(result: Utilities.Result | null): Utilities.Result | null;
+    roundTripOptionalNetworkingResult(result: NetworkingResult | null): NetworkingResult | null;
 }
 export type Imports = {
 }
