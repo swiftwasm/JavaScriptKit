@@ -469,7 +469,7 @@ enum ComplexResult {
     return name
 }
 
-@JS func roundTripOptionalWithSpaces(value: Optional< Double >) -> Optional< Double > {
+@JS func roundTripOptionalWithSpaces(value: Optional<Double>) -> Optional<Double> {
     return value
 }
 
@@ -517,10 +517,20 @@ typealias OptionalAge = Int?
     @JS var optionalName: String?
     @JS var optionalAge: Int? = nil
     @JS var optionalGreeter: Greeter? = nil
-    
+
     @JS init(optionalName: String?) {
         self.optionalName = optionalName
     }
+}
+
+@JS
+enum APIOptionalResult {
+    case success(String?)
+    case failure(Int?, Bool?)
+    case status(Bool?, Int?, String?)
+}
+@JS func roundTripOptionalAPIOptionalResult(result: APIOptionalResult?) -> APIOptionalResult? {
+    return result
 }
 
 // MARK: - Property Tests

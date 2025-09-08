@@ -1,13 +1,14 @@
 @JS class Greeter {
     @JS var name: String?
 
-    @JS init(name?: String) {
+    @JS init(name: String?) {
         self.name = name
     }
+
     @JS func greet() -> String {
         return "Hello, " + (self.name ?? "stranger") + "!"
     }
-    
+
     @JS func changeName(name: String?) {
         self.name = name
     }
@@ -23,7 +24,7 @@ class OptionalPropertyHolder {
     @JS var optionalName: String? = nil
     @JS var optionalAge: Int? = nil
     @JS var optionalGreeter: Greeter? = nil
-    
+
     @JS init() {}
 }
 
@@ -70,7 +71,7 @@ func roundTripDouble(precision: Double?) -> Double? {
     return name
 }
 
-@JS func roundTripWithSpaces(value: Optional < Double >) -> Optional < Double > {
+@JS func roundTripWithSpaces(value: Optional<Double>) -> Optional<Double> {
     return value
 }
 
@@ -80,10 +81,12 @@ typealias OptionalAge = Int?
     return age
 }
 
+typealias OptionalNameAlias = Optional<String>
+@JS func roundTripOptionalAlias(name: OptionalNameAlias) -> OptionalNameAlias {
+    return name
+}
+
 @JS
-func testMixedOptionals(firstName: String?, lastName: String?age: Int?, active: Bool) -> String? {
-    if let firstName = firstName, let lastName = lastName, let age = age {
-        return "\(firstName)-\(lastName)-\(age)-\(active)"
-    }
+func testMixedOptionals(firstName: String?, lastName: String?, age: Int?, active: Bool) -> String? {
     return nil
 }

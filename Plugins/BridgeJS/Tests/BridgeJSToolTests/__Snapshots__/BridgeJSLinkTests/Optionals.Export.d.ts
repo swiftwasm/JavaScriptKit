@@ -23,7 +23,7 @@ export interface OptionalPropertyHolder extends SwiftHeapObject {
 }
 export type Exports = {
     Greeter: {
-        new(name: string): Greeter;
+        new(name: string | null): Greeter;
     }
     OptionalPropertyHolder: {
         new(): OptionalPropertyHolder;
@@ -41,7 +41,8 @@ export type Exports = {
     roundTripMixedSwiftSyntax(name: string | null): string | null;
     roundTripWithSpaces(value: number | null): number | null;
     roundTripAlias(age: number | null): number | null;
-    testMixedOptionals(firstName: string | null, lastName: string | null): string | null;
+    roundTripOptionalAlias(name: string | null): string | null;
+    testMixedOptionals(firstName: string | null, lastName: string | null, age: number | null, active: boolean): string | null;
 }
 export type Imports = {
 }

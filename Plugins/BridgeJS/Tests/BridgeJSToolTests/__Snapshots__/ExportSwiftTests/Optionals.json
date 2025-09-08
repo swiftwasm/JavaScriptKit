@@ -12,8 +12,12 @@
             "label" : "name",
             "name" : "name",
             "type" : {
-              "string" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
 
+                  }
+                }
               }
             }
           }
@@ -563,6 +567,38 @@
       }
     },
     {
+      "abiName" : "bjs_roundTripOptionalAlias",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalAlias",
+      "parameters" : [
+        {
+          "label" : "name",
+          "name" : "name",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "string" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
       "abiName" : "bjs_testMixedOptionals",
       "effects" : {
         "isAsync" : false,
@@ -593,6 +629,28 @@
 
                 }
               }
+            }
+          }
+        },
+        {
+          "label" : "age",
+          "name" : "age",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "int" : {
+
+                }
+              }
+            }
+          }
+        },
+        {
+          "label" : "active",
+          "name" : "active",
+          "type" : {
+            "bool" : {
+
             }
           }
         }

@@ -63,7 +63,7 @@ class TypeDeclResolver {
         override func visitPost(_ node: EnumDeclSyntax) {
             visitPostNominalDecl()
         }
-        
+
         override func visit(_ node: TypeAliasDeclSyntax) -> SyntaxVisitorContinueKind {
             let name = node.name.text
             let qualifiedName = scope.map(\.name.text) + [name]
@@ -139,7 +139,7 @@ class TypeDeclResolver {
         }
         return nil
     }
-    
+
     /// Resolves a type usage node to a type alias declaration
     ///
     /// - Parameter type: The SwiftSyntax node representing a type appearance in source code.

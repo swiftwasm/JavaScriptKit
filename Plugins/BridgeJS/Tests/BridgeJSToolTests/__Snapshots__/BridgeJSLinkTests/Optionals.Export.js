@@ -187,10 +187,16 @@ export async function createInstantiator(options, swift) {
                 }
             
                 constructor(name) {
-                    const nameBytes = textEncoder.encode(name);
-                    const nameId = swift.memory.retain(nameBytes);
-                    const ret = instance.exports.bjs_Greeter_init(nameId, nameBytes.length);
-                    swift.memory.release(nameId);
+                    const isSome = name != null;
+                    let nameId, nameBytes;
+                    if (isSome) {
+                        nameBytes = textEncoder.encode(name);
+                        nameId = swift.memory.retain(nameBytes);
+                    }
+                    const ret = instance.exports.bjs_Greeter_init(+isSome, isSome ? nameId : 0, isSome ? nameBytes.length : 0);
+                    if (nameId != undefined) {
+                        swift.memory.release(nameId);
+                    }
                     return Greeter.__construct(ret);
                 }
                 greet() {
@@ -415,7 +421,22 @@ export async function createInstantiator(options, swift) {
                     tmpRetOptionalInt = undefined;
                     return optResult;
                 },
-                testMixedOptionals: function bjs_testMixedOptionals(firstName, lastName) {
+                roundTripOptionalAlias: function bjs_roundTripOptionalAlias(name) {
+                    const isSome = name != null;
+                    let nameId, nameBytes;
+                    if (isSome) {
+                        nameBytes = textEncoder.encode(name);
+                        nameId = swift.memory.retain(nameBytes);
+                    }
+                    instance.exports.bjs_roundTripOptionalAlias(+isSome, isSome ? nameId : 0, isSome ? nameBytes.length : 0);
+                    const optResult = tmpRetString;
+                    tmpRetString = undefined;
+                    if (nameId != undefined) {
+                        swift.memory.release(nameId);
+                    }
+                    return optResult;
+                },
+                testMixedOptionals: function bjs_testMixedOptionals(firstName, lastName, age, active) {
                     const isSome = firstName != null;
                     let firstNameId, firstNameBytes;
                     if (isSome) {
@@ -428,7 +449,8 @@ export async function createInstantiator(options, swift) {
                         lastNameBytes = textEncoder.encode(lastName);
                         lastNameId = swift.memory.retain(lastNameBytes);
                     }
-                    instance.exports.bjs_testMixedOptionals(+isSome, isSome ? firstNameId : 0, isSome ? firstNameBytes.length : 0, +isSome1, isSome1 ? lastNameId : 0, isSome1 ? lastNameBytes.length : 0);
+                    const isSome2 = age != null;
+                    instance.exports.bjs_testMixedOptionals(+isSome, isSome ? firstNameId : 0, isSome ? firstNameBytes.length : 0, +isSome1, isSome1 ? lastNameId : 0, isSome1 ? lastNameBytes.length : 0, +isSome2, isSome2 ? age : 0, active);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
                     if (firstNameId != undefined) {

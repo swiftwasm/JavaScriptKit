@@ -365,7 +365,9 @@ struct BridgeJSLink {
                     }
                     printer.write("} else {")
                     printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = Math.fround(value);")
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = Math.fround(value);"
+                        )
                     }
                     printer.write("}")
                 }
@@ -393,7 +395,7 @@ struct BridgeJSLink {
                     printer.indent {
                         printer.write(lines: [
                             "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len);",
-                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);"
+                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);",
                         ])
                     }
                     printer.write("}")
@@ -407,7 +409,9 @@ struct BridgeJSLink {
                     }
                     printer.write("} else {")
                     printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedSwift).memory.getObject(objectId);")
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedSwift).memory.getObject(objectId);"
+                        )
                     }
                     printer.write("}")
                 }

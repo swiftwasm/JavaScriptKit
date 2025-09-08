@@ -349,7 +349,7 @@ extension BridgeType {
             return nil
         }
     }
-    
+
     /// Returns true if this type is optional
     public var isOptional: Bool {
         if case .optional = self { return true }

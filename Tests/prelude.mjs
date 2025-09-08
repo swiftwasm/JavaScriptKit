@@ -1,7 +1,7 @@
 // @ts-check
 
 import {
-    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme, APIResult, ComplexResult
+    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme, APIResult, ComplexResult, APIOptionalResult
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
@@ -528,6 +528,29 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(optionalsHolder.optionalGreeter, null);
     testPropertyGreeter.release();
     optionalsHolder.release();
+
+    const aor1 = { tag: APIOptionalResult.Tag.Success, param0: "hello world" };
+    const aor2 = { tag: APIOptionalResult.Tag.Success, param0: null };
+    const aor3 = { tag: APIOptionalResult.Tag.Failure, param0: 404, param1: true };
+    const aor4 = { tag: APIOptionalResult.Tag.Failure, param0: 404, param1: null };
+    const aor5 = { tag: APIOptionalResult.Tag.Failure, param0: null, param1: null };
+    const aor6 = { tag: APIOptionalResult.Tag.Status, param0: true, param1: 200, param2: "OK" };
+    const aor7 = { tag: APIOptionalResult.Tag.Status, param0: true, param1: null, param2: "Partial" };
+    const aor8 = { tag: APIOptionalResult.Tag.Status, param0: null, param1: null, param2: "Zero" };
+    const aor9 = { tag: APIOptionalResult.Tag.Status, param0: false, param1: 500, param2: null };
+    const aor10 = { tag: APIOptionalResult.Tag.Status, param0: null, param1: 0, param2: "Zero" };
+
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor1), aor1);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor2), aor2);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor3), aor3);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor4), aor4);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor5), aor5);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor6), aor6);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor7), aor7);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor8), aor8);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor9), aor9);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor10), aor10);
+    assert.equal(exports.roundTripOptionalAPIOptionalResult(null), null);
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

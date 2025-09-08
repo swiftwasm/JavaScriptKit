@@ -149,11 +149,22 @@ public func _bjs_roundTripAlias(ageIsSome: Int32, ageValue: Int32) -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_roundTripOptionalAlias")
+@_cdecl("bjs_roundTripOptionalAlias")
+public func _bjs_roundTripOptionalAlias(nameIsSome: Int32, nameBytes: Int32, nameLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripOptionalAlias(name: Optional<String>.bridgeJSLiftParameter(nameIsSome, nameBytes, nameLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_testMixedOptionals")
 @_cdecl("bjs_testMixedOptionals")
-public func _bjs_testMixedOptionals(firstNameIsSome: Int32, firstNameBytes: Int32, firstNameLength: Int32, lastNameIsSome: Int32, lastNameBytes: Int32, lastNameLength: Int32) -> Void {
+public func _bjs_testMixedOptionals(firstNameIsSome: Int32, firstNameBytes: Int32, firstNameLength: Int32, lastNameIsSome: Int32, lastNameBytes: Int32, lastNameLength: Int32, ageIsSome: Int32, ageValue: Int32, active: Int32) -> Void {
     #if arch(wasm32)
-    let ret = testMixedOptionals(firstName: Optional<String>.bridgeJSLiftParameter(firstNameIsSome, firstNameBytes, firstNameLength), lastName: Optional<String>.bridgeJSLiftParameter(lastNameIsSome, lastNameBytes, lastNameLength))
+    let ret = testMixedOptionals(firstName: Optional<String>.bridgeJSLiftParameter(firstNameIsSome, firstNameBytes, firstNameLength), lastName: Optional<String>.bridgeJSLiftParameter(lastNameIsSome, lastNameBytes, lastNameLength), age: Optional<Int>.bridgeJSLiftParameter(ageIsSome, ageValue), active: Bool.bridgeJSLiftParameter(active))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -162,9 +173,9 @@ public func _bjs_testMixedOptionals(firstNameIsSome: Int32, firstNameBytes: Int3
 
 @_expose(wasm, "bjs_Greeter_init")
 @_cdecl("bjs_Greeter_init")
-public func _bjs_Greeter_init(nameBytes: Int32, nameLength: Int32) -> UnsafeMutableRawPointer {
+public func _bjs_Greeter_init(nameIsSome: Int32, nameBytes: Int32, nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = Greeter(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let ret = Greeter(name: Optional<String>.bridgeJSLiftParameter(nameIsSome, nameBytes, nameLength))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

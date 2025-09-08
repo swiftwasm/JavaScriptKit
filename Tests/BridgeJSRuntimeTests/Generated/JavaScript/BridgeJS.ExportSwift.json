@@ -1354,6 +1354,94 @@
         "API"
       ],
       "swiftCallName" : "API.NetworkingResult"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "optional" : {
+                  "_0" : {
+                    "string" : {
+
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "optional" : {
+                  "_0" : {
+                    "int" : {
+
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type" : {
+                "optional" : {
+                  "_0" : {
+                    "bool" : {
+
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "name" : "failure"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "optional" : {
+                  "_0" : {
+                    "bool" : {
+
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type" : {
+                "optional" : {
+                  "_0" : {
+                    "int" : {
+
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type" : {
+                "optional" : {
+                  "_0" : {
+                    "string" : {
+
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "name" : "status"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "APIOptionalResult",
+      "swiftCallName" : "APIOptionalResult"
     }
   ],
   "functions" : [
@@ -3685,6 +3773,38 @@
           "_0" : {
             "swiftHeapObject" : {
               "_0" : "Greeter"
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalAPIOptionalResult",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalAPIOptionalResult",
+      "parameters" : [
+        {
+          "label" : "result",
+          "name" : "result",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIOptionalResult"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "associatedValueEnum" : {
+              "_0" : "APIOptionalResult"
             }
           }
         }
