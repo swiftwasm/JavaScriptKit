@@ -435,6 +435,104 @@ enum ComplexResult {
     return result
 }
 
+// MARK: - Optionals
+
+@JS func roundTripOptionalString(name: String?) -> String? {
+    return name
+}
+
+@JS func roundTripOptionalInt(value: Int?) -> Int? {
+    return value
+}
+
+@JS func roundTripOptionalBool(flag: Bool?) -> Bool? {
+    return flag
+}
+
+@JS func roundTripOptionalFloat(number: Float?) -> Float? {
+    return number
+}
+
+@JS func roundTripOptionalDouble(precision: Double?) -> Double? {
+    return precision
+}
+
+@JS func roundTripOptionalSyntax(name: Optional<String>) -> Optional<String> {
+    return name
+}
+
+@JS func roundTripOptionalMixSyntax(name: String?) -> Optional<String> {
+    return name
+}
+
+@JS func roundTripOptionalSwiftSyntax(name: Swift.Optional<String>) -> Swift.Optional<String> {
+    return name
+}
+
+@JS func roundTripOptionalWithSpaces(value: Optional<Double>) -> Optional<Double> {
+    return value
+}
+
+typealias OptionalAge = Int?
+@JS func roundTripOptionalTypeAlias(age: OptionalAge) -> OptionalAge {
+    return age
+}
+
+@JS func roundTripOptionalStatus(value: Status?) -> Status? {
+    return value
+}
+
+@JS func roundTripOptionalTheme(value: Theme?) -> Theme? {
+    return value
+}
+
+@JS func roundTripOptionalHttpStatus(value: HttpStatus?) -> HttpStatus? {
+    return value
+}
+
+@JS func roundTripOptionalTSDirection(value: TSDirection?) -> TSDirection? {
+    return value
+}
+
+@JS func roundTripOptionalTSTheme(value: TSTheme?) -> TSTheme? {
+    return value
+}
+
+@JS func roundTripOptionalNetworkingAPIMethod(_ method: Networking.API.Method?) -> Networking.API.Method? {
+    return method
+}
+
+@JS func roundTripOptionalAPIResult(value: APIResult?) -> APIResult? {
+    return value
+}
+
+@JS func roundTripOptionalComplexResult(_ result: ComplexResult?) -> ComplexResult? {
+    return result
+}
+
+@JS func roundTripOptionalClass(value: Greeter?) -> Greeter? {
+    return value
+}
+@JS class OptionalPropertyHolder {
+    @JS var optionalName: String?
+    @JS var optionalAge: Int? = nil
+    @JS var optionalGreeter: Greeter? = nil
+
+    @JS init(optionalName: String?) {
+        self.optionalName = optionalName
+    }
+}
+
+@JS
+enum APIOptionalResult {
+    case success(String?)
+    case failure(Int?, Bool?)
+    case status(Bool?, Int?, String?)
+}
+@JS func roundTripOptionalAPIOptionalResult(result: APIOptionalResult?) -> APIOptionalResult? {
+    return result
+}
+
 // MARK: - Property Tests
 
 // Simple class for SwiftHeapObject property testing

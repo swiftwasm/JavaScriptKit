@@ -6,6 +6,7 @@
 
 export type Exports = {
     checkString(a: string): void;
+    roundtripString(a: string): string;
 }
 export type Imports = {
 }

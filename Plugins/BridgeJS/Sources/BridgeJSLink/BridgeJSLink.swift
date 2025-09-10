@@ -189,6 +189,11 @@ struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedStorageToReturnString);",
             "let \(JSGlueVariableScope.reservedStorageToReturnBytes);",
             "let \(JSGlueVariableScope.reservedStorageToReturnException);",
+            "let \(JSGlueVariableScope.reservedStorageToReturnOptionalBool);",
+            "let \(JSGlueVariableScope.reservedStorageToReturnOptionalInt);",
+            "let \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);",
+            "let \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);",
+            "let \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);",
             "let \(JSGlueVariableScope.reservedTmpRetTag);",
             "let \(JSGlueVariableScope.reservedTmpRetStrings) = [];",
             "let \(JSGlueVariableScope.reservedTmpRetInts) = [];",
@@ -233,7 +238,6 @@ struct BridgeJSLink {
                     )
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_init_memory\"] = function(sourceId, bytesPtr) {")
                 printer.indent {
                     printer.write(
@@ -245,7 +249,6 @@ struct BridgeJSLink {
                     printer.write("bytes.set(source);")
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_make_js_string\"] = function(ptr, len) {")
                 printer.indent {
                     printer.write(
@@ -256,7 +259,6 @@ struct BridgeJSLink {
                     )
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_init_memory_with_result\"] = function(ptr, len) {")
                 printer.indent {
                     printer.write(
@@ -266,7 +268,6 @@ struct BridgeJSLink {
                     printer.write("\(JSGlueVariableScope.reservedStorageToReturnBytes) = undefined;")
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_throw\"] = function(id) {")
                 printer.indent {
                     printer.write(
@@ -274,7 +275,6 @@ struct BridgeJSLink {
                     )
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_retain\"] = function(id) {")
                 printer.indent {
                     printer.write(
@@ -282,37 +282,31 @@ struct BridgeJSLink {
                     )
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_release\"] = function(id) {")
                 printer.indent {
                     printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(id);")
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_push_tag\"] = function(tag) {")
                 printer.indent {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetTag) = tag;")
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_push_int\"] = function(v) {")
                 printer.indent {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetInts).push(v | 0);")
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_push_f32\"] = function(v) {")
                 printer.indent {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetF32s).push(Math.fround(v));")
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_push_f64\"] = function(v) {")
                 printer.indent {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetF64s).push(v);")
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_push_string\"] = function(ptr, len) {")
                 printer.indent {
                     printer.write(
@@ -322,22 +316,117 @@ struct BridgeJSLink {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetStrings).push(value);")
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_pop_param_int32\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamInts).pop();")
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_pop_param_f32\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamF32s).pop();")
                 }
                 printer.write("}")
-
                 printer.write("bjs[\"swift_js_pop_param_f64\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamF64s).pop();")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_return_optional_bool\"] = function(isSome, value) {")
+                printer.indent {
+                    printer.write("if (isSome === 0) {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalBool) = null;")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalBool) = value !== 0;")
+                    }
+                    printer.write("}")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_return_optional_int\"] = function(isSome, value) {")
+                printer.indent {
+                    printer.write("if (isSome === 0) {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = null;")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = value | 0;")
+                    }
+                    printer.write("}")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_return_optional_float\"] = function(isSome, value) {")
+                printer.indent {
+                    printer.write("if (isSome === 0) {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = null;")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = Math.fround(value);"
+                        )
+                    }
+                    printer.write("}")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_return_optional_double\"] = function(isSome, value) {")
+                printer.indent {
+                    printer.write("if (isSome === 0) {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = null;")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = value;")
+                    }
+                    printer.write("}")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_return_optional_string\"] = function(isSome, ptr, len) {")
+                printer.indent {
+                    printer.write("if (isSome === 0) {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = null;")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write(lines: [
+                            "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len);",
+                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);",
+                        ])
+                    }
+                    printer.write("}")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_return_optional_object\"] = function(isSome, objectId) {")
+                printer.indent {
+                    printer.write("if (isSome === 0) {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = null;")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedSwift).memory.getObject(objectId);"
+                        )
+                    }
+                    printer.write("}")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_return_optional_heap_object\"] = function(isSome, pointer) {")
+                printer.indent {
+                    printer.write("if (isSome === 0) {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = null;")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = pointer;")
+                    }
+                    printer.write("}")
                 }
                 printer.write("}")
             }
@@ -1676,6 +1765,8 @@ extension BridgeType {
             return name ?? "any"
         case .swiftHeapObject(let name):
             return name
+        case .optional(let wrappedType):
+            return "\(wrappedType.tsType) | null"
         case .caseEnum(let name):
             return name
         case .rawValueEnum(let name, _):

@@ -4,6 +4,7 @@
 
 public enum BridgeType: Codable, Equatable, Sendable {
     case int, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
+    indirect case optional(BridgeType)
     case caseEnum(String)
     case rawValueEnum(String, SwiftEnumRawType)
     case associatedValueEnum(String)
@@ -336,6 +337,8 @@ extension BridgeType {
         case .swiftHeapObject:
             // UnsafeMutableRawPointer is returned as an i32 pointer
             return .pointer
+        case .optional(_):
+            return nil
         case .caseEnum:
             return .i32
         case .rawValueEnum(_, let rawType):
@@ -345,5 +348,11 @@ extension BridgeType {
         case .namespaceEnum:
             return nil
         }
+    }
+
+    /// Returns true if this type is optional
+    public var isOptional: Bool {
+        if case .optional = self { return true }
+        return false
     }
 }

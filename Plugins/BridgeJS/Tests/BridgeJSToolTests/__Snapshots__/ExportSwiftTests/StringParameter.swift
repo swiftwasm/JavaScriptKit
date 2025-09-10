@@ -15,3 +15,14 @@ public func _bjs_checkString(aBytes: Int32, aLength: Int32) -> Void {
     fatalError("Only available on WebAssembly")
     #endif
 }
+
+@_expose(wasm, "bjs_roundtripString")
+@_cdecl("bjs_roundtripString")
+public func _bjs_roundtripString(aBytes: Int32, aLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundtripString(a: String.bridgeJSLiftParameter(aBytes, aLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}

@@ -143,6 +143,14 @@ public class ExportSwift {
             )
         }
 
+        private func diagnoseNestedOptional(node: some SyntaxProtocol, type: String) {
+            diagnose(
+                node: node,
+                message: "Nested optional types are not supported: \(type)",
+                hint: "Use a single optional like String? instead of String?? or Optional<Optional<T>>"
+            )
+        }
+
         override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
             switch state {
             case .topLevel:
@@ -183,17 +191,32 @@ public class ExportSwift {
 
             var parameters: [Parameter] = []
             for param in node.signature.parameterClause.parameters {
-                guard let type = self.parent.lookupType(for: param.type) else {
+                let resolvedType = self.parent.lookupType(for: param.type)
+
+                if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
+                    diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)
+                    continue
+                }
+
+                guard let type = resolvedType else {
                     diagnoseUnsupportedType(node: param.type, type: param.type.trimmedDescription)
                     continue
                 }
+
                 let name = param.secondName?.text ?? param.firstName.text
                 let label = param.firstName.text
                 parameters.append(Parameter(label: label, name: name, type: type))
             }
             let returnType: BridgeType
             if let returnClause = node.signature.returnClause {
-                guard let type = self.parent.lookupType(for: returnClause.type) else {
+                let resolvedType = self.parent.lookupType(for: returnClause.type)
+
+                if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
+                    diagnoseNestedOptional(node: returnClause.type, type: returnClause.type.trimmedDescription)
+                    return nil
+                }
+
+                guard let type = resolvedType else {
                     diagnoseUnsupportedType(node: returnClause.type, type: returnClause.type.trimmedDescription)
                     return nil
                 }
@@ -538,12 +561,24 @@ public class ExportSwift {
                         switch associatedValue.type {
                         case .string, .int, .float, .double, .bool:
                             break
+                        case .optional(let wrappedType):
+                            switch wrappedType {
+                            case .string, .int, .float, .double, .bool:
+                                break
+                            default:
+                                diagnose(
+                                    node: node,
+                                    message: "Unsupported associated value type: \(associatedValue.type.swiftType)",
+                                    hint:
+                                        "Only primitive types and optional primitives (String?, Int?, Float?, Double?, Bool?) are supported in associated-value enums"
+                                )
+                            }
                         default:
                             diagnose(
                                 node: node,
                                 message: "Unsupported associated value type: \(associatedValue.type.swiftType)",
                                 hint:
-                                    "Only primitive types (String, Int, Float, Double, Bool) are supported in associated-value enums"
+                                    "Only primitive types and optional primitives (String?, Int?, Float?, Double?, Bool?) are supported in associated-value enums"
                             )
                         }
                     }
@@ -712,8 +747,46 @@ public class ExportSwift {
     }
 
     func lookupType(for type: TypeSyntax) -> BridgeType? {
-        if let primitive = BridgeType(swiftType: type.trimmedDescription) {
-            return primitive
+        // T?
+        if let optionalType = type.as(OptionalTypeSyntax.self) {
+            let wrappedType = optionalType.wrappedType
+            if let baseType = lookupType(for: wrappedType) {
+                return .optional(baseType)
+            }
+        }
+        // Optional<T>
+        if let identifierType = type.as(IdentifierTypeSyntax.self),
+            identifierType.name.text == "Optional",
+            let genericArgs = identifierType.genericArgumentClause?.arguments,
+            genericArgs.count == 1,
+            let argType = genericArgs.first?.argument
+        {
+            if let baseType = lookupType(for: argType) {
+                return .optional(baseType)
+            }
+        }
+        // Swift.Optional<T>
+        if let memberType = type.as(MemberTypeSyntax.self),
+            let baseType = memberType.baseType.as(IdentifierTypeSyntax.self),
+            baseType.name.text == "Swift",
+            memberType.name.text == "Optional",
+            let genericArgs = memberType.genericArgumentClause?.arguments,
+            genericArgs.count == 1,
+            let argType = genericArgs.first?.argument
+        {
+            if let wrappedType = lookupType(for: argType) {
+                return .optional(wrappedType)
+            }
+        }
+        if let aliasDecl = typeDeclResolver.resolveTypeAlias(type) {
+            if let resolvedType = lookupType(for: aliasDecl.initializer.value) {
+                return resolvedType
+            }
+        }
+
+        let typeName = type.trimmedDescription
+        if let primitiveType = BridgeType(swiftType: typeName) {
+            return primitiveType
         }
 
         guard let typeDecl = typeDeclResolver.resolve(type) else {
@@ -831,9 +904,18 @@ public class ExportSwift {
             } else {
                 argumentsToLift = liftingInfo.parameters.map { (name, _) in param.name + name.capitalizedFirstLetter }
             }
+
+            let typeNameForIntrinsic: String
+            switch param.type {
+            case .optional(let wrappedType):
+                typeNameForIntrinsic = "Optional<\(wrappedType.swiftType)>"
+            default:
+                typeNameForIntrinsic = param.type.swiftType
+            }
+
             liftedParameterExprs.append(
                 ExprSyntax(
-                    "\(raw: param.type.swiftType).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
+                    "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
                 )
             )
             for (name, type) in zip(argumentsToLift, liftingInfo.parameters.map { $0.type }) {
@@ -1013,7 +1095,7 @@ public class ExportSwift {
             let valueSwitch = (["switch self {"] + valueCases + ["}"]).joined(separator: "\n")
 
             return """
-                extension \(raw: typeName) {
+                extension \(raw: typeName): _BridgedSwiftCaseEnum {
                     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
                         return bridgeJSRawValue
                     }
@@ -1041,15 +1123,15 @@ public class ExportSwift {
         func renderAssociatedValueEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
             let typeName = enumDef.swiftCallName
             return """
-                private extension \(raw: typeName) {
-                    static func bridgeJSLiftParameter(_ caseId: Int32) -> \(raw: typeName) {
+                extension \(raw: typeName): _BridgedSwiftAssociatedValueEnum {
+                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> \(raw: typeName) {
                         switch caseId {
                         \(raw: generateStackLiftSwitchCases(enumDef: enumDef).joined(separator: "\n"))
                         default: fatalError("Unknown \(raw: typeName) case ID: \\(caseId)")
                         }
                     }
 
-                    func bridgeJSLowerReturn() {
+                    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
                         switch self {
                         \(raw: generateReturnSwitchCases(enumDef: enumDef).joined(separator: "\n"))
                         }
@@ -1085,6 +1167,26 @@ public class ExportSwift {
                             return "\(paramName)Float.bridgeJSLiftParameter(_swift_js_pop_param_f32())"
                         case .double:
                             return "\(paramName)Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())"
+                        case .optional(let wrappedType):
+                            switch wrappedType {
+                            case .string:
+                                return
+                                    "\(paramName)Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+                            case .int:
+                                return
+                                    "\(paramName)Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+                            case .bool:
+                                return
+                                    "\(paramName)Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+                            case .float:
+                                return
+                                    "\(paramName)Optional<Float>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f32())"
+                            case .double:
+                                return
+                                    "\(paramName)Optional<Double>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f64())"
+                            default:
+                                return ""
+                            }
                         default:
                             return "\(paramName)Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
                         }
@@ -1121,6 +1223,30 @@ public class ExportSwift {
                             bodyLines.append("_swift_js_push_f32(\(paramName))")
                         case .double:
                             bodyLines.append("_swift_js_push_f64(\(paramName))")
+                        case .optional(let wrappedType):
+                            bodyLines.append("let __bjs_isSome_\(paramName) = \(paramName) != nil")
+                            bodyLines.append("if let __bjs_unwrapped_\(paramName) = \(paramName) {")
+                            switch wrappedType {
+                            case .string:
+                                bodyLines.append("var __bjs_str_\(paramName) = __bjs_unwrapped_\(paramName)")
+                                bodyLines.append("__bjs_str_\(paramName).withUTF8 { ptr in")
+                                bodyLines.append("_swift_js_push_string(ptr.baseAddress, Int32(ptr.count))")
+                                bodyLines.append("}")
+                            case .int:
+                                bodyLines.append("_swift_js_push_int(Int32(__bjs_unwrapped_\(paramName)))")
+                            case .bool:
+                                bodyLines.append("_swift_js_push_int(__bjs_unwrapped_\(paramName) ? 1 : 0)")
+                            case .float:
+                                bodyLines.append("_swift_js_push_f32(__bjs_unwrapped_\(paramName))")
+                            case .double:
+                                bodyLines.append("_swift_js_push_f64(__bjs_unwrapped_\(paramName))")
+                            default:
+                                bodyLines.append(
+                                    "preconditionFailure(\"BridgeJS: unsupported optional wrapped type in generated code\")"
+                                )
+                            }
+                            bodyLines.append("}")
+                            bodyLines.append("_swift_js_push_int(__bjs_isSome_\(paramName) ? 1 : 0)")
                         default:
                             bodyLines.append(
                                 "preconditionFailure(\"BridgeJS: unsupported associated value type in generated code\")"
@@ -1377,6 +1503,7 @@ extension BridgeType {
         case .jsObject(let name?): return name
         case .swiftHeapObject(let name): return name
         case .void: return "Void"
+        case .optional(let wrappedType): return "Optional<\(wrappedType.swiftType)>"
         case .caseEnum(let name): return name
         case .rawValueEnum(let name, _): return name
         case .associatedValueEnum(let name): return name
@@ -1411,6 +1538,10 @@ extension BridgeType {
         case .jsObject: return .jsObject
         case .swiftHeapObject: return .swiftHeapObject
         case .void: return .void
+        case .optional(let wrappedType):
+            var optionalParams: [(name: String, type: WasmCoreType)] = [("isSome", .i32)]
+            optionalParams.append(contentsOf: try wrappedType.liftParameterInfo().parameters)
+            return LiftingIntrinsicInfo(parameters: optionalParams)
         case .caseEnum: return .caseEnum
         case .rawValueEnum(_, let rawType):
             switch rawType {
@@ -1446,6 +1577,7 @@ extension BridgeType {
         static let caseEnum = LoweringIntrinsicInfo(returnType: .i32)
         static let rawValueEnum = LoweringIntrinsicInfo(returnType: .i32)
         static let associatedValueEnum = LoweringIntrinsicInfo(returnType: nil)
+        static let optional = LoweringIntrinsicInfo(returnType: nil)
     }
 
     func loweringReturnInfo() throws -> LoweringIntrinsicInfo {
@@ -1458,6 +1590,7 @@ extension BridgeType {
         case .jsObject: return .jsObject
         case .swiftHeapObject: return .swiftHeapObject
         case .void: return .void
+        case .optional: return .optional
         case .caseEnum: return .caseEnum
         case .rawValueEnum(_, let rawType):
             switch rawType {

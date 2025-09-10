@@ -35,8 +35,10 @@ export type Exports = {
     setDirection(direction: Direction): void;
     getDirection(): Direction;
     processDirection(input: Direction): Status;
+    roundTripOptionalDirection(input: Direction | null): Direction | null;
     setTSDirection(direction: TSDirection): void;
     getTSDirection(): TSDirection;
+    roundTripOptionalTSDirection(input: TSDirection | null): TSDirection | null;
 }
 export type Imports = {
 }

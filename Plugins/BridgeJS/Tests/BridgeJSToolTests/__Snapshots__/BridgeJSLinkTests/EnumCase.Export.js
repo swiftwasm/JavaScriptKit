@@ -37,6 +37,11 @@ export async function createInstantiator(options, swift) {
     let tmpRetString;
     let tmpRetBytes;
     let tmpRetException;
+    let tmpRetOptionalBool;
+    let tmpRetOptionalInt;
+    let tmpRetOptionalFloat;
+    let tmpRetOptionalDouble;
+    let tmpRetOptionalHeapObject;
     let tmpRetTag;
     let tmpRetStrings = [];
     let tmpRetInts = [];
@@ -107,6 +112,56 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_pop_param_f64"] = function() {
                 return tmpParamF64s.pop();
             }
+            bjs["swift_js_return_optional_bool"] = function(isSome, value) {
+                if (isSome === 0) {
+                    tmpRetOptionalBool = null;
+                } else {
+                    tmpRetOptionalBool = value !== 0;
+                }
+            }
+            bjs["swift_js_return_optional_int"] = function(isSome, value) {
+                if (isSome === 0) {
+                    tmpRetOptionalInt = null;
+                } else {
+                    tmpRetOptionalInt = value | 0;
+                }
+            }
+            bjs["swift_js_return_optional_float"] = function(isSome, value) {
+                if (isSome === 0) {
+                    tmpRetOptionalFloat = null;
+                } else {
+                    tmpRetOptionalFloat = Math.fround(value);
+                }
+            }
+            bjs["swift_js_return_optional_double"] = function(isSome, value) {
+                if (isSome === 0) {
+                    tmpRetOptionalDouble = null;
+                } else {
+                    tmpRetOptionalDouble = value;
+                }
+            }
+            bjs["swift_js_return_optional_string"] = function(isSome, ptr, len) {
+                if (isSome === 0) {
+                    tmpRetString = null;
+                } else {
+                    const bytes = new Uint8Array(memory.buffer, ptr, len);
+                    tmpRetString = textDecoder.decode(bytes);
+                }
+            }
+            bjs["swift_js_return_optional_object"] = function(isSome, objectId) {
+                if (isSome === 0) {
+                    tmpRetString = null;
+                } else {
+                    tmpRetString = swift.memory.getObject(objectId);
+                }
+            }
+            bjs["swift_js_return_optional_heap_object"] = function(isSome, pointer) {
+                if (isSome === 0) {
+                    tmpRetOptionalHeapObject = null;
+                } else {
+                    tmpRetOptionalHeapObject = pointer;
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;
@@ -131,12 +186,26 @@ export async function createInstantiator(options, swift) {
                     const ret = instance.exports.bjs_processDirection(input);
                     return ret;
                 },
+                roundTripOptionalDirection: function bjs_roundTripOptionalDirection(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalDirection(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalInt;
+                    tmpRetOptionalInt = undefined;
+                    return optResult;
+                },
                 setTSDirection: function bjs_setTSDirection(direction) {
                     instance.exports.bjs_setTSDirection(direction);
                 },
                 getTSDirection: function bjs_getTSDirection() {
                     const ret = instance.exports.bjs_getTSDirection();
                     return ret;
+                },
+                roundTripOptionalTSDirection: function bjs_roundTripOptionalTSDirection(input) {
+                    const isSome = input != null;
+                    instance.exports.bjs_roundTripOptionalTSDirection(+isSome, isSome ? input : 0);
+                    const optResult = tmpRetOptionalInt;
+                    tmpRetOptionalInt = undefined;
+                    return optResult;
                 },
             };
         },

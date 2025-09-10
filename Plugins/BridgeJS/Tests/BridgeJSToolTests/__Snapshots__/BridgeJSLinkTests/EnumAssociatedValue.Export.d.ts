@@ -32,6 +32,17 @@ export const ComplexResult: {
 export type ComplexResult =
   { tag: typeof ComplexResult.Tag.Success; param0: string } | { tag: typeof ComplexResult.Tag.Error; param0: string; param1: number } | { tag: typeof ComplexResult.Tag.Status; param0: boolean; param1: number; param2: string } | { tag: typeof ComplexResult.Tag.Coordinates; param0: number; param1: number; param2: number } | { tag: typeof ComplexResult.Tag.Comprehensive; param0: boolean; param1: boolean; param2: number; param3: number; param4: number; param5: number; param6: string; param7: string; param8: string } | { tag: typeof ComplexResult.Tag.Info }
 
+export const APIOptionalResult: {
+    readonly Tag: {
+        readonly Success: 0;
+        readonly Failure: 1;
+        readonly Status: 2;
+    };
+};
+
+export type APIOptionalResult =
+  { tag: typeof APIOptionalResult.Tag.Success; param0: string | null } | { tag: typeof APIOptionalResult.Tag.Failure; param0: number | null; param1: boolean | null } | { tag: typeof APIOptionalResult.Tag.Status; param0: boolean | null; param1: number | null; param2: string | null }
+
 export {};
 
 declare global {
@@ -62,9 +73,14 @@ export type Exports = {
     handle(result: APIResult): void;
     getResult(): APIResult;
     roundtripAPIResult(result: APIResult): APIResult;
+    roundTripOptionalAPIResult(result: APIResult | null): APIResult | null;
     handleComplex(result: ComplexResult): void;
     getComplexResult(): ComplexResult;
     roundtripComplexResult(result: ComplexResult): ComplexResult;
+    roundTripOptionalComplexResult(result: ComplexResult | null): ComplexResult | null;
+    roundTripOptionalUtilitiesResult(result: Utilities.Result | null): Utilities.Result | null;
+    roundTripOptionalNetworkingResult(result: NetworkingResult | null): NetworkingResult | null;
+    roundTripOptionalAPIOptionalResult(result: APIOptionalResult | null): APIOptionalResult | null;
 }
 export type Imports = {
 }

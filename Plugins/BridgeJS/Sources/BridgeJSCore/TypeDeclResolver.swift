@@ -8,6 +8,7 @@ class TypeDeclResolver {
     /// `Outer.Inner` type declaration is represented as ["Outer", "Inner"]
     typealias QualifiedName = [String]
     private var typeDeclByQualifiedName: [QualifiedName: TypeDecl] = [:]
+    private var typeAliasByQualifiedName: [QualifiedName: TypeAliasDeclSyntax] = [:]
 
     enum Error: Swift.Error {
         case typeNotFound(QualifiedName)
@@ -61,6 +62,13 @@ class TypeDeclResolver {
         }
         override func visitPost(_ node: EnumDeclSyntax) {
             visitPostNominalDecl()
+        }
+
+        override func visit(_ node: TypeAliasDeclSyntax) -> SyntaxVisitorContinueKind {
+            let name = node.name.text
+            let qualifiedName = scope.map(\.name.text) + [name]
+            resolver.typeAliasByQualifiedName[qualifiedName] = node
+            return .skipChildren
         }
     }
 
@@ -128,6 +136,21 @@ class TypeDeclResolver {
         }
         if let components = qualifiedComponents(from: type) {
             return lookupType(fullyQualified: components)
+        }
+        return nil
+    }
+
+    /// Resolves a type usage node to a type alias declaration
+    ///
+    /// - Parameter type: The SwiftSyntax node representing a type appearance in source code.
+    /// - Returns: The type alias declaration if found, otherwise nil.
+    func resolveTypeAlias(_ type: TypeSyntax) -> TypeAliasDeclSyntax? {
+        if let id = type.as(IdentifierTypeSyntax.self) {
+            let qualifiedName = tryQualify(type: id)
+            return typeAliasByQualifiedName[qualifiedName]
+        }
+        if let components = qualifiedComponents(from: type) {
+            return typeAliasByQualifiedName[components]
         }
         return nil
     }

@@ -6,8 +6,8 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-private extension APIResult {
-    static func bridgeJSLiftParameter(_ caseId: Int32) -> APIResult {
+extension APIResult: _BridgedSwiftAssociatedValueEnum {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
             return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
@@ -26,7 +26,7 @@ private extension APIResult {
         }
     }
 
-    func bridgeJSLowerReturn() {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
         switch self {
         case .success(let param0):
             _swift_js_push_tag(Int32(0))
@@ -52,8 +52,8 @@ private extension APIResult {
     }
 }
 
-private extension ComplexResult {
-    static func bridgeJSLiftParameter(_ caseId: Int32) -> ComplexResult {
+extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> ComplexResult {
         switch caseId {
         case 0:
             return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
@@ -74,7 +74,7 @@ private extension ComplexResult {
         }
     }
 
-    func bridgeJSLowerReturn() {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
         switch self {
         case .success(let param0):
             _swift_js_push_tag(Int32(0))

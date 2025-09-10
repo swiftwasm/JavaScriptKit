@@ -342,6 +342,143 @@ const __bjs_createNetworkingResultHelpers = () => {
         }
     });
 };
+export const APIOptionalResult = {
+    Tag: {
+        Success: 0,
+        Failure: 1,
+        Status: 2,
+    }
+};
+
+const __bjs_createAPIOptionalResultHelpers = () => {
+    return (tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift) => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case APIOptionalResult.Tag.Success: {
+                    const isSome = value.param0 != null;
+                    let id;
+                    if (isSome) {
+                        let bytes = textEncoder.encode(value.param0);
+                        id = swift.memory.retain(bytes);
+                        tmpParamInts.push(bytes.length);
+                        tmpParamInts.push(id);
+                    } else {
+                        tmpParamInts.push(0);
+                        tmpParamInts.push(0);
+                    }
+                    tmpParamInts.push(isSome ? 1 : 0);
+                    const cleanup = () => {
+                        if(id) {
+                            swift.memory.release(id);
+                        }
+                    };
+                    return { caseId: APIOptionalResult.Tag.Success, cleanup };
+                }
+                case APIOptionalResult.Tag.Failure: {
+                    const isSome = value.param1 != null;
+                    tmpParamInts.push(isSome ? (value.param1 ? 1 : 0) : 0);
+                    tmpParamInts.push(isSome ? 1 : 0);
+                    const isSome1 = value.param0 != null;
+                    tmpParamInts.push(isSome1 ? (value.param0 | 0) : 0);
+                    tmpParamInts.push(isSome1 ? 1 : 0);
+                    const cleanup = undefined;
+                    return { caseId: APIOptionalResult.Tag.Failure, cleanup };
+                }
+                case APIOptionalResult.Tag.Status: {
+                    const isSome = value.param2 != null;
+                    let id;
+                    if (isSome) {
+                        let bytes = textEncoder.encode(value.param2);
+                        id = swift.memory.retain(bytes);
+                        tmpParamInts.push(bytes.length);
+                        tmpParamInts.push(id);
+                    } else {
+                        tmpParamInts.push(0);
+                        tmpParamInts.push(0);
+                    }
+                    tmpParamInts.push(isSome ? 1 : 0);
+                    const isSome1 = value.param1 != null;
+                    tmpParamInts.push(isSome1 ? (value.param1 | 0) : 0);
+                    tmpParamInts.push(isSome1 ? 1 : 0);
+                    const isSome2 = value.param0 != null;
+                    tmpParamInts.push(isSome2 ? (value.param0 ? 1 : 0) : 0);
+                    tmpParamInts.push(isSome2 ? 1 : 0);
+                    const cleanup = () => {
+                        if(id) {
+                            swift.memory.release(id);
+                        }
+                    };
+                    return { caseId: APIOptionalResult.Tag.Status, cleanup };
+                }
+                default: throw new Error("Unknown APIOptionalResult tag: " + String(enumTag));
+            }
+        },
+        raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
+            const tag = tmpRetTag | 0;
+            switch (tag) {
+                case APIOptionalResult.Tag.Success: {
+                    const isSome = tmpRetInts.pop();
+                    let optional;
+                    if (isSome) {
+                        const string = tmpRetStrings.pop();
+                        optional = string;
+                    } else {
+                        optional = null;
+                    }
+                    return { tag: APIOptionalResult.Tag.Success, param0: optional };
+                }
+                case APIOptionalResult.Tag.Failure: {
+                    const isSome = tmpRetInts.pop();
+                    let optional;
+                    if (isSome) {
+                        const bool = tmpRetInts.pop();
+                        optional = bool;
+                    } else {
+                        optional = null;
+                    }
+                    const isSome1 = tmpRetInts.pop();
+                    let optional1;
+                    if (isSome1) {
+                        const int = tmpRetInts.pop();
+                        optional1 = int;
+                    } else {
+                        optional1 = null;
+                    }
+                    return { tag: APIOptionalResult.Tag.Failure, param0: optional1, param1: optional };
+                }
+                case APIOptionalResult.Tag.Status: {
+                    const isSome = tmpRetInts.pop();
+                    let optional;
+                    if (isSome) {
+                        const string = tmpRetStrings.pop();
+                        optional = string;
+                    } else {
+                        optional = null;
+                    }
+                    const isSome1 = tmpRetInts.pop();
+                    let optional1;
+                    if (isSome1) {
+                        const int = tmpRetInts.pop();
+                        optional1 = int;
+                    } else {
+                        optional1 = null;
+                    }
+                    const isSome2 = tmpRetInts.pop();
+                    let optional2;
+                    if (isSome2) {
+                        const bool = tmpRetInts.pop();
+                        optional2 = bool;
+                    } else {
+                        optional2 = null;
+                    }
+                    return { tag: APIOptionalResult.Tag.Status, param0: optional2, param1: optional1, param2: optional };
+                }
+                default: throw new Error("Unknown APIOptionalResult tag returned from Swift: " + String(tag));
+            }
+        }
+    });
+};
 if (typeof globalThis.Utilities === 'undefined') {
     globalThis.Utilities = {};
 }
@@ -361,6 +498,11 @@ export async function createInstantiator(options, swift) {
     let tmpRetString;
     let tmpRetBytes;
     let tmpRetException;
+    let tmpRetOptionalBool;
+    let tmpRetOptionalInt;
+    let tmpRetOptionalFloat;
+    let tmpRetOptionalDouble;
+    let tmpRetOptionalHeapObject;
     let tmpRetTag;
     let tmpRetStrings = [];
     let tmpRetInts = [];
@@ -432,6 +574,56 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_pop_param_f64"] = function() {
                 return tmpParamF64s.pop();
             }
+            bjs["swift_js_return_optional_bool"] = function(isSome, value) {
+                if (isSome === 0) {
+                    tmpRetOptionalBool = null;
+                } else {
+                    tmpRetOptionalBool = value !== 0;
+                }
+            }
+            bjs["swift_js_return_optional_int"] = function(isSome, value) {
+                if (isSome === 0) {
+                    tmpRetOptionalInt = null;
+                } else {
+                    tmpRetOptionalInt = value | 0;
+                }
+            }
+            bjs["swift_js_return_optional_float"] = function(isSome, value) {
+                if (isSome === 0) {
+                    tmpRetOptionalFloat = null;
+                } else {
+                    tmpRetOptionalFloat = Math.fround(value);
+                }
+            }
+            bjs["swift_js_return_optional_double"] = function(isSome, value) {
+                if (isSome === 0) {
+                    tmpRetOptionalDouble = null;
+                } else {
+                    tmpRetOptionalDouble = value;
+                }
+            }
+            bjs["swift_js_return_optional_string"] = function(isSome, ptr, len) {
+                if (isSome === 0) {
+                    tmpRetString = null;
+                } else {
+                    const bytes = new Uint8Array(memory.buffer, ptr, len);
+                    tmpRetString = textDecoder.decode(bytes);
+                }
+            }
+            bjs["swift_js_return_optional_object"] = function(isSome, objectId) {
+                if (isSome === 0) {
+                    tmpRetString = null;
+                } else {
+                    tmpRetString = swift.memory.getObject(objectId);
+                }
+            }
+            bjs["swift_js_return_optional_heap_object"] = function(isSome, pointer) {
+                if (isSome === 0) {
+                    tmpRetOptionalHeapObject = null;
+                } else {
+                    tmpRetOptionalHeapObject = pointer;
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;
@@ -448,6 +640,9 @@ export async function createInstantiator(options, swift) {
             
             const NetworkingResultHelpers = __bjs_createNetworkingResultHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift);
             enumHelpers.NetworkingResult = NetworkingResultHelpers;
+            
+            const APIOptionalResultHelpers = __bjs_createAPIOptionalResultHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift);
+            enumHelpers.APIOptionalResult = APIOptionalResultHelpers;
             
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
@@ -474,6 +669,25 @@ export async function createInstantiator(options, swift) {
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
+                roundTripOptionalAPIResult: function bjs_roundTripOptionalAPIResult(result) {
+                    const isSome = result != null;
+                    let resultCaseId, resultCleanup;
+                    if (isSome) {
+                        const enumResult = enumHelpers.APIResult.lower(result);
+                        resultCaseId = enumResult.caseId;
+                        resultCleanup = enumResult.cleanup;
+                    }
+                    instance.exports.bjs_roundTripOptionalAPIResult(+isSome, isSome ? resultCaseId : 0);
+                    const isNull = (tmpRetTag === -1);
+                    let optResult;
+                    if (isNull) {
+                        optResult = null;
+                    } else {
+                        optResult = enumHelpers.APIResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    }
+                    if (resultCleanup) { resultCleanup(); }
+                    return optResult;
+                },
                 handleComplex: function bjs_handleComplex(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.ComplexResult.lower(result);
                     instance.exports.bjs_handleComplex(resultCaseId);
@@ -490,6 +704,82 @@ export async function createInstantiator(options, swift) {
                     const ret = enumHelpers.ComplexResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
+                },
+                roundTripOptionalComplexResult: function bjs_roundTripOptionalComplexResult(result) {
+                    const isSome = result != null;
+                    let resultCaseId, resultCleanup;
+                    if (isSome) {
+                        const enumResult = enumHelpers.ComplexResult.lower(result);
+                        resultCaseId = enumResult.caseId;
+                        resultCleanup = enumResult.cleanup;
+                    }
+                    instance.exports.bjs_roundTripOptionalComplexResult(+isSome, isSome ? resultCaseId : 0);
+                    const isNull = (tmpRetTag === -1);
+                    let optResult;
+                    if (isNull) {
+                        optResult = null;
+                    } else {
+                        optResult = enumHelpers.ComplexResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    }
+                    if (resultCleanup) { resultCleanup(); }
+                    return optResult;
+                },
+                roundTripOptionalUtilitiesResult: function bjs_roundTripOptionalUtilitiesResult(result) {
+                    const isSome = result != null;
+                    let resultCaseId, resultCleanup;
+                    if (isSome) {
+                        const enumResult = enumHelpers.Result.lower(result);
+                        resultCaseId = enumResult.caseId;
+                        resultCleanup = enumResult.cleanup;
+                    }
+                    instance.exports.bjs_roundTripOptionalUtilitiesResult(+isSome, isSome ? resultCaseId : 0);
+                    const isNull = (tmpRetTag === -1);
+                    let optResult;
+                    if (isNull) {
+                        optResult = null;
+                    } else {
+                        optResult = enumHelpers.Result.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    }
+                    if (resultCleanup) { resultCleanup(); }
+                    return optResult;
+                },
+                roundTripOptionalNetworkingResult: function bjs_roundTripOptionalNetworkingResult(result) {
+                    const isSome = result != null;
+                    let resultCaseId, resultCleanup;
+                    if (isSome) {
+                        const enumResult = enumHelpers.NetworkingResult.lower(result);
+                        resultCaseId = enumResult.caseId;
+                        resultCleanup = enumResult.cleanup;
+                    }
+                    instance.exports.bjs_roundTripOptionalNetworkingResult(+isSome, isSome ? resultCaseId : 0);
+                    const isNull = (tmpRetTag === -1);
+                    let optResult;
+                    if (isNull) {
+                        optResult = null;
+                    } else {
+                        optResult = enumHelpers.NetworkingResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    }
+                    if (resultCleanup) { resultCleanup(); }
+                    return optResult;
+                },
+                roundTripOptionalAPIOptionalResult: function bjs_roundTripOptionalAPIOptionalResult(result) {
+                    const isSome = result != null;
+                    let resultCaseId, resultCleanup;
+                    if (isSome) {
+                        const enumResult = enumHelpers.APIOptionalResult.lower(result);
+                        resultCaseId = enumResult.caseId;
+                        resultCleanup = enumResult.cleanup;
+                    }
+                    instance.exports.bjs_roundTripOptionalAPIOptionalResult(+isSome, isSome ? resultCaseId : 0);
+                    const isNull = (tmpRetTag === -1);
+                    let optResult;
+                    if (isNull) {
+                        optResult = null;
+                    } else {
+                        optResult = enumHelpers.APIOptionalResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    }
+                    if (resultCleanup) { resultCleanup(); }
+                    return optResult;
                 },
             };
         },

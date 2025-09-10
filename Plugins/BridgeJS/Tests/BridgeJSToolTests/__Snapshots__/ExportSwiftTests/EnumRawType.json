@@ -417,6 +417,40 @@
       }
     },
     {
+      "abiName" : "bjs_roundTripOptionalTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalTheme",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "Theme",
+                  "_1" : "String"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "Theme",
+              "_1" : "String"
+            }
+          }
+        }
+      }
+    },
+    {
       "abiName" : "bjs_setTSTheme",
       "effects" : {
         "isAsync" : false,
@@ -455,6 +489,40 @@
         "rawValueEnum" : {
           "_0" : "TSTheme",
           "_1" : "String"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalTSTheme",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalTSTheme",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "TSTheme",
+                  "_1" : "String"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "TSTheme",
+              "_1" : "String"
+            }
+          }
         }
       }
     },
@@ -501,6 +569,40 @@
       }
     },
     {
+      "abiName" : "bjs_roundTripOptionalFeatureFlag",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalFeatureFlag",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "FeatureFlag",
+                  "_1" : "Bool"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "FeatureFlag",
+              "_1" : "Bool"
+            }
+          }
+        }
+      }
+    },
+    {
       "abiName" : "bjs_setHttpStatus",
       "effects" : {
         "isAsync" : false,
@@ -539,6 +641,40 @@
         "rawValueEnum" : {
           "_0" : "HttpStatus",
           "_1" : "Int"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalHttpStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalHttpStatus",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "HttpStatus",
+                  "_1" : "Int"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "HttpStatus",
+              "_1" : "Int"
+            }
+          }
         }
       }
     },
@@ -585,6 +721,40 @@
       }
     },
     {
+      "abiName" : "bjs_roundTripOptionalHttpStatus",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalHttpStatus",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "TSHttpStatus",
+                  "_1" : "Int"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "TSHttpStatus",
+              "_1" : "Int"
+            }
+          }
+        }
+      }
+    },
+    {
       "abiName" : "bjs_setPriority",
       "effects" : {
         "isAsync" : false,
@@ -623,6 +793,40 @@
         "rawValueEnum" : {
           "_0" : "Priority",
           "_1" : "Int32"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalPriority",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalPriority",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "Priority",
+                  "_1" : "Int32"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "Priority",
+              "_1" : "Int32"
+            }
+          }
         }
       }
     },
@@ -669,6 +873,40 @@
       }
     },
     {
+      "abiName" : "bjs_roundTripOptionalFileSize",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalFileSize",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "FileSize",
+                  "_1" : "Int64"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "FileSize",
+              "_1" : "Int64"
+            }
+          }
+        }
+      }
+    },
+    {
       "abiName" : "bjs_setUserId",
       "effects" : {
         "isAsync" : false,
@@ -707,6 +945,40 @@
         "rawValueEnum" : {
           "_0" : "UserId",
           "_1" : "UInt"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalUserId",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalUserId",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "UserId",
+                  "_1" : "UInt"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "UserId",
+              "_1" : "UInt"
+            }
+          }
         }
       }
     },
@@ -753,6 +1025,40 @@
       }
     },
     {
+      "abiName" : "bjs_roundTripOptionalTokenId",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalTokenId",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "TokenId",
+                  "_1" : "UInt32"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "TokenId",
+              "_1" : "UInt32"
+            }
+          }
+        }
+      }
+    },
+    {
       "abiName" : "bjs_setSessionId",
       "effects" : {
         "isAsync" : false,
@@ -791,6 +1097,40 @@
         "rawValueEnum" : {
           "_0" : "SessionId",
           "_1" : "UInt64"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripOptionalSessionId",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalSessionId",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "SessionId",
+                  "_1" : "UInt64"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "SessionId",
+              "_1" : "UInt64"
+            }
+          }
         }
       }
     },
@@ -837,6 +1177,40 @@
       }
     },
     {
+      "abiName" : "bjs_roundTripOptionalPrecision",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripOptionalPrecision",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "input",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "Precision",
+                  "_1" : "Float"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "Precision",
+              "_1" : "Float"
+            }
+          }
+        }
+      }
+    },
+    {
       "abiName" : "bjs_setRatio",
       "effects" : {
         "isAsync" : false,
@@ -879,44 +1253,36 @@
       }
     },
     {
-      "abiName" : "bjs_setFeatureFlag",
+      "abiName" : "bjs_roundTripOptionalRatio",
       "effects" : {
         "isAsync" : false,
         "isThrows" : false
       },
-      "name" : "setFeatureFlag",
+      "name" : "roundTripOptionalRatio",
       "parameters" : [
         {
           "label" : "_",
-          "name" : "featureFlag",
+          "name" : "input",
           "type" : {
-            "rawValueEnum" : {
-              "_0" : "FeatureFlag",
-              "_1" : "Bool"
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "Ratio",
+                  "_1" : "Double"
+                }
+              }
             }
           }
         }
       ],
       "returnType" : {
-        "void" : {
-
-        }
-      }
-    },
-    {
-      "abiName" : "bjs_getFeatureFlag",
-      "effects" : {
-        "isAsync" : false,
-        "isThrows" : false
-      },
-      "name" : "getFeatureFlag",
-      "parameters" : [
-
-      ],
-      "returnType" : {
-        "rawValueEnum" : {
-          "_0" : "FeatureFlag",
-          "_1" : "Bool"
+        "optional" : {
+          "_0" : {
+            "rawValueEnum" : {
+              "_0" : "Ratio",
+              "_1" : "Double"
+            }
+          }
         }
       }
     },

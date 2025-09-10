@@ -11,8 +11,8 @@ Use this page as a quick reference for how common TypeScript types appear in Swi
 | `boolean` | `Bool` |
 | TODO | `Array<T>` |
 | TODO | `Dictionary<K, V>` |
-| TODO | `Optional<T>` |
 | `T \| undefined` | TODO |
+| `T \| null` | `Optional<T>` |
 | `Promise<T>` | `JSPromise` |
 | `any` / `unknown` / `object` | `JSObject` |
 | Other types | `JSObject` |

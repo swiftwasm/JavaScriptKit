@@ -306,6 +306,22 @@ extension _JSBridgedClass {
 /// The conformance is automatically synthesized by the BridgeJS code generator.
 public protocol _BridgedSwiftEnumNoPayload {}
 
+/// A protocol that Swift case enum types (enums without raw values or associated values) conform to.
+///
+/// The conformance is automatically synthesized by the BridgeJS code generator.
+public protocol _BridgedSwiftCaseEnum {
+    @_spi(BridgeJS) static func bridgeJSLiftParameter(_ value: Int32) -> Self
+    @_spi(BridgeJS) consuming func bridgeJSLowerReturn() -> Int32
+}
+
+/// A protocol that Swift associated value enum types conform to.
+///
+/// The conformance is automatically synthesized by the BridgeJS code generator.
+public protocol _BridgedSwiftAssociatedValueEnum {
+    @_spi(BridgeJS) static func bridgeJSLiftParameter(_ caseId: Int32) -> Self
+    @_spi(BridgeJS) consuming func bridgeJSLowerReturn() -> Void
+}
+
 extension _BridgedSwiftEnumNoPayload where Self: RawRepresentable, RawValue == String {
     // MARK: ImportTS
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 { rawValue.bridgeJSLowerParameter() }
@@ -372,7 +388,7 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 @_extern(wasm, module: "bjs", name: "swift_js_push_int")
 @_spi(BridgeJS) public func _swift_js_push_int(_ value: Int32)
 #else
-@_spi(BridgeJS) public func _swift_js_return_int(_ value: Int32) {
+@_spi(BridgeJS) public func _swift_js_push_int(_ value: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
@@ -399,7 +415,7 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 @_extern(wasm, module: "bjs", name: "swift_js_pop_param_int32")
 @_spi(BridgeJS) public func _swift_js_pop_param_int32() -> Int32
 #else
-@_spi(BridgeJS) public func _swift_js_pop_param_int32() {
+@_spi(BridgeJS) public func _swift_js_pop_param_int32() -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
@@ -408,7 +424,7 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 @_extern(wasm, module: "bjs", name: "swift_js_pop_param_f32")
 @_spi(BridgeJS) public func _swift_js_pop_param_f32() -> Float32
 #else
-@_spi(BridgeJS) public func _swift_js_pop_param_f32() {
+@_spi(BridgeJS) public func _swift_js_pop_param_f32() -> Float32 {
     _onlyAvailableOnWasm()
 }
 #endif
@@ -417,7 +433,585 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 @_extern(wasm, module: "bjs", name: "swift_js_pop_param_f64")
 @_spi(BridgeJS) public func _swift_js_pop_param_f64() -> Float64
 #else
-@_spi(BridgeJS) public func _swift_js_pop_param_f64() {
+@_spi(BridgeJS) public func _swift_js_pop_param_f64() -> Float64 {
     _onlyAvailableOnWasm()
 }
 #endif
+
+// MARK: Optional Type Support
+
+extension Optional where Wrapped == Bool {
+    // MARK: ImportTS
+
+    @available(*, unavailable, message: "Optional Bool type is not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+
+    @available(*, unavailable, message: "Optional Bool type is not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Int32) -> Bool? {
+        return nil
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Bool? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Bool.bridgeJSLiftParameter(wrappedValue)
+        }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_bool")
+        func _swift_js_return_optional_bool(_ isSome: Int32, _ value: Int32)
+        #else
+        /// Sets the optional bool for return value storage
+        func _swift_js_return_optional_bool(_ isSome: Int32, _ value: Int32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+
+        switch consume self {
+        case .none:
+            _swift_js_return_optional_bool(0, 0)
+        case .some(let value):
+            _swift_js_return_optional_bool(1, value.bridgeJSLowerReturn())
+        }
+    }
+}
+
+/// Optional support for Int
+extension Optional where Wrapped == Int {
+    // MARK: ImportTS
+
+    @available(*, unavailable, message: "Optional Int type is not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public func bridgeJSLowerParameter() -> Void {}
+
+    @available(*, unavailable, message: "Optional Int type is not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Int32) -> Int? { return nil }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Int? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Int.bridgeJSLiftParameter(wrappedValue)
+        }
+    }
+
+    @_spi(BridgeJS) public func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_int")
+        func _swift_js_return_optional_int(_ isSome: Int32, _ value: Int32)
+        #else
+        /// Sets the optional int for return value storage
+        func _swift_js_return_optional_int(_ isSome: Int32, _ value: Int32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+
+        switch self {
+        case .none:
+            _swift_js_return_optional_int(0, 0)
+        case .some(let value):
+            _swift_js_return_optional_int(1, value.bridgeJSLowerReturn())
+        }
+    }
+}
+extension Optional where Wrapped == String {
+    // MARK: ImportTS
+
+    @available(*, unavailable, message: "Optional String type is not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public func bridgeJSLowerParameter() -> Void {}
+
+    @available(*, unavailable, message: "Optional String type is not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32) -> String? { return nil }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ bytes: Int32, _ count: Int32) -> String?
+    {
+        if isSome == 0 {
+            return nil
+        } else {
+            return String.bridgeJSLiftParameter(bytes, count)
+        }
+    }
+
+    @_spi(BridgeJS) public func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_string")
+        func _swift_js_return_optional_string(_ isSome: Int32, _ ptr: UnsafePointer<UInt8>?, _ len: Int32)
+        #else
+        /// Write an optional string to reserved string storage to be returned to JavaScript
+        func _swift_js_return_optional_string(_ isSome: Int32, _ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+
+        switch self {
+        case .none:
+            _swift_js_return_optional_string(0, nil, 0)
+        case .some(var value):
+            return value.withUTF8 { ptr in
+                _swift_js_return_optional_string(1, ptr.baseAddress, Int32(ptr.count))
+            }
+        }
+    }
+}
+extension Optional where Wrapped == JSObject {
+    // MARK: ImportTS
+
+    @available(*, unavailable, message: "Optional JSObject type is not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public func bridgeJSLowerParameter() -> Void {}
+
+    @available(*, unavailable, message: "Optional JSObject type is not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ objectId: Int32) -> JSObject? {
+        return nil
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ objectId: Int32) -> JSObject? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return JSObject.bridgeJSLiftParameter(objectId)
+        }
+    }
+
+    @_spi(BridgeJS) public func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_object")
+        func _swift_js_return_optional_object(_ isSome: Int32, _ objectId: Int32)
+        #else
+        /// Write an optional JSObject to reserved storage to be returned to JavaScript
+        func _swift_js_return_optional_object(_ isSome: Int32, _ objectId: Int32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+
+        switch self {
+        case .none:
+            _swift_js_return_optional_object(0, 0)
+        case .some(let value):
+            let retainedId = value.bridgeJSLowerReturn()
+            _swift_js_return_optional_object(1, retainedId)
+        }
+    }
+}
+
+/// Optional support for Swift heap objects
+extension Optional where Wrapped: _BridgedSwiftHeapObject {
+    // MARK: ImportTS
+    @available(
+        *,
+        unavailable,
+        message: "Optional Swift heap objects are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Void {}
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional Swift heap objects are not supported to be returned from imported JS functions"
+    )
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ pointer: UnsafeMutableRawPointer) -> Void {
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(
+        _ isSome: Int32,
+        _ pointer: UnsafeMutableRawPointer
+    ) -> Optional<Wrapped> {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Wrapped.bridgeJSLiftParameter(pointer)
+        }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_heap_object")
+        func _swift_js_return_optional_heap_object(_ isSome: Int32, _ pointer: UnsafeMutableRawPointer?)
+        #else
+        /// Write an optional Swift heap object to reserved storage to be returned to JavaScript
+        func _swift_js_return_optional_heap_object(_ isSome: Int32, _ pointer: UnsafeMutableRawPointer?) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+
+        switch consume self {
+        case .none:
+            _swift_js_return_optional_heap_object(0, nil)
+        case .some(let value):
+            let retainedPointer = value.bridgeJSLowerReturn()
+            _swift_js_return_optional_heap_object(1, retainedPointer)
+        }
+    }
+}
+extension Optional where Wrapped == Float {
+    // MARK: ImportTS
+
+    @available(*, unavailable, message: "Optional Float type is not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+
+    @available(*, unavailable, message: "Optional Float type is not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Float32) -> Float? {
+        return nil
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float32) -> Float? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Float.bridgeJSLiftParameter(wrappedValue)
+        }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_float")
+        func _swift_js_return_optional_float(_ isSome: Int32, _ value: Float32)
+        #else
+        /// Sets the optional float for return value storage
+        func _swift_js_return_optional_float(_ isSome: Int32, _ value: Float32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+
+        switch consume self {
+        case .none:
+            _swift_js_return_optional_float(0, 0.0)
+        case .some(let value):
+            _swift_js_return_optional_float(1, value.bridgeJSLowerReturn())
+        }
+    }
+}
+
+/// Optional support for Double
+extension Optional where Wrapped == Double {
+    // MARK: ImportTS
+
+    @available(*, unavailable, message: "Optional Double type is not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+
+    @available(*, unavailable, message: "Optional Double type is not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Float64) -> Double? {
+        return nil
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float64) -> Double? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Double.bridgeJSLiftParameter(wrappedValue)
+        }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_double")
+        func _swift_js_return_optional_double(_ isSome: Int32, _ value: Float64)
+        #else
+        /// Sets the optional double for return value storage
+        func _swift_js_return_optional_double(_ isSome: Int32, _ value: Float64) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+
+        switch consume self {
+        case .none:
+            _swift_js_return_optional_double(0, 0.0)
+        case .some(let value):
+            _swift_js_return_optional_double(1, value.bridgeJSLowerReturn())
+        }
+    }
+}
+
+/// Optional support for case enums
+extension Optional where Wrapped: _BridgedSwiftCaseEnum {
+    // MARK: ImportTS
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional case enum types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional case enum types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
+        return nil
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Wrapped.bridgeJSLiftParameter(wrappedValue)
+        }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_int")
+        func _swift_js_return_optional_int(_ isSome: Int32, _ value: Int32)
+        #else
+        /// Sets the optional int for return value storage
+        func _swift_js_return_optional_int(_ isSome: Int32, _ value: Int32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+
+        switch consume self {
+        case .none:
+            _swift_js_return_optional_int(0, 0)
+        case .some(let value):
+            _swift_js_return_optional_int(1, value.bridgeJSLowerReturn())
+        }
+    }
+}
+
+public protocol _BridgedSwiftTypeLoweredIntoVoidType {
+    // MARK: ExportSwift
+    consuming func bridgeJSLowerReturn() -> Void
+}
+
+extension Optional where Wrapped: _BridgedSwiftTypeLoweredIntoVoidType {
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        switch consume self {
+        case .none:
+            ()
+        case .some(let value):
+            value.bridgeJSLowerReturn()
+        }
+    }
+}
+
+// MARK: Optional Raw Value Enum Support
+
+extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == String {
+    // MARK: ImportTS
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional String raw value enum types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional String raw value enum types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32) -> Wrapped? { return nil }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(
+        _ isSome: Int32,
+        _ bytes: Int32,
+        _ count: Int32
+    ) -> Wrapped? {
+        let optionalRawValue = String?.bridgeJSLiftParameter(isSome, bytes, count)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        let optionalRawValue: String? = self?.rawValue
+        optionalRawValue.bridgeJSLowerReturn()
+    }
+}
+
+extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Int {
+    // MARK: ImportTS
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional Int raw value enum types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional Int raw value enum types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
+        return nil
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
+        let optionalRawValue = Int?.bridgeJSLiftParameter(isSome, wrappedValue)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        let optionalRawValue: Int? = self?.rawValue
+        optionalRawValue.bridgeJSLowerReturn()
+    }
+}
+
+extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Bool {
+    // MARK: ImportTS
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional Bool raw value enum types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional Bool raw value enum types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
+        return nil
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
+        let optionalRawValue = Bool?.bridgeJSLiftParameter(isSome, wrappedValue)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        let optionalRawValue: Bool? = self?.rawValue
+        optionalRawValue.bridgeJSLowerReturn()
+    }
+}
+
+extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Float {
+    // MARK: ImportTS
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional Float raw value enum types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional Float raw value enum types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Float32) -> Wrapped? {
+        return nil
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float32) -> Wrapped? {
+        let optionalRawValue = Float?.bridgeJSLiftParameter(isSome, wrappedValue)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        let optionalRawValue: Float? = self?.rawValue
+        optionalRawValue.bridgeJSLowerReturn()
+    }
+}
+
+extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Double {
+    // MARK: ImportTS
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional Double raw value enum types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional Double raw value enum types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Float64) -> Wrapped? {
+        return nil
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float64) -> Wrapped? {
+        let optionalRawValue = Double?.bridgeJSLiftParameter(isSome, wrappedValue)
+        return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        let optionalRawValue: Double? = self?.rawValue
+        optionalRawValue.bridgeJSLowerReturn()
+    }
+}
+
+// MARK: Optional Associated Value Enum Support
+
+extension Optional where Wrapped: _BridgedSwiftAssociatedValueEnum {
+    // MARK: ImportTS
+    @available(
+        *,
+        unavailable,
+        message: "Optional associated value enums are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {
+        fatalError("Optional associated value enum bridgeJSLowerParameter is not supported for ImportTS")
+    }
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional associated value enums are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ caseId: Int32) -> Wrapped? { return nil }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ caseId: Int32) -> Wrapped? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Wrapped.bridgeJSLiftParameter(caseId)
+        }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_push_tag")
+        func _swift_js_push_tag(_ tag: Int32)
+        #else
+        func _swift_js_push_tag(_ tag: Int32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+
+        switch consume self {
+        case .none:
+            _swift_js_push_tag(-1)  // Use -1 as sentinel for null
+        case .some(let value):
+            value.bridgeJSLowerReturn()
+        }
+    }
+}

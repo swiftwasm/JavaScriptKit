@@ -13,6 +13,9 @@ enum APIResult {
 @JS func roundtripAPIResult(result: APIResult) -> APIResult {
     return result
 }
+@JS func roundTripOptionalAPIResult(result: APIResult?) -> APIResult? {
+    return result
+}
 
 @JS
 enum ComplexResult {
@@ -29,6 +32,9 @@ enum ComplexResult {
 @JS func roundtripComplexResult(_ result: ComplexResult) -> ComplexResult {
     return result
 }
+@JS func roundTripOptionalComplexResult(result: ComplexResult?) -> ComplexResult? {
+    return result
+}
 
 @JS
 enum Utilities {
@@ -39,8 +45,26 @@ enum Utilities {
     }
 }
 
+@JS func roundTripOptionalUtilitiesResult(result: Utilities.Result?) -> Utilities.Result? {
+    return result
+}
+
 @JS(namespace: "API")
 @JS enum NetworkingResult {
     case success(String)
     case failure(String, Int)
+}
+
+@JS func roundTripOptionalNetworkingResult(result: NetworkingResult?) -> NetworkingResult? {
+    return result
+}
+
+@JS
+enum APIOptionalResult {
+    case success(String?)
+    case failure(Int?, Bool?)
+    case status(Bool?, Int?, String?)
+}
+@JS func roundTripOptionalAPIOptionalResult(result: APIOptionalResult?) -> APIOptionalResult? {
+    return result
 }

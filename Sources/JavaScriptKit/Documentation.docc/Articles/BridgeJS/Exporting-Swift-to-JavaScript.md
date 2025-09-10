@@ -66,4 +66,5 @@ This command will:
 - <doc:Exporting-Swift-Function>
 - <doc:Exporting-Swift-Class>
 - <doc:Exporting-Swift-Enum>
+- <doc:Exporting-Swift-Optional>
 - <doc:Using-Namespace>

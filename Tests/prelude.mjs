@@ -1,7 +1,7 @@
 // @ts-check
 
 import {
-    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme, APIResult, ComplexResult
+    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme, APIResult, ComplexResult, APIOptionalResult
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
@@ -229,26 +229,26 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(ph.lazyValue, "computed lazily");
     ph.lazyValue = "modified lazy";
     assert.equal(ph.lazyValue, "modified lazy");
-    
+
     // Test computed read-write property
     assert.equal(ph.computedReadWrite, "Value: 456");
     ph.computedReadWrite = "Value: 777";
     assert.equal(ph.intValue, 777); // Should have parsed and set intValue
     assert.equal(ph.computedReadWrite, "Value: 777");
-    
+
     // Test computed readonly property  
     assert.equal(ph.computedReadonly, 1554); // intValue * 2 = 777 * 2
-    
+
     // Test property with observers
     // Sync observedProperty to match current intValue, then reset counters for clean test
     ph.observedProperty = 777; // Sync with current intValue after computed property changed it
     exports.resetObserverCounts(); // Reset counters to start fresh test
-    
+
     // Set property from JavaScript and verify observers are called
     ph.observedProperty = 100;
     assert.equal(ph.observedProperty, 100);
     let afterSetStats = exports.getObserverStats();
-    
+
     // Verify willSet and didSet were called
     // The stats should show: willSet:1,didSet:1,willSetOld:777,willSetNew:100,didSetOld:777,didSetNew:100
     assert(afterSetStats.includes("willSet:1"), `willSet should be called once, got: ${afterSetStats}`);
@@ -257,12 +257,12 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert(afterSetStats.includes("willSetNew:100"), `willSet should see new value 100, got: ${afterSetStats}`);
     assert(afterSetStats.includes("didSetOld:777"), `didSet should see old value 777, got: ${afterSetStats}`);
     assert(afterSetStats.includes("didSetNew:100"), `didSet should see new value 100, got: ${afterSetStats}`);
-    
+
     // Set property to a different value and verify observers are called again
     ph.observedProperty = 200;
     assert.equal(ph.observedProperty, 200);
     let afterSecondSetStats = exports.getObserverStats();
-    
+
     // Now should be: willSet:2,didSet:2,willSetOld:100,willSetNew:200,didSetOld:100,didSetNew:200
     assert(afterSecondSetStats.includes("willSet:2"), `willSet should be called twice, got: ${afterSecondSetStats}`);
     assert(afterSecondSetStats.includes("didSet:2"), `didSet should be called twice, got: ${afterSecondSetStats}`);
@@ -463,6 +463,94 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 
     assert.deepEqual(exports.makeAPINetworkingResultSuccess("Connected"), { tag: globalThis.API.NetworkingResult.Tag.Success, param0: "Connected" });
     assert.deepEqual(exports.makeAPINetworkingResultFailure("Timeout", 408), { tag: globalThis.API.NetworkingResult.Tag.Failure, param0: "Timeout", param1: 408 });
+
+    assert.equal(exports.roundTripOptionalString(null), null);
+    assert.equal(exports.roundTripOptionalInt(null), null);
+    assert.equal(exports.roundTripOptionalBool(null), null);
+    assert.equal(exports.roundTripOptionalFloat(null), null);
+    assert.equal(exports.roundTripOptionalDouble(null), null);
+
+    assert.equal(exports.roundTripOptionalString("Hello"), "Hello");
+    assert.equal(exports.roundTripOptionalInt(42), 42);
+    assert.equal(exports.roundTripOptionalBool(true), true);
+    assert.equal(exports.roundTripOptionalFloat(3.141592502593994), 3.141592502593994); // Float32 precision
+    assert.equal(exports.roundTripOptionalDouble(2.718), 2.718);
+
+    assert.equal(exports.roundTripOptionalSyntax(null), null);
+    assert.equal(exports.roundTripOptionalSyntax("Test"), "Test");
+    assert.equal(exports.roundTripOptionalMixSyntax(null), null);
+    assert.equal(exports.roundTripOptionalMixSyntax("Mix"), "Mix");
+    assert.equal(exports.roundTripOptionalSwiftSyntax(null), null);
+    assert.equal(exports.roundTripOptionalSwiftSyntax("Swift"), "Swift");
+    assert.equal(exports.roundTripOptionalWithSpaces(null), null);
+    assert.equal(exports.roundTripOptionalWithSpaces(1.618), 1.618);
+    assert.equal(exports.roundTripOptionalTypeAlias(null), null);
+    assert.equal(exports.roundTripOptionalTypeAlias(25), 25);
+    assert.equal(exports.roundTripOptionalStatus(Status.Success), Status.Success);
+    assert.equal(exports.roundTripOptionalTheme(Theme.Light), Theme.Light);
+    assert.equal(exports.roundTripOptionalHttpStatus(HttpStatus.Ok), HttpStatus.Ok);
+    assert.equal(exports.roundTripOptionalTSDirection(TSDirection.North), TSDirection.North);
+    assert.equal(exports.roundTripOptionalTSTheme(TSTheme.Light), TSTheme.Light);
+    assert.equal(exports.roundTripOptionalNetworkingAPIMethod(globalThis.Networking.API.Method.Get), globalThis.Networking.API.Method.Get);
+    assert.deepEqual(exports.roundTripOptionalAPIResult(p1), p1);
+    assert.deepEqual(exports.roundTripOptionalComplexResult(cl1), cl1);
+
+    const optionalGreeter = new exports.Greeter("Schrödinger");
+    const optionalGreeter2 = exports.roundTripOptionalClass(optionalGreeter);
+    assert.equal(optionalGreeter2?.greet() ?? "", "Hello, Schrödinger!");
+    assert.equal(optionalGreeter2?.name ?? "", "Schrödinger");
+    assert.equal(optionalGreeter2?.prefix ?? "", "Hello");
+    assert.equal(exports.roundTripOptionalClass(null), null);
+    optionalGreeter.release();
+    optionalGreeter2?.release();
+
+    const optionalsHolder = new exports.OptionalPropertyHolder(null);
+
+    assert.equal(optionalsHolder.optionalName, null);
+    assert.equal(optionalsHolder.optionalAge, null);
+    assert.equal(optionalsHolder.optionalGreeter, null);
+
+    optionalsHolder.optionalName = "Alice";
+    optionalsHolder.optionalAge = 25;
+    assert.equal(optionalsHolder.optionalName, "Alice");
+    assert.equal(optionalsHolder.optionalAge, 25);
+
+    const testPropertyGreeter = new exports.Greeter("Bob");
+    optionalsHolder.optionalGreeter = testPropertyGreeter;
+    assert.equal(optionalsHolder.optionalGreeter.greet(), "Hello, Bob!");
+    assert.equal(optionalsHolder.optionalGreeter.name, "Bob");
+
+    optionalsHolder.optionalName = null;
+    optionalsHolder.optionalAge = null;
+    optionalsHolder.optionalGreeter = null;
+    assert.equal(optionalsHolder.optionalName, null);
+    assert.equal(optionalsHolder.optionalAge, null);
+    assert.equal(optionalsHolder.optionalGreeter, null);
+    testPropertyGreeter.release();
+    optionalsHolder.release();
+
+    const aor1 = { tag: APIOptionalResult.Tag.Success, param0: "hello world" };
+    const aor2 = { tag: APIOptionalResult.Tag.Success, param0: null };
+    const aor3 = { tag: APIOptionalResult.Tag.Failure, param0: 404, param1: true };
+    const aor4 = { tag: APIOptionalResult.Tag.Failure, param0: 404, param1: null };
+    const aor5 = { tag: APIOptionalResult.Tag.Failure, param0: null, param1: null };
+    const aor6 = { tag: APIOptionalResult.Tag.Status, param0: true, param1: 200, param2: "OK" };
+    const aor7 = { tag: APIOptionalResult.Tag.Status, param0: true, param1: null, param2: "Partial" };
+    const aor8 = { tag: APIOptionalResult.Tag.Status, param0: null, param1: null, param2: "Zero" };
+    const aor9 = { tag: APIOptionalResult.Tag.Status, param0: false, param1: 500, param2: null };
+    const aor10 = { tag: APIOptionalResult.Tag.Status, param0: null, param1: 0, param2: "Zero" };
+
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor1), aor1);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor2), aor2);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor3), aor3);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor4), aor4);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor5), aor5);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor6), aor6);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor7), aor7);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor8), aor8);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor9), aor9);
+    assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor10), aor10);
+    assert.equal(exports.roundTripOptionalAPIOptionalResult(null), null);
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

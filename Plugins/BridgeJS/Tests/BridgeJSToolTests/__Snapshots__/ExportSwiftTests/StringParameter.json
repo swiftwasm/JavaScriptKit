@@ -29,6 +29,30 @@
 
         }
       }
+    },
+    {
+      "abiName" : "bjs_roundtripString",
+      "effects" : {
+        "isAsync" : false,
+        "isThrows" : false
+      },
+      "name" : "roundtripString",
+      "parameters" : [
+        {
+          "label" : "a",
+          "name" : "a",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
     }
   ],
   "moduleName" : "TestModule"

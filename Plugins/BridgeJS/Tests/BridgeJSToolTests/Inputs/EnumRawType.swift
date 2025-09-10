@@ -75,42 +75,51 @@
 
 @JS func setTheme(_ theme: Theme)
 @JS func getTheme() -> Theme
+@JS func roundTripOptionalTheme(_ input: Theme?) -> Theme?
 
 @JS func setTSTheme(_ theme: TSTheme)
 @JS func getTSTheme() -> TSTheme
+@JS func roundTripOptionalTSTheme(_ input: TSTheme?) -> TSTheme?
 
 @JS func setFeatureFlag(_ flag: FeatureFlag)
 @JS func getFeatureFlag() -> FeatureFlag
+@JS func roundTripOptionalFeatureFlag(_ input: FeatureFlag?) -> FeatureFlag?
 
 @JS func setHttpStatus(_ status: HttpStatus)
 @JS func getHttpStatus() -> HttpStatus
+@JS func roundTripOptionalHttpStatus(_ input: HttpStatus?) -> HttpStatus?
 
 @JS func setTSHttpStatus(_ status: TSHttpStatus)
 @JS func getTSHttpStatus() -> TSHttpStatus
+@JS func roundTripOptionalHttpStatus(_ input: TSHttpStatus?) -> TSHttpStatus?
 
 @JS func setPriority(_ priority: Priority)
 @JS func getPriority() -> Priority
+@JS func roundTripOptionalPriority(_ input: Priority?) -> Priority?
 
 @JS func setFileSize(_ size: FileSize)
 @JS func getFileSize() -> FileSize
+@JS func roundTripOptionalFileSize(_ input: FileSize?) -> FileSize?
 
 @JS func setUserId(_ id: UserId)
 @JS func getUserId() -> UserId
+@JS func roundTripOptionalUserId(_ input: UserId?) -> UserId?
 
 @JS func setTokenId(_ token: TokenId)
 @JS func getTokenId() -> TokenId
+@JS func roundTripOptionalTokenId(_ input: TokenId?) -> TokenId?
 
 @JS func setSessionId(_ session: SessionId)
 @JS func getSessionId() -> SessionId
+@JS func roundTripOptionalSessionId(_ input: SessionId?) -> SessionId?
 
 @JS func setPrecision(_ precision: Precision)
 @JS func getPrecision() -> Precision
+@JS func roundTripOptionalPrecision(_ input: Precision?) -> Precision?
 
 @JS func setRatio(_ ratio: Ratio)
 @JS func getRatio() -> Ratio
-
-@JS func setFeatureFlag(_ featureFlag: FeatureFlag)
-@JS func getFeatureFlag() -> FeatureFlag
+@JS func roundTripOptionalRatio(_ input: Ratio?) -> Ratio?
 
 @JS func processTheme(_ theme: Theme) -> HttpStatus
 @JS func convertPriority(_ status: HttpStatus) -> Priority
