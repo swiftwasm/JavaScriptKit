@@ -759,7 +759,7 @@ public class ExportSwift {
             identifierType.name.text == "Optional",
             let genericArgs = identifierType.genericArgumentClause?.arguments,
             genericArgs.count == 1,
-            let argType = genericArgs.first?.argument
+            let argType = TypeSyntax(genericArgs.first?.argument)
         {
             if let baseType = lookupType(for: argType) {
                 return .optional(baseType)
@@ -772,7 +772,7 @@ public class ExportSwift {
             memberType.name.text == "Optional",
             let genericArgs = memberType.genericArgumentClause?.arguments,
             genericArgs.count == 1,
-            let argType = genericArgs.first?.argument
+            let argType = TypeSyntax(genericArgs.first?.argument)
         {
             if let wrappedType = lookupType(for: argType) {
                 return .optional(wrappedType)
