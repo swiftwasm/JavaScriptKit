@@ -7,8 +7,8 @@
 /// property if you need those.
 public final class JSDate: JSBridgedClass {
     /// The constructor function used to create new `Date` objects.
-    public static var constructor: JSFunction? { _constructor.wrappedValue }
-    private static let _constructor = LazyThreadLocal(initialize: { JSObject.global.Date.function })
+    public static var constructor: JSObject? { _constructor.wrappedValue }
+    private static let _constructor = LazyThreadLocal(initialize: { JSObject.global.Date.object })
 
     /// The underlying JavaScript `Date` object.
     public let jsObject: JSObject

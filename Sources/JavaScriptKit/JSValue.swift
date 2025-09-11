@@ -9,7 +9,6 @@ public enum JSValue: Equatable {
     case object(JSObject)
     case null
     case undefined
-    case function(JSFunction)
     case symbol(JSSymbol)
     case bigInt(JSBigInt)
 
@@ -60,14 +59,8 @@ public enum JSValue: Equatable {
         }
     }
 
-    /// Returns the `JSFunction` of this JS value if its type is function.
-    /// If not, returns `nil`.
-    public var function: JSFunction? {
-        switch self {
-        case .function(let function): return function
-        default: return nil
-        }
-    }
+    // @available(*, deprecated, renamed: "object", message: "Use the .object property instead")
+    public var function: JSObject? { object }
 
     /// Returns the `JSSymbol` of this JS value if its type is function.
     /// If not, returns `nil`.
@@ -180,6 +173,9 @@ extension JSValue {
     public static func function(_ closure: JSClosure) -> JSValue {
         .object(closure)
     }
+
+    @available(*, deprecated, renamed: "object", message: "Use .object(function) instead")
+    public static func function(_ function: JSObject) -> JSValue { .object(function) }
 }
 
 extension JSValue: ExpressibleByStringLiteral {
@@ -271,13 +267,11 @@ extension JSValue {
     /// Returns `false` for everything except objects and functions.
     /// - Parameter constructor: The constructor function to check.
     /// - Returns: The result of `instanceof` in the JavaScript environment.
-    public func isInstanceOf(_ constructor: JSFunction) -> Bool {
+    public func isInstanceOf(_ constructor: JSObject) -> Bool {
         switch self {
         case .boolean, .string, .number, .null, .undefined, .symbol, .bigInt:
             return false
         case .object(let ref):
-            return ref.isInstanceOf(constructor)
-        case .function(let ref):
             return ref.isInstanceOf(constructor)
         }
     }
@@ -287,7 +281,7 @@ extension JSValue: CustomStringConvertible {
     public var description: String {
         // per https://tc39.es/ecma262/multipage/text-processing.html#sec-string-constructor-string-value
         // this always returns a string
-        JSObject.global.String.function!(self).string!
+        JSObject.global.String.object!(self).string!
     }
 }
 

@@ -4,8 +4,8 @@ import _CJavaScriptKit
 /// A `JSFunction` wrapper that enables throwing function calls.
 /// Exceptions produced by JavaScript functions will be thrown as `JSValue`.
 public class JSThrowingFunction {
-    private let base: JSFunction
-    public init(_ base: JSFunction) {
+    private let base: JSObject
+    public init(_ base: JSObject) {
         self.base = base
     }
 
@@ -73,7 +73,7 @@ public class JSThrowingFunction {
 }
 
 private func invokeJSFunction(
-    _ jsFunc: JSFunction,
+    _ jsFunc: JSObject,
     arguments: [ConvertibleToJSValue],
     this: JSObject?
 ) throws -> JSValue {

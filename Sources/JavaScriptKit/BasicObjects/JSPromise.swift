@@ -12,8 +12,8 @@ public final class JSPromise: JSBridgedClass {
         .object(jsObject)
     }
 
-    public static var constructor: JSFunction? {
-        JSObject.global.Promise.function!
+    public static var constructor: JSObject? {
+        JSObject.global.Promise.object!
     }
 
     /// This private initializer assumes that the passed object is a JavaScript `Promise`
@@ -54,8 +54,8 @@ public final class JSPromise: JSBridgedClass {
         let closure = JSOneshotClosure { arguments in
             // The arguments are always coming from the `Promise` constructor, so we should be
             // safe to assume their type here
-            let resolve = arguments[0].function!
-            let reject = arguments[1].function!
+            let resolve = arguments[0].object!
+            let reject = arguments[1].object!
 
             resolver {
                 switch $0 {

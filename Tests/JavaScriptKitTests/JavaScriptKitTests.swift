@@ -243,14 +243,8 @@ class JavaScriptKitTests: XCTestCase {
         let bigInt: JSValue = js.bi
 
         XCTAssertNotNil(JSObject.construct(from: object))
-        XCTAssertEqual(JSObject.construct(from: function).map { $0 is JSFunction }, .some(true))
         XCTAssertEqual(JSObject.construct(from: symbol).map { $0 is JSSymbol }, .some(true))
         XCTAssertEqual(JSObject.construct(from: bigInt).map { $0 is JSBigInt }, .some(true))
-
-        XCTAssertNil(JSFunction.construct(from: object))
-        XCTAssertNotNil(JSFunction.construct(from: function))
-        XCTAssertNil(JSFunction.construct(from: symbol))
-        XCTAssertNil(JSFunction.construct(from: bigInt))
 
         XCTAssertNil(JSSymbol.construct(from: object))
         XCTAssertNil(JSSymbol.construct(from: function))

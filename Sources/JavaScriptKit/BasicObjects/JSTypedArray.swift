@@ -7,7 +7,7 @@ import _CJavaScriptKit
 public protocol TypedArrayElement {
     associatedtype Element: ConvertibleToJSValue, ConstructibleFromJSValue = Self
     /// The constructor function for the TypedArray class for this particular kind of number
-    static var typedArrayClass: JSFunction { get }
+    static var typedArrayClass: JSObject { get }
 }
 
 /// A wrapper around all [JavaScript `TypedArray`
@@ -15,7 +15,7 @@ public protocol TypedArrayElement {
 /// that exposes their properties in a type-safe way.
 public final class JSTypedArray<Traits>: JSBridgedClass, ExpressibleByArrayLiteral where Traits: TypedArrayElement {
     public typealias Element = Traits.Element
-    public class var constructor: JSFunction? { Traits.typedArrayClass }
+    public class var constructor: JSObject? { Traits.typedArrayClass }
     public var jsObject: JSObject
 
     public subscript(_ index: Int) -> Element {
@@ -141,11 +141,11 @@ public final class JSTypedArray<Traits>: JSBridgedClass, ExpressibleByArrayLiter
 }
 
 extension Int: TypedArrayElement {
-    public static var typedArrayClass: JSFunction {
+    public static var typedArrayClass: JSObject {
         #if _pointerBitWidth(_32)
-        return JSObject.global.Int32Array.function!
+        return JSObject.global.Int32Array.object!
         #elseif _pointerBitWidth(_64)
-        return JSObject.global.Int64Array.function!
+        return JSObject.global.Int64Array.object!
         #else
         #error("Unsupported pointer width")
         #endif
@@ -153,11 +153,11 @@ extension Int: TypedArrayElement {
 }
 
 extension UInt: TypedArrayElement {
-    public static var typedArrayClass: JSFunction {
+    public static var typedArrayClass: JSObject {
         #if _pointerBitWidth(_32)
-        return JSObject.global.Uint32Array.function!
+        return JSObject.global.Uint32Array.object!
         #elseif _pointerBitWidth(_64)
-        return JSObject.global.Uint64Array.function!
+        return JSObject.global.Uint64Array.object!
         #else
         #error("Unsupported pointer width")
         #endif
@@ -165,40 +165,40 @@ extension UInt: TypedArrayElement {
 }
 
 extension Int8: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Int8Array.function! }
+    public static var typedArrayClass: JSObject { JSObject.global.Int8Array.object! }
 }
 
 extension UInt8: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Uint8Array.function! }
+    public static var typedArrayClass: JSObject { JSObject.global.Uint8Array.object! }
 }
 
 extension Int16: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Int16Array.function! }
+    public static var typedArrayClass: JSObject { JSObject.global.Int16Array.object! }
 }
 
 extension UInt16: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Uint16Array.function! }
+    public static var typedArrayClass: JSObject { JSObject.global.Uint16Array.object! }
 }
 
 extension Int32: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Int32Array.function! }
+    public static var typedArrayClass: JSObject { JSObject.global.Int32Array.object! }
 }
 
 extension UInt32: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Uint32Array.function! }
+    public static var typedArrayClass: JSObject { JSObject.global.Uint32Array.object! }
 }
 
 extension Float32: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Float32Array.function! }
+    public static var typedArrayClass: JSObject { JSObject.global.Float32Array.object! }
 }
 
 extension Float64: TypedArrayElement {
-    public static var typedArrayClass: JSFunction { JSObject.global.Float64Array.function! }
+    public static var typedArrayClass: JSObject { JSObject.global.Float64Array.object! }
 }
 
 public enum JSUInt8Clamped: TypedArrayElement {
     public typealias Element = UInt8
-    public static var typedArrayClass: JSFunction { JSObject.global.Uint8ClampedArray.function! }
+    public static var typedArrayClass: JSObject { JSObject.global.Uint8ClampedArray.object! }
 }
 
 public typealias JSUInt8ClampedArray = JSTypedArray<JSUInt8Clamped>
