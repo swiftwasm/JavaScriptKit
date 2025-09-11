@@ -34,7 +34,7 @@ import WASILibc
 ///
 /// ```swift
 /// // Create and transfer an object to a worker thread
-/// let buffer = JSObject.global.ArrayBuffer.function!.new(1024).object!
+/// let buffer = JSObject.global.ArrayBuffer.object!.new(1024).object!
 /// let transferring = JSSending.transfer(buffer)
 ///
 /// let task = Task(executorPreference: executor) {

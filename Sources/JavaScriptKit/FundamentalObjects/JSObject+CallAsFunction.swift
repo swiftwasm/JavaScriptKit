@@ -76,7 +76,7 @@ extension JSObject {
     /// ```
     ///
     /// ```swift
-    /// let validateAge = JSObject.global.validateAge.function!
+    /// let validateAge = JSObject.global.validateAge.object!
     /// try validateAge.throws(20)
     /// ```
     public var `throws`: JSThrowingFunction {

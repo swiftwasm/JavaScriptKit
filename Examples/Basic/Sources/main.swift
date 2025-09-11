@@ -1,7 +1,7 @@
 import JavaScriptEventLoop
 import JavaScriptKit
 
-let alert = JSObject.global.alert.function!
+let alert = JSObject.global.alert.object!
 let document = JSObject.global.document
 
 let divElement = document.createElement("div")
@@ -19,7 +19,7 @@ buttonElement.onclick = .object(
 
 _ = document.body.appendChild(buttonElement)
 
-private let jsFetch = JSObject.global.fetch.function!
+private let jsFetch = JSObject.global.fetch.object!
 func fetch(_ url: String) -> JSPromise {
     JSPromise(jsFetch(url).object!)!
 }

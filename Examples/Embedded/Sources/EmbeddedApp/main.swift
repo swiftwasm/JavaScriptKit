@@ -1,6 +1,6 @@
 import JavaScriptKit
 
-let alert = JSObject.global.alert.function!
+let alert = JSObject.global.alert.object!
 let document = JSObject.global.document
 
 print("Hello from WASM, document title: \(document.title.string ?? "")")
@@ -28,8 +28,8 @@ textInputElement.type = "text"
 textInputElement.placeholder = "Enter text to encode to UTF-8"
 textInputElement.oninput = JSValue.object(
     JSClosure { _ in
-        let textEncoder = JSObject.global.TextEncoder.function!.new()
-        let encode = textEncoder.encode.function!
+        let textEncoder = JSObject.global.TextEncoder.object!.new()
+        let encode = textEncoder.encode.object!
         let encodedData = JSTypedArray<UInt8>(
             unsafelyWrapping: encode(this: textEncoder, textInputElement.value).object!
         )

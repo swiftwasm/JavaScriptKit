@@ -82,7 +82,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
         let promise = JSPromise(resolver: { resolver -> Void in
             resolver(.success(.undefined))
         })
-        let setTimeout = JSObject.global.setTimeout.function!
+        let setTimeout = JSObject.global.setTimeout.object!
         let eventLoop = JavaScriptEventLoop(
             queueTask: { job in
                 // TODO(katei): Should prefer `queueMicrotask` if available?
