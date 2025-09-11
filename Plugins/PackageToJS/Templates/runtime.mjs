@@ -34,7 +34,6 @@ const decode = (kind, payload1, payload2, objectSpace) => {
             return payload2;
         case 1 /* Kind.String */:
         case 3 /* Kind.Object */:
-        case 6 /* Kind.Function */:
         case 7 /* Kind.Symbol */:
         case 8 /* Kind.BigInt */:
             return objectSpace.getObject(payload1);
@@ -100,7 +99,7 @@ const writeAndReturnKindBits = (value, payload1_ptr, payload2_ptr, is_exception,
             return writeRef(3 /* Kind.Object */);
         }
         case "function": {
-            return writeRef(6 /* Kind.Function */);
+            return writeRef(3 /* Kind.Object */);
         }
         case "symbol": {
             return writeRef(7 /* Kind.Symbol */);
