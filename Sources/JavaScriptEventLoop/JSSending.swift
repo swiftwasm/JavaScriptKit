@@ -23,7 +23,7 @@ import Synchronization
 ///
 /// ```swift
 /// // Transfer an object to another thread
-/// let buffer = JSObject.global.Uint8Array.function!.new(100).buffer.object!
+/// let buffer = JSObject.global.Uint8Array.object!.new(100).buffer.object!
 /// let transferring = JSSending.transfer(buffer)
 ///
 /// // Receive the object on a worker thread
@@ -34,7 +34,7 @@ import Synchronization
 /// }
 ///
 /// // Clone an object for use in another thread
-/// let object = JSObject.global.Object.function!.new()
+/// let object = JSObject.global.Object.object!.new()
 /// object["test"] = "Hello, World!"
 /// let cloning = JSSending(object)
 ///
@@ -136,7 +136,7 @@ extension JSSending where T == JSObject {
     /// ## Example
     ///
     /// ```swift
-    /// let buffer = JSObject.global.Uint8Array.function!.new(100).buffer.object!
+    /// let buffer = JSObject.global.Uint8Array.object!.new(100).buffer.object!
     /// let transferring = JSSending.transfer(buffer)
     ///
     /// // After transfer, the original buffer is neutered
@@ -167,7 +167,7 @@ extension JSSending where T == JSObject {
     /// ## Example
     ///
     /// ```swift
-    /// let object = JSObject.global.Object.function!.new()
+    /// let object = JSObject.global.Object.object!.new()
     /// object["test"] = "Hello, World!"
     /// let cloning = JSSending(object)
     ///
@@ -212,7 +212,7 @@ extension JSSending {
     /// ## Example - Cloning
     ///
     /// ```swift
-    /// let data = JSObject.global.Object.function!.new()
+    /// let data = JSObject.global.Object.object!.new()
     /// data["value"] = 42
     /// let cloning = JSSending(data)
     ///

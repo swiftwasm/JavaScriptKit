@@ -1,16 +1,14 @@
 import _CJavaScriptKit
 
-/// `JSFunction` represents a function in JavaScript and supports new object instantiation.
-/// This type can be callable as a function using `callAsFunction`.
-///
-/// e.g.
-/// ```swift
-/// let alert: JSFunction = JSObject.global.alert.function!
-/// // Call `JSFunction` as a function
-/// alert("Hello, world")
-/// ```
-///
-public class JSFunction: JSObject {
+@available(
+    *,
+    deprecated,
+    renamed: "JSObject",
+    message: "Please use JSObject instead. JSFunction is unified with JSObject"
+)
+public typealias JSFunction = JSObject
+
+extension JSObject {
     #if !hasFeature(Embedded)
     /// Call this function with given `arguments` and binding given `this` as context.
     /// - Parameters:
@@ -78,7 +76,7 @@ public class JSFunction: JSObject {
     /// ```
     ///
     /// ```swift
-    /// let validateAge = JSObject.global.validateAge.function!
+    /// let validateAge = JSObject.global.validateAge.object!
     /// try validateAge.throws(20)
     /// ```
     public var `throws`: JSThrowingFunction {
@@ -102,10 +100,6 @@ public class JSFunction: JSObject {
     @available(*, unavailable, message: "Please use JSClosure instead")
     public static func from(_: @escaping ([JSValue]) -> JSValue) -> JSFunction {
         fatalError("unavailable")
-    }
-
-    override public var jsValue: JSValue {
-        .function(self)
     }
 
     final func invokeNonThrowingJSFunction(arguments: [JSValue]) -> RawJSValue {

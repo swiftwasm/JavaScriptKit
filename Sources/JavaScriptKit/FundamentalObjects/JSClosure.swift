@@ -103,7 +103,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 /// button.removeEventListener!("click", JSValue.function(eventListener))
 /// ```
 ///
-public class JSClosure: JSFunction, JSClosureProtocol {
+public class JSClosure: JSObject, JSClosureProtocol {
 
     class SharedJSClosure {
         // Note: 6.0 compilers built with assertions enabled crash when calling
@@ -317,7 +317,7 @@ func _call_host_function_impl(
         arguments.append(argv[i].jsValue)
     }
     let result = hostFunc(arguments)
-    let callbackFuncRef = JSFunction(id: callbackFuncRef)
+    let callbackFuncRef = JSObject(id: callbackFuncRef)
     _ = callbackFuncRef(result)
     return false
 }

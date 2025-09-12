@@ -30,7 +30,7 @@ actor SearchService {
 
     // Utility function for fetch
     func fetch(_ url: String) -> JSPromise {
-        let jsFetch = JSObject.global.fetch.function!
+        let jsFetch = JSObject.global.fetch.object!
         return JSPromise(jsFetch(url).object!)!
     }
 
@@ -117,7 +117,7 @@ struct SearchResult {
 @MainActor
 final class App {
     private let document = JSObject.global.document
-    private let alert = JSObject.global.alert.function!
+    private let alert = JSObject.global.alert.object!
 
     // UI elements
     private let container: JSValue

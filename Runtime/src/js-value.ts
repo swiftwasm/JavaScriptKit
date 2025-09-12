@@ -8,7 +8,6 @@ export const enum Kind {
     Object = 3,
     Null = 4,
     Undefined = 5,
-    Function = 6,
     Symbol = 7,
     BigInt = 8,
 }
@@ -32,7 +31,6 @@ export const decode = (
 
         case Kind.String:
         case Kind.Object:
-        case Kind.Function:
         case Kind.Symbol:
         case Kind.BigInt:
             return objectSpace.getObject(payload1);
@@ -129,7 +127,7 @@ export const writeAndReturnKindBits = (
             return writeRef(Kind.Object);
         }
         case "function": {
-            return writeRef(Kind.Function);
+            return writeRef(Kind.Object);
         }
         case "symbol": {
             return writeRef(Kind.Symbol);

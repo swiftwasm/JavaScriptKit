@@ -16,8 +16,8 @@ import _CJavaScriptKit
 /// reference counting system.
 @dynamicMemberLookup
 public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
-    internal static var constructor: JSFunction { _constructor.wrappedValue }
-    private static let _constructor = LazyThreadLocal(initialize: { JSObject.global.Object.function! })
+    internal static var constructor: JSObject { _constructor.wrappedValue }
+    private static let _constructor = LazyThreadLocal(initialize: { JSObject.global.Object.object! })
 
     @usableFromInline
     internal var _id: JavaScriptObjectRef
@@ -213,7 +213,7 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     /// Return `true` if this value is an instance of the passed `constructor` function.
     /// - Parameter constructor: The constructor function to check.
     /// - Returns: The result of `instanceof` in the JavaScript environment.
-    public func isInstanceOf(_ constructor: JSFunction) -> Bool {
+    public func isInstanceOf(_ constructor: JSObject) -> Bool {
         assertOnOwnerThread(hint: "calling 'isInstanceOf'")
         return swjs_instanceof(id, constructor.id)
     }
@@ -258,8 +258,6 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
             return nil
         case .object(let object):
             return object as? Self
-        case .function(let function):
-            return function as? Self
         case .symbol(let symbol):
             return symbol as? Self
         case .bigInt(let bigInt):

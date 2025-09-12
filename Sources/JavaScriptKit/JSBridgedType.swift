@@ -29,7 +29,7 @@ public protocol _JSBridgedClass {
 /// Conform to this protocol when your Swift class wraps a JavaScript class.
 public protocol JSBridgedClass: JSBridgedType, _JSBridgedClass {
     /// The constructor function for the JavaScript class
-    static var constructor: JSFunction? { get }
+    static var constructor: JSObject? { get }
 
     /// The JavaScript object wrapped by this instance.
     /// You may assume that `jsObject instanceof Self.constructor == true`

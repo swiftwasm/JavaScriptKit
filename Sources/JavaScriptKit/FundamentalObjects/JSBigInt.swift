@@ -1,6 +1,6 @@
 import _CJavaScriptKit
 
-private var constructor: JSFunction { JSObject.global.BigInt.function! }
+private var constructor: JSObject { JSObject.global.BigInt.object! }
 
 /// A wrapper around [the JavaScript `BigInt`
 /// class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)

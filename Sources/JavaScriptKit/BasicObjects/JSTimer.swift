@@ -75,9 +75,9 @@ public final class JSTimer {
         }
         self.isRepeating = isRepeating
         if isRepeating {
-            value = global.setInterval.function!(arguments: [closure.jsValue, millisecondsDelay.jsValue])
+            value = global.setInterval.object!(arguments: [closure.jsValue, millisecondsDelay.jsValue])
         } else {
-            value = global.setTimeout.function!(arguments: [closure.jsValue, millisecondsDelay.jsValue])
+            value = global.setTimeout.object!(arguments: [closure.jsValue, millisecondsDelay.jsValue])
         }
     }
 
@@ -87,9 +87,9 @@ public final class JSTimer {
      */
     deinit {
         if isRepeating {
-            global.clearInterval.function!(value)
+            global.clearInterval.object!(value)
         } else {
-            global.clearTimeout.function!(value)
+            global.clearTimeout.object!(value)
         }
         closure.release()
     }

@@ -79,15 +79,12 @@ extension JSString: ConvertibleToJSValue {
     public var jsValue: JSValue { .string(self) }
 }
 
-extension JSObject: JSValueCompatible {
-    // `JSObject.jsValue` is defined in JSObject.swift to be able to overridden
-    // from `JSFunction`
-}
+extension JSObject: JSValueCompatible {}
 
-private let _objectConstructor = LazyThreadLocal(initialize: { JSObject.global.Object.function! })
-private var objectConstructor: JSFunction { _objectConstructor.wrappedValue }
-private let _arrayConstructor = LazyThreadLocal(initialize: { JSObject.global.Array.function! })
-private var arrayConstructor: JSFunction { _arrayConstructor.wrappedValue }
+private let _objectConstructor = LazyThreadLocal(initialize: { JSObject.global.Object.object! })
+private var objectConstructor: JSObject { _objectConstructor.wrappedValue }
+private let _arrayConstructor = LazyThreadLocal(initialize: { JSObject.global.Array.object! })
+private var arrayConstructor: JSObject { _arrayConstructor.wrappedValue }
 
 #if !hasFeature(Embedded)
 extension Dictionary where Value == ConvertibleToJSValue, Key == String {
@@ -177,7 +174,7 @@ extension Array: ConstructibleFromJSValue where Element: ConstructibleFromJSValu
     public static func construct(from value: JSValue) -> [Element]? {
         guard
             let objectRef = value.object,
-            objectRef.isInstanceOf(JSObject.global.Array.function!)
+            objectRef.isInstanceOf(JSObject.global.Array.object!)
         else { return nil }
 
         let count: Int = objectRef.length.fromJSValue()!
@@ -208,8 +205,6 @@ extension RawJSValue: ConvertibleToJSValue {
             return .null
         case .undefined:
             return .undefined
-        case .function:
-            return .function(JSFunction(id: UInt32(payload1)))
         case .symbol:
             return .symbol(JSSymbol(id: UInt32(payload1)))
         case .bigInt:
@@ -248,9 +243,6 @@ extension JSValue {
         case .undefined:
             kind = .undefined
             payload1 = 0
-        case .function(let functionRef):
-            kind = .function
-            payload1 = JavaScriptPayload1(functionRef.id)
         case .symbol(let symbolRef):
             kind = .symbol
             payload1 = JavaScriptPayload1(symbolRef.id)
