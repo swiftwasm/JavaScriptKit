@@ -248,12 +248,6 @@
         }
       ],
       "swiftCallName" : "PropertyNamespace"
-<<<<<<< HEAD
-    }
-  ],
-  "functions" : [
-
-=======
     },
     {
       "cases" : [
@@ -328,7 +322,6 @@
       ],
       "swiftCallName" : "PropertyNamespace.Nested"
     }
->>>>>>> 26a78490 (WIP: Enum handling and nesting simplifications (+1 squashed commit))
   ],
   "functions" : [
 

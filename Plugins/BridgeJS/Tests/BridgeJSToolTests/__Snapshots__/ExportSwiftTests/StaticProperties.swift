@@ -179,41 +179,6 @@ public func _bjs_PropertyNamespace_Nested_static_nestedDouble_set(value: Float64
     #endif
 }
 
-<<<<<<< HEAD
-@_expose(wasm, "bjs_PropertyNamespace_static_namespaceProperty_get")
-@_cdecl("bjs_PropertyNamespace_static_namespaceProperty_get")
-public func _bjs_PropertyNamespace_static_namespaceProperty_get() -> Void {
-    #if arch(wasm32)
-    let ret = PropertyNamespace.namespaceProperty
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_PropertyNamespace_static_namespaceProperty_set")
-@_cdecl("bjs_PropertyNamespace_static_namespaceProperty_set")
-public func _bjs_PropertyNamespace_static_namespaceProperty_set(valueBytes: Int32, valueLength: Int32) -> Void {
-    #if arch(wasm32)
-    PropertyNamespace.namespaceProperty = String.bridgeJSLiftParameter(valueBytes, valueLength)
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_PropertyNamespace_static_namespaceConstant_get")
-@_cdecl("bjs_PropertyNamespace_static_namespaceConstant_get")
-public func _bjs_PropertyNamespace_static_namespaceConstant_get() -> Void {
-    #if arch(wasm32)
-    let ret = PropertyNamespace.namespaceConstant
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-=======
->>>>>>> 26a78490 (WIP: Enum handling and nesting simplifications (+1 squashed commit))
 @_expose(wasm, "bjs_PropertyClass_init")
 @_cdecl("bjs_PropertyClass_init")
 public func _bjs_PropertyClass_init() -> UnsafeMutableRawPointer {

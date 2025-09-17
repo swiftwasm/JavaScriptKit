@@ -1128,11 +1128,9 @@ extension BridgeJSLink {
         case .enumName(let enumName):
             return try renderEnumStaticFunction(function: function, enumName: enumName)
         case .namespaceEnum:
-            // Use function's namespace property for namespace enum
             if let namespace = function.namespace, !namespace.isEmpty {
                 return try renderNamespaceFunction(function: function, namespace: namespace.joined(separator: "."))
             } else {
-                // Fallback to regular function rendering
                 return try renderExportedFunction(function: function)
             }
         }
@@ -1250,7 +1248,7 @@ extension BridgeJSLink {
         // Generate getter assignment
         let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
         let getterReturnExpr = try getterThunkBuilder.call(
-            abiName: property.getterAbiName(className: enumName),
+            abiName: property.getterAbiName(),
             returnType: property.type
         )
 
@@ -1278,7 +1276,7 @@ extension BridgeJSLink {
                 param: Parameter(label: "value", name: "value", type: property.type)
             )
             _ = try setterThunkBuilder.call(
-                abiName: property.setterAbiName(className: enumName),
+                abiName: property.setterAbiName(),
                 returnType: .void
             )
 
@@ -1321,7 +1319,7 @@ extension BridgeJSLink {
         // Use the last component of namespace as the className for ABI name generation
         let className = namespacePath.components(separatedBy: ".").last ?? namespacePath
         let getterReturnExpr = try getterThunkBuilder.call(
-            abiName: property.getterAbiName(className: className),
+            abiName: property.getterAbiName(),
             returnType: property.type
         )
 
@@ -1351,7 +1349,7 @@ extension BridgeJSLink {
                 param: Parameter(label: "value", name: "value", type: property.type)
             )
             _ = try setterThunkBuilder.call(
-                abiName: property.setterAbiName(className: className),
+                abiName: property.setterAbiName(),
                 returnType: .void
             )
 
@@ -1488,7 +1486,7 @@ extension BridgeJSLink {
                 // Generate static property getter
                 let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
                 let getterReturnExpr = try getterThunkBuilder.call(
-                    abiName: property.getterAbiName(className: klass.name),
+                    abiName: property.getterAbiName(),
                     returnType: property.type
                 )
 
@@ -1510,7 +1508,7 @@ extension BridgeJSLink {
                         param: Parameter(label: "value", name: "value", type: property.type)
                     )
                     _ = try setterThunkBuilder.call(
-                        abiName: property.setterAbiName(className: klass.name),
+                        abiName: property.setterAbiName(),
                         returnType: .void
                     )
 

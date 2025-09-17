@@ -260,8 +260,8 @@ export async function createInstantiator(options, swift) {
                     tmpRetString = undefined;
                     return ret;
                 },
-                namespacedFunction: function bjs_namespacedFunction() {
-                    instance.exports.bjs_namespacedFunction();
+                namespacedFunction: function bjs_MyModule_Utils_namespacedFunction() {
+                    instance.exports.bjs_MyModule_Utils_namespacedFunction();
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;

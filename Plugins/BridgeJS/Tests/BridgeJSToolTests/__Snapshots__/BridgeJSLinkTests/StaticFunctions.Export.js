@@ -57,11 +57,6 @@ const __bjs_createAPIResultHelpers = () => {
         }
     });
 };
-if (typeof globalThis.Utils === 'undefined') {
-    globalThis.Utils = {};
-}
-
-
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;

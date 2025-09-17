@@ -263,14 +263,6 @@ export async function createInstantiator(options, swift) {
                     }
                 }
             }
-<<<<<<< HEAD
-=======
-            if (typeof globalThis.PropertyNamespace === 'undefined') {
-                globalThis.PropertyNamespace = {};
-            }
-            if (typeof globalThis.PropertyNamespace.Nested === 'undefined') {
-                globalThis.PropertyNamespace.Nested = {};
-            }
             Object.defineProperty(globalThis.PropertyNamespace, 'namespaceProperty', { get: function() {
                 instance.exports.bjs_PropertyNamespace_static_namespaceProperty_get();
                 const ret = tmpRetString;
@@ -288,7 +280,6 @@ export async function createInstantiator(options, swift) {
                 tmpRetString = undefined;
                 return ret;
             } });
->>>>>>> 26a78490 (WIP: Enum handling and nesting simplifications (+1 squashed commit))
             Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedProperty', { get: function() {
                 const ret = instance.exports.bjs_PropertyNamespace_Nested_static_nestedProperty_get();
                 return ret;

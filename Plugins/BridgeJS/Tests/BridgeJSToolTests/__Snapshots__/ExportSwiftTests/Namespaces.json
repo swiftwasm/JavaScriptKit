@@ -151,7 +151,7 @@
       }
     },
     {
-      "abiName" : "bjs_namespacedFunction",
+      "abiName" : "bjs_MyModule_Utils_namespacedFunction",
       "effects" : {
         "isAsync" : false,
         "isStatic" : false,

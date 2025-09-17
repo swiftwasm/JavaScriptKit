@@ -2,40 +2,43 @@
 
 // MARK: - ABI Name Generation
 
-/// Utility for generating consistent ABI names across all exported types
-struct ABINameGenerator {
+/// Utility for generating consistent ABI names across all exported and imported types
+public struct ABINameGenerator {
+    static let prefixComponent = "bjs"
 
     /// Generates ABI name using standardized namespace + context pattern
-    static func generateABIName(
+    public static func generateABIName(
         baseName: String,
         namespace: [String]?,
         staticContext: StaticContext?,
-        operation: String? = nil
+        operation: String? = nil,
+        className: String? = nil
     ) -> String {
-
-        let namespacePart: String
+        
+        let namespacePart: String?
         if let namespace = namespace, !namespace.isEmpty {
             namespacePart = namespace.joined(separator: "_")
         } else {
-            namespacePart = ""
+            namespacePart = nil
         }
-
-        let contextPart: String
+        
+        let contextPart: String?
         if let staticContext = staticContext {
             switch staticContext {
             case .className(let name), .enumName(let name):
                 contextPart = name
             case .namespaceEnum:
                 contextPart = namespacePart
-
             }
+        } else if let className = className {
+            contextPart = className
         } else {
             contextPart = namespacePart
         }
-
-        var components = ["bjs"]
-        if !contextPart.isEmpty {
-            components.append(contextPart)
+        
+        var components = [ABINameGenerator.prefixComponent]
+        if let context = contextPart {
+            components.append(context)
         }
 
         if staticContext != nil {
@@ -47,8 +50,16 @@ struct ABINameGenerator {
         if let operation = operation {
             components.append(operation)
         }
-
+        
         return components.joined(separator: "_")
+    }
+
+    static func generateImportedABIName(
+        baseName: String,
+        context: ImportedTypeSkeleton? = nil,
+        operation: String? = nil
+    ) -> String {
+        return [ABINameGenerator.prefixComponent, context?.name, baseName, operation].compactMap { $0 }.joined(separator: "_")
     }
 }
 
@@ -256,19 +267,6 @@ public struct ExportedFunction: Codable, Equatable, Sendable {
         self.namespace = namespace
         self.staticContext = staticContext
     }
-
-    // MARK: - Unified ABI Name Generation (New Approach)
-
-    /// Generates ABI name using the new unified approach
-    /// This method uses the standardized namespace property and ABINameGenerator
-    public func abiNameUnified() -> String {
-        return ABINameGenerator.generateABIName(
-            baseName: name,
-            namespace: namespace,
-            staticContext: effects.isStatic ? staticContext : nil,
-            operation: nil
-        )
-    }
 }
 
 public struct ExportedClass: Codable {
@@ -336,75 +334,42 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
         self.namespace = namespace
         self.staticContext = staticContext
     }
-
-    public func getterAbiName(className: String) -> String {
-        if isStatic, let staticContext = staticContext {
+    
+    public func callName(prefix: String? = nil) -> String {
+        if let staticContext = staticContext {
             switch staticContext {
-            case .className(let className):
-                return "bjs_\(className)_static_\(name)_get"
-            case .enumName(let enumName):
-                return "bjs_\(enumName)_static_\(name)_get"
+            case .className(let baseName), .enumName(let baseName):
+                return "\(baseName).\(name)"
             case .namespaceEnum:
                 if let namespace = namespace, !namespace.isEmpty {
-                    let abiNamespace = namespace.joined(separator: "_")
-                    return "bjs_\(abiNamespace)_static_\(name)_get"
-                } else {
-                    return "bjs_static_\(name)_get"
+                    let namespacePath = namespace.joined(separator: ".")
+                    return "\(namespacePath).\(name)"
                 }
             }
-        } else if isStatic {
-            return "bjs_\(className)_static_\(name)_get"
-        } else {
-            return "bjs_\(className)_\(name)_get"
         }
+        if let prefix = prefix {
+            return "\(prefix).\(name)"
+        }
+        return name
     }
 
-    public func setterAbiName(className: String) -> String {
-        if isStatic, let staticContext = staticContext {
-            // Generate context-aware ABI names for static properties
-            switch staticContext {
-            case .className(let className):
-                return "bjs_\(className)_static_\(name)_set"
-            case .enumName(let enumName):
-                return "bjs_\(enumName)_static_\(name)_set"
-            case .namespaceEnum:
-                // For namespace enums, use ONLY the namespace property to avoid duplication
-                if let namespace = namespace, !namespace.isEmpty {
-                    let abiNamespace = namespace.joined(separator: "_")
-                    return "bjs_\(abiNamespace)_static_\(name)_set"
-                } else {
-                    // Fallback if no namespace is available
-                    return "bjs_static_\(name)_set"
-                }
-            }
-        } else if isStatic {
-            return "bjs_\(className)_static_\(name)_set"
-        } else {
-            return "bjs_\(className)_\(name)_set"
-        }
-    }
-
-    // MARK: - Unified ABI Name Generation (New Approach)
-
-    /// Generates getter ABI name using the new unified approach
-    /// This method uses the standardized namespace property and ABINameGenerator
-    public func getterAbiNameUnified() -> String {
+    public func getterAbiName(className: String = "") -> String {
         return ABINameGenerator.generateABIName(
             baseName: name,
             namespace: namespace,
             staticContext: isStatic ? staticContext : nil,
-            operation: "get"
+            operation: "get",
+            className: isStatic ? nil : className
         )
     }
 
-    /// Generates setter ABI name using the new unified approach
-    /// This method uses the standardized namespace property and ABINameGenerator
-    public func setterAbiNameUnified() -> String {
+    public func setterAbiName(className: String = "") -> String {
         return ABINameGenerator.generateABIName(
             baseName: name,
             namespace: namespace,
             staticContext: isStatic ? staticContext : nil,
-            operation: "set"
+            operation: "set",
+            className: isStatic ? nil : className
         )
     }
 }
@@ -430,9 +395,12 @@ public struct ImportedFunctionSkeleton: Codable {
     public let parameters: [Parameter]
     public let returnType: BridgeType
     public let documentation: String?
-
+    
     public func abiName(context: ImportedTypeSkeleton?) -> String {
-        return context.map { "bjs_\($0.name)_\(name)" } ?? "bjs_\(name)"
+        return ABINameGenerator.generateImportedABIName(
+            baseName: name,
+            context: context
+        )
     }
 }
 
@@ -440,7 +408,10 @@ public struct ImportedConstructorSkeleton: Codable {
     public let parameters: [Parameter]
 
     public func abiName(context: ImportedTypeSkeleton) -> String {
-        return "bjs_\(context.name)_init"
+        return ABINameGenerator.generateImportedABIName(
+            baseName: "init",
+            context: context
+        )
     }
 }
 
@@ -451,11 +422,19 @@ public struct ImportedPropertySkeleton: Codable {
     public let documentation: String?
 
     public func getterAbiName(context: ImportedTypeSkeleton) -> String {
-        return "bjs_\(context.name)_\(name)_get"
+        return ABINameGenerator.generateImportedABIName(
+            baseName: name,
+            context: context,
+            operation: "get"
+        )
     }
-
+    
     public func setterAbiName(context: ImportedTypeSkeleton) -> String {
-        return "bjs_\(context.name)_\(name)_set"
+        return ABINameGenerator.generateImportedABIName(
+            baseName: name,
+            context: context,
+            operation: "set"
+        )
     }
 }
 
