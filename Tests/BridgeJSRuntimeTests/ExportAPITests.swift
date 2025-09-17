@@ -672,6 +672,34 @@ enum APIOptionalResult {
     return
         "willSet:\(PropertyHolder.willSetCallCount),didSet:\(PropertyHolder.didSetCallCount),willSetOld:\(PropertyHolder.lastWillSetOldValue),willSetNew:\(PropertyHolder.lastWillSetNewValue),didSetOld:\(PropertyHolder.lastDidSetOldValue),didSetNew:\(PropertyHolder.lastDidSetNewValue)"
 }
+
+// MARK: - Static Functions
+@JS class MathUtils {
+    @JS static func add(a: Int, b: Int) -> Int {
+        return a + b
+    }
+     @JS class func substract(a: Int, b: Int) -> Int {
+        return a - b
+    }
+}
+
+@JS enum StaticCalculator {
+    case scientific
+    case basic
+
+    @JS static func roundtrip(_ value: Int) -> Int {
+        return value
+    }
+}
+
+@JS enum StaticUtils {
+    @JS enum Nested {
+        @JS static func roundtrip(_ value: String) -> String {
+            return value
+        }
+    }
+}
+
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false

@@ -10,6 +10,7 @@
       "abiName" : "bjs_checkString",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "checkString",

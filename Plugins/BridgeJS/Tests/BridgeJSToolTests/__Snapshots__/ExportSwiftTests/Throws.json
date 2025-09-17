@@ -10,6 +10,7 @@
       "abiName" : "bjs_throwsSomething",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : true
       },
       "name" : "throwsSomething",

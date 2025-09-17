@@ -74,6 +74,9 @@
       ],
       "emitStyle" : "const",
       "name" : "APIResult",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "APIResult"
     },
     {
@@ -238,6 +241,9 @@
       ],
       "emitStyle" : "const",
       "name" : "ComplexResult",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "ComplexResult"
     },
     {
@@ -305,6 +311,9 @@
       "namespace" : [
         "Utilities"
       ],
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "Utilities.Result"
     },
     {
@@ -345,6 +354,9 @@
       "name" : "NetworkingResult",
       "namespace" : [
         "API"
+      ],
+      "staticMethods" : [
+
       ],
       "swiftCallName" : "NetworkingResult"
     },
@@ -434,6 +446,9 @@
       ],
       "emitStyle" : "const",
       "name" : "APIOptionalResult",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "APIOptionalResult"
     }
   ],
@@ -442,6 +457,7 @@
       "abiName" : "bjs_handle",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "handle",
@@ -466,6 +482,7 @@
       "abiName" : "bjs_getResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getResult",
@@ -482,6 +499,7 @@
       "abiName" : "bjs_roundtripAPIResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundtripAPIResult",
@@ -506,6 +524,7 @@
       "abiName" : "bjs_roundTripOptionalAPIResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalAPIResult",
@@ -538,6 +557,7 @@
       "abiName" : "bjs_handleComplex",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "handleComplex",
@@ -562,6 +582,7 @@
       "abiName" : "bjs_getComplexResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getComplexResult",
@@ -578,6 +599,7 @@
       "abiName" : "bjs_roundtripComplexResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundtripComplexResult",
@@ -602,6 +624,7 @@
       "abiName" : "bjs_roundTripOptionalComplexResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalComplexResult",
@@ -634,6 +657,7 @@
       "abiName" : "bjs_roundTripOptionalUtilitiesResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalUtilitiesResult",
@@ -666,6 +690,7 @@
       "abiName" : "bjs_roundTripOptionalNetworkingResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalNetworkingResult",
@@ -698,6 +723,7 @@
       "abiName" : "bjs_roundTripOptionalAPIOptionalResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalAPIOptionalResult",

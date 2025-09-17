@@ -5,6 +5,7 @@
         "abiName" : "bjs_Greeter_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -28,6 +29,7 @@
           "abiName" : "bjs_Greeter_greet",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "greet",
@@ -44,6 +46,7 @@
           "abiName" : "bjs_Greeter_changeName",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "changeName",
@@ -92,6 +95,7 @@
         "abiName" : "bjs_OptionalPropertyHolder_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -154,6 +158,7 @@
       "abiName" : "bjs_roundTripOptionalClass",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalClass",
@@ -186,6 +191,7 @@
       "abiName" : "bjs_testOptionalPropertyRoundtrip",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "testOptionalPropertyRoundtrip",
@@ -218,6 +224,7 @@
       "abiName" : "bjs_roundTripString",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripString",
@@ -250,6 +257,7 @@
       "abiName" : "bjs_roundTripInt",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripInt",
@@ -282,6 +290,7 @@
       "abiName" : "bjs_roundTripBool",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripBool",
@@ -314,6 +323,7 @@
       "abiName" : "bjs_roundTripFloat",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripFloat",
@@ -346,6 +356,7 @@
       "abiName" : "bjs_roundTripDouble",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripDouble",
@@ -378,6 +389,7 @@
       "abiName" : "bjs_roundTripSyntax",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripSyntax",
@@ -410,6 +422,7 @@
       "abiName" : "bjs_roundTripMixSyntax",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripMixSyntax",
@@ -442,6 +455,7 @@
       "abiName" : "bjs_roundTripSwiftSyntax",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripSwiftSyntax",
@@ -474,6 +488,7 @@
       "abiName" : "bjs_roundTripMixedSwiftSyntax",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripMixedSwiftSyntax",
@@ -506,6 +521,7 @@
       "abiName" : "bjs_roundTripWithSpaces",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripWithSpaces",
@@ -538,6 +554,7 @@
       "abiName" : "bjs_roundTripAlias",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripAlias",
@@ -570,6 +587,7 @@
       "abiName" : "bjs_roundTripOptionalAlias",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalAlias",
@@ -602,6 +620,7 @@
       "abiName" : "bjs_testMixedOptionals",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "testMixedOptionals",

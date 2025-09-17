@@ -5,6 +5,7 @@
         "abiName" : "bjs_Greeter_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -24,6 +25,7 @@
           "abiName" : "bjs_Greeter_greet",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "greet",
@@ -40,6 +42,7 @@
           "abiName" : "bjs_Greeter_changeName",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "changeName",
@@ -106,6 +109,7 @@
       "abiName" : "bjs_takeGreeter",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "takeGreeter",

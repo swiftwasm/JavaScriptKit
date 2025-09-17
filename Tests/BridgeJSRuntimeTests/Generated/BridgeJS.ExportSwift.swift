@@ -488,6 +488,63 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
     }
 }
 
+extension StaticCalculator: _BridgedSwiftCaseEnum {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> StaticCalculator {
+        return StaticCalculator(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> StaticCalculator {
+        return StaticCalculator(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSRawValue
+    }
+
+    private init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .scientific
+        case 1:
+            self = .basic
+        default:
+            return nil
+        }
+    }
+
+    private var bridgeJSRawValue: Int32 {
+        switch self {
+        case .scientific:
+            return 0
+        case .basic:
+            return 1
+        }
+    }
+}
+
+@_expose(wasm, "bjs_StaticCalculator_static_roundtrip")
+@_cdecl("bjs_StaticCalculator_static_roundtrip")
+public func _bjs_StaticCalculator_static_roundtrip(value: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = StaticCalculator.roundtrip(_: Int.bridgeJSLiftParameter(value))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StaticUtils_Nested_roundtrip")
+@_cdecl("bjs_StaticUtils_Nested_roundtrip")
+public func _bjs_StaticUtils_Nested_roundtrip(valueBytes: Int32, valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = StaticUtils.Nested.roundtrip(_: String.bridgeJSLiftParameter(valueBytes, valueLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundTripVoid")
 @_cdecl("bjs_roundTripVoid")
 public func _bjs_roundTripVoid() -> Void {
@@ -2406,5 +2463,47 @@ extension PropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
         }
         #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_PropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+@_expose(wasm, "bjs_MathUtils_static_add")
+@_cdecl("bjs_MathUtils_static_add")
+public func _bjs_MathUtils_static_add(a: Int32, b: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = MathUtils.add(a: Int.bridgeJSLiftParameter(a), b: Int.bridgeJSLiftParameter(b))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MathUtils_static_substract")
+@_cdecl("bjs_MathUtils_static_substract")
+public func _bjs_MathUtils_static_substract(a: Int32, b: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = MathUtils.substract(a: Int.bridgeJSLiftParameter(a), b: Int.bridgeJSLiftParameter(b))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MathUtils_deinit")
+@_cdecl("bjs_MathUtils_deinit")
+public func _bjs_MathUtils_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<MathUtils>.fromOpaque(pointer).release()
+}
+
+extension MathUtils: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        #if arch(wasm32)
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_MathUtils_wrap")
+        func _bjs_MathUtils_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_MathUtils_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_MathUtils_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }

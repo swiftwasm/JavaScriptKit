@@ -5,6 +5,7 @@
         "abiName" : "bjs_Greeter_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -24,6 +25,7 @@
           "abiName" : "bjs_Greeter_greet",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "greet",
@@ -40,6 +42,7 @@
           "abiName" : "bjs_Greeter_changeName",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "changeName",
@@ -90,6 +93,7 @@
           "abiName" : "bjs_Calculator_square",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "square",
@@ -114,6 +118,7 @@
           "abiName" : "bjs_Calculator_add",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "add",
@@ -188,6 +193,7 @@
         "abiName" : "bjs_Converter_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -199,6 +205,7 @@
           "abiName" : "bjs_Converter_toString",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "toString",
@@ -234,6 +241,7 @@
         "abiName" : "bjs_HTTPServer_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -245,6 +253,7 @@
           "abiName" : "bjs_HTTPServer_call",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "call",
@@ -281,6 +290,7 @@
         "abiName" : "bjs_TestServer_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -292,6 +302,7 @@
           "abiName" : "bjs_TestServer_call",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "call",
@@ -329,6 +340,7 @@
         "abiName" : "bjs_OptionalPropertyHolder_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -399,6 +411,7 @@
         "abiName" : "bjs_SimplePropertyHolder_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -435,6 +448,7 @@
         "abiName" : "bjs_PropertyHolder_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -508,6 +522,7 @@
           "abiName" : "bjs_PropertyHolder_getAllValues",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "getAllValues",
@@ -669,6 +684,93 @@
         }
       ],
       "swiftCallName" : "PropertyHolder"
+    },
+    {
+      "methods" : [
+        {
+          "abiName" : "bjs_MathUtils_static_add",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "add",
+          "parameters" : [
+            {
+              "label" : "a",
+              "name" : "a",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "label" : "b",
+              "name" : "b",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          },
+          "staticContext" : {
+            "className" : {
+              "_0" : "MathUtils"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MathUtils_static_substract",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "substract",
+          "parameters" : [
+            {
+              "label" : "a",
+              "name" : "a",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "label" : "b",
+              "name" : "b",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          },
+          "staticContext" : {
+            "className" : {
+              "_0" : "MathUtils"
+            }
+          }
+        }
+      ],
+      "name" : "MathUtils",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "MathUtils"
     }
   ],
   "enums" : [
@@ -701,6 +803,9 @@
       ],
       "emitStyle" : "const",
       "name" : "Direction",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "Direction"
     },
     {
@@ -726,6 +831,9 @@
       ],
       "emitStyle" : "const",
       "name" : "Status",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "Status"
     },
     {
@@ -755,6 +863,9 @@
       "emitStyle" : "const",
       "name" : "Theme",
       "rawType" : "String",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "Theme"
     },
     {
@@ -784,6 +895,9 @@
       "emitStyle" : "const",
       "name" : "HttpStatus",
       "rawType" : "Int",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "HttpStatus"
     },
     {
@@ -815,6 +929,9 @@
       ],
       "emitStyle" : "tsEnum",
       "name" : "TSDirection",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "TSDirection"
     },
     {
@@ -844,6 +961,9 @@
       "emitStyle" : "tsEnum",
       "name" : "TSTheme",
       "rawType" : "String",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "TSTheme"
     },
     {
@@ -852,6 +972,9 @@
       ],
       "emitStyle" : "const",
       "name" : "Utils",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "Utils"
     },
     {
@@ -886,6 +1009,9 @@
       "namespace" : [
         "Networking",
         "API"
+      ],
+      "staticMethods" : [
+
       ],
       "swiftCallName" : "Networking.API.Method"
     },
@@ -926,6 +1052,9 @@
         "Configuration"
       ],
       "rawType" : "String",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "Configuration.LogLevel"
     },
     {
@@ -958,6 +1087,9 @@
         "Configuration"
       ],
       "rawType" : "Int",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "Configuration.Port"
     },
     {
@@ -981,6 +1113,9 @@
         "Networking",
         "APIV2",
         "Internal"
+      ],
+      "staticMethods" : [
+
       ],
       "swiftCallName" : "Internal.SupportedMethod"
     },
@@ -1055,6 +1190,9 @@
       ],
       "emitStyle" : "const",
       "name" : "APIResult",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "APIResult"
     },
     {
@@ -1245,6 +1383,9 @@
       ],
       "emitStyle" : "const",
       "name" : "ComplexResult",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "ComplexResult"
     },
     {
@@ -1312,6 +1453,9 @@
       "namespace" : [
         "Utilities"
       ],
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "Utilities.Result"
     },
     {
@@ -1352,6 +1496,9 @@
       "name" : "NetworkingResult",
       "namespace" : [
         "API"
+      ],
+      "staticMethods" : [
+
       ],
       "swiftCallName" : "API.NetworkingResult"
     },
@@ -1441,7 +1588,104 @@
       ],
       "emitStyle" : "const",
       "name" : "APIOptionalResult",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "APIOptionalResult"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "scientific"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "basic"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "StaticCalculator",
+      "staticMethods" : [
+        {
+          "abiName" : "bjs_StaticCalculator_static_roundtrip",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "roundtrip",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "value",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          },
+          "staticContext" : {
+            "enumName" : {
+              "_0" : "StaticCalculator"
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "StaticCalculator"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Nested",
+      "namespace" : [
+        "StaticUtils"
+      ],
+      "staticMethods" : [
+        {
+          "abiName" : "bjs_StaticUtils_Nested_roundtrip",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "roundtrip",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "value",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          },
+          "staticContext" : {
+            "namespaceEnum" : {
+              "_0" : "StaticUtils.Nested"
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "StaticUtils.Nested"
     }
   ],
   "functions" : [
@@ -1449,6 +1693,7 @@
       "abiName" : "bjs_roundTripVoid",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripVoid",
@@ -1465,6 +1710,7 @@
       "abiName" : "bjs_roundTripInt",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripInt",
@@ -1489,6 +1735,7 @@
       "abiName" : "bjs_roundTripFloat",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripFloat",
@@ -1513,6 +1760,7 @@
       "abiName" : "bjs_roundTripDouble",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripDouble",
@@ -1537,6 +1785,7 @@
       "abiName" : "bjs_roundTripBool",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripBool",
@@ -1561,6 +1810,7 @@
       "abiName" : "bjs_roundTripString",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripString",
@@ -1585,6 +1835,7 @@
       "abiName" : "bjs_roundTripSwiftHeapObject",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripSwiftHeapObject",
@@ -1609,6 +1860,7 @@
       "abiName" : "bjs_roundTripJSObject",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripJSObject",
@@ -1633,6 +1885,7 @@
       "abiName" : "bjs_throwsSwiftError",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : true
       },
       "name" : "throwsSwiftError",
@@ -1657,6 +1910,7 @@
       "abiName" : "bjs_throwsWithIntResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : true
       },
       "name" : "throwsWithIntResult",
@@ -1673,6 +1927,7 @@
       "abiName" : "bjs_throwsWithStringResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : true
       },
       "name" : "throwsWithStringResult",
@@ -1689,6 +1944,7 @@
       "abiName" : "bjs_throwsWithBoolResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : true
       },
       "name" : "throwsWithBoolResult",
@@ -1705,6 +1961,7 @@
       "abiName" : "bjs_throwsWithFloatResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : true
       },
       "name" : "throwsWithFloatResult",
@@ -1721,6 +1978,7 @@
       "abiName" : "bjs_throwsWithDoubleResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : true
       },
       "name" : "throwsWithDoubleResult",
@@ -1737,6 +1995,7 @@
       "abiName" : "bjs_throwsWithSwiftHeapObjectResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : true
       },
       "name" : "throwsWithSwiftHeapObjectResult",
@@ -1753,6 +2012,7 @@
       "abiName" : "bjs_throwsWithJSObjectResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : true
       },
       "name" : "throwsWithJSObjectResult",
@@ -1769,6 +2029,7 @@
       "abiName" : "bjs_asyncRoundTripVoid",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripVoid",
@@ -1785,6 +2046,7 @@
       "abiName" : "bjs_asyncRoundTripInt",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripInt",
@@ -1809,6 +2071,7 @@
       "abiName" : "bjs_asyncRoundTripFloat",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripFloat",
@@ -1833,6 +2096,7 @@
       "abiName" : "bjs_asyncRoundTripDouble",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripDouble",
@@ -1857,6 +2121,7 @@
       "abiName" : "bjs_asyncRoundTripBool",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripBool",
@@ -1881,6 +2146,7 @@
       "abiName" : "bjs_asyncRoundTripString",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripString",
@@ -1905,6 +2171,7 @@
       "abiName" : "bjs_asyncRoundTripSwiftHeapObject",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripSwiftHeapObject",
@@ -1929,6 +2196,7 @@
       "abiName" : "bjs_asyncRoundTripJSObject",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripJSObject",
@@ -1953,6 +2221,7 @@
       "abiName" : "bjs_takeGreeter",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "takeGreeter",
@@ -1986,6 +2255,7 @@
       "abiName" : "bjs_createCalculator",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "createCalculator",
@@ -2002,6 +2272,7 @@
       "abiName" : "bjs_useCalculator",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "useCalculator",
@@ -2044,6 +2315,7 @@
       "abiName" : "bjs_testGreeterToJSValue",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "testGreeterToJSValue",
@@ -2060,6 +2332,7 @@
       "abiName" : "bjs_testCalculatorToJSValue",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "testCalculatorToJSValue",
@@ -2076,6 +2349,7 @@
       "abiName" : "bjs_testSwiftClassAsJSValue",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "testSwiftClassAsJSValue",
@@ -2100,6 +2374,7 @@
       "abiName" : "bjs_setDirection",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setDirection",
@@ -2124,6 +2399,7 @@
       "abiName" : "bjs_getDirection",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getDirection",
@@ -2140,6 +2416,7 @@
       "abiName" : "bjs_processDirection",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "processDirection",
@@ -2164,6 +2441,7 @@
       "abiName" : "bjs_setTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setTheme",
@@ -2190,6 +2468,7 @@
       "abiName" : "bjs_getTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getTheme",
@@ -2207,6 +2486,7 @@
       "abiName" : "bjs_setHttpStatus",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setHttpStatus",
@@ -2233,6 +2513,7 @@
       "abiName" : "bjs_getHttpStatus",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getHttpStatus",
@@ -2250,6 +2531,7 @@
       "abiName" : "bjs_processTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "processTheme",
@@ -2276,6 +2558,7 @@
       "abiName" : "bjs_setTSDirection",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setTSDirection",
@@ -2300,6 +2583,7 @@
       "abiName" : "bjs_getTSDirection",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getTSDirection",
@@ -2316,6 +2600,7 @@
       "abiName" : "bjs_setTSTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setTSTheme",
@@ -2342,6 +2627,7 @@
       "abiName" : "bjs_getTSTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getTSTheme",
@@ -2359,6 +2645,7 @@
       "abiName" : "bjs_roundtripNetworkingAPIMethod",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundtripNetworkingAPIMethod",
@@ -2383,6 +2670,7 @@
       "abiName" : "bjs_roundtripConfigurationLogLevel",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundtripConfigurationLogLevel",
@@ -2409,6 +2697,7 @@
       "abiName" : "bjs_roundtripConfigurationPort",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundtripConfigurationPort",
@@ -2435,6 +2724,7 @@
       "abiName" : "bjs_processConfigurationLogLevel",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "processConfigurationLogLevel",
@@ -2461,6 +2751,7 @@
       "abiName" : "bjs_roundtripInternalSupportedMethod",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundtripInternalSupportedMethod",
@@ -2485,6 +2776,7 @@
       "abiName" : "bjs_roundtripAPIResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundtripAPIResult",
@@ -2509,6 +2801,7 @@
       "abiName" : "bjs_makeAPIResultSuccess",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeAPIResultSuccess",
@@ -2533,6 +2826,7 @@
       "abiName" : "bjs_makeAPIResultFailure",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeAPIResultFailure",
@@ -2557,6 +2851,7 @@
       "abiName" : "bjs_makeAPIResultInfo",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeAPIResultInfo",
@@ -2573,6 +2868,7 @@
       "abiName" : "bjs_makeAPIResultFlag",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeAPIResultFlag",
@@ -2597,6 +2893,7 @@
       "abiName" : "bjs_makeAPIResultRate",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeAPIResultRate",
@@ -2621,6 +2918,7 @@
       "abiName" : "bjs_makeAPIResultPrecise",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeAPIResultPrecise",
@@ -2645,6 +2943,7 @@
       "abiName" : "bjs_roundtripComplexResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundtripComplexResult",
@@ -2669,6 +2968,7 @@
       "abiName" : "bjs_makeComplexResultSuccess",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeComplexResultSuccess",
@@ -2693,6 +2993,7 @@
       "abiName" : "bjs_makeComplexResultError",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeComplexResultError",
@@ -2726,6 +3027,7 @@
       "abiName" : "bjs_makeComplexResultLocation",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeComplexResultLocation",
@@ -2768,6 +3070,7 @@
       "abiName" : "bjs_makeComplexResultStatus",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeComplexResultStatus",
@@ -2810,6 +3113,7 @@
       "abiName" : "bjs_makeComplexResultCoordinates",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeComplexResultCoordinates",
@@ -2852,6 +3156,7 @@
       "abiName" : "bjs_makeComplexResultComprehensive",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeComplexResultComprehensive",
@@ -2948,6 +3253,7 @@
       "abiName" : "bjs_makeComplexResultInfo",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeComplexResultInfo",
@@ -2964,6 +3270,7 @@
       "abiName" : "bjs_makeUtilitiesResultSuccess",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeUtilitiesResultSuccess",
@@ -2988,6 +3295,7 @@
       "abiName" : "bjs_makeUtilitiesResultFailure",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeUtilitiesResultFailure",
@@ -3021,6 +3329,7 @@
       "abiName" : "bjs_makeUtilitiesResultStatus",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeUtilitiesResultStatus",
@@ -3063,6 +3372,7 @@
       "abiName" : "bjs_makeAPINetworkingResultSuccess",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeAPINetworkingResultSuccess",
@@ -3087,6 +3397,7 @@
       "abiName" : "bjs_makeAPINetworkingResultFailure",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "makeAPINetworkingResultFailure",
@@ -3120,6 +3431,7 @@
       "abiName" : "bjs_roundtripUtilitiesResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundtripUtilitiesResult",
@@ -3144,6 +3456,7 @@
       "abiName" : "bjs_roundtripAPINetworkingResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundtripAPINetworkingResult",
@@ -3168,6 +3481,7 @@
       "abiName" : "bjs_roundTripOptionalString",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalString",
@@ -3200,6 +3514,7 @@
       "abiName" : "bjs_roundTripOptionalInt",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalInt",
@@ -3232,6 +3547,7 @@
       "abiName" : "bjs_roundTripOptionalBool",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalBool",
@@ -3264,6 +3580,7 @@
       "abiName" : "bjs_roundTripOptionalFloat",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalFloat",
@@ -3296,6 +3613,7 @@
       "abiName" : "bjs_roundTripOptionalDouble",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalDouble",
@@ -3328,6 +3646,7 @@
       "abiName" : "bjs_roundTripOptionalSyntax",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalSyntax",
@@ -3360,6 +3679,7 @@
       "abiName" : "bjs_roundTripOptionalMixSyntax",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalMixSyntax",
@@ -3392,6 +3712,7 @@
       "abiName" : "bjs_roundTripOptionalSwiftSyntax",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalSwiftSyntax",
@@ -3424,6 +3745,7 @@
       "abiName" : "bjs_roundTripOptionalWithSpaces",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalWithSpaces",
@@ -3456,6 +3778,7 @@
       "abiName" : "bjs_roundTripOptionalTypeAlias",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalTypeAlias",
@@ -3488,6 +3811,7 @@
       "abiName" : "bjs_roundTripOptionalStatus",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalStatus",
@@ -3520,6 +3844,7 @@
       "abiName" : "bjs_roundTripOptionalTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalTheme",
@@ -3554,6 +3879,7 @@
       "abiName" : "bjs_roundTripOptionalHttpStatus",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalHttpStatus",
@@ -3588,6 +3914,7 @@
       "abiName" : "bjs_roundTripOptionalTSDirection",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalTSDirection",
@@ -3620,6 +3947,7 @@
       "abiName" : "bjs_roundTripOptionalTSTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalTSTheme",
@@ -3654,6 +3982,7 @@
       "abiName" : "bjs_roundTripOptionalNetworkingAPIMethod",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalNetworkingAPIMethod",
@@ -3686,6 +4015,7 @@
       "abiName" : "bjs_roundTripOptionalAPIResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalAPIResult",
@@ -3718,6 +4048,7 @@
       "abiName" : "bjs_roundTripOptionalComplexResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalComplexResult",
@@ -3750,6 +4081,7 @@
       "abiName" : "bjs_roundTripOptionalClass",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalClass",
@@ -3782,6 +4114,7 @@
       "abiName" : "bjs_roundTripOptionalAPIOptionalResult",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalAPIOptionalResult",
@@ -3814,6 +4147,7 @@
       "abiName" : "bjs_createPropertyHolder",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "createPropertyHolder",
@@ -3883,6 +4217,7 @@
       "abiName" : "bjs_testPropertyHolder",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "testPropertyHolder",
@@ -3907,6 +4242,7 @@
       "abiName" : "bjs_resetObserverCounts",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "resetObserverCounts",
@@ -3923,6 +4259,7 @@
       "abiName" : "bjs_getObserverStats",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getObserverStats",

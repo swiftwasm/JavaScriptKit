@@ -62,7 +62,7 @@ public enum SwiftEnumRawType: String, CaseIterable, Codable, Sendable {
     }
 }
 
-public struct Parameter: Codable {
+public struct Parameter: Codable, Equatable, Sendable {
     public let label: String?
     public let name: String
     public let type: BridgeType
@@ -74,14 +74,25 @@ public struct Parameter: Codable {
     }
 }
 
-public struct Effects: Codable {
+public struct Effects: Codable, Equatable, Sendable {
     public var isAsync: Bool
     public var isThrows: Bool
+    public var isStatic: Bool
 
-    public init(isAsync: Bool, isThrows: Bool) {
+    public init(isAsync: Bool, isThrows: Bool, isStatic: Bool = false) {
         self.isAsync = isAsync
         self.isThrows = isThrows
+        self.isStatic = isStatic
     }
+}
+
+// MARK: - Static Function Context
+
+public enum StaticContext: Codable, Equatable, Sendable {
+    case className(String)
+    case enumName(String)
+    case namespaceEnum(String)
+    case explicitNamespace([String])
 }
 
 // MARK: - Enum Skeleton
@@ -124,6 +135,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
     public let rawType: String?
     public let namespace: [String]?
     public let emitStyle: EnumEmitStyle
+    public var staticMethods: [ExportedFunction]
     public var enumType: EnumType {
         if cases.isEmpty {
             return .namespace
@@ -141,7 +153,8 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
         cases: [EnumCase],
         rawType: String?,
         namespace: [String]?,
-        emitStyle: EnumEmitStyle
+        emitStyle: EnumEmitStyle,
+        staticMethods: [ExportedFunction] = []
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
@@ -150,6 +163,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
         self.rawType = rawType
         self.namespace = namespace
         self.emitStyle = emitStyle
+        self.staticMethods = staticMethods
     }
 }
 
@@ -162,13 +176,14 @@ public enum EnumType: String, Codable, Sendable {
 
 // MARK: - Exported Skeleton
 
-public struct ExportedFunction: Codable {
+public struct ExportedFunction: Codable, Equatable, Sendable {
     public var name: String
     public var abiName: String
     public var parameters: [Parameter]
     public var returnType: BridgeType
     public var effects: Effects
     public var namespace: [String]?
+    public var staticContext: StaticContext?
 
     public init(
         name: String,
@@ -176,7 +191,8 @@ public struct ExportedFunction: Codable {
         parameters: [Parameter],
         returnType: BridgeType,
         effects: Effects,
-        namespace: [String]? = nil
+        namespace: [String]? = nil,
+        staticContext: StaticContext? = nil
     ) {
         self.name = name
         self.abiName = abiName
@@ -184,6 +200,7 @@ public struct ExportedFunction: Codable {
         self.returnType = returnType
         self.effects = effects
         self.namespace = namespace
+        self.staticContext = staticContext
     }
 }
 

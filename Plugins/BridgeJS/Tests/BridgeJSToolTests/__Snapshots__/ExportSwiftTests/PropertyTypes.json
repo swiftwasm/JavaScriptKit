@@ -5,6 +5,7 @@
         "abiName" : "bjs_PropertyHolder_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -69,6 +70,7 @@
           "abiName" : "bjs_PropertyHolder_getAllValues",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "getAllValues",
@@ -240,6 +242,7 @@
       "abiName" : "bjs_createPropertyHolder",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "createPropertyHolder",
@@ -309,6 +312,7 @@
       "abiName" : "bjs_testPropertyHolder",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "testPropertyHolder",

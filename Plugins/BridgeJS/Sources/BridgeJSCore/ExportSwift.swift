@@ -93,6 +93,7 @@ public class ExportSwift {
             var name: String?
             var cases: [EnumCase] = []
             var rawType: String?
+            var staticMethods: [ExportedFunction] = []
         }
         var currentEnum = CurrentEnum()
 
@@ -152,28 +153,54 @@ public class ExportSwift {
         }
 
         override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
+            guard node.attributes.hasJSAttribute() else {
+                return .skipChildren
+            }
+
+            let isStatic = node.modifiers.contains { modifier in
+                modifier.name.tokenKind == .keyword(.static) ||
+                modifier.name.tokenKind == .keyword(.class)
+            }
+
             switch state {
             case .topLevel:
-                if let exportedFunction = visitFunction(
-                    node: node
-                ) {
+                if isStatic {
+                    diagnose(node: node, message: "Top-level functions cannot be static")
+                    return .skipChildren
+                }
+                if let exportedFunction = visitFunction(node: node, isStatic: false) {
                     exportedFunctions.append(exportedFunction)
                 }
                 return .skipChildren
-            case .classBody(_, let classKey):
+            case .classBody(let className, let classKey):
                 if let exportedFunction = visitFunction(
-                    node: node
+                    node: node,
+                    isStatic: isStatic,
+                    className: className,
+                    classKey: classKey
                 ) {
                     exportedClassByName[classKey]?.methods.append(exportedFunction)
                 }
                 return .skipChildren
-            case .enumBody:
-                diagnose(node: node, message: "Functions are not supported inside enums")
+            case .enumBody(let enumName):
+                if !isStatic {
+                    diagnose(node: node, message: "Only static functions are supported in enums")
+                    return .skipChildren
+                }
+                if let exportedFunction = visitFunction(node: node, isStatic: isStatic, enumName: enumName) {
+                    currentEnum.staticMethods.append(exportedFunction)
+                }
                 return .skipChildren
             }
         }
 
-        private func visitFunction(node: FunctionDeclSyntax) -> ExportedFunction? {
+        private func visitFunction(
+            node: FunctionDeclSyntax,
+            isStatic: Bool,
+            className: String? = nil,
+            classKey: String? = nil,
+            enumName: String? = nil
+        ) -> ExportedFunction? {
             guard let jsAttribute = node.attributes.firstJSAttribute else {
                 return nil
             }
@@ -186,6 +213,14 @@ public class ExportSwift {
                     node: jsAttribute,
                     message: "Namespace is only needed in top-level declaration",
                     hint: "Remove the namespace from @JS attribute or move this function to top-level"
+                )
+            }
+
+            if namespace != nil, case .enumBody = state {
+                diagnose(
+                    node: jsAttribute,
+                    message: "Namespace is not supported for enum static functions",
+                    hint: "Remove the namespace from @JS attribute - enum functions inherit namespace from enum"
                 )
             }
 
@@ -226,20 +261,52 @@ public class ExportSwift {
             }
 
             let abiName: String
+            let staticContext: StaticContext?
+
             switch state {
             case .topLevel:
                 abiName = "bjs_\(name)"
+                staticContext = nil
             case .classBody(let className, _):
-                abiName = "bjs_\(className)_\(name)"
-            case .enumBody:
-                abiName = ""
-                diagnose(
-                    node: node,
-                    message: "Functions are not supported inside enums"
-                )
+                if isStatic {
+                    abiName = "bjs_\(className)_static_\(name)"
+                    staticContext = .className(className)
+                } else {
+                    abiName = "bjs_\(className)_\(name)"
+                    staticContext = nil
+                }
+            case .enumBody(let enumName):
+                if !isStatic {
+                    diagnose(node: node, message: "Only static functions are supported in enums")
+                    return nil
+                }
+
+                let isNamespaceEnum = currentEnum.cases.isEmpty
+
+                if isNamespaceEnum {
+                    // For namespace enums, compute the full Swift call path manually
+                    var swiftPath: [String] = []
+                    var currentNode: Syntax? = node.parent
+                    while let parent = currentNode {
+                        if let enumDecl = parent.as(EnumDeclSyntax.self),
+                            enumDecl.attributes.hasJSAttribute()
+                        {
+                            swiftPath.insert(enumDecl.name.text, at: 0)
+                        }
+                        currentNode = parent.parent
+                    }
+                    let fullEnumCallName = swiftPath.joined(separator: ".")
+                    
+                    // ABI name should include full namespace path to avoid conflicts
+                    abiName = "bjs_\(swiftPath.joined(separator: "_"))_\(name)"
+                    staticContext = .namespaceEnum(fullEnumCallName)
+                } else {
+                    abiName = "bjs_\(enumName)_static_\(name)"
+                    staticContext = .enumName(enumName)
+                }
             }
 
-            guard let effects = collectEffects(signature: node.signature) else {
+            guard let effects = collectEffects(signature: node.signature, isStatic: isStatic) else {
                 return nil
             }
 
@@ -249,11 +316,12 @@ public class ExportSwift {
                 parameters: parameters,
                 returnType: returnType,
                 effects: effects,
-                namespace: namespace
+                namespace: namespace,
+                staticContext: staticContext
             )
         }
 
-        private func collectEffects(signature: FunctionSignatureSyntax) -> Effects? {
+        private func collectEffects(signature: FunctionSignatureSyntax, isStatic: Bool = false) -> Effects? {
             let isAsync = signature.effectSpecifiers?.asyncSpecifier != nil
             var isThrows = false
             if let throwsClause: ThrowsClauseSyntax = signature.effectSpecifiers?.throwsClause {
@@ -274,7 +342,7 @@ public class ExportSwift {
                 }
                 isThrows = true
             }
-            return Effects(isAsync: isAsync, isThrows: isThrows)
+            return Effects(isAsync: isAsync, isThrows: isThrows, isStatic: isStatic)
         }
 
         private func extractNamespace(
@@ -537,15 +605,25 @@ public class ExportSwift {
             }
 
             let emitStyle = extractEnumStyle(from: jsAttribute) ?? .const
-            if case .tsEnum = emitStyle,
-                let raw = currentEnum.rawType,
-                let rawEnum = SwiftEnumRawType.from(raw), rawEnum == .bool
-            {
-                diagnose(
-                    node: jsAttribute,
-                    message: "TypeScript enum style is not supported for Bool raw-value enums",
-                    hint: "Use enumStyle: .const or change the raw type to String or a numeric type"
-                )
+
+            if case .tsEnum = emitStyle {
+                if let raw = currentEnum.rawType,
+                    let rawEnum = SwiftEnumRawType.from(raw), rawEnum == .bool
+                {
+                    diagnose(
+                        node: jsAttribute,
+                        message: "TypeScript enum style is not supported for Bool raw-value enums",
+                        hint: "Use enumStyle: .const or change the raw type to String or a numeric type"
+                    )
+                }
+
+                if !currentEnum.staticMethods.isEmpty {
+                    diagnose(
+                        node: jsAttribute,
+                        message: "TypeScript enum style does not support static functions",
+                        hint: "Use enumStyle: .const to generate a const object that supports static functions"
+                    )
+                }
             }
 
             if currentEnum.cases.contains(where: { !$0.associatedValues.isEmpty }) {
@@ -597,7 +675,8 @@ public class ExportSwift {
                 cases: currentEnum.cases,
                 rawType: currentEnum.rawType,
                 namespace: effectiveNamespace,
-                emitStyle: emitStyle
+                emitStyle: emitStyle,
+                staticMethods: currentEnum.staticMethods
             )
             exportedEnumByName[enumName] = exportedEnum
             exportedEnumNames.append(enumName)
@@ -861,6 +940,10 @@ public class ExportSwift {
                 decls.append(enumCodegen.renderAssociatedValueEnumHelpers(enumDef))
             case .namespace:
                 ()
+            }
+            
+            for staticMethod in enumDef.staticMethods {
+                decls.append(try renderSingleExportedFunction(function: staticMethod))
             }
         }
 
@@ -1269,7 +1352,24 @@ public class ExportSwift {
         for param in function.parameters {
             try builder.liftParameter(param: param)
         }
-        builder.call(name: function.name, returnType: function.returnType)
+        
+        if function.effects.isStatic, let staticContext = function.staticContext {
+            let callName: String
+            switch staticContext {
+            case .className(let className):
+                callName = "\(className).\(function.name)"
+            case .enumName(let enumName):
+                callName = "\(enumName).\(function.name)"
+            case .namespaceEnum(let enumName):
+                callName = "\(enumName).\(function.name)"
+            case .explicitNamespace(let namespace):
+                callName = "\(namespace.joined(separator: ".")).\(function.name)"
+            }
+            builder.call(name: callName, returnType: function.returnType)
+        } else {
+            builder.call(name: function.name, returnType: function.returnType)
+        }
+        
         try builder.lowerReturnValue(returnType: function.returnType)
         return builder.render(abiName: function.abiName)
     }
@@ -1335,17 +1435,25 @@ public class ExportSwift {
         }
         for method in klass.methods {
             let builder = ExportedThunkBuilder(effects: method.effects)
-            try builder.liftParameter(
-                param: Parameter(label: nil, name: "_self", type: BridgeType.swiftHeapObject(klass.swiftCallName))
-            )
-            for param in method.parameters {
-                try builder.liftParameter(param: param)
+            
+            if method.effects.isStatic {
+                for param in method.parameters {
+                    try builder.liftParameter(param: param)
+                }
+                builder.call(name: "\(klass.swiftCallName).\(method.name)", returnType: method.returnType)
+            } else {
+                try builder.liftParameter(
+                    param: Parameter(label: nil, name: "_self", type: BridgeType.swiftHeapObject(klass.swiftCallName))
+                )
+                for param in method.parameters {
+                    try builder.liftParameter(param: param)
+                }
+                builder.callMethod(
+                    klassName: klass.swiftCallName,
+                    methodName: method.name,
+                    returnType: method.returnType
+                )
             }
-            builder.callMethod(
-                klassName: klass.swiftCallName,
-                methodName: method.name,
-                returnType: method.returnType
-            )
             try builder.lowerReturnValue(returnType: method.returnType)
             decls.append(builder.render(abiName: method.abiName))
         }

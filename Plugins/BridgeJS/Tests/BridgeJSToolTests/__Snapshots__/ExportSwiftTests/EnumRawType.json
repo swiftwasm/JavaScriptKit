@@ -30,6 +30,9 @@
       "emitStyle" : "const",
       "name" : "Theme",
       "rawType" : "String",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "Theme"
     },
     {
@@ -59,6 +62,9 @@
       "emitStyle" : "tsEnum",
       "name" : "TSTheme",
       "rawType" : "String",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "TSTheme"
     },
     {
@@ -81,6 +87,9 @@
       "emitStyle" : "const",
       "name" : "FeatureFlag",
       "rawType" : "Bool",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "FeatureFlag"
     },
     {
@@ -110,6 +119,9 @@
       "emitStyle" : "const",
       "name" : "HttpStatus",
       "rawType" : "Int",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "HttpStatus"
     },
     {
@@ -139,6 +151,9 @@
       "emitStyle" : "tsEnum",
       "name" : "TSHttpStatus",
       "rawType" : "Int",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "TSHttpStatus"
     },
     {
@@ -182,6 +197,9 @@
       "emitStyle" : "const",
       "name" : "Priority",
       "rawType" : "Int32",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "Priority"
     },
     {
@@ -218,6 +236,9 @@
       "emitStyle" : "const",
       "name" : "FileSize",
       "rawType" : "Int64",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "FileSize"
     },
     {
@@ -247,6 +268,9 @@
       "emitStyle" : "const",
       "name" : "UserId",
       "rawType" : "UInt",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "UserId"
     },
     {
@@ -276,6 +300,9 @@
       "emitStyle" : "const",
       "name" : "TokenId",
       "rawType" : "UInt32",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "TokenId"
     },
     {
@@ -305,6 +332,9 @@
       "emitStyle" : "const",
       "name" : "SessionId",
       "rawType" : "UInt64",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "SessionId"
     },
     {
@@ -334,6 +364,9 @@
       "emitStyle" : "const",
       "name" : "Precision",
       "rawType" : "Float",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "Precision"
     },
     {
@@ -370,6 +403,9 @@
       "emitStyle" : "const",
       "name" : "Ratio",
       "rawType" : "Double",
+      "staticMethods" : [
+
+      ],
       "swiftCallName" : "Ratio"
     }
   ],
@@ -378,6 +414,7 @@
       "abiName" : "bjs_setTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setTheme",
@@ -403,6 +440,7 @@
       "abiName" : "bjs_getTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getTheme",
@@ -420,6 +458,7 @@
       "abiName" : "bjs_roundTripOptionalTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalTheme",
@@ -454,6 +493,7 @@
       "abiName" : "bjs_setTSTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setTSTheme",
@@ -479,6 +519,7 @@
       "abiName" : "bjs_getTSTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getTSTheme",
@@ -496,6 +537,7 @@
       "abiName" : "bjs_roundTripOptionalTSTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalTSTheme",
@@ -530,6 +572,7 @@
       "abiName" : "bjs_setFeatureFlag",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setFeatureFlag",
@@ -555,6 +598,7 @@
       "abiName" : "bjs_getFeatureFlag",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getFeatureFlag",
@@ -572,6 +616,7 @@
       "abiName" : "bjs_roundTripOptionalFeatureFlag",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalFeatureFlag",
@@ -606,6 +651,7 @@
       "abiName" : "bjs_setHttpStatus",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setHttpStatus",
@@ -631,6 +677,7 @@
       "abiName" : "bjs_getHttpStatus",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getHttpStatus",
@@ -648,6 +695,7 @@
       "abiName" : "bjs_roundTripOptionalHttpStatus",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalHttpStatus",
@@ -682,6 +730,7 @@
       "abiName" : "bjs_setTSHttpStatus",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setTSHttpStatus",
@@ -707,6 +756,7 @@
       "abiName" : "bjs_getTSHttpStatus",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getTSHttpStatus",
@@ -724,6 +774,7 @@
       "abiName" : "bjs_roundTripOptionalHttpStatus",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalHttpStatus",
@@ -758,6 +809,7 @@
       "abiName" : "bjs_setPriority",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setPriority",
@@ -783,6 +835,7 @@
       "abiName" : "bjs_getPriority",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getPriority",
@@ -800,6 +853,7 @@
       "abiName" : "bjs_roundTripOptionalPriority",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalPriority",
@@ -834,6 +888,7 @@
       "abiName" : "bjs_setFileSize",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setFileSize",
@@ -859,6 +914,7 @@
       "abiName" : "bjs_getFileSize",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getFileSize",
@@ -876,6 +932,7 @@
       "abiName" : "bjs_roundTripOptionalFileSize",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalFileSize",
@@ -910,6 +967,7 @@
       "abiName" : "bjs_setUserId",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setUserId",
@@ -935,6 +993,7 @@
       "abiName" : "bjs_getUserId",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getUserId",
@@ -952,6 +1011,7 @@
       "abiName" : "bjs_roundTripOptionalUserId",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalUserId",
@@ -986,6 +1046,7 @@
       "abiName" : "bjs_setTokenId",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setTokenId",
@@ -1011,6 +1072,7 @@
       "abiName" : "bjs_getTokenId",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getTokenId",
@@ -1028,6 +1090,7 @@
       "abiName" : "bjs_roundTripOptionalTokenId",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalTokenId",
@@ -1062,6 +1125,7 @@
       "abiName" : "bjs_setSessionId",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setSessionId",
@@ -1087,6 +1151,7 @@
       "abiName" : "bjs_getSessionId",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getSessionId",
@@ -1104,6 +1169,7 @@
       "abiName" : "bjs_roundTripOptionalSessionId",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalSessionId",
@@ -1138,6 +1204,7 @@
       "abiName" : "bjs_setPrecision",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setPrecision",
@@ -1163,6 +1230,7 @@
       "abiName" : "bjs_getPrecision",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getPrecision",
@@ -1180,6 +1248,7 @@
       "abiName" : "bjs_roundTripOptionalPrecision",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalPrecision",
@@ -1214,6 +1283,7 @@
       "abiName" : "bjs_setRatio",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setRatio",
@@ -1239,6 +1309,7 @@
       "abiName" : "bjs_getRatio",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getRatio",
@@ -1256,6 +1327,7 @@
       "abiName" : "bjs_roundTripOptionalRatio",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalRatio",
@@ -1290,6 +1362,7 @@
       "abiName" : "bjs_processTheme",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "processTheme",
@@ -1316,6 +1389,7 @@
       "abiName" : "bjs_convertPriority",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "convertPriority",
@@ -1342,6 +1416,7 @@
       "abiName" : "bjs_validateSession",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "validateSession",

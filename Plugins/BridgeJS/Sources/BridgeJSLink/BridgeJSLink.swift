@@ -76,6 +76,7 @@ struct BridgeJSLink {
         var topLevelEnumLines: [String] = []
         var topLevelDtsEnumLines: [String] = []
         var importObjectBuilders: [ImportObjectBuilder] = []
+        var enumStaticAssignments: [String] = []
     }
 
     private func collectLinkData() throws -> LinkData {
@@ -145,9 +146,19 @@ struct BridgeJSLink {
 
             // Process functions
             for function in skeleton.functions {
+                if function.effects.isStatic,
+                    case .enumName(_) = function.staticContext
+                {
+                    continue
+                }
+
                 var (js, dts) = try renderExportedFunction(function: function)
 
-                if function.namespace != nil {
+                if function.effects.isStatic,
+                    case .namespaceEnum(_) = function.staticContext
+                {
+                    data.namespacedFunctions.append(function)
+                } else if function.namespace != nil {
                     data.namespacedFunctions.append(function)
                 }
 
@@ -156,6 +167,42 @@ struct BridgeJSLink {
                 data.exportsLines.append(contentsOf: js)
                 data.dtsExportLines.append(contentsOf: dts)
             }
+
+            for enumDefinition in skeleton.enums where enumDefinition.enumType == .namespace {
+                for function in enumDefinition.staticMethods {
+                    // Create namespace function with full namespace path (parent namespace + enum name)
+                    var functionWithNamespace = function
+                    let fullNamespace = (enumDefinition.namespace ?? []) + [enumDefinition.name]
+                    functionWithNamespace.namespace = fullNamespace
+                    data.namespacedFunctions.append(functionWithNamespace)
+                    
+                    var (js, dts) = try renderExportedFunction(function: functionWithNamespace)
+                    js[0] = "\(functionWithNamespace.name): " + js[0]
+                    js[js.count - 1] += ","
+                    data.exportsLines.append(contentsOf: js)
+                    data.dtsExportLines.append(contentsOf: dts)
+                }
+            }
+
+            for enumDefinition in skeleton.enums where enumDefinition.enumType != .namespace {
+                for function in enumDefinition.staticMethods {
+                    let (funcJs, _) = try renderEnumStaticFunction(function: function, enumName: enumDefinition.name)
+                    var assignmentJs = funcJs
+                    if !assignmentJs.isEmpty && assignmentJs.last?.hasSuffix(",") == true {
+                        assignmentJs[assignmentJs.count - 1] = String(assignmentJs.last?.dropLast() ?? "")
+                    }
+                    if !assignmentJs.isEmpty {
+                        let firstLine = assignmentJs[0]
+                        if firstLine.contains("(") {
+                            assignmentJs[0] =
+                                "\(enumDefinition.name).\(function.name) = function"
+                                + firstLine.dropFirst(function.name.count)
+                        }
+                    }
+                    data.enumStaticAssignments.append(contentsOf: assignmentJs)
+                }
+            }
+
         }
 
         // Process imported skeletons
@@ -575,6 +622,8 @@ struct BridgeJSLink {
                 let hasNamespacedItems = !data.namespacedFunctions.isEmpty || !data.namespacedClasses.isEmpty
 
                 printer.write(lines: data.classLines)
+                printer.write(lines: data.enumStaticAssignments)
+
                 if hasNamespacedItems {
                     printer.write("const exports = {")
                     printer.indent {
@@ -825,6 +874,7 @@ struct BridgeJSLink {
             _ = fragment.printCode([enumDefinition.name], scope, printer, cleanup)
 
             jsLines.append(contentsOf: printer.lines)
+            try addStaticFunctionsToEnum(enumDefinition: enumDefinition, jsLines: &jsLines, dtsLines: &dtsLines)
         case .rawValue:
             guard enumDefinition.rawType != nil else {
                 throw BridgeJSLinkError(message: "Raw value enum \(enumDefinition.name) is missing rawType")
@@ -834,11 +884,13 @@ struct BridgeJSLink {
             _ = fragment.printCode([enumDefinition.name], scope, printer, cleanup)
 
             jsLines.append(contentsOf: printer.lines)
+            try addStaticFunctionsToEnum(enumDefinition: enumDefinition, jsLines: &jsLines, dtsLines: &dtsLines)
         case .associatedValue:
             let fragment = IntrinsicJSFragment.associatedValueEnumHelper(enumDefinition: enumDefinition)
             _ = fragment.printCode([enumDefinition.name], scope, printer, cleanup)
 
             jsLines.append(contentsOf: printer.lines)
+            try addStaticFunctionsToEnum(enumDefinition: enumDefinition, jsLines: &jsLines, dtsLines: &dtsLines)
         case .namespace:
             break
         }
@@ -850,8 +902,47 @@ struct BridgeJSLink {
         return (jsLines, dtsLines)
     }
 
+    private func addStaticFunctionsToEnum(
+        enumDefinition: ExportedEnum,
+        jsLines: inout [String],
+        dtsLines: inout [String]
+    ) throws {
+        let enumStaticFunctions = enumDefinition.staticMethods
+
+        guard !enumStaticFunctions.isEmpty else { return }
+
+        let enumName = enumDefinition.name
+
+        if !jsLines.isEmpty {
+            for i in 0..<jsLines.count {
+                if jsLines[i].contains("const \(enumName) = {") {
+                    var insertIndex = jsLines.count - 1
+
+                    for j in (i + 1)..<jsLines.count {
+                        if jsLines[j].contains("};") {
+                            insertIndex = j
+                            break
+                        }
+                    }
+
+                    var staticFunctionLines: [String] = []
+                    for function in enumStaticFunctions {
+                        staticFunctionLines.append("    \(function.name): null,")
+                    }
+
+                    if !staticFunctionLines.isEmpty {
+                        jsLines.insert(contentsOf: staticFunctionLines, at: insertIndex)
+                    }
+                    break
+                }
+            }
+        }
+    }
+
     private func generateDeclarations(enumDefinition: ExportedEnum) -> [String] {
         let printer = CodeFragmentPrinter()
+
+        let enumStaticFunctions = enumDefinition.staticMethods
 
         switch enumDefinition.emitStyle {
         case .tsEnum:
@@ -891,6 +982,15 @@ struct BridgeJSLink {
                         )
                         printer.write("readonly \(caseName): \(value);")
                     }
+
+                    for function in enumStaticFunctions {
+                        let signature = renderTSSignature(
+                            parameters: function.parameters,
+                            returnType: function.returnType,
+                            effects: function.effects
+                        )
+                        printer.write("\(function.name)\(signature);")
+                    }
                 }
                 printer.write("};")
                 printer.write(
@@ -907,6 +1007,15 @@ struct BridgeJSLink {
                         }
                     }
                     printer.write("};")
+
+                    for function in enumStaticFunctions {
+                        let signature = renderTSSignature(
+                            parameters: function.parameters,
+                            returnType: function.returnType,
+                            effects: function.effects
+                        )
+                        printer.write("\(function.name)\(signature);")
+                    }
                 }
                 printer.write("};")
                 printer.nextLine()
@@ -955,6 +1064,10 @@ struct BridgeJSLink {
 extension BridgeJSLink {
 
     func renderExportedFunction(function: ExportedFunction) throws -> (js: [String], dts: [String]) {
+        if function.effects.isStatic, let staticContext = function.staticContext {
+            return try renderStaticFunction(function: function, staticContext: staticContext)
+        }
+
         let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
         for param in function.parameters {
             try thunkBuilder.lowerParameter(param: param)
@@ -970,6 +1083,97 @@ extension BridgeJSLink {
         dtsLines.append(
             "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
         )
+
+        return (funcLines, dtsLines)
+    }
+
+    private func renderStaticFunction(
+        function: ExportedFunction,
+        staticContext: StaticContext
+    ) throws -> (js: [String], dts: [String]) {
+        switch staticContext {
+        case .className(let className):
+            return try renderClassStaticFunction(function: function, className: className)
+        case .enumName(let enumName):
+            return try renderEnumStaticFunction(function: function, enumName: enumName)
+        case .namespaceEnum(let enumName):
+            return try renderNamespaceFunction(function: function, namespace: enumName)
+        case .explicitNamespace(let namespace):
+            return try renderNamespaceFunction(function: function, namespace: namespace.joined(separator: "."))
+        }
+    }
+
+    private func renderClassStaticFunction(
+        function: ExportedFunction,
+        className: String
+    ) throws -> (js: [String], dts: [String]) {
+        let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
+        for param in function.parameters {
+            try thunkBuilder.lowerParameter(param: param)
+        }
+        let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
+
+        let funcLines = thunkBuilder.renderFunction(
+            name: function.name,
+            parameters: function.parameters,
+            returnExpr: returnExpr,
+            declarationPrefixKeyword: "static"
+        )
+
+        let dtsLines = [
+            "static \(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+        ]
+
+        return (funcLines, dtsLines)
+    }
+
+    private func renderEnumStaticFunction(
+        function: ExportedFunction,
+        enumName: String
+    ) throws -> (js: [String], dts: [String]) {
+        let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
+        for param in function.parameters {
+            try thunkBuilder.lowerParameter(param: param)
+        }
+        let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
+
+        let printer = CodeFragmentPrinter()
+        printer.write("\(function.name)(\(function.parameters.map { $0.name }.joined(separator: ", "))) {")
+        printer.indent {
+            printer.write(contentsOf: thunkBuilder.body)
+            printer.write(contentsOf: thunkBuilder.cleanupCode)
+            printer.write(lines: thunkBuilder.checkExceptionLines())
+            if let returnExpr = returnExpr {
+                printer.write("return \(returnExpr);")
+            }
+        }
+        printer.write("},")
+
+        let dtsLines = [
+            "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+        ]
+
+        return (printer.lines, dtsLines)
+    }
+
+    private func renderNamespaceFunction(
+        function: ExportedFunction,
+        namespace: String
+    ) throws -> (js: [String], dts: [String]) {
+        let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
+        for param in function.parameters {
+            try thunkBuilder.lowerParameter(param: param)
+        }
+        let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
+
+        let funcLines = thunkBuilder.renderFunction(
+            name: function.abiName,
+            parameters: function.parameters,
+            returnExpr: returnExpr,
+            declarationPrefixKeyword: "function"
+        )
+
+        let dtsLines: [String] = []
 
         return (funcLines, dtsLines)
     }
@@ -1023,28 +1227,53 @@ extension BridgeJSLink {
         }
 
         for method in klass.methods {
-            let thunkBuilder = ExportedThunkBuilder(effects: method.effects)
-            thunkBuilder.lowerSelf()
-            for param in method.parameters {
-                try thunkBuilder.lowerParameter(param: param)
-            }
-            let returnExpr = try thunkBuilder.call(abiName: method.abiName, returnType: method.returnType)
+            if method.effects.isStatic {
+                let thunkBuilder = ExportedThunkBuilder(effects: method.effects)
+                for param in method.parameters {
+                    try thunkBuilder.lowerParameter(param: param)
+                }
+                let returnExpr = try thunkBuilder.call(abiName: method.abiName, returnType: method.returnType)
 
-            jsPrinter.indent {
-                jsPrinter.write(
-                    lines: thunkBuilder.renderFunction(
-                        name: method.name,
-                        parameters: method.parameters,
-                        returnExpr: returnExpr,
-                        declarationPrefixKeyword: nil
+                jsPrinter.indent {
+                    jsPrinter.write(
+                        lines: thunkBuilder.renderFunction(
+                            name: method.name,
+                            parameters: method.parameters,
+                            returnExpr: returnExpr,
+                            declarationPrefixKeyword: "static"
+                        )
                     )
-                )
-            }
+                }
 
-            dtsTypePrinter.indent {
-                dtsTypePrinter.write(
-                    "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
-                )
+                dtsExportEntryPrinter.indent {
+                    dtsExportEntryPrinter.write(
+                        "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                    )
+                }
+            } else {
+                let thunkBuilder = ExportedThunkBuilder(effects: method.effects)
+                thunkBuilder.lowerSelf()
+                for param in method.parameters {
+                    try thunkBuilder.lowerParameter(param: param)
+                }
+                let returnExpr = try thunkBuilder.call(abiName: method.abiName, returnType: method.returnType)
+
+                jsPrinter.indent {
+                    jsPrinter.write(
+                        lines: thunkBuilder.renderFunction(
+                            name: method.name,
+                            parameters: method.parameters,
+                            returnExpr: returnExpr,
+                            declarationPrefixKeyword: nil
+                        )
+                    )
+                }
+
+                dtsTypePrinter.indent {
+                    dtsTypePrinter.write(
+                        "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                    )
+                }
             }
         }
 
@@ -1422,7 +1651,13 @@ extension BridgeJSLink {
 
             for skeleton in exportedSkeletons {
                 for function in skeleton.functions {
-                    if let namespace = function.namespace {
+                    if function.effects.isStatic,
+                        case .namespaceEnum(let enumName) = function.staticContext
+                    {
+                        var currentNode = rootNode
+                        currentNode = currentNode.addChild(enumName)
+                        currentNode.content.functions.append(function)
+                    } else if let namespace = function.namespace {
                         var currentNode = rootNode
                         for part in namespace {
                             currentNode = currentNode.addChild(part)
@@ -1446,6 +1681,18 @@ extension BridgeJSLink {
                             currentNode = currentNode.addChild(part)
                         }
                         currentNode.content.enums.append(enumDefinition)
+                    }
+
+                    if enumDefinition.enumType == .namespace {
+                        for function in enumDefinition.staticMethods {
+                            var currentNode = rootNode
+                            // Build full namespace path: parent namespace + enum name
+                            let fullNamespace = (enumDefinition.namespace ?? []) + [enumDefinition.name]
+                            for part in fullNamespace {
+                                currentNode = currentNode.addChild(part)
+                            }
+                            currentNode.content.functions.append(function)
+                        }
                     }
                 }
             }
@@ -1783,6 +2030,21 @@ extension WasmCoreType {
     fileprivate var placeholderValue: String {
         switch self {
         case .i32, .i64, .f32, .f64, .pointer: return "0"
+        }
+    }
+}
+
+extension StaticContext {
+    var namespaceName: String {
+        switch self {
+        case .className(let name):
+            return name
+        case .enumName(let name):
+            return name
+        case .namespaceEnum(let name):
+            return name
+        case .explicitNamespace(let components):
+            return components.joined(separator: ".")
         }
     }
 }

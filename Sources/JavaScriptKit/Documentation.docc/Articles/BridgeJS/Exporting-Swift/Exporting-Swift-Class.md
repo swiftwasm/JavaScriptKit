@@ -89,6 +89,6 @@ export type Exports = {
 | Computed properties: `var x: X { get set }` | ✅ |
 | Computed properties with effects: `var x: X { get async throws }` | 🚧  |
 | Methods: `func` | ✅ (See <doc:Exporting-Swift-Function> ) |
-| Static/class methods: `static func`, `class func` | 🚧 |
+| Static/class methods: `static func`, `class func` | ✅ (See <doc:Exporting-Swift-Static-Functions> ) |
 | Subscripts: `subscript()` | ❌ |
 | Generics | ❌ |

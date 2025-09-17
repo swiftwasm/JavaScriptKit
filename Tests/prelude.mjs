@@ -1,7 +1,7 @@
 // @ts-check
 
 import {
-    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme, APIResult, ComplexResult, APIOptionalResult
+    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme, APIResult, ComplexResult, APIOptionalResult, StaticCalculator
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
@@ -551,6 +551,13 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor9), aor9);
     assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor10), aor10);
     assert.equal(exports.roundTripOptionalAPIOptionalResult(null), null);
+
+    assert.equal(exports.MathUtils.add(2147483647, 0), 2147483647);
+    assert.equal(StaticCalculator.roundtrip(42), 42);
+    assert.equal(StaticCalculator.Scientific, 0);
+    assert.equal(StaticCalculator.Basic, 1);
+
+    assert.equal(globalThis.StaticUtils.Nested.roundtrip("hello world"), "hello world");
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
