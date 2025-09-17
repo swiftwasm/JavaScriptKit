@@ -57,6 +57,11 @@ const __bjs_createAPIResultHelpers = () => {
         }
     });
 };
+if (typeof globalThis.Utils === 'undefined') {
+    globalThis.Utils = {};
+}
+
+
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -275,10 +280,10 @@ export async function createInstantiator(options, swift) {
             };
             const exports = {
                 MathUtils,
-                uppercase: function bjs_Utils_String_uppercase(text) {
+                uppercase: function bjs_Utils_String_static_uppercase(text) {
                     const textBytes = textEncoder.encode(text);
                     const textId = swift.memory.retain(textBytes);
-                    instance.exports.bjs_Utils_String_uppercase(textId, textBytes.length);
+                    instance.exports.bjs_Utils_String_static_uppercase(textId, textBytes.length);
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     swift.memory.release(textId);

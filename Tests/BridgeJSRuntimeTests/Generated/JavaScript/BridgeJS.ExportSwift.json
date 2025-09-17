@@ -211,6 +211,9 @@
             "isThrows" : false
           },
           "name" : "toString",
+          "namespace" : [
+            "Utils"
+          ],
           "parameters" : [
             {
               "label" : "value",
@@ -259,6 +262,10 @@
             "isThrows" : false
           },
           "name" : "call",
+          "namespace" : [
+            "Networking",
+            "API"
+          ],
           "parameters" : [
             {
               "label" : "_",
@@ -308,6 +315,11 @@
             "isThrows" : false
           },
           "name" : "call",
+          "namespace" : [
+            "Networking",
+            "APIV2",
+            "Internal"
+          ],
           "parameters" : [
             {
               "label" : "_",
@@ -1215,6 +1227,37 @@
     },
     {
       "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Networking",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Networking"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "API",
+      "namespace" : [
+        "Networking"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Networking.API"
+    },
+    {
+      "cases" : [
         {
           "associatedValues" : [
 
@@ -1259,28 +1302,14 @@
 
       ],
       "emitStyle" : "const",
-      "name" : "API",
+      "name" : "Configuration",
       "staticMethods" : [
 
       ],
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "API"
-    },
-    {
-      "cases" : [
-
-      ],
-      "emitStyle" : "const",
-      "name" : "Networking",
-      "staticMethods" : [
-
-      ],
-      "staticProperties" : [
-
-      ],
-      "swiftCallName" : "Networking"
+      "swiftCallName" : "Configuration"
     },
     {
       "cases" : [
@@ -1370,14 +1399,18 @@
 
       ],
       "emitStyle" : "const",
-      "name" : "Configuration",
+      "name" : "Internal",
+      "namespace" : [
+        "Networking",
+        "APIV2"
+      ],
       "staticMethods" : [
 
       ],
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Configuration"
+      "swiftCallName" : "Internal"
     },
     {
       "cases" : [
@@ -1408,24 +1441,6 @@
 
       ],
       "swiftCallName" : "Internal.SupportedMethod"
-    },
-    {
-      "cases" : [
-
-      ],
-      "emitStyle" : "const",
-      "name" : "Internal",
-      "namespace" : [
-        "Networking",
-        "APIV2"
-      ],
-      "staticMethods" : [
-
-      ],
-      "staticProperties" : [
-
-      ],
-      "swiftCallName" : "Internal"
     },
     {
       "cases" : [
@@ -1704,6 +1719,20 @@
     },
     {
       "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Utilities",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Utilities"
+    },
+    {
+      "cases" : [
         {
           "associatedValues" : [
             {
@@ -1780,14 +1809,14 @@
 
       ],
       "emitStyle" : "const",
-      "name" : "Utilities",
+      "name" : "API",
       "staticMethods" : [
 
       ],
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Utilities"
+      "swiftCallName" : "API"
     },
     {
       "cases" : [
@@ -1835,20 +1864,6 @@
 
       ],
       "swiftCallName" : "API.NetworkingResult"
-    },
-    {
-      "cases" : [
-
-      ],
-      "emitStyle" : "const",
-      "name" : "API",
-      "staticMethods" : [
-
-      ],
-      "staticProperties" : [
-
-      ],
-      "swiftCallName" : "API"
     },
     {
       "cases" : [
@@ -2003,19 +2018,37 @@
 
       ],
       "emitStyle" : "const",
+      "name" : "StaticUtils",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "StaticUtils"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
       "name" : "Nested",
       "namespace" : [
         "StaticUtils"
       ],
       "staticMethods" : [
         {
-          "abiName" : "bjs_StaticUtils_Nested_roundtrip",
+          "abiName" : "bjs_StaticUtils_Nested_static_roundtrip",
           "effects" : {
             "isAsync" : false,
             "isStatic" : true,
             "isThrows" : false
           },
           "name" : "roundtrip",
+          "namespace" : [
+            "StaticUtils",
+            "Nested"
+          ],
           "parameters" : [
             {
               "label" : "_",
@@ -2034,7 +2067,7 @@
           },
           "staticContext" : {
             "namespaceEnum" : {
-              "_0" : "StaticUtils.Nested"
+
             }
           }
         }
@@ -2043,20 +2076,6 @@
 
       ],
       "swiftCallName" : "StaticUtils.Nested"
-    },
-    {
-      "cases" : [
-
-      ],
-      "emitStyle" : "const",
-      "name" : "StaticUtils",
-      "staticMethods" : [
-
-      ],
-      "staticProperties" : [
-
-      ],
-      "swiftCallName" : "StaticUtils"
     },
     {
       "cases" : [
@@ -2177,67 +2196,6 @@
 
       ],
       "emitStyle" : "const",
-      "name" : "NestedProperties",
-      "namespace" : [
-        "StaticPropertyNamespace"
-      ],
-      "staticMethods" : [
-
-      ],
-      "staticProperties" : [
-        {
-          "isReadonly" : false,
-          "isStatic" : true,
-          "name" : "nestedProperty",
-          "staticContext" : {
-            "namespaceEnum" : {
-              "_0" : "StaticPropertyNamespace.NestedProperties"
-            }
-          },
-          "type" : {
-            "int" : {
-
-            }
-          }
-        },
-        {
-          "isReadonly" : true,
-          "isStatic" : true,
-          "name" : "nestedConstant",
-          "staticContext" : {
-            "namespaceEnum" : {
-              "_0" : "StaticPropertyNamespace.NestedProperties"
-            }
-          },
-          "type" : {
-            "string" : {
-
-            }
-          }
-        },
-        {
-          "isReadonly" : false,
-          "isStatic" : true,
-          "name" : "nestedDouble",
-          "staticContext" : {
-            "namespaceEnum" : {
-              "_0" : "StaticPropertyNamespace.NestedProperties"
-            }
-          },
-          "type" : {
-            "double" : {
-
-            }
-          }
-        }
-      ],
-      "swiftCallName" : "StaticPropertyNamespace.NestedProperties"
-    },
-    {
-      "cases" : [
-
-      ],
-      "emitStyle" : "const",
       "name" : "StaticPropertyNamespace",
       "staticMethods" : [
 
@@ -2247,9 +2205,12 @@
           "isReadonly" : false,
           "isStatic" : true,
           "name" : "namespaceProperty",
+          "namespace" : [
+            "StaticPropertyNamespace"
+          ],
           "staticContext" : {
             "namespaceEnum" : {
-              "_0" : "StaticPropertyNamespace"
+
             }
           },
           "type" : {
@@ -2262,9 +2223,12 @@
           "isReadonly" : true,
           "isStatic" : true,
           "name" : "namespaceConstant",
+          "namespace" : [
+            "StaticPropertyNamespace"
+          ],
           "staticContext" : {
             "namespaceEnum" : {
-              "_0" : "StaticPropertyNamespace"
+
             }
           },
           "type" : {
@@ -2275,6 +2239,79 @@
         }
       ],
       "swiftCallName" : "StaticPropertyNamespace"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "NestedProperties",
+      "namespace" : [
+        "StaticPropertyNamespace"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "nestedProperty",
+          "namespace" : [
+            "StaticPropertyNamespace",
+            "NestedProperties"
+          ],
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "nestedConstant",
+          "namespace" : [
+            "StaticPropertyNamespace",
+            "NestedProperties"
+          ],
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "nestedDouble",
+          "namespace" : [
+            "StaticPropertyNamespace",
+            "NestedProperties"
+          ],
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          },
+          "type" : {
+            "double" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "StaticPropertyNamespace.NestedProperties"
     }
   ],
   "functions" : [

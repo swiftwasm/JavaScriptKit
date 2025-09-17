@@ -259,19 +259,37 @@
 
       ],
       "emitStyle" : "const",
+      "name" : "Utils",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Utils"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
       "name" : "String",
       "namespace" : [
         "Utils"
       ],
       "staticMethods" : [
         {
-          "abiName" : "bjs_Utils_String_uppercase",
+          "abiName" : "bjs_Utils_String_static_uppercase",
           "effects" : {
             "isAsync" : false,
             "isStatic" : true,
             "isThrows" : false
           },
           "name" : "uppercase",
+          "namespace" : [
+            "Utils",
+            "String"
+          ],
           "parameters" : [
             {
               "label" : "_",
@@ -290,7 +308,7 @@
           },
           "staticContext" : {
             "namespaceEnum" : {
-              "_0" : "Utils.String"
+
             }
           }
         }
@@ -299,20 +317,6 @@
 
       ],
       "swiftCallName" : "Utils.String"
-    },
-    {
-      "cases" : [
-
-      ],
-      "emitStyle" : "const",
-      "name" : "Utils",
-      "staticMethods" : [
-
-      ],
-      "staticProperties" : [
-
-      ],
-      "swiftCallName" : "Utils"
     }
   ],
   "functions" : [

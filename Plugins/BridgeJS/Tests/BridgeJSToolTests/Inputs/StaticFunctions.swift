@@ -4,7 +4,7 @@
     @JS class func subtract(a: Int, b: Int) -> Int {
         return a - b
     }
-    
+
     @JS static func add(a: Int, b: Int) -> Int {
         return a + b
     }
@@ -28,7 +28,7 @@ enum APIResult {
     case success(String)
     case failure(Int)
 
-    @JS static func roundtrip(value: APIResult) -> APIResult { }
+    @JS static func roundtrip(value: APIResult) -> APIResult {}
 }
 
 @JS enum Utils {

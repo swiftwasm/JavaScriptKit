@@ -263,6 +263,32 @@ export async function createInstantiator(options, swift) {
                     }
                 }
             }
+<<<<<<< HEAD
+=======
+            if (typeof globalThis.PropertyNamespace === 'undefined') {
+                globalThis.PropertyNamespace = {};
+            }
+            if (typeof globalThis.PropertyNamespace.Nested === 'undefined') {
+                globalThis.PropertyNamespace.Nested = {};
+            }
+            Object.defineProperty(globalThis.PropertyNamespace, 'namespaceProperty', { get: function() {
+                instance.exports.bjs_PropertyNamespace_static_namespaceProperty_get();
+                const ret = tmpRetString;
+                tmpRetString = undefined;
+                return ret;
+            }, set: function(value) {
+                const valueBytes = textEncoder.encode(value);
+                const valueId = swift.memory.retain(valueBytes);
+                instance.exports.bjs_PropertyNamespace_static_namespaceProperty_set(valueId, valueBytes.length);
+                swift.memory.release(valueId);
+            } });
+            Object.defineProperty(globalThis.PropertyNamespace, 'namespaceConstant', { get: function() {
+                instance.exports.bjs_PropertyNamespace_static_namespaceConstant_get();
+                const ret = tmpRetString;
+                tmpRetString = undefined;
+                return ret;
+            } });
+>>>>>>> 26a78490 (WIP: Enum handling and nesting simplifications (+1 squashed commit))
             Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedProperty', { get: function() {
                 const ret = instance.exports.bjs_PropertyNamespace_Nested_static_nestedProperty_get();
                 return ret;
@@ -280,23 +306,6 @@ export async function createInstantiator(options, swift) {
                 return ret;
             }, set: function(value) {
                 instance.exports.bjs_PropertyNamespace_Nested_static_nestedDouble_set(value);
-            } });
-            Object.defineProperty(globalThis.PropertyNamespace, 'namespaceProperty', { get: function() {
-                instance.exports.bjs_PropertyNamespace_static_namespaceProperty_get();
-                const ret = tmpRetString;
-                tmpRetString = undefined;
-                return ret;
-            }, set: function(value) {
-                const valueBytes = textEncoder.encode(value);
-                const valueId = swift.memory.retain(valueBytes);
-                instance.exports.bjs_PropertyNamespace_static_namespaceProperty_set(valueId, valueBytes.length);
-                swift.memory.release(valueId);
-            } });
-            Object.defineProperty(globalThis.PropertyNamespace, 'namespaceConstant', { get: function() {
-                instance.exports.bjs_PropertyNamespace_static_namespaceConstant_get();
-                const ret = tmpRetString;
-                tmpRetString = undefined;
-                return ret;
             } });
             Object.defineProperty(PropertyEnum, 'enumProperty', { get: function() {
                 instance.exports.bjs_PropertyEnum_static_enumProperty_get();

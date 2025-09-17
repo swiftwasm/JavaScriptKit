@@ -534,9 +534,9 @@ public func _bjs_StaticCalculator_static_roundtrip(value: Int32) -> Int32 {
     #endif
 }
 
-@_expose(wasm, "bjs_StaticUtils_Nested_roundtrip")
-@_cdecl("bjs_StaticUtils_Nested_roundtrip")
-public func _bjs_StaticUtils_Nested_roundtrip(valueBytes: Int32, valueLength: Int32) -> Void {
+@_expose(wasm, "bjs_StaticUtils_Nested_static_roundtrip")
+@_cdecl("bjs_StaticUtils_Nested_static_roundtrip")
+public func _bjs_StaticUtils_Nested_static_roundtrip(valueBytes: Int32, valueLength: Int32) -> Void {
     #if arch(wasm32)
     let ret = StaticUtils.Nested.roundtrip(_: String.bridgeJSLiftParameter(valueBytes, valueLength))
     return ret.bridgeJSLowerReturn()
@@ -686,6 +686,38 @@ public func _bjs_StaticPropertyEnum_static_computedReadWrite_set(valueBytes: Int
     #endif
 }
 
+@_expose(wasm, "bjs_StaticPropertyNamespace_static_namespaceProperty_get")
+@_cdecl("bjs_StaticPropertyNamespace_static_namespaceProperty_get")
+public func _bjs_StaticPropertyNamespace_static_namespaceProperty_get() -> Void {
+    #if arch(wasm32)
+    let ret = StaticPropertyNamespace.namespaceProperty
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StaticPropertyNamespace_static_namespaceProperty_set")
+@_cdecl("bjs_StaticPropertyNamespace_static_namespaceProperty_set")
+public func _bjs_StaticPropertyNamespace_static_namespaceProperty_set(valueBytes: Int32, valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    StaticPropertyNamespace.namespaceProperty = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StaticPropertyNamespace_static_namespaceConstant_get")
+@_cdecl("bjs_StaticPropertyNamespace_static_namespaceConstant_get")
+public func _bjs_StaticPropertyNamespace_static_namespaceConstant_get() -> Void {
+    #if arch(wasm32)
+    let ret = StaticPropertyNamespace.namespaceConstant
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_StaticPropertyNamespace_NestedProperties_static_nestedProperty_get")
 @_cdecl("bjs_StaticPropertyNamespace_NestedProperties_static_nestedProperty_get")
 public func _bjs_StaticPropertyNamespace_NestedProperties_static_nestedProperty_get() -> Int32 {
@@ -734,38 +766,6 @@ public func _bjs_StaticPropertyNamespace_NestedProperties_static_nestedDouble_ge
 public func _bjs_StaticPropertyNamespace_NestedProperties_static_nestedDouble_set(value: Float64) -> Void {
     #if arch(wasm32)
     StaticPropertyNamespace.NestedProperties.nestedDouble = Double.bridgeJSLiftParameter(value)
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_StaticPropertyNamespace_static_namespaceProperty_get")
-@_cdecl("bjs_StaticPropertyNamespace_static_namespaceProperty_get")
-public func _bjs_StaticPropertyNamespace_static_namespaceProperty_get() -> Void {
-    #if arch(wasm32)
-    let ret = StaticPropertyNamespace.namespaceProperty
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_StaticPropertyNamespace_static_namespaceProperty_set")
-@_cdecl("bjs_StaticPropertyNamespace_static_namespaceProperty_set")
-public func _bjs_StaticPropertyNamespace_static_namespaceProperty_set(valueBytes: Int32, valueLength: Int32) -> Void {
-    #if arch(wasm32)
-    StaticPropertyNamespace.namespaceProperty = String.bridgeJSLiftParameter(valueBytes, valueLength)
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_StaticPropertyNamespace_static_namespaceConstant_get")
-@_cdecl("bjs_StaticPropertyNamespace_static_namespaceConstant_get")
-public func _bjs_StaticPropertyNamespace_static_namespaceConstant_get() -> Void {
-    #if arch(wasm32)
-    let ret = StaticPropertyNamespace.namespaceConstant
-    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

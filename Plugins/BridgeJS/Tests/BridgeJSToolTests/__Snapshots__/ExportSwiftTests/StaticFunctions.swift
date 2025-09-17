@@ -90,9 +90,9 @@ public func _bjs_APIResult_static_roundtrip(value: Int32) -> Void {
     #endif
 }
 
-@_expose(wasm, "bjs_Utils_String_uppercase")
-@_cdecl("bjs_Utils_String_uppercase")
-public func _bjs_Utils_String_uppercase(textBytes: Int32, textLength: Int32) -> Void {
+@_expose(wasm, "bjs_Utils_String_static_uppercase")
+@_cdecl("bjs_Utils_String_static_uppercase")
+public func _bjs_Utils_String_static_uppercase(textBytes: Int32, textLength: Int32) -> Void {
     #if arch(wasm32)
     let ret = Utils.String.uppercase(_: String.bridgeJSLiftParameter(textBytes, textLength))
     return ret.bridgeJSLowerReturn()

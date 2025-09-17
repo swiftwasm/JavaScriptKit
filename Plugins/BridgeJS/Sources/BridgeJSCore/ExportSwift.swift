@@ -88,50 +88,19 @@ public class ExportSwift {
             }
         }
 
-        /// Temporary storage for enum data during visitor traversal since EnumCaseDeclSyntax lacks parent context
-        struct CurrentEnum {
-            var name: String?
-            var cases: [EnumCase] = []
-            var rawType: String?
-            var staticMethods: [ExportedFunction] = []
-            var staticProperties: [ExportedProperty] = []
-        }
-        
-        struct EnumStack {
-            private var stack: [CurrentEnum] = []
-            
-            var current: CurrentEnum {
-                get {
-                    return stack.last ?? CurrentEnum()
-                }
-                set {
-                    if stack.isEmpty {
-                        stack.append(newValue)
-                    } else {
-                        stack[stack.count - 1] = newValue
-                    }
-                }
-            }
-            
-            mutating func push(_ enumData: CurrentEnum) {
-                stack.append(enumData)
-            }
-            
-            mutating func pop() -> CurrentEnum? {
-                return stack.popLast()
-            }
-            
-            var isEmpty: Bool {
-                return stack.isEmpty
+        /// Creates a unique key for an enum by combining name and namespace
+        private func enumKey(name: String, namespace: [String]?) -> String {
+            if let namespace = namespace, !namespace.isEmpty {
+                return "\(namespace.joined(separator: ".")).\(name)"
+            } else {
+                return name
             }
         }
-        
-        var enumStack = EnumStack()
 
         enum State {
             case topLevel
             case classBody(name: String, key: String)
-            case enumBody(name: String)
+            case enumBody(name: String, key: String)
         }
 
         struct StateStack {
@@ -189,8 +158,7 @@ public class ExportSwift {
             }
 
             let isStatic = node.modifiers.contains { modifier in
-                modifier.name.tokenKind == .keyword(.static) ||
-                modifier.name.tokenKind == .keyword(.class)
+                modifier.name.tokenKind == .keyword(.static) || modifier.name.tokenKind == .keyword(.class)
             }
 
             switch state {
@@ -213,15 +181,16 @@ public class ExportSwift {
                     exportedClassByName[classKey]?.methods.append(exportedFunction)
                 }
                 return .skipChildren
-            case .enumBody(let enumName):
+            case .enumBody(let enumName, let enumKey):
                 if !isStatic {
                     diagnose(node: node, message: "Only static functions are supported in enums")
                     return .skipChildren
                 }
                 if let exportedFunction = visitFunction(node: node, isStatic: isStatic, enumName: enumName) {
-                    var current = enumStack.current
-                    current.staticMethods.append(exportedFunction)
-                    enumStack.current = current
+                    if var currentEnum = exportedEnumByName[enumKey] {
+                        currentEnum.staticMethods.append(exportedFunction)
+                        exportedEnumByName[enumKey] = currentEnum
+                    }
                 }
                 return .skipChildren
             }
@@ -239,9 +208,19 @@ public class ExportSwift {
             }
 
             let name = node.name.text
-            let namespace = extractNamespace(from: jsAttribute)
 
-            if namespace != nil, case .classBody = state {
+            let attributeNamespace = extractNamespace(from: jsAttribute)
+            let computedNamespace = computeNamespace(for: node)
+
+            let finalNamespace: [String]?
+
+            if let computed = computedNamespace, !computed.isEmpty {
+                finalNamespace = computed
+            } else {
+                finalNamespace = attributeNamespace
+            }
+
+            if attributeNamespace != nil, case .classBody = state {
                 diagnose(
                     node: jsAttribute,
                     message: "Namespace is only needed in top-level declaration",
@@ -249,7 +228,7 @@ public class ExportSwift {
                 )
             }
 
-            if namespace != nil, case .enumBody = state {
+            if attributeNamespace != nil, case .enumBody = state {
                 diagnose(
                     node: jsAttribute,
                     message: "Namespace is not supported for enum static functions",
@@ -308,34 +287,22 @@ public class ExportSwift {
                     abiName = "bjs_\(className)_\(name)"
                     staticContext = nil
                 }
-            case .enumBody(let enumName):
+            case .enumBody(let enumName, let enumKey):
                 if !isStatic {
                     diagnose(node: node, message: "Only static functions are supported in enums")
                     return nil
                 }
 
-                let isNamespaceEnum = enumStack.current.cases.isEmpty
+                let isNamespaceEnum = exportedEnumByName[enumKey]?.cases.isEmpty ?? true
+                staticContext = isNamespaceEnum ? .namespaceEnum : .enumName(enumName)
 
-                if isNamespaceEnum {
-                    // For namespace enums, compute the full Swift call path manually
-                    var swiftPath: [String] = []
-                    var currentNode: Syntax? = node.parent
-                    while let parent = currentNode {
-                        if let enumDecl = parent.as(EnumDeclSyntax.self),
-                            enumDecl.attributes.hasJSAttribute()
-                        {
-                            swiftPath.insert(enumDecl.name.text, at: 0)
-                        }
-                        currentNode = parent.parent
-                    }
-                    let fullEnumCallName = swiftPath.joined(separator: ".")
-                    
-                    // ABI name should include full namespace path to avoid conflicts
-                    abiName = "bjs_\(swiftPath.joined(separator: "_"))_\(name)"
-                    staticContext = .namespaceEnum(fullEnumCallName)
+                if isNamespaceEnum, let namespace = finalNamespace, !namespace.isEmpty {
+                    // For namespace enums, use ONLY the resolved namespace to avoid duplication
+                    // The finalNamespace already contains the correct namespace path
+                    let abiNamespace = namespace.joined(separator: "_")
+                    abiName = "bjs_\(abiNamespace)_static_\(name)"
                 } else {
                     abiName = "bjs_\(enumName)_static_\(name)"
-                    staticContext = .enumName(enumName)
                 }
             }
 
@@ -349,7 +316,7 @@ public class ExportSwift {
                 parameters: parameters,
                 returnType: returnType,
                 effects: effects,
-                namespace: namespace,
+                namespace: finalNamespace,  // UPDATED: Use resolved namespace
                 staticContext: staticContext
             )
         }
@@ -414,9 +381,9 @@ public class ExportSwift {
         }
 
         override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
-            guard node.attributes.hasJSAttribute() else { return .skipChildren }
+            guard let jsAttribute = node.attributes.firstJSAttribute else { return .skipChildren }
             guard case .classBody(let className, _) = state else {
-                if case .enumBody(_) = state {
+                if case .enumBody(_, _) = state {
                     diagnose(node: node, message: "Initializers are not supported inside enums")
                 } else {
                     diagnose(node: node, message: "@JS init must be inside a @JS class")
@@ -424,9 +391,7 @@ public class ExportSwift {
                 return .skipChildren
             }
 
-            if let jsAttribute = node.attributes.firstJSAttribute,
-                extractNamespace(from: jsAttribute) != nil
-            {
+            if extractNamespace(from: jsAttribute) != nil {
                 diagnose(
                     node: jsAttribute,
                     message: "Namespace is not supported for initializer declarations",
@@ -461,61 +426,52 @@ public class ExportSwift {
         }
 
         override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
-            guard node.attributes.hasJSAttribute() else { return .skipChildren }
-            
+            guard let jsAttribute = node.attributes.firstJSAttribute else { return .skipChildren }
+
             let isStatic = node.modifiers.contains { modifier in
-                modifier.name.tokenKind == .keyword(.static) ||
-                modifier.name.tokenKind == .keyword(.class)
+                modifier.name.tokenKind == .keyword(.static) || modifier.name.tokenKind == .keyword(.class)
             }
-            
+
+            let attributeNamespace = extractNamespace(from: jsAttribute)
+            if attributeNamespace != nil {
+                diagnose(
+                    node: node.attributes.firstJSAttribute!,
+                    message: "Namespace parameter within @JS attribute is not supported for property declarations",
+                    hint:
+                        "Remove the namespace from @JS attribute. If you need dedicated namespace, consider using a nested enum or class instead."
+                )
+            }
+
+            let computedNamespace = computeNamespace(for: node)
+            let finalNamespace: [String]?
+
+            if let computed = computedNamespace, !computed.isEmpty {
+                finalNamespace = computed
+            } else {
+                finalNamespace = nil
+            }
+
+            // Determine static context and validate placement
             let staticContext: StaticContext?
             let classKey: String
-            
+
             switch state {
             case .classBody(let className, let key):
                 classKey = key
-                if isStatic {
-                    staticContext = .className(className)
-                } else {
-                    staticContext = nil
-                }
-            case .enumBody(let enumName):
+                staticContext = isStatic ? .className(className) : nil
+            case .enumBody(let enumName, let enumKey):
                 if !isStatic {
                     diagnose(node: node, message: "Only static properties are supported in enums")
                     return .skipChildren
                 }
-                classKey = enumName // We'll handle enum properties differently
-                
-                let isNamespaceEnum = enumStack.current.cases.isEmpty
-                if isNamespaceEnum {
-                    var swiftPath: [String] = []
-                    var currentNode: Syntax? = node.parent
-                    while let parent = currentNode {
-                        if let enumDecl = parent.as(EnumDeclSyntax.self),
-                            enumDecl.attributes.hasJSAttribute()
-                        {
-                            swiftPath.insert(enumDecl.name.text, at: 0)
-                        }
-                        currentNode = parent.parent
-                    }
-                    let fullEnumCallName = swiftPath.joined(separator: ".")
-                    staticContext = .namespaceEnum(fullEnumCallName)
-                } else {
-                    staticContext = .enumName(enumName)
-                }
+                classKey = enumKey
+
+                let isNamespaceEnum = exportedEnumByName[enumKey]?.cases.isEmpty ?? true
+                staticContext = isStatic ? (isNamespaceEnum ? .namespaceEnum : .enumName(enumName)) : nil
+
             case .topLevel:
                 diagnose(node: node, message: "@JS var must be inside a @JS class or enum")
                 return .skipChildren
-            }
-
-            if let jsAttribute = node.attributes.firstJSAttribute,
-                extractNamespace(from: jsAttribute) != nil
-            {
-                diagnose(
-                    node: jsAttribute,
-                    message: "Namespace is not supported for property declarations",
-                    hint: "Remove the namespace from @JS attribute"
-                )
             }
 
             // Process each binding (variable declaration)
@@ -563,13 +519,15 @@ public class ExportSwift {
                     type: propertyType,
                     isReadonly: isReadonly,
                     isStatic: isStatic,
+                    namespace: finalNamespace,
                     staticContext: staticContext
                 )
 
-                if case .enumBody(_) = state {
-                    var current = enumStack.current
-                    current.staticProperties.append(exportedProperty)
-                    enumStack.current = current
+                if case .enumBody(_, let enumKey) = state {
+                    if var currentEnum = exportedEnumByName[enumKey] {
+                        currentEnum.staticProperties.append(exportedProperty)
+                        exportedEnumByName[enumKey] = currentEnum
+                    }
                 } else {
                     exportedClassByName[classKey]?.properties.append(exportedProperty)
                 }
@@ -656,46 +614,59 @@ public class ExportSwift {
                 return .skipChildren
             }
 
-            let newEnum = CurrentEnum()
-            enumStack.push(newEnum)
-            
-            var current = enumStack.current
-            current.name = name
-            current.cases = []
-            current.rawType = rawType
-            enumStack.current = current
+            let effectiveNamespace = computedNamespace ?? attributeNamespace
+            let emitStyle = extractEnumStyle(from: jsAttribute) ?? .const
+            let swiftCallName = ExportSwift.computeSwiftCallName(for: node, itemName: name)
+            let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
+                for: node,
+                message: "Enum visibility must be at least internal"
+            )
 
-            stateStack.push(state: .enumBody(name: name))
+            // Create enum directly in dictionary
+            let exportedEnum = ExportedEnum(
+                name: name,
+                swiftCallName: swiftCallName,
+                explicitAccessControl: explicitAccessControl,
+                cases: [],  // Will be populated in visit(EnumCaseDeclSyntax)
+                rawType: rawType,
+                namespace: effectiveNamespace,
+                emitStyle: emitStyle,
+                staticMethods: [],
+                staticProperties: []
+            )
+
+            let enumUniqueKey = enumKey(name: name, namespace: effectiveNamespace)
+            exportedEnumByName[enumUniqueKey] = exportedEnum
+            exportedEnumNames.append(enumUniqueKey)
+
+            stateStack.push(state: .enumBody(name: name, key: enumUniqueKey))
 
             return .visitChildren
         }
 
         override func visitPost(_ node: EnumDeclSyntax) {
-            guard let jsAttribute = node.attributes.firstJSAttribute,
-                let enumName = enumStack.current.name
-            else {
+            guard let jsAttribute = node.attributes.firstJSAttribute else {
                 // Only pop if we have a valid enum that was processed
-                if case .enumBody(_) = stateStack.current {
+                if case .enumBody(_, _) = stateStack.current {
                     stateStack.pop()
-                    _ = enumStack.pop() // Also pop the enum stack
                 }
                 return
             }
 
-            let attributeNamespace = extractNamespace(from: jsAttribute)
-            let computedNamespace = computeNamespace(for: node)
-
-            let effectiveNamespace: [String]?
-            if computedNamespace == nil && attributeNamespace != nil {
-                effectiveNamespace = attributeNamespace
-            } else {
-                effectiveNamespace = computedNamespace
+            guard case .enumBody(_, let enumKey) = stateStack.current else {
+                return
             }
 
-            let emitStyle = extractEnumStyle(from: jsAttribute) ?? .const
+            guard let exportedEnum = exportedEnumByName[enumKey] else {
+                stateStack.pop()
+                return
+            }
+
+            let emitStyle = exportedEnum.emitStyle
 
             if case .tsEnum = emitStyle {
-                if let raw = enumStack.current.rawType,
+                // Check for Bool raw type limitation
+                if let raw = exportedEnum.rawType,
                     let rawEnum = SwiftEnumRawType.from(raw), rawEnum == .bool
                 {
                     diagnose(
@@ -705,8 +676,8 @@ public class ExportSwift {
                     )
                 }
 
-                if !enumStack.current.staticMethods.isEmpty {
-
+                // Check for static functions limitation
+                if !exportedEnum.staticMethods.isEmpty {
                     diagnose(
                         node: jsAttribute,
                         message: "TypeScript enum style does not support static functions",
@@ -715,7 +686,7 @@ public class ExportSwift {
                 }
             }
 
-            if enumStack.current.cases.contains(where: { !$0.associatedValues.isEmpty }) {
+            if exportedEnum.cases.contains(where: { !$0.associatedValues.isEmpty }) {
                 if case .tsEnum = emitStyle {
                     diagnose(
                         node: jsAttribute,
@@ -723,7 +694,7 @@ public class ExportSwift {
                         hint: "Use enumStyle: .const in order to map associated-value enums"
                     )
                 }
-                for enumCase in enumStack.current.cases {
+                for enumCase in exportedEnum.cases {
                     for associatedValue in enumCase.associatedValues {
                         switch associatedValue.type {
                         case .string, .int, .float, .double, .bool:
@@ -752,37 +723,20 @@ public class ExportSwift {
                 }
             }
 
-            let swiftCallName = ExportSwift.computeSwiftCallName(for: node, itemName: enumName)
-            let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
-                for: node,
-                message: "Enum visibility must be at least internal"
-            )
-            let currentEnumData = enumStack.current
-            let exportedEnum = ExportedEnum(
-                name: enumName,
-                swiftCallName: swiftCallName,
-                explicitAccessControl: explicitAccessControl,
-                cases: currentEnumData.cases,
-                rawType: currentEnumData.rawType,
-                namespace: effectiveNamespace,
-                emitStyle: emitStyle,
-                staticMethods: currentEnumData.staticMethods,
-                staticProperties: currentEnumData.staticProperties
-            )
-            exportedEnumByName[enumName] = exportedEnum
-            exportedEnumNames.append(enumName)
-
-            _ = enumStack.pop() // Pop the completed enum from stack
             stateStack.pop()
         }
 
         override func visit(_ node: EnumCaseDeclSyntax) -> SyntaxVisitorContinueKind {
+            guard case .enumBody(_, let enumKey) = stateStack.current else {
+                return .visitChildren
+            }
+
             for element in node.elements {
                 let caseName = element.name.text
                 let rawValue: String?
                 var associatedValues: [AssociatedValue] = []
 
-                if enumStack.current.rawType != nil {
+                if exportedEnumByName[enumKey]?.rawType != nil {
                     if let stringLiteral = element.rawValue?.value.as(StringLiteralExprSyntax.self) {
                         rawValue = stringLiteral.segments.first?.as(StringSegmentSyntax.self)?.content.text
                     } else if let boolLiteral = element.rawValue?.value.as(BooleanLiteralExprSyntax.self) {
@@ -817,10 +771,7 @@ public class ExportSwift {
                     rawValue: rawValue,
                     associatedValues: associatedValues
                 )
-
-                var current = enumStack.current
-                current.cases.append(enumCase)
-                enumStack.current = current
+                exportedEnumByName[enumKey]?.cases.append(enumCase)
             }
 
             return .visitChildren
@@ -1034,14 +985,17 @@ public class ExportSwift {
             case .namespace:
                 ()
             }
-            
+
             for staticMethod in enumDef.staticMethods {
                 decls.append(try renderSingleExportedFunction(function: staticMethod))
             }
-            
+
             for staticProperty in enumDef.staticProperties {
-                let getterBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false, isStatic: true))
-                
+                let getterBuilder = ExportedThunkBuilder(
+                    effects: Effects(isAsync: false, isThrows: false, isStatic: true)
+                )
+
+                // Use context-aware call name based on static context and namespace
                 let staticCallName: String
                 if let staticContext = staticProperty.staticContext {
                     switch staticContext {
@@ -1049,21 +1003,28 @@ public class ExportSwift {
                         staticCallName = "\(className).\(staticProperty.name)"
                     case .enumName(let enumName):
                         staticCallName = "\(enumName).\(staticProperty.name)"
-                    case .namespaceEnum(let enumName):
-                        staticCallName = "\(enumName).\(staticProperty.name)"
-                    case .explicitNamespace(let namespace):
-                        staticCallName = "\(namespace.joined(separator: ".")).\(staticProperty.name)"
+                    case .namespaceEnum:
+                        // For namespace enums and explicit namespace, use the namespace property
+                        if let namespace = staticProperty.namespace, !namespace.isEmpty {
+                            let namespacePath = namespace.joined(separator: ".")
+                            staticCallName = "\(namespacePath).\(staticProperty.name)"
+                        } else {
+                            // Fallback to using the enum's swift call name
+                            staticCallName = "\(enumDef.swiftCallName).\(staticProperty.name)"
+                        }
                     }
                 } else {
                     staticCallName = "\(enumDef.swiftCallName).\(staticProperty.name)"
                 }
-                
+
                 getterBuilder.callStaticProperty(name: staticCallName, returnType: staticProperty.type)
                 try getterBuilder.lowerReturnValue(returnType: staticProperty.type)
                 decls.append(getterBuilder.render(abiName: staticProperty.getterAbiName(className: enumDef.name)))
 
                 if !staticProperty.isReadonly {
-                    let setterBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false, isStatic: true))
+                    let setterBuilder = ExportedThunkBuilder(
+                        effects: Effects(isAsync: false, isThrows: false, isStatic: true)
+                    )
                     try setterBuilder.liftParameter(
                         param: Parameter(label: "value", name: "value", type: staticProperty.type)
                     )
@@ -1495,7 +1456,7 @@ public class ExportSwift {
         for param in function.parameters {
             try builder.liftParameter(param: param)
         }
-        
+
         if function.effects.isStatic, let staticContext = function.staticContext {
             let callName: String
             switch staticContext {
@@ -1503,16 +1464,20 @@ public class ExportSwift {
                 callName = "\(className).\(function.name)"
             case .enumName(let enumName):
                 callName = "\(enumName).\(function.name)"
-            case .namespaceEnum(let enumName):
-                callName = "\(enumName).\(function.name)"
-            case .explicitNamespace(let namespace):
-                callName = "\(namespace.joined(separator: ".")).\(function.name)"
+            case .namespaceEnum:
+                // For namespace enums and explicit namespace, use the namespace property
+                if let namespace = function.namespace, !namespace.isEmpty {
+                    callName = "\(namespace.joined(separator: ".")).\(function.name)"
+                } else {
+                    // Fallback to just the function name for functions without namespace
+                    callName = function.name
+                }
             }
             builder.call(name: callName, returnType: function.returnType)
         } else {
             builder.call(name: function.name, returnType: function.returnType)
         }
-        
+
         try builder.lowerReturnValue(returnType: function.returnType)
         return builder.render(abiName: function.abiName)
     }
@@ -1578,7 +1543,7 @@ public class ExportSwift {
         }
         for method in klass.methods {
             let builder = ExportedThunkBuilder(effects: method.effects)
-            
+
             if method.effects.isStatic {
                 for param in method.parameters {
                     try builder.liftParameter(param: param)
@@ -1605,7 +1570,9 @@ public class ExportSwift {
         for property in klass.properties {
             if property.isStatic {
                 // Generate static property getter
-                let getterBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false, isStatic: true))
+                let getterBuilder = ExportedThunkBuilder(
+                    effects: Effects(isAsync: false, isThrows: false, isStatic: true)
+                )
                 let staticCallName = "\(klass.swiftCallName).\(property.name)"
                 getterBuilder.callStaticProperty(name: staticCallName, returnType: property.type)
                 try getterBuilder.lowerReturnValue(returnType: property.type)
@@ -1613,7 +1580,9 @@ public class ExportSwift {
 
                 // Generate static property setter if not readonly
                 if !property.isReadonly {
-                    let setterBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false, isStatic: true))
+                    let setterBuilder = ExportedThunkBuilder(
+                        effects: Effects(isAsync: false, isThrows: false, isStatic: true)
+                    )
                     try setterBuilder.liftParameter(
                         param: Parameter(label: "value", name: "value", type: property.type)
                     )

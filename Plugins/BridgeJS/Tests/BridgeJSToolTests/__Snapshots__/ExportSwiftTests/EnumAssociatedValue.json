@@ -254,6 +254,20 @@
     },
     {
       "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Utilities",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Utilities"
+    },
+    {
+      "cases" : [
         {
           "associatedValues" : [
             {
@@ -324,20 +338,6 @@
 
       ],
       "swiftCallName" : "Utilities.Result"
-    },
-    {
-      "cases" : [
-
-      ],
-      "emitStyle" : "const",
-      "name" : "Utilities",
-      "staticMethods" : [
-
-      ],
-      "staticProperties" : [
-
-      ],
-      "swiftCallName" : "Utilities"
     },
     {
       "cases" : [

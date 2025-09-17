@@ -155,7 +155,7 @@ struct BridgeJSLink {
                 var (js, dts) = try renderExportedFunction(function: function)
 
                 if function.effects.isStatic,
-                    case .namespaceEnum(_) = function.staticContext
+                    case .namespaceEnum = function.staticContext
                 {
                     data.namespacedFunctions.append(function)
                 } else if function.namespace != nil {
@@ -175,25 +175,31 @@ struct BridgeJSLink {
                     let fullNamespace = (enumDefinition.namespace ?? []) + [enumDefinition.name]
                     functionWithNamespace.namespace = fullNamespace
                     data.namespacedFunctions.append(functionWithNamespace)
-                    
+
                     var (js, dts) = try renderExportedFunction(function: functionWithNamespace)
                     js[0] = "\(functionWithNamespace.name): " + js[0]
                     js[js.count - 1] += ","
                     data.exportsLines.append(contentsOf: js)
                     data.dtsExportLines.append(contentsOf: dts)
                 }
-                
+
                 for property in enumDefinition.staticProperties {
                     let fullNamespace = (enumDefinition.namespace ?? []) + [enumDefinition.name]
                     let namespacePath = fullNamespace.joined(separator: ".")
-                    let (propJs, _) = try renderNamespaceStaticProperty(property: property, namespacePath: namespacePath)
+                    let (propJs, _) = try renderNamespaceStaticProperty(
+                        property: property,
+                        namespacePath: namespacePath
+                    )
                     data.enumStaticAssignments.append(contentsOf: propJs)
                 }
             }
 
             for enumDefinition in skeleton.enums where enumDefinition.enumType != .namespace {
                 for function in enumDefinition.staticMethods {
-                    let assignmentJs = try renderEnumStaticFunctionAssignment(function: function, enumName: enumDefinition.name)
+                    let assignmentJs = try renderEnumStaticFunctionAssignment(
+                        function: function,
+                        enumName: enumDefinition.name
+                    )
                     data.enumStaticAssignments.append(contentsOf: assignmentJs)
                 }
                 for property in enumDefinition.staticProperties {
@@ -629,7 +635,7 @@ struct BridgeJSLink {
                 if hasAnyNamespacedItems {
                     var allUniqueNamespaces: [String] = []
                     var seen = Set<String>()
-                    
+
                     let functionNamespacePaths: Set<[String]> = Set(
                         data.namespacedFunctions.compactMap { $0.namespace }
                     )
@@ -637,25 +643,27 @@ struct BridgeJSLink {
                         data.namespacedClasses.compactMap { $0.namespace }
                     )
                     let allRegularNamespacePaths = functionNamespacePaths.union(classNamespacePaths)
-                    
+
                     let enumNamespacePaths: Set<[String]> = Set(
                         data.namespacedEnums.compactMap { $0.namespace }
                     )
-                    
-                    var namespaceEnumPropertyPaths: Set<[String]> = Set()
+
+                    // From static properties with namespace property (collect their complete namespace paths)
+                    var staticPropertyNamespacePaths: Set<[String]> = Set()
                     for skeleton in exportedSkeletons {
                         for enumDefinition in skeleton.enums {
                             for property in enumDefinition.staticProperties {
-                                if case .namespaceEnum(let fullNamespacePath) = property.staticContext {
-                                    let namespaceParts = fullNamespacePath.split(separator: ".").map(String.init)
-                                    namespaceEnumPropertyPaths.insert(namespaceParts)
+                                if let namespace = property.namespace, !namespace.isEmpty {
+                                    staticPropertyNamespacePaths.insert(namespace)
                                 }
                             }
                         }
                     }
-                    
-                    let allNamespacePaths = allRegularNamespacePaths.union(enumNamespacePaths).union(namespaceEnumPropertyPaths)
-                    
+
+                    let allNamespacePaths = allRegularNamespacePaths.union(enumNamespacePaths).union(
+                        staticPropertyNamespacePaths
+                    )
+
                     allNamespacePaths.forEach { namespacePath in
                         namespacePath.enumerated().forEach { (index, _) in
                             let path = namespacePath[0...index].joined(separator: ".")
@@ -664,7 +672,7 @@ struct BridgeJSLink {
                             }
                         }
                     }
-                    
+
                     allUniqueNamespaces.sorted().forEach { namespace in
                         printer.write("if (typeof globalThis.\(namespace) === 'undefined') {")
                         printer.indent {
@@ -676,14 +684,14 @@ struct BridgeJSLink {
 
                 // NOW assign enum static function/property implementations (namespaces are ready)
                 printer.write(lines: data.enumStaticAssignments)
-                
+
                 if hasAnyNamespacedItems {
                     printer.write("const exports = {")
                     printer.indent {
                         printer.write(lines: data.exportsLines)
                     }
                     printer.write("};")
-                    
+
                     data.namespacedClasses.forEach { klass in
                         let namespacePath: String = klass.namespace?.joined(separator: ".") ?? ""
                         printer.write("globalThis.\(namespacePath).\(klass.name) = exports.\(klass.name);")
@@ -954,7 +962,6 @@ struct BridgeJSLink {
         return (jsLines, dtsLines)
     }
 
-
     private func generateDeclarations(enumDefinition: ExportedEnum) -> [String] {
         let printer = CodeFragmentPrinter()
 
@@ -1120,10 +1127,14 @@ extension BridgeJSLink {
             return try renderClassStaticFunction(function: function, className: className)
         case .enumName(let enumName):
             return try renderEnumStaticFunction(function: function, enumName: enumName)
-        case .namespaceEnum(let enumName):
-            return try renderNamespaceFunction(function: function, namespace: enumName)
-        case .explicitNamespace(let namespace):
-            return try renderNamespaceFunction(function: function, namespace: namespace.joined(separator: "."))
+        case .namespaceEnum:
+            // Use function's namespace property for namespace enum
+            if let namespace = function.namespace, !namespace.isEmpty {
+                return try renderNamespaceFunction(function: function, namespace: namespace.joined(separator: "."))
+            } else {
+                // Fallback to regular function rendering
+                return try renderExportedFunction(function: function)
+            }
         }
     }
 
@@ -1213,7 +1224,9 @@ extension BridgeJSLink {
         let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
 
         let printer = CodeFragmentPrinter()
-        printer.write("\(enumName).\(function.name) = function(\(function.parameters.map { $0.name }.joined(separator: ", "))) {")
+        printer.write(
+            "\(enumName).\(function.name) = function(\(function.parameters.map { $0.name }.joined(separator: ", "))) {"
+        )
         printer.indent {
             printer.write(contentsOf: thunkBuilder.body)
             printer.write(contentsOf: thunkBuilder.cleanupCode)
@@ -1233,7 +1246,7 @@ extension BridgeJSLink {
         enumName: String
     ) throws -> (js: [String], dts: [String]) {
         var jsLines: [String] = []
-        
+
         // Generate getter assignment
         let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
         let getterReturnExpr = try getterThunkBuilder.call(
@@ -1247,17 +1260,17 @@ extension BridgeJSLink {
             returnExpr: getterReturnExpr,
             declarationPrefixKeyword: nil
         )
-        
+
         // Build Object.defineProperty call
         var definePropertyLines: [String] = []
         definePropertyLines.append("Object.defineProperty(\(enumName), '\(property.name)', { get: function() {")
-        
+
         // Add getter body (skip function declaration and closing brace)
         if getterLines.count > 2 {
-            let bodyLines = Array(getterLines[1..<getterLines.count-1]) // Skip first and last lines
+            let bodyLines = Array(getterLines[1..<getterLines.count - 1])  // Skip first and last lines
             definePropertyLines.append(contentsOf: bodyLines)
         }
-        
+
         if !property.isReadonly {
             // Generate setter
             let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
@@ -1275,11 +1288,11 @@ extension BridgeJSLink {
                 returnExpr: nil,
                 declarationPrefixKeyword: nil
             )
-            
+
             // Add setter with proper comma separation
             definePropertyLines.append("}, set: function(value) {")
             if setterLines.count > 2 {
-                let bodyLines = Array(setterLines[1..<setterLines.count-1]) // Skip first and last lines
+                let bodyLines = Array(setterLines[1..<setterLines.count - 1])  // Skip first and last lines
                 definePropertyLines.append(contentsOf: bodyLines)
             }
             definePropertyLines.append("} });")
@@ -1287,7 +1300,7 @@ extension BridgeJSLink {
             // Readonly property - just close the getter
             definePropertyLines.append("} });")
         }
-        
+
         jsLines.append(contentsOf: definePropertyLines)
 
         // TypeScript definitions are handled by generateDeclarations
@@ -1302,7 +1315,7 @@ extension BridgeJSLink {
         namespacePath: String
     ) throws -> (js: [String], dts: [String]) {
         var jsLines: [String] = []
-        
+
         // Generate getter assignment
         let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
         // Use the last component of namespace as the className for ABI name generation
@@ -1318,17 +1331,19 @@ extension BridgeJSLink {
             returnExpr: getterReturnExpr,
             declarationPrefixKeyword: nil
         )
-        
+
         // Build Object.defineProperty call for namespace
         var definePropertyLines: [String] = []
-        definePropertyLines.append("Object.defineProperty(globalThis.\(namespacePath), '\(property.name)', { get: function() {")
-        
+        definePropertyLines.append(
+            "Object.defineProperty(globalThis.\(namespacePath), '\(property.name)', { get: function() {"
+        )
+
         // Add getter body (skip function declaration and closing brace)
         if getterLines.count > 2 {
-            let bodyLines = Array(getterLines[1..<getterLines.count-1]) // Skip first and last lines
+            let bodyLines = Array(getterLines[1..<getterLines.count - 1])  // Skip first and last lines
             definePropertyLines.append(contentsOf: bodyLines)
         }
-        
+
         if !property.isReadonly {
             // Generate setter
             let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
@@ -1346,12 +1361,12 @@ extension BridgeJSLink {
                 returnExpr: nil,
                 declarationPrefixKeyword: nil
             )
-            
+
             // Add setter with proper comma separation
             definePropertyLines.append("}, set: function(value) {")
             // Add setter body (skip function declaration and closing brace)
             if setterLines.count > 2 {
-                let bodyLines = Array(setterLines[1..<setterLines.count-1]) // Skip first and last lines
+                let bodyLines = Array(setterLines[1..<setterLines.count - 1])  // Skip first and last lines
                 definePropertyLines.append(contentsOf: bodyLines)
             }
             definePropertyLines.append("} });")
@@ -1359,7 +1374,7 @@ extension BridgeJSLink {
             // Readonly property - just close the getter
             definePropertyLines.append("} });")
         }
-        
+
         jsLines.append(contentsOf: definePropertyLines)
 
         // TypeScript definitions are handled by namespace declarations
@@ -1824,13 +1839,13 @@ extension BridgeJSLink {
                 }
             }
 
+            // Collect namespaces from static properties with namespace property
             for skeleton in exportedSkeletons {
                 for enumDefinition in skeleton.enums {
                     for property in enumDefinition.staticProperties {
-                        if case .namespaceEnum(let fullNamespacePath) = property.staticContext {
-                            let namespaceParts = fullNamespacePath.split(separator: ".").map(String.init)
-                            namespaceParts.enumerated().forEach { (index, _) in
-                                let path = namespaceParts[0...index].joined(separator: ".")
+                        if let namespace = property.namespace, !namespace.isEmpty {
+                            namespace.enumerated().forEach { (index, _) in
+                                let path = namespace[0...index].joined(separator: ".")
                                 if !seen.contains(path) {
                                     seen.insert(path)
                                     uniqueNamespaces.append(path)
@@ -1857,7 +1872,7 @@ extension BridgeJSLink {
                 if enumDef.enumType == .namespace {
                     continue
                 }
-                
+
                 let namespacePath = enumDef.namespace?.joined(separator: ".") ?? ""
                 printer.write("globalThis.\(namespacePath).\(enumDef.name) = \(enumDef.name);")
             }
@@ -1916,11 +1931,16 @@ extension BridgeJSLink {
             for skeleton in exportedSkeletons {
                 for function in skeleton.functions {
                     if function.effects.isStatic,
-                        case .namespaceEnum(let enumName) = function.staticContext
+                        case .namespaceEnum = function.staticContext
                     {
-                        var currentNode = rootNode
-                        currentNode = currentNode.addChild(enumName)
-                        currentNode.content.functions.append(function)
+                        // Use the function's namespace property instead of enumName
+                        if let namespace = function.namespace {
+                            var currentNode = rootNode
+                            for part in namespace {
+                                currentNode = currentNode.addChild(part)
+                            }
+                            currentNode.content.functions.append(function)
+                        }
                     } else if let namespace = function.namespace {
                         var currentNode = rootNode
                         for part in namespace {
@@ -1957,7 +1977,7 @@ extension BridgeJSLink {
                             }
                             currentNode.content.functions.append(function)
                         }
-                        
+
                         // Add static properties to namespace content for TypeScript declarations
                         for property in enumDefinition.staticProperties {
                             var currentNode = rootNode
@@ -2311,21 +2331,6 @@ extension WasmCoreType {
     fileprivate var placeholderValue: String {
         switch self {
         case .i32, .i64, .f32, .f64, .pointer: return "0"
-        }
-    }
-}
-
-extension StaticContext {
-    var namespaceName: String {
-        switch self {
-        case .className(let name):
-            return name
-        case .enumName(let name):
-            return name
-        case .namespaceEnum(let name):
-            return name
-        case .explicitNamespace(let components):
-            return components.joined(separator: ".")
         }
     }
 }

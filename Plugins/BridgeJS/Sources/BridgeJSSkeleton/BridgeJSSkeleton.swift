@@ -1,5 +1,57 @@
 // This file is shared between BridgeTool and BridgeJSLink
 
+// MARK: - ABI Name Generation
+
+/// Utility for generating consistent ABI names across all exported types
+struct ABINameGenerator {
+
+    /// Generates ABI name using standardized namespace + context pattern
+    static func generateABIName(
+        baseName: String,
+        namespace: [String]?,
+        staticContext: StaticContext?,
+        operation: String? = nil
+    ) -> String {
+
+        let namespacePart: String
+        if let namespace = namespace, !namespace.isEmpty {
+            namespacePart = namespace.joined(separator: "_")
+        } else {
+            namespacePart = ""
+        }
+
+        let contextPart: String
+        if let staticContext = staticContext {
+            switch staticContext {
+            case .className(let name), .enumName(let name):
+                contextPart = name
+            case .namespaceEnum:
+                contextPart = namespacePart
+
+            }
+        } else {
+            contextPart = namespacePart
+        }
+
+        var components = ["bjs"]
+        if !contextPart.isEmpty {
+            components.append(contextPart)
+        }
+
+        if staticContext != nil {
+            components.append("static")
+        }
+
+        components.append(baseName)
+
+        if let operation = operation {
+            components.append(operation)
+        }
+
+        return components.joined(separator: "_")
+    }
+}
+
 // MARK: - Types
 
 public enum BridgeType: Codable, Equatable, Sendable {
@@ -91,8 +143,7 @@ public struct Effects: Codable, Equatable, Sendable {
 public enum StaticContext: Codable, Equatable, Sendable {
     case className(String)
     case enumName(String)
-    case namespaceEnum(String)
-    case explicitNamespace([String])
+    case namespaceEnum
 }
 
 // MARK: - Enum Skeleton
@@ -131,7 +182,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
     public let name: String
     public let swiftCallName: String
     public let explicitAccessControl: String?
-    public let cases: [EnumCase]
+    public var cases: [EnumCase]
     public let rawType: String?
     public let namespace: [String]?
     public let emitStyle: EnumEmitStyle
@@ -205,6 +256,19 @@ public struct ExportedFunction: Codable, Equatable, Sendable {
         self.namespace = namespace
         self.staticContext = staticContext
     }
+
+    // MARK: - Unified ABI Name Generation (New Approach)
+
+    /// Generates ABI name using the new unified approach
+    /// This method uses the standardized namespace property and ABINameGenerator
+    public func abiNameUnified() -> String {
+        return ABINameGenerator.generateABIName(
+            baseName: name,
+            namespace: namespace,
+            staticContext: effects.isStatic ? staticContext : nil,
+            operation: nil
+        )
+    }
 }
 
 public struct ExportedClass: Codable {
@@ -253,32 +317,40 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
     public var name: String
     public var type: BridgeType
     public var isReadonly: Bool
-    public var isStatic: Bool = false
+    public var isStatic: Bool
+    public var namespace: [String]?
     public var staticContext: StaticContext?
 
-    public init(name: String, type: BridgeType, isReadonly: Bool = false, isStatic: Bool = false, staticContext: StaticContext? = nil) {
+    public init(
+        name: String,
+        type: BridgeType,
+        isReadonly: Bool = false,
+        isStatic: Bool = false,
+        namespace: [String]? = nil,
+        staticContext: StaticContext? = nil
+    ) {
         self.name = name
         self.type = type
         self.isReadonly = isReadonly
         self.isStatic = isStatic
+        self.namespace = namespace
         self.staticContext = staticContext
     }
 
     public func getterAbiName(className: String) -> String {
         if isStatic, let staticContext = staticContext {
-            // Generate context-aware ABI names for static properties
             switch staticContext {
             case .className(let className):
                 return "bjs_\(className)_static_\(name)_get"
             case .enumName(let enumName):
                 return "bjs_\(enumName)_static_\(name)_get"
-            case .namespaceEnum(let enumName):
-                // Convert dots to underscores for namespace enums
-                let abiEnumName = enumName.split(separator: ".").joined(separator: "_")
-                return "bjs_\(abiEnumName)_static_\(name)_get"
-            case .explicitNamespace(let namespace):
-                let abiNamespace = namespace.joined(separator: "_")
-                return "bjs_\(abiNamespace)_static_\(name)_get"
+            case .namespaceEnum:
+                if let namespace = namespace, !namespace.isEmpty {
+                    let abiNamespace = namespace.joined(separator: "_")
+                    return "bjs_\(abiNamespace)_static_\(name)_get"
+                } else {
+                    return "bjs_static_\(name)_get"
+                }
             }
         } else if isStatic {
             return "bjs_\(className)_static_\(name)_get"
@@ -295,19 +367,45 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
                 return "bjs_\(className)_static_\(name)_set"
             case .enumName(let enumName):
                 return "bjs_\(enumName)_static_\(name)_set"
-            case .namespaceEnum(let enumName):
-                // Convert dots to underscores for namespace enums
-                let abiEnumName = enumName.split(separator: ".").joined(separator: "_")
-                return "bjs_\(abiEnumName)_static_\(name)_set"
-            case .explicitNamespace(let namespace):
-                let abiNamespace = namespace.joined(separator: "_")
-                return "bjs_\(abiNamespace)_static_\(name)_set"
+            case .namespaceEnum:
+                // For namespace enums, use ONLY the namespace property to avoid duplication
+                if let namespace = namespace, !namespace.isEmpty {
+                    let abiNamespace = namespace.joined(separator: "_")
+                    return "bjs_\(abiNamespace)_static_\(name)_set"
+                } else {
+                    // Fallback if no namespace is available
+                    return "bjs_static_\(name)_set"
+                }
             }
         } else if isStatic {
             return "bjs_\(className)_static_\(name)_set"
         } else {
             return "bjs_\(className)_\(name)_set"
         }
+    }
+
+    // MARK: - Unified ABI Name Generation (New Approach)
+
+    /// Generates getter ABI name using the new unified approach
+    /// This method uses the standardized namespace property and ABINameGenerator
+    public func getterAbiNameUnified() -> String {
+        return ABINameGenerator.generateABIName(
+            baseName: name,
+            namespace: namespace,
+            staticContext: isStatic ? staticContext : nil,
+            operation: "get"
+        )
+    }
+
+    /// Generates setter ABI name using the new unified approach
+    /// This method uses the standardized namespace property and ABINameGenerator
+    public func setterAbiNameUnified() -> String {
+        return ABINameGenerator.generateABIName(
+            baseName: name,
+            namespace: namespace,
+            staticContext: isStatic ? staticContext : nil,
+            operation: "set"
+        )
     }
 }
 

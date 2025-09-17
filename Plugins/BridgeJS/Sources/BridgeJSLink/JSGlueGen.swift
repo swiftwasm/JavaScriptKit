@@ -537,11 +537,11 @@ struct IntrinsicJSFragment: Sendable {
                         }
                     }
                     printer.write("},")
-                    
+
                     for function in enumDefinition.staticMethods {
                         printer.write("\(function.name): null,")
                     }
-                    
+
                     for property in enumDefinition.staticProperties {
                         printer.write("\(property.name): null,")
                     }
@@ -633,11 +633,11 @@ struct IntrinsicJSFragment: Sendable {
                         let caseName = enumCase.name.capitalizedFirstLetter
                         printer.write("\(caseName): \(index),")
                     }
-                    
+
                     for function in enumDefinition.staticMethods {
                         printer.write("\(function.name): null,")
                     }
-                    
+
                     for property in enumDefinition.staticProperties {
                         printer.write("\(property.name): null,")
                     }
@@ -667,11 +667,11 @@ struct IntrinsicJSFragment: Sendable {
 
                         printer.write("\(caseName): \(formattedValue),")
                     }
-                    
+
                     for function in enumDefinition.staticMethods {
                         printer.write("\(function.name): null,")
                     }
-                    
+
                     for property in enumDefinition.staticProperties {
                         printer.write("\(property.name): null,")
                     }

@@ -21,6 +21,9 @@
             "isThrows" : false
           },
           "name" : "toString",
+          "namespace" : [
+            "Utils"
+          ],
           "parameters" : [
             {
               "label" : "value",
@@ -69,6 +72,10 @@
             "isThrows" : false
           },
           "name" : "call",
+          "namespace" : [
+            "Networking",
+            "API"
+          ],
           "parameters" : [
             {
               "label" : "_",
@@ -118,6 +125,11 @@
             "isThrows" : false
           },
           "name" : "call",
+          "namespace" : [
+            "Networking",
+            "APIV2",
+            "Internal"
+          ],
           "parameters" : [
             {
               "label" : "_",
@@ -165,6 +177,37 @@
     },
     {
       "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Networking",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Networking"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "API",
+      "namespace" : [
+        "Networking"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Networking.API"
+    },
+    {
+      "cases" : [
         {
           "associatedValues" : [
 
@@ -209,31 +252,14 @@
 
       ],
       "emitStyle" : "const",
-      "name" : "API",
-      "namespace" : [
-        "Networking"
-      ],
+      "name" : "Configuration",
       "staticMethods" : [
 
       ],
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Networking.API"
-    },
-    {
-      "cases" : [
-
-      ],
-      "emitStyle" : "const",
-      "name" : "Networking",
-      "staticMethods" : [
-
-      ],
-      "staticProperties" : [
-
-      ],
-      "swiftCallName" : "Networking"
+      "swiftCallName" : "Configuration"
     },
     {
       "cases" : [
@@ -323,14 +349,18 @@
 
       ],
       "emitStyle" : "const",
-      "name" : "Configuration",
+      "name" : "Internal",
+      "namespace" : [
+        "Networking",
+        "APIV2"
+      ],
       "staticMethods" : [
 
       ],
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Configuration"
+      "swiftCallName" : "Internal"
     },
     {
       "cases" : [
@@ -361,24 +391,6 @@
 
       ],
       "swiftCallName" : "Internal.SupportedMethod"
-    },
-    {
-      "cases" : [
-
-      ],
-      "emitStyle" : "const",
-      "name" : "Internal",
-      "namespace" : [
-        "Networking",
-        "APIV2"
-      ],
-      "staticMethods" : [
-
-      ],
-      "staticProperties" : [
-
-      ],
-      "swiftCallName" : "Internal"
     }
   ],
   "functions" : [

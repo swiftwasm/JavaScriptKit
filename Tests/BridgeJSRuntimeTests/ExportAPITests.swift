@@ -678,7 +678,7 @@ enum APIOptionalResult {
     @JS static func add(a: Int, b: Int) -> Int {
         return a + b
     }
-     @JS class func substract(a: Int, b: Int) -> Int {
+    @JS class func substract(a: Int, b: Int) -> Int {
         return a - b
     }
 }
@@ -709,7 +709,7 @@ enum APIOptionalResult {
     @JS nonisolated(unsafe) static var staticBool: Bool = true
     @JS nonisolated(unsafe) static var staticFloat: Float = 3.14
     @JS nonisolated(unsafe) static var staticDouble: Double = 2.718
-    
+
     @JS static var computedProperty: String {
         get { return "computed: \(staticVariable)" }
         set {
@@ -718,14 +718,14 @@ enum APIOptionalResult {
             }
         }
     }
-    
+
     @JS static var readOnlyComputed: Int {
         return staticVariable * 2
     }
-    
+
     @JS nonisolated(unsafe) static var optionalString: String? = nil
     @JS nonisolated(unsafe) static var optionalInt: Int? = nil
-    
+
     @JS nonisolated(unsafe) static var jsObjectProperty: JSObject = JSObject()
 
     @JS init() {}
@@ -735,11 +735,11 @@ enum APIOptionalResult {
 @JS enum StaticPropertyEnum {
     case option1
     case option2
-    
+
     @JS nonisolated(unsafe) static var enumProperty: String = "enum value"
     @JS static let enumConstant: Int = 42
     @JS nonisolated(unsafe) static var enumBool: Bool = false
-    
+
     @JS nonisolated(unsafe) static var enumVariable: Int = 200
 
     @JS static var computedReadonly: Int {
@@ -763,7 +763,7 @@ enum APIOptionalResult {
 @JS enum StaticPropertyNamespace {
     @JS nonisolated(unsafe) static var namespaceProperty: String = "namespace"
     @JS static let namespaceConstant: String = "constant"
-    
+
     @JS enum NestedProperties {
         @JS nonisolated(unsafe) static var nestedProperty: Int = 999
         @JS static let nestedConstant: String = "nested"
@@ -773,7 +773,8 @@ enum APIOptionalResult {
 
 // Test functions for static properties
 @JS func getAllStaticPropertyValues() -> String {
-    return "const:\(StaticPropertyHolder.staticConstant),var:\(StaticPropertyHolder.staticVariable),computed:\(StaticPropertyHolder.computedProperty),readonly:\(StaticPropertyHolder.readOnlyComputed)"
+    return
+        "const:\(StaticPropertyHolder.staticConstant),var:\(StaticPropertyHolder.staticVariable),computed:\(StaticPropertyHolder.computedProperty),readonly:\(StaticPropertyHolder.readOnlyComputed)"
 }
 
 class ExportAPITests: XCTestCase {
