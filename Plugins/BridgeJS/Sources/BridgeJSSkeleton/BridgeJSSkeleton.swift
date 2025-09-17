@@ -14,14 +14,14 @@ public struct ABINameGenerator {
         operation: String? = nil,
         className: String? = nil
     ) -> String {
-        
+
         let namespacePart: String?
         if let namespace = namespace, !namespace.isEmpty {
             namespacePart = namespace.joined(separator: "_")
         } else {
             namespacePart = nil
         }
-        
+
         let contextPart: String?
         if let staticContext = staticContext {
             switch staticContext {
@@ -35,7 +35,7 @@ public struct ABINameGenerator {
         } else {
             contextPart = namespacePart
         }
-        
+
         var components = [ABINameGenerator.prefixComponent]
         if let context = contextPart {
             components.append(context)
@@ -50,7 +50,7 @@ public struct ABINameGenerator {
         if let operation = operation {
             components.append(operation)
         }
-        
+
         return components.joined(separator: "_")
     }
 
@@ -59,7 +59,9 @@ public struct ABINameGenerator {
         context: ImportedTypeSkeleton? = nil,
         operation: String? = nil
     ) -> String {
-        return [ABINameGenerator.prefixComponent, context?.name, baseName, operation].compactMap { $0 }.joined(separator: "_")
+        return [ABINameGenerator.prefixComponent, context?.name, baseName, operation].compactMap { $0 }.joined(
+            separator: "_"
+        )
     }
 }
 
@@ -334,7 +336,7 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
         self.namespace = namespace
         self.staticContext = staticContext
     }
-    
+
     public func callName(prefix: String? = nil) -> String {
         if let staticContext = staticContext {
             switch staticContext {
@@ -395,7 +397,7 @@ public struct ImportedFunctionSkeleton: Codable {
     public let parameters: [Parameter]
     public let returnType: BridgeType
     public let documentation: String?
-    
+
     public func abiName(context: ImportedTypeSkeleton?) -> String {
         return ABINameGenerator.generateImportedABIName(
             baseName: name,
@@ -428,7 +430,7 @@ public struct ImportedPropertySkeleton: Codable {
             operation: "get"
         )
     }
-    
+
     public func setterAbiName(context: ImportedTypeSkeleton) -> String {
         return ABINameGenerator.generateImportedABIName(
             baseName: name,

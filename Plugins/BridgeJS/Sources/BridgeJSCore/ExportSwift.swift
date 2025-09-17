@@ -293,7 +293,7 @@ public class ExportSwift {
                 let isNamespaceEnum = exportedEnumByName[enumKey]?.cases.isEmpty ?? true
                 staticContext = isNamespaceEnum ? .namespaceEnum : .enumName(enumName)
             }
-            
+
             let classNameForABI: String?
             if case .classBody(let className, _) = state {
                 classNameForABI = className
@@ -993,7 +993,12 @@ public class ExportSwift {
             }
 
             for staticProperty in enumDef.staticProperties {
-                decls.append(contentsOf: try renderSingleExportedProperty(property: staticProperty, context: .enumStatic(enumDef: enumDef)))
+                decls.append(
+                    contentsOf: try renderSingleExportedProperty(
+                        property: staticProperty,
+                        context: .enumStatic(enumDef: enumDef)
+                    )
+                )
             }
         }
 
@@ -1409,19 +1414,22 @@ public class ExportSwift {
             return cases
         }
     }
-    
+
     /// Context for property rendering that determines call behavior and ABI generation
     private enum PropertyRenderingContext {
         case enumStatic(enumDef: ExportedEnum)
-        case classStatic(klass: ExportedClass)  
+        case classStatic(klass: ExportedClass)
         case classInstance(klass: ExportedClass)
     }
 
     /// Renders getter and setter Swift thunk code for a property in any context
     /// This unified function eliminates duplication between enum static, class static, and class instance property rendering
-    private func renderSingleExportedProperty(property: ExportedProperty, context: PropertyRenderingContext) throws -> [DeclSyntax] {
+    private func renderSingleExportedProperty(
+        property: ExportedProperty,
+        context: PropertyRenderingContext
+    ) throws -> [DeclSyntax] {
         var decls: [DeclSyntax] = []
-        
+
         let (callName, className, isStatic): (String, String, Bool)
         switch context {
         case .enumStatic(let enumDef):
@@ -1432,34 +1440,36 @@ public class ExportSwift {
             callName = property.callName()
             className = klass.name
             isStatic = true
-            
+
         case .classInstance(let klass):
             callName = property.callName()
             className = klass.name
             isStatic = false
         }
-        
+
         let getterBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false, isStatic: isStatic))
-        
+
         if !isStatic {
             try getterBuilder.liftParameter(
                 param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(className))
             )
         }
-        
+
         if isStatic {
             getterBuilder.callStaticProperty(name: callName, returnType: property.type)
         } else {
             getterBuilder.callPropertyGetter(klassName: className, propertyName: callName, returnType: property.type)
         }
-        
+
         try getterBuilder.lowerReturnValue(returnType: property.type)
         decls.append(getterBuilder.render(abiName: property.getterAbiName(className: className)))
-        
+
         // Generate property setter if not readonly
         if !property.isReadonly {
-            let setterBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false, isStatic: isStatic))
-            
+            let setterBuilder = ExportedThunkBuilder(
+                effects: Effects(isAsync: false, isThrows: false, isStatic: isStatic)
+            )
+
             // Lift parameters based on property type
             if !isStatic {
                 // Instance properties need _self parameter
@@ -1467,25 +1477,24 @@ public class ExportSwift {
                     param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(className))
                 )
             }
-            
+
             try setterBuilder.liftParameter(
                 param: Parameter(label: "value", name: "value", type: property.type)
             )
-            
+
             if isStatic {
                 let klassName = callName.components(separatedBy: ".").dropLast().joined(separator: ".")
                 setterBuilder.callStaticPropertySetter(klassName: klassName, propertyName: property.name)
             } else {
                 setterBuilder.callPropertySetter(klassName: className, propertyName: callName)
             }
-            
+
             try setterBuilder.lowerReturnValue(returnType: .void)
             decls.append(setterBuilder.render(abiName: property.setterAbiName(className: className)))
         }
-        
+
         return decls
     }
-
 
     func renderSingleExportedFunction(function: ExportedFunction) throws -> DeclSyntax {
         let builder = ExportedThunkBuilder(effects: function.effects)
@@ -1601,9 +1610,19 @@ public class ExportSwift {
         // Generate property getters and setters
         for property in klass.properties {
             if property.isStatic {
-                decls.append(contentsOf: try renderSingleExportedProperty(property: property, context: .classStatic(klass: klass)))
+                decls.append(
+                    contentsOf: try renderSingleExportedProperty(
+                        property: property,
+                        context: .classStatic(klass: klass)
+                    )
+                )
             } else {
-                decls.append(contentsOf: try renderSingleExportedProperty(property: property, context: .classInstance(klass: klass)))
+                decls.append(
+                    contentsOf: try renderSingleExportedProperty(
+                        property: property,
+                        context: .classInstance(klass: klass)
+                    )
+                )
             }
         }
 

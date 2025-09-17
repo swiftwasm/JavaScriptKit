@@ -29,14 +29,14 @@ export const SupportedMethod = {
     Post: 1,
 };
 
+if (typeof globalThis.Configuration === 'undefined') {
+    globalThis.Configuration = {};
+}
 if (typeof globalThis.Networking === 'undefined') {
     globalThis.Networking = {};
 }
 if (typeof globalThis.Networking.API === 'undefined') {
     globalThis.Networking.API = {};
-}
-if (typeof globalThis.Configuration === 'undefined') {
-    globalThis.Configuration = {};
 }
 if (typeof globalThis.Networking.APIV2 === 'undefined') {
     globalThis.Networking.APIV2 = {};
@@ -44,12 +44,10 @@ if (typeof globalThis.Networking.APIV2 === 'undefined') {
 if (typeof globalThis.Networking.APIV2.Internal === 'undefined') {
     globalThis.Networking.APIV2.Internal = {};
 }
-
 globalThis.Networking.API.Method = Method;
 globalThis.Configuration.LogLevel = LogLevel;
 globalThis.Configuration.Port = Port;
 globalThis.Networking.APIV2.Internal.SupportedMethod = SupportedMethod;
-
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;

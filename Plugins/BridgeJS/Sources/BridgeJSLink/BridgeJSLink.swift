@@ -561,12 +561,18 @@ struct BridgeJSLink {
         printer.write(lines: data.topLevelEnumLines)
 
         // Namespace assignments section
-        let namespaceBuilder = NamespaceBuilder()
-        let topLevelNamespaceCode = namespaceBuilder.renderTopLevelEnumNamespaceAssignments(
-            namespacedEnums: data.namespacedEnums,
-            exportedSkeletons: exportedSkeletons
+        let topLevelNamespaceCode = generateNamespaceInitializationCode(
+            namespacePaths: Set(data.namespacedEnums.compactMap { $0.namespace })
         )
         printer.write(lines: topLevelNamespaceCode)
+
+        // Add enum assignments to global namespace
+        for enumDef in data.namespacedEnums {
+            if enumDef.enumType != .namespace {
+                let namespacePath = enumDef.namespace?.joined(separator: ".") ?? ""
+                printer.write("globalThis.\(namespacePath).\(enumDef.name) = \(enumDef.name);")
+            }
+        }
 
         // Main function declaration
         printer.write("export async function createInstantiator(options, \(JSGlueVariableScope.reservedSwift)) {")
@@ -631,85 +637,20 @@ struct BridgeJSLink {
 
                 printer.write(lines: data.classLines)
 
-                // CRITICAL: Initialize ALL namespaces BEFORE any property assignments
+                // Initialize all namespaces before property assignments
                 if hasAnyNamespacedItems {
-                    var allUniqueNamespaces: [String] = []
-                    var seen = Set<String>()
-
-                    let functionNamespacePaths: Set<[String]> = Set(
-                        data.namespacedFunctions.compactMap { $0.namespace }
+                    let allNamespacePaths = collectAllNamespacePaths(data: data)
+                    let namespaceInitializationCode = generateNamespaceInitializationCode(
+                        namespacePaths: allNamespacePaths
                     )
-                    let classNamespacePaths: Set<[String]> = Set(
-                        data.namespacedClasses.compactMap { $0.namespace }
-                    )
-                    let allRegularNamespacePaths = functionNamespacePaths.union(classNamespacePaths)
-
-                    let enumNamespacePaths: Set<[String]> = Set(
-                        data.namespacedEnums.compactMap { $0.namespace }
-                    )
-
-                    // From static properties with namespace property (collect their complete namespace paths)
-                    var staticPropertyNamespacePaths: Set<[String]> = Set()
-                    for skeleton in exportedSkeletons {
-                        for enumDefinition in skeleton.enums {
-                            for property in enumDefinition.staticProperties {
-                                if let namespace = property.namespace, !namespace.isEmpty {
-                                    staticPropertyNamespacePaths.insert(namespace)
-                                }
-                            }
-                        }
-                    }
-
-                    let allNamespacePaths = allRegularNamespacePaths.union(enumNamespacePaths).union(
-                        staticPropertyNamespacePaths
-                    )
-
-                    allNamespacePaths.forEach { namespacePath in
-                        namespacePath.enumerated().forEach { (index, _) in
-                            let path = namespacePath[0...index].joined(separator: ".")
-                            if seen.insert(path).inserted {
-                                allUniqueNamespaces.append(path)
-                            }
-                        }
-                    }
-
-                    allUniqueNamespaces.sorted().forEach { namespace in
-                        printer.write("if (typeof globalThis.\(namespace) === 'undefined') {")
-                        printer.indent {
-                            printer.write("globalThis.\(namespace) = {};")
-                        }
-                        printer.write("}")
-                    }
+                    printer.write(lines: namespaceInitializationCode)
                 }
 
-                // NOW assign enum static function/property implementations (namespaces are ready)
-                printer.write(lines: data.enumStaticAssignments)
-
-                if hasAnyNamespacedItems {
-                    printer.write("const exports = {")
-                    printer.indent {
-                        printer.write(lines: data.exportsLines)
-                    }
-                    printer.write("};")
-
-                    data.namespacedClasses.forEach { klass in
-                        let namespacePath: String = klass.namespace?.joined(separator: ".") ?? ""
-                        printer.write("globalThis.\(namespacePath).\(klass.name) = exports.\(klass.name);")
-                    }
-
-                    data.namespacedFunctions.forEach { function in
-                        let namespacePath: String = function.namespace?.joined(separator: ".") ?? ""
-                        printer.write("globalThis.\(namespacePath).\(function.name) = exports.\(function.name);")
-                    }
-
-                    printer.write("return exports;")
-                } else {
-                    printer.write("return {")
-                    printer.indent {
-                        printer.write(lines: data.exportsLines)
-                    }
-                    printer.write("};")
-                }
+                let propertyAssignments = generateNamespacePropertyAssignments(
+                    data: data,
+                    hasAnyNamespacedItems: hasAnyNamespacedItems
+                )
+                printer.write(lines: propertyAssignments)
             }
             printer.write("},")
         }
@@ -775,6 +716,94 @@ struct BridgeJSLink {
         }
 
         return wrapperLines
+    }
+
+    /// Collects all unique namespace paths from functions, classes, enums, and static properties
+    private func collectAllNamespacePaths(data: LinkData) -> Set<[String]> {
+        let functionNamespacePaths: Set<[String]> = Set(
+            data.namespacedFunctions.compactMap { $0.namespace }
+        )
+        let classNamespacePaths: Set<[String]> = Set(
+            data.namespacedClasses.compactMap { $0.namespace }
+        )
+        let allRegularNamespacePaths = functionNamespacePaths.union(classNamespacePaths)
+
+        let enumNamespacePaths: Set<[String]> = Set(
+            data.namespacedEnums.compactMap { $0.namespace }
+        )
+        var staticPropertyNamespacePaths: Set<[String]> = Set()
+        for skeleton in exportedSkeletons {
+            for enumDefinition in skeleton.enums {
+                for property in enumDefinition.staticProperties {
+                    if let namespace = property.namespace, !namespace.isEmpty {
+                        staticPropertyNamespacePaths.insert(namespace)
+                    }
+                }
+            }
+        }
+
+        return allRegularNamespacePaths.union(enumNamespacePaths).union(staticPropertyNamespacePaths)
+    }
+
+    /// Generates JavaScript code lines for initializing namespace objects on globalThis
+    private func generateNamespaceInitializationCode(namespacePaths: Set<[String]>) -> [String] {
+        let printer = CodeFragmentPrinter()
+        var allUniqueNamespaces: [String] = []
+        var seen = Set<String>()
+
+        namespacePaths.forEach { namespacePath in
+            namespacePath.enumerated().forEach { (index, _) in
+                let path = namespacePath[0...index].joined(separator: ".")
+                if seen.insert(path).inserted {
+                    allUniqueNamespaces.append(path)
+                }
+            }
+        }
+
+        allUniqueNamespaces.sorted().forEach { namespace in
+            printer.write("if (typeof globalThis.\(namespace) === 'undefined') {")
+            printer.indent {
+                printer.write("globalThis.\(namespace) = {};")
+            }
+            printer.write("}")
+        }
+
+        return printer.lines
+    }
+
+    /// Generates JavaScript code for assigning namespaced items to globalThis
+    private func generateNamespacePropertyAssignments(data: LinkData, hasAnyNamespacedItems: Bool) -> [String] {
+        let printer = CodeFragmentPrinter()
+
+        printer.write(lines: data.enumStaticAssignments)
+
+        if hasAnyNamespacedItems {
+            printer.write("const exports = {")
+            printer.indent()
+            printer.write(lines: data.exportsLines.map { "\($0)" })
+            printer.unindent()
+            printer.write("};")
+
+            data.namespacedClasses.forEach { klass in
+                let namespacePath: String = klass.namespace?.joined(separator: ".") ?? ""
+                printer.write("globalThis.\(namespacePath).\(klass.name) = exports.\(klass.name);")
+            }
+
+            data.namespacedFunctions.forEach { function in
+                let namespacePath: String = function.namespace?.joined(separator: ".") ?? ""
+                printer.write("globalThis.\(namespacePath).\(function.name) = exports.\(function.name);")
+            }
+
+            printer.write("return exports;")
+        } else {
+            printer.write("return {")
+            printer.indent()
+            printer.write(lines: data.exportsLines.map { "\($0)" })
+            printer.unindent()
+            printer.write("};")
+        }
+
+        return printer.lines
     }
 
     private func generateImportedTypeDefinitions() -> [String] {
@@ -1316,8 +1345,6 @@ extension BridgeJSLink {
 
         // Generate getter assignment
         let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
-        // Use the last component of namespace as the className for ABI name generation
-        let className = namespacePath.components(separatedBy: ".").last ?? namespacePath
         let getterReturnExpr = try getterThunkBuilder.call(
             abiName: property.getterAbiName(),
             returnType: property.type
@@ -1750,134 +1777,6 @@ extension BridgeJSLink {
     }
 
     struct NamespaceBuilder {
-
-        /// Generates JavaScript code for setting up global namespace structure
-        ///
-        /// This function creates the necessary JavaScript code to properly expose namespaced
-        /// functions, classes, and enums on the global object (globalThis). It ensures that
-        /// nested namespace paths are created correctly and that all exported items are
-        /// accessible through their full namespace paths.
-        ///
-        /// For example, if you have @JS("Utils.Math") func add() it will generate code that
-        /// makes globalThis.Utils.Math.add accessible.
-        ///
-        /// - Parameters:
-        ///   - namespacedFunctions: Functions annotated with @JS("namespace.path")
-        ///   - namespacedClasses: Classes annotated with @JS("namespace.path")
-        /// - Returns: Array of JavaScript code lines that set up the global namespace structure
-        func renderGlobalNamespace(
-            namespacedFunctions: [ExportedFunction],
-            namespacedClasses: [ExportedClass]
-        ) -> [String] {
-            let printer = CodeFragmentPrinter()
-            var uniqueNamespaces: [String] = []
-            var seen = Set<String>()
-
-            let functionNamespacePaths: Set<[String]> = Set(
-                namespacedFunctions
-                    .compactMap { $0.namespace }
-            )
-            let classNamespacePaths: Set<[String]> = Set(
-                namespacedClasses
-                    .compactMap { $0.namespace }
-            )
-
-            let allNamespacePaths =
-                functionNamespacePaths
-                .union(classNamespacePaths)
-
-            allNamespacePaths.forEach { namespacePath in
-                namespacePath.makeIterator().enumerated().forEach { (index, _) in
-                    let path = namespacePath[0...index].joined(separator: ".")
-                    if seen.insert(path).inserted {
-                        uniqueNamespaces.append(path)
-                    }
-                }
-            }
-
-            uniqueNamespaces.sorted().forEach { namespace in
-                printer.write("if (typeof globalThis.\(namespace) === 'undefined') {")
-                printer.indent {
-                    printer.write("globalThis.\(namespace) = {};")
-                }
-                printer.write("}")
-            }
-
-            namespacedClasses.forEach { klass in
-                let namespacePath: String = klass.namespace?.joined(separator: ".") ?? ""
-                printer.write("globalThis.\(namespacePath).\(klass.name) = exports.\(klass.name);")
-            }
-
-            namespacedFunctions.forEach { function in
-                let namespacePath: String = function.namespace?.joined(separator: ".") ?? ""
-                printer.write("globalThis.\(namespacePath).\(function.name) = exports.\(function.name);")
-            }
-
-            return printer.lines
-        }
-
-        func renderTopLevelEnumNamespaceAssignments(
-            namespacedEnums: [ExportedEnum],
-            exportedSkeletons: [ExportedSkeleton]
-        ) -> [String] {
-            guard !namespacedEnums.isEmpty else { return [] }
-
-            let printer = CodeFragmentPrinter()
-            var uniqueNamespaces: [String] = []
-            var seen = Set<String>()
-
-            for enumDef in namespacedEnums {
-                guard let namespacePath = enumDef.namespace else { continue }
-                namespacePath.enumerated().forEach { (index, _) in
-                    let path = namespacePath[0...index].joined(separator: ".")
-                    if !seen.contains(path) {
-                        seen.insert(path)
-                        uniqueNamespaces.append(path)
-                    }
-                }
-            }
-
-            // Collect namespaces from static properties with namespace property
-            for skeleton in exportedSkeletons {
-                for enumDefinition in skeleton.enums {
-                    for property in enumDefinition.staticProperties {
-                        if let namespace = property.namespace, !namespace.isEmpty {
-                            namespace.enumerated().forEach { (index, _) in
-                                let path = namespace[0...index].joined(separator: ".")
-                                if !seen.contains(path) {
-                                    seen.insert(path)
-                                    uniqueNamespaces.append(path)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            for namespace in uniqueNamespaces {
-                printer.write("if (typeof globalThis.\(namespace) === 'undefined') {")
-                printer.indent {
-                    printer.write("globalThis.\(namespace) = {};")
-                }
-                printer.write("}")
-            }
-
-            if !uniqueNamespaces.isEmpty {
-                printer.nextLine()
-            }
-
-            for enumDef in namespacedEnums {
-                if enumDef.enumType == .namespace {
-                    continue
-                }
-
-                let namespacePath = enumDef.namespace?.joined(separator: ".") ?? ""
-                printer.write("globalThis.\(namespacePath).\(enumDef.name) = \(enumDef.name);")
-            }
-            printer.nextLine()
-            return printer.lines
-        }
-
         private struct NamespaceContent {
             var functions: [ExportedFunction] = []
             var classes: [ExportedClass] = []

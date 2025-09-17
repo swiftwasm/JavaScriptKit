@@ -479,16 +479,14 @@ const __bjs_createAPIOptionalResultHelpers = () => {
         }
     });
 };
-if (typeof globalThis.Utilities === 'undefined') {
-    globalThis.Utilities = {};
-}
 if (typeof globalThis.API === 'undefined') {
     globalThis.API = {};
 }
-
+if (typeof globalThis.Utilities === 'undefined') {
+    globalThis.Utilities = {};
+}
 globalThis.Utilities.Result = Result;
 globalThis.API.NetworkingResult = NetworkingResult;
-
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;

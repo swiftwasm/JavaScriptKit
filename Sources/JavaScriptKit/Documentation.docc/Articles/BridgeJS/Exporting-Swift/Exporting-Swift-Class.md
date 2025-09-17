@@ -88,6 +88,7 @@ export type Exports = {
 | Stored properties: `var`, `let` (with `willSet`, `didSet`) | ✅ |
 | Computed properties: `var x: X { get set }` | ✅ |
 | Computed properties with effects: `var x: X { get async throws }` | 🚧  |
+| Static / class properties: `static var`, `class let` | ✅ (See <doc:Exporting-Swift-Static-Properties> )|
 | Methods: `func` | ✅ (See <doc:Exporting-Swift-Function> ) |
 | Static/class methods: `static func`, `class func` | ✅ (See <doc:Exporting-Swift-Static-Functions> ) |
 | Subscripts: `subscript()` | ❌ |
