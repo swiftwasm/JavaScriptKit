@@ -21,12 +21,12 @@ jobs:
             target: "wasm32-unknown-wasi"
           - os: ubuntu-22.04
             toolchain:
-              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a-ubuntu22.04.tar.gz
+              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-08-27-a/swift-DEVELOPMENT-SNAPSHOT-2025-08-27-a-ubuntu22.04.tar.gz
             wasi-backend: Node
-            target: "wasm32-unknown-wasi"
+            target: "wasm32-unknown-wasip1"
           - os: ubuntu-22.04
             toolchain:
-              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a-ubuntu22.04.tar.gz
+              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-08-27-a/swift-DEVELOPMENT-SNAPSHOT-2025-08-27-a-ubuntu22.04.tar.gz
             wasi-backend: Node
             target: "wasm32-unknown-wasip1-threads"
 
@@ -95,7 +95,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/install-swift
         with:
-          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a-ubuntu22.04.tar.gz
+          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-08-27-a/swift-DEVELOPMENT-SNAPSHOT-2025-08-27-a-ubuntu22.04.tar.gz
       - run: make bootstrap
       - run: ./Utilities/bridge-js-generate.sh
       - name: Check if BridgeJS generated files are up-to-date
@@ -112,17 +112,17 @@ jobs:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/install-swift
         with:
-          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a/swift-DEVELOPMENT-SNAPSHOT-2025-06-12-a-ubuntu22.04.tar.gz
+          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-08-27-a/swift-DEVELOPMENT-SNAPSHOT-2025-08-27-a-ubuntu22.04.tar.gz
       - uses: swiftwasm/setup-swiftwasm@v2
-        id: setup-wasm32-unknown-wasi
-        with: { target: wasm32-unknown-wasi }
+        id: setup-wasm32-unknown-wasip1
+        with: { target: wasm32-unknown-wasip1 }
       - uses: swiftwasm/setup-swiftwasm@v2
         id: setup-wasm32-unknown-wasip1-threads
         with: { target: wasm32-unknown-wasip1-threads }
       - run: ./Utilities/build-examples.sh
         env:
           SWIFT_SDK_ID_wasm32_unknown_wasip1_threads: ${{ steps.setup-wasm32-unknown-wasip1-threads.outputs.swift-sdk-id }}
-          SWIFT_SDK_ID_wasm32_unknown_wasi: ${{ steps.setup-wasm32-unknown-wasi.outputs.swift-sdk-id }}
+          SWIFT_SDK_ID_wasm32_unknown_wasip1: ${{ steps.setup-wasm32-unknown-wasip1.outputs.swift-sdk-id }}
       - name: Upload static files as artifact
         id: deployment
         uses: actions/upload-pages-artifact@v4
