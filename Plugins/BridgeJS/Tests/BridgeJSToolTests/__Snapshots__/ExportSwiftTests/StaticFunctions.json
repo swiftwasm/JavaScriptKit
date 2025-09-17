@@ -183,6 +183,9 @@
           }
         }
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Calculator"
     },
     {
@@ -246,6 +249,9 @@
           }
         }
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "APIResult"
     },
     {
@@ -289,7 +295,24 @@
           }
         }
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Utils.String"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Utils",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Utils"
     }
   ],
   "functions" : [

@@ -136,6 +136,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
     public let namespace: [String]?
     public let emitStyle: EnumEmitStyle
     public var staticMethods: [ExportedFunction]
+    public var staticProperties: [ExportedProperty] = []
     public var enumType: EnumType {
         if cases.isEmpty {
             return .namespace
@@ -154,7 +155,8 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
         rawType: String?,
         namespace: [String]?,
         emitStyle: EnumEmitStyle,
-        staticMethods: [ExportedFunction] = []
+        staticMethods: [ExportedFunction] = [],
+        staticProperties: [ExportedProperty] = []
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
@@ -164,6 +166,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
         self.namespace = namespace
         self.emitStyle = emitStyle
         self.staticMethods = staticMethods
+        self.staticProperties = staticProperties
     }
 }
 
@@ -246,23 +249,65 @@ public struct ExportedConstructor: Codable {
     }
 }
 
-public struct ExportedProperty: Codable {
+public struct ExportedProperty: Codable, Equatable, Sendable {
     public var name: String
     public var type: BridgeType
     public var isReadonly: Bool
+    public var isStatic: Bool = false
+    public var staticContext: StaticContext?
 
-    public init(name: String, type: BridgeType, isReadonly: Bool = false) {
+    public init(name: String, type: BridgeType, isReadonly: Bool = false, isStatic: Bool = false, staticContext: StaticContext? = nil) {
         self.name = name
         self.type = type
         self.isReadonly = isReadonly
+        self.isStatic = isStatic
+        self.staticContext = staticContext
     }
 
     public func getterAbiName(className: String) -> String {
-        return "bjs_\(className)_\(name)_get"
+        if isStatic, let staticContext = staticContext {
+            // Generate context-aware ABI names for static properties
+            switch staticContext {
+            case .className(let className):
+                return "bjs_\(className)_static_\(name)_get"
+            case .enumName(let enumName):
+                return "bjs_\(enumName)_static_\(name)_get"
+            case .namespaceEnum(let enumName):
+                // Convert dots to underscores for namespace enums
+                let abiEnumName = enumName.split(separator: ".").joined(separator: "_")
+                return "bjs_\(abiEnumName)_static_\(name)_get"
+            case .explicitNamespace(let namespace):
+                let abiNamespace = namespace.joined(separator: "_")
+                return "bjs_\(abiNamespace)_static_\(name)_get"
+            }
+        } else if isStatic {
+            return "bjs_\(className)_static_\(name)_get"
+        } else {
+            return "bjs_\(className)_\(name)_get"
+        }
     }
 
     public func setterAbiName(className: String) -> String {
-        return "bjs_\(className)_\(name)_set"
+        if isStatic, let staticContext = staticContext {
+            // Generate context-aware ABI names for static properties
+            switch staticContext {
+            case .className(let className):
+                return "bjs_\(className)_static_\(name)_set"
+            case .enumName(let enumName):
+                return "bjs_\(enumName)_static_\(name)_set"
+            case .namespaceEnum(let enumName):
+                // Convert dots to underscores for namespace enums
+                let abiEnumName = enumName.split(separator: ".").joined(separator: "_")
+                return "bjs_\(abiEnumName)_static_\(name)_set"
+            case .explicitNamespace(let namespace):
+                let abiNamespace = namespace.joined(separator: "_")
+                return "bjs_\(abiNamespace)_static_\(name)_set"
+            }
+        } else if isStatic {
+            return "bjs_\(className)_static_\(name)_set"
+        } else {
+            return "bjs_\(className)_\(name)_set"
+        }
     }
 }
 

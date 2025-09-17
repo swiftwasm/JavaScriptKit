@@ -536,7 +536,15 @@ struct IntrinsicJSFragment: Sendable {
                             printer.write("\(caseName): \(index),")
                         }
                     }
-                    printer.write("}")
+                    printer.write("},")
+                    
+                    for function in enumDefinition.staticMethods {
+                        printer.write("\(function.name): null,")
+                    }
+                    
+                    for property in enumDefinition.staticProperties {
+                        printer.write("\(property.name): null,")
+                    }
                 }
                 printer.write("};")
                 printer.nextLine()
@@ -625,6 +633,14 @@ struct IntrinsicJSFragment: Sendable {
                         let caseName = enumCase.name.capitalizedFirstLetter
                         printer.write("\(caseName): \(index),")
                     }
+                    
+                    for function in enumDefinition.staticMethods {
+                        printer.write("\(function.name): null,")
+                    }
+                    
+                    for property in enumDefinition.staticProperties {
+                        printer.write("\(property.name): null,")
+                    }
                 }
                 printer.write("};")
                 printer.nextLine()
@@ -650,6 +666,14 @@ struct IntrinsicJSFragment: Sendable {
                         )
 
                         printer.write("\(caseName): \(formattedValue),")
+                    }
+                    
+                    for function in enumDefinition.staticMethods {
+                        printer.write("\(function.name): null,")
+                    }
+                    
+                    for property in enumDefinition.staticProperties {
+                        printer.write("\(property.name): null,")
                     }
                 }
                 printer.write("};")

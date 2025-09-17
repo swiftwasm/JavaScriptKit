@@ -158,6 +158,9 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Utils"
     },
     {
@@ -196,7 +199,41 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Networking.API.Method"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "API",
+      "namespace" : [
+        "Networking"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Networking.API"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Networking",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Networking"
     },
     {
       "cases" : [
@@ -238,6 +275,9 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Configuration.LogLevel"
     },
     {
@@ -273,7 +313,24 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Configuration.Port"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Configuration",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Configuration"
     },
     {
       "cases" : [
@@ -300,7 +357,28 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Internal.SupportedMethod"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Internal",
+      "namespace" : [
+        "Networking",
+        "APIV2"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Internal"
     }
   ],
   "functions" : [

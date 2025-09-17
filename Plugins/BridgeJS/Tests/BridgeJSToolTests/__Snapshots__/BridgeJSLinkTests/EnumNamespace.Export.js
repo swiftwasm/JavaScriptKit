@@ -273,11 +273,9 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_TestServer_call(this.pointer, method);
                 }
             }
-            const exports = {
-                Converter,
-                HTTPServer,
-                TestServer,
-            };
+            if (typeof globalThis.Configuration === 'undefined') {
+                globalThis.Configuration = {};
+            }
             if (typeof globalThis.Networking === 'undefined') {
                 globalThis.Networking = {};
             }
@@ -293,6 +291,11 @@ export async function createInstantiator(options, swift) {
             if (typeof globalThis.Utils === 'undefined') {
                 globalThis.Utils = {};
             }
+            const exports = {
+                Converter,
+                HTTPServer,
+                TestServer,
+            };
             globalThis.Utils.Converter = exports.Converter;
             globalThis.Networking.API.HTTPServer = exports.HTTPServer;
             globalThis.Networking.APIV2.Internal.TestServer = exports.TestServer;

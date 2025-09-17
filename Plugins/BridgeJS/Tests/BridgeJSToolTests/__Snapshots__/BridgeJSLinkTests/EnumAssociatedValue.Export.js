@@ -12,7 +12,7 @@ export const APIResult = {
         Rate: 3,
         Precise: 4,
         Info: 5,
-    }
+    },
 };
 
 const __bjs_createAPIResultHelpers = () => {
@@ -94,7 +94,7 @@ export const ComplexResult = {
         Coordinates: 3,
         Comprehensive: 4,
         Info: 5,
-    }
+    },
 };
 
 const __bjs_createComplexResultHelpers = () => {
@@ -222,7 +222,7 @@ export const Result = {
         Success: 0,
         Failure: 1,
         Status: 2,
-    }
+    },
 };
 
 const __bjs_createResultHelpers = () => {
@@ -293,7 +293,7 @@ export const NetworkingResult = {
     Tag: {
         Success: 0,
         Failure: 1,
-    }
+    },
 };
 
 const __bjs_createNetworkingResultHelpers = () => {
@@ -347,7 +347,7 @@ export const APIOptionalResult = {
         Success: 0,
         Failure: 1,
         Status: 2,
-    }
+    },
 };
 
 const __bjs_createAPIOptionalResultHelpers = () => {
@@ -651,7 +651,13 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            return {
+            if (typeof globalThis.API === 'undefined') {
+                globalThis.API = {};
+            }
+            if (typeof globalThis.Utilities === 'undefined') {
+                globalThis.Utilities = {};
+            }
+            const exports = {
                 handle: function bjs_handle(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.APIResult.lower(result);
                     instance.exports.bjs_handle(resultCaseId);
@@ -782,6 +788,7 @@ export async function createInstantiator(options, swift) {
                     return optResult;
                 },
             };
+            return exports;
         },
     }
 }

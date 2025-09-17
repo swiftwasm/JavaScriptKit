@@ -35,6 +35,9 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Direction"
     },
     {
@@ -61,6 +64,9 @@
       "emitStyle" : "const",
       "name" : "Status",
       "staticMethods" : [
+
+      ],
+      "staticProperties" : [
 
       ],
       "swiftCallName" : "Status"
@@ -97,6 +103,9 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "TSDirection"
     },
     {
@@ -112,6 +121,9 @@
       "explicitAccessControl" : "public",
       "name" : "PublicStatus",
       "staticMethods" : [
+
+      ],
+      "staticProperties" : [
 
       ],
       "swiftCallName" : "PublicStatus"

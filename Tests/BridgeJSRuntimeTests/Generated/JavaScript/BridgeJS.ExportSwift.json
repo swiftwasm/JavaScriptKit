@@ -68,6 +68,7 @@
       "properties" : [
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "name",
           "type" : {
             "string" : {
@@ -77,6 +78,7 @@
         },
         {
           "isReadonly" : true,
+          "isStatic" : false,
           "name" : "prefix",
           "type" : {
             "string" : {
@@ -366,6 +368,7 @@
       "properties" : [
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "optionalName",
           "type" : {
             "optional" : {
@@ -379,6 +382,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "optionalAge",
           "type" : {
             "optional" : {
@@ -392,6 +396,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "optionalGreeter",
           "type" : {
             "optional" : {
@@ -433,6 +438,7 @@
       "properties" : [
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "value",
           "type" : {
             "int" : {
@@ -540,6 +546,7 @@
       "properties" : [
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "intValue",
           "type" : {
             "int" : {
@@ -549,6 +556,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "floatValue",
           "type" : {
             "float" : {
@@ -558,6 +566,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "doubleValue",
           "type" : {
             "double" : {
@@ -567,6 +576,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "boolValue",
           "type" : {
             "bool" : {
@@ -576,6 +586,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "stringValue",
           "type" : {
             "string" : {
@@ -585,6 +596,7 @@
         },
         {
           "isReadonly" : true,
+          "isStatic" : false,
           "name" : "readonlyInt",
           "type" : {
             "int" : {
@@ -594,6 +606,7 @@
         },
         {
           "isReadonly" : true,
+          "isStatic" : false,
           "name" : "readonlyFloat",
           "type" : {
             "float" : {
@@ -603,6 +616,7 @@
         },
         {
           "isReadonly" : true,
+          "isStatic" : false,
           "name" : "readonlyDouble",
           "type" : {
             "double" : {
@@ -612,6 +626,7 @@
         },
         {
           "isReadonly" : true,
+          "isStatic" : false,
           "name" : "readonlyBool",
           "type" : {
             "bool" : {
@@ -621,6 +636,7 @@
         },
         {
           "isReadonly" : true,
+          "isStatic" : false,
           "name" : "readonlyString",
           "type" : {
             "string" : {
@@ -630,6 +646,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "jsObject",
           "type" : {
             "jsObject" : {
@@ -639,6 +656,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "sibling",
           "type" : {
             "swiftHeapObject" : {
@@ -648,6 +666,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "lazyValue",
           "type" : {
             "string" : {
@@ -657,6 +676,7 @@
         },
         {
           "isReadonly" : true,
+          "isStatic" : false,
           "name" : "computedReadonly",
           "type" : {
             "int" : {
@@ -666,6 +686,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "computedReadWrite",
           "type" : {
             "string" : {
@@ -675,6 +696,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "observedProperty",
           "type" : {
             "int" : {
@@ -771,6 +793,199 @@
 
       ],
       "swiftCallName" : "MathUtils"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_StaticPropertyHolder_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+
+      ],
+      "name" : "StaticPropertyHolder",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "staticConstant",
+          "staticContext" : {
+            "className" : {
+              "_0" : "StaticPropertyHolder"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "staticVariable",
+          "staticContext" : {
+            "className" : {
+              "_0" : "StaticPropertyHolder"
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "staticString",
+          "staticContext" : {
+            "className" : {
+              "_0" : "StaticPropertyHolder"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "staticBool",
+          "staticContext" : {
+            "className" : {
+              "_0" : "StaticPropertyHolder"
+            }
+          },
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "staticFloat",
+          "staticContext" : {
+            "className" : {
+              "_0" : "StaticPropertyHolder"
+            }
+          },
+          "type" : {
+            "float" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "staticDouble",
+          "staticContext" : {
+            "className" : {
+              "_0" : "StaticPropertyHolder"
+            }
+          },
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "computedProperty",
+          "staticContext" : {
+            "className" : {
+              "_0" : "StaticPropertyHolder"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "readOnlyComputed",
+          "staticContext" : {
+            "className" : {
+              "_0" : "StaticPropertyHolder"
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "optionalString",
+          "staticContext" : {
+            "className" : {
+              "_0" : "StaticPropertyHolder"
+            }
+          },
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "optionalInt",
+          "staticContext" : {
+            "className" : {
+              "_0" : "StaticPropertyHolder"
+            }
+          },
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "int" : {
+
+                }
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "jsObjectProperty",
+          "staticContext" : {
+            "className" : {
+              "_0" : "StaticPropertyHolder"
+            }
+          },
+          "type" : {
+            "jsObject" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "StaticPropertyHolder"
     }
   ],
   "enums" : [
@@ -806,6 +1021,9 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Direction"
     },
     {
@@ -832,6 +1050,9 @@
       "emitStyle" : "const",
       "name" : "Status",
       "staticMethods" : [
+
+      ],
+      "staticProperties" : [
 
       ],
       "swiftCallName" : "Status"
@@ -866,6 +1087,9 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Theme"
     },
     {
@@ -896,6 +1120,9 @@
       "name" : "HttpStatus",
       "rawType" : "Int",
       "staticMethods" : [
+
+      ],
+      "staticProperties" : [
 
       ],
       "swiftCallName" : "HttpStatus"
@@ -932,6 +1159,9 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "TSDirection"
     },
     {
@@ -964,6 +1194,9 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "TSTheme"
     },
     {
@@ -973,6 +1206,9 @@
       "emitStyle" : "const",
       "name" : "Utils",
       "staticMethods" : [
+
+      ],
+      "staticProperties" : [
 
       ],
       "swiftCallName" : "Utils"
@@ -1013,7 +1249,38 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Networking.API.Method"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "API",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "API"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Networking",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Networking"
     },
     {
       "cases" : [
@@ -1055,6 +1322,9 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Configuration.LogLevel"
     },
     {
@@ -1090,7 +1360,24 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Configuration.Port"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Configuration",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Configuration"
     },
     {
       "cases" : [
@@ -1117,7 +1404,28 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Internal.SupportedMethod"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Internal",
+      "namespace" : [
+        "Networking",
+        "APIV2"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Internal"
     },
     {
       "cases" : [
@@ -1191,6 +1499,9 @@
       "emitStyle" : "const",
       "name" : "APIResult",
       "staticMethods" : [
+
+      ],
+      "staticProperties" : [
 
       ],
       "swiftCallName" : "APIResult"
@@ -1386,6 +1697,9 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "ComplexResult"
     },
     {
@@ -1456,7 +1770,24 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Utilities.Result"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Utilities",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Utilities"
     },
     {
       "cases" : [
@@ -1500,7 +1831,24 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "API.NetworkingResult"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "API",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "API"
     },
     {
       "cases" : [
@@ -1591,6 +1939,9 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "APIOptionalResult"
     },
     {
@@ -1642,6 +1993,9 @@
           }
         }
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "StaticCalculator"
     },
     {
@@ -1685,7 +2039,242 @@
           }
         }
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "StaticUtils.Nested"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "StaticUtils",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "StaticUtils"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "option1"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "option2"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "StaticPropertyEnum",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "enumProperty",
+          "staticContext" : {
+            "enumName" : {
+              "_0" : "StaticPropertyEnum"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "enumConstant",
+          "staticContext" : {
+            "enumName" : {
+              "_0" : "StaticPropertyEnum"
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "enumBool",
+          "staticContext" : {
+            "enumName" : {
+              "_0" : "StaticPropertyEnum"
+            }
+          },
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "enumVariable",
+          "staticContext" : {
+            "enumName" : {
+              "_0" : "StaticPropertyEnum"
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "computedReadonly",
+          "staticContext" : {
+            "enumName" : {
+              "_0" : "StaticPropertyEnum"
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "computedReadWrite",
+          "staticContext" : {
+            "enumName" : {
+              "_0" : "StaticPropertyEnum"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "StaticPropertyEnum"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "NestedProperties",
+      "namespace" : [
+        "StaticPropertyNamespace"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "nestedProperty",
+          "staticContext" : {
+            "namespaceEnum" : {
+              "_0" : "StaticPropertyNamespace.NestedProperties"
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "nestedConstant",
+          "staticContext" : {
+            "namespaceEnum" : {
+              "_0" : "StaticPropertyNamespace.NestedProperties"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "nestedDouble",
+          "staticContext" : {
+            "namespaceEnum" : {
+              "_0" : "StaticPropertyNamespace.NestedProperties"
+            }
+          },
+          "type" : {
+            "double" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "StaticPropertyNamespace.NestedProperties"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "StaticPropertyNamespace",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "namespaceProperty",
+          "staticContext" : {
+            "namespaceEnum" : {
+              "_0" : "StaticPropertyNamespace"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "namespaceConstant",
+          "staticContext" : {
+            "namespaceEnum" : {
+              "_0" : "StaticPropertyNamespace"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "StaticPropertyNamespace"
     }
   ],
   "functions" : [
@@ -4263,6 +4852,23 @@
         "isThrows" : false
       },
       "name" : "getObserverStats",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_getAllStaticPropertyValues",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "getAllStaticPropertyValues",
       "parameters" : [
 
       ],

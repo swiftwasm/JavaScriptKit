@@ -1,7 +1,7 @@
 // @ts-check
 
 import {
-    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme, APIResult, ComplexResult, APIOptionalResult, StaticCalculator
+    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme, APIResult, ComplexResult, APIOptionalResult, StaticCalculator, StaticPropertyEnum
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
@@ -273,6 +273,88 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 
     ph.release();
     ph2.release();
+
+    // Test static properties
+    assert.equal(exports.StaticPropertyHolder.staticConstant, "constant");
+    assert.equal(exports.StaticPropertyHolder.staticVariable, 42);
+    assert.equal(exports.StaticPropertyHolder.staticString, "initial");
+    assert.equal(exports.StaticPropertyHolder.staticBool, true);
+    assert.equal(exports.StaticPropertyHolder.staticFloat, 3.140000104904175);
+    assert.equal(exports.StaticPropertyHolder.staticDouble, 2.718);
+    assert.equal(exports.StaticPropertyHolder.readOnlyComputed, 84); // staticVariable * 2 = 42 * 2
+
+    // Test static primitive property setters
+    exports.StaticPropertyHolder.staticVariable = 200;
+    exports.StaticPropertyHolder.staticString = "updated";
+    exports.StaticPropertyHolder.staticBool = false;
+    exports.StaticPropertyHolder.staticFloat = 6.28;
+    exports.StaticPropertyHolder.staticDouble = 1.414;
+
+    assert.equal(exports.StaticPropertyHolder.staticVariable, 200);
+    assert.equal(exports.StaticPropertyHolder.staticString, "updated");
+    assert.equal(exports.StaticPropertyHolder.staticBool, false);
+    assert.equal(exports.StaticPropertyHolder.staticFloat, 6.280000209808350);
+    assert.equal(exports.StaticPropertyHolder.staticDouble, 1.414);
+
+    // Test static JSObject
+    const testStaticObj = { staticTest: "object" };
+    exports.StaticPropertyHolder.jsObjectProperty = testStaticObj;
+    assert.equal(exports.StaticPropertyHolder.jsObjectProperty, testStaticObj);
+
+    const newStaticObj = { newStaticProp: "new" };
+    exports.StaticPropertyHolder.jsObjectProperty = newStaticObj;
+    assert.equal(exports.StaticPropertyHolder.jsObjectProperty, newStaticObj);
+
+    // Test static optional properties
+    assert.equal(exports.StaticPropertyHolder.optionalString, null);
+    assert.equal(exports.StaticPropertyHolder.optionalInt, null);
+    exports.StaticPropertyHolder.optionalString = "optional value";
+    exports.StaticPropertyHolder.optionalInt = 42;
+    assert.equal(exports.StaticPropertyHolder.optionalString, "optional value");
+    assert.equal(exports.StaticPropertyHolder.optionalInt, 42);
+    exports.StaticPropertyHolder.optionalString = null;
+    exports.StaticPropertyHolder.optionalInt = null;
+    assert.equal(exports.StaticPropertyHolder.optionalString, null);
+    assert.equal(exports.StaticPropertyHolder.optionalInt, null);
+
+    // Test static computed properties
+    assert.equal(exports.StaticPropertyHolder.computedProperty, "computed: 200");
+    exports.StaticPropertyHolder.computedProperty = "computed: 300"; // Should have parsed and set staticVariable
+    assert.equal(exports.StaticPropertyHolder.staticVariable, 300);
+    assert.equal(exports.StaticPropertyHolder.computedProperty, "computed: 300");
+    assert.equal(exports.StaticPropertyHolder.readOnlyComputed, 600); // staticVariable * 2 = 300 * 2
+
+    // Test static properties in enums
+    assert.equal(StaticPropertyEnum.enumProperty, "enum value");
+    assert.equal(StaticPropertyEnum.enumConstant, 42);
+    assert.equal(StaticPropertyEnum.enumBool, false);
+
+    StaticPropertyEnum.enumProperty = "modified enum";
+    StaticPropertyEnum.enumBool = true;
+    assert.equal(StaticPropertyEnum.enumProperty, "modified enum");
+    assert.equal(StaticPropertyEnum.enumBool, true);
+
+    assert.equal(StaticPropertyEnum.enumVariable, 200);
+    assert.equal(StaticPropertyEnum.computedReadonly, 400);
+    assert.equal(StaticPropertyEnum.computedReadWrite, "Value: 200");
+    StaticPropertyEnum.computedReadWrite = "Value: 500";
+    assert.equal(StaticPropertyEnum.enumVariable, 500);
+
+    // Namespace enum static properties
+    assert.equal(globalThis.StaticPropertyNamespace.namespaceProperty, "namespace");
+    assert.equal(globalThis.StaticPropertyNamespace.namespaceConstant, "constant");
+
+    globalThis.StaticPropertyNamespace.namespaceProperty = "modified namespace";
+    assert.equal(globalThis.StaticPropertyNamespace.namespaceProperty, "modified namespace");
+
+    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedProperty, 999);
+    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedConstant, "nested");
+    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedDouble, 1.414);
+
+    globalThis.StaticPropertyNamespace.NestedProperties.nestedProperty = 1000;
+    globalThis.StaticPropertyNamespace.NestedProperties.nestedDouble = 2.828;
+    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedProperty, 1000);
+    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedDouble, 2.828);
 
     // Test class without @JS init constructor
     const calc = exports.createCalculator();

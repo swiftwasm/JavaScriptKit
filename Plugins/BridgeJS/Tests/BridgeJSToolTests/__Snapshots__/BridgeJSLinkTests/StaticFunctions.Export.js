@@ -14,7 +14,7 @@ export const APIResult = {
     Tag: {
         Success: 0,
         Failure: 1,
-    }
+    },
     roundtrip: null,
 };
 
@@ -256,17 +256,23 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
             }
+            if (typeof globalThis.Utils === 'undefined') {
+                globalThis.Utils = {};
+            }
+            if (typeof globalThis.Utils.String === 'undefined') {
+                globalThis.Utils.String = {};
+            }
             Calculator.square = function(value) {
                 const ret = instance.exports.bjs_Calculator_static_square(value);
                 return ret;
-            }
+            };
             APIResult.roundtrip = function(value) {
                 const { caseId: valueCaseId, cleanup: valueCleanup } = enumHelpers.APIResult.lower(value);
                 instance.exports.bjs_APIResult_static_roundtrip(valueCaseId);
                 const ret = enumHelpers.APIResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                 if (valueCleanup) { valueCleanup(); }
                 return ret;
-            }
+            };
             const exports = {
                 MathUtils,
                 uppercase: function bjs_Utils_String_uppercase(text) {
@@ -279,12 +285,6 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 },
             };
-            if (typeof globalThis.Utils === 'undefined') {
-                globalThis.Utils = {};
-            }
-            if (typeof globalThis.Utils.String === 'undefined') {
-                globalThis.Utils.String = {};
-            }
             globalThis.Utils.String.uppercase = exports.uppercase;
             return exports;
         },

@@ -77,6 +77,9 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "APIResult"
     },
     {
@@ -244,6 +247,9 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "ComplexResult"
     },
     {
@@ -314,7 +320,24 @@
       "staticMethods" : [
 
       ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Utilities.Result"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Utilities",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Utilities"
     },
     {
       "cases" : [
@@ -356,6 +379,9 @@
         "API"
       ],
       "staticMethods" : [
+
+      ],
+      "staticProperties" : [
 
       ],
       "swiftCallName" : "NetworkingResult"
@@ -447,6 +473,9 @@
       "emitStyle" : "const",
       "name" : "APIOptionalResult",
       "staticMethods" : [
+
+      ],
+      "staticProperties" : [
 
       ],
       "swiftCallName" : "APIOptionalResult"

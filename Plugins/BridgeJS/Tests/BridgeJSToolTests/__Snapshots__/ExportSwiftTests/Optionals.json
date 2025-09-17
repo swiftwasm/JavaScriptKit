@@ -76,6 +76,7 @@
       "properties" : [
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "name",
           "type" : {
             "optional" : {
@@ -109,6 +110,7 @@
       "properties" : [
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "optionalName",
           "type" : {
             "optional" : {
@@ -122,6 +124,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "optionalAge",
           "type" : {
             "optional" : {
@@ -135,6 +138,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "optionalGreeter",
           "type" : {
             "optional" : {

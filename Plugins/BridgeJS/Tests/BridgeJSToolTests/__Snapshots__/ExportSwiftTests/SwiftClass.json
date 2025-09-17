@@ -68,6 +68,7 @@
       "properties" : [
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "name",
           "type" : {
             "string" : {
