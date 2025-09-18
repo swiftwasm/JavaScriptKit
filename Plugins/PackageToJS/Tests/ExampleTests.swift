@@ -246,6 +246,9 @@ extension Trait where Self == ConditionTrait {
         }
     }
 
+    // FIXME: This test fails on Swift 6.3 and later due to memory corruption
+    // Enable it back when https://github.com/swiftlang/swift-driver/pull/1987 is included in the snapshot
+    #if !compiler(>=6.3)
     @Test(.requireSwiftSDK)
     func testing() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
@@ -313,6 +316,7 @@ extension Trait where Self == ConditionTrait {
         }
     }
     #endif
+    #endif  // compiler(>=6.3)
 
     @Test(.requireSwiftSDK(triple: "wasm32-unknown-wasip1-threads"))
     func multithreading() throws {
@@ -338,6 +342,8 @@ extension Trait where Self == ConditionTrait {
         }
     }
 
+    // FIXME: This test fails on the current main snapshot
+    #if !compiler(>=6.3)
     @Test(.requireEmbeddedSwiftInToolchain(triple: "wasm32-unknown-none-wasm"))
     func embeddedWasmUnknownNone() throws {
         try withPackage(at: "Examples/Embedded") { packageDir, _, runSwift in
@@ -349,6 +355,7 @@ extension Trait where Self == ConditionTrait {
             )
         }
     }
+    #endif  // compiler(>=6.3)
 
     @Test(.requireEmbeddedSwiftInSwiftSDK())
     func embeddedWasmUnknownWasi() throws {
