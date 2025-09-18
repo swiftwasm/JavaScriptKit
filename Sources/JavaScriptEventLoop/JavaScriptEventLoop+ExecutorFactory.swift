@@ -7,7 +7,7 @@
 import _Concurrency
 import _CJavaScriptKit
 
-#if compiler(>=6.2)
+#if compiler(>=6.3)
 
 // MARK: - MainExecutor Implementation
 // MainExecutor is used by the main actor to execute tasks on the main thread
@@ -104,4 +104,4 @@ extension JavaScriptEventLoop: ExecutorFactory {
     }
 }
 
-#endif  // compiler(>=6.2)
+#endif  // compiler(>=6.3)
