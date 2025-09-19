@@ -1,5 +1,70 @@
 // This file is shared between BridgeTool and BridgeJSLink
 
+// MARK: - ABI Name Generation
+
+/// Utility for generating consistent ABI names across all exported and imported types
+public struct ABINameGenerator {
+    static let prefixComponent = "bjs"
+
+    /// Generates ABI name using standardized namespace + context pattern
+    public static func generateABIName(
+        baseName: String,
+        namespace: [String]?,
+        staticContext: StaticContext?,
+        operation: String? = nil,
+        className: String? = nil
+    ) -> String {
+
+        let namespacePart: String?
+        if let namespace = namespace, !namespace.isEmpty {
+            namespacePart = namespace.joined(separator: "_")
+        } else {
+            namespacePart = nil
+        }
+
+        let contextPart: String?
+        if let staticContext = staticContext {
+            switch staticContext {
+            case .className(let name), .enumName(let name):
+                contextPart = name
+            case .namespaceEnum:
+                contextPart = namespacePart
+            }
+        } else if let className = className {
+            contextPart = className
+        } else {
+            contextPart = namespacePart
+        }
+
+        var components = [ABINameGenerator.prefixComponent]
+        if let context = contextPart {
+            components.append(context)
+        }
+
+        if staticContext != nil {
+            components.append("static")
+        }
+
+        components.append(baseName)
+
+        if let operation = operation {
+            components.append(operation)
+        }
+
+        return components.joined(separator: "_")
+    }
+
+    static func generateImportedABIName(
+        baseName: String,
+        context: ImportedTypeSkeleton? = nil,
+        operation: String? = nil
+    ) -> String {
+        return [ABINameGenerator.prefixComponent, context?.name, baseName, operation].compactMap { $0 }.joined(
+            separator: "_"
+        )
+    }
+}
+
 // MARK: - Types
 
 public enum BridgeType: Codable, Equatable, Sendable {
@@ -62,7 +127,7 @@ public enum SwiftEnumRawType: String, CaseIterable, Codable, Sendable {
     }
 }
 
-public struct Parameter: Codable {
+public struct Parameter: Codable, Equatable, Sendable {
     public let label: String?
     public let name: String
     public let type: BridgeType
@@ -74,14 +139,24 @@ public struct Parameter: Codable {
     }
 }
 
-public struct Effects: Codable {
+public struct Effects: Codable, Equatable, Sendable {
     public var isAsync: Bool
     public var isThrows: Bool
+    public var isStatic: Bool
 
-    public init(isAsync: Bool, isThrows: Bool) {
+    public init(isAsync: Bool, isThrows: Bool, isStatic: Bool = false) {
         self.isAsync = isAsync
         self.isThrows = isThrows
+        self.isStatic = isStatic
     }
+}
+
+// MARK: - Static Function Context
+
+public enum StaticContext: Codable, Equatable, Sendable {
+    case className(String)
+    case enumName(String)
+    case namespaceEnum
 }
 
 // MARK: - Enum Skeleton
@@ -120,10 +195,12 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
     public let name: String
     public let swiftCallName: String
     public let explicitAccessControl: String?
-    public let cases: [EnumCase]
+    public var cases: [EnumCase]
     public let rawType: String?
     public let namespace: [String]?
     public let emitStyle: EnumEmitStyle
+    public var staticMethods: [ExportedFunction]
+    public var staticProperties: [ExportedProperty] = []
     public var enumType: EnumType {
         if cases.isEmpty {
             return .namespace
@@ -141,7 +218,9 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
         cases: [EnumCase],
         rawType: String?,
         namespace: [String]?,
-        emitStyle: EnumEmitStyle
+        emitStyle: EnumEmitStyle,
+        staticMethods: [ExportedFunction] = [],
+        staticProperties: [ExportedProperty] = []
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
@@ -150,6 +229,8 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
         self.rawType = rawType
         self.namespace = namespace
         self.emitStyle = emitStyle
+        self.staticMethods = staticMethods
+        self.staticProperties = staticProperties
     }
 }
 
@@ -162,13 +243,14 @@ public enum EnumType: String, Codable, Sendable {
 
 // MARK: - Exported Skeleton
 
-public struct ExportedFunction: Codable {
+public struct ExportedFunction: Codable, Equatable, Sendable {
     public var name: String
     public var abiName: String
     public var parameters: [Parameter]
     public var returnType: BridgeType
     public var effects: Effects
     public var namespace: [String]?
+    public var staticContext: StaticContext?
 
     public init(
         name: String,
@@ -176,7 +258,8 @@ public struct ExportedFunction: Codable {
         parameters: [Parameter],
         returnType: BridgeType,
         effects: Effects,
-        namespace: [String]? = nil
+        namespace: [String]? = nil,
+        staticContext: StaticContext? = nil
     ) {
         self.name = name
         self.abiName = abiName
@@ -184,6 +267,7 @@ public struct ExportedFunction: Codable {
         self.returnType = returnType
         self.effects = effects
         self.namespace = namespace
+        self.staticContext = staticContext
     }
 }
 
@@ -229,23 +313,66 @@ public struct ExportedConstructor: Codable {
     }
 }
 
-public struct ExportedProperty: Codable {
+public struct ExportedProperty: Codable, Equatable, Sendable {
     public var name: String
     public var type: BridgeType
     public var isReadonly: Bool
+    public var isStatic: Bool
+    public var namespace: [String]?
+    public var staticContext: StaticContext?
 
-    public init(name: String, type: BridgeType, isReadonly: Bool = false) {
+    public init(
+        name: String,
+        type: BridgeType,
+        isReadonly: Bool = false,
+        isStatic: Bool = false,
+        namespace: [String]? = nil,
+        staticContext: StaticContext? = nil
+    ) {
         self.name = name
         self.type = type
         self.isReadonly = isReadonly
+        self.isStatic = isStatic
+        self.namespace = namespace
+        self.staticContext = staticContext
     }
 
-    public func getterAbiName(className: String) -> String {
-        return "bjs_\(className)_\(name)_get"
+    public func callName(prefix: String? = nil) -> String {
+        if let staticContext = staticContext {
+            switch staticContext {
+            case .className(let baseName), .enumName(let baseName):
+                return "\(baseName).\(name)"
+            case .namespaceEnum:
+                if let namespace = namespace, !namespace.isEmpty {
+                    let namespacePath = namespace.joined(separator: ".")
+                    return "\(namespacePath).\(name)"
+                }
+            }
+        }
+        if let prefix = prefix {
+            return "\(prefix).\(name)"
+        }
+        return name
     }
 
-    public func setterAbiName(className: String) -> String {
-        return "bjs_\(className)_\(name)_set"
+    public func getterAbiName(className: String = "") -> String {
+        return ABINameGenerator.generateABIName(
+            baseName: name,
+            namespace: namespace,
+            staticContext: isStatic ? staticContext : nil,
+            operation: "get",
+            className: isStatic ? nil : className
+        )
+    }
+
+    public func setterAbiName(className: String = "") -> String {
+        return ABINameGenerator.generateABIName(
+            baseName: name,
+            namespace: namespace,
+            staticContext: isStatic ? staticContext : nil,
+            operation: "set",
+            className: isStatic ? nil : className
+        )
     }
 }
 
@@ -272,7 +399,10 @@ public struct ImportedFunctionSkeleton: Codable {
     public let documentation: String?
 
     public func abiName(context: ImportedTypeSkeleton?) -> String {
-        return context.map { "bjs_\($0.name)_\(name)" } ?? "bjs_\(name)"
+        return ABINameGenerator.generateImportedABIName(
+            baseName: name,
+            context: context
+        )
     }
 }
 
@@ -280,7 +410,10 @@ public struct ImportedConstructorSkeleton: Codable {
     public let parameters: [Parameter]
 
     public func abiName(context: ImportedTypeSkeleton) -> String {
-        return "bjs_\(context.name)_init"
+        return ABINameGenerator.generateImportedABIName(
+            baseName: "init",
+            context: context
+        )
     }
 }
 
@@ -291,11 +424,19 @@ public struct ImportedPropertySkeleton: Codable {
     public let documentation: String?
 
     public func getterAbiName(context: ImportedTypeSkeleton) -> String {
-        return "bjs_\(context.name)_\(name)_get"
+        return ABINameGenerator.generateImportedABIName(
+            baseName: name,
+            context: context,
+            operation: "get"
+        )
     }
 
     public func setterAbiName(context: ImportedTypeSkeleton) -> String {
-        return "bjs_\(context.name)_\(name)_set"
+        return ABINameGenerator.generateImportedABIName(
+            baseName: name,
+            context: context,
+            operation: "set"
+        )
     }
 }
 

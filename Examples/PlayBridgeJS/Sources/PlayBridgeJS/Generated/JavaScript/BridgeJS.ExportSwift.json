@@ -5,6 +5,7 @@
         "abiName" : "bjs_PlayBridgeJS_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -16,6 +17,7 @@
           "abiName" : "bjs_PlayBridgeJS_update",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : true
           },
           "name" : "update",
@@ -58,6 +60,7 @@
           "abiName" : "bjs_PlayBridgeJSOutput_outputJs",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "outputJs",
@@ -74,6 +77,7 @@
           "abiName" : "bjs_PlayBridgeJSOutput_outputDts",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "outputDts",
@@ -90,6 +94,7 @@
           "abiName" : "bjs_PlayBridgeJSOutput_importSwiftGlue",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "importSwiftGlue",
@@ -106,6 +111,7 @@
           "abiName" : "bjs_PlayBridgeJSOutput_exportSwiftGlue",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "exportSwiftGlue",

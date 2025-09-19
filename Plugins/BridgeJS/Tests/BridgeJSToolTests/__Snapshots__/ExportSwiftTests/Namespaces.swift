@@ -17,9 +17,9 @@ public func _bjs_plainFunction() -> Void {
     #endif
 }
 
-@_expose(wasm, "bjs_namespacedFunction")
-@_cdecl("bjs_namespacedFunction")
-public func _bjs_namespacedFunction() -> Void {
+@_expose(wasm, "bjs_MyModule_Utils_namespacedFunction")
+@_cdecl("bjs_MyModule_Utils_namespacedFunction")
+public func _bjs_MyModule_Utils_namespacedFunction() -> Void {
     #if arch(wasm32)
     let ret = namespacedFunction()
     return ret.bridgeJSLowerReturn()

@@ -1,0 +1,326 @@
+{
+  "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_MathUtils_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_MathUtils_static_subtract",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "subtract",
+          "parameters" : [
+            {
+              "label" : "a",
+              "name" : "a",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "label" : "b",
+              "name" : "b",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          },
+          "staticContext" : {
+            "className" : {
+              "_0" : "MathUtils"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MathUtils_static_add",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "add",
+          "parameters" : [
+            {
+              "label" : "a",
+              "name" : "a",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "label" : "b",
+              "name" : "b",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          },
+          "staticContext" : {
+            "className" : {
+              "_0" : "MathUtils"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MathUtils_multiply",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "multiply",
+          "parameters" : [
+            {
+              "label" : "x",
+              "name" : "x",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "label" : "y",
+              "name" : "y",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "MathUtils",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "MathUtils"
+    }
+  ],
+  "enums" : [
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "scientific"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "basic"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Calculator",
+      "staticMethods" : [
+        {
+          "abiName" : "bjs_Calculator_static_square",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "square",
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          },
+          "staticContext" : {
+            "enumName" : {
+              "_0" : "Calculator"
+            }
+          }
+        }
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Calculator"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "failure"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "APIResult",
+      "staticMethods" : [
+        {
+          "abiName" : "bjs_APIResult_static_roundtrip",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "roundtrip",
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          },
+          "staticContext" : {
+            "enumName" : {
+              "_0" : "APIResult"
+            }
+          }
+        }
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "APIResult"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Utils",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Utils"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "String",
+      "namespace" : [
+        "Utils"
+      ],
+      "staticMethods" : [
+        {
+          "abiName" : "bjs_Utils_String_static_uppercase",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "uppercase",
+          "namespace" : [
+            "Utils",
+            "String"
+          ],
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "text",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          },
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          }
+        }
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Utils.String"
+    }
+  ],
+  "functions" : [
+
+  ],
+  "moduleName" : "TestModule"
+}

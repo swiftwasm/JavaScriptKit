@@ -5,6 +5,7 @@
         "abiName" : "bjs_Converter_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -16,9 +17,13 @@
           "abiName" : "bjs_Converter_toString",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "toString",
+          "namespace" : [
+            "Utils"
+          ],
           "parameters" : [
             {
               "label" : "value",
@@ -51,6 +56,7 @@
         "abiName" : "bjs_HTTPServer_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -62,9 +68,14 @@
           "abiName" : "bjs_HTTPServer_call",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "call",
+          "namespace" : [
+            "Networking",
+            "API"
+          ],
           "parameters" : [
             {
               "label" : "_",
@@ -98,6 +109,7 @@
         "abiName" : "bjs_TestServer_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -109,9 +121,15 @@
           "abiName" : "bjs_TestServer_call",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "call",
+          "namespace" : [
+            "Networking",
+            "APIV2",
+            "Internal"
+          ],
           "parameters" : [
             {
               "label" : "_",
@@ -149,7 +167,44 @@
       ],
       "emitStyle" : "const",
       "name" : "Utils",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Utils"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Networking",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Networking"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "API",
+      "namespace" : [
+        "Networking"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Networking.API"
     },
     {
       "cases" : [
@@ -184,7 +239,27 @@
         "Networking",
         "API"
       ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Networking.API.Method"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Configuration",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Configuration"
     },
     {
       "cases" : [
@@ -223,6 +298,12 @@
         "Configuration"
       ],
       "rawType" : "String",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Configuration.LogLevel"
     },
     {
@@ -255,7 +336,31 @@
         "Configuration"
       ],
       "rawType" : "Int",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Configuration.Port"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Internal",
+      "namespace" : [
+        "Networking",
+        "APIV2"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Internal"
     },
     {
       "cases" : [
@@ -278,6 +383,12 @@
         "Networking",
         "APIV2",
         "Internal"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
       ],
       "swiftCallName" : "Internal.SupportedMethod"
     }
