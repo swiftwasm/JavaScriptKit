@@ -355,7 +355,6 @@ extension Trait where Self == ConditionTrait {
             )
         }
     }
-    #endif  // compiler(>=6.3)
 
     @Test(.requireEmbeddedSwiftInSwiftSDK())
     func embeddedWasmUnknownWasi() throws {
@@ -369,6 +368,7 @@ extension Trait where Self == ConditionTrait {
             )
         }
     }
+    #endif  // compiler(>=6.3)
 
     @Test(.requireSwiftSDK)
     func continuationLeakInTest_XCTest() throws {
