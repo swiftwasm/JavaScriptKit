@@ -167,18 +167,6 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
         }
     }
 
-    /// Access the `symbol` member dynamically through JavaScript and Swift runtime bridge library.
-    /// - Parameter symbol: The name of this object's member to access.
-    /// - Returns: The value of the `name` member of this object.
-    public subscript(_ name: JSSymbol) -> JSValue {
-        get {
-            return getJSValue(this: self, symbol: name)
-        }
-        set {
-            setJSValue(this: self, symbol: name, value: newValue)
-        }
-    }
-
     /// Return `true` if this value is an instance of the passed `constructor` function.
     /// - Parameter constructor: The constructor function to check.
     /// - Returns: The result of `instanceof` in the JavaScript environment.
