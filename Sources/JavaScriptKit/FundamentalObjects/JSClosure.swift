@@ -309,16 +309,6 @@ func _call_host_function_impl(
     _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
 ) -> Bool {
-    guard let (_, hostFunc) = JSClosure.sharedClosures.wrappedValue[hostFuncRef] else {
-        return true
-    }
-    var arguments: [JSValue] = []
-    for i in 0..<Int(argc) {
-        arguments.append(argv[i].jsValue)
-    }
-    let result = hostFunc(arguments)
-    let callbackFuncRef = JSObject(id: callbackFuncRef)
-    _ = callbackFuncRef(result)
     return false
 }
 

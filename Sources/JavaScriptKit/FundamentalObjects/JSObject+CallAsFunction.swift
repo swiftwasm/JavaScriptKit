@@ -9,81 +9,6 @@ import _CJavaScriptKit
 public typealias JSFunction = JSObject
 
 extension JSObject {
-    #if !hasFeature(Embedded)
-    /// Call this function with given `arguments` and binding given `this` as context.
-    /// - Parameters:
-    ///   - this: The value to be passed as the `this` parameter to this function.
-    ///   - arguments: Arguments to be passed to this function.
-    /// - Returns: The result of this call.
-    @discardableResult
-    public func callAsFunction(this: JSObject, arguments: [ConvertibleToJSValue]) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: arguments, this: this).jsValue
-    }
-
-    /// Call this function with given `arguments`.
-    /// - Parameters:
-    ///   - arguments: Arguments to be passed to this function.
-    /// - Returns: The result of this call.
-    @discardableResult
-    public func callAsFunction(arguments: [ConvertibleToJSValue]) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: arguments).jsValue
-    }
-
-    /// A variadic arguments version of `callAsFunction`.
-    @discardableResult
-    public func callAsFunction(this: JSObject, _ arguments: ConvertibleToJSValue...) -> JSValue {
-        self(this: this, arguments: arguments)
-    }
-
-    /// A variadic arguments version of `callAsFunction`.
-    @discardableResult
-    public func callAsFunction(_ arguments: ConvertibleToJSValue...) -> JSValue {
-        self(arguments: arguments)
-    }
-
-    /// Instantiate an object from this function as a constructor.
-    ///
-    /// Guaranteed to return an object because either:
-    ///
-    /// - a. the constructor explicitly returns an object, or
-    /// - b. the constructor returns nothing, which causes JS to return the `this` value, or
-    /// - c. the constructor returns undefined, null or a non-object, in which case JS also returns `this`.
-    ///
-    /// - Parameter arguments: Arguments to be passed to this constructor function.
-    /// - Returns: A new instance of this constructor.
-    public func new(arguments: [ConvertibleToJSValue]) -> JSObject {
-        arguments.withRawJSValues { rawValues in
-            rawValues.withUnsafeBufferPointer { bufferPointer in
-                JSObject(id: swjs_call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
-            }
-        }
-    }
-
-    /// A variadic arguments version of `new`.
-    public func new(_ arguments: ConvertibleToJSValue...) -> JSObject {
-        new(arguments: arguments)
-    }
-
-    /// A modifier to call this function as a throwing function
-    ///
-    ///
-    /// ```javascript
-    /// function validateAge(age) {
-    ///   if (age < 0) {
-    ///     throw new Error("Invalid age");
-    ///   }
-    /// }
-    /// ```
-    ///
-    /// ```swift
-    /// let validateAge = JSObject.global.validateAge.object!
-    /// try validateAge.throws(20)
-    /// ```
-    public var `throws`: JSThrowingFunction {
-        JSThrowingFunction(self)
-    }
-    #endif
-
     @discardableResult
     public func callAsFunction(arguments: [JSValue]) -> JSValue {
         invokeNonThrowingJSFunction(arguments: arguments).jsValue
@@ -109,16 +34,6 @@ extension JSObject {
     final func invokeNonThrowingJSFunction(arguments: [JSValue], this: JSObject) -> RawJSValue {
         arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0, this: this) }
     }
-
-    #if !hasFeature(Embedded)
-    final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue]) -> RawJSValue {
-        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0) }
-    }
-
-    final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue], this: JSObject) -> RawJSValue {
-        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0, this: this) }
-    }
-    #endif
 
     final private func invokeNonThrowingJSFunction(rawValues: [RawJSValue]) -> RawJSValue {
         rawValues.withUnsafeBufferPointer { [id] bufferPointer in
