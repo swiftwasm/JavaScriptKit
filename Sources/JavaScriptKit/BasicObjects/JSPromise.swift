@@ -3,7 +3,7 @@ import _Concurrency
 #endif
 
 /// A wrapper around [the JavaScript `Promise` class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-public final class JSPromise: JSBridgedClass {
+public final class JSPromise {
     /// The underlying JavaScript `Promise` object.
     public let jsObject: JSObject
 
@@ -24,7 +24,8 @@ public final class JSPromise: JSBridgedClass {
     /// Creates a new `JSPromise` instance from a given JavaScript `Promise` object. If `jsObject`
     /// is not an instance of JavaScript `Promise`, this initializer will return `nil`.
     public convenience init?(_ jsObject: JSObject) {
-        self.init(from: jsObject)
+        // self.init(from: jsObject)
+        fatalError("Not implemented")
     }
 
     /// Creates a new `JSPromise` instance from a given JavaScript `Promise` object. If `value`

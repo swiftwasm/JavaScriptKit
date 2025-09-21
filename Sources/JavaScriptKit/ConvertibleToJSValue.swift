@@ -192,10 +192,6 @@ extension RawJSValue: ConvertibleToJSValue {
             return .null
         case .undefined:
             return .undefined
-        case .symbol:
-            return .symbol(JSSymbol(id: UInt32(payload1)))
-        case .bigInt:
-            return .bigInt(JSBigInt(id: UInt32(payload1)))
         }
     }
 }
@@ -230,12 +226,6 @@ extension JSValue {
         case .undefined:
             kind = .undefined
             payload1 = 0
-        case .symbol(let symbolRef):
-            kind = .symbol
-            payload1 = JavaScriptPayload1(symbolRef.id)
-        case .bigInt(let bigIntRef):
-            kind = .bigInt
-            payload1 = JavaScriptPayload1(bigIntRef.id)
         }
         return RawJSValue(kind: kind, payload1: payload1, payload2: payload2)
     }

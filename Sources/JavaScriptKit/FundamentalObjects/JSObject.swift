@@ -115,10 +115,6 @@ public class JSObject: Equatable {
             return nil
         case .object(let object):
             return object as? Self
-        case .symbol(let symbol):
-            return symbol as? Self
-        case .bigInt(let bigInt):
-            return bigInt as? Self
         }
     }
 

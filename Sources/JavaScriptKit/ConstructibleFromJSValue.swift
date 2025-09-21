@@ -35,24 +35,6 @@ extension Double: ConstructibleFromJSValue {}
 extension Float: ConstructibleFromJSValue {}
 
 extension SignedInteger where Self: ConstructibleFromJSValue {
-    /// Construct an instance of `SignedInteger` from the given `JSBigIntExtended`.
-    ///
-    /// If the value is too large to fit in the `Self` type, `nil` is returned.
-    ///
-    /// - Parameter bigInt: The `JSBigIntExtended` to decode
-    public init?(exactly bigInt: some JSBigIntExtended) {
-        self.init(exactly: bigInt.int64Value)
-    }
-
-    /// Construct an instance of `SignedInteger` from the given `JSBigIntExtended`.
-    ///
-    /// Crash if the value is too large to fit in the `Self` type.
-    ///
-    /// - Parameter bigInt: The `JSBigIntExtended` to decode
-    public init(_ bigInt: some JSBigIntExtended) {
-        self.init(bigInt.int64Value)
-    }
-
     /// Construct an instance of `SignedInteger` from the given `JSValue`.
     ///
     /// Returns `nil` if one of the following conditions is met:
@@ -68,11 +50,6 @@ extension SignedInteger where Self: ConstructibleFromJSValue {
         if let number = value.number {
             return Self(exactly: number.rounded(.towardZero))
         }
-        #if !hasFeature(Embedded)
-        if let bigInt = value.bigInt as? JSBigIntExtended {
-            return Self(exactly: bigInt)
-        }
-        #endif
         return nil
     }
 }
@@ -83,25 +60,6 @@ extension Int32: ConstructibleFromJSValue {}
 extension Int64: ConstructibleFromJSValue {}
 
 extension UnsignedInteger where Self: ConstructibleFromJSValue {
-
-    /// Construct an instance of `UnsignedInteger` from the given `JSBigIntExtended`.
-    ///
-    /// Returns `nil` if the value is negative or too large to fit in the `Self` type.
-    ///
-    /// - Parameter bigInt: The `JSBigIntExtended` to decode
-    public init?(exactly bigInt: some JSBigIntExtended) {
-        self.init(exactly: bigInt.uInt64Value)
-    }
-
-    /// Construct an instance of `UnsignedInteger` from the given `JSBigIntExtended`.
-    ///
-    /// Crash if the value is negative or too large to fit in the `Self` type.
-    ///
-    /// - Parameter bigInt: The `JSBigIntExtended` to decode
-    public init(_ bigInt: some JSBigIntExtended) {
-        self.init(bigInt.uInt64Value)
-    }
-
     /// Construct an instance of `UnsignedInteger` from the given `JSValue`.
     ///
     /// Returns `nil` if one of the following conditions is met:
@@ -116,11 +74,6 @@ extension UnsignedInteger where Self: ConstructibleFromJSValue {
         if let number = value.number {
             return Self(exactly: number.rounded(.towardZero))
         }
-        #if !hasFeature(Embedded)
-        if let bigInt = value.bigInt as? JSBigIntExtended {
-            return Self(exactly: bigInt)
-        }
-        #endif
         return nil
     }
 }
