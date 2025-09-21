@@ -110,20 +110,7 @@ extension Dictionary: ConvertibleToJSValue where Value: ConvertibleToJSValue, Ke
 
 extension Dictionary: ConstructibleFromJSValue where Value: ConstructibleFromJSValue, Key == String {
     public static func construct(from value: JSValue) -> Self? {
-        guard
-            let objectRef = value.object,
-            let keys: [String] = objectConstructor.keys!(objectRef.jsValue).fromJSValue()
-        else { return nil }
-
-        var entries = [(String, Value)]()
-        entries.reserveCapacity(keys.count)
-        for key in keys {
-            guard let value: Value = objectRef[key].fromJSValue() else {
-                return nil
-            }
-            entries.append((key, value))
-        }
-        return Dictionary(uniqueKeysWithValues: entries)
+        fatalError("Not implemented")
     }
 }
 

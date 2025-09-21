@@ -30,21 +30,23 @@ public class JSSymbol: JSObject {
     }
 
     public static func `for`(key: JSString) -> JSSymbol {
-        Symbol.for!(key).symbol!
+        fatalError("Not implemented")
     }
 
     @_disfavoredOverload
     public static func `for`(key: String) -> JSSymbol {
-        Symbol.for!(key).symbol!
+        fatalError("Not implemented")
     }
 
     public static func key(for symbol: JSSymbol) -> JSString? {
-        Symbol.keyFor!(symbol).jsString
+        // Symbol.keyFor!(symbol).jsString
+        nil
     }
 
     @_disfavoredOverload
     public static func key(for symbol: JSSymbol) -> String? {
-        Symbol.keyFor!(symbol).string
+        // Symbol.keyFor!(symbol).string
+        nil
     }
 
     override public var jsValue: JSValue {
@@ -53,17 +55,4 @@ public class JSSymbol: JSObject {
 }
 
 extension JSSymbol {
-    public static var asyncIterator: JSSymbol! { Symbol.asyncIterator.symbol }
-    public static var hasInstance: JSSymbol! { Symbol.hasInstance.symbol }
-    public static var isConcatSpreadable: JSSymbol! { Symbol.isConcatSpreadable.symbol }
-    public static var iterator: JSSymbol! { Symbol.iterator.symbol }
-    public static var match: JSSymbol! { Symbol.match.symbol }
-    public static var matchAll: JSSymbol! { Symbol.matchAll.symbol }
-    public static var replace: JSSymbol! { Symbol.replace.symbol }
-    public static var search: JSSymbol! { Symbol.search.symbol }
-    public static var species: JSSymbol! { Symbol.species.symbol }
-    public static var split: JSSymbol! { Symbol.split.symbol }
-    public static var toPrimitive: JSSymbol! { Symbol.toPrimitive.symbol }
-    public static var toStringTag: JSSymbol! { Symbol.toStringTag.symbol }
-    public static var unscopables: JSSymbol! { Symbol.unscopables.symbol }
 }

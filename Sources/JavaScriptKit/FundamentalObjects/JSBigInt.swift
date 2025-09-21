@@ -29,11 +29,12 @@ public final class JSBigInt: JSObject {
     }
 
     public func clamped(bitSize: Int, signed: Bool) -> JSBigInt {
-        if signed {
-            return constructor.asIntN(bitSize, self).bigInt!
-        } else {
-            return constructor.asUintN(bitSize, self).bigInt!
-        }
+        // if signed {
+        //     return constructor.asIntN(bitSize, self).bigInt!
+        // } else {
+        //     return constructor.asUintN(bitSize, self).bigInt!
+        // }
+        fatalError("Not implemented")
     }
 }
 

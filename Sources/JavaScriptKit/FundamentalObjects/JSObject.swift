@@ -187,29 +187,6 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
         }
     }
 
-    #if !hasFeature(Embedded)
-    /// A modifier to call methods as throwing methods capturing `this`
-    ///
-    ///
-    /// ```javascript
-    /// const animal = {
-    ///   validateAge: function() {
-    ///     if (this.age < 0) {
-    ///       throw new Error("Invalid age");
-    ///     }
-    ///   }
-    /// }
-    /// ```
-    ///
-    /// ```swift
-    /// let animal = JSObject.global.animal.object!
-    /// try animal.throwing.validateAge!()
-    /// ```
-    public var throwing: JSThrowingObject {
-        JSThrowingObject(self)
-    }
-    #endif
-
     /// Return `true` if this value is an instance of the passed `constructor` function.
     /// - Parameter constructor: The constructor function to check.
     /// - Returns: The result of `instanceof` in the JavaScript environment.
@@ -228,13 +205,6 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     })
 
     deinit {
-        #if compiler(>=6.1) && _runtime(_multithreaded)
-        if ownerTid != swjs_get_worker_thread_id_cached() {
-            // If the object is not owned by the current thread
-            swjs_release_remote(ownerTid, id)
-            return
-        }
-        #endif
         swjs_release(id)
     }
 
@@ -270,10 +240,6 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     }
 }
 
-extension JSObject: CustomStringConvertible {
-    public var description: String { self.toString!().string! }
-}
-
 extension JSObject: Hashable {
     /// Hashes the essential components of this value by feeding them into the
     /// given hasher.
@@ -284,134 +250,3 @@ extension JSObject: Hashable {
         hasher.combine(id)
     }
 }
-
-#if !hasFeature(Embedded)
-/// A `JSObject` wrapper that enables throwing method calls capturing `this`.
-/// Exceptions produced by JavaScript functions will be thrown as `JSValue`.
-@dynamicMemberLookup
-public class JSThrowingObject {
-    private let base: JSObject
-    public init(_ base: JSObject) {
-        self.base = base
-    }
-
-    /// Returns the `name` member method binding this object as `this` context.
-    /// - Parameter name: The name of this object's member to access.
-    /// - Returns: The `name` member method binding this object as `this` context.
-    @_disfavoredOverload
-    public subscript(_ name: String) -> ((ConvertibleToJSValue...) throws -> JSValue)? {
-        guard let function = base[name].function?.throws else { return nil }
-        return { [base] (arguments: ConvertibleToJSValue...) in
-            try function(this: base, arguments: arguments)
-        }
-    }
-
-    /// A convenience method of `subscript(_ name: String) -> ((ConvertibleToJSValue...) throws -> JSValue)?`
-    /// to access the member through Dynamic Member Lookup.
-    @_disfavoredOverload
-    public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) throws -> JSValue)? {
-        self[name]
-    }
-}
-#endif
-
-#if hasFeature(Embedded)
-// Overloads of `JSObject.subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
-// for 0 through 7 arguments for Embedded Swift.
-//
-// These are required because the `ConvertibleToJSValue...` subscript is not
-// available in Embedded Swift due to lack of support for existentials.
-//
-// NOTE: Once Embedded Swift supports parameter packs/variadic generics, we can
-// replace all of these with a single method that takes a generic pack.
-extension JSObject {
-    @_disfavoredOverload
-    public subscript(dynamicMember name: String) -> (() -> JSValue)? {
-        self[name].function.map { function in
-            { function(this: self) }
-        }
-    }
-
-    @_disfavoredOverload
-    public subscript<A0: ConvertibleToJSValue>(dynamicMember name: String) -> ((A0) -> JSValue)? {
-        self[name].function.map { function in
-            { function(this: self, $0) }
-        }
-    }
-
-    @_disfavoredOverload
-    public subscript<
-        A0: ConvertibleToJSValue,
-        A1: ConvertibleToJSValue
-    >(dynamicMember name: String) -> ((A0, A1) -> JSValue)? {
-        self[name].function.map { function in
-            { function(this: self, $0, $1) }
-        }
-    }
-
-    @_disfavoredOverload
-    public subscript<
-        A0: ConvertibleToJSValue,
-        A1: ConvertibleToJSValue,
-        A2: ConvertibleToJSValue
-    >(dynamicMember name: String) -> ((A0, A1, A2) -> JSValue)? {
-        self[name].function.map { function in
-            { function(this: self, $0, $1, $2) }
-        }
-    }
-
-    @_disfavoredOverload
-    public subscript<
-        A0: ConvertibleToJSValue,
-        A1: ConvertibleToJSValue,
-        A2: ConvertibleToJSValue,
-        A3: ConvertibleToJSValue
-    >(dynamicMember name: String) -> ((A0, A1, A2, A3) -> JSValue)? {
-        self[name].function.map { function in
-            { function(this: self, $0, $1, $2, $3) }
-        }
-    }
-
-    @_disfavoredOverload
-    public subscript<
-        A0: ConvertibleToJSValue,
-        A1: ConvertibleToJSValue,
-        A2: ConvertibleToJSValue,
-        A3: ConvertibleToJSValue,
-        A4: ConvertibleToJSValue
-    >(dynamicMember name: String) -> ((A0, A1, A2, A3, A4) -> JSValue)? {
-        self[name].function.map { function in
-            { function(this: self, $0, $1, $2, $3, $4) }
-        }
-    }
-
-    @_disfavoredOverload
-    public subscript<
-        A0: ConvertibleToJSValue,
-        A1: ConvertibleToJSValue,
-        A2: ConvertibleToJSValue,
-        A3: ConvertibleToJSValue,
-        A4: ConvertibleToJSValue,
-        A5: ConvertibleToJSValue
-    >(dynamicMember name: String) -> ((A0, A1, A2, A3, A4, A5) -> JSValue)? {
-        self[name].function.map { function in
-            { function(this: self, $0, $1, $2, $3, $4, $5) }
-        }
-    }
-
-    @_disfavoredOverload
-    public subscript<
-        A0: ConvertibleToJSValue,
-        A1: ConvertibleToJSValue,
-        A2: ConvertibleToJSValue,
-        A3: ConvertibleToJSValue,
-        A4: ConvertibleToJSValue,
-        A5: ConvertibleToJSValue,
-        A6: ConvertibleToJSValue
-    >(dynamicMember name: String) -> ((A0, A1, A2, A3, A4, A5, A6) -> JSValue)? {
-        self[name].function.map { function in
-            { function(this: self, $0, $1, $2, $3, $4, $5, $6) }
-        }
-    }
-}
-#endif

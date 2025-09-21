@@ -51,23 +51,7 @@ public final class JSPromise: JSBridgedClass {
     /// Calling the completion handler more than once will have no effect
     /// (per the JavaScript specification).
     public convenience init(resolver: @escaping (@escaping (Result) -> Void) -> Void) {
-        let closure = JSOneshotClosure { arguments in
-            // The arguments are always coming from the `Promise` constructor, so we should be
-            // safe to assume their type here
-            let resolve = arguments[0].object!
-            let reject = arguments[1].object!
-
-            resolver {
-                switch $0 {
-                case .success(let success):
-                    resolve(success)
-                case .failure(let error):
-                    reject(error)
-                }
-            }
-            return .undefined
-        }
-        self.init(unsafelyWrapping: Self.constructor!.new(closure))
+        fatalError("Not implemented")
     }
 
     #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
@@ -110,29 +94,26 @@ public final class JSPromise: JSBridgedClass {
 
     #if !hasFeature(Embedded)
     public static func resolve(_ value: ConvertibleToJSValue) -> JSPromise {
-        self.init(unsafelyWrapping: Self.constructor!.resolve!(value).object!)
+        fatalError("Not implemented")
     }
 
     public static func reject(_ reason: ConvertibleToJSValue) -> JSPromise {
-        self.init(unsafelyWrapping: Self.constructor!.reject!(reason).object!)
+        fatalError("Not implemented")
     }
     #else
     public static func resolve(_ value: some ConvertibleToJSValue) -> JSPromise {
-        self.init(unsafelyWrapping: constructor!.resolve!(value).object!)
+        fatalError("Not implemented")
     }
 
     public static func reject(_ reason: some ConvertibleToJSValue) -> JSPromise {
-        self.init(unsafelyWrapping: constructor!.reject!(reason).object!)
+        fatalError("Not implemented")
     }
     #endif
 
     /// Schedules the `success` closure to be invoked on successful completion of `self`.
     @discardableResult
     public func then(success: @escaping (JSValue) -> JSValue) -> JSPromise {
-        let closure = JSOneshotClosure {
-            success($0[0]).jsValue
-        }
-        return JSPromise(unsafelyWrapping: jsObject.then!(closure).object!)
+        fatalError("Not implemented")
     }
 
     #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
@@ -155,13 +136,7 @@ public final class JSPromise: JSBridgedClass {
         success: @escaping (sending JSValue) -> JSValue,
         failure: @escaping (sending JSValue) -> JSValue
     ) -> JSPromise {
-        let successClosure = JSOneshotClosure {
-            success($0[0]).jsValue
-        }
-        let failureClosure = JSOneshotClosure {
-            failure($0[0]).jsValue
-        }
-        return JSPromise(unsafelyWrapping: jsObject.then!(successClosure, failureClosure).object!)
+        fatalError("Not implemented")
     }
 
     #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
@@ -189,10 +164,7 @@ public final class JSPromise: JSBridgedClass {
     )
         -> JSPromise
     {
-        let closure = JSOneshotClosure {
-            failure($0[0]).jsValue
-        }
-        return .init(unsafelyWrapping: jsObject.catch!(closure).object!)
+        fatalError("Not implemented")
     }
 
     #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
@@ -202,10 +174,7 @@ public final class JSPromise: JSBridgedClass {
     public func `catch`(
         failure: sending @escaping (sending JSValue) async throws(JSException) -> JSValue
     ) -> JSPromise {
-        let closure = JSOneshotClosure.async { arguments throws(JSException) -> JSValue in
-            try await failure(arguments[0]).jsValue
-        }
-        return .init(unsafelyWrapping: jsObject.catch!(closure).object!)
+        fatalError("Not implemented")
     }
     #endif
 
@@ -213,10 +182,6 @@ public final class JSPromise: JSBridgedClass {
     /// completion of `self`.
     @discardableResult
     public func finally(successOrFailure: @escaping () -> Void) -> JSPromise {
-        let closure = JSOneshotClosure { _ in
-            successOrFailure()
-            return .undefined
-        }
-        return .init(unsafelyWrapping: jsObject.finally!(closure).object!)
+        fatalError("Not implemented")
     }
 }
