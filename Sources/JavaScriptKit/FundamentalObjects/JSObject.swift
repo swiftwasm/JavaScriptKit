@@ -15,7 +15,7 @@ import _CJavaScriptKit
 /// The lifetime of this object is managed by the JavaScript and Swift runtime bridge library with
 /// reference counting system.
 @dynamicMemberLookup
-public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
+public class JSObject: Equatable {
     internal static var constructor: JSObject { _constructor.wrappedValue }
     private static let _constructor = LazyThreadLocal(initialize: { JSObject.global.Object.object! })
 
@@ -45,85 +45,6 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
         self.init(id: swjs_create_object())
     }
 
-    /// Creates a new object with the key-value pairs in the dictionary literal.
-    ///
-    /// - Parameter elements: A variadic list of key-value pairs where all keys are strings
-    public convenience required init(dictionaryLiteral elements: (String, JSValue)...) {
-        self.init()
-        for (key, value) in elements { self[key] = value }
-    }
-
-    /// Asserts that the object is being accessed from the owner thread.
-    ///
-    /// - Parameter hint: A string to provide additional context for debugging.
-    ///
-    /// NOTE: Accessing a `JSObject` from a thread other than the thread it was created on
-    /// is a programmer error and will result in a runtime assertion failure because JavaScript
-    /// object spaces are not shared across threads backed by Web Workers.
-    private func assertOnOwnerThread(hint: @autoclosure () -> String) {
-        #if compiler(>=6.1) && _runtime(_multithreaded)
-        precondition(
-            ownerTid == swjs_get_worker_thread_id_cached(),
-            "JSObject is being accessed from a thread other than the owner thread: \(hint())"
-        )
-        #endif
-    }
-
-    /// Asserts that the two objects being compared are owned by the same thread.
-    private static func assertSameOwnerThread(lhs: JSObject, rhs: JSObject, hint: @autoclosure () -> String) {
-        #if compiler(>=6.1) && _runtime(_multithreaded)
-        precondition(
-            lhs.ownerTid == rhs.ownerTid,
-            "JSObject is being accessed from a thread other than the owner thread: \(hint())"
-        )
-        #endif
-    }
-
-    #if !hasFeature(Embedded)
-    /// Returns the `name` member method binding this object as `this` context.
-    ///
-    /// e.g.
-    /// ```swift
-    /// let document = JSObject.global.document.object!
-    /// let divElement = document.createElement!("div")
-    /// ```
-    ///
-    /// - Parameter name: The name of this object's member to access.
-    /// - Returns: The `name` member method binding this object as `this` context.
-    @_disfavoredOverload
-    public subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)? {
-        guard let function = self[name].function else { return nil }
-        return { (arguments: ConvertibleToJSValue...) in
-            function(this: self, arguments: arguments)
-        }
-    }
-
-    /// Returns the `name` member method binding this object as `this` context.
-    ///
-    /// e.g.
-    /// ```swift
-    /// let document = JSObject.global.document.object!
-    /// let divElement = document.createElement!("div")
-    /// ```
-    ///
-    /// - Parameter name: The name of this object's member to access.
-    /// - Returns: The `name` member method binding this object as `this` context.
-    @_disfavoredOverload
-    public subscript(_ name: JSString) -> ((ConvertibleToJSValue...) -> JSValue)? {
-        guard let function = self[name].function else { return nil }
-        return { (arguments: ConvertibleToJSValue...) in
-            function(this: self, arguments: arguments)
-        }
-    }
-
-    /// A convenience method of `subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)?`
-    /// to access the member through Dynamic Member Lookup.
-    @_disfavoredOverload
-    public subscript(dynamicMember name: String) -> ((ConvertibleToJSValue...) -> JSValue)? {
-        self[name]
-    }
-    #endif
-
     /// A convenience method of `subscript(_ name: String) -> JSValue`
     /// to access the member through Dynamic Member Lookup.
     public subscript(dynamicMember name: String) -> JSValue {
@@ -136,22 +57,10 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     /// - Returns: The value of the `name` member of this object.
     public subscript(_ name: String) -> JSValue {
         get {
-            return getJSValue(this: self, name: JSString(name))
+            fatalError()
         }
         set {
-            setJSValue(this: self, name: JSString(name), value: newValue)
-        }
-    }
-
-    /// Access the `name` member dynamically through JavaScript and Swift runtime bridge library.
-    /// - Parameter name: The name of this object's member to access.
-    /// - Returns: The value of the `name` member of this object.
-    public subscript(_ name: JSString) -> JSValue {
-        get {
-            return getJSValue(this: self, name: name)
-        }
-        set {
-            setJSValue(this: self, name: name, value: newValue)
+            fatalError()
         }
     }
 
