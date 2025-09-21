@@ -24,7 +24,7 @@ final class ThreadLocal<Value>: Sendable {
 
 /// A property wrapper that lazily initializes a thread-local value
 /// for each thread that accesses the value.
-final class LazyThreadLocal<Value>: Sendable {
+struct LazyThreadLocal<Value>: Sendable {
     nonisolated(unsafe) var wrappedValue: Value
 
     init(initialize: Value) where Value: AnyObject {
