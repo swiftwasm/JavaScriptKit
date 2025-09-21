@@ -76,13 +76,6 @@ public class JSObject: Equatable {
         }
     }
 
-    /// Return `true` if this value is an instance of the passed `constructor` function.
-    /// - Parameter constructor: The constructor function to check.
-    /// - Returns: The result of `instanceof` in the JavaScript environment.
-    public func isInstanceOf(_ constructor: JSObject) -> Bool {
-        return swjs_instanceof(id, constructor.id)
-    }
-
     static let _JS_Predef_Value_Global: JavaScriptObjectRef = 1
 
     /// A `JSObject` of the global scope object.
