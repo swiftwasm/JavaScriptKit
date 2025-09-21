@@ -16,9 +16,6 @@ import _CJavaScriptKit
 /// reference counting system.
 @dynamicMemberLookup
 public class JSObject {
-    internal static var constructor: JSObject { _constructor.wrappedValue }
-    private static let _constructor = LazyThreadLocal(initialize: { JSObject.global.Object.object! })
-
     @usableFromInline
     internal var _id: JavaScriptObjectRef
 
@@ -66,7 +63,7 @@ public class JSObject {
     /// A `JSObject` of the global scope object.
     /// This allows access to the global properties and global names by accessing the `JSObject` returned.
     public static var global: JSObject { return _global.wrappedValue }
-    private static let _global = LazyThreadLocal(initialize: {
-        JSObject(id: 1)
-    })
+    private static let _global = LazyThreadLocal(
+        initialize: JSObject(id: 1)
+    )
 }

@@ -27,15 +27,6 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         _id = withExtendedLifetime(JSString(file)) { file in
             swjs_create_oneshot_function(hostFuncRef, line, file.asInternalJSRef())
         }
-
-        // 3. Retain the given body in static storage by `funcRef`.
-        JSClosure.sharedClosures.wrappedValue[hostFuncRef] = (
-            self,
-            {
-                defer { self.release() }
-                return body($0)
-            }
-        )
     }
 
     @available(*, unavailable, message: "JSOneshotClosure does not support dictionary literal initialization")
@@ -84,7 +75,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
     /// Release this function resource.
     /// After calling `release`, calling this function from JavaScript will fail.
     public func release() {
-        JSClosure.sharedClosures.wrappedValue[hostFuncRef] = nil
+        // JSClosure.sharedClosures.wrappedValue[hostFuncRef] = nil
     }
 }
 
@@ -122,9 +113,7 @@ public class JSClosure: JSObject, JSClosureProtocol {
     }
 
     // Note: Retain the closure object itself also to avoid funcRef conflicts
-    fileprivate static let sharedClosures = LazyThreadLocal {
-        SharedJSClosure()
-    }
+    fileprivate static let sharedClosures = LazyThreadLocal(initialize: SharedJSClosure())
 
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 
@@ -157,7 +146,7 @@ public class JSClosure: JSObject, JSClosureProtocol {
         }
 
         // 3. Retain the given body in static storage by `funcRef`.
-        Self.sharedClosures.wrappedValue[hostFuncRef] = (self, body)
+        // Self.sharedClosures.wrappedValue[hostFuncRef] = (self, body)
     }
 
     @available(*, unavailable, message: "JSClosure does not support dictionary literal initialization")
@@ -340,7 +329,6 @@ extension JSClosure {
 
 @_cdecl("_free_host_function_impl")
 func _free_host_function_impl(_ hostFuncRef: JavaScriptHostFuncRef) {
-    JSClosure.sharedClosures.wrappedValue[hostFuncRef] = nil
 }
 #endif
 
