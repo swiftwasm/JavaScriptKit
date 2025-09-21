@@ -113,13 +113,13 @@ public class JSObject: Equatable {
             .null,
             .undefined:
             return nil
-        case .object(let object):
-            return object as? Self
+        case .object:
+            return nil
         }
     }
 
     public var jsValue: JSValue {
-        .object(self)
+        .object
     }
 }
 

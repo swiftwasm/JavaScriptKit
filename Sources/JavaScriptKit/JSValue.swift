@@ -6,7 +6,7 @@ public enum JSValue {
     case boolean(Bool)
     case string
     case number(Double)
-    case object(JSObject)
+    case object
     case null
     case undefined
 
@@ -42,7 +42,7 @@ public enum JSValue {
     /// If not, returns `nil`.
     public var object: JSObject? {
         switch self {
-        case .object(let object): return object
+        case .object: return nil
         default: return nil
         }
     }

@@ -96,7 +96,7 @@ extension RawJSValue: ConvertibleToJSValue {
         case .string:
             return .string
         case .object:
-            return .object(JSObject(id: UInt32(payload1)))
+            return .object
         case .null:
             return .null
         case .undefined:
@@ -126,9 +126,9 @@ extension JSValue {
             kind = .string
             payload1 = 0
             payload2 = 0
-        case .object(let ref):
+        case .object:
             kind = .object
-            payload1 = JavaScriptPayload1(ref.id)
+            payload1 = 0
         case .null:
             kind = .null
             payload1 = 0

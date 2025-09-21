@@ -9,7 +9,7 @@ public final class JSPromise {
 
     /// The underlying JavaScript `Promise` object wrapped as `JSValue`.
     public func jsValue() -> JSValue {
-        .object(jsObject)
+        .object
     }
 
     public static var constructor: JSObject? {
@@ -32,8 +32,7 @@ public final class JSPromise {
     /// is not an object and is not an instance of JavaScript `Promise`, this function will
     /// return `nil`.
     public static func construct(from value: JSValue) -> Self? {
-        guard case .object(let jsObject) = value else { return nil }
-        return Self(jsObject)
+        return nil
     }
 
     /// The result of a promise.
