@@ -6,7 +6,7 @@ import _Concurrency
 /// `JSClosureProtocol` wraps Swift closure objects for use in JavaScript. Conforming types
 /// are responsible for managing the lifetime of the closure they wrap, but can delegate that
 /// task to the user by requiring an explicit `release()` call.
-public protocol JSClosureProtocol: JSValueCompatible {
+public protocol JSClosureProtocol {
 
     /// Release this function resource.
     /// After calling `release`, calling this function from JavaScript will fail.

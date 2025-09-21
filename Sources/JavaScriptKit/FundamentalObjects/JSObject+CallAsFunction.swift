@@ -15,11 +15,7 @@ extension JSObject {
     }
 
     public func new(arguments: [JSValue]) -> JSObject {
-        arguments.withRawJSValues { rawValues in
-            rawValues.withUnsafeBufferPointer { bufferPointer in
-                JSObject(id: swjs_call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
-            }
-        }
+        fatalError()
     }
 
     @available(*, unavailable, message: "Please use JSClosure instead")
@@ -28,11 +24,11 @@ extension JSObject {
     }
 
     final func invokeNonThrowingJSFunction(arguments: [JSValue]) -> RawJSValue {
-        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0) }
+        fatalError()
     }
 
     final func invokeNonThrowingJSFunction(arguments: [JSValue], this: JSObject) -> RawJSValue {
-        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0, this: this) }
+        fatalError()
     }
 
     final private func invokeNonThrowingJSFunction(rawValues: [RawJSValue]) -> RawJSValue {

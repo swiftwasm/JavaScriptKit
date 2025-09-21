@@ -15,7 +15,7 @@ import _CJavaScriptKit
 /// The lifetime of this object is managed by the JavaScript and Swift runtime bridge library with
 /// reference counting system.
 @dynamicMemberLookup
-public class JSObject: Equatable {
+public class JSObject {
     internal static var constructor: JSObject { _constructor.wrappedValue }
     private static let _constructor = LazyThreadLocal(initialize: { JSObject.global.Object.object! })
 
@@ -89,15 +89,6 @@ public class JSObject: Equatable {
         swjs_release(id)
     }
 
-    /// Returns a Boolean value indicating whether two values point to same objects.
-    ///
-    /// - Parameters:
-    ///   - lhs: A object to compare.
-    ///   - rhs: Another object to compare.
-    public static func == (lhs: JSObject, rhs: JSObject) -> Bool {
-        return lhs.id == rhs.id
-    }
-
     public static func construct(from value: JSValue) -> Self? {
         switch value {
         case .boolean,
@@ -113,16 +104,5 @@ public class JSObject: Equatable {
 
     public var jsValue: JSValue {
         .object
-    }
-}
-
-extension JSObject: Hashable {
-    /// Hashes the essential components of this value by feeding them into the
-    /// given hasher.
-    ///
-    /// - Parameter hasher: The hasher to use when combining the components
-    ///   of this instance.
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
     }
 }
