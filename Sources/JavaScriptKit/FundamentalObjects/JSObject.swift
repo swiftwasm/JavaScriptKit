@@ -136,11 +136,9 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     /// - Returns: The value of the `name` member of this object.
     public subscript(_ name: String) -> JSValue {
         get {
-            assertOnOwnerThread(hint: "reading '\(name)' property")
             return getJSValue(this: self, name: JSString(name))
         }
         set {
-            assertOnOwnerThread(hint: "writing '\(name)' property")
             setJSValue(this: self, name: JSString(name), value: newValue)
         }
     }
@@ -150,11 +148,9 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     /// - Returns: The value of the `name` member of this object.
     public subscript(_ name: JSString) -> JSValue {
         get {
-            assertOnOwnerThread(hint: "reading '<<JSString>>' property")
             return getJSValue(this: self, name: name)
         }
         set {
-            assertOnOwnerThread(hint: "writing '<<JSString>>' property")
             setJSValue(this: self, name: name, value: newValue)
         }
     }
@@ -164,11 +160,9 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     /// - Returns: The value of the `index` member of this object.
     public subscript(_ index: Int) -> JSValue {
         get {
-            assertOnOwnerThread(hint: "reading '\(index)' property")
             return getJSValue(this: self, index: Int32(index))
         }
         set {
-            assertOnOwnerThread(hint: "writing '\(index)' property")
             setJSValue(this: self, index: Int32(index), value: newValue)
         }
     }
@@ -178,11 +172,9 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     /// - Returns: The value of the `name` member of this object.
     public subscript(_ name: JSSymbol) -> JSValue {
         get {
-            assertOnOwnerThread(hint: "reading '<<JSSymbol>>' property")
             return getJSValue(this: self, symbol: name)
         }
         set {
-            assertOnOwnerThread(hint: "writing '<<JSSymbol>>' property")
             setJSValue(this: self, symbol: name, value: newValue)
         }
     }
@@ -191,7 +183,6 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     /// - Parameter constructor: The constructor function to check.
     /// - Returns: The result of `instanceof` in the JavaScript environment.
     public func isInstanceOf(_ constructor: JSObject) -> Bool {
-        assertOnOwnerThread(hint: "calling 'isInstanceOf'")
         return swjs_instanceof(id, constructor.id)
     }
 
@@ -214,7 +205,6 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     ///   - lhs: A object to compare.
     ///   - rhs: Another object to compare.
     public static func == (lhs: JSObject, rhs: JSObject) -> Bool {
-        assertSameOwnerThread(lhs: lhs, rhs: rhs, hint: "comparing two JSObjects for equality")
         return lhs.id == rhs.id
     }
 
