@@ -2,7 +2,7 @@ import _CJavaScriptKit
 
 /// `JSValue` represents a value in JavaScript.
 @dynamicMemberLookup
-public enum JSValue: Equatable {
+public enum JSValue {
     case boolean(Bool)
     case string
     case number(Double)
@@ -49,18 +49,6 @@ public enum JSValue: Equatable {
 
     // @available(*, deprecated, renamed: "object", message: "Use the .object property instead")
     public var function: JSObject? { object }
-
-    /// Returns the `true` if this JS value is null.
-    /// If not, returns `false`.
-    public var isNull: Bool {
-        return self == .null
-    }
-
-    /// Returns the `true` if this JS value is undefined.
-    /// If not, returns `false`.
-    public var isUndefined: Bool {
-        return self == .undefined
-    }
 }
 
 /// JSValue is intentionally not `Sendable` because accessing a JSValue living in a different

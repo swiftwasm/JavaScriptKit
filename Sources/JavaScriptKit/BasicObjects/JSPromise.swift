@@ -37,7 +37,7 @@ public final class JSPromise {
     }
 
     /// The result of a promise.
-    public enum Result: Equatable {
+    public enum Result {
         /// The promise resolved with a value.
         case success(JSValue)
         /// The promise rejected with a value.
