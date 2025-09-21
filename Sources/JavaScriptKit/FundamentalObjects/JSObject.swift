@@ -22,10 +22,6 @@ public class JSObject {
     @usableFromInline
     internal var _id: JavaScriptObjectRef
 
-    #if compiler(>=6.1) && _runtime(_multithreaded)
-    package let ownerTid: Int32
-    #endif
-
     @_spi(JSObject_id)
     @_spi(BridgeJS)
     @inlinable
@@ -35,9 +31,6 @@ public class JSObject {
     @_spi(BridgeJS)
     public init(id: JavaScriptObjectRef) {
         self._id = id
-        #if compiler(>=6.1) && _runtime(_multithreaded)
-        self.ownerTid = swjs_get_worker_thread_id_cached()
-        #endif
     }
 
     /// Creates an empty JavaScript object.
@@ -48,32 +41,24 @@ public class JSObject {
     /// A convenience method of `subscript(_ name: String) -> JSValue`
     /// to access the member through Dynamic Member Lookup.
     public subscript(dynamicMember name: String) -> JSValue {
-        get { self[name] }
-        set { self[name] = newValue }
+        get { .undefined }
+        set {}
     }
 
     /// Access the `name` member dynamically through JavaScript and Swift runtime bridge library.
     /// - Parameter name: The name of this object's member to access.
     /// - Returns: The value of the `name` member of this object.
     public subscript(_ name: String) -> JSValue {
-        get {
-            fatalError()
-        }
-        set {
-            fatalError()
-        }
+        get { .undefined }
+        set {}
     }
 
     /// Access the `index` member dynamically through JavaScript and Swift runtime bridge library.
     /// - Parameter index: The index of this object's member to access.
     /// - Returns: The value of the `index` member of this object.
     public subscript(_ index: Int) -> JSValue {
-        get {
-            return getJSValue(this: self, index: Int32(index))
-        }
-        set {
-            setJSValue(this: self, index: Int32(index), value: newValue)
-        }
+        get { .undefined }
+        set {}
     }
 
     static let _JS_Predef_Value_Global: JavaScriptObjectRef = 1
@@ -82,27 +67,6 @@ public class JSObject {
     /// This allows access to the global properties and global names by accessing the `JSObject` returned.
     public static var global: JSObject { return _global.wrappedValue }
     private static let _global = LazyThreadLocal(initialize: {
-        JSObject(id: _JS_Predef_Value_Global)
+        JSObject(id: 1)
     })
-
-    deinit {
-        swjs_release(id)
-    }
-
-    public static func construct(from value: JSValue) -> Self? {
-        switch value {
-        case .boolean,
-            .string,
-            .number,
-            .null,
-            .undefined:
-            return nil
-        case .object:
-            return nil
-        }
-    }
-
-    public var jsValue: JSValue {
-        .object
-    }
 }

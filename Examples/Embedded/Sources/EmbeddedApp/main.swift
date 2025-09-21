@@ -1,3 +1,3 @@
 import JavaScriptKit
 
-_ = JSObject.global
+_ = JSObject.global["console"]
