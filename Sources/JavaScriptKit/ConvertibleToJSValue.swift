@@ -48,7 +48,7 @@ extension Double: ConvertibleToJSValue {
 }
 
 extension String: ConvertibleToJSValue {
-    public var jsValue: JSValue { .string(JSString(self)) }
+    public var jsValue: JSValue { .string }
 }
 
 extension UInt8: ConvertibleToJSValue {
@@ -76,7 +76,7 @@ extension Int32: ConvertibleToJSValue {
 }
 
 extension JSString: ConvertibleToJSValue {
-    public var jsValue: JSValue { .string(self) }
+    public var jsValue: JSValue { .string }
 }
 
 extension JSObject: JSValueCompatible {}
@@ -86,97 +86,6 @@ private var objectConstructor: JSObject { _objectConstructor.wrappedValue }
 private let _arrayConstructor = LazyThreadLocal(initialize: { JSObject.global.Array.object! })
 private var arrayConstructor: JSObject { _arrayConstructor.wrappedValue }
 
-#if !hasFeature(Embedded)
-extension Dictionary where Value == ConvertibleToJSValue, Key == String {
-    public var jsValue: JSValue {
-        let object = objectConstructor.new()
-        for (key, value) in self {
-            object[key] = value.jsValue
-        }
-        return .object(object)
-    }
-}
-#endif
-
-extension Dictionary: ConvertibleToJSValue where Value: ConvertibleToJSValue, Key == String {
-    public var jsValue: JSValue {
-        let object = objectConstructor.new()
-        for (key, value) in self {
-            object[key] = value.jsValue
-        }
-        return .object(object)
-    }
-}
-
-extension Dictionary: ConstructibleFromJSValue where Value: ConstructibleFromJSValue, Key == String {
-    public static func construct(from value: JSValue) -> Self? {
-        fatalError("Not implemented")
-    }
-}
-
-extension Optional: ConstructibleFromJSValue where Wrapped: ConstructibleFromJSValue {
-    public static func construct(from value: JSValue) -> Self? {
-        switch value {
-        case .null, .undefined:
-            return .some(nil)
-        default:
-            guard let wrapped = Wrapped.construct(from: value) else { return nil }
-            return .some(wrapped)
-        }
-    }
-}
-
-extension Optional: ConvertibleToJSValue where Wrapped: ConvertibleToJSValue {
-    public var jsValue: JSValue {
-        switch self {
-        case .none: return .null
-        case .some(let wrapped): return wrapped.jsValue
-        }
-    }
-}
-
-extension Array: ConvertibleToJSValue where Element: ConvertibleToJSValue {
-    public var jsValue: JSValue {
-        let array = arrayConstructor.new(count)
-        for (index, element) in enumerated() {
-            array[index] = element.jsValue
-        }
-        return .object(array)
-    }
-}
-
-#if !hasFeature(Embedded)
-extension Array where Element == ConvertibleToJSValue {
-    public var jsValue: JSValue {
-        let array = arrayConstructor.new(count)
-        for (index, element) in enumerated() {
-            array[index] = element.jsValue
-        }
-        return .object(array)
-    }
-}
-#endif
-
-extension Array: ConstructibleFromJSValue where Element: ConstructibleFromJSValue {
-    public static func construct(from value: JSValue) -> [Element]? {
-        guard
-            let objectRef = value.object,
-            objectRef.isInstanceOf(JSObject.global.Array.object!)
-        else { return nil }
-
-        let count: Int = objectRef.length.fromJSValue()!
-        var array = [Element]()
-        array.reserveCapacity(count)
-
-        for i in 0..<count {
-            guard let value: Element = objectRef[i].fromJSValue() else { return nil }
-            array.append(value)
-        }
-
-        return array
-    }
-}
-
 extension RawJSValue: ConvertibleToJSValue {
     public var jsValue: JSValue {
         switch kind {
@@ -185,7 +94,7 @@ extension RawJSValue: ConvertibleToJSValue {
         case .number:
             return .number(payload2)
         case .string:
-            return .string(JSString(jsRef: payload1))
+            return .string
         case .object:
             return .object(JSObject(id: UInt32(payload1)))
         case .null:
@@ -213,9 +122,9 @@ extension JSValue {
             kind = .number
             payload1 = 0
             payload2 = numberValue
-        case .string(let string):
+        case .string:
             kind = .string
-            payload1 = string.asInternalJSRef()
+            payload1 = 0
             payload2 = 0
         case .object(let ref):
             kind = .object

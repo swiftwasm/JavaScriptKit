@@ -22,7 +22,7 @@ extension String: ConstructibleFromJSValue {
 
 extension JSString: ConstructibleFromJSValue {
     public static func construct(from value: JSValue) -> JSString? {
-        value.jsString
+        fatalError()
     }
 }
 

@@ -4,7 +4,7 @@ import _CJavaScriptKit
 @dynamicMemberLookup
 public enum JSValue: Equatable {
     case boolean(Bool)
-    case string(JSString)
+    case string
     case number(Double)
     case object(JSObject)
     case null
@@ -26,17 +26,7 @@ public enum JSValue: Equatable {
     ///
     /// To avoid the copying, please consider the `jsString` instead.
     public var string: String? {
-        jsString.map(String.init)
-    }
-
-    /// Returns the `JSString` value of this JS value if the type is string.
-    /// If not, returns `nil`.
-    ///
-    public var jsString: JSString? {
-        switch self {
-        case .string(let string): return string
-        default: return nil
-        }
+        fatalError()
     }
 
     /// Returns the `Double` value of this JS value if the type is number.
