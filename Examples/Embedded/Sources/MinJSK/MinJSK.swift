@@ -1,13 +1,11 @@
 public class JSObject {
     public subscript(_ index: Int) -> Int {
         get { 0 }
-        set {}
+        set { }
     }
 
-    public static var global: JSObject { return _global.wrappedValue }
-    private nonisolated(unsafe) static let _global = LazyThreadLocal(
-        initialize: JSObject()
-    )
+    public static var global: JSObject { return _global }
+    private nonisolated(unsafe) static let _global = JSObject()
 }
 
 struct LazyThreadLocal {
