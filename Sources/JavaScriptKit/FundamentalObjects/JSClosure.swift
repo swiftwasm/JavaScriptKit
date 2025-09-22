@@ -34,44 +34,6 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         fatalError("JSOneshotClosure does not support dictionary literal initialization")
     }
 
-    #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
-    /// Creates a new `JSOneshotClosure` that calls the given Swift function asynchronously.
-    ///
-    /// - Parameters:
-    ///   - priority: The priority of the new unstructured Task created under the hood.
-    ///   - body: The Swift function to call asynchronously.
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public static func async(
-        priority: TaskPriority? = nil,
-        file: String = #fileID,
-        line: UInt32 = #line,
-        _ body: @escaping (sending [JSValue]) async throws(JSException) -> JSValue
-    ) -> JSOneshotClosure {
-        JSOneshotClosure(file: file, line: line, makeAsyncClosure(priority: priority, body))
-    }
-
-    /// Creates a new `JSOneshotClosure` that calls the given Swift function asynchronously.
-    ///
-    /// - Parameters:
-    ///   - taskExecutor: The executor preference of the new unstructured Task created under the hood.
-    ///   - priority: The priority of the new unstructured Task created under the hood.
-    ///   - body: The Swift function to call asynchronously.
-    @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
-    public static func async(
-        executorPreference taskExecutor: (any TaskExecutor)? = nil,
-        priority: TaskPriority? = nil,
-        file: String = #fileID,
-        line: UInt32 = #line,
-        _ body: @escaping (sending [JSValue]) async throws(JSException) -> JSValue
-    ) -> JSOneshotClosure {
-        JSOneshotClosure(
-            file: file,
-            line: line,
-            makeAsyncClosure(executorPreference: taskExecutor, priority: priority, body)
-        )
-    }
-    #endif
-
     /// Release this function resource.
     /// After calling `release`, calling this function from JavaScript will fail.
     public func release() {
@@ -154,40 +116,6 @@ public class JSClosure: JSObject, JSClosureProtocol {
         fatalError("JSClosure does not support dictionary literal initialization")
     }
 
-    #if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
-    /// Creates a new `JSClosure` that calls the given Swift function asynchronously.
-    ///
-    /// - Parameters:
-    ///   - priority: The priority of the new unstructured Task created under the hood.
-    ///   - body: The Swift function to call asynchronously.
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public static func async(
-        priority: TaskPriority? = nil,
-        file: String = #fileID,
-        line: UInt32 = #line,
-        _ body: @escaping @isolated(any) (sending [JSValue]) async throws(JSException) -> JSValue
-    ) -> JSClosure {
-        JSClosure(file: file, line: line, makeAsyncClosure(priority: priority, body))
-    }
-
-    /// Creates a new `JSClosure` that calls the given Swift function asynchronously.
-    ///
-    /// - Parameters:
-    ///   - taskExecutor: The executor preference of the new unstructured Task created under the hood.
-    ///   - priority: The priority of the new unstructured Task created under the hood.
-    ///   - body: The Swift function to call asynchronously.
-    @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
-    public static func async(
-        executorPreference taskExecutor: (any TaskExecutor)? = nil,
-        priority: TaskPriority? = nil,
-        file: String = #fileID,
-        line: UInt32 = #line,
-        _ body: @escaping (sending [JSValue]) async throws(JSException) -> JSValue
-    ) -> JSClosure {
-        JSClosure(file: file, line: line, makeAsyncClosure(executorPreference: taskExecutor, priority: priority, body))
-    }
-    #endif
-
     #if JAVASCRIPTKIT_WITHOUT_WEAKREFS
     deinit {
         guard isReleased else {
@@ -196,65 +124,6 @@ public class JSClosure: JSObject, JSClosureProtocol {
     }
     #endif
 }
-
-#if compiler(>=5.5) && (!hasFeature(Embedded) || os(WASI))
-@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-private func makeAsyncClosure(
-    priority: TaskPriority?,
-    _ body: @escaping @isolated(any) (sending [JSValue]) async throws(JSException) -> JSValue
-) -> ((sending [JSValue]) -> JSValue) {
-    { arguments in
-        JSPromise { resolver in
-            // NOTE: The context is fully transferred to the unstructured task
-            // isolation but the compiler can't prove it yet, so we need to
-            // use `@unchecked Sendable` to make it compile with the Swift 6 mode.
-            struct Context: @unchecked Sendable {
-                let resolver: (JSPromise.Result) -> Void
-                let arguments: [JSValue]
-                let body: (sending [JSValue]) async throws(JSException) -> JSValue
-            }
-            let context = Context(resolver: resolver, arguments: arguments, body: body)
-            Task(priority: priority) {
-                do throws(JSException) {
-                    let result = try await context.body(context.arguments)
-                    context.resolver(.success(result))
-                } catch {
-                    context.resolver(.failure(error.thrownValue))
-                }
-            }
-        }.jsValue()
-    }
-}
-
-@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
-private func makeAsyncClosure(
-    executorPreference taskExecutor: (any TaskExecutor)?,
-    priority: TaskPriority?,
-    _ body: @escaping (sending [JSValue]) async throws(JSException) -> JSValue
-) -> ((sending [JSValue]) -> JSValue) {
-    { arguments in
-        JSPromise { resolver in
-            // NOTE: The context is fully transferred to the unstructured task
-            // isolation but the compiler can't prove it yet, so we need to
-            // use `@unchecked Sendable` to make it compile with the Swift 6 mode.
-            struct Context: @unchecked Sendable {
-                let resolver: (JSPromise.Result) -> Void
-                let arguments: [JSValue]
-                let body: (sending [JSValue]) async throws(JSException) -> JSValue
-            }
-            let context = Context(resolver: resolver, arguments: arguments, body: body)
-            Task(executorPreference: taskExecutor, priority: priority) {
-                do throws(JSException) {
-                    let result = try await context.body(context.arguments)
-                    context.resolver(.success(result))
-                } catch {
-                    context.resolver(.failure(error.thrownValue))
-                }
-            }
-        }.jsValue()
-    }
-}
-#endif
 
 // MARK: - `JSClosure` mechanism note
 //
