@@ -80,24 +80,6 @@ extension JSValue {
     }
 }
 
-public func getJSValue(this: JSObject, name: JSString) -> JSValue {
-    var rawValue = RawJSValue()
-    let rawBitPattern = swjs_get_prop(
-        this.id,
-        name.asInternalJSRef(),
-        &rawValue.payload1,
-        &rawValue.payload2
-    )
-    rawValue.kind = unsafeBitCast(rawBitPattern, to: JavaScriptValueKind.self)
-    return rawValue.jsValue
-}
-
-public func setJSValue(this: JSObject, name: JSString, value: JSValue) {
-    value.withRawJSValue { rawValue in
-        swjs_set_prop(this.id, name.asInternalJSRef(), rawValue.kind, rawValue.payload1, rawValue.payload2)
-    }
-}
-
 public func getJSValue(this: JSObject, index: Int32) -> JSValue {
     var rawValue = RawJSValue()
     let rawBitPattern = swjs_get_subscript(
