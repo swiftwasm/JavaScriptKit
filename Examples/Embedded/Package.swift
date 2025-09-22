@@ -10,10 +10,9 @@ let package = Package(
             dependencies: [
                 "MinJSK",
             ],
-            cSettings: [.unsafeFlags(["-fdeclspec"])],
+            cSettings: [],
             swiftSettings: [
                 .enableExperimentalFeature("Embedded"),
-                .enableExperimentalFeature("Extern"),
                 .unsafeFlags([
                     "-Xfrontend", "-gnone",
                     "-Xfrontend", "-disable-stack-protector",
