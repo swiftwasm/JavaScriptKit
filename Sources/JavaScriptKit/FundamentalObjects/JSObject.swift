@@ -1,22 +1,8 @@
 import _CJavaScriptKit
 
-/// `JSObject` represents an object in JavaScript and supports dynamic member lookup.
-/// Any member access like `object.foo` will dynamically request the JavaScript and Swift
-/// runtime bridge library for a member with the specified name in this object.
-///
-/// And this object supports to call a member method of the object.
-///
-/// e.g.
-/// ```swift
-/// let document = JSObject.global.document.object!
-/// let divElement = document.createElement!("div")
-/// ```
-///
-/// The lifetime of this object is managed by the JavaScript and Swift runtime bridge library with
-/// reference counting system.
 public class JSObject {
-    internal var _id: JavaScriptObjectRef
-    public init(id: JavaScriptObjectRef) {
+    internal var _id: UInt
+    public init(id: UInt) {
         self._id = id
     }
 
@@ -38,10 +24,10 @@ public class JSObject {
 
 /// A property wrapper that lazily initializes a thread-local value
 /// for each thread that accesses the value.
-struct LazyThreadLocal<Value> {
-    var wrappedValue: Value
+struct LazyThreadLocal {
+    var wrappedValue: JSObject
 
-    init(initialize: Value) {
+    init(initialize: JSObject) {
         self.wrappedValue = initialize
     }
 }
