@@ -14,7 +14,6 @@ import _CJavaScriptKit
 ///
 /// The lifetime of this object is managed by the JavaScript and Swift runtime bridge library with
 /// reference counting system.
-@dynamicMemberLookup
 public class JSObject {
     @usableFromInline
     internal var _id: JavaScriptObjectRef
@@ -28,18 +27,6 @@ public class JSObject {
     @_spi(BridgeJS)
     public init(id: JavaScriptObjectRef) {
         self._id = id
-    }
-
-    /// Creates an empty JavaScript object.
-    public convenience init() {
-        self.init(id: swjs_create_object())
-    }
-
-    /// A convenience method of `subscript(_ name: String) -> JSValue`
-    /// to access the member through Dynamic Member Lookup.
-    public subscript(dynamicMember name: String) -> JSValue {
-        get { .undefined }
-        set {}
     }
 
     /// Access the `name` member dynamically through JavaScript and Swift runtime bridge library.
