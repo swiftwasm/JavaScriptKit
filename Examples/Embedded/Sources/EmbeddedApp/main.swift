@@ -1,3 +1,9 @@
 import JavaScriptKit
 
-_ = JSObject.global[0]
+public func take(_ value: JSObject) {
+    _ = value[0]
+}
+
+public func main() {
+    take(JSObject.global)
+}

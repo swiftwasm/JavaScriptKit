@@ -31,17 +31,17 @@ public class JSObject {
     /// A `JSObject` of the global scope object.
     /// This allows access to the global properties and global names by accessing the `JSObject` returned.
     public static var global: JSObject { return _global.wrappedValue }
-    private static let _global = LazyThreadLocal(
+    private nonisolated(unsafe) static let _global = LazyThreadLocal(
         initialize: JSObject(id: 1)
     )
 }
 
 /// A property wrapper that lazily initializes a thread-local value
 /// for each thread that accesses the value.
-struct LazyThreadLocal<Value>: Sendable {
-    nonisolated(unsafe) var wrappedValue: Value
+struct LazyThreadLocal<Value> {
+    var wrappedValue: Value
 
-    init(initialize: Value) where Value: AnyObject {
+    init(initialize: Value) {
         self.wrappedValue = initialize
     }
 }
