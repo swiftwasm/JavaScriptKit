@@ -15,16 +15,7 @@ import _CJavaScriptKit
 /// The lifetime of this object is managed by the JavaScript and Swift runtime bridge library with
 /// reference counting system.
 public class JSObject {
-    @usableFromInline
     internal var _id: JavaScriptObjectRef
-
-    @_spi(JSObject_id)
-    @_spi(BridgeJS)
-    @inlinable
-    public var id: JavaScriptObjectRef { _id }
-
-    @_spi(JSObject_id)
-    @_spi(BridgeJS)
     public init(id: JavaScriptObjectRef) {
         self._id = id
     }
@@ -57,10 +48,5 @@ struct LazyThreadLocal<Value>: Sendable {
 
 /// `JSValue` represents a value in JavaScript.
 public enum JSValue {
-    case boolean(Bool)
-    case string
-    case number(Double)
-    case object
-    case null
     case undefined
 }
