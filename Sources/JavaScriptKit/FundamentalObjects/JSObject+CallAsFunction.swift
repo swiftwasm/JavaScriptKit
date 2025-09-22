@@ -11,7 +11,7 @@ public typealias JSFunction = JSObject
 extension JSObject {
     @discardableResult
     public func callAsFunction(arguments: [JSValue]) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: arguments).jsValue
+        .undefined
     }
 
     public func new(arguments: [JSValue]) -> JSObject {
@@ -88,12 +88,12 @@ extension JSFunction {
 
     @discardableResult
     public func callAsFunction(this: JSObject) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [], this: this).jsValue
+        .undefined
     }
 
     @discardableResult
     public func callAsFunction(this: JSObject, _ arg0: some ConvertibleToJSValue) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue], this: this).jsValue
+        .undefined
     }
 
     @discardableResult
@@ -102,7 +102,7 @@ extension JSFunction {
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue], this: this).jsValue
+        .undefined
     }
 
     @discardableResult
@@ -112,7 +112,7 @@ extension JSFunction {
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue], this: this).jsValue
+        .undefined
     }
 
     @discardableResult
@@ -123,8 +123,7 @@ extension JSFunction {
         _ arg2: some ConvertibleToJSValue,
         _ arg3: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue], this: this)
-            .jsValue
+        .undefined
     }
 
     @discardableResult
@@ -136,10 +135,7 @@ extension JSFunction {
         _ arg3: some ConvertibleToJSValue,
         _ arg4: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(
-            arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue],
-            this: this
-        ).jsValue
+        .undefined
     }
 
     @discardableResult
@@ -152,10 +148,7 @@ extension JSFunction {
         _ arg4: some ConvertibleToJSValue,
         _ arg5: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(
-            arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue],
-            this: this
-        ).jsValue
+        .undefined
     }
 
     @discardableResult
@@ -169,27 +162,22 @@ extension JSFunction {
         _ arg5: some ConvertibleToJSValue,
         _ arg6: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(
-            arguments: [
-                arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue,
-            ],
-            this: this
-        ).jsValue
+        .undefined
     }
 
     @discardableResult
     public func callAsFunction(this: JSObject, arguments: [JSValue]) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: arguments, this: this).jsValue
+        .undefined
     }
 
     @discardableResult
     public func callAsFunction() -> JSValue {
-        invokeNonThrowingJSFunction(arguments: []).jsValue
+        .undefined
     }
 
     @discardableResult
     public func callAsFunction(_ arg0: some ConvertibleToJSValue) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue]).jsValue
+        .undefined
     }
 
     @discardableResult
@@ -197,7 +185,7 @@ extension JSFunction {
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue]).jsValue
+        .undefined
     }
 
     @discardableResult
@@ -206,7 +194,7 @@ extension JSFunction {
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue]).jsValue
+        .undefined
     }
 
     @discardableResult
@@ -216,7 +204,7 @@ extension JSFunction {
         _ arg2: some ConvertibleToJSValue,
         _ arg3: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue]).jsValue
+        .undefined
     }
 
     @discardableResult
@@ -227,8 +215,7 @@ extension JSFunction {
         _ arg3: some ConvertibleToJSValue,
         _ arg4: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue])
-            .jsValue
+        .undefined
     }
 
     @discardableResult
@@ -240,9 +227,7 @@ extension JSFunction {
         _ arg4: some ConvertibleToJSValue,
         _ arg5: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [
-            arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue,
-        ]).jsValue
+        .undefined
     }
 
     @discardableResult
@@ -255,9 +240,7 @@ extension JSFunction {
         _ arg5: some ConvertibleToJSValue,
         _ arg6: some ConvertibleToJSValue
     ) -> JSValue {
-        invokeNonThrowingJSFunction(arguments: [
-            arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue,
-        ]).jsValue
+        .undefined
     }
 
     public func new() -> JSObject {
@@ -265,14 +248,14 @@ extension JSFunction {
     }
 
     public func new(_ arg0: some ConvertibleToJSValue) -> JSObject {
-        new(arguments: [arg0.jsValue])
+        fatalError()
     }
 
     public func new(
         _ arg0: some ConvertibleToJSValue,
         _ arg1: some ConvertibleToJSValue
     ) -> JSObject {
-        new(arguments: [arg0.jsValue, arg1.jsValue])
+        fatalError()
     }
 
     public func new(
@@ -280,7 +263,7 @@ extension JSFunction {
         _ arg1: some ConvertibleToJSValue,
         _ arg2: some ConvertibleToJSValue
     ) -> JSObject {
-        new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue])
+        fatalError()
     }
 
     public func new(
@@ -289,7 +272,7 @@ extension JSFunction {
         _ arg2: some ConvertibleToJSValue,
         _ arg3: some ConvertibleToJSValue
     ) -> JSObject {
-        new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue])
+        fatalError()
     }
 
     public func new(
@@ -299,7 +282,7 @@ extension JSFunction {
         _ arg3: some ConvertibleToJSValue,
         _ arg4: some ConvertibleToJSValue
     ) -> JSObject {
-        new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue])
+        fatalError()
     }
 
     public func new(
@@ -310,7 +293,7 @@ extension JSFunction {
         _ arg4: some ConvertibleToJSValue,
         _ arg5: some ConvertibleToJSValue
     ) -> JSObject {
-        new(arguments: [arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue])
+        fatalError()
     }
 
     public func new(
@@ -322,9 +305,7 @@ extension JSFunction {
         _ arg5: some ConvertibleToJSValue,
         _ arg6: some ConvertibleToJSValue
     ) -> JSObject {
-        new(arguments: [
-            arg0.jsValue, arg1.jsValue, arg2.jsValue, arg3.jsValue, arg4.jsValue, arg5.jsValue, arg6.jsValue,
-        ])
+        fatalError()
     }
 }
 #endif
