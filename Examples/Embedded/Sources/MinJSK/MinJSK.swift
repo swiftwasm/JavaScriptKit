@@ -1,6 +1,6 @@
 public class JSObject {
-    public subscript(_ index: Int) -> JSValue {
-        get { .undefined }
+    public subscript(_ index: Int) -> Int {
+        get { 0 }
         set {}
     }
 
@@ -16,8 +16,4 @@ struct LazyThreadLocal {
     init(initialize: JSObject) {
         self.wrappedValue = initialize
     }
-}
-
-public enum JSValue {
-    case undefined
 }
