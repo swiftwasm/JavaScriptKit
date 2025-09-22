@@ -4,8 +4,10 @@ public class JSObject {
         set { }
     }
 
-    public static var global: JSObject { return _global }
-    private nonisolated(unsafe) static let _global = JSObject()
+    public static var global: JSObject { return _global.wrappedValue }
+    private nonisolated(unsafe) static let _global = LazyThreadLocal(
+        initialize: JSObject()
+    )
 }
 
 struct LazyThreadLocal {
