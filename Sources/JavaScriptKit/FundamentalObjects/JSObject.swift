@@ -29,14 +29,6 @@ public class JSObject {
         self._id = id
     }
 
-    /// Access the `name` member dynamically through JavaScript and Swift runtime bridge library.
-    /// - Parameter name: The name of this object's member to access.
-    /// - Returns: The value of the `name` member of this object.
-    public subscript(_ name: String) -> JSValue {
-        get { .undefined }
-        set {}
-    }
-
     /// Access the `index` member dynamically through JavaScript and Swift runtime bridge library.
     /// - Parameter index: The index of this object's member to access.
     /// - Returns: The value of the `index` member of this object.
@@ -45,12 +37,30 @@ public class JSObject {
         set {}
     }
 
-    static let _JS_Predef_Value_Global: JavaScriptObjectRef = 1
-
     /// A `JSObject` of the global scope object.
     /// This allows access to the global properties and global names by accessing the `JSObject` returned.
     public static var global: JSObject { return _global.wrappedValue }
     private static let _global = LazyThreadLocal(
         initialize: JSObject(id: 1)
     )
+}
+
+/// A property wrapper that lazily initializes a thread-local value
+/// for each thread that accesses the value.
+struct LazyThreadLocal<Value>: Sendable {
+    nonisolated(unsafe) var wrappedValue: Value
+
+    init(initialize: Value) where Value: AnyObject {
+        self.wrappedValue = initialize
+    }
+}
+
+/// `JSValue` represents a value in JavaScript.
+public enum JSValue {
+    case boolean(Bool)
+    case string
+    case number(Double)
+    case object
+    case null
+    case undefined
 }
