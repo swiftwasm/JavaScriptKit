@@ -24,13 +24,9 @@ let package = Package(
     targets: [
         .target(
             name: "JavaScriptKit",
-            dependencies: ["_CJavaScriptKit"],
+            dependencies: [],
             exclude: useLegacyResourceBundling ? [] : ["Runtime"],
             resources: useLegacyResourceBundling ? [.copy("Runtime")] : [],
-            cSettings: shouldBuildForEmbedded
-                ? [
-                    .unsafeFlags(["-fdeclspec"])
-                ] : nil,
             swiftSettings: [
                 .enableExperimentalFeature("Extern")
             ]

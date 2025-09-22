@@ -1,4 +1,4 @@
-import JavaScriptKit
+import MinJSK
 
 public func take(_ value: JSObject) {
     _ = value[0]

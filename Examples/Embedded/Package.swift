@@ -12,7 +12,7 @@ let package = Package(
         .executableTarget(
             name: "EmbeddedApp",
             dependencies: [
-                "JavaScriptKit",
+                "MinJSK",
                 .product(name: "dlmalloc", package: "swift-dlmalloc"),
             ],
             cSettings: [.unsafeFlags(["-fdeclspec"])],
@@ -31,7 +31,8 @@ let package = Package(
                     "-Xlinker", "--export-if-defined=__main_argc_argv",
                 ])
             ]
-        )
+        ),
+        .target(name: "MinJSK", swiftSettings: [.enableExperimentalFeature("Embedded")]),
     ],
     swiftLanguageModes: [.v5]
 )

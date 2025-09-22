@@ -1,5 +1,3 @@
-import _CJavaScriptKit
-
 public class JSObject {
     internal var _id: UInt
     public init(id: UInt) {

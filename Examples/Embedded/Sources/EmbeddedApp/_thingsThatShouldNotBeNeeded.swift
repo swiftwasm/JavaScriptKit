@@ -1,5 +1,3 @@
-import JavaScriptKit
-
 // TODO: why do I need this? and surely this is not ideal... figure this out, or at least have this come from a C lib
 @_cdecl("strlen")
 func strlen(_ s: UnsafePointer<Int8>) -> Int {
