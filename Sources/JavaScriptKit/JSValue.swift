@@ -74,32 +74,9 @@ extension JSValue {
     }
 }
 
-extension JSValue {
-    public func fromJSValue<Type>() -> Type? where Type: ConstructibleFromJSValue {
-        return Type.construct(from: self)
-    }
-}
-
 public func getJSValue(this: JSObject, index: Int32) -> JSValue {
-    var rawValue = RawJSValue()
-    let rawBitPattern = swjs_get_subscript(
-        this.id,
-        index,
-        &rawValue.payload1,
-        &rawValue.payload2
-    )
-    rawValue.kind = unsafeBitCast(rawBitPattern, to: JavaScriptValueKind.self)
-    return rawValue.jsValue
+    return .undefined
 }
 
 public func setJSValue(this: JSObject, index: Int32, value: JSValue) {
-    value.withRawJSValue { rawValue in
-        swjs_set_subscript(
-            this.id,
-            index,
-            rawValue.kind,
-            rawValue.payload1,
-            rawValue.payload2
-        )
-    }
 }
