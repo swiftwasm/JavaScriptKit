@@ -9,7 +9,7 @@ export const Theme: {
     readonly Dark: "dark";
     readonly Auto: "auto";
 };
-export type Theme = typeof Theme[keyof typeof Theme];
+export type ThemeTag = typeof Theme[keyof typeof Theme];
 
 export enum TSTheme {
     Light = "light",
@@ -21,14 +21,14 @@ export const FeatureFlag: {
     readonly Enabled: true;
     readonly Disabled: false;
 };
-export type FeatureFlag = typeof FeatureFlag[keyof typeof FeatureFlag];
+export type FeatureFlagTag = typeof FeatureFlag[keyof typeof FeatureFlag];
 
 export const HttpStatus: {
     readonly Ok: 200;
     readonly NotFound: 404;
     readonly ServerError: 500;
 };
-export type HttpStatus = typeof HttpStatus[keyof typeof HttpStatus];
+export type HttpStatusTag = typeof HttpStatus[keyof typeof HttpStatus];
 
 export enum TSHttpStatus {
     Ok = 200,
@@ -43,7 +43,7 @@ export const Priority: {
     readonly High: 4;
     readonly Highest: 5;
 };
-export type Priority = typeof Priority[keyof typeof Priority];
+export type PriorityTag = typeof Priority[keyof typeof Priority];
 
 export const FileSize: {
     readonly Tiny: 1024;
@@ -51,35 +51,35 @@ export const FileSize: {
     readonly Medium: 102400;
     readonly Large: 1048576;
 };
-export type FileSize = typeof FileSize[keyof typeof FileSize];
+export type FileSizeTag = typeof FileSize[keyof typeof FileSize];
 
 export const UserId: {
     readonly Guest: 0;
     readonly User: 1000;
     readonly Admin: 9999;
 };
-export type UserId = typeof UserId[keyof typeof UserId];
+export type UserIdTag = typeof UserId[keyof typeof UserId];
 
 export const TokenId: {
     readonly Invalid: 0;
     readonly Session: 12345;
     readonly Refresh: 67890;
 };
-export type TokenId = typeof TokenId[keyof typeof TokenId];
+export type TokenIdTag = typeof TokenId[keyof typeof TokenId];
 
 export const SessionId: {
     readonly None: 0;
     readonly Active: 9876543210;
     readonly Expired: 1234567890;
 };
-export type SessionId = typeof SessionId[keyof typeof SessionId];
+export type SessionIdTag = typeof SessionId[keyof typeof SessionId];
 
 export const Precision: {
     readonly Rough: 0.1;
     readonly Normal: 0.01;
     readonly Fine: 0.001;
 };
-export type Precision = typeof Precision[keyof typeof Precision];
+export type PrecisionTag = typeof Precision[keyof typeof Precision];
 
 export const Ratio: {
     readonly Quarter: 0.25;
@@ -87,7 +87,7 @@ export const Ratio: {
     readonly Golden: 1.618;
     readonly Pi: 3.14159;
 };
-export type Ratio = typeof Ratio[keyof typeof Ratio];
+export type RatioTag = typeof Ratio[keyof typeof Ratio];
 
 export type Exports = {
     setTheme(theme: Theme): void;

@@ -7,11 +7,8 @@
 export const PropertyEnum: {
     readonly Value1: 0;
     readonly Value2: 1;
-    enumProperty: string;
-    readonly enumConstant: number;
-    computedEnum: string;
 };
-export type PropertyEnum = typeof PropertyEnum[keyof typeof PropertyEnum];
+export type PropertyEnumTag = typeof PropertyEnum[keyof typeof PropertyEnum];
 
 export {};
 
@@ -46,6 +43,11 @@ export type Exports = {
         computedProperty: string;
         readonly readOnlyComputed: number;
         optionalProperty: string | null;
+    }
+    PropertyEnum: {
+        enumProperty: string;
+        readonly enumConstant: number;
+        computedEnum: string;
     }
 }
 export type Imports = {

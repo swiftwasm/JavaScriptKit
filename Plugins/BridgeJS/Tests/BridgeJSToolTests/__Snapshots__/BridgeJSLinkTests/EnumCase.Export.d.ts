@@ -10,14 +10,14 @@ export const Direction: {
     readonly East: 2;
     readonly West: 3;
 };
-export type Direction = typeof Direction[keyof typeof Direction];
+export type DirectionTag = typeof Direction[keyof typeof Direction];
 
 export const Status: {
     readonly Loading: 0;
     readonly Success: 1;
     readonly Error: 2;
 };
-export type Status = typeof Status[keyof typeof Status];
+export type StatusTag = typeof Status[keyof typeof Status];
 
 export enum TSDirection {
     North = 0,
@@ -29,7 +29,7 @@ export enum TSDirection {
 export const PublicStatus: {
     readonly Success: 0;
 };
-export type PublicStatus = typeof PublicStatus[keyof typeof PublicStatus];
+export type PublicStatusTag = typeof PublicStatus[keyof typeof PublicStatus];
 
 export type Exports = {
     setDirection(direction: Direction): void;

@@ -325,20 +325,20 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.StaticPropertyHolder.readOnlyComputed, 600); // staticVariable * 2 = 300 * 2
 
     // Test static properties in enums
-    assert.equal(StaticPropertyEnum.enumProperty, "enum value");
-    assert.equal(StaticPropertyEnum.enumConstant, 42);
-    assert.equal(StaticPropertyEnum.enumBool, false);
+    assert.equal(exports.StaticPropertyEnum.enumProperty, "enum value");
+    assert.equal(exports.StaticPropertyEnum.enumConstant, 42);
+    assert.equal(exports.StaticPropertyEnum.enumBool, false);
 
-    StaticPropertyEnum.enumProperty = "modified enum";
-    StaticPropertyEnum.enumBool = true;
-    assert.equal(StaticPropertyEnum.enumProperty, "modified enum");
-    assert.equal(StaticPropertyEnum.enumBool, true);
+    exports.StaticPropertyEnum.enumProperty = "modified enum";
+    exports.StaticPropertyEnum.enumBool = true;
+    assert.equal(exports.StaticPropertyEnum.enumProperty, "modified enum");
+    assert.equal(exports.StaticPropertyEnum.enumBool, true);
 
-    assert.equal(StaticPropertyEnum.enumVariable, 200);
-    assert.equal(StaticPropertyEnum.computedReadonly, 400);
-    assert.equal(StaticPropertyEnum.computedReadWrite, "Value: 200");
-    StaticPropertyEnum.computedReadWrite = "Value: 500";
-    assert.equal(StaticPropertyEnum.enumVariable, 500);
+    assert.equal(exports.StaticPropertyEnum.enumVariable, 200);
+    assert.equal(exports.StaticPropertyEnum.computedReadonly, 400);
+    assert.equal(exports.StaticPropertyEnum.computedReadWrite, "Value: 200");
+    exports.StaticPropertyEnum.computedReadWrite = "Value: 500";
+    assert.equal(exports.StaticPropertyEnum.enumVariable, 500);
 
     // Namespace enum static properties
     assert.equal(globalThis.StaticPropertyNamespace.namespaceProperty, "namespace");
@@ -635,7 +635,7 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.roundTripOptionalAPIOptionalResult(null), null);
 
     assert.equal(exports.MathUtils.add(2147483647, 0), 2147483647);
-    assert.equal(StaticCalculator.roundtrip(42), 42);
+    assert.equal(exports.StaticCalculator.roundtrip(42), 42);
     assert.equal(StaticCalculator.Scientific, 0);
     assert.equal(StaticCalculator.Basic, 1);
 

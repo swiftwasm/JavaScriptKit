@@ -7,16 +7,14 @@
 export const Calculator: {
     readonly Scientific: 0;
     readonly Basic: 1;
-    square(value: number): number;
 };
-export type Calculator = typeof Calculator[keyof typeof Calculator];
+export type CalculatorTag = typeof Calculator[keyof typeof Calculator];
 
 export const APIResult: {
     readonly Tag: {
         readonly Success: 0;
         readonly Failure: 1;
     };
-    roundtrip(value: APIResult): APIResult;
 };
 
 export type APIResult =
@@ -47,6 +45,12 @@ export type Exports = {
         new(): MathUtils;
         subtract(a: number, b: number): number;
         add(a: number, b: number): number;
+    }
+    Calculator: {
+        square(value: number): number;
+    }
+    APIResult: {
+        roundtrip(value: APIResult): APIResult;
     }
 }
 export type Imports = {

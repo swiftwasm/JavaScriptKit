@@ -7,9 +7,6 @@
 export const PropertyEnum = {
     Value1: 0,
     Value2: 1,
-    enumProperty: null,
-    enumConstant: null,
-    computedEnum: null,
 };
 
 export async function createInstantiator(options, swift) {
@@ -298,34 +295,38 @@ export async function createInstantiator(options, swift) {
             }, set: function(value) {
                 instance.exports.bjs_PropertyNamespace_Nested_static_nestedDouble_set(value);
             } });
-            Object.defineProperty(PropertyEnum, 'enumProperty', { get: function() {
-                instance.exports.bjs_PropertyEnum_static_enumProperty_get();
-                const ret = tmpRetString;
-                tmpRetString = undefined;
-                return ret;
-            }, set: function(value) {
-                const valueBytes = textEncoder.encode(value);
-                const valueId = swift.memory.retain(valueBytes);
-                instance.exports.bjs_PropertyEnum_static_enumProperty_set(valueId, valueBytes.length);
-                swift.memory.release(valueId);
-            } });
-            Object.defineProperty(PropertyEnum, 'enumConstant', { get: function() {
-                const ret = instance.exports.bjs_PropertyEnum_static_enumConstant_get();
-                return ret;
-            } });
-            Object.defineProperty(PropertyEnum, 'computedEnum', { get: function() {
-                instance.exports.bjs_PropertyEnum_static_computedEnum_get();
-                const ret = tmpRetString;
-                tmpRetString = undefined;
-                return ret;
-            }, set: function(value) {
-                const valueBytes = textEncoder.encode(value);
-                const valueId = swift.memory.retain(valueBytes);
-                instance.exports.bjs_PropertyEnum_static_computedEnum_set(valueId, valueBytes.length);
-                swift.memory.release(valueId);
-            } });
             return {
                 PropertyClass,
+                PropertyEnum: {
+                    get enumProperty() {
+                        instance.exports.bjs_PropertyEnum_static_enumProperty_get();
+                        const ret = tmpRetString;
+                        tmpRetString = undefined;
+                        return ret;
+                    },
+                    set enumProperty(value) {
+                        const valueBytes = textEncoder.encode(value);
+                        const valueId = swift.memory.retain(valueBytes);
+                        instance.exports.bjs_PropertyEnum_static_enumProperty_set(valueId, valueBytes.length);
+                        swift.memory.release(valueId);
+                    },
+                    get enumConstant() {
+                        const ret = instance.exports.bjs_PropertyEnum_static_enumConstant_get();
+                        return ret;
+                    },
+                    get computedEnum() {
+                        instance.exports.bjs_PropertyEnum_static_computedEnum_get();
+                        const ret = tmpRetString;
+                        tmpRetString = undefined;
+                        return ret;
+                    },
+                    set computedEnum(value) {
+                        const valueBytes = textEncoder.encode(value);
+                        const valueId = swift.memory.retain(valueBytes);
+                        instance.exports.bjs_PropertyEnum_static_computedEnum_set(valueId, valueBytes.length);
+                        swift.memory.release(valueId);
+                    }
+                },
             };
         },
     }

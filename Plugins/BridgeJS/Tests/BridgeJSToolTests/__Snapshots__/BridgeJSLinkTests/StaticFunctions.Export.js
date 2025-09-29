@@ -7,7 +7,6 @@
 export const Calculator = {
     Scientific: 0,
     Basic: 1,
-    square: null,
 };
 
 export const APIResult = {
@@ -15,7 +14,6 @@ export const APIResult = {
         Success: 0,
         Failure: 1,
     },
-    roundtrip: null,
 };
 
 const __bjs_createAPIResultHelpers = () => {
@@ -262,17 +260,6 @@ export async function createInstantiator(options, swift) {
             if (typeof globalThis.Utils.String === 'undefined') {
                 globalThis.Utils.String = {};
             }
-            Calculator.square = function(value) {
-                const ret = instance.exports.bjs_Calculator_static_square(value);
-                return ret;
-            };
-            APIResult.roundtrip = function(value) {
-                const { caseId: valueCaseId, cleanup: valueCleanup } = enumHelpers.APIResult.lower(value);
-                instance.exports.bjs_APIResult_static_roundtrip(valueCaseId);
-                const ret = enumHelpers.APIResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
-                if (valueCleanup) { valueCleanup(); }
-                return ret;
-            };
             const exports = {
                 MathUtils,
                 uppercase: function bjs_Utils_String_static_uppercase(text) {
@@ -283,6 +270,21 @@ export async function createInstantiator(options, swift) {
                     tmpRetString = undefined;
                     swift.memory.release(textId);
                     return ret;
+                },
+                Calculator: {
+                    square: function(value) {
+                        const ret = instance.exports.bjs_Calculator_static_square(value);
+                        return ret;
+                    }
+                },
+                APIResult: {
+                    roundtrip: function(value) {
+                        const { caseId: valueCaseId, cleanup: valueCleanup } = enumHelpers.APIResult.lower(value);
+                        instance.exports.bjs_APIResult_static_roundtrip(valueCaseId);
+                        const ret = enumHelpers.APIResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                        if (valueCleanup) { valueCleanup(); }
+                        return ret;
+                    }
                 },
             };
             globalThis.Utils.String.uppercase = exports.uppercase;
