@@ -32,18 +32,6 @@ Classes can export both `static` and `class` functions:
 }
 ```
 
-JavaScript usage:
-
-```javascript
-// Static methods - no instance needed
-const sum = MathUtils.add(5, 3);
-const difference = MathUtils.subtract(10, 4);
-
-// Instance method - requires instance
-const utils = new MathUtils();
-const product = utils.multiply(4, 7);
-```
-
 Generated TypeScript definitions:
 
 ```typescript
@@ -59,6 +47,29 @@ export interface MathUtils extends SwiftHeapObject {
     multiply(x: number, y: number): number;
 }
 ```
+
+Usage:
+
+```typescript
+// Static methods
+const sum = MathUtils.add(5, 3);
+const difference = MathUtils.subtract(10, 4);
+
+// Instance methods
+const utils = new MathUtils();
+const product = utils.multiply(4, 7);
+```
+
+## Values/Tag/Object Pattern
+
+For enums with static functions, BridgeJS generates a structured pattern:
+
+- **Values**: Constants for enum cases (`CalculatorValues: { readonly Scientific: 0; readonly Basic: 1; }`)
+- **Tag**: Type alias for enum values (`CalculatorTag = typeof CalculatorValues[keyof typeof CalculatorValues]`)
+- **Object**: Intersection type combining Values + methods (`CalculatorObject = typeof CalculatorValues & { methods }`)
+- **Exports**: Uses Object type for unified access (`Calculator: CalculatorObject`)
+
+This allows accessing both enum constants and static functions through a single interface: `exports.Calculator.Scientific` and `exports.Calculator.square(5)`.
 
 ## Enum Static Functions
 
@@ -79,44 +90,34 @@ Enums can contain static functions that are exported as properties:
 }
 ```
 
-Generated JavaScript:
-
-```javascript
-export const Calculator = {
-    Scientific: 0,
-    Basic: 1,
-    square: null,
-    cube: null,
-};
-
-// Later assigned:
-Calculator.square = function(value) {
-    const ret = instance.exports.bjs_Calculator_static_square(value);
-    return ret;
-}
-Calculator.cube = function(value) {
-    const ret = instance.exports.bjs_Calculator_static_cube(value);
-    return ret;
-}
-```
-
-JavaScript usage:
-
-```javascript
-const squared = Calculator.square(5);
-const cubed = Calculator.cube(3);
-```
-
 Generated TypeScript definitions:
 
 ```typescript
-export const Calculator: {
+export const CalculatorValues: {
     readonly Scientific: 0;
     readonly Basic: 1;
+};
+export type CalculatorTag = typeof CalculatorValues[keyof typeof CalculatorValues];
+
+export type CalculatorObject = typeof CalculatorValues & {
     square(value: number): number;
     cube(value: number): number;
 };
-export type Calculator = typeof Calculator[keyof typeof Calculator];
+
+export type Exports = {
+    Calculator: CalculatorObject
+}
+```
+
+This enables unified access to both enum constants and static functions:
+
+```typescript
+// Access enum constants
+const mode: CalculatorTag = exports.Calculator.Scientific;  // 0
+const otherMode: CalculatorTag = CalculatorValues.Basic;  // 1
+
+// Call static functions
+const result: number = exports.Calculator.square(5);  // 25
 ```
 
 ## Namespace Enum Static Functions
@@ -133,38 +134,6 @@ Namespace enums organize related utility functions and are assigned to `globalTh
 }
 ```
 
-Generated JavaScript:
-
-```javascript
-// Function exported in exports object
-const exports = {
-    uppercase: function bjs_Utils_String_uppercase(text) {
-        const textBytes = textEncoder.encode(text);
-        const textId = swift.memory.retain(textBytes);
-        instance.exports.bjs_Utils_String_uppercase(textId, textBytes.length);
-        const ret = tmpRetString;
-        tmpRetString = undefined;
-        swift.memory.release(textId);
-        return ret;
-    },
-};
-
-// Then assigned to globalThis
-if (typeof globalThis.Utils === 'undefined') {
-    globalThis.Utils = {};
-}
-if (typeof globalThis.Utils.String === 'undefined') {
-    globalThis.Utils.String = {};
-}
-globalThis.Utils.String.uppercase = exports.uppercase;
-```
-
-JavaScript usage:
-
-```javascript
-const upper = Utils.String.uppercase("hello");
-```
-
 Generated TypeScript definitions:
 
 ```typescript
@@ -175,6 +144,14 @@ declare global {
         }
     }
 }
+```
+
+Usage:
+
+```typescript
+// Direct access via global namespace (no exports needed)
+const upper: string = Utils.String.uppercase("hello");
+const result: string = Utils.String.uppercase("world");
 ```
 
 ## Supported Features

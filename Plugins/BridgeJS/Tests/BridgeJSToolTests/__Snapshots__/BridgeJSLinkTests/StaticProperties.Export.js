@@ -4,7 +4,7 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export const PropertyEnum = {
+export const PropertyEnumValues = {
     Value1: 0,
     Value2: 1,
 };
@@ -298,6 +298,7 @@ export async function createInstantiator(options, swift) {
             return {
                 PropertyClass,
                 PropertyEnum: {
+                    ...PropertyEnumValues,
                     get enumProperty() {
                         instance.exports.bjs_PropertyEnum_static_enumProperty_get();
                         const ret = tmpRetString;

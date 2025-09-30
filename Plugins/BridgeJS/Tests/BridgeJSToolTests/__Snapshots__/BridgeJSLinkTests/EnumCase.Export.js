@@ -4,14 +4,14 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export const Direction = {
+export const DirectionValues = {
     North: 0,
     South: 1,
     East: 2,
     West: 3,
 };
 
-export const Status = {
+export const StatusValues = {
     Loading: 0,
     Success: 1,
     Error: 2,
@@ -24,7 +24,7 @@ export const TSDirection = {
     West: 3,
 };
 
-export const PublicStatus = {
+export const PublicStatusValues = {
     Success: 0,
 };
 
@@ -207,6 +207,9 @@ export async function createInstantiator(options, swift) {
                     tmpRetOptionalInt = undefined;
                     return optResult;
                 },
+                Direction: DirectionValues,
+                Status: StatusValues,
+                PublicStatus: PublicStatusValues,
             };
         },
     }

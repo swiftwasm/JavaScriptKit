@@ -31,17 +31,6 @@ Classes can export both stored and computed static properties:
 }
 ```
 
-JavaScript usage:
-
-```javascript
-console.log(Configuration.version);      // "1.0.0"
-console.log(Configuration.debugMode);    // false
-console.log(Configuration.timestamp);    // current timestamp
-
-Configuration.debugMode = true;
-Configuration.timestamp = Date.now() / 1000;
-```
-
 Generated TypeScript definitions:
 
 ```typescript
@@ -61,60 +50,80 @@ export interface Configuration extends SwiftHeapObject {
 }
 ```
 
+Usage:
+
+```typescript
+console.log(Configuration.version);      // "1.0.0"
+console.log(Configuration.debugMode);    // false
+console.log(Configuration.timestamp);    // current timestamp
+
+Configuration.debugMode = true;
+Configuration.timestamp = Date.now() / 1000;
+```
+
+
+## Values/Tag/Object Pattern
+
+For enums with static properties, BridgeJS generates a structured pattern:
+
+- **Values**: Constants for enum cases (`PropertyEnumValues: { readonly Value1: 0; readonly Value2: 1; }`)
+- **Tag**: Type alias for enum values (`PropertyEnumTag = typeof PropertyEnumValues[keyof typeof PropertyEnumValues]`)
+- **Object**: Intersection type combining Values + properties (`PropertyEnumObject = typeof PropertyEnumValues & { properties }`)
+- **Exports**: Uses Object type for unified access (`PropertyEnum: PropertyEnumObject`)
+
+This allows accessing both enum constants and static properties through a single interface: `exports.PropertyEnum.Value1` and `exports.PropertyEnum.enumProperty`.
+
 ## Enum Static Properties
 
 Enums can contain static properties that are exported alongside enum cases:
 
 ```swift
-@JS enum NetworkStatus {
-    case connected
-    case disconnected
-    case connecting
+@JS enum PropertyEnum {
+    case value1
+    case value2
     
-    @JS static var retryCount = 3
-    @JS static let maxRetries = 10
+    @JS static var enumProperty = "mutable"
+    @JS static let enumConstant = 42
+    @JS static var computedEnum: String {
+        return "computed value"
+    }
 }
-```
-
-Generated JavaScript:
-
-```javascript
-export const NetworkStatus = {
-    Connected: 0,
-    Disconnected: 1,
-    Connecting: 2
-};
-
-// Properties added via Object.defineProperty
-Object.defineProperty(NetworkStatus, 'retryCount', {
-    get: function() { return wasmCall('bjs_NetworkStatus_static_retryCount_get'); },
-    set: function(value) { wasmCall('bjs_NetworkStatus_static_retryCount_set', value); }
-});
-
-Object.defineProperty(NetworkStatus, 'maxRetries', {
-    get: function() { return wasmCall('bjs_NetworkStatus_static_maxRetries_get'); }
-});
-```
-
-JavaScript usage:
-
-```javascript
-console.log(NetworkStatus.retryCount);  // 3
-console.log(NetworkStatus.maxRetries);  // 10
-NetworkStatus.retryCount = 5;
 ```
 
 Generated TypeScript definitions:
 
 ```typescript
-export const NetworkStatus: {
-    readonly Connected: 0;
-    readonly Disconnected: 1;
-    readonly Connecting: 2;
-    retryCount: number;
-    readonly maxRetries: number;
+export const PropertyEnumValues: {
+    readonly Value1: 0;
+    readonly Value2: 1;
 };
-export type NetworkStatus = typeof NetworkStatus[keyof typeof NetworkStatus];
+export type PropertyEnumTag = typeof PropertyEnumValues[keyof typeof PropertyEnumValues];
+
+export type PropertyEnumObject = typeof PropertyEnumValues & {
+    enumProperty: string;
+    readonly enumConstant: number;
+    computedEnum: string;
+};
+
+export type Exports = {
+    PropertyEnum: PropertyEnumObject
+}
+```
+
+Usage:
+
+```typescript
+const status: PropertyEnumTag = exports.PropertyEnum.Value1;  // 0
+const otherStatus: PropertyEnumTag = PropertyEnumValues.Value2;  // 1
+
+// Access static properties
+console.log(exports.PropertyEnum.enumProperty);  // "mutable"
+console.log(exports.PropertyEnum.enumConstant);  // 42
+console.log(exports.PropertyEnum.computedEnum);  // "computed value"
+
+// Modify mutable properties
+exports.PropertyEnum.enumProperty = "updated";
+
 ```
 
 ## Namespace Enum Static Properties
@@ -122,54 +131,44 @@ export type NetworkStatus = typeof NetworkStatus[keyof typeof NetworkStatus];
 Namespace enums organize related static properties and are assigned to `globalThis`:
 
 ```swift
-@JS enum Config {
-    @JS enum API {
-        @JS static var baseURL = "https://api.example.com"
-        @JS static let version = "v1"
+@JS enum PropertyNamespace {
+    @JS enum Nested {
+        @JS static var nestedConstant = "constant"
+        @JS static var nestedDouble = 3.14
+        @JS static var nestedProperty = 100
     }
 }
-```
-
-Generated JavaScript:
-
-```javascript
-if (typeof globalThis.Config === 'undefined') {
-    globalThis.Config = {};
-}
-if (typeof globalThis.Config.API === 'undefined') {
-    globalThis.Config.API = {};
-}
-
-Object.defineProperty(globalThis.Config.API, 'baseURL', {
-    get: function() { return wasmCall('bjs_Config_API_baseURL_get'); },
-    set: function(value) { wasmCall('bjs_Config_API_baseURL_set', value); }
-});
-
-Object.defineProperty(globalThis.Config.API, 'version', {
-    get: function() { return wasmCall('bjs_Config_API_version_get'); }
-});
-```
-
-JavaScript usage:
-
-```javascript
-console.log(Config.API.baseURL);  // "https://api.example.com"
-console.log(Config.API.version);  // "v1"
-
-Config.API.baseURL = "https://staging.api.example.com";
 ```
 
 Generated TypeScript definitions:
 
 ```typescript
 declare global {
-    namespace Config {
-        namespace API {
-            baseURL: string;
-            readonly version: string;
+    namespace PropertyNamespace {
+        namespace Nested {
+            var nestedConstant: string;
+            let nestedDouble: number;
+            let nestedProperty: number;
         }
     }
 }
+```
+
+JavaScript usage:
+
+```typescript
+// Direct access via global namespace (no exports needed)
+console.log(PropertyNamespace.Nested.nestedConstant);  // "constant"
+console.log(PropertyNamespace.Nested.nestedDouble);    // 3.14
+console.log(PropertyNamespace.Nested.nestedProperty);  // 100
+
+// Modify mutable properties
+PropertyNamespace.Nested.nestedConstant = "updated";
+PropertyNamespace.Nested.nestedProperty = 200;
+
+// Type-safe access
+const constant: string = PropertyNamespace.Nested.nestedConstant;
+const value: number = PropertyNamespace.Nested.nestedProperty;
 ```
 
 ## Supported Features

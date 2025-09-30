@@ -4,11 +4,17 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export const PropertyEnum: {
+export const PropertyEnumValues: {
     readonly Value1: 0;
     readonly Value2: 1;
 };
-export type PropertyEnumTag = typeof PropertyEnum[keyof typeof PropertyEnum];
+export type PropertyEnumTag = typeof PropertyEnumValues[keyof typeof PropertyEnumValues];
+
+export type PropertyEnumObject = typeof PropertyEnumValues & {
+    enumProperty: string;
+    readonly enumConstant: number;
+    computedEnum: string;
+};
 
 export {};
 
@@ -44,11 +50,7 @@ export type Exports = {
         readonly readOnlyComputed: number;
         optionalProperty: string | null;
     }
-    PropertyEnum: {
-        enumProperty: string;
-        readonly enumConstant: number;
-        computedEnum: string;
-    }
+    PropertyEnum: PropertyEnumObject
 }
 export type Imports = {
 }

@@ -4,7 +4,7 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export const APIResult: {
+export const APIResultValues: {
     readonly Tag: {
         readonly Success: 0;
         readonly Failure: 1;
@@ -15,10 +15,10 @@ export const APIResult: {
     };
 };
 
-export type APIResult =
-  { tag: typeof APIResult.Tag.Success; param0: string } | { tag: typeof APIResult.Tag.Failure; param0: number } | { tag: typeof APIResult.Tag.Flag; param0: boolean } | { tag: typeof APIResult.Tag.Rate; param0: number } | { tag: typeof APIResult.Tag.Precise; param0: number } | { tag: typeof APIResult.Tag.Info }
+export type APIResultTag =
+  { tag: typeof APIResultValues.Tag.Success; param0: string } | { tag: typeof APIResultValues.Tag.Failure; param0: number } | { tag: typeof APIResultValues.Tag.Flag; param0: boolean } | { tag: typeof APIResultValues.Tag.Rate; param0: number } | { tag: typeof APIResultValues.Tag.Precise; param0: number } | { tag: typeof APIResultValues.Tag.Info }
 
-export const ComplexResult: {
+export const ComplexResultValues: {
     readonly Tag: {
         readonly Success: 0;
         readonly Error: 1;
@@ -29,10 +29,10 @@ export const ComplexResult: {
     };
 };
 
-export type ComplexResult =
-  { tag: typeof ComplexResult.Tag.Success; param0: string } | { tag: typeof ComplexResult.Tag.Error; param0: string; param1: number } | { tag: typeof ComplexResult.Tag.Status; param0: boolean; param1: number; param2: string } | { tag: typeof ComplexResult.Tag.Coordinates; param0: number; param1: number; param2: number } | { tag: typeof ComplexResult.Tag.Comprehensive; param0: boolean; param1: boolean; param2: number; param3: number; param4: number; param5: number; param6: string; param7: string; param8: string } | { tag: typeof ComplexResult.Tag.Info }
+export type ComplexResultTag =
+  { tag: typeof ComplexResultValues.Tag.Success; param0: string } | { tag: typeof ComplexResultValues.Tag.Error; param0: string; param1: number } | { tag: typeof ComplexResultValues.Tag.Status; param0: boolean; param1: number; param2: string } | { tag: typeof ComplexResultValues.Tag.Coordinates; param0: number; param1: number; param2: number } | { tag: typeof ComplexResultValues.Tag.Comprehensive; param0: boolean; param1: boolean; param2: number; param3: number; param4: number; param5: number; param6: string; param7: string; param8: string } | { tag: typeof ComplexResultValues.Tag.Info }
 
-export const APIOptionalResult: {
+export const APIOptionalResultValues: {
     readonly Tag: {
         readonly Success: 0;
         readonly Failure: 1;
@@ -40,47 +40,62 @@ export const APIOptionalResult: {
     };
 };
 
-export type APIOptionalResult =
-  { tag: typeof APIOptionalResult.Tag.Success; param0: string | null } | { tag: typeof APIOptionalResult.Tag.Failure; param0: number | null; param1: boolean | null } | { tag: typeof APIOptionalResult.Tag.Status; param0: boolean | null; param1: number | null; param2: string | null }
+export type APIOptionalResultTag =
+  { tag: typeof APIOptionalResultValues.Tag.Success; param0: string | null } | { tag: typeof APIOptionalResultValues.Tag.Failure; param0: number | null; param1: boolean | null } | { tag: typeof APIOptionalResultValues.Tag.Status; param0: boolean | null; param1: number | null; param2: string | null }
+
+export type APIResultObject = typeof APIResultValues;
+
+export type ComplexResultObject = typeof ComplexResultValues;
+
+export type ResultObject = typeof ResultValues;
+
+export type NetworkingResultObject = typeof NetworkingResultValues;
+
+export type APIOptionalResultObject = typeof APIOptionalResultValues;
 
 export {};
 
 declare global {
     namespace API {
-        const NetworkingResult: {
+        const NetworkingResultValues: {
             readonly Tag: {
                 readonly Success: 0;
                 readonly Failure: 1;
             };
         };
-        type NetworkingResult =
-          { tag: typeof NetworkingResult.Tag.Success; param0: string } | { tag: typeof NetworkingResult.Tag.Failure; param0: string; param1: number }
+        type NetworkingResultTag =
+          { tag: typeof NetworkingResultValues.Tag.Success; param0: string } | { tag: typeof NetworkingResultValues.Tag.Failure; param0: string; param1: number }
     }
     namespace Utilities {
-        const Result: {
+        const ResultValues: {
             readonly Tag: {
                 readonly Success: 0;
                 readonly Failure: 1;
                 readonly Status: 2;
             };
         };
-        type Result =
-          { tag: typeof Result.Tag.Success; param0: string } | { tag: typeof Result.Tag.Failure; param0: string; param1: number } | { tag: typeof Result.Tag.Status; param0: boolean; param1: number; param2: string }
+        type ResultTag =
+          { tag: typeof ResultValues.Tag.Success; param0: string } | { tag: typeof ResultValues.Tag.Failure; param0: string; param1: number } | { tag: typeof ResultValues.Tag.Status; param0: boolean; param1: number; param2: string }
     }
 }
 
 export type Exports = {
-    handle(result: APIResult): void;
-    getResult(): APIResult;
-    roundtripAPIResult(result: APIResult): APIResult;
-    roundTripOptionalAPIResult(result: APIResult | null): APIResult | null;
-    handleComplex(result: ComplexResult): void;
-    getComplexResult(): ComplexResult;
-    roundtripComplexResult(result: ComplexResult): ComplexResult;
-    roundTripOptionalComplexResult(result: ComplexResult | null): ComplexResult | null;
-    roundTripOptionalUtilitiesResult(result: Utilities.Result | null): Utilities.Result | null;
-    roundTripOptionalNetworkingResult(result: NetworkingResult | null): NetworkingResult | null;
-    roundTripOptionalAPIOptionalResult(result: APIOptionalResult | null): APIOptionalResult | null;
+    handle(result: APIResultTag): void;
+    getResult(): APIResultTag;
+    roundtripAPIResult(result: APIResultTag): APIResultTag;
+    roundTripOptionalAPIResult(result: APIResultTag | null): APIResultTag | null;
+    handleComplex(result: ComplexResultTag): void;
+    getComplexResult(): ComplexResultTag;
+    roundtripComplexResult(result: ComplexResultTag): ComplexResultTag;
+    roundTripOptionalComplexResult(result: ComplexResultTag | null): ComplexResultTag | null;
+    roundTripOptionalUtilitiesResult(result: Utilities.ResultTag | null): Utilities.ResultTag | null;
+    roundTripOptionalNetworkingResult(result: NetworkingResultTag | null): NetworkingResultTag | null;
+    roundTripOptionalAPIOptionalResult(result: APIOptionalResultTag | null): APIOptionalResultTag | null;
+    APIResult: APIResultObject
+    ComplexResult: ComplexResultObject
+    Result: ResultObject
+    NetworkingResult: NetworkingResultObject
+    APIOptionalResult: APIOptionalResultObject
 }
 export type Imports = {
 }

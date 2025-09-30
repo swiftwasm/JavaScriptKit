@@ -4,24 +4,24 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export const Calculator = {
+export const CalculatorValues = {
     Scientific: 0,
     Basic: 1,
 };
 
-export const APIResult = {
+export const APIResultValues = {
     Tag: {
         Success: 0,
         Failure: 1,
     },
 };
 
-const __bjs_createAPIResultHelpers = () => {
+const __bjs_createAPIResultValuesHelpers = () => {
     return (tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift) => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
-                case APIResult.Tag.Success: {
+                case APIResultValues.Tag.Success: {
                     const bytes = textEncoder.encode(value.param0);
                     const id = swift.memory.retain(bytes);
                     tmpParamInts.push(bytes.length);
@@ -29,28 +29,28 @@ const __bjs_createAPIResultHelpers = () => {
                     const cleanup = () => {
                         swift.memory.release(id);
                     };
-                    return { caseId: APIResult.Tag.Success, cleanup };
+                    return { caseId: APIResultValues.Tag.Success, cleanup };
                 }
-                case APIResult.Tag.Failure: {
+                case APIResultValues.Tag.Failure: {
                     tmpParamInts.push((value.param0 | 0));
                     const cleanup = undefined;
-                    return { caseId: APIResult.Tag.Failure, cleanup };
+                    return { caseId: APIResultValues.Tag.Failure, cleanup };
                 }
-                default: throw new Error("Unknown APIResult tag: " + String(enumTag));
+                default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
             }
         },
         raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
             const tag = tmpRetTag | 0;
             switch (tag) {
-                case APIResult.Tag.Success: {
+                case APIResultValues.Tag.Success: {
                     const string = tmpRetStrings.pop();
-                    return { tag: APIResult.Tag.Success, param0: string };
+                    return { tag: APIResultValues.Tag.Success, param0: string };
                 }
-                case APIResult.Tag.Failure: {
+                case APIResultValues.Tag.Failure: {
                     const int = tmpRetInts.pop();
-                    return { tag: APIResult.Tag.Failure, param0: int };
+                    return { tag: APIResultValues.Tag.Failure, param0: int };
                 }
-                default: throw new Error("Unknown APIResult tag returned from Swift: " + String(tag));
+                default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
             }
         }
     });
@@ -203,7 +203,7 @@ export async function createInstantiator(options, swift) {
             instance = i;
             memory = instance.exports.memory;
 
-            const APIResultHelpers = __bjs_createAPIResultHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift);
+            const APIResultHelpers = __bjs_createAPIResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift);
             enumHelpers.APIResult = APIResultHelpers;
             
             setException = (error) => {
@@ -272,12 +272,14 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 },
                 Calculator: {
+                    ...CalculatorValues,
                     square: function(value) {
                         const ret = instance.exports.bjs_Calculator_static_square(value);
                         return ret;
                     }
                 },
                 APIResult: {
+                    ...APIResultValues,
                     roundtrip: function(value) {
                         const { caseId: valueCaseId, cleanup: valueCleanup } = enumHelpers.APIResult.lower(value);
                         instance.exports.bjs_APIResult_static_roundtrip(valueCaseId);

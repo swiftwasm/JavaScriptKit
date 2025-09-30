@@ -4,7 +4,7 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export const Theme = {
+export const ThemeValues = {
     Light: "light",
     Dark: "dark",
     Auto: "auto",
@@ -16,12 +16,12 @@ export const TSTheme = {
     Auto: "auto",
 };
 
-export const FeatureFlag = {
+export const FeatureFlagValues = {
     Enabled: true,
     Disabled: false,
 };
 
-export const HttpStatus = {
+export const HttpStatusValues = {
     Ok: 200,
     NotFound: 404,
     ServerError: 500,
@@ -33,7 +33,7 @@ export const TSHttpStatus = {
     ServerError: 500,
 };
 
-export const Priority = {
+export const PriorityValues = {
     Lowest: 1,
     Low: 2,
     Medium: 3,
@@ -41,38 +41,38 @@ export const Priority = {
     Highest: 5,
 };
 
-export const FileSize = {
+export const FileSizeValues = {
     Tiny: 1024,
     Small: 10240,
     Medium: 102400,
     Large: 1048576,
 };
 
-export const UserId = {
+export const UserIdValues = {
     Guest: 0,
     User: 1000,
     Admin: 9999,
 };
 
-export const TokenId = {
+export const TokenIdValues = {
     Invalid: 0,
     Session: 12345,
     Refresh: 67890,
 };
 
-export const SessionId = {
+export const SessionIdValues = {
     None: 0,
     Active: 9876543210,
     Expired: 1234567890,
 };
 
-export const Precision = {
+export const PrecisionValues = {
     Rough: 0.1,
     Normal: 0.01,
     Fine: 0.001,
 };
 
-export const Ratio = {
+export const RatioValues = {
     Quarter: 0.25,
     Half: 0.5,
     Golden: 1.618,
@@ -437,6 +437,16 @@ export async function createInstantiator(options, swift) {
                     tmpRetString = undefined;
                     return ret;
                 },
+                Theme: ThemeValues,
+                FeatureFlag: FeatureFlagValues,
+                HttpStatus: HttpStatusValues,
+                Priority: PriorityValues,
+                FileSize: FileSizeValues,
+                UserId: UserIdValues,
+                TokenId: TokenIdValues,
+                SessionId: SessionIdValues,
+                Precision: PrecisionValues,
+                Ratio: RatioValues,
             };
         },
     }

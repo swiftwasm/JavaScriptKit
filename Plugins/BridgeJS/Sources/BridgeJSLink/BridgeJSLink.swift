@@ -188,20 +188,22 @@ struct BridgeJSLink {
                 }
             }
 
-            for enumDefinition in skeleton.enums where enumDefinition.enumType != .namespace {
-                // Process enum static methods to add to Exports type
+            for enumDefinition in skeleton.enums
+            where enumDefinition.enumType != .namespace && enumDefinition.emitStyle != .tsEnum {
                 let enumExportPrinter = CodeFragmentPrinter()
-                let enumDtsPrinter = CodeFragmentPrinter()
-                
+                let enumValuesName = "\(enumDefinition.name)Values"
+
                 for function in enumDefinition.staticMethods {
                     let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
                     for param in function.parameters {
                         try thunkBuilder.lowerParameter(param: param)
                     }
                     let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
-                    
+
                     let methodPrinter = CodeFragmentPrinter()
-                    methodPrinter.write("\(function.name): function(\(function.parameters.map { $0.name }.joined(separator: ", "))) {")
+                    methodPrinter.write(
+                        "\(function.name): function(\(function.parameters.map { $0.name }.joined(separator: ", "))) {"
+                    )
                     methodPrinter.indent {
                         methodPrinter.write(contentsOf: thunkBuilder.body)
                         methodPrinter.write(contentsOf: thunkBuilder.cleanupCode)
@@ -211,27 +213,21 @@ struct BridgeJSLink {
                         }
                     }
                     methodPrinter.write("},")
-                    
+
                     enumExportPrinter.write(lines: methodPrinter.lines)
-                    enumDtsPrinter.write("\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));")
                 }
-                
+
                 let enumExportLines = enumExportPrinter.lines
-                let enumDtsLines = enumDtsPrinter.lines
-                
+
                 let enumPropertyPrinter = CodeFragmentPrinter()
-                let enumPropertyDtsPrinter = CodeFragmentPrinter()
-                
+
                 for property in enumDefinition.staticProperties {
-                    let readonly = property.isReadonly ? "readonly " : ""
-                    enumPropertyDtsPrinter.write("\(readonly)\(property.name): \(property.type.tsType);")
-                    
                     let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
                     let getterReturnExpr = try getterThunkBuilder.call(
                         abiName: property.getterAbiName(),
                         returnType: property.type
                     )
-                    
+
                     enumPropertyPrinter.write("get \(property.name)() {")
                     enumPropertyPrinter.indent {
                         enumPropertyPrinter.write(contentsOf: getterThunkBuilder.body)
@@ -242,7 +238,7 @@ struct BridgeJSLink {
                         }
                     }
                     enumPropertyPrinter.write("},")
-                    
+
                     if !property.isReadonly {
                         let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
                         try setterThunkBuilder.lowerParameter(
@@ -252,7 +248,7 @@ struct BridgeJSLink {
                             abiName: property.setterAbiName(),
                             returnType: .void
                         )
-                        
+
                         enumPropertyPrinter.write("set \(property.name)(value) {")
                         enumPropertyPrinter.indent {
                             enumPropertyPrinter.write(contentsOf: setterThunkBuilder.body)
@@ -262,17 +258,16 @@ struct BridgeJSLink {
                         enumPropertyPrinter.write("},")
                     }
                 }
-                
+
                 let enumPropertyLines = enumPropertyPrinter.lines
-                let enumPropertyDtsLines = enumPropertyDtsPrinter.lines
-                
+
+                let exportsPrinter = CodeFragmentPrinter()
+                let dtsExportsPrinter = CodeFragmentPrinter()
+
                 if !enumExportLines.isEmpty || !enumPropertyLines.isEmpty {
-                    let exportsPrinter = CodeFragmentPrinter()
-                    let dtsExportsPrinter = CodeFragmentPrinter()
-                    
                     exportsPrinter.write("\(enumDefinition.name): {")
                     exportsPrinter.indent {
-                        // Combine all lines and handle trailing comma removal
+                        exportsPrinter.write("...\(enumValuesName),")
                         var allLines = enumExportLines + enumPropertyLines
                         if let lastLineIndex = allLines.indices.last, allLines[lastLineIndex].hasSuffix(",") {
                             allLines[lastLineIndex] = String(allLines[lastLineIndex].dropLast())
@@ -280,21 +275,15 @@ struct BridgeJSLink {
                         exportsPrinter.write(lines: allLines)
                     }
                     exportsPrinter.write("},")
-                    
-                    dtsExportsPrinter.write("\(enumDefinition.name): {")
-                    dtsExportsPrinter.indent {
-                        dtsExportsPrinter.write(lines: enumDtsLines)
-                        dtsExportsPrinter.write(lines: enumPropertyDtsLines)
-                    }
-                    dtsExportsPrinter.write("}")
-                    
-                    data.exportsLines.append(contentsOf: exportsPrinter.lines)
-                    data.dtsExportLines.append(contentsOf: dtsExportsPrinter.lines)
+                } else {
+                    exportsPrinter.write("\(enumDefinition.name): \(enumValuesName),")
                 }
-                
-                // Static properties are now handled in Exports type - no global assignments needed
-            }
 
+                dtsExportsPrinter.write("\(enumDefinition.name): \(enumDefinition.name)Object")
+
+                data.exportsLines.append(contentsOf: exportsPrinter.lines)
+                data.dtsExportLines.append(contentsOf: dtsExportsPrinter.lines)
+            }
         }
 
         // Process imported skeletons
@@ -585,6 +574,34 @@ struct BridgeJSLink {
         printer.nextLine()
         printer.write(lines: data.topLevelDtsEnumLines)
 
+        // Generate Object types for const-style enums
+        for skeleton in exportedSkeletons {
+            for enumDefinition in skeleton.enums
+            where enumDefinition.enumType != .namespace && enumDefinition.emitStyle != .tsEnum {
+                let enumValuesName = "\(enumDefinition.name)Values"
+                let enumObjectName = "\(enumDefinition.name)Object"
+
+                if !enumDefinition.staticMethods.isEmpty || !enumDefinition.staticProperties.isEmpty {
+                    printer.write("export type \(enumObjectName) = typeof \(enumValuesName) & {")
+                    printer.indent {
+                        for function in enumDefinition.staticMethods {
+                            printer.write(
+                                "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+                            )
+                        }
+                        for property in enumDefinition.staticProperties {
+                            let readonly = property.isReadonly ? "readonly " : ""
+                            printer.write("\(readonly)\(property.name): \(property.type.tsType);")
+                        }
+                    }
+                    printer.write("};")
+                } else {
+                    printer.write("export type \(enumObjectName) = typeof \(enumValuesName);")
+                }
+                printer.nextLine()
+            }
+        }
+
         // Type definitions section (namespace declarations, class definitions, imported types)
         let namespaceBuilder = NamespaceBuilder()
         let namespaceDeclarationsLines = namespaceBuilder.namespaceDeclarations(
@@ -657,7 +674,8 @@ struct BridgeJSLink {
         for enumDef in data.namespacedEnums {
             if enumDef.enumType != .namespace {
                 let namespacePath = enumDef.namespace?.joined(separator: ".") ?? ""
-                printer.write("globalThis.\(namespacePath).\(enumDef.name) = \(enumDef.name);")
+                let enumValuesName = enumDef.emitStyle == .tsEnum ? enumDef.name : "\(enumDef.name)Values"
+                printer.write("globalThis.\(namespacePath).\(enumValuesName) = \(enumValuesName);")
             }
         }
 
@@ -761,8 +779,9 @@ struct BridgeJSLink {
         for skeleton in exportedSkeletons {
             for enumDef in skeleton.enums where enumDef.enumType == .associatedValue {
                 let base = enumDef.name
+                let baseValues = "\(base)Values"
                 printer.write(
-                    "const \(base)Helpers = __bjs_create\(base)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift));"
+                    "const \(base)Helpers = __bjs_create\(baseValues)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift));"
                 )
                 printer.write("enumHelpers.\(base) = \(base)Helpers;")
                 printer.nextLine()
@@ -1049,11 +1068,12 @@ struct BridgeJSLink {
         let scope = JSGlueVariableScope()
         let cleanup = CodeFragmentPrinter()
         let printer = CodeFragmentPrinter()
+        let enumValuesName = enumDefinition.emitStyle == .tsEnum ? enumDefinition.name : "\(enumDefinition.name)Values"
 
         switch enumDefinition.enumType {
         case .simple:
             let fragment = IntrinsicJSFragment.simpleEnumHelper(enumDefinition: enumDefinition)
-            _ = fragment.printCode([enumDefinition.name], scope, printer, cleanup)
+            _ = fragment.printCode([enumValuesName], scope, printer, cleanup)
             jsLines.append(contentsOf: printer.lines)
         case .rawValue:
             guard enumDefinition.rawType != nil else {
@@ -1061,11 +1081,11 @@ struct BridgeJSLink {
             }
 
             let fragment = IntrinsicJSFragment.rawValueEnumHelper(enumDefinition: enumDefinition)
-            _ = fragment.printCode([enumDefinition.name], scope, printer, cleanup)
+            _ = fragment.printCode([enumValuesName], scope, printer, cleanup)
             jsLines.append(contentsOf: printer.lines)
         case .associatedValue:
             let fragment = IntrinsicJSFragment.associatedValueEnumHelper(enumDefinition: enumDefinition)
-            _ = fragment.printCode([enumDefinition.name], scope, printer, cleanup)
+            _ = fragment.printCode([enumValuesName], scope, printer, cleanup)
             jsLines.append(contentsOf: printer.lines)
         case .namespace:
             break
@@ -1080,6 +1100,7 @@ struct BridgeJSLink {
 
     private func generateDeclarations(enumDefinition: ExportedEnum) -> [String] {
         let printer = CodeFragmentPrinter()
+        let enumValuesName = enumDefinition.emitStyle == .tsEnum ? enumDefinition.name : "\(enumDefinition.name)Values"
 
         switch enumDefinition.emitStyle {
         case .tsEnum:
@@ -1105,7 +1126,7 @@ struct BridgeJSLink {
             }
 
         case .const:
-            printer.write("export const \(enumDefinition.name): {")
+            printer.write("export const \(enumValuesName): {")
             switch enumDefinition.enumType {
             case .simple, .rawValue:
                 printer.indent {
@@ -1123,7 +1144,7 @@ struct BridgeJSLink {
                 }
                 printer.write("};")
                 printer.write(
-                    "export type \(enumDefinition.name)Tag = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                    "export type \(enumDefinition.name)Tag = typeof \(enumValuesName)[keyof typeof \(enumValuesName)];"
                 )
                 printer.nextLine()
             case .associatedValue:
@@ -1145,11 +1166,11 @@ struct BridgeJSLink {
                 for enumCase in enumDefinition.cases {
                     if enumCase.associatedValues.isEmpty {
                         unionParts.append(
-                            "{ tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter) }"
+                            "{ tag: typeof \(enumValuesName).Tag.\(enumCase.name.capitalizedFirstLetter) }"
                         )
                     } else {
                         var fields: [String] = [
-                            "tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter)"
+                            "tag: typeof \(enumValuesName).Tag.\(enumCase.name.capitalizedFirstLetter)"
                         ]
                         for (associatedValueIndex, associatedValue) in enumCase.associatedValues.enumerated() {
                             let prop = associatedValue.label ?? "param\(associatedValueIndex)"
@@ -1159,7 +1180,9 @@ struct BridgeJSLink {
                     }
                 }
 
-                printer.write("export type \(enumDefinition.name) =")
+                let unionTypeName =
+                    enumDefinition.emitStyle == .tsEnum ? enumDefinition.name : "\(enumDefinition.name)Tag"
+                printer.write("export type \(unionTypeName) =")
                 printer.write("  " + unionParts.joined(separator: " | "))
                 printer.nextLine()
             case .namespace:
@@ -1989,6 +2012,8 @@ extension BridgeJSLink {
                     let sortedEnums = childNode.content.enums.sorted { $0.name < $1.name }
                     for enumDefinition in sortedEnums {
                         let style: EnumEmitStyle = enumDefinition.emitStyle
+                        let enumValuesName =
+                            enumDefinition.emitStyle == .tsEnum ? enumDefinition.name : "\(enumDefinition.name)Values"
                         switch enumDefinition.enumType {
                         case .simple:
                             switch style {
@@ -2002,7 +2027,7 @@ extension BridgeJSLink {
                                 }
                                 printer.write("}")
                             case .const:
-                                printer.write("const \(enumDefinition.name): {")
+                                printer.write("const \(enumValuesName): {")
                                 printer.indent {
                                     for (index, enumCase) in enumDefinition.cases.enumerated() {
                                         let caseName = enumCase.name.capitalizedFirstLetter
@@ -2011,7 +2036,7 @@ extension BridgeJSLink {
                                 }
                                 printer.write("};")
                                 printer.write(
-                                    "type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                                    "type \(enumDefinition.name)Tag = typeof \(enumValuesName)[keyof typeof \(enumValuesName)];"
                                 )
                             }
                         case .rawValue:
@@ -2029,7 +2054,7 @@ extension BridgeJSLink {
                                 }
                                 printer.write("}")
                             case .const:
-                                printer.write("const \(enumDefinition.name): {")
+                                printer.write("const \(enumValuesName): {")
                                 printer.indent {
                                     for enumCase in enumDefinition.cases {
                                         let caseName = enumCase.name.capitalizedFirstLetter
@@ -2040,11 +2065,11 @@ extension BridgeJSLink {
                                 }
                                 printer.write("};")
                                 printer.write(
-                                    "type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                                    "type \(enumDefinition.name)Tag = typeof \(enumValuesName)[keyof typeof \(enumValuesName)];"
                                 )
                             }
                         case .associatedValue:
-                            printer.write("const \(enumDefinition.name): {")
+                            printer.write("const \(enumValuesName): {")
                             printer.indent {
                                 printer.write("readonly Tag: {")
                                 printer.indent {
@@ -2061,11 +2086,11 @@ extension BridgeJSLink {
                             for enumCase in enumDefinition.cases {
                                 if enumCase.associatedValues.isEmpty {
                                     unionParts.append(
-                                        "{ tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter) }"
+                                        "{ tag: typeof \(enumValuesName).Tag.\(enumCase.name.capitalizedFirstLetter) }"
                                     )
                                 } else {
                                     var fields: [String] = [
-                                        "tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter)"
+                                        "tag: typeof \(enumValuesName).Tag.\(enumCase.name.capitalizedFirstLetter)"
                                     ]
                                     for (associatedValueIndex, associatedValue) in enumCase.associatedValues
                                         .enumerated()
@@ -2076,7 +2101,9 @@ extension BridgeJSLink {
                                     unionParts.append("{ \(fields.joined(separator: "; ")) }")
                                 }
                             }
-                            printer.write("type \(enumDefinition.name) =")
+                            let unionTypeName =
+                                enumDefinition.emitStyle == .tsEnum ? enumDefinition.name : "\(enumDefinition.name)Tag"
+                            printer.write("type \(unionTypeName) =")
                             printer.write("  " + unionParts.joined(separator: " | "))
                         case .namespace:
                             continue
@@ -2274,11 +2301,11 @@ extension BridgeType {
         case .optional(let wrappedType):
             return "\(wrappedType.tsType) | null"
         case .caseEnum(let name):
-            return name
+            return "\(name)Tag"
         case .rawValueEnum(let name, _):
-            return name
+            return "\(name)Tag"
         case .associatedValueEnum(let name):
-            return name
+            return "\(name)Tag"
         case .namespaceEnum(let name):
             return name
         }

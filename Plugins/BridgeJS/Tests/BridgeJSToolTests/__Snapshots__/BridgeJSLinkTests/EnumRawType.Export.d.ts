@@ -4,12 +4,12 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export const Theme: {
+export const ThemeValues: {
     readonly Light: "light";
     readonly Dark: "dark";
     readonly Auto: "auto";
 };
-export type ThemeTag = typeof Theme[keyof typeof Theme];
+export type ThemeTag = typeof ThemeValues[keyof typeof ThemeValues];
 
 export enum TSTheme {
     Light = "light",
@@ -17,18 +17,18 @@ export enum TSTheme {
     Auto = "auto",
 }
 
-export const FeatureFlag: {
+export const FeatureFlagValues: {
     readonly Enabled: true;
     readonly Disabled: false;
 };
-export type FeatureFlagTag = typeof FeatureFlag[keyof typeof FeatureFlag];
+export type FeatureFlagTag = typeof FeatureFlagValues[keyof typeof FeatureFlagValues];
 
-export const HttpStatus: {
+export const HttpStatusValues: {
     readonly Ok: 200;
     readonly NotFound: 404;
     readonly ServerError: 500;
 };
-export type HttpStatusTag = typeof HttpStatus[keyof typeof HttpStatus];
+export type HttpStatusTag = typeof HttpStatusValues[keyof typeof HttpStatusValues];
 
 export enum TSHttpStatus {
     Ok = 200,
@@ -36,99 +36,129 @@ export enum TSHttpStatus {
     ServerError = 500,
 }
 
-export const Priority: {
+export const PriorityValues: {
     readonly Lowest: 1;
     readonly Low: 2;
     readonly Medium: 3;
     readonly High: 4;
     readonly Highest: 5;
 };
-export type PriorityTag = typeof Priority[keyof typeof Priority];
+export type PriorityTag = typeof PriorityValues[keyof typeof PriorityValues];
 
-export const FileSize: {
+export const FileSizeValues: {
     readonly Tiny: 1024;
     readonly Small: 10240;
     readonly Medium: 102400;
     readonly Large: 1048576;
 };
-export type FileSizeTag = typeof FileSize[keyof typeof FileSize];
+export type FileSizeTag = typeof FileSizeValues[keyof typeof FileSizeValues];
 
-export const UserId: {
+export const UserIdValues: {
     readonly Guest: 0;
     readonly User: 1000;
     readonly Admin: 9999;
 };
-export type UserIdTag = typeof UserId[keyof typeof UserId];
+export type UserIdTag = typeof UserIdValues[keyof typeof UserIdValues];
 
-export const TokenId: {
+export const TokenIdValues: {
     readonly Invalid: 0;
     readonly Session: 12345;
     readonly Refresh: 67890;
 };
-export type TokenIdTag = typeof TokenId[keyof typeof TokenId];
+export type TokenIdTag = typeof TokenIdValues[keyof typeof TokenIdValues];
 
-export const SessionId: {
+export const SessionIdValues: {
     readonly None: 0;
     readonly Active: 9876543210;
     readonly Expired: 1234567890;
 };
-export type SessionIdTag = typeof SessionId[keyof typeof SessionId];
+export type SessionIdTag = typeof SessionIdValues[keyof typeof SessionIdValues];
 
-export const Precision: {
+export const PrecisionValues: {
     readonly Rough: 0.1;
     readonly Normal: 0.01;
     readonly Fine: 0.001;
 };
-export type PrecisionTag = typeof Precision[keyof typeof Precision];
+export type PrecisionTag = typeof PrecisionValues[keyof typeof PrecisionValues];
 
-export const Ratio: {
+export const RatioValues: {
     readonly Quarter: 0.25;
     readonly Half: 0.5;
     readonly Golden: 1.618;
     readonly Pi: 3.14159;
 };
-export type RatioTag = typeof Ratio[keyof typeof Ratio];
+export type RatioTag = typeof RatioValues[keyof typeof RatioValues];
+
+export type ThemeObject = typeof ThemeValues;
+
+export type FeatureFlagObject = typeof FeatureFlagValues;
+
+export type HttpStatusObject = typeof HttpStatusValues;
+
+export type PriorityObject = typeof PriorityValues;
+
+export type FileSizeObject = typeof FileSizeValues;
+
+export type UserIdObject = typeof UserIdValues;
+
+export type TokenIdObject = typeof TokenIdValues;
+
+export type SessionIdObject = typeof SessionIdValues;
+
+export type PrecisionObject = typeof PrecisionValues;
+
+export type RatioObject = typeof RatioValues;
 
 export type Exports = {
-    setTheme(theme: Theme): void;
-    getTheme(): Theme;
-    roundTripOptionalTheme(input: Theme | null): Theme | null;
-    setTSTheme(theme: TSTheme): void;
-    getTSTheme(): TSTheme;
-    roundTripOptionalTSTheme(input: TSTheme | null): TSTheme | null;
-    setFeatureFlag(flag: FeatureFlag): void;
-    getFeatureFlag(): FeatureFlag;
-    roundTripOptionalFeatureFlag(input: FeatureFlag | null): FeatureFlag | null;
-    setHttpStatus(status: HttpStatus): void;
-    getHttpStatus(): HttpStatus;
-    roundTripOptionalHttpStatus(input: HttpStatus | null): HttpStatus | null;
-    setTSHttpStatus(status: TSHttpStatus): void;
-    getTSHttpStatus(): TSHttpStatus;
-    roundTripOptionalHttpStatus(input: TSHttpStatus | null): TSHttpStatus | null;
-    setPriority(priority: Priority): void;
-    getPriority(): Priority;
-    roundTripOptionalPriority(input: Priority | null): Priority | null;
-    setFileSize(size: FileSize): void;
-    getFileSize(): FileSize;
-    roundTripOptionalFileSize(input: FileSize | null): FileSize | null;
-    setUserId(id: UserId): void;
-    getUserId(): UserId;
-    roundTripOptionalUserId(input: UserId | null): UserId | null;
-    setTokenId(token: TokenId): void;
-    getTokenId(): TokenId;
-    roundTripOptionalTokenId(input: TokenId | null): TokenId | null;
-    setSessionId(session: SessionId): void;
-    getSessionId(): SessionId;
-    roundTripOptionalSessionId(input: SessionId | null): SessionId | null;
-    setPrecision(precision: Precision): void;
-    getPrecision(): Precision;
-    roundTripOptionalPrecision(input: Precision | null): Precision | null;
-    setRatio(ratio: Ratio): void;
-    getRatio(): Ratio;
-    roundTripOptionalRatio(input: Ratio | null): Ratio | null;
-    processTheme(theme: Theme): HttpStatus;
-    convertPriority(status: HttpStatus): Priority;
-    validateSession(session: SessionId): Theme;
+    setTheme(theme: ThemeTag): void;
+    getTheme(): ThemeTag;
+    roundTripOptionalTheme(input: ThemeTag | null): ThemeTag | null;
+    setTSTheme(theme: TSThemeTag): void;
+    getTSTheme(): TSThemeTag;
+    roundTripOptionalTSTheme(input: TSThemeTag | null): TSThemeTag | null;
+    setFeatureFlag(flag: FeatureFlagTag): void;
+    getFeatureFlag(): FeatureFlagTag;
+    roundTripOptionalFeatureFlag(input: FeatureFlagTag | null): FeatureFlagTag | null;
+    setHttpStatus(status: HttpStatusTag): void;
+    getHttpStatus(): HttpStatusTag;
+    roundTripOptionalHttpStatus(input: HttpStatusTag | null): HttpStatusTag | null;
+    setTSHttpStatus(status: TSHttpStatusTag): void;
+    getTSHttpStatus(): TSHttpStatusTag;
+    roundTripOptionalHttpStatus(input: TSHttpStatusTag | null): TSHttpStatusTag | null;
+    setPriority(priority: PriorityTag): void;
+    getPriority(): PriorityTag;
+    roundTripOptionalPriority(input: PriorityTag | null): PriorityTag | null;
+    setFileSize(size: FileSizeTag): void;
+    getFileSize(): FileSizeTag;
+    roundTripOptionalFileSize(input: FileSizeTag | null): FileSizeTag | null;
+    setUserId(id: UserIdTag): void;
+    getUserId(): UserIdTag;
+    roundTripOptionalUserId(input: UserIdTag | null): UserIdTag | null;
+    setTokenId(token: TokenIdTag): void;
+    getTokenId(): TokenIdTag;
+    roundTripOptionalTokenId(input: TokenIdTag | null): TokenIdTag | null;
+    setSessionId(session: SessionIdTag): void;
+    getSessionId(): SessionIdTag;
+    roundTripOptionalSessionId(input: SessionIdTag | null): SessionIdTag | null;
+    setPrecision(precision: PrecisionTag): void;
+    getPrecision(): PrecisionTag;
+    roundTripOptionalPrecision(input: PrecisionTag | null): PrecisionTag | null;
+    setRatio(ratio: RatioTag): void;
+    getRatio(): RatioTag;
+    roundTripOptionalRatio(input: RatioTag | null): RatioTag | null;
+    processTheme(theme: ThemeTag): HttpStatusTag;
+    convertPriority(status: HttpStatusTag): PriorityTag;
+    validateSession(session: SessionIdTag): ThemeTag;
+    Theme: ThemeObject
+    FeatureFlag: FeatureFlagObject
+    HttpStatus: HttpStatusObject
+    Priority: PriorityObject
+    FileSize: FileSizeObject
+    UserId: UserIdObject
+    TokenId: TokenIdObject
+    SessionId: SessionIdObject
+    Precision: PrecisionObject
+    Ratio: RatioObject
 }
 export type Imports = {
 }

@@ -4,27 +4,27 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export const Method = {
+export const MethodValues = {
     Get: 0,
     Post: 1,
     Put: 2,
     Delete: 3,
 };
 
-export const LogLevel = {
+export const LogLevelValues = {
     Debug: "debug",
     Info: "info",
     Warning: "warning",
     Error: "error",
 };
 
-export const Port = {
+export const PortValues = {
     Http: 80,
     Https: 443,
     Development: 3000,
 };
 
-export const SupportedMethod = {
+export const SupportedMethodValues = {
     Get: 0,
     Post: 1,
 };
@@ -44,10 +44,10 @@ if (typeof globalThis.Networking.APIV2 === 'undefined') {
 if (typeof globalThis.Networking.APIV2.Internal === 'undefined') {
     globalThis.Networking.APIV2.Internal = {};
 }
-globalThis.Networking.API.Method = Method;
-globalThis.Configuration.LogLevel = LogLevel;
-globalThis.Configuration.Port = Port;
-globalThis.Networking.APIV2.Internal.SupportedMethod = SupportedMethod;
+globalThis.Networking.API.MethodValues = MethodValues;
+globalThis.Configuration.LogLevelValues = LogLevelValues;
+globalThis.Configuration.PortValues = PortValues;
+globalThis.Networking.APIV2.Internal.SupportedMethodValues = SupportedMethodValues;
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -293,6 +293,10 @@ export async function createInstantiator(options, swift) {
                 Converter,
                 HTTPServer,
                 TestServer,
+                Method: MethodValues,
+                LogLevel: LogLevelValues,
+                Port: PortValues,
+                SupportedMethod: SupportedMethodValues,
             };
             globalThis.Utils.Converter = exports.Converter;
             globalThis.Networking.API.HTTPServer = exports.HTTPServer;

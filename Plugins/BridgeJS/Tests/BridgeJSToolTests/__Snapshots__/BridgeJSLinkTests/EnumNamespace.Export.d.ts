@@ -4,49 +4,57 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export type MethodObject = typeof MethodValues;
+
+export type LogLevelObject = typeof LogLevelValues;
+
+export type PortObject = typeof PortValues;
+
+export type SupportedMethodObject = typeof SupportedMethodValues;
+
 export {};
 
 declare global {
     namespace Configuration {
-        const LogLevel: {
+        const LogLevelValues: {
             readonly Debug: "debug";
             readonly Info: "info";
             readonly Warning: "warning";
             readonly Error: "error";
         };
-        type LogLevel = typeof LogLevel[keyof typeof LogLevel];
-        const Port: {
+        type LogLevelTag = typeof LogLevelValues[keyof typeof LogLevelValues];
+        const PortValues: {
             readonly Http: 80;
             readonly Https: 443;
             readonly Development: 3000;
         };
-        type Port = typeof Port[keyof typeof Port];
+        type PortTag = typeof PortValues[keyof typeof PortValues];
     }
     namespace Networking {
         namespace API {
             class HTTPServer {
                 constructor();
-                call(method: Networking.API.Method): void;
+                call(method: Networking.API.MethodTag): void;
             }
-            const Method: {
+            const MethodValues: {
                 readonly Get: 0;
                 readonly Post: 1;
                 readonly Put: 2;
                 readonly Delete: 3;
             };
-            type Method = typeof Method[keyof typeof Method];
+            type MethodTag = typeof MethodValues[keyof typeof MethodValues];
         }
         namespace APIV2 {
             namespace Internal {
                 class TestServer {
                     constructor();
-                    call(method: Internal.SupportedMethod): void;
+                    call(method: Internal.SupportedMethodTag): void;
                 }
-                const SupportedMethod: {
+                const SupportedMethodValues: {
                     readonly Get: 0;
                     readonly Post: 1;
                 };
-                type SupportedMethod = typeof SupportedMethod[keyof typeof SupportedMethod];
+                type SupportedMethodTag = typeof SupportedMethodValues[keyof typeof SupportedMethodValues];
             }
         }
     }
@@ -69,10 +77,10 @@ export interface Converter extends SwiftHeapObject {
     toString(value: number): string;
 }
 export interface HTTPServer extends SwiftHeapObject {
-    call(method: Networking.API.Method): void;
+    call(method: Networking.API.MethodTag): void;
 }
 export interface TestServer extends SwiftHeapObject {
-    call(method: Internal.SupportedMethod): void;
+    call(method: Internal.SupportedMethodTag): void;
 }
 export type Exports = {
     Converter: {
@@ -84,6 +92,10 @@ export type Exports = {
     TestServer: {
         new(): TestServer;
     }
+    Method: MethodObject
+    LogLevel: LogLevelObject
+    Port: PortObject
+    SupportedMethod: SupportedMethodObject
 }
 export type Imports = {
 }

@@ -1,7 +1,7 @@
 // @ts-check
 
 import {
-    Direction, Status, Theme, HttpStatus, TSDirection, TSTheme, APIResult, ComplexResult, APIOptionalResult, StaticCalculator, StaticPropertyEnum
+    DirectionValues, StatusValues, ThemeValues, HttpStatusValues, TSDirection, TSTheme, APIResultValues, ComplexResultValues, APIOptionalResultValues, StaticCalculatorValues, StaticPropertyEnumValues
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
@@ -380,34 +380,35 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
         assert.fail("Expected no error");
     }
 
-    assert.equal(Direction.North, 0);
-    assert.equal(Direction.South, 1);
-    assert.equal(Direction.East, 2);
-    assert.equal(Direction.West, 3);
-    assert.equal(Status.Loading, 0);
-    assert.equal(Status.Success, 1);
-    assert.equal(Status.Error, 2);
+    // Test enums
+    assert.equal(exports.Direction.North, 0);
+    assert.equal(exports.Direction.South, 1);
+    assert.equal(exports.Direction.East, 2);
+    assert.equal(DirectionValues.West, 3);
+    assert.equal(exports.Status.Loading, 0);
+    assert.equal(exports.Status.Success, 1);
+    assert.equal(StatusValues.Error, 2);
 
-    assert.equal(exports.setDirection(Direction.North), Direction.North);
-    assert.equal(exports.setDirection(Direction.South), Direction.South);
-    assert.equal(exports.getDirection(), Direction.North);
-    assert.equal(exports.processDirection(Direction.North), Status.Success);
-    assert.equal(exports.processDirection(Direction.East), Status.Loading);
+    assert.equal(exports.setDirection(exports.Direction.North), DirectionValues.North);
+    assert.equal(exports.setDirection(exports.Direction.South), exports.Direction.South);
+    assert.equal(exports.getDirection(), exports.Direction.North);
+    assert.equal(exports.processDirection(exports.Direction.North), exports.Status.Success);
+    assert.equal(exports.processDirection(DirectionValues.East), StatusValues.Loading);
 
-    assert.equal(Theme.Light, "light");
-    assert.equal(Theme.Dark, "dark");
-    assert.equal(Theme.Auto, "auto");
-    assert.equal(HttpStatus.Ok, 200);
-    assert.equal(HttpStatus.NotFound, 404);
-    assert.equal(HttpStatus.ServerError, 500);
+    assert.equal(exports.Theme.Light, "light");
+    assert.equal(exports.Theme.Dark, "dark");
+    assert.equal(ThemeValues.Auto, "auto");
+    assert.equal(exports.HttpStatus.Ok, 200);
+    assert.equal(exports.HttpStatus.NotFound, 404);
+    assert.equal(HttpStatusValues.ServerError, 500);
 
-    assert.equal(exports.setTheme(Theme.Light), Theme.Light);
-    assert.equal(exports.setTheme(Theme.Dark), Theme.Dark);
-    assert.equal(exports.getTheme(), Theme.Light);
-    assert.equal(exports.setHttpStatus(HttpStatus.Ok), HttpStatus.Ok);
-    assert.equal(exports.getHttpStatus(), HttpStatus.Ok);
-    assert.equal(exports.processTheme(Theme.Light), HttpStatus.Ok);
-    assert.equal(exports.processTheme(Theme.Dark), HttpStatus.NotFound);
+    assert.equal(exports.setTheme(exports.Theme.Light), exports.Theme.Light);
+    assert.equal(exports.setTheme(exports.Theme.Dark), exports.Theme.Dark);
+    assert.equal(exports.getTheme(), ThemeValues.Light);
+    assert.equal(exports.setHttpStatus(exports.HttpStatus.Ok), HttpStatusValues.Ok);
+    assert.equal(exports.getHttpStatus(), exports.HttpStatus.Ok);
+    assert.equal(exports.processTheme(exports.Theme.Light), exports.HttpStatus.Ok);
+    assert.equal(exports.processTheme(exports.Theme.Dark), HttpStatusValues.NotFound);
 
     assert.equal(TSDirection.North, 0);
     assert.equal(TSDirection.South, 1);
@@ -422,28 +423,28 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.setTSTheme(TSTheme.Light), TSTheme.Light);
     assert.equal(exports.getTSTheme(), TSTheme.Light);
 
-    assert.equal(globalThis.Networking.API.Method.Get, 0);
-    assert.equal(globalThis.Networking.API.Method.Post, 1);
-    assert.equal(globalThis.Networking.API.Method.Put, 2);
-    assert.equal(globalThis.Networking.API.Method.Delete, 3);
-    assert.equal(globalThis.Configuration.LogLevel.Debug, "debug");
-    assert.equal(globalThis.Configuration.LogLevel.Info, "info");
-    assert.equal(globalThis.Configuration.LogLevel.Warning, "warning");
-    assert.equal(globalThis.Configuration.LogLevel.Error, "error");
-    assert.equal(globalThis.Configuration.Port.Http, 80);
-    assert.equal(globalThis.Configuration.Port.Https, 443);
-    assert.equal(globalThis.Configuration.Port.Development, 3000);
-    assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethod.Get, 0);
-    assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethod.Post, 1);
+    assert.equal(globalThis.Networking.API.MethodValues.Get, 0);
+    assert.equal(globalThis.Networking.API.MethodValues.Post, 1);
+    assert.equal(globalThis.Networking.API.MethodValues.Put, 2);
+    assert.equal(globalThis.Networking.API.MethodValues.Delete, 3);
+    assert.equal(globalThis.Configuration.LogLevelValues.Debug, "debug");
+    assert.equal(globalThis.Configuration.LogLevelValues.Info, "info");
+    assert.equal(globalThis.Configuration.LogLevelValues.Warning, "warning");
+    assert.equal(globalThis.Configuration.LogLevelValues.Error, "error");
+    assert.equal(globalThis.Configuration.PortValues.Http, 80);
+    assert.equal(globalThis.Configuration.PortValues.Https, 443);
+    assert.equal(globalThis.Configuration.PortValues.Development, 3000);
+    assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Get, 0);
+    assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Post, 1);
 
-    assert.equal(exports.roundtripNetworkingAPIMethod(globalThis.Networking.API.Method.Get), globalThis.Networking.API.Method.Get);
-    assert.equal(exports.roundtripConfigurationLogLevel(globalThis.Configuration.LogLevel.Debug), globalThis.Configuration.LogLevel.Debug);
-    assert.equal(exports.roundtripConfigurationPort(globalThis.Configuration.Port.Http), globalThis.Configuration.Port.Http);
-    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Debug), globalThis.Configuration.Port.Development);
-    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Info), globalThis.Configuration.Port.Http);
-    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Warning), globalThis.Configuration.Port.Https);
-    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevel.Error), globalThis.Configuration.Port.Development);
-    assert.equal(exports.roundtripInternalSupportedMethod(globalThis.Networking.APIV2.Internal.SupportedMethod.Get), globalThis.Networking.APIV2.Internal.SupportedMethod.Get);
+    assert.equal(exports.roundtripNetworkingAPIMethod(globalThis.Networking.API.MethodValues.Get), globalThis.Networking.API.MethodValues.Get);
+    assert.equal(exports.roundtripConfigurationLogLevel(globalThis.Configuration.LogLevelValues.Debug), globalThis.Configuration.LogLevelValues.Debug);
+    assert.equal(exports.roundtripConfigurationPort(globalThis.Configuration.PortValues.Http), globalThis.Configuration.PortValues.Http);
+    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevelValues.Debug), globalThis.Configuration.PortValues.Development);
+    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevelValues.Info), globalThis.Configuration.PortValues.Http);
+    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevelValues.Warning), globalThis.Configuration.PortValues.Https);
+    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevelValues.Error), globalThis.Configuration.PortValues.Development);
+    assert.equal(exports.roundtripInternalSupportedMethod(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Get), globalThis.Networking.APIV2.Internal.SupportedMethodValues.Get);
 
     const converter = new exports.Converter();
     assert.equal(converter.toString(42), "42");
@@ -451,13 +452,13 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     converter.release();
 
     const httpServer = new exports.HTTPServer();
-    httpServer.call(globalThis.Networking.API.Method.Get);
-    httpServer.call(globalThis.Networking.API.Method.Post);
+    httpServer.call(globalThis.Networking.API.MethodValues.Get);
+    httpServer.call(globalThis.Networking.API.MethodValues.Post);
     httpServer.release();
 
     const testServer = new exports.TestServer();
-    testServer.call(globalThis.Networking.APIV2.Internal.SupportedMethod.Get);
-    testServer.call(globalThis.Networking.APIV2.Internal.SupportedMethod.Post);
+    testServer.call(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Get);
+    testServer.call(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Post);
     testServer.release();
 
     const globalConverter = new globalThis.Utils.Converter();
@@ -465,48 +466,48 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     globalConverter.release();
 
     const globalHttpServer = new globalThis.Networking.API.HTTPServer();
-    globalHttpServer.call(globalThis.Networking.API.Method.Get);
+    globalHttpServer.call(globalThis.Networking.API.MethodValues.Get);
     globalHttpServer.release();
 
     const globalTestServer = new globalThis.Networking.APIV2.Internal.TestServer();
-    globalTestServer.call(globalThis.Networking.APIV2.Internal.SupportedMethod.Post);
+    globalTestServer.call(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Post);
     globalTestServer.release();
 
-    const s1 = { tag: APIResult.Tag.Success, param0: "Cześć 🙋‍♂️" };
-    const f1 = { tag: APIResult.Tag.Failure, param0: 42 };
-    const i1 = { tag: APIResult.Tag.Info };
+    const s1 = { tag: exports.APIResult.Tag.Success, param0: "Cześć 🙋‍♂️" };
+    const f1 = { tag: exports.APIResult.Tag.Failure, param0: 42 };
+    const i1 = { tag: APIResultValues.Tag.Info };
 
     assert.deepEqual(exports.roundtripAPIResult(s1), s1);
     assert.deepEqual(exports.roundtripAPIResult(f1), f1);
     assert.deepEqual(exports.roundtripAPIResult(i1), i1);
 
-    assert.deepEqual(exports.makeAPIResultSuccess("Test"), { tag: APIResult.Tag.Success, param0: "Test" });
-    assert.deepEqual(exports.makeAPIResultSuccess("ok"), { tag: APIResult.Tag.Success, param0: "ok" });
-    assert.deepEqual(exports.makeAPIResultFailure(123), { tag: APIResult.Tag.Failure, param0: 123 });
-    assert.deepEqual(exports.makeAPIResultInfo(), { tag: APIResult.Tag.Info });
+    assert.deepEqual(exports.makeAPIResultSuccess("Test"), { tag: exports.APIResult.Tag.Success, param0: "Test" });
+    assert.deepEqual(exports.makeAPIResultSuccess("ok"), { tag: exports.APIResult.Tag.Success, param0: "ok" });
+    assert.deepEqual(exports.makeAPIResultFailure(123), { tag: exports.APIResult.Tag.Failure, param0: 123 });
+    assert.deepEqual(exports.makeAPIResultInfo(), { tag: APIResultValues.Tag.Info });
 
-    const bTrue = { tag: APIResult.Tag.Flag, param0: true };
-    const bFalse = { tag: APIResult.Tag.Flag, param0: false };
+    const bTrue = { tag: exports.APIResult.Tag.Flag, param0: true };
+    const bFalse = { tag: exports.APIResult.Tag.Flag, param0: false };
     assert.deepEqual(exports.makeAPIResultFlag(true), bTrue);
     assert.deepEqual(exports.makeAPIResultFlag(false), bFalse);
 
     const rVal = 3.25;
-    const r1 = { tag: APIResult.Tag.Rate, param0: rVal };
+    const r1 = { tag: exports.APIResult.Tag.Rate, param0: rVal };
     assert.deepEqual(exports.roundtripAPIResult(r1), r1);
     assert.deepEqual(exports.makeAPIResultRate(rVal), r1);
 
     const pVal = 3.141592653589793;
-    const p1 = { tag: APIResult.Tag.Precise, param0: pVal };
+    const p1 = { tag: APIResultValues.Tag.Precise, param0: pVal };
     assert.deepEqual(exports.roundtripAPIResult(p1), p1);
     assert.deepEqual(exports.makeAPIResultPrecise(pVal), p1);
 
-    const cs1 = { tag: ComplexResult.Tag.Success, param0: "All good!" };
-    const ce1 = { tag: ComplexResult.Tag.Error, param0: "Network error", param1: 503 };
-    const cl1 = { tag: ComplexResult.Tag.Location, param0: 37.7749, param1: -122.4194, param2: "San Francisco" };
-    const cst1 = { tag: ComplexResult.Tag.Status, param0: true, param1: 200, param2: "OK" };
-    const cc1 = { tag: ComplexResult.Tag.Coordinates, param0: 10.5, param1: 20.3, param2: 30.7 };
-    const ccomp1 = { tag: ComplexResult.Tag.Comprehensive, param0: true, param1: false, param2: 42, param3: 100, param4: 3.14, param5: 2.718, param6: "Hello", param7: "World", param8: "Test" };
-    const ci1 = { tag: ComplexResult.Tag.Info };
+    const cs1 = { tag: exports.ComplexResult.Tag.Success, param0: "All good!" };
+    const ce1 = { tag: exports.ComplexResult.Tag.Error, param0: "Network error", param1: 503 };
+    const cl1 = { tag: exports.ComplexResult.Tag.Location, param0: 37.7749, param1: -122.4194, param2: "San Francisco" };
+    const cst1 = { tag: exports.ComplexResult.Tag.Status, param0: true, param1: 200, param2: "OK" };
+    const cc1 = { tag: exports.ComplexResult.Tag.Coordinates, param0: 10.5, param1: 20.3, param2: 30.7 };
+    const ccomp1 = { tag: ComplexResultValues.Tag.Comprehensive, param0: true, param1: false, param2: 42, param3: 100, param4: 3.14, param5: 2.718, param6: "Hello", param7: "World", param8: "Test" };
+    const ci1 = { tag: ComplexResultValues.Tag.Info };
 
     assert.deepEqual(exports.roundtripComplexResult(cs1), cs1);
     assert.deepEqual(exports.roundtripComplexResult(ce1), ce1);
@@ -516,35 +517,35 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.deepEqual(exports.roundtripComplexResult(ccomp1), ccomp1);
     assert.deepEqual(exports.roundtripComplexResult(ci1), ci1);
 
-    assert.deepEqual(exports.makeComplexResultSuccess("Great!"), { tag: ComplexResult.Tag.Success, param0: "Great!" });
-    assert.deepEqual(exports.makeComplexResultError("Timeout", 408), { tag: ComplexResult.Tag.Error, param0: "Timeout", param1: 408 });
-    assert.deepEqual(exports.makeComplexResultLocation(40.7128, -74.0060, "New York"), { tag: ComplexResult.Tag.Location, param0: 40.7128, param1: -74.0060, param2: "New York" });
-    assert.deepEqual(exports.makeComplexResultStatus(false, 500, "Internal Server Error"), { tag: ComplexResult.Tag.Status, param0: false, param1: 500, param2: "Internal Server Error" });
-    assert.deepEqual(exports.makeComplexResultCoordinates(1.1, 2.2, 3.3), { tag: ComplexResult.Tag.Coordinates, param0: 1.1, param1: 2.2, param2: 3.3 });
-    assert.deepEqual(exports.makeComplexResultComprehensive(true, false, 10, 20, 1.5, 2.5, "First", "Second", "Third"), { tag: ComplexResult.Tag.Comprehensive, param0: true, param1: false, param2: 10, param3: 20, param4: 1.5, param5: 2.5, param6: "First", param7: "Second", param8: "Third" });
-    assert.deepEqual(exports.makeComplexResultInfo(), { tag: ComplexResult.Tag.Info });
+    assert.deepEqual(exports.makeComplexResultSuccess("Great!"), { tag: exports.ComplexResult.Tag.Success, param0: "Great!" });
+    assert.deepEqual(exports.makeComplexResultError("Timeout", 408), { tag: exports.ComplexResult.Tag.Error, param0: "Timeout", param1: 408 });
+    assert.deepEqual(exports.makeComplexResultLocation(40.7128, -74.0060, "New York"), { tag: exports.ComplexResult.Tag.Location, param0: 40.7128, param1: -74.0060, param2: "New York" });
+    assert.deepEqual(exports.makeComplexResultStatus(false, 500, "Internal Server Error"), { tag: exports.ComplexResult.Tag.Status, param0: false, param1: 500, param2: "Internal Server Error" });
+    assert.deepEqual(exports.makeComplexResultCoordinates(1.1, 2.2, 3.3), { tag: exports.ComplexResult.Tag.Coordinates, param0: 1.1, param1: 2.2, param2: 3.3 });
+    assert.deepEqual(exports.makeComplexResultComprehensive(true, false, 10, 20, 1.5, 2.5, "First", "Second", "Third"), { tag: exports.ComplexResult.Tag.Comprehensive, param0: true, param1: false, param2: 10, param3: 20, param4: 1.5, param5: 2.5, param6: "First", param7: "Second", param8: "Third" });
+    assert.deepEqual(exports.makeComplexResultInfo(), { tag: exports.ComplexResult.Tag.Info });
 
-    const urSuccess = { tag: globalThis.Utilities.Result.Tag.Success, param0: "Utility operation completed" };
-    const urFailure = { tag: globalThis.Utilities.Result.Tag.Failure, param0: "Utility error occurred", param1: 500 };
-    const urStatus = { tag: globalThis.Utilities.Result.Tag.Status, param0: true, param1: 200, param2: "Utility status OK" };
+    const urSuccess = { tag: globalThis.Utilities.ResultValues.Tag.Success, param0: "Utility operation completed" };
+    const urFailure = { tag: globalThis.Utilities.ResultValues.Tag.Failure, param0: "Utility error occurred", param1: 500 };
+    const urStatus = { tag: globalThis.Utilities.ResultValues.Tag.Status, param0: true, param1: 200, param2: "Utility status OK" };
 
     assert.deepEqual(exports.roundtripUtilitiesResult(urSuccess), urSuccess);
     assert.deepEqual(exports.roundtripUtilitiesResult(urFailure), urFailure);
     assert.deepEqual(exports.roundtripUtilitiesResult(urStatus), urStatus);
 
-    assert.deepEqual(exports.makeUtilitiesResultSuccess("Test"), { tag: globalThis.Utilities.Result.Tag.Success, param0: "Test" });
-    assert.deepEqual(exports.makeUtilitiesResultSuccess("ok"), { tag: globalThis.Utilities.Result.Tag.Success, param0: "ok" });
-    assert.deepEqual(exports.makeUtilitiesResultFailure("Error", 123), { tag: globalThis.Utilities.Result.Tag.Failure, param0: "Error", param1: 123 });
-    assert.deepEqual(exports.makeUtilitiesResultStatus(true, 200, "OK"), { tag: globalThis.Utilities.Result.Tag.Status, param0: true, param1: 200, param2: "OK" });
+    assert.deepEqual(exports.makeUtilitiesResultSuccess("Test"), { tag: globalThis.Utilities.ResultValues.Tag.Success, param0: "Test" });
+    assert.deepEqual(exports.makeUtilitiesResultSuccess("ok"), { tag: globalThis.Utilities.ResultValues.Tag.Success, param0: "ok" });
+    assert.deepEqual(exports.makeUtilitiesResultFailure("Error", 123), { tag: globalThis.Utilities.ResultValues.Tag.Failure, param0: "Error", param1: 123 });
+    assert.deepEqual(exports.makeUtilitiesResultStatus(true, 200, "OK"), { tag: globalThis.Utilities.ResultValues.Tag.Status, param0: true, param1: 200, param2: "OK" });
 
-    const nrSuccess = { tag: globalThis.API.NetworkingResult.Tag.Success, param0: "Network request successful" };
-    const nrFailure = { tag: globalThis.API.NetworkingResult.Tag.Failure, param0: "Network timeout", param1: 408 };
+    const nrSuccess = { tag: globalThis.API.NetworkingResultValues.Tag.Success, param0: "Network request successful" };
+    const nrFailure = { tag: globalThis.API.NetworkingResultValues.Tag.Failure, param0: "Network timeout", param1: 408 };
 
     assert.deepEqual(exports.roundtripAPINetworkingResult(nrSuccess), nrSuccess);
     assert.deepEqual(exports.roundtripAPINetworkingResult(nrFailure), nrFailure);
 
-    assert.deepEqual(exports.makeAPINetworkingResultSuccess("Connected"), { tag: globalThis.API.NetworkingResult.Tag.Success, param0: "Connected" });
-    assert.deepEqual(exports.makeAPINetworkingResultFailure("Timeout", 408), { tag: globalThis.API.NetworkingResult.Tag.Failure, param0: "Timeout", param1: 408 });
+    assert.deepEqual(exports.makeAPINetworkingResultSuccess("Connected"), { tag: globalThis.API.NetworkingResultValues.Tag.Success, param0: "Connected" });
+    assert.deepEqual(exports.makeAPINetworkingResultFailure("Timeout", 408), { tag: globalThis.API.NetworkingResultValues.Tag.Failure, param0: "Timeout", param1: 408 });
 
     assert.equal(exports.roundTripOptionalString(null), null);
     assert.equal(exports.roundTripOptionalInt(null), null);
@@ -568,12 +569,12 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.roundTripOptionalWithSpaces(1.618), 1.618);
     assert.equal(exports.roundTripOptionalTypeAlias(null), null);
     assert.equal(exports.roundTripOptionalTypeAlias(25), 25);
-    assert.equal(exports.roundTripOptionalStatus(Status.Success), Status.Success);
-    assert.equal(exports.roundTripOptionalTheme(Theme.Light), Theme.Light);
-    assert.equal(exports.roundTripOptionalHttpStatus(HttpStatus.Ok), HttpStatus.Ok);
+    assert.equal(exports.roundTripOptionalStatus(exports.Status.Success), StatusValues.Success);
+    assert.equal(exports.roundTripOptionalTheme(exports.Theme.Light), ThemeValues.Light);
+    assert.equal(exports.roundTripOptionalHttpStatus(exports.HttpStatus.Ok), HttpStatusValues.Ok);
     assert.equal(exports.roundTripOptionalTSDirection(TSDirection.North), TSDirection.North);
     assert.equal(exports.roundTripOptionalTSTheme(TSTheme.Light), TSTheme.Light);
-    assert.equal(exports.roundTripOptionalNetworkingAPIMethod(globalThis.Networking.API.Method.Get), globalThis.Networking.API.Method.Get);
+    assert.equal(exports.roundTripOptionalNetworkingAPIMethod(globalThis.Networking.API.MethodValues.Get), globalThis.Networking.API.MethodValues.Get);
     assert.deepEqual(exports.roundTripOptionalAPIResult(p1), p1);
     assert.deepEqual(exports.roundTripOptionalComplexResult(cl1), cl1);
 
@@ -611,16 +612,16 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     testPropertyGreeter.release();
     optionalsHolder.release();
 
-    const aor1 = { tag: APIOptionalResult.Tag.Success, param0: "hello world" };
-    const aor2 = { tag: APIOptionalResult.Tag.Success, param0: null };
-    const aor3 = { tag: APIOptionalResult.Tag.Failure, param0: 404, param1: true };
-    const aor4 = { tag: APIOptionalResult.Tag.Failure, param0: 404, param1: null };
-    const aor5 = { tag: APIOptionalResult.Tag.Failure, param0: null, param1: null };
-    const aor6 = { tag: APIOptionalResult.Tag.Status, param0: true, param1: 200, param2: "OK" };
-    const aor7 = { tag: APIOptionalResult.Tag.Status, param0: true, param1: null, param2: "Partial" };
-    const aor8 = { tag: APIOptionalResult.Tag.Status, param0: null, param1: null, param2: "Zero" };
-    const aor9 = { tag: APIOptionalResult.Tag.Status, param0: false, param1: 500, param2: null };
-    const aor10 = { tag: APIOptionalResult.Tag.Status, param0: null, param1: 0, param2: "Zero" };
+    const aor1 = { tag: APIOptionalResultValues.Tag.Success, param0: "hello world" };
+    const aor2 = { tag: APIOptionalResultValues.Tag.Success, param0: null };
+    const aor3 = { tag: APIOptionalResultValues.Tag.Failure, param0: 404, param1: true };
+    const aor4 = { tag: APIOptionalResultValues.Tag.Failure, param0: 404, param1: null };
+    const aor5 = { tag: APIOptionalResultValues.Tag.Failure, param0: null, param1: null };
+    const aor6 = { tag: APIOptionalResultValues.Tag.Status, param0: true, param1: 200, param2: "OK" };
+    const aor7 = { tag: APIOptionalResultValues.Tag.Status, param0: true, param1: null, param2: "Partial" };
+    const aor8 = { tag: APIOptionalResultValues.Tag.Status, param0: null, param1: null, param2: "Zero" };
+    const aor9 = { tag: APIOptionalResultValues.Tag.Status, param0: false, param1: 500, param2: null };
+    const aor10 = { tag: APIOptionalResultValues.Tag.Status, param0: null, param1: 0, param2: "Zero" };
 
     assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor1), aor1);
     assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor2), aor2);
@@ -636,9 +637,10 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 
     assert.equal(exports.MathUtils.add(2147483647, 0), 2147483647);
     assert.equal(exports.StaticCalculator.roundtrip(42), 42);
-    assert.equal(StaticCalculator.Scientific, 0);
-    assert.equal(StaticCalculator.Basic, 1);
-
+    assert.equal(StaticCalculatorValues.Scientific, 0);
+    assert.equal(StaticCalculatorValues.Basic, 1);
+    assert.equal(StaticCalculatorValues.Scientific, exports.StaticCalculator.Scientific);
+    assert.equal(StaticCalculatorValues.Basic, exports.StaticCalculator.Basic);
     assert.equal(globalThis.StaticUtils.Nested.roundtrip("hello world"), "hello world");
 }
 
