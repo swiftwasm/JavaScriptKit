@@ -536,7 +536,7 @@ struct IntrinsicJSFragment: Sendable {
                             printer.write("\(caseName): \(index),")
                         }
                     }
-                    printer.write("}")
+                    printer.write("},")
                 }
                 printer.write("};")
                 printer.nextLine()

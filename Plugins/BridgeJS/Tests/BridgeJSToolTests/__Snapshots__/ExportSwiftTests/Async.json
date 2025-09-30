@@ -10,6 +10,7 @@
       "abiName" : "bjs_asyncReturnVoid",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncReturnVoid",
@@ -26,6 +27,7 @@
       "abiName" : "bjs_asyncRoundTripInt",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripInt",
@@ -50,6 +52,7 @@
       "abiName" : "bjs_asyncRoundTripString",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripString",
@@ -74,6 +77,7 @@
       "abiName" : "bjs_asyncRoundTripBool",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripBool",
@@ -98,6 +102,7 @@
       "abiName" : "bjs_asyncRoundTripFloat",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripFloat",
@@ -122,6 +127,7 @@
       "abiName" : "bjs_asyncRoundTripDouble",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripDouble",
@@ -146,6 +152,7 @@
       "abiName" : "bjs_asyncRoundTripJSObject",
       "effects" : {
         "isAsync" : true,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "asyncRoundTripJSObject",

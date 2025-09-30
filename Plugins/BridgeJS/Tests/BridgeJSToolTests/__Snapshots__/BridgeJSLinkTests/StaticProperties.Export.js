@@ -4,6 +4,11 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export const PropertyEnumValues = {
+    Value1: 0,
+    Value2: 1,
+};
+
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -142,16 +147,8 @@ export async function createInstantiator(options, swift) {
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
             }
-            importObject["TestModule"]["bjs_Greeter_wrap"] = function(pointer) {
-                const obj = Greeter.__construct(pointer);
-                return swift.memory.retain(obj);
-            };
-            importObject["TestModule"]["bjs_Converter_wrap"] = function(pointer) {
-                const obj = Converter.__construct(pointer);
-                return swift.memory.retain(obj);
-            };
-            importObject["TestModule"]["bjs_UUID_wrap"] = function(pointer) {
-                const obj = UUID.__construct(pointer);
+            importObject["TestModule"]["bjs_PropertyClass_wrap"] = function(pointer) {
+                const obj = PropertyClass.__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },
@@ -185,93 +182,153 @@ export async function createInstantiator(options, swift) {
                     this.deinit(this.pointer);
                 }
             }
-            class Greeter extends SwiftHeapObject {
+            class PropertyClass extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Greeter_deinit, Greeter.prototype);
-                }
-            
-                constructor(name) {
-                    const nameBytes = textEncoder.encode(name);
-                    const nameId = swift.memory.retain(nameBytes);
-                    const ret = instance.exports.bjs_Greeter_init(nameId, nameBytes.length);
-                    swift.memory.release(nameId);
-                    return Greeter.__construct(ret);
-                }
-                greet() {
-                    instance.exports.bjs_Greeter_greet(this.pointer);
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    return ret;
-                }
-            }
-            class Converter extends SwiftHeapObject {
-                static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Converter_deinit, Converter.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PropertyClass_deinit, PropertyClass.prototype);
                 }
             
                 constructor() {
-                    const ret = instance.exports.bjs_Converter_init();
-                    return Converter.__construct(ret);
+                    const ret = instance.exports.bjs_PropertyClass_init();
+                    return PropertyClass.__construct(ret);
                 }
-                toString(value) {
-                    instance.exports.bjs_Converter_toString(this.pointer, value);
+                static get staticConstant() {
+                    instance.exports.bjs_PropertyClass_static_staticConstant_get();
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;
                 }
-            }
-            class UUID extends SwiftHeapObject {
-                static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_UUID_deinit, UUID.prototype);
-                }
-            
-                uuidString() {
-                    instance.exports.bjs_UUID_uuidString(this.pointer);
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
+                static get staticVariable() {
+                    const ret = instance.exports.bjs_PropertyClass_static_staticVariable_get();
                     return ret;
                 }
-            }
-            if (typeof globalThis.MyModule === 'undefined') {
-                globalThis.MyModule = {};
-            }
-            if (typeof globalThis.MyModule.Utils === 'undefined') {
-                globalThis.MyModule.Utils = {};
-            }
-            if (typeof globalThis.Utils === 'undefined') {
-                globalThis.Utils = {};
-            }
-            if (typeof globalThis.Utils.Converters === 'undefined') {
-                globalThis.Utils.Converters = {};
-            }
-            if (typeof globalThis.__Swift === 'undefined') {
-                globalThis.__Swift = {};
-            }
-            if (typeof globalThis.__Swift.Foundation === 'undefined') {
-                globalThis.__Swift.Foundation = {};
-            }
-            const exports = {
-                Greeter,
-                Converter,
-                UUID,
-                plainFunction: function bjs_plainFunction() {
-                    instance.exports.bjs_plainFunction();
+                static set staticVariable(value) {
+                    instance.exports.bjs_PropertyClass_static_staticVariable_set(value);
+                }
+                static get jsObjectProperty() {
+                    const ret = instance.exports.bjs_PropertyClass_static_jsObjectProperty_get();
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
+                }
+                static set jsObjectProperty(value) {
+                    instance.exports.bjs_PropertyClass_static_jsObjectProperty_set(swift.memory.retain(value));
+                }
+                static get classVariable() {
+                    instance.exports.bjs_PropertyClass_static_classVariable_get();
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;
-                },
-                namespacedFunction: function bjs_MyModule_Utils_namespacedFunction() {
-                    instance.exports.bjs_MyModule_Utils_namespacedFunction();
+                }
+                static set classVariable(value) {
+                    const valueBytes = textEncoder.encode(value);
+                    const valueId = swift.memory.retain(valueBytes);
+                    instance.exports.bjs_PropertyClass_static_classVariable_set(valueId, valueBytes.length);
+                    swift.memory.release(valueId);
+                }
+                static get computedProperty() {
+                    instance.exports.bjs_PropertyClass_static_computedProperty_get();
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;
+                }
+                static set computedProperty(value) {
+                    const valueBytes = textEncoder.encode(value);
+                    const valueId = swift.memory.retain(valueBytes);
+                    instance.exports.bjs_PropertyClass_static_computedProperty_set(valueId, valueBytes.length);
+                    swift.memory.release(valueId);
+                }
+                static get readOnlyComputed() {
+                    const ret = instance.exports.bjs_PropertyClass_static_readOnlyComputed_get();
+                    return ret;
+                }
+                static get optionalProperty() {
+                    instance.exports.bjs_PropertyClass_static_optionalProperty_get();
+                    const optResult = tmpRetString;
+                    tmpRetString = undefined;
+                    return optResult;
+                }
+                static set optionalProperty(value) {
+                    const isSome = value != null;
+                    let valueId, valueBytes;
+                    if (isSome) {
+                        valueBytes = textEncoder.encode(value);
+                        valueId = swift.memory.retain(valueBytes);
+                    }
+                    instance.exports.bjs_PropertyClass_static_optionalProperty_set(+isSome, isSome ? valueId : 0, isSome ? valueBytes.length : 0);
+                    if (valueId != undefined) {
+                        swift.memory.release(valueId);
+                    }
+                }
+            }
+            Object.defineProperty(globalThis.PropertyNamespace, 'namespaceProperty', { get: function() {
+                instance.exports.bjs_PropertyNamespace_static_namespaceProperty_get();
+                const ret = tmpRetString;
+                tmpRetString = undefined;
+                return ret;
+            }, set: function(value) {
+                const valueBytes = textEncoder.encode(value);
+                const valueId = swift.memory.retain(valueBytes);
+                instance.exports.bjs_PropertyNamespace_static_namespaceProperty_set(valueId, valueBytes.length);
+                swift.memory.release(valueId);
+            } });
+            Object.defineProperty(globalThis.PropertyNamespace, 'namespaceConstant', { get: function() {
+                instance.exports.bjs_PropertyNamespace_static_namespaceConstant_get();
+                const ret = tmpRetString;
+                tmpRetString = undefined;
+                return ret;
+            } });
+            Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedProperty', { get: function() {
+                const ret = instance.exports.bjs_PropertyNamespace_Nested_static_nestedProperty_get();
+                return ret;
+            }, set: function(value) {
+                instance.exports.bjs_PropertyNamespace_Nested_static_nestedProperty_set(value);
+            } });
+            Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedConstant', { get: function() {
+                instance.exports.bjs_PropertyNamespace_Nested_static_nestedConstant_get();
+                const ret = tmpRetString;
+                tmpRetString = undefined;
+                return ret;
+            } });
+            Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedDouble', { get: function() {
+                const ret = instance.exports.bjs_PropertyNamespace_Nested_static_nestedDouble_get();
+                return ret;
+            }, set: function(value) {
+                instance.exports.bjs_PropertyNamespace_Nested_static_nestedDouble_set(value);
+            } });
+            return {
+                PropertyClass,
+                PropertyEnum: {
+                    ...PropertyEnumValues,
+                    get enumProperty() {
+                        instance.exports.bjs_PropertyEnum_static_enumProperty_get();
+                        const ret = tmpRetString;
+                        tmpRetString = undefined;
+                        return ret;
+                    },
+                    set enumProperty(value) {
+                        const valueBytes = textEncoder.encode(value);
+                        const valueId = swift.memory.retain(valueBytes);
+                        instance.exports.bjs_PropertyEnum_static_enumProperty_set(valueId, valueBytes.length);
+                        swift.memory.release(valueId);
+                    },
+                    get enumConstant() {
+                        const ret = instance.exports.bjs_PropertyEnum_static_enumConstant_get();
+                        return ret;
+                    },
+                    get computedEnum() {
+                        instance.exports.bjs_PropertyEnum_static_computedEnum_get();
+                        const ret = tmpRetString;
+                        tmpRetString = undefined;
+                        return ret;
+                    },
+                    set computedEnum(value) {
+                        const valueBytes = textEncoder.encode(value);
+                        const valueId = swift.memory.retain(valueBytes);
+                        instance.exports.bjs_PropertyEnum_static_computedEnum_set(valueId, valueBytes.length);
+                        swift.memory.release(valueId);
+                    }
                 },
             };
-            globalThis.__Swift.Foundation.Greeter = exports.Greeter;
-            globalThis.Utils.Converters.Converter = exports.Converter;
-            globalThis.__Swift.Foundation.UUID = exports.UUID;
-            globalThis.MyModule.Utils.namespacedFunction = exports.namespacedFunction;
-            return exports;
         },
     }
 }

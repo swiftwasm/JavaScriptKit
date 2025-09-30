@@ -13,6 +13,12 @@ BridgeJS supports two output styles for enums, controlled by the `enumStyle` par
 
 Examples output of both styles can be found below.
 
+BridgeJS generates separate objects with descriptive naming for `.const` enums:
+
+- **`EnumNameValues`**: Contains the enum case constants for all enums
+- **`EnumNameTag`**: Represents the union type for enums
+- **`EnumNameObject`**: Object type for all const-style enums, contains static members for enums with methods/properties or references the values type for simple enums
+
 #### Case Enums
 
 **Swift Definition:**
@@ -43,50 +49,50 @@ Examples output of both styles can be found below.
 
 ```typescript
 // Const object style (default)
-const Direction: {
+export const DirectionValues: {
     readonly North: 0;
     readonly South: 1;
     readonly East: 2;
     readonly West: 3;
 };
-type Direction = typeof Direction[keyof typeof Direction];
+export type DirectionTag = typeof DirectionValues[keyof typeof DirectionValues];
 
 // Native TypeScript enum style
-enum TSDirection {
+export enum TSDirection {
     North = 0,
     South = 1,
     East = 2,
     West = 3,
 }
 
-const Status: {
+export const StatusValues: {
     readonly Loading: 0;
     readonly Success: 1;
     readonly Error: 2;
 };
-type Status = typeof Status[keyof typeof Status];
+export type StatusTag = typeof StatusValues[keyof typeof StatusValues];
 ```
 
 **Usage in TypeScript:**
 
 ```typescript
-const direction: Direction = exports.Direction.North;
-const tsDirection: TSDirection = exports.TSDirection.North;
-const status: Status = exports.Status.Loading;
+const direction: DirectionTag = DirectionValues.North;
+const tsDirection: TSDirection = TSDirection.North;
+const status: StatusTag = StatusValues.Loading;
 
-exports.setDirection(exports.Direction.South);
-exports.setTSDirection(exports.TSDirection.East);
-const currentDirection: Direction = exports.getDirection();
+exports.setDirection(DirectionValues.South);
+exports.setTSDirection(TSDirection.East);
+const currentDirection: DirectionTag = exports.getDirection();
 const currentTSDirection: TSDirection = exports.getTSDirection();
 
-const result: Status = exports.processDirection(exports.Direction.East);
+const result: StatusTag = exports.processDirection(DirectionValues.East);
 
-function handleDirection(direction: Direction) {
+function handleDirection(direction: DirectionTag) {
     switch (direction) {
-        case exports.Direction.North:
+        case DirectionValues.North:
             console.log("Going north");
             break;
-        case exports.Direction.South:
+        case DirectionValues.South:
             console.log("Going south");
             break;
         // TypeScript will warn about missing cases
@@ -175,15 +181,15 @@ public func _bjs_getDirection() -> Int32 {
 
 ```typescript
 // Const object style (default)
-const Theme: {
+export const ThemeValues: {
     readonly Light: "light";
     readonly Dark: "dark";
     readonly Auto: "auto";
 };
-type Theme = typeof Theme[keyof typeof Theme];
+export type ThemeTag = typeof ThemeValues[keyof typeof ThemeValues];
 
 // Native TypeScript enum style
-enum TSTheme {
+export enum TSTheme {
     Light = "light",
     Dark = "dark",
     Auto = "auto",
@@ -193,14 +199,14 @@ enum TSTheme {
 **Usage in TypeScript:**
 
 ```typescript
-// Both styles work similarly in usage
-const theme: Theme = exports.Theme.Dark;
-const tsTheme: TSTheme = exports.TSTheme.Dark;
+// Raw value enums work similarly to case enums
+const theme: ThemeTag = ThemeValues.Dark;
+const tsTheme: TSTheme = TSTheme.Dark;
 
-exports.setTheme(exports.Theme.Light);
-const currentTheme: Theme = exports.getTheme();
+exports.setTheme(ThemeValues.Light);
+const currentTheme: ThemeTag = exports.getTheme();
 
-const status: HttpStatus = exports.processTheme(exports.Theme.Auto);
+const status: HttpStatusTag = exports.processTheme(ThemeValues.Auto);
 ```
 
 ##### Integer Raw Values
@@ -235,41 +241,41 @@ const status: HttpStatus = exports.processTheme(exports.Theme.Auto);
 
 ```typescript
 // Const object style (default)
-const HttpStatus: {
+export const HttpStatusValues: {
     readonly Ok: 200;
     readonly NotFound: 404;
     readonly ServerError: 500;
 };
-type HttpStatus = typeof HttpStatus[keyof typeof HttpStatus];
+export type HttpStatusTag = typeof HttpStatusValues[keyof typeof HttpStatusValues];
 
 // Native TypeScript enum style
-enum TSHttpStatus {
+export enum TSHttpStatus {
     Ok = 200,
     NotFound = 404,
     ServerError = 500,
 }
 
-const Priority: {
+export const PriorityValues: {
     readonly Lowest: 1;
     readonly Low: 2;
     readonly Medium: 3;
     readonly High: 4;
     readonly Highest: 5;
 };
-type Priority = typeof Priority[keyof typeof Priority];
+export type PriorityTag = typeof PriorityValues[keyof typeof PriorityValues];
 ```
 
 **Usage in TypeScript:**
 
 ```typescript
-const status: HttpStatus = exports.HttpStatus.Ok;
-const tsStatus: TSHttpStatus = exports.TSHttpStatus.Ok;
-const priority: Priority = exports.Priority.High;
+const status: HttpStatusTag = HttpStatusValues.Ok;
+const tsStatus: TSHttpStatus = TSHttpStatus.Ok;
+const priority: PriorityTag = PriorityValues.High;
 
-exports.setHttpStatus(exports.HttpStatus.NotFound);
-exports.setPriority(exports.Priority.Medium);
+exports.setHttpStatus(HttpStatusValues.NotFound);
+exports.setPriority(PriorityValues.Medium);
 
-const convertedPriority: Priority = exports.convertPriority(exports.HttpStatus.Ok);
+const convertedPriority: PriorityTag = exports.convertPriority(HttpStatusValues.Ok);
 ```
 
 ### Namespace Enums
@@ -333,25 +339,25 @@ declare global {
         namespace API {
             class HTTPServer {
                 constructor();
-                call(method: Networking.API.Method): void;
+                call(method: Networking.API.MethodTag): void;
             }
-            const Method: {
+            const MethodValues: {
                 readonly Get: 0;
                 readonly Post: 1;
             };
-            type Method = typeof Method[keyof typeof Method];
+            type MethodTag = typeof MethodValues[keyof typeof MethodValues];
         }
         namespace APIV2 {
             namespace Internal {
                 class TestServer {
                     constructor();
-                    call(method: Internal.SupportedMethod): void;
+                    call(method: Internal.SupportedMethodTag): void;
                 }
-                const SupportedMethod: {
+                const SupportedMethodValues: {
                     readonly Get: 0;
                     readonly Post: 1;
                 };
-                type SupportedMethod = typeof SupportedMethod[keyof typeof SupportedMethod];
+                type SupportedMethodTag = typeof SupportedMethodValues[keyof typeof SupportedMethodValues];
             }
         }
     }
@@ -361,16 +367,16 @@ declare global {
 **Usage in TypeScript:**
 
 ```typescript
-// Access nested classes through namespaces
-const converter = new globalThis.Utils.Converter();
+// Access nested classes through namespaces (no globalThis prefix needed)
+const converter = new Utils.Converter();
 const result: string = converter.toString(42)
 
-const server = new globalThis.Networking.API.HTTPServer();
-const method: Networking.API.Method = globalThis.Networking.API.Method.Get;
+const server = new Networking.API.HTTPServer();
+const method: Networking.API.MethodTag = Networking.API.MethodValues.Get;
 server.call(method)
 
-const testServer = new globalThis.Networking.APIV2.Internal.TestServer();
-const supportedMethod: Internal.SupportedMethod = globalThis.Networking.APIV2.Internal.SupportedMethod.Post;
+const testServer = new Networking.APIV2.Internal.TestServer();
+const supportedMethod: Internal.SupportedMethodTag = Networking.APIV2.Internal.SupportedMethodValues.Post;
 testServer.call(supportedMethod);
 ```
 
@@ -437,7 +443,7 @@ enum ComplexResult {
 **Generated TypeScript Declaration:**
 
 ```typescript
-export const APIResult: {
+export const APIResultValues: {
     readonly Tag: {
         readonly Success: 0;
         readonly Failure: 1;
@@ -448,15 +454,15 @@ export const APIResult: {
     };
 };
 
-export type APIResult =
-  { tag: typeof APIResult.Tag.Success; param0: string } | 
-  { tag: typeof APIResult.Tag.Failure; param0: number } | 
-  { tag: typeof APIResult.Tag.Flag; param0: boolean } | 
-  { tag: typeof APIResult.Tag.Rate; param0: number } | 
-  { tag: typeof APIResult.Tag.Precise; param0: number } | 
-  { tag: typeof APIResult.Tag.Info }
+export type APIResultTag =
+  { tag: typeof APIResultValues.Tag.Success; param0: string } |
+  { tag: typeof APIResultValues.Tag.Failure; param0: number } |
+  { tag: typeof APIResultValues.Tag.Flag; param0: boolean } |
+  { tag: typeof APIResultValues.Tag.Rate; param0: number } |
+  { tag: typeof APIResultValues.Tag.Precise; param0: number } |
+  { tag: typeof APIResultValues.Tag.Info }
 
-export const ComplexResult: {
+export const ComplexResultValues: {
     readonly Tag: {
         readonly Success: 0;
         readonly Error: 1;
@@ -467,31 +473,31 @@ export const ComplexResult: {
     };
 };
 
-export type ComplexResult =
-  { tag: typeof ComplexResult.Tag.Success; param0: string } | 
-  { tag: typeof ComplexResult.Tag.Error; param0: string; param1: number } | 
-  { tag: typeof ComplexResult.Tag.Status; param0: boolean; param1: number; param2: string } | 
-  { tag: typeof ComplexResult.Tag.Coordinates; param0: number; param1: number; param2: number } | 
-  { tag: typeof ComplexResult.Tag.Comprehensive; param0: boolean; param1: boolean; param2: number; param3: number; param4: number; param5: number; param6: string; param7: string; param8: string } | 
-  { tag: typeof ComplexResult.Tag.Info }
+export type ComplexResultTag =
+  { tag: typeof ComplexResultValues.Tag.Success; param0: string } |
+  { tag: typeof ComplexResultValues.Tag.Error; param0: string; param1: number } |
+  { tag: typeof ComplexResultValues.Tag.Status; param0: boolean; param1: number; param2: string } |
+  { tag: typeof ComplexResultValues.Tag.Coordinates; param0: number; param1: number; param2: number } |
+  { tag: typeof ComplexResultValues.Tag.Comprehensive; param0: boolean; param1: boolean; param2: number; param3: number; param4: number; param5: number; param6: string; param7: string; param8: string } |
+  { tag: typeof ComplexResultValues.Tag.Info }
 ```
 
 **Usage in TypeScript:**
 
 ```typescript
-const successResult: APIResult = { 
-    tag: exports.APIResult.Tag.Success, 
-    param0: "Operation completed successfully" 
+const successResult: APIResultTag = {
+    tag: APIResultValues.Tag.Success,
+    param0: "Operation completed successfully"
 };
 
-const errorResult: ComplexResult = {
-    tag: exports.ComplexResult.Tag.Error,
+const errorResult: ComplexResultTag = {
+    tag: ComplexResultValues.Tag.Error,
     param0: "Network timeout",
     param1: 503
 };
 
-const statusResult: ComplexResult = {
-    tag: exports.ComplexResult.Tag.Status,
+const statusResult: ComplexResultTag = {
+    tag: ComplexResultValues.Tag.Status,
     param0: true,
     param1: 200,
     param2: "OK"
@@ -500,21 +506,21 @@ const statusResult: ComplexResult = {
 exports.handle(successResult);
 exports.handle(errorResult);
 
-const result: APIResult = exports.getResult();
+const result: APIResultTag = exports.getResult();
 
 // Pattern matching with discriminated unions
-function processResult(result: APIResult) {
+function processResult(result: APIResultTag) {
     switch (result.tag) {
-        case exports.APIResult.Tag.Success:
+        case APIResultValues.Tag.Success:
             console.log("Success:", result.param0); // TypeScript knows param0 is string
             break;
-        case exports.APIResult.Tag.Failure:
+        case APIResultValues.Tag.Failure:
             console.log("Failure code:", result.param0); // TypeScript knows param0 is number
             break;
-        case exports.APIResult.Tag.Flag:
+        case APIResultValues.Tag.Flag:
             console.log("Flag value:", result.param0); // TypeScript knows param0 is boolean
             break;
-        case exports.APIResult.Tag.Info:
+        case APIResultValues.Tag.Info:
             console.log("Info case has no associated data");
             break;
         // TypeScript will warn about missing cases

@@ -10,6 +10,7 @@
       "abiName" : "bjs_checkString",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "checkString",
@@ -34,6 +35,7 @@
       "abiName" : "bjs_roundtripString",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundtripString",

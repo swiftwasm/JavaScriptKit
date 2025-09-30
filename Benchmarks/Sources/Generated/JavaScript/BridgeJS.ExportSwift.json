@@ -5,6 +5,7 @@
         "abiName" : "bjs_EnumRoundtrip_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -16,6 +17,7 @@
           "abiName" : "bjs_EnumRoundtrip_take",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "take",
@@ -40,6 +42,7 @@
           "abiName" : "bjs_EnumRoundtrip_makeSuccess",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "makeSuccess",
@@ -56,6 +59,7 @@
           "abiName" : "bjs_EnumRoundtrip_makeFailure",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "makeFailure",
@@ -72,6 +76,7 @@
           "abiName" : "bjs_EnumRoundtrip_makeFlag",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "makeFlag",
@@ -88,6 +93,7 @@
           "abiName" : "bjs_EnumRoundtrip_makeRate",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "makeRate",
@@ -104,6 +110,7 @@
           "abiName" : "bjs_EnumRoundtrip_makePrecise",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "makePrecise",
@@ -120,6 +127,7 @@
           "abiName" : "bjs_EnumRoundtrip_makeInfo",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "makeInfo",
@@ -136,6 +144,7 @@
           "abiName" : "bjs_EnumRoundtrip_roundtrip",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "roundtrip",
@@ -168,6 +177,7 @@
         "abiName" : "bjs_ComplexResultRoundtrip_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -179,6 +189,7 @@
           "abiName" : "bjs_ComplexResultRoundtrip_take",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "take",
@@ -203,6 +214,7 @@
           "abiName" : "bjs_ComplexResultRoundtrip_makeSuccess",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "makeSuccess",
@@ -219,6 +231,7 @@
           "abiName" : "bjs_ComplexResultRoundtrip_makeError",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "makeError",
@@ -235,6 +248,7 @@
           "abiName" : "bjs_ComplexResultRoundtrip_makeLocation",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "makeLocation",
@@ -251,6 +265,7 @@
           "abiName" : "bjs_ComplexResultRoundtrip_makeStatus",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "makeStatus",
@@ -267,6 +282,7 @@
           "abiName" : "bjs_ComplexResultRoundtrip_makeCoordinates",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "makeCoordinates",
@@ -283,6 +299,7 @@
           "abiName" : "bjs_ComplexResultRoundtrip_makeComprehensive",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "makeComprehensive",
@@ -299,6 +316,7 @@
           "abiName" : "bjs_ComplexResultRoundtrip_makeInfo",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "makeInfo",
@@ -315,6 +333,7 @@
           "abiName" : "bjs_ComplexResultRoundtrip_roundtrip",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "roundtrip",
@@ -347,6 +366,7 @@
         "abiName" : "bjs_StringRoundtrip_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -358,6 +378,7 @@
           "abiName" : "bjs_StringRoundtrip_take",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "take",
@@ -382,6 +403,7 @@
           "abiName" : "bjs_StringRoundtrip_make",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "make",
@@ -474,6 +496,12 @@
       ],
       "emitStyle" : "const",
       "name" : "APIResult",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "APIResult"
     },
     {
@@ -664,6 +692,12 @@
       ],
       "emitStyle" : "const",
       "name" : "ComplexResult",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "ComplexResult"
     }
   ],
@@ -672,6 +706,7 @@
       "abiName" : "bjs_run",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "run",

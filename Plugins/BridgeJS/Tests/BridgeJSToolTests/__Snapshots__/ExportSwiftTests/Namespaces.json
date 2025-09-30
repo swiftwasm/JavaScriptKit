@@ -5,6 +5,7 @@
         "abiName" : "bjs_Greeter_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -24,6 +25,7 @@
           "abiName" : "bjs_Greeter_greet",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "greet",
@@ -52,6 +54,7 @@
         "abiName" : "bjs_Converter_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -63,6 +66,7 @@
           "abiName" : "bjs_Converter_toString",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "toString",
@@ -100,6 +104,7 @@
           "abiName" : "bjs_UUID_uuidString",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "uuidString",
@@ -132,6 +137,7 @@
       "abiName" : "bjs_plainFunction",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "plainFunction",
@@ -145,9 +151,10 @@
       }
     },
     {
-      "abiName" : "bjs_namespacedFunction",
+      "abiName" : "bjs_MyModule_Utils_namespacedFunction",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "namespacedFunction",

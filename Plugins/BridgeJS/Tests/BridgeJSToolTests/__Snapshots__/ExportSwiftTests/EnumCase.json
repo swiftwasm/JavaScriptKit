@@ -32,6 +32,12 @@
       ],
       "emitStyle" : "const",
       "name" : "Direction",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Direction"
     },
     {
@@ -57,6 +63,12 @@
       ],
       "emitStyle" : "const",
       "name" : "Status",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "Status"
     },
     {
@@ -88,6 +100,12 @@
       ],
       "emitStyle" : "tsEnum",
       "name" : "TSDirection",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "TSDirection"
     },
     {
@@ -102,6 +120,12 @@
       "emitStyle" : "const",
       "explicitAccessControl" : "public",
       "name" : "PublicStatus",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
       "swiftCallName" : "PublicStatus"
     }
   ],
@@ -110,6 +134,7 @@
       "abiName" : "bjs_setDirection",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setDirection",
@@ -134,6 +159,7 @@
       "abiName" : "bjs_getDirection",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getDirection",
@@ -150,6 +176,7 @@
       "abiName" : "bjs_processDirection",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "processDirection",
@@ -174,6 +201,7 @@
       "abiName" : "bjs_roundTripOptionalDirection",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalDirection",
@@ -206,6 +234,7 @@
       "abiName" : "bjs_setTSDirection",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "setTSDirection",
@@ -230,6 +259,7 @@
       "abiName" : "bjs_getTSDirection",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "getTSDirection",
@@ -246,6 +276,7 @@
       "abiName" : "bjs_roundTripOptionalTSDirection",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "roundTripOptionalTSDirection",

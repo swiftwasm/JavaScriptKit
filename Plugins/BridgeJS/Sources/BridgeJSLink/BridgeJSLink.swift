@@ -76,6 +76,7 @@ struct BridgeJSLink {
         var topLevelEnumLines: [String] = []
         var topLevelDtsEnumLines: [String] = []
         var importObjectBuilders: [ImportObjectBuilder] = []
+        var enumStaticAssignments: [String] = []
     }
 
     private func collectLinkData() throws -> LinkData {
@@ -147,7 +148,11 @@ struct BridgeJSLink {
             for function in skeleton.functions {
                 var (js, dts) = try renderExportedFunction(function: function)
 
-                if function.namespace != nil {
+                if function.effects.isStatic,
+                    case .namespaceEnum = function.staticContext
+                {
+                    data.namespacedFunctions.append(function)
+                } else if function.namespace != nil {
                     data.namespacedFunctions.append(function)
                 }
 
@@ -155,6 +160,129 @@ struct BridgeJSLink {
                 js[js.count - 1] += ","
                 data.exportsLines.append(contentsOf: js)
                 data.dtsExportLines.append(contentsOf: dts)
+            }
+
+            for enumDefinition in skeleton.enums where enumDefinition.enumType == .namespace {
+                for function in enumDefinition.staticMethods {
+                    // Create namespace function with full namespace path (parent namespace + enum name)
+                    var functionWithNamespace = function
+                    let fullNamespace = (enumDefinition.namespace ?? []) + [enumDefinition.name]
+                    functionWithNamespace.namespace = fullNamespace
+                    data.namespacedFunctions.append(functionWithNamespace)
+
+                    var (js, dts) = try renderExportedFunction(function: functionWithNamespace)
+                    js[0] = "\(functionWithNamespace.name): " + js[0]
+                    js[js.count - 1] += ","
+                    data.exportsLines.append(contentsOf: js)
+                    data.dtsExportLines.append(contentsOf: dts)
+                }
+
+                for property in enumDefinition.staticProperties {
+                    let fullNamespace = (enumDefinition.namespace ?? []) + [enumDefinition.name]
+                    let namespacePath = fullNamespace.joined(separator: ".")
+                    let (propJs, _) = try renderNamespaceStaticProperty(
+                        property: property,
+                        namespacePath: namespacePath
+                    )
+                    data.enumStaticAssignments.append(contentsOf: propJs)
+                }
+            }
+
+            for enumDefinition in skeleton.enums
+            where enumDefinition.enumType != .namespace && enumDefinition.emitStyle != .tsEnum {
+                let enumExportPrinter = CodeFragmentPrinter()
+                let enumValuesName = "\(enumDefinition.name)Values"
+
+                for function in enumDefinition.staticMethods {
+                    let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
+                    for param in function.parameters {
+                        try thunkBuilder.lowerParameter(param: param)
+                    }
+                    let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
+
+                    let methodPrinter = CodeFragmentPrinter()
+                    methodPrinter.write(
+                        "\(function.name): function(\(function.parameters.map { $0.name }.joined(separator: ", "))) {"
+                    )
+                    methodPrinter.indent {
+                        methodPrinter.write(contentsOf: thunkBuilder.body)
+                        methodPrinter.write(contentsOf: thunkBuilder.cleanupCode)
+                        methodPrinter.write(lines: thunkBuilder.checkExceptionLines())
+                        if let returnExpr = returnExpr {
+                            methodPrinter.write("return \(returnExpr);")
+                        }
+                    }
+                    methodPrinter.write("},")
+
+                    enumExportPrinter.write(lines: methodPrinter.lines)
+                }
+
+                let enumExportLines = enumExportPrinter.lines
+
+                let enumPropertyPrinter = CodeFragmentPrinter()
+
+                for property in enumDefinition.staticProperties {
+                    let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+                    let getterReturnExpr = try getterThunkBuilder.call(
+                        abiName: property.getterAbiName(),
+                        returnType: property.type
+                    )
+
+                    enumPropertyPrinter.write("get \(property.name)() {")
+                    enumPropertyPrinter.indent {
+                        enumPropertyPrinter.write(contentsOf: getterThunkBuilder.body)
+                        enumPropertyPrinter.write(contentsOf: getterThunkBuilder.cleanupCode)
+                        enumPropertyPrinter.write(lines: getterThunkBuilder.checkExceptionLines())
+                        if let returnExpr = getterReturnExpr {
+                            enumPropertyPrinter.write("return \(returnExpr);")
+                        }
+                    }
+                    enumPropertyPrinter.write("},")
+
+                    if !property.isReadonly {
+                        let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+                        try setterThunkBuilder.lowerParameter(
+                            param: Parameter(label: "value", name: "value", type: property.type)
+                        )
+                        _ = try setterThunkBuilder.call(
+                            abiName: property.setterAbiName(),
+                            returnType: .void
+                        )
+
+                        enumPropertyPrinter.write("set \(property.name)(value) {")
+                        enumPropertyPrinter.indent {
+                            enumPropertyPrinter.write(contentsOf: setterThunkBuilder.body)
+                            enumPropertyPrinter.write(contentsOf: setterThunkBuilder.cleanupCode)
+                            enumPropertyPrinter.write(lines: setterThunkBuilder.checkExceptionLines())
+                        }
+                        enumPropertyPrinter.write("},")
+                    }
+                }
+
+                let enumPropertyLines = enumPropertyPrinter.lines
+
+                let exportsPrinter = CodeFragmentPrinter()
+                let dtsExportsPrinter = CodeFragmentPrinter()
+
+                if !enumExportLines.isEmpty || !enumPropertyLines.isEmpty {
+                    exportsPrinter.write("\(enumDefinition.name): {")
+                    exportsPrinter.indent {
+                        exportsPrinter.write("...\(enumValuesName),")
+                        var allLines = enumExportLines + enumPropertyLines
+                        if let lastLineIndex = allLines.indices.last, allLines[lastLineIndex].hasSuffix(",") {
+                            allLines[lastLineIndex] = String(allLines[lastLineIndex].dropLast())
+                        }
+                        exportsPrinter.write(lines: allLines)
+                    }
+                    exportsPrinter.write("},")
+                } else {
+                    exportsPrinter.write("\(enumDefinition.name): \(enumValuesName),")
+                }
+
+                dtsExportsPrinter.write("\(enumDefinition.name): \(enumDefinition.name)Object")
+
+                data.exportsLines.append(contentsOf: exportsPrinter.lines)
+                data.dtsExportLines.append(contentsOf: dtsExportsPrinter.lines)
             }
         }
 
@@ -446,6 +574,34 @@ struct BridgeJSLink {
         printer.nextLine()
         printer.write(lines: data.topLevelDtsEnumLines)
 
+        // Generate Object types for const-style enums
+        for skeleton in exportedSkeletons {
+            for enumDefinition in skeleton.enums
+            where enumDefinition.enumType != .namespace && enumDefinition.emitStyle != .tsEnum {
+                let enumValuesName = "\(enumDefinition.name)Values"
+                let enumObjectName = "\(enumDefinition.name)Object"
+
+                if !enumDefinition.staticMethods.isEmpty || !enumDefinition.staticProperties.isEmpty {
+                    printer.write("export type \(enumObjectName) = typeof \(enumValuesName) & {")
+                    printer.indent {
+                        for function in enumDefinition.staticMethods {
+                            printer.write(
+                                "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+                            )
+                        }
+                        for property in enumDefinition.staticProperties {
+                            let readonly = property.isReadonly ? "readonly " : ""
+                            printer.write("\(readonly)\(property.name): \(property.type.tsType);")
+                        }
+                    }
+                    printer.write("};")
+                } else {
+                    printer.write("export type \(enumObjectName) = typeof \(enumValuesName);")
+                }
+                printer.nextLine()
+            }
+        }
+
         // Type definitions section (namespace declarations, class definitions, imported types)
         let namespaceBuilder = NamespaceBuilder()
         let namespaceDeclarationsLines = namespaceBuilder.namespaceDeclarations(
@@ -509,11 +665,19 @@ struct BridgeJSLink {
         printer.write(lines: data.topLevelEnumLines)
 
         // Namespace assignments section
-        let namespaceBuilder = NamespaceBuilder()
-        let topLevelNamespaceCode = namespaceBuilder.renderTopLevelEnumNamespaceAssignments(
-            namespacedEnums: data.namespacedEnums
+        let topLevelNamespaceCode = generateNamespaceInitializationCode(
+            namespacePaths: Set(data.namespacedEnums.compactMap { $0.namespace })
         )
         printer.write(lines: topLevelNamespaceCode)
+
+        // Add enum assignments to global namespace
+        for enumDef in data.namespacedEnums {
+            if enumDef.enumType != .namespace {
+                let namespacePath = enumDef.namespace?.joined(separator: ".") ?? ""
+                let enumValuesName = enumDef.emitStyle == .tsEnum ? enumDef.name : "\(enumDef.name)Values"
+                printer.write("globalThis.\(namespacePath).\(enumValuesName) = \(enumValuesName);")
+            }
+        }
 
         // Main function declaration
         printer.write("export async function createInstantiator(options, \(JSGlueVariableScope.reservedSwift)) {")
@@ -573,28 +737,25 @@ struct BridgeJSLink {
 
                 // Exports / return section
                 let hasNamespacedItems = !data.namespacedFunctions.isEmpty || !data.namespacedClasses.isEmpty
+                let hasNamespacedEnums = !data.namespacedEnums.isEmpty
+                let hasAnyNamespacedItems = hasNamespacedItems || hasNamespacedEnums
 
                 printer.write(lines: data.classLines)
-                if hasNamespacedItems {
-                    printer.write("const exports = {")
-                    printer.indent {
-                        printer.write(lines: data.exportsLines)
-                    }
-                    printer.write("};")
-                    let namespaceSetupCode = namespaceBuilder.renderGlobalNamespace(
-                        namespacedFunctions: data.namespacedFunctions,
-                        namespacedClasses: data.namespacedClasses
-                    )
-                    printer.write(lines: namespaceSetupCode)
 
-                    printer.write("return exports;")
-                } else {
-                    printer.write("return {")
-                    printer.indent {
-                        printer.write(lines: data.exportsLines)
-                    }
-                    printer.write("};")
+                // Initialize all namespaces before property assignments
+                if hasAnyNamespacedItems {
+                    let allNamespacePaths = collectAllNamespacePaths(data: data)
+                    let namespaceInitializationCode = generateNamespaceInitializationCode(
+                        namespacePaths: allNamespacePaths
+                    )
+                    printer.write(lines: namespaceInitializationCode)
                 }
+
+                let propertyAssignments = generateNamespacePropertyAssignments(
+                    data: data,
+                    hasAnyNamespacedItems: hasAnyNamespacedItems
+                )
+                printer.write(lines: propertyAssignments)
             }
             printer.write("},")
         }
@@ -618,8 +779,9 @@ struct BridgeJSLink {
         for skeleton in exportedSkeletons {
             for enumDef in skeleton.enums where enumDef.enumType == .associatedValue {
                 let base = enumDef.name
+                let baseValues = "\(base)Values"
                 printer.write(
-                    "const \(base)Helpers = __bjs_create\(base)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift));"
+                    "const \(base)Helpers = __bjs_create\(baseValues)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift));"
                 )
                 printer.write("enumHelpers.\(base) = \(base)Helpers;")
                 printer.nextLine()
@@ -660,6 +822,94 @@ struct BridgeJSLink {
         }
 
         return wrapperLines
+    }
+
+    /// Collects all unique namespace paths from functions, classes, enums, and static properties
+    private func collectAllNamespacePaths(data: LinkData) -> Set<[String]> {
+        let functionNamespacePaths: Set<[String]> = Set(
+            data.namespacedFunctions.compactMap { $0.namespace }
+        )
+        let classNamespacePaths: Set<[String]> = Set(
+            data.namespacedClasses.compactMap { $0.namespace }
+        )
+        let allRegularNamespacePaths = functionNamespacePaths.union(classNamespacePaths)
+
+        let enumNamespacePaths: Set<[String]> = Set(
+            data.namespacedEnums.compactMap { $0.namespace }
+        )
+        var staticPropertyNamespacePaths: Set<[String]> = Set()
+        for skeleton in exportedSkeletons {
+            for enumDefinition in skeleton.enums {
+                for property in enumDefinition.staticProperties {
+                    if let namespace = property.namespace, !namespace.isEmpty {
+                        staticPropertyNamespacePaths.insert(namespace)
+                    }
+                }
+            }
+        }
+
+        return allRegularNamespacePaths.union(enumNamespacePaths).union(staticPropertyNamespacePaths)
+    }
+
+    /// Generates JavaScript code lines for initializing namespace objects on globalThis
+    private func generateNamespaceInitializationCode(namespacePaths: Set<[String]>) -> [String] {
+        let printer = CodeFragmentPrinter()
+        var allUniqueNamespaces: [String] = []
+        var seen = Set<String>()
+
+        namespacePaths.forEach { namespacePath in
+            namespacePath.enumerated().forEach { (index, _) in
+                let path = namespacePath[0...index].joined(separator: ".")
+                if seen.insert(path).inserted {
+                    allUniqueNamespaces.append(path)
+                }
+            }
+        }
+
+        allUniqueNamespaces.sorted().forEach { namespace in
+            printer.write("if (typeof globalThis.\(namespace) === 'undefined') {")
+            printer.indent {
+                printer.write("globalThis.\(namespace) = {};")
+            }
+            printer.write("}")
+        }
+
+        return printer.lines
+    }
+
+    /// Generates JavaScript code for assigning namespaced items to globalThis
+    private func generateNamespacePropertyAssignments(data: LinkData, hasAnyNamespacedItems: Bool) -> [String] {
+        let printer = CodeFragmentPrinter()
+
+        printer.write(lines: data.enumStaticAssignments)
+
+        if hasAnyNamespacedItems {
+            printer.write("const exports = {")
+            printer.indent()
+            printer.write(lines: data.exportsLines.map { "\($0)" })
+            printer.unindent()
+            printer.write("};")
+
+            data.namespacedClasses.forEach { klass in
+                let namespacePath: String = klass.namespace?.joined(separator: ".") ?? ""
+                printer.write("globalThis.\(namespacePath).\(klass.name) = exports.\(klass.name);")
+            }
+
+            data.namespacedFunctions.forEach { function in
+                let namespacePath: String = function.namespace?.joined(separator: ".") ?? ""
+                printer.write("globalThis.\(namespacePath).\(function.name) = exports.\(function.name);")
+            }
+
+            printer.write("return exports;")
+        } else {
+            printer.write("return {")
+            printer.indent()
+            printer.write(lines: data.exportsLines.map { "\($0)" })
+            printer.unindent()
+            printer.write("};")
+        }
+
+        return printer.lines
     }
 
     private func generateImportedTypeDefinitions() -> [String] {
@@ -818,12 +1068,12 @@ struct BridgeJSLink {
         let scope = JSGlueVariableScope()
         let cleanup = CodeFragmentPrinter()
         let printer = CodeFragmentPrinter()
+        let enumValuesName = enumDefinition.emitStyle == .tsEnum ? enumDefinition.name : "\(enumDefinition.name)Values"
 
         switch enumDefinition.enumType {
         case .simple:
             let fragment = IntrinsicJSFragment.simpleEnumHelper(enumDefinition: enumDefinition)
-            _ = fragment.printCode([enumDefinition.name], scope, printer, cleanup)
-
+            _ = fragment.printCode([enumValuesName], scope, printer, cleanup)
             jsLines.append(contentsOf: printer.lines)
         case .rawValue:
             guard enumDefinition.rawType != nil else {
@@ -831,13 +1081,11 @@ struct BridgeJSLink {
             }
 
             let fragment = IntrinsicJSFragment.rawValueEnumHelper(enumDefinition: enumDefinition)
-            _ = fragment.printCode([enumDefinition.name], scope, printer, cleanup)
-
+            _ = fragment.printCode([enumValuesName], scope, printer, cleanup)
             jsLines.append(contentsOf: printer.lines)
         case .associatedValue:
             let fragment = IntrinsicJSFragment.associatedValueEnumHelper(enumDefinition: enumDefinition)
-            _ = fragment.printCode([enumDefinition.name], scope, printer, cleanup)
-
+            _ = fragment.printCode([enumValuesName], scope, printer, cleanup)
             jsLines.append(contentsOf: printer.lines)
         case .namespace:
             break
@@ -852,6 +1100,7 @@ struct BridgeJSLink {
 
     private func generateDeclarations(enumDefinition: ExportedEnum) -> [String] {
         let printer = CodeFragmentPrinter()
+        let enumValuesName = enumDefinition.emitStyle == .tsEnum ? enumDefinition.name : "\(enumDefinition.name)Values"
 
         switch enumDefinition.emitStyle {
         case .tsEnum:
@@ -877,7 +1126,7 @@ struct BridgeJSLink {
             }
 
         case .const:
-            printer.write("export const \(enumDefinition.name): {")
+            printer.write("export const \(enumValuesName): {")
             switch enumDefinition.enumType {
             case .simple, .rawValue:
                 printer.indent {
@@ -891,10 +1140,11 @@ struct BridgeJSLink {
                         )
                         printer.write("readonly \(caseName): \(value);")
                     }
+
                 }
                 printer.write("};")
                 printer.write(
-                    "export type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                    "export type \(enumDefinition.name)Tag = typeof \(enumValuesName)[keyof typeof \(enumValuesName)];"
                 )
                 printer.nextLine()
             case .associatedValue:
@@ -907,6 +1157,7 @@ struct BridgeJSLink {
                         }
                     }
                     printer.write("};")
+
                 }
                 printer.write("};")
                 printer.nextLine()
@@ -915,11 +1166,11 @@ struct BridgeJSLink {
                 for enumCase in enumDefinition.cases {
                     if enumCase.associatedValues.isEmpty {
                         unionParts.append(
-                            "{ tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter) }"
+                            "{ tag: typeof \(enumValuesName).Tag.\(enumCase.name.capitalizedFirstLetter) }"
                         )
                     } else {
                         var fields: [String] = [
-                            "tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter)"
+                            "tag: typeof \(enumValuesName).Tag.\(enumCase.name.capitalizedFirstLetter)"
                         ]
                         for (associatedValueIndex, associatedValue) in enumCase.associatedValues.enumerated() {
                             let prop = associatedValue.label ?? "param\(associatedValueIndex)"
@@ -929,7 +1180,9 @@ struct BridgeJSLink {
                     }
                 }
 
-                printer.write("export type \(enumDefinition.name) =")
+                let unionTypeName =
+                    enumDefinition.emitStyle == .tsEnum ? enumDefinition.name : "\(enumDefinition.name)Tag"
+                printer.write("export type \(unionTypeName) =")
                 printer.write("  " + unionParts.joined(separator: " | "))
                 printer.nextLine()
             case .namespace:
@@ -955,6 +1208,10 @@ struct BridgeJSLink {
 extension BridgeJSLink {
 
     func renderExportedFunction(function: ExportedFunction) throws -> (js: [String], dts: [String]) {
+        if function.effects.isStatic, let staticContext = function.staticContext {
+            return try renderStaticFunction(function: function, staticContext: staticContext)
+        }
+
         let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
         for param in function.parameters {
             try thunkBuilder.lowerParameter(param: param)
@@ -972,6 +1229,267 @@ extension BridgeJSLink {
         )
 
         return (funcLines, dtsLines)
+    }
+
+    private func renderStaticFunction(
+        function: ExportedFunction,
+        staticContext: StaticContext
+    ) throws -> (js: [String], dts: [String]) {
+        switch staticContext {
+        case .className(let className):
+            return try renderClassStaticFunction(function: function, className: className)
+        case .enumName(let enumName):
+            return try renderEnumStaticFunction(function: function, enumName: enumName)
+        case .namespaceEnum:
+            if let namespace = function.namespace, !namespace.isEmpty {
+                return try renderNamespaceFunction(function: function, namespace: namespace.joined(separator: "."))
+            } else {
+                return try renderExportedFunction(function: function)
+            }
+        }
+    }
+
+    private func renderClassStaticFunction(
+        function: ExportedFunction,
+        className: String
+    ) throws -> (js: [String], dts: [String]) {
+        let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
+        for param in function.parameters {
+            try thunkBuilder.lowerParameter(param: param)
+        }
+        let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
+
+        let funcLines = thunkBuilder.renderFunction(
+            name: function.name,
+            parameters: function.parameters,
+            returnExpr: returnExpr,
+            declarationPrefixKeyword: "static"
+        )
+
+        let dtsLines = [
+            "static \(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+        ]
+
+        return (funcLines, dtsLines)
+    }
+
+    private func renderEnumStaticFunction(
+        function: ExportedFunction,
+        enumName: String
+    ) throws -> (js: [String], dts: [String]) {
+        let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
+        for param in function.parameters {
+            try thunkBuilder.lowerParameter(param: param)
+        }
+        let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
+
+        let printer = CodeFragmentPrinter()
+        printer.write("\(function.name)(\(function.parameters.map { $0.name }.joined(separator: ", "))) {")
+        printer.indent {
+            printer.write(contentsOf: thunkBuilder.body)
+            printer.write(contentsOf: thunkBuilder.cleanupCode)
+            printer.write(lines: thunkBuilder.checkExceptionLines())
+            if let returnExpr = returnExpr {
+                printer.write("return \(returnExpr);")
+            }
+        }
+        printer.write("},")
+
+        let dtsLines = [
+            "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+        ]
+
+        return (printer.lines, dtsLines)
+    }
+
+    private func renderNamespaceFunction(
+        function: ExportedFunction,
+        namespace: String
+    ) throws -> (js: [String], dts: [String]) {
+        let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
+        for param in function.parameters {
+            try thunkBuilder.lowerParameter(param: param)
+        }
+        let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
+
+        let funcLines = thunkBuilder.renderFunction(
+            name: function.abiName,
+            parameters: function.parameters,
+            returnExpr: returnExpr,
+            declarationPrefixKeyword: "function"
+        )
+
+        let dtsLines: [String] = []
+
+        return (funcLines, dtsLines)
+    }
+
+    private func renderEnumStaticFunctionAssignment(
+        function: ExportedFunction,
+        enumName: String
+    ) throws -> [String] {
+        let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
+        for param in function.parameters {
+            try thunkBuilder.lowerParameter(param: param)
+        }
+        let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
+
+        let printer = CodeFragmentPrinter()
+        printer.write(
+            "\(enumName).\(function.name) = function(\(function.parameters.map { $0.name }.joined(separator: ", "))) {"
+        )
+        printer.indent {
+            printer.write(contentsOf: thunkBuilder.body)
+            printer.write(contentsOf: thunkBuilder.cleanupCode)
+            printer.write(lines: thunkBuilder.checkExceptionLines())
+            if let returnExpr = returnExpr {
+                printer.write("return \(returnExpr);")
+            }
+        }
+        printer.write("};")
+
+        return printer.lines
+    }
+
+    /// Renders an enum static property as getter/setter assignments on the enum object
+    private func renderEnumStaticProperty(
+        property: ExportedProperty,
+        enumName: String
+    ) throws -> (js: [String], dts: [String]) {
+        var jsLines: [String] = []
+
+        // Generate getter assignment
+        let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+        let getterReturnExpr = try getterThunkBuilder.call(
+            abiName: property.getterAbiName(),
+            returnType: property.type
+        )
+
+        let getterLines = getterThunkBuilder.renderFunction(
+            name: property.name,
+            parameters: [],
+            returnExpr: getterReturnExpr,
+            declarationPrefixKeyword: nil
+        )
+
+        // Build Object.defineProperty call
+        var definePropertyLines: [String] = []
+        definePropertyLines.append("Object.defineProperty(\(enumName), '\(property.name)', { get: function() {")
+
+        // Add getter body (skip function declaration and closing brace)
+        if getterLines.count > 2 {
+            let bodyLines = Array(getterLines[1..<getterLines.count - 1])  // Skip first and last lines
+            definePropertyLines.append(contentsOf: bodyLines)
+        }
+
+        if !property.isReadonly {
+            // Generate setter
+            let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+            try setterThunkBuilder.lowerParameter(
+                param: Parameter(label: "value", name: "value", type: property.type)
+            )
+            _ = try setterThunkBuilder.call(
+                abiName: property.setterAbiName(),
+                returnType: .void
+            )
+
+            let setterLines = setterThunkBuilder.renderFunction(
+                name: property.name,
+                parameters: [.init(label: nil, name: "value", type: property.type)],
+                returnExpr: nil,
+                declarationPrefixKeyword: nil
+            )
+
+            // Add setter with proper comma separation
+            definePropertyLines.append("}, set: function(value) {")
+            if setterLines.count > 2 {
+                let bodyLines = Array(setterLines[1..<setterLines.count - 1])  // Skip first and last lines
+                definePropertyLines.append(contentsOf: bodyLines)
+            }
+            definePropertyLines.append("} });")
+        } else {
+            // Readonly property - just close the getter
+            definePropertyLines.append("} });")
+        }
+
+        jsLines.append(contentsOf: definePropertyLines)
+
+        // TypeScript definitions are handled by generateDeclarations
+        let dtsLines: [String] = []
+
+        return (jsLines, dtsLines)
+    }
+
+    /// Renders a namespace static property as getter/setter assignments on the namespace object
+    private func renderNamespaceStaticProperty(
+        property: ExportedProperty,
+        namespacePath: String
+    ) throws -> (js: [String], dts: [String]) {
+        var jsLines: [String] = []
+
+        // Generate getter assignment
+        let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+        let getterReturnExpr = try getterThunkBuilder.call(
+            abiName: property.getterAbiName(),
+            returnType: property.type
+        )
+
+        let getterLines = getterThunkBuilder.renderFunction(
+            name: property.name,
+            parameters: [],
+            returnExpr: getterReturnExpr,
+            declarationPrefixKeyword: nil
+        )
+
+        // Build Object.defineProperty call for namespace
+        var definePropertyLines: [String] = []
+        definePropertyLines.append(
+            "Object.defineProperty(globalThis.\(namespacePath), '\(property.name)', { get: function() {"
+        )
+
+        // Add getter body (skip function declaration and closing brace)
+        if getterLines.count > 2 {
+            let bodyLines = Array(getterLines[1..<getterLines.count - 1])  // Skip first and last lines
+            definePropertyLines.append(contentsOf: bodyLines)
+        }
+
+        if !property.isReadonly {
+            // Generate setter
+            let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+            try setterThunkBuilder.lowerParameter(
+                param: Parameter(label: "value", name: "value", type: property.type)
+            )
+            _ = try setterThunkBuilder.call(
+                abiName: property.setterAbiName(),
+                returnType: .void
+            )
+
+            let setterLines = setterThunkBuilder.renderFunction(
+                name: property.name,
+                parameters: [.init(label: nil, name: "value", type: property.type)],
+                returnExpr: nil,
+                declarationPrefixKeyword: nil
+            )
+
+            // Add setter with proper comma separation
+            definePropertyLines.append("}, set: function(value) {")
+            // Add setter body (skip function declaration and closing brace)
+            if setterLines.count > 2 {
+                let bodyLines = Array(setterLines[1..<setterLines.count - 1])  // Skip first and last lines
+                definePropertyLines.append(contentsOf: bodyLines)
+            }
+            definePropertyLines.append("} });")
+        } else {
+            // Readonly property - just close the getter
+            definePropertyLines.append("} });")
+        }
+
+        jsLines.append(contentsOf: definePropertyLines)
+
+        // TypeScript definitions are handled by namespace declarations
+        let dtsLines: [String] = []
+
+        return (jsLines, dtsLines)
     }
 
     func renderExportedClass(
@@ -1023,80 +1541,154 @@ extension BridgeJSLink {
         }
 
         for method in klass.methods {
-            let thunkBuilder = ExportedThunkBuilder(effects: method.effects)
-            thunkBuilder.lowerSelf()
-            for param in method.parameters {
-                try thunkBuilder.lowerParameter(param: param)
-            }
-            let returnExpr = try thunkBuilder.call(abiName: method.abiName, returnType: method.returnType)
+            if method.effects.isStatic {
+                let thunkBuilder = ExportedThunkBuilder(effects: method.effects)
+                for param in method.parameters {
+                    try thunkBuilder.lowerParameter(param: param)
+                }
+                let returnExpr = try thunkBuilder.call(abiName: method.abiName, returnType: method.returnType)
 
-            jsPrinter.indent {
-                jsPrinter.write(
-                    lines: thunkBuilder.renderFunction(
-                        name: method.name,
-                        parameters: method.parameters,
-                        returnExpr: returnExpr,
-                        declarationPrefixKeyword: nil
+                jsPrinter.indent {
+                    jsPrinter.write(
+                        lines: thunkBuilder.renderFunction(
+                            name: method.name,
+                            parameters: method.parameters,
+                            returnExpr: returnExpr,
+                            declarationPrefixKeyword: "static"
+                        )
                     )
-                )
-            }
+                }
 
-            dtsTypePrinter.indent {
-                dtsTypePrinter.write(
-                    "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
-                )
+                dtsExportEntryPrinter.indent {
+                    dtsExportEntryPrinter.write(
+                        "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                    )
+                }
+            } else {
+                let thunkBuilder = ExportedThunkBuilder(effects: method.effects)
+                thunkBuilder.lowerSelf()
+                for param in method.parameters {
+                    try thunkBuilder.lowerParameter(param: param)
+                }
+                let returnExpr = try thunkBuilder.call(abiName: method.abiName, returnType: method.returnType)
+
+                jsPrinter.indent {
+                    jsPrinter.write(
+                        lines: thunkBuilder.renderFunction(
+                            name: method.name,
+                            parameters: method.parameters,
+                            returnExpr: returnExpr,
+                            declarationPrefixKeyword: nil
+                        )
+                    )
+                }
+
+                dtsTypePrinter.indent {
+                    dtsTypePrinter.write(
+                        "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                    )
+                }
             }
         }
 
         // Generate property getters and setters
         for property in klass.properties {
-            // Generate getter
-            let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
-            getterThunkBuilder.lowerSelf()
-            let getterReturnExpr = try getterThunkBuilder.call(
-                abiName: property.getterAbiName(className: klass.name),
-                returnType: property.type
-            )
-
-            jsPrinter.indent {
-                jsPrinter.write(
-                    lines: getterThunkBuilder.renderFunction(
-                        name: property.name,
-                        parameters: [],
-                        returnExpr: getterReturnExpr,
-                        declarationPrefixKeyword: "get"
-                    )
-                )
-            }
-
-            // Generate setter if not readonly
-            if !property.isReadonly {
-                let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
-                setterThunkBuilder.lowerSelf()
-                try setterThunkBuilder.lowerParameter(
-                    param: Parameter(label: "value", name: "value", type: property.type)
-                )
-                _ = try setterThunkBuilder.call(
-                    abiName: property.setterAbiName(className: klass.name),
-                    returnType: .void
+            if property.isStatic {
+                // Generate static property getter
+                let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+                let getterReturnExpr = try getterThunkBuilder.call(
+                    abiName: property.getterAbiName(),
+                    returnType: property.type
                 )
 
                 jsPrinter.indent {
                     jsPrinter.write(
-                        lines: setterThunkBuilder.renderFunction(
+                        lines: getterThunkBuilder.renderFunction(
                             name: property.name,
-                            parameters: [.init(label: nil, name: "value", type: property.type)],
-                            returnExpr: nil,
-                            declarationPrefixKeyword: "set"
+                            parameters: [],
+                            returnExpr: getterReturnExpr,
+                            declarationPrefixKeyword: "static get"
                         )
                     )
                 }
-            }
 
-            // Add TypeScript property definition
-            let readonly = property.isReadonly ? "readonly " : ""
-            dtsTypePrinter.indent {
-                dtsTypePrinter.write("\(readonly)\(property.name): \(property.type.tsType);")
+                // Generate static property setter if not readonly
+                if !property.isReadonly {
+                    let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+                    try setterThunkBuilder.lowerParameter(
+                        param: Parameter(label: "value", name: "value", type: property.type)
+                    )
+                    _ = try setterThunkBuilder.call(
+                        abiName: property.setterAbiName(),
+                        returnType: .void
+                    )
+
+                    jsPrinter.indent {
+                        jsPrinter.write(
+                            lines: setterThunkBuilder.renderFunction(
+                                name: property.name,
+                                parameters: [.init(label: nil, name: "value", type: property.type)],
+                                returnExpr: nil,
+                                declarationPrefixKeyword: "static set"
+                            )
+                        )
+                    }
+                }
+
+                // Add static property to TypeScript exports definition (not instance interface)
+                let readonly = property.isReadonly ? "readonly " : ""
+                dtsExportEntryPrinter.indent {
+                    dtsExportEntryPrinter.write("\(readonly)\(property.name): \(property.type.tsType);")
+                }
+            } else {
+                // Generate instance property getter
+                let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+                getterThunkBuilder.lowerSelf()
+                let getterReturnExpr = try getterThunkBuilder.call(
+                    abiName: property.getterAbiName(className: klass.name),
+                    returnType: property.type
+                )
+
+                jsPrinter.indent {
+                    jsPrinter.write(
+                        lines: getterThunkBuilder.renderFunction(
+                            name: property.name,
+                            parameters: [],
+                            returnExpr: getterReturnExpr,
+                            declarationPrefixKeyword: "get"
+                        )
+                    )
+                }
+
+                // Generate instance property setter if not readonly
+                if !property.isReadonly {
+                    let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+                    setterThunkBuilder.lowerSelf()
+                    try setterThunkBuilder.lowerParameter(
+                        param: Parameter(label: "value", name: "value", type: property.type)
+                    )
+                    _ = try setterThunkBuilder.call(
+                        abiName: property.setterAbiName(className: klass.name),
+                        returnType: .void
+                    )
+
+                    jsPrinter.indent {
+                        jsPrinter.write(
+                            lines: setterThunkBuilder.renderFunction(
+                                name: property.name,
+                                parameters: [.init(label: nil, name: "value", type: property.type)],
+                                returnExpr: nil,
+                                declarationPrefixKeyword: "set"
+                            )
+                        )
+                    }
+                }
+
+                // Add instance property to TypeScript interface definition
+                let readonly = property.isReadonly ? "readonly " : ""
+                dtsTypePrinter.indent {
+                    dtsTypePrinter.write("\(readonly)\(property.name): \(property.type.tsType);")
+                }
             }
         }
 
@@ -1269,114 +1861,11 @@ extension BridgeJSLink {
     }
 
     struct NamespaceBuilder {
-
-        /// Generates JavaScript code for setting up global namespace structure
-        ///
-        /// This function creates the necessary JavaScript code to properly expose namespaced
-        /// functions, classes, and enums on the global object (globalThis). It ensures that
-        /// nested namespace paths are created correctly and that all exported items are
-        /// accessible through their full namespace paths.
-        ///
-        /// For example, if you have @JS("Utils.Math") func add() it will generate code that
-        /// makes globalThis.Utils.Math.add accessible.
-        ///
-        /// - Parameters:
-        ///   - namespacedFunctions: Functions annotated with @JS("namespace.path")
-        ///   - namespacedClasses: Classes annotated with @JS("namespace.path")
-        /// - Returns: Array of JavaScript code lines that set up the global namespace structure
-        func renderGlobalNamespace(
-            namespacedFunctions: [ExportedFunction],
-            namespacedClasses: [ExportedClass]
-        ) -> [String] {
-            let printer = CodeFragmentPrinter()
-            var uniqueNamespaces: [String] = []
-            var seen = Set<String>()
-
-            let functionNamespacePaths: Set<[String]> = Set(
-                namespacedFunctions
-                    .compactMap { $0.namespace }
-            )
-            let classNamespacePaths: Set<[String]> = Set(
-                namespacedClasses
-                    .compactMap { $0.namespace }
-            )
-
-            let allNamespacePaths =
-                functionNamespacePaths
-                .union(classNamespacePaths)
-
-            allNamespacePaths.forEach { namespacePath in
-                namespacePath.makeIterator().enumerated().forEach { (index, _) in
-                    let path = namespacePath[0...index].joined(separator: ".")
-                    if seen.insert(path).inserted {
-                        uniqueNamespaces.append(path)
-                    }
-                }
-            }
-
-            uniqueNamespaces.sorted().forEach { namespace in
-                printer.write("if (typeof globalThis.\(namespace) === 'undefined') {")
-                printer.indent {
-                    printer.write("globalThis.\(namespace) = {};")
-                }
-                printer.write("}")
-            }
-
-            namespacedClasses.forEach { klass in
-                let namespacePath: String = klass.namespace?.joined(separator: ".") ?? ""
-                printer.write("globalThis.\(namespacePath).\(klass.name) = exports.\(klass.name);")
-            }
-
-            namespacedFunctions.forEach { function in
-                let namespacePath: String = function.namespace?.joined(separator: ".") ?? ""
-                printer.write("globalThis.\(namespacePath).\(function.name) = exports.\(function.name);")
-            }
-
-            return printer.lines
-        }
-
-        func renderTopLevelEnumNamespaceAssignments(namespacedEnums: [ExportedEnum]) -> [String] {
-            guard !namespacedEnums.isEmpty else { return [] }
-
-            let printer = CodeFragmentPrinter()
-            var uniqueNamespaces: [String] = []
-            var seen = Set<String>()
-
-            for enumDef in namespacedEnums {
-                guard let namespacePath = enumDef.namespace else { continue }
-                namespacePath.enumerated().forEach { (index, _) in
-                    let path = namespacePath[0...index].joined(separator: ".")
-                    if !seen.contains(path) {
-                        seen.insert(path)
-                        uniqueNamespaces.append(path)
-                    }
-                }
-            }
-
-            for namespace in uniqueNamespaces {
-                printer.write("if (typeof globalThis.\(namespace) === 'undefined') {")
-                printer.indent {
-                    printer.write("globalThis.\(namespace) = {};")
-                }
-                printer.write("}")
-            }
-
-            if !uniqueNamespaces.isEmpty {
-                printer.nextLine()
-            }
-
-            for enumDef in namespacedEnums {
-                let namespacePath = enumDef.namespace?.joined(separator: ".") ?? ""
-                printer.write("globalThis.\(namespacePath).\(enumDef.name) = \(enumDef.name);")
-            }
-            printer.nextLine()
-            return printer.lines
-        }
-
         private struct NamespaceContent {
             var functions: [ExportedFunction] = []
             var classes: [ExportedClass] = []
             var enums: [ExportedEnum] = []
+            var staticProperties: [ExportedProperty] = []
         }
 
         private final class NamespaceNode {
@@ -1422,7 +1911,18 @@ extension BridgeJSLink {
 
             for skeleton in exportedSkeletons {
                 for function in skeleton.functions {
-                    if let namespace = function.namespace {
+                    if function.effects.isStatic,
+                        case .namespaceEnum = function.staticContext
+                    {
+                        // Use the function's namespace property instead of enumName
+                        if let namespace = function.namespace {
+                            var currentNode = rootNode
+                            for part in namespace {
+                                currentNode = currentNode.addChild(part)
+                            }
+                            currentNode.content.functions.append(function)
+                        }
+                    } else if let namespace = function.namespace {
                         var currentNode = rootNode
                         for part in namespace {
                             currentNode = currentNode.addChild(part)
@@ -1446,6 +1946,30 @@ extension BridgeJSLink {
                             currentNode = currentNode.addChild(part)
                         }
                         currentNode.content.enums.append(enumDefinition)
+                    }
+
+                    if enumDefinition.enumType == .namespace {
+                        for function in enumDefinition.staticMethods {
+                            var currentNode = rootNode
+                            // Build full namespace path: parent namespace + enum name
+                            let fullNamespace = (enumDefinition.namespace ?? []) + [enumDefinition.name]
+                            for part in fullNamespace {
+                                currentNode = currentNode.addChild(part)
+                            }
+                            currentNode.content.functions.append(function)
+                        }
+
+                        // Add static properties to namespace content for TypeScript declarations
+                        for property in enumDefinition.staticProperties {
+                            var currentNode = rootNode
+                            let fullNamespace = (enumDefinition.namespace ?? []) + [enumDefinition.name]
+                            for part in fullNamespace {
+                                currentNode = currentNode.addChild(part)
+                            }
+                            if !currentNode.content.staticProperties.contains(where: { $0.name == property.name }) {
+                                currentNode.content.staticProperties.append(property)
+                            }
+                        }
                     }
                 }
             }
@@ -1488,6 +2012,8 @@ extension BridgeJSLink {
                     let sortedEnums = childNode.content.enums.sorted { $0.name < $1.name }
                     for enumDefinition in sortedEnums {
                         let style: EnumEmitStyle = enumDefinition.emitStyle
+                        let enumValuesName =
+                            enumDefinition.emitStyle == .tsEnum ? enumDefinition.name : "\(enumDefinition.name)Values"
                         switch enumDefinition.enumType {
                         case .simple:
                             switch style {
@@ -1501,7 +2027,7 @@ extension BridgeJSLink {
                                 }
                                 printer.write("}")
                             case .const:
-                                printer.write("const \(enumDefinition.name): {")
+                                printer.write("const \(enumValuesName): {")
                                 printer.indent {
                                     for (index, enumCase) in enumDefinition.cases.enumerated() {
                                         let caseName = enumCase.name.capitalizedFirstLetter
@@ -1510,7 +2036,7 @@ extension BridgeJSLink {
                                 }
                                 printer.write("};")
                                 printer.write(
-                                    "type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                                    "type \(enumDefinition.name)Tag = typeof \(enumValuesName)[keyof typeof \(enumValuesName)];"
                                 )
                             }
                         case .rawValue:
@@ -1528,7 +2054,7 @@ extension BridgeJSLink {
                                 }
                                 printer.write("}")
                             case .const:
-                                printer.write("const \(enumDefinition.name): {")
+                                printer.write("const \(enumValuesName): {")
                                 printer.indent {
                                     for enumCase in enumDefinition.cases {
                                         let caseName = enumCase.name.capitalizedFirstLetter
@@ -1539,11 +2065,11 @@ extension BridgeJSLink {
                                 }
                                 printer.write("};")
                                 printer.write(
-                                    "type \(enumDefinition.name) = typeof \(enumDefinition.name)[keyof typeof \(enumDefinition.name)];"
+                                    "type \(enumDefinition.name)Tag = typeof \(enumValuesName)[keyof typeof \(enumValuesName)];"
                                 )
                             }
                         case .associatedValue:
-                            printer.write("const \(enumDefinition.name): {")
+                            printer.write("const \(enumValuesName): {")
                             printer.indent {
                                 printer.write("readonly Tag: {")
                                 printer.indent {
@@ -1560,11 +2086,11 @@ extension BridgeJSLink {
                             for enumCase in enumDefinition.cases {
                                 if enumCase.associatedValues.isEmpty {
                                     unionParts.append(
-                                        "{ tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter) }"
+                                        "{ tag: typeof \(enumValuesName).Tag.\(enumCase.name.capitalizedFirstLetter) }"
                                     )
                                 } else {
                                     var fields: [String] = [
-                                        "tag: typeof \(enumDefinition.name).Tag.\(enumCase.name.capitalizedFirstLetter)"
+                                        "tag: typeof \(enumValuesName).Tag.\(enumCase.name.capitalizedFirstLetter)"
                                     ]
                                     for (associatedValueIndex, associatedValue) in enumCase.associatedValues
                                         .enumerated()
@@ -1575,7 +2101,9 @@ extension BridgeJSLink {
                                     unionParts.append("{ \(fields.joined(separator: "; ")) }")
                                 }
                             }
-                            printer.write("type \(enumDefinition.name) =")
+                            let unionTypeName =
+                                enumDefinition.emitStyle == .tsEnum ? enumDefinition.name : "\(enumDefinition.name)Tag"
+                            printer.write("type \(unionTypeName) =")
                             printer.write("  " + unionParts.joined(separator: " | "))
                         case .namespace:
                             continue
@@ -1587,6 +2115,11 @@ extension BridgeJSLink {
                         let signature =
                             "\(function.name)\(renderTSSignatureCallback(function.parameters, function.returnType, function.effects));"
                         printer.write(signature)
+                    }
+                    let sortedProperties = childNode.content.staticProperties.sorted { $0.name < $1.name }
+                    for property in sortedProperties {
+                        let readonly = property.isReadonly ? "var " : "let "
+                        printer.write("\(readonly)\(property.name): \(property.type.tsType);")
                     }
 
                     generateNamespaceDeclarations(node: childNode, depth: depth + 1)
@@ -1768,11 +2301,11 @@ extension BridgeType {
         case .optional(let wrappedType):
             return "\(wrappedType.tsType) | null"
         case .caseEnum(let name):
-            return name
+            return "\(name)Tag"
         case .rawValueEnum(let name, _):
-            return name
+            return "\(name)Tag"
         case .associatedValueEnum(let name):
-            return name
+            return "\(name)Tag"
         case .namespaceEnum(let name):
             return name
         }

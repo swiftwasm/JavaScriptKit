@@ -672,6 +672,111 @@ enum APIOptionalResult {
     return
         "willSet:\(PropertyHolder.willSetCallCount),didSet:\(PropertyHolder.didSetCallCount),willSetOld:\(PropertyHolder.lastWillSetOldValue),willSetNew:\(PropertyHolder.lastWillSetNewValue),didSetOld:\(PropertyHolder.lastDidSetOldValue),didSetNew:\(PropertyHolder.lastDidSetNewValue)"
 }
+
+// MARK: - Static Functions
+@JS class MathUtils {
+    @JS static func add(a: Int, b: Int) -> Int {
+        return a + b
+    }
+    @JS class func substract(a: Int, b: Int) -> Int {
+        return a - b
+    }
+}
+
+@JS enum StaticCalculator {
+    case scientific
+    case basic
+
+    @JS static func roundtrip(_ value: Int) -> Int {
+        return value
+    }
+}
+
+@JS enum StaticUtils {
+    @JS enum Nested {
+        @JS static func roundtrip(_ value: String) -> String {
+            return value
+        }
+    }
+}
+
+// MARK: - Static Properties
+
+@JS class StaticPropertyHolder {
+    @JS static let staticConstant: String = "constant"
+    @JS nonisolated(unsafe) static var staticVariable: Int = 42
+    @JS nonisolated(unsafe) static var staticString: String = "initial"
+    @JS nonisolated(unsafe) static var staticBool: Bool = true
+    @JS nonisolated(unsafe) static var staticFloat: Float = 3.14
+    @JS nonisolated(unsafe) static var staticDouble: Double = 2.718
+
+    @JS static var computedProperty: String {
+        get { return "computed: \(staticVariable)" }
+        set {
+            if let number = Int(newValue.replacingOccurrences(of: "computed: ", with: "")) {
+                staticVariable = number
+            }
+        }
+    }
+
+    @JS static var readOnlyComputed: Int {
+        return staticVariable * 2
+    }
+
+    @JS nonisolated(unsafe) static var optionalString: String? = nil
+    @JS nonisolated(unsafe) static var optionalInt: Int? = nil
+
+    @JS nonisolated(unsafe) static var jsObjectProperty: JSObject = JSObject()
+
+    @JS init() {}
+
+}
+
+@JS enum StaticPropertyEnum {
+    case option1
+    case option2
+
+    @JS nonisolated(unsafe) static var enumProperty: String = "enum value"
+    @JS static let enumConstant: Int = 42
+    @JS nonisolated(unsafe) static var enumBool: Bool = false
+
+    @JS nonisolated(unsafe) static var enumVariable: Int = 200
+
+    @JS static var computedReadonly: Int {
+        return enumVariable * 2
+    }
+
+    @JS static var computedReadWrite: String {
+        get {
+            return "Value: \(enumVariable)"
+        }
+        set {
+            if let range = newValue.range(of: "Value: "),
+                let number = Int(String(newValue[range.upperBound...]))
+            {
+                enumVariable = number
+            }
+        }
+    }
+}
+
+@JS enum StaticPropertyNamespace {
+    @JS nonisolated(unsafe) static var namespaceProperty: String = "namespace"
+    @JS static let namespaceConstant: String = "constant"
+
+    @JS enum NestedProperties {
+        @JS nonisolated(unsafe) static var nestedProperty: Int = 999
+        @JS static let nestedConstant: String = "nested"
+        @JS nonisolated(unsafe) static var nestedDouble: Double = 1.414
+    }
+}
+
+// Test functions for static properties
+@JS func getAllStaticPropertyValues() -> String {
+    return
+        "const:\(StaticPropertyHolder.staticConstant),var:\(StaticPropertyHolder.staticVariable),computed:\(StaticPropertyHolder.computedProperty),readonly:\(StaticPropertyHolder.readOnlyComputed)"
+}
+
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false

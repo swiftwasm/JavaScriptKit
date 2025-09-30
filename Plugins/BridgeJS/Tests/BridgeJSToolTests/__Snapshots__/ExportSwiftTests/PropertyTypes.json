@@ -5,6 +5,7 @@
         "abiName" : "bjs_PropertyHolder_init",
         "effects" : {
           "isAsync" : false,
+          "isStatic" : false,
           "isThrows" : false
         },
         "parameters" : [
@@ -69,6 +70,7 @@
           "abiName" : "bjs_PropertyHolder_getAllValues",
           "effects" : {
             "isAsync" : false,
+            "isStatic" : false,
             "isThrows" : false
           },
           "name" : "getAllValues",
@@ -86,6 +88,7 @@
       "properties" : [
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "intValue",
           "type" : {
             "int" : {
@@ -95,6 +98,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "floatValue",
           "type" : {
             "float" : {
@@ -104,6 +108,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "doubleValue",
           "type" : {
             "double" : {
@@ -113,6 +118,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "boolValue",
           "type" : {
             "bool" : {
@@ -122,6 +128,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "stringValue",
           "type" : {
             "string" : {
@@ -131,6 +138,7 @@
         },
         {
           "isReadonly" : true,
+          "isStatic" : false,
           "name" : "readonlyInt",
           "type" : {
             "int" : {
@@ -140,6 +148,7 @@
         },
         {
           "isReadonly" : true,
+          "isStatic" : false,
           "name" : "readonlyFloat",
           "type" : {
             "float" : {
@@ -149,6 +158,7 @@
         },
         {
           "isReadonly" : true,
+          "isStatic" : false,
           "name" : "readonlyDouble",
           "type" : {
             "double" : {
@@ -158,6 +168,7 @@
         },
         {
           "isReadonly" : true,
+          "isStatic" : false,
           "name" : "readonlyBool",
           "type" : {
             "bool" : {
@@ -167,6 +178,7 @@
         },
         {
           "isReadonly" : true,
+          "isStatic" : false,
           "name" : "readonlyString",
           "type" : {
             "string" : {
@@ -176,6 +188,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "jsObject",
           "type" : {
             "jsObject" : {
@@ -185,6 +198,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "sibling",
           "type" : {
             "swiftHeapObject" : {
@@ -194,6 +208,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "lazyValue",
           "type" : {
             "string" : {
@@ -203,6 +218,7 @@
         },
         {
           "isReadonly" : true,
+          "isStatic" : false,
           "name" : "computedReadonly",
           "type" : {
             "int" : {
@@ -212,6 +228,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "computedReadWrite",
           "type" : {
             "string" : {
@@ -221,6 +238,7 @@
         },
         {
           "isReadonly" : false,
+          "isStatic" : false,
           "name" : "observedProperty",
           "type" : {
             "int" : {
@@ -240,6 +258,7 @@
       "abiName" : "bjs_createPropertyHolder",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "createPropertyHolder",
@@ -309,6 +328,7 @@
       "abiName" : "bjs_testPropertyHolder",
       "effects" : {
         "isAsync" : false,
+        "isStatic" : false,
         "isThrows" : false
       },
       "name" : "testPropertyHolder",
