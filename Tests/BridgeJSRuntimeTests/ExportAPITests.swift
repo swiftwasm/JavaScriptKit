@@ -700,6 +700,52 @@ enum APIOptionalResult {
     }
 }
 
+// MARK: - Default Parameters
+
+@JS func testStringDefault(message: String = "Hello World") -> String {
+    return message
+}
+
+@JS func testIntDefault(count: Int = 42) -> Int {
+    return count
+}
+
+@JS func testBoolDefault(flag: Bool = true) -> Bool {
+    return flag
+}
+
+@JS func testOptionalDefault(name: String? = nil) -> String? {
+    return name
+}
+
+@JS func testMultipleDefaults(
+    title: String = "Default Title",
+    count: Int = 10,
+    enabled: Bool = false
+) -> String {
+    return "\(title): \(count) (\(enabled))"
+}
+
+@JS func testSimpleEnumDefault(status: Status = .success) -> Status {
+    return status
+}
+
+@JS func testDirectionDefault(direction: Direction = .north) -> Direction {
+    return direction
+}
+
+@JS func testRawStringEnumDefault(theme: Theme = .light) -> Theme {
+    return theme
+}
+
+@JS func testComplexInit(greeter: Greeter = Greeter(name: "DefaultGreeter")) -> String {
+    return greeter.greet()
+}
+
+@JS func testEmptyInit(_ object: StaticPropertyHolder = StaticPropertyHolder()) -> StaticPropertyHolder {
+    return object
+}
+
 // MARK: - Static Properties
 
 @JS class StaticPropertyHolder {

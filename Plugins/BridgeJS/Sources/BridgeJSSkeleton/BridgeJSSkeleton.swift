@@ -127,15 +127,33 @@ public enum SwiftEnumRawType: String, CaseIterable, Codable, Sendable {
     }
 }
 
+public enum DefaultValue: Codable, Equatable, Sendable {
+    case string(String)
+    case int(Int)
+    case float(Float)
+    case double(Double)
+    case bool(Bool)
+    case null
+    case enumCase(String, String)  // enumName, caseName
+    case object(String)  // className for parameterless constructor
+    case objectWithArguments(String, [DefaultValue])  // className, constructor argument values
+}
+
 public struct Parameter: Codable, Equatable, Sendable {
     public let label: String?
     public let name: String
     public let type: BridgeType
+    public let defaultValue: DefaultValue?
 
-    public init(label: String?, name: String, type: BridgeType) {
+    public var hasDefault: Bool {
+        return defaultValue != nil
+    }
+
+    public init(label: String?, name: String, type: BridgeType, defaultValue: DefaultValue? = nil) {
         self.label = label
         self.name = name
         self.type = type
+        self.defaultValue = defaultValue
     }
 }
 

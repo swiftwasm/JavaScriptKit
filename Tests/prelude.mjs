@@ -642,6 +642,47 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(StaticCalculatorValues.Scientific, exports.StaticCalculator.Scientific);
     assert.equal(StaticCalculatorValues.Basic, exports.StaticCalculator.Basic);
     assert.equal(globalThis.StaticUtils.Nested.roundtrip("hello world"), "hello world");
+
+    // Test default parameters
+    assert.equal(exports.testStringDefault(), "Hello World");
+    assert.equal(exports.testStringDefault("Custom Message"), "Custom Message");
+
+    assert.equal(exports.testIntDefault(), 42);
+    assert.equal(exports.testIntDefault(100), 100);
+
+    assert.equal(exports.testBoolDefault(), true);
+    assert.equal(exports.testBoolDefault(false), false);
+
+    assert.equal(exports.testOptionalDefault(), null);
+    assert.equal(exports.testOptionalDefault("Test"), "Test");
+
+    assert.equal(exports.testMultipleDefaults(), "Default Title: 10 (false)");
+    assert.equal(exports.testMultipleDefaults("Custom"), "Custom: 10 (false)");
+    assert.equal(exports.testMultipleDefaults("Custom", 5), "Custom: 5 (false)");
+    assert.equal(exports.testMultipleDefaults("Custom", undefined, true), "Custom: 10 (true)");
+    assert.equal(exports.testMultipleDefaults("Custom", 5, true), "Custom: 5 (true)");
+
+    assert.equal(exports.testSimpleEnumDefault(), exports.Status.Success);
+    assert.equal(exports.testSimpleEnumDefault(exports.Status.Loading), exports.Status.Loading);
+
+    assert.equal(exports.testDirectionDefault(), exports.Direction.North);
+    assert.equal(exports.testDirectionDefault(exports.Direction.South), exports.Direction.South);
+
+    assert.equal(exports.testRawStringEnumDefault(), exports.Theme.Light);
+    assert.equal(exports.testRawStringEnumDefault(exports.Theme.Dark), exports.Theme.Dark);
+
+    const holder = exports.testEmptyInit()
+    assert.notEqual(holder, null);
+    holder.release();
+
+    const customHolder = new exports.StaticPropertyHolder();
+    assert.deepEqual(exports.testEmptyInit(customHolder), customHolder);
+    customHolder.release();
+
+    assert.equal(exports.testComplexInit(), "Hello, DefaultGreeter!");
+    const customGreeter = new exports.Greeter("CustomName");
+    assert.equal(exports.testComplexInit(customGreeter), "Hello, CustomName!");
+    customGreeter.release();
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

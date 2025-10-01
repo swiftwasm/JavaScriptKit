@@ -1038,6 +1038,18 @@ struct BridgeJSLink {
                 "\(declarationPrefixKeyword.map { "\($0) "} ?? "")\(name)(\(parameters.map { $0.name }.joined(separator: ", "))) {"
             )
             printer.indent {
+                let generator = DefaultValueGenerator()
+                for param in parameters {
+                    if let defaultValue = param.defaultValue {
+                        let defaultJs = generator.generate(defaultValue, format: .javascript)
+                        printer.write("if (\(param.name) === undefined) {")
+                        printer.indent {
+                            printer.write("\(param.name) = \(defaultJs);")
+                        }
+                        printer.write("}")
+                    }
+                }
+
                 printer.write(contentsOf: body)
                 printer.write(contentsOf: cleanupCode)
                 printer.write(lines: checkExceptionLines())
@@ -1058,8 +1070,76 @@ struct BridgeJSLink {
         } else {
             returnTypeWithEffect = returnType.tsType
         }
-        return
-            "(\(parameters.map { "\($0.name): \($0.type.tsType)" }.joined(separator: ", "))): \(returnTypeWithEffect)"
+        let parameterSignatures = parameters.map { param in
+            let optional = param.hasDefault ? "?" : ""
+            return "\(param.name)\(optional): \(param.type.tsType)"
+        }
+        return "(\(parameterSignatures.joined(separator: ", "))): \(returnTypeWithEffect)"
+    }
+
+    /// Helper struct for generating default value representations
+    private struct DefaultValueGenerator {
+        enum OutputFormat {
+            case javascript
+            case typescript
+        }
+
+        /// Generates default value representation for JavaScript or TypeScript
+        func generate(_ defaultValue: DefaultValue, format: OutputFormat) -> String {
+            switch defaultValue {
+            case .string(let value):
+                let escapedValue =
+                    format == .javascript
+                    ? escapeForJavaScript(value)
+                    : value  // TypeScript doesn't need escape in doc comments
+                return "\"\(escapedValue)\""
+            case .int(let value):
+                return "\(value)"
+            case .float(let value):
+                return "\(value)"
+            case .double(let value):
+                return "\(value)"
+            case .bool(let value):
+                return value ? "true" : "false"
+            case .null:
+                return "null"
+            case .enumCase(let enumName, let caseName):
+                // Extract simple enum name and add "Values" suffix for JavaScript const-style enums
+                // (TypeScript definitions use the base name, but JS runtime uses {Name}Values)
+                let simpleName = enumName.components(separatedBy: ".").last ?? enumName
+                let jsEnumName = format == .javascript ? "\(simpleName)Values" : simpleName
+                return "\(jsEnumName).\(caseName.capitalizedFirstLetter)"
+            case .object(let className):
+                return "new \(className)()"
+            case .objectWithArguments(let className, let args):
+                // JavaScript doesn't support labeled arguments, only generate values
+                let argStrings = args.map { arg in
+                    generate(arg, format: format)
+                }
+                return "new \(className)(\(argStrings.joined(separator: ", ")))"
+            }
+        }
+
+        private func escapeForJavaScript(_ string: String) -> String {
+            return
+                string
+                .replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "\"", with: "\\\"")
+        }
+
+        /// Generates JSDoc comment lines for parameters with default values
+        /// Note: Caller should check if parameters have defaults before calling
+        func generateJSDoc(for parameters: [Parameter]) -> [String] {
+            var jsDocLines: [String] = ["/**"]
+            for param in parameters where param.hasDefault {
+                if let defaultValue = param.defaultValue {
+                    let defaultDoc = generate(defaultValue, format: .typescript)
+                    jsDocLines.append(" * @param \(param.name) - Optional parameter (default: \(defaultDoc))")
+                }
+            }
+            jsDocLines.append(" */")
+            return jsDocLines
+        }
     }
 
     func renderExportedEnum(_ enumDefinition: ExportedEnum) throws -> (js: [String], dts: [String]) {
@@ -1224,6 +1304,14 @@ extension BridgeJSLink {
             declarationPrefixKeyword: "function"
         )
         var dtsLines: [String] = []
+
+        // Add JSDoc comments for parameters with default values
+        if function.parameters.contains(where: { $0.hasDefault }) {
+            let generator = DefaultValueGenerator()
+            let jsDocLines = generator.generateJSDoc(for: function.parameters)
+            dtsLines.append(contentsOf: jsDocLines)
+        }
+
         dtsLines.append(
             "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
         )
@@ -1266,9 +1354,18 @@ extension BridgeJSLink {
             declarationPrefixKeyword: "static"
         )
 
-        let dtsLines = [
+        var dtsLines: [String] = []
+
+        // Add JSDoc comments for parameters with default values
+        if function.parameters.contains(where: { $0.hasDefault }) {
+            let generator = DefaultValueGenerator()
+            let jsDocLines = generator.generateJSDoc(for: function.parameters)
+            dtsLines.append(contentsOf: jsDocLines)
+        }
+
+        dtsLines.append(
             "static \(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
-        ]
+        )
 
         return (funcLines, dtsLines)
     }
@@ -1295,9 +1392,18 @@ extension BridgeJSLink {
         }
         printer.write("},")
 
-        let dtsLines = [
+        var dtsLines: [String] = []
+
+        // Add JSDoc comments for parameters with default values
+        if function.parameters.contains(where: { $0.hasDefault }) {
+            let generator = DefaultValueGenerator()
+            let jsDocLines = generator.generateJSDoc(for: function.parameters)
+            dtsLines.append(contentsOf: jsDocLines)
+        }
+
+        dtsLines.append(
             "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
-        ]
+        )
 
         return (printer.lines, dtsLines)
     }

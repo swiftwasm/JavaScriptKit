@@ -1918,6 +1918,116 @@ public func _bjs_getObserverStats() -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_testStringDefault")
+@_cdecl("bjs_testStringDefault")
+public func _bjs_testStringDefault(messageBytes: Int32, messageLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = testStringDefault(message: String.bridgeJSLiftParameter(messageBytes, messageLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testIntDefault")
+@_cdecl("bjs_testIntDefault")
+public func _bjs_testIntDefault(count: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = testIntDefault(count: Int.bridgeJSLiftParameter(count))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testBoolDefault")
+@_cdecl("bjs_testBoolDefault")
+public func _bjs_testBoolDefault(flag: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = testBoolDefault(flag: Bool.bridgeJSLiftParameter(flag))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testOptionalDefault")
+@_cdecl("bjs_testOptionalDefault")
+public func _bjs_testOptionalDefault(nameIsSome: Int32, nameBytes: Int32, nameLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = testOptionalDefault(name: Optional<String>.bridgeJSLiftParameter(nameIsSome, nameBytes, nameLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testMultipleDefaults")
+@_cdecl("bjs_testMultipleDefaults")
+public func _bjs_testMultipleDefaults(titleBytes: Int32, titleLength: Int32, count: Int32, enabled: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = testMultipleDefaults(title: String.bridgeJSLiftParameter(titleBytes, titleLength), count: Int.bridgeJSLiftParameter(count), enabled: Bool.bridgeJSLiftParameter(enabled))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testSimpleEnumDefault")
+@_cdecl("bjs_testSimpleEnumDefault")
+public func _bjs_testSimpleEnumDefault(status: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = testSimpleEnumDefault(status: Status.bridgeJSLiftParameter(status))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testDirectionDefault")
+@_cdecl("bjs_testDirectionDefault")
+public func _bjs_testDirectionDefault(direction: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = testDirectionDefault(direction: Direction.bridgeJSLiftParameter(direction))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testRawStringEnumDefault")
+@_cdecl("bjs_testRawStringEnumDefault")
+public func _bjs_testRawStringEnumDefault(themeBytes: Int32, themeLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = testRawStringEnumDefault(theme: Theme.bridgeJSLiftParameter(themeBytes, themeLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testComplexInit")
+@_cdecl("bjs_testComplexInit")
+public func _bjs_testComplexInit(greeter: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = testComplexInit(greeter: Greeter.bridgeJSLiftParameter(greeter))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testEmptyInit")
+@_cdecl("bjs_testEmptyInit")
+public func _bjs_testEmptyInit(object: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = testEmptyInit(_: StaticPropertyHolder.bridgeJSLiftParameter(object))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_getAllStaticPropertyValues")
 @_cdecl("bjs_getAllStaticPropertyValues")
 public func _bjs_getAllStaticPropertyValues() -> Void {

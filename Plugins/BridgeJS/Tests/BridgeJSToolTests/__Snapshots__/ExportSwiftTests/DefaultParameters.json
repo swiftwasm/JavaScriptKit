@@ -1,0 +1,482 @@
+{
+  "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_DefaultGreeter_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+
+      ],
+      "name" : "DefaultGreeter",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "DefaultGreeter"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_EmptyGreeter_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+
+      ],
+      "name" : "EmptyGreeter",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "EmptyGreeter"
+    }
+  ],
+  "enums" : [
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "active"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "inactive"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "pending"
+        }
+      ],
+      "emitStyle" : "const",
+      "explicitAccessControl" : "public",
+      "name" : "Status",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Status"
+    }
+  ],
+  "functions" : [
+    {
+      "abiName" : "bjs_testStringDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testStringDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "string" : {
+              "_0" : "Hello World"
+            }
+          },
+          "label" : "message",
+          "name" : "message",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testIntDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testIntDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "int" : {
+              "_0" : 42
+            }
+          },
+          "label" : "count",
+          "name" : "count",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "int" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testBoolDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testBoolDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "bool" : {
+              "_0" : true
+            }
+          },
+          "label" : "flag",
+          "name" : "flag",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "bool" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testFloatDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testFloatDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "float" : {
+              "_0" : 3.14
+            }
+          },
+          "label" : "value",
+          "name" : "value",
+          "type" : {
+            "float" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "float" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testDoubleDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testDoubleDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "double" : {
+              "_0" : 2.718
+            }
+          },
+          "label" : "precision",
+          "name" : "precision",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "double" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testOptionalDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testOptionalDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "null" : {
+
+            }
+          },
+          "label" : "name",
+          "name" : "name",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "string" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testOptionalStringDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testOptionalStringDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "string" : {
+              "_0" : "Hi"
+            }
+          },
+          "label" : "greeting",
+          "name" : "greeting",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "string" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testMultipleDefaults",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testMultipleDefaults",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "string" : {
+              "_0" : "Default Title"
+            }
+          },
+          "label" : "title",
+          "name" : "title",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "defaultValue" : {
+            "int" : {
+              "_0" : 10
+            }
+          },
+          "label" : "count",
+          "name" : "count",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "defaultValue" : {
+            "bool" : {
+              "_0" : false
+            }
+          },
+          "label" : "enabled",
+          "name" : "enabled",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testEnumDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testEnumDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "enumCase" : {
+              "_0" : "Status",
+              "_1" : "active"
+            }
+          },
+          "label" : "status",
+          "name" : "status",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "Status"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "Status"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testComplexInit",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testComplexInit",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "objectWithArguments" : {
+              "_0" : "DefaultGreeter",
+              "_1" : [
+                {
+                  "string" : {
+                    "_0" : "DefaultUser"
+                  }
+                }
+              ]
+            }
+          },
+          "label" : "greeter",
+          "name" : "greeter",
+          "type" : {
+            "swiftHeapObject" : {
+              "_0" : "DefaultGreeter"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "swiftHeapObject" : {
+          "_0" : "DefaultGreeter"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testEmptyInit",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testEmptyInit",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "object" : {
+              "_0" : "EmptyGreeter"
+            }
+          },
+          "label" : "greeter",
+          "name" : "greeter",
+          "type" : {
+            "swiftHeapObject" : {
+              "_0" : "EmptyGreeter"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "swiftHeapObject" : {
+          "_0" : "EmptyGreeter"
+        }
+      }
+    }
+  ],
+  "moduleName" : "TestModule"
+}
