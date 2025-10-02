@@ -243,48 +243,18 @@ public class ExportSwift {
                 return .null
             }
 
-            if let stringLiteral = expr.as(StringLiteralExprSyntax.self),
-                let segment = stringLiteral.segments.first?.as(StringSegmentSyntax.self),
-                type.matches(against: .string)
-            {
-                return .string(segment.content.text)
-            }
-
-            if let boolLiteral = expr.as(BooleanLiteralExprSyntax.self),
-                type.matches(against: .bool)
-            {
-                return .bool(boolLiteral.literal.text == "true")
-            }
-
-            if let intLiteral = expr.as(IntegerLiteralExprSyntax.self),
-                let intValue = Int(intLiteral.literal.text),
-                type.matches(against: .int)
-            {
-                return .int(intValue)
-            }
-
-            if let floatLiteral = expr.as(FloatLiteralExprSyntax.self) {
-                if type.matches(against: .float),
-                    let floatValue = Float(floatLiteral.literal.text)
-                {
-                    return .float(floatValue)
-                }
-                if type.matches(against: .double),
-                    let doubleValue = Double(floatLiteral.literal.text)
-                {
-                    return .double(doubleValue)
-                }
-            }
-
             if let memberExpr = expr.as(MemberAccessExprSyntax.self),
                 let enumValue = extractEnumCaseValue(from: memberExpr, type: type)
             {
                 return enumValue
             }
 
-            // Constructor calls (e.g., Greeter(name: "John"))
             if let funcCall = expr.as(FunctionCallExprSyntax.self) {
                 return extractConstructorDefaultValue(from: funcCall, type: type)
+            }
+
+            if let literalValue = extractLiteralValue(from: expr, type: type) {
+                return literalValue
             }
 
             diagnose(
@@ -300,7 +270,6 @@ public class ExportSwift {
             from funcCall: FunctionCallExprSyntax,
             type: BridgeType
         ) -> DefaultValue? {
-            // Extract class name
             guard let calledExpr = funcCall.calledExpression.as(DeclReferenceExprSyntax.self) else {
                 diagnose(
                     node: funcCall,
@@ -311,8 +280,6 @@ public class ExportSwift {
             }
 
             let className = calledExpr.baseName.text
-
-            // Verify type matches
             let expectedClassName: String?
             switch type {
             case .swiftHeapObject(let name):
@@ -337,17 +304,13 @@ public class ExportSwift {
                 return nil
             }
 
-            // Handle parameterless constructor
             if funcCall.arguments.isEmpty {
                 return .object(className)
             }
 
-            // Extract arguments for constructor with parameters
             var constructorArgs: [DefaultValue] = []
             for argument in funcCall.arguments {
-                // Recursively extract the argument's default value
-                // For now, only support literals in constructor arguments
-                guard let argValue = extractConstructorArgumentValue(from: argument.expression) else {
+                guard let argValue = extractLiteralValue(from: argument.expression) else {
                     diagnose(
                         node: argument.expression,
                         message: "Constructor argument must be a literal value",
@@ -362,40 +325,62 @@ public class ExportSwift {
             return .objectWithArguments(className, constructorArgs)
         }
 
-        /// Extracts a literal value from an expression for use in constructor arguments
-        private func extractConstructorArgumentValue(from expr: ExprSyntax) -> DefaultValue? {
-            // String literals
+        /// Extracts a literal value from an expression with optional type checking
+        private func extractLiteralValue(from expr: ExprSyntax, type: BridgeType? = nil) -> DefaultValue? {
+            if expr.is(NilLiteralExprSyntax.self) {
+                return .null
+            }
+
             if let stringLiteral = expr.as(StringLiteralExprSyntax.self),
                 let segment = stringLiteral.segments.first?.as(StringSegmentSyntax.self)
             {
-                return .string(segment.content.text)
+                let value = DefaultValue.string(segment.content.text)
+                if let type = type, !type.isCompatibleWith(.string) {
+                    return nil
+                }
+                return value
             }
 
-            // Boolean literals
             if let boolLiteral = expr.as(BooleanLiteralExprSyntax.self) {
-                return .bool(boolLiteral.literal.text == "true")
+                let value = DefaultValue.bool(boolLiteral.literal.text == "true")
+                if let type = type, !type.isCompatibleWith(.bool) {
+                    return nil
+                }
+                return value
             }
 
-            // Integer literals
-            if let intLiteral = expr.as(IntegerLiteralExprSyntax.self),
+            var numericExpr = expr
+            var isNegative = false
+            if let prefixExpr = expr.as(PrefixOperatorExprSyntax.self),
+                prefixExpr.operator.text == "-"
+            {
+                numericExpr = prefixExpr.expression
+                isNegative = true
+            }
+
+            if let intLiteral = numericExpr.as(IntegerLiteralExprSyntax.self),
                 let intValue = Int(intLiteral.literal.text)
             {
-                return .int(intValue)
+                let value = DefaultValue.int(isNegative ? -intValue : intValue)
+                if let type = type, !type.isCompatibleWith(.int) {
+                    return nil
+                }
+                return value
             }
 
-            // Float literals
-            if let floatLiteral = expr.as(FloatLiteralExprSyntax.self) {
+            if let floatLiteral = numericExpr.as(FloatLiteralExprSyntax.self) {
                 if let floatValue = Float(floatLiteral.literal.text) {
-                    return .float(floatValue)
+                    let value = DefaultValue.float(isNegative ? -floatValue : floatValue)
+                    if type == nil || type?.isCompatibleWith(.float) == true {
+                        return value
+                    }
                 }
                 if let doubleValue = Double(floatLiteral.literal.text) {
-                    return .double(doubleValue)
+                    let value = DefaultValue.double(isNegative ? -doubleValue : doubleValue)
+                    if type == nil || type?.isCompatibleWith(.double) == true {
+                        return value
+                    }
                 }
-            }
-
-            // nil literal
-            if expr.is(NilLiteralExprSyntax.self) {
-                return .null
             }
 
             return nil
@@ -885,7 +870,7 @@ public class ExportSwift {
                 swiftCallName: swiftCallName,
                 explicitAccessControl: explicitAccessControl,
                 cases: [],  // Will be populated in visit(EnumCaseDeclSyntax)
-                rawType: rawType,
+                rawType: SwiftEnumRawType(rawType),
                 namespace: effectiveNamespace,
                 emitStyle: emitStyle,
                 staticMethods: [],
@@ -923,9 +908,7 @@ public class ExportSwift {
 
             if case .tsEnum = emitStyle {
                 // Check for Bool raw type limitation
-                if let raw = exportedEnum.rawType,
-                    let rawEnum = SwiftEnumRawType.from(raw), rawEnum == .bool
-                {
+                if exportedEnum.rawType == .bool {
                     diagnose(
                         node: jsAttribute,
                         message: "TypeScript enum style is not supported for Bool raw-value enums",
@@ -1180,7 +1163,7 @@ public class ExportSwift {
                 return Constants.supportedRawTypes.contains(typeName)
             }?.type.trimmedDescription
 
-            if let rawTypeString, let rawType = SwiftEnumRawType.from(rawTypeString) {
+            if let rawType = SwiftEnumRawType(rawTypeString) {
                 return .rawValueEnum(swiftCallName, rawType)
             } else {
                 let hasAnyCases = enumDecl.memberBlock.members.contains { member in
@@ -2160,12 +2143,13 @@ extension WithModifiersSyntax {
 }
 
 fileprivate extension BridgeType {
-    func matches(against expected: BridgeType) -> Bool {
-        switch (self, expected) {
+    /// Returns true if a value of `expectedType` can be assigned to this type.
+    func isCompatibleWith(_ expectedType: BridgeType) -> Bool {
+        switch (self, expectedType) {
         case let (lhs, rhs) where lhs == rhs:
             return true
-        case (.optional(let wrapped), expected):
-            return wrapped == expected
+        case (.optional(let wrapped), expectedType):
+            return wrapped == expectedType
         default:
             return false
         }

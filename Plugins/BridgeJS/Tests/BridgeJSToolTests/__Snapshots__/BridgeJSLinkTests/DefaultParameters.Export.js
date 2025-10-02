@@ -156,6 +156,10 @@ export async function createInstantiator(options, swift) {
                 const obj = EmptyGreeter.__construct(pointer);
                 return swift.memory.retain(obj);
             };
+            importObject["TestModule"]["bjs_ConstructorDefaults_wrap"] = function(pointer) {
+                const obj = ConstructorDefaults.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
         },
         setInstance: (i) => {
             instance = i;
@@ -222,13 +226,90 @@ export async function createInstantiator(options, swift) {
                     return EmptyGreeter.__construct(ret);
                 }
             }
+            class ConstructorDefaults extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_ConstructorDefaults_deinit, ConstructorDefaults.prototype);
+                }
+            
+                constructor(name = "Default", count = 42, enabled = true, status = StatusValues.Active, tag = null) {
+                    const nameBytes = textEncoder.encode(name);
+                    const nameId = swift.memory.retain(nameBytes);
+                    const isSome = tag != null;
+                    let tagId, tagBytes;
+                    if (isSome) {
+                        tagBytes = textEncoder.encode(tag);
+                        tagId = swift.memory.retain(tagBytes);
+                    }
+                    const ret = instance.exports.bjs_ConstructorDefaults_init(nameId, nameBytes.length, count, enabled, status, +isSome, isSome ? tagId : 0, isSome ? tagBytes.length : 0);
+                    swift.memory.release(nameId);
+                    if (tagId != undefined) {
+                        swift.memory.release(tagId);
+                    }
+                    return ConstructorDefaults.__construct(ret);
+                }
+                describe() {
+                    instance.exports.bjs_ConstructorDefaults_describe(this.pointer);
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
+                    return ret;
+                }
+                get name() {
+                    instance.exports.bjs_ConstructorDefaults_name_get(this.pointer);
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
+                    return ret;
+                }
+                set name(value) {
+                    const valueBytes = textEncoder.encode(value);
+                    const valueId = swift.memory.retain(valueBytes);
+                    instance.exports.bjs_ConstructorDefaults_name_set(this.pointer, valueId, valueBytes.length);
+                    swift.memory.release(valueId);
+                }
+                get count() {
+                    const ret = instance.exports.bjs_ConstructorDefaults_count_get(this.pointer);
+                    return ret;
+                }
+                set count(value) {
+                    instance.exports.bjs_ConstructorDefaults_count_set(this.pointer, value);
+                }
+                get enabled() {
+                    const ret = instance.exports.bjs_ConstructorDefaults_enabled_get(this.pointer);
+                    return ret !== 0;
+                }
+                set enabled(value) {
+                    instance.exports.bjs_ConstructorDefaults_enabled_set(this.pointer, value);
+                }
+                get status() {
+                    const ret = instance.exports.bjs_ConstructorDefaults_status_get(this.pointer);
+                    return ret;
+                }
+                set status(value) {
+                    instance.exports.bjs_ConstructorDefaults_status_set(this.pointer, value);
+                }
+                get tag() {
+                    instance.exports.bjs_ConstructorDefaults_tag_get(this.pointer);
+                    const optResult = tmpRetString;
+                    tmpRetString = undefined;
+                    return optResult;
+                }
+                set tag(value) {
+                    const isSome = value != null;
+                    let valueId, valueBytes;
+                    if (isSome) {
+                        valueBytes = textEncoder.encode(value);
+                        valueId = swift.memory.retain(valueBytes);
+                    }
+                    instance.exports.bjs_ConstructorDefaults_tag_set(this.pointer, +isSome, isSome ? valueId : 0, isSome ? valueBytes.length : 0);
+                    if (valueId != undefined) {
+                        swift.memory.release(valueId);
+                    }
+                }
+            }
             return {
                 DefaultGreeter,
                 EmptyGreeter,
-                testStringDefault: function bjs_testStringDefault(message) {
-                    if (message === undefined) {
-                        message = "Hello World";
-                    }
+                ConstructorDefaults,
+                testStringDefault: function bjs_testStringDefault(message = "Hello World") {
                     const messageBytes = textEncoder.encode(message);
                     const messageId = swift.memory.retain(messageBytes);
                     instance.exports.bjs_testStringDefault(messageId, messageBytes.length);
@@ -237,38 +318,23 @@ export async function createInstantiator(options, swift) {
                     swift.memory.release(messageId);
                     return ret;
                 },
-                testIntDefault: function bjs_testIntDefault(count) {
-                    if (count === undefined) {
-                        count = 42;
-                    }
-                    const ret = instance.exports.bjs_testIntDefault(count);
+                testNegativeIntDefault: function bjs_testNegativeIntDefault(value = -42) {
+                    const ret = instance.exports.bjs_testNegativeIntDefault(value);
                     return ret;
                 },
-                testBoolDefault: function bjs_testBoolDefault(flag) {
-                    if (flag === undefined) {
-                        flag = true;
-                    }
+                testBoolDefault: function bjs_testBoolDefault(flag = true) {
                     const ret = instance.exports.bjs_testBoolDefault(flag);
                     return ret !== 0;
                 },
-                testFloatDefault: function bjs_testFloatDefault(value) {
-                    if (value === undefined) {
-                        value = 3.14;
-                    }
-                    const ret = instance.exports.bjs_testFloatDefault(value);
+                testNegativeFloatDefault: function bjs_testNegativeFloatDefault(temp = -273.15) {
+                    const ret = instance.exports.bjs_testNegativeFloatDefault(temp);
                     return ret;
                 },
-                testDoubleDefault: function bjs_testDoubleDefault(precision) {
-                    if (precision === undefined) {
-                        precision = 2.718;
-                    }
+                testDoubleDefault: function bjs_testDoubleDefault(precision = 2.718) {
                     const ret = instance.exports.bjs_testDoubleDefault(precision);
                     return ret;
                 },
-                testOptionalDefault: function bjs_testOptionalDefault(name) {
-                    if (name === undefined) {
-                        name = null;
-                    }
+                testOptionalDefault: function bjs_testOptionalDefault(name = null) {
                     const isSome = name != null;
                     let nameId, nameBytes;
                     if (isSome) {
@@ -283,10 +349,7 @@ export async function createInstantiator(options, swift) {
                     }
                     return optResult;
                 },
-                testOptionalStringDefault: function bjs_testOptionalStringDefault(greeting) {
-                    if (greeting === undefined) {
-                        greeting = "Hi";
-                    }
+                testOptionalStringDefault: function bjs_testOptionalStringDefault(greeting = "Hi") {
                     const isSome = greeting != null;
                     let greetingId, greetingBytes;
                     if (isSome) {
@@ -301,16 +364,7 @@ export async function createInstantiator(options, swift) {
                     }
                     return optResult;
                 },
-                testMultipleDefaults: function bjs_testMultipleDefaults(title, count, enabled) {
-                    if (title === undefined) {
-                        title = "Default Title";
-                    }
-                    if (count === undefined) {
-                        count = 10;
-                    }
-                    if (enabled === undefined) {
-                        enabled = false;
-                    }
+                testMultipleDefaults: function bjs_testMultipleDefaults(title = "Default Title", count = 10, enabled = false) {
                     const titleBytes = textEncoder.encode(title);
                     const titleId = swift.memory.retain(titleBytes);
                     instance.exports.bjs_testMultipleDefaults(titleId, titleBytes.length, count, enabled);
@@ -319,24 +373,15 @@ export async function createInstantiator(options, swift) {
                     swift.memory.release(titleId);
                     return ret;
                 },
-                testEnumDefault: function bjs_testEnumDefault(status) {
-                    if (status === undefined) {
-                        status = StatusValues.Active;
-                    }
+                testEnumDefault: function bjs_testEnumDefault(status = StatusValues.Active) {
                     const ret = instance.exports.bjs_testEnumDefault(status);
                     return ret;
                 },
-                testComplexInit: function bjs_testComplexInit(greeter) {
-                    if (greeter === undefined) {
-                        greeter = new DefaultGreeter("DefaultUser");
-                    }
+                testComplexInit: function bjs_testComplexInit(greeter = new DefaultGreeter("DefaultUser")) {
                     const ret = instance.exports.bjs_testComplexInit(greeter.pointer);
                     return DefaultGreeter.__construct(ret);
                 },
-                testEmptyInit: function bjs_testEmptyInit(greeter) {
-                    if (greeter === undefined) {
-                        greeter = new EmptyGreeter();
-                    }
+                testEmptyInit: function bjs_testEmptyInit(greeter = new EmptyGreeter()) {
                     const ret = instance.exports.bjs_testEmptyInit(greeter.pointer);
                     return EmptyGreeter.__construct(ret);
                 },

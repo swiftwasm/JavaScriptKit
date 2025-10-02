@@ -58,6 +58,170 @@
 
       ],
       "swiftCallName" : "EmptyGreeter"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_ConstructorDefaults_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "defaultValue" : {
+              "string" : {
+                "_0" : "Default"
+              }
+            },
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "defaultValue" : {
+              "int" : {
+                "_0" : 42
+              }
+            },
+            "label" : "count",
+            "name" : "count",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "defaultValue" : {
+              "bool" : {
+                "_0" : true
+              }
+            },
+            "label" : "enabled",
+            "name" : "enabled",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "defaultValue" : {
+              "enumCase" : {
+                "_0" : "Status",
+                "_1" : "active"
+              }
+            },
+            "label" : "status",
+            "name" : "status",
+            "type" : {
+              "caseEnum" : {
+                "_0" : "Status"
+              }
+            }
+          },
+          {
+            "defaultValue" : {
+              "null" : {
+
+              }
+            },
+            "label" : "tag",
+            "name" : "tag",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_ConstructorDefaults_describe",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "describe",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "ConstructorDefaults",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "count",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "enabled",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "status",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "Status"
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "tag",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "ConstructorDefaults"
     }
   ],
   "enums" : [
@@ -126,22 +290,22 @@
       }
     },
     {
-      "abiName" : "bjs_testIntDefault",
+      "abiName" : "bjs_testNegativeIntDefault",
       "effects" : {
         "isAsync" : false,
         "isStatic" : false,
         "isThrows" : false
       },
-      "name" : "testIntDefault",
+      "name" : "testNegativeIntDefault",
       "parameters" : [
         {
           "defaultValue" : {
             "int" : {
-              "_0" : 42
+              "_0" : -42
             }
           },
-          "label" : "count",
-          "name" : "count",
+          "label" : "value",
+          "name" : "value",
           "type" : {
             "int" : {
 
@@ -186,22 +350,22 @@
       }
     },
     {
-      "abiName" : "bjs_testFloatDefault",
+      "abiName" : "bjs_testNegativeFloatDefault",
       "effects" : {
         "isAsync" : false,
         "isStatic" : false,
         "isThrows" : false
       },
-      "name" : "testFloatDefault",
+      "name" : "testNegativeFloatDefault",
       "parameters" : [
         {
           "defaultValue" : {
             "float" : {
-              "_0" : 3.14
+              "_0" : -273.15
             }
           },
-          "label" : "value",
-          "name" : "value",
+          "label" : "temp",
+          "name" : "temp",
           "type" : {
             "float" : {
 

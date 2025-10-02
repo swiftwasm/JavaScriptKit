@@ -656,10 +656,10 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.testOptionalDefault(), null);
     assert.equal(exports.testOptionalDefault("Test"), "Test");
 
-    assert.equal(exports.testMultipleDefaults(), "Default Title: 10 (false)");
-    assert.equal(exports.testMultipleDefaults("Custom"), "Custom: 10 (false)");
+    assert.equal(exports.testMultipleDefaults(), "Default Title: -10 (false)");
+    assert.equal(exports.testMultipleDefaults("Custom"), "Custom: -10 (false)");
     assert.equal(exports.testMultipleDefaults("Custom", 5), "Custom: 5 (false)");
-    assert.equal(exports.testMultipleDefaults("Custom", undefined, true), "Custom: 10 (true)");
+    assert.equal(exports.testMultipleDefaults("Custom", undefined, true), "Custom: -10 (true)");
     assert.equal(exports.testMultipleDefaults("Custom", 5, true), "Custom: 5 (true)");
 
     assert.equal(exports.testSimpleEnumDefault(), exports.Status.Success);
@@ -683,6 +683,26 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     const customGreeter = new exports.Greeter("CustomName");
     assert.equal(exports.testComplexInit(customGreeter), "Hello, CustomName!");
     customGreeter.release();
+
+    const cd1 = new exports.ConstructorDefaults();
+    assert.equal(cd1.describe(), "Default:42:true:success:nil");
+    cd1.release();
+
+    const cd2 = new exports.ConstructorDefaults("Custom");
+    assert.equal(cd2.describe(), "Custom:42:true:success:nil");
+    cd2.release();
+
+    const cd3 = new exports.ConstructorDefaults("Custom", 100);
+    assert.equal(cd3.describe(), "Custom:100:true:success:nil");
+    cd3.release();
+
+    const cd4 = new exports.ConstructorDefaults("Custom", undefined, false);
+    assert.equal(cd4.describe(), "Custom:42:false:success:nil");
+    cd4.release();
+
+    const cd5 = new exports.ConstructorDefaults("Test", 99, false, exports.Status.Loading);
+    assert.equal(cd5.describe(), "Test:99:false:loading:nil");
+    cd5.release();
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

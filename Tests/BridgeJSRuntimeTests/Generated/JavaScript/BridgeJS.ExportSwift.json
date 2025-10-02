@@ -808,6 +808,170 @@
     },
     {
       "constructor" : {
+        "abiName" : "bjs_ConstructorDefaults_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "defaultValue" : {
+              "string" : {
+                "_0" : "Default"
+              }
+            },
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "defaultValue" : {
+              "int" : {
+                "_0" : 42
+              }
+            },
+            "label" : "count",
+            "name" : "count",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "defaultValue" : {
+              "bool" : {
+                "_0" : true
+              }
+            },
+            "label" : "enabled",
+            "name" : "enabled",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "defaultValue" : {
+              "enumCase" : {
+                "_0" : "Status",
+                "_1" : "success"
+              }
+            },
+            "label" : "status",
+            "name" : "status",
+            "type" : {
+              "caseEnum" : {
+                "_0" : "Status"
+              }
+            }
+          },
+          {
+            "defaultValue" : {
+              "null" : {
+
+              }
+            },
+            "label" : "tag",
+            "name" : "tag",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_ConstructorDefaults_describe",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "describe",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "ConstructorDefaults",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "count",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "enabled",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "status",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "Status"
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "tag",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "ConstructorDefaults"
+    },
+    {
+      "constructor" : {
         "abiName" : "bjs_StaticPropertyHolder_init",
         "effects" : {
           "isAsync" : false,
@@ -5052,7 +5216,7 @@
         {
           "defaultValue" : {
             "int" : {
-              "_0" : 10
+              "_0" : -10
             }
           },
           "label" : "count",

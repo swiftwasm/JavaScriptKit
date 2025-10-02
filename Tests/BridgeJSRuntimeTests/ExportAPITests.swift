@@ -720,7 +720,7 @@ enum APIOptionalResult {
 
 @JS func testMultipleDefaults(
     title: String = "Default Title",
-    count: Int = 10,
+    count: Int = -10,
     enabled: Bool = false
 ) -> String {
     return "\(title): \(count) (\(enabled))"
@@ -744,6 +744,39 @@ enum APIOptionalResult {
 
 @JS func testEmptyInit(_ object: StaticPropertyHolder = StaticPropertyHolder()) -> StaticPropertyHolder {
     return object
+}
+
+@JS class ConstructorDefaults {
+    @JS var name: String
+    @JS var count: Int
+    @JS var enabled: Bool
+    @JS var status: Status
+    @JS var tag: String?
+
+    @JS init(
+        name: String = "Default",
+        count: Int = 42,
+        enabled: Bool = true,
+        status: Status = .success,
+        tag: String? = nil
+    ) {
+        self.name = name
+        self.count = count
+        self.enabled = enabled
+        self.status = status
+        self.tag = tag
+    }
+
+    @JS func describe() -> String {
+        let tagStr = tag ?? "nil"
+        let statusStr: String
+        switch status {
+        case .loading: statusStr = "loading"
+        case .success: statusStr = "success"
+        case .error: statusStr = "error"
+        }
+        return "\(name):\(count):\(enabled):\(statusStr):\(tagStr)"
+    }
 }
 
 // MARK: - Static Properties

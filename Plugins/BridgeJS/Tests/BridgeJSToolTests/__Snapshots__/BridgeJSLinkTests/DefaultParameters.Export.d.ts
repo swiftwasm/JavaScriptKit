@@ -25,6 +25,14 @@ export interface DefaultGreeter extends SwiftHeapObject {
 }
 export interface EmptyGreeter extends SwiftHeapObject {
 }
+export interface ConstructorDefaults extends SwiftHeapObject {
+    describe(): string;
+    name: string;
+    count: number;
+    enabled: boolean;
+    status: StatusTag;
+    tag: string | null;
+}
 export type Exports = {
     DefaultGreeter: {
         new(name: string): DefaultGreeter;
@@ -32,22 +40,32 @@ export type Exports = {
     EmptyGreeter: {
         new(): EmptyGreeter;
     }
+    ConstructorDefaults: {
+        /**
+         * @param name - Optional parameter (default: "Default")
+         * @param count - Optional parameter (default: 42)
+         * @param enabled - Optional parameter (default: true)
+         * @param status - Optional parameter (default: Status.Active)
+         * @param tag - Optional parameter (default: null)
+         */
+        new(name?: string, count?: number, enabled?: boolean, status?: StatusTag, tag?: string | null): ConstructorDefaults;
+    }
     /**
      * @param message - Optional parameter (default: "Hello World")
      */
     testStringDefault(message?: string): string;
     /**
-     * @param count - Optional parameter (default: 42)
+     * @param value - Optional parameter (default: -42)
      */
-    testIntDefault(count?: number): number;
+    testNegativeIntDefault(value?: number): number;
     /**
      * @param flag - Optional parameter (default: true)
      */
     testBoolDefault(flag?: boolean): boolean;
     /**
-     * @param value - Optional parameter (default: 3.14)
+     * @param temp - Optional parameter (default: -273.15)
      */
-    testFloatDefault(value?: number): number;
+    testNegativeFloatDefault(temp?: number): number;
     /**
      * @param precision - Optional parameter (default: 2.718)
      */
