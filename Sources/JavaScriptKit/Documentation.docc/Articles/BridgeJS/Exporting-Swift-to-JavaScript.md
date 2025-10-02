@@ -67,6 +67,7 @@ This command will:
 - <doc:Exporting-Swift-Class>
 - <doc:Exporting-Swift-Enum>
 - <doc:Exporting-Swift-Optional>
+- <doc:Exporting-Swift-Default-Parameters>
 - <doc:Exporting-Swift-Static-Functions>
 - <doc:Exporting-Swift-Static-Properties>
 - <doc:Using-Namespace>

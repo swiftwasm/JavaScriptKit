@@ -107,35 +107,43 @@ public enum SwiftEnumRawType: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    public static func from(_ rawTypeString: String) -> SwiftEnumRawType? {
-        return Self.allCases.first { $0.rawValue == rawTypeString }
-    }
-
-    public static func formatValue(_ rawValue: String, rawType: String) -> String {
-        if let enumType = from(rawType) {
-            switch enumType {
-            case .string:
-                return "\"\(rawValue)\""
-            case .bool:
-                return rawValue.lowercased() == "true" ? "true" : "false"
-            case .float, .double, .int, .int32, .int64, .uint, .uint32, .uint64:
-                return rawValue
-            }
-        } else {
-            return rawValue
+    public init?(_ rawTypeString: String?) {
+        guard let rawTypeString = rawTypeString,
+            let match = Self.allCases.first(where: { $0.rawValue == rawTypeString })
+        else {
+            return nil
         }
+        self = match
     }
+}
+
+public enum DefaultValue: Codable, Equatable, Sendable {
+    case string(String)
+    case int(Int)
+    case float(Float)
+    case double(Double)
+    case bool(Bool)
+    case null
+    case enumCase(String, String)  // enumName, caseName
+    case object(String)  // className for parameterless constructor
+    case objectWithArguments(String, [DefaultValue])  // className, constructor argument values
 }
 
 public struct Parameter: Codable, Equatable, Sendable {
     public let label: String?
     public let name: String
     public let type: BridgeType
+    public let defaultValue: DefaultValue?
 
-    public init(label: String?, name: String, type: BridgeType) {
+    public var hasDefault: Bool {
+        return defaultValue != nil
+    }
+
+    public init(label: String?, name: String, type: BridgeType, defaultValue: DefaultValue? = nil) {
         self.label = label
         self.name = name
         self.type = type
+        self.defaultValue = defaultValue
     }
 }
 
@@ -186,6 +194,24 @@ public struct EnumCase: Codable, Equatable, Sendable {
     }
 }
 
+extension EnumCase {
+    /// Generates JavaScript/TypeScript value representation for this enum case
+    public func jsValue(rawType: SwiftEnumRawType?, index: Int) -> String {
+        guard let rawType = rawType else {
+            return "\(index)"
+        }
+        let rawValue = self.rawValue ?? self.name
+        switch rawType {
+        case .string:
+            return "\"\(rawValue)\""
+        case .bool:
+            return rawValue.lowercased() == "true" ? "true" : "false"
+        case .float, .double, .int, .int32, .int64, .uint, .uint32, .uint64:
+            return rawValue
+        }
+    }
+}
+
 public enum EnumEmitStyle: String, Codable, Sendable {
     case const
     case tsEnum
@@ -196,7 +222,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
     public let swiftCallName: String
     public let explicitAccessControl: String?
     public var cases: [EnumCase]
-    public let rawType: String?
+    public let rawType: SwiftEnumRawType?
     public let namespace: [String]?
     public let emitStyle: EnumEmitStyle
     public var staticMethods: [ExportedFunction]
@@ -216,7 +242,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
         swiftCallName: String,
         explicitAccessControl: String?,
         cases: [EnumCase],
-        rawType: String?,
+        rawType: SwiftEnumRawType?,
         namespace: [String]?,
         emitStyle: EnumEmitStyle,
         staticMethods: [ExportedFunction] = [],

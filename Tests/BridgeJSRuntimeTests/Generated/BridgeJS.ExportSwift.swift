@@ -1918,6 +1918,116 @@ public func _bjs_getObserverStats() -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_testStringDefault")
+@_cdecl("bjs_testStringDefault")
+public func _bjs_testStringDefault(messageBytes: Int32, messageLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = testStringDefault(message: String.bridgeJSLiftParameter(messageBytes, messageLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testIntDefault")
+@_cdecl("bjs_testIntDefault")
+public func _bjs_testIntDefault(count: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = testIntDefault(count: Int.bridgeJSLiftParameter(count))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testBoolDefault")
+@_cdecl("bjs_testBoolDefault")
+public func _bjs_testBoolDefault(flag: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = testBoolDefault(flag: Bool.bridgeJSLiftParameter(flag))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testOptionalDefault")
+@_cdecl("bjs_testOptionalDefault")
+public func _bjs_testOptionalDefault(nameIsSome: Int32, nameBytes: Int32, nameLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = testOptionalDefault(name: Optional<String>.bridgeJSLiftParameter(nameIsSome, nameBytes, nameLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testMultipleDefaults")
+@_cdecl("bjs_testMultipleDefaults")
+public func _bjs_testMultipleDefaults(titleBytes: Int32, titleLength: Int32, count: Int32, enabled: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = testMultipleDefaults(title: String.bridgeJSLiftParameter(titleBytes, titleLength), count: Int.bridgeJSLiftParameter(count), enabled: Bool.bridgeJSLiftParameter(enabled))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testSimpleEnumDefault")
+@_cdecl("bjs_testSimpleEnumDefault")
+public func _bjs_testSimpleEnumDefault(status: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = testSimpleEnumDefault(status: Status.bridgeJSLiftParameter(status))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testDirectionDefault")
+@_cdecl("bjs_testDirectionDefault")
+public func _bjs_testDirectionDefault(direction: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = testDirectionDefault(direction: Direction.bridgeJSLiftParameter(direction))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testRawStringEnumDefault")
+@_cdecl("bjs_testRawStringEnumDefault")
+public func _bjs_testRawStringEnumDefault(themeBytes: Int32, themeLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = testRawStringEnumDefault(theme: Theme.bridgeJSLiftParameter(themeBytes, themeLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testComplexInit")
+@_cdecl("bjs_testComplexInit")
+public func _bjs_testComplexInit(greeter: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = testComplexInit(greeter: Greeter.bridgeJSLiftParameter(greeter))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testEmptyInit")
+@_cdecl("bjs_testEmptyInit")
+public func _bjs_testEmptyInit(object: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = testEmptyInit(_: StaticPropertyHolder.bridgeJSLiftParameter(object))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_getAllStaticPropertyValues")
 @_cdecl("bjs_getAllStaticPropertyValues")
 public func _bjs_getAllStaticPropertyValues() -> Void {
@@ -2742,6 +2852,153 @@ extension MathUtils: ConvertibleToJSValue, _BridgedSwiftHeapObject {
         }
         #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_MathUtils_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+@_expose(wasm, "bjs_ConstructorDefaults_init")
+@_cdecl("bjs_ConstructorDefaults_init")
+public func _bjs_ConstructorDefaults_init(nameBytes: Int32, nameLength: Int32, count: Int32, enabled: Int32, status: Int32, tagIsSome: Int32, tagBytes: Int32, tagLength: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = ConstructorDefaults(name: String.bridgeJSLiftParameter(nameBytes, nameLength), count: Int.bridgeJSLiftParameter(count), enabled: Bool.bridgeJSLiftParameter(enabled), status: Status.bridgeJSLiftParameter(status), tag: Optional<String>.bridgeJSLiftParameter(tagIsSome, tagBytes, tagLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConstructorDefaults_describe")
+@_cdecl("bjs_ConstructorDefaults_describe")
+public func _bjs_ConstructorDefaults_describe(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = ConstructorDefaults.bridgeJSLiftParameter(_self).describe()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConstructorDefaults_name_get")
+@_cdecl("bjs_ConstructorDefaults_name_get")
+public func _bjs_ConstructorDefaults_name_get(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = ConstructorDefaults.bridgeJSLiftParameter(_self).name
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConstructorDefaults_name_set")
+@_cdecl("bjs_ConstructorDefaults_name_set")
+public func _bjs_ConstructorDefaults_name_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    ConstructorDefaults.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConstructorDefaults_count_get")
+@_cdecl("bjs_ConstructorDefaults_count_get")
+public func _bjs_ConstructorDefaults_count_get(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = ConstructorDefaults.bridgeJSLiftParameter(_self).count
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConstructorDefaults_count_set")
+@_cdecl("bjs_ConstructorDefaults_count_set")
+public func _bjs_ConstructorDefaults_count_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+    #if arch(wasm32)
+    ConstructorDefaults.bridgeJSLiftParameter(_self).count = Int.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConstructorDefaults_enabled_get")
+@_cdecl("bjs_ConstructorDefaults_enabled_get")
+public func _bjs_ConstructorDefaults_enabled_get(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = ConstructorDefaults.bridgeJSLiftParameter(_self).enabled
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConstructorDefaults_enabled_set")
+@_cdecl("bjs_ConstructorDefaults_enabled_set")
+public func _bjs_ConstructorDefaults_enabled_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+    #if arch(wasm32)
+    ConstructorDefaults.bridgeJSLiftParameter(_self).enabled = Bool.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConstructorDefaults_status_get")
+@_cdecl("bjs_ConstructorDefaults_status_get")
+public func _bjs_ConstructorDefaults_status_get(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = ConstructorDefaults.bridgeJSLiftParameter(_self).status
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConstructorDefaults_status_set")
+@_cdecl("bjs_ConstructorDefaults_status_set")
+public func _bjs_ConstructorDefaults_status_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+    #if arch(wasm32)
+    ConstructorDefaults.bridgeJSLiftParameter(_self).status = Status.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConstructorDefaults_tag_get")
+@_cdecl("bjs_ConstructorDefaults_tag_get")
+public func _bjs_ConstructorDefaults_tag_get(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = ConstructorDefaults.bridgeJSLiftParameter(_self).tag
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConstructorDefaults_tag_set")
+@_cdecl("bjs_ConstructorDefaults_tag_set")
+public func _bjs_ConstructorDefaults_tag_set(_self: UnsafeMutableRawPointer, valueIsSome: Int32, valueBytes: Int32, valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    ConstructorDefaults.bridgeJSLiftParameter(_self).tag = Optional<String>.bridgeJSLiftParameter(valueIsSome, valueBytes, valueLength)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConstructorDefaults_deinit")
+@_cdecl("bjs_ConstructorDefaults_deinit")
+public func _bjs_ConstructorDefaults_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<ConstructorDefaults>.fromOpaque(pointer).release()
+}
+
+extension ConstructorDefaults: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        #if arch(wasm32)
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ConstructorDefaults_wrap")
+        func _bjs_ConstructorDefaults_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_ConstructorDefaults_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_ConstructorDefaults_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
 

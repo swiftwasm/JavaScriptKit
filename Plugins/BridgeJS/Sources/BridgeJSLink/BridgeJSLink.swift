@@ -1026,6 +1026,16 @@ struct BridgeJSLink {
             ]
         }
 
+        func generateParameterList(parameters: [Parameter]) -> String {
+            parameters.map { param in
+                if let defaultValue = param.defaultValue {
+                    let defaultJs = DefaultValueGenerator().generate(defaultValue, format: .javascript)
+                    return "\(param.name) = \(defaultJs)"
+                }
+                return param.name
+            }.joined(separator: ", ")
+        }
+
         func renderFunction(
             name: String,
             parameters: [Parameter],
@@ -1034,8 +1044,10 @@ struct BridgeJSLink {
         ) -> [String] {
             let printer = CodeFragmentPrinter()
 
+            let parameterList = generateParameterList(parameters: parameters)
+
             printer.write(
-                "\(declarationPrefixKeyword.map { "\($0) "} ?? "")\(name)(\(parameters.map { $0.name }.joined(separator: ", "))) {"
+                "\(declarationPrefixKeyword.map { "\($0) "} ?? "")\(name)(\(parameterList)) {"
             )
             printer.indent {
                 printer.write(contentsOf: body)
@@ -1058,8 +1070,83 @@ struct BridgeJSLink {
         } else {
             returnTypeWithEffect = returnType.tsType
         }
-        return
-            "(\(parameters.map { "\($0.name): \($0.type.tsType)" }.joined(separator: ", "))): \(returnTypeWithEffect)"
+        let parameterSignatures = parameters.map { param in
+            let optional = param.hasDefault ? "?" : ""
+            return "\(param.name)\(optional): \(param.type.tsType)"
+        }
+        return "(\(parameterSignatures.joined(separator: ", "))): \(returnTypeWithEffect)"
+    }
+
+    /// Helper method to append JSDoc comments for parameters with default values
+    private func appendJSDocIfNeeded(for parameters: [Parameter], to lines: inout [String]) {
+        let jsDocLines = DefaultValueGenerator().generateJSDoc(for: parameters)
+        lines.append(contentsOf: jsDocLines)
+    }
+
+    /// Helper struct for generating default value representations
+    private struct DefaultValueGenerator {
+        enum OutputFormat {
+            case javascript
+            case typescript
+        }
+
+        /// Generates default value representation for JavaScript or TypeScript
+        func generate(_ defaultValue: DefaultValue, format: OutputFormat) -> String {
+            switch defaultValue {
+            case .string(let value):
+                let escapedValue =
+                    format == .javascript
+                    ? escapeForJavaScript(value)
+                    : value  // TypeScript doesn't need escape in doc comments
+                return "\"\(escapedValue)\""
+            case .int(let value):
+                return "\(value)"
+            case .float(let value):
+                return "\(value)"
+            case .double(let value):
+                return "\(value)"
+            case .bool(let value):
+                return value ? "true" : "false"
+            case .null:
+                return "null"
+            case .enumCase(let enumName, let caseName):
+                let simpleName = enumName.components(separatedBy: ".").last ?? enumName
+                let jsEnumName = format == .javascript ? "\(simpleName)Values" : simpleName
+                return "\(jsEnumName).\(caseName.capitalizedFirstLetter)"
+            case .object(let className):
+                return "new \(className)()"
+            case .objectWithArguments(let className, let args):
+                let argStrings = args.map { arg in
+                    generate(arg, format: format)
+                }
+                return "new \(className)(\(argStrings.joined(separator: ", ")))"
+            }
+        }
+
+        private func escapeForJavaScript(_ string: String) -> String {
+            return
+                string
+                .replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "\"", with: "\\\"")
+        }
+
+        /// Generates JSDoc comment lines for parameters with default values
+        func generateJSDoc(for parameters: [Parameter]) -> [String] {
+            let paramsWithDefaults = parameters.filter { $0.hasDefault }
+            guard !paramsWithDefaults.isEmpty else {
+                return []
+            }
+
+            var jsDocLines: [String] = ["/**"]
+            for param in paramsWithDefaults {
+                if let defaultValue = param.defaultValue {
+                    let defaultDoc = generate(defaultValue, format: .typescript)
+                    jsDocLines.append(" * @param \(param.name) - Optional parameter (default: \(defaultDoc))")
+                }
+            }
+            jsDocLines.append(" */")
+            return jsDocLines
+        }
     }
 
     func renderExportedEnum(_ enumDefinition: ExportedEnum) throws -> (js: [String], dts: [String]) {
@@ -1110,9 +1197,7 @@ struct BridgeJSLink {
                 printer.indent {
                     for (index, enumCase) in enumDefinition.cases.enumerated() {
                         let caseName = enumCase.name.capitalizedFirstLetter
-                        let value = getEnumCaseValue(
-                            enumCase: enumCase,
-                            enumType: enumDefinition.enumType,
+                        let value = enumCase.jsValue(
                             rawType: enumDefinition.rawType,
                             index: index
                         )
@@ -1132,9 +1217,7 @@ struct BridgeJSLink {
                 printer.indent {
                     for (index, enumCase) in enumDefinition.cases.enumerated() {
                         let caseName = enumCase.name.capitalizedFirstLetter
-                        let value = getEnumCaseValue(
-                            enumCase: enumCase,
-                            enumType: enumDefinition.enumType,
+                        let value = enumCase.jsValue(
                             rawType: enumDefinition.rawType,
                             index: index
                         )
@@ -1192,17 +1275,6 @@ struct BridgeJSLink {
         return printer.lines
     }
 
-    private func getEnumCaseValue(enumCase: EnumCase, enumType: EnumType, rawType: String?, index: Int) -> String {
-        switch enumType {
-        case .simple:
-            return "\(index)"
-        case .rawValue:
-            let rawValue = enumCase.rawValue ?? enumCase.name
-            return SwiftEnumRawType.formatValue(rawValue, rawType: rawType ?? "")
-        case .associatedValue, .namespace:
-            return ""
-        }
-    }
 }
 
 extension BridgeJSLink {
@@ -1224,6 +1296,9 @@ extension BridgeJSLink {
             declarationPrefixKeyword: "function"
         )
         var dtsLines: [String] = []
+
+        appendJSDocIfNeeded(for: function.parameters, to: &dtsLines)
+
         dtsLines.append(
             "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
         )
@@ -1266,9 +1341,13 @@ extension BridgeJSLink {
             declarationPrefixKeyword: "static"
         )
 
-        let dtsLines = [
+        var dtsLines: [String] = []
+
+        appendJSDocIfNeeded(for: function.parameters, to: &dtsLines)
+
+        dtsLines.append(
             "static \(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
-        ]
+        )
 
         return (funcLines, dtsLines)
     }
@@ -1295,9 +1374,13 @@ extension BridgeJSLink {
         }
         printer.write("},")
 
-        let dtsLines = [
+        var dtsLines: [String] = []
+
+        appendJSDocIfNeeded(for: function.parameters, to: &dtsLines)
+
+        dtsLines.append(
             "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
-        ]
+        )
 
         return (printer.lines, dtsLines)
     }
@@ -1333,10 +1416,11 @@ extension BridgeJSLink {
             try thunkBuilder.lowerParameter(param: param)
         }
         let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
+        let paramList = thunkBuilder.generateParameterList(parameters: function.parameters)
 
         let printer = CodeFragmentPrinter()
         printer.write(
-            "\(enumName).\(function.name) = function(\(function.parameters.map { $0.name }.joined(separator: ", "))) {"
+            "\(enumName).\(function.name) = function(\(paramList)) {"
         )
         printer.indent {
             printer.write(contentsOf: thunkBuilder.body)
@@ -1521,8 +1605,10 @@ extension BridgeJSLink {
                 try thunkBuilder.lowerParameter(param: param)
             }
 
+            let constructorParamList = thunkBuilder.generateParameterList(parameters: constructor.parameters)
+
             jsPrinter.indent {
-                jsPrinter.write("constructor(\(constructor.parameters.map { $0.name }.joined(separator: ", "))) {")
+                jsPrinter.write("constructor(\(constructorParamList)) {")
                 let returnExpr = thunkBuilder.callConstructor(abiName: constructor.abiName)
                 jsPrinter.indent {
                     jsPrinter.write(contentsOf: thunkBuilder.body)
@@ -1534,6 +1620,10 @@ extension BridgeJSLink {
             }
 
             dtsExportEntryPrinter.indent {
+                let jsDocLines = DefaultValueGenerator().generateJSDoc(for: constructor.parameters)
+                for line in jsDocLines {
+                    dtsExportEntryPrinter.write(line)
+                }
                 dtsExportEntryPrinter.write(
                     "new\(renderTSSignature(parameters: constructor.parameters, returnType: .swiftHeapObject(klass.name), effects: constructor.effects));"
                 )
@@ -2045,22 +2135,26 @@ extension BridgeJSLink {
                             case .tsEnum:
                                 printer.write("enum \(enumDefinition.name) {")
                                 printer.indent {
-                                    for enumCase in enumDefinition.cases {
+                                    for (index, enumCase) in enumDefinition.cases.enumerated() {
                                         let caseName = enumCase.name.capitalizedFirstLetter
-                                        let rawValue = enumCase.rawValue ?? enumCase.name
-                                        let formattedValue = SwiftEnumRawType.formatValue(rawValue, rawType: rawType)
-                                        printer.write("\(caseName) = \(formattedValue),")
+                                        let value = enumCase.jsValue(
+                                            rawType: rawType,
+                                            index: index
+                                        )
+                                        printer.write("\(caseName) = \(value),")
                                     }
                                 }
                                 printer.write("}")
                             case .const:
                                 printer.write("const \(enumValuesName): {")
                                 printer.indent {
-                                    for enumCase in enumDefinition.cases {
+                                    for (index, enumCase) in enumDefinition.cases.enumerated() {
                                         let caseName = enumCase.name.capitalizedFirstLetter
-                                        let rawValue = enumCase.rawValue ?? enumCase.name
-                                        let formattedValue = SwiftEnumRawType.formatValue(rawValue, rawType: rawType)
-                                        printer.write("readonly \(caseName): \(formattedValue);")
+                                        let value = enumCase.jsValue(
+                                            rawType: rawType,
+                                            index: index
+                                        )
+                                        printer.write("readonly \(caseName): \(value);")
                                     }
                                 }
                                 printer.write("};")

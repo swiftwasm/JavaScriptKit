@@ -150,4 +150,4 @@ export type Exports = {
 | Async methods: `func x() async` | ✅ |
 | Generics | ❌ |
 | Opaque types: `func x() -> some P`, `func y(_: some P)` | ❌ |
-| Default parameter values: `func x(_ foo: String = "")` | ❌ |
+| Default parameter values: `func x(_ foo: String = "")` | ✅ (See <doc:Exporting-Swift-Default-Parameters>) |
