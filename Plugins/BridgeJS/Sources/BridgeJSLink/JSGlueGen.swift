@@ -623,7 +623,11 @@ struct IntrinsicJSFragment: Sendable {
                 printer.indent {
                     for (index, enumCase) in enumDefinition.cases.enumerated() {
                         let caseName = enumCase.name.capitalizedFirstLetter
-                        printer.write("\(caseName): \(index),")
+                        let value = enumCase.jsValue(
+                            rawType: enumDefinition.rawType,
+                            index: index
+                        )
+                        printer.write("\(caseName): \(value),")
                     }
                 }
                 printer.write("};")
@@ -641,15 +645,13 @@ struct IntrinsicJSFragment: Sendable {
                 let enumName = arguments[0]
                 printer.write("const \(enumName) = {")
                 printer.indent {
-                    for enumCase in enumDefinition.cases {
+                    for (index, enumCase) in enumDefinition.cases.enumerated() {
                         let caseName = enumCase.name.capitalizedFirstLetter
-                        let rawValue = enumCase.rawValue ?? enumCase.name
-                        let formattedValue = SwiftEnumRawType.formatValue(
-                            rawValue,
-                            rawType: enumDefinition.rawType ?? ""
+                        let value = enumCase.jsValue(
+                            rawType: enumDefinition.rawType,
+                            index: index
                         )
-
-                        printer.write("\(caseName): \(formattedValue),")
+                        printer.write("\(caseName): \(value),")
                     }
                 }
                 printer.write("};")

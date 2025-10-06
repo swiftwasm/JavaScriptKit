@@ -808,6 +808,170 @@
     },
     {
       "constructor" : {
+        "abiName" : "bjs_ConstructorDefaults_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "defaultValue" : {
+              "string" : {
+                "_0" : "Default"
+              }
+            },
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "defaultValue" : {
+              "int" : {
+                "_0" : 42
+              }
+            },
+            "label" : "count",
+            "name" : "count",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "defaultValue" : {
+              "bool" : {
+                "_0" : true
+              }
+            },
+            "label" : "enabled",
+            "name" : "enabled",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "defaultValue" : {
+              "enumCase" : {
+                "_0" : "Status",
+                "_1" : "success"
+              }
+            },
+            "label" : "status",
+            "name" : "status",
+            "type" : {
+              "caseEnum" : {
+                "_0" : "Status"
+              }
+            }
+          },
+          {
+            "defaultValue" : {
+              "null" : {
+
+              }
+            },
+            "label" : "tag",
+            "name" : "tag",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_ConstructorDefaults_describe",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "describe",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "ConstructorDefaults",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "count",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "enabled",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "status",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "Status"
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "tag",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "ConstructorDefaults"
+    },
+    {
+      "constructor" : {
         "abiName" : "bjs_StaticPropertyHolder_init",
         "effects" : {
           "isAsync" : false,
@@ -4895,6 +5059,354 @@
       "returnType" : {
         "string" : {
 
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testStringDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testStringDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "string" : {
+              "_0" : "Hello World"
+            }
+          },
+          "label" : "message",
+          "name" : "message",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testIntDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testIntDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "int" : {
+              "_0" : 42
+            }
+          },
+          "label" : "count",
+          "name" : "count",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "int" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testBoolDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testBoolDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "bool" : {
+              "_0" : true
+            }
+          },
+          "label" : "flag",
+          "name" : "flag",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "bool" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testOptionalDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testOptionalDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "null" : {
+
+            }
+          },
+          "label" : "name",
+          "name" : "name",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "string" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testMultipleDefaults",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testMultipleDefaults",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "string" : {
+              "_0" : "Default Title"
+            }
+          },
+          "label" : "title",
+          "name" : "title",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "defaultValue" : {
+            "int" : {
+              "_0" : -10
+            }
+          },
+          "label" : "count",
+          "name" : "count",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "defaultValue" : {
+            "bool" : {
+              "_0" : false
+            }
+          },
+          "label" : "enabled",
+          "name" : "enabled",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testSimpleEnumDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testSimpleEnumDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "enumCase" : {
+              "_0" : "Status",
+              "_1" : "success"
+            }
+          },
+          "label" : "status",
+          "name" : "status",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "Status"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "Status"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testDirectionDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testDirectionDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "enumCase" : {
+              "_0" : "Direction",
+              "_1" : "north"
+            }
+          },
+          "label" : "direction",
+          "name" : "direction",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "Direction"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "caseEnum" : {
+          "_0" : "Direction"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testRawStringEnumDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testRawStringEnumDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "enumCase" : {
+              "_0" : "Theme",
+              "_1" : "light"
+            }
+          },
+          "label" : "theme",
+          "name" : "theme",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "Theme",
+              "_1" : "String"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "rawValueEnum" : {
+          "_0" : "Theme",
+          "_1" : "String"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testComplexInit",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testComplexInit",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "objectWithArguments" : {
+              "_0" : "Greeter",
+              "_1" : [
+                {
+                  "string" : {
+                    "_0" : "DefaultGreeter"
+                  }
+                }
+              ]
+            }
+          },
+          "label" : "greeter",
+          "name" : "greeter",
+          "type" : {
+            "swiftHeapObject" : {
+              "_0" : "Greeter"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testEmptyInit",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testEmptyInit",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "object" : {
+              "_0" : "StaticPropertyHolder"
+            }
+          },
+          "label" : "_",
+          "name" : "object",
+          "type" : {
+            "swiftHeapObject" : {
+              "_0" : "StaticPropertyHolder"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "swiftHeapObject" : {
+          "_0" : "StaticPropertyHolder"
         }
       }
     },
