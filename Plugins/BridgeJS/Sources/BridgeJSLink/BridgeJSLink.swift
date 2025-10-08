@@ -314,6 +314,13 @@ struct BridgeJSLink {
                 }
 
                 for proto in skeleton.protocols {
+                    for property in proto.properties {
+                        try renderProtocolProperty(
+                            importObjectBuilder: importObjectBuilder,
+                            protocol: proto,
+                            property: property
+                        )
+                    }
                     for method in proto.methods {
                         try renderProtocolMethod(
                             importObjectBuilder: importObjectBuilder,
@@ -606,6 +613,13 @@ struct BridgeJSLink {
                         printer.write(
                             "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                         )
+                    }
+                    for property in proto.properties {
+                        let propertySignature =
+                            property.isReadonly
+                            ? "readonly \(property.name): \(property.type.tsType);"
+                            : "\(property.name): \(property.type.tsType);"
+                        printer.write(propertySignature)
                     }
                 }
                 printer.write("}")
@@ -2415,6 +2429,52 @@ extension BridgeJSLink {
             returnType: method.returnType
         )
         return (funcLines, [])
+    }
+
+    func renderProtocolProperty(
+        importObjectBuilder: ImportObjectBuilder,
+        protocol: ExportedProtocol,
+        property: ExportedProtocolProperty
+    ) throws {
+        let getterAbiName = ABINameGenerator.generateABIName(
+            baseName: property.name,
+            namespace: nil,
+            staticContext: nil,
+            operation: "get",
+            className: `protocol`.name
+        )
+
+        let getterThunkBuilder = ImportedThunkBuilder()
+        getterThunkBuilder.liftSelf()
+        let returnExpr = try getterThunkBuilder.callPropertyGetter(name: property.name, returnType: property.type)
+        let getterLines = getterThunkBuilder.renderFunction(
+            name: getterAbiName,
+            returnExpr: returnExpr,
+            returnType: property.type
+        )
+        importObjectBuilder.assignToImportObject(name: getterAbiName, function: getterLines)
+        
+        if !property.isReadonly {
+            let setterAbiName = ABINameGenerator.generateABIName(
+                baseName: property.name,
+                namespace: nil,
+                staticContext: nil,
+                operation: "set",
+                className: `protocol`.name
+            )
+            let setterThunkBuilder = ImportedThunkBuilder()
+            setterThunkBuilder.liftSelf()
+            try setterThunkBuilder.liftParameter(
+                param: Parameter(label: nil, name: "value", type: property.type)
+            )
+            setterThunkBuilder.callPropertySetter(name: property.name, returnType: property.type)
+            let setterLines = setterThunkBuilder.renderFunction(
+                name: setterAbiName,
+                returnExpr: nil,
+                returnType: .void
+            )
+            importObjectBuilder.assignToImportObject(name: setterAbiName, function: setterLines)
+        }
     }
 
     func renderProtocolMethod(

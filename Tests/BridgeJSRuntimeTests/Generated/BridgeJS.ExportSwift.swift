@@ -19,7 +19,11 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_getValue")
         func _extern_getValue(this: Int32) -> Int32
         let ret = _extern_getValue(this: Int32(bitPattern: jsObject.id))
+<<<<<<< HEAD
         return Int.bridgeJSLiftReturn(ret)
+=======
+    return Int.bridgeJSLiftReturn(ret)
+>>>>>>> f19c8b06 (WIP: Initial protocol support)
     }
 
     func setLabelElements(_ labelPrefix: String, _ labelSuffix: String) {
@@ -32,7 +36,11 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
         @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_getLabel")
         func _extern_getLabel(this: Int32) -> Int32
         let ret = _extern_getLabel(this: Int32(bitPattern: jsObject.id))
+<<<<<<< HEAD
         return String.bridgeJSLiftReturn(ret)
+=======
+    return String.bridgeJSLiftReturn(ret)
+>>>>>>> f19c8b06 (WIP: Initial protocol support)
     }
 
     func isEven() -> Bool {
@@ -40,6 +48,29 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
         func _extern_isEven(this: Int32) -> Int32
         let ret = _extern_isEven(this: Int32(bitPattern: jsObject.id))
         return Bool.bridgeJSLiftReturn(ret)
+    }
+
+    var count: Int {
+        get {
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_count_get")
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Int.bridgeJSLiftReturn(ret)
+        }
+        set {
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_count_get")
+            func _extern_set(this: Int32, value: Int32)
+            _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
+        }
+    }
+
+    var name: String {
+        get {
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_name_get")
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return String.bridgeJSLiftReturn(ret)
+        }
     }
 
     static func bridgeJSLiftParameter(_ value: Int32) -> Self {
@@ -3503,6 +3534,38 @@ public func _bjs_SwiftCounter_getLabel(_self: UnsafeMutableRawPointer) -> Void {
 public func _bjs_SwiftCounter_isEven(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = SwiftCounter.bridgeJSLiftParameter(_self).isEven()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_count_get")
+@_cdecl("bjs_SwiftCounter_count_get")
+public func _bjs_SwiftCounter_count_get(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = SwiftCounter.bridgeJSLiftParameter(_self).count
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_count_set")
+@_cdecl("bjs_SwiftCounter_count_set")
+public func _bjs_SwiftCounter_count_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+    #if arch(wasm32)
+    SwiftCounter.bridgeJSLiftParameter(_self).count = Int.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_name_get")
+@_cdecl("bjs_SwiftCounter_name_get")
+public func _bjs_SwiftCounter_name_get(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = SwiftCounter.bridgeJSLiftParameter(_self).name
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

@@ -41,6 +41,29 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
         return Bool.bridgeJSLiftReturn(ret)
     }
 
+    var eventCount: Int {
+        get {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_eventCount_get")
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Int.bridgeJSLiftReturn(ret)
+        }
+        set {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_eventCount_set")
+            func _extern_set(this: Int32, value: Int32)
+            _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
+        }
+    }
+
+    var delegateName: String {
+        get {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_delegateName_get")
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return String.bridgeJSLiftReturn(ret)
+        }
+    }
+
     static func bridgeJSLiftParameter(_ value: Int32) -> Self {
         return AnyMyViewControllerDelegate(jsObject: JSObject(id: UInt32(bitPattern: value)))
     }

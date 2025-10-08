@@ -190,20 +190,3 @@ When you pass a JavaScript object implementing a protocol to Swift:
 | Protocol inheritance | ❌ |
 | Protocol composition: `Protocol1 & Protocol2` | ❌ |
 | Generics | ❌ |
-
-### Type Support for Protocol Method Parameters and Return Types
-
-Protocol method parameters and return values have more limited type support compared to regular exported Swift functions and classes.
-
-**Supported Types:**
-- Primitives: `Bool`, `Int`, `Float`, `Double`
-- `String`
-- `JSObject`
-
-**Not Supported:**
-- `@JS class` types
-- `@JS enum` types (case, raw value, or associated value)
-- `@JS protocol` types
-- Optional types: `Int?`, `String?`, etc.
-
-> Note: For regular `@JS func` and `@JS class` exports (not within protocols), all these types including optionals, enums, and classes are fully supported. See <doc:Exporting-Swift-Function> and <doc:Exporting-Swift-Optional> for more information.

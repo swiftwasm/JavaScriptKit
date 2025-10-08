@@ -812,7 +812,9 @@ function testProtocolSupport(exports) {
     let counterValue = 0;
     let counterLabel = "";
     const jsCounter = {
-        increment(amount) { counterValue += amount; },
+        count: 0,
+        name: "JSCounter",
+        increment(amount) { counterValue += amount; this.count += amount; },
         getValue() { return counterValue; },
         setLabelElements(labelPrefix, labelSuffix) { counterLabel = labelPrefix + labelSuffix; },
         getLabel() { return counterLabel; },
@@ -820,8 +822,13 @@ function testProtocolSupport(exports) {
     };
 
     const manager = new exports.CounterManager(jsCounter);
+    
+    assert.equal(jsCounter.count, 0);
+    assert.equal(jsCounter.name, "JSCounter");
+    
     manager.incrementByAmount(4);
     assert.equal(manager.getCurrentValue(), 4);
+    assert.equal(jsCounter.count, 4);
 
     manager.setCounterLabel("Test", "Label");
     assert.equal(manager.getCounterLabel(), "TestLabel");
@@ -839,21 +846,33 @@ function testProtocolSupport(exports) {
     const swiftCounter = new exports.SwiftCounter();
     const swiftManager = new exports.CounterManager(swiftCounter);
 
+    assert.equal(swiftCounter.count, 0);
+    assert.equal(swiftCounter.name, "SwiftCounter");
+
     swiftManager.incrementByAmount(10);
     assert.equal(swiftManager.getCurrentValue(), 10);
+    assert.equal(swiftCounter.count, 10);
 
     swiftManager.setCounterLabel("Swift", "Label");
     assert.equal(swiftManager.getCounterLabel(), "SwiftLabel");
 
     swiftCounter.increment(5);
     assert.equal(swiftCounter.getValue(), 15);
+    assert.equal(swiftCounter.count, 15);
+    
+    swiftCounter.count = 100;
+    assert.equal(swiftCounter.count, 100);
+    assert.equal(swiftCounter.getValue(), 100);
+    
     swiftManager.release();
     swiftCounter.release();
 
     let optionalCounterValue = 100;
     let optionalCounterLabel = "optional";
     const optionalCounter = {
-        increment(amount) { optionalCounterValue += amount; },
+        count: 100,
+        name: "OptionalCounter",
+        increment(amount) { optionalCounterValue += amount; this.count += amount; },
         getValue() { return optionalCounterValue; },
         setLabelElements(labelPrefix, labelSuffix) { optionalCounterLabel = labelPrefix + labelSuffix; },
         getLabel() { return optionalCounterLabel; },
@@ -863,7 +882,9 @@ function testProtocolSupport(exports) {
     let mainCounterValue = 0;
     let mainCounterLabel = "main";
     const mainCounter = {
-        increment(amount) { mainCounterValue += amount; },
+        count: 0,
+        name: "MainCounter",
+        increment(amount) { mainCounterValue += amount; this.count += amount; },
         getValue() { return mainCounterValue; },
         setLabelElements(labelPrefix, labelSuffix) { mainCounterLabel = labelPrefix + labelSuffix; },
         getLabel() { return mainCounterLabel; },
@@ -902,6 +923,8 @@ function testProtocolSupport(exports) {
 
     assert.equal(managerWithOptional.hasBackup(), true);
     assert.equal(managerWithOptional.getBackupValue(), 1);
+    assert.equal(swiftBackupCounter.count, 1);
+    assert.equal(swiftBackupCounter.name, "SwiftCounter");
 
     managerWithOptional.release();
     swiftBackupCounter.release();

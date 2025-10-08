@@ -860,6 +860,8 @@ enum APIOptionalResult {
 // MARK: - Protocol Tests
 
 @JS protocol Counter {
+    var count: Int { get set }
+    var name: String { get }
     func increment(by amount: Int)
     func getValue() -> Int
     func setLabelElements(_ labelPrefix: String, _ labelSuffix: String)
@@ -912,17 +914,18 @@ enum APIOptionalResult {
 }
 
 @JS class SwiftCounter: Counter {
-    private var value: Int = 0
+    @JS var count: Int = 0
+    @JS let name: String = "SwiftCounter"
     private var label: String = ""
 
     @JS init() {}
 
     @JS func increment(by amount: Int) {
-        value += amount
+        count += amount
     }
 
     @JS func getValue() -> Int {
-        return value
+        return count
     }
 
     @JS func setLabelElements(_ labelPrefix: String, _ labelSuffix: String) {
@@ -934,7 +937,7 @@ enum APIOptionalResult {
     }
 
     @JS func isEven() -> Bool {
-        return value % 2 == 0
+        return count % 2 == 0
     }
 }
 

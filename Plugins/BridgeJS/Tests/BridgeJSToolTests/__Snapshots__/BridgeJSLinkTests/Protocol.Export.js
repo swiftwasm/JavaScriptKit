@@ -147,6 +147,31 @@ export async function createInstantiator(options, swift) {
                 return swift.memory.retain(obj);
             };
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
+            TestModule["bjs_MyViewControllerDelegate_eventCount_get"] = function bjs_MyViewControllerDelegate_eventCount_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).eventCount;
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_eventCount_get"] = function bjs_MyViewControllerDelegate_eventCount_get(self, value) {
+                try {
+                    swift.memory.getObject(self).eventCount = value;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_delegateName_get"] = function bjs_MyViewControllerDelegate_delegateName_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).delegateName;
+                    tmpRetBytes = textEncoder.encode(ret);
+                    return tmpRetBytes.length;
+                } catch (error) {
+                    setException(error);
+                }
+            }
             TestModule["bjs_MyViewControllerDelegate_onSomethingHappened"] = function bjs_MyViewControllerDelegate_onSomethingHappened(self) {
                 try {
                     swift.memory.getObject(self).onSomethingHappened();

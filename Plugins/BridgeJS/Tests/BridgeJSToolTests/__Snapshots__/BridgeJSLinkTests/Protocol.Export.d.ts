@@ -10,6 +10,8 @@ export interface MyViewControllerDelegate {
     onCountUpdated(count: number): boolean;
     onLabelUpdated(prefix: string, suffix: string): void;
     isCountEven(): boolean;
+    eventCount: number;
+    readonly delegateName: string;
 }
 
 /// Represents a Swift heap object like a class instance or an actor instance.

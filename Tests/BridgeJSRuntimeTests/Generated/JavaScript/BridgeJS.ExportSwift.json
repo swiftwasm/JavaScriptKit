@@ -1505,7 +1505,26 @@
       ],
       "name" : "SwiftCounter",
       "properties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "count",
+          "type" : {
+            "int" : {
 
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
       ],
       "swiftCallName" : "SwiftCounter"
     }
@@ -5896,7 +5915,27 @@
           }
         }
       ],
-      "name" : "Counter"
+      "name" : "Counter",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "name" : "count",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ]
     }
   ]
 }

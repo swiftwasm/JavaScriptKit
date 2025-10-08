@@ -749,9 +749,8 @@ public class ExportSwift {
             case .topLevel:
                 diagnose(node: node, message: "@JS var must be inside a @JS class or enum")
                 return .skipChildren
-            case .protocolBody(_, _):
-                diagnose(node: node, message: "Properties are not supported in protocols")
-                return .skipChildren
+            case .protocolBody(let protocolName, let protocolKey):
+                return visitProtocolProperty(node: node, protocolName: protocolName, protocolKey: protocolKey)
             }
 
             // Process each binding (variable declaration)
@@ -775,23 +774,8 @@ public class ExportSwift {
 
                 // Check if property is readonly
                 let isLet = node.bindingSpecifier.tokenKind == .keyword(.let)
-                let isGetterOnly = node.bindings.contains(where: {
-                    switch $0.accessorBlock?.accessors {
-                    case .accessors(let accessors):
-                        // Has accessors - check if it only has a getter (no setter, willSet, or didSet)
-                        return !accessors.contains(where: { accessor in
-                            let tokenKind = accessor.accessorSpecifier.tokenKind
-                            return tokenKind == .keyword(.set) || tokenKind == .keyword(.willSet)
-                                || tokenKind == .keyword(.didSet)
-                        })
-                    case .getter:
-                        // Has only a getter block
-                        return true
-                    case nil:
-                        // No accessor block - this is a stored property, not readonly
-                        return false
-                    }
-                })
+                let isGetterOnly = node.bindings.contains(where: { self.hasOnlyGetter($0.accessorBlock) })
+
                 let isReadonly = isLet || isGetterOnly
 
                 let exportedProperty = ExportedProperty(
@@ -997,6 +981,17 @@ public class ExportSwift {
                 message: "Protocol visibility must be at least internal"
             )
 
+            let protocolUniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
+            
+            exportedProtocolByName[protocolUniqueKey] = ExportedProtocol(
+                name: name,
+                methods: [],
+                properties: [],
+                namespace: namespaceResult.namespace
+            )
+            
+            stateStack.push(state: .protocolBody(name: name, key: protocolUniqueKey))
+            
             var methods: [ExportedFunction] = []
             for member in node.memberBlock.members {
                 if let funcDecl = member.decl.as(FunctionDeclSyntax.self) {
@@ -1007,18 +1002,22 @@ public class ExportSwift {
                     ) {
                         methods.append(exportedFunction)
                     }
+                } else if let varDecl = member.decl.as(VariableDeclSyntax.self) {
+                    _ = visitProtocolProperty(node: varDecl, protocolName: name, protocolKey: protocolUniqueKey)
                 }
             }
 
             let exportedProtocol = ExportedProtocol(
                 name: name,
                 methods: methods,
+                properties: exportedProtocolByName[protocolUniqueKey]?.properties ?? [],
                 namespace: namespaceResult.namespace
             )
-
-            let protocolUniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
+            
             exportedProtocolByName[protocolUniqueKey] = exportedProtocol
             exportedProtocolNames.append(protocolUniqueKey)
+            
+            stateStack.pop()
 
             parent.exportedProtocolNameByKey[protocolUniqueKey] = name
 
@@ -1073,6 +1072,89 @@ public class ExportSwift {
                 namespace: namespace,
                 staticContext: nil
             )
+        }
+
+        private func visitProtocolProperty(
+            node: VariableDeclSyntax,
+            protocolName: String,
+            protocolKey: String
+        ) -> SyntaxVisitorContinueKind {
+            for binding in node.bindings {
+                guard let pattern = binding.pattern.as(IdentifierPatternSyntax.self) else {
+                    diagnose(node: binding.pattern, message: "Complex patterns not supported for protocol properties")
+                    continue
+                }
+
+                let propertyName = pattern.identifier.text
+
+                guard let typeAnnotation = binding.typeAnnotation else {
+                    diagnose(node: binding, message: "Protocol property must have explicit type annotation")
+                    continue
+                }
+
+                guard let propertyType = self.parent.lookupType(for: typeAnnotation.type) else {
+                    diagnoseUnsupportedType(node: typeAnnotation.type, type: typeAnnotation.type.trimmedDescription)
+                    continue
+                }
+
+                if case .optional = propertyType {
+                    diagnose(
+                        node: typeAnnotation.type,
+                        message: "Optional properties are not yet supported in protocols"
+                    )
+                    continue
+                }
+
+                guard let accessorBlock = binding.accessorBlock else {
+                    diagnose(
+                        node: binding,
+                        message: "Protocol property must specify { get } or { get set }",
+                        hint: "Add { get } for readonly or { get set } for readwrite property"
+                    )
+                    continue
+                }
+
+                let isReadonly = hasOnlyGetter(accessorBlock)
+
+                let exportedProperty = ExportedProtocolProperty(
+                    name: propertyName,
+                    type: propertyType,
+                    isReadonly: isReadonly
+                )
+
+                if var currentProtocol = exportedProtocolByName[protocolKey] {
+                    var properties = currentProtocol.properties
+                    properties.append(exportedProperty)
+                    
+                    currentProtocol = ExportedProtocol(
+                        name: currentProtocol.name,
+                        methods: currentProtocol.methods,
+                        properties: properties,
+                        namespace: currentProtocol.namespace
+                    )
+                    exportedProtocolByName[protocolKey] = currentProtocol
+                }
+            }
+
+            return .skipChildren
+        }
+
+        private func hasOnlyGetter(_ accessorBlock: AccessorBlockSyntax?) -> Bool {
+            switch accessorBlock?.accessors {
+            case .accessors(let accessors):
+                // Has accessors - check if it only has a getter (no setter, willSet, or didSet)
+                return !accessors.contains(where: { accessor in
+                    let tokenKind = accessor.accessorSpecifier.tokenKind
+                    return tokenKind == .keyword(.set) || tokenKind == .keyword(.willSet)
+                        || tokenKind == .keyword(.didSet)
+                })
+            case .getter:
+                // Has only a getter block
+                return true
+            case nil:
+                // No accessor block - this is a stored property, not readonly
+                return false
+            }
         }
 
         override func visit(_ node: EnumCaseDeclSyntax) -> SyntaxVisitorContinueKind {
@@ -2179,17 +2261,110 @@ public class ExportSwift {
             methodDecls.append(methodImplementation)
         }
 
+        var propertyDecls: [DeclSyntax] = []
+
+        for property in proto.properties {
+            let propertyImpl = try renderProtocolProperty(
+                property: property,
+                protocolName: protocolName,
+                moduleName: moduleName
+            )
+            propertyDecls.append(propertyImpl)
+        }
+
+        let allDecls = (methodDecls + propertyDecls).map { $0.description }.joined(separator: "\n\n")
+
         return """
             struct \(raw: wrapperName): \(raw: protocolName), _BridgedSwiftProtocolWrapper {
                 let jsObject: JSObject
                 
-                \(raw: methodDecls.map { $0.description }.joined(separator: "\n\n"))
+                \(raw: allDecls)
                 
                 static func bridgeJSLiftParameter(_ value: Int32) -> Self {
                     return \(raw: wrapperName)(jsObject: JSObject(id: UInt32(bitPattern: value)))
                 }
             }
             """
+    }
+    
+    private func renderProtocolProperty(
+        property: ExportedProtocolProperty,
+        protocolName: String,
+        moduleName: String
+    ) throws -> DeclSyntax {
+        let getterAbiName = ABINameGenerator.generateABIName(
+            baseName: property.name,
+            namespace: nil,
+            staticContext: nil,
+            operation: "get",
+            className: protocolName
+        )
+        let setterAbiName = ABINameGenerator.generateABIName(
+            baseName: property.name,
+            namespace: nil,
+            staticContext: nil,
+            operation: "set",
+            className: protocolName
+        )
+        
+        // Generate getter
+        let liftingInfo = try property.type.liftingReturnInfo()
+        let getterReturnType: String
+        let getterCallCode: String
+        
+        if let abiType = liftingInfo.valueToLift {
+            getterReturnType = " -> \(abiType.swiftType)"
+            getterCallCode = """
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+                    return \(property.type.swiftType).bridgeJSLiftReturn(ret)
+            """
+        } else {
+            // For String and other types that use tmpRetString
+            getterReturnType = ""
+            getterCallCode = """
+            _extern_get(this: Int32(bitPattern: jsObject.id))
+                    return \(property.type.swiftType).bridgeJSLiftReturn()
+            """
+        }
+        
+        if property.isReadonly {
+            // Readonly property - only getter
+            return """
+                var \(raw: property.name): \(raw: property.type.swiftType) {
+                    get {
+                        @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: getterAbiName)")
+                        func _extern_get(this: Int32)\(raw: getterReturnType)
+                        \(raw: getterCallCode)
+                    }
+                }
+                """
+        } else {
+            // Readwrite property - getter and setter
+            let loweringInfo = try property.type.loweringParameterInfo()
+            assert(
+                loweringInfo.loweredParameters.count == 1,
+                "Protocol property setters must lower to a single WASM parameter"
+            )
+            
+            let (paramName, wasmType) = loweringInfo.loweredParameters[0]
+            let setterParams = "this: Int32, \(paramName): \(wasmType.swiftType)"
+            let setterCallArgs = "this: Int32(bitPattern: jsObject.id), \(paramName): newValue.bridgeJSLowerParameter()"
+            
+            return """
+                var \(raw: property.name): \(raw: property.type.swiftType) {
+                    get {
+                        @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: getterAbiName)")
+                        func _extern_get(this: Int32)\(raw: getterReturnType)
+                        \(raw: getterCallCode)
+                    }
+                    set {
+                        @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: setterAbiName)")
+                        func _extern_set(\(raw: setterParams))
+                        _extern_set(\(raw: setterCallArgs))
+                    }
+                }
+                """
+        }
     }
 }
 

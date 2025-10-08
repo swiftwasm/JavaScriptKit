@@ -1,6 +1,8 @@
 import JavaScriptKit
 
 @JS protocol MyViewControllerDelegate {
+    var eventCount: Int { get set }
+    var delegateName: String { get }
     func onSomethingHappened()
     func onValueChanged(_ value: String)
     func onCountUpdated(count: Int) -> Bool
