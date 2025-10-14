@@ -818,7 +818,9 @@ function testProtocolSupport(exports) {
         getValue() { return counterValue; },
         setLabelElements(labelPrefix, labelSuffix) { counterLabel = labelPrefix + labelSuffix; },
         getLabel() { return counterLabel; },
-        isEven() { return counterValue % 2 === 0; }
+        isEven() { return counterValue % 2 === 0; },
+        processGreeter(greeter) { return `JSCounter processed: ${greeter.greet()}`; },
+        createGreeter() { return new exports.Greeter("JSCounterGreeter"); }
     };
 
     const manager = new exports.CounterManager(jsCounter);
@@ -864,6 +866,26 @@ function testProtocolSupport(exports) {
     assert.equal(swiftCounter.count, 100);
     assert.equal(swiftCounter.getValue(), 100);
     
+    const testGreeter = new exports.Greeter("TestUser");
+    const jsResult = jsCounter.processGreeter(testGreeter);
+    assert.equal(jsResult, "JSCounter processed: Hello, TestUser!");
+    
+    const swiftResult = swiftCounter.processGreeter(testGreeter);
+    assert.equal(swiftResult, "SwiftCounter processed: Hello, TestUser!");
+    
+    // Test swiftHeapObject return from protocol methods
+    const jsCreatedGreeter = jsCounter.createGreeter();
+    assert.equal(jsCreatedGreeter.name, "JSCounterGreeter");
+    assert.equal(jsCreatedGreeter.greet(), "Hello, JSCounterGreeter!");
+    jsCreatedGreeter.release();
+    
+    const swiftCreatedGreeter = swiftCounter.createGreeter();
+    assert.equal(swiftCreatedGreeter.name, "CounterGreeter");
+    assert.equal(swiftCreatedGreeter.greet(), "Hello, CounterGreeter!");
+    swiftCreatedGreeter.release();
+    
+    testGreeter.release();
+    
     swiftManager.release();
     swiftCounter.release();
 
@@ -876,7 +898,9 @@ function testProtocolSupport(exports) {
         getValue() { return optionalCounterValue; },
         setLabelElements(labelPrefix, labelSuffix) { optionalCounterLabel = labelPrefix + labelSuffix; },
         getLabel() { return optionalCounterLabel; },
-        isEven() { return optionalCounterValue % 2 === 0; }
+        isEven() { return optionalCounterValue % 2 === 0; },
+        processGreeter(greeter) { return `OptionalCounter processed: ${greeter.greet()}`; },
+        createGreeter() { return new exports.Greeter("OptionalCounterGreeter"); }
     };
 
     let mainCounterValue = 0;
@@ -888,7 +912,9 @@ function testProtocolSupport(exports) {
         getValue() { return mainCounterValue; },
         setLabelElements(labelPrefix, labelSuffix) { mainCounterLabel = labelPrefix + labelSuffix; },
         getLabel() { return mainCounterLabel; },
-        isEven() { return mainCounterValue % 2 === 0; }
+        isEven() { return mainCounterValue % 2 === 0; },
+        processGreeter(greeter) { return `MainCounter processed: ${greeter.greet()}`; },
+        createGreeter() { return new exports.Greeter("MainCounterGreeter"); }
     };
 
     const managerWithOptional = new exports.CounterManager(mainCounter);

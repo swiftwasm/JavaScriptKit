@@ -142,6 +142,10 @@ export async function createInstantiator(options, swift) {
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
             }
+            importObject["TestModule"]["bjs_Helper_wrap"] = function(pointer) {
+                const obj = Helper.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
             importObject["TestModule"]["bjs_MyViewController_wrap"] = function(pointer) {
                 const obj = MyViewController.__construct(pointer);
                 return swift.memory.retain(obj);
@@ -156,7 +160,7 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_eventCount_get"] = function bjs_MyViewControllerDelegate_eventCount_get(self, value) {
+            TestModule["bjs_MyViewControllerDelegate_eventCount_set"] = function bjs_MyViewControllerDelegate_eventCount_set(self, value) {
                 try {
                     swift.memory.getObject(self).eventCount = value;
                 } catch (error) {
@@ -217,6 +221,22 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
+            TestModule["bjs_MyViewControllerDelegate_onHelperUpdated"] = function bjs_MyViewControllerDelegate_onHelperUpdated(self, helper) {
+                try {
+                    swift.memory.getObject(self).onHelperUpdated(Helper.__construct(helper));
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_createHelper"] = function bjs_MyViewControllerDelegate_createHelper(self) {
+                try {
+                    let ret = swift.memory.getObject(self).createHelper();
+                    return ret.pointer;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;
@@ -246,6 +266,26 @@ export async function createInstantiator(options, swift) {
                 release() {
                     this.registry.unregister(this);
                     this.deinit(this.pointer);
+                }
+            }
+            class Helper extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Helper_deinit, Helper.prototype);
+                }
+            
+                constructor(value) {
+                    const ret = instance.exports.bjs_Helper_init(value);
+                    return Helper.__construct(ret);
+                }
+                increment() {
+                    instance.exports.bjs_Helper_increment(this.pointer);
+                }
+                get value() {
+                    const ret = instance.exports.bjs_Helper_value_get(this.pointer);
+                    return ret;
+                }
+                set value(value) {
+                    instance.exports.bjs_Helper_value_set(this.pointer, value);
                 }
             }
             class MyViewController extends SwiftHeapObject {
@@ -283,6 +323,9 @@ export async function createInstantiator(options, swift) {
                     const ret = instance.exports.bjs_MyViewController_checkEvenCount(this.pointer);
                     return ret !== 0;
                 }
+                sendHelper(helper) {
+                    instance.exports.bjs_MyViewController_sendHelper(this.pointer, helper.pointer);
+                }
                 get delegate() {
                     const ret = instance.exports.bjs_MyViewController_delegate_get(this.pointer);
                     const ret1 = swift.memory.getObject(ret);
@@ -304,6 +347,7 @@ export async function createInstantiator(options, swift) {
                 }
             }
             return {
+                Helper,
                 MyViewController,
             };
         },

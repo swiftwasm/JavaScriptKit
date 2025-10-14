@@ -1,5 +1,17 @@
 import JavaScriptKit
 
+@JS class Helper {
+    @JS var value: Int
+    
+    @JS init(value: Int) {
+        self.value = value
+    }
+    
+    @JS func increment() {
+        value += 1
+    }
+}
+
 @JS protocol MyViewControllerDelegate {
     var eventCount: Int { get set }
     var delegateName: String { get }
@@ -8,6 +20,8 @@ import JavaScriptKit
     func onCountUpdated(count: Int) -> Bool
     func onLabelUpdated(_ prefix: String, _ suffix: String)
     func isCountEven() -> Bool
+    func onHelperUpdated(_ helper: Helper)
+    func createHelper() -> Helper
 }
 
 @JS class MyViewController {
@@ -39,5 +53,9 @@ import JavaScriptKit
 
     @JS func checkEvenCount() -> Bool {
         return delegate.isCountEven()
+    }
+    
+    @JS func sendHelper(_ helper: Helper) {
+        delegate.onHelperUpdated(helper)
     }
 }

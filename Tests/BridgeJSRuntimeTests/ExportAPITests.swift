@@ -867,6 +867,8 @@ enum APIOptionalResult {
     func setLabelElements(_ labelPrefix: String, _ labelSuffix: String)
     func getLabel() -> String
     func isEven() -> Bool
+    func processGreeter(_ greeter: Greeter) -> String
+    func createGreeter() -> Greeter
 }
 
 @JS class CounterManager {
@@ -938,6 +940,14 @@ enum APIOptionalResult {
 
     @JS func isEven() -> Bool {
         return count % 2 == 0
+    }
+    
+    @JS func processGreeter(_ greeter: Greeter) -> String {
+        return "SwiftCounter processed: \(greeter.greet())"
+    }
+    
+    @JS func createGreeter() -> Greeter {
+        return Greeter(name: "CounterGreeter")
     }
 }
 

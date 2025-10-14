@@ -1856,13 +1856,15 @@ extension BridgeJSLink {
         let body: CodeFragmentPrinter
         let scope: JSGlueVariableScope
         let cleanupCode: CodeFragmentPrinter
+        let context: BridgeContext
         var parameterNames: [String] = []
         var parameterForwardings: [String] = []
 
-        init() {
+        init(context: BridgeContext = .importTS) {
             self.body = CodeFragmentPrinter()
             self.scope = JSGlueVariableScope()
             self.cleanupCode = CodeFragmentPrinter()
+            self.context = context
         }
 
         func liftSelf() {
@@ -1870,7 +1872,7 @@ extension BridgeJSLink {
         }
 
         func liftParameter(param: Parameter) throws {
-            let liftingFragment = try IntrinsicJSFragment.liftParameter(type: param.type)
+            let liftingFragment = try IntrinsicJSFragment.liftParameter(type: param.type, context: context)
             assert(
                 liftingFragment.parameters.count >= 1,
                 "Lifting fragment should have at least one parameter to lift"
@@ -1927,7 +1929,7 @@ extension BridgeJSLink {
         }
 
         private func call(callExpr: String, returnType: BridgeType) throws -> String? {
-            let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: returnType)
+            let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: returnType, context: context)
             let returnExpr: String?
             if loweringFragment.parameters.count == 0 {
                 body.write("\(callExpr);")
@@ -1947,7 +1949,7 @@ extension BridgeJSLink {
         func callConstructor(name: String) throws -> String? {
             let call = "new imports.\(name)(\(parameterForwardings.joined(separator: ", ")))"
             let type: BridgeType = .jsObject(name)
-            let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: type)
+            let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: type, context: context)
             return try lowerReturnValue(returnType: type, returnExpr: call, loweringFragment: loweringFragment)
         }
 
@@ -2444,7 +2446,7 @@ extension BridgeJSLink {
             className: `protocol`.name
         )
 
-        let getterThunkBuilder = ImportedThunkBuilder()
+        let getterThunkBuilder = ImportedThunkBuilder(context: .protocolExport)
         getterThunkBuilder.liftSelf()
         let returnExpr = try getterThunkBuilder.callPropertyGetter(name: property.name, returnType: property.type)
         let getterLines = getterThunkBuilder.renderFunction(
@@ -2462,7 +2464,7 @@ extension BridgeJSLink {
                 operation: "set",
                 className: `protocol`.name
             )
-            let setterThunkBuilder = ImportedThunkBuilder()
+            let setterThunkBuilder = ImportedThunkBuilder(context: .protocolExport)
             setterThunkBuilder.liftSelf()
             try setterThunkBuilder.liftParameter(
                 param: Parameter(label: nil, name: "value", type: property.type)
@@ -2482,7 +2484,7 @@ extension BridgeJSLink {
         protocol: ExportedProtocol,
         method: ExportedFunction
     ) throws {
-        let thunkBuilder = ImportedThunkBuilder()
+        let thunkBuilder = ImportedThunkBuilder(context: .protocolExport)
         thunkBuilder.liftSelf()
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)

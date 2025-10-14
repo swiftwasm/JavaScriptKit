@@ -41,6 +41,19 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
         return Bool.bridgeJSLiftReturn(ret)
     }
 
+    func onHelperUpdated(_ helper: Helper) {
+        @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onHelperUpdated")
+        func _extern_onHelperUpdated(this: Int32, helper: UnsafeMutableRawPointer)
+        _extern_onHelperUpdated(this: Int32(bitPattern: jsObject.id), helper: helper.bridgeJSLowerParameter())
+    }
+
+    func createHelper() -> Helper {
+        @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_createHelper")
+        func _extern_createHelper(this: Int32) -> UnsafeMutableRawPointer
+        let ret = _extern_createHelper(this: Int32(bitPattern: jsObject.id))
+        return Helper.bridgeJSLiftReturn(ret)
+    }
+
     var eventCount: Int {
         get {
             @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_eventCount_get")
@@ -66,6 +79,68 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
 
     static func bridgeJSLiftParameter(_ value: Int32) -> Self {
         return AnyMyViewControllerDelegate(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+@_expose(wasm, "bjs_Helper_init")
+@_cdecl("bjs_Helper_init")
+public func _bjs_Helper_init(value: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = Helper(value: Int.bridgeJSLiftParameter(value))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Helper_increment")
+@_cdecl("bjs_Helper_increment")
+public func _bjs_Helper_increment(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Helper.bridgeJSLiftParameter(_self).increment()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Helper_value_get")
+@_cdecl("bjs_Helper_value_get")
+public func _bjs_Helper_value_get(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = Helper.bridgeJSLiftParameter(_self).value
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Helper_value_set")
+@_cdecl("bjs_Helper_value_set")
+public func _bjs_Helper_value_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+    #if arch(wasm32)
+    Helper.bridgeJSLiftParameter(_self).value = Int.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Helper_deinit")
+@_cdecl("bjs_Helper_deinit")
+public func _bjs_Helper_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<Helper>.fromOpaque(pointer).release()
+}
+
+extension Helper: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        #if arch(wasm32)
+        @_extern(wasm, module: "TestModule", name: "bjs_Helper_wrap")
+        func _bjs_Helper_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_Helper_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_Helper_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
 
@@ -127,6 +202,16 @@ public func _bjs_MyViewController_checkEvenCount(_self: UnsafeMutableRawPointer)
     #if arch(wasm32)
     let ret = MyViewController.bridgeJSLiftParameter(_self).checkEvenCount()
     return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MyViewController_sendHelper")
+@_cdecl("bjs_MyViewController_sendHelper")
+public func _bjs_MyViewController_sendHelper(_self: UnsafeMutableRawPointer, helper: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    MyViewController.bridgeJSLiftParameter(_self).sendHelper(_: Helper.bridgeJSLiftParameter(helper))
     #else
     fatalError("Only available on WebAssembly")
     #endif

@@ -2213,7 +2213,7 @@ public class ExportSwift {
 
             var externParams: [String] = ["this: Int32"]
             for param in method.parameters {
-                let loweringInfo = try param.type.loweringParameterInfo()
+                let loweringInfo = try param.type.loweringParameterInfo(context: .protocolExport)
                 assert(
                     loweringInfo.loweredParameters.count == 1,
                     "Protocol parameters must lower to a single WASM type"
@@ -2239,7 +2239,7 @@ public class ExportSwift {
                     """
             } else {
                 returnTypeStr = " -> \(method.returnType.swiftType)"
-                let liftingInfo = try method.returnType.liftingReturnInfo()
+                let liftingInfo = try method.returnType.liftingReturnInfo(context: .protocolExport)
                 if let abiType = liftingInfo.valueToLift {
                     externReturnType = " -> \(abiType.swiftType)"
                 } else {
@@ -2308,7 +2308,7 @@ public class ExportSwift {
         )
         
         // Generate getter
-        let liftingInfo = try property.type.liftingReturnInfo()
+        let liftingInfo = try property.type.liftingReturnInfo(context: .protocolExport)
         let getterReturnType: String
         let getterCallCode: String
         
@@ -2340,7 +2340,7 @@ public class ExportSwift {
                 """
         } else {
             // Readwrite property - getter and setter
-            let loweringInfo = try property.type.loweringParameterInfo()
+            let loweringInfo = try property.type.loweringParameterInfo(context: .protocolExport)
             assert(
                 loweringInfo.loweredParameters.count == 1,
                 "Protocol property setters must lower to a single WASM parameter"

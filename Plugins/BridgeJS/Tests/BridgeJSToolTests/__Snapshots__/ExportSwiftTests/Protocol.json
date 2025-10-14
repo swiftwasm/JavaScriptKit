@@ -2,6 +2,60 @@
   "classes" : [
     {
       "constructor" : {
+        "abiName" : "bjs_Helper_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_Helper_increment",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "increment",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "Helper",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "value",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "Helper"
+    },
+    {
+      "constructor" : {
         "abiName" : "bjs_MyViewController_init",
         "effects" : {
           "isAsync" : false,
@@ -135,6 +189,31 @@
           ],
           "returnType" : {
             "bool" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MyViewController_sendHelper",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "sendHelper",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "helper",
+              "type" : {
+                "swiftHeapObject" : {
+                  "_0" : "Helper"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
 
             }
           }
@@ -297,9 +376,71 @@
 
             }
           }
+        },
+        {
+          "abiName" : "bjs_MyViewControllerDelegate_onHelperUpdated",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "onHelperUpdated",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "helper",
+              "type" : {
+                "swiftHeapObject" : {
+                  "_0" : "Helper"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MyViewControllerDelegate_createHelper",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "createHelper",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "swiftHeapObject" : {
+              "_0" : "Helper"
+            }
+          }
         }
       ],
-      "name" : "MyViewControllerDelegate"
+      "name" : "MyViewControllerDelegate",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "name" : "eventCount",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "name" : "delegateName",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ]
     }
   ]
 }

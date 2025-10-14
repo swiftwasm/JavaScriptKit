@@ -10,6 +10,8 @@ export interface MyViewControllerDelegate {
     onCountUpdated(count: number): boolean;
     onLabelUpdated(prefix: string, suffix: string): void;
     isCountEven(): boolean;
+    onHelperUpdated(helper: Helper): void;
+    createHelper(): Helper;
     eventCount: number;
     readonly delegateName: string;
 }
@@ -21,16 +23,24 @@ export interface SwiftHeapObject {
     /// Note: Calling this method will release the heap object and it will no longer be accessible.
     release(): void;
 }
+export interface Helper extends SwiftHeapObject {
+    increment(): void;
+    value: number;
+}
 export interface MyViewController extends SwiftHeapObject {
     triggerEvent(): void;
     updateValue(value: string): void;
     updateCount(count: number): boolean;
     updateLabel(prefix: string, suffix: string): void;
     checkEvenCount(): boolean;
+    sendHelper(helper: Helper): void;
     delegate: MyViewControllerDelegate;
     secondDelegate: MyViewControllerDelegate | null;
 }
 export type Exports = {
+    Helper: {
+        new(value: number): Helper;
+    }
     MyViewController: {
         new(delegate: MyViewControllerDelegate): MyViewController;
     }

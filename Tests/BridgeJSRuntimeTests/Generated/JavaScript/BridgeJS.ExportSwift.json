@@ -1501,6 +1501,48 @@
 
             }
           }
+        },
+        {
+          "abiName" : "bjs_SwiftCounter_processGreeter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processGreeter",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "greeter",
+              "type" : {
+                "swiftHeapObject" : {
+                  "_0" : "Greeter"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_SwiftCounter_createGreeter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "createGreeter",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "swiftHeapObject" : {
+              "_0" : "Greeter"
+            }
+          }
         }
       ],
       "name" : "SwiftCounter",
@@ -5911,6 +5953,48 @@
           "returnType" : {
             "bool" : {
 
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Counter_processGreeter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processGreeter",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "greeter",
+              "type" : {
+                "swiftHeapObject" : {
+                  "_0" : "Greeter"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Counter_createGreeter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "createGreeter",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "swiftHeapObject" : {
+              "_0" : "Greeter"
             }
           }
         }

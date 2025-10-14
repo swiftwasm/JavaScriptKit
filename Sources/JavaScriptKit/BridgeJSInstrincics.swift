@@ -268,14 +268,14 @@ public protocol _BridgedSwiftHeapObject: AnyObject {}
 extension _BridgedSwiftHeapObject {
 
     // MARK: ImportTS
-    @available(*, unavailable, message: "Swift heap objects are not supported to be passed to imported JS functions")
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Void {}
-    @available(
-        *,
-        unavailable,
-        message: "Swift heap objects are not supported to be returned from imported JS functions"
-    )
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer) -> Void {}
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
+        // For protocol parameters, we pass the unretained pointer since JS already has a reference
+        return Unmanaged.passUnretained(self).toOpaque()
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer) -> Self {
+        // For protocol returns, take an unretained value since JS manages the lifetime
+        return Unmanaged<Self>.fromOpaque(pointer).takeUnretainedValue()
+    }
 
     // MARK: ExportSwift
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ pointer: UnsafeMutableRawPointer) -> Self {

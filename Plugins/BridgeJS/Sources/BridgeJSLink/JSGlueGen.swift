@@ -219,6 +219,20 @@ struct IntrinsicJSFragment: Sendable {
             }
         )
     }
+    static func swiftHeapObjectLiftParameter(_ name: String) -> IntrinsicJSFragment {
+        return IntrinsicJSFragment(
+            parameters: ["pointer"],
+            printCode: { arguments, scope, printer, cleanupCode in
+                return ["\(name).__construct(\(arguments[0]))"]
+            }
+        )
+    }
+    static let swiftHeapObjectLowerReturn = IntrinsicJSFragment(
+        parameters: ["value"],
+        printCode: { arguments, scope, printer, cleanupCode in
+            return ["\(arguments[0]).pointer"]
+        }
+    )
 
     static func associatedEnumLowerParameter(enumBase: String) -> IntrinsicJSFragment {
         IntrinsicJSFragment(
@@ -468,17 +482,23 @@ struct IntrinsicJSFragment: Sendable {
     // MARK: - ImportedJS
 
     /// Returns a fragment that lifts Wasm core values to JS values for parameters
-    static func liftParameter(type: BridgeType) throws -> IntrinsicJSFragment {
+    ///
+    /// - Parameters:
+    ///   - type: The bridge type to lift
+    ///   - context: The bridge context (defaults to .importTS for backward compatibility)
+    static func liftParameter(type: BridgeType, context: BridgeContext = .importTS) throws -> IntrinsicJSFragment {
         switch type {
         case .int, .float, .double: return .identity
         case .bool: return .boolLiftParameter
         case .string: return .stringLiftParameter
         case .jsObject: return .jsObjectLiftParameter
         case .swiftHeapObject(let name):
-            throw BridgeJSLinkError(
-                message:
-                    "Swift heap objects are not supported to be passed as parameters to imported JS functions: \(name)"
-            )
+            guard context == .protocolExport else {
+                throw BridgeJSLinkError(
+                    message: "swiftHeapObject '\(name)' can only be used in protocol exports, not in \(context)"
+                )
+            }
+            return .swiftHeapObjectLiftParameter(name)
         case .swiftProtocol: return .jsObjectLiftParameter
         case .void:
             throw BridgeJSLinkError(
@@ -509,16 +529,23 @@ struct IntrinsicJSFragment: Sendable {
     }
 
     /// Returns a fragment that lowers a JS value to Wasm core values for return values
-    static func lowerReturn(type: BridgeType) throws -> IntrinsicJSFragment {
+    ///
+    /// - Parameters:
+    ///   - type: The bridge type to lower
+    ///   - context: The bridge context (defaults to .importTS for backward compatibility)
+    static func lowerReturn(type: BridgeType, context: BridgeContext = .importTS) throws -> IntrinsicJSFragment {
         switch type {
         case .int, .float, .double: return .identity
         case .bool: return .boolLowerReturn
         case .string: return .stringLowerReturn
         case .jsObject: return .jsObjectLowerReturn
-        case .swiftHeapObject:
-            throw BridgeJSLinkError(
-                message: "Swift heap objects are not supported to be returned from imported JS functions"
-            )
+        case .swiftHeapObject(let name):
+            guard context == .protocolExport else {
+                throw BridgeJSLinkError(
+                    message: "swiftHeapObject '\(name)' can only be used in protocol exports, not in \(context)"
+                )
+            }
+            return .swiftHeapObjectLowerReturn
         case .swiftProtocol: return .jsObjectLowerReturn
         case .void: return .void
         case .optional(let wrappedType):

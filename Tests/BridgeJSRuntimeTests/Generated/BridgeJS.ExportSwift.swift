@@ -50,6 +50,20 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
         return Bool.bridgeJSLiftReturn(ret)
     }
 
+    func processGreeter(_ greeter: Greeter) -> String {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_processGreeter")
+        func _extern_processGreeter(this: Int32, greeter: UnsafeMutableRawPointer) -> Int32
+        let ret = _extern_processGreeter(this: Int32(bitPattern: jsObject.id), greeter: greeter.bridgeJSLowerParameter())
+        return String.bridgeJSLiftReturn(ret)
+    }
+
+    func createGreeter() -> Greeter {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_createGreeter")
+        func _extern_createGreeter(this: Int32) -> UnsafeMutableRawPointer
+        let ret = _extern_createGreeter(this: Int32(bitPattern: jsObject.id))
+        return Greeter.bridgeJSLiftReturn(ret)
+    }
+
     var count: Int {
         get {
             @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_count_get")
@@ -58,7 +72,7 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
             return Int.bridgeJSLiftReturn(ret)
         }
         set {
-            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_count_get")
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_count_set")
             func _extern_set(this: Int32, value: Int32)
             _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
         }
@@ -3534,6 +3548,28 @@ public func _bjs_SwiftCounter_getLabel(_self: UnsafeMutableRawPointer) -> Void {
 public func _bjs_SwiftCounter_isEven(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = SwiftCounter.bridgeJSLiftParameter(_self).isEven()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_processGreeter")
+@_cdecl("bjs_SwiftCounter_processGreeter")
+public func _bjs_SwiftCounter_processGreeter(_self: UnsafeMutableRawPointer, greeter: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = SwiftCounter.bridgeJSLiftParameter(_self).processGreeter(_: Greeter.bridgeJSLiftParameter(greeter))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_createGreeter")
+@_cdecl("bjs_SwiftCounter_createGreeter")
+public func _bjs_SwiftCounter_createGreeter(_self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = SwiftCounter.bridgeJSLiftParameter(_self).createGreeter()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

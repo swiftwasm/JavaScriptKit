@@ -67,6 +67,12 @@ public struct ABINameGenerator {
 
 // MARK: - Types
 
+/// Context for bridge operations that determines which types are valid
+public enum BridgeContext: Sendable {
+    case importTS
+    case protocolExport
+}
+
 public enum BridgeType: Codable, Equatable, Sendable {
     case int, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
     indirect case optional(BridgeType)
