@@ -1543,6 +1543,56 @@
               "_0" : "Greeter"
             }
           }
+        },
+        {
+          "abiName" : "bjs_SwiftCounter_processOptionalGreeter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processOptionalGreeter",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "greeter",
+              "type" : {
+                "optional" : {
+                  "_0" : {
+                    "swiftHeapObject" : {
+                      "_0" : "Greeter"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_SwiftCounter_createOptionalGreeter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "createOptionalGreeter",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "optional" : {
+              "_0" : {
+                "swiftHeapObject" : {
+                  "_0" : "Greeter"
+                }
+              }
+            }
+          }
         }
       ],
       "name" : "SwiftCounter",
@@ -1564,6 +1614,20 @@
           "type" : {
             "string" : {
 
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "optionalTag",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
             }
           }
         }
@@ -5997,6 +6061,56 @@
               "_0" : "Greeter"
             }
           }
+        },
+        {
+          "abiName" : "bjs_Counter_processOptionalGreeter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processOptionalGreeter",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "greeter",
+              "type" : {
+                "optional" : {
+                  "_0" : {
+                    "swiftHeapObject" : {
+                      "_0" : "Greeter"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Counter_createOptionalGreeter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "createOptionalGreeter",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "optional" : {
+              "_0" : {
+                "swiftHeapObject" : {
+                  "_0" : "Greeter"
+                }
+              }
+            }
+          }
         }
       ],
       "name" : "Counter",
@@ -6016,6 +6130,19 @@
           "type" : {
             "string" : {
 
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "optionalTag",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
             }
           }
         }

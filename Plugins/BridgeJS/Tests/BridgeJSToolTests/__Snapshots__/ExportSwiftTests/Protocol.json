@@ -418,6 +418,56 @@
               "_0" : "Helper"
             }
           }
+        },
+        {
+          "abiName" : "bjs_MyViewControllerDelegate_onOptionalHelperUpdated",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "onOptionalHelperUpdated",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "helper",
+              "type" : {
+                "optional" : {
+                  "_0" : {
+                    "swiftHeapObject" : {
+                      "_0" : "Helper"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MyViewControllerDelegate_createOptionalHelper",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "createOptionalHelper",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "optional" : {
+              "_0" : {
+                "swiftHeapObject" : {
+                  "_0" : "Helper"
+                }
+              }
+            }
+          }
         }
       ],
       "name" : "MyViewControllerDelegate",
@@ -437,6 +487,19 @@
           "type" : {
             "string" : {
 
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "optionalName",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
             }
           }
         }

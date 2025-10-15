@@ -12,8 +12,11 @@ export interface MyViewControllerDelegate {
     isCountEven(): boolean;
     onHelperUpdated(helper: Helper): void;
     createHelper(): Helper;
+    onOptionalHelperUpdated(helper: Helper | null): void;
+    createOptionalHelper(): Helper | null;
     eventCount: number;
     readonly delegateName: string;
+    optionalName: string | null;
 }
 
 /// Represents a Swift heap object like a class instance or an actor instance.

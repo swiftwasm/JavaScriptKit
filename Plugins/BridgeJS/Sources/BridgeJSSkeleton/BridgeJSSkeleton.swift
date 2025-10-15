@@ -280,7 +280,7 @@ public struct ExportedProtocolProperty: Codable, Equatable, Sendable {
     public let name: String
     public let type: BridgeType
     public let isReadonly: Bool
-    
+
     public init(
         name: String,
         type: BridgeType,

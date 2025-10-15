@@ -54,6 +54,19 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
         return Helper.bridgeJSLiftReturn(ret)
     }
 
+    func onOptionalHelperUpdated(_ helper: Optional<Helper>) {
+        @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onOptionalHelperUpdated")
+        func _extern_onOptionalHelperUpdated(this: Int32, helper: UnsafeMutableRawPointer)
+        _extern_onOptionalHelperUpdated(this: Int32(bitPattern: jsObject.id), helper: helper.bridgeJSLowerParameter())
+    }
+
+    func createOptionalHelper() -> Optional<Helper> {
+        @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_createOptionalHelper")
+        func _extern_createOptionalHelper(this: Int32) -> UnsafeMutableRawPointer
+        let ret = _extern_createOptionalHelper(this: Int32(bitPattern: jsObject.id))
+        return Optional<Helper>.bridgeJSLiftReturn(ret)
+    }
+
     var eventCount: Int {
         get {
             @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_eventCount_get")
@@ -74,6 +87,20 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
             func _extern_get(this: Int32) -> Int32
             let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
             return String.bridgeJSLiftReturn(ret)
+        }
+    }
+
+    var optionalName: Optional<String> {
+        get {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalName_get")
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Optional<String>.bridgeJSLiftReturn(ret)
+        }
+        set {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalName_set")
+            func _extern_set(this: Int32, value: Int32)
+            _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
         }
     }
 

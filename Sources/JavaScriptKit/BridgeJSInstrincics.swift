@@ -538,11 +538,23 @@ extension Optional where Wrapped == Int {
 extension Optional where Wrapped == String {
     // MARK: ImportTS
 
-    @available(*, unavailable, message: "Optional String type is not supported to be passed to imported JS functions")
-    @_spi(BridgeJS) public func bridgeJSLowerParameter() -> Void {}
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch consume self {
+        case .none:
+            return 0
+        case .some(let value):
+            return value.bridgeJSLowerParameter()
+        }
+    }
 
-    @available(*, unavailable, message: "Optional String type is not supported to be passed to imported JS functions")
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32) -> String? { return nil }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ length: Int32) -> String? {
+        // JavaScript returns -1 for null, or the byte length if present
+        // The actual string is already in tmpRetString side channel
+        if length < 0 {
+            return nil
+        }
+        return String.bridgeJSLiftReturn(length)
+    }
 
     // MARK: ExportSwift
 
@@ -671,19 +683,24 @@ extension Optional where Wrapped: _BridgedSwiftProtocolWrapper {
 /// Optional support for Swift heap objects
 extension Optional where Wrapped: _BridgedSwiftHeapObject {
     // MARK: ImportTS
-    @available(
-        *,
-        unavailable,
-        message: "Optional Swift heap objects are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Void {}
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
+        switch consume self {
+        case .none:
+            // Return null pointer for nil
+            return UnsafeMutableRawPointer(bitPattern: 0).unsafelyUnwrapped
+        case .some(let value):
+            // Pass unretained pointer since JS will manage the lifetime
+            return Unmanaged.passUnretained(value).toOpaque()
+        }
+    }
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional Swift heap objects are not supported to be returned from imported JS functions"
-    )
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ pointer: UnsafeMutableRawPointer) -> Void {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer) -> Wrapped?
+    {
+        if pointer == UnsafeMutableRawPointer(bitPattern: 0) {
+            return nil
+        } else {
+            return Wrapped.bridgeJSLiftReturn(pointer)
+        }
     }
 
     // MARK: ExportSwift

@@ -814,13 +814,18 @@ function testProtocolSupport(exports) {
     const jsCounter = {
         count: 0,
         name: "JSCounter",
+        optionalTag: null,
         increment(amount) { counterValue += amount; this.count += amount; },
         getValue() { return counterValue; },
         setLabelElements(labelPrefix, labelSuffix) { counterLabel = labelPrefix + labelSuffix; },
         getLabel() { return counterLabel; },
         isEven() { return counterValue % 2 === 0; },
         processGreeter(greeter) { return `JSCounter processed: ${greeter.greet()}`; },
-        createGreeter() { return new exports.Greeter("JSCounterGreeter"); }
+        createGreeter() { return new exports.Greeter("JSCounterGreeter"); },
+        processOptionalGreeter(greeter) {
+            return greeter ? `JSCounter processed optional: ${greeter.greet()}` : "JSCounter received null";
+        },
+        createOptionalGreeter() { return new exports.Greeter("JSOptionalGreeter"); }
     };
 
     const manager = new exports.CounterManager(jsCounter);
@@ -884,6 +889,29 @@ function testProtocolSupport(exports) {
     assert.equal(swiftCreatedGreeter.greet(), "Hello, CounterGreeter!");
     swiftCreatedGreeter.release();
     
+    const optGreeterTest = new exports.Greeter("OptionalTest");
+    assert.equal(jsCounter.processOptionalGreeter(optGreeterTest), "JSCounter processed optional: Hello, OptionalTest!");
+    assert.equal(jsCounter.processOptionalGreeter(null), "JSCounter received null");
+    assert.equal(swiftCounter.processOptionalGreeter(optGreeterTest), "SwiftCounter processed optional: Hello, OptionalTest!");
+    assert.equal(swiftCounter.processOptionalGreeter(null), "SwiftCounter received nil");
+    optGreeterTest.release();
+    
+    const jsOptGreeter = jsCounter.createOptionalGreeter();
+    assert.notEqual(jsOptGreeter, null);
+    assert.equal(jsOptGreeter.name, "JSOptionalGreeter");
+    jsOptGreeter.release();
+    
+    const swiftOptGreeter = swiftCounter.createOptionalGreeter();
+    assert.notEqual(swiftOptGreeter, null);
+    assert.equal(swiftOptGreeter.name, "OptionalCounterGreeter");
+    swiftOptGreeter.release();
+    
+    assert.equal(jsCounter.optionalTag, null);
+    jsCounter.optionalTag = "test-tag";
+    assert.equal(jsCounter.optionalTag, "test-tag");
+    jsCounter.optionalTag = null;
+    assert.equal(jsCounter.optionalTag, null);
+    
     testGreeter.release();
     
     swiftManager.release();
@@ -894,13 +922,18 @@ function testProtocolSupport(exports) {
     const optionalCounter = {
         count: 100,
         name: "OptionalCounter",
+        optionalTag: "optional-tag",
         increment(amount) { optionalCounterValue += amount; this.count += amount; },
         getValue() { return optionalCounterValue; },
         setLabelElements(labelPrefix, labelSuffix) { optionalCounterLabel = labelPrefix + labelSuffix; },
         getLabel() { return optionalCounterLabel; },
         isEven() { return optionalCounterValue % 2 === 0; },
         processGreeter(greeter) { return `OptionalCounter processed: ${greeter.greet()}`; },
-        createGreeter() { return new exports.Greeter("OptionalCounterGreeter"); }
+        createGreeter() { return new exports.Greeter("OptionalCounterGreeter"); },
+        processOptionalGreeter(greeter) {
+            return greeter ? `OptionalCounter processed optional: ${greeter.greet()}` : "OptionalCounter received null";
+        },
+        createOptionalGreeter() { return null; }
     };
 
     let mainCounterValue = 0;
@@ -908,13 +941,18 @@ function testProtocolSupport(exports) {
     const mainCounter = {
         count: 0,
         name: "MainCounter",
+        optionalTag: null,
         increment(amount) { mainCounterValue += amount; this.count += amount; },
         getValue() { return mainCounterValue; },
         setLabelElements(labelPrefix, labelSuffix) { mainCounterLabel = labelPrefix + labelSuffix; },
         getLabel() { return mainCounterLabel; },
         isEven() { return mainCounterValue % 2 === 0; },
         processGreeter(greeter) { return `MainCounter processed: ${greeter.greet()}`; },
-        createGreeter() { return new exports.Greeter("MainCounterGreeter"); }
+        createGreeter() { return new exports.Greeter("MainCounterGreeter"); },
+        processOptionalGreeter(greeter) {
+            return greeter ? `MainCounter processed optional: ${greeter.greet()}` : "MainCounter received null";
+        },
+        createOptionalGreeter() { return new exports.Greeter("MainOptionalGreeter"); }
     };
 
     const managerWithOptional = new exports.CounterManager(mainCounter);

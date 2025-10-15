@@ -64,6 +64,20 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
         return Greeter.bridgeJSLiftReturn(ret)
     }
 
+    func processOptionalGreeter(_ greeter: Optional<Greeter>) -> String {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_processOptionalGreeter")
+        func _extern_processOptionalGreeter(this: Int32, greeter: UnsafeMutableRawPointer) -> Int32
+        let ret = _extern_processOptionalGreeter(this: Int32(bitPattern: jsObject.id), greeter: greeter.bridgeJSLowerParameter())
+        return String.bridgeJSLiftReturn(ret)
+    }
+
+    func createOptionalGreeter() -> Optional<Greeter> {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_createOptionalGreeter")
+        func _extern_createOptionalGreeter(this: Int32) -> UnsafeMutableRawPointer
+        let ret = _extern_createOptionalGreeter(this: Int32(bitPattern: jsObject.id))
+        return Optional<Greeter>.bridgeJSLiftReturn(ret)
+    }
+
     var count: Int {
         get {
             @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_count_get")
@@ -84,6 +98,20 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
             func _extern_get(this: Int32) -> Int32
             let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
             return String.bridgeJSLiftReturn(ret)
+        }
+    }
+
+    var optionalTag: Optional<String> {
+        get {
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_optionalTag_get")
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Optional<String>.bridgeJSLiftReturn(ret)
+        }
+        set {
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_optionalTag_set")
+            func _extern_set(this: Int32, value: Int32)
+            _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
         }
     }
 
@@ -3576,6 +3604,28 @@ public func _bjs_SwiftCounter_createGreeter(_self: UnsafeMutableRawPointer) -> U
     #endif
 }
 
+@_expose(wasm, "bjs_SwiftCounter_processOptionalGreeter")
+@_cdecl("bjs_SwiftCounter_processOptionalGreeter")
+public func _bjs_SwiftCounter_processOptionalGreeter(_self: UnsafeMutableRawPointer, greeterIsSome: Int32, greeterValue: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = SwiftCounter.bridgeJSLiftParameter(_self).processOptionalGreeter(_: Optional<Greeter>.bridgeJSLiftParameter(greeterIsSome, greeterValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_createOptionalGreeter")
+@_cdecl("bjs_SwiftCounter_createOptionalGreeter")
+public func _bjs_SwiftCounter_createOptionalGreeter(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = SwiftCounter.bridgeJSLiftParameter(_self).createOptionalGreeter()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_SwiftCounter_count_get")
 @_cdecl("bjs_SwiftCounter_count_get")
 public func _bjs_SwiftCounter_count_get(_self: UnsafeMutableRawPointer) -> Int32 {
@@ -3603,6 +3653,27 @@ public func _bjs_SwiftCounter_name_get(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = SwiftCounter.bridgeJSLiftParameter(_self).name
     return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_optionalTag_get")
+@_cdecl("bjs_SwiftCounter_optionalTag_get")
+public func _bjs_SwiftCounter_optionalTag_get(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = SwiftCounter.bridgeJSLiftParameter(_self).optionalTag
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_optionalTag_set")
+@_cdecl("bjs_SwiftCounter_optionalTag_set")
+public func _bjs_SwiftCounter_optionalTag_set(_self: UnsafeMutableRawPointer, valueIsSome: Int32, valueBytes: Int32, valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    SwiftCounter.bridgeJSLiftParameter(_self).optionalTag = Optional<String>.bridgeJSLiftParameter(valueIsSome, valueBytes, valueLength)
     #else
     fatalError("Only available on WebAssembly")
     #endif

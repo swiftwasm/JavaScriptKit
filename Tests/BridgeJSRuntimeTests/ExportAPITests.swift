@@ -862,6 +862,7 @@ enum APIOptionalResult {
 @JS protocol Counter {
     var count: Int { get set }
     var name: String { get }
+    var optionalTag: String? { get set }
     func increment(by amount: Int)
     func getValue() -> Int
     func setLabelElements(_ labelPrefix: String, _ labelSuffix: String)
@@ -869,6 +870,8 @@ enum APIOptionalResult {
     func isEven() -> Bool
     func processGreeter(_ greeter: Greeter) -> String
     func createGreeter() -> Greeter
+    func processOptionalGreeter(_ greeter: Greeter?) -> String
+    func createOptionalGreeter() -> Greeter?
 }
 
 @JS class CounterManager {
@@ -918,6 +921,7 @@ enum APIOptionalResult {
 @JS class SwiftCounter: Counter {
     @JS var count: Int = 0
     @JS let name: String = "SwiftCounter"
+    @JS var optionalTag: String? = nil
     private var label: String = ""
 
     @JS init() {}
@@ -941,13 +945,25 @@ enum APIOptionalResult {
     @JS func isEven() -> Bool {
         return count % 2 == 0
     }
-    
+
     @JS func processGreeter(_ greeter: Greeter) -> String {
         return "SwiftCounter processed: \(greeter.greet())"
     }
-    
+
     @JS func createGreeter() -> Greeter {
         return Greeter(name: "CounterGreeter")
+    }
+
+    @JS func processOptionalGreeter(_ greeter: Greeter?) -> String {
+        if let greeter = greeter {
+            return "SwiftCounter processed optional: \(greeter.greet())"
+        } else {
+            return "SwiftCounter received nil"
+        }
+    }
+
+    @JS func createOptionalGreeter() -> Greeter? {
+        return Greeter(name: "OptionalCounterGreeter")
     }
 }
 

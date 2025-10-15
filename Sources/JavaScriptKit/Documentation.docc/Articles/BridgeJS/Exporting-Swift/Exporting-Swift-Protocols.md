@@ -23,6 +23,7 @@ import JavaScriptKit
 @JS protocol Counter {
     var count: Int { get set }
     var name: String { get }
+    var label: String? { get set }
     func increment(by amount: Int)
     func reset()
     func getValue() -> Int
@@ -51,6 +52,10 @@ import JavaScriptKit
     @JS func setCountValue(_ value: Int) {
         delegate.count = value
     }
+    
+    @JS func updateLabel(_ newLabel: String?) {
+        delegate.label = newLabel
+    }
 }
 ```
 
@@ -64,6 +69,7 @@ const { exports } = await init({});
 const counterImpl = {
     count: 0,
     name: "JSCounter",
+    label: "Default Label",
     increment(amount) {
         this.count += amount;
     },
@@ -82,6 +88,11 @@ console.log(manager.getCurrentValue()); // 2
 console.log(manager.getCounterName()); // "JSCounter"
 manager.setCountValue(10);
 console.log(counterImpl.count); // 10
+
+manager.updateLabel("Custom Label");
+console.log(counterImpl.label); // "Custom Label"
+manager.updateLabel(null);
+console.log(counterImpl.label); // null
 ```
 
 The generated TypeScript interface:
@@ -90,6 +101,7 @@ The generated TypeScript interface:
 export interface Counter {
     count: number;
     readonly name: string;
+    label: string | null;
     increment(amount: number): void;
     reset(): void;
     getValue(): number;
@@ -222,32 +234,17 @@ When you pass a JavaScript object implementing a protocol to Swift:
 
 | Swift Feature | Status |
 |:--------------|:-------|
-| Method requirements: `func method()` | ✅ |
-| Method requirements with parameters | ✅ |
-| Method requirements with return values | ✅ |
-| Throwing method requirements: `func method() throws(JSException)` | ✅ |
-| Async method requirements: `func method() async` | ✅ |
-| Property requirements: `var property: Type { get }` | ✅ |
-| Property requirements: `var property: Type { get set }` | ✅ |
+| Method requirements: `func foo(_ param: String?) -> FooClass?` | ✅ |
+| Property requirements: `var property: Type { get }` / `var property: Type { get set }` | ✅ |
+| Optional parameters / return values in methods | ✅ |
+| Optional properties | ✅ |
 | Optional protocol methods | ❌ |
 | Associated types | ❌ |
 | Protocol inheritance | ❌ |
 | Protocol composition: `Protocol1 & Protocol2` | ❌ |
 | Generics | ❌ |
 
-### Type Support for Protocol Properties and Method Parameters
+**Type Limitations:**
+- `@JS enum` types are not supported in protocol signatures (use raw values or separate parameters instead)
 
-Protocol properties and method parameters have more limited type support compared to regular exported Swift functions and classes. This is because protocols bridge Swift implementations to JavaScript objects using the TypeScript import mechanism.
-
-**Supported Types:**
-- Primitives: `Bool`, `Int`, `Float`, `Double`
-- `String`
-- `JSObject`
-
-**Not Supported:**
-- `@JS class` types
-- `@JS enum` types (case, raw value, or associated value)
-- `@JS protocol` types
-- Optional types: `Int?`, `String?`, etc.
-
-> Note: For regular `@JS func` and `@JS class` exports (not within protocols), all these types including optionals, enums, and classes are fully supported. See <doc:Exporting-Swift-Function> and <doc:Exporting-Swift-Optional> for more information.
+> Note: Protocol type support matches that of regular `@JS func` and `@JS class` exports. See <doc:Exporting-Swift-Function> and <doc:Exporting-Swift-Optional> for more information.

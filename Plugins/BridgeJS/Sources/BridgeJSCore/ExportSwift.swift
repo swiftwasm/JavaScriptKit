@@ -982,16 +982,16 @@ public class ExportSwift {
             )
 
             let protocolUniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
-            
+
             exportedProtocolByName[protocolUniqueKey] = ExportedProtocol(
                 name: name,
                 methods: [],
                 properties: [],
                 namespace: namespaceResult.namespace
             )
-            
+
             stateStack.push(state: .protocolBody(name: name, key: protocolUniqueKey))
-            
+
             var methods: [ExportedFunction] = []
             for member in node.memberBlock.members {
                 if let funcDecl = member.decl.as(FunctionDeclSyntax.self) {
@@ -1013,10 +1013,10 @@ public class ExportSwift {
                 properties: exportedProtocolByName[protocolUniqueKey]?.properties ?? [],
                 namespace: namespaceResult.namespace
             )
-            
+
             exportedProtocolByName[protocolUniqueKey] = exportedProtocol
             exportedProtocolNames.append(protocolUniqueKey)
-            
+
             stateStack.pop()
 
             parent.exportedProtocolNameByKey[protocolUniqueKey] = name
@@ -1097,14 +1097,6 @@ public class ExportSwift {
                     continue
                 }
 
-                if case .optional = propertyType {
-                    diagnose(
-                        node: typeAnnotation.type,
-                        message: "Optional properties are not yet supported in protocols"
-                    )
-                    continue
-                }
-
                 guard let accessorBlock = binding.accessorBlock else {
                     diagnose(
                         node: binding,
@@ -1125,7 +1117,7 @@ public class ExportSwift {
                 if var currentProtocol = exportedProtocolByName[protocolKey] {
                     var properties = currentProtocol.properties
                     properties.append(exportedProperty)
-                    
+
                     currentProtocol = ExportedProtocol(
                         name: currentProtocol.name,
                         methods: currentProtocol.methods,
@@ -2240,15 +2232,34 @@ public class ExportSwift {
             } else {
                 returnTypeStr = " -> \(method.returnType.swiftType)"
                 let liftingInfo = try method.returnType.liftingReturnInfo(context: .protocolExport)
-                if let abiType = liftingInfo.valueToLift {
+
+                if case .optional = method.returnType {
+                    if let abiType = liftingInfo.valueToLift {
+                        externReturnType = " -> \(abiType.swiftType)"
+                        callCode = """
+                            let ret = _extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
+                                return \(raw: method.returnType.swiftType).bridgeJSLiftReturn(ret)
+                            """
+                    } else {
+                        externReturnType = ""
+                        callCode = """
+                            _extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
+                                return \(raw: method.returnType.swiftType).bridgeJSLiftReturn()
+                            """
+                    }
+                } else if let abiType = liftingInfo.valueToLift {
                     externReturnType = " -> \(abiType.swiftType)"
+                    callCode = """
+                        let ret = _extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
+                            return \(raw: method.returnType.swiftType).bridgeJSLiftReturn(ret)
+                        """
                 } else {
                     externReturnType = ""
+                    callCode = """
+                        _extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
+                            return \(raw: method.returnType.swiftType).bridgeJSLiftReturn()
+                        """
                 }
-                callCode = """
-                    let ret = _extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
-                        return \(raw: method.returnType.swiftType).bridgeJSLiftReturn(ret)
-                    """
             }
             let methodImplementation: DeclSyntax = """
                 func \(raw: method.name)(\(raw: swiftParams.joined(separator: ", ")))\(raw: returnTypeStr) {
@@ -2286,7 +2297,7 @@ public class ExportSwift {
             }
             """
     }
-    
+
     private func renderProtocolProperty(
         property: ExportedProtocolProperty,
         protocolName: String,
@@ -2306,27 +2317,27 @@ public class ExportSwift {
             operation: "set",
             className: protocolName
         )
-        
+
         // Generate getter
         let liftingInfo = try property.type.liftingReturnInfo(context: .protocolExport)
         let getterReturnType: String
         let getterCallCode: String
-        
+
         if let abiType = liftingInfo.valueToLift {
             getterReturnType = " -> \(abiType.swiftType)"
             getterCallCode = """
-            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
-                    return \(property.type.swiftType).bridgeJSLiftReturn(ret)
-            """
+                let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+                        return \(property.type.swiftType).bridgeJSLiftReturn(ret)
+                """
         } else {
             // For String and other types that use tmpRetString
             getterReturnType = ""
             getterCallCode = """
-            _extern_get(this: Int32(bitPattern: jsObject.id))
-                    return \(property.type.swiftType).bridgeJSLiftReturn()
-            """
+                _extern_get(this: Int32(bitPattern: jsObject.id))
+                        return \(property.type.swiftType).bridgeJSLiftReturn()
+                """
         }
-        
+
         if property.isReadonly {
             // Readonly property - only getter
             return """
@@ -2345,11 +2356,11 @@ public class ExportSwift {
                 loweringInfo.loweredParameters.count == 1,
                 "Protocol property setters must lower to a single WASM parameter"
             )
-            
+
             let (paramName, wasmType) = loweringInfo.loweredParameters[0]
             let setterParams = "this: Int32, \(paramName): \(wasmType.swiftType)"
             let setterCallArgs = "this: Int32(bitPattern: jsObject.id), \(paramName): newValue.bridgeJSLowerParameter()"
-            
+
             return """
                 var \(raw: property.name): \(raw: property.type.swiftType) {
                     get {
@@ -2542,6 +2553,7 @@ extension BridgeType {
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
         }
     }
+
 }
 
 extension DeclModifierSyntax {

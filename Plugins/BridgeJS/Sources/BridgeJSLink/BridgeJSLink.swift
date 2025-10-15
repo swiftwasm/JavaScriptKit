@@ -1883,6 +1883,7 @@ extension BridgeJSLink {
                 valuesToLift = [scope.variable(param.name)]
             } else {
                 valuesToLift = liftingFragment.parameters.map { scope.variable(param.name + $0.capitalizedFirstLetter) }
+                parameterNames.append(contentsOf: valuesToLift)
             }
             let liftedValues = liftingFragment.printCode(valuesToLift, scope, body, cleanupCode)
             assert(liftedValues.count == 1, "Lifting fragment should produce exactly one value")
@@ -2455,7 +2456,7 @@ extension BridgeJSLink {
             returnType: property.type
         )
         importObjectBuilder.assignToImportObject(name: getterAbiName, function: getterLines)
-        
+
         if !property.isReadonly {
             let setterAbiName = ABINameGenerator.generateABIName(
                 baseName: property.name,

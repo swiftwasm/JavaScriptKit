@@ -176,6 +176,34 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
+            TestModule["bjs_MyViewControllerDelegate_optionalName_get"] = function bjs_MyViewControllerDelegate_optionalName_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).optionalName;
+                    const isSome = ret != null;
+                    if (isSome) {
+                        const bytes = textEncoder.encode(ret);
+                        bjs["swift_js_return_optional_string"](1, bytes, bytes.length);
+                        return bytes.length;
+                    } else {
+                        bjs["swift_js_return_optional_string"](0, 0, 0);
+                        return -1;
+                    }
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_optionalName_set"] = function bjs_MyViewControllerDelegate_optionalName_set(self, valueIsSome, valueWrappedValue) {
+                try {
+                    let obj;
+                    if (valueIsSome) {
+                        obj = swift.memory.getObject(valueWrappedValue);
+                        swift.memory.release(valueWrappedValue);
+                    }
+                    swift.memory.getObject(self).optionalName = valueIsSome ? obj : null;
+                } catch (error) {
+                    setException(error);
+                }
+            }
             TestModule["bjs_MyViewControllerDelegate_onSomethingHappened"] = function bjs_MyViewControllerDelegate_onSomethingHappened(self) {
                 try {
                     swift.memory.getObject(self).onSomethingHappened();
@@ -235,6 +263,22 @@ export async function createInstantiator(options, swift) {
                 } catch (error) {
                     setException(error);
                     return 0
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_onOptionalHelperUpdated"] = function bjs_MyViewControllerDelegate_onOptionalHelperUpdated(self, helperIsSome, helperWrappedValue) {
+                try {
+                    swift.memory.getObject(self).onOptionalHelperUpdated(helperIsSome ? Helper.__construct(helperWrappedValue) : null);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_createOptionalHelper"] = function bjs_MyViewControllerDelegate_createOptionalHelper(self) {
+                try {
+                    let ret = swift.memory.getObject(self).createOptionalHelper();
+                    const isSome = ret != null;
+                    return isSome ? ret.pointer : 0;
+                } catch (error) {
+                    setException(error);
                 }
             }
         },

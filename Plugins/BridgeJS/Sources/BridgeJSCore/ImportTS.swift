@@ -449,8 +449,13 @@ extension BridgeType {
             throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
         case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
             throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-        case .optional:
-            throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
+        case .optional(let wrappedType):
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
+            case .protocolExport:
+                return try wrappedType.loweringParameterInfo(context: context)
+            }
         }
     }
 
@@ -492,7 +497,19 @@ extension BridgeType {
         case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
             throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
         case .optional:
-            throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
+            case .protocolExport:
+                // For Optional<String>, return the length (or -1 for null)
+                if case .optional(.string) = self {
+                    return .string
+                }
+                if case .optional(.swiftHeapObject) = self {
+                    return LiftingReturnInfo(valueToLift: .pointer)
+                }
+                return LiftingReturnInfo(valueToLift: nil)
+            }
         }
     }
 }
