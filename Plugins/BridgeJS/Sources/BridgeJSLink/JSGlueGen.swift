@@ -490,9 +490,9 @@ struct IntrinsicJSFragment: Sendable {
     static func optionalLowerReturn(wrappedType: BridgeType) throws -> IntrinsicJSFragment {
         switch wrappedType {
         case .bool, .int, .float, .double, .string, .swiftHeapObject, .jsObject, .swiftProtocol, .caseEnum,
-            .rawValueEnum:
+            .rawValueEnum, .associatedValueEnum:
             break
-        case .void, .optional, .associatedValueEnum, .namespaceEnum:
+        case .void, .optional, .namespaceEnum:
             throw BridgeJSLinkError(message: "Unsupported optional wrapped type for protocol export: \(wrappedType)")
         }
 
@@ -586,6 +586,23 @@ struct IntrinsicJSFragment: Sendable {
                             "bjs[\"swift_js_return_optional_int\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? (\(value) | 0) : 0);"
                         )
                     }
+                case .associatedValueEnum(let fullName):
+                    let base = fullName.components(separatedBy: ".").last ?? fullName
+                    let caseIdVar = scope.variable("caseId")
+                    let cleanupVar = scope.variable("cleanup")
+                    printer.write("if (\(isSomeVar)) {")
+                    printer.indent {
+                        printer.write(
+                            "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = enumHelpers.\(base).lower(\(value));"
+                        )
+                        cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
+                        printer.write("bjs[\"swift_js_return_optional_int\"](1, \(caseIdVar));")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("bjs[\"swift_js_return_optional_int\"](0, 0);")
+                    }
+                    printer.write("}")
                 default:
                     ()
                 }
@@ -693,11 +710,27 @@ struct IntrinsicJSFragment: Sendable {
             case .bool: return .boolLiftParameter
             default: return .identity
             }
-        case .associatedValueEnum(let string):
-            throw BridgeJSLinkError(
-                message:
-                    "Associated value enums are not supported to be passed as parameters to imported JS functions: \(string)"
-            )
+        case .associatedValueEnum(let fullName):
+            switch context {
+            case .importTS:
+                throw BridgeJSLinkError(
+                    message:
+                        "Associated value enums are not supported to be passed as parameters to imported JS functions: \(fullName)"
+                )
+            case .protocolExport:
+                let base = fullName.components(separatedBy: ".").last ?? fullName
+                return IntrinsicJSFragment(
+                    parameters: ["caseId"],
+                    printCode: { arguments, scope, printer, cleanupCode in
+                        let caseId = arguments[0]
+                        let resultVar = scope.variable("enumValue")
+                        printer.write(
+                            "const \(resultVar) = enumHelpers.\(base).raise(\(caseId), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
+                        )
+                        return [resultVar]
+                    }
+                )
+            }
         case .namespaceEnum(let string):
             throw BridgeJSLinkError(
                 message:
@@ -743,10 +776,30 @@ struct IntrinsicJSFragment: Sendable {
             case .bool: return .boolLowerReturn
             default: return .identity
             }
-        case .associatedValueEnum(let string):
-            throw BridgeJSLinkError(
-                message: "Associated value enums are not supported to be returned from imported JS functions: \(string)"
-            )
+        case .associatedValueEnum(let fullName):
+            switch context {
+            case .importTS:
+                throw BridgeJSLinkError(
+                    message:
+                        "Associated value enums are not supported to be returned from imported JS functions: \(fullName)"
+                )
+            case .protocolExport:
+                let base = fullName.components(separatedBy: ".").last ?? fullName
+                return IntrinsicJSFragment(
+                    parameters: ["value"],
+                    printCode: { arguments, scope, printer, cleanupCode in
+                        let value = arguments[0]
+                        let caseIdVar = scope.variable("caseId")
+                        let cleanupVar = scope.variable("cleanup")
+                        printer.write(
+                            "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = enumHelpers.\(base).lower(\(value));"
+                        )
+                        cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
+                        printer.write("return \(caseIdVar);")
+                        return []
+                    }
+                )
+            }
         case .namespaceEnum(let string):
             throw BridgeJSLinkError(
                 message: "Namespace enums are not supported to be returned from imported JS functions: \(string)"

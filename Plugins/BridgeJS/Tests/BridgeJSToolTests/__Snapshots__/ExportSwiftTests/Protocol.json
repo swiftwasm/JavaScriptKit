@@ -250,7 +250,71 @@
     }
   ],
   "enums" : [
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
 
+          ],
+          "name" : "test",
+          "rawValue" : "test"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "test2",
+          "rawValue" : "test2"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "ExampleEnum",
+      "rawType" : "String",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "ExampleEnum"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "failure"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Result",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Result"
+    }
   ],
   "functions" : [
 
@@ -468,6 +532,66 @@
               }
             }
           }
+        },
+        {
+          "abiName" : "bjs_MyViewControllerDelegate_createEnum",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "createEnum",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "rawValueEnum" : {
+              "_0" : "ExampleEnum",
+              "_1" : "String"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MyViewControllerDelegate_handleResult",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "handleResult",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "result",
+              "type" : {
+                "associatedValueEnum" : {
+                  "_0" : "Result"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MyViewControllerDelegate_getResult",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "getResult",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "Result"
+            }
+          }
         }
       ],
       "name" : "MyViewControllerDelegate",
@@ -498,6 +622,29 @@
               "_0" : {
                 "string" : {
 
+                }
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "myEnum",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "ExampleEnum",
+              "_1" : "String"
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "result",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "Result"
                 }
               }
             }

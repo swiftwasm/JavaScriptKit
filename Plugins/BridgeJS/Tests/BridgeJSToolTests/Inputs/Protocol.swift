@@ -1,5 +1,15 @@
 import JavaScriptKit
 
+@JS enum ExampleEnum: String {
+    case test = "test"
+    case test2 = "test2"
+}
+
+@JS enum Result {
+    case success(String)
+    case failure(Int)
+}
+
 @JS class Helper {
     @JS var value: Int
 
@@ -16,6 +26,8 @@ import JavaScriptKit
     var eventCount: Int { get set }
     var delegateName: String { get }
     var optionalName: String? { get set }
+    var myEnum: ExampleEnum { get set }
+    var result: Result? { get set }
     func onSomethingHappened()
     func onValueChanged(_ value: String)
     func onCountUpdated(count: Int) -> Bool
@@ -25,6 +37,9 @@ import JavaScriptKit
     func createHelper() -> Helper
     func onOptionalHelperUpdated(_ helper: Helper?)
     func createOptionalHelper() -> Helper?
+    func createEnum() -> ExampleEnum
+    func handleResult(_ result: Result)
+    func getResult() -> Result
 }
 
 @JS class MyViewController {

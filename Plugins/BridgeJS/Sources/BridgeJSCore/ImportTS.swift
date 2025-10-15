@@ -447,14 +447,41 @@ extension BridgeType {
             }
         case .swiftProtocol:
             throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
-        case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
-            throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
+        case .caseEnum:
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
+            case .protocolExport:
+                return LoweringParameterInfo(loweredParameters: [("value", .i32)])
+            }
+        case .rawValueEnum(_, let rawType):
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
+            case .protocolExport:
+                let wasmType = rawType == .string ? WasmCoreType.i32 : (rawType.wasmCoreType ?? .i32)
+                return LoweringParameterInfo(loweredParameters: [("value", wasmType)])
+            }
+        case .associatedValueEnum:
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
+            case .protocolExport:
+                return LoweringParameterInfo(loweredParameters: [("caseId", .i32)])
+            }
+        case .namespaceEnum:
+            throw BridgeJSCoreError("Namespace enums cannot be used as parameters")
         case .optional(let wrappedType):
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
             case .protocolExport:
-                return try wrappedType.loweringParameterInfo(context: context)
+                let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
+                guard wrappedInfo.loweredParameters.count == 1 else {
+                    throw BridgeJSCoreError("Optional wrapped type must lower to single parameter")
+                }
+                let (_, wrappedWasmType) = wrappedInfo.loweredParameters[0]
+                return LoweringParameterInfo(loweredParameters: [("value", wrappedWasmType)])
             }
         }
     }
@@ -494,21 +521,37 @@ extension BridgeType {
             }
         case .swiftProtocol:
             throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
-        case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
-            throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-        case .optional:
+        case .caseEnum:
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
+            case .protocolExport:
+                return LiftingReturnInfo(valueToLift: .i32)
+            }
+        case .rawValueEnum(_, let rawType):
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
+            case .protocolExport:
+                let wasmType = rawType == .string ? WasmCoreType.i32 : (rawType.wasmCoreType ?? .i32)
+                return LiftingReturnInfo(valueToLift: wasmType)
+            }
+        case .associatedValueEnum:
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
+            case .protocolExport:
+                return LiftingReturnInfo(valueToLift: nil)
+            }
+        case .namespaceEnum:
+            throw BridgeJSCoreError("Namespace enums cannot be used as return values")
+        case .optional(let wrappedType):
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
             case .protocolExport:
-                // For Optional<String>, return the length (or -1 for null)
-                if case .optional(.string) = self {
-                    return .string
-                }
-                if case .optional(.swiftHeapObject) = self {
-                    return LiftingReturnInfo(valueToLift: .pointer)
-                }
-                return LiftingReturnInfo(valueToLift: nil)
+                let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
+                return wrappedInfo
             }
         }
     }

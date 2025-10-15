@@ -14,10 +14,35 @@ export interface MyViewControllerDelegate {
     createHelper(): Helper;
     onOptionalHelperUpdated(helper: Helper | null): void;
     createOptionalHelper(): Helper | null;
+    createEnum(): ExampleEnumTag;
+    handleResult(result: ResultTag): void;
+    getResult(): ResultTag;
     eventCount: number;
     readonly delegateName: string;
     optionalName: string | null;
+    myEnum: ExampleEnumTag;
+    result: ResultTag | null;
 }
+
+export const ExampleEnumValues: {
+    readonly Test: "test";
+    readonly Test2: "test2";
+};
+export type ExampleEnumTag = typeof ExampleEnumValues[keyof typeof ExampleEnumValues];
+
+export const ResultValues: {
+    readonly Tag: {
+        readonly Success: 0;
+        readonly Failure: 1;
+    };
+};
+
+export type ResultTag =
+  { tag: typeof ResultValues.Tag.Success; param0: string } | { tag: typeof ResultValues.Tag.Failure; param0: number }
+
+export type ExampleEnumObject = typeof ExampleEnumValues;
+
+export type ResultObject = typeof ResultValues;
 
 /// Represents a Swift heap object like a class instance or an actor instance.
 export interface SwiftHeapObject {
@@ -47,6 +72,8 @@ export type Exports = {
     MyViewController: {
         new(delegate: MyViewControllerDelegate): MyViewController;
     }
+    ExampleEnum: ExampleEnumObject
+    Result: ResultObject
 }
 export type Imports = {
 }

@@ -1751,13 +1751,13 @@ public class ExportSwift {
                         return bridgeJSRawValue
                     }
                     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> \(raw: typeName) {
-                        return \(raw: typeName)(bridgeJSRawValue: value)!
+                        return bridgeJSLiftParameter(value)
                     }
                     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> \(raw: typeName) {
                         return \(raw: typeName)(bridgeJSRawValue: value)!
                     }
                     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
-                        return bridgeJSRawValue
+                        return bridgeJSLowerParameter()
                     }
 
                     private init?(bridgeJSRawValue: Int32) {
@@ -1774,12 +1774,31 @@ public class ExportSwift {
         func renderAssociatedValueEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
             let typeName = enumDef.swiftCallName
             return """
-                extension \(raw: typeName): _BridgedSwiftAssociatedValueEnum {
-                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> \(raw: typeName) {
+                extension \(raw: typeName): _BridgedSwiftAssociatedValueEnum {                    
+                    private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> \(raw: typeName) {
                         switch caseId {
                         \(raw: generateStackLiftSwitchCases(enumDef: enumDef).joined(separator: "\n"))
                         default: fatalError("Unknown \(raw: typeName) case ID: \\(caseId)")
                         }
+                    }
+                    
+                    // MARK: Protocol Export
+                    
+                    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+                        switch self {
+                        \(raw: generateLowerParameterSwitchCases(enumDef: enumDef).joined(separator: "\n"))
+                        }
+                    }
+                    
+                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> \(raw: typeName) {
+                        let caseId = _swift_js_pop_param_int32()
+                        return _bridgeJSLiftFromCaseId(caseId)
+                    }
+                    
+                    // MARK: ExportSwift
+                    
+                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> \(raw: typeName) {
+                        return _bridgeJSLiftFromCaseId(caseId)
                     }
 
                     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
@@ -1849,6 +1868,80 @@ public class ExportSwift {
             return cases
         }
 
+        /// Generates code to push associated value payloads to side channels
+        /// This helper is reused by both lowerParameter and lowerReturn to avoid duplication
+        private func generatePayloadPushingCode(
+            associatedValues: [AssociatedValue]
+        ) -> [String] {
+            var bodyLines: [String] = []
+            for (index, associatedValue) in associatedValues.enumerated() {
+                let paramName = associatedValue.label ?? "param\(index)"
+                switch associatedValue.type {
+                case .string:
+                    bodyLines.append("var __bjs_\(paramName) = \(paramName)")
+                    bodyLines.append("__bjs_\(paramName).withUTF8 { ptr in")
+                    bodyLines.append("_swift_js_push_string(ptr.baseAddress, Int32(ptr.count))")
+                    bodyLines.append("}")
+                case .int:
+                    bodyLines.append("_swift_js_push_int(Int32(\(paramName)))")
+                case .bool:
+                    bodyLines.append("_swift_js_push_int(\(paramName) ? 1 : 0)")
+                case .float:
+                    bodyLines.append("_swift_js_push_f32(\(paramName))")
+                case .double:
+                    bodyLines.append("_swift_js_push_f64(\(paramName))")
+                case .optional(let wrappedType):
+                    bodyLines.append("let __bjs_isSome_\(paramName) = \(paramName) != nil")
+                    bodyLines.append("if let __bjs_unwrapped_\(paramName) = \(paramName) {")
+                    switch wrappedType {
+                    case .string:
+                        bodyLines.append("var __bjs_str_\(paramName) = __bjs_unwrapped_\(paramName)")
+                        bodyLines.append("__bjs_str_\(paramName).withUTF8 { ptr in")
+                        bodyLines.append("_swift_js_push_string(ptr.baseAddress, Int32(ptr.count))")
+                        bodyLines.append("}")
+                    case .int:
+                        bodyLines.append("_swift_js_push_int(Int32(__bjs_unwrapped_\(paramName)))")
+                    case .bool:
+                        bodyLines.append("_swift_js_push_int(__bjs_unwrapped_\(paramName) ? 1 : 0)")
+                    case .float:
+                        bodyLines.append("_swift_js_push_f32(__bjs_unwrapped_\(paramName))")
+                    case .double:
+                        bodyLines.append("_swift_js_push_f64(__bjs_unwrapped_\(paramName))")
+                    default:
+                        bodyLines.append(
+                            "preconditionFailure(\"BridgeJS: unsupported optional wrapped type in generated code\")"
+                        )
+                    }
+                    bodyLines.append("}")
+                    bodyLines.append("_swift_js_push_int(__bjs_isSome_\(paramName) ? 1 : 0)")
+                default:
+                    bodyLines.append(
+                        "preconditionFailure(\"BridgeJS: unsupported associated value type in generated code\")"
+                    )
+                }
+            }
+            return bodyLines
+        }
+
+        private func generateLowerParameterSwitchCases(enumDef: ExportedEnum) -> [String] {
+            var cases: [String] = []
+            for (caseIndex, enumCase) in enumDef.cases.enumerated() {
+                if enumCase.associatedValues.isEmpty {
+                    cases.append("case .\(enumCase.name):")
+                    cases.append("return Int32(\(caseIndex))")
+                } else {
+                    let payloadCode = generatePayloadPushingCode(associatedValues: enumCase.associatedValues)
+                    let pattern = enumCase.associatedValues.enumerated()
+                        .map { index, associatedValue in "let \(associatedValue.label ?? "param\(index)")" }
+                        .joined(separator: ", ")
+                    cases.append("case .\(enumCase.name)(\(pattern)):")
+                    cases.append(contentsOf: payloadCode)
+                    cases.append("return Int32(\(caseIndex))")
+                }
+            }
+            return cases
+        }
+
         private func generateReturnSwitchCases(enumDef: ExportedEnum) -> [String] {
             var cases: [String] = []
             for (caseIndex, enumCase) in enumDef.cases.enumerated() {
@@ -1856,59 +1949,13 @@ public class ExportSwift {
                     cases.append("case .\(enumCase.name):")
                     cases.append("_swift_js_push_tag(Int32(\(caseIndex)))")
                 } else {
-                    var bodyLines: [String] = []
-                    bodyLines.append("_swift_js_push_tag(Int32(\(caseIndex)))")
-                    for (index, associatedValue) in enumCase.associatedValues.enumerated() {
-                        let paramName = associatedValue.label ?? "param\(index)"
-                        switch associatedValue.type {
-                        case .string:
-                            bodyLines.append("var __bjs_\(paramName) = \(paramName)")
-                            bodyLines.append("__bjs_\(paramName).withUTF8 { ptr in")
-                            bodyLines.append("_swift_js_push_string(ptr.baseAddress, Int32(ptr.count))")
-                            bodyLines.append("}")
-                        case .int:
-                            bodyLines.append("_swift_js_push_int(Int32(\(paramName)))")
-                        case .bool:
-                            bodyLines.append("_swift_js_push_int(\(paramName) ? 1 : 0)")
-                        case .float:
-                            bodyLines.append("_swift_js_push_f32(\(paramName))")
-                        case .double:
-                            bodyLines.append("_swift_js_push_f64(\(paramName))")
-                        case .optional(let wrappedType):
-                            bodyLines.append("let __bjs_isSome_\(paramName) = \(paramName) != nil")
-                            bodyLines.append("if let __bjs_unwrapped_\(paramName) = \(paramName) {")
-                            switch wrappedType {
-                            case .string:
-                                bodyLines.append("var __bjs_str_\(paramName) = __bjs_unwrapped_\(paramName)")
-                                bodyLines.append("__bjs_str_\(paramName).withUTF8 { ptr in")
-                                bodyLines.append("_swift_js_push_string(ptr.baseAddress, Int32(ptr.count))")
-                                bodyLines.append("}")
-                            case .int:
-                                bodyLines.append("_swift_js_push_int(Int32(__bjs_unwrapped_\(paramName)))")
-                            case .bool:
-                                bodyLines.append("_swift_js_push_int(__bjs_unwrapped_\(paramName) ? 1 : 0)")
-                            case .float:
-                                bodyLines.append("_swift_js_push_f32(__bjs_unwrapped_\(paramName))")
-                            case .double:
-                                bodyLines.append("_swift_js_push_f64(__bjs_unwrapped_\(paramName))")
-                            default:
-                                bodyLines.append(
-                                    "preconditionFailure(\"BridgeJS: unsupported optional wrapped type in generated code\")"
-                                )
-                            }
-                            bodyLines.append("}")
-                            bodyLines.append("_swift_js_push_int(__bjs_isSome_\(paramName) ? 1 : 0)")
-                        default:
-                            bodyLines.append(
-                                "preconditionFailure(\"BridgeJS: unsupported associated value type in generated code\")"
-                            )
-                        }
-                    }
                     let pattern = enumCase.associatedValues.enumerated()
                         .map { index, associatedValue in "let \(associatedValue.label ?? "param\(index)")" }
                         .joined(separator: ", ")
                     cases.append("case .\(enumCase.name)(\(pattern)):")
-                    cases.append(contentsOf: bodyLines)
+                    cases.append("_swift_js_push_tag(Int32(\(caseIndex)))")
+                    let payloadCode = generatePayloadPushingCode(associatedValues: enumCase.associatedValues)
+                    cases.append(contentsOf: payloadCode)
                 }
             }
             return cases

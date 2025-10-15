@@ -859,10 +859,11 @@ enum APIOptionalResult {
 
 // MARK: - Protocol Tests
 
-@JS protocol Counter {
+@JS protocol DataProcessor {
     var count: Int { get set }
     var name: String { get }
     var optionalTag: String? { get set }
+    var apiResult: APIResult? { get set }
     func increment(by amount: Int)
     func getValue() -> Int
     func setLabelElements(_ labelPrefix: String, _ labelSuffix: String)
@@ -872,56 +873,59 @@ enum APIOptionalResult {
     func createGreeter() -> Greeter
     func processOptionalGreeter(_ greeter: Greeter?) -> String
     func createOptionalGreeter() -> Greeter?
+    func handleAPIResult(_ result: APIResult)
+    func getAPIResult() -> APIResult
 }
 
-@JS class CounterManager {
+@JS class DataProcessorManager {
 
-    @JS var counter: Counter
-    @JS var backupCounter: Counter?
+    @JS var processor: DataProcessor
+    @JS var backupProcessor: DataProcessor?
 
-    @JS init(counter: Counter) {
-        self.counter = counter
-        self.backupCounter = nil
+    @JS init(processor: DataProcessor) {
+        self.processor = processor
+        self.backupProcessor = nil
     }
 
     @JS func incrementByAmount(_ amount: Int) {
-        counter.increment(by: amount)
+        processor.increment(by: amount)
     }
 
-    @JS func setCounterLabel(_ prefix: String, _ suffix: String) {
-        counter.setLabelElements(prefix, suffix)
+    @JS func setProcessorLabel(_ prefix: String, _ suffix: String) {
+        processor.setLabelElements(prefix, suffix)
     }
 
-    @JS func isCounterEven() -> Bool {
-        return counter.isEven()
+    @JS func isProcessorEven() -> Bool {
+        return processor.isEven()
     }
 
-    @JS func getCounterLabel() -> String {
-        return counter.getLabel()
+    @JS func getProcessorLabel() -> String {
+        return processor.getLabel()
     }
 
     @JS func getCurrentValue() -> Int {
-        return counter.getValue()
+        return processor.getValue()
     }
 
     @JS func incrementBoth() {
-        counter.increment(by: 1)
-        backupCounter?.increment(by: 1)
+        processor.increment(by: 1)
+        backupProcessor?.increment(by: 1)
     }
 
     @JS func getBackupValue() -> Int? {
-        return backupCounter?.getValue()
+        return backupProcessor?.getValue()
     }
 
     @JS func hasBackup() -> Bool {
-        return backupCounter != nil
+        return backupProcessor != nil
     }
 }
 
-@JS class SwiftCounter: Counter {
+@JS class SwiftDataProcessor: DataProcessor {
     @JS var count: Int = 0
-    @JS let name: String = "SwiftCounter"
+    @JS let name: String = "SwiftDataProcessor"
     @JS var optionalTag: String? = nil
+    @JS var apiResult: APIResult? = nil
     private var label: String = ""
 
     @JS init() {}
@@ -947,23 +951,31 @@ enum APIOptionalResult {
     }
 
     @JS func processGreeter(_ greeter: Greeter) -> String {
-        return "SwiftCounter processed: \(greeter.greet())"
+        return "SwiftProcessor processed: \(greeter.greet())"
     }
 
     @JS func createGreeter() -> Greeter {
-        return Greeter(name: "CounterGreeter")
+        return Greeter(name: "ProcessorGreeter")
     }
 
     @JS func processOptionalGreeter(_ greeter: Greeter?) -> String {
         if let greeter = greeter {
-            return "SwiftCounter processed optional: \(greeter.greet())"
+            return "SwiftProcessor processed optional: \(greeter.greet())"
         } else {
-            return "SwiftCounter received nil"
+            return "SwiftProcessor received nil"
         }
     }
 
     @JS func createOptionalGreeter() -> Greeter? {
-        return Greeter(name: "OptionalCounterGreeter")
+        return Greeter(name: "OptionalProcessorGreeter")
+    }
+
+    @JS func handleAPIResult(_ result: APIResult) {
+        self.apiResult = result
+    }
+
+    @JS func getAPIResult() -> APIResult {
+        return apiResult ?? .failure(0)
     }
 }
 

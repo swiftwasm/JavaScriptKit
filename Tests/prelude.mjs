@@ -809,160 +809,185 @@ function setupTestGlobals(global) {
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 function testProtocolSupport(exports) {
-    let counterValue = 0;
-    let counterLabel = "";
-    const jsCounter = {
+    let processorValue = 0;
+    let processorLabel = "";
+    let apiResultValue = null;
+    const jsProcessor = {
         count: 0,
-        name: "JSCounter",
+        name: "JSProcessor",
         optionalTag: null,
-        increment(amount) { counterValue += amount; this.count += amount; },
-        getValue() { return counterValue; },
-        setLabelElements(labelPrefix, labelSuffix) { counterLabel = labelPrefix + labelSuffix; },
-        getLabel() { return counterLabel; },
-        isEven() { return counterValue % 2 === 0; },
-        processGreeter(greeter) { return `JSCounter processed: ${greeter.greet()}`; },
-        createGreeter() { return new exports.Greeter("JSCounterGreeter"); },
+        apiResult: null,
+        increment(amount) { processorValue += amount; this.count += amount; },
+        getValue() { return processorValue; },
+        setLabelElements(labelPrefix, labelSuffix) { processorLabel = labelPrefix + labelSuffix; },
+        getLabel() { return processorLabel; },
+        isEven() { return processorValue % 2 === 0; },
+        processGreeter(greeter) { return `JSProcessor processed: ${greeter.greet()}`; },
+        createGreeter() { return new exports.Greeter("JSProcessorGreeter"); },
         processOptionalGreeter(greeter) {
-            return greeter ? `JSCounter processed optional: ${greeter.greet()}` : "JSCounter received null";
+            return greeter ? `JSProcessor processed optional: ${greeter.greet()}` : "JSProcessor received null";
         },
-        createOptionalGreeter() { return new exports.Greeter("JSOptionalGreeter"); }
+        createOptionalGreeter() { return new exports.Greeter("JSOptionalGreeter"); },
+        handleAPIResult(result) { apiResultValue = result; },
+        getAPIResult() { return apiResultValue; }
     };
 
-    const manager = new exports.CounterManager(jsCounter);
+    const manager = new exports.DataProcessorManager(jsProcessor);
     
-    assert.equal(jsCounter.count, 0);
-    assert.equal(jsCounter.name, "JSCounter");
+    assert.equal(jsProcessor.count, 0);
+    assert.equal(jsProcessor.name, "JSProcessor");
     
     manager.incrementByAmount(4);
     assert.equal(manager.getCurrentValue(), 4);
-    assert.equal(jsCounter.count, 4);
+    assert.equal(jsProcessor.count, 4);
 
-    manager.setCounterLabel("Test", "Label");
-    assert.equal(manager.getCounterLabel(), "TestLabel");
-    assert.equal(jsCounter.getLabel(), "TestLabel");
+    manager.setProcessorLabel("Test", "Label");
+    assert.equal(manager.getProcessorLabel(), "TestLabel");
+    assert.equal(jsProcessor.getLabel(), "TestLabel");
 
-    assert.equal(manager.isCounterEven(), true);
+    assert.equal(manager.isProcessorEven(), true);
     manager.incrementByAmount(1);
-    assert.equal(manager.isCounterEven(), false);
-    assert.equal(jsCounter.isEven(), false);
+    assert.equal(manager.isProcessorEven(), false);
+    assert.equal(jsProcessor.isEven(), false);
 
-    jsCounter.increment(3);
-    assert.equal(jsCounter.getValue(), 8);
+    jsProcessor.increment(3);
+    assert.equal(jsProcessor.getValue(), 8);
     manager.release();
 
-    const swiftCounter = new exports.SwiftCounter();
-    const swiftManager = new exports.CounterManager(swiftCounter);
+    const swiftProcessor = new exports.SwiftDataProcessor();
+    const swiftManager = new exports.DataProcessorManager(swiftProcessor);
 
-    assert.equal(swiftCounter.count, 0);
-    assert.equal(swiftCounter.name, "SwiftCounter");
+    assert.equal(swiftProcessor.count, 0);
+    assert.equal(swiftProcessor.name, "SwiftDataProcessor");
 
     swiftManager.incrementByAmount(10);
     assert.equal(swiftManager.getCurrentValue(), 10);
-    assert.equal(swiftCounter.count, 10);
+    assert.equal(swiftProcessor.count, 10);
 
-    swiftManager.setCounterLabel("Swift", "Label");
-    assert.equal(swiftManager.getCounterLabel(), "SwiftLabel");
+    swiftManager.setProcessorLabel("Swift", "Label");
+    assert.equal(swiftManager.getProcessorLabel(), "SwiftLabel");
 
-    swiftCounter.increment(5);
-    assert.equal(swiftCounter.getValue(), 15);
-    assert.equal(swiftCounter.count, 15);
+    swiftProcessor.increment(5);
+    assert.equal(swiftProcessor.getValue(), 15);
+    assert.equal(swiftProcessor.count, 15);
     
-    swiftCounter.count = 100;
-    assert.equal(swiftCounter.count, 100);
-    assert.equal(swiftCounter.getValue(), 100);
+    swiftProcessor.count = 100;
+    assert.equal(swiftProcessor.count, 100);
+    assert.equal(swiftProcessor.getValue(), 100);
     
     const testGreeter = new exports.Greeter("TestUser");
-    const jsResult = jsCounter.processGreeter(testGreeter);
-    assert.equal(jsResult, "JSCounter processed: Hello, TestUser!");
+    const jsResult = jsProcessor.processGreeter(testGreeter);
+    assert.equal(jsResult, "JSProcessor processed: Hello, TestUser!");
     
-    const swiftResult = swiftCounter.processGreeter(testGreeter);
-    assert.equal(swiftResult, "SwiftCounter processed: Hello, TestUser!");
+    const swiftResult = swiftProcessor.processGreeter(testGreeter);
+    assert.equal(swiftResult, "SwiftProcessor processed: Hello, TestUser!");
     
     // Test swiftHeapObject return from protocol methods
-    const jsCreatedGreeter = jsCounter.createGreeter();
-    assert.equal(jsCreatedGreeter.name, "JSCounterGreeter");
-    assert.equal(jsCreatedGreeter.greet(), "Hello, JSCounterGreeter!");
+    const jsCreatedGreeter = jsProcessor.createGreeter();
+    assert.equal(jsCreatedGreeter.name, "JSProcessorGreeter");
+    assert.equal(jsCreatedGreeter.greet(), "Hello, JSProcessorGreeter!");
     jsCreatedGreeter.release();
     
-    const swiftCreatedGreeter = swiftCounter.createGreeter();
-    assert.equal(swiftCreatedGreeter.name, "CounterGreeter");
-    assert.equal(swiftCreatedGreeter.greet(), "Hello, CounterGreeter!");
+    const swiftCreatedGreeter = swiftProcessor.createGreeter();
+    assert.equal(swiftCreatedGreeter.name, "ProcessorGreeter");
+    assert.equal(swiftCreatedGreeter.greet(), "Hello, ProcessorGreeter!");
     swiftCreatedGreeter.release();
     
     const optGreeterTest = new exports.Greeter("OptionalTest");
-    assert.equal(jsCounter.processOptionalGreeter(optGreeterTest), "JSCounter processed optional: Hello, OptionalTest!");
-    assert.equal(jsCounter.processOptionalGreeter(null), "JSCounter received null");
-    assert.equal(swiftCounter.processOptionalGreeter(optGreeterTest), "SwiftCounter processed optional: Hello, OptionalTest!");
-    assert.equal(swiftCounter.processOptionalGreeter(null), "SwiftCounter received nil");
+    assert.equal(jsProcessor.processOptionalGreeter(optGreeterTest), "JSProcessor processed optional: Hello, OptionalTest!");
+    assert.equal(jsProcessor.processOptionalGreeter(null), "JSProcessor received null");
+    assert.equal(swiftProcessor.processOptionalGreeter(optGreeterTest), "SwiftProcessor processed optional: Hello, OptionalTest!");
+    assert.equal(swiftProcessor.processOptionalGreeter(null), "SwiftProcessor received nil");
     optGreeterTest.release();
     
-    const jsOptGreeter = jsCounter.createOptionalGreeter();
+    const jsOptGreeter = jsProcessor.createOptionalGreeter();
     assert.notEqual(jsOptGreeter, null);
     assert.equal(jsOptGreeter.name, "JSOptionalGreeter");
     jsOptGreeter.release();
     
-    const swiftOptGreeter = swiftCounter.createOptionalGreeter();
+    const swiftOptGreeter = swiftProcessor.createOptionalGreeter();
     assert.notEqual(swiftOptGreeter, null);
-    assert.equal(swiftOptGreeter.name, "OptionalCounterGreeter");
+    assert.equal(swiftOptGreeter.name, "OptionalProcessorGreeter");
     swiftOptGreeter.release();
     
-    assert.equal(jsCounter.optionalTag, null);
-    jsCounter.optionalTag = "test-tag";
-    assert.equal(jsCounter.optionalTag, "test-tag");
-    jsCounter.optionalTag = null;
-    assert.equal(jsCounter.optionalTag, null);
+    assert.equal(jsProcessor.optionalTag, null);
+    jsProcessor.optionalTag = "test-tag";
+    assert.equal(jsProcessor.optionalTag, "test-tag");
+    jsProcessor.optionalTag = null;
+    assert.equal(jsProcessor.optionalTag, null);
+    
+    const successResult = { tag: exports.Result.Tag.Success, param0: "Operation completed" };
+    const failureResult = { tag: exports.Result.Tag.Failure, param0: 500 };
+    
+    jsProcessor.handleAPIResult(successResult);
+    assert.deepEqual(jsProcessor.getAPIResult(), successResult);
+    
+    jsProcessor.handleAPIResult(failureResult);
+    assert.deepEqual(jsProcessor.getAPIResult(), failureResult);
+    
+    assert.equal(jsProcessor.apiResult, null);
+    jsProcessor.apiResult = successResult;
+    assert.deepEqual(jsProcessor.apiResult, successResult);
+    jsProcessor.apiResult = null;
+    assert.equal(jsProcessor.apiResult, null);
     
     testGreeter.release();
     
     swiftManager.release();
-    swiftCounter.release();
+    swiftProcessor.release();
 
-    let optionalCounterValue = 100;
-    let optionalCounterLabel = "optional";
-    const optionalCounter = {
+    let optionalProcessorValue = 100;
+    let optionalProcessorLabel = "optional";
+    const optionalProcessor = {
         count: 100,
-        name: "OptionalCounter",
+        name: "OptionalProcessor",
         optionalTag: "optional-tag",
-        increment(amount) { optionalCounterValue += amount; this.count += amount; },
-        getValue() { return optionalCounterValue; },
-        setLabelElements(labelPrefix, labelSuffix) { optionalCounterLabel = labelPrefix + labelSuffix; },
-        getLabel() { return optionalCounterLabel; },
-        isEven() { return optionalCounterValue % 2 === 0; },
-        processGreeter(greeter) { return `OptionalCounter processed: ${greeter.greet()}`; },
-        createGreeter() { return new exports.Greeter("OptionalCounterGreeter"); },
+        apiResult: null,
+        increment(amount) { optionalProcessorValue += amount; this.count += amount; },
+        getValue() { return optionalProcessorValue; },
+        setLabelElements(labelPrefix, labelSuffix) { optionalProcessorLabel = labelPrefix + labelSuffix; },
+        getLabel() { return optionalProcessorLabel; },
+        isEven() { return optionalProcessorValue % 2 === 0; },
+        processGreeter(greeter) { return `OptionalProcessor processed: ${greeter.greet()}`; },
+        createGreeter() { return new exports.Greeter("OptionalProcessorGreeter"); },
         processOptionalGreeter(greeter) {
-            return greeter ? `OptionalCounter processed optional: ${greeter.greet()}` : "OptionalCounter received null";
+            return greeter ? `OptionalProcessor processed optional: ${greeter.greet()}` : "OptionalProcessor received null";
         },
-        createOptionalGreeter() { return null; }
+        createOptionalGreeter() { return null; },
+        handleAPIResult(result) { },
+        getAPIResult() { return { tag: exports.APIResult.Tag.Info }; }
     };
 
-    let mainCounterValue = 0;
-    let mainCounterLabel = "main";
-    const mainCounter = {
+    let mainProcessorValue = 0;
+    let mainProcessorLabel = "main";
+    const mainProcessor = {
         count: 0,
-        name: "MainCounter",
+        name: "MainProcessor",
         optionalTag: null,
-        increment(amount) { mainCounterValue += amount; this.count += amount; },
-        getValue() { return mainCounterValue; },
-        setLabelElements(labelPrefix, labelSuffix) { mainCounterLabel = labelPrefix + labelSuffix; },
-        getLabel() { return mainCounterLabel; },
-        isEven() { return mainCounterValue % 2 === 0; },
-        processGreeter(greeter) { return `MainCounter processed: ${greeter.greet()}`; },
-        createGreeter() { return new exports.Greeter("MainCounterGreeter"); },
+        apiResult: null,
+        increment(amount) { mainProcessorValue += amount; this.count += amount; },
+        getValue() { return mainProcessorValue; },
+        setLabelElements(labelPrefix, labelSuffix) { mainProcessorLabel = labelPrefix + labelSuffix; },
+        getLabel() { return mainProcessorLabel; },
+        isEven() { return mainProcessorValue % 2 === 0; },
+        processGreeter(greeter) { return `MainProcessor processed: ${greeter.greet()}`; },
+        createGreeter() { return new exports.Greeter("MainProcessorGreeter"); },
         processOptionalGreeter(greeter) {
-            return greeter ? `MainCounter processed optional: ${greeter.greet()}` : "MainCounter received null";
+            return greeter ? `MainProcessor processed optional: ${greeter.greet()}` : "MainProcessor received null";
         },
-        createOptionalGreeter() { return new exports.Greeter("MainOptionalGreeter"); }
+        createOptionalGreeter() { return new exports.Greeter("MainOptionalGreeter"); },
+        handleAPIResult(result) { },
+        getAPIResult() { return { tag: exports.APIResult.Tag.Info }; }
     };
 
-    const managerWithOptional = new exports.CounterManager(mainCounter);
+    const managerWithOptional = new exports.DataProcessorManager(mainProcessor);
 
-    assert.equal(managerWithOptional.backupCounter, null);
+    assert.equal(managerWithOptional.backupProcessor, null);
     assert.equal(managerWithOptional.hasBackup(), false);
     assert.equal(managerWithOptional.getBackupValue(), null);
 
-    managerWithOptional.backupCounter = optionalCounter;
-    assert.notEqual(managerWithOptional.backupCounter, null);
+    managerWithOptional.backupProcessor = optionalProcessor;
+    assert.notEqual(managerWithOptional.backupProcessor, null);
     assert.equal(managerWithOptional.hasBackup(), true);
 
     managerWithOptional.incrementBoth();
@@ -973,23 +998,23 @@ function testProtocolSupport(exports) {
     assert.equal(managerWithOptional.getCurrentValue(), 2);
     assert.equal(managerWithOptional.getBackupValue(), 102);
 
-    managerWithOptional.backupCounter = null;
-    assert.equal(managerWithOptional.backupCounter, null);
+    managerWithOptional.backupProcessor = null;
+    assert.equal(managerWithOptional.backupProcessor, null);
     assert.equal(managerWithOptional.hasBackup(), false);
 
     managerWithOptional.incrementBoth();
     assert.equal(managerWithOptional.getCurrentValue(), 3);
     assert.equal(managerWithOptional.getBackupValue(), null);
 
-    const swiftBackupCounter = new exports.SwiftCounter();
-    swiftBackupCounter.increment(1);
-    managerWithOptional.backupCounter = swiftBackupCounter;
+    const swiftBackupProcessor = new exports.SwiftDataProcessor();
+    swiftBackupProcessor.increment(1);
+    managerWithOptional.backupProcessor = swiftBackupProcessor;
 
     assert.equal(managerWithOptional.hasBackup(), true);
     assert.equal(managerWithOptional.getBackupValue(), 1);
-    assert.equal(swiftBackupCounter.count, 1);
-    assert.equal(swiftBackupCounter.name, "SwiftCounter");
+    assert.equal(swiftBackupProcessor.count, 1);
+    assert.equal(swiftBackupProcessor.name, "SwiftDataProcessor");
 
     managerWithOptional.release();
-    swiftBackupCounter.release();
+    swiftBackupProcessor.release();
 }

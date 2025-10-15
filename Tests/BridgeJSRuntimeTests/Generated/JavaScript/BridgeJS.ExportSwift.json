@@ -1165,7 +1165,7 @@
     },
     {
       "constructor" : {
-        "abiName" : "bjs_CounterManager_init",
+        "abiName" : "bjs_DataProcessorManager_init",
         "effects" : {
           "isAsync" : false,
           "isStatic" : false,
@@ -1173,11 +1173,11 @@
         },
         "parameters" : [
           {
-            "label" : "counter",
-            "name" : "counter",
+            "label" : "processor",
+            "name" : "processor",
             "type" : {
               "swiftProtocol" : {
-                "_0" : "Counter"
+                "_0" : "DataProcessor"
               }
             }
           }
@@ -1185,7 +1185,7 @@
       },
       "methods" : [
         {
-          "abiName" : "bjs_CounterManager_incrementByAmount",
+          "abiName" : "bjs_DataProcessorManager_incrementByAmount",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1210,13 +1210,13 @@
           }
         },
         {
-          "abiName" : "bjs_CounterManager_setCounterLabel",
+          "abiName" : "bjs_DataProcessorManager_setProcessorLabel",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
             "isThrows" : false
           },
-          "name" : "setCounterLabel",
+          "name" : "setProcessorLabel",
           "parameters" : [
             {
               "label" : "_",
@@ -1244,13 +1244,13 @@
           }
         },
         {
-          "abiName" : "bjs_CounterManager_isCounterEven",
+          "abiName" : "bjs_DataProcessorManager_isProcessorEven",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
             "isThrows" : false
           },
-          "name" : "isCounterEven",
+          "name" : "isProcessorEven",
           "parameters" : [
 
           ],
@@ -1261,13 +1261,13 @@
           }
         },
         {
-          "abiName" : "bjs_CounterManager_getCounterLabel",
+          "abiName" : "bjs_DataProcessorManager_getProcessorLabel",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
             "isThrows" : false
           },
-          "name" : "getCounterLabel",
+          "name" : "getProcessorLabel",
           "parameters" : [
 
           ],
@@ -1278,7 +1278,7 @@
           }
         },
         {
-          "abiName" : "bjs_CounterManager_getCurrentValue",
+          "abiName" : "bjs_DataProcessorManager_getCurrentValue",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1295,7 +1295,7 @@
           }
         },
         {
-          "abiName" : "bjs_CounterManager_incrementBoth",
+          "abiName" : "bjs_DataProcessorManager_incrementBoth",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1312,7 +1312,7 @@
           }
         },
         {
-          "abiName" : "bjs_CounterManager_getBackupValue",
+          "abiName" : "bjs_DataProcessorManager_getBackupValue",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1333,7 +1333,7 @@
           }
         },
         {
-          "abiName" : "bjs_CounterManager_hasBackup",
+          "abiName" : "bjs_DataProcessorManager_hasBackup",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1350,38 +1350,38 @@
           }
         }
       ],
-      "name" : "CounterManager",
+      "name" : "DataProcessorManager",
       "properties" : [
         {
           "isReadonly" : false,
           "isStatic" : false,
-          "name" : "counter",
+          "name" : "processor",
           "type" : {
             "swiftProtocol" : {
-              "_0" : "Counter"
+              "_0" : "DataProcessor"
             }
           }
         },
         {
           "isReadonly" : false,
           "isStatic" : false,
-          "name" : "backupCounter",
+          "name" : "backupProcessor",
           "type" : {
             "optional" : {
               "_0" : {
                 "swiftProtocol" : {
-                  "_0" : "Counter"
+                  "_0" : "DataProcessor"
                 }
               }
             }
           }
         }
       ],
-      "swiftCallName" : "CounterManager"
+      "swiftCallName" : "DataProcessorManager"
     },
     {
       "constructor" : {
-        "abiName" : "bjs_SwiftCounter_init",
+        "abiName" : "bjs_SwiftDataProcessor_init",
         "effects" : {
           "isAsync" : false,
           "isStatic" : false,
@@ -1393,7 +1393,7 @@
       },
       "methods" : [
         {
-          "abiName" : "bjs_SwiftCounter_increment",
+          "abiName" : "bjs_SwiftDataProcessor_increment",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1418,7 +1418,7 @@
           }
         },
         {
-          "abiName" : "bjs_SwiftCounter_getValue",
+          "abiName" : "bjs_SwiftDataProcessor_getValue",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1435,7 +1435,7 @@
           }
         },
         {
-          "abiName" : "bjs_SwiftCounter_setLabelElements",
+          "abiName" : "bjs_SwiftDataProcessor_setLabelElements",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1469,7 +1469,7 @@
           }
         },
         {
-          "abiName" : "bjs_SwiftCounter_getLabel",
+          "abiName" : "bjs_SwiftDataProcessor_getLabel",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1486,7 +1486,7 @@
           }
         },
         {
-          "abiName" : "bjs_SwiftCounter_isEven",
+          "abiName" : "bjs_SwiftDataProcessor_isEven",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1503,7 +1503,7 @@
           }
         },
         {
-          "abiName" : "bjs_SwiftCounter_processGreeter",
+          "abiName" : "bjs_SwiftDataProcessor_processGreeter",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1528,7 +1528,7 @@
           }
         },
         {
-          "abiName" : "bjs_SwiftCounter_createGreeter",
+          "abiName" : "bjs_SwiftDataProcessor_createGreeter",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1545,7 +1545,7 @@
           }
         },
         {
-          "abiName" : "bjs_SwiftCounter_processOptionalGreeter",
+          "abiName" : "bjs_SwiftDataProcessor_processOptionalGreeter",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1574,7 +1574,7 @@
           }
         },
         {
-          "abiName" : "bjs_SwiftCounter_createOptionalGreeter",
+          "abiName" : "bjs_SwiftDataProcessor_createOptionalGreeter",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1593,9 +1593,51 @@
               }
             }
           }
+        },
+        {
+          "abiName" : "bjs_SwiftDataProcessor_handleAPIResult",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "handleAPIResult",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "result",
+              "type" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_SwiftDataProcessor_getAPIResult",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "getAPIResult",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
         }
       ],
-      "name" : "SwiftCounter",
+      "name" : "SwiftDataProcessor",
       "properties" : [
         {
           "isReadonly" : false,
@@ -1630,9 +1672,23 @@
               }
             }
           }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "apiResult",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              }
+            }
+          }
         }
       ],
-      "swiftCallName" : "SwiftCounter"
+      "swiftCallName" : "SwiftDataProcessor"
     }
   ],
   "enums" : [
@@ -5911,7 +5967,7 @@
     {
       "methods" : [
         {
-          "abiName" : "bjs_Counter_increment",
+          "abiName" : "bjs_DataProcessor_increment",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -5936,7 +5992,7 @@
           }
         },
         {
-          "abiName" : "bjs_Counter_getValue",
+          "abiName" : "bjs_DataProcessor_getValue",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -5953,7 +6009,7 @@
           }
         },
         {
-          "abiName" : "bjs_Counter_setLabelElements",
+          "abiName" : "bjs_DataProcessor_setLabelElements",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -5987,7 +6043,7 @@
           }
         },
         {
-          "abiName" : "bjs_Counter_getLabel",
+          "abiName" : "bjs_DataProcessor_getLabel",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -6004,7 +6060,7 @@
           }
         },
         {
-          "abiName" : "bjs_Counter_isEven",
+          "abiName" : "bjs_DataProcessor_isEven",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -6021,7 +6077,7 @@
           }
         },
         {
-          "abiName" : "bjs_Counter_processGreeter",
+          "abiName" : "bjs_DataProcessor_processGreeter",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -6046,7 +6102,7 @@
           }
         },
         {
-          "abiName" : "bjs_Counter_createGreeter",
+          "abiName" : "bjs_DataProcessor_createGreeter",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -6063,7 +6119,7 @@
           }
         },
         {
-          "abiName" : "bjs_Counter_processOptionalGreeter",
+          "abiName" : "bjs_DataProcessor_processOptionalGreeter",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -6092,7 +6148,7 @@
           }
         },
         {
-          "abiName" : "bjs_Counter_createOptionalGreeter",
+          "abiName" : "bjs_DataProcessor_createOptionalGreeter",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -6111,9 +6167,51 @@
               }
             }
           }
+        },
+        {
+          "abiName" : "bjs_DataProcessor_handleAPIResult",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "handleAPIResult",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "result",
+              "type" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_DataProcessor_getAPIResult",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "getAPIResult",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
         }
       ],
-      "name" : "Counter",
+      "name" : "DataProcessor",
       "properties" : [
         {
           "isReadonly" : false,
@@ -6141,6 +6239,19 @@
               "_0" : {
                 "string" : {
 
+                }
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "apiResult",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
                 }
               }
             }

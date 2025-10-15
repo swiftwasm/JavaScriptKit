@@ -6,17 +6,17 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
+struct AnyDataProcessor: DataProcessor, _BridgedSwiftProtocolWrapper {
     let jsObject: JSObject
 
     func increment(by amount: Int) {
-    @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_increment")
+    @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_increment")
     func _extern_increment(this: Int32, amount: Int32)
     _extern_increment(this: Int32(bitPattern: jsObject.id), amount: amount.bridgeJSLowerParameter())
     }
 
     func getValue() -> Int {
-        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_getValue")
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_getValue")
         func _extern_getValue(this: Int32) -> Int32
         let ret = _extern_getValue(this: Int32(bitPattern: jsObject.id))
 <<<<<<< HEAD
@@ -27,13 +27,13 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
     }
 
     func setLabelElements(_ labelPrefix: String, _ labelSuffix: String) {
-        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_setLabelElements")
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_setLabelElements")
         func _extern_setLabelElements(this: Int32, labelPrefix: Int32, labelSuffix: Int32)
         _extern_setLabelElements(this: Int32(bitPattern: jsObject.id), labelPrefix: labelPrefix.bridgeJSLowerParameter(), labelSuffix: labelSuffix.bridgeJSLowerParameter())
     }
 
     func getLabel() -> String {
-        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_getLabel")
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_getLabel")
         func _extern_getLabel(this: Int32) -> Int32
         let ret = _extern_getLabel(this: Int32(bitPattern: jsObject.id))
 <<<<<<< HEAD
@@ -44,49 +44,62 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
     }
 
     func isEven() -> Bool {
-        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_isEven")
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_isEven")
         func _extern_isEven(this: Int32) -> Int32
         let ret = _extern_isEven(this: Int32(bitPattern: jsObject.id))
         return Bool.bridgeJSLiftReturn(ret)
     }
 
     func processGreeter(_ greeter: Greeter) -> String {
-        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_processGreeter")
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_processGreeter")
         func _extern_processGreeter(this: Int32, greeter: UnsafeMutableRawPointer) -> Int32
         let ret = _extern_processGreeter(this: Int32(bitPattern: jsObject.id), greeter: greeter.bridgeJSLowerParameter())
         return String.bridgeJSLiftReturn(ret)
     }
 
     func createGreeter() -> Greeter {
-        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_createGreeter")
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_createGreeter")
         func _extern_createGreeter(this: Int32) -> UnsafeMutableRawPointer
         let ret = _extern_createGreeter(this: Int32(bitPattern: jsObject.id))
         return Greeter.bridgeJSLiftReturn(ret)
     }
 
     func processOptionalGreeter(_ greeter: Optional<Greeter>) -> String {
-        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_processOptionalGreeter")
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_processOptionalGreeter")
         func _extern_processOptionalGreeter(this: Int32, greeter: UnsafeMutableRawPointer) -> Int32
         let ret = _extern_processOptionalGreeter(this: Int32(bitPattern: jsObject.id), greeter: greeter.bridgeJSLowerParameter())
         return String.bridgeJSLiftReturn(ret)
     }
 
     func createOptionalGreeter() -> Optional<Greeter> {
-        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_createOptionalGreeter")
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_createOptionalGreeter")
         func _extern_createOptionalGreeter(this: Int32) -> UnsafeMutableRawPointer
         let ret = _extern_createOptionalGreeter(this: Int32(bitPattern: jsObject.id))
         return Optional<Greeter>.bridgeJSLiftReturn(ret)
     }
 
+    func handleAPIResult(_ result: APIResult) {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_handleAPIResult")
+        func _extern_handleAPIResult(this: Int32, result: Int32)
+        _extern_handleAPIResult(this: Int32(bitPattern: jsObject.id), result: result.bridgeJSLowerParameter())
+    }
+
+    func getAPIResult() -> APIResult {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_getAPIResult")
+        func _extern_getAPIResult(this: Int32)
+        _extern_getAPIResult(this: Int32(bitPattern: jsObject.id))
+        return APIResult.bridgeJSLiftReturn()
+    }
+
     var count: Int {
         get {
-            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_count_get")
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_count_get")
             func _extern_get(this: Int32) -> Int32
             let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
             return Int.bridgeJSLiftReturn(ret)
         }
         set {
-            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_count_set")
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_count_set")
             func _extern_set(this: Int32, value: Int32)
             _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
         }
@@ -94,7 +107,7 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
 
     var name: String {
         get {
-            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_name_get")
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_name_get")
             func _extern_get(this: Int32) -> Int32
             let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
             return String.bridgeJSLiftReturn(ret)
@@ -103,20 +116,34 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
 
     var optionalTag: Optional<String> {
         get {
-            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_optionalTag_get")
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_optionalTag_get")
             func _extern_get(this: Int32) -> Int32
             let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
             return Optional<String>.bridgeJSLiftReturn(ret)
         }
         set {
-            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_optionalTag_set")
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_optionalTag_set")
+            func _extern_set(this: Int32, value: Int32)
+            _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
+        }
+    }
+
+    var apiResult: Optional<APIResult> {
+        get {
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_apiResult_get")
+            func _extern_get(this: Int32)
+            _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Optional<APIResult>.bridgeJSLiftReturn()
+        }
+        set {
+            @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_apiResult_set")
             func _extern_set(this: Int32, value: Int32)
             _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
         }
     }
 
     static func bridgeJSLiftParameter(_ value: Int32) -> Self {
-        return AnyCounter(jsObject: JSObject(id: UInt32(bitPattern: value)))
+        return AnyDataProcessor(jsObject: JSObject(id: UInt32(bitPattern: value)))
     }
 }
 
@@ -125,13 +152,13 @@ extension Direction: _BridgedSwiftCaseEnum {
         return bridgeJSRawValue
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> Direction {
-        return Direction(bridgeJSRawValue: value)!
+        return bridgeJSLiftParameter(value)
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> Direction {
         return Direction(bridgeJSRawValue: value)!
     }
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
-        return bridgeJSRawValue
+        return bridgeJSLowerParameter()
     }
 
     private init?(bridgeJSRawValue: Int32) {
@@ -168,13 +195,13 @@ extension Status: _BridgedSwiftCaseEnum {
         return bridgeJSRawValue
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> Status {
-        return Status(bridgeJSRawValue: value)!
+        return bridgeJSLiftParameter(value)
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> Status {
         return Status(bridgeJSRawValue: value)!
     }
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
-        return bridgeJSRawValue
+        return bridgeJSLowerParameter()
     }
 
     private init?(bridgeJSRawValue: Int32) {
@@ -213,13 +240,13 @@ extension TSDirection: _BridgedSwiftCaseEnum {
         return bridgeJSRawValue
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> TSDirection {
-        return TSDirection(bridgeJSRawValue: value)!
+        return bridgeJSLiftParameter(value)
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> TSDirection {
         return TSDirection(bridgeJSRawValue: value)!
     }
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
-        return bridgeJSRawValue
+        return bridgeJSLowerParameter()
     }
 
     private init?(bridgeJSRawValue: Int32) {
@@ -259,13 +286,13 @@ extension Networking.API.Method: _BridgedSwiftCaseEnum {
         return bridgeJSRawValue
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> Networking.API.Method {
-        return Networking.API.Method(bridgeJSRawValue: value)!
+        return bridgeJSLiftParameter(value)
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> Networking.API.Method {
         return Networking.API.Method(bridgeJSRawValue: value)!
     }
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
-        return bridgeJSRawValue
+        return bridgeJSLowerParameter()
     }
 
     private init?(bridgeJSRawValue: Int32) {
@@ -308,13 +335,13 @@ extension Internal.SupportedMethod: _BridgedSwiftCaseEnum {
         return bridgeJSRawValue
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> Internal.SupportedMethod {
-        return Internal.SupportedMethod(bridgeJSRawValue: value)!
+        return bridgeJSLiftParameter(value)
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> Internal.SupportedMethod {
         return Internal.SupportedMethod(bridgeJSRawValue: value)!
     }
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
-        return bridgeJSRawValue
+        return bridgeJSLowerParameter()
     }
 
     private init?(bridgeJSRawValue: Int32) {
@@ -339,7 +366,7 @@ extension Internal.SupportedMethod: _BridgedSwiftCaseEnum {
 }
 
 extension APIResult: _BridgedSwiftAssociatedValueEnum {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> APIResult {
+    private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
             return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
@@ -356,6 +383,44 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
         default:
             fatalError("Unknown APIResult case ID: \(caseId)")
         }
+    }
+
+    // MARK: Protocol Export
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch self {
+        case .success(let param0):
+            var __bjs_param0 = param0
+            __bjs_param0.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(0)
+        case .failure(let param0):
+            _swift_js_push_int(Int32(param0))
+            return Int32(1)
+        case .flag(let param0):
+            _swift_js_push_int(param0 ? 1 : 0)
+            return Int32(2)
+        case .rate(let param0):
+            _swift_js_push_f32(param0)
+            return Int32(3)
+        case .precise(let param0):
+            _swift_js_push_f64(param0)
+            return Int32(4)
+        case .info:
+            return Int32(5)
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> APIResult {
+        let caseId = _swift_js_pop_param_int32()
+        return _bridgeJSLiftFromCaseId(caseId)
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> APIResult {
+        return _bridgeJSLiftFromCaseId(caseId)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
@@ -385,7 +450,7 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
 }
 
 extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> ComplexResult {
+    private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> ComplexResult {
         switch caseId {
         case 0:
             return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
@@ -404,6 +469,80 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
         default:
             fatalError("Unknown ComplexResult case ID: \(caseId)")
         }
+    }
+
+    // MARK: Protocol Export
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch self {
+        case .success(let param0):
+            var __bjs_param0 = param0
+            __bjs_param0.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(0)
+        case .error(let param0, let param1):
+            var __bjs_param0 = param0
+            __bjs_param0.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            _swift_js_push_int(Int32(param1))
+            return Int32(1)
+        case .location(let param0, let param1, let param2):
+            _swift_js_push_f64(param0)
+            _swift_js_push_f64(param1)
+            var __bjs_param2 = param2
+            __bjs_param2.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(2)
+        case .status(let param0, let param1, let param2):
+            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_int(Int32(param1))
+            var __bjs_param2 = param2
+            __bjs_param2.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(3)
+        case .coordinates(let param0, let param1, let param2):
+            _swift_js_push_f64(param0)
+            _swift_js_push_f64(param1)
+            _swift_js_push_f64(param2)
+            return Int32(4)
+        case .comprehensive(let param0, let param1, let param2, let param3, let param4, let param5, let param6, let param7, let param8):
+            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_int(param1 ? 1 : 0)
+            _swift_js_push_int(Int32(param2))
+            _swift_js_push_int(Int32(param3))
+            _swift_js_push_f64(param4)
+            _swift_js_push_f64(param5)
+            var __bjs_param6 = param6
+            __bjs_param6.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            var __bjs_param7 = param7
+            __bjs_param7.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            var __bjs_param8 = param8
+            __bjs_param8.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(5)
+        case .info:
+            return Int32(6)
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> ComplexResult {
+        let caseId = _swift_js_pop_param_int32()
+        return _bridgeJSLiftFromCaseId(caseId)
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> ComplexResult {
+        return _bridgeJSLiftFromCaseId(caseId)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
@@ -469,7 +608,7 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
 }
 
 extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> Utilities.Result {
+    private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> Utilities.Result {
         switch caseId {
         case 0:
             return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
@@ -480,6 +619,45 @@ extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
         default:
             fatalError("Unknown Utilities.Result case ID: \(caseId)")
         }
+    }
+
+    // MARK: Protocol Export
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch self {
+        case .success(let param0):
+            var __bjs_param0 = param0
+            __bjs_param0.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(0)
+        case .failure(let param0, let param1):
+            var __bjs_param0 = param0
+            __bjs_param0.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            _swift_js_push_int(Int32(param1))
+            return Int32(1)
+        case .status(let param0, let param1, let param2):
+            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_int(Int32(param1))
+            var __bjs_param2 = param2
+            __bjs_param2.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(2)
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> Utilities.Result {
+        let caseId = _swift_js_pop_param_int32()
+        return _bridgeJSLiftFromCaseId(caseId)
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> Utilities.Result {
+        return _bridgeJSLiftFromCaseId(caseId)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
@@ -510,7 +688,7 @@ extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
 }
 
 extension API.NetworkingResult: _BridgedSwiftAssociatedValueEnum {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> API.NetworkingResult {
+    private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> API.NetworkingResult {
         switch caseId {
         case 0:
             return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
@@ -519,6 +697,37 @@ extension API.NetworkingResult: _BridgedSwiftAssociatedValueEnum {
         default:
             fatalError("Unknown API.NetworkingResult case ID: \(caseId)")
         }
+    }
+
+    // MARK: Protocol Export
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch self {
+        case .success(let param0):
+            var __bjs_param0 = param0
+            __bjs_param0.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(0)
+        case .failure(let param0, let param1):
+            var __bjs_param0 = param0
+            __bjs_param0.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            _swift_js_push_int(Int32(param1))
+            return Int32(1)
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> API.NetworkingResult {
+        let caseId = _swift_js_pop_param_int32()
+        return _bridgeJSLiftFromCaseId(caseId)
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> API.NetworkingResult {
+        return _bridgeJSLiftFromCaseId(caseId)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
@@ -541,7 +750,7 @@ extension API.NetworkingResult: _BridgedSwiftAssociatedValueEnum {
 }
 
 extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> APIOptionalResult {
+    private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIOptionalResult {
         switch caseId {
         case 0:
             return .success(Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
@@ -552,6 +761,66 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
         default:
             fatalError("Unknown APIOptionalResult case ID: \(caseId)")
         }
+    }
+
+    // MARK: Protocol Export
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch self {
+        case .success(let param0):
+            let __bjs_isSome_param0 = param0 != nil
+            if let __bjs_unwrapped_param0 = param0 {
+                var __bjs_str_param0 = __bjs_unwrapped_param0
+                __bjs_str_param0.withUTF8 { ptr in
+                    _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+                }
+            }
+            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            return Int32(0)
+        case .failure(let param0, let param1):
+            let __bjs_isSome_param0 = param0 != nil
+            if let __bjs_unwrapped_param0 = param0 {
+                _swift_js_push_int(Int32(__bjs_unwrapped_param0))
+            }
+            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            let __bjs_isSome_param1 = param1 != nil
+            if let __bjs_unwrapped_param1 = param1 {
+                _swift_js_push_int(__bjs_unwrapped_param1 ? 1 : 0)
+            }
+            _swift_js_push_int(__bjs_isSome_param1 ? 1 : 0)
+            return Int32(1)
+        case .status(let param0, let param1, let param2):
+            let __bjs_isSome_param0 = param0 != nil
+            if let __bjs_unwrapped_param0 = param0 {
+                _swift_js_push_int(__bjs_unwrapped_param0 ? 1 : 0)
+            }
+            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            let __bjs_isSome_param1 = param1 != nil
+            if let __bjs_unwrapped_param1 = param1 {
+                _swift_js_push_int(Int32(__bjs_unwrapped_param1))
+            }
+            _swift_js_push_int(__bjs_isSome_param1 ? 1 : 0)
+            let __bjs_isSome_param2 = param2 != nil
+            if let __bjs_unwrapped_param2 = param2 {
+                var __bjs_str_param2 = __bjs_unwrapped_param2
+                __bjs_str_param2.withUTF8 { ptr in
+                    _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+                }
+            }
+            _swift_js_push_int(__bjs_isSome_param2 ? 1 : 0)
+            return Int32(2)
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> APIOptionalResult {
+        let caseId = _swift_js_pop_param_int32()
+        return _bridgeJSLiftFromCaseId(caseId)
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> APIOptionalResult {
+        return _bridgeJSLiftFromCaseId(caseId)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
@@ -607,13 +876,13 @@ extension StaticCalculator: _BridgedSwiftCaseEnum {
         return bridgeJSRawValue
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> StaticCalculator {
-        return StaticCalculator(bridgeJSRawValue: value)!
+        return bridgeJSLiftParameter(value)
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> StaticCalculator {
         return StaticCalculator(bridgeJSRawValue: value)!
     }
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
-        return bridgeJSRawValue
+        return bridgeJSLowerParameter()
     }
 
     private init?(bridgeJSRawValue: Int32) {
@@ -664,13 +933,13 @@ extension StaticPropertyEnum: _BridgedSwiftCaseEnum {
         return bridgeJSRawValue
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> StaticPropertyEnum {
-        return StaticPropertyEnum(bridgeJSRawValue: value)!
+        return bridgeJSLiftParameter(value)
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> StaticPropertyEnum {
         return StaticPropertyEnum(bridgeJSRawValue: value)!
     }
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
-        return bridgeJSRawValue
+        return bridgeJSLowerParameter()
     }
 
     private init?(bridgeJSRawValue: Int32) {
@@ -3358,129 +3627,129 @@ extension StaticPropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     }
 }
 
-@_expose(wasm, "bjs_CounterManager_init")
-@_cdecl("bjs_CounterManager_init")
-public func _bjs_CounterManager_init(counter: Int32) -> UnsafeMutableRawPointer {
+@_expose(wasm, "bjs_DataProcessorManager_init")
+@_cdecl("bjs_DataProcessorManager_init")
+public func _bjs_DataProcessorManager_init(processor: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = CounterManager(counter: AnyCounter.bridgeJSLiftParameter(counter))
+    let ret = DataProcessorManager(processor: AnyDataProcessor.bridgeJSLiftParameter(processor))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_CounterManager_incrementByAmount")
-@_cdecl("bjs_CounterManager_incrementByAmount")
-public func _bjs_CounterManager_incrementByAmount(_self: UnsafeMutableRawPointer, amount: Int32) -> Void {
+@_expose(wasm, "bjs_DataProcessorManager_incrementByAmount")
+@_cdecl("bjs_DataProcessorManager_incrementByAmount")
+public func _bjs_DataProcessorManager_incrementByAmount(_self: UnsafeMutableRawPointer, amount: Int32) -> Void {
     #if arch(wasm32)
-    CounterManager.bridgeJSLiftParameter(_self).incrementByAmount(_: Int.bridgeJSLiftParameter(amount))
+    DataProcessorManager.bridgeJSLiftParameter(_self).incrementByAmount(_: Int.bridgeJSLiftParameter(amount))
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_CounterManager_setCounterLabel")
-@_cdecl("bjs_CounterManager_setCounterLabel")
-public func _bjs_CounterManager_setCounterLabel(_self: UnsafeMutableRawPointer, prefixBytes: Int32, prefixLength: Int32, suffixBytes: Int32, suffixLength: Int32) -> Void {
+@_expose(wasm, "bjs_DataProcessorManager_setProcessorLabel")
+@_cdecl("bjs_DataProcessorManager_setProcessorLabel")
+public func _bjs_DataProcessorManager_setProcessorLabel(_self: UnsafeMutableRawPointer, prefixBytes: Int32, prefixLength: Int32, suffixBytes: Int32, suffixLength: Int32) -> Void {
     #if arch(wasm32)
-    CounterManager.bridgeJSLiftParameter(_self).setCounterLabel(_: String.bridgeJSLiftParameter(prefixBytes, prefixLength), _: String.bridgeJSLiftParameter(suffixBytes, suffixLength))
+    DataProcessorManager.bridgeJSLiftParameter(_self).setProcessorLabel(_: String.bridgeJSLiftParameter(prefixBytes, prefixLength), _: String.bridgeJSLiftParameter(suffixBytes, suffixLength))
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_CounterManager_isCounterEven")
-@_cdecl("bjs_CounterManager_isCounterEven")
-public func _bjs_CounterManager_isCounterEven(_self: UnsafeMutableRawPointer) -> Int32 {
+@_expose(wasm, "bjs_DataProcessorManager_isProcessorEven")
+@_cdecl("bjs_DataProcessorManager_isProcessorEven")
+public func _bjs_DataProcessorManager_isProcessorEven(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = CounterManager.bridgeJSLiftParameter(_self).isCounterEven()
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).isProcessorEven()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_CounterManager_getCounterLabel")
-@_cdecl("bjs_CounterManager_getCounterLabel")
-public func _bjs_CounterManager_getCounterLabel(_self: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_DataProcessorManager_getProcessorLabel")
+@_cdecl("bjs_DataProcessorManager_getProcessorLabel")
+public func _bjs_DataProcessorManager_getProcessorLabel(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = CounterManager.bridgeJSLiftParameter(_self).getCounterLabel()
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).getProcessorLabel()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_CounterManager_getCurrentValue")
-@_cdecl("bjs_CounterManager_getCurrentValue")
-public func _bjs_CounterManager_getCurrentValue(_self: UnsafeMutableRawPointer) -> Int32 {
+@_expose(wasm, "bjs_DataProcessorManager_getCurrentValue")
+@_cdecl("bjs_DataProcessorManager_getCurrentValue")
+public func _bjs_DataProcessorManager_getCurrentValue(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = CounterManager.bridgeJSLiftParameter(_self).getCurrentValue()
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).getCurrentValue()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_CounterManager_incrementBoth")
-@_cdecl("bjs_CounterManager_incrementBoth")
-public func _bjs_CounterManager_incrementBoth(_self: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_DataProcessorManager_incrementBoth")
+@_cdecl("bjs_DataProcessorManager_incrementBoth")
+public func _bjs_DataProcessorManager_incrementBoth(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    CounterManager.bridgeJSLiftParameter(_self).incrementBoth()
+    DataProcessorManager.bridgeJSLiftParameter(_self).incrementBoth()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_CounterManager_getBackupValue")
-@_cdecl("bjs_CounterManager_getBackupValue")
-public func _bjs_CounterManager_getBackupValue(_self: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_DataProcessorManager_getBackupValue")
+@_cdecl("bjs_DataProcessorManager_getBackupValue")
+public func _bjs_DataProcessorManager_getBackupValue(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = CounterManager.bridgeJSLiftParameter(_self).getBackupValue()
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).getBackupValue()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_CounterManager_hasBackup")
-@_cdecl("bjs_CounterManager_hasBackup")
-public func _bjs_CounterManager_hasBackup(_self: UnsafeMutableRawPointer) -> Int32 {
+@_expose(wasm, "bjs_DataProcessorManager_hasBackup")
+@_cdecl("bjs_DataProcessorManager_hasBackup")
+public func _bjs_DataProcessorManager_hasBackup(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = CounterManager.bridgeJSLiftParameter(_self).hasBackup()
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).hasBackup()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_CounterManager_counter_get")
-@_cdecl("bjs_CounterManager_counter_get")
-public func _bjs_CounterManager_counter_get(_self: UnsafeMutableRawPointer) -> Int32 {
+@_expose(wasm, "bjs_DataProcessorManager_processor_get")
+@_cdecl("bjs_DataProcessorManager_processor_get")
+public func _bjs_DataProcessorManager_processor_get(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = CounterManager.bridgeJSLiftParameter(_self).counter as! AnyCounter
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).processor as! AnyDataProcessor
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_CounterManager_counter_set")
-@_cdecl("bjs_CounterManager_counter_set")
-public func _bjs_CounterManager_counter_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+@_expose(wasm, "bjs_DataProcessorManager_processor_set")
+@_cdecl("bjs_DataProcessorManager_processor_set")
+public func _bjs_DataProcessorManager_processor_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
     #if arch(wasm32)
-    CounterManager.bridgeJSLiftParameter(_self).counter = AnyCounter.bridgeJSLiftParameter(value)
+    DataProcessorManager.bridgeJSLiftParameter(_self).processor = AnyDataProcessor.bridgeJSLiftParameter(value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_CounterManager_backupCounter_get")
-@_cdecl("bjs_CounterManager_backupCounter_get")
-public func _bjs_CounterManager_backupCounter_get(_self: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_DataProcessorManager_backupProcessor_get")
+@_cdecl("bjs_DataProcessorManager_backupProcessor_get")
+public func _bjs_DataProcessorManager_backupProcessor_get(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = CounterManager.bridgeJSLiftParameter(_self).backupCounter.flatMap {
-        $0 as? AnyCounter
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).backupProcessor.flatMap {
+        $0 as? AnyDataProcessor
     }
     return ret.bridgeJSLowerReturn()
     #else
@@ -3488,213 +3757,255 @@ public func _bjs_CounterManager_backupCounter_get(_self: UnsafeMutableRawPointer
     #endif
 }
 
-@_expose(wasm, "bjs_CounterManager_backupCounter_set")
-@_cdecl("bjs_CounterManager_backupCounter_set")
-public func _bjs_CounterManager_backupCounter_set(_self: UnsafeMutableRawPointer, valueIsSome: Int32, valueValue: Int32) -> Void {
+@_expose(wasm, "bjs_DataProcessorManager_backupProcessor_set")
+@_cdecl("bjs_DataProcessorManager_backupProcessor_set")
+public func _bjs_DataProcessorManager_backupProcessor_set(_self: UnsafeMutableRawPointer, valueIsSome: Int32, valueValue: Int32) -> Void {
     #if arch(wasm32)
-    CounterManager.bridgeJSLiftParameter(_self).backupCounter = Optional<AnyCounter>.bridgeJSLiftParameter(valueIsSome, valueValue)
+    DataProcessorManager.bridgeJSLiftParameter(_self).backupProcessor = Optional<AnyDataProcessor>.bridgeJSLiftParameter(valueIsSome, valueValue)
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_CounterManager_deinit")
-@_cdecl("bjs_CounterManager_deinit")
-public func _bjs_CounterManager_deinit(pointer: UnsafeMutableRawPointer) {
-    Unmanaged<CounterManager>.fromOpaque(pointer).release()
+@_expose(wasm, "bjs_DataProcessorManager_deinit")
+@_cdecl("bjs_DataProcessorManager_deinit")
+public func _bjs_DataProcessorManager_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<DataProcessorManager>.fromOpaque(pointer).release()
 }
 
-extension CounterManager: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension DataProcessorManager: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
         #if arch(wasm32)
-        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_CounterManager_wrap")
-        func _bjs_CounterManager_wrap(_: UnsafeMutableRawPointer) -> Int32
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessorManager_wrap")
+        func _bjs_DataProcessorManager_wrap(_: UnsafeMutableRawPointer) -> Int32
         #else
-        func _bjs_CounterManager_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+        func _bjs_DataProcessorManager_wrap(_: UnsafeMutableRawPointer) -> Int32 {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        return .object(JSObject(id: UInt32(bitPattern: _bjs_CounterManager_wrap(Unmanaged.passRetained(self).toOpaque()))))
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_DataProcessorManager_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
 
-@_expose(wasm, "bjs_SwiftCounter_init")
-@_cdecl("bjs_SwiftCounter_init")
-public func _bjs_SwiftCounter_init() -> UnsafeMutableRawPointer {
+@_expose(wasm, "bjs_SwiftDataProcessor_init")
+@_cdecl("bjs_SwiftDataProcessor_init")
+public func _bjs_SwiftDataProcessor_init() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = SwiftCounter()
+    let ret = SwiftDataProcessor()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_increment")
-@_cdecl("bjs_SwiftCounter_increment")
-public func _bjs_SwiftCounter_increment(_self: UnsafeMutableRawPointer, amount: Int32) -> Void {
+@_expose(wasm, "bjs_SwiftDataProcessor_increment")
+@_cdecl("bjs_SwiftDataProcessor_increment")
+public func _bjs_SwiftDataProcessor_increment(_self: UnsafeMutableRawPointer, amount: Int32) -> Void {
     #if arch(wasm32)
-    SwiftCounter.bridgeJSLiftParameter(_self).increment(by: Int.bridgeJSLiftParameter(amount))
+    SwiftDataProcessor.bridgeJSLiftParameter(_self).increment(by: Int.bridgeJSLiftParameter(amount))
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_getValue")
-@_cdecl("bjs_SwiftCounter_getValue")
-public func _bjs_SwiftCounter_getValue(_self: UnsafeMutableRawPointer) -> Int32 {
+@_expose(wasm, "bjs_SwiftDataProcessor_getValue")
+@_cdecl("bjs_SwiftDataProcessor_getValue")
+public func _bjs_SwiftDataProcessor_getValue(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = SwiftCounter.bridgeJSLiftParameter(_self).getValue()
+    let ret = SwiftDataProcessor.bridgeJSLiftParameter(_self).getValue()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_setLabelElements")
-@_cdecl("bjs_SwiftCounter_setLabelElements")
-public func _bjs_SwiftCounter_setLabelElements(_self: UnsafeMutableRawPointer, labelPrefixBytes: Int32, labelPrefixLength: Int32, labelSuffixBytes: Int32, labelSuffixLength: Int32) -> Void {
+@_expose(wasm, "bjs_SwiftDataProcessor_setLabelElements")
+@_cdecl("bjs_SwiftDataProcessor_setLabelElements")
+public func _bjs_SwiftDataProcessor_setLabelElements(_self: UnsafeMutableRawPointer, labelPrefixBytes: Int32, labelPrefixLength: Int32, labelSuffixBytes: Int32, labelSuffixLength: Int32) -> Void {
     #if arch(wasm32)
-    SwiftCounter.bridgeJSLiftParameter(_self).setLabelElements(_: String.bridgeJSLiftParameter(labelPrefixBytes, labelPrefixLength), _: String.bridgeJSLiftParameter(labelSuffixBytes, labelSuffixLength))
+    SwiftDataProcessor.bridgeJSLiftParameter(_self).setLabelElements(_: String.bridgeJSLiftParameter(labelPrefixBytes, labelPrefixLength), _: String.bridgeJSLiftParameter(labelSuffixBytes, labelSuffixLength))
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_getLabel")
-@_cdecl("bjs_SwiftCounter_getLabel")
-public func _bjs_SwiftCounter_getLabel(_self: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_SwiftDataProcessor_getLabel")
+@_cdecl("bjs_SwiftDataProcessor_getLabel")
+public func _bjs_SwiftDataProcessor_getLabel(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = SwiftCounter.bridgeJSLiftParameter(_self).getLabel()
+    let ret = SwiftDataProcessor.bridgeJSLiftParameter(_self).getLabel()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_isEven")
-@_cdecl("bjs_SwiftCounter_isEven")
-public func _bjs_SwiftCounter_isEven(_self: UnsafeMutableRawPointer) -> Int32 {
+@_expose(wasm, "bjs_SwiftDataProcessor_isEven")
+@_cdecl("bjs_SwiftDataProcessor_isEven")
+public func _bjs_SwiftDataProcessor_isEven(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = SwiftCounter.bridgeJSLiftParameter(_self).isEven()
+    let ret = SwiftDataProcessor.bridgeJSLiftParameter(_self).isEven()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_processGreeter")
-@_cdecl("bjs_SwiftCounter_processGreeter")
-public func _bjs_SwiftCounter_processGreeter(_self: UnsafeMutableRawPointer, greeter: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_SwiftDataProcessor_processGreeter")
+@_cdecl("bjs_SwiftDataProcessor_processGreeter")
+public func _bjs_SwiftDataProcessor_processGreeter(_self: UnsafeMutableRawPointer, greeter: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = SwiftCounter.bridgeJSLiftParameter(_self).processGreeter(_: Greeter.bridgeJSLiftParameter(greeter))
+    let ret = SwiftDataProcessor.bridgeJSLiftParameter(_self).processGreeter(_: Greeter.bridgeJSLiftParameter(greeter))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_createGreeter")
-@_cdecl("bjs_SwiftCounter_createGreeter")
-public func _bjs_SwiftCounter_createGreeter(_self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+@_expose(wasm, "bjs_SwiftDataProcessor_createGreeter")
+@_cdecl("bjs_SwiftDataProcessor_createGreeter")
+public func _bjs_SwiftDataProcessor_createGreeter(_self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = SwiftCounter.bridgeJSLiftParameter(_self).createGreeter()
+    let ret = SwiftDataProcessor.bridgeJSLiftParameter(_self).createGreeter()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_processOptionalGreeter")
-@_cdecl("bjs_SwiftCounter_processOptionalGreeter")
-public func _bjs_SwiftCounter_processOptionalGreeter(_self: UnsafeMutableRawPointer, greeterIsSome: Int32, greeterValue: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_SwiftDataProcessor_processOptionalGreeter")
+@_cdecl("bjs_SwiftDataProcessor_processOptionalGreeter")
+public func _bjs_SwiftDataProcessor_processOptionalGreeter(_self: UnsafeMutableRawPointer, greeterIsSome: Int32, greeterValue: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = SwiftCounter.bridgeJSLiftParameter(_self).processOptionalGreeter(_: Optional<Greeter>.bridgeJSLiftParameter(greeterIsSome, greeterValue))
+    let ret = SwiftDataProcessor.bridgeJSLiftParameter(_self).processOptionalGreeter(_: Optional<Greeter>.bridgeJSLiftParameter(greeterIsSome, greeterValue))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_createOptionalGreeter")
-@_cdecl("bjs_SwiftCounter_createOptionalGreeter")
-public func _bjs_SwiftCounter_createOptionalGreeter(_self: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_SwiftDataProcessor_createOptionalGreeter")
+@_cdecl("bjs_SwiftDataProcessor_createOptionalGreeter")
+public func _bjs_SwiftDataProcessor_createOptionalGreeter(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = SwiftCounter.bridgeJSLiftParameter(_self).createOptionalGreeter()
+    let ret = SwiftDataProcessor.bridgeJSLiftParameter(_self).createOptionalGreeter()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_count_get")
-@_cdecl("bjs_SwiftCounter_count_get")
-public func _bjs_SwiftCounter_count_get(_self: UnsafeMutableRawPointer) -> Int32 {
+@_expose(wasm, "bjs_SwiftDataProcessor_handleAPIResult")
+@_cdecl("bjs_SwiftDataProcessor_handleAPIResult")
+public func _bjs_SwiftDataProcessor_handleAPIResult(_self: UnsafeMutableRawPointer, result: Int32) -> Void {
     #if arch(wasm32)
-    let ret = SwiftCounter.bridgeJSLiftParameter(_self).count
+    SwiftDataProcessor.bridgeJSLiftParameter(_self).handleAPIResult(_: APIResult.bridgeJSLiftParameter(result))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftDataProcessor_getAPIResult")
+@_cdecl("bjs_SwiftDataProcessor_getAPIResult")
+public func _bjs_SwiftDataProcessor_getAPIResult(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = SwiftDataProcessor.bridgeJSLiftParameter(_self).getAPIResult()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_count_set")
-@_cdecl("bjs_SwiftCounter_count_set")
-public func _bjs_SwiftCounter_count_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+@_expose(wasm, "bjs_SwiftDataProcessor_count_get")
+@_cdecl("bjs_SwiftDataProcessor_count_get")
+public func _bjs_SwiftDataProcessor_count_get(_self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    SwiftCounter.bridgeJSLiftParameter(_self).count = Int.bridgeJSLiftParameter(value)
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_SwiftCounter_name_get")
-@_cdecl("bjs_SwiftCounter_name_get")
-public func _bjs_SwiftCounter_name_get(_self: UnsafeMutableRawPointer) -> Void {
-    #if arch(wasm32)
-    let ret = SwiftCounter.bridgeJSLiftParameter(_self).name
+    let ret = SwiftDataProcessor.bridgeJSLiftParameter(_self).count
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_optionalTag_get")
-@_cdecl("bjs_SwiftCounter_optionalTag_get")
-public func _bjs_SwiftCounter_optionalTag_get(_self: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_SwiftDataProcessor_count_set")
+@_cdecl("bjs_SwiftDataProcessor_count_set")
+public func _bjs_SwiftDataProcessor_count_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
     #if arch(wasm32)
-    let ret = SwiftCounter.bridgeJSLiftParameter(_self).optionalTag
+    SwiftDataProcessor.bridgeJSLiftParameter(_self).count = Int.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftDataProcessor_name_get")
+@_cdecl("bjs_SwiftDataProcessor_name_get")
+public func _bjs_SwiftDataProcessor_name_get(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = SwiftDataProcessor.bridgeJSLiftParameter(_self).name
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_optionalTag_set")
-@_cdecl("bjs_SwiftCounter_optionalTag_set")
-public func _bjs_SwiftCounter_optionalTag_set(_self: UnsafeMutableRawPointer, valueIsSome: Int32, valueBytes: Int32, valueLength: Int32) -> Void {
+@_expose(wasm, "bjs_SwiftDataProcessor_optionalTag_get")
+@_cdecl("bjs_SwiftDataProcessor_optionalTag_get")
+public func _bjs_SwiftDataProcessor_optionalTag_get(_self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    SwiftCounter.bridgeJSLiftParameter(_self).optionalTag = Optional<String>.bridgeJSLiftParameter(valueIsSome, valueBytes, valueLength)
+    let ret = SwiftDataProcessor.bridgeJSLiftParameter(_self).optionalTag
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_SwiftCounter_deinit")
-@_cdecl("bjs_SwiftCounter_deinit")
-public func _bjs_SwiftCounter_deinit(pointer: UnsafeMutableRawPointer) {
-    Unmanaged<SwiftCounter>.fromOpaque(pointer).release()
+@_expose(wasm, "bjs_SwiftDataProcessor_optionalTag_set")
+@_cdecl("bjs_SwiftDataProcessor_optionalTag_set")
+public func _bjs_SwiftDataProcessor_optionalTag_set(_self: UnsafeMutableRawPointer, valueIsSome: Int32, valueBytes: Int32, valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    SwiftDataProcessor.bridgeJSLiftParameter(_self).optionalTag = Optional<String>.bridgeJSLiftParameter(valueIsSome, valueBytes, valueLength)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
-extension SwiftCounter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+@_expose(wasm, "bjs_SwiftDataProcessor_apiResult_get")
+@_cdecl("bjs_SwiftDataProcessor_apiResult_get")
+public func _bjs_SwiftDataProcessor_apiResult_get(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = SwiftDataProcessor.bridgeJSLiftParameter(_self).apiResult
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftDataProcessor_apiResult_set")
+@_cdecl("bjs_SwiftDataProcessor_apiResult_set")
+public func _bjs_SwiftDataProcessor_apiResult_set(_self: UnsafeMutableRawPointer, valueIsSome: Int32, valueCaseId: Int32) -> Void {
+    #if arch(wasm32)
+    SwiftDataProcessor.bridgeJSLiftParameter(_self).apiResult = Optional<APIResult>.bridgeJSLiftParameter(valueIsSome, valueCaseId)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftDataProcessor_deinit")
+@_cdecl("bjs_SwiftDataProcessor_deinit")
+public func _bjs_SwiftDataProcessor_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<SwiftDataProcessor>.fromOpaque(pointer).release()
+}
+
+extension SwiftDataProcessor: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
         #if arch(wasm32)
-        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SwiftCounter_wrap")
-        func _bjs_SwiftCounter_wrap(_: UnsafeMutableRawPointer) -> Int32
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SwiftDataProcessor_wrap")
+        func _bjs_SwiftDataProcessor_wrap(_: UnsafeMutableRawPointer) -> Int32
         #else
-        func _bjs_SwiftCounter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+        func _bjs_SwiftDataProcessor_wrap(_: UnsafeMutableRawPointer) -> Int32 {
             fatalError("Only available on WebAssembly")
         }
         #endif
-        return .object(JSObject(id: UInt32(bitPattern: _bjs_SwiftCounter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_SwiftDataProcessor_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }

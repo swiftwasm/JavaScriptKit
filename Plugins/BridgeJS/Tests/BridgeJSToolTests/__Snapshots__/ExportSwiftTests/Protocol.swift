@@ -67,6 +67,26 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
         return Optional<Helper>.bridgeJSLiftReturn(ret)
     }
 
+    func createEnum() -> ExampleEnum {
+        @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_createEnum")
+        func _extern_createEnum(this: Int32) -> Int32
+        let ret = _extern_createEnum(this: Int32(bitPattern: jsObject.id))
+        return ExampleEnum.bridgeJSLiftReturn(ret)
+    }
+
+    func handleResult(_ result: Result) {
+        @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_handleResult")
+        func _extern_handleResult(this: Int32, result: Int32)
+        _extern_handleResult(this: Int32(bitPattern: jsObject.id), result: result.bridgeJSLowerParameter())
+    }
+
+    func getResult() -> Result {
+        @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_getResult")
+        func _extern_getResult(this: Int32)
+        _extern_getResult(this: Int32(bitPattern: jsObject.id))
+        return Result.bridgeJSLiftReturn()
+    }
+
     var eventCount: Int {
         get {
             @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_eventCount_get")
@@ -104,8 +124,95 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
         }
     }
 
+    var myEnum: ExampleEnum {
+        get {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_myEnum_get")
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return ExampleEnum.bridgeJSLiftReturn(ret)
+        }
+        set {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_myEnum_set")
+            func _extern_set(this: Int32, value: Int32)
+            _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
+        }
+    }
+
+    var result: Optional<Result> {
+        get {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_result_get")
+            func _extern_get(this: Int32)
+            _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Optional<Result>.bridgeJSLiftReturn()
+        }
+        set {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_result_set")
+            func _extern_set(this: Int32, value: Int32)
+            _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
+        }
+    }
+
     static func bridgeJSLiftParameter(_ value: Int32) -> Self {
         return AnyMyViewControllerDelegate(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+extension ExampleEnum: _BridgedSwiftEnumNoPayload {
+}
+
+extension Result: _BridgedSwiftAssociatedValueEnum {
+    // MARK: Private Helper
+
+    private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> Result {
+        switch caseId {
+        case 0:
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+        case 1:
+            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+        default:
+            fatalError("Unknown Result case ID: \(caseId)")
+        }
+    }
+
+    // MARK: Protocol Export
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch self {
+        case .success(let param0):
+            var __bjs_param0 = param0
+            __bjs_param0.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(0)
+        case .failure(let param0):
+            _swift_js_push_int(Int32(param0))
+            return Int32(1)
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> Result {
+        let caseId = _swift_js_pop_param_int32()
+        return _bridgeJSLiftFromCaseId(caseId)
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> Result {
+        return _bridgeJSLiftFromCaseId(caseId)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        switch self {
+        case .success(let param0):
+            _swift_js_push_tag(Int32(0))
+            var __bjs_param0 = param0
+            __bjs_param0.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+        case .failure(let param0):
+            _swift_js_push_tag(Int32(1))
+            _swift_js_push_int(Int32(param0))
+        }
     }
 }
 

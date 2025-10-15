@@ -325,6 +325,11 @@ public protocol _BridgedSwiftEnumNoPayload {}
 ///
 /// The conformance is automatically synthesized by the BridgeJS code generator.
 public protocol _BridgedSwiftCaseEnum {
+    // MARK: ImportTS
+    @_spi(BridgeJS) consuming func bridgeJSLowerParameter() -> Int32
+    @_spi(BridgeJS) static func bridgeJSLiftReturn(_ value: Int32) -> Self
+
+    // MARK: ExportSwift
     @_spi(BridgeJS) static func bridgeJSLiftParameter(_ value: Int32) -> Self
     @_spi(BridgeJS) consuming func bridgeJSLowerReturn() -> Int32
 }
@@ -332,7 +337,12 @@ public protocol _BridgedSwiftCaseEnum {
 /// A protocol that Swift associated value enum types conform to.
 ///
 /// The conformance is automatically synthesized by the BridgeJS code generator.
-public protocol _BridgedSwiftAssociatedValueEnum {
+public protocol _BridgedSwiftAssociatedValueEnum: _BridgedSwiftTypeLoweredIntoVoidType {
+    // MARK: ImportTS
+    @_spi(BridgeJS) consuming func bridgeJSLowerParameter() -> Int32
+    @_spi(BridgeJS) static func bridgeJSLiftReturn() -> Self
+
+    // MARK: ExportSwift
     @_spi(BridgeJS) static func bridgeJSLiftParameter(_ caseId: Int32) -> Self
     @_spi(BridgeJS) consuming func bridgeJSLowerReturn() -> Void
 }
@@ -340,8 +350,9 @@ public protocol _BridgedSwiftAssociatedValueEnum {
 extension _BridgedSwiftEnumNoPayload where Self: RawRepresentable, RawValue == String {
     // MARK: ImportTS
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 { rawValue.bridgeJSLowerParameter() }
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ bytesCount: Int32) -> Self {
-        Self(rawValue: .bridgeJSLiftReturn(bytesCount))!
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ id: Int32) -> Self {
+        Self(rawValue: .bridgeJSLiftReturn(id))!
     }
 
     // MARK: ExportSwift
@@ -823,20 +834,21 @@ extension Optional where Wrapped == Double {
 extension Optional where Wrapped: _BridgedSwiftCaseEnum {
     // MARK: ImportTS
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional case enum types are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch consume self {
+        case .none:
+            return -1  // Sentinel for nil
+        case .some(let value):
+            return value.bridgeJSLowerParameter()
+        }
+    }
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional case enum types are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
-        return nil
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ value: Int32) -> Wrapped? {
+        if value == -1 {
+            return nil
+        } else {
+            return Wrapped.bridgeJSLiftReturn(value)
+        }
     }
 
     // MARK: ExportSwift
@@ -890,19 +902,23 @@ extension Optional where Wrapped: _BridgedSwiftTypeLoweredIntoVoidType {
 extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == String {
     // MARK: ImportTS
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional String raw value enum types are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch consume self {
+        case .none:
+            return 0  // Sentinel for nil
+        case .some(let value):
+            return value.bridgeJSLowerParameter()
+        }
+    }
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional String raw value enum types are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32) -> Wrapped? { return nil }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ length: Int32) -> Wrapped? {
+        if length == 0 {
+            return nil
+        } else {
+            let rawValue = String.bridgeJSLiftReturn(length)
+            return Wrapped(rawValue: rawValue)
+        }
+    }
 
     // MARK: ExportSwift
 
@@ -924,20 +940,21 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
 extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Int {
     // MARK: ImportTS
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional Int raw value enum types are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch consume self {
+        case .none:
+            return -1  // Sentinel for nil
+        case .some(let value):
+            return value.bridgeJSLowerParameter()
+        }
+    }
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional Int raw value enum types are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
-        return nil
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ value: Int32) -> Wrapped? {
+        if value == -1 {
+            return nil
+        } else {
+            return Wrapped(rawValue: Int(value))
+        }
     }
 
     // MARK: ExportSwift
@@ -956,20 +973,21 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
 extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Bool {
     // MARK: ImportTS
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional Bool raw value enum types are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch consume self {
+        case .none:
+            return -1  // Sentinel for nil
+        case .some(let value):
+            return value.bridgeJSLowerParameter()
+        }
+    }
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional Bool raw value enum types are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
-        return nil
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ value: Int32) -> Wrapped? {
+        if value == -1 {
+            return nil
+        } else {
+            return Wrapped(rawValue: value != 0)
+        }
     }
 
     // MARK: ExportSwift
@@ -988,20 +1006,21 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
 extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Float {
     // MARK: ImportTS
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional Float raw value enum types are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Float32 {
+        switch consume self {
+        case .none:
+            return Float32.nan  // Sentinel for nil (NaN)
+        case .some(let value):
+            return value.bridgeJSLowerParameter()
+        }
+    }
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional Float raw value enum types are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Float32) -> Wrapped? {
-        return nil
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ value: Float32) -> Wrapped? {
+        if value.isNaN {
+            return nil
+        } else {
+            return Wrapped(rawValue: Float(value))
+        }
     }
 
     // MARK: ExportSwift
@@ -1020,20 +1039,21 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
 extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Double {
     // MARK: ImportTS
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional Double raw value enum types are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Float64 {
+        switch consume self {
+        case .none:
+            return Float64.nan  // Sentinel for nil (NaN)
+        case .some(let value):
+            return value.bridgeJSLowerParameter()
+        }
+    }
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional Double raw value enum types are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ wrappedValue: Float64) -> Wrapped? {
-        return nil
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ value: Float64) -> Wrapped? {
+        if value.isNaN {
+            return nil
+        } else {
+            return Wrapped(rawValue: Double(value))
+        }
     }
 
     // MARK: ExportSwift
@@ -1053,21 +1073,27 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
 
 extension Optional where Wrapped: _BridgedSwiftAssociatedValueEnum {
     // MARK: ImportTS
-    @available(
-        *,
-        unavailable,
-        message: "Optional associated value enums are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {
-        fatalError("Optional associated value enum bridgeJSLowerParameter is not supported for ImportTS")
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch consume self {
+        case .none:
+            return -1  // Sentinel for nil
+        case .some(let value):
+            return value.bridgeJSLowerParameter()
+        }
     }
 
-    @available(
-        *,
-        unavailable,
-        message: "Optional associated value enums are not supported to be passed to imported JS functions"
-    )
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ caseId: Int32) -> Wrapped? { return nil }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> Wrapped? {
+        // Read tag from side channel
+        let tag = _swift_js_pop_param_int32()
+        if tag == -1 {
+            return nil
+        } else {
+            // Put tag back for the wrapped type's liftReturn to consume
+            _swift_js_push_int(tag)
+            return Wrapped.bridgeJSLiftReturn()
+        }
+    }
 
     // MARK: ExportSwift
 
