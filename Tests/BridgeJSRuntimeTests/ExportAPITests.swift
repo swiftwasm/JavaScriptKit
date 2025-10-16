@@ -863,7 +863,13 @@ enum APIOptionalResult {
     var count: Int { get set }
     var name: String { get }
     var optionalTag: String? { get set }
+    var optionalCount: Int? { get set }
+    var direction: Direction? { get set }
+    var optionalTheme: Theme? { get set }
+    var httpStatus: HttpStatus? { get set }
     var apiResult: APIResult? { get set }
+    var helper: Greeter { get set }
+    var optionalHelper: Greeter? { get set }
     func increment(by amount: Int)
     func getValue() -> Int
     func setLabelElements(_ labelPrefix: String, _ labelSuffix: String)
@@ -873,8 +879,8 @@ enum APIOptionalResult {
     func createGreeter() -> Greeter
     func processOptionalGreeter(_ greeter: Greeter?) -> String
     func createOptionalGreeter() -> Greeter?
-    func handleAPIResult(_ result: APIResult)
-    func getAPIResult() -> APIResult
+    func handleAPIResult(_ result: APIResult?)
+    func getAPIResult() -> APIResult?
 }
 
 @JS class DataProcessorManager {
@@ -919,13 +925,67 @@ enum APIOptionalResult {
     @JS func hasBackup() -> Bool {
         return backupProcessor != nil
     }
+
+    @JS func getProcessorOptionalTag() -> String? {
+        return processor.optionalTag
+    }
+
+    @JS func setProcessorOptionalTag(_ tag: String?) {
+        processor.optionalTag = tag
+    }
+
+    @JS func getProcessorOptionalCount() -> Int? {
+        return processor.optionalCount
+    }
+
+    @JS func setProcessorOptionalCount(_ count: Int?) {
+        processor.optionalCount = count
+    }
+
+    @JS func getProcessorDirection() -> Direction? {
+        return processor.direction
+    }
+
+    @JS func setProcessorDirection(_ direction: Direction?) {
+        processor.direction = direction
+    }
+
+    @JS func getProcessorTheme() -> Theme? {
+        return processor.optionalTheme
+    }
+
+    @JS func setProcessorTheme(_ theme: Theme?) {
+        processor.optionalTheme = theme
+    }
+
+    @JS func getProcessorHttpStatus() -> HttpStatus? {
+        return processor.httpStatus
+    }
+
+    @JS func setProcessorHttpStatus(_ status: HttpStatus?) {
+        processor.httpStatus = status
+    }
+
+    @JS func getProcessorAPIResult() -> APIResult? {
+        return processor.getAPIResult()
+    }
+
+    @JS func setProcessorAPIResult(_ apiResult: APIResult?) {
+        processor.handleAPIResult(apiResult)
+    }
 }
 
 @JS class SwiftDataProcessor: DataProcessor {
     @JS var count: Int = 0
     @JS let name: String = "SwiftDataProcessor"
     @JS var optionalTag: String? = nil
+    @JS var optionalCount: Int? = nil
+    @JS var direction: Direction? = nil
+    @JS var optionalTheme: Theme? = nil
+    @JS var httpStatus: HttpStatus? = nil
     @JS var apiResult: APIResult? = nil
+    @JS var helper: Greeter = Greeter(name: "DefaultHelper")
+    @JS var optionalHelper: Greeter? = nil
     private var label: String = ""
 
     @JS init() {}
@@ -970,12 +1030,12 @@ enum APIOptionalResult {
         return Greeter(name: "OptionalProcessorGreeter")
     }
 
-    @JS func handleAPIResult(_ result: APIResult) {
+    @JS func handleAPIResult(_ result: APIResult?) {
         self.apiResult = result
     }
 
-    @JS func getAPIResult() -> APIResult {
-        return apiResult ?? .failure(0)
+    @JS func getAPIResult() -> APIResult? {
+        return apiResult
     }
 }
 

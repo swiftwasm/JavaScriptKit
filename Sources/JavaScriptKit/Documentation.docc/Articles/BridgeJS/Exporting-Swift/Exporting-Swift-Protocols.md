@@ -244,7 +244,4 @@ When you pass a JavaScript object implementing a protocol to Swift:
 | Protocol composition: `Protocol1 & Protocol2` | ❌ |
 | Generics | ❌ |
 
-**Type Limitations:**
-- `@JS enum` types are not supported in protocol signatures (use raw values or separate parameters instead)
-
-> Note: Protocol type support matches that of regular `@JS func` and `@JS class` exports. See <doc:Exporting-Swift-Function> and <doc:Exporting-Swift-Optional> for more information.
+> Note: Protocol type support matches that of regular `@JS func` and `@JS class` exports. See <doc:Exporting-Swift-Function>, <doc:Exporting-Swift-Optional>, and <doc:Exporting-Swift-Enum> for more information.

@@ -459,8 +459,8 @@ extension BridgeType {
             case .importTS:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
             case .protocolExport:
-                let wasmType = rawType == .string ? WasmCoreType.i32 : (rawType.wasmCoreType ?? .i32)
-                return LoweringParameterInfo(loweredParameters: [("value", wasmType)])
+                // For protocol export we return .i32 for String raw value type instead of nil
+                return LoweringParameterInfo(loweredParameters: [("value", rawType.wasmCoreType ?? .i32)])
             }
         case .associatedValueEnum:
             switch context {
@@ -477,11 +477,9 @@ extension BridgeType {
                 throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
             case .protocolExport:
                 let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
-                guard wrappedInfo.loweredParameters.count == 1 else {
-                    throw BridgeJSCoreError("Optional wrapped type must lower to single parameter")
-                }
-                let (_, wrappedWasmType) = wrappedInfo.loweredParameters[0]
-                return LoweringParameterInfo(loweredParameters: [("value", wrappedWasmType)])
+                var params = [("isSome", WasmCoreType.i32)]
+                params.append(contentsOf: wrappedInfo.loweredParameters)
+                return LoweringParameterInfo(loweredParameters: params)
             }
         }
     }
@@ -498,7 +496,9 @@ extension BridgeType {
         static let void = LiftingReturnInfo(valueToLift: nil)
     }
 
-    func liftingReturnInfo(context: BridgeContext = .importTS) throws -> LiftingReturnInfo {
+    func liftingReturnInfo(
+        context: BridgeContext = .importTS
+    ) throws -> LiftingReturnInfo {
         switch self {
         case .bool: return .bool
         case .int: return .int
@@ -533,15 +533,15 @@ extension BridgeType {
             case .importTS:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
             case .protocolExport:
-                let wasmType = rawType == .string ? WasmCoreType.i32 : (rawType.wasmCoreType ?? .i32)
-                return LiftingReturnInfo(valueToLift: wasmType)
+                // For protocol export we return .i32 for String raw value type instead of nil
+                return LiftingReturnInfo(valueToLift: rawType.wasmCoreType ?? .i32)
             }
         case .associatedValueEnum:
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
             case .protocolExport:
-                return LiftingReturnInfo(valueToLift: nil)
+                return LiftingReturnInfo(valueToLift: .i32)
             }
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as return values")
@@ -551,7 +551,7 @@ extension BridgeType {
                 throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
             case .protocolExport:
                 let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
-                return wrappedInfo
+                return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
             }
         }
     }

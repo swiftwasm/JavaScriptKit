@@ -9,8 +9,8 @@ public struct ABINameGenerator {
     /// Generates ABI name using standardized namespace + context pattern
     public static func generateABIName(
         baseName: String,
-        namespace: [String]?,
-        staticContext: StaticContext?,
+        namespace: [String]? = nil,
+        staticContext: StaticContext? = nil,
         operation: String? = nil,
         className: String? = nil
     ) -> String {

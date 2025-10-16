@@ -7,8 +7,6 @@
 @_spi(BridgeJS) import JavaScriptKit
 
 extension APIResult: _BridgedSwiftAssociatedValueEnum {
-    // MARK: Private Helper
-
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
@@ -55,8 +53,7 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
         }
     }
 
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> APIResult {
-        let caseId = _swift_js_pop_param_int32()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> APIResult {
         return _bridgeJSLiftFromCaseId(caseId)
     }
 
@@ -93,8 +90,6 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
 }
 
 extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
-    // MARK: Private Helper
-
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> ComplexResult {
         switch caseId {
         case 0:
@@ -169,8 +164,7 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
         }
     }
 
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> ComplexResult {
-        let caseId = _swift_js_pop_param_int32()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> ComplexResult {
         return _bridgeJSLiftFromCaseId(caseId)
     }
 
@@ -235,8 +229,6 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
 }
 
 extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
-    // MARK: Private Helper
-
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> Utilities.Result {
         switch caseId {
         case 0:
@@ -278,8 +270,7 @@ extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
         }
     }
 
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> Utilities.Result {
-        let caseId = _swift_js_pop_param_int32()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> Utilities.Result {
         return _bridgeJSLiftFromCaseId(caseId)
     }
 
@@ -317,8 +308,6 @@ extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
 }
 
 extension NetworkingResult: _BridgedSwiftAssociatedValueEnum {
-    // MARK: Private Helper
-
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> NetworkingResult {
         switch caseId {
         case 0:
@@ -350,8 +339,7 @@ extension NetworkingResult: _BridgedSwiftAssociatedValueEnum {
         }
     }
 
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> NetworkingResult {
-        let caseId = _swift_js_pop_param_int32()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> NetworkingResult {
         return _bridgeJSLiftFromCaseId(caseId)
     }
 
@@ -381,8 +369,6 @@ extension NetworkingResult: _BridgedSwiftAssociatedValueEnum {
 }
 
 extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
-    // MARK: Private Helper
-
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIOptionalResult {
         switch caseId {
         case 0:
@@ -445,8 +431,7 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
         }
     }
 
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> APIOptionalResult {
-        let caseId = _swift_js_pop_param_int32()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> APIOptionalResult {
         return _bridgeJSLiftFromCaseId(caseId)
     }
 

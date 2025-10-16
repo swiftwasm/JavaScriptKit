@@ -263,21 +263,19 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
-    static func optionalLiftParameter(wrappedType: BridgeType, context: BridgeContext) throws -> IntrinsicJSFragment {
+    static func optionalLiftParameter(wrappedType: BridgeType) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["isSome", "wrappedValue"],
             printCode: { arguments, scope, printer, cleanupCode in
                 let isSome = arguments[0]
                 let wrappedValue = arguments[1]
-
                 let resultExpr: String
+
                 switch wrappedType {
                 case .int, .float, .double, .caseEnum:
                     resultExpr = "\(isSome) ? \(wrappedValue) : null"
-
                 case .bool:
                     resultExpr = "\(isSome) ? \(wrappedValue) !== 0 : null"
-
                 case .string:
                     let objectLabel = scope.variable("obj")
                     printer.write("let \(objectLabel);")
@@ -290,14 +288,11 @@ struct IntrinsicJSFragment: Sendable {
                     }
                     printer.write("}")
                     resultExpr = "\(isSome) ? \(objectLabel) : null"
-
                 case .swiftHeapObject(let name):
                     resultExpr = "\(isSome) ? \(name).__construct(\(wrappedValue)) : null"
-
                 case .jsObject:
                     resultExpr =
                         "\(isSome) ? \(JSGlueVariableScope.reservedSwift).memory.getObject(\(wrappedValue)) : null"
-
                 case .rawValueEnum(_, let rawType):
                     switch rawType {
                     case .string:
@@ -317,7 +312,18 @@ struct IntrinsicJSFragment: Sendable {
                     default:
                         resultExpr = "\(isSome) ? \(wrappedValue) : null"
                     }
-
+                case .associatedValueEnum(let fullName):
+                    let base = fullName.components(separatedBy: ".").last ?? fullName
+                    let enumVar = scope.variable("enumValue")
+                    printer.write("let \(enumVar);")
+                    printer.write("if (\(isSome)) {")
+                    printer.indent {
+                        printer.write(
+                            "\(enumVar) = enumHelpers.\(base).raise(\(wrappedValue), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
+                        )
+                    }
+                    printer.write("}")
+                    resultExpr = "\(isSome) ? \(enumVar) : null"
                 default:
                     resultExpr = "\(isSome) ? \(wrappedValue) : null"
                 }
@@ -371,6 +377,9 @@ struct IntrinsicJSFragment: Sendable {
                     cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
 
                     return ["+\(isSomeVar)", "\(isSomeVar) ? \(caseIdVar) : 0"]
+                case .rawValueEnum:
+                    // Raw value enums with optional - falls through to handle based on raw type
+                    return ["+\(isSomeVar)", "\(isSomeVar) ? \(value) : 0"]
                 default:
                     switch wrappedType {
                     case .swiftHeapObject:
@@ -489,11 +498,9 @@ struct IntrinsicJSFragment: Sendable {
 
     static func optionalLowerReturn(wrappedType: BridgeType) throws -> IntrinsicJSFragment {
         switch wrappedType {
-        case .bool, .int, .float, .double, .string, .swiftHeapObject, .jsObject, .swiftProtocol, .caseEnum,
-            .rawValueEnum, .associatedValueEnum:
-            break
         case .void, .optional, .namespaceEnum:
             throw BridgeJSLinkError(message: "Unsupported optional wrapped type for protocol export: \(wrappedType)")
+        default: break
         }
 
         return IntrinsicJSFragment(
@@ -501,7 +508,6 @@ struct IntrinsicJSFragment: Sendable {
             printCode: { arguments, scope, printer, cleanupCode in
                 let value = arguments[0]
                 let isSomeVar = scope.variable("isSome")
-
                 printer.write("const \(isSomeVar) = \(value) != null;")
 
                 switch wrappedType {
@@ -509,10 +515,12 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write(
                         "bjs[\"swift_js_return_optional_bool\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? (\(value) ? 1 : 0) : 0);"
                     )
-                case .int, .caseEnum:
+                case .int:
                     printer.write(
                         "bjs[\"swift_js_return_optional_int\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? (\(value) | 0) : 0);"
                     )
+                case .caseEnum:
+                    printer.write("return \(isSomeVar) ? (\(value) | 0) : -1;")
                 case .float:
                     printer.write(
                         "bjs[\"swift_js_return_optional_float\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? Math.fround(\(value)) : 0.0);"
@@ -537,9 +545,6 @@ struct IntrinsicJSFragment: Sendable {
                         printer.write("return -1;")
                     }
                     printer.write("}")
-
-                case .swiftHeapObject:
-                    printer.write("return \(isSomeVar) ? \(value).pointer : 0;")
                 case .jsObject, .swiftProtocol:
                     let idVar = scope.variable("id")
                     printer.write("let \(idVar) = 0;")
@@ -561,30 +566,31 @@ struct IntrinsicJSFragment: Sendable {
                             printer.write(
                                 "bjs[\"swift_js_return_optional_string\"](1, \(bytesVar), \(bytesVar).length);"
                             )
-                            printer.write("return \(bytesVar).length;")
                         }
                         printer.write("} else {")
                         printer.indent {
                             printer.write("bjs[\"swift_js_return_optional_string\"](0, 0, 0);")
-                            printer.write("return -1;")
                         }
                         printer.write("}")
-                    case .bool:
-                        printer.write(
-                            "bjs[\"swift_js_return_optional_bool\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? (\(value) ? 1 : 0) : 0);"
-                        )
-                    case .float:
-                        printer.write(
-                            "bjs[\"swift_js_return_optional_float\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? Math.fround(\(value)) : 0.0);"
-                        )
-                    case .double:
-                        printer.write(
-                            "bjs[\"swift_js_return_optional_double\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? \(value) : 0.0);"
-                        )
                     default:
-                        printer.write(
-                            "bjs[\"swift_js_return_optional_int\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? (\(value) | 0) : 0);"
-                        )
+                        switch rawType {
+                        case .bool:
+                            printer.write(
+                                "bjs[\"swift_js_return_optional_bool\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? (\(value) ? 1 : 0) : 0);"
+                            )
+                        case .float:
+                            printer.write(
+                                "bjs[\"swift_js_return_optional_float\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? Math.fround(\(value)) : 0.0);"
+                            )
+                        case .double:
+                            printer.write(
+                                "bjs[\"swift_js_return_optional_double\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? \(value) : 0.0);"
+                            )
+                        default:
+                            printer.write(
+                                "bjs[\"swift_js_return_optional_int\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? (\(value) | 0) : 0);"
+                            )
+                        }
                     }
                 case .associatedValueEnum(let fullName):
                     let base = fullName.components(separatedBy: ".").last ?? fullName
@@ -595,14 +601,14 @@ struct IntrinsicJSFragment: Sendable {
                         printer.write(
                             "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = enumHelpers.\(base).lower(\(value));"
                         )
-                        cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
-                        printer.write("bjs[\"swift_js_return_optional_int\"](1, \(caseIdVar));")
+                        printer.write("return \(caseIdVar);")
                     }
                     printer.write("} else {")
                     printer.indent {
-                        printer.write("bjs[\"swift_js_return_optional_int\"](0, 0);")
+                        printer.write("return -1;")
                     }
                     printer.write("}")
+                    cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
                 default:
                     ()
                 }
@@ -671,10 +677,6 @@ struct IntrinsicJSFragment: Sendable {
     // MARK: - ImportedJS
 
     /// Returns a fragment that lifts Wasm core values to JS values for parameters
-    ///
-    /// - Parameters:
-    ///   - type: The bridge type to lift
-    ///   - context: The bridge context (defaults to .importTS for backward compatibility)
     static func liftParameter(type: BridgeType, context: BridgeContext = .importTS) throws -> IntrinsicJSFragment {
         switch type {
         case .int, .float, .double: return .identity
@@ -682,12 +684,14 @@ struct IntrinsicJSFragment: Sendable {
         case .string: return .stringLiftParameter
         case .jsObject: return .jsObjectLiftParameter
         case .swiftHeapObject(let name):
-            guard context == .protocolExport else {
+            switch context {
+            case .importTS:
                 throw BridgeJSLinkError(
                     message: "swiftHeapObject '\(name)' can only be used in protocol exports, not in \(context)"
                 )
+            case .protocolExport:
+                return .swiftHeapObjectLiftParameter(name)
             }
-            return .swiftHeapObjectLiftParameter(name)
         case .swiftProtocol: return .jsObjectLiftParameter
         case .void:
             throw BridgeJSLinkError(
@@ -700,8 +704,7 @@ struct IntrinsicJSFragment: Sendable {
                     message: "Optional types are not supported for imported JS functions: \(wrappedType)"
                 )
             case .protocolExport:
-                // Protocol exports support Optional - use existing optionalLiftParameter fragment
-                return try .optionalLiftParameter(wrappedType: wrappedType, context: context)
+                return try .optionalLiftParameter(wrappedType: wrappedType)
             }
         case .caseEnum: return .identity
         case .rawValueEnum(_, let rawType):
@@ -740,10 +743,6 @@ struct IntrinsicJSFragment: Sendable {
     }
 
     /// Returns a fragment that lowers a JS value to Wasm core values for return values
-    ///
-    /// - Parameters:
-    ///   - type: The bridge type to lower
-    ///   - context: The bridge context (defaults to .importTS for backward compatibility)
     static func lowerReturn(type: BridgeType, context: BridgeContext = .importTS) throws -> IntrinsicJSFragment {
         switch type {
         case .int, .float, .double: return .identity
@@ -751,12 +750,14 @@ struct IntrinsicJSFragment: Sendable {
         case .string: return .stringLowerReturn
         case .jsObject: return .jsObjectLowerReturn
         case .swiftHeapObject(let name):
-            guard context == .protocolExport else {
+            switch context {
+            case .importTS:
                 throw BridgeJSLinkError(
                     message: "swiftHeapObject '\(name)' can only be used in protocol exports, not in \(context)"
                 )
+            case .protocolExport:
+                return .swiftHeapObjectLowerReturn
             }
-            return .swiftHeapObjectLowerReturn
         case .swiftProtocol: return .jsObjectLowerReturn
         case .void: return .void
         case .optional(let wrappedType):
@@ -784,21 +785,7 @@ struct IntrinsicJSFragment: Sendable {
                         "Associated value enums are not supported to be returned from imported JS functions: \(fullName)"
                 )
             case .protocolExport:
-                let base = fullName.components(separatedBy: ".").last ?? fullName
-                return IntrinsicJSFragment(
-                    parameters: ["value"],
-                    printCode: { arguments, scope, printer, cleanupCode in
-                        let value = arguments[0]
-                        let caseIdVar = scope.variable("caseId")
-                        let cleanupVar = scope.variable("cleanup")
-                        printer.write(
-                            "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = enumHelpers.\(base).lower(\(value));"
-                        )
-                        cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
-                        printer.write("return \(caseIdVar);")
-                        return []
-                    }
-                )
+                return associatedValueLowerReturn(fullName: fullName)
             }
         case .namespaceEnum(let string):
             throw BridgeJSLinkError(
@@ -809,6 +796,23 @@ struct IntrinsicJSFragment: Sendable {
 
     // MARK: - Enums Payload Fragments
 
+    static func associatedValueLowerReturn(fullName: String) -> IntrinsicJSFragment {
+        let base = fullName.components(separatedBy: ".").last ?? fullName
+        return IntrinsicJSFragment(
+            parameters: ["value"],
+            printCode: { arguments, scope, printer, cleanupCode in
+                let value = arguments[0]
+                let caseIdVar = scope.variable("caseId")
+                let cleanupVar = scope.variable("cleanup")
+                printer.write(
+                    "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = enumHelpers.\(base).lower(\(value));"
+                )
+                cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
+                printer.write("return \(caseIdVar);")
+                return []
+            }
+        )
+    }
     /// Fragment for generating an entire associated value enum helper
     static func associatedValueEnumHelper(enumDefinition: ExportedEnum) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
@@ -1118,26 +1122,27 @@ struct IntrinsicJSFragment: Sendable {
                             cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
                         }
                         cleanup.write("}")
+                    case .int:
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? (\(value) | 0) : 0);"
+                        )
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                    case .bool:
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? (\(value) ? 1 : 0) : 0);"
+                        )
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                    case .float:
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedTmpParamF32s).push(\(isSomeVar) ? Math.fround(\(value)) : 0.0);"
+                        )
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                    case .double:
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedTmpParamF64s).push(\(isSomeVar) ? \(value) : 0.0);"
+                        )
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
                     default:
-                        switch wrappedType {
-                        case .int:
-                            printer.write(
-                                "\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? (\(value) | 0) : 0);"
-                            )
-                        case .bool:
-                            printer.write(
-                                "\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? (\(value) ? 1 : 0) : 0);"
-                            )
-                        case .float:
-                            printer.write(
-                                "\(JSGlueVariableScope.reservedTmpParamF32s).push(\(isSomeVar) ? Math.fround(\(value)) : 0.0);"
-                            )
-                        case .double:
-                            printer.write(
-                                "\(JSGlueVariableScope.reservedTmpParamF64s).push(\(isSomeVar) ? \(value) : 0.0);"
-                            )
-                        default: ()
-                        }
                         printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
                     }
 

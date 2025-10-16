@@ -11,13 +11,13 @@ extension Calculator: _BridgedSwiftCaseEnum {
         return bridgeJSRawValue
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> Calculator {
-        return Calculator(bridgeJSRawValue: value)!
+        return bridgeJSLiftParameter(value)
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> Calculator {
         return Calculator(bridgeJSRawValue: value)!
     }
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
-        return bridgeJSRawValue
+        return bridgeJSLowerParameter()
     }
 
     private init?(bridgeJSRawValue: Int32) {
@@ -53,8 +53,6 @@ public func _bjs_Calculator_static_square(value: Int32) -> Int32 {
 }
 
 extension APIResult: _BridgedSwiftAssociatedValueEnum {
-    // MARK: Private Helper
-
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
@@ -82,8 +80,7 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
         }
     }
 
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> APIResult {
-        let caseId = _swift_js_pop_param_int32()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> APIResult {
         return _bridgeJSLiftFromCaseId(caseId)
     }
 

@@ -20,9 +20,23 @@ export interface MyViewControllerDelegate {
     eventCount: number;
     readonly delegateName: string;
     optionalName: string | null;
-    myEnum: ExampleEnumTag;
-    result: ResultTag | null;
+    optionalRawEnum: ExampleEnumTag | null;
+    rawStringEnum: ExampleEnumTag;
+    result: ResultTag;
+    optionalResult: ResultTag | null;
+    direction: DirectionTag;
+    directionOptional: DirectionTag | null;
+    priority: PriorityTag;
+    priorityOptional: PriorityTag | null;
 }
+
+export const DirectionValues: {
+    readonly North: 0;
+    readonly South: 1;
+    readonly East: 2;
+    readonly West: 3;
+};
+export type DirectionTag = typeof DirectionValues[keyof typeof DirectionValues];
 
 export const ExampleEnumValues: {
     readonly Test: "test";
@@ -40,9 +54,20 @@ export const ResultValues: {
 export type ResultTag =
   { tag: typeof ResultValues.Tag.Success; param0: string } | { tag: typeof ResultValues.Tag.Failure; param0: number }
 
+export const PriorityValues: {
+    readonly Low: -1;
+    readonly Medium: 0;
+    readonly High: 1;
+};
+export type PriorityTag = typeof PriorityValues[keyof typeof PriorityValues];
+
+export type DirectionObject = typeof DirectionValues;
+
 export type ExampleEnumObject = typeof ExampleEnumValues;
 
 export type ResultObject = typeof ResultValues;
+
+export type PriorityObject = typeof PriorityValues;
 
 /// Represents a Swift heap object like a class instance or an actor instance.
 export interface SwiftHeapObject {
@@ -72,8 +97,10 @@ export type Exports = {
     MyViewController: {
         new(delegate: MyViewControllerDelegate): MyViewController;
     }
+    Direction: DirectionObject
     ExampleEnum: ExampleEnumObject
     Result: ResultObject
+    Priority: PriorityObject
 }
 export type Imports = {
 }

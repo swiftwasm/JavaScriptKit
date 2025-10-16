@@ -589,6 +589,61 @@ struct BridgeJSLink {
                     printer.write("}")
                 }
                 printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_int_presence\"] = function() {")
+                printer.indent {
+                    printer.write("return \(JSGlueVariableScope.reservedStorageToReturnOptionalInt) != null ? 1 : 0;")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_int_value\"] = function() {")
+                printer.indent {
+                    printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalInt);")
+                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = undefined;")
+                    printer.write("return value;")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_string\"] = function() {")
+                printer.indent {
+                    printer.write("const str = \(JSGlueVariableScope.reservedStorageToReturnString);")
+                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
+                    printer.write("if (str == null) {")
+                    printer.indent {
+                        printer.write("return -1;")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("const bytes = \(JSGlueVariableScope.reservedTextEncoder).encode(str);")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnBytes) = bytes;")
+                        printer.write("return bytes.length;")
+                    }
+                    printer.write("}")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_float_presence\"] = function() {")
+                printer.indent {
+                    printer.write("return \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) != null ? 1 : 0;")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_float_value\"] = function() {")
+                printer.indent {
+                    printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);")
+                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = undefined;")
+                    printer.write("return value;")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_double_presence\"] = function() {")
+                printer.indent {
+                    printer.write(
+                        "return \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) != null ? 1 : 0;"
+                    )
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_double_value\"] = function() {")
+                printer.indent {
+                    printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);")
+                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = undefined;")
+                    printer.write("return value;")
+                }
+                printer.write("}")
             }
         }
         return printer
@@ -1962,6 +2017,43 @@ extension BridgeJSLink {
         }
 
         func callPropertyGetter(name: String, returnType: BridgeType) throws -> String? {
+            if context == .protocolExport, case .optional(let wrappedType) = returnType {
+                let usesSideChannel: Bool
+                switch wrappedType {
+                case .string, .int, .float, .double, .jsObject, .swiftProtocol:
+                    usesSideChannel = true
+                case .rawValueEnum:
+                    usesSideChannel = true
+                case .bool, .caseEnum, .swiftHeapObject, .associatedValueEnum:
+                    usesSideChannel = false
+                default:
+                    usesSideChannel = false
+                }
+
+                if usesSideChannel {
+                    let resultVar = scope.variable("ret")
+                    body.write(
+                        "let \(resultVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(self).\(name);"
+                    )
+
+                    switch wrappedType {
+                    case .string, .rawValueEnum(_, .string):
+                        body.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(resultVar);")
+                    case .int, .rawValueEnum(_, .int):
+                        body.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = \(resultVar);")
+                    case .float, .rawValueEnum(_, .float):
+                        body.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = \(resultVar);")
+                    case .double, .rawValueEnum(_, .double):
+                        body.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = \(resultVar);")
+                    case .jsObject, .swiftProtocol:
+                        body.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(resultVar);")
+                    default:
+                        break
+                    }
+                    return nil  // Side-channel types return nil (no direct return value)
+                }
+            }
+
             return try call(
                 callExpr: "\(JSGlueVariableScope.reservedSwift).memory.getObject(self).\(name)",
                 returnType: returnType

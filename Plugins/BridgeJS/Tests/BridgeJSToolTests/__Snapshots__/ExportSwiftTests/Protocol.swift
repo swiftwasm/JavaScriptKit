@@ -56,8 +56,9 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
 
     func onOptionalHelperUpdated(_ helper: Optional<Helper>) {
         @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onOptionalHelperUpdated")
-        func _extern_onOptionalHelperUpdated(this: Int32, helper: UnsafeMutableRawPointer)
-        _extern_onOptionalHelperUpdated(this: Int32(bitPattern: jsObject.id), helper: helper.bridgeJSLowerParameter())
+        func _extern_onOptionalHelperUpdated(this: Int32, helperIsSome: Int32, helperPointer: UnsafeMutableRawPointer)
+        let (helperIsSome, helperPointer) = helper.bridgeJSLowerParameterWithPresence()
+    _extern_onOptionalHelperUpdated(this: Int32(bitPattern: jsObject.id), helperIsSome: helperIsSome, helperPointer: helperPointer)
     }
 
     func createOptionalHelper() -> Optional<Helper> {
@@ -82,9 +83,9 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
 
     func getResult() -> Result {
         @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_getResult")
-        func _extern_getResult(this: Int32)
-        _extern_getResult(this: Int32(bitPattern: jsObject.id))
-        return Result.bridgeJSLiftReturn()
+        func _extern_getResult(this: Int32) -> Int32
+        let ret = _extern_getResult(this: Int32(bitPattern: jsObject.id))
+        return Result.bridgeJSLiftReturn(ret)
     }
 
     var eventCount: Int {
@@ -113,42 +114,131 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
     var optionalName: Optional<String> {
         get {
             @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalName_get")
-            func _extern_get(this: Int32) -> Int32
-            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
-            return Optional<String>.bridgeJSLiftReturn(ret)
+            func _extern_get(this: Int32)
+            _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Optional<String>.bridgeJSLiftReturnFromSideChannel()
         }
         set {
             @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalName_set")
-            func _extern_set(this: Int32, value: Int32)
-            _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
+            func _extern_set(this: Int32, isSome: Int32, value: Int32)
+            let (isSome, value) = newValue.bridgeJSLowerParameterWithPresence()
+            _extern_set(this: Int32(bitPattern: jsObject.id), isSome: isSome, value: value)
         }
     }
 
-    var myEnum: ExampleEnum {
+    var optionalRawEnum: Optional<ExampleEnum> {
         get {
-            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_myEnum_get")
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalRawEnum_get")
+            func _extern_get(this: Int32)
+            _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Optional<ExampleEnum>.bridgeJSLiftReturnFromSideChannel()
+        }
+        set {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalRawEnum_set")
+            func _extern_set(this: Int32, isSome: Int32, value: Int32)
+            let (isSome, value) = newValue.bridgeJSLowerParameterWithPresence()
+            _extern_set(this: Int32(bitPattern: jsObject.id), isSome: isSome, value: value)
+        }
+    }
+
+    var rawStringEnum: ExampleEnum {
+        get {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_rawStringEnum_get")
             func _extern_get(this: Int32) -> Int32
             let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
             return ExampleEnum.bridgeJSLiftReturn(ret)
         }
         set {
-            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_myEnum_set")
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_rawStringEnum_set")
             func _extern_set(this: Int32, value: Int32)
             _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
         }
     }
 
-    var result: Optional<Result> {
+    var result: Result {
         get {
             @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_result_get")
-            func _extern_get(this: Int32)
-            _extern_get(this: Int32(bitPattern: jsObject.id))
-            return Optional<Result>.bridgeJSLiftReturn()
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Result.bridgeJSLiftReturn(ret)
         }
         set {
             @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_result_set")
+            func _extern_set(this: Int32, caseId: Int32)
+            _extern_set(this: Int32(bitPattern: jsObject.id), caseId: newValue.bridgeJSLowerParameter())
+        }
+    }
+
+    var optionalResult: Optional<Result> {
+        get {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalResult_get")
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Optional<Result>.bridgeJSLiftReturn(ret)
+        }
+        set {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalResult_set")
+            func _extern_set(this: Int32, isSome: Int32, caseId: Int32)
+            let (isSome, caseId) = newValue.bridgeJSLowerParameterWithPresence()
+            _extern_set(this: Int32(bitPattern: jsObject.id), isSome: isSome, caseId: caseId)
+        }
+    }
+
+    var direction: Direction {
+        get {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_direction_get")
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Direction.bridgeJSLiftReturn(ret)
+        }
+        set {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_direction_set")
             func _extern_set(this: Int32, value: Int32)
             _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
+        }
+    }
+
+    var directionOptional: Optional<Direction> {
+        get {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_directionOptional_get")
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Optional<Direction>.bridgeJSLiftReturn(ret)
+        }
+        set {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_directionOptional_set")
+            func _extern_set(this: Int32, isSome: Int32, value: Int32)
+            let (isSome, value) = newValue.bridgeJSLowerParameterWithPresence()
+            _extern_set(this: Int32(bitPattern: jsObject.id), isSome: isSome, value: value)
+        }
+    }
+
+    var priority: Priority {
+        get {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_priority_get")
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Priority.bridgeJSLiftReturn(ret)
+        }
+        set {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_priority_set")
+            func _extern_set(this: Int32, value: Int32)
+            _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
+        }
+    }
+
+    var priorityOptional: Optional<Priority> {
+        get {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_priorityOptional_get")
+            func _extern_get(this: Int32)
+            _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Optional<Priority>.bridgeJSLiftReturnFromSideChannel()
+        }
+        set {
+            @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_priorityOptional_set")
+            func _extern_set(this: Int32, isSome: Int32, value: Int32)
+            let (isSome, value) = newValue.bridgeJSLowerParameterWithPresence()
+            _extern_set(this: Int32(bitPattern: jsObject.id), isSome: isSome, value: value)
         }
     }
 
@@ -157,12 +247,53 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
     }
 }
 
+extension Direction: _BridgedSwiftCaseEnum {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> Direction {
+        return bridgeJSLiftParameter(value)
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> Direction {
+        return Direction(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSLowerParameter()
+    }
+
+    private init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .north
+        case 1:
+            self = .south
+        case 2:
+            self = .east
+        case 3:
+            self = .west
+        default:
+            return nil
+        }
+    }
+
+    private var bridgeJSRawValue: Int32 {
+        switch self {
+        case .north:
+            return 0
+        case .south:
+            return 1
+        case .east:
+            return 2
+        case .west:
+            return 3
+        }
+    }
+}
+
 extension ExampleEnum: _BridgedSwiftEnumNoPayload {
 }
 
 extension Result: _BridgedSwiftAssociatedValueEnum {
-    // MARK: Private Helper
-
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> Result {
         switch caseId {
         case 0:
@@ -190,8 +321,7 @@ extension Result: _BridgedSwiftAssociatedValueEnum {
         }
     }
 
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn() -> Result {
-        let caseId = _swift_js_pop_param_int32()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> Result {
         return _bridgeJSLiftFromCaseId(caseId)
     }
 
@@ -214,6 +344,9 @@ extension Result: _BridgedSwiftAssociatedValueEnum {
             _swift_js_push_int(Int32(param0))
         }
     }
+}
+
+extension Priority: _BridgedSwiftEnumNoPayload {
 }
 
 @_expose(wasm, "bjs_Helper_init")
