@@ -34,7 +34,7 @@ export const TSHttpStatus = {
 };
 
 export const PriorityValues = {
-    Lowest: 1,
+    Lowest: -1,
     Low: 2,
     Medium: 3,
     High: 4,
