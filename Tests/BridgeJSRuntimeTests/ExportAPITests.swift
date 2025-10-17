@@ -857,6 +857,87 @@ enum APIOptionalResult {
         "const:\(StaticPropertyHolder.staticConstant),var:\(StaticPropertyHolder.staticVariable),computed:\(StaticPropertyHolder.computedProperty),readonly:\(StaticPropertyHolder.readOnlyComputed)"
 }
 
+// MARK: - Protocol Tests
+
+@JS protocol Counter {
+    func increment(by amount: Int)
+    func getValue() -> Int
+    func setLabelElements(_ labelPrefix: String, _ labelSuffix: String)
+    func getLabel() -> String
+    func isEven() -> Bool
+}
+
+@JS class CounterManager {
+
+    @JS var counter: Counter
+    @JS var backupCounter: Counter?
+
+    @JS init(counter: Counter) {
+        self.counter = counter
+        self.backupCounter = nil
+    }
+
+    @JS func incrementByAmount(_ amount: Int) {
+        counter.increment(by: amount)
+    }
+
+    @JS func setCounterLabel(_ prefix: String, _ suffix: String) {
+        counter.setLabelElements(prefix, suffix)
+    }
+
+    @JS func isCounterEven() -> Bool {
+        return counter.isEven()
+    }
+
+    @JS func getCounterLabel() -> String {
+        return counter.getLabel()
+    }
+
+    @JS func getCurrentValue() -> Int {
+        return counter.getValue()
+    }
+
+    @JS func incrementBoth() {
+        counter.increment(by: 1)
+        backupCounter?.increment(by: 1)
+    }
+
+    @JS func getBackupValue() -> Int? {
+        return backupCounter?.getValue()
+    }
+
+    @JS func hasBackup() -> Bool {
+        return backupCounter != nil
+    }
+}
+
+@JS class SwiftCounter: Counter {
+    private var value: Int = 0
+    private var label: String = ""
+
+    @JS init() {}
+
+    @JS func increment(by amount: Int) {
+        value += amount
+    }
+
+    @JS func getValue() -> Int {
+        return value
+    }
+
+    @JS func setLabelElements(_ labelPrefix: String, _ labelSuffix: String) {
+        self.label = labelPrefix + labelSuffix
+    }
+
+    @JS func getLabel() -> String {
+        return label
+    }
+
+    @JS func isEven() -> Bool {
+        return value % 2 == 0
+    }
+}
+
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false

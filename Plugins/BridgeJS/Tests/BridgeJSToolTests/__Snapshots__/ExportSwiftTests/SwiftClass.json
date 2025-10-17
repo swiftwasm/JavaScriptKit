@@ -132,5 +132,8 @@
       }
     }
   ],
-  "moduleName" : "TestModule"
+  "moduleName" : "TestModule",
+  "protocols" : [
+
+  ]
 }

@@ -297,6 +297,25 @@ struct IntrinsicJSFragment: Sendable {
                     switch wrappedType {
                     case .swiftHeapObject:
                         return ["+\(isSomeVar)", "\(isSomeVar) ? \(value).pointer : 0"]
+                    case .swiftProtocol:
+                        return [
+                            "+\(isSomeVar)",
+                            "\(isSomeVar) ? \(JSGlueVariableScope.reservedSwift).memory.retain(\(value)) : 0",
+                        ]
+                    case .jsObject:
+                        let idVar = scope.variable("id")
+                        printer.write("let \(idVar);")
+                        printer.write("if (\(isSomeVar)) {")
+                        printer.indent {
+                            printer.write("\(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));")
+                        }
+                        printer.write("}")
+                        cleanupCode.write("if (\(idVar) !== undefined) {")
+                        cleanupCode.indent {
+                            cleanupCode.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
+                        }
+                        cleanupCode.write("}")
+                        return ["+\(isSomeVar)", "\(isSomeVar) ? \(idVar) : 0"]
                     default:
                         return ["+\(isSomeVar)", "\(isSomeVar) ? \(value) : 0"]
                     }
@@ -324,6 +343,9 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);")
                     printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = undefined;")
                 case .string:
+                    printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnString);")
+                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
+                case .jsObject, .swiftProtocol:
                     printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnString);")
                     printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
                 case .swiftHeapObject(let className):
@@ -397,6 +419,7 @@ struct IntrinsicJSFragment: Sendable {
         case .jsObject: return .jsObjectLowerParameter
         case .swiftHeapObject:
             return .swiftHeapObjectLowerParameter
+        case .swiftProtocol: return .jsObjectLowerParameter
         case .void: return .void
         case .optional(let wrappedType):
             return try .optionalLowerParameter(wrappedType: wrappedType)
@@ -422,6 +445,7 @@ struct IntrinsicJSFragment: Sendable {
         case .string: return .stringLiftReturn
         case .jsObject: return .jsObjectLiftReturn
         case .swiftHeapObject(let name): return .swiftHeapObjectLiftReturn(name)
+        case .swiftProtocol: return .jsObjectLiftReturn
         case .void: return .void
         case .optional(let wrappedType): return .optionalLiftReturn(wrappedType: wrappedType)
         case .caseEnum: return .identity
@@ -455,6 +479,7 @@ struct IntrinsicJSFragment: Sendable {
                 message:
                     "Swift heap objects are not supported to be passed as parameters to imported JS functions: \(name)"
             )
+        case .swiftProtocol: return .jsObjectLiftParameter
         case .void:
             throw BridgeJSLinkError(
                 message: "Void can't appear in parameters of imported JS functions"
@@ -494,6 +519,7 @@ struct IntrinsicJSFragment: Sendable {
             throw BridgeJSLinkError(
                 message: "Swift heap objects are not supported to be returned from imported JS functions"
             )
+        case .swiftProtocol: return .jsObjectLowerReturn
         case .void: return .void
         case .optional(let wrappedType):
             throw BridgeJSLinkError(

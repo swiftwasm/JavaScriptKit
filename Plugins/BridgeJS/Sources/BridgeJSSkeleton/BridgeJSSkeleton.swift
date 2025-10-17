@@ -74,6 +74,7 @@ public enum BridgeType: Codable, Equatable, Sendable {
     case rawValueEnum(String, SwiftEnumRawType)
     case associatedValueEnum(String)
     case namespaceEnum(String)
+    case swiftProtocol(String)
 }
 
 public enum WasmCoreType: String, Codable, Sendable {
@@ -269,6 +270,18 @@ public enum EnumType: String, Codable, Sendable {
 
 // MARK: - Exported Skeleton
 
+public struct ExportedProtocol: Codable, Equatable {
+    public let name: String
+    public let methods: [ExportedFunction]
+    public let namespace: [String]?
+
+    public init(name: String, methods: [ExportedFunction], namespace: [String]? = nil) {
+        self.name = name
+        self.methods = methods
+        self.namespace = namespace
+    }
+}
+
 public struct ExportedFunction: Codable, Equatable, Sendable {
     public var name: String
     public var abiName: String
@@ -407,12 +420,20 @@ public struct ExportedSkeleton: Codable {
     public let functions: [ExportedFunction]
     public let classes: [ExportedClass]
     public let enums: [ExportedEnum]
+    public let protocols: [ExportedProtocol]
 
-    public init(moduleName: String, functions: [ExportedFunction], classes: [ExportedClass], enums: [ExportedEnum]) {
+    public init(
+        moduleName: String,
+        functions: [ExportedFunction],
+        classes: [ExportedClass],
+        enums: [ExportedEnum],
+        protocols: [ExportedProtocol] = []
+    ) {
         self.moduleName = moduleName
         self.functions = functions
         self.classes = classes
         self.enums = enums
+        self.protocols = protocols
     }
 }
 
@@ -514,6 +535,9 @@ extension BridgeType {
             return nil
         case .namespaceEnum:
             return nil
+        case .swiftProtocol:
+            // Protocols pass JSObject IDs as Int32
+            return .i32
         }
     }
 

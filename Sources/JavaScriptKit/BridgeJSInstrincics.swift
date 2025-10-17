@@ -301,6 +301,21 @@ extension _JSBridgedClass {
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 { jsObject.bridgeJSLowerReturn() }
 }
 
+/// A protocol that Swift protocol wrappers exposed from JavaScript must conform to.
+///
+/// The conformance is automatically synthesized by the BridgeJS code generator.
+public protocol _BridgedSwiftProtocolWrapper {
+    var jsObject: JSObject { get }
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self
+}
+
+extension _BridgedSwiftProtocolWrapper {
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 {
+        jsObject.bridgeJSLowerReturn()
+    }
+}
+
 /// A protocol that Swift enum types that do not have a payload can conform to.
 ///
 /// The conformance is automatically synthesized by the BridgeJS code generator.
@@ -598,6 +613,56 @@ extension Optional where Wrapped == JSObject {
             _swift_js_return_optional_object(0, 0)
         case .some(let value):
             let retainedId = value.bridgeJSLowerReturn()
+            _swift_js_return_optional_object(1, retainedId)
+        }
+    }
+}
+
+extension Optional where Wrapped: _BridgedSwiftProtocolWrapper {
+    // MARK: ImportTS
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional protocol types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public func bridgeJSLowerParameter() -> Void {}
+
+    @available(
+        *,
+        unavailable,
+        message: "Optional protocol types are not supported to be passed to imported JS functions"
+    )
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ isSome: Int32, _ objectId: Int32) -> Wrapped? {
+        return nil
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ objectId: Int32) -> Wrapped? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Wrapped.bridgeJSLiftParameter(objectId)
+        }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_return_optional_object")
+        func _swift_js_return_optional_object(_ isSome: Int32, _ objectId: Int32)
+        #else
+        /// Write an optional protocol wrapper to reserved storage to be returned to JavaScript
+        func _swift_js_return_optional_object(_ isSome: Int32, _ objectId: Int32) {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+
+        switch consume self {
+        case .none:
+            _swift_js_return_optional_object(0, 0)
+        case .some(let wrapper):
+            let retainedId = wrapper.bridgeJSLowerReturn()
             _swift_js_return_optional_object(1, retainedId)
         }
     }

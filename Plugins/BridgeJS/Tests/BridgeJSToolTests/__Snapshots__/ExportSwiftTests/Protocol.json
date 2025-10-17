@@ -1,0 +1,305 @@
+{
+  "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_MyViewController_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "delegate",
+            "name" : "delegate",
+            "type" : {
+              "swiftProtocol" : {
+                "_0" : "MyViewControllerDelegate"
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_MyViewController_triggerEvent",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "triggerEvent",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MyViewController_updateValue",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "updateValue",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "value",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MyViewController_updateCount",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "updateCount",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "count",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MyViewController_updateLabel",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "updateLabel",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "prefix",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "_",
+              "name" : "suffix",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MyViewController_checkEvenCount",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "checkEvenCount",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "MyViewController",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "delegate",
+          "type" : {
+            "swiftProtocol" : {
+              "_0" : "MyViewControllerDelegate"
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "secondDelegate",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "swiftProtocol" : {
+                  "_0" : "MyViewControllerDelegate"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "MyViewController"
+    }
+  ],
+  "enums" : [
+
+  ],
+  "functions" : [
+
+  ],
+  "moduleName" : "TestModule",
+  "protocols" : [
+    {
+      "methods" : [
+        {
+          "abiName" : "bjs_MyViewControllerDelegate_onSomethingHappened",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "onSomethingHappened",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MyViewControllerDelegate_onValueChanged",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "onValueChanged",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "value",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MyViewControllerDelegate_onCountUpdated",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "onCountUpdated",
+          "parameters" : [
+            {
+              "label" : "count",
+              "name" : "count",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MyViewControllerDelegate_onLabelUpdated",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "onLabelUpdated",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "prefix",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "_",
+              "name" : "suffix",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MyViewControllerDelegate_isCountEven",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "isCountEven",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "MyViewControllerDelegate"
+    }
+  ]
+}

@@ -6,6 +6,47 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
+struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    func increment(by amount: Int) {
+    @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_increment")
+    func _extern_increment(this: Int32, amount: Int32)
+    _extern_increment(this: Int32(bitPattern: jsObject.id), amount: amount.bridgeJSLowerParameter())
+    }
+
+    func getValue() -> Int {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_getValue")
+        func _extern_getValue(this: Int32) -> Int32
+        let ret = _extern_getValue(this: Int32(bitPattern: jsObject.id))
+        return Int.bridgeJSLiftReturn(ret)
+    }
+
+    func setLabelElements(_ labelPrefix: String, _ labelSuffix: String) {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_setLabelElements")
+        func _extern_setLabelElements(this: Int32, labelPrefix: Int32, labelSuffix: Int32)
+        _extern_setLabelElements(this: Int32(bitPattern: jsObject.id), labelPrefix: labelPrefix.bridgeJSLowerParameter(), labelSuffix: labelSuffix.bridgeJSLowerParameter())
+    }
+
+    func getLabel() -> String {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_getLabel")
+        func _extern_getLabel(this: Int32) -> Int32
+        let ret = _extern_getLabel(this: Int32(bitPattern: jsObject.id))
+        return String.bridgeJSLiftReturn(ret)
+    }
+
+    func isEven() -> Bool {
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Counter_isEven")
+        func _extern_isEven(this: Int32) -> Int32
+        let ret = _extern_isEven(this: Int32(bitPattern: jsObject.id))
+        return Bool.bridgeJSLiftReturn(ret)
+    }
+
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyCounter(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
 extension Direction: _BridgedSwiftCaseEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         return bridgeJSRawValue
@@ -3241,5 +3282,249 @@ extension StaticPropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
         }
         #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_StaticPropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+@_expose(wasm, "bjs_CounterManager_init")
+@_cdecl("bjs_CounterManager_init")
+public func _bjs_CounterManager_init(counter: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = CounterManager(counter: AnyCounter.bridgeJSLiftParameter(counter))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_CounterManager_incrementByAmount")
+@_cdecl("bjs_CounterManager_incrementByAmount")
+public func _bjs_CounterManager_incrementByAmount(_self: UnsafeMutableRawPointer, amount: Int32) -> Void {
+    #if arch(wasm32)
+    CounterManager.bridgeJSLiftParameter(_self).incrementByAmount(_: Int.bridgeJSLiftParameter(amount))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_CounterManager_setCounterLabel")
+@_cdecl("bjs_CounterManager_setCounterLabel")
+public func _bjs_CounterManager_setCounterLabel(_self: UnsafeMutableRawPointer, prefixBytes: Int32, prefixLength: Int32, suffixBytes: Int32, suffixLength: Int32) -> Void {
+    #if arch(wasm32)
+    CounterManager.bridgeJSLiftParameter(_self).setCounterLabel(_: String.bridgeJSLiftParameter(prefixBytes, prefixLength), _: String.bridgeJSLiftParameter(suffixBytes, suffixLength))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_CounterManager_isCounterEven")
+@_cdecl("bjs_CounterManager_isCounterEven")
+public func _bjs_CounterManager_isCounterEven(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = CounterManager.bridgeJSLiftParameter(_self).isCounterEven()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_CounterManager_getCounterLabel")
+@_cdecl("bjs_CounterManager_getCounterLabel")
+public func _bjs_CounterManager_getCounterLabel(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = CounterManager.bridgeJSLiftParameter(_self).getCounterLabel()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_CounterManager_getCurrentValue")
+@_cdecl("bjs_CounterManager_getCurrentValue")
+public func _bjs_CounterManager_getCurrentValue(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = CounterManager.bridgeJSLiftParameter(_self).getCurrentValue()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_CounterManager_incrementBoth")
+@_cdecl("bjs_CounterManager_incrementBoth")
+public func _bjs_CounterManager_incrementBoth(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    CounterManager.bridgeJSLiftParameter(_self).incrementBoth()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_CounterManager_getBackupValue")
+@_cdecl("bjs_CounterManager_getBackupValue")
+public func _bjs_CounterManager_getBackupValue(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = CounterManager.bridgeJSLiftParameter(_self).getBackupValue()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_CounterManager_hasBackup")
+@_cdecl("bjs_CounterManager_hasBackup")
+public func _bjs_CounterManager_hasBackup(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = CounterManager.bridgeJSLiftParameter(_self).hasBackup()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_CounterManager_counter_get")
+@_cdecl("bjs_CounterManager_counter_get")
+public func _bjs_CounterManager_counter_get(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = CounterManager.bridgeJSLiftParameter(_self).counter as! AnyCounter
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_CounterManager_counter_set")
+@_cdecl("bjs_CounterManager_counter_set")
+public func _bjs_CounterManager_counter_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+    #if arch(wasm32)
+    CounterManager.bridgeJSLiftParameter(_self).counter = AnyCounter.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_CounterManager_backupCounter_get")
+@_cdecl("bjs_CounterManager_backupCounter_get")
+public func _bjs_CounterManager_backupCounter_get(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = CounterManager.bridgeJSLiftParameter(_self).backupCounter.flatMap {
+        $0 as? AnyCounter
+    }
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_CounterManager_backupCounter_set")
+@_cdecl("bjs_CounterManager_backupCounter_set")
+public func _bjs_CounterManager_backupCounter_set(_self: UnsafeMutableRawPointer, valueIsSome: Int32, valueValue: Int32) -> Void {
+    #if arch(wasm32)
+    CounterManager.bridgeJSLiftParameter(_self).backupCounter = Optional<AnyCounter>.bridgeJSLiftParameter(valueIsSome, valueValue)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_CounterManager_deinit")
+@_cdecl("bjs_CounterManager_deinit")
+public func _bjs_CounterManager_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<CounterManager>.fromOpaque(pointer).release()
+}
+
+extension CounterManager: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        #if arch(wasm32)
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_CounterManager_wrap")
+        func _bjs_CounterManager_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_CounterManager_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_CounterManager_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+@_expose(wasm, "bjs_SwiftCounter_init")
+@_cdecl("bjs_SwiftCounter_init")
+public func _bjs_SwiftCounter_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = SwiftCounter()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_increment")
+@_cdecl("bjs_SwiftCounter_increment")
+public func _bjs_SwiftCounter_increment(_self: UnsafeMutableRawPointer, amount: Int32) -> Void {
+    #if arch(wasm32)
+    SwiftCounter.bridgeJSLiftParameter(_self).increment(by: Int.bridgeJSLiftParameter(amount))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_getValue")
+@_cdecl("bjs_SwiftCounter_getValue")
+public func _bjs_SwiftCounter_getValue(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = SwiftCounter.bridgeJSLiftParameter(_self).getValue()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_setLabelElements")
+@_cdecl("bjs_SwiftCounter_setLabelElements")
+public func _bjs_SwiftCounter_setLabelElements(_self: UnsafeMutableRawPointer, labelPrefixBytes: Int32, labelPrefixLength: Int32, labelSuffixBytes: Int32, labelSuffixLength: Int32) -> Void {
+    #if arch(wasm32)
+    SwiftCounter.bridgeJSLiftParameter(_self).setLabelElements(_: String.bridgeJSLiftParameter(labelPrefixBytes, labelPrefixLength), _: String.bridgeJSLiftParameter(labelSuffixBytes, labelSuffixLength))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_getLabel")
+@_cdecl("bjs_SwiftCounter_getLabel")
+public func _bjs_SwiftCounter_getLabel(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = SwiftCounter.bridgeJSLiftParameter(_self).getLabel()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_isEven")
+@_cdecl("bjs_SwiftCounter_isEven")
+public func _bjs_SwiftCounter_isEven(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = SwiftCounter.bridgeJSLiftParameter(_self).isEven()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftCounter_deinit")
+@_cdecl("bjs_SwiftCounter_deinit")
+public func _bjs_SwiftCounter_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<SwiftCounter>.fromOpaque(pointer).release()
+}
+
+extension SwiftCounter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        #if arch(wasm32)
+        @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SwiftCounter_wrap")
+        func _bjs_SwiftCounter_wrap(_: UnsafeMutableRawPointer) -> Int32
+        #else
+        func _bjs_SwiftCounter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+            fatalError("Only available on WebAssembly")
+        }
+        #endif
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_SwiftCounter_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
