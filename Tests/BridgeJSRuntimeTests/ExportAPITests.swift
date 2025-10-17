@@ -153,6 +153,7 @@ struct TestError: Error {
     case ok = 200
     case notFound = 404
     case serverError = 500
+    case unknown = -1
 }
 
 @JS(enumStyle: .tsEnum) enum TSDirection {

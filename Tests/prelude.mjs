@@ -401,6 +401,7 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.HttpStatus.Ok, 200);
     assert.equal(exports.HttpStatus.NotFound, 404);
     assert.equal(HttpStatusValues.ServerError, 500);
+    assert.equal(HttpStatusValues.Unknown, -1);
 
     assert.equal(exports.setTheme(exports.Theme.Light), exports.Theme.Light);
     assert.equal(exports.setTheme(exports.Theme.Dark), exports.Theme.Dark);
