@@ -1290,6 +1290,13 @@
           ],
           "name" : "serverError",
           "rawValue" : "500"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "unknown",
+          "rawValue" : "-1"
         }
       ],
       "emitStyle" : "const",
