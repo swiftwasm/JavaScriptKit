@@ -9,13 +9,5 @@
     },
     "dependencies": {
         "@bjorn3/browser_wasi_shim": "0.3.0"
-    },
-    "peerDependencies": {
-        "playwright": "^1.51.0"
-    },
-    "peerDependenciesMeta": {
-        "playwright": {
-            "optional": true
-        }
     }
 }
