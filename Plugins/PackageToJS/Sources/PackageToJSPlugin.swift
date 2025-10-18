@@ -446,6 +446,7 @@ extension PackageToJS.PackageOptions {
         let configuration: String? =
             (extractor.extractOption(named: "configuration") + extractor.extractSingleDashOption(named: "c")).last
         let packageName = extractor.extractOption(named: "package-name").last
+        let platform = extractor.extractOption(named: "platform").last
         let explain = extractor.extractFlag(named: "explain")
         let useCDN = extractor.extractFlag(named: "use-cdn")
         let verbose = extractor.extractFlag(named: "verbose")
@@ -454,6 +455,7 @@ extension PackageToJS.PackageOptions {
             outputPath: outputPath,
             configuration: configuration,
             packageName: packageName,
+            platform: platform,
             explain: explain != 0,
             verbose: verbose != 0,
             useCDN: useCDN != 0,
@@ -466,6 +468,7 @@ extension PackageToJS.PackageOptions {
               --output <path>            Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
               -c, --configuration <name> The build configuration to use (values: debug, release; default: debug)
               --package-name <name>      Name of the package (default: lowercased Package.swift name)
+              --platform <name>          Target platform for generated JavaScript (values: browser, node; default: browser)
               --use-cdn                  Whether to use CDN for dependency packages
               --enable-code-coverage     Whether to enable code coverage collection
               --explain                  Whether to explain the build plan
