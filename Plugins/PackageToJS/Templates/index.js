@@ -1,9 +1,24 @@
 // @ts-check
 import { instantiate } from './instantiate.js';
+/* #if TARGET_PLATFORM_NODE */
+import { defaultNodeSetup /* #if USE_SHARED_MEMORY */, createDefaultWorkerFactory /* #endif */} from './platforms/node.js';
+/* #else */
 import { defaultBrowserSetup /* #if USE_SHARED_MEMORY */, createDefaultWorkerFactory /* #endif */} from './platforms/browser.js';
+/* #endif */
 
 /** @type {import('./index.d').init} */
 export async function init(_options) {
+/* #if TARGET_PLATFORM_NODE */
+    /** @type {import('./platforms/node.d.ts').DefaultNodeSetupOptions} */
+    const options = _options || {};
+    const instantiateOptions = await defaultNodeSetup({
+        args: options.args,
+        onExit: options.onExit,
+/* #if USE_SHARED_MEMORY */
+        spawnWorker: options.spawnWorker || createDefaultWorkerFactory()
+/* #endif */
+    });
+/* #else */
     /** @type {import('./index.d').Options} */
     const options = _options || {
 /* #if HAS_IMPORTS */
@@ -24,5 +39,6 @@ export async function init(_options) {
         spawnWorker: createDefaultWorkerFactory()
 /* #endif */
     })
+/* #endif */
     return await instantiate(instantiateOptions);
 }
