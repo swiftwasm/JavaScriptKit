@@ -139,7 +139,9 @@ export async function defaultNodeSetup(options) {
 
     return {
         module,
+/* #if HAS_IMPORTS */
         getImports() { return {} },
+/* #endif */
 /* #if IS_WASI */
         wasi: Object.assign(wasi, {
             setInstance(instance) {
