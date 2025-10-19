@@ -4,6 +4,67 @@ import Testing
 @testable import PackageToJS
 
 @Suite struct MiniMakeTests {
+    final class InMemoryFileSystem: MiniMakeFileSystem {
+        struct FileEntry {
+            var content: Data
+            var modificationDate: Date
+            var isDirectory: Bool
+        }
+        private var storage: [URL: FileEntry] = [:]
+
+        struct MonotonicDateGenerator {
+            private var currentDate: Date
+
+            init(startingFrom date: Date = Date()) {
+                self.currentDate = date
+            }
+
+            mutating func next() -> Date {
+                currentDate = currentDate.addingTimeInterval(1)
+                return currentDate
+            }
+        }
+        var dateGenerator = MonotonicDateGenerator()
+
+        // MARK: - MiniMakeFileSystem conformance
+
+        func removeItem(at url: URL) throws {
+            storage.removeValue(forKey: url)
+        }
+
+        func fileExists(at url: URL) -> Bool {
+            return storage[url] != nil
+        }
+
+        func fileExists(at url: URL) -> (exists: Bool, isDirectory: Bool) {
+            if let entry = storage[url] {
+                return (true, entry.isDirectory)
+            } else {
+                return (false, false)
+            }
+        }
+
+        func modificationDate(of url: URL) throws -> Date? {
+            return storage[url]?.modificationDate
+        }
+
+        func writeFile(at url: URL, content: Data) {
+            storage[url] = FileEntry(content: content, modificationDate: dateGenerator.next(), isDirectory: false)
+        }
+
+        // MARK: - Helpers for tests
+
+        func touch(_ url: URL) {
+            let date = dateGenerator.next()
+            if var entry = storage[url] {
+                entry.modificationDate = date
+                storage[url] = entry
+            } else {
+                storage[url] = FileEntry(content: Data(), modificationDate: date, isDirectory: false)
+            }
+        }
+    }
+
     // Test basic task management functionality
     @Test func basicTaskManagement() throws {
         try withTemporaryDirectory { tempDir, _ in
@@ -114,7 +175,11 @@ import Testing
     // Test that rebuilds are controlled by timestamps
     @Test func timestampBasedRebuild() throws {
         try withTemporaryDirectory { tempDir, _ in
-            var make = MiniMake(printProgress: { _, _ in })
+            let fs = InMemoryFileSystem()
+            var make = MiniMake(
+                fileSystem: fs,
+                printProgress: { _, _ in }
+            )
             let prefix = BuildPath(prefix: "PREFIX")
             let scope = MiniMake.VariableScope(variables: [
                 "PREFIX": tempDir.path
@@ -123,25 +188,25 @@ import Testing
             let output = prefix.appending(path: "output.txt")
             var buildCount = 0
 
-            try "Initial".write(toFile: scope.resolve(path: input).path, atomically: true, encoding: .utf8)
+            // Create initial input file
+            fs.touch(scope.resolve(path: input))
 
             let task = make.addTask(inputFiles: [input], output: output) { task, scope in
                 buildCount += 1
-                let content = try String(contentsOfFile: scope.resolve(path: task.inputs[0]).path, encoding: .utf8)
-                try content.write(toFile: scope.resolve(path: task.output).path, atomically: true, encoding: .utf8)
+                fs.touch(scope.resolve(path: task.output))
             }
 
             // First build
-            try make.build(output: task, scope: scope)
+            #expect(throws: Never.self) { try make.build(output: task, scope: scope) }
             #expect(buildCount == 1, "First build should occur")
 
             // Second build without changes
-            try make.build(output: task, scope: scope)
+            #expect(throws: Never.self) { try make.build(output: task, scope: scope) }
             #expect(buildCount == 1, "No rebuild should occur if input is not modified")
 
             // Modify input and rebuild
-            try "Modified".write(toFile: scope.resolve(path: input).path, atomically: true, encoding: .utf8)
-            try make.build(output: task, scope: scope)
+            fs.touch(scope.resolve(path: input))
+            #expect(throws: Never.self) { try make.build(output: task, scope: scope) }
             #expect(buildCount == 2, "Should rebuild when input is modified")
         }
     }
