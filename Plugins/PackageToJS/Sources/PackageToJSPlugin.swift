@@ -442,10 +442,10 @@ private func printStderr(_ message: String) {
 
 extension ArgumentExtractor {
     mutating func extractPlatformOption(named name: String) throws -> PackageToJS.PackageOptions.Platform {
-        let stringValue : String? = self.extractOption(named: name).last
-        guard let stringValue else {
-            throw PackageToJSError("Missing value for option --\(name)")
+        guard let stringValue = self.extractOption(named: name).last else {
+            return .browser
         }
+
         guard let platform = PackageToJS.PackageOptions.Platform(rawValue: stringValue) else {
             throw PackageToJSError(
                 "Invalid platform: \(stringValue), expected one of \(PackageToJS.PackageOptions.Platform.allCases.map(\.rawValue).joined(separator: ", "))"
