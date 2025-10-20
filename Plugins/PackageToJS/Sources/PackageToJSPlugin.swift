@@ -175,7 +175,7 @@ struct PackageToJSPlugin: CommandPlugin {
         }
 
         var extractor = ArgumentExtractor(arguments)
-        let buildOptions = PackageToJS.BuildOptions.parse(from: &extractor)
+        let buildOptions = try PackageToJS.BuildOptions.parse(from: &extractor)
 
         if extractor.remainingArguments.count > 0 {
             printStderr(
@@ -239,7 +239,7 @@ struct PackageToJSPlugin: CommandPlugin {
         }
 
         var extractor = ArgumentExtractor(arguments)
-        let testOptions = PackageToJS.TestOptions.parse(from: &extractor)
+        let testOptions = try PackageToJS.TestOptions.parse(from: &extractor)
 
         if extractor.remainingArguments.count > 0 {
             printStderr(
@@ -440,13 +440,28 @@ private func printStderr(_ message: String) {
 
 // MARK: - Options parsing
 
+extension ArgumentExtractor {
+    mutating func extractPlatformOption(named name: String) throws -> PackageToJS.PackageOptions.Platform {
+        let stringValue : String? = self.extractOption(named: name).last
+        guard let stringValue else {
+            throw PackageToJSError("Missing value for option --\(name)")
+        }
+        guard let platform = PackageToJS.PackageOptions.Platform(rawValue: stringValue) else {
+            throw PackageToJSError(
+                "Invalid platform: \(stringValue), expected one of \(PackageToJS.PackageOptions.Platform.allCases.map(\.rawValue).joined(separator: ", "))"
+            )
+        }
+        return platform
+    }
+}
+
 extension PackageToJS.PackageOptions {
-    static func parse(from extractor: inout ArgumentExtractor) -> PackageToJS.PackageOptions {
+    static func parse(from extractor: inout ArgumentExtractor) throws -> PackageToJS.PackageOptions {
         let outputPath = extractor.extractOption(named: "output").last
         let configuration: String? =
             (extractor.extractOption(named: "configuration") + extractor.extractSingleDashOption(named: "c")).last
         let packageName = extractor.extractOption(named: "package-name").last
-        let platform = extractor.extractOption(named: "platform").last
+        let platform = try extractor.extractPlatformOption(named: "platform")
         let explain = extractor.extractFlag(named: "explain")
         let useCDN = extractor.extractFlag(named: "use-cdn")
         let verbose = extractor.extractFlag(named: "verbose")
@@ -468,7 +483,7 @@ extension PackageToJS.PackageOptions {
               --output <path>            Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
               -c, --configuration <name> The build configuration to use (values: debug, release; default: debug)
               --package-name <name>      Name of the package (default: lowercased Package.swift name)
-              --platform <name>          Target platform for generated JavaScript (values: browser, node; default: browser)
+              --platform <name>          Target platform for generated JavaScript (values: \(PackageToJS.PackageOptions.Platform.allCases.map(\.rawValue).joined(separator: ", ")); default: \(PackageToJS.PackageOptions.Platform.browser))
               --use-cdn                  Whether to use CDN for dependency packages
               --enable-code-coverage     Whether to enable code coverage collection
               --explain                  Whether to explain the build plan
@@ -478,7 +493,7 @@ extension PackageToJS.PackageOptions {
 }
 
 extension PackageToJS.BuildOptions {
-    static func parse(from extractor: inout ArgumentExtractor) -> PackageToJS.BuildOptions {
+    static func parse(from extractor: inout ArgumentExtractor) throws -> PackageToJS.BuildOptions {
         let product = extractor.extractOption(named: "product").last
         let noOptimize = extractor.extractFlag(named: "no-optimize")
         let rawDebugInfoFormat = extractor.extractOption(named: "debug-info-format").last
@@ -491,7 +506,7 @@ extension PackageToJS.BuildOptions {
             }
             debugInfoFormat = format
         }
-        let packageOptions = PackageToJS.PackageOptions.parse(from: &extractor)
+        let packageOptions = try PackageToJS.PackageOptions.parse(from: &extractor)
         return PackageToJS.BuildOptions(
             product: product,
             noOptimize: noOptimize != 0,
@@ -529,7 +544,7 @@ extension PackageToJS.BuildOptions {
 }
 
 extension PackageToJS.TestOptions {
-    static func parse(from extractor: inout ArgumentExtractor) -> PackageToJS.TestOptions {
+    static func parse(from extractor: inout ArgumentExtractor) throws -> PackageToJS.TestOptions {
         let buildOnly = extractor.extractFlag(named: "build-only")
         let listTests = extractor.extractFlag(named: "list-tests")
         let filter = extractor.extractOption(named: "filter")
@@ -537,7 +552,7 @@ extension PackageToJS.TestOptions {
         let environment = extractor.extractOption(named: "environment").last
         let inspect = extractor.extractFlag(named: "inspect")
         let extraNodeArguments = extractor.extractSingleDashOption(named: "Xnode")
-        let packageOptions = PackageToJS.PackageOptions.parse(from: &extractor)
+        let packageOptions = try PackageToJS.PackageOptions.parse(from: &extractor)
         var options = PackageToJS.TestOptions(
             buildOnly: buildOnly != 0,
             listTests: listTests != 0,
