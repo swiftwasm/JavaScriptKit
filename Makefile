@@ -3,6 +3,7 @@ SWIFT_SDK_ID ?= wasm32-unknown-wasi
 .PHONY: bootstrap
 bootstrap:
 	npm ci
+	cd Plugins/PackageToJS/Templates && npm ci
 
 .PHONY: unittest
 unittest:
