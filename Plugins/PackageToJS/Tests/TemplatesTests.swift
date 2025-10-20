@@ -37,7 +37,8 @@ import Foundation
         let enumerator = FileManager.default.enumerator(at: tempDir, includingPropertiesForKeys: nil)
         while let fileURL = enumerator?.nextObject() as? URL {
             guard !fileURL.hasDirectoryPath,
-                  fileURL.pathExtension == "js" || fileURL.pathExtension == "ts" else {
+                fileURL.pathExtension == "js" || fileURL.pathExtension == "ts"
+            else {
                 continue
             }
 
