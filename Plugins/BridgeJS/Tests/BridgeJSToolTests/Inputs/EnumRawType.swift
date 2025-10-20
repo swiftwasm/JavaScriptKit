@@ -28,7 +28,7 @@
 }
 
 @JS enum Priority: Int32 {
-    case lowest = 1
+    case lowest = -1
     case low = 2
     case medium = 3
     case high = 4

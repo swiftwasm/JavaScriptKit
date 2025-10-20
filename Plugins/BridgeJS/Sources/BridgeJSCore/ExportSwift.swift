@@ -981,12 +981,23 @@ public class ExportSwift {
                         rawValue = stringLiteral.segments.first?.as(StringSegmentSyntax.self)?.content.text
                     } else if let boolLiteral = element.rawValue?.value.as(BooleanLiteralExprSyntax.self) {
                         rawValue = boolLiteral.literal.text
-                    } else if let intLiteral = element.rawValue?.value.as(IntegerLiteralExprSyntax.self) {
-                        rawValue = intLiteral.literal.text
-                    } else if let floatLiteral = element.rawValue?.value.as(FloatLiteralExprSyntax.self) {
-                        rawValue = floatLiteral.literal.text
                     } else {
-                        rawValue = nil
+                        var numericExpr = element.rawValue?.value
+                        var isNegative = false
+                        if let prefixExpr = numericExpr?.as(PrefixOperatorExprSyntax.self),
+                            prefixExpr.operator.text == "-"
+                        {
+                            numericExpr = prefixExpr.expression
+                            isNegative = true
+                        }
+
+                        if let intLiteral = numericExpr?.as(IntegerLiteralExprSyntax.self) {
+                            rawValue = isNegative ? "-\(intLiteral.literal.text)" : intLiteral.literal.text
+                        } else if let floatLiteral = numericExpr?.as(FloatLiteralExprSyntax.self) {
+                            rawValue = isNegative ? "-\(floatLiteral.literal.text)" : floatLiteral.literal.text
+                        } else {
+                            rawValue = nil
+                        }
                     }
                 } else {
                     rawValue = nil

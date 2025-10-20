@@ -37,7 +37,7 @@ export enum TSHttpStatus {
 }
 
 export const PriorityValues: {
-    readonly Lowest: 1;
+    readonly Lowest: -1;
     readonly Low: 2;
     readonly Medium: 3;
     readonly High: 4;

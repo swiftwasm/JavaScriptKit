@@ -93,14 +93,18 @@ struct MiniMake {
     private var tasks: [TaskKey: Task]
     /// Whether to explain why tasks are built
     private var shouldExplain: Bool
+    /// File system operations
+    private var fileSystem: MiniMakeFileSystem
     /// Prints progress of the build
     private var printProgress: ProgressPrinter.PrintProgress
 
     init(
         explain: Bool = false,
+        fileSystem: MiniMakeFileSystem = DefaultMiniMakeFileSystem(),
         printProgress: @escaping ProgressPrinter.PrintProgress
     ) {
         self.tasks = [:]
+        self.fileSystem = fileSystem
         self.shouldExplain = explain
         self.printProgress = printProgress
     }
@@ -222,7 +226,7 @@ struct MiniMake {
     /// Cleans all outputs of all tasks
     func cleanEverything(scope: VariableScope) {
         for task in self.tasks.values {
-            try? FileManager.default.removeItem(at: scope.resolve(path: task.output))
+            try? fileSystem.removeItem(at: scope.resolve(path: task.output))
         }
     }
 
@@ -234,26 +238,20 @@ struct MiniMake {
                 return true
             }
             let outputURL = scope.resolve(path: task.output)
-            if !FileManager.default.fileExists(atPath: outputURL.path) {
+            if !fileSystem.fileExists(at: outputURL) {
                 explain("Task \(task.output) should be built because it doesn't exist")
                 return true
             }
-            let outputMtime = try? outputURL.resourceValues(forKeys: [.contentModificationDateKey])
-                .contentModificationDate
+            let outputMtime = try? fileSystem.modificationDate(of: outputURL)
             return task.inputs.contains { input in
                 let inputURL = scope.resolve(path: input)
                 // Ignore directory modification times
-                var isDirectory: ObjCBool = false
-                let fileExists = FileManager.default.fileExists(
-                    atPath: inputURL.path,
-                    isDirectory: &isDirectory
-                )
-                if fileExists && isDirectory.boolValue {
+                let (fileExists, isDirectory) = fileSystem.fileExists(at: inputURL)
+                if fileExists && isDirectory {
                     return false
                 }
 
-                let inputMtime = try? inputURL.resourceValues(forKeys: [.contentModificationDateKey]
-                ).contentModificationDate
+                let inputMtime = try? fileSystem.modificationDate(of: inputURL)
                 let shouldBuild =
                     outputMtime == nil || inputMtime == nil || outputMtime! < inputMtime!
                 if shouldBuild {
@@ -335,5 +333,34 @@ struct BuildPath: Encodable, Hashable, CustomStringConvertible {
     func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.description)
+    }
+}
+
+/// Abstraction over file system operations
+protocol MiniMakeFileSystem {
+    func removeItem(at url: URL) throws
+    func fileExists(at url: URL) -> Bool
+    func fileExists(at url: URL) -> (exists: Bool, isDirectory: Bool)
+    func modificationDate(of url: URL) throws -> Date?
+}
+
+/// Default implementation of MiniMakeFileSystem using FileManager
+struct DefaultMiniMakeFileSystem: MiniMakeFileSystem {
+    func removeItem(at url: URL) throws {
+        try FileManager.default.removeItem(at: url)
+    }
+
+    func fileExists(at url: URL) -> Bool {
+        FileManager.default.fileExists(atPath: url.path)
+    }
+
+    func fileExists(at url: URL) -> (exists: Bool, isDirectory: Bool) {
+        var isDirectory: ObjCBool = false
+        let exists = FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory)
+        return (exists, isDirectory.boolValue)
+    }
+
+    func modificationDate(of url: URL) throws -> Date? {
+        try url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
     }
 }
