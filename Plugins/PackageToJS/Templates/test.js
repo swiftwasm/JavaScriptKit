@@ -96,7 +96,7 @@ Please run the following command to install it:
             process.exit(1);
         }
     })();
-    const browser = await playwright.chromium.launch();
+    const browser = await playwright[options.playwright?.browser ?? "chromium"].launch(options.playwright?.launchOptions ?? {});
     const context = await browser.newContext();
     const page = await context.newPage();
 

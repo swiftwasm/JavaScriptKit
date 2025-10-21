@@ -9,8 +9,15 @@ export type SetupOptionsFn = (
 
 export function testBrowser(
     options: {
+        /** Path to the prelude script to be injected before tests run */
         preludeScript?: string,
+        /** Command-line arguments to pass to the test runner */
         args?: string[],
+        /** Options for Playwright browser */
+        playwright?: {
+            browser?: string,
+            launchOptions?: import("playwright").LaunchOptions
+        }
     }
 ): Promise<number>
 

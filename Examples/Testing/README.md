@@ -31,3 +31,10 @@ llvm-cov show -instr-profile=.build/plugins/PackageToJS/outputs/PackageTests/def
 ```console
 npx serve .build/coverage/html
 ```
+## Customize test harness
+
+See [./run-tests-with-browser-options.mjs](./run-tests-with-browser-options.mjs) for an example of customizing the test harness to run tests with specific browser options.
+
+```console
+node run-tests-with-browser-options.mjs
+```
