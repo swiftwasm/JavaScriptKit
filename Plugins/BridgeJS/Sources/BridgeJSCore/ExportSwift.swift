@@ -24,6 +24,8 @@ public class ExportSwift {
     private var exportedFunctions: [ExportedFunction] = []
     private var exportedClasses: [ExportedClass] = []
     private var exportedEnums: [ExportedEnum] = []
+    private var exportedProtocols: [ExportedProtocol] = []
+    private var exportedProtocolNameByKey: [String: String] = [:]
     private var typeDeclResolver: TypeDeclResolver = TypeDeclResolver()
     private let enumCodegen: EnumCodegen = EnumCodegen()
 
@@ -64,7 +66,8 @@ public class ExportSwift {
                 moduleName: moduleName,
                 functions: exportedFunctions,
                 classes: exportedClasses,
-                enums: exportedEnums
+                enums: exportedEnums,
+                protocols: exportedProtocols
             )
         )
     }
@@ -77,10 +80,13 @@ public class ExportSwift {
         /// The names of the exported enums, in the order they were written in the source file
         var exportedEnumNames: [String] = []
         var exportedEnumByName: [String: ExportedEnum] = [:]
+        /// The names of the exported protocols, in the order they were written in the source file
+        var exportedProtocolNames: [String] = []
+        var exportedProtocolByName: [String: ExportedProtocol] = [:]
         var errors: [DiagnosticError] = []
 
-        /// Creates a unique key for a class by combining name and namespace
-        private func classKey(name: String, namespace: [String]?) -> String {
+        /// Creates a unique key by combining name and namespace
+        private func makeKey(name: String, namespace: [String]?) -> String {
             if let namespace = namespace, !namespace.isEmpty {
                 return "\(namespace.joined(separator: ".")).\(name)"
             } else {
@@ -88,19 +94,39 @@ public class ExportSwift {
             }
         }
 
-        /// Creates a unique key for an enum by combining name and namespace
-        private func enumKey(name: String, namespace: [String]?) -> String {
-            if let namespace = namespace, !namespace.isEmpty {
-                return "\(namespace.joined(separator: ".")).\(name)"
-            } else {
-                return name
+        struct NamespaceResolution {
+            let namespace: [String]?
+            let isValid: Bool
+        }
+
+        /// Resolves and validates namespace from both @JS attribute and computed (nested) namespace
+        /// Returns the effective namespace and whether validation succeeded
+        private func resolveNamespace(
+            from jsAttribute: AttributeSyntax,
+            for node: some SyntaxProtocol,
+            declarationType: String
+        ) -> NamespaceResolution {
+            let attributeNamespace = extractNamespace(from: jsAttribute)
+            let computedNamespace = computeNamespace(for: node)
+
+            if computedNamespace != nil && attributeNamespace != nil {
+                diagnose(
+                    node: jsAttribute,
+                    message: "Nested \(declarationType)s cannot specify their own namespace",
+                    hint:
+                        "Remove the namespace from @JS attribute - nested \(declarationType)s inherit namespace from parent"
+                )
+                return NamespaceResolution(namespace: nil, isValid: false)
             }
+
+            return NamespaceResolution(namespace: computedNamespace ?? attributeNamespace, isValid: true)
         }
 
         enum State {
             case topLevel
             case classBody(name: String, key: String)
             case enumBody(name: String, key: String)
+            case protocolBody(name: String, key: String)
         }
 
         struct StateStack {
@@ -386,6 +412,42 @@ public class ExportSwift {
             return nil
         }
 
+        /// Shared parameter parsing logic used by functions, initializers, and protocol methods
+        private func parseParameters(
+            from parameterClause: FunctionParameterClauseSyntax,
+            allowDefaults: Bool = true
+        ) -> [Parameter] {
+            var parameters: [Parameter] = []
+
+            for param in parameterClause.parameters {
+                let resolvedType = self.parent.lookupType(for: param.type)
+
+                if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
+                    diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)
+                    continue
+                }
+
+                guard let type = resolvedType else {
+                    diagnoseUnsupportedType(node: param.type, type: param.type.trimmedDescription)
+                    continue
+                }
+
+                let name = param.secondName?.text ?? param.firstName.text
+                let label = param.firstName.text
+
+                let defaultValue: DefaultValue?
+                if allowDefaults {
+                    defaultValue = extractDefaultValue(from: param.defaultValue, type: type)
+                } else {
+                    defaultValue = nil
+                }
+
+                parameters.append(Parameter(label: label, name: name, type: type, defaultValue: defaultValue))
+            }
+
+            return parameters
+        }
+
         override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
             guard node.attributes.hasJSAttribute() else {
                 return .skipChildren
@@ -426,6 +488,9 @@ public class ExportSwift {
                         exportedEnumByName[enumKey] = currentEnum
                     }
                 }
+                return .skipChildren
+            case .protocolBody(_, _):
+                // Protocol methods are handled in visitProtocolMethod during protocol parsing
                 return .skipChildren
             }
         }
@@ -470,27 +535,7 @@ public class ExportSwift {
                 )
             }
 
-            var parameters: [Parameter] = []
-            for param in node.signature.parameterClause.parameters {
-                let resolvedType = self.parent.lookupType(for: param.type)
-
-                if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
-                    diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)
-                    continue
-                }
-
-                guard let type = resolvedType else {
-                    diagnoseUnsupportedType(node: param.type, type: param.type.trimmedDescription)
-                    continue
-                }
-
-                let name = param.secondName?.text ?? param.firstName.text
-                let label = param.firstName.text
-
-                let defaultValue = extractDefaultValue(from: param.defaultValue, type: type)
-
-                parameters.append(Parameter(label: label, name: name, type: type, defaultValue: defaultValue))
-            }
+            let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: true)
             let returnType: BridgeType
             if let returnClause = node.signature.returnClause {
                 let resolvedType = self.parent.lookupType(for: returnClause.type)
@@ -529,6 +574,8 @@ public class ExportSwift {
 
                 let isNamespaceEnum = exportedEnumByName[enumKey]?.cases.isEmpty ?? true
                 staticContext = isNamespaceEnum ? .namespaceEnum : .enumName(enumName)
+            case .protocolBody(_, _):
+                return nil
             }
 
             let classNameForABI: String?
@@ -638,19 +685,7 @@ public class ExportSwift {
                 )
             }
 
-            var parameters: [Parameter] = []
-            for param in node.signature.parameterClause.parameters {
-                guard let type = self.parent.lookupType(for: param.type) else {
-                    diagnoseUnsupportedType(node: param.type, type: param.type.trimmedDescription)
-                    continue
-                }
-                let name = param.secondName?.text ?? param.firstName.text
-                let label = param.firstName.text
-
-                let defaultValue = extractDefaultValue(from: param.defaultValue, type: type)
-
-                parameters.append(Parameter(label: label, name: name, type: type, defaultValue: defaultValue))
-            }
+            let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: true)
 
             guard let effects = collectEffects(signature: node.signature) else {
                 return .skipChildren
@@ -677,7 +712,7 @@ public class ExportSwift {
             let attributeNamespace = extractNamespace(from: jsAttribute)
             if attributeNamespace != nil {
                 diagnose(
-                    node: node.attributes.firstJSAttribute!,
+                    node: jsAttribute,
                     message: "Namespace parameter within @JS attribute is not supported for property declarations",
                     hint:
                         "Remove the namespace from @JS attribute. If you need dedicated namespace, consider using a nested enum or class instead."
@@ -713,6 +748,9 @@ public class ExportSwift {
 
             case .topLevel:
                 diagnose(node: node, message: "@JS var must be inside a @JS class or enum")
+                return .skipChildren
+            case .protocolBody(_, _):
+                diagnose(node: node, message: "Properties are not supported in protocols")
                 return .skipChildren
             }
 
@@ -785,20 +823,10 @@ public class ExportSwift {
                 return .skipChildren
             }
 
-            let attributeNamespace = extractNamespace(from: jsAttribute)
-            let computedNamespace = computeNamespace(for: node)
-
-            if computedNamespace != nil && attributeNamespace != nil {
-                diagnose(
-                    node: jsAttribute,
-                    message: "Nested classes cannot specify their own namespace",
-                    hint: "Remove the namespace from @JS attribute - nested classes inherit namespace from parent"
-                )
+            let namespaceResult = resolveNamespace(from: jsAttribute, for: node, declarationType: "class")
+            guard namespaceResult.isValid else {
                 return .skipChildren
             }
-
-            let effectiveNamespace = computedNamespace ?? attributeNamespace
-
             let swiftCallName = ExportSwift.computeSwiftCallName(for: node, itemName: name)
             let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
                 for: node,
@@ -811,9 +839,9 @@ public class ExportSwift {
                 constructor: nil,
                 methods: [],
                 properties: [],
-                namespace: effectiveNamespace
+                namespace: namespaceResult.namespace
             )
-            let uniqueKey = classKey(name: name, namespace: effectiveNamespace)
+            let uniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
 
             stateStack.push(state: .classBody(name: name, key: uniqueKey))
             exportedClassByName[uniqueKey] = exportedClass
@@ -829,10 +857,6 @@ public class ExportSwift {
         }
 
         override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
-            guard node.attributes.hasJSAttribute() else {
-                return .skipChildren
-            }
-
             guard let jsAttribute = node.attributes.firstJSAttribute else {
                 return .skipChildren
             }
@@ -844,19 +868,10 @@ public class ExportSwift {
                 return Constants.supportedRawTypes.contains(typeName)
             }?.type.trimmedDescription
 
-            let attributeNamespace = extractNamespace(from: jsAttribute)
-            let computedNamespace = computeNamespace(for: node)
-
-            if computedNamespace != nil && attributeNamespace != nil {
-                diagnose(
-                    node: jsAttribute,
-                    message: "Nested enums cannot specify their own namespace",
-                    hint: "Remove the namespace from @JS attribute - nested enums inherit namespace from parent"
-                )
+            let namespaceResult = resolveNamespace(from: jsAttribute, for: node, declarationType: "enum")
+            guard namespaceResult.isValid else {
                 return .skipChildren
             }
-
-            let effectiveNamespace = computedNamespace ?? attributeNamespace
             let emitStyle = extractEnumStyle(from: jsAttribute) ?? .const
             let swiftCallName = ExportSwift.computeSwiftCallName(for: node, itemName: name)
             let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
@@ -871,13 +886,13 @@ public class ExportSwift {
                 explicitAccessControl: explicitAccessControl,
                 cases: [],  // Will be populated in visit(EnumCaseDeclSyntax)
                 rawType: SwiftEnumRawType(rawType),
-                namespace: effectiveNamespace,
+                namespace: namespaceResult.namespace,
                 emitStyle: emitStyle,
                 staticMethods: [],
                 staticProperties: []
             )
 
-            let enumUniqueKey = enumKey(name: name, namespace: effectiveNamespace)
+            let enumUniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
             exportedEnumByName[enumUniqueKey] = exportedEnum
             exportedEnumNames.append(enumUniqueKey)
 
@@ -964,6 +979,100 @@ public class ExportSwift {
             }
 
             stateStack.pop()
+        }
+
+        override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
+            guard let jsAttribute = node.attributes.firstJSAttribute else {
+                return .skipChildren
+            }
+
+            let name = node.name.text
+
+            let namespaceResult = resolveNamespace(from: jsAttribute, for: node, declarationType: "protocol")
+            guard namespaceResult.isValid else {
+                return .skipChildren
+            }
+            _ = computeExplicitAtLeastInternalAccessControl(
+                for: node,
+                message: "Protocol visibility must be at least internal"
+            )
+
+            var methods: [ExportedFunction] = []
+            for member in node.memberBlock.members {
+                if let funcDecl = member.decl.as(FunctionDeclSyntax.self) {
+                    if let exportedFunction = visitProtocolMethod(
+                        node: funcDecl,
+                        protocolName: name,
+                        namespace: namespaceResult.namespace
+                    ) {
+                        methods.append(exportedFunction)
+                    }
+                }
+            }
+
+            let exportedProtocol = ExportedProtocol(
+                name: name,
+                methods: methods,
+                namespace: namespaceResult.namespace
+            )
+
+            let protocolUniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
+            exportedProtocolByName[protocolUniqueKey] = exportedProtocol
+            exportedProtocolNames.append(protocolUniqueKey)
+
+            parent.exportedProtocolNameByKey[protocolUniqueKey] = name
+
+            return .skipChildren
+        }
+
+        private func visitProtocolMethod(
+            node: FunctionDeclSyntax,
+            protocolName: String,
+            namespace: [String]?
+        ) -> ExportedFunction? {
+            let name = node.name.text
+
+            let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: false)
+
+            let returnType: BridgeType
+            if let returnClause = node.signature.returnClause {
+                let resolvedType = self.parent.lookupType(for: returnClause.type)
+
+                if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
+                    diagnoseNestedOptional(node: returnClause.type, type: returnClause.type.trimmedDescription)
+                    return nil
+                }
+
+                guard let type = resolvedType else {
+                    diagnoseUnsupportedType(node: returnClause.type, type: returnClause.type.trimmedDescription)
+                    return nil
+                }
+                returnType = type
+            } else {
+                returnType = .void
+            }
+
+            let abiName = ABINameGenerator.generateABIName(
+                baseName: name,
+                namespace: namespace,
+                staticContext: nil,
+                operation: nil,
+                className: protocolName
+            )
+
+            guard let effects = collectEffects(signature: node.signature) else {
+                return nil
+            }
+
+            return ExportedFunction(
+                name: name,
+                abiName: abiName,
+                parameters: parameters,
+                returnType: returnType,
+                effects: effects,
+                namespace: namespace,
+                staticContext: nil
+            )
         }
 
         override func visit(_ node: EnumCaseDeclSyntax) -> SyntaxVisitorContinueKind {
@@ -1095,6 +1204,12 @@ public class ExportSwift {
                 collector.exportedEnumByName[$0]!
             }
         )
+        exportedProtocols.append(
+            contentsOf: collector.exportedProtocolNames.map {
+                collector.exportedProtocolByName[$0]!
+            }
+        )
+
         return collector.errors
     }
 
@@ -1163,8 +1278,18 @@ public class ExportSwift {
             return primitiveType
         }
 
+        let protocolKey = typeName
+        if let protocolName = exportedProtocolNameByKey[protocolKey] {
+            return .swiftProtocol(protocolName)
+        }
+
         guard let typeDecl = typeDeclResolver.resolve(type) else {
             return nil
+        }
+
+        if typeDecl.is(ProtocolDeclSyntax.self) {
+            let swiftCallName = ExportSwift.computeSwiftCallName(for: typeDecl, itemName: typeDecl.name.text)
+            return .swiftProtocol(swiftCallName)
         }
 
         if let enumDecl = typeDecl.as(EnumDeclSyntax.self) {
@@ -1220,10 +1345,17 @@ public class ExportSwift {
 
     func renderSwiftGlue() throws -> String? {
         var decls: [DeclSyntax] = []
-        guard exportedFunctions.count > 0 || exportedClasses.count > 0 || exportedEnums.count > 0 else {
+        guard
+            exportedFunctions.count > 0 || exportedClasses.count > 0 || exportedEnums.count > 0
+                || exportedProtocols.count > 0
+        else {
             return nil
         }
         decls.append(Self.prelude)
+
+        for proto in exportedProtocols {
+            decls.append(try renderProtocolWrapper(protocol: proto))
+        }
 
         for enumDef in exportedEnums {
             switch enumDef.enumType {
@@ -1343,7 +1475,26 @@ public class ExportSwift {
             if returnType == .void {
                 return CodeBlockItemSyntax(item: .init(ExpressionStmtSyntax(expression: callExpr)))
             } else {
-                return CodeBlockItemSyntax(item: .init(DeclSyntax("let ret = \(raw: callExpr)")))
+                switch returnType {
+                case .swiftProtocol(let protocolName):
+                    let wrapperName = "Any\(protocolName)"
+                    return CodeBlockItemSyntax(
+                        item: .init(DeclSyntax("let ret = \(raw: callExpr) as! \(raw: wrapperName)"))
+                    )
+                case .optional(let wrappedType):
+                    if case .swiftProtocol(let protocolName) = wrappedType {
+                        let wrapperName = "Any\(protocolName)"
+                        return CodeBlockItemSyntax(
+                            item: .init(
+                                DeclSyntax("let ret = (\(raw: callExpr)).flatMap { $0 as? \(raw: wrapperName) }")
+                            )
+                        )
+                    } else {
+                        return CodeBlockItemSyntax(item: .init(DeclSyntax("let ret = \(raw: callExpr)")))
+                    }
+                default:
+                    return CodeBlockItemSyntax(item: .init(DeclSyntax("let ret = \(raw: callExpr)")))
+                }
             }
         }
 
@@ -1356,7 +1507,20 @@ public class ExportSwift {
             if returnType == .void {
                 append("\(raw: name)")
             } else {
-                append("let ret = \(raw: name)")
+                switch returnType {
+                case .swiftProtocol(let protocolName):
+                    let wrapperName = "Any\(protocolName)"
+                    append("let ret = \(raw: name) as! \(raw: wrapperName)")
+                case .optional(let wrappedType):
+                    if case .swiftProtocol(let protocolName) = wrappedType {
+                        let wrapperName = "Any\(protocolName)"
+                        append("let ret = \(raw: name).flatMap { $0 as? \(raw: wrapperName) }")
+                    } else {
+                        append("let ret = \(raw: name)")
+                    }
+                default:
+                    append("let ret = \(raw: name)")
+                }
             }
         }
 
@@ -1374,7 +1538,20 @@ public class ExportSwift {
             if returnType == .void {
                 append("\(raw: selfExpr).\(raw: propertyName)")
             } else {
-                append("let ret = \(raw: selfExpr).\(raw: propertyName)")
+                switch returnType {
+                case .swiftProtocol(let protocolName):
+                    let wrapperName = "Any\(protocolName)"
+                    append("let ret = \(raw: selfExpr).\(raw: propertyName) as! \(raw: wrapperName)")
+                case .optional(let wrappedType):
+                    if case .swiftProtocol(let protocolName) = wrappedType {
+                        let wrapperName = "Any\(protocolName)"
+                        append("let ret = \(raw: selfExpr).\(raw: propertyName).flatMap { $0 as? \(raw: wrapperName) }")
+                    } else {
+                        append("let ret = \(raw: selfExpr).\(raw: propertyName)")
+                    }
+                default:
+                    append("let ret = \(raw: selfExpr).\(raw: propertyName)")
+                }
             }
         }
 
@@ -1930,6 +2107,90 @@ public class ExportSwift {
             }
             """
     }
+
+    /// Generates an AnyProtocol wrapper struct for a protocol
+    ///
+    /// Creates a struct that wraps a JSObject and implements protocol methods
+    /// by calling `@_extern(wasm)` functions that forward to JavaScript
+    func renderProtocolWrapper(protocol proto: ExportedProtocol) throws -> DeclSyntax {
+        let wrapperName = "Any\(proto.name)"
+        let protocolName = proto.name
+
+        var methodDecls: [DeclSyntax] = []
+
+        for method in proto.methods {
+            var swiftParams: [String] = []
+            for param in method.parameters {
+                let label = param.label ?? param.name
+                if label == param.name {
+                    swiftParams.append("\(param.name): \(param.type.swiftType)")
+                } else {
+                    swiftParams.append("\(label) \(param.name): \(param.type.swiftType)")
+                }
+            }
+
+            var externParams: [String] = ["this: Int32"]
+            for param in method.parameters {
+                let loweringInfo = try param.type.loweringParameterInfo()
+                assert(
+                    loweringInfo.loweredParameters.count == 1,
+                    "Protocol parameters must lower to a single WASM type"
+                )
+                let (_, wasmType) = loweringInfo.loweredParameters[0]
+                externParams.append("\(param.name): \(wasmType.swiftType)")
+            }
+
+            var callArgs: [String] = ["this: Int32(bitPattern: jsObject.id)"]
+            for param in method.parameters {
+                callArgs.append("\(param.name): \(param.name).bridgeJSLowerParameter()")
+            }
+
+            let returnTypeStr: String
+            let externReturnType: String
+            let callCode: DeclSyntax
+
+            if method.returnType == .void {
+                returnTypeStr = ""
+                externReturnType = ""
+                callCode = """
+                    _extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
+                    """
+            } else {
+                returnTypeStr = " -> \(method.returnType.swiftType)"
+                let liftingInfo = try method.returnType.liftingReturnInfo()
+                if let abiType = liftingInfo.valueToLift {
+                    externReturnType = " -> \(abiType.swiftType)"
+                } else {
+                    externReturnType = ""
+                }
+                callCode = """
+                    let ret = _extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
+                        return \(raw: method.returnType.swiftType).bridgeJSLiftReturn(ret)
+                    """
+            }
+            let methodImplementation: DeclSyntax = """
+                func \(raw: method.name)(\(raw: swiftParams.joined(separator: ", ")))\(raw: returnTypeStr) {
+                    @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: method.abiName)")
+                    func _extern_\(raw: method.name)(\(raw: externParams.joined(separator: ", ")))\(raw: externReturnType)
+                    \(raw: callCode)
+                }
+                """
+
+            methodDecls.append(methodImplementation)
+        }
+
+        return """
+            struct \(raw: wrapperName): \(raw: protocolName), _BridgedSwiftProtocolWrapper {
+                let jsObject: JSObject
+                
+                \(raw: methodDecls.map { $0.description }.joined(separator: "\n\n"))
+                
+                static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+                    return \(raw: wrapperName)(jsObject: JSObject(id: UInt32(bitPattern: value)))
+                }
+            }
+            """
+    }
 }
 
 fileprivate enum Constants {
@@ -1994,6 +2255,7 @@ extension BridgeType {
         case .jsObject(nil): return "JSObject"
         case .jsObject(let name?): return name
         case .swiftHeapObject(let name): return name
+        case .swiftProtocol(let name): return "Any\(name)"
         case .void: return "Void"
         case .optional(let wrappedType): return "Optional<\(wrappedType.swiftType)>"
         case .caseEnum(let name): return name
@@ -2029,6 +2291,7 @@ extension BridgeType {
         case .string: return .string
         case .jsObject: return .jsObject
         case .swiftHeapObject: return .swiftHeapObject
+        case .swiftProtocol: return .jsObject
         case .void: return .void
         case .optional(let wrappedType):
             var optionalParams: [(name: String, type: WasmCoreType)] = [("isSome", .i32)]
@@ -2081,6 +2344,7 @@ extension BridgeType {
         case .string: return .string
         case .jsObject: return .jsObject
         case .swiftHeapObject: return .swiftHeapObject
+        case .swiftProtocol: return .jsObject
         case .void: return .void
         case .optional: return .optional
         case .caseEnum: return .caseEnum

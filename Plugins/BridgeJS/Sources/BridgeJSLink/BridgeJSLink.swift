@@ -240,7 +240,9 @@ struct BridgeJSLink {
                     enumPropertyPrinter.write("},")
 
                     if !property.isReadonly {
-                        let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+                        let setterThunkBuilder = ExportedThunkBuilder(
+                            effects: Effects(isAsync: false, isThrows: false)
+                        )
                         try setterThunkBuilder.lowerParameter(
                             param: Parameter(label: "value", name: "value", type: property.type)
                         )
@@ -298,6 +300,29 @@ struct BridgeJSLink {
                 }
             }
             data.importObjectBuilders.append(importObjectBuilder)
+        }
+
+        for skeleton in exportedSkeletons {
+            if !skeleton.protocols.isEmpty {
+                let importObjectBuilder: ImportObjectBuilder
+                if let existingBuilder = data.importObjectBuilders.first(where: { $0.moduleName == skeleton.moduleName }
+                ) {
+                    importObjectBuilder = existingBuilder
+                } else {
+                    importObjectBuilder = ImportObjectBuilder(moduleName: skeleton.moduleName)
+                    data.importObjectBuilders.append(importObjectBuilder)
+                }
+
+                for proto in skeleton.protocols {
+                    for method in proto.methods {
+                        try renderProtocolMethod(
+                            importObjectBuilder: importObjectBuilder,
+                            protocol: proto,
+                            method: method
+                        )
+                    }
+                }
+            }
         }
 
         return data
@@ -572,6 +597,22 @@ struct BridgeJSLink {
             """
         let printer = CodeFragmentPrinter(header: header)
         printer.nextLine()
+
+        for skeleton in exportedSkeletons {
+            for proto in skeleton.protocols {
+                printer.write("export interface \(proto.name) {")
+                printer.indent {
+                    for method in proto.methods {
+                        printer.write(
+                            "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                        )
+                    }
+                }
+                printer.write("}")
+                printer.nextLine()
+            }
+        }
+
         printer.write(lines: data.topLevelDtsEnumLines)
 
         // Generate Object types for const-style enums
@@ -1468,7 +1509,9 @@ extension BridgeJSLink {
 
         if !property.isReadonly {
             // Generate setter
-            let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+            let setterThunkBuilder = ExportedThunkBuilder(
+                effects: Effects(isAsync: false, isThrows: false)
+            )
             try setterThunkBuilder.lowerParameter(
                 param: Parameter(label: "value", name: "value", type: property.type)
             )
@@ -1539,7 +1582,9 @@ extension BridgeJSLink {
 
         if !property.isReadonly {
             // Generate setter
-            let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+            let setterThunkBuilder = ExportedThunkBuilder(
+                effects: Effects(isAsync: false, isThrows: false)
+            )
             try setterThunkBuilder.lowerParameter(
                 param: Parameter(label: "value", name: "value", type: property.type)
             )
@@ -1704,7 +1749,9 @@ extension BridgeJSLink {
 
                 // Generate static property setter if not readonly
                 if !property.isReadonly {
-                    let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+                    let setterThunkBuilder = ExportedThunkBuilder(
+                        effects: Effects(isAsync: false, isThrows: false)
+                    )
                     try setterThunkBuilder.lowerParameter(
                         param: Parameter(label: "value", name: "value", type: property.type)
                     )
@@ -1752,7 +1799,9 @@ extension BridgeJSLink {
 
                 // Generate instance property setter if not readonly
                 if !property.isReadonly {
-                    let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+                    let setterThunkBuilder = ExportedThunkBuilder(
+                        effects: Effects(isAsync: false, isThrows: false)
+                    )
                     setterThunkBuilder.lowerSelf()
                     try setterThunkBuilder.lowerParameter(
                         param: Parameter(label: "value", name: "value", type: property.type)
@@ -2367,6 +2416,25 @@ extension BridgeJSLink {
         )
         return (funcLines, [])
     }
+
+    func renderProtocolMethod(
+        importObjectBuilder: ImportObjectBuilder,
+        protocol: ExportedProtocol,
+        method: ExportedFunction
+    ) throws {
+        let thunkBuilder = ImportedThunkBuilder()
+        thunkBuilder.liftSelf()
+        for param in method.parameters {
+            try thunkBuilder.liftParameter(param: param)
+        }
+        let returnExpr = try thunkBuilder.callMethod(name: method.name, returnType: method.returnType)
+        let funcLines = thunkBuilder.renderFunction(
+            name: method.abiName,
+            returnExpr: returnExpr,
+            returnType: method.returnType
+        )
+        importObjectBuilder.assignToImportObject(name: method.abiName, function: funcLines)
+    }
 }
 
 struct BridgeJSLinkError: Error {
@@ -2401,6 +2469,8 @@ extension BridgeType {
         case .associatedValueEnum(let name):
             return "\(name)Tag"
         case .namespaceEnum(let name):
+            return name
+        case .swiftProtocol(let name):
             return name
         }
     }

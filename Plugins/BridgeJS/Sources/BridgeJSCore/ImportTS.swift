@@ -435,6 +435,8 @@ extension BridgeType {
         case .void: return .void
         case .swiftHeapObject:
             throw BridgeJSCoreError("swiftHeapObject is not supported in imported signatures")
+        case .swiftProtocol:
+            throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
         case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
             throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
         case .optional:
@@ -465,6 +467,8 @@ extension BridgeType {
         case .void: return .void
         case .swiftHeapObject:
             throw BridgeJSCoreError("swiftHeapObject is not supported in imported signatures")
+        case .swiftProtocol:
+            throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
         case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum:
             throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
         case .optional:

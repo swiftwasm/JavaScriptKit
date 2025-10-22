@@ -1162,6 +1162,352 @@
         }
       ],
       "swiftCallName" : "StaticPropertyHolder"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_CounterManager_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "counter",
+            "name" : "counter",
+            "type" : {
+              "swiftProtocol" : {
+                "_0" : "Counter"
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_CounterManager_incrementByAmount",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "incrementByAmount",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "amount",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_CounterManager_setCounterLabel",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "setCounterLabel",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "prefix",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "_",
+              "name" : "suffix",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_CounterManager_isCounterEven",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "isCounterEven",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "bool" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_CounterManager_getCounterLabel",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "getCounterLabel",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_CounterManager_getCurrentValue",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "getCurrentValue",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_CounterManager_incrementBoth",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "incrementBoth",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_CounterManager_getBackupValue",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "getBackupValue",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "optional" : {
+              "_0" : {
+                "int" : {
+
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_CounterManager_hasBackup",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "hasBackup",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "CounterManager",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "counter",
+          "type" : {
+            "swiftProtocol" : {
+              "_0" : "Counter"
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "backupCounter",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "swiftProtocol" : {
+                  "_0" : "Counter"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "CounterManager"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_SwiftCounter_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_SwiftCounter_increment",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "increment",
+          "parameters" : [
+            {
+              "label" : "by",
+              "name" : "amount",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_SwiftCounter_getValue",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "getValue",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_SwiftCounter_setLabelElements",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "setLabelElements",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "labelPrefix",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "_",
+              "name" : "labelSuffix",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_SwiftCounter_getLabel",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "getLabel",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_SwiftCounter_isEven",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "isEven",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "SwiftCounter",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "SwiftCounter"
     }
   ],
   "enums" : [
@@ -5435,5 +5781,122 @@
       }
     }
   ],
-  "moduleName" : "BridgeJSRuntimeTests"
+  "moduleName" : "BridgeJSRuntimeTests",
+  "protocols" : [
+    {
+      "methods" : [
+        {
+          "abiName" : "bjs_Counter_increment",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "increment",
+          "parameters" : [
+            {
+              "label" : "by",
+              "name" : "amount",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Counter_getValue",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "getValue",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Counter_setLabelElements",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "setLabelElements",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "labelPrefix",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "_",
+              "name" : "labelSuffix",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Counter_getLabel",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "getLabel",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Counter_isEven",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "isEven",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "Counter"
+    }
+  ]
 }

@@ -683,6 +683,7 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.testComplexInit(), "Hello, DefaultGreeter!");
     const customGreeter = new exports.Greeter("CustomName");
     assert.equal(exports.testComplexInit(customGreeter), "Hello, CustomName!");
+
     customGreeter.release();
 
     const cd1 = new exports.ConstructorDefaults();
@@ -704,6 +705,8 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     const cd5 = new exports.ConstructorDefaults("Test", 99, false, exports.Status.Loading);
     assert.equal(cd5.describe(), "Test:99:false:loading:nil");
     cd5.release();
+
+    testProtocolSupport(exports);
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
@@ -802,4 +805,104 @@ function setupTestGlobals(global) {
         sym: Symbol("s"),
         bi: BigInt(3)
     };
+}
+
+/** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
+function testProtocolSupport(exports) {
+    let counterValue = 0;
+    let counterLabel = "";
+    const jsCounter = {
+        increment(amount) { counterValue += amount; },
+        getValue() { return counterValue; },
+        setLabelElements(labelPrefix, labelSuffix) { counterLabel = labelPrefix + labelSuffix; },
+        getLabel() { return counterLabel; },
+        isEven() { return counterValue % 2 === 0; }
+    };
+
+    const manager = new exports.CounterManager(jsCounter);
+    manager.incrementByAmount(4);
+    assert.equal(manager.getCurrentValue(), 4);
+
+    manager.setCounterLabel("Test", "Label");
+    assert.equal(manager.getCounterLabel(), "TestLabel");
+    assert.equal(jsCounter.getLabel(), "TestLabel");
+
+    assert.equal(manager.isCounterEven(), true);
+    manager.incrementByAmount(1);
+    assert.equal(manager.isCounterEven(), false);
+    assert.equal(jsCounter.isEven(), false);
+
+    jsCounter.increment(3);
+    assert.equal(jsCounter.getValue(), 8);
+    manager.release();
+
+    const swiftCounter = new exports.SwiftCounter();
+    const swiftManager = new exports.CounterManager(swiftCounter);
+
+    swiftManager.incrementByAmount(10);
+    assert.equal(swiftManager.getCurrentValue(), 10);
+
+    swiftManager.setCounterLabel("Swift", "Label");
+    assert.equal(swiftManager.getCounterLabel(), "SwiftLabel");
+
+    swiftCounter.increment(5);
+    assert.equal(swiftCounter.getValue(), 15);
+    swiftManager.release();
+    swiftCounter.release();
+
+    let optionalCounterValue = 100;
+    let optionalCounterLabel = "optional";
+    const optionalCounter = {
+        increment(amount) { optionalCounterValue += amount; },
+        getValue() { return optionalCounterValue; },
+        setLabelElements(labelPrefix, labelSuffix) { optionalCounterLabel = labelPrefix + labelSuffix; },
+        getLabel() { return optionalCounterLabel; },
+        isEven() { return optionalCounterValue % 2 === 0; }
+    };
+
+    let mainCounterValue = 0;
+    let mainCounterLabel = "main";
+    const mainCounter = {
+        increment(amount) { mainCounterValue += amount; },
+        getValue() { return mainCounterValue; },
+        setLabelElements(labelPrefix, labelSuffix) { mainCounterLabel = labelPrefix + labelSuffix; },
+        getLabel() { return mainCounterLabel; },
+        isEven() { return mainCounterValue % 2 === 0; }
+    };
+
+    const managerWithOptional = new exports.CounterManager(mainCounter);
+
+    assert.equal(managerWithOptional.backupCounter, null);
+    assert.equal(managerWithOptional.hasBackup(), false);
+    assert.equal(managerWithOptional.getBackupValue(), null);
+
+    managerWithOptional.backupCounter = optionalCounter;
+    assert.notEqual(managerWithOptional.backupCounter, null);
+    assert.equal(managerWithOptional.hasBackup(), true);
+
+    managerWithOptional.incrementBoth();
+    assert.equal(managerWithOptional.getCurrentValue(), 1);
+    assert.equal(managerWithOptional.getBackupValue(), 101);
+
+    managerWithOptional.incrementBoth();
+    assert.equal(managerWithOptional.getCurrentValue(), 2);
+    assert.equal(managerWithOptional.getBackupValue(), 102);
+
+    managerWithOptional.backupCounter = null;
+    assert.equal(managerWithOptional.backupCounter, null);
+    assert.equal(managerWithOptional.hasBackup(), false);
+
+    managerWithOptional.incrementBoth();
+    assert.equal(managerWithOptional.getCurrentValue(), 3);
+    assert.equal(managerWithOptional.getBackupValue(), null);
+
+    const swiftBackupCounter = new exports.SwiftCounter();
+    swiftBackupCounter.increment(1);
+    managerWithOptional.backupCounter = swiftBackupCounter;
+
+    assert.equal(managerWithOptional.hasBackup(), true);
+    assert.equal(managerWithOptional.getBackupValue(), 1);
+
+    managerWithOptional.release();
+    swiftBackupCounter.release();
 }
