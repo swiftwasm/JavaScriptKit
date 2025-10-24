@@ -2,12 +2,19 @@ import Foundation
 
 struct PackageToJS {
     struct PackageOptions {
+        enum Platform: String, CaseIterable {
+            case browser
+            case node
+        }
+
         /// Path to the output directory
         var outputPath: String?
         /// The build configuration to use (default: debug)
         var configuration: String?
         /// Name of the package (default: lowercased Package.swift name)
         var packageName: String?
+        /// Target platform for the generated JavaScript (default: browser)
+        var defaultPlatform: Platform = .browser
         /// Whether to explain the build plan (default: false)
         var explain: Bool = false
         /// Whether to print verbose output
@@ -717,6 +724,8 @@ struct PackagingPlanner {
             "USE_WASI_CDN": options.useCDN,
             "HAS_BRIDGE": exportedSkeletons.count > 0 || importedSkeletons.count > 0,
             "HAS_IMPORTS": importedSkeletons.count > 0,
+            "TARGET_DEFAULT_PLATFORM_NODE": options.defaultPlatform == .node,
+            "TARGET_DEFAULT_PLATFORM_BROWSER": options.defaultPlatform == .browser,
         ]
         let constantSubstitutions: [String: String] = [
             "PACKAGE_TO_JS_MODULE_PATH": wasmFilename,
