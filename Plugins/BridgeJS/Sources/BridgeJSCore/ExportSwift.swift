@@ -588,7 +588,6 @@ public class ExportSwift {
                 baseName: name,
                 namespace: finalNamespace,
                 staticContext: isStatic ? staticContext : nil,
-                operation: nil,
                 className: classNameForABI
             )
 
@@ -749,9 +748,8 @@ public class ExportSwift {
             case .topLevel:
                 diagnose(node: node, message: "@JS var must be inside a @JS class or enum")
                 return .skipChildren
-            case .protocolBody(_, _):
-                diagnose(node: node, message: "Properties are not supported in protocols")
-                return .skipChildren
+            case .protocolBody(let protocolName, let protocolKey):
+                return visitProtocolProperty(node: node, protocolName: protocolName, protocolKey: protocolKey)
             }
 
             // Process each binding (variable declaration)
@@ -775,23 +773,8 @@ public class ExportSwift {
 
                 // Check if property is readonly
                 let isLet = node.bindingSpecifier.tokenKind == .keyword(.let)
-                let isGetterOnly = node.bindings.contains(where: {
-                    switch $0.accessorBlock?.accessors {
-                    case .accessors(let accessors):
-                        // Has accessors - check if it only has a getter (no setter, willSet, or didSet)
-                        return !accessors.contains(where: { accessor in
-                            let tokenKind = accessor.accessorSpecifier.tokenKind
-                            return tokenKind == .keyword(.set) || tokenKind == .keyword(.willSet)
-                                || tokenKind == .keyword(.didSet)
-                        })
-                    case .getter:
-                        // Has only a getter block
-                        return true
-                    case nil:
-                        // No accessor block - this is a stored property, not readonly
-                        return false
-                    }
-                })
+                let isGetterOnly = node.bindings.contains(where: { self.hasOnlyGetter($0.accessorBlock) })
+
                 let isReadonly = isLet || isGetterOnly
 
                 let exportedProperty = ExportedProperty(
@@ -997,6 +980,17 @@ public class ExportSwift {
                 message: "Protocol visibility must be at least internal"
             )
 
+            let protocolUniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
+
+            exportedProtocolByName[protocolUniqueKey] = ExportedProtocol(
+                name: name,
+                methods: [],
+                properties: [],
+                namespace: namespaceResult.namespace
+            )
+
+            stateStack.push(state: .protocolBody(name: name, key: protocolUniqueKey))
+
             var methods: [ExportedFunction] = []
             for member in node.memberBlock.members {
                 if let funcDecl = member.decl.as(FunctionDeclSyntax.self) {
@@ -1007,18 +1001,22 @@ public class ExportSwift {
                     ) {
                         methods.append(exportedFunction)
                     }
+                } else if let varDecl = member.decl.as(VariableDeclSyntax.self) {
+                    _ = visitProtocolProperty(node: varDecl, protocolName: name, protocolKey: protocolUniqueKey)
                 }
             }
 
             let exportedProtocol = ExportedProtocol(
                 name: name,
                 methods: methods,
+                properties: exportedProtocolByName[protocolUniqueKey]?.properties ?? [],
                 namespace: namespaceResult.namespace
             )
 
-            let protocolUniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
             exportedProtocolByName[protocolUniqueKey] = exportedProtocol
             exportedProtocolNames.append(protocolUniqueKey)
+
+            stateStack.pop()
 
             parent.exportedProtocolNameByKey[protocolUniqueKey] = name
 
@@ -1055,8 +1053,6 @@ public class ExportSwift {
             let abiName = ABINameGenerator.generateABIName(
                 baseName: name,
                 namespace: namespace,
-                staticContext: nil,
-                operation: nil,
                 className: protocolName
             )
 
@@ -1073,6 +1069,81 @@ public class ExportSwift {
                 namespace: namespace,
                 staticContext: nil
             )
+        }
+
+        private func visitProtocolProperty(
+            node: VariableDeclSyntax,
+            protocolName: String,
+            protocolKey: String
+        ) -> SyntaxVisitorContinueKind {
+            for binding in node.bindings {
+                guard let pattern = binding.pattern.as(IdentifierPatternSyntax.self) else {
+                    diagnose(node: binding.pattern, message: "Complex patterns not supported for protocol properties")
+                    continue
+                }
+
+                let propertyName = pattern.identifier.text
+
+                guard let typeAnnotation = binding.typeAnnotation else {
+                    diagnose(node: binding, message: "Protocol property must have explicit type annotation")
+                    continue
+                }
+
+                guard let propertyType = self.parent.lookupType(for: typeAnnotation.type) else {
+                    diagnoseUnsupportedType(node: typeAnnotation.type, type: typeAnnotation.type.trimmedDescription)
+                    continue
+                }
+
+                guard let accessorBlock = binding.accessorBlock else {
+                    diagnose(
+                        node: binding,
+                        message: "Protocol property must specify { get } or { get set }",
+                        hint: "Add { get } for readonly or { get set } for readwrite property"
+                    )
+                    continue
+                }
+
+                let isReadonly = hasOnlyGetter(accessorBlock)
+
+                let exportedProperty = ExportedProtocolProperty(
+                    name: propertyName,
+                    type: propertyType,
+                    isReadonly: isReadonly
+                )
+
+                if var currentProtocol = exportedProtocolByName[protocolKey] {
+                    var properties = currentProtocol.properties
+                    properties.append(exportedProperty)
+
+                    currentProtocol = ExportedProtocol(
+                        name: currentProtocol.name,
+                        methods: currentProtocol.methods,
+                        properties: properties,
+                        namespace: currentProtocol.namespace
+                    )
+                    exportedProtocolByName[protocolKey] = currentProtocol
+                }
+            }
+
+            return .skipChildren
+        }
+
+        private func hasOnlyGetter(_ accessorBlock: AccessorBlockSyntax?) -> Bool {
+            switch accessorBlock?.accessors {
+            case .accessors(let accessors):
+                // Has accessors - check if it only has a getter (no setter, willSet, or didSet)
+                return !accessors.contains(where: { accessor in
+                    let tokenKind = accessor.accessorSpecifier.tokenKind
+                    return tokenKind == .keyword(.set) || tokenKind == .keyword(.willSet)
+                        || tokenKind == .keyword(.didSet)
+                })
+            case .getter:
+                // Has only a getter block
+                return true
+            case nil:
+                // No accessor block - this is a stored property, not readonly
+                return false
+            }
         }
 
         override func visit(_ node: EnumCaseDeclSyntax) -> SyntaxVisitorContinueKind {
@@ -1093,6 +1164,8 @@ public class ExportSwift {
                     } else {
                         var numericExpr = element.rawValue?.value
                         var isNegative = false
+
+                        // Check for prefix operator (for negative numbers)
                         if let prefixExpr = numericExpr?.as(PrefixOperatorExprSyntax.self),
                             prefixExpr.operator.text == "-"
                         {
@@ -1677,13 +1750,13 @@ public class ExportSwift {
                         return bridgeJSRawValue
                     }
                     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> \(raw: typeName) {
-                        return \(raw: typeName)(bridgeJSRawValue: value)!
+                        return bridgeJSLiftParameter(value)
                     }
                     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> \(raw: typeName) {
                         return \(raw: typeName)(bridgeJSRawValue: value)!
                     }
                     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
-                        return bridgeJSRawValue
+                        return bridgeJSLowerParameter()
                     }
 
                     private init?(bridgeJSRawValue: Int32) {
@@ -1700,12 +1773,30 @@ public class ExportSwift {
         func renderAssociatedValueEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
             let typeName = enumDef.swiftCallName
             return """
-                extension \(raw: typeName): _BridgedSwiftAssociatedValueEnum {
-                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> \(raw: typeName) {
+                extension \(raw: typeName): _BridgedSwiftAssociatedValueEnum {                    
+                    private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> \(raw: typeName) {
                         switch caseId {
                         \(raw: generateStackLiftSwitchCases(enumDef: enumDef).joined(separator: "\n"))
                         default: fatalError("Unknown \(raw: typeName) case ID: \\(caseId)")
                         }
+                    }
+                    
+                    // MARK: Protocol Export
+                    
+                    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+                        switch self {
+                        \(raw: generateLowerParameterSwitchCases(enumDef: enumDef).joined(separator: "\n"))
+                        }
+                    }
+                    
+                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> \(raw: typeName) {
+                        return _bridgeJSLiftFromCaseId(caseId)
+                    }
+                    
+                    // MARK: ExportSwift
+                    
+                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> \(raw: typeName) {
+                        return _bridgeJSLiftFromCaseId(caseId)
                     }
 
                     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
@@ -1775,6 +1866,78 @@ public class ExportSwift {
             return cases
         }
 
+        private func generatePayloadPushingCode(
+            associatedValues: [AssociatedValue]
+        ) -> [String] {
+            var bodyLines: [String] = []
+            for (index, associatedValue) in associatedValues.enumerated() {
+                let paramName = associatedValue.label ?? "param\(index)"
+                switch associatedValue.type {
+                case .string:
+                    bodyLines.append("var __bjs_\(paramName) = \(paramName)")
+                    bodyLines.append("__bjs_\(paramName).withUTF8 { ptr in")
+                    bodyLines.append("_swift_js_push_string(ptr.baseAddress, Int32(ptr.count))")
+                    bodyLines.append("}")
+                case .int:
+                    bodyLines.append("_swift_js_push_int(Int32(\(paramName)))")
+                case .bool:
+                    bodyLines.append("_swift_js_push_int(\(paramName) ? 1 : 0)")
+                case .float:
+                    bodyLines.append("_swift_js_push_f32(\(paramName))")
+                case .double:
+                    bodyLines.append("_swift_js_push_f64(\(paramName))")
+                case .optional(let wrappedType):
+                    bodyLines.append("let __bjs_isSome_\(paramName) = \(paramName) != nil")
+                    bodyLines.append("if let __bjs_unwrapped_\(paramName) = \(paramName) {")
+                    switch wrappedType {
+                    case .string:
+                        bodyLines.append("var __bjs_str_\(paramName) = __bjs_unwrapped_\(paramName)")
+                        bodyLines.append("__bjs_str_\(paramName).withUTF8 { ptr in")
+                        bodyLines.append("_swift_js_push_string(ptr.baseAddress, Int32(ptr.count))")
+                        bodyLines.append("}")
+                    case .int:
+                        bodyLines.append("_swift_js_push_int(Int32(__bjs_unwrapped_\(paramName)))")
+                    case .bool:
+                        bodyLines.append("_swift_js_push_int(__bjs_unwrapped_\(paramName) ? 1 : 0)")
+                    case .float:
+                        bodyLines.append("_swift_js_push_f32(__bjs_unwrapped_\(paramName))")
+                    case .double:
+                        bodyLines.append("_swift_js_push_f64(__bjs_unwrapped_\(paramName))")
+                    default:
+                        bodyLines.append(
+                            "preconditionFailure(\"BridgeJS: unsupported optional wrapped type in generated code\")"
+                        )
+                    }
+                    bodyLines.append("}")
+                    bodyLines.append("_swift_js_push_int(__bjs_isSome_\(paramName) ? 1 : 0)")
+                default:
+                    bodyLines.append(
+                        "preconditionFailure(\"BridgeJS: unsupported associated value type in generated code\")"
+                    )
+                }
+            }
+            return bodyLines
+        }
+
+        private func generateLowerParameterSwitchCases(enumDef: ExportedEnum) -> [String] {
+            var cases: [String] = []
+            for (caseIndex, enumCase) in enumDef.cases.enumerated() {
+                if enumCase.associatedValues.isEmpty {
+                    cases.append("case .\(enumCase.name):")
+                    cases.append("return Int32(\(caseIndex))")
+                } else {
+                    let payloadCode = generatePayloadPushingCode(associatedValues: enumCase.associatedValues)
+                    let pattern = enumCase.associatedValues.enumerated()
+                        .map { index, associatedValue in "let \(associatedValue.label ?? "param\(index)")" }
+                        .joined(separator: ", ")
+                    cases.append("case .\(enumCase.name)(\(pattern)):")
+                    cases.append(contentsOf: payloadCode)
+                    cases.append("return Int32(\(caseIndex))")
+                }
+            }
+            return cases
+        }
+
         private func generateReturnSwitchCases(enumDef: ExportedEnum) -> [String] {
             var cases: [String] = []
             for (caseIndex, enumCase) in enumDef.cases.enumerated() {
@@ -1782,59 +1945,13 @@ public class ExportSwift {
                     cases.append("case .\(enumCase.name):")
                     cases.append("_swift_js_push_tag(Int32(\(caseIndex)))")
                 } else {
-                    var bodyLines: [String] = []
-                    bodyLines.append("_swift_js_push_tag(Int32(\(caseIndex)))")
-                    for (index, associatedValue) in enumCase.associatedValues.enumerated() {
-                        let paramName = associatedValue.label ?? "param\(index)"
-                        switch associatedValue.type {
-                        case .string:
-                            bodyLines.append("var __bjs_\(paramName) = \(paramName)")
-                            bodyLines.append("__bjs_\(paramName).withUTF8 { ptr in")
-                            bodyLines.append("_swift_js_push_string(ptr.baseAddress, Int32(ptr.count))")
-                            bodyLines.append("}")
-                        case .int:
-                            bodyLines.append("_swift_js_push_int(Int32(\(paramName)))")
-                        case .bool:
-                            bodyLines.append("_swift_js_push_int(\(paramName) ? 1 : 0)")
-                        case .float:
-                            bodyLines.append("_swift_js_push_f32(\(paramName))")
-                        case .double:
-                            bodyLines.append("_swift_js_push_f64(\(paramName))")
-                        case .optional(let wrappedType):
-                            bodyLines.append("let __bjs_isSome_\(paramName) = \(paramName) != nil")
-                            bodyLines.append("if let __bjs_unwrapped_\(paramName) = \(paramName) {")
-                            switch wrappedType {
-                            case .string:
-                                bodyLines.append("var __bjs_str_\(paramName) = __bjs_unwrapped_\(paramName)")
-                                bodyLines.append("__bjs_str_\(paramName).withUTF8 { ptr in")
-                                bodyLines.append("_swift_js_push_string(ptr.baseAddress, Int32(ptr.count))")
-                                bodyLines.append("}")
-                            case .int:
-                                bodyLines.append("_swift_js_push_int(Int32(__bjs_unwrapped_\(paramName)))")
-                            case .bool:
-                                bodyLines.append("_swift_js_push_int(__bjs_unwrapped_\(paramName) ? 1 : 0)")
-                            case .float:
-                                bodyLines.append("_swift_js_push_f32(__bjs_unwrapped_\(paramName))")
-                            case .double:
-                                bodyLines.append("_swift_js_push_f64(__bjs_unwrapped_\(paramName))")
-                            default:
-                                bodyLines.append(
-                                    "preconditionFailure(\"BridgeJS: unsupported optional wrapped type in generated code\")"
-                                )
-                            }
-                            bodyLines.append("}")
-                            bodyLines.append("_swift_js_push_int(__bjs_isSome_\(paramName) ? 1 : 0)")
-                        default:
-                            bodyLines.append(
-                                "preconditionFailure(\"BridgeJS: unsupported associated value type in generated code\")"
-                            )
-                        }
-                    }
                     let pattern = enumCase.associatedValues.enumerated()
                         .map { index, associatedValue in "let \(associatedValue.label ?? "param\(index)")" }
                         .joined(separator: ", ")
                     cases.append("case .\(enumCase.name)(\(pattern)):")
-                    cases.append(contentsOf: bodyLines)
+                    cases.append("_swift_js_push_tag(Int32(\(caseIndex)))")
+                    let payloadCode = generatePayloadPushingCode(associatedValues: enumCase.associatedValues)
+                    cases.append(contentsOf: payloadCode)
                 }
             }
             return cases
@@ -2108,10 +2225,8 @@ public class ExportSwift {
             """
     }
 
-    /// Generates an AnyProtocol wrapper struct for a protocol
-    ///
     /// Creates a struct that wraps a JSObject and implements protocol methods
-    /// by calling `@_extern(wasm)` functions that forward to JavaScript
+    /// by calling `@_extern(wasm)` functions that forward to JavaScript via JSObject ID
     func renderProtocolWrapper(protocol proto: ExportedProtocol) throws -> DeclSyntax {
         let wrapperName = "Any\(proto.name)"
         let protocolName = proto.name
@@ -2131,42 +2246,77 @@ public class ExportSwift {
 
             var externParams: [String] = ["this: Int32"]
             for param in method.parameters {
-                let loweringInfo = try param.type.loweringParameterInfo()
-                assert(
-                    loweringInfo.loweredParameters.count == 1,
-                    "Protocol parameters must lower to a single WASM type"
-                )
-                let (_, wasmType) = loweringInfo.loweredParameters[0]
-                externParams.append("\(param.name): \(wasmType.swiftType)")
+                let loweringInfo = try param.type.loweringParameterInfo(context: .protocolExport)
+                for (paramName, wasmType) in loweringInfo.loweredParameters {
+                    let fullParamName =
+                        loweringInfo.loweredParameters.count > 1
+                        ? "\(param.name)\(paramName.capitalizedFirstLetter)" : param.name
+                    externParams.append("\(fullParamName): \(wasmType.swiftType)")
+                }
             }
 
+            var preCallStatements: [String] = []
             var callArgs: [String] = ["this: Int32(bitPattern: jsObject.id)"]
             for param in method.parameters {
-                callArgs.append("\(param.name): \(param.name).bridgeJSLowerParameter()")
+                let loweringInfo = try param.type.loweringParameterInfo(context: .protocolExport)
+                if case .optional = param.type, loweringInfo.loweredParameters.count > 1 {
+                    let isSomeName = "\(param.name)\(loweringInfo.loweredParameters[0].name.capitalizedFirstLetter)"
+                    let wrappedName = "\(param.name)\(loweringInfo.loweredParameters[1].name.capitalizedFirstLetter)"
+                    preCallStatements.append(
+                        "let (\(isSomeName), \(wrappedName)) = \(param.name).bridgeJSLowerParameterWithPresence()"
+                    )
+                    callArgs.append("\(isSomeName): \(isSomeName)")
+                    callArgs.append("\(wrappedName): \(wrappedName)")
+                } else {
+                    callArgs.append("\(param.name): \(param.name).bridgeJSLowerParameter()")
+                }
             }
 
             let returnTypeStr: String
             let externReturnType: String
             let callCode: DeclSyntax
 
+            let preCallCode = preCallStatements.isEmpty ? "" : preCallStatements.joined(separator: "\n") + "\n"
+
             if method.returnType == .void {
                 returnTypeStr = ""
                 externReturnType = ""
                 callCode = """
-                    _extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
+                    \(raw: preCallCode)_extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
                     """
             } else {
                 returnTypeStr = " -> \(method.returnType.swiftType)"
-                let liftingInfo = try method.returnType.liftingReturnInfo()
-                if let abiType = liftingInfo.valueToLift {
+                let liftingInfo = try method.returnType.liftingReturnInfo(
+                    context: .protocolExport
+                )
+
+                if case .optional = method.returnType {
+                    if let abiType = liftingInfo.valueToLift {
+                        externReturnType = " -> \(abiType.swiftType)"
+                        callCode = """
+                            \(raw: preCallCode)let ret = _extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
+                                return \(raw: method.returnType.swiftType).bridgeJSLiftReturn(ret)
+                            """
+                    } else {
+                        externReturnType = ""
+                        callCode = """
+                            \(raw: preCallCode)_extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
+                                return \(raw: method.returnType.swiftType).bridgeJSLiftReturn()
+                            """
+                    }
+                } else if let abiType = liftingInfo.valueToLift {
                     externReturnType = " -> \(abiType.swiftType)"
+                    callCode = """
+                        \(raw: preCallCode)let ret = _extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
+                            return \(raw: method.returnType.swiftType).bridgeJSLiftReturn(ret)
+                        """
                 } else {
                     externReturnType = ""
+                    callCode = """
+                        \(raw: preCallCode)_extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
+                            return \(raw: method.returnType.swiftType).bridgeJSLiftReturn()
+                        """
                 }
-                callCode = """
-                    let ret = _extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
-                        return \(raw: method.returnType.swiftType).bridgeJSLiftReturn(ret)
-                    """
             }
             let methodImplementation: DeclSyntax = """
                 func \(raw: method.name)(\(raw: swiftParams.joined(separator: ", ")))\(raw: returnTypeStr) {
@@ -2179,17 +2329,143 @@ public class ExportSwift {
             methodDecls.append(methodImplementation)
         }
 
+        var propertyDecls: [DeclSyntax] = []
+
+        for property in proto.properties {
+            let propertyImpl = try renderProtocolProperty(
+                property: property,
+                protocolName: protocolName,
+                moduleName: moduleName
+            )
+            propertyDecls.append(propertyImpl)
+        }
+
+        let allDecls = (methodDecls + propertyDecls).map { $0.description }.joined(separator: "\n\n")
+
         return """
             struct \(raw: wrapperName): \(raw: protocolName), _BridgedSwiftProtocolWrapper {
                 let jsObject: JSObject
                 
-                \(raw: methodDecls.map { $0.description }.joined(separator: "\n\n"))
+                \(raw: allDecls)
                 
                 static func bridgeJSLiftParameter(_ value: Int32) -> Self {
                     return \(raw: wrapperName)(jsObject: JSObject(id: UInt32(bitPattern: value)))
                 }
             }
             """
+    }
+
+    private func renderProtocolProperty(
+        property: ExportedProtocolProperty,
+        protocolName: String,
+        moduleName: String
+    ) throws -> DeclSyntax {
+        let getterAbiName = ABINameGenerator.generateABIName(
+            baseName: property.name,
+            operation: "get",
+            className: protocolName
+        )
+        let setterAbiName = ABINameGenerator.generateABIName(
+            baseName: property.name,
+            operation: "set",
+            className: protocolName
+        )
+
+        let usesSideChannel: Bool
+        if case .optional(let wrappedType) = property.type {
+            switch wrappedType {
+            case .string:
+                usesSideChannel = true
+            case .rawValueEnum(_, let rawType):
+                switch rawType {
+                case .string:
+                    usesSideChannel = true
+                default:
+                    usesSideChannel = true
+                }
+            case .int, .float, .double:
+                usesSideChannel = true
+            case .bool, .caseEnum, .associatedValueEnum, .swiftHeapObject:
+                usesSideChannel = false
+            default:
+                usesSideChannel = false
+            }
+        } else {
+            usesSideChannel = false
+        }
+
+        let liftingInfo = try property.type.liftingReturnInfo(context: .protocolExport)
+        let getterReturnType: String
+        let getterBody: String
+
+        if usesSideChannel {
+            // Optional case/raw enums use side-channel reading (Void return)
+            getterReturnType = ""
+            getterBody = """
+                _extern_get(this: Int32(bitPattern: jsObject.id))
+                        return \(property.type.swiftType).bridgeJSLiftReturnFromSideChannel()
+                """
+        } else if let abiType = liftingInfo.valueToLift {
+            getterReturnType = " -> \(abiType.swiftType)"
+            getterBody = """
+                let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+                        return \(property.type.swiftType).bridgeJSLiftReturn(ret)
+                """
+        } else {
+            getterReturnType = ""
+            getterBody = """
+                _extern_get(this: Int32(bitPattern: jsObject.id))
+                        return \(property.type.swiftType).bridgeJSLiftReturn()
+                """
+        }
+
+        if property.isReadonly {
+            return """
+                var \(raw: property.name): \(raw: property.type.swiftType) {
+                    get {
+                        @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: getterAbiName)")
+                        func _extern_get(this: Int32)\(raw: getterReturnType)
+                        \(raw: getterBody)
+                    }
+                }
+                """
+        } else {
+            let loweringInfo = try property.type.loweringParameterInfo(context: .protocolExport)
+
+            let setterParams =
+                (["this: Int32"] + loweringInfo.loweredParameters.map { "\($0.name): \($0.type.swiftType)" }).joined(
+                    separator: ", "
+                )
+
+            let setterBody: String
+            if case .optional = property.type, loweringInfo.loweredParameters.count > 1 {
+                let isSomeParam = loweringInfo.loweredParameters[0].name
+                let wrappedParam = loweringInfo.loweredParameters[1].name
+                setterBody = """
+                    let (\(isSomeParam), \(wrappedParam)) = newValue.bridgeJSLowerParameterWithPresence()
+                            _extern_set(this: Int32(bitPattern: jsObject.id), \(isSomeParam): \(isSomeParam), \(wrappedParam): \(wrappedParam))
+                    """
+            } else {
+                let paramName = loweringInfo.loweredParameters[0].name
+                setterBody =
+                    "_extern_set(this: Int32(bitPattern: jsObject.id), \(paramName): newValue.bridgeJSLowerParameter())"
+            }
+
+            return """
+                var \(raw: property.name): \(raw: property.type.swiftType) {
+                    get {
+                        @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: getterAbiName)")
+                        func _extern_get(this: Int32)\(raw: getterReturnType)
+                        \(raw: getterBody)
+                    }
+                    set {
+                        @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: setterAbiName)")
+                        func _extern_set(\(raw: setterParams))
+                        \(raw: setterBody)
+                    }
+                }
+                """
+        }
     }
 }
 

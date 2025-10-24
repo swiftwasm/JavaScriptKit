@@ -138,6 +138,41 @@ export async function createInstantiator(options, swift) {
                     tmpRetOptionalHeapObject = pointer;
                 }
             }
+            bjs["swift_js_get_optional_int_presence"] = function() {
+                return tmpRetOptionalInt != null ? 1 : 0;
+            }
+            bjs["swift_js_get_optional_int_value"] = function() {
+                const value = tmpRetOptionalInt;
+                tmpRetOptionalInt = undefined;
+                return value;
+            }
+            bjs["swift_js_get_optional_string"] = function() {
+                const str = tmpRetString;
+                tmpRetString = undefined;
+                if (str == null) {
+                    return -1;
+                } else {
+                    const bytes = textEncoder.encode(str);
+                    tmpRetBytes = bytes;
+                    return bytes.length;
+                }
+            }
+            bjs["swift_js_get_optional_float_presence"] = function() {
+                return tmpRetOptionalFloat != null ? 1 : 0;
+            }
+            bjs["swift_js_get_optional_float_value"] = function() {
+                const value = tmpRetOptionalFloat;
+                tmpRetOptionalFloat = undefined;
+                return value;
+            }
+            bjs["swift_js_get_optional_double_presence"] = function() {
+                return tmpRetOptionalDouble != null ? 1 : 0;
+            }
+            bjs["swift_js_get_optional_double_value"] = function() {
+                const value = tmpRetOptionalDouble;
+                tmpRetOptionalDouble = undefined;
+                return value;
+            }
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_checkSimple"] = function bjs_checkSimple(a) {
                 try {

@@ -809,75 +809,251 @@ function setupTestGlobals(global) {
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 function testProtocolSupport(exports) {
-    let counterValue = 0;
-    let counterLabel = "";
-    const jsCounter = {
-        increment(amount) { counterValue += amount; },
-        getValue() { return counterValue; },
-        setLabelElements(labelPrefix, labelSuffix) { counterLabel = labelPrefix + labelSuffix; },
-        getLabel() { return counterLabel; },
-        isEven() { return counterValue % 2 === 0; }
+    let processorValue = 0;
+    let processorLabel = "";
+    let lastAPIResult = null;
+    const jsProcessor = {
+        count: 0,
+        name: "JSProcessor",
+        optionalTag: null,
+        direction: null,
+        optionalTheme: null,
+        httpStatus: null,
+        get apiResult() { return lastAPIResult; },
+        set apiResult(value) { lastAPIResult = value; },
+        helper: new exports.Greeter("JSHelper"),
+        optionalHelper: null,
+        optionalCount: null,
+        increment(amount) { processorValue += amount; this.count += amount; },
+        getValue() { return processorValue; },
+        setLabelElements(labelPrefix, labelSuffix) { processorLabel = labelPrefix + labelSuffix; },
+        getLabel() { return processorLabel; },
+        isEven() { return processorValue % 2 === 0; },
+        processGreeter(greeter) { return `JSProcessor processed: ${greeter.greet()}`; },
+        createGreeter() { return new exports.Greeter("JSProcessorGreeter"); },
+        processOptionalGreeter(greeter) {
+            return greeter ? `JSProcessor processed optional: ${greeter.greet()}` : "JSProcessor received null";
+        },
+        createOptionalGreeter() { return new exports.Greeter("JSOptionalGreeter"); },
+        handleAPIResult(result) { lastAPIResult = result; },
+        getAPIResult() { return lastAPIResult; }
     };
 
-    const manager = new exports.CounterManager(jsCounter);
-    manager.incrementByAmount(4);
-    assert.equal(manager.getCurrentValue(), 4);
+    const successResult = { tag: exports.Result.Tag.Success, param0: "Operation completed" };
+    const failureResult = { tag: exports.Result.Tag.Failure, param0: 500 };
 
-    manager.setCounterLabel("Test", "Label");
-    assert.equal(manager.getCounterLabel(), "TestLabel");
-    assert.equal(jsCounter.getLabel(), "TestLabel");
+    const jsManager = new exports.DataProcessorManager(jsProcessor);
 
-    assert.equal(manager.isCounterEven(), true);
-    manager.incrementByAmount(1);
-    assert.equal(manager.isCounterEven(), false);
-    assert.equal(jsCounter.isEven(), false);
+    jsManager.incrementByAmount(4);
+    assert.equal(jsManager.getCurrentValue(), 4);
+    assert.equal(jsProcessor.count, 4);
 
-    jsCounter.increment(3);
-    assert.equal(jsCounter.getValue(), 8);
-    manager.release();
+    jsManager.setProcessorLabel("Test", "Label");
+    assert.equal(jsManager.getProcessorLabel(), "TestLabel");
 
-    const swiftCounter = new exports.SwiftCounter();
-    const swiftManager = new exports.CounterManager(swiftCounter);
+    assert.equal(jsManager.isProcessorEven(), true);
+    jsManager.incrementByAmount(1);
+    assert.equal(jsManager.isProcessorEven(), false);
+
+    assert.equal(jsManager.getProcessorOptionalTag(), null);
+    jsManager.setProcessorOptionalTag("test-tag");
+    assert.equal(jsManager.getProcessorOptionalTag(), "test-tag");
+    jsManager.setProcessorOptionalTag("another-tag");
+    assert.equal(jsManager.getProcessorOptionalTag(), "another-tag");
+    jsManager.setProcessorOptionalTag(null);
+    assert.equal(jsManager.getProcessorOptionalTag(), null);
+
+    // Test direct property access for optionalTag
+    jsProcessor.optionalTag = "direct-tag";
+    assert.equal(jsManager.getProcessorOptionalTag(), "direct-tag");
+    assert.equal(jsProcessor.optionalTag, "direct-tag");
+    jsProcessor.optionalTag = null;
+    assert.equal(jsManager.getProcessorOptionalTag(), null);
+    assert.equal(jsProcessor.optionalTag, null);
+
+    assert.equal(jsManager.getProcessorDirection(), null);
+    jsManager.setProcessorDirection(exports.Direction.North);
+    assert.equal(jsManager.getProcessorDirection(), exports.Direction.North);
+    jsManager.setProcessorDirection(exports.Direction.East);
+    assert.equal(jsManager.getProcessorDirection(), exports.Direction.East);
+    jsManager.setProcessorDirection(null);
+    assert.equal(jsManager.getProcessorDirection(), null);
+
+    assert.equal(jsManager.getProcessorTheme(), null);
+    jsManager.setProcessorTheme(exports.Theme.Light);
+    assert.equal(jsManager.getProcessorTheme(), exports.Theme.Light);
+    jsManager.setProcessorTheme(exports.Theme.Dark);
+    assert.equal(jsManager.getProcessorTheme(), exports.Theme.Dark);
+    jsManager.setProcessorTheme(null);
+    assert.equal(jsManager.getProcessorTheme(), null);
+
+    assert.equal(jsManager.getProcessorHttpStatus(), null);
+    jsManager.setProcessorHttpStatus(exports.HttpStatus.Ok);
+    assert.equal(jsManager.getProcessorHttpStatus(), exports.HttpStatus.Ok);
+    jsManager.setProcessorHttpStatus(exports.HttpStatus.NotFound);
+    assert.equal(jsManager.getProcessorHttpStatus(), exports.HttpStatus.NotFound);
+    jsManager.setProcessorHttpStatus(null);
+    assert.equal(jsManager.getProcessorHttpStatus(), null);
+
+    jsProcessor.handleAPIResult(successResult);
+    assert.deepEqual(jsProcessor.getAPIResult(), successResult);
+
+    jsProcessor.handleAPIResult(failureResult);
+    assert.deepEqual(jsProcessor.getAPIResult(), failureResult);
+
+    jsProcessor.apiResult = successResult;
+    assert.deepEqual(jsProcessor.apiResult, successResult);
+    jsProcessor.apiResult = null;
+    assert.equal(jsProcessor.apiResult, null);
+    assert.equal(jsManager.getProcessorAPIResult(), null);
+
+    assert.equal(jsProcessor.helper.name, "JSHelper");
+    const newHelper = new exports.Greeter("UpdatedHelper");
+    jsProcessor.helper = newHelper;
+    assert.equal(jsProcessor.helper.name, "UpdatedHelper");
+    assert.equal(jsProcessor.helper.greet(), "Hello, UpdatedHelper!");
+
+    assert.equal(jsProcessor.optionalHelper, null);
+    const optHelper = new exports.Greeter("OptHelper");
+    jsProcessor.optionalHelper = optHelper;
+    assert.equal(jsProcessor.optionalHelper.name, "OptHelper");
+    assert.equal(jsProcessor.optionalHelper.greet(), "Hello, OptHelper!");
+    jsProcessor.optionalHelper = null;
+    assert.equal(jsProcessor.optionalHelper, null);
+
+    assert.equal(jsManager.getProcessorOptionalCount(), null);
+    jsManager.setProcessorOptionalCount(42);
+    assert.equal(jsManager.getProcessorOptionalCount(), 42);
+    jsManager.setProcessorOptionalCount(0);
+    assert.equal(jsManager.getProcessorOptionalCount(), 0);
+    jsManager.setProcessorOptionalCount(-100);
+    assert.equal(jsManager.getProcessorOptionalCount(), -100);
+    jsManager.setProcessorOptionalCount(null);
+    assert.equal(jsManager.getProcessorOptionalCount(), null);
+
+    assert.equal(jsProcessor.optionalCount, null);
+    jsProcessor.optionalCount = 42;
+    assert.equal(jsProcessor.optionalCount, 42);
+    assert.equal(jsManager.getProcessorOptionalCount(), 42);
+    jsProcessor.optionalCount = 0;
+    assert.equal(jsProcessor.optionalCount, 0);
+    jsProcessor.optionalCount = null;
+    assert.equal(jsProcessor.optionalCount, null);
+
+    newHelper.release();
+    optHelper.release();
+    jsManager.release();
+
+    const swiftProcessor = new exports.SwiftDataProcessor();
+    const swiftManager = new exports.DataProcessorManager(swiftProcessor);
 
     swiftManager.incrementByAmount(10);
     assert.equal(swiftManager.getCurrentValue(), 10);
 
-    swiftManager.setCounterLabel("Swift", "Label");
-    assert.equal(swiftManager.getCounterLabel(), "SwiftLabel");
+    swiftManager.setProcessorLabel("Swift", "Label");
+    assert.equal(swiftManager.getProcessorLabel(), "SwiftLabel");
 
-    swiftCounter.increment(5);
-    assert.equal(swiftCounter.getValue(), 15);
+    assert.equal(swiftManager.isProcessorEven(), true);
+    swiftManager.incrementByAmount(1);
+    assert.equal(swiftManager.isProcessorEven(), false);
+
+    assert.equal(swiftManager.getProcessorDirection(), null);
+    swiftManager.setProcessorDirection(exports.Direction.South);
+    assert.equal(swiftManager.getProcessorDirection(), exports.Direction.South);
+    swiftManager.setProcessorDirection(exports.Direction.West);
+    assert.equal(swiftManager.getProcessorDirection(), exports.Direction.West);
+    swiftManager.setProcessorDirection(null);
+    assert.equal(swiftManager.getProcessorDirection(), null);
+
+    assert.equal(swiftManager.getProcessorTheme(), null);
+    swiftProcessor.optionalTheme = exports.Theme.Light;
+    assert.equal(swiftManager.getProcessorTheme(), exports.Theme.Light);
+    swiftManager.setProcessorTheme(exports.Theme.Auto);
+    assert.equal(swiftManager.getProcessorTheme(), exports.Theme.Auto);
+    swiftManager.setProcessorTheme(exports.Theme.Light);
+    assert.equal(swiftManager.getProcessorTheme(), exports.Theme.Light);
+    swiftManager.setProcessorTheme(null);
+    assert.equal(swiftManager.getProcessorTheme(), null);
+
+    assert.equal(swiftManager.getProcessorHttpStatus(), null);
+    swiftManager.setProcessorHttpStatus(exports.HttpStatus.ServerError);
+    assert.equal(swiftManager.getProcessorHttpStatus(), exports.HttpStatus.ServerError);
+    swiftManager.setProcessorHttpStatus(exports.HttpStatus.Ok);
+    assert.equal(swiftManager.getProcessorHttpStatus(), exports.HttpStatus.Ok);
+    swiftManager.setProcessorHttpStatus(null);
+    assert.equal(swiftManager.getProcessorHttpStatus(), null);
+
+    swiftProcessor.handleAPIResult(successResult);
+    assert.deepEqual(swiftProcessor.getAPIResult(), successResult);
+    assert.deepEqual(swiftManager.getProcessorAPIResult(), successResult);
+
+    swiftProcessor.handleAPIResult(failureResult);
+    assert.deepEqual(swiftProcessor.getAPIResult(), failureResult);
+    assert.deepEqual(swiftManager.getProcessorAPIResult(), failureResult);
+    swiftManager.setProcessorAPIResult(successResult);
+    assert.deepEqual(swiftProcessor.getAPIResult(), successResult);
+
     swiftManager.release();
-    swiftCounter.release();
+    swiftProcessor.release();
 
-    let optionalCounterValue = 100;
-    let optionalCounterLabel = "optional";
-    const optionalCounter = {
-        increment(amount) { optionalCounterValue += amount; },
-        getValue() { return optionalCounterValue; },
-        setLabelElements(labelPrefix, labelSuffix) { optionalCounterLabel = labelPrefix + labelSuffix; },
-        getLabel() { return optionalCounterLabel; },
-        isEven() { return optionalCounterValue % 2 === 0; }
+    let backupValue = 100;
+    const backupProcessor = {
+        count: 100,
+        name: "BackupProcessor",
+        optionalTag: null,
+        direction: null,
+        optionalTheme: null,
+        httpStatus: null,
+        apiResult: null,
+        helper: new exports.Greeter("BackupHelper"),
+        optionalHelper: null,
+        optionalCount: null,
+        increment(amount) { backupValue += amount; this.count += amount; },
+        getValue() { return backupValue; },
+        setLabelElements(labelPrefix, labelSuffix) { },
+        getLabel() { return "backup"; },
+        isEven() { return backupValue % 2 === 0; },
+        processGreeter(greeter) { return ""; },
+        createGreeter() { return new exports.Greeter("BackupGreeter"); },
+        processOptionalGreeter(greeter) { return ""; },
+        createOptionalGreeter() { return null; },
+        handleAPIResult(result) { },
+        getAPIResult() { return { tag: exports.APIResult.Tag.Info }; }
     };
 
-    let mainCounterValue = 0;
-    let mainCounterLabel = "main";
-    const mainCounter = {
-        increment(amount) { mainCounterValue += amount; },
-        getValue() { return mainCounterValue; },
-        setLabelElements(labelPrefix, labelSuffix) { mainCounterLabel = labelPrefix + labelSuffix; },
-        getLabel() { return mainCounterLabel; },
-        isEven() { return mainCounterValue % 2 === 0; }
+    let mainValue = 0;
+    const mainProcessor = {
+        count: 0,
+        name: "MainProcessor",
+        optionalTag: null,
+        direction: null,
+        optionalTheme: null,
+        httpStatus: null,
+        apiResult: null,
+        helper: new exports.Greeter("MainHelper"),
+        optionalHelper: null,
+        optionalCount: null,
+        increment(amount) { mainValue += amount; this.count += amount; },
+        getValue() { return mainValue; },
+        setLabelElements(labelPrefix, labelSuffix) { },
+        getLabel() { return "main"; },
+        isEven() { return mainValue % 2 === 0; },
+        processGreeter(greeter) { return ""; },
+        createGreeter() { return new exports.Greeter("MainGreeter"); },
+        processOptionalGreeter(greeter) { return ""; },
+        createOptionalGreeter() { return null; },
+        handleAPIResult(result) { },
+        getAPIResult() { return { tag: exports.APIResult.Tag.Info }; }
     };
 
-    const managerWithOptional = new exports.CounterManager(mainCounter);
+    const managerWithOptional = new exports.DataProcessorManager(mainProcessor);
 
-    assert.equal(managerWithOptional.backupCounter, null);
+    assert.equal(managerWithOptional.backupProcessor, null);
     assert.equal(managerWithOptional.hasBackup(), false);
     assert.equal(managerWithOptional.getBackupValue(), null);
 
-    managerWithOptional.backupCounter = optionalCounter;
-    assert.notEqual(managerWithOptional.backupCounter, null);
+    managerWithOptional.backupProcessor = backupProcessor;
+    assert.notEqual(managerWithOptional.backupProcessor, null);
     assert.equal(managerWithOptional.hasBackup(), true);
 
     managerWithOptional.incrementBoth();
@@ -888,21 +1064,24 @@ function testProtocolSupport(exports) {
     assert.equal(managerWithOptional.getCurrentValue(), 2);
     assert.equal(managerWithOptional.getBackupValue(), 102);
 
-    managerWithOptional.backupCounter = null;
-    assert.equal(managerWithOptional.backupCounter, null);
+    managerWithOptional.backupProcessor = null;
+    assert.equal(managerWithOptional.backupProcessor, null);
     assert.equal(managerWithOptional.hasBackup(), false);
 
     managerWithOptional.incrementBoth();
     assert.equal(managerWithOptional.getCurrentValue(), 3);
     assert.equal(managerWithOptional.getBackupValue(), null);
 
-    const swiftBackupCounter = new exports.SwiftCounter();
-    swiftBackupCounter.increment(1);
-    managerWithOptional.backupCounter = swiftBackupCounter;
+    const swiftBackup = new exports.SwiftDataProcessor();
+    managerWithOptional.backupProcessor = swiftBackup;
 
     assert.equal(managerWithOptional.hasBackup(), true);
+    assert.equal(managerWithOptional.getBackupValue(), 0);
+
+    managerWithOptional.incrementBoth();
+    assert.equal(managerWithOptional.getCurrentValue(), 4);
     assert.equal(managerWithOptional.getBackupValue(), 1);
 
     managerWithOptional.release();
-    swiftBackupCounter.release();
+    swiftBackup.release();
 }

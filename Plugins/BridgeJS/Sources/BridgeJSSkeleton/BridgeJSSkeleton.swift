@@ -9,8 +9,8 @@ public struct ABINameGenerator {
     /// Generates ABI name using standardized namespace + context pattern
     public static func generateABIName(
         baseName: String,
-        namespace: [String]?,
-        staticContext: StaticContext?,
+        namespace: [String]? = nil,
+        staticContext: StaticContext? = nil,
         operation: String? = nil,
         className: String? = nil
     ) -> String {
@@ -66,6 +66,12 @@ public struct ABINameGenerator {
 }
 
 // MARK: - Types
+
+/// Context for bridge operations that determines which types are valid
+public enum BridgeContext: Sendable {
+    case importTS
+    case protocolExport
+}
 
 public enum BridgeType: Codable, Equatable, Sendable {
     case int, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
@@ -270,14 +276,37 @@ public enum EnumType: String, Codable, Sendable {
 
 // MARK: - Exported Skeleton
 
+public struct ExportedProtocolProperty: Codable, Equatable, Sendable {
+    public let name: String
+    public let type: BridgeType
+    public let isReadonly: Bool
+
+    public init(
+        name: String,
+        type: BridgeType,
+        isReadonly: Bool
+    ) {
+        self.name = name
+        self.type = type
+        self.isReadonly = isReadonly
+    }
+}
+
 public struct ExportedProtocol: Codable, Equatable {
     public let name: String
     public let methods: [ExportedFunction]
+    public let properties: [ExportedProtocolProperty]
     public let namespace: [String]?
 
-    public init(name: String, methods: [ExportedFunction], namespace: [String]? = nil) {
+    public init(
+        name: String,
+        methods: [ExportedFunction],
+        properties: [ExportedProtocolProperty] = [],
+        namespace: [String]? = nil
+    ) {
         self.name = name
         self.methods = methods
+        self.properties = properties
         self.namespace = namespace
     }
 }

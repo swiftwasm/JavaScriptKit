@@ -314,6 +314,13 @@ struct BridgeJSLink {
                 }
 
                 for proto in skeleton.protocols {
+                    for property in proto.properties {
+                        try renderProtocolProperty(
+                            importObjectBuilder: importObjectBuilder,
+                            protocol: proto,
+                            property: property
+                        )
+                    }
                     for method in proto.methods {
                         try renderProtocolMethod(
                             importObjectBuilder: importObjectBuilder,
@@ -582,6 +589,61 @@ struct BridgeJSLink {
                     printer.write("}")
                 }
                 printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_int_presence\"] = function() {")
+                printer.indent {
+                    printer.write("return \(JSGlueVariableScope.reservedStorageToReturnOptionalInt) != null ? 1 : 0;")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_int_value\"] = function() {")
+                printer.indent {
+                    printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalInt);")
+                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = undefined;")
+                    printer.write("return value;")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_string\"] = function() {")
+                printer.indent {
+                    printer.write("const str = \(JSGlueVariableScope.reservedStorageToReturnString);")
+                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
+                    printer.write("if (str == null) {")
+                    printer.indent {
+                        printer.write("return -1;")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("const bytes = \(JSGlueVariableScope.reservedTextEncoder).encode(str);")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnBytes) = bytes;")
+                        printer.write("return bytes.length;")
+                    }
+                    printer.write("}")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_float_presence\"] = function() {")
+                printer.indent {
+                    printer.write("return \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) != null ? 1 : 0;")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_float_value\"] = function() {")
+                printer.indent {
+                    printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);")
+                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = undefined;")
+                    printer.write("return value;")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_double_presence\"] = function() {")
+                printer.indent {
+                    printer.write(
+                        "return \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) != null ? 1 : 0;"
+                    )
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_double_value\"] = function() {")
+                printer.indent {
+                    printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);")
+                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = undefined;")
+                    printer.write("return value;")
+                }
+                printer.write("}")
             }
         }
         return printer
@@ -606,6 +668,13 @@ struct BridgeJSLink {
                         printer.write(
                             "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                         )
+                    }
+                    for property in proto.properties {
+                        let propertySignature =
+                            property.isReadonly
+                            ? "readonly \(property.name): \(property.type.tsType);"
+                            : "\(property.name): \(property.type.tsType);"
+                        printer.write(propertySignature)
                     }
                 }
                 printer.write("}")
@@ -1842,13 +1911,15 @@ extension BridgeJSLink {
         let body: CodeFragmentPrinter
         let scope: JSGlueVariableScope
         let cleanupCode: CodeFragmentPrinter
+        let context: BridgeContext
         var parameterNames: [String] = []
         var parameterForwardings: [String] = []
 
-        init() {
+        init(context: BridgeContext = .importTS) {
             self.body = CodeFragmentPrinter()
             self.scope = JSGlueVariableScope()
             self.cleanupCode = CodeFragmentPrinter()
+            self.context = context
         }
 
         func liftSelf() {
@@ -1856,7 +1927,7 @@ extension BridgeJSLink {
         }
 
         func liftParameter(param: Parameter) throws {
-            let liftingFragment = try IntrinsicJSFragment.liftParameter(type: param.type)
+            let liftingFragment = try IntrinsicJSFragment.liftParameter(type: param.type, context: context)
             assert(
                 liftingFragment.parameters.count >= 1,
                 "Lifting fragment should have at least one parameter to lift"
@@ -1867,6 +1938,7 @@ extension BridgeJSLink {
                 valuesToLift = [scope.variable(param.name)]
             } else {
                 valuesToLift = liftingFragment.parameters.map { scope.variable(param.name + $0.capitalizedFirstLetter) }
+                parameterNames.append(contentsOf: valuesToLift)
             }
             let liftedValues = liftingFragment.printCode(valuesToLift, scope, body, cleanupCode)
             assert(liftedValues.count == 1, "Lifting fragment should produce exactly one value")
@@ -1913,7 +1985,7 @@ extension BridgeJSLink {
         }
 
         private func call(callExpr: String, returnType: BridgeType) throws -> String? {
-            let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: returnType)
+            let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: returnType, context: context)
             let returnExpr: String?
             if loweringFragment.parameters.count == 0 {
                 body.write("\(callExpr);")
@@ -1933,7 +2005,7 @@ extension BridgeJSLink {
         func callConstructor(name: String) throws -> String? {
             let call = "new imports.\(name)(\(parameterForwardings.joined(separator: ", ")))"
             let type: BridgeType = .jsObject(name)
-            let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: type)
+            let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: type, context: context)
             return try lowerReturnValue(returnType: type, returnExpr: call, loweringFragment: loweringFragment)
         }
 
@@ -1945,6 +2017,43 @@ extension BridgeJSLink {
         }
 
         func callPropertyGetter(name: String, returnType: BridgeType) throws -> String? {
+            if context == .protocolExport, case .optional(let wrappedType) = returnType {
+                let usesSideChannel: Bool
+                switch wrappedType {
+                case .string, .int, .float, .double, .jsObject, .swiftProtocol:
+                    usesSideChannel = true
+                case .rawValueEnum:
+                    usesSideChannel = true
+                case .bool, .caseEnum, .swiftHeapObject, .associatedValueEnum:
+                    usesSideChannel = false
+                default:
+                    usesSideChannel = false
+                }
+
+                if usesSideChannel {
+                    let resultVar = scope.variable("ret")
+                    body.write(
+                        "let \(resultVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(self).\(name);"
+                    )
+
+                    switch wrappedType {
+                    case .string, .rawValueEnum(_, .string):
+                        body.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(resultVar);")
+                    case .int, .rawValueEnum(_, .int):
+                        body.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = \(resultVar);")
+                    case .float, .rawValueEnum(_, .float):
+                        body.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = \(resultVar);")
+                    case .double, .rawValueEnum(_, .double):
+                        body.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = \(resultVar);")
+                    case .jsObject, .swiftProtocol:
+                        body.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(resultVar);")
+                    default:
+                        break
+                    }
+                    return nil  // Side-channel types return nil (no direct return value)
+                }
+            }
+
             return try call(
                 callExpr: "\(JSGlueVariableScope.reservedSwift).memory.getObject(self).\(name)",
                 returnType: returnType
@@ -2417,12 +2526,58 @@ extension BridgeJSLink {
         return (funcLines, [])
     }
 
+    func renderProtocolProperty(
+        importObjectBuilder: ImportObjectBuilder,
+        protocol: ExportedProtocol,
+        property: ExportedProtocolProperty
+    ) throws {
+        let getterAbiName = ABINameGenerator.generateABIName(
+            baseName: property.name,
+            namespace: nil,
+            staticContext: nil,
+            operation: "get",
+            className: `protocol`.name
+        )
+
+        let getterThunkBuilder = ImportedThunkBuilder(context: .protocolExport)
+        getterThunkBuilder.liftSelf()
+        let returnExpr = try getterThunkBuilder.callPropertyGetter(name: property.name, returnType: property.type)
+        let getterLines = getterThunkBuilder.renderFunction(
+            name: getterAbiName,
+            returnExpr: returnExpr,
+            returnType: property.type
+        )
+        importObjectBuilder.assignToImportObject(name: getterAbiName, function: getterLines)
+
+        if !property.isReadonly {
+            let setterAbiName = ABINameGenerator.generateABIName(
+                baseName: property.name,
+                namespace: nil,
+                staticContext: nil,
+                operation: "set",
+                className: `protocol`.name
+            )
+            let setterThunkBuilder = ImportedThunkBuilder(context: .protocolExport)
+            setterThunkBuilder.liftSelf()
+            try setterThunkBuilder.liftParameter(
+                param: Parameter(label: nil, name: "value", type: property.type)
+            )
+            setterThunkBuilder.callPropertySetter(name: property.name, returnType: property.type)
+            let setterLines = setterThunkBuilder.renderFunction(
+                name: setterAbiName,
+                returnExpr: nil,
+                returnType: .void
+            )
+            importObjectBuilder.assignToImportObject(name: setterAbiName, function: setterLines)
+        }
+    }
+
     func renderProtocolMethod(
         importObjectBuilder: ImportObjectBuilder,
         protocol: ExportedProtocol,
         method: ExportedFunction
     ) throws {
-        let thunkBuilder = ImportedThunkBuilder()
+        let thunkBuilder = ImportedThunkBuilder(context: .protocolExport)
         thunkBuilder.liftSelf()
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)

@@ -21,6 +21,9 @@ Mark a Swift protocol with `@JS` to expose it:
 import JavaScriptKit
 
 @JS protocol Counter {
+    var count: Int { get set }
+    var name: String { get }
+    var label: String? { get set }
     func increment(by amount: Int)
     func reset()
     func getValue() -> Int
@@ -41,6 +44,18 @@ import JavaScriptKit
     @JS func getCurrentValue() -> Int {
         return delegate.getValue()
     }
+    
+    @JS func getCounterName() -> String {
+        return delegate.name
+    }
+    
+    @JS func setCountValue(_ value: Int) {
+        delegate.count = value
+    }
+    
+    @JS func updateLabel(_ newLabel: String?) {
+        delegate.label = newLabel
+    }
 }
 ```
 
@@ -53,6 +68,8 @@ const { exports } = await init({});
 // Implement the Counter protocol
 const counterImpl = {
     count: 0,
+    name: "JSCounter",
+    label: "Default Label",
     increment(amount) {
         this.count += amount;
     },
@@ -68,12 +85,23 @@ const counterImpl = {
 const manager = new exports.CounterManager(counterImpl);
 manager.incrementTwice();
 console.log(manager.getCurrentValue()); // 2
+console.log(manager.getCounterName()); // "JSCounter"
+manager.setCountValue(10);
+console.log(counterImpl.count); // 10
+
+manager.updateLabel("Custom Label");
+console.log(counterImpl.label); // "Custom Label"
+manager.updateLabel(null);
+console.log(counterImpl.label); // null
 ```
 
 The generated TypeScript interface:
 
 ```typescript
 export interface Counter {
+    count: number;
+    readonly name: string;
+    label: string | null;
     increment(amount: number): void;
     reset(): void;
     getValue(): number;
@@ -93,6 +121,27 @@ BridgeJS generates a Swift wrapper struct for each `@JS` protocol. This wrapper 
 ```swift
 struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
     let jsObject: JSObject
+
+    var count: Int {
+        get {
+            @_extern(wasm, module: "TestModule", name: "bjs_Counter_count_get")
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Int.bridgeJSLiftReturn(ret)
+        }
+        set {
+            @_extern(wasm, module: "TestModule", name: "bjs_Counter_count_set")
+            func _extern_set(this: Int32, value: Int32)
+            _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
+        }
+    }
+
+    var name: String {
+        @_extern(wasm, module: "TestModule", name: "bjs_Counter_name_get")
+        func _extern_get(this: Int32)
+        _extern_get(this: Int32(bitPattern: jsObject.id))
+        return String.bridgeJSLiftReturn()
+    }
 
     func increment(by amount: Int) {
         @_extern(wasm, module: "TestModule", name: "bjs_Counter_increment")
@@ -128,13 +177,16 @@ You can also implement protocols in Swift and use them from JavaScript:
 
 ```swift
 @JS protocol Counter {
+    var count: Int { get set }
+    var name: String { get }
     func increment(by amount: Int)
     func reset()
     func getValue() -> Int
 }
 
 final class SwiftCounter: Counter {
-    private var count = 0
+    var count = 0
+    let name = "SwiftCounter"
     
     func increment(by amount: Int) {
         count += amount
@@ -158,9 +210,13 @@ From JavaScript:
 
 ```javascript
 const counter = exports.createCounter();
+console.log(counter.name); // "SwiftCounter"
 counter.increment(5);
 counter.increment(3);
 console.log(counter.getValue()); // 8
+console.log(counter.count); // 8
+counter.count = 100;
+console.log(counter.getValue()); // 100
 counter.reset();
 console.log(counter.getValue()); // 0
 ```
@@ -178,32 +234,14 @@ When you pass a JavaScript object implementing a protocol to Swift:
 
 | Swift Feature | Status |
 |:--------------|:-------|
-| Method requirements: `func method()` | ✅ |
-| Method requirements with parameters | ✅ |
-| Method requirements with return values | ✅ |
-| Throwing method requirements: `func method() throws(JSException)` | ✅ |
-| Async method requirements: `func method() async` | ✅ |
+| Method requirements: `func foo(_ param: String?) -> FooClass?` | ✅ |
+| Property requirements: `var property: Type { get }` / `var property: Type { get set }` | ✅ |
+| Optional parameters / return values in methods | ✅ |
+| Optional properties | ✅ |
 | Optional protocol methods | ❌ |
-| Property requirements: `var property: Type { get }` | ❌ |
-| Property requirements: `var property: Type { get set }` | ❌ |
 | Associated types | ❌ |
 | Protocol inheritance | ❌ |
 | Protocol composition: `Protocol1 & Protocol2` | ❌ |
 | Generics | ❌ |
 
-### Type Support for Protocol Method Parameters and Return Types
-
-Protocol method parameters and return values have more limited type support compared to regular exported Swift functions and classes.
-
-**Supported Types:**
-- Primitives: `Bool`, `Int`, `Float`, `Double`
-- `String`
-- `JSObject`
-
-**Not Supported:**
-- `@JS class` types
-- `@JS enum` types (case, raw value, or associated value)
-- `@JS protocol` types
-- Optional types: `Int?`, `String?`, etc.
-
-> Note: For regular `@JS func` and `@JS class` exports (not within protocols), all these types including optionals, enums, and classes are fully supported. See <doc:Exporting-Swift-Function> and <doc:Exporting-Swift-Optional> for more information.
+> Note: Protocol type support matches that of regular `@JS func` and `@JS class` exports. See <doc:Exporting-Swift-Function>, <doc:Exporting-Swift-Optional>, and <doc:Exporting-Swift-Enum> for more information.

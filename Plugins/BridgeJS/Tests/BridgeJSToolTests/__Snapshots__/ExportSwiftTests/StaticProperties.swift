@@ -11,13 +11,13 @@ extension PropertyEnum: _BridgedSwiftCaseEnum {
         return bridgeJSRawValue
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> PropertyEnum {
-        return PropertyEnum(bridgeJSRawValue: value)!
+        return bridgeJSLiftParameter(value)
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> PropertyEnum {
         return PropertyEnum(bridgeJSRawValue: value)!
     }
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
-        return bridgeJSRawValue
+        return bridgeJSLowerParameter()
     }
 
     private init?(bridgeJSRawValue: Int32) {

@@ -7,7 +7,7 @@
 @_spi(BridgeJS) import JavaScriptKit
 
 extension APIResult: _BridgedSwiftAssociatedValueEnum {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> APIResult {
+    private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
             return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
@@ -24,6 +24,43 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
         default:
             fatalError("Unknown APIResult case ID: \(caseId)")
         }
+    }
+
+    // MARK: Protocol Export
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch self {
+        case .success(let param0):
+            var __bjs_param0 = param0
+            __bjs_param0.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(0)
+        case .failure(let param0):
+            _swift_js_push_int(Int32(param0))
+            return Int32(1)
+        case .flag(let param0):
+            _swift_js_push_int(param0 ? 1 : 0)
+            return Int32(2)
+        case .rate(let param0):
+            _swift_js_push_f32(param0)
+            return Int32(3)
+        case .precise(let param0):
+            _swift_js_push_f64(param0)
+            return Int32(4)
+        case .info:
+            return Int32(5)
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> APIResult {
+        return _bridgeJSLiftFromCaseId(caseId)
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> APIResult {
+        return _bridgeJSLiftFromCaseId(caseId)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
@@ -53,7 +90,7 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
 }
 
 extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> ComplexResult {
+    private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> ComplexResult {
         switch caseId {
         case 0:
             return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
@@ -72,6 +109,79 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
         default:
             fatalError("Unknown ComplexResult case ID: \(caseId)")
         }
+    }
+
+    // MARK: Protocol Export
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch self {
+        case .success(let param0):
+            var __bjs_param0 = param0
+            __bjs_param0.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(0)
+        case .error(let param0, let param1):
+            var __bjs_param0 = param0
+            __bjs_param0.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            _swift_js_push_int(Int32(param1))
+            return Int32(1)
+        case .location(let param0, let param1, let param2):
+            _swift_js_push_f64(param0)
+            _swift_js_push_f64(param1)
+            var __bjs_param2 = param2
+            __bjs_param2.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(2)
+        case .status(let param0, let param1, let param2):
+            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_int(Int32(param1))
+            var __bjs_param2 = param2
+            __bjs_param2.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(3)
+        case .coordinates(let param0, let param1, let param2):
+            _swift_js_push_f64(param0)
+            _swift_js_push_f64(param1)
+            _swift_js_push_f64(param2)
+            return Int32(4)
+        case .comprehensive(let param0, let param1, let param2, let param3, let param4, let param5, let param6, let param7, let param8):
+            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_int(param1 ? 1 : 0)
+            _swift_js_push_int(Int32(param2))
+            _swift_js_push_int(Int32(param3))
+            _swift_js_push_f64(param4)
+            _swift_js_push_f64(param5)
+            var __bjs_param6 = param6
+            __bjs_param6.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            var __bjs_param7 = param7
+            __bjs_param7.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            var __bjs_param8 = param8
+            __bjs_param8.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+            return Int32(5)
+        case .info:
+            return Int32(6)
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> ComplexResult {
+        return _bridgeJSLiftFromCaseId(caseId)
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> ComplexResult {
+        return _bridgeJSLiftFromCaseId(caseId)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
