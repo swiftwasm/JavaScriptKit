@@ -4,9 +4,12 @@ struct MakeTemporaryDirectoryError: Error {
     let error: CInt
 }
 
-internal func withTemporaryDirectory<T>(body: (URL, _ retain: inout Bool) throws -> T) throws -> T {
+internal func withTemporaryDirectory<T>(
+    prefixDirectory: URL = FileManager.default.temporaryDirectory,
+    body: (URL, _ retain: inout Bool) throws -> T
+) throws -> T {
     // Create a temporary directory using mkdtemp
-    var template = FileManager.default.temporaryDirectory.appendingPathComponent("PackageToJSTests.XXXXXX").path
+    var template = prefixDirectory.appendingPathComponent("PackageToJSTests.XXXXXX").path
     return try template.withUTF8 { template in
         let copy = UnsafeMutableBufferPointer<CChar>.allocate(capacity: template.count + 1)
         template.copyBytes(to: copy)

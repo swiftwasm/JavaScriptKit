@@ -9,8 +9,5 @@
     },
     "dependencies": {
         "@bjorn3/browser_wasi_shim": "0.3.0"
-    },
-    "devDependencies": {
-        "@types/node": "^22.0.0"
     }
 }

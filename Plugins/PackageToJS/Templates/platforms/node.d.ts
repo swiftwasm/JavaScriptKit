@@ -13,4 +13,4 @@ export type DefaultNodeSetupOptions = {
 
 export function defaultNodeSetup(options: DefaultNodeSetupOptions): Promise<InstantiateOptions>
 
-export function createDefaultWorkerFactory(preludeScript: string): (module: WebAssembly.Module, memory: WebAssembly.Memory, startArg: any) => Worker
+export function createDefaultWorkerFactory(preludeScript?: string): (module: WebAssembly.Module, memory: WebAssembly.Memory, startArg: any) => Worker

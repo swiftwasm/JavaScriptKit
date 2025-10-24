@@ -461,7 +461,7 @@ extension PackageToJS.PackageOptions {
         let configuration: String? =
             (extractor.extractOption(named: "configuration") + extractor.extractSingleDashOption(named: "c")).last
         let packageName = extractor.extractOption(named: "package-name").last
-        let platform = try extractor.extractPlatformOption(named: "platform")
+        let defaultPlatform = try extractor.extractPlatformOption(named: "default-platform")
         let explain = extractor.extractFlag(named: "explain")
         let useCDN = extractor.extractFlag(named: "use-cdn")
         let verbose = extractor.extractFlag(named: "verbose")
@@ -470,7 +470,7 @@ extension PackageToJS.PackageOptions {
             outputPath: outputPath,
             configuration: configuration,
             packageName: packageName,
-            platform: platform,
+            defaultPlatform: defaultPlatform,
             explain: explain != 0,
             verbose: verbose != 0,
             useCDN: useCDN != 0,

@@ -131,7 +131,7 @@ export async function defaultNodeSetup(options) {
         new PreopenDirectory("/", rootFs),
     ], { debug: false })
     const pkgDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
-    const module = await WebAssembly.compile(await readFile(path.join(pkgDir, MODULE_PATH)))
+    const module = await WebAssembly.compile(new Uint8Array(await readFile(path.join(pkgDir, MODULE_PATH))))
 /* #if USE_SHARED_MEMORY */
     const memory = new WebAssembly.Memory(MEMORY_TYPE);
     const threadChannel = new DefaultNodeThreadRegistry(options.spawnWorker)
