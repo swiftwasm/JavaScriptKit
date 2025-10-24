@@ -1,0 +1,1048 @@
+{
+  "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_Person_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ]
+      },
+      "explicitAccessControl" : "public",
+      "methods" : [
+
+      ],
+      "name" : "Person",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "Person"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_TestProcessor_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "transform",
+            "name" : "transform",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "String_To_String",
+                  "parameters" : [
+                    {
+                      "string" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "string" : {
+
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_TestProcessor_getTransform",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "getTransform",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "String_To_String",
+                "parameters" : [
+                  {
+                    "string" : {
+
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_processWithCustom",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processWithCustom",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "text",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "customTransform",
+              "name" : "customTransform",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "String_To_String",
+                    "parameters" : [
+                      {
+                        "string" : {
+
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_printTogether",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "printTogether",
+          "parameters" : [
+            {
+              "label" : "person",
+              "name" : "person",
+              "type" : {
+                "swiftHeapObject" : {
+                  "_0" : "Person"
+                }
+              }
+            },
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "ratio",
+              "name" : "ratio",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "label" : "customTransform",
+              "name" : "customTransform",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "OptionalPerson_OptionalString_OptionalDouble_To_String",
+                    "parameters" : [
+                      {
+                        "optional" : {
+                          "_0" : {
+                            "swiftHeapObject" : {
+                              "_0" : "Person"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "optional" : {
+                          "_0" : {
+                            "string" : {
+
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "optional" : {
+                          "_0" : {
+                            "double" : {
+
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_roundtrip",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "roundtrip",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "personClosure",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "Person_To_String",
+                    "parameters" : [
+                      {
+                        "swiftHeapObject" : {
+                          "_0" : "Person"
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "Person_To_String",
+                "parameters" : [
+                  {
+                    "swiftHeapObject" : {
+                      "_0" : "Person"
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_roundtripOptional",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "roundtripOptional",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "personClosure",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "OptionalPerson_To_String",
+                    "parameters" : [
+                      {
+                        "optional" : {
+                          "_0" : {
+                            "swiftHeapObject" : {
+                              "_0" : "Person"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "OptionalPerson_To_String",
+                "parameters" : [
+                  {
+                    "optional" : {
+                      "_0" : {
+                        "swiftHeapObject" : {
+                          "_0" : "Person"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_processDirection",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processDirection",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "Direction_To_String",
+                    "parameters" : [
+                      {
+                        "caseEnum" : {
+                          "_0" : "Direction"
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_processTheme",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processTheme",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "Theme_To_String",
+                    "parameters" : [
+                      {
+                        "rawValueEnum" : {
+                          "_0" : "Theme",
+                          "_1" : "String"
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_processHttpStatus",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processHttpStatus",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "HttpStatus_To_Int",
+                    "parameters" : [
+                      {
+                        "rawValueEnum" : {
+                          "_0" : "HttpStatus",
+                          "_1" : "Int"
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_processAPIResult",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processAPIResult",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "APIResult_To_String",
+                    "parameters" : [
+                      {
+                        "associatedValueEnum" : {
+                          "_0" : "APIResult"
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_makeDirectionChecker",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeDirectionChecker",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "Direction_To_Bool",
+                "parameters" : [
+                  {
+                    "caseEnum" : {
+                      "_0" : "Direction"
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_makeThemeValidator",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeThemeValidator",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "Theme_To_Bool",
+                "parameters" : [
+                  {
+                    "rawValueEnum" : {
+                      "_0" : "Theme",
+                      "_1" : "String"
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_makeStatusCodeExtractor",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeStatusCodeExtractor",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "HttpStatus_To_Int",
+                "parameters" : [
+                  {
+                    "rawValueEnum" : {
+                      "_0" : "HttpStatus",
+                      "_1" : "Int"
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_makeAPIResultHandler",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeAPIResultHandler",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "APIResult_To_String",
+                "parameters" : [
+                  {
+                    "associatedValueEnum" : {
+                      "_0" : "APIResult"
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_processOptionalDirection",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processOptionalDirection",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "OptionalDirection_To_String",
+                    "parameters" : [
+                      {
+                        "optional" : {
+                          "_0" : {
+                            "caseEnum" : {
+                              "_0" : "Direction"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_processOptionalTheme",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processOptionalTheme",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "OptionalTheme_To_String",
+                    "parameters" : [
+                      {
+                        "optional" : {
+                          "_0" : {
+                            "rawValueEnum" : {
+                              "_0" : "Theme",
+                              "_1" : "String"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_processOptionalAPIResult",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processOptionalAPIResult",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "OptionalAPIResult_To_String",
+                    "parameters" : [
+                      {
+                        "optional" : {
+                          "_0" : {
+                            "associatedValueEnum" : {
+                              "_0" : "APIResult"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TestProcessor_makeOptionalDirectionFormatter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeOptionalDirectionFormatter",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "OptionalDirection_To_String",
+                "parameters" : [
+                  {
+                    "optional" : {
+                      "_0" : {
+                        "caseEnum" : {
+                          "_0" : "Direction"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "name" : "TestProcessor",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "TestProcessor"
+    }
+  ],
+  "enums" : [
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "north"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "south"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "east"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "west"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Direction",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Direction"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "light",
+          "rawValue" : "light"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "dark",
+          "rawValue" : "dark"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "auto",
+          "rawValue" : "auto"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Theme",
+      "rawType" : "String",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Theme"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "ok",
+          "rawValue" : "200"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "notFound",
+          "rawValue" : "404"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "serverError",
+          "rawValue" : "500"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "unknown",
+          "rawValue" : "-1"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "HttpStatus",
+      "rawType" : "Int",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "HttpStatus"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "success"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "failure"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "flag"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "float" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "rate"
+        },
+        {
+          "associatedValues" : [
+            {
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "name" : "precise"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "info"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "APIResult",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "APIResult"
+    }
+  ],
+  "functions" : [
+
+  ],
+  "moduleName" : "TestModule",
+  "protocols" : [
+
+  ]
+}

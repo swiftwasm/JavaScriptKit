@@ -26,13 +26,16 @@ export async function createInstantiator(options, swift) {
     let tmpParamInts = [];
     let tmpParamF32s = [];
     let tmpParamF64s = [];
+    
+    let _exports = null;
+    let bjs = null;
 
     return {
         /**
          * @param {WebAssembly.Imports} importObject
          */
         addImports: (importObject, importsContext) => {
-            const bjs = {};
+            bjs = {};
             importObject["bjs"] = bjs;
             const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
@@ -173,6 +176,11 @@ export async function createInstantiator(options, swift) {
                 tmpRetOptionalDouble = undefined;
                 return value;
             }
+            bjs["swift_js_get_optional_heap_object_pointer"] = function() {
+                const pointer = tmpRetOptionalHeapObject;
+                tmpRetOptionalHeapObject = undefined;
+                return pointer || 0;
+            }
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_createTS2Skeleton"] = function bjs_createTS2Skeleton() {
                 try {
@@ -255,8 +263,10 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            return {
+            const exports = {
             };
+            _exports = exports;
+            return exports;
         },
     }
 }

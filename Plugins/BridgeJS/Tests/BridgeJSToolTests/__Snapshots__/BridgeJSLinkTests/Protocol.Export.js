@@ -91,13 +91,16 @@ export async function createInstantiator(options, swift) {
     let tmpParamF32s = [];
     let tmpParamF64s = [];
     const enumHelpers = {};
+    
+    let _exports = null;
+    let bjs = null;
 
     return {
         /**
          * @param {WebAssembly.Imports} importObject
          */
         addImports: (importObject, importsContext) => {
-            const bjs = {};
+            bjs = {};
             importObject["bjs"] = bjs;
             const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
@@ -237,6 +240,11 @@ export async function createInstantiator(options, swift) {
                 const value = tmpRetOptionalDouble;
                 tmpRetOptionalDouble = undefined;
                 return value;
+            }
+            bjs["swift_js_get_optional_heap_object_pointer"] = function() {
+                const pointer = tmpRetOptionalHeapObject;
+                tmpRetOptionalHeapObject = undefined;
+                return pointer || 0;
             }
             // Wrapper functions for module: TestModule
             if (!importObject["TestModule"]) {
@@ -653,7 +661,7 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_MyViewController_secondDelegate_set(this.pointer, +isSome, isSome ? swift.memory.retain(value) : 0);
                 }
             }
-            return {
+            const exports = {
                 Helper,
                 MyViewController,
                 Direction: DirectionValues,
@@ -661,6 +669,8 @@ export async function createInstantiator(options, swift) {
                 Result: ResultValues,
                 Priority: PriorityValues,
             };
+            _exports = exports;
+            return exports;
         },
     }
 }

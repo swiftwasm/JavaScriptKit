@@ -59,7 +59,7 @@ struct TestError: Error {
 @JS func asyncRoundTripSwiftHeapObject(v: Greeter) async -> Greeter { return v }
 @JS func asyncRoundTripJSObject(v: JSObject) async -> JSObject { return v }
 
-@JS class Greeter {
+@JS public class Greeter {
     @JS var name: String
     @JS let prefix: String = "Hello"
 
@@ -74,6 +74,27 @@ struct TestError: Error {
     }
     @JS func changeName(name: String) {
         self.name = name
+    }
+
+    @JS func greetWith(greeter: Greeter, customGreeting: (Greeter) -> String) -> String {
+        return customGreeting(greeter)
+    }
+
+    @JS func makeFormatter(suffix: String) -> (String) -> String {
+        return { value in "\(self.greet()) - \(value) - \(suffix)" }
+    }
+
+    @JS static func makeCreator(defaultName: String) -> (String) -> Greeter {
+        return { name in
+            let fullName = name.isEmpty ? defaultName : name
+            return Greeter(name: fullName)
+        }
+    }
+
+    @JS func makeCustomGreeter() -> (Greeter) -> String {
+        return { otherGreeter in
+            return "\(self.name) greets \(otherGreeter.name): \(otherGreeter.greet())"
+        }
     }
 
     deinit {
@@ -1036,6 +1057,161 @@ enum APIOptionalResult {
 
     @JS func getAPIResult() -> APIResult? {
         return apiResult
+    }
+}
+
+// MARK: - Closure Tests
+
+// @JS func makeFormatter(prefix: String) -> (String) -> String {
+//     return { value in "\(prefix) \(value)" }
+// }
+
+@JS func formatName(_ name: String, transform: (String) -> String) -> String {
+    return transform(name)
+}
+
+@JS func makeFormatter(prefix: String) -> (String) -> String {
+    return { value in "\(prefix) \(value)" }
+}
+
+@JS func makeAdder(base: Int) -> (Int) -> Int {
+    return { value in base + value }
+}
+
+@JS class TextProcessor {
+    private var transform: (String) -> String
+
+    @JS init(transform: @escaping (String) -> String) {
+        self.transform = transform
+    }
+
+    @JS func process(_ text: String) -> String {
+        return transform(text)
+    }
+
+    @JS func processWithCustom(_ text: String, customTransform: (Int, String, Double) -> String) -> String {
+        return customTransform(42, text, 3.14)
+    }
+
+    @JS func getTransform() -> (String) -> String {
+        return transform
+    }
+
+    // Optional parameter in closure
+    @JS func processOptionalString(_ callback: (String?) -> String) -> String {
+        return callback("test") + " | " + callback(nil)
+    }
+
+    @JS func processOptionalInt(_ callback: (Int?) -> String) -> String {
+        return callback(42) + " | " + callback(nil)
+    }
+
+    @JS func processOptionalGreeter(_ callback: (Greeter?) -> String) -> String {
+        let greeter = Greeter(name: "Alice")
+        return callback(greeter) + " | " + callback(nil)
+    }
+
+    // Return closure with optional parameter
+    @JS func makeOptionalStringFormatter() -> (String?) -> String {
+        return { value in
+            if let value = value {
+                return "Got: \(value)"
+            } else {
+                return "Got: nil"
+            }
+        }
+    }
+
+    // Return closure with optional return type
+    @JS func makeOptionalGreeterCreator() -> () -> Greeter? {
+        var count = 0
+        return {
+            count += 1
+            if count % 2 == 0 {
+                return Greeter(name: "Greeter\(count)")
+            } else {
+                return nil
+            }
+        }
+    }
+
+    @JS func processDirection(_ callback: (Direction) -> String) -> String {
+        return callback(.north)
+    }
+
+    @JS func processTheme(_ callback: (Theme) -> String) -> String {
+        return callback(.dark)
+    }
+
+    @JS func processHttpStatus(_ callback: (HttpStatus) -> Int) -> Int {
+        return callback(.ok)
+    }
+
+    @JS func processAPIResult(_ callback: (APIResult) -> String) -> String {
+        return callback(.success("test"))
+    }
+
+    @JS func makeDirectionChecker() -> (Direction) -> Bool {
+        return { direction in
+            direction == .north || direction == .south
+        }
+    }
+
+    @JS func makeThemeValidator() -> (Theme) -> Bool {
+        return { theme in
+            theme == .dark
+        }
+    }
+
+    @JS func makeStatusCodeExtractor() -> (HttpStatus) -> Int {
+        return { status in
+            switch status {
+            case .ok: return 200
+            case .notFound: return 404
+            case .serverError: return 500
+            case .unknown: return -1
+            }
+        }
+    }
+
+    @JS func makeAPIResultHandler() -> (APIResult) -> String {
+        return { result in
+            switch result {
+            case .success(let message): return "Success: \(message)"
+            case .failure(let code): return "Failure: \(code)"
+            case .info: return "Info"
+            case .flag(let value): return "Flag: \(value)"
+            case .rate(let value): return "Rate: \(value)"
+            case .precise(let value): return "Precise: \(value)"
+            }
+        }
+    }
+
+    @JS func processOptionalDirection(_ callback: (Direction?) -> String) -> String {
+        return callback(.north) + " | " + callback(nil)
+    }
+
+    @JS func processOptionalTheme(_ callback: (Theme?) -> String) -> String {
+        return callback(.light) + " | " + callback(nil)
+    }
+
+    @JS func processOptionalAPIResult(_ callback: (APIResult?) -> String) -> String {
+        return callback(.success("ok")) + " | " + callback(nil)
+    }
+
+    @JS func makeOptionalDirectionFormatter() -> (Direction?) -> String {
+        return { direction in
+            if let direction = direction {
+                switch direction {
+                case .north: return "N"
+                case .south: return "S"
+                case .east: return "E"
+                case .west: return "W"
+                }
+            } else {
+                return "nil"
+            }
+        }
     }
 }
 

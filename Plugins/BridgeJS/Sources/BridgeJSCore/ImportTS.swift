@@ -433,6 +433,8 @@ extension BridgeType {
         case .string: return .string
         case .jsObject: return .jsObject
         case .void: return .void
+        case .closure:
+            throw BridgeJSCoreError("Closure types are not yet supported in TypeScript imports")
         case .swiftHeapObject(let className):
             switch context {
             case .importTS:
@@ -442,7 +444,7 @@ extension BridgeType {
                     Swift classes can only be used in @JS protocols where Swift owns the instance.
                     """
                 )
-            case .protocolExport:
+            case .exportSwift:
                 return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
             }
         case .swiftProtocol:
@@ -451,14 +453,14 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .protocolExport:
+            case .exportSwift:
                 return LoweringParameterInfo(loweredParameters: [("value", .i32)])
             }
         case .rawValueEnum(_, let rawType):
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .protocolExport:
+            case .exportSwift:
                 // For protocol export we return .i32 for String raw value type instead of nil
                 return LoweringParameterInfo(loweredParameters: [("value", rawType.wasmCoreType ?? .i32)])
             }
@@ -466,7 +468,7 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .protocolExport:
+            case .exportSwift:
                 return LoweringParameterInfo(loweredParameters: [("caseId", .i32)])
             }
         case .namespaceEnum:
@@ -475,7 +477,7 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
-            case .protocolExport:
+            case .exportSwift:
                 let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
                 var params = [("isSome", WasmCoreType.i32)]
                 params.append(contentsOf: wrappedInfo.loweredParameters)
@@ -507,6 +509,8 @@ extension BridgeType {
         case .string: return .string
         case .jsObject: return .jsObject
         case .void: return .void
+        case .closure:
+            throw BridgeJSCoreError("Closure types are not yet supported in TypeScript imports")
         case .swiftHeapObject(let className):
             switch context {
             case .importTS:
@@ -516,7 +520,7 @@ extension BridgeType {
                     JavaScript cannot create Swift heap objects.
                     """
                 )
-            case .protocolExport:
+            case .exportSwift:
                 return LiftingReturnInfo(valueToLift: .pointer)
             }
         case .swiftProtocol:
@@ -525,14 +529,14 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .protocolExport:
+            case .exportSwift:
                 return LiftingReturnInfo(valueToLift: .i32)
             }
         case .rawValueEnum(_, let rawType):
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .protocolExport:
+            case .exportSwift:
                 // For protocol export we return .i32 for String raw value type instead of nil
                 return LiftingReturnInfo(valueToLift: rawType.wasmCoreType ?? .i32)
             }
@@ -540,7 +544,7 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .protocolExport:
+            case .exportSwift:
                 return LiftingReturnInfo(valueToLift: .i32)
             }
         case .namespaceEnum:
@@ -549,7 +553,7 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
-            case .protocolExport:
+            case .exportSwift:
                 let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
                 return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
             }

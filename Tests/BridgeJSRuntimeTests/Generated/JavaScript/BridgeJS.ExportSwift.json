@@ -20,6 +20,7 @@
           }
         ]
       },
+      "explicitAccessControl" : "public",
       "methods" : [
         {
           "abiName" : "bjs_Greeter_greet",
@@ -60,6 +61,176 @@
           "returnType" : {
             "void" : {
 
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Greeter_greetWith",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "greetWith",
+          "parameters" : [
+            {
+              "label" : "greeter",
+              "name" : "greeter",
+              "type" : {
+                "swiftHeapObject" : {
+                  "_0" : "Greeter"
+                }
+              }
+            },
+            {
+              "label" : "customGreeting",
+              "name" : "customGreeting",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "Greeter_To_String",
+                    "parameters" : [
+                      {
+                        "swiftHeapObject" : {
+                          "_0" : "Greeter"
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Greeter_makeFormatter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeFormatter",
+          "parameters" : [
+            {
+              "label" : "suffix",
+              "name" : "suffix",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "String_To_String",
+                "parameters" : [
+                  {
+                    "string" : {
+
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Greeter_static_makeCreator",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "makeCreator",
+          "parameters" : [
+            {
+              "label" : "defaultName",
+              "name" : "defaultName",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "String_To_Greeter",
+                "parameters" : [
+                  {
+                    "string" : {
+
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            }
+          },
+          "staticContext" : {
+            "className" : {
+              "_0" : "Greeter"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Greeter_makeCustomGreeter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeCustomGreeter",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "Greeter_To_String",
+                "parameters" : [
+                  {
+                    "swiftHeapObject" : {
+                      "_0" : "Greeter"
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
             }
           }
         }
@@ -2083,6 +2254,846 @@
         }
       ],
       "swiftCallName" : "SwiftDataProcessor"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_TextProcessor_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "transform",
+            "name" : "transform",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "String_To_String",
+                  "parameters" : [
+                    {
+                      "string" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "string" : {
+
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_TextProcessor_process",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "process",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "text",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_processWithCustom",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processWithCustom",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "text",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "customTransform",
+              "name" : "customTransform",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "Int_String_Double_To_String",
+                    "parameters" : [
+                      {
+                        "int" : {
+
+                        }
+                      },
+                      {
+                        "string" : {
+
+                        }
+                      },
+                      {
+                        "double" : {
+
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_getTransform",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "getTransform",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "String_To_String",
+                "parameters" : [
+                  {
+                    "string" : {
+
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_processOptionalString",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processOptionalString",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "OptionalString_To_String",
+                    "parameters" : [
+                      {
+                        "optional" : {
+                          "_0" : {
+                            "string" : {
+
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_processOptionalInt",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processOptionalInt",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "OptionalInt_To_String",
+                    "parameters" : [
+                      {
+                        "optional" : {
+                          "_0" : {
+                            "int" : {
+
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_processOptionalGreeter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processOptionalGreeter",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "OptionalGreeter_To_String",
+                    "parameters" : [
+                      {
+                        "optional" : {
+                          "_0" : {
+                            "swiftHeapObject" : {
+                              "_0" : "Greeter"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_makeOptionalStringFormatter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeOptionalStringFormatter",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "OptionalString_To_String",
+                "parameters" : [
+                  {
+                    "optional" : {
+                      "_0" : {
+                        "string" : {
+
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_makeOptionalGreeterCreator",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeOptionalGreeterCreator",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "Void_To_OptionalGreeter",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "optional" : {
+                    "_0" : {
+                      "swiftHeapObject" : {
+                        "_0" : "Greeter"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_processDirection",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processDirection",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "Direction_To_String",
+                    "parameters" : [
+                      {
+                        "caseEnum" : {
+                          "_0" : "Direction"
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_processTheme",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processTheme",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "Theme_To_String",
+                    "parameters" : [
+                      {
+                        "rawValueEnum" : {
+                          "_0" : "Theme",
+                          "_1" : "String"
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_processHttpStatus",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processHttpStatus",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "HttpStatus_To_Int",
+                    "parameters" : [
+                      {
+                        "rawValueEnum" : {
+                          "_0" : "HttpStatus",
+                          "_1" : "Int"
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_processAPIResult",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processAPIResult",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "APIResult_To_String",
+                    "parameters" : [
+                      {
+                        "associatedValueEnum" : {
+                          "_0" : "APIResult"
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_makeDirectionChecker",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeDirectionChecker",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "Direction_To_Bool",
+                "parameters" : [
+                  {
+                    "caseEnum" : {
+                      "_0" : "Direction"
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_makeThemeValidator",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeThemeValidator",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "Theme_To_Bool",
+                "parameters" : [
+                  {
+                    "rawValueEnum" : {
+                      "_0" : "Theme",
+                      "_1" : "String"
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_makeStatusCodeExtractor",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeStatusCodeExtractor",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "HttpStatus_To_Int",
+                "parameters" : [
+                  {
+                    "rawValueEnum" : {
+                      "_0" : "HttpStatus",
+                      "_1" : "Int"
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_makeAPIResultHandler",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeAPIResultHandler",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "APIResult_To_String",
+                "parameters" : [
+                  {
+                    "associatedValueEnum" : {
+                      "_0" : "APIResult"
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_processOptionalDirection",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processOptionalDirection",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "OptionalDirection_To_String",
+                    "parameters" : [
+                      {
+                        "optional" : {
+                          "_0" : {
+                            "caseEnum" : {
+                              "_0" : "Direction"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_processOptionalTheme",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processOptionalTheme",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "OptionalTheme_To_String",
+                    "parameters" : [
+                      {
+                        "optional" : {
+                          "_0" : {
+                            "rawValueEnum" : {
+                              "_0" : "Theme",
+                              "_1" : "String"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_processOptionalAPIResult",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "processOptionalAPIResult",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "callback",
+              "type" : {
+                "closure" : {
+                  "_0" : {
+                    "isAsync" : false,
+                    "isThrows" : false,
+                    "mangleName" : "OptionalAPIResult_To_String",
+                    "parameters" : [
+                      {
+                        "optional" : {
+                          "_0" : {
+                            "associatedValueEnum" : {
+                              "_0" : "APIResult"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_TextProcessor_makeOptionalDirectionFormatter",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "makeOptionalDirectionFormatter",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "OptionalDirection_To_String",
+                "parameters" : [
+                  {
+                    "optional" : {
+                      "_0" : {
+                        "caseEnum" : {
+                          "_0" : "Direction"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "name" : "TextProcessor",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "TextProcessor"
     }
   ],
   "enums" : [
@@ -6352,6 +7363,138 @@
       "returnType" : {
         "string" : {
 
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_formatName",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "formatName",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "label" : "transform",
+          "name" : "transform",
+          "type" : {
+            "closure" : {
+              "_0" : {
+                "isAsync" : false,
+                "isThrows" : false,
+                "mangleName" : "String_To_String",
+                "parameters" : [
+                  {
+                    "string" : {
+
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeFormatter",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "makeFormatter",
+      "parameters" : [
+        {
+          "label" : "prefix",
+          "name" : "prefix",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "closure" : {
+          "_0" : {
+            "isAsync" : false,
+            "isThrows" : false,
+            "mangleName" : "String_To_String",
+            "parameters" : [
+              {
+                "string" : {
+
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_makeAdder",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "makeAdder",
+      "parameters" : [
+        {
+          "label" : "base",
+          "name" : "base",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "closure" : {
+          "_0" : {
+            "isAsync" : false,
+            "isThrows" : false,
+            "mangleName" : "Int_To_Int",
+            "parameters" : [
+              {
+                "int" : {
+
+                }
+              }
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            }
+          }
         }
       }
     }

@@ -101,13 +101,16 @@ export async function createInstantiator(options, swift) {
     let tmpParamInts = [];
     let tmpParamF32s = [];
     let tmpParamF64s = [];
+    
+    let _exports = null;
+    let bjs = null;
 
     return {
         /**
          * @param {WebAssembly.Imports} importObject
          */
         addImports: (importObject, importsContext) => {
-            const bjs = {};
+            bjs = {};
             importObject["bjs"] = bjs;
             const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
@@ -248,6 +251,11 @@ export async function createInstantiator(options, swift) {
                 tmpRetOptionalDouble = undefined;
                 return value;
             }
+            bjs["swift_js_get_optional_heap_object_pointer"] = function() {
+                const pointer = tmpRetOptionalHeapObject;
+                tmpRetOptionalHeapObject = undefined;
+                return pointer || 0;
+            }
         },
         setInstance: (i) => {
             instance = i;
@@ -260,7 +268,7 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            return {
+            const exports = {
                 setTheme: function bjs_setTheme(theme) {
                     const themeBytes = textEncoder.encode(theme);
                     const themeId = swift.memory.retain(themeBytes);
@@ -483,6 +491,8 @@ export async function createInstantiator(options, swift) {
                 Precision: PrecisionValues,
                 Ratio: RatioValues,
             };
+            _exports = exports;
+            return exports;
         },
     }
 }
