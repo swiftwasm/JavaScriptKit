@@ -58,6 +58,8 @@ struct PackageToJS {
         var environment: String?
         /// Whether to run tests in the browser with inspector enabled
         var inspect: Bool
+        /// The script defining Playwright exposed functions
+        var playwrightExpose: String?
         /// The extra arguments to pass to node
         var extraNodeArguments: [String]
         /// The options for packaging
@@ -88,6 +90,14 @@ struct PackageToJS {
             )
             testJsArguments.append("--prelude")
             testJsArguments.append(preludeURL.path)
+        }
+        if let playwrightExpose = testOptions.playwrightExpose {
+            let playwrightExposeURL = URL(
+                fileURLWithPath: playwrightExpose,
+                relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+            )
+            testJsArguments.append("--playwright-expose")
+            testJsArguments.append(playwrightExposeURL.path)
         }
         if let environment = testOptions.environment {
             testJsArguments.append("--environment")

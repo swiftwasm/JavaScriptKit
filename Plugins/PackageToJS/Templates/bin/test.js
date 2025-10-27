@@ -33,6 +33,7 @@ const args = parseArgs({
         environment: { type: "string" },
         inspect: { type: "boolean" },
         "coverage-file": { type: "string" },
+        "playwright-expose": { type: "string" },
     },
 })
 
@@ -95,7 +96,47 @@ Hint: This typically means that a continuation leak occurred.
         }
     },
     browser: async ({ preludeScript }) => {
-        process.exit(await testBrowser({ preludeScript, inspect: args.values.inspect, args: testFrameworkArgs }));
+        let onPageLoad = undefined;
+
+        // Load exposed functions from playwright-expose flag
+        if (args.values["playwright-expose"]) {
+            const exposeScript = path.resolve(process.cwd(), args.values["playwright-expose"]);
+            try {
+                const exposeModule = await import(exposeScript);
+                const exposedFunctions = exposeModule.exposedFunctions;
+
+                if (exposedFunctions) {
+                    onPageLoad = async (page) => {
+                        // If exposedFunctions is a function, call it with the page object
+                        // This allows the functions to capture the page in their closure
+                        const functions = typeof exposedFunctions === 'function'
+                            ? await exposedFunctions(page)
+                            : exposedFunctions;
+
+                        for (const [name, fn] of Object.entries(functions)) {
+                            // Bind the page context to each function if needed
+                            // The function can optionally use the page from its closure
+                            page.exposeFunction(name, fn);
+                        }
+                    };
+                }
+            } catch (e) {
+                // If --playwright-expose is specified but file doesn't exist or has no exposedFunctions, that's an error
+                if (args.values["playwright-expose"]) {
+                    throw e;
+                }
+            }
+        }
+
+        const exitCode = await testBrowser({
+            preludeScript,
+            inspect: args.values.inspect,
+            args: testFrameworkArgs,
+            playwright: {
+                onPageLoad
+            }
+        });
+        process.exit(exitCode);
     }
 }
 
