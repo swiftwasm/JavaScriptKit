@@ -394,4 +394,29 @@ extension Trait where Self == ConditionTrait {
         }
     }
     #endif
+
+    @Test(.requireSwiftSDK)
+    func playwrightOnPageLoad_XCTest() throws {
+        let swiftSDKID = try #require(Self.getSwiftSDKID())
+        try withPackage(
+            at: "Plugins/PackageToJS/Fixtures/PlaywrightOnPageLoadTest/XCTest",
+            assertTerminationStatus: { $0 == 0 }
+        ) { packageDir, _, runSwift in
+            try runSwift(["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
+        }
+    }
+
+    #if compiler(>=6.1)
+    // TODO: Remove triple restriction once swift-testing is shipped in p1-threads SDK
+    @Test(.requireSwiftSDK(triple: "wasm32-unknown-wasi"))
+    func playwrightOnPageLoad_SwiftTesting() throws {
+        let swiftSDKID = try #require(Self.getSwiftSDKID())
+        try withPackage(
+            at: "Plugins/PackageToJS/Fixtures/PlaywrightOnPageLoadTest/SwiftTesting",
+            assertTerminationStatus: { $0 == 0 }
+        ) { packageDir, _, runSwift in
+            try runSwift(["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
+        }
+    }
+    #endif
 }
