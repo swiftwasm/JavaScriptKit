@@ -551,6 +551,7 @@ extension PackageToJS.TestOptions {
         let prelude = extractor.extractOption(named: "prelude").last
         let environment = extractor.extractOption(named: "environment").last
         let inspect = extractor.extractFlag(named: "inspect")
+        let playwrightExpose = extractor.extractOption(named: "playwright-expose").last
         let extraNodeArguments = extractor.extractSingleDashOption(named: "Xnode")
         let packageOptions = try PackageToJS.PackageOptions.parse(from: &extractor)
         var options = PackageToJS.TestOptions(
@@ -560,6 +561,7 @@ extension PackageToJS.TestOptions {
             prelude: prelude,
             environment: environment,
             inspect: inspect != 0,
+            playwrightExpose: playwrightExpose,
             extraNodeArguments: extraNodeArguments,
             packageOptions: packageOptions
         )
@@ -582,6 +584,7 @@ extension PackageToJS.TestOptions {
               --prelude <path>           Path to the prelude script
               --environment <name>       The environment to use for the tests (values: node, browser; default: node)
               --inspect                  Whether to run tests in the browser with inspector enabled
+              --playwright-expose <path> Path to script defining Playwright exposed functions
               -Xnode <args>              Extra arguments to pass to Node.js
             \(PackageToJS.PackageOptions.optionsHelp())
 

@@ -127,6 +127,7 @@ extension Trait where Self == ConditionTrait {
             ".vscode",
             ".build",
             "node_modules",
+            "Tests/TemporaryDirectory",
         ]
 
         let enumerator = FileManager.default.enumerator(atPath: repoPath.path)!
@@ -230,6 +231,16 @@ extension Trait where Self == ConditionTrait {
             }
             try body(destination.appending(path: path), runProcess, runSwift)
         }
+    }
+
+    /// FIXME: swift-testing uses too much stack space, so we need to increase the stack size for tests using swift-testing.
+    static var stackSizeLinkerFlags: [String] {
+        [
+            "-Xlinker", "--stack-first",
+            "-Xlinker", "-z",
+            "-Xlinker", "stack-size=524288",
+            "-Xlinker", "--global-base=524288",
+        ]
     }
 
     @Test(.requireSwiftSDK)
@@ -391,6 +402,49 @@ extension Trait where Self == ConditionTrait {
             assertTerminationStatus: { $0 != 0 }
         ) { packageDir, _, runSwift in
             try runSwift(["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
+        }
+    }
+    #endif
+
+    @Test(.requireSwiftSDK)
+    func playwrightOnPageLoad_XCTest() throws {
+        let swiftSDKID = try #require(Self.getSwiftSDKID())
+        try withPackage(
+            at: "Plugins/PackageToJS/Fixtures/PlaywrightOnPageLoadTest/XCTest",
+            assertTerminationStatus: { $0 == 0 }
+        ) { packageDir, runProcess, runSwift in
+            try runProcess(which("npm"), ["install"], [:])
+            try runProcess(which("npx"), ["playwright", "install", "chromium-headless-shell"], [:])
+
+            try runSwift(
+                ["package", "--disable-sandbox"] + Self.stackSizeLinkerFlags + [
+                    "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser",
+                    "--playwright-expose", "../expose.js",
+                ],
+                [:]
+            )
+        }
+    }
+
+    #if compiler(>=6.1)
+    // TODO: Remove triple restriction once swift-testing is shipped in p1-threads SDK
+    @Test(.requireSwiftSDK(triple: "wasm32-unknown-wasi"))
+    func playwrightOnPageLoad_SwiftTesting() throws {
+        let swiftSDKID = try #require(Self.getSwiftSDKID())
+        try withPackage(
+            at: "Plugins/PackageToJS/Fixtures/PlaywrightOnPageLoadTest/SwiftTesting",
+            assertTerminationStatus: { $0 == 0 }
+        ) { packageDir, runProcess, runSwift in
+            try runProcess(which("npm"), ["install"], [:])
+            try runProcess(which("npx"), ["playwright", "install", "chromium-headless-shell"], [:])
+
+            try runSwift(
+                [
+                    "package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser",
+                    "--playwright-expose", "../expose.js",
+                ],
+                [:]
+            )
         }
     }
     #endif

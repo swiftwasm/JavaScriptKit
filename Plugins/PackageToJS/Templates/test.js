@@ -99,13 +99,16 @@ Please run the following command to install it:
     const browser = await playwright[options.playwright?.browser ?? "chromium"].launch(options.playwright?.launchOptions ?? {});
     const context = await browser.newContext();
     const page = await context.newPage();
-
+    // Allow the user to customize the page before it's loaded, for defining custom export functions
+    if (options.playwright?.onPageLoad) {
+        await options.playwright.onPageLoad(page);
+    }
 
     // Forward console messages in the page to the Node.js console
     page.on("console", (message) => {
         console.log(message.text());
     });
-
+    
     const onExit = new Promise((resolve) => {
         page.exposeFunction("exitTest", resolve);
     });
