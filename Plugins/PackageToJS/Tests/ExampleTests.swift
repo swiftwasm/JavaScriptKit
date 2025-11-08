@@ -127,6 +127,7 @@ extension Trait where Self == ConditionTrait {
             ".vscode",
             ".build",
             "node_modules",
+            "Tests/TemporaryDirectory",
         ]
 
         let enumerator = FileManager.default.enumerator(atPath: repoPath.path)!
