@@ -229,8 +229,5 @@
       ]
     }
   ],
-  "moduleName" : "BridgeJSRuntimeTests",
-  "protocols" : [
-
-  ]
+  "moduleName" : "BridgeJSRuntimeTests"
 }

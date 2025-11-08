@@ -44,8 +44,5 @@
       ]
     }
   ],
-  "moduleName" : "PlayBridgeJS",
-  "protocols" : [
-
-  ]
+  "moduleName" : "PlayBridgeJS"
 }

@@ -63,8 +63,5 @@
       ]
     }
   ],
-  "moduleName" : "Benchmarks",
-  "protocols" : [
-
-  ]
+  "moduleName" : "Benchmarks"
 }
