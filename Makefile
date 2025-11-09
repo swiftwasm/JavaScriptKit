@@ -9,10 +9,6 @@ unittest:
 	@echo Running unit tests
 	env JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1 swift package --swift-sdk "$(SWIFT_SDK_ID)" \
 	    --disable-sandbox \
-	    -Xlinker --stack-first \
-	    -Xlinker --global-base=524288 \
-	    -Xlinker -z \
-	    -Xlinker stack-size=524288 \
 	    js test --prelude ./Tests/prelude.mjs -Xnode --expose-gc
 
 .PHONY: regenerate_swiftpm_resources
