@@ -123,11 +123,12 @@ jobs:
         env:
           SWIFT_SDK_ID_wasm32_unknown_wasip1_threads: ${{ steps.setup-wasm32-unknown-wasip1-threads.outputs.swift-sdk-id }}
           SWIFT_SDK_ID_wasm32_unknown_wasip1: ${{ steps.setup-wasm32-unknown-wasip1.outputs.swift-sdk-id }}
+      - run: ./Utilities/prepare-gh-pages.sh
       - name: Upload static files as artifact
         id: deployment
         uses: actions/upload-pages-artifact@v4
         with:
-          path: Examples/
+          path: ./_site
   deploy-examples:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
