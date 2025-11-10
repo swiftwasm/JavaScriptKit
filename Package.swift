@@ -8,6 +8,15 @@ let shouldBuildForEmbedded = Context.environment["JAVASCRIPTKIT_EXPERIMENTAL_EMB
 let useLegacyResourceBundling =
     Context.environment["JAVASCRIPTKIT_USE_LEGACY_RESOURCE_BUNDLING"].flatMap(Bool.init) ?? false
 
+let testingLinkerFlags: [LinkerSetting] = [
+    .unsafeFlags([
+        "-Xlinker", "--stack-first",
+        "-Xlinker", "--global-base=524288",
+        "-Xlinker", "-z",
+        "-Xlinker", "stack-size=524288",
+    ])
+]
+
 let package = Package(
     name: "JavaScriptKit",
     platforms: [
@@ -55,7 +64,8 @@ let package = Package(
             dependencies: ["JavaScriptKit"],
             swiftSettings: [
                 .enableExperimentalFeature("Extern")
-            ]
+            ],
+            linkerSettings: testingLinkerFlags
         ),
 
         .target(
@@ -70,7 +80,8 @@ let package = Package(
         .target(name: "_CJavaScriptBigIntSupport", dependencies: ["_CJavaScriptKit"]),
         .testTarget(
             name: "JavaScriptBigIntSupportTests",
-            dependencies: ["JavaScriptBigIntSupport", "JavaScriptKit"]
+            dependencies: ["JavaScriptBigIntSupport", "JavaScriptKit"],
+            linkerSettings: testingLinkerFlags
         ),
 
         .target(
@@ -92,7 +103,8 @@ let package = Package(
             ],
             swiftSettings: [
                 .enableExperimentalFeature("Extern")
-            ]
+            ],
+            linkerSettings: testingLinkerFlags
         ),
         .target(
             name: "JavaScriptEventLoopTestSupport",
@@ -107,7 +119,8 @@ let package = Package(
             dependencies: [
                 "JavaScriptKit",
                 "JavaScriptEventLoopTestSupport",
-            ]
+            ],
+            linkerSettings: testingLinkerFlags
         ),
         .target(
             name: "JavaScriptFoundationCompat",
@@ -119,7 +132,8 @@ let package = Package(
             name: "JavaScriptFoundationCompatTests",
             dependencies: [
                 "JavaScriptFoundationCompat"
-            ]
+            ],
+            linkerSettings: testingLinkerFlags
         ),
         .plugin(
             name: "PackageToJS",
@@ -163,7 +177,8 @@ let package = Package(
             ],
             swiftSettings: [
                 .enableExperimentalFeature("Extern")
-            ]
+            ],
+            linkerSettings: testingLinkerFlags
         ),
     ]
 )
