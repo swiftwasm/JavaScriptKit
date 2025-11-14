@@ -28,7 +28,7 @@ public class ExportSwift {
     private var exportedProtocolNameByKey: [String: String] = [:]
     private var typeDeclResolver: TypeDeclResolver = TypeDeclResolver()
     private let enumCodegen: EnumCodegen = EnumCodegen()
-    private lazy var closureCodegen = ClosureCodegen(moduleName: moduleName)
+    private let closureCodegen = ClosureCodegen()
 
     public init(progress: ProgressReporting, moduleName: String) {
         self.progress = progress
@@ -1354,6 +1354,7 @@ public class ExportSwift {
                 ClosureSignature(
                     parameters: parameters,
                     returnType: returnType,
+                    moduleName: moduleName,
                     isAsync: isAsync,
                     isThrows: isThrows
                 )
@@ -1477,7 +1478,6 @@ public class ExportSwift {
         }
         decls.append(Self.prelude)
 
-        // Collect all unique closure signatures
         var closureSignatures: Set<ClosureSignature> = []
         for function in exportedFunctions {
             collectClosureSignatures(from: function.parameters, into: &closureSignatures)
@@ -1817,8 +1817,6 @@ public class ExportSwift {
     }
 
     private struct ClosureCodegen {
-        let moduleName: String
-
         func generateOptionalParameterLowering(signature: ClosureSignature) throws -> String {
             var lines: [String] = []
 
@@ -1826,11 +1824,7 @@ public class ExportSwift {
                 guard case .optional(let wrappedType) = paramType else {
                     continue
                 }
-
                 let paramName = "param\(index)"
-
-                // Use bridgeJSLowerParameterWithRetain for heap objects in escaping closures
-                // to ensure proper ownership transfer
                 if case .swiftHeapObject = wrappedType {
                     lines.append(
                         "let (\(paramName)IsSome, \(paramName)Value) = \(paramName).bridgeJSLowerParameterWithRetain()"
@@ -1859,7 +1853,7 @@ public class ExportSwift {
             let closureType = "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
 
             var invokeParams: [(name: String, type: String)] = [("_", "Int32")]
-            var invokeCallArgs: [String] = ["owner.callbackId"]
+            var invokeCallArgs: [String] = ["callback.bridgeJSLowerParameter()"]
 
             for (index, paramType) in signature.parameters.enumerated() {
                 let paramName = "param\(index)"
@@ -1920,7 +1914,7 @@ public class ExportSwift {
                     """
             }
 
-            let externName = "invoke_js_callback_\(mangledName.lowercased())"
+            let externName = "invoke_js_callback_\(signature.moduleName)_\(mangledName)"
             let optionalLoweringCode = try generateOptionalParameterLowering(signature: signature)
 
             return """
@@ -1938,8 +1932,8 @@ public class ExportSwift {
                     }
 
                     static func bridgeJSLift(_ callbackId: Int32) -> \(raw: closureType) {
-                            let owner = _JSCallbackOwner(callbackId: callbackId)
-                            return { [owner] \(raw: signature.parameters.indices.map { "param\($0)" }.joined(separator: ", ")) in
+                            let callback = JSObject.bridgeJSLiftParameter(callbackId)
+                            return { [callback] \(raw: signature.parameters.indices.map { "param\($0)" }.joined(separator: ", ")) in
                                 #if arch(wasm32)
                                 @_extern(wasm, module: "bjs", name: "\(raw: externName)")
                                 func _invoke(\(raw: invokeSignature)) -> \(raw: invokeReturnType)
@@ -1955,7 +1949,7 @@ public class ExportSwift {
 
         func renderClosureInvokeHandler(signature: ClosureSignature) throws -> DeclSyntax {
             let boxClassName = "_BJS_ClosureBox_\(signature.mangleName)"
-            let abiName = "invoke_swift_closure_\(signature.mangleName.lowercased())"
+            let abiName = "invoke_swift_closure_\(signature.moduleName)_\(signature.mangleName)"
 
             var abiParams: [(name: String, type: String)] = [("boxPtr", "UnsafeMutableRawPointer")]
             var liftedParams: [String] = []
@@ -2471,14 +2465,12 @@ public class ExportSwift {
         return decls
     }
 
-    /// Collects all closure signatures from function parameters
     private func collectClosureSignatures(from parameters: [Parameter], into signatures: inout Set<ClosureSignature>) {
         for param in parameters {
             collectClosureSignatures(from: param.type, into: &signatures)
         }
     }
 
-    /// Collects all closure signatures from a bridge type
     private func collectClosureSignatures(from type: BridgeType, into signatures: inout Set<ClosureSignature>) {
         switch type {
         case .closure(let signature):
@@ -2933,7 +2925,6 @@ extension BridgeType {
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
         case .closure:
-            // Closures are returned as UnsafeMutableRawPointer (box pointer)
             return .swiftHeapObject
         }
     }

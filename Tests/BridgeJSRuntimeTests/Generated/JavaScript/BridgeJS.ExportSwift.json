@@ -90,7 +90,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "Greeter_To_String",
+                    "mangleName" : "20BridgeJSRuntimeTests7GreeterC_SS",
+                    "moduleName" : "BridgeJSRuntimeTests",
                     "parameters" : [
                       {
                         "swiftHeapObject" : {
@@ -138,7 +139,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "String_To_String",
+                "mangleName" : "20BridgeJSRuntimeTestsSS_SS",
+                "moduleName" : "BridgeJSRuntimeTests",
                 "parameters" : [
                   {
                     "string" : {
@@ -179,7 +181,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "String_To_Greeter",
+                "mangleName" : "20BridgeJSRuntimeTestsSS_7GreeterC",
+                "moduleName" : "BridgeJSRuntimeTests",
                 "parameters" : [
                   {
                     "string" : {
@@ -217,7 +220,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "Greeter_To_String",
+                "mangleName" : "20BridgeJSRuntimeTests7GreeterC_SS",
+                "moduleName" : "BridgeJSRuntimeTests",
                 "parameters" : [
                   {
                     "swiftHeapObject" : {
@@ -2272,7 +2276,8 @@
                 "_0" : {
                   "isAsync" : false,
                   "isThrows" : false,
-                  "mangleName" : "String_To_String",
+                  "mangleName" : "20BridgeJSRuntimeTestsSS_SS",
+                  "moduleName" : "BridgeJSRuntimeTests",
                   "parameters" : [
                     {
                       "string" : {
@@ -2343,7 +2348,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "Int_String_Double_To_String",
+                    "mangleName" : "20BridgeJSRuntimeTestsSiSSSd_SS",
+                    "moduleName" : "BridgeJSRuntimeTests",
                     "parameters" : [
                       {
                         "int" : {
@@ -2393,7 +2399,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "String_To_String",
+                "mangleName" : "20BridgeJSRuntimeTestsSS_SS",
+                "moduleName" : "BridgeJSRuntimeTests",
                 "parameters" : [
                   {
                     "string" : {
@@ -2427,7 +2434,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "OptionalString_To_String",
+                    "mangleName" : "20BridgeJSRuntimeTestsSqSS_SS",
+                    "moduleName" : "BridgeJSRuntimeTests",
                     "parameters" : [
                       {
                         "optional" : {
@@ -2472,7 +2480,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "OptionalInt_To_String",
+                    "mangleName" : "20BridgeJSRuntimeTestsSqSi_SS",
+                    "moduleName" : "BridgeJSRuntimeTests",
                     "parameters" : [
                       {
                         "optional" : {
@@ -2517,7 +2526,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "OptionalGreeter_To_String",
+                    "mangleName" : "20BridgeJSRuntimeTestsSq7GreeterC_SS",
+                    "moduleName" : "BridgeJSRuntimeTests",
                     "parameters" : [
                       {
                         "optional" : {
@@ -2561,7 +2571,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "OptionalString_To_String",
+                "mangleName" : "20BridgeJSRuntimeTestsSqSS_SS",
+                "moduleName" : "BridgeJSRuntimeTests",
                 "parameters" : [
                   {
                     "optional" : {
@@ -2598,7 +2609,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "Void_To_OptionalGreeter",
+                "mangleName" : "20BridgeJSRuntimeTestsy_Sq7GreeterC",
+                "moduleName" : "BridgeJSRuntimeTests",
                 "parameters" : [
 
                 ],
@@ -2632,7 +2644,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "Direction_To_String",
+                    "mangleName" : "20BridgeJSRuntimeTests9DirectionO_SS",
+                    "moduleName" : "BridgeJSRuntimeTests",
                     "parameters" : [
                       {
                         "caseEnum" : {
@@ -2673,7 +2686,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "Theme_To_String",
+                    "mangleName" : "20BridgeJSRuntimeTests5ThemeO_SS",
+                    "moduleName" : "BridgeJSRuntimeTests",
                     "parameters" : [
                       {
                         "rawValueEnum" : {
@@ -2715,7 +2729,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "HttpStatus_To_Int",
+                    "mangleName" : "20BridgeJSRuntimeTests10HttpStatusO_Si",
+                    "moduleName" : "BridgeJSRuntimeTests",
                     "parameters" : [
                       {
                         "rawValueEnum" : {
@@ -2757,7 +2772,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "APIResult_To_String",
+                    "mangleName" : "20BridgeJSRuntimeTests9APIResultO_SS",
+                    "moduleName" : "BridgeJSRuntimeTests",
                     "parameters" : [
                       {
                         "associatedValueEnum" : {
@@ -2797,7 +2813,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "Direction_To_Bool",
+                "mangleName" : "20BridgeJSRuntimeTests9DirectionO_Sb",
+                "moduleName" : "BridgeJSRuntimeTests",
                 "parameters" : [
                   {
                     "caseEnum" : {
@@ -2830,7 +2847,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "Theme_To_Bool",
+                "mangleName" : "20BridgeJSRuntimeTests5ThemeO_Sb",
+                "moduleName" : "BridgeJSRuntimeTests",
                 "parameters" : [
                   {
                     "rawValueEnum" : {
@@ -2864,7 +2882,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "HttpStatus_To_Int",
+                "mangleName" : "20BridgeJSRuntimeTests10HttpStatusO_Si",
+                "moduleName" : "BridgeJSRuntimeTests",
                 "parameters" : [
                   {
                     "rawValueEnum" : {
@@ -2898,7 +2917,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "APIResult_To_String",
+                "mangleName" : "20BridgeJSRuntimeTests9APIResultO_SS",
+                "moduleName" : "BridgeJSRuntimeTests",
                 "parameters" : [
                   {
                     "associatedValueEnum" : {
@@ -2932,7 +2952,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "OptionalDirection_To_String",
+                    "mangleName" : "20BridgeJSRuntimeTestsSq9DirectionO_SS",
+                    "moduleName" : "BridgeJSRuntimeTests",
                     "parameters" : [
                       {
                         "optional" : {
@@ -2977,7 +2998,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "OptionalTheme_To_String",
+                    "mangleName" : "20BridgeJSRuntimeTestsSq5ThemeO_SS",
+                    "moduleName" : "BridgeJSRuntimeTests",
                     "parameters" : [
                       {
                         "optional" : {
@@ -3023,7 +3045,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "OptionalAPIResult_To_String",
+                    "mangleName" : "20BridgeJSRuntimeTestsSq9APIResultO_SS",
+                    "moduleName" : "BridgeJSRuntimeTests",
                     "parameters" : [
                       {
                         "optional" : {
@@ -3067,7 +3090,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "OptionalDirection_To_String",
+                "mangleName" : "20BridgeJSRuntimeTestsSq9DirectionO_SS",
+                "moduleName" : "BridgeJSRuntimeTests",
                 "parameters" : [
                   {
                     "optional" : {
@@ -7392,7 +7416,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "String_To_String",
+                "mangleName" : "20BridgeJSRuntimeTestsSS_SS",
+                "moduleName" : "BridgeJSRuntimeTests",
                 "parameters" : [
                   {
                     "string" : {
@@ -7440,7 +7465,8 @@
           "_0" : {
             "isAsync" : false,
             "isThrows" : false,
-            "mangleName" : "String_To_String",
+            "mangleName" : "20BridgeJSRuntimeTestsSS_SS",
+            "moduleName" : "BridgeJSRuntimeTests",
             "parameters" : [
               {
                 "string" : {
@@ -7481,7 +7507,8 @@
           "_0" : {
             "isAsync" : false,
             "isThrows" : false,
-            "mangleName" : "Int_To_Int",
+            "mangleName" : "20BridgeJSRuntimeTestsSi_Si",
+            "moduleName" : "BridgeJSRuntimeTests",
             "parameters" : [
               {
                 "int" : {

@@ -696,53 +696,29 @@ struct BridgeJSLink {
                 }
                 printer.write("}")
 
-                var closureSignatures: Set<ClosureSignature> = []
                 for skeleton in exportedSkeletons {
+                    var closureSignatures: Set<ClosureSignature> = []
                     collectClosureSignatures(from: skeleton, into: &closureSignatures)
-                }
 
-                var classToModule: [String: String] = [:]
-                for skeleton in exportedSkeletons {
-                    for klass in skeleton.classes {
-                        classToModule[klass.name] = skeleton.moduleName
-                    }
-                }
+                    guard !closureSignatures.isEmpty else { continue }
 
-                for signature in closureSignatures.sorted(by: { $0.mangleName < $1.mangleName }) {
-                    let invokeFuncName = "invoke_js_callback_\(signature.mangleName.lowercased())"
-                    printer.write(
-                        lines: generateInvokeFunction(
-                            signature: signature,
-                            functionName: invokeFuncName,
-                            classToModule: classToModule
-                        )
-                    )
-
-                    let lowerFuncName = "lower_closure_\(signature.mangleName.lowercased())"
-                    printer.write(
-                        lines: generateLowerClosureFunction(
-                            signature: signature,
-                            functionName: lowerFuncName
-                        )
-                    )
-                }
-
-                if !closureSignatures.isEmpty {
-                    printer.nextLine()
-                    printer.write("bjs[\"release_js_callback\"] = function(id) {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(id);")
-                    }
-                    printer.write("};")
-
-                    printer.nextLine()
-                    printer.write("bjs[\"release_swift_closure\"] = function(boxPtr) {")
-                    printer.indent {
+                    for signature in closureSignatures.sorted(by: { $0.mangleName < $1.mangleName }) {
+                        let invokeFuncName = "invoke_js_callback_\(skeleton.moduleName)_\(signature.mangleName)"
                         printer.write(
-                            "\(JSGlueVariableScope.reservedInstance).exports._release_swift_closure(boxPtr);"
+                            lines: generateInvokeFunction(
+                                signature: signature,
+                                functionName: invokeFuncName
+                            )
+                        )
+
+                        let lowerFuncName = "lower_closure_\(skeleton.moduleName)_\(signature.mangleName)"
+                        printer.write(
+                            lines: generateLowerClosureFunction(
+                                signature: signature,
+                                functionName: lowerFuncName
+                            )
                         )
                     }
-                    printer.write("};")
                 }
             }
         }
@@ -793,8 +769,7 @@ struct BridgeJSLink {
 
     private func generateInvokeFunction(
         signature: ClosureSignature,
-        functionName: String,
-        classToModule: [String: String]
+        functionName: String
     ) -> [String] {
         let printer = CodeFragmentPrinter()
         let scope = JSGlueVariableScope()
@@ -889,7 +864,7 @@ struct BridgeJSLink {
 
                     // Call the Swift invoke function
                     let invokeCall =
-                        "\(JSGlueVariableScope.reservedInstance).exports.invoke_swift_closure_\(signature.mangleName.lowercased())(\(invokeArgs.joined(separator: ", ")))"
+                        "\(JSGlueVariableScope.reservedInstance).exports.invoke_swift_closure_\(signature.moduleName)_\(signature.mangleName)(\(invokeArgs.joined(separator: ", ")))"
 
                     let returnFragment = try! IntrinsicJSFragment.closureLiftReturn(type: signature.returnType)
                     _ = returnFragment.printCode([invokeCall], scope, printer, cleanupCode)

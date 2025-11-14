@@ -285,7 +285,123 @@ export async function createInstantiator(options, swift) {
                 return pointer || 0;
             }
             
-            bjs["invoke_js_callback_apiresult_to_string"] = function(callbackId, param0Id) {
+            bjs["invoke_js_callback_TestModule_10TestModule10HttpStatusO_Si"] = function(callbackId, param0Id) {
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    let param0 = param0Id;
+                    const result = callback(param0);
+                    return result | 0;
+                } catch (error) {
+                    setException?.(error);
+                    return 0;
+                }
+            };
+            
+            bjs["lower_closure_TestModule_10TestModule10HttpStatusO_Si"] = function(closurePtr) {
+                return function(param0) {
+                    try {
+                        return instance.exports.invoke_swift_closure_TestModule_10TestModule10HttpStatusO_Si(closurePtr, param0) | 0;
+                    } catch (error) {
+                        setException?.(error);
+                        throw error;
+                    }
+                };
+            };
+            
+            bjs["invoke_js_callback_TestModule_10TestModule5ThemeO_SS"] = function(callbackId, param0Id) {
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    const param0IdObject = swift.memory.getObject(param0Id);
+                    swift.memory.release(param0Id);
+                    let param0 = String(param0IdObject);
+                    const result = callback(param0);
+                    if (typeof result !== "string") {
+                        throw new TypeError("Callback must return a string");
+                    }
+                    tmpRetBytes = textEncoder.encode(result);
+                    return tmpRetBytes.length;
+                } catch (error) {
+                    setException?.(error);
+                    tmpRetBytes = new Uint8Array(0);
+                    return 0;
+                }
+            };
+            
+            bjs["lower_closure_TestModule_10TestModule5ThemeO_SS"] = function(closurePtr) {
+                return function(param0) {
+                    try {
+                        const param0Bytes = textEncoder.encode(param0);
+                        const param0Id = swift.memory.retain(param0Bytes);
+                        const resultLen = instance.exports.invoke_swift_closure_TestModule_10TestModule5ThemeO_SS(closurePtr, param0Id, param0Bytes.length);
+                        const ret = tmpRetString;
+                        tmpRetString = undefined;
+                        return ret;
+                    } catch (error) {
+                        setException?.(error);
+                        throw error;
+                    }
+                };
+            };
+            
+            bjs["invoke_js_callback_TestModule_10TestModule5ThemeO_Sb"] = function(callbackId, param0Id) {
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    const param0IdObject = swift.memory.getObject(param0Id);
+                    swift.memory.release(param0Id);
+                    let param0 = String(param0IdObject);
+                    const result = callback(param0);
+                    return result ? 1 : 0;
+                } catch (error) {
+                    setException?.(error);
+                    return 0;
+                }
+            };
+            
+            bjs["lower_closure_TestModule_10TestModule5ThemeO_Sb"] = function(closurePtr) {
+                return function(param0) {
+                    try {
+                        const param0Bytes = textEncoder.encode(param0);
+                        const param0Id = swift.memory.retain(param0Bytes);
+                        return instance.exports.invoke_swift_closure_TestModule_10TestModule5ThemeO_Sb(closurePtr, param0Id, param0Bytes.length) !== 0;
+                    } catch (error) {
+                        setException?.(error);
+                        throw error;
+                    }
+                };
+            };
+            
+            bjs["invoke_js_callback_TestModule_10TestModule6PersonC_SS"] = function(callbackId, param0Id) {
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    let param0 = _exports['Person'].__construct(param0Id);
+                    const result = callback(param0);
+                    if (typeof result !== "string") {
+                        throw new TypeError("Callback must return a string");
+                    }
+                    tmpRetBytes = textEncoder.encode(result);
+                    return tmpRetBytes.length;
+                } catch (error) {
+                    setException?.(error);
+                    tmpRetBytes = new Uint8Array(0);
+                    return 0;
+                }
+            };
+            
+            bjs["lower_closure_TestModule_10TestModule6PersonC_SS"] = function(closurePtr) {
+                return function(param0) {
+                    try {
+                        const resultLen = instance.exports.invoke_swift_closure_TestModule_10TestModule6PersonC_SS(closurePtr, param0.pointer);
+                        const ret = tmpRetString;
+                        tmpRetString = undefined;
+                        return ret;
+                    } catch (error) {
+                        setException?.(error);
+                        throw error;
+                    }
+                };
+            };
+            
+            bjs["invoke_js_callback_TestModule_10TestModule9APIResultO_SS"] = function(callbackId, param0Id) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
                     let param0 = enumHelpers.APIResult.raise(param0Id, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
@@ -302,11 +418,11 @@ export async function createInstantiator(options, swift) {
                 }
             };
             
-            bjs["lower_closure_apiresult_to_string"] = function(closurePtr) {
+            bjs["lower_closure_TestModule_10TestModule9APIResultO_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
                         const { caseId: param0CaseId, cleanup: param0Cleanup } = enumHelpers.APIResult.lower(param0);
-                        const resultLen = instance.exports.invoke_swift_closure_apiresult_to_string(closurePtr, param0CaseId);
+                        const resultLen = instance.exports.invoke_swift_closure_TestModule_10TestModule9APIResultO_SS(closurePtr, param0CaseId);
                         const ret = tmpRetString;
                         tmpRetString = undefined;
                         return ret;
@@ -317,7 +433,38 @@ export async function createInstantiator(options, swift) {
                 };
             };
             
-            bjs["invoke_js_callback_direction_to_bool"] = function(callbackId, param0Id) {
+            bjs["invoke_js_callback_TestModule_10TestModule9DirectionO_SS"] = function(callbackId, param0Id) {
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    let param0 = param0Id;
+                    const result = callback(param0);
+                    if (typeof result !== "string") {
+                        throw new TypeError("Callback must return a string");
+                    }
+                    tmpRetBytes = textEncoder.encode(result);
+                    return tmpRetBytes.length;
+                } catch (error) {
+                    setException?.(error);
+                    tmpRetBytes = new Uint8Array(0);
+                    return 0;
+                }
+            };
+            
+            bjs["lower_closure_TestModule_10TestModule9DirectionO_SS"] = function(closurePtr) {
+                return function(param0) {
+                    try {
+                        const resultLen = instance.exports.invoke_swift_closure_TestModule_10TestModule9DirectionO_SS(closurePtr, param0);
+                        const ret = tmpRetString;
+                        tmpRetString = undefined;
+                        return ret;
+                    } catch (error) {
+                        setException?.(error);
+                        throw error;
+                    }
+                };
+            };
+            
+            bjs["invoke_js_callback_TestModule_10TestModule9DirectionO_Sb"] = function(callbackId, param0Id) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
                     let param0 = param0Id;
@@ -329,10 +476,10 @@ export async function createInstantiator(options, swift) {
                 }
             };
             
-            bjs["lower_closure_direction_to_bool"] = function(closurePtr) {
+            bjs["lower_closure_TestModule_10TestModule9DirectionO_Sb"] = function(closurePtr) {
                 return function(param0) {
                     try {
-                        return instance.exports.invoke_swift_closure_direction_to_bool(closurePtr, param0) !== 0;
+                        return instance.exports.invoke_swift_closure_TestModule_10TestModule9DirectionO_Sb(closurePtr, param0) !== 0;
                     } catch (error) {
                         setException?.(error);
                         throw error;
@@ -340,10 +487,12 @@ export async function createInstantiator(options, swift) {
                 };
             };
             
-            bjs["invoke_js_callback_direction_to_string"] = function(callbackId, param0Id) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSS_SS"] = function(callbackId, param0Id) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
-                    let param0 = param0Id;
+                    const param0IdObject = swift.memory.getObject(param0Id);
+                    swift.memory.release(param0Id);
+                    let param0 = String(param0IdObject);
                     const result = callback(param0);
                     if (typeof result !== "string") {
                         throw new TypeError("Callback must return a string");
@@ -357,10 +506,12 @@ export async function createInstantiator(options, swift) {
                 }
             };
             
-            bjs["lower_closure_direction_to_string"] = function(closurePtr) {
+            bjs["lower_closure_TestModule_10TestModuleSS_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
-                        const resultLen = instance.exports.invoke_swift_closure_direction_to_string(closurePtr, param0);
+                        const param0Bytes = textEncoder.encode(param0);
+                        const param0Id = swift.memory.retain(param0Bytes);
+                        const resultLen = instance.exports.invoke_swift_closure_TestModule_10TestModuleSS_SS(closurePtr, param0Id, param0Bytes.length);
                         const ret = tmpRetString;
                         tmpRetString = undefined;
                         return ret;
@@ -371,35 +522,14 @@ export async function createInstantiator(options, swift) {
                 };
             };
             
-            bjs["invoke_js_callback_httpstatus_to_int"] = function(callbackId, param0Id) {
-                try {
-                    const callback = swift.memory.getObject(callbackId);
-                    let param0 = param0Id;
-                    const result = callback(param0);
-                    return result | 0;
-                } catch (error) {
-                    setException?.(error);
-                    return 0;
-                }
-            };
-            
-            bjs["lower_closure_httpstatus_to_int"] = function(closurePtr) {
-                return function(param0) {
-                    try {
-                        return instance.exports.invoke_swift_closure_httpstatus_to_int(closurePtr, param0) | 0;
-                    } catch (error) {
-                        setException?.(error);
-                        throw error;
-                    }
-                };
-            };
-            
-            bjs["invoke_js_callback_optionalapiresult_to_string"] = function(callbackId, param0IsSome, param0Value) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSq5ThemeO_SS"] = function(callbackId, param0IsSome, param0Value) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
                     let param0;
                     if (param0IsSome) {
-                        param0 = enumHelpers.APIResult.raise(param0Value, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                        const param0Object = swift.memory.getObject(param0Value);
+                        swift.memory.release(param0Value);
+                        param0 = String(param0Object);
                     } else {
                         param0 = null;
                     }
@@ -416,17 +546,16 @@ export async function createInstantiator(options, swift) {
                 }
             };
             
-            bjs["lower_closure_optionalapiresult_to_string"] = function(closurePtr) {
+            bjs["lower_closure_TestModule_10TestModuleSq5ThemeO_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
                         const isSome = param0 != null;
-                        let param0CaseId, param0Cleanup;
+                        let param0Id, param0Bytes;
                         if (isSome) {
-                            const enumResult = enumHelpers.APIResult.lower(param0);
-                            param0CaseId = enumResult.caseId;
-                            param0Cleanup = enumResult.cleanup;
+                            param0Bytes = textEncoder.encode(param0);
+                            param0Id = swift.memory.retain(param0Bytes);
                         }
-                        const resultLen = instance.exports.invoke_swift_closure_optionalapiresult_to_string(closurePtr, +isSome, isSome ? param0CaseId : 0);
+                        const resultLen = instance.exports.invoke_swift_closure_TestModule_10TestModuleSq5ThemeO_SS(closurePtr, +isSome, isSome ? param0Id : 0, isSome ? param0Bytes.length : 0);
                         const ret = tmpRetString;
                         tmpRetString = undefined;
                         return ret;
@@ -437,44 +566,7 @@ export async function createInstantiator(options, swift) {
                 };
             };
             
-            bjs["invoke_js_callback_optionaldirection_to_string"] = function(callbackId, param0IsSome, param0Value) {
-                try {
-                    const callback = swift.memory.getObject(callbackId);
-                    let param0;
-                    if (param0IsSome) {
-                        param0 = param0Value;
-                    } else {
-                        param0 = null;
-                    }
-                    const result = callback(param0);
-                    if (typeof result !== "string") {
-                        throw new TypeError("Callback must return a string");
-                    }
-                    tmpRetBytes = textEncoder.encode(result);
-                    return tmpRetBytes.length;
-                } catch (error) {
-                    setException?.(error);
-                    tmpRetBytes = new Uint8Array(0);
-                    return 0;
-                }
-            };
-            
-            bjs["lower_closure_optionaldirection_to_string"] = function(closurePtr) {
-                return function(param0) {
-                    try {
-                        const isSome = param0 != null;
-                        const resultLen = instance.exports.invoke_swift_closure_optionaldirection_to_string(closurePtr, +isSome, isSome ? param0 : 0);
-                        const ret = tmpRetString;
-                        tmpRetString = undefined;
-                        return ret;
-                    } catch (error) {
-                        setException?.(error);
-                        throw error;
-                    }
-                };
-            };
-            
-            bjs["invoke_js_callback_optionalperson_optionalstring_optionaldouble_to_string"] = function(callbackId, param0IsSome, param0Value, param1IsSome, param1Value, param2IsSome, param2Value) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSq6PersonCSqSSSqSd_SS"] = function(callbackId, param0IsSome, param0Value, param1IsSome, param1Value, param2IsSome, param2Value) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
                     let param0;
@@ -510,7 +602,7 @@ export async function createInstantiator(options, swift) {
                 }
             };
             
-            bjs["lower_closure_optionalperson_optionalstring_optionaldouble_to_string"] = function(closurePtr) {
+            bjs["lower_closure_TestModule_10TestModuleSq6PersonCSqSSSqSd_SS"] = function(closurePtr) {
                 return function(param0, param1, param2) {
                     try {
                         const isSome = param0 != null;
@@ -521,7 +613,7 @@ export async function createInstantiator(options, swift) {
                             param1Id = swift.memory.retain(param1Bytes);
                         }
                         const isSome2 = param2 != null;
-                        const resultLen = instance.exports.invoke_swift_closure_optionalperson_optionalstring_optionaldouble_to_string(closurePtr, +isSome, isSome ? param0.pointer : 0, +isSome1, isSome1 ? param1Id : 0, isSome1 ? param1Bytes.length : 0, +isSome2, isSome2 ? param2 : 0);
+                        const resultLen = instance.exports.invoke_swift_closure_TestModule_10TestModuleSq6PersonCSqSSSqSd_SS(closurePtr, +isSome, isSome ? param0.pointer : 0, +isSome1, isSome1 ? param1Id : 0, isSome1 ? param1Bytes.length : 0, +isSome2, isSome2 ? param2 : 0);
                         const ret = tmpRetString;
                         tmpRetString = undefined;
                         return ret;
@@ -532,7 +624,7 @@ export async function createInstantiator(options, swift) {
                 };
             };
             
-            bjs["invoke_js_callback_optionalperson_to_string"] = function(callbackId, param0IsSome, param0Value) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSq6PersonC_SS"] = function(callbackId, param0IsSome, param0Value) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
                     let param0;
@@ -554,11 +646,11 @@ export async function createInstantiator(options, swift) {
                 }
             };
             
-            bjs["lower_closure_optionalperson_to_string"] = function(closurePtr) {
+            bjs["lower_closure_TestModule_10TestModuleSq6PersonC_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
                         const isSome = param0 != null;
-                        const resultLen = instance.exports.invoke_swift_closure_optionalperson_to_string(closurePtr, +isSome, isSome ? param0.pointer : 0);
+                        const resultLen = instance.exports.invoke_swift_closure_TestModule_10TestModuleSq6PersonC_SS(closurePtr, +isSome, isSome ? param0.pointer : 0);
                         const ret = tmpRetString;
                         tmpRetString = undefined;
                         return ret;
@@ -569,14 +661,12 @@ export async function createInstantiator(options, swift) {
                 };
             };
             
-            bjs["invoke_js_callback_optionaltheme_to_string"] = function(callbackId, param0IsSome, param0Value) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSq9APIResultO_SS"] = function(callbackId, param0IsSome, param0Value) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
                     let param0;
                     if (param0IsSome) {
-                        const param0Object = swift.memory.getObject(param0Value);
-                        swift.memory.release(param0Value);
-                        param0 = String(param0Object);
+                        param0 = enumHelpers.APIResult.raise(param0Value, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     } else {
                         param0 = null;
                     }
@@ -593,16 +683,17 @@ export async function createInstantiator(options, swift) {
                 }
             };
             
-            bjs["lower_closure_optionaltheme_to_string"] = function(closurePtr) {
+            bjs["lower_closure_TestModule_10TestModuleSq9APIResultO_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
                         const isSome = param0 != null;
-                        let param0Id, param0Bytes;
+                        let param0CaseId, param0Cleanup;
                         if (isSome) {
-                            param0Bytes = textEncoder.encode(param0);
-                            param0Id = swift.memory.retain(param0Bytes);
+                            const enumResult = enumHelpers.APIResult.lower(param0);
+                            param0CaseId = enumResult.caseId;
+                            param0Cleanup = enumResult.cleanup;
                         }
-                        const resultLen = instance.exports.invoke_swift_closure_optionaltheme_to_string(closurePtr, +isSome, isSome ? param0Id : 0, isSome ? param0Bytes.length : 0);
+                        const resultLen = instance.exports.invoke_swift_closure_TestModule_10TestModuleSq9APIResultO_SS(closurePtr, +isSome, isSome ? param0CaseId : 0);
                         const ret = tmpRetString;
                         tmpRetString = undefined;
                         return ret;
@@ -613,10 +704,15 @@ export async function createInstantiator(options, swift) {
                 };
             };
             
-            bjs["invoke_js_callback_person_to_string"] = function(callbackId, param0Id) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSq9DirectionO_SS"] = function(callbackId, param0IsSome, param0Value) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
-                    let param0 = _exports['Person'].__construct(param0Id);
+                    let param0;
+                    if (param0IsSome) {
+                        param0 = param0Value;
+                    } else {
+                        param0 = null;
+                    }
                     const result = callback(param0);
                     if (typeof result !== "string") {
                         throw new TypeError("Callback must return a string");
@@ -630,10 +726,11 @@ export async function createInstantiator(options, swift) {
                 }
             };
             
-            bjs["lower_closure_person_to_string"] = function(closurePtr) {
+            bjs["lower_closure_TestModule_10TestModuleSq9DirectionO_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
-                        const resultLen = instance.exports.invoke_swift_closure_person_to_string(closurePtr, param0.pointer);
+                        const isSome = param0 != null;
+                        const resultLen = instance.exports.invoke_swift_closure_TestModule_10TestModuleSq9DirectionO_SS(closurePtr, +isSome, isSome ? param0 : 0);
                         const ret = tmpRetString;
                         tmpRetString = undefined;
                         return ret;
@@ -642,111 +739,6 @@ export async function createInstantiator(options, swift) {
                         throw error;
                     }
                 };
-            };
-            
-            bjs["invoke_js_callback_string_to_string"] = function(callbackId, param0Id) {
-                try {
-                    const callback = swift.memory.getObject(callbackId);
-                    const param0IdObject = swift.memory.getObject(param0Id);
-                    swift.memory.release(param0Id);
-                    let param0 = String(param0IdObject);
-                    const result = callback(param0);
-                    if (typeof result !== "string") {
-                        throw new TypeError("Callback must return a string");
-                    }
-                    tmpRetBytes = textEncoder.encode(result);
-                    return tmpRetBytes.length;
-                } catch (error) {
-                    setException?.(error);
-                    tmpRetBytes = new Uint8Array(0);
-                    return 0;
-                }
-            };
-            
-            bjs["lower_closure_string_to_string"] = function(closurePtr) {
-                return function(param0) {
-                    try {
-                        const param0Bytes = textEncoder.encode(param0);
-                        const param0Id = swift.memory.retain(param0Bytes);
-                        const resultLen = instance.exports.invoke_swift_closure_string_to_string(closurePtr, param0Id, param0Bytes.length);
-                        const ret = tmpRetString;
-                        tmpRetString = undefined;
-                        return ret;
-                    } catch (error) {
-                        setException?.(error);
-                        throw error;
-                    }
-                };
-            };
-            
-            bjs["invoke_js_callback_theme_to_bool"] = function(callbackId, param0Id) {
-                try {
-                    const callback = swift.memory.getObject(callbackId);
-                    const param0IdObject = swift.memory.getObject(param0Id);
-                    swift.memory.release(param0Id);
-                    let param0 = String(param0IdObject);
-                    const result = callback(param0);
-                    return result ? 1 : 0;
-                } catch (error) {
-                    setException?.(error);
-                    return 0;
-                }
-            };
-            
-            bjs["lower_closure_theme_to_bool"] = function(closurePtr) {
-                return function(param0) {
-                    try {
-                        const param0Bytes = textEncoder.encode(param0);
-                        const param0Id = swift.memory.retain(param0Bytes);
-                        return instance.exports.invoke_swift_closure_theme_to_bool(closurePtr, param0Id, param0Bytes.length) !== 0;
-                    } catch (error) {
-                        setException?.(error);
-                        throw error;
-                    }
-                };
-            };
-            
-            bjs["invoke_js_callback_theme_to_string"] = function(callbackId, param0Id) {
-                try {
-                    const callback = swift.memory.getObject(callbackId);
-                    const param0IdObject = swift.memory.getObject(param0Id);
-                    swift.memory.release(param0Id);
-                    let param0 = String(param0IdObject);
-                    const result = callback(param0);
-                    if (typeof result !== "string") {
-                        throw new TypeError("Callback must return a string");
-                    }
-                    tmpRetBytes = textEncoder.encode(result);
-                    return tmpRetBytes.length;
-                } catch (error) {
-                    setException?.(error);
-                    tmpRetBytes = new Uint8Array(0);
-                    return 0;
-                }
-            };
-            
-            bjs["lower_closure_theme_to_string"] = function(closurePtr) {
-                return function(param0) {
-                    try {
-                        const param0Bytes = textEncoder.encode(param0);
-                        const param0Id = swift.memory.retain(param0Bytes);
-                        const resultLen = instance.exports.invoke_swift_closure_theme_to_string(closurePtr, param0Id, param0Bytes.length);
-                        const ret = tmpRetString;
-                        tmpRetString = undefined;
-                        return ret;
-                    } catch (error) {
-                        setException?.(error);
-                        throw error;
-                    }
-                };
-            };
-    
-            bjs["release_js_callback"] = function(id) {
-                swift.memory.release(id);
-            };
-    
-            bjs["release_swift_closure"] = function(boxPtr) {
-                instance.exports._release_swift_closure(boxPtr);
             };
             // Wrapper functions for module: TestModule
             if (!importObject["TestModule"]) {
@@ -819,8 +811,7 @@ export async function createInstantiator(options, swift) {
                 }
                 getTransform() {
                     const ret = instance.exports.bjs_TestProcessor_getTransform(this.pointer);
-                    const closure = bjs["lower_closure_string_to_string"](ret);
-                    return closure;
+                    return bjs["lower_closure_TestModule_10TestModuleSS_SS"](ret);
                 }
                 processWithCustom(text, customTransform) {
                     const textBytes = textEncoder.encode(text);
@@ -845,14 +836,12 @@ export async function createInstantiator(options, swift) {
                 roundtrip(personClosure) {
                     const callbackId = swift.memory.retain(personClosure);
                     const ret = instance.exports.bjs_TestProcessor_roundtrip(this.pointer, callbackId);
-                    const closure = bjs["lower_closure_person_to_string"](ret);
-                    return closure;
+                    return bjs["lower_closure_TestModule_10TestModule6PersonC_SS"](ret);
                 }
                 roundtripOptional(personClosure) {
                     const callbackId = swift.memory.retain(personClosure);
                     const ret = instance.exports.bjs_TestProcessor_roundtripOptional(this.pointer, callbackId);
-                    const closure = bjs["lower_closure_optionalperson_to_string"](ret);
-                    return closure;
+                    return bjs["lower_closure_TestModule_10TestModuleSq6PersonC_SS"](ret);
                 }
                 processDirection(callback) {
                     const callbackId = swift.memory.retain(callback);
@@ -882,23 +871,19 @@ export async function createInstantiator(options, swift) {
                 }
                 makeDirectionChecker() {
                     const ret = instance.exports.bjs_TestProcessor_makeDirectionChecker(this.pointer);
-                    const closure = bjs["lower_closure_direction_to_bool"](ret);
-                    return closure;
+                    return bjs["lower_closure_TestModule_10TestModule9DirectionO_Sb"](ret);
                 }
                 makeThemeValidator() {
                     const ret = instance.exports.bjs_TestProcessor_makeThemeValidator(this.pointer);
-                    const closure = bjs["lower_closure_theme_to_bool"](ret);
-                    return closure;
+                    return bjs["lower_closure_TestModule_10TestModule5ThemeO_Sb"](ret);
                 }
                 makeStatusCodeExtractor() {
                     const ret = instance.exports.bjs_TestProcessor_makeStatusCodeExtractor(this.pointer);
-                    const closure = bjs["lower_closure_httpstatus_to_int"](ret);
-                    return closure;
+                    return bjs["lower_closure_TestModule_10TestModule10HttpStatusO_Si"](ret);
                 }
                 makeAPIResultHandler() {
                     const ret = instance.exports.bjs_TestProcessor_makeAPIResultHandler(this.pointer);
-                    const closure = bjs["lower_closure_apiresult_to_string"](ret);
-                    return closure;
+                    return bjs["lower_closure_TestModule_10TestModule9APIResultO_SS"](ret);
                 }
                 processOptionalDirection(callback) {
                     const callbackId = swift.memory.retain(callback);
@@ -923,8 +908,7 @@ export async function createInstantiator(options, swift) {
                 }
                 makeOptionalDirectionFormatter() {
                     const ret = instance.exports.bjs_TestProcessor_makeOptionalDirectionFormatter(this.pointer);
-                    const closure = bjs["lower_closure_optionaldirection_to_string"](ret);
-                    return closure;
+                    return bjs["lower_closure_TestModule_10TestModuleSq9DirectionO_SS"](ret);
                 }
             }
             const exports = {

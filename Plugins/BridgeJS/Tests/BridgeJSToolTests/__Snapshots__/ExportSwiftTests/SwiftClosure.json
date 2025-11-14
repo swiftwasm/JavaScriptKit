@@ -47,7 +47,8 @@
                 "_0" : {
                   "isAsync" : false,
                   "isThrows" : false,
-                  "mangleName" : "String_To_String",
+                  "mangleName" : "10TestModuleSS_SS",
+                  "moduleName" : "TestModule",
                   "parameters" : [
                     {
                       "string" : {
@@ -83,7 +84,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "String_To_String",
+                "mangleName" : "10TestModuleSS_SS",
+                "moduleName" : "TestModule",
                 "parameters" : [
                   {
                     "string" : {
@@ -126,7 +128,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "String_To_String",
+                    "mangleName" : "10TestModuleSS_SS",
+                    "moduleName" : "TestModule",
                     "parameters" : [
                       {
                         "string" : {
@@ -194,7 +197,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "OptionalPerson_OptionalString_OptionalDouble_To_String",
+                    "mangleName" : "10TestModuleSq6PersonCSqSSSqSd_SS",
+                    "moduleName" : "TestModule",
                     "parameters" : [
                       {
                         "optional" : {
@@ -257,7 +261,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "Person_To_String",
+                    "mangleName" : "10TestModule6PersonC_SS",
+                    "moduleName" : "TestModule",
                     "parameters" : [
                       {
                         "swiftHeapObject" : {
@@ -280,7 +285,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "Person_To_String",
+                "mangleName" : "10TestModule6PersonC_SS",
+                "moduleName" : "TestModule",
                 "parameters" : [
                   {
                     "swiftHeapObject" : {
@@ -314,7 +320,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "OptionalPerson_To_String",
+                    "mangleName" : "10TestModuleSq6PersonC_SS",
+                    "moduleName" : "TestModule",
                     "parameters" : [
                       {
                         "optional" : {
@@ -341,7 +348,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "OptionalPerson_To_String",
+                "mangleName" : "10TestModuleSq6PersonC_SS",
+                "moduleName" : "TestModule",
                 "parameters" : [
                   {
                     "optional" : {
@@ -379,7 +387,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "Direction_To_String",
+                    "mangleName" : "10TestModule9DirectionO_SS",
+                    "moduleName" : "TestModule",
                     "parameters" : [
                       {
                         "caseEnum" : {
@@ -420,7 +429,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "Theme_To_String",
+                    "mangleName" : "10TestModule5ThemeO_SS",
+                    "moduleName" : "TestModule",
                     "parameters" : [
                       {
                         "rawValueEnum" : {
@@ -462,7 +472,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "HttpStatus_To_Int",
+                    "mangleName" : "10TestModule10HttpStatusO_Si",
+                    "moduleName" : "TestModule",
                     "parameters" : [
                       {
                         "rawValueEnum" : {
@@ -504,7 +515,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "APIResult_To_String",
+                    "mangleName" : "10TestModule9APIResultO_SS",
+                    "moduleName" : "TestModule",
                     "parameters" : [
                       {
                         "associatedValueEnum" : {
@@ -544,7 +556,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "Direction_To_Bool",
+                "mangleName" : "10TestModule9DirectionO_Sb",
+                "moduleName" : "TestModule",
                 "parameters" : [
                   {
                     "caseEnum" : {
@@ -577,7 +590,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "Theme_To_Bool",
+                "mangleName" : "10TestModule5ThemeO_Sb",
+                "moduleName" : "TestModule",
                 "parameters" : [
                   {
                     "rawValueEnum" : {
@@ -611,7 +625,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "HttpStatus_To_Int",
+                "mangleName" : "10TestModule10HttpStatusO_Si",
+                "moduleName" : "TestModule",
                 "parameters" : [
                   {
                     "rawValueEnum" : {
@@ -645,7 +660,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "APIResult_To_String",
+                "mangleName" : "10TestModule9APIResultO_SS",
+                "moduleName" : "TestModule",
                 "parameters" : [
                   {
                     "associatedValueEnum" : {
@@ -679,7 +695,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "OptionalDirection_To_String",
+                    "mangleName" : "10TestModuleSq9DirectionO_SS",
+                    "moduleName" : "TestModule",
                     "parameters" : [
                       {
                         "optional" : {
@@ -724,7 +741,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "OptionalTheme_To_String",
+                    "mangleName" : "10TestModuleSq5ThemeO_SS",
+                    "moduleName" : "TestModule",
                     "parameters" : [
                       {
                         "optional" : {
@@ -770,7 +788,8 @@
                   "_0" : {
                     "isAsync" : false,
                     "isThrows" : false,
-                    "mangleName" : "OptionalAPIResult_To_String",
+                    "mangleName" : "10TestModuleSq9APIResultO_SS",
+                    "moduleName" : "TestModule",
                     "parameters" : [
                       {
                         "optional" : {
@@ -814,7 +833,8 @@
               "_0" : {
                 "isAsync" : false,
                 "isThrows" : false,
-                "mangleName" : "OptionalDirection_To_String",
+                "mangleName" : "10TestModuleSq9DirectionO_SS",
+                "moduleName" : "TestModule",
                 "parameters" : [
                   {
                     "optional" : {

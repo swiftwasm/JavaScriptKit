@@ -1298,14 +1298,13 @@ struct IntrinsicJSFragment: Sendable {
             let base = fullName.components(separatedBy: ".").last ?? fullName
             return .associatedEnumLiftReturn(enumBase: base)
         case .closure(let signature):
+            let lowerFuncName = "lower_closure_\(signature.moduleName)_\(signature.mangleName)"
             return IntrinsicJSFragment(
-                parameters: ["closurePtr"],
+                parameters: ["boxPtr"],
                 printCode: { arguments, scope, printer, cleanupCode in
-                    let closurePtr = arguments[0]
-                    let lowerFuncName = "lower_closure_\(signature.mangleName.lowercased())"
-                    let resultVar = scope.variable("closure")
-                    printer.write("const \(resultVar) = bjs[\"\(lowerFuncName)\"](\(closurePtr));")
-                    return [resultVar]
+                    let boxPtr = arguments[0]
+                    printer.write("return bjs[\"\(lowerFuncName)\"](\(boxPtr));")
+                    return []
                 }
             )
         case .namespaceEnum(let string):

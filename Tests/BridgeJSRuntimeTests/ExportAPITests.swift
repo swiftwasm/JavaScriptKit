@@ -1097,7 +1097,6 @@ enum APIOptionalResult {
         return transform
     }
 
-    // Optional parameter in closure
     @JS func processOptionalString(_ callback: (String?) -> String) -> String {
         return callback("test") + " | " + callback(nil)
     }
@@ -1111,7 +1110,6 @@ enum APIOptionalResult {
         return callback(greeter) + " | " + callback(nil)
     }
 
-    // Return closure with optional parameter
     @JS func makeOptionalStringFormatter() -> (String?) -> String {
         return { value in
             if let value = value {
@@ -1122,7 +1120,6 @@ enum APIOptionalResult {
         }
     }
 
-    // Return closure with optional return type
     @JS func makeOptionalGreeterCreator() -> () -> Greeter? {
         var count = 0
         return {

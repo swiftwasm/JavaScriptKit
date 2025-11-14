@@ -29,48 +29,6 @@ import _CJavaScriptKit
 }
 #endif
 
-// MARK: Closure Callback Management
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "release_js_callback")
-@_spi(BridgeJS) public func _swift_js_release_callback(_ id: Int32)
-#else
-/// Releases a JavaScript callback registered from JavaScript side.
-///
-/// This function is called by BridgeJS-generated code after consuming a closure
-/// parameter to ensure the JavaScript callback is properly cleaned up and can be
-/// garbage collected.
-///
-/// - Parameter id: The callback ID to release
-@_spi(BridgeJS) public func _swift_js_release_callback(_ id: Int32) {
-    _onlyAvailableOnWasm()
-}
-#endif
-
-/// Owns a JavaScript callback and automatically releases it on deinit.
-/// This ensures the callback lives exactly as long as the Swift closure that uses it.
-///
-/// When a JavaScript function is passed to Swift as a closure parameter, the callback
-/// is stored in `swift.memory` with an ID. This owner class captures that ID and ensures
-/// it's released when the Swift closure is deallocated, preventing memory leaks while
-/// supporting both @escaping and non-escaping closures.
-@_spi(BridgeJS) public final class _JSCallbackOwner {
-    public let callbackId: Int32
-    private var isReleased: Bool = false
-
-    public init(callbackId: Int32) {
-        self.callbackId = callbackId
-    }
-
-    deinit {
-        guard !isReleased else { return }
-        #if arch(wasm32)
-        _swift_js_release_callback(callbackId)
-        #endif
-        isReleased = true
-    }
-}
-
 /// Retrieves and clears any pending JavaScript exception.
 ///
 /// This function checks for any JavaScript exceptions that were thrown during
@@ -339,20 +297,6 @@ extension _BridgedSwiftHeapObject {
 ///
 /// The conformance is automatically synthesized by the BridgeJS code generator.
 @_spi(BridgeJS) public protocol _BridgedSwiftClosureBox: AnyObject {}
-
-/// Release function for closure boxes
-/// - Parameter boxPtr: Opaque pointer to a closure box conforming to _BridgedSwiftClosureBox
-#if arch(wasm32)
-@_expose(wasm, "release_swift_closure")
-@_cdecl("release_swift_closure")
-public func _release_swift_closure(boxPtr: UnsafeMutableRawPointer) {
-    Unmanaged<AnyObject>.fromOpaque(boxPtr).release()
-}
-#else
-@_spi(BridgeJS) public func _release_swift_closure(boxPtr: UnsafeMutableRawPointer) {
-    _onlyAvailableOnWasm()
-}
-#endif
 
 extension _JSBridgedClass {
     // MARK: ImportTS
@@ -835,9 +779,6 @@ extension Optional where Wrapped: _BridgedSwiftHeapObject {
     /// object remains valid even if the JavaScript closure escapes and stores the parameter.
     /// JavaScript must wrap the pointer with `__construct()` to create a managed reference
     /// that will be cleaned up via FinalizationRegistry.
-    ///
-    /// Use this method when passing heap objects to @escaping closures that may outlive
-    /// the original call context.
     ///
     /// - Returns: A tuple containing presence flag (0 for nil, 1 for some) and retained pointer
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithRetain() -> (
