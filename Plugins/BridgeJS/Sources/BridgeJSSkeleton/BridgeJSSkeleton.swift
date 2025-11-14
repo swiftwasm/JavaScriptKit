@@ -70,10 +70,44 @@ public struct ABINameGenerator {
 /// Context for bridge operations that determines which types are valid
 public enum BridgeContext: Sendable {
     case importTS
-    case protocolExport
+    case exportSwift
 }
 
-public enum BridgeType: Codable, Equatable, Sendable {
+public struct ClosureSignature: Codable, Equatable, Hashable, Sendable {
+    public let parameters: [BridgeType]
+    public let returnType: BridgeType
+    /// Simplified Swift ABI-style mangling with module prefix
+    // <moduleLength><module> + params + _ + return
+    // Examples:
+    //   - 4MainSS_Si (Main module, String->Int)
+    //   - 6MyAppSiSi_y (MyApp module, Int,Int->Void)
+    public let mangleName: String
+    public let isAsync: Bool
+    public let isThrows: Bool
+    public let moduleName: String
+
+    public init(
+        parameters: [BridgeType],
+        returnType: BridgeType,
+        moduleName: String,
+        isAsync: Bool = false,
+        isThrows: Bool = false
+    ) {
+        self.parameters = parameters
+        self.returnType = returnType
+        self.moduleName = moduleName
+        self.isAsync = isAsync
+        self.isThrows = isThrows
+        let paramPart =
+            parameters.isEmpty
+            ? "y"
+            : parameters.map { $0.mangleTypeName }.joined()
+        let signaturePart = "\(paramPart)_\(returnType.mangleTypeName)"
+        self.mangleName = "\(moduleName.count)\(moduleName)\(signaturePart)"
+    }
+}
+
+public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case int, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
     indirect case optional(BridgeType)
     case caseEnum(String)
@@ -81,6 +115,7 @@ public enum BridgeType: Codable, Equatable, Sendable {
     case associatedValueEnum(String)
     case namespaceEnum(String)
     case swiftProtocol(String)
+    indirect case closure(ClosureSignature)
 }
 
 public enum WasmCoreType: String, Codable, Sendable {
@@ -567,6 +602,9 @@ extension BridgeType {
         case .swiftProtocol:
             // Protocols pass JSObject IDs as Int32
             return .i32
+        case .closure:
+            // Closures pass callback ID as Int32
+            return .i32
         }
     }
 
@@ -574,5 +612,62 @@ extension BridgeType {
     public var isOptional: Bool {
         if case .optional = self { return true }
         return false
+    }
+
+    /// Simplified Swift ABI-style mangled name
+    /// https://github.com/swiftlang/swift/blob/main/docs/ABI/Mangling.rst#types
+    public var mangleTypeName: String {
+        switch self {
+        case .int: return "Si"
+        case .float: return "Sf"
+        case .double: return "Sd"
+        case .string: return "SS"
+        case .bool: return "Sb"
+        case .void: return "y"
+        case .jsObject(let name):
+            let typeName = name ?? "JSObject"
+            return "\(typeName.count)\(typeName)C"
+        case .swiftHeapObject(let name):
+            return "\(name.count)\(name)C"
+        case .optional(let wrapped):
+            return "Sq\(wrapped.mangleTypeName)"
+        case .caseEnum(let name),
+            .rawValueEnum(let name, _),
+            .associatedValueEnum(let name),
+            .namespaceEnum(let name):
+            return "\(name.count)\(name)O"
+        case .swiftProtocol(let name):
+            return "\(name.count)\(name)P"
+        case .closure(let signature):
+            let params =
+                signature.parameters.isEmpty
+                ? "y"
+                : signature.parameters.map { $0.mangleTypeName }.joined()
+            return "K\(params)_\(signature.returnType.mangleTypeName)"
+        }
+    }
+
+    /// Determines if an optional type requires side-channel communication for protocol property returns
+    ///
+    /// Side channels are needed when the wrapped type cannot be directly returned via WASM,
+    /// or when we need to distinguish null from absent value for certain primitives.
+    public func usesSideChannelForOptionalReturn() -> Bool {
+        guard case .optional(let wrappedType) = self else { return false }
+
+        switch wrappedType {
+        case .string, .int, .float, .double, .jsObject, .swiftProtocol:
+            return true
+        case .rawValueEnum(_, let rawType):
+            switch rawType {
+            case .string, .int, .float, .double:
+                return true
+            default:
+                return false
+            }
+        case .bool, .caseEnum, .swiftHeapObject, .associatedValueEnum:
+            return false
+        default:
+            return false
+        }
     }
 }

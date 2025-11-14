@@ -78,7 +78,8 @@ import _CJavaScriptKit
 // - `func bridgeJSLowerReturn() -> <#WasmCoreType#>`: lower the given higher-level return value to a Wasm core type
 //
 // Optional types (ExportSwift only) additionally define:
-// - `func bridgeJSLowerParameterWithPresence()`: lower optional as (isSome, value) tuple for protocol setters/parameters
+// - `func bridgeJSLowerParameterWithPresence()`: lower optional as (isSome, value) tuple for protocol setters/parameters (borrows object)
+// - `func bridgeJSLowerParameterWithRetain()`: lower optional heap object with ownership transfer for escaping closures
 // - `func bridgeJSLiftReturnFromSideChannel()`: lift optional from side-channel storage for protocol property getters
 //
 // See JSGlueGen.swift in BridgeJSLink for JS-side lowering/lifting implementation.
@@ -290,6 +291,12 @@ extension _BridgedSwiftHeapObject {
         return Unmanaged.passRetained(self).toOpaque()
     }
 }
+// MARK: Closure Box Protocol
+
+/// A protocol that Swift closure box types must conform to.
+///
+/// The conformance is automatically synthesized by the BridgeJS code generator.
+@_spi(BridgeJS) public protocol _BridgedSwiftClosureBox: AnyObject {}
 
 extension _JSBridgedClass {
     // MARK: ImportTS
@@ -748,14 +755,40 @@ extension Optional where Wrapped: _BridgedSwiftHeapObject {
         }
     }
 
+    /// Lowers optional Swift heap object as (isSome, pointer) tuple for protocol parameters.
+    ///
+    /// This method uses `passUnretained()` because the caller (JavaScript protocol implementation)
+    /// already owns the object and will not retain it. The pointer is only valid for the
+    /// duration of the call.
+    ///
+    /// - Returns: A tuple containing presence flag (0 for nil, 1 for some) and unretained pointer
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithPresence() -> (
         isSome: Int32, pointer: UnsafeMutableRawPointer
     ) {
         switch consume self {
         case .none:
-            return (isSome: 0, pointer: UnsafeMutableRawPointer(bitPattern: 0)!)
+            return (isSome: 0, pointer: UnsafeMutableRawPointer(bitPattern: 1)!)
         case .some(let value):
             return (isSome: 1, pointer: value.bridgeJSLowerParameter())
+        }
+    }
+
+    /// Lowers optional Swift heap object with ownership transfer for escaping closures.
+    ///
+    /// This method uses `passRetained()` to transfer ownership to JavaScript, ensuring the
+    /// object remains valid even if the JavaScript closure escapes and stores the parameter.
+    /// JavaScript must wrap the pointer with `__construct()` to create a managed reference
+    /// that will be cleaned up via FinalizationRegistry.
+    ///
+    /// - Returns: A tuple containing presence flag (0 for nil, 1 for some) and retained pointer
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithRetain() -> (
+        isSome: Int32, pointer: UnsafeMutableRawPointer
+    ) {
+        switch consume self {
+        case .none:
+            return (isSome: 0, pointer: UnsafeMutableRawPointer(bitPattern: 1)!)
+        case .some(let value):
+            return (isSome: 1, pointer: Unmanaged.passRetained(value).toOpaque())
         }
     }
 
@@ -778,6 +811,24 @@ extension Optional where Wrapped: _BridgedSwiftHeapObject {
             return nil
         } else {
             return Wrapped.bridgeJSLiftParameter(pointer)
+        }
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Wrapped? {
+        #if arch(wasm32)
+        @_extern(wasm, module: "bjs", name: "swift_js_get_optional_heap_object_pointer")
+        func _swift_js_get_optional_heap_object_pointer() -> UnsafeMutableRawPointer
+        #else
+        func _swift_js_get_optional_heap_object_pointer() -> UnsafeMutableRawPointer {
+            _onlyAvailableOnWasm()
+        }
+        #endif
+
+        let pointer = _swift_js_get_optional_heap_object_pointer()
+        if pointer == UnsafeMutableRawPointer(bitPattern: 0) {
+            return nil
+        } else {
+            return Wrapped.bridgeJSLiftReturn(pointer)
         }
     }
 

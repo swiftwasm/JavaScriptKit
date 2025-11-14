@@ -368,7 +368,51 @@ struct BridgeJSLink {
             declarations.append("const enumHelpers = {};")
         }
 
+        declarations.append("")
+        declarations.append("let _exports = null;")
+        declarations.append("let bjs = null;")
+
         return declarations
+    }
+
+    /// Checks if a skeleton contains any closure types
+    private func hasClosureTypes(in skeleton: ExportedSkeleton) -> Bool {
+        for function in skeleton.functions {
+            if containsClosureType(in: function.parameters) || containsClosureType(in: function.returnType) {
+                return true
+            }
+        }
+        for klass in skeleton.classes {
+            if let constructor = klass.constructor, containsClosureType(in: constructor.parameters) {
+                return true
+            }
+            for method in klass.methods {
+                if containsClosureType(in: method.parameters) || containsClosureType(in: method.returnType) {
+                    return true
+                }
+            }
+            for property in klass.properties {
+                if containsClosureType(in: property.type) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private func containsClosureType(in parameters: [Parameter]) -> Bool {
+        parameters.contains { containsClosureType(in: $0.type) }
+    }
+
+    private func containsClosureType(in type: BridgeType) -> Bool {
+        switch type {
+        case .closure:
+            return true
+        case .optional(let wrapped):
+            return containsClosureType(in: wrapped)
+        default:
+            return false
+        }
     }
 
     private func generateAddImports() -> CodeFragmentPrinter {
@@ -384,7 +428,7 @@ struct BridgeJSLink {
 
             printer.indent {
                 printer.write(lines: [
-                    "const bjs = {};",
+                    "bjs = {};",
                     "importObject[\"bjs\"] = bjs;",
                     "const imports = options.getImports(importsContext);",
                 ])
@@ -644,9 +688,204 @@ struct BridgeJSLink {
                     printer.write("return value;")
                 }
                 printer.write("}")
+                printer.write("bjs[\"swift_js_get_optional_heap_object_pointer\"] = function() {")
+                printer.indent {
+                    printer.write("const pointer = \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);")
+                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = undefined;")
+                    printer.write("return pointer || 0;")
+                }
+                printer.write("}")
+
+                for skeleton in exportedSkeletons {
+                    var closureSignatures: Set<ClosureSignature> = []
+                    collectClosureSignatures(from: skeleton, into: &closureSignatures)
+
+                    guard !closureSignatures.isEmpty else { continue }
+
+                    for signature in closureSignatures.sorted(by: { $0.mangleName < $1.mangleName }) {
+                        let invokeFuncName = "invoke_js_callback_\(skeleton.moduleName)_\(signature.mangleName)"
+                        printer.write(
+                            lines: generateInvokeFunction(
+                                signature: signature,
+                                functionName: invokeFuncName
+                            )
+                        )
+
+                        let lowerFuncName = "lower_closure_\(skeleton.moduleName)_\(signature.mangleName)"
+                        printer.write(
+                            lines: generateLowerClosureFunction(
+                                signature: signature,
+                                functionName: lowerFuncName
+                            )
+                        )
+                    }
+                }
             }
         }
+
         return printer
+    }
+
+    private func collectClosureSignatures(from skeleton: ExportedSkeleton, into signatures: inout Set<ClosureSignature>)
+    {
+        for function in skeleton.functions {
+            collectClosureSignatures(from: function.parameters, into: &signatures)
+            collectClosureSignatures(from: function.returnType, into: &signatures)
+        }
+        for klass in skeleton.classes {
+            if let constructor = klass.constructor {
+                collectClosureSignatures(from: constructor.parameters, into: &signatures)
+            }
+            for method in klass.methods {
+                collectClosureSignatures(from: method.parameters, into: &signatures)
+                collectClosureSignatures(from: method.returnType, into: &signatures)
+            }
+            for property in klass.properties {
+                collectClosureSignatures(from: property.type, into: &signatures)
+            }
+        }
+    }
+
+    private func collectClosureSignatures(from parameters: [Parameter], into signatures: inout Set<ClosureSignature>) {
+        for param in parameters {
+            collectClosureSignatures(from: param.type, into: &signatures)
+        }
+    }
+
+    private func collectClosureSignatures(from type: BridgeType, into signatures: inout Set<ClosureSignature>) {
+        switch type {
+        case .closure(let signature):
+            signatures.insert(signature)
+            for paramType in signature.parameters {
+                collectClosureSignatures(from: paramType, into: &signatures)
+            }
+            collectClosureSignatures(from: signature.returnType, into: &signatures)
+        case .optional(let wrapped):
+            collectClosureSignatures(from: wrapped, into: &signatures)
+        default:
+            break
+        }
+    }
+
+    private func generateInvokeFunction(
+        signature: ClosureSignature,
+        functionName: String
+    ) -> [String] {
+        let printer = CodeFragmentPrinter()
+        let scope = JSGlueVariableScope()
+        let cleanupCode = CodeFragmentPrinter()
+
+        // Build parameter list for invoke function
+        var invokeParams: [String] = ["callbackId"]
+        for (index, paramType) in signature.parameters.enumerated() {
+            if case .optional = paramType {
+                invokeParams.append("param\(index)IsSome")
+                invokeParams.append("param\(index)Value")
+            } else {
+                invokeParams.append("param\(index)Id")
+            }
+        }
+
+        printer.nextLine()
+        printer.write("bjs[\"\(functionName)\"] = function(\(invokeParams.joined(separator: ", "))) {")
+        printer.indent {
+            printer.write("try {")
+            printer.indent {
+                printer.write("const callback = \(JSGlueVariableScope.reservedSwift).memory.getObject(callbackId);")
+
+                for (index, paramType) in signature.parameters.enumerated() {
+                    let fragment = try! IntrinsicJSFragment.closureLiftParameter(type: paramType)
+                    let args: [String]
+                    if case .optional = paramType {
+                        args = ["param\(index)IsSome", "param\(index)Value", "param\(index)"]
+                    } else {
+                        args = ["param\(index)Id", "param\(index)"]
+                    }
+                    _ = fragment.printCode(args, scope, printer, cleanupCode)
+                }
+
+                let callbackParams = signature.parameters.indices.map { "param\($0)" }.joined(separator: ", ")
+                printer.write("const result = callback(\(callbackParams));")
+
+                // Type check if needed (for example, formatName requires string return)
+                switch signature.returnType {
+                case .string:
+                    printer.write("if (typeof result !== \"string\") {")
+                    printer.indent {
+                        printer.write("throw new TypeError(\"Callback must return a string\");")
+                    }
+                    printer.write("}")
+                default:
+                    break
+                }
+
+                let returnFragment = try! IntrinsicJSFragment.closureLowerReturn(type: signature.returnType)
+                _ = returnFragment.printCode(["result"], scope, printer, cleanupCode)
+            }
+            printer.write("} catch (error) {")
+            printer.indent {
+                printer.write("\(JSGlueVariableScope.reservedSetException)?.(error);")
+                let errorFragment = IntrinsicJSFragment.closureErrorReturn(type: signature.returnType)
+                _ = errorFragment.printCode([], scope, printer, cleanupCode)
+            }
+            printer.write("}")
+        }
+        printer.write("};")
+
+        return printer.lines
+    }
+
+    /// Generates a lower_closure_* function that wraps a Swift closure for JavaScript
+    private func generateLowerClosureFunction(
+        signature: ClosureSignature,
+        functionName: String
+    ) -> [String] {
+        let printer = CodeFragmentPrinter()
+        let scope = JSGlueVariableScope()
+        let cleanupCode = CodeFragmentPrinter()
+
+        printer.nextLine()
+        printer.write("bjs[\"\(functionName)\"] = function(closurePtr) {")
+        printer.indent {
+            printer.write(
+                "return function(\(signature.parameters.indices.map { "param\($0)" }.joined(separator: ", "))) {"
+            )
+            printer.indent {
+                printer.write("try {")
+                printer.indent {
+                    var invokeArgs: [String] = ["closurePtr"]
+
+                    for (index, paramType) in signature.parameters.enumerated() {
+                        let paramName = "param\(index)"
+                        let fragment = try! IntrinsicJSFragment.lowerParameter(type: paramType)
+                        let lowered = fragment.printCode([paramName], scope, printer, cleanupCode)
+                        invokeArgs.append(contentsOf: lowered)
+                    }
+
+                    // Call the Swift invoke function
+                    let invokeCall =
+                        "\(JSGlueVariableScope.reservedInstance).exports.invoke_swift_closure_\(signature.moduleName)_\(signature.mangleName)(\(invokeArgs.joined(separator: ", ")))"
+
+                    let returnFragment = try! IntrinsicJSFragment.closureLiftReturn(type: signature.returnType)
+                    _ = returnFragment.printCode([invokeCall], scope, printer, cleanupCode)
+                }
+                printer.write("} catch (error) {")
+                printer.indent {
+                    printer.write("\(JSGlueVariableScope.reservedSetException)?.(error);")
+                    switch signature.returnType {
+                    case .void:
+                        printer.write("return;")
+                    default:
+                        printer.write("throw error;")
+                    }
+                }
+                printer.write("}")
+            }
+            printer.write("};")
+        }
+        printer.write("};")
+
+        return printer.lines
     }
 
     private func generateTypeScript(data: LinkData) -> String {
@@ -988,36 +1227,29 @@ struct BridgeJSLink {
     }
 
     /// Generates JavaScript code for assigning namespaced items to globalThis
-    private func generateNamespacePropertyAssignments(data: LinkData, hasAnyNamespacedItems: Bool) -> [String] {
+    private func generateNamespacePropertyAssignments(
+        data: LinkData,
+        hasAnyNamespacedItems: Bool
+    ) -> [String] {
         let printer = CodeFragmentPrinter()
-
         printer.write(lines: data.enumStaticAssignments)
-
+        printer.write("const exports = {")
+        printer.indent()
+        printer.write(lines: data.exportsLines.map { "\($0)" })
+        printer.unindent()
+        printer.write("};")
+        printer.write("_exports = exports;")
         if hasAnyNamespacedItems {
-            printer.write("const exports = {")
-            printer.indent()
-            printer.write(lines: data.exportsLines.map { "\($0)" })
-            printer.unindent()
-            printer.write("};")
-
             data.namespacedClasses.forEach { klass in
                 let namespacePath: String = klass.namespace?.joined(separator: ".") ?? ""
                 printer.write("globalThis.\(namespacePath).\(klass.name) = exports.\(klass.name);")
             }
-
             data.namespacedFunctions.forEach { function in
                 let namespacePath: String = function.namespace?.joined(separator: ".") ?? ""
                 printer.write("globalThis.\(namespacePath).\(function.name) = exports.\(function.name);")
             }
-
-            printer.write("return exports;")
-        } else {
-            printer.write("return {")
-            printer.indent()
-            printer.write(lines: data.exportsLines.map { "\($0)" })
-            printer.unindent()
-            printer.write("};")
         }
+        printer.write("return exports;")
 
         return printer.lines
     }
@@ -2017,41 +2249,20 @@ extension BridgeJSLink {
         }
 
         func callPropertyGetter(name: String, returnType: BridgeType) throws -> String? {
-            if context == .protocolExport, case .optional(let wrappedType) = returnType {
-                let usesSideChannel: Bool
-                switch wrappedType {
-                case .string, .int, .float, .double, .jsObject, .swiftProtocol:
-                    usesSideChannel = true
-                case .rawValueEnum:
-                    usesSideChannel = true
-                case .bool, .caseEnum, .swiftHeapObject, .associatedValueEnum:
-                    usesSideChannel = false
-                default:
-                    usesSideChannel = false
+            if context == .exportSwift, returnType.usesSideChannelForOptionalReturn() {
+                guard case .optional(let wrappedType) = returnType else {
+                    fatalError("usesSideChannelForOptionalReturn returned true for non-optional type")
                 }
 
-                if usesSideChannel {
-                    let resultVar = scope.variable("ret")
-                    body.write(
-                        "let \(resultVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(self).\(name);"
-                    )
+                let resultVar = scope.variable("ret")
+                body.write(
+                    "let \(resultVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(self).\(name);"
+                )
 
-                    switch wrappedType {
-                    case .string, .rawValueEnum(_, .string):
-                        body.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(resultVar);")
-                    case .int, .rawValueEnum(_, .int):
-                        body.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = \(resultVar);")
-                    case .float, .rawValueEnum(_, .float):
-                        body.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = \(resultVar);")
-                    case .double, .rawValueEnum(_, .double):
-                        body.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = \(resultVar);")
-                    case .jsObject, .swiftProtocol:
-                        body.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(resultVar);")
-                    default:
-                        break
-                    }
-                    return nil  // Side-channel types return nil (no direct return value)
-                }
+                let fragment = try IntrinsicJSFragment.protocolPropertyOptionalToSideChannel(wrappedType: wrappedType)
+                _ = fragment.printCode([resultVar], scope, body, cleanupCode)
+
+                return nil  // Side-channel types return nil (no direct return value)
             }
 
             return try call(
@@ -2539,7 +2750,7 @@ extension BridgeJSLink {
             className: `protocol`.name
         )
 
-        let getterThunkBuilder = ImportedThunkBuilder(context: .protocolExport)
+        let getterThunkBuilder = ImportedThunkBuilder(context: .exportSwift)
         getterThunkBuilder.liftSelf()
         let returnExpr = try getterThunkBuilder.callPropertyGetter(name: property.name, returnType: property.type)
         let getterLines = getterThunkBuilder.renderFunction(
@@ -2557,7 +2768,7 @@ extension BridgeJSLink {
                 operation: "set",
                 className: `protocol`.name
             )
-            let setterThunkBuilder = ImportedThunkBuilder(context: .protocolExport)
+            let setterThunkBuilder = ImportedThunkBuilder(context: .exportSwift)
             setterThunkBuilder.liftSelf()
             try setterThunkBuilder.liftParameter(
                 param: Parameter(label: nil, name: "value", type: property.type)
@@ -2577,7 +2788,7 @@ extension BridgeJSLink {
         protocol: ExportedProtocol,
         method: ExportedFunction
     ) throws {
-        let thunkBuilder = ImportedThunkBuilder(context: .protocolExport)
+        let thunkBuilder = ImportedThunkBuilder(context: .exportSwift)
         thunkBuilder.liftSelf()
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)
@@ -2627,6 +2838,11 @@ extension BridgeType {
             return name
         case .swiftProtocol(let name):
             return name
+        case .closure(let signature):
+            let paramTypes = signature.parameters.enumerated().map { index, param in
+                "arg\(index): \(param.tsType)"
+            }.joined(separator: ", ")
+            return "(\(paramTypes)) => \(signature.returnType.tsType)"
         }
     }
 }

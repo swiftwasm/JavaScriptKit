@@ -26,13 +26,16 @@ export async function createInstantiator(options, swift) {
     let tmpParamInts = [];
     let tmpParamF32s = [];
     let tmpParamF64s = [];
+    
+    let _exports = null;
+    let bjs = null;
 
     return {
         /**
          * @param {WebAssembly.Imports} importObject
          */
         addImports: (importObject, importsContext) => {
-            const bjs = {};
+            bjs = {};
             importObject["bjs"] = bjs;
             const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
@@ -172,6 +175,11 @@ export async function createInstantiator(options, swift) {
                 const value = tmpRetOptionalDouble;
                 tmpRetOptionalDouble = undefined;
                 return value;
+            }
+            bjs["swift_js_get_optional_heap_object_pointer"] = function() {
+                const pointer = tmpRetOptionalHeapObject;
+                tmpRetOptionalHeapObject = undefined;
+                return pointer || 0;
             }
             // Wrapper functions for module: TestModule
             if (!importObject["TestModule"]) {
@@ -344,7 +352,7 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_PropertyHolder_observedProperty_set(this.pointer, value);
                 }
             }
-            return {
+            const exports = {
                 PropertyHolder,
                 createPropertyHolder: function bjs_createPropertyHolder(intValue, floatValue, doubleValue, boolValue, stringValue, jsObject) {
                     const stringValueBytes = textEncoder.encode(stringValue);
@@ -360,6 +368,8 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 },
             };
+            _exports = exports;
+            return exports;
         },
     }
 }

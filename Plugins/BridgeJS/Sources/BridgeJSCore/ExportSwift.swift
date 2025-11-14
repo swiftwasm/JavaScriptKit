@@ -28,6 +28,7 @@ public class ExportSwift {
     private var exportedProtocolNameByKey: [String: String] = [:]
     private var typeDeclResolver: TypeDeclResolver = TypeDeclResolver()
     private let enumCodegen: EnumCodegen = EnumCodegen()
+    private let closureCodegen = ClosureCodegen()
 
     public init(progress: ProgressReporting, moduleName: String) {
         self.progress = progress
@@ -421,7 +422,26 @@ public class ExportSwift {
 
             for param in parameterClause.parameters {
                 let resolvedType = self.parent.lookupType(for: param.type)
-
+                if let type = resolvedType, case .closure(let signature) = type {
+                    if signature.isAsync {
+                        diagnose(
+                            node: param.type,
+                            message: "Async is not supported for Swift closures yet."
+                        )
+                        continue
+                    }
+                    if signature.isThrows {
+                        diagnose(
+                            node: param.type,
+                            message: "Throws is not supported for Swift closures yet."
+                        )
+                        continue
+                    }
+                }
+                if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
+                    diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)
+                    continue
+                }
                 if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
                     diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)
                     continue
@@ -1309,6 +1329,38 @@ public class ExportSwift {
     }
 
     func lookupType(for type: TypeSyntax) -> BridgeType? {
+        if let attributedType = type.as(AttributedTypeSyntax.self) {
+            return lookupType(for: attributedType.baseType)
+        }
+
+        // (T1, T2, ...) -> R
+        if let functionType = type.as(FunctionTypeSyntax.self) {
+            var parameters: [BridgeType] = []
+            for param in functionType.parameters {
+                guard let paramType = lookupType(for: param.type) else {
+                    return nil
+                }
+                parameters.append(paramType)
+            }
+
+            guard let returnType = lookupType(for: functionType.returnClause.type) else {
+                return nil
+            }
+
+            let isAsync = functionType.effectSpecifiers?.asyncSpecifier != nil
+            let isThrows = functionType.effectSpecifiers?.throwsClause != nil
+
+            return .closure(
+                ClosureSignature(
+                    parameters: parameters,
+                    returnType: returnType,
+                    moduleName: moduleName,
+                    isAsync: isAsync,
+                    isThrows: isThrows
+                )
+            )
+        }
+
         // T?
         if let optionalType = type.as(OptionalTypeSyntax.self) {
             let wrappedType = optionalType.wrappedType
@@ -1426,6 +1478,29 @@ public class ExportSwift {
         }
         decls.append(Self.prelude)
 
+        var closureSignatures: Set<ClosureSignature> = []
+        for function in exportedFunctions {
+            collectClosureSignatures(from: function.parameters, into: &closureSignatures)
+            collectClosureSignatures(from: function.returnType, into: &closureSignatures)
+        }
+        for klass in exportedClasses {
+            if let constructor = klass.constructor {
+                collectClosureSignatures(from: constructor.parameters, into: &closureSignatures)
+            }
+            for method in klass.methods {
+                collectClosureSignatures(from: method.parameters, into: &closureSignatures)
+                collectClosureSignatures(from: method.returnType, into: &closureSignatures)
+            }
+            for property in klass.properties {
+                collectClosureSignatures(from: property.type, into: &closureSignatures)
+            }
+        }
+
+        for signature in closureSignatures.sorted(by: { $0.mangleName < $1.mangleName }) {
+            decls.append(try closureCodegen.renderClosureHelper(signature: signature))
+            decls.append(try closureCodegen.renderClosureInvokeHandler(signature: signature))
+        }
+
         for proto in exportedProtocols {
             decls.append(try renderProtocolWrapper(protocol: proto))
         }
@@ -1498,18 +1573,25 @@ public class ExportSwift {
             }
 
             let typeNameForIntrinsic: String
+            let liftingExpr: ExprSyntax
+
             switch param.type {
+            case .closure(let signature):
+                typeNameForIntrinsic = param.type.swiftType
+                liftingExpr = ExprSyntax("_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(\(raw: param.name))")
             case .optional(let wrappedType):
                 typeNameForIntrinsic = "Optional<\(wrappedType.swiftType)>"
-            default:
-                typeNameForIntrinsic = param.type.swiftType
-            }
-
-            liftedParameterExprs.append(
-                ExprSyntax(
+                liftingExpr = ExprSyntax(
                     "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
                 )
-            )
+            default:
+                typeNameForIntrinsic = param.type.swiftType
+                liftingExpr = ExprSyntax(
+                    "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
+                )
+            }
+
+            liftedParameterExprs.append(liftingExpr)
             for (name, type) in zip(argumentsToLift, liftingInfo.parameters.map { $0.type }) {
                 abiParameterSignatures.append((name, type))
             }
@@ -1660,7 +1742,11 @@ public class ExportSwift {
                 return
             }
 
-            append("return ret.bridgeJSLowerReturn()")
+            if case .closure(let signature) = returnType {
+                append("return _BJS_Closure_\(raw: signature.mangleName).bridgeJSLower(ret)")
+            } else {
+                append("return ret.bridgeJSLowerReturn()")
+            }
         }
 
         func render(abiName: String) -> DeclSyntax {
@@ -1728,6 +1814,198 @@ public class ExportSwift {
         func returnSignature() -> String {
             return abiReturnType?.swiftType ?? "Void"
         }
+    }
+
+    private struct ClosureCodegen {
+        func generateOptionalParameterLowering(signature: ClosureSignature) throws -> String {
+            var lines: [String] = []
+
+            for (index, paramType) in signature.parameters.enumerated() {
+                guard case .optional(let wrappedType) = paramType else {
+                    continue
+                }
+                let paramName = "param\(index)"
+                if case .swiftHeapObject = wrappedType {
+                    lines.append(
+                        "let (\(paramName)IsSome, \(paramName)Value) = \(paramName).bridgeJSLowerParameterWithRetain()"
+                    )
+                } else {
+                    lines.append(
+                        "let (\(paramName)IsSome, \(paramName)Value) = \(paramName).bridgeJSLowerParameterWithPresence()"
+                    )
+                }
+            }
+
+            return lines.isEmpty ? "" : lines.joined(separator: "\n") + "\n"
+        }
+
+        func renderClosureHelper(signature: ClosureSignature) throws -> DeclSyntax {
+            let mangledName = signature.mangleName
+            let helperName = "_BJS_Closure_\(mangledName)"
+            let boxClassName = "_BJS_ClosureBox_\(mangledName)"
+
+            let closureParams = signature.parameters.enumerated().map { index, type in
+                "\(type.swiftType)"
+            }.joined(separator: ", ")
+
+            let swiftEffects = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
+            let swiftReturnType = signature.returnType.swiftType
+            let closureType = "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
+
+            var invokeParams: [(name: String, type: String)] = [("_", "Int32")]
+            var invokeCallArgs: [String] = ["callback.bridgeJSLowerParameter()"]
+
+            for (index, paramType) in signature.parameters.enumerated() {
+                let paramName = "param\(index)"
+
+                if case .optional(let wrappedType) = paramType {
+                    invokeParams.append(("_", "Int32"))
+
+                    switch wrappedType {
+                    case .swiftHeapObject:
+                        invokeParams.append(("_", "UnsafeMutableRawPointer"))
+                    case .string, .rawValueEnum(_, .string):
+                        invokeParams.append(("_", "Int32"))
+                    default:
+                        let lowerInfo = try wrappedType.loweringReturnInfo()
+                        if let wasmType = lowerInfo.returnType {
+                            invokeParams.append(("_", wasmType.swiftType))
+                        } else {
+                            invokeParams.append(("_", "Int32"))
+                        }
+                    }
+
+                    invokeCallArgs.append("\(paramName)IsSome")
+                    invokeCallArgs.append("\(paramName)Value")
+                } else {
+                    let lowerInfo = try paramType.loweringReturnInfo()
+                    if let wasmType = lowerInfo.returnType {
+                        invokeParams.append(("_", wasmType.swiftType))
+                        invokeCallArgs.append("\(paramName).bridgeJSLowerParameter()")
+                    } else {
+                        invokeParams.append(("_", "Int32"))
+                        invokeCallArgs.append("\(paramName).bridgeJSLowerParameter()")
+                    }
+                }
+            }
+
+            let invokeSignature = invokeParams.map { "\($0.name): \($0.type)" }.joined(separator: ", ")
+            let invokeReturnType: String
+            if case .optional = signature.returnType {
+                invokeReturnType = "Void"
+            } else if let wasmType = try signature.returnType.liftingReturnInfo(context: .exportSwift).valueToLift {
+                invokeReturnType = wasmType.swiftType
+            } else {
+                invokeReturnType = "Void"
+            }
+
+            let returnLifting: String
+            if signature.returnType == .void {
+                returnLifting = "_invoke(\(invokeCallArgs.joined(separator: ", ")))"
+            } else if case .optional = signature.returnType {
+                returnLifting = """
+                    _invoke(\(invokeCallArgs.joined(separator: ", ")))
+                                return \(signature.returnType.swiftType).bridgeJSLiftReturnFromSideChannel()
+                    """
+            } else {
+                returnLifting = """
+                    let resultId = _invoke(\(invokeCallArgs.joined(separator: ", ")))
+                                return \(signature.returnType.swiftType).bridgeJSLiftReturn(resultId)
+                    """
+            }
+
+            let externName = "invoke_js_callback_\(signature.moduleName)_\(mangledName)"
+            let optionalLoweringCode = try generateOptionalParameterLowering(signature: signature)
+
+            return """
+                private final class \(raw: boxClassName): _BridgedSwiftClosureBox {
+                    let closure: \(raw: closureType)
+                    init(_ closure: @escaping \(raw: closureType)) {
+                        self.closure = closure
+                    }
+                }
+
+                private enum \(raw: helperName) {
+                    static func bridgeJSLower(_ closure: @escaping \(raw: closureType)) -> UnsafeMutableRawPointer {
+                        let box = \(raw: boxClassName)(closure)
+                        return Unmanaged.passRetained(box).toOpaque()
+                    }
+
+                    static func bridgeJSLift(_ callbackId: Int32) -> \(raw: closureType) {
+                            let callback = JSObject.bridgeJSLiftParameter(callbackId)
+                            return { [callback] \(raw: signature.parameters.indices.map { "param\($0)" }.joined(separator: ", ")) in
+                                #if arch(wasm32)
+                                @_extern(wasm, module: "bjs", name: "\(raw: externName)")
+                                func _invoke(\(raw: invokeSignature)) -> \(raw: invokeReturnType)
+                                \(raw: optionalLoweringCode)\(raw: returnLifting)
+                                #else
+                                fatalError("Only available on WebAssembly")
+                                 #endif
+                            }
+                        }
+                }
+                """
+        }
+
+        func renderClosureInvokeHandler(signature: ClosureSignature) throws -> DeclSyntax {
+            let boxClassName = "_BJS_ClosureBox_\(signature.mangleName)"
+            let abiName = "invoke_swift_closure_\(signature.moduleName)_\(signature.mangleName)"
+
+            var abiParams: [(name: String, type: String)] = [("boxPtr", "UnsafeMutableRawPointer")]
+            var liftedParams: [String] = []
+
+            for (index, paramType) in signature.parameters.enumerated() {
+                let paramName = "param\(index)"
+                let liftInfo = try paramType.liftParameterInfo()
+
+                for (argName, wasmType) in liftInfo.parameters {
+                    let fullName =
+                        liftInfo.parameters.count > 1 ? "\(paramName)\(argName.capitalizedFirstLetter)" : paramName
+                    abiParams.append((fullName, wasmType.swiftType))
+                }
+
+                let argNames = liftInfo.parameters.map { (argName, _) in
+                    liftInfo.parameters.count > 1 ? "\(paramName)\(argName.capitalizedFirstLetter)" : paramName
+                }
+                liftedParams.append("\(paramType.swiftType).bridgeJSLiftParameter(\(argNames.joined(separator: ", ")))")
+            }
+
+            let paramSignature = abiParams.map { "\($0.name): \($0.type)" }.joined(separator: ", ")
+            let closureCall = "box.closure(\(liftedParams.joined(separator: ", ")))"
+
+            let returnCode: String
+            if signature.returnType == .void {
+                returnCode = closureCall
+            } else {
+                returnCode = """
+                    let result = \(closureCall)
+                    return result.bridgeJSLowerReturn()
+                    """
+            }
+
+            let abiReturnType: String
+            if signature.returnType == .void {
+                abiReturnType = "Void"
+            } else if let wasmType = try signature.returnType.loweringReturnInfo().returnType {
+                abiReturnType = wasmType.swiftType
+            } else {
+                abiReturnType = "Void"
+            }
+
+            return """
+                @_expose(wasm, "\(raw: abiName)")
+                @_cdecl("\(raw: abiName)")
+                public func _\(raw: abiName)(\(raw: paramSignature)) -> \(raw: abiReturnType) {
+                    #if arch(wasm32)
+                    let box = Unmanaged<\(raw: boxClassName)>.fromOpaque(boxPtr).takeUnretainedValue()
+                    \(raw: returnCode)
+                    #else
+                    fatalError("Only available on WebAssembly")
+                    #endif
+                }
+                """
+        }
+
     }
 
     private struct EnumCodegen {
@@ -2187,6 +2465,27 @@ public class ExportSwift {
         return decls
     }
 
+    private func collectClosureSignatures(from parameters: [Parameter], into signatures: inout Set<ClosureSignature>) {
+        for param in parameters {
+            collectClosureSignatures(from: param.type, into: &signatures)
+        }
+    }
+
+    private func collectClosureSignatures(from type: BridgeType, into signatures: inout Set<ClosureSignature>) {
+        switch type {
+        case .closure(let signature):
+            signatures.insert(signature)
+            for paramType in signature.parameters {
+                collectClosureSignatures(from: paramType, into: &signatures)
+            }
+            collectClosureSignatures(from: signature.returnType, into: &signatures)
+        case .optional(let wrapped):
+            collectClosureSignatures(from: wrapped, into: &signatures)
+        default:
+            break
+        }
+    }
+
     /// Generates a ConvertibleToJSValue extension for the exported class
     ///
     /// # Example
@@ -2246,7 +2545,7 @@ public class ExportSwift {
 
             var externParams: [String] = ["this: Int32"]
             for param in method.parameters {
-                let loweringInfo = try param.type.loweringParameterInfo(context: .protocolExport)
+                let loweringInfo = try param.type.loweringParameterInfo(context: .exportSwift)
                 for (paramName, wasmType) in loweringInfo.loweredParameters {
                     let fullParamName =
                         loweringInfo.loweredParameters.count > 1
@@ -2258,7 +2557,7 @@ public class ExportSwift {
             var preCallStatements: [String] = []
             var callArgs: [String] = ["this: Int32(bitPattern: jsObject.id)"]
             for param in method.parameters {
-                let loweringInfo = try param.type.loweringParameterInfo(context: .protocolExport)
+                let loweringInfo = try param.type.loweringParameterInfo(context: .exportSwift)
                 if case .optional = param.type, loweringInfo.loweredParameters.count > 1 {
                     let isSomeName = "\(param.name)\(loweringInfo.loweredParameters[0].name.capitalizedFirstLetter)"
                     let wrappedName = "\(param.name)\(loweringInfo.loweredParameters[1].name.capitalizedFirstLetter)"
@@ -2287,7 +2586,7 @@ public class ExportSwift {
             } else {
                 returnTypeStr = " -> \(method.returnType.swiftType)"
                 let liftingInfo = try method.returnType.liftingReturnInfo(
-                    context: .protocolExport
+                    context: .exportSwift
                 )
 
                 if case .optional = method.returnType {
@@ -2371,30 +2670,8 @@ public class ExportSwift {
             className: protocolName
         )
 
-        let usesSideChannel: Bool
-        if case .optional(let wrappedType) = property.type {
-            switch wrappedType {
-            case .string:
-                usesSideChannel = true
-            case .rawValueEnum(_, let rawType):
-                switch rawType {
-                case .string:
-                    usesSideChannel = true
-                default:
-                    usesSideChannel = true
-                }
-            case .int, .float, .double:
-                usesSideChannel = true
-            case .bool, .caseEnum, .associatedValueEnum, .swiftHeapObject:
-                usesSideChannel = false
-            default:
-                usesSideChannel = false
-            }
-        } else {
-            usesSideChannel = false
-        }
-
-        let liftingInfo = try property.type.liftingReturnInfo(context: .protocolExport)
+        let usesSideChannel = property.type.usesSideChannelForOptionalReturn()
+        let liftingInfo = try property.type.liftingReturnInfo(context: .exportSwift)
         let getterReturnType: String
         let getterBody: String
 
@@ -2430,7 +2707,7 @@ public class ExportSwift {
                 }
                 """
         } else {
-            let loweringInfo = try property.type.loweringParameterInfo(context: .protocolExport)
+            let loweringInfo = try property.type.loweringParameterInfo(context: .exportSwift)
 
             let setterParams =
                 (["this: Int32"] + loweringInfo.loweredParameters.map { "\($0.name): \($0.type.swiftType)" }).joined(
@@ -2538,6 +2815,10 @@ extension BridgeType {
         case .rawValueEnum(let name, _): return name
         case .associatedValueEnum(let name): return name
         case .namespaceEnum(let name): return name
+        case .closure(let signature):
+            let paramTypes = signature.parameters.map { $0.swiftType }.joined(separator: ", ")
+            let effectsStr = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
+            return "(\(paramTypes))\(effectsStr) -> \(signature.returnType.swiftType)"
         }
     }
 
@@ -2591,6 +2872,8 @@ extension BridgeType {
             return .associatedValueEnum
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
+        case .closure:
+            return LiftingIntrinsicInfo(parameters: [("callbackId", .i32)])
         }
     }
 
@@ -2641,6 +2924,8 @@ extension BridgeType {
             return .associatedValueEnum
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
+        case .closure:
+            return .swiftHeapObject
         }
     }
 }
