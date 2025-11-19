@@ -21,10 +21,18 @@ import JavaScriptKit
 }
 ```
 
-This function will be accessible in JavaScript through its namespace hierarchy:
+This function will be accessible in JavaScript through its namespace hierarchy in two ways:
 
 ```javascript
-// Access the function through its namespace
+// Recommended: Access via the exports object (supports multiple WASM instances)
+const { createInstantiator } = await import('./path/to/bridge-js.js');
+const instantiator = await createInstantiator(options, swift);
+const exports = instantiator.createExports(instance);
+
+const result = exports.MyModule.Utils.namespacedFunction();
+console.log(result); // "namespaced"
+
+// Alternative: Access via globalThis
 const result = globalThis.MyModule.Utils.namespacedFunction();
 console.log(result); // "namespaced"
 ```
@@ -65,10 +73,14 @@ import JavaScriptKit
 }
 ```
 
-In JavaScript, this class is accessible through its namespace:
+In JavaScript, this class is accessible through its namespace in two ways:
 
 ```javascript
-// Create instances through namespaced constructors
+// Recommended: Access via the exports object (supports multiple WASM instances)
+const greeter = new exports.__Swift.Foundation.Greeter("World");
+console.log(greeter.greet()); // "Hello, World!"
+
+// Alternative: Access via globalThis and through its namespace
 const greeter = new globalThis.__Swift.Foundation.Greeter("World");
 console.log(greeter.greet()); // "Hello, World!"
 ```
@@ -82,6 +94,16 @@ declare global {
             class Greeter {
                 constructor(name: string);
                 greet(): string;
+            }
+        }
+    }
+}
+
+export type Exports = {
+    __Swift: {
+        Foundation: {
+            Greeter: {
+                new(name: string): Greeter;
             }
         }
     }

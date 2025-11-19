@@ -56,6 +56,11 @@ export type Exports = {
     }
     Calculator: CalculatorObject
     APIResult: APIResultObject
+    Utils: {
+        String: {
+            uppercase(text: string): string;
+        },
+    },
 }
 export type Imports = {
 }

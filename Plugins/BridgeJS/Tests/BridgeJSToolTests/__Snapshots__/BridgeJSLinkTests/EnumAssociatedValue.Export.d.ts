@@ -93,9 +93,13 @@ export type Exports = {
     roundTripOptionalAPIOptionalResult(result: APIOptionalResultTag | null): APIOptionalResultTag | null;
     APIResult: APIResultObject
     ComplexResult: ComplexResultObject
-    Result: ResultObject
-    NetworkingResult: NetworkingResultObject
     APIOptionalResult: APIOptionalResultObject
+    API: {
+        NetworkingResult: NetworkingResultObject
+    },
+    Utilities: {
+        Result: ResultObject
+    },
 }
 export type Imports = {
 }

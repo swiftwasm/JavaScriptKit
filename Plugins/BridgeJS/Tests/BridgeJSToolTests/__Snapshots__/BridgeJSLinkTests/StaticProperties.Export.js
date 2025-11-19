@@ -303,41 +303,12 @@ export async function createInstantiator(options, swift) {
                     }
                 }
             }
-            Object.defineProperty(globalThis.PropertyNamespace, 'namespaceProperty', { get: function() {
-                instance.exports.bjs_PropertyNamespace_static_namespaceProperty_get();
-                const ret = tmpRetString;
-                tmpRetString = undefined;
-                return ret;
-            }, set: function(value) {
-                const valueBytes = textEncoder.encode(value);
-                const valueId = swift.memory.retain(valueBytes);
-                instance.exports.bjs_PropertyNamespace_static_namespaceProperty_set(valueId, valueBytes.length);
-                swift.memory.release(valueId);
-            } });
-            Object.defineProperty(globalThis.PropertyNamespace, 'namespaceConstant', { get: function() {
-                instance.exports.bjs_PropertyNamespace_static_namespaceConstant_get();
-                const ret = tmpRetString;
-                tmpRetString = undefined;
-                return ret;
-            } });
-            Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedProperty', { get: function() {
-                const ret = instance.exports.bjs_PropertyNamespace_Nested_static_nestedProperty_get();
-                return ret;
-            }, set: function(value) {
-                instance.exports.bjs_PropertyNamespace_Nested_static_nestedProperty_set(value);
-            } });
-            Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedConstant', { get: function() {
-                instance.exports.bjs_PropertyNamespace_Nested_static_nestedConstant_get();
-                const ret = tmpRetString;
-                tmpRetString = undefined;
-                return ret;
-            } });
-            Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedDouble', { get: function() {
-                const ret = instance.exports.bjs_PropertyNamespace_Nested_static_nestedDouble_get();
-                return ret;
-            }, set: function(value) {
-                instance.exports.bjs_PropertyNamespace_Nested_static_nestedDouble_set(value);
-            } });
+            if (typeof globalThis.PropertyNamespace === 'undefined') {
+                globalThis.PropertyNamespace = {};
+            }
+            if (typeof globalThis.PropertyNamespace.Nested === 'undefined') {
+                globalThis.PropertyNamespace.Nested = {};
+            }
             const exports = {
                 PropertyClass,
                 PropertyEnum: {
@@ -371,8 +342,68 @@ export async function createInstantiator(options, swift) {
                         swift.memory.release(valueId);
                     }
                 },
+                PropertyNamespace: {
+                    get namespaceProperty() {
+                        instance.exports.bjs_PropertyNamespace_static_namespaceProperty_get();
+                        const ret = tmpRetString;
+                        tmpRetString = undefined;
+                        return ret;
+                    },
+                    set namespaceProperty(value) {
+                        const valueBytes = textEncoder.encode(value);
+                        const valueId = swift.memory.retain(valueBytes);
+                        instance.exports.bjs_PropertyNamespace_static_namespaceProperty_set(valueId, valueBytes.length);
+                        swift.memory.release(valueId);
+                    },
+                    get namespaceConstant() {
+                        instance.exports.bjs_PropertyNamespace_static_namespaceConstant_get();
+                        const ret = tmpRetString;
+                        tmpRetString = undefined;
+                        return ret;
+                    },
+                    Nested: {
+                        get nestedProperty() {
+                            const ret = instance.exports.bjs_PropertyNamespace_Nested_static_nestedProperty_get();
+                            return ret;
+                        },
+                        set nestedProperty(value) {
+                            instance.exports.bjs_PropertyNamespace_Nested_static_nestedProperty_set(value);
+                        },
+                        get nestedConstant() {
+                            instance.exports.bjs_PropertyNamespace_Nested_static_nestedConstant_get();
+                            const ret = tmpRetString;
+                            tmpRetString = undefined;
+                            return ret;
+                        },
+                        get nestedDouble() {
+                            const ret = instance.exports.bjs_PropertyNamespace_Nested_static_nestedDouble_get();
+                            return ret;
+                        },
+                        set nestedDouble(value) {
+                            instance.exports.bjs_PropertyNamespace_Nested_static_nestedDouble_set(value);
+                        },
+                    },
+                },
             };
             _exports = exports;
+            Object.defineProperty(globalThis.PropertyNamespace, 'namespaceProperty', {
+                get: () => exports.PropertyNamespace.namespaceProperty,
+                set: (value) => { exports.PropertyNamespace.namespaceProperty = value; }
+            });
+            Object.defineProperty(globalThis.PropertyNamespace, 'namespaceConstant', {
+                get: () => exports.PropertyNamespace.namespaceConstant,
+            });
+            Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedProperty', {
+                get: () => exports.PropertyNamespace.Nested.nestedProperty,
+                set: (value) => { exports.PropertyNamespace.Nested.nestedProperty = value; }
+            });
+            Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedConstant', {
+                get: () => exports.PropertyNamespace.Nested.nestedConstant,
+            });
+            Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedDouble', {
+                get: () => exports.PropertyNamespace.Nested.nestedDouble,
+                set: (value) => { exports.PropertyNamespace.Nested.nestedDouble = value; }
+            });
             return exports;
         },
     }

@@ -260,6 +260,9 @@ public enum EnumEmitStyle: String, Codable, Sendable {
 }
 
 public struct ExportedEnum: Codable, Equatable, Sendable {
+    public static let valuesSuffix = "Values"
+    public static let objectSuffix = "Object"
+
     public let name: String
     public let swiftCallName: String
     public let explicitAccessControl: String?
@@ -277,6 +280,14 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
         } else {
             return .associatedValue
         }
+    }
+
+    public var valuesName: String {
+        emitStyle == .tsEnum ? name : "\(name)\(Self.valuesSuffix)"
+    }
+
+    public var objectTypeName: String {
+        "\(name)\(Self.objectSuffix)"
     }
 
     public init(

@@ -830,9 +830,13 @@ export async function createInstantiator(options, swift) {
                 },
                 APIResult: APIResultValues,
                 ComplexResult: ComplexResultValues,
-                Result: ResultValues,
-                NetworkingResult: NetworkingResultValues,
                 APIOptionalResult: APIOptionalResultValues,
+                API: {
+                    NetworkingResult: NetworkingResultValues,
+                },
+                Utilities: {
+                    Result: ResultValues,
+                },
             };
             _exports = exports;
             return exports;

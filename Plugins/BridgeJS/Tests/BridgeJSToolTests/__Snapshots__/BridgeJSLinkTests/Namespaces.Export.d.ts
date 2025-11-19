@@ -50,16 +50,28 @@ export interface UUID extends SwiftHeapObject {
     uuidString(): string;
 }
 export type Exports = {
-    Greeter: {
-        new(name: string): Greeter;
-    }
-    Converter: {
-        new(): Converter;
-    }
-    UUID: {
-    }
     plainFunction(): string;
-    namespacedFunction(): string;
+    MyModule: {
+        Utils: {
+            namespacedFunction(): string;
+        },
+    },
+    Utils: {
+        Converters: {
+            Converter: {
+                new(): Converter;
+            }
+        },
+    },
+    __Swift: {
+        Foundation: {
+            Greeter: {
+                new(name: string): Greeter;
+            }
+            UUID: {
+            }
+        },
+    },
 }
 export type Imports = {
 }
