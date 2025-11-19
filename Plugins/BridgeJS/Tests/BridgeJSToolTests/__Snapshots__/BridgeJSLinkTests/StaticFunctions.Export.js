@@ -305,15 +305,6 @@ export async function createInstantiator(options, swift) {
             }
             const exports = {
                 MathUtils,
-                uppercase: function bjs_Utils_String_static_uppercase(text) {
-                    const textBytes = textEncoder.encode(text);
-                    const textId = swift.memory.retain(textBytes);
-                    instance.exports.bjs_Utils_String_static_uppercase(textId, textBytes.length);
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    swift.memory.release(textId);
-                    return ret;
-                },
                 Calculator: {
                     ...CalculatorValues,
                     square: function(value) {
@@ -331,9 +322,22 @@ export async function createInstantiator(options, swift) {
                         return ret;
                     }
                 },
+                Utils: {
+                    String: {
+                        uppercase: function bjs_Utils_String_static_uppercase(text) {
+                            const textBytes = textEncoder.encode(text);
+                            const textId = swift.memory.retain(textBytes);
+                            instance.exports.bjs_Utils_String_static_uppercase(textId, textBytes.length);
+                            const ret = tmpRetString;
+                            tmpRetString = undefined;
+                            swift.memory.release(textId);
+                            return ret;
+                        },
+                    },
+                },
             };
             _exports = exports;
-            globalThis.Utils.String.uppercase = exports.uppercase;
+            globalThis.Utils.String.uppercase = exports.Utils.String.uppercase;
             return exports;
         },
     }

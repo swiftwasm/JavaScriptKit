@@ -333,18 +333,30 @@ export async function createInstantiator(options, swift) {
                 globalThis.Utils = {};
             }
             const exports = {
-                Converter,
-                HTTPServer,
-                TestServer,
-                Method: MethodValues,
-                LogLevel: LogLevelValues,
-                Port: PortValues,
-                SupportedMethod: SupportedMethodValues,
+                Configuration: {
+                    LogLevel: LogLevelValues,
+                    Port: PortValues,
+                },
+                Networking: {
+                    API: {
+                        HTTPServer,
+                        Method: MethodValues,
+                    },
+                    APIV2: {
+                        Internal: {
+                            TestServer,
+                            SupportedMethod: SupportedMethodValues,
+                        },
+                    },
+                },
+                Utils: {
+                    Converter,
+                },
             };
             _exports = exports;
-            globalThis.Utils.Converter = exports.Converter;
-            globalThis.Networking.API.HTTPServer = exports.HTTPServer;
-            globalThis.Networking.APIV2.Internal.TestServer = exports.TestServer;
+            globalThis.Utils.Converter = exports.Utils.Converter;
+            globalThis.Networking.API.HTTPServer = exports.Networking.API.HTTPServer;
+            globalThis.Networking.APIV2.Internal.TestServer = exports.Networking.APIV2.Internal.TestServer;
             return exports;
         },
     }

@@ -51,6 +51,15 @@ export type Exports = {
         optionalProperty: string | null;
     }
     PropertyEnum: PropertyEnumObject
+    PropertyNamespace: {
+        readonly namespaceConstant: string;
+        namespaceProperty: string;
+        Nested: {
+            readonly nestedConstant: string;
+            nestedDouble: number;
+            nestedProperty: number;
+        },
+    },
 }
 export type Imports = {
 }

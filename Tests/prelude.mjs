@@ -356,6 +356,22 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedProperty, 1000);
     assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedDouble, 2.828);
 
+    assert.equal(exports.StaticPropertyNamespace.namespaceProperty, "modified namespace");
+    assert.equal(exports.StaticPropertyNamespace.namespaceConstant, "constant");
+    exports.StaticPropertyNamespace.namespaceProperty = "exports modified";
+    assert.equal(exports.StaticPropertyNamespace.namespaceProperty, "exports modified");
+    assert.equal(globalThis.StaticPropertyNamespace.namespaceProperty, "exports modified");
+
+    assert.equal(exports.StaticPropertyNamespace.NestedProperties.nestedProperty, 1000);
+    assert.equal(exports.StaticPropertyNamespace.NestedProperties.nestedConstant, "nested");
+    assert.equal(exports.StaticPropertyNamespace.NestedProperties.nestedDouble, 2.828);
+    exports.StaticPropertyNamespace.NestedProperties.nestedProperty = 2000;
+    exports.StaticPropertyNamespace.NestedProperties.nestedDouble = 3.14;
+    assert.equal(exports.StaticPropertyNamespace.NestedProperties.nestedProperty, 2000);
+    assert.equal(exports.StaticPropertyNamespace.NestedProperties.nestedDouble, 3.14);
+    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedProperty, 2000);
+    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedDouble, 3.14);
+
     // Test class without @JS init constructor
     const calc = exports.createCalculator();
     assert.equal(calc.square(5), 25);
@@ -428,6 +444,10 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(globalThis.Networking.API.MethodValues.Post, 1);
     assert.equal(globalThis.Networking.API.MethodValues.Put, 2);
     assert.equal(globalThis.Networking.API.MethodValues.Delete, 3);
+    assert.equal(exports.Networking.API.Method.Get, 0);
+    assert.equal(exports.Networking.API.Method.Post, 1);
+    assert.equal(exports.Networking.API.Method.Put, 2);
+    assert.equal(exports.Networking.API.Method.Delete, 3);
     assert.equal(globalThis.Configuration.LogLevelValues.Debug, "debug");
     assert.equal(globalThis.Configuration.LogLevelValues.Info, "info");
     assert.equal(globalThis.Configuration.LogLevelValues.Warning, "warning");
@@ -435,8 +455,17 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(globalThis.Configuration.PortValues.Http, 80);
     assert.equal(globalThis.Configuration.PortValues.Https, 443);
     assert.equal(globalThis.Configuration.PortValues.Development, 3000);
+    assert.equal(exports.Configuration.LogLevel.Debug, "debug");
+    assert.equal(exports.Configuration.LogLevel.Info, "info");
+    assert.equal(exports.Configuration.LogLevel.Warning, "warning");
+    assert.equal(exports.Configuration.LogLevel.Error, "error");
+    assert.equal(exports.Configuration.Port.Http, 80);
+    assert.equal(exports.Configuration.Port.Https, 443);
+    assert.equal(exports.Configuration.Port.Development, 3000);
     assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Get, 0);
     assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Post, 1);
+    assert.equal(exports.Networking.APIV2.Internal.SupportedMethod.Get, 0);
+    assert.equal(exports.Networking.APIV2.Internal.SupportedMethod.Post, 1);
 
     assert.equal(exports.roundtripNetworkingAPIMethod(globalThis.Networking.API.MethodValues.Get), globalThis.Networking.API.MethodValues.Get);
     assert.equal(exports.roundtripConfigurationLogLevel(globalThis.Configuration.LogLevelValues.Debug), globalThis.Configuration.LogLevelValues.Debug);
@@ -447,17 +476,17 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevelValues.Error), globalThis.Configuration.PortValues.Development);
     assert.equal(exports.roundtripInternalSupportedMethod(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Get), globalThis.Networking.APIV2.Internal.SupportedMethodValues.Get);
 
-    const converter = new exports.Converter();
+    const converter = new exports.Utils.Converter();
     assert.equal(converter.toString(42), "42");
     assert.equal(converter.toString(123), "123");
     converter.release();
 
-    const httpServer = new exports.HTTPServer();
+    const httpServer = new exports.Networking.API.HTTPServer();
     httpServer.call(globalThis.Networking.API.MethodValues.Get);
     httpServer.call(globalThis.Networking.API.MethodValues.Post);
     httpServer.release();
 
-    const testServer = new exports.TestServer();
+    const testServer = new exports.Networking.APIV2.Internal.TestServer();
     testServer.call(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Get);
     testServer.call(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Post);
     testServer.release();
@@ -643,6 +672,8 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(StaticCalculatorValues.Scientific, exports.StaticCalculator.Scientific);
     assert.equal(StaticCalculatorValues.Basic, exports.StaticCalculator.Basic);
     assert.equal(globalThis.StaticUtils.Nested.roundtrip("hello world"), "hello world");
+    assert.equal(exports.StaticUtils.Nested.roundtrip("test"), "test");
+    assert.equal(exports.StaticUtils.Nested.roundtrip("exports api"), "exports api");
 
     // Test default parameters
     assert.equal(exports.testStringDefault(), "Hello World");
@@ -1034,8 +1065,8 @@ function testProtocolSupport(exports) {
         getAPIResult() { return lastAPIResult; }
     };
 
-    const successResult = { tag: exports.Result.Tag.Success, param0: "Operation completed" };
-    const failureResult = { tag: exports.Result.Tag.Failure, param0: 500 };
+    const successResult = { tag: exports.Utilities.Result.Tag.Success, param0: "Operation completed" };
+    const failureResult = { tag: exports.Utilities.Result.Tag.Failure, param0: 500 };
 
     const jsManager = new exports.DataProcessorManager(jsProcessor);
 

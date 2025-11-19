@@ -294,27 +294,39 @@ export async function createInstantiator(options, swift) {
                 globalThis.__Swift.Foundation = {};
             }
             const exports = {
-                Greeter,
-                Converter,
-                UUID,
                 plainFunction: function bjs_plainFunction() {
                     instance.exports.bjs_plainFunction();
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;
                 },
-                namespacedFunction: function bjs_MyModule_Utils_namespacedFunction() {
-                    instance.exports.bjs_MyModule_Utils_namespacedFunction();
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    return ret;
+                MyModule: {
+                    Utils: {
+                        namespacedFunction: function bjs_MyModule_Utils_namespacedFunction() {
+                            instance.exports.bjs_MyModule_Utils_namespacedFunction();
+                            const ret = tmpRetString;
+                            tmpRetString = undefined;
+                            return ret;
+                        },
+                    },
+                },
+                Utils: {
+                    Converters: {
+                        Converter,
+                    },
+                },
+                __Swift: {
+                    Foundation: {
+                        Greeter,
+                        UUID,
+                    },
                 },
             };
             _exports = exports;
-            globalThis.__Swift.Foundation.Greeter = exports.Greeter;
-            globalThis.Utils.Converters.Converter = exports.Converter;
-            globalThis.__Swift.Foundation.UUID = exports.UUID;
-            globalThis.MyModule.Utils.namespacedFunction = exports.namespacedFunction;
+            globalThis.__Swift.Foundation.Greeter = exports.__Swift.Foundation.Greeter;
+            globalThis.Utils.Converters.Converter = exports.Utils.Converters.Converter;
+            globalThis.__Swift.Foundation.UUID = exports.__Swift.Foundation.UUID;
+            globalThis.MyModule.Utils.namespacedFunction = exports.MyModule.Utils.namespacedFunction;
             return exports;
         },
     }

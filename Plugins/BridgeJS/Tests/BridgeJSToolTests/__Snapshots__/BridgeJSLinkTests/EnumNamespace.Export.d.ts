@@ -83,19 +83,31 @@ export interface TestServer extends SwiftHeapObject {
     call(method: Internal.SupportedMethodTag): void;
 }
 export type Exports = {
-    Converter: {
-        new(): Converter;
-    }
-    HTTPServer: {
-        new(): HTTPServer;
-    }
-    TestServer: {
-        new(): TestServer;
-    }
-    Method: MethodObject
-    LogLevel: LogLevelObject
-    Port: PortObject
-    SupportedMethod: SupportedMethodObject
+    Configuration: {
+        LogLevel: LogLevelObject
+        Port: PortObject
+    },
+    Networking: {
+        API: {
+            HTTPServer: {
+                new(): HTTPServer;
+            }
+            Method: MethodObject
+        },
+        APIV2: {
+            Internal: {
+                TestServer: {
+                    new(): TestServer;
+                }
+                SupportedMethod: SupportedMethodObject
+            },
+        },
+    },
+    Utils: {
+        Converter: {
+            new(): Converter;
+        }
+    },
 }
 export type Imports = {
 }
