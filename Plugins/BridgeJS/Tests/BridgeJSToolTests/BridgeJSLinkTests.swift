@@ -55,7 +55,7 @@ import Testing
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let outputSkeletonData = try encoder.encode(outputSkeleton)
-        var bridgeJSLink = BridgeJSLink(sharedMemory: false)
+        var bridgeJSLink = BridgeJSLink(sharedMemory: false, exposeToGlobal: true)
         try bridgeJSLink.addExportedSkeletonFile(data: outputSkeletonData)
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Export")
     }
@@ -74,8 +74,54 @@ import Testing
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let outputSkeletonData = try encoder.encode(importTS.skeleton)
 
-        var bridgeJSLink = BridgeJSLink(sharedMemory: false)
+        var bridgeJSLink = BridgeJSLink(sharedMemory: false, exposeToGlobal: true)
         try bridgeJSLink.addImportedSkeletonFile(data: outputSkeletonData)
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Import")
+    }
+
+    @Test(arguments: [
+        "Namespaces.swift",
+        "StaticFunctions.swift",
+        "StaticProperties.swift",
+        "EnumNamespace.swift"
+    ])
+    func testWithoutGlobal(inputFile: String) throws {
+        let url = Self.inputsDirectory.appendingPathComponent(inputFile)
+        let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
+        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule")
+        try swiftAPI.addSourceFile(sourceFile, inputFile)
+
+        let (_, outputSkeleton) = try #require(try swiftAPI.finalize())
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let outputSkeletonData = try encoder.encode(outputSkeleton)
+
+        var bridgeJSLink = BridgeJSLink(sharedMemory: false, exposeToGlobal: false)
+        try bridgeJSLink.addExportedSkeletonFile(data: outputSkeletonData)
+
+        let (outputJs, outputDts) = try bridgeJSLink.link()
+
+        // Verify no global declarations
+        #expect(!outputDts.contains("declare global"))
+        #expect(!outputJs.contains("globalThis."))
+
+        // Save snapshots
+        let name = url.deletingPathExtension().lastPathComponent + "_NoGlobal.Export"
+        try assertSnapshot(
+            name: name,
+            filePath: #filePath,
+            function: #function,
+            sourceLocation: #_sourceLocation,
+            input: outputJs.data(using: .utf8)!,
+            fileExtension: "js"
+        )
+        try assertSnapshot(
+            name: name,
+            filePath: #filePath,
+            function: #function,
+            sourceLocation: #_sourceLocation,
+            input: outputDts.data(using: .utf8)!,
+            fileExtension: "d.ts"
+        )
     }
 }

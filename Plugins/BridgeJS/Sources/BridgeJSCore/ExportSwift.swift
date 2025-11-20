@@ -882,10 +882,18 @@ public class ExportSwift {
                 message: "Enum visibility must be at least internal"
             )
 
+            let tsFullPath: String
+            if let namespace = namespaceResult.namespace, !namespace.isEmpty {
+                tsFullPath = namespace.joined(separator: ".") + "." + name
+            } else {
+                tsFullPath = name
+            }
+
             // Create enum directly in dictionary
             let exportedEnum = ExportedEnum(
                 name: name,
                 swiftCallName: swiftCallName,
+                tsFullPath: tsFullPath,
                 explicitAccessControl: explicitAccessControl,
                 cases: [],  // Will be populated in visit(EnumCaseDeclSyntax)
                 rawType: SwiftEnumRawType(rawType),

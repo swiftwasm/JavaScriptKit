@@ -198,7 +198,8 @@
           }
         }
       ],
-      "swiftCallName" : "PropertyEnum"
+      "swiftCallName" : "PropertyEnum",
+      "tsFullPath" : "PropertyEnum"
     },
     {
       "cases" : [
@@ -247,7 +248,8 @@
           }
         }
       ],
-      "swiftCallName" : "PropertyNamespace"
+      "swiftCallName" : "PropertyNamespace",
+      "tsFullPath" : "PropertyNamespace"
     },
     {
       "cases" : [
@@ -320,7 +322,8 @@
           }
         }
       ],
-      "swiftCallName" : "PropertyNamespace.Nested"
+      "swiftCallName" : "PropertyNamespace.Nested",
+      "tsFullPath" : "PropertyNamespace.Nested"
     }
   ],
   "functions" : [

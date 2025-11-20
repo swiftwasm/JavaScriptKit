@@ -80,7 +80,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "APIResult"
+      "swiftCallName" : "APIResult",
+      "tsFullPath" : "APIResult"
     },
     {
       "cases" : [
@@ -250,7 +251,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "ComplexResult"
+      "swiftCallName" : "ComplexResult",
+      "tsFullPath" : "ComplexResult"
     },
     {
       "cases" : [
@@ -264,7 +266,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Utilities"
+      "swiftCallName" : "Utilities",
+      "tsFullPath" : "Utilities"
     },
     {
       "cases" : [
@@ -337,7 +340,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Utilities.Result"
+      "swiftCallName" : "Utilities.Result",
+      "tsFullPath" : "Utilities.Result"
     },
     {
       "cases" : [
@@ -384,7 +388,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "NetworkingResult"
+      "swiftCallName" : "NetworkingResult",
+      "tsFullPath" : "API.NetworkingResult"
     },
     {
       "cases" : [
@@ -478,7 +483,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "APIOptionalResult"
+      "swiftCallName" : "APIOptionalResult",
+      "tsFullPath" : "APIOptionalResult"
     }
   ],
   "functions" : [

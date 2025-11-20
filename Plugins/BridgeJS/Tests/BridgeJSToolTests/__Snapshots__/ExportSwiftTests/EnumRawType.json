@@ -36,7 +36,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Theme"
+      "swiftCallName" : "Theme",
+      "tsFullPath" : "Theme"
     },
     {
       "cases" : [
@@ -71,7 +72,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "TSTheme"
+      "swiftCallName" : "TSTheme",
+      "tsFullPath" : "TSTheme"
     },
     {
       "cases" : [
@@ -99,7 +101,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "FeatureFlag"
+      "swiftCallName" : "FeatureFlag",
+      "tsFullPath" : "FeatureFlag"
     },
     {
       "cases" : [
@@ -134,7 +137,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "HttpStatus"
+      "swiftCallName" : "HttpStatus",
+      "tsFullPath" : "HttpStatus"
     },
     {
       "cases" : [
@@ -169,7 +173,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "TSHttpStatus"
+      "swiftCallName" : "TSHttpStatus",
+      "tsFullPath" : "TSHttpStatus"
     },
     {
       "cases" : [
@@ -218,7 +223,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Priority"
+      "swiftCallName" : "Priority",
+      "tsFullPath" : "Priority"
     },
     {
       "cases" : [
@@ -260,7 +266,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "FileSize"
+      "swiftCallName" : "FileSize",
+      "tsFullPath" : "FileSize"
     },
     {
       "cases" : [
@@ -295,7 +302,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "UserId"
+      "swiftCallName" : "UserId",
+      "tsFullPath" : "UserId"
     },
     {
       "cases" : [
@@ -330,7 +338,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "TokenId"
+      "swiftCallName" : "TokenId",
+      "tsFullPath" : "TokenId"
     },
     {
       "cases" : [
@@ -365,7 +374,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "SessionId"
+      "swiftCallName" : "SessionId",
+      "tsFullPath" : "SessionId"
     },
     {
       "cases" : [
@@ -400,7 +410,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Precision"
+      "swiftCallName" : "Precision",
+      "tsFullPath" : "Precision"
     },
     {
       "cases" : [
@@ -442,7 +453,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Ratio"
+      "swiftCallName" : "Ratio",
+      "tsFullPath" : "Ratio"
     }
   ],
   "functions" : [

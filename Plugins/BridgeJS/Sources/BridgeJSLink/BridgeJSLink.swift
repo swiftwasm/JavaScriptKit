@@ -12,16 +12,19 @@ struct BridgeJSLink {
     var exportedSkeletons: [ExportedSkeleton] = []
     var importedSkeletons: [ImportedModuleSkeleton] = []
     let sharedMemory: Bool
+    let exposeToGlobal: Bool
     private let namespaceBuilder = NamespaceBuilder()
 
     init(
         exportedSkeletons: [ExportedSkeleton] = [],
         importedSkeletons: [ImportedModuleSkeleton] = [],
-        sharedMemory: Bool
+        sharedMemory: Bool,
+        exposeToGlobal: Bool = true
     ) {
         self.exportedSkeletons = exportedSkeletons
         self.importedSkeletons = importedSkeletons
         self.sharedMemory = sharedMemory
+        self.exposeToGlobal = exposeToGlobal
     }
 
     mutating func addExportedSkeletonFile(data: Data) throws {
@@ -77,7 +80,7 @@ struct BridgeJSLink {
         var enumStaticAssignments: [String] = []
     }
 
-    private func collectLinkData() throws -> LinkData {
+    private func collectLinkData(exposeToGlobal: Bool) throws -> LinkData {
         var data = LinkData()
 
         // Swift heap object class definitions
@@ -873,8 +876,8 @@ struct BridgeJSLink {
                     for property in proto.properties {
                         let propertySignature =
                             property.isReadonly
-                            ? "readonly \(property.name): \(property.type.tsType);"
-                            : "\(property.name): \(property.type.tsType);"
+                            ? "readonly \(property.name): \(resolveTypeScriptType(property.type));"
+                            : "\(property.name): \(resolveTypeScriptType(property.type));"
                         printer.write(propertySignature)
                     }
                 }
@@ -892,8 +895,16 @@ struct BridgeJSLink {
                 let enumValuesName = enumDefinition.valuesName
                 let enumObjectName = enumDefinition.objectTypeName
 
+                // Use fully-qualified path for namespaced enums
+                let fullEnumValuesPath: String
+                if let namespace = enumDefinition.namespace, !namespace.isEmpty {
+                    fullEnumValuesPath = namespace.joined(separator: ".") + "." + enumValuesName
+                } else {
+                    fullEnumValuesPath = enumValuesName
+                }
+
                 if !enumDefinition.staticMethods.isEmpty || !enumDefinition.staticProperties.isEmpty {
-                    printer.write("export type \(enumObjectName) = typeof \(enumValuesName) & {")
+                    printer.write("export type \(enumObjectName) = typeof \(fullEnumValuesPath) & {")
                     printer.indent {
                         for function in enumDefinition.staticMethods {
                             printer.write(
@@ -902,12 +913,12 @@ struct BridgeJSLink {
                         }
                         for property in enumDefinition.staticProperties {
                             let readonly = property.isReadonly ? "readonly " : ""
-                            printer.write("\(readonly)\(property.name): \(property.type.tsType);")
+                            printer.write("\(readonly)\(property.name): \(resolveTypeScriptType(property.type));")
                         }
                     }
                     printer.write("};")
                 } else {
-                    printer.write("export type \(enumObjectName) = typeof \(enumValuesName);")
+                    printer.write("export type \(enumObjectName) = typeof \(fullEnumValuesPath);")
                 }
                 printer.nextLine()
             }
@@ -916,6 +927,7 @@ struct BridgeJSLink {
         // Type definitions section (namespace declarations, class definitions, imported types)
         let namespaceDeclarationsLines = namespaceBuilder.namespaceDeclarations(
             exportedSkeletons: exportedSkeletons,
+            exposeToGlobal: exposeToGlobal,
             renderTSSignatureCallback: { parameters, returnType, effects in
                 self.renderTSSignature(parameters: parameters, returnType: returnType, effects: effects)
             }
@@ -998,7 +1010,8 @@ struct BridgeJSLink {
         printer.write(lines: data.topLevelEnumLines)
 
         let topLevelNamespaceCode = namespaceBuilder.buildTopLevelNamespaceInitialization(
-            exportedSkeletons: exportedSkeletons
+            exportedSkeletons: exportedSkeletons,
+            exposeToGlobal: exposeToGlobal
         )
         printer.write(lines: topLevelNamespaceCode)
 
@@ -1061,14 +1074,16 @@ struct BridgeJSLink {
                 printer.write(lines: data.classLines)
 
                 let namespaceInitCode = namespaceBuilder.buildNamespaceInitialization(
-                    exportedSkeletons: exportedSkeletons
+                    exportedSkeletons: exportedSkeletons,
+                    exposeToGlobal: exposeToGlobal
                 )
                 printer.write(lines: namespaceInitCode)
 
-                let propertyAssignments = try generateNamespacePropertyAssignments(
-                    data: data,
-                    exportedSkeletons: exportedSkeletons,
-                    namespaceBuilder: namespaceBuilder
+                    let propertyAssignments = try generateNamespacePropertyAssignments(
+                        data: data,
+                        exportedSkeletons: exportedSkeletons,
+                        namespaceBuilder: namespaceBuilder,
+                        exposeToGlobal: exposeToGlobal
                 )
                 printer.write(lines: propertyAssignments)
             }
@@ -1082,7 +1097,7 @@ struct BridgeJSLink {
     }
 
     func link() throws -> (outputJs: String, outputDts: String) {
-        let data = try collectLinkData()
+        let data = try collectLinkData(exposeToGlobal: exposeToGlobal)
         let outputJs = try generateJavaScript(data: data)
         let outputDts = generateTypeScript(data: data)
         return (outputJs, outputDts)
@@ -1140,10 +1155,15 @@ struct BridgeJSLink {
     private func generateNamespacePropertyAssignments(
         data: LinkData,
         exportedSkeletons: [ExportedSkeleton],
-        namespaceBuilder: NamespaceBuilder
+        namespaceBuilder: NamespaceBuilder,
+        exposeToGlobal: Bool
     ) throws -> [String] {
         let printer = CodeFragmentPrinter()
-        printer.write(lines: data.enumStaticAssignments)
+
+        // Only write globalThis property assignments when exposeToGlobal is true
+        if exposeToGlobal {
+            printer.write(lines: data.enumStaticAssignments)
+        }
 
         printer.write("const exports = {")
         try printer.indent {
@@ -1151,6 +1171,7 @@ struct BridgeJSLink {
 
             let hierarchicalLines = try namespaceBuilder.buildHierarchicalExportsObject(
                 exportedSkeletons: exportedSkeletons,
+                exposeToGlobal: exposeToGlobal,
                 renderFunctionImpl: { function in
                     let (js, _) = try self.renderExportedFunction(function: function)
                     return js
@@ -1161,8 +1182,10 @@ struct BridgeJSLink {
         printer.write("};")
         printer.write("_exports = exports;")
 
-        let globalThisLines = namespaceBuilder.buildGlobalThisAssignments(exportedSkeletons: exportedSkeletons)
-        printer.write(lines: globalThisLines)
+        if exposeToGlobal {
+            let globalThisLines = namespaceBuilder.buildGlobalThisAssignments(exportedSkeletons: exportedSkeletons)
+            printer.write(lines: globalThisLines)
+        }
 
         printer.write("return exports;")
 
@@ -1189,8 +1212,8 @@ struct BridgeJSLink {
                     for property in type.properties {
                         let propertySignature =
                             property.isReadonly
-                            ? "readonly \(property.name): \(property.type.tsType);"
-                            : "\(property.name): \(property.type.tsType);"
+                            ? "readonly \(property.name): \(resolveTypeScriptType(property.type));"
+                            : "\(property.name): \(resolveTypeScriptType(property.type));"
                         printer.write(propertySignature)
                     }
 
@@ -1320,16 +1343,57 @@ struct BridgeJSLink {
         }
     }
 
+    /// Returns TypeScript type string for a BridgeType, using full paths for enums
+    /// If the type is an enum, looks up the ExportedEnum and uses its tsFullPath
+    /// Otherwise, uses the default tsType property
+    private func resolveTypeScriptType(_ type: BridgeType) -> String {
+        return Self.resolveTypeScriptType(type, exportedSkeletons: exportedSkeletons)
+    }
+
+    /// Static helper for resolving TypeScript types with full enum paths
+    /// Can be used by both BridgeJSLink and NamespaceBuilder
+    fileprivate static func resolveTypeScriptType(_ type: BridgeType, exportedSkeletons: [ExportedSkeleton]) -> String {
+        switch type {
+        case .caseEnum(let name), .rawValueEnum(let name, _),
+            .associatedValueEnum(let name), .namespaceEnum(let name):
+            // Look up the enum to get its tsFullPath
+            for skeleton in exportedSkeletons {
+                for enumDef in skeleton.enums {
+                    if enumDef.name == name || enumDef.swiftCallName == name {
+                        // Use the stored tsFullPath which has the full namespace
+                        switch type {
+                        case .caseEnum:
+                            return "\(enumDef.tsFullPath)Tag"
+                        case .rawValueEnum:
+                            return "\(enumDef.tsFullPath)Tag"
+                        case .associatedValueEnum:
+                            return "\(enumDef.tsFullPath)Tag"
+                        case .namespaceEnum:
+                            return enumDef.tsFullPath
+                        default:
+                            return type.tsType
+                        }
+                    }
+                }
+            }
+            return type.tsType
+        case .optional(let wrapped):
+            return "\(resolveTypeScriptType(wrapped, exportedSkeletons: exportedSkeletons)) | null"
+        default:
+            return type.tsType
+        }
+    }
+
     private func renderTSSignature(parameters: [Parameter], returnType: BridgeType, effects: Effects) -> String {
         let returnTypeWithEffect: String
         if effects.isAsync {
-            returnTypeWithEffect = "Promise<\(returnType.tsType)>"
+            returnTypeWithEffect = "Promise<\(resolveTypeScriptType(returnType))>"
         } else {
-            returnTypeWithEffect = returnType.tsType
+            returnTypeWithEffect = resolveTypeScriptType(returnType)
         }
         let parameterSignatures = parameters.map { param in
             let optional = param.hasDefault ? "?" : ""
-            return "\(param.name)\(optional): \(param.type.tsType)"
+            return "\(param.name)\(optional): \(resolveTypeScriptType(param.type))"
         }
         return "(\(parameterSignatures.joined(separator: ", "))): \(returnTypeWithEffect)"
     }
@@ -2179,12 +2243,18 @@ extension BridgeJSLink {
             )
         }
 
-        func buildNamespaceInitialization(exportedSkeletons: [ExportedSkeleton]) -> [String] {
+        func buildNamespaceInitialization(exportedSkeletons: [ExportedSkeleton], exposeToGlobal: Bool) -> [String] {
+            guard exposeToGlobal else { return [] }
             let allNamespacePaths = collectAllNamespacePaths(exportedSkeletons: exportedSkeletons)
             return generateNamespaceInitializationCode(namespacePaths: allNamespacePaths)
         }
 
-        func buildTopLevelNamespaceInitialization(exportedSkeletons: [ExportedSkeleton]) -> [String] {
+        func buildTopLevelNamespaceInitialization(
+            exportedSkeletons: [ExportedSkeleton],
+            exposeToGlobal: Bool
+        ) -> [String] {
+            guard exposeToGlobal else { return [] }
+
             var namespacedEnumPaths: Set<[String]> = []
             for skeleton in exportedSkeletons {
                 for enumDef in skeleton.enums where enumDef.namespace != nil && enumDef.enumType != .namespace {
@@ -2408,6 +2478,7 @@ extension BridgeJSLink {
 
         fileprivate func buildHierarchicalExportsObject(
             exportedSkeletons: [ExportedSkeleton],
+            exposeToGlobal: Bool,
             renderFunctionImpl: (ExportedFunction) throws -> [String]
         ) throws -> [String] {
             let printer = CodeFragmentPrinter()
@@ -2575,6 +2646,7 @@ extension BridgeJSLink {
         /// - Returns: Array of TypeScript declaration lines defining the global namespace structure
         func namespaceDeclarations(
             exportedSkeletons: [ExportedSkeleton],
+            exposeToGlobal: Bool,
             renderTSSignatureCallback: @escaping ([Parameter], BridgeType, Effects) -> String
         ) -> [String] {
             let printer = CodeFragmentPrinter()
@@ -2585,38 +2657,76 @@ extension BridgeJSLink {
             guard !rootNode.children.isEmpty else {
                 return printer.lines
             }
-            printer.write("export {};")
-            printer.nextLine()
-            printer.write("declare global {")
-            printer.indent()
+
+            if exposeToGlobal {
+                printer.write("export {};")
+                printer.nextLine()
+                printer.write("declare global {")
+                printer.indent()
+            }
+
+            func hasContent(node: NamespaceNode) -> Bool {
+                // Enums are always included
+                if !node.content.enums.isEmpty {
+                    return true
+                }
+
+                // When exposeToGlobal is true, classes, functions, and properties are included
+                if exposeToGlobal {
+                    if !node.content.classes.isEmpty || !node.content.functions.isEmpty
+                        || !node.content.staticProperties.isEmpty
+                    {
+                        return true
+                    }
+                }
+
+                // Check if any child has content
+                for (_, childNode) in node.children {
+                    if hasContent(node: childNode) {
+                        return true
+                    }
+                }
+
+                return false
+            }
 
             func generateNamespaceDeclarations(node: NamespaceNode, depth: Int) {
                 let sortedChildren = node.children.sorted { $0.key < $1.key }
 
                 for (childName, childNode) in sortedChildren {
-                    printer.write("namespace \(childName) {")
+                    // Skip empty namespaces
+                    guard hasContent(node: childNode) else {
+                        continue
+                    }
+                    
+                    let exportKeyword = exposeToGlobal ? "" : "export "
+                    printer.write("\(exportKeyword)namespace \(childName) {")
                     printer.indent()
 
-                    let sortedClasses = childNode.content.classes.sorted { $0.name < $1.name }
-                    for klass in sortedClasses {
-                        printer.write("class \(klass.name) {")
-                        printer.indent {
-                            if let constructor = klass.constructor {
-                                let constructorSignature =
-                                    "constructor(\(constructor.parameters.map { "\($0.name): \($0.type.tsType)" }.joined(separator: ", ")));"
-                                printer.write(constructorSignature)
-                            }
+                    // Only include classes when exposeToGlobal is true
+                    if exposeToGlobal {
+                        let sortedClasses = childNode.content.classes.sorted { $0.name < $1.name }
+                        for klass in sortedClasses {
+                            printer.write("class \(klass.name) {")
+                            printer.indent {
+                                if let constructor = klass.constructor {
+                                    let constructorSignature =
+                                        "constructor(\(constructor.parameters.map { "\($0.name): \($0.type.tsType)" }.joined(separator: ", ")));"
+                                    printer.write(constructorSignature)
+                                }
 
-                            let sortedMethods = klass.methods.sorted { $0.name < $1.name }
-                            for method in sortedMethods {
-                                let methodSignature =
-                                    "\(method.name)\(renderTSSignatureCallback(method.parameters, method.returnType, method.effects));"
-                                printer.write(methodSignature)
+                                let sortedMethods = klass.methods.sorted { $0.name < $1.name }
+                                for method in sortedMethods {
+                                    let methodSignature =
+                                        "\(method.name)\(renderTSSignatureCallback(method.parameters, method.returnType, method.effects));"
+                                    printer.write(methodSignature)
+                                }
                             }
+                            printer.write("}")
                         }
-                        printer.write("}")
                     }
 
+                    // Generate enum definitions within declare global namespace
                     let sortedEnums = childNode.content.enums.sorted { $0.name < $1.name }
                     for enumDefinition in sortedEnums {
                         let style: EnumEmitStyle = enumDefinition.emitStyle
@@ -2721,16 +2831,19 @@ extension BridgeJSLink {
                         }
                     }
 
-                    let sortedFunctions = childNode.content.functions.sorted { $0.name < $1.name }
-                    for function in sortedFunctions {
-                        let signature =
-                            "\(function.name)\(renderTSSignatureCallback(function.parameters, function.returnType, function.effects));"
-                        printer.write(signature)
-                    }
-                    let sortedProperties = childNode.content.staticProperties.sorted { $0.name < $1.name }
-                    for property in sortedProperties {
-                        let readonly = property.isReadonly ? "var " : "let "
-                        printer.write("\(readonly)\(property.name): \(property.type.tsType);")
+                    // Only include functions and properties when exposeToGlobal is true
+                    if exposeToGlobal {
+                        let sortedFunctions = childNode.content.functions.sorted { $0.name < $1.name }
+                        for function in sortedFunctions {
+                            let signature =
+                                "\(function.name)\(renderTSSignatureCallback(function.parameters, function.returnType, function.effects));"
+                            printer.write(signature)
+                        }
+                        let sortedProperties = childNode.content.staticProperties.sorted { $0.name < $1.name }
+                        for property in sortedProperties {
+                            let readonly = property.isReadonly ? "var " : "let "
+                            printer.write("\(readonly)\(property.name): \(property.type.tsType);")
+                        }
                     }
 
                     generateNamespaceDeclarations(node: childNode, depth: depth + 1)
@@ -2742,9 +2855,11 @@ extension BridgeJSLink {
 
             generateNamespaceDeclarations(node: rootNode, depth: 1)
 
-            printer.unindent()
-            printer.write("}")
-            printer.nextLine()
+            if exposeToGlobal {
+                printer.unindent()
+                printer.write("}")
+                printer.nextLine()
+            }
 
             return printer.lines
         }

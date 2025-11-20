@@ -613,7 +613,8 @@ struct PackagingPlanner {
                             let data = try Data(contentsOf: URL(fileURLWithPath: scope.resolve(path: $0).path))
                             return try decoder.decode(ImportedModuleSkeleton.self, from: data)
                         },
-                        sharedMemory: Self.isSharedMemoryEnabled(triple: triple)
+                        sharedMemory: Self.isSharedMemoryEnabled(triple: triple),
+                        exposeToGlobal: true
                     )
                     let (outputJs, outputDts) = try link.link()
                     try system.writeFile(atPath: scope.resolve(path: bridgeJs).path, content: Data(outputJs.utf8))

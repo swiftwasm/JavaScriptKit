@@ -47,9 +47,9 @@ export type APIResultObject = typeof APIResultValues;
 
 export type ComplexResultObject = typeof ComplexResultValues;
 
-export type ResultObject = typeof ResultValues;
+export type ResultObject = typeof Utilities.ResultValues;
 
-export type NetworkingResultObject = typeof NetworkingResultValues;
+export type NetworkingResultObject = typeof API.NetworkingResultValues;
 
 export type APIOptionalResultObject = typeof APIOptionalResultValues;
 
@@ -89,7 +89,7 @@ export type Exports = {
     roundtripComplexResult(result: ComplexResultTag): ComplexResultTag;
     roundTripOptionalComplexResult(result: ComplexResultTag | null): ComplexResultTag | null;
     roundTripOptionalUtilitiesResult(result: Utilities.ResultTag | null): Utilities.ResultTag | null;
-    roundTripOptionalNetworkingResult(result: NetworkingResultTag | null): NetworkingResultTag | null;
+    roundTripOptionalNetworkingResult(result: API.NetworkingResultTag | null): API.NetworkingResultTag | null;
     roundTripOptionalAPIOptionalResult(result: APIOptionalResultTag | null): APIOptionalResultTag | null;
     APIResult: APIResultObject
     ComplexResult: ComplexResultObject

@@ -40,7 +40,8 @@ import class Foundation.JSONDecoder
                     children: [importSkeleton]
                 )
             ],
-            sharedMemory: false
+            sharedMemory: false,
+            exposeToGlobal: true
         )
         let linked = try linker.link()
 

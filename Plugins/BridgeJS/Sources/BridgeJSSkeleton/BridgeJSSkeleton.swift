@@ -265,6 +265,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
 
     public let name: String
     public let swiftCallName: String
+    public let tsFullPath: String
     public let explicitAccessControl: String?
     public var cases: [EnumCase]
     public let rawType: SwiftEnumRawType?
@@ -293,6 +294,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
     public init(
         name: String,
         swiftCallName: String,
+        tsFullPath: String,
         explicitAccessControl: String?,
         cases: [EnumCase],
         rawType: SwiftEnumRawType?,
@@ -303,6 +305,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
+        self.tsFullPath = tsFullPath
         self.explicitAccessControl = explicitAccessControl
         self.cases = cases
         self.rawType = rawType

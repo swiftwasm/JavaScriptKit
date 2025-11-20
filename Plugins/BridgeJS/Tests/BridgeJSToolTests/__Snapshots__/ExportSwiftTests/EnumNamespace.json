@@ -173,7 +173,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Utils"
+      "swiftCallName" : "Utils",
+      "tsFullPath" : "Utils"
     },
     {
       "cases" : [
@@ -187,7 +188,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Networking"
+      "swiftCallName" : "Networking",
+      "tsFullPath" : "Networking"
     },
     {
       "cases" : [
@@ -204,7 +206,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Networking.API"
+      "swiftCallName" : "Networking.API",
+      "tsFullPath" : "Networking.API"
     },
     {
       "cases" : [
@@ -245,7 +248,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Networking.API.Method"
+      "swiftCallName" : "Networking.API.Method",
+      "tsFullPath" : "Networking.API.Method"
     },
     {
       "cases" : [
@@ -259,7 +263,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Configuration"
+      "swiftCallName" : "Configuration",
+      "tsFullPath" : "Configuration"
     },
     {
       "cases" : [
@@ -304,7 +309,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Configuration.LogLevel"
+      "swiftCallName" : "Configuration.LogLevel",
+      "tsFullPath" : "Configuration.LogLevel"
     },
     {
       "cases" : [
@@ -342,7 +348,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Configuration.Port"
+      "swiftCallName" : "Configuration.Port",
+      "tsFullPath" : "Configuration.Port"
     },
     {
       "cases" : [
@@ -360,7 +367,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Internal"
+      "swiftCallName" : "Internal",
+      "tsFullPath" : "Networking.APIV2.Internal"
     },
     {
       "cases" : [
@@ -390,7 +398,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Internal.SupportedMethod"
+      "swiftCallName" : "Internal.SupportedMethod",
+      "tsFullPath" : "Networking.APIV2.Internal.SupportedMethod"
     }
   ],
   "functions" : [

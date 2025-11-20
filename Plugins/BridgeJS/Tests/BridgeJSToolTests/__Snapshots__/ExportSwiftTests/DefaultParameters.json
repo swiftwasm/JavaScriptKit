@@ -255,7 +255,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Status"
+      "swiftCallName" : "Status",
+      "tsFullPath" : "Status"
     }
   ],
   "functions" : [
