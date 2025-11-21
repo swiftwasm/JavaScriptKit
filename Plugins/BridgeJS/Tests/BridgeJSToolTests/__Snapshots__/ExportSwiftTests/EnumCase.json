@@ -133,6 +133,7 @@
       "tsFullPath" : "PublicStatus"
     }
   ],
+  "exposeToGlobal" : false,
   "functions" : [
     {
       "abiName" : "bjs_setDirection",

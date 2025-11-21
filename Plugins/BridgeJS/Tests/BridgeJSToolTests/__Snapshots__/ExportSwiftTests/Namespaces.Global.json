@@ -132,7 +132,7 @@
   "enums" : [
 
   ],
-  "exposeToGlobal" : false,
+  "exposeToGlobal" : true,
   "functions" : [
     {
       "abiName" : "bjs_plainFunction",

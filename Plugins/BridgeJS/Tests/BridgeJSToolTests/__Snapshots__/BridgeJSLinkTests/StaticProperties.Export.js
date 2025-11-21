@@ -303,12 +303,6 @@ export async function createInstantiator(options, swift) {
                     }
                 }
             }
-            if (typeof globalThis.PropertyNamespace === 'undefined') {
-                globalThis.PropertyNamespace = {};
-            }
-            if (typeof globalThis.PropertyNamespace.Nested === 'undefined') {
-                globalThis.PropertyNamespace.Nested = {};
-            }
             const exports = {
                 PropertyClass,
                 PropertyEnum: {
@@ -386,24 +380,6 @@ export async function createInstantiator(options, swift) {
                 },
             };
             _exports = exports;
-            Object.defineProperty(globalThis.PropertyNamespace, 'namespaceProperty', {
-                get: () => exports.PropertyNamespace.namespaceProperty,
-                set: (value) => { exports.PropertyNamespace.namespaceProperty = value; }
-            });
-            Object.defineProperty(globalThis.PropertyNamespace, 'namespaceConstant', {
-                get: () => exports.PropertyNamespace.namespaceConstant,
-            });
-            Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedProperty', {
-                get: () => exports.PropertyNamespace.Nested.nestedProperty,
-                set: (value) => { exports.PropertyNamespace.Nested.nestedProperty = value; }
-            });
-            Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedConstant', {
-                get: () => exports.PropertyNamespace.Nested.nestedConstant,
-            });
-            Object.defineProperty(globalThis.PropertyNamespace.Nested, 'nestedDouble', {
-                get: () => exports.PropertyNamespace.Nested.nestedDouble,
-                set: (value) => { exports.PropertyNamespace.Nested.nestedDouble = value; }
-            });
             return exports;
         },
     }

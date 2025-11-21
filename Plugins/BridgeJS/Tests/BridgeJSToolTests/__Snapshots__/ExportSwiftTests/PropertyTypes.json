@@ -253,6 +253,7 @@
   "enums" : [
 
   ],
+  "exposeToGlobal" : false,
   "functions" : [
     {
       "abiName" : "bjs_createPropertyHolder",

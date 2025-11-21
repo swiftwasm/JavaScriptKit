@@ -326,7 +326,7 @@
       "tsFullPath" : "PropertyNamespace.Nested"
     }
   ],
-  "exposeToGlobal" : false,
+  "exposeToGlobal" : true,
   "functions" : [
 
   ],

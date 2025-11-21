@@ -502,7 +502,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "APIResult"
+      "swiftCallName" : "APIResult",
+      "tsFullPath" : "APIResult"
     },
     {
       "cases" : [
@@ -698,9 +699,11 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "ComplexResult"
+      "swiftCallName" : "ComplexResult",
+      "tsFullPath" : "ComplexResult"
     }
   ],
+  "exposeToGlobal" : false,
   "functions" : [
     {
       "abiName" : "bjs_run",

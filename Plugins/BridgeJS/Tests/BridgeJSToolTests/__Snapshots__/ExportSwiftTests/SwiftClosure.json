@@ -1062,6 +1062,7 @@
       "tsFullPath" : "APIResult"
     }
   ],
+  "exposeToGlobal" : false,
   "functions" : [
 
   ],

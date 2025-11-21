@@ -487,6 +487,7 @@
       "tsFullPath" : "APIOptionalResult"
     }
   ],
+  "exposeToGlobal" : false,
   "functions" : [
     {
       "abiName" : "bjs_handle",

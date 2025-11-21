@@ -47,16 +47,12 @@ import Testing
     func snapshotExport(input: String) throws {
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule")
+        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
         try swiftAPI.addSourceFile(sourceFile, input)
         let name = url.deletingPathExtension().lastPathComponent
 
         let (_, outputSkeleton) = try #require(try swiftAPI.finalize())
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        let outputSkeletonData = try encoder.encode(outputSkeleton)
-        var bridgeJSLink = BridgeJSLink(sharedMemory: false, exposeToGlobal: true)
-        try bridgeJSLink.addExportedSkeletonFile(data: outputSkeletonData)
+        let bridgeJSLink: BridgeJSLink = BridgeJSLink(exportedSkeletons: [outputSkeleton], sharedMemory: false)
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Export")
     }
 
@@ -74,7 +70,7 @@ import Testing
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let outputSkeletonData = try encoder.encode(importTS.skeleton)
 
-        var bridgeJSLink = BridgeJSLink(sharedMemory: false, exposeToGlobal: true)
+        var bridgeJSLink = BridgeJSLink(sharedMemory: false)
         try bridgeJSLink.addImportedSkeletonFile(data: outputSkeletonData)
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Import")
     }
@@ -83,45 +79,16 @@ import Testing
         "Namespaces.swift",
         "StaticFunctions.swift",
         "StaticProperties.swift",
-        "EnumNamespace.swift"
+        "EnumNamespace.swift",
     ])
-    func testWithoutGlobal(inputFile: String) throws {
+    func snapshotExportWithGlobal(inputFile: String) throws {
         let url = Self.inputsDirectory.appendingPathComponent(inputFile)
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule")
+        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule", exposeToGlobal: true)
         try swiftAPI.addSourceFile(sourceFile, inputFile)
-
+        let name = url.deletingPathExtension().lastPathComponent
         let (_, outputSkeleton) = try #require(try swiftAPI.finalize())
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        let outputSkeletonData = try encoder.encode(outputSkeleton)
-
-        var bridgeJSLink = BridgeJSLink(sharedMemory: false, exposeToGlobal: false)
-        try bridgeJSLink.addExportedSkeletonFile(data: outputSkeletonData)
-
-        let (outputJs, outputDts) = try bridgeJSLink.link()
-
-        // Verify no global declarations
-        #expect(!outputDts.contains("declare global"))
-        #expect(!outputJs.contains("globalThis."))
-
-        // Save snapshots
-        let name = url.deletingPathExtension().lastPathComponent + "_NoGlobal.Export"
-        try assertSnapshot(
-            name: name,
-            filePath: #filePath,
-            function: #function,
-            sourceLocation: #_sourceLocation,
-            input: outputJs.data(using: .utf8)!,
-            fileExtension: "js"
-        )
-        try assertSnapshot(
-            name: name,
-            filePath: #filePath,
-            function: #function,
-            sourceLocation: #_sourceLocation,
-            input: outputDts.data(using: .utf8)!,
-            fileExtension: "d.ts"
-        )
+        let bridgeJSLink: BridgeJSLink = BridgeJSLink(exportedSkeletons: [outputSkeleton], sharedMemory: false)
+        try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Global.Export")
     }
 }

@@ -341,36 +341,20 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.StaticPropertyEnum.enumVariable, 500);
 
     // Namespace enum static properties
-    assert.equal(globalThis.StaticPropertyNamespace.namespaceProperty, "namespace");
-    assert.equal(globalThis.StaticPropertyNamespace.namespaceConstant, "constant");
-
-    globalThis.StaticPropertyNamespace.namespaceProperty = "modified namespace";
-    assert.equal(globalThis.StaticPropertyNamespace.namespaceProperty, "modified namespace");
-
-    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedProperty, 999);
-    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedConstant, "nested");
-    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedDouble, 1.414);
-
-    globalThis.StaticPropertyNamespace.NestedProperties.nestedProperty = 1000;
-    globalThis.StaticPropertyNamespace.NestedProperties.nestedDouble = 2.828;
-    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedProperty, 1000);
-    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedDouble, 2.828);
-
-    assert.equal(exports.StaticPropertyNamespace.namespaceProperty, "modified namespace");
+    assert.equal(exports.StaticPropertyNamespace.namespaceProperty, "namespace");
     assert.equal(exports.StaticPropertyNamespace.namespaceConstant, "constant");
-    exports.StaticPropertyNamespace.namespaceProperty = "exports modified";
-    assert.equal(exports.StaticPropertyNamespace.namespaceProperty, "exports modified");
-    assert.equal(globalThis.StaticPropertyNamespace.namespaceProperty, "exports modified");
 
-    assert.equal(exports.StaticPropertyNamespace.NestedProperties.nestedProperty, 1000);
+    exports.StaticPropertyNamespace.namespaceProperty = "modified namespace";
+    assert.equal(exports.StaticPropertyNamespace.namespaceProperty, "modified namespace");
+
+    assert.equal(exports.StaticPropertyNamespace.NestedProperties.nestedProperty, 999);
     assert.equal(exports.StaticPropertyNamespace.NestedProperties.nestedConstant, "nested");
+    assert.equal(exports.StaticPropertyNamespace.NestedProperties.nestedDouble, 1.414);
+
+    exports.StaticPropertyNamespace.NestedProperties.nestedProperty = 1000;
+    exports.StaticPropertyNamespace.NestedProperties.nestedDouble = 2.828;
+    assert.equal(exports.StaticPropertyNamespace.NestedProperties.nestedProperty, 1000);
     assert.equal(exports.StaticPropertyNamespace.NestedProperties.nestedDouble, 2.828);
-    exports.StaticPropertyNamespace.NestedProperties.nestedProperty = 2000;
-    exports.StaticPropertyNamespace.NestedProperties.nestedDouble = 3.14;
-    assert.equal(exports.StaticPropertyNamespace.NestedProperties.nestedProperty, 2000);
-    assert.equal(exports.StaticPropertyNamespace.NestedProperties.nestedDouble, 3.14);
-    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedProperty, 2000);
-    assert.equal(globalThis.StaticPropertyNamespace.NestedProperties.nestedDouble, 3.14);
 
     // Test class without @JS init constructor
     const calc = exports.createCalculator();
@@ -440,21 +424,10 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.setTSTheme(TSTheme.Light), TSTheme.Light);
     assert.equal(exports.getTSTheme(), TSTheme.Light);
 
-    assert.equal(globalThis.Networking.API.MethodValues.Get, 0);
-    assert.equal(globalThis.Networking.API.MethodValues.Post, 1);
-    assert.equal(globalThis.Networking.API.MethodValues.Put, 2);
-    assert.equal(globalThis.Networking.API.MethodValues.Delete, 3);
     assert.equal(exports.Networking.API.Method.Get, 0);
     assert.equal(exports.Networking.API.Method.Post, 1);
     assert.equal(exports.Networking.API.Method.Put, 2);
     assert.equal(exports.Networking.API.Method.Delete, 3);
-    assert.equal(globalThis.Configuration.LogLevelValues.Debug, "debug");
-    assert.equal(globalThis.Configuration.LogLevelValues.Info, "info");
-    assert.equal(globalThis.Configuration.LogLevelValues.Warning, "warning");
-    assert.equal(globalThis.Configuration.LogLevelValues.Error, "error");
-    assert.equal(globalThis.Configuration.PortValues.Http, 80);
-    assert.equal(globalThis.Configuration.PortValues.Https, 443);
-    assert.equal(globalThis.Configuration.PortValues.Development, 3000);
     assert.equal(exports.Configuration.LogLevel.Debug, "debug");
     assert.equal(exports.Configuration.LogLevel.Info, "info");
     assert.equal(exports.Configuration.LogLevel.Warning, "warning");
@@ -462,19 +435,16 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.Configuration.Port.Http, 80);
     assert.equal(exports.Configuration.Port.Https, 443);
     assert.equal(exports.Configuration.Port.Development, 3000);
-    assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Get, 0);
-    assert.equal(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Post, 1);
     assert.equal(exports.Networking.APIV2.Internal.SupportedMethod.Get, 0);
     assert.equal(exports.Networking.APIV2.Internal.SupportedMethod.Post, 1);
 
-    assert.equal(exports.roundtripNetworkingAPIMethod(globalThis.Networking.API.MethodValues.Get), globalThis.Networking.API.MethodValues.Get);
-    assert.equal(exports.roundtripConfigurationLogLevel(globalThis.Configuration.LogLevelValues.Debug), globalThis.Configuration.LogLevelValues.Debug);
-    assert.equal(exports.roundtripConfigurationPort(globalThis.Configuration.PortValues.Http), globalThis.Configuration.PortValues.Http);
-    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevelValues.Debug), globalThis.Configuration.PortValues.Development);
-    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevelValues.Info), globalThis.Configuration.PortValues.Http);
-    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevelValues.Warning), globalThis.Configuration.PortValues.Https);
-    assert.equal(exports.processConfigurationLogLevel(globalThis.Configuration.LogLevelValues.Error), globalThis.Configuration.PortValues.Development);
-    assert.equal(exports.roundtripInternalSupportedMethod(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Get), globalThis.Networking.APIV2.Internal.SupportedMethodValues.Get);
+    assert.equal(exports.roundtripNetworkingAPIMethod(exports.Networking.API.Method.Get), exports.Networking.API.Method.Get);
+    assert.equal(exports.roundtripConfigurationLogLevel(exports.Configuration.LogLevel.Debug), exports.Configuration.LogLevel.Debug);
+    assert.equal(exports.roundtripConfigurationPort(exports.Configuration.Port.Http), exports.Configuration.Port.Http);
+    assert.equal(exports.processConfigurationLogLevel(exports.Configuration.LogLevel.Debug), exports.Configuration.Port.Development);
+    assert.equal(exports.processConfigurationLogLevel(exports.Configuration.LogLevel.Info), exports.Configuration.Port.Http);
+    assert.equal(exports.processConfigurationLogLevel(exports.Configuration.LogLevel.Warning), exports.Configuration.Port.Https);
+    assert.equal(exports.roundtripInternalSupportedMethod(exports.Networking.APIV2.Internal.SupportedMethod.Get), exports.Networking.APIV2.Internal.SupportedMethod.Get);
 
     const converter = new exports.Utils.Converter();
     assert.equal(converter.toString(42), "42");
@@ -482,26 +452,14 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     converter.release();
 
     const httpServer = new exports.Networking.API.HTTPServer();
-    httpServer.call(globalThis.Networking.API.MethodValues.Get);
-    httpServer.call(globalThis.Networking.API.MethodValues.Post);
+    httpServer.call(exports.Networking.API.Method.Get);
+    httpServer.call(exports.Networking.API.Method.Post);
     httpServer.release();
 
     const testServer = new exports.Networking.APIV2.Internal.TestServer();
-    testServer.call(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Get);
-    testServer.call(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Post);
+    testServer.call(exports.Networking.APIV2.Internal.SupportedMethod.Get);
+    testServer.call(exports.Networking.APIV2.Internal.SupportedMethod.Post);
     testServer.release();
-
-    const globalConverter = new globalThis.Utils.Converter();
-    assert.equal(globalConverter.toString(99), "99");
-    globalConverter.release();
-
-    const globalHttpServer = new globalThis.Networking.API.HTTPServer();
-    globalHttpServer.call(globalThis.Networking.API.MethodValues.Get);
-    globalHttpServer.release();
-
-    const globalTestServer = new globalThis.Networking.APIV2.Internal.TestServer();
-    globalTestServer.call(globalThis.Networking.APIV2.Internal.SupportedMethodValues.Post);
-    globalTestServer.release();
 
     const s1 = { tag: exports.APIResult.Tag.Success, param0: "Cześć 🙋‍♂️" };
     const f1 = { tag: exports.APIResult.Tag.Failure, param0: 42 };
@@ -555,27 +513,27 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.deepEqual(exports.makeComplexResultComprehensive(true, false, 10, 20, 1.5, 2.5, "First", "Second", "Third"), { tag: exports.ComplexResult.Tag.Comprehensive, param0: true, param1: false, param2: 10, param3: 20, param4: 1.5, param5: 2.5, param6: "First", param7: "Second", param8: "Third" });
     assert.deepEqual(exports.makeComplexResultInfo(), { tag: exports.ComplexResult.Tag.Info });
 
-    const urSuccess = { tag: globalThis.Utilities.ResultValues.Tag.Success, param0: "Utility operation completed" };
-    const urFailure = { tag: globalThis.Utilities.ResultValues.Tag.Failure, param0: "Utility error occurred", param1: 500 };
-    const urStatus = { tag: globalThis.Utilities.ResultValues.Tag.Status, param0: true, param1: 200, param2: "Utility status OK" };
+    const urSuccess = { tag: exports.Utilities.Result.Tag.Success, param0: "Utility operation completed" };
+    const urFailure = { tag: exports.Utilities.Result.Tag.Failure, param0: "Utility error occurred", param1: 500 };
+    const urStatus = { tag: exports.Utilities.Result.Tag.Status, param0: true, param1: 200, param2: "Utility status OK" };
 
     assert.deepEqual(exports.roundtripUtilitiesResult(urSuccess), urSuccess);
     assert.deepEqual(exports.roundtripUtilitiesResult(urFailure), urFailure);
     assert.deepEqual(exports.roundtripUtilitiesResult(urStatus), urStatus);
 
-    assert.deepEqual(exports.makeUtilitiesResultSuccess("Test"), { tag: globalThis.Utilities.ResultValues.Tag.Success, param0: "Test" });
-    assert.deepEqual(exports.makeUtilitiesResultSuccess("ok"), { tag: globalThis.Utilities.ResultValues.Tag.Success, param0: "ok" });
-    assert.deepEqual(exports.makeUtilitiesResultFailure("Error", 123), { tag: globalThis.Utilities.ResultValues.Tag.Failure, param0: "Error", param1: 123 });
-    assert.deepEqual(exports.makeUtilitiesResultStatus(true, 200, "OK"), { tag: globalThis.Utilities.ResultValues.Tag.Status, param0: true, param1: 200, param2: "OK" });
+    assert.deepEqual(exports.makeUtilitiesResultSuccess("Test"), { tag: exports.Utilities.Result.Tag.Success, param0: "Test" });
+    assert.deepEqual(exports.makeUtilitiesResultSuccess("ok"), { tag: exports.Utilities.Result.Tag.Success, param0: "ok" });
+    assert.deepEqual(exports.makeUtilitiesResultFailure("Error", 123), { tag: exports.Utilities.Result.Tag.Failure, param0: "Error", param1: 123 });
+    assert.deepEqual(exports.makeUtilitiesResultStatus(true, 200, "OK"), { tag: exports.Utilities.Result.Tag.Status, param0: true, param1: 200, param2: "OK" });
 
-    const nrSuccess = { tag: globalThis.API.NetworkingResultValues.Tag.Success, param0: "Network request successful" };
-    const nrFailure = { tag: globalThis.API.NetworkingResultValues.Tag.Failure, param0: "Network timeout", param1: 408 };
+    const nrSuccess = { tag: exports.API.NetworkingResult.Tag.Success, param0: "Network request successful" };
+    const nrFailure = { tag: exports.API.NetworkingResult.Tag.Failure, param0: "Network timeout", param1: 408 };
 
     assert.deepEqual(exports.roundtripAPINetworkingResult(nrSuccess), nrSuccess);
     assert.deepEqual(exports.roundtripAPINetworkingResult(nrFailure), nrFailure);
 
-    assert.deepEqual(exports.makeAPINetworkingResultSuccess("Connected"), { tag: globalThis.API.NetworkingResultValues.Tag.Success, param0: "Connected" });
-    assert.deepEqual(exports.makeAPINetworkingResultFailure("Timeout", 408), { tag: globalThis.API.NetworkingResultValues.Tag.Failure, param0: "Timeout", param1: 408 });
+    assert.deepEqual(exports.makeAPINetworkingResultSuccess("Connected"), { tag: exports.API.NetworkingResult.Tag.Success, param0: "Connected" });
+    assert.deepEqual(exports.makeAPINetworkingResultFailure("Timeout", 408), { tag: exports.API.NetworkingResult.Tag.Failure, param0: "Timeout", param1: 408 });
 
     assert.equal(exports.roundTripOptionalString(null), null);
     assert.equal(exports.roundTripOptionalInt(null), null);
@@ -604,7 +562,7 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.roundTripOptionalHttpStatus(exports.HttpStatus.Ok), HttpStatusValues.Ok);
     assert.equal(exports.roundTripOptionalTSDirection(TSDirection.North), TSDirection.North);
     assert.equal(exports.roundTripOptionalTSTheme(TSTheme.Light), TSTheme.Light);
-    assert.equal(exports.roundTripOptionalNetworkingAPIMethod(globalThis.Networking.API.MethodValues.Get), globalThis.Networking.API.MethodValues.Get);
+    assert.equal(exports.roundTripOptionalNetworkingAPIMethod(exports.Networking.API.Method.Get), exports.Networking.API.Method.Get);
     assert.deepEqual(exports.roundTripOptionalAPIResult(p1), p1);
     assert.deepEqual(exports.roundTripOptionalComplexResult(cl1), cl1);
 
@@ -671,9 +629,8 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(StaticCalculatorValues.Basic, 1);
     assert.equal(StaticCalculatorValues.Scientific, exports.StaticCalculator.Scientific);
     assert.equal(StaticCalculatorValues.Basic, exports.StaticCalculator.Basic);
-    assert.equal(globalThis.StaticUtils.Nested.roundtrip("hello world"), "hello world");
+    assert.equal(exports.StaticUtils.Nested.roundtrip("hello world"), "hello world");
     assert.equal(exports.StaticUtils.Nested.roundtrip("test"), "test");
-    assert.equal(exports.StaticUtils.Nested.roundtrip("exports api"), "exports api");
 
     // Test default parameters
     assert.equal(exports.testStringDefault(), "Hello World");
@@ -744,9 +701,9 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 function testClosureSupport(exports) {
     const upperTransform = (text) => text.toUpperCase();
     const processor = new exports.TextProcessor(upperTransform);
-    
+
     assert.equal(processor.process("hello"), "HELLO");
-    
+
     const multiParamTransform = (count, text, ratio) => {
         return `${text.toUpperCase()}-${count}-${ratio.toFixed(2)}`;
     };
@@ -767,14 +724,14 @@ function testClosureSupport(exports) {
     const addDr = exports.makeFormatter("Dr.");
     assert.equal(addDr("Ada"), "Dr. Ada");
     assert.equal(addDr("Grace"), "Dr. Grace");
-    
+
     const addProf = exports.makeFormatter("Prof.");
     assert.equal(addProf("Hopper"), "Prof. Hopper");
 
     const add10 = exports.makeAdder(10);
     assert.equal(add10(5), 15);
     assert.equal(add10(32), 42);
-    
+
     const add100 = exports.makeAdder(100);
     assert.equal(add100(23), 123);
 
@@ -821,12 +778,12 @@ function testClosureSupport(exports) {
         return value !== null ? `Got: ${value}` : `Got: null`;
     });
     assert.equal(optResult1, "Got: test | Got: null");
-    
+
     const optResult2 = processor.processOptionalInt((value) => {
         return value !== null ? `Number: ${value}` : `Number: null`;
     });
     assert.equal(optResult2, "Number: 42 | Number: null");
-    
+
     const optResult3 = processor.processOptionalGreeter((greeter) => {
         return greeter !== null ? `Greeter: ${greeter.name}` : `Greeter: null`;
     });

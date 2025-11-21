@@ -297,12 +297,6 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
             }
-            if (typeof globalThis.Utils === 'undefined') {
-                globalThis.Utils = {};
-            }
-            if (typeof globalThis.Utils.String === 'undefined') {
-                globalThis.Utils.String = {};
-            }
             const exports = {
                 MathUtils,
                 Calculator: {
@@ -337,7 +331,6 @@ export async function createInstantiator(options, swift) {
                 },
             };
             _exports = exports;
-            globalThis.Utils.String.uppercase = exports.Utils.String.uppercase;
             return exports;
         },
     }

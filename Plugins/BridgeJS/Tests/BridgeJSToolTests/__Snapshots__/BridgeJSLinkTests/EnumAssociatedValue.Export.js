@@ -479,14 +479,6 @@ const __bjs_createAPIOptionalResultValuesHelpers = () => {
         }
     });
 };
-if (typeof globalThis.API === 'undefined') {
-    globalThis.API = {};
-}
-if (typeof globalThis.Utilities === 'undefined') {
-    globalThis.Utilities = {};
-}
-globalThis.Utilities.ResultValues = ResultValues;
-globalThis.API.NetworkingResultValues = NetworkingResultValues;
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -692,12 +684,6 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            if (typeof globalThis.API === 'undefined') {
-                globalThis.API = {};
-            }
-            if (typeof globalThis.Utilities === 'undefined') {
-                globalThis.Utilities = {};
-            }
             const exports = {
                 handle: function bjs_handle(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.APIResult.lower(result);

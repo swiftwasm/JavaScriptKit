@@ -457,6 +457,7 @@
       "tsFullPath" : "Ratio"
     }
   ],
+  "exposeToGlobal" : false,
   "functions" : [
     {
       "abiName" : "bjs_setTheme",

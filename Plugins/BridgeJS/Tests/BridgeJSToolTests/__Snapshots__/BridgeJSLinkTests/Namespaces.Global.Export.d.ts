@@ -4,6 +4,35 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export {};
+
+declare global {
+    namespace MyModule {
+        namespace Utils {
+            namespacedFunction(): string;
+        }
+    }
+    namespace Utils {
+        namespace Converters {
+            class Converter {
+                constructor();
+                toString(value: number): string;
+            }
+        }
+    }
+    namespace __Swift {
+        namespace Foundation {
+            class Greeter {
+                constructor(name: string);
+                greet(): string;
+            }
+            class UUID {
+                uuidString(): string;
+            }
+        }
+    }
+}
+
 /// Represents a Swift heap object like a class instance or an actor instance.
 export interface SwiftHeapObject {
     /// Release the heap object.

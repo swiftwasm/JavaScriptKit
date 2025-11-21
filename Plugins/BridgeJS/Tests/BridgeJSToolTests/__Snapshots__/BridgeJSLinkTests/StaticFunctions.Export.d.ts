@@ -28,16 +28,6 @@ export type APIResultObject = typeof APIResultValues & {
     roundtrip(value: APIResultTag): APIResultTag;
 };
 
-export {};
-
-declare global {
-    namespace Utils {
-        namespace String {
-            uppercase(text: string): string;
-        }
-    }
-}
-
 /// Represents a Swift heap object like a class instance or an actor instance.
 export interface SwiftHeapObject {
     /// Release the heap object.

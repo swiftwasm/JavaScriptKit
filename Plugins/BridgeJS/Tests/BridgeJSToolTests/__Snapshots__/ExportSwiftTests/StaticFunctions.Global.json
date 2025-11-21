@@ -323,7 +323,7 @@
       "tsFullPath" : "Utils.String"
     }
   ],
-  "exposeToGlobal" : false,
+  "exposeToGlobal" : true,
   "functions" : [
 
   ],

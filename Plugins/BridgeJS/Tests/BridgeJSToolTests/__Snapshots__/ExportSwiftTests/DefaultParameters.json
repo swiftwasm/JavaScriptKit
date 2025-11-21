@@ -259,6 +259,7 @@
       "tsFullPath" : "Status"
     }
   ],
+  "exposeToGlobal" : false,
   "functions" : [
     {
       "abiName" : "bjs_testStringDefault",

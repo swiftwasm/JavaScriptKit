@@ -402,7 +402,7 @@
       "tsFullPath" : "Networking.APIV2.Internal.SupportedMethod"
     }
   ],
-  "exposeToGlobal" : false,
+  "exposeToGlobal" : true,
   "functions" : [
 
   ],

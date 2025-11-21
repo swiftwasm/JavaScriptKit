@@ -4,11 +4,57 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export const PropertyEnumValues = {
-    Value1: 0,
-    Value2: 1,
+export const CalculatorValues = {
+    Scientific: 0,
+    Basic: 1,
 };
 
+export const APIResultValues = {
+    Tag: {
+        Success: 0,
+        Failure: 1,
+    },
+};
+
+const __bjs_createAPIResultValuesHelpers = () => {
+    return (tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift) => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case APIResultValues.Tag.Success: {
+                    const bytes = textEncoder.encode(value.param0);
+                    const id = swift.memory.retain(bytes);
+                    tmpParamInts.push(bytes.length);
+                    tmpParamInts.push(id);
+                    const cleanup = () => {
+                        swift.memory.release(id);
+                    };
+                    return { caseId: APIResultValues.Tag.Success, cleanup };
+                }
+                case APIResultValues.Tag.Failure: {
+                    tmpParamInts.push((value.param0 | 0));
+                    const cleanup = undefined;
+                    return { caseId: APIResultValues.Tag.Failure, cleanup };
+                }
+                default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
+            }
+        },
+        raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
+            const tag = tmpRetTag | 0;
+            switch (tag) {
+                case APIResultValues.Tag.Success: {
+                    const string = tmpRetStrings.pop();
+                    return { tag: APIResultValues.Tag.Success, param0: string };
+                }
+                case APIResultValues.Tag.Failure: {
+                    const int = tmpRetInts.pop();
+                    return { tag: APIResultValues.Tag.Failure, param0: int };
+                }
+                default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
+            }
+        }
+    });
+};
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -31,6 +77,7 @@ export async function createInstantiator(options, swift) {
     let tmpParamInts = [];
     let tmpParamF32s = [];
     let tmpParamF64s = [];
+    const enumHelpers = {};
     
     let _exports = null;
     let bjs = null;
@@ -190,8 +237,8 @@ export async function createInstantiator(options, swift) {
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
             }
-            importObject["TestModule"]["bjs_PropertyClass_wrap"] = function(pointer) {
-                const obj = PropertyClass.__construct(pointer);
+            importObject["TestModule"]["bjs_MathUtils_wrap"] = function(pointer) {
+                const obj = MathUtils.__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },
@@ -199,6 +246,9 @@ export async function createInstantiator(options, swift) {
             instance = i;
             memory = instance.exports.memory;
 
+            const APIResultHelpers = __bjs_createAPIResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift);
+            enumHelpers.APIResult = APIResultHelpers;
+            
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
             }
@@ -225,161 +275,69 @@ export async function createInstantiator(options, swift) {
                     this.deinit(this.pointer);
                 }
             }
-            class PropertyClass extends SwiftHeapObject {
+            class MathUtils extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PropertyClass_deinit, PropertyClass.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_MathUtils_deinit, MathUtils.prototype);
                 }
             
                 constructor() {
-                    const ret = instance.exports.bjs_PropertyClass_init();
-                    return PropertyClass.__construct(ret);
+                    const ret = instance.exports.bjs_MathUtils_init();
+                    return MathUtils.__construct(ret);
                 }
-                static get staticConstant() {
-                    instance.exports.bjs_PropertyClass_static_staticConstant_get();
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
+                static subtract(a, b) {
+                    const ret = instance.exports.bjs_MathUtils_static_subtract(a, b);
                     return ret;
                 }
-                static get staticVariable() {
-                    const ret = instance.exports.bjs_PropertyClass_static_staticVariable_get();
+                static add(a, b) {
+                    const ret = instance.exports.bjs_MathUtils_static_add(a, b);
                     return ret;
                 }
-                static set staticVariable(value) {
-                    instance.exports.bjs_PropertyClass_static_staticVariable_set(value);
-                }
-                static get jsObjectProperty() {
-                    const ret = instance.exports.bjs_PropertyClass_static_jsObjectProperty_get();
-                    const ret1 = swift.memory.getObject(ret);
-                    swift.memory.release(ret);
-                    return ret1;
-                }
-                static set jsObjectProperty(value) {
-                    instance.exports.bjs_PropertyClass_static_jsObjectProperty_set(swift.memory.retain(value));
-                }
-                static get classVariable() {
-                    instance.exports.bjs_PropertyClass_static_classVariable_get();
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
+                multiply(x, y) {
+                    const ret = instance.exports.bjs_MathUtils_multiply(this.pointer, x, y);
                     return ret;
-                }
-                static set classVariable(value) {
-                    const valueBytes = textEncoder.encode(value);
-                    const valueId = swift.memory.retain(valueBytes);
-                    instance.exports.bjs_PropertyClass_static_classVariable_set(valueId, valueBytes.length);
-                    swift.memory.release(valueId);
-                }
-                static get computedProperty() {
-                    instance.exports.bjs_PropertyClass_static_computedProperty_get();
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    return ret;
-                }
-                static set computedProperty(value) {
-                    const valueBytes = textEncoder.encode(value);
-                    const valueId = swift.memory.retain(valueBytes);
-                    instance.exports.bjs_PropertyClass_static_computedProperty_set(valueId, valueBytes.length);
-                    swift.memory.release(valueId);
-                }
-                static get readOnlyComputed() {
-                    const ret = instance.exports.bjs_PropertyClass_static_readOnlyComputed_get();
-                    return ret;
-                }
-                static get optionalProperty() {
-                    instance.exports.bjs_PropertyClass_static_optionalProperty_get();
-                    const optResult = tmpRetString;
-                    tmpRetString = undefined;
-                    return optResult;
-                }
-                static set optionalProperty(value) {
-                    const isSome = value != null;
-                    let valueId, valueBytes;
-                    if (isSome) {
-                        valueBytes = textEncoder.encode(value);
-                        valueId = swift.memory.retain(valueBytes);
-                    }
-                    instance.exports.bjs_PropertyClass_static_optionalProperty_set(+isSome, isSome ? valueId : 0, isSome ? valueBytes.length : 0);
-                    if (valueId != undefined) {
-                        swift.memory.release(valueId);
-                    }
                 }
             }
+            if (typeof globalThis.Utils === 'undefined') {
+                globalThis.Utils = {};
+            }
+            if (typeof globalThis.Utils.String === 'undefined') {
+                globalThis.Utils.String = {};
+            }
             const exports = {
-                PropertyClass,
-                PropertyEnum: {
-                    ...PropertyEnumValues,
-                    get enumProperty() {
-                        instance.exports.bjs_PropertyEnum_static_enumProperty_get();
-                        const ret = tmpRetString;
-                        tmpRetString = undefined;
+                MathUtils,
+                Calculator: {
+                    ...CalculatorValues,
+                    square: function(value) {
+                        const ret = instance.exports.bjs_Calculator_static_square(value);
                         return ret;
-                    },
-                    set enumProperty(value) {
-                        const valueBytes = textEncoder.encode(value);
-                        const valueId = swift.memory.retain(valueBytes);
-                        instance.exports.bjs_PropertyEnum_static_enumProperty_set(valueId, valueBytes.length);
-                        swift.memory.release(valueId);
-                    },
-                    get enumConstant() {
-                        const ret = instance.exports.bjs_PropertyEnum_static_enumConstant_get();
-                        return ret;
-                    },
-                    get computedEnum() {
-                        instance.exports.bjs_PropertyEnum_static_computedEnum_get();
-                        const ret = tmpRetString;
-                        tmpRetString = undefined;
-                        return ret;
-                    },
-                    set computedEnum(value) {
-                        const valueBytes = textEncoder.encode(value);
-                        const valueId = swift.memory.retain(valueBytes);
-                        instance.exports.bjs_PropertyEnum_static_computedEnum_set(valueId, valueBytes.length);
-                        swift.memory.release(valueId);
                     }
                 },
-                PropertyNamespace: {
-                    get namespaceProperty() {
-                        instance.exports.bjs_PropertyNamespace_static_namespaceProperty_get();
-                        const ret = tmpRetString;
-                        tmpRetString = undefined;
+                APIResult: {
+                    ...APIResultValues,
+                    roundtrip: function(value) {
+                        const { caseId: valueCaseId, cleanup: valueCleanup } = enumHelpers.APIResult.lower(value);
+                        instance.exports.bjs_APIResult_static_roundtrip(valueCaseId);
+                        const ret = enumHelpers.APIResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                        if (valueCleanup) { valueCleanup(); }
                         return ret;
-                    },
-                    set namespaceProperty(value) {
-                        const valueBytes = textEncoder.encode(value);
-                        const valueId = swift.memory.retain(valueBytes);
-                        instance.exports.bjs_PropertyNamespace_static_namespaceProperty_set(valueId, valueBytes.length);
-                        swift.memory.release(valueId);
-                    },
-                    get namespaceConstant() {
-                        instance.exports.bjs_PropertyNamespace_static_namespaceConstant_get();
-                        const ret = tmpRetString;
-                        tmpRetString = undefined;
-                        return ret;
-                    },
-                    Nested: {
-                        get nestedProperty() {
-                            const ret = instance.exports.bjs_PropertyNamespace_Nested_static_nestedProperty_get();
-                            return ret;
-                        },
-                        set nestedProperty(value) {
-                            instance.exports.bjs_PropertyNamespace_Nested_static_nestedProperty_set(value);
-                        },
-                        get nestedConstant() {
-                            instance.exports.bjs_PropertyNamespace_Nested_static_nestedConstant_get();
+                    }
+                },
+                Utils: {
+                    String: {
+                        uppercase: function bjs_Utils_String_static_uppercase(text) {
+                            const textBytes = textEncoder.encode(text);
+                            const textId = swift.memory.retain(textBytes);
+                            instance.exports.bjs_Utils_String_static_uppercase(textId, textBytes.length);
                             const ret = tmpRetString;
                             tmpRetString = undefined;
+                            swift.memory.release(textId);
                             return ret;
-                        },
-                        get nestedDouble() {
-                            const ret = instance.exports.bjs_PropertyNamespace_Nested_static_nestedDouble_get();
-                            return ret;
-                        },
-                        set nestedDouble(value) {
-                            instance.exports.bjs_PropertyNamespace_Nested_static_nestedDouble_set(value);
                         },
                     },
                 },
             };
             _exports = exports;
+            globalThis.Utils.String.uppercase = exports.Utils.String.uppercase;
             return exports;
         },
     }

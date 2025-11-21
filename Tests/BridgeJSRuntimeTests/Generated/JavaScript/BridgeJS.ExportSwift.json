@@ -4469,6 +4469,7 @@
       "tsFullPath" : "StaticPropertyNamespace.NestedProperties"
     }
   ],
+  "exposeToGlobal" : false,
   "functions" : [
     {
       "abiName" : "bjs_roundTripVoid",

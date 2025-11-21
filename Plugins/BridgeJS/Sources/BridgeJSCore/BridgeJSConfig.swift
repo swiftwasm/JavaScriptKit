@@ -10,6 +10,31 @@ public struct BridgeJSConfig: Codable {
     /// If not present, the tool will be searched for in the system PATH.
     public var tools: [String: String]?
 
+    /// Whether to expose exported Swift APIs to the global namespace.
+    ///
+    /// When `true`, exported functions, classes, and namespaces are available
+    /// via `globalThis` in JavaScript. When `false`, they are only available
+    /// through the exports object returned by `createExports()`.
+    ///
+    /// Default: `false`
+    public var exposeToGlobal: Bool
+
+    public init(tools: [String: String]? = nil, exposeToGlobal: Bool = false) {
+        self.tools = tools
+        self.exposeToGlobal = exposeToGlobal
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case tools
+        case exposeToGlobal
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        tools = try container.decodeIfPresent([String: String].self, forKey: .tools)
+        exposeToGlobal = try container.decodeIfPresent(Bool.self, forKey: .exposeToGlobal) ?? false
+    }
+
     /// Load the configuration file from the SwiftPM package target directory.
     ///
     /// Files are loaded **in this order** and merged (later files override earlier ones):
@@ -49,7 +74,8 @@ public struct BridgeJSConfig: Codable {
     /// Merge the current configuration with the overrides.
     func merging(overrides: BridgeJSConfig) -> BridgeJSConfig {
         return BridgeJSConfig(
-            tools: (tools ?? [:]).merging(overrides.tools ?? [:], uniquingKeysWith: { $1 })
+            tools: (tools ?? [:]).merging(overrides.tools ?? [:], uniquingKeysWith: { $1 }),
+            exposeToGlobal: overrides.exposeToGlobal
         )
     }
 }

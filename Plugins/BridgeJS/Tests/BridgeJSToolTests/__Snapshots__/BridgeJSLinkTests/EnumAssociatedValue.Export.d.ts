@@ -53,32 +53,27 @@ export type NetworkingResultObject = typeof API.NetworkingResultValues;
 
 export type APIOptionalResultObject = typeof APIOptionalResultValues;
 
-export {};
-
-declare global {
-    namespace API {
-        const NetworkingResultValues: {
-            readonly Tag: {
-                readonly Success: 0;
-                readonly Failure: 1;
-            };
+export namespace API {
+    const NetworkingResultValues: {
+        readonly Tag: {
+            readonly Success: 0;
+            readonly Failure: 1;
         };
-        type NetworkingResultTag =
-          { tag: typeof NetworkingResultValues.Tag.Success; param0: string } | { tag: typeof NetworkingResultValues.Tag.Failure; param0: string; param1: number }
-    }
-    namespace Utilities {
-        const ResultValues: {
-            readonly Tag: {
-                readonly Success: 0;
-                readonly Failure: 1;
-                readonly Status: 2;
-            };
-        };
-        type ResultTag =
-          { tag: typeof ResultValues.Tag.Success; param0: string } | { tag: typeof ResultValues.Tag.Failure; param0: string; param1: number } | { tag: typeof ResultValues.Tag.Status; param0: boolean; param1: number; param2: string }
-    }
+    };
+    type NetworkingResultTag =
+      { tag: typeof NetworkingResultValues.Tag.Success; param0: string } | { tag: typeof NetworkingResultValues.Tag.Failure; param0: string; param1: number }
 }
-
+export namespace Utilities {
+    const ResultValues: {
+        readonly Tag: {
+            readonly Success: 0;
+            readonly Failure: 1;
+            readonly Status: 2;
+        };
+    };
+    type ResultTag =
+      { tag: typeof ResultValues.Tag.Success; param0: string } | { tag: typeof ResultValues.Tag.Failure; param0: string; param1: number } | { tag: typeof ResultValues.Tag.Status; param0: boolean; param1: number; param2: string }
+}
 export type Exports = {
     handle(result: APIResultTag): void;
     getResult(): APIResultTag;

@@ -12,24 +12,26 @@ struct BridgeJSLink {
     var exportedSkeletons: [ExportedSkeleton] = []
     var importedSkeletons: [ImportedModuleSkeleton] = []
     let sharedMemory: Bool
-    let exposeToGlobal: Bool
+    var exposeToGlobal: Bool
     private let namespaceBuilder = NamespaceBuilder()
 
     init(
         exportedSkeletons: [ExportedSkeleton] = [],
         importedSkeletons: [ImportedModuleSkeleton] = [],
-        sharedMemory: Bool,
-        exposeToGlobal: Bool = true
+        sharedMemory: Bool
     ) {
         self.exportedSkeletons = exportedSkeletons
         self.importedSkeletons = importedSkeletons
         self.sharedMemory = sharedMemory
-        self.exposeToGlobal = exposeToGlobal
+        self.exposeToGlobal = exportedSkeletons.contains { $0.exposeToGlobal }
     }
 
     mutating func addExportedSkeletonFile(data: Data) throws {
         let skeleton = try JSONDecoder().decode(ExportedSkeleton.self, from: data)
         exportedSkeletons.append(skeleton)
+        if skeleton.exposeToGlobal {
+            exposeToGlobal = true
+        }
     }
 
     mutating func addImportedSkeletonFile(data: Data) throws {
@@ -80,7 +82,7 @@ struct BridgeJSLink {
         var enumStaticAssignments: [String] = []
     }
 
-    private func collectLinkData(exposeToGlobal: Bool) throws -> LinkData {
+    private func collectLinkData() throws -> LinkData {
         var data = LinkData()
 
         // Swift heap object class definitions
@@ -1079,11 +1081,11 @@ struct BridgeJSLink {
                 )
                 printer.write(lines: namespaceInitCode)
 
-                    let propertyAssignments = try generateNamespacePropertyAssignments(
-                        data: data,
-                        exportedSkeletons: exportedSkeletons,
-                        namespaceBuilder: namespaceBuilder,
-                        exposeToGlobal: exposeToGlobal
+                let propertyAssignments = try generateNamespacePropertyAssignments(
+                    data: data,
+                    exportedSkeletons: exportedSkeletons,
+                    namespaceBuilder: namespaceBuilder,
+                    exposeToGlobal: exposeToGlobal
                 )
                 printer.write(lines: propertyAssignments)
             }
@@ -1097,7 +1099,7 @@ struct BridgeJSLink {
     }
 
     func link() throws -> (outputJs: String, outputDts: String) {
-        let data = try collectLinkData(exposeToGlobal: exposeToGlobal)
+        let data = try collectLinkData()
         let outputJs = try generateJavaScript(data: data)
         let outputDts = generateTypeScript(data: data)
         return (outputJs, outputDts)
@@ -1160,7 +1162,6 @@ struct BridgeJSLink {
     ) throws -> [String] {
         let printer = CodeFragmentPrinter()
 
-        // Only write globalThis property assignments when exposeToGlobal is true
         if exposeToGlobal {
             printer.write(lines: data.enumStaticAssignments)
         }
@@ -1171,7 +1172,6 @@ struct BridgeJSLink {
 
             let hierarchicalLines = try namespaceBuilder.buildHierarchicalExportsObject(
                 exportedSkeletons: exportedSkeletons,
-                exposeToGlobal: exposeToGlobal,
                 renderFunctionImpl: { function in
                     let (js, _) = try self.renderExportedFunction(function: function)
                     return js
@@ -2478,7 +2478,6 @@ extension BridgeJSLink {
 
         fileprivate func buildHierarchicalExportsObject(
             exportedSkeletons: [ExportedSkeleton],
-            exposeToGlobal: Bool,
             renderFunctionImpl: (ExportedFunction) throws -> [String]
         ) throws -> [String] {
             let printer = CodeFragmentPrinter()
@@ -2698,7 +2697,7 @@ extension BridgeJSLink {
                     guard hasContent(node: childNode) else {
                         continue
                     }
-                    
+
                     let exportKeyword = exposeToGlobal ? "" : "export "
                     printer.write("\(exportKeyword)namespace \(childName) {")
                     printer.indent()

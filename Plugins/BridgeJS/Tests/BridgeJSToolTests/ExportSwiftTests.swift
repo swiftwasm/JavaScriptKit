@@ -47,11 +47,26 @@ import Testing
 
     @Test(arguments: collectInputs())
     func snapshot(input: String) throws {
-        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule")
+        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
         try swiftAPI.addSourceFile(sourceFile, input)
         let name = url.deletingPathExtension().lastPathComponent
         try snapshot(swiftAPI: swiftAPI, name: name)
+    }
+
+    @Test(arguments: [
+        "Namespaces.swift",
+        "StaticFunctions.swift",
+        "StaticProperties.swift",
+        "EnumNamespace.swift",
+    ])
+    func snapshotWithGlobal(input: String) throws {
+        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule", exposeToGlobal: true)
+        let url = Self.inputsDirectory.appendingPathComponent(input)
+        let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
+        try swiftAPI.addSourceFile(sourceFile, input)
+        let name = url.deletingPathExtension().lastPathComponent
+        try snapshot(swiftAPI: swiftAPI, name: name + ".Global")
     }
 }

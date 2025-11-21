@@ -392,6 +392,7 @@
       "tsFullPath" : "Priority"
     }
   ],
+  "exposeToGlobal" : false,
   "functions" : [
 
   ],
