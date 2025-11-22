@@ -1,4 +1,4 @@
-@Tutorial(time: 5) {
+@Tutorial(time: 30) {
   @Intro(title: "Quick Start: Hello World") {
     This tutorial walks you through creating a simple web application using JavaScriptKit. You'll learn how to set up a Swift package, add JavaScriptKit as a dependency, write code to manipulate the DOM, and build and run your web application.
 
