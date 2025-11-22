@@ -5,7 +5,7 @@ Creating .gitignore
 Creating Sources/
 Creating Sources/main.swift
 
-$ swift package add-dependency https://github.com/swiftwasm/JavaScriptKit.git --from 0.36.0
+$ swift package add-dependency https://github.com/swiftwasm/JavaScriptKit.git --from <version>
 Updating package manifest at Package.swift... done.
 
 $ swift package add-target-dependency --package JavaScriptKit JavaScriptKit Hello
