@@ -1,0 +1,14 @@
+# Install latest 6.2 development snapshot
+$ swiftly install 6.2.1
+Installing Swift 6.2.1...
+Swift 6.2.1 installed successfully.
+
+# Select the installed toolchain
+$ swiftly use 6.2.1
+Using Swift 6.2.1
+
+# Verify the toolchain is active
+$ swift --version
+Apple Swift version 6.2.1 (swift-6.2.1-RELEASE)
+or
+Swift version 6.2.1 (swift-6.2.1-RELEASE)

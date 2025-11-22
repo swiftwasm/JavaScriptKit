@@ -6,19 +6,35 @@
   }
 
   @Section(title: "Prerequisites") {
-    Visit the [installation guide](https://book.swiftwasm.org/getting-started/setup.html) to install the Swift SDK for WebAssembly before starting this tutorial.
-    This tutorial assumes you have the Swift SDK for WebAssembly installed. Please check your Swift installation.
+    This tutorial requires the OSS Swift Toolchain and Swift SDK for WebAssembly to be installed. Follow these steps to set up your development environment for building web applications with JavaScriptKit.
 
     @Steps {
       @Step {
-        Check your Swift toolchain version. If you see different 
-        @Code(name: "Console", file: "hello-world-0-1-swift-version.txt")
+        Install `swiftly`, the Swift toolchain installer, per the [instructions on swift.org](https://www.swift.org/install/) for your platform.
+
+        `swiftly` is the recommended way to install and manage OSS Swift toolchains. You cannot use toolchains bundled with Xcode for WebAssembly development.
+        @Code(name: "Console", file: "hello-world-0-0-install-swiftly.txt")
       }
+
       @Step {
-        Select a Swift SDK for WebAssembly version that matches the version of the Swift toolchain you have installed.
+        Install the latest Swift 6.2 development snapshot using `swiftly`:
+
+        @Code(name: "Console", file: "hello-world-0-1-install-toolchain.txt")
+      }
+
+      @Step {
+        Install the Swift SDK for WASI that matches your toolchain version:
+
+        Navigate to [the downloads page](https://www.swift.org/download/) and find the "Swift SDK for WASI" section. Find a version that **exactly** matches the toolchain version from step 2.
+
+        @Code(name: "Console", file: "hello-world-0-2-install-sdk.txt")
+      }
+
+      @Step {
+        Verify the Swift SDK installation and set up your environment:
 
         The following sections of this tutorial assume you have set the `SWIFT_SDK_ID` environment variable.
-        @Code(name: "Console", file: "hello-world-0-2-select-sdk.txt")
+        @Code(name: "Console", file: "hello-world-0-3-verify-sdk.txt")
       }
     }
   }
@@ -98,4 +114,4 @@
       }
     }
   }
-} 
+}

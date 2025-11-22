@@ -1,0 +1,8 @@
+# Verify the Swift SDK was installed
+$ swift sdk list
+swift-6.2.1-RELEASE_wasm
+swift-6.2.1-RELEASE_wasm-embedded
+
+# In this tutorial, we use non-embedded SDK.
+# Set the SDK ID as an environment variable for convenience
+$ export SWIFT_SDK_ID=swift-6.2.1-RELEASE_wasm

@@ -1,9 +1,0 @@
-$ swift --version
-Apple Swift version 6.0.3 (swift-6.0.3-RELEASE)
-or
-Swift version 6.0.3 (swift-6.0.3-RELEASE)
-
-$ swift sdk list
-6.0.3-RELEASE-wasm32-unknown-wasi
-
-$ export SWIFT_SDK_ID=6.0.3-RELEASE-wasm32-unknown-wasi

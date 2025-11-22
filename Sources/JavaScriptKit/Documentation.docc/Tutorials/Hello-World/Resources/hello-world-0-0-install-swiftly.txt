@@ -1,0 +1,9 @@
+# Install swiftly per the instructions for your platform
+# Visit https://www.swift.org/install/ for platform-specific instructions
+
+# Example for macOS:
+$ curl -O https://download.swift.org/swiftly/darwin/swiftly.pkg && \
+installer -pkg swiftly.pkg -target CurrentUserHomeDirectory && \
+~/.swiftly/bin/swiftly init --quiet-shell-followup && \
+. "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/env.sh" && \
+hash -r

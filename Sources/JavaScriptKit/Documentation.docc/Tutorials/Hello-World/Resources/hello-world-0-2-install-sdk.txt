@@ -1,0 +1,6 @@
+# Navigate to https://www.swift.org/download/ and find the "Swift SDK for WASI" section
+# Find a URL that exactly matches your toolchain version from the previous step
+# Press "Copy install command" to get the installation command
+
+# Example installation command (replace with the exact command from swift.org):
+$ swift sdk install https://download.swift.org/swift-6.2.1-release/wasm-sdk/swift-6.2.1-RELEASE/swift-6.2.1-RELEASE_wasm.artifactbundle.tar.gz --checksum 482b9f95462b87bedfafca94a092cf9ec4496671ca13b43745097122d20f18af
