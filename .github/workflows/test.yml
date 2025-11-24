@@ -35,7 +35,7 @@ jobs:
       JAVASCRIPTKIT_WASI_BACKEND: ${{ matrix.entry.wasi-backend }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: ./.github/actions/install-swift
         with:
           download-url: ${{ matrix.entry.toolchain.download-url }}
@@ -69,7 +69,7 @@ jobs:
             xcode: Xcode_16.4
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - run: swift build --package-path ./Examples/Basic
         env:
           DEVELOPER_DIR: /Applications/${{ matrix.xcode }}.app/Contents/Developer/
@@ -79,7 +79,7 @@ jobs:
     container:
       image: swift:6.1.2
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - run: ./Utilities/format.swift
       - name: Check for formatting changes
         run: |
@@ -92,7 +92,7 @@ jobs:
   check-bridgejs-generated:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/install-swift
         with:
           download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-09-14-a/swift-DEVELOPMENT-SNAPSHOT-2025-09-14-a-ubuntu22.04.tar.gz
@@ -109,7 +109,7 @@ jobs:
   build-examples:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/install-swift
         with:
           download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-09-14-a/swift-DEVELOPMENT-SNAPSHOT-2025-09-14-a-ubuntu22.04.tar.gz
