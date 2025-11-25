@@ -476,6 +476,13 @@ extension BridgeType {
             case .exportSwift:
                 return LoweringParameterInfo(loweredParameters: [("caseId", .i32)])
             }
+        case .swiftStruct:
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("Swift structs are not yet supported in TypeScript imports")
+            case .exportSwift:
+                return LoweringParameterInfo(loweredParameters: [])
+            }
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as parameters")
         case .optional(let wrappedType):
@@ -551,6 +558,13 @@ extension BridgeType {
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
             case .exportSwift:
                 return LiftingReturnInfo(valueToLift: .i32)
+            }
+        case .swiftStruct:
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("Swift structs are not yet supported in TypeScript imports")
+            case .exportSwift:
+                return LiftingReturnInfo(valueToLift: nil)
             }
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as return values")

@@ -533,5 +533,8 @@
   "moduleName" : "BridgeJSGlobalTests",
   "protocols" : [
 
+  ],
+  "structs" : [
+
   ]
 }

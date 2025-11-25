@@ -28,10 +28,14 @@ final class JSGlueVariableScope {
     static let reservedTmpParamInts = "tmpParamInts"
     static let reservedTmpParamF32s = "tmpParamF32s"
     static let reservedTmpParamF64s = "tmpParamF64s"
+    static let reservedTmpRetPointers = "tmpRetPointers"
+    static let reservedTmpParamPointers = "tmpParamPointers"
 
     private var variables: Set<String> = [
         reservedSwift,
+        reservedInstance,
         reservedMemory,
+        reservedSetException,
         reservedStorageToReturnString,
         reservedStorageToReturnBytes,
         reservedStorageToReturnException,
@@ -50,6 +54,8 @@ final class JSGlueVariableScope {
         reservedTmpParamInts,
         reservedTmpParamF32s,
         reservedTmpParamF64s,
+        reservedTmpRetPointers,
+        reservedTmpParamPointers,
     ]
 
     /// Returns a unique variable name in the scope based on the given name hint.
@@ -324,6 +330,22 @@ struct IntrinsicJSFragment: Sendable {
                     }
                     printer.write("}")
                     resultExpr = "\(isSome) ? \(enumVar) : null"
+                case .swiftStruct(let fullName):
+                    let base = fullName.components(separatedBy: ".").last ?? fullName
+                    let structVar = scope.variable("structValue")
+                    printer.write("let \(structVar);")
+                    printer.write("if (\(isSome)) {")
+                    printer.indent {
+                        printer.write(
+                            "\(structVar) = structHelpers.\(base).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
+                        )
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("\(structVar) = null;")
+                    }
+                    printer.write("}")
+                    resultExpr = structVar
                 default:
                     resultExpr = "\(isSome) ? \(wrappedValue) : null"
                 }
@@ -342,6 +364,19 @@ struct IntrinsicJSFragment: Sendable {
                 printer.write("const \(isSomeVar) = \(value) != null;")
 
                 switch wrappedType {
+                case .swiftStruct(let fullName):
+                    let base = fullName.components(separatedBy: ".").last ?? fullName
+                    let cleanupVar = scope.variable("\(value)Cleanup")
+                    printer.write("let \(cleanupVar);")
+                    printer.write("if (\(isSomeVar)) {")
+                    printer.indent {
+                        let resultVar = scope.variable("structResult")
+                        printer.write("const \(resultVar) = structHelpers.\(base).lower(\(value));")
+                        printer.write("\(cleanupVar) = \(resultVar).cleanup;")
+                    }
+                    printer.write("}")
+                    cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
+                    return ["+\(isSomeVar)"]
                 case .string, .rawValueEnum(_, .string):
                     let bytesVar = scope.variable("\(value)Bytes")
                     let idVar = scope.variable("\(value)Id")
@@ -492,6 +527,22 @@ struct IntrinsicJSFragment: Sendable {
                         printer.write(
                             "\(resultVar) = enumHelpers.\(base).raise(\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
                         )
+                    }
+                    printer.write("}")
+                case .swiftStruct(let fullName):
+                    let base = fullName.components(separatedBy: ".").last ?? fullName
+                    let isSomeVar = scope.variable("isSome")
+                    printer.write("const \(isSomeVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    printer.write("let \(resultVar);")
+                    printer.write("if (\(isSomeVar)) {")
+                    printer.indent {
+                        printer.write(
+                            "\(resultVar) = structHelpers.\(base).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
+                        )
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("\(resultVar) = null;")
                     }
                     printer.write("}")
                 default:
@@ -1259,6 +1310,9 @@ struct IntrinsicJSFragment: Sendable {
         case .associatedValueEnum(let fullName):
             let base = fullName.components(separatedBy: ".").last ?? fullName
             return .associatedEnumLowerParameter(enumBase: base)
+        case .swiftStruct(let fullName):
+            let base = fullName.components(separatedBy: ".").last ?? fullName
+            return swiftStructLowerParameter(structBase: base)
         case .closure:
             return IntrinsicJSFragment(
                 parameters: ["closure"],
@@ -1297,6 +1351,9 @@ struct IntrinsicJSFragment: Sendable {
         case .associatedValueEnum(let fullName):
             let base = fullName.components(separatedBy: ".").last ?? fullName
             return .associatedEnumLiftReturn(enumBase: base)
+        case .swiftStruct(let fullName):
+            let base = fullName.components(separatedBy: ".").last ?? fullName
+            return swiftStructLiftReturn(structBase: base)
         case .closure(let signature):
             let lowerFuncName = "lower_closure_\(signature.moduleName)_\(signature.mangleName)"
             return IntrinsicJSFragment(
@@ -1374,6 +1431,26 @@ struct IntrinsicJSFragment: Sendable {
                     }
                 )
             }
+        case .swiftStruct(let fullName):
+            switch context {
+            case .importTS:
+                throw BridgeJSLinkError(
+                    message:
+                        "Swift structs are not supported to be passed as parameters to imported JS functions: \(fullName)"
+                )
+            case .exportSwift:
+                let base = fullName.components(separatedBy: ".").last ?? fullName
+                return IntrinsicJSFragment(
+                    parameters: [],
+                    printCode: { arguments, scope, printer, cleanupCode in
+                        let resultVar = scope.variable("structValue")
+                        printer.write(
+                            "const \(resultVar) = structHelpers.\(base).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
+                        )
+                        return [resultVar]
+                    }
+                )
+            }
         case .closure:
             throw BridgeJSLinkError(message: "Closure parameters not yet implemented for imported JS functions")
         case .namespaceEnum(let string):
@@ -1427,6 +1504,16 @@ struct IntrinsicJSFragment: Sendable {
                 )
             case .exportSwift:
                 return associatedValueLowerReturn(fullName: fullName)
+            }
+        case .swiftStruct(let fullName):
+            switch context {
+            case .importTS:
+                throw BridgeJSLinkError(
+                    message:
+                        "Swift structs are not supported to be returned from imported JS functions: \(fullName)"
+                )
+            case .exportSwift:
+                return swiftStructLowerReturn(fullName: fullName)
             }
         case .closure:
             throw BridgeJSLinkError(message: "Closure return values not yet implemented for imported JS functions")
@@ -1882,6 +1969,841 @@ struct IntrinsicJSFragment: Sendable {
                 parameters: [],
                 printCode: { arguments, scope, printer, cleanup in
                     return ["undefined"]
+                }
+            )
+        }
+    }
+
+    static func swiftStructLowerReturn(fullName: String) -> IntrinsicJSFragment {
+        let base = fullName.components(separatedBy: ".").last ?? fullName
+        return IntrinsicJSFragment(
+            parameters: ["value"],
+            printCode: { arguments, scope, printer, cleanupCode in
+                let value = arguments[0]
+                let cleanupVar = scope.variable("cleanup")
+                printer.write(
+                    "const { cleanup: \(cleanupVar) } = structHelpers.\(base).lower(\(value));"
+                )
+                cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
+                return []
+            }
+        )
+    }
+
+    static func swiftStructLowerParameter(structBase: String) -> IntrinsicJSFragment {
+        return IntrinsicJSFragment(
+            parameters: ["value"],
+            printCode: { arguments, scope, printer, cleanupCode in
+                let value = arguments[0]
+                let cleanupVar = scope.variable("cleanup")
+                printer.write(
+                    "const { cleanup: \(cleanupVar) } = structHelpers.\(structBase).lower(\(value));"
+                )
+                cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
+                return []
+            }
+        )
+    }
+
+    static func swiftStructLiftReturn(structBase: String) -> IntrinsicJSFragment {
+        return IntrinsicJSFragment(
+            parameters: [],
+            printCode: { arguments, scope, printer, cleanupCode in
+                let resultVar = scope.variable("structValue")
+                printer.write(
+                    "const \(resultVar) = structHelpers.\(structBase).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
+                )
+                return [resultVar]
+            }
+        )
+    }
+
+    static func structHelper(structDefinition: ExportedStruct, allStructs: [ExportedStruct]) -> IntrinsicJSFragment {
+        return IntrinsicJSFragment(
+            parameters: ["structName"],
+            printCode: { arguments, scope, printer, cleanup in
+                let structName = arguments[0]
+                let capturedStructDef = structDefinition
+                let capturedAllStructs = allStructs
+
+                printer.write("const __bjs_create\(structName)Helpers = () => {")
+                printer.indent()
+                printer.write(
+                    "return (\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTmpParamPointers), \(JSGlueVariableScope.reservedTmpRetPointers), textEncoder, \(JSGlueVariableScope.reservedSwift), enumHelpers) => ({"
+                )
+                printer.indent()
+
+                printer.write("lower: (value) => {")
+                printer.indent {
+                    generateStructLowerCode(
+                        structDef: capturedStructDef,
+                        allStructs: capturedAllStructs,
+                        printer: printer
+                    )
+                }
+                printer.write("},")
+
+                printer.write(
+                    "raise: (\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers)) => {"
+                )
+                printer.indent {
+                    generateStructRaiseCode(
+                        structDef: capturedStructDef,
+                        allStructs: capturedAllStructs,
+                        printer: printer,
+                        attachMethods: true
+                    )
+                }
+                printer.write("}")
+                printer.unindent()
+                printer.write("});")
+                printer.unindent()
+                printer.write("};")
+
+                return []
+            }
+        )
+    }
+
+    private static func findStruct(name: String, structs: [ExportedStruct]) -> ExportedStruct? {
+        return structs.first(where: { $0.swiftCallName == name || $0.name == name })
+    }
+
+    private static func generateStructLowerCode(
+        structDef: ExportedStruct,
+        allStructs: [ExportedStruct],
+        printer: CodeFragmentPrinter
+    ) {
+        let lowerPrinter = CodeFragmentPrinter()
+        let lowerScope = JSGlueVariableScope()
+        let lowerCleanup = CodeFragmentPrinter()
+        lowerCleanup.indent()
+
+        let instanceProps = structDef.properties.filter { !$0.isStatic }
+        for property in instanceProps {
+            let fragment = structFieldLowerFragment(field: property, allStructs: allStructs)
+            let fieldValue = "value.\(property.name)"
+            _ = fragment.printCode([fieldValue], lowerScope, lowerPrinter, lowerCleanup)
+        }
+
+        for line in lowerPrinter.lines {
+            printer.write(line)
+        }
+
+        if !lowerCleanup.lines.isEmpty {
+            printer.write("const cleanup = () => {")
+            printer.write(contentsOf: lowerCleanup)
+            printer.write("};")
+            printer.write("return { cleanup };")
+        } else {
+            printer.write("return { cleanup: undefined };")
+        }
+    }
+
+    private static func generateStructRaiseCode(
+        structDef: ExportedStruct,
+        allStructs: [ExportedStruct],
+        printer: CodeFragmentPrinter,
+        attachMethods: Bool = false
+    ) {
+        let raiseScope = JSGlueVariableScope()
+        let raiseCleanup = CodeFragmentPrinter()
+
+        var fieldExpressions: [(name: String, expression: String)] = []
+
+        let instanceProps = structDef.properties.filter { !$0.isStatic }
+        for property in instanceProps.reversed() {
+            let fragment = structFieldRaiseFragment(field: property, allStructs: allStructs)
+            let results = fragment.printCode([], raiseScope, printer, raiseCleanup)
+
+            if let resultExpr = results.first {
+                fieldExpressions.append((property.name, resultExpr))
+            } else {
+                fieldExpressions.append((property.name, "undefined"))
+            }
+        }
+
+        // Construct struct object with fields in original order
+        let reconstructedFields = instanceProps.map { property in
+            let expr = fieldExpressions.first(where: { $0.name == property.name })?.expression ?? "undefined"
+            return "\(property.name): \(expr)"
+        }
+
+        if attachMethods && !structDef.methods.filter({ !$0.effects.isStatic }).isEmpty {
+            let instanceVar = raiseScope.variable("instance")
+            printer.write("const \(instanceVar) = { \(reconstructedFields.joined(separator: ", ")) };")
+
+            // Attach instance methods to the struct instance
+            for method in structDef.methods where !method.effects.isStatic {
+                printer.write(
+                    "\(instanceVar).\(method.name) = function(\(method.parameters.map { $0.name }.joined(separator: ", "))) {"
+                )
+                printer.indent {
+                    let methodScope = JSGlueVariableScope()
+                    let methodCleanup = CodeFragmentPrinter()
+
+                    // Lower the struct instance (this) using the helper's lower function
+                    let structCleanupVar = methodScope.variable("structCleanup")
+                    printer.write(
+                        "const { cleanup: \(structCleanupVar) } = structHelpers.\(structDef.name).lower(this);"
+                    )
+
+                    // Lower each parameter and collect forwarding expressions
+                    var paramForwardings: [String] = []
+                    for param in method.parameters {
+                        let fragment = try! IntrinsicJSFragment.lowerParameter(type: param.type)
+                        let loweredValues = fragment.printCode([param.name], methodScope, printer, methodCleanup)
+                        paramForwardings.append(contentsOf: loweredValues)
+                    }
+
+                    // Call the Swift function with all lowered parameters
+                    let callExpr = "instance.exports.\(method.abiName)(\(paramForwardings.joined(separator: ", ")))"
+                    if method.returnType == .void {
+                        printer.write("\(callExpr);")
+                    } else {
+                        printer.write("const ret = \(callExpr);")
+                    }
+
+                    // Cleanup
+                    printer.write("if (\(structCleanupVar)) { \(structCleanupVar)(); }")
+                    printer.write(contentsOf: methodCleanup)
+
+                    // Lift return value if needed
+                    if method.returnType != .void {
+                        let liftFragment = try! IntrinsicJSFragment.liftReturn(type: method.returnType)
+                        if !liftFragment.parameters.isEmpty {
+                            let lifted = liftFragment.printCode(["ret"], methodScope, printer, methodCleanup)
+                            if let liftedValue = lifted.first {
+                                printer.write("return \(liftedValue);")
+                            }
+                        }
+                    }
+                }
+                printer.write("}.bind(\(instanceVar));")
+            }
+
+            printer.write("return \(instanceVar);")
+        } else {
+            printer.write("return { \(reconstructedFields.joined(separator: ", ")) };")
+        }
+    }
+
+    private static func structFieldLowerFragment(
+        field: ExportedProperty,
+        allStructs: [ExportedStruct]
+    ) -> IntrinsicJSFragment {
+        switch field.type {
+        case .string:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    let value = arguments[0]
+                    let bytesVar = scope.variable("bytes")
+                    let idVar = scope.variable("id")
+                    printer.write("const \(bytesVar) = textEncoder.encode(\(value));")
+                    printer.write("const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));")
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(bytesVar).length);")
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar));")
+                    cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
+                    return [idVar]
+                }
+            )
+        case .bool:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(arguments[0]) ? 1 : 0);")
+                    return []
+                }
+            )
+        case .int:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push((\(arguments[0]) | 0));")
+                    return []
+                }
+            )
+        case .float:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamF32s).push(Math.fround(\(arguments[0])));")
+                    return []
+                }
+            )
+        case .double:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamF64s).push(\(arguments[0]));")
+                    return []
+                }
+            )
+        case .jsObject:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    let value = arguments[0]
+                    let idVar = scope.variable("id")
+                    printer.write("let \(idVar);")
+                    printer.write("if (\(value) != null) {")
+                    printer.indent {
+                        printer.write("\(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("\(idVar) = undefined;")
+                    }
+                    printer.write("}")
+                    printer.write(
+                        "\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar) !== undefined ? \(idVar) : 0);"
+                    )
+                    cleanup.write("if(\(idVar) !== undefined && \(idVar) !== 0) {")
+                    cleanup.indent {
+                        cleanup.write("try {")
+                        cleanup.indent {
+                            cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.getObject(\(idVar));")
+                            cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
+                        }
+                        cleanup.write("} catch(e) {}")
+                    }
+                    cleanup.write("}")
+                    return [idVar]
+                }
+            )
+        case .optional(let wrappedType):
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    let value = arguments[0]
+                    let isSomeVar = scope.variable("isSome")
+                    printer.write("const \(isSomeVar) = \(value) != null;")
+
+                    if case .caseEnum = wrappedType {
+                        printer.write("if (\(isSomeVar)) {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push((\(value) | 0));")
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
+                        }
+                        printer.write("}")
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                        return []
+                    } else if case .rawValueEnum(_, let rawType) = wrappedType {
+                        switch rawType {
+                        case .string:
+                            let idVar = scope.variable("id")
+                            printer.write("let \(idVar);")
+                            printer.write("if (\(isSomeVar)) {")
+                            printer.indent {
+                                let bytesVar = scope.variable("bytes")
+                                printer.write("const \(bytesVar) = textEncoder.encode(\(value));")
+                                printer.write(
+                                    "\(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));"
+                                )
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(bytesVar).length);")
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar));")
+                            }
+                            printer.write("} else {")
+                            printer.indent {
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
+                            }
+                            printer.write("}")
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                            cleanup.write(
+                                "if(\(idVar) !== undefined) { \(JSGlueVariableScope.reservedSwift).memory.release(\(idVar)); }"
+                            )
+                            return [idVar]
+                        default:
+                            printer.write("if (\(isSomeVar)) {")
+                            printer.indent {
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push((\(value) | 0));")
+                            }
+                            printer.write("} else {")
+                            printer.indent {
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
+                            }
+                            printer.write("}")
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                            return []
+                        }
+                    } else if case .swiftHeapObject = wrappedType {
+                        let ptrVar = scope.variable("ptr")
+                        printer.write("let \(ptrVar);")
+                        printer.write("if (\(isSomeVar)) {")
+                        printer.indent {
+                            printer.write("\(ptrVar) = \(value).pointer;")
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamPointers).push(\(ptrVar));")
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamPointers).push(0);")
+                        }
+                        printer.write("}")
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                        return []
+                    } else if case .swiftStruct(let structName) = wrappedType {
+                        let nestedCleanupVar = scope.variable("nestedCleanup")
+                        printer.write("let \(nestedCleanupVar);")
+                        printer.write("if (\(isSomeVar)) {")
+                        printer.indent {
+                            let structResultVar = scope.variable("structResult")
+                            printer.write("const \(structResultVar) = structHelpers.\(structName).lower(\(value));")
+                            printer.write("\(nestedCleanupVar) = \(structResultVar).cleanup;")
+                        }
+                        printer.write("}")
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                        cleanup.write("if (\(nestedCleanupVar)) { \(nestedCleanupVar)(); }")
+                        return []
+                    } else if case .string = wrappedType {
+                        let idVar = scope.variable("id")
+                        printer.write("let \(idVar);")
+                        printer.write("if (\(isSomeVar)) {")
+                        printer.indent {
+                            let bytesVar = scope.variable("bytes")
+                            printer.write("const \(bytesVar) = textEncoder.encode(\(value));")
+                            printer.write("\(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));")
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(bytesVar).length);")
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar));")
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
+                        }
+                        printer.write("}")
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                        cleanup.write(
+                            "if(\(idVar) !== undefined) { \(JSGlueVariableScope.reservedSwift).memory.release(\(idVar)); }"
+                        )
+                        return [idVar]
+                    } else if case .jsObject = wrappedType {
+                        let idVar = scope.variable("id")
+                        printer.write("let \(idVar);")
+                        printer.write("if (\(isSomeVar)) {")
+                        printer.indent {
+                            printer.write("\(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));")
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar));")
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            printer.write("\(idVar) = undefined;")
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
+                        }
+                        printer.write("}")
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                        cleanup.write("if(\(idVar) !== undefined && \(idVar) !== 0) {")
+                        cleanup.indent {
+                            cleanup.write("try {")
+                            cleanup.indent {
+                                cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.getObject(\(idVar));")
+                                cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
+                            }
+                            cleanup.write("} catch(e) {}")
+                        }
+                        cleanup.write("}")
+                        return [idVar]
+                    } else {
+                        // Handle optional primitive types using helper
+                        switch wrappedType {
+                        case .int:
+                            pushOptionalPrimitive(
+                                value: value,
+                                isSomeVar: isSomeVar,
+                                stack: .tmpParamInts,
+                                convert: "| 0",
+                                zeroValue: "0",
+                                printer: printer
+                            )
+                        case .bool:
+                            pushOptionalPrimitive(
+                                value: value,
+                                isSomeVar: isSomeVar,
+                                stack: .tmpParamInts,
+                                convert: "? 1 : 0",
+                                zeroValue: "0",
+                                printer: printer
+                            )
+                        case .float:
+                            pushOptionalPrimitive(
+                                value: value,
+                                isSomeVar: isSomeVar,
+                                stack: .tmpParamF32s,
+                                convert: "Math.fround",
+                                zeroValue: "0.0",
+                                printer: printer
+                            )
+                        case .double:
+                            pushOptionalPrimitive(
+                                value: value,
+                                isSomeVar: isSomeVar,
+                                stack: .tmpParamF64s,
+                                convert: nil,
+                                zeroValue: "0.0",
+                                printer: printer
+                            )
+                        case .associatedValueEnum(let enumName):
+                            let base = enumName.components(separatedBy: ".").last ?? enumName
+                            let caseIdVar = scope.variable("enumCaseId")
+                            let enumCleanupVar = scope.variable("enumCleanup")
+                            printer.write("let \(caseIdVar), \(enumCleanupVar);")
+                            printer.write("if (\(isSomeVar)) {")
+                            printer.indent {
+                                let enumResultVar = scope.variable("enumResult")
+                                printer.write("const \(enumResultVar) = enumHelpers.\(base).lower(\(value));")
+                                printer.write("\(caseIdVar) = \(enumResultVar).caseId;")
+                                printer.write("\(enumCleanupVar) = \(enumResultVar).cleanup;")
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(caseIdVar));")
+                            }
+                            printer.write("} else {")
+                            printer.indent {
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
+                            }
+                            printer.write("}")
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                            cleanup.write("if (\(enumCleanupVar)) { \(enumCleanupVar)(); }")
+                        default:
+                            // For other types (nested structs, etc.), original logic applies
+                            let wrappedFragment = structFieldLowerFragment(
+                                field: ExportedProperty(
+                                    name: field.name,
+                                    type: wrappedType,
+                                    isReadonly: true,
+                                    isStatic: false
+                                ),
+                                allStructs: allStructs
+                            )
+                            printer.write("if (\(isSomeVar)) {")
+                            printer.indent {
+                                _ = wrappedFragment.printCode([value], scope, printer, cleanup)
+                            }
+                            printer.write("}")
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                        }
+                        return []
+                    }
+                }
+            )
+        case .swiftStruct(let nestedName):
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    let value = arguments[0]
+                    let structResultVar = scope.variable("structResult")
+                    printer.write("const \(structResultVar) = structHelpers.\(nestedName).lower(\(value));")
+                    cleanup.write("if (\(structResultVar).cleanup) { \(structResultVar).cleanup(); }")
+                    return []
+                }
+            )
+        case .swiftHeapObject:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    let value = arguments[0]
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamPointers).push(\(value).pointer);")
+                    return []
+                }
+            )
+        case .associatedValueEnum(let fullName):
+            let base = fullName.components(separatedBy: ".").last ?? fullName
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    let value = arguments[0]
+                    let caseIdVar = scope.variable("caseId")
+                    let cleanupVar = scope.variable("enumCleanup")
+                    printer.write(
+                        "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = enumHelpers.\(base).lower(\(value));"
+                    )
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(caseIdVar));")
+                    cleanup.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
+                    return [cleanupVar]
+                }
+            )
+        case .caseEnum:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push((\(arguments[0]) | 0));")
+                    return []
+                }
+            )
+        case .rawValueEnum(_, let rawType):
+            switch rawType {
+            case .string:
+                return IntrinsicJSFragment(
+                    parameters: ["value"],
+                    printCode: { arguments, scope, printer, cleanup in
+                        let value = arguments[0]
+                        let bytesVar = scope.variable("bytes")
+                        let idVar = scope.variable("id")
+                        printer.write("const \(bytesVar) = textEncoder.encode(\(value));")
+                        printer.write(
+                            "const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));"
+                        )
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(bytesVar).length);")
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar));")
+                        cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
+                        return [idVar]
+                    }
+                )
+            default:
+                return IntrinsicJSFragment(
+                    parameters: ["value"],
+                    printCode: { arguments, scope, printer, cleanup in
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push((\(arguments[0]) | 0));")
+                        return []
+                    }
+                )
+            }
+        case .void, .swiftProtocol, .namespaceEnum, .closure:
+            // These types should not appear as struct fields - return error fragment
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("throw new Error(\"Unsupported struct field type for lowering: \(field.type)\");")
+                    return []
+                }
+            )
+        }
+    }
+
+    /// Helper to push optional primitive values to stack-based parameters
+    private static func pushOptionalPrimitive(
+        value: String,
+        isSomeVar: String,
+        stack: StackType,
+        convert: String?,
+        zeroValue: String,
+        printer: CodeFragmentPrinter
+    ) {
+        let stackName: String
+        switch stack {
+        case .tmpParamInts: stackName = JSGlueVariableScope.reservedTmpParamInts
+        case .tmpParamF32s: stackName = JSGlueVariableScope.reservedTmpParamF32s
+        case .tmpParamF64s: stackName = JSGlueVariableScope.reservedTmpParamF64s
+        }
+
+        printer.write("if (\(isSomeVar)) {")
+        printer.indent {
+            let converted: String
+            if let convert = convert {
+                if convert.starts(with: "Math.") {
+                    converted = "\(convert)(\(value))"
+                } else {
+                    converted = "\(value) \(convert)"
+                }
+            } else {
+                converted = value
+            }
+            printer.write("\(stackName).push(\(converted));")
+        }
+        printer.write("} else {")
+        printer.indent {
+            printer.write("\(stackName).push(\(zeroValue));")
+        }
+        printer.write("}")
+        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+    }
+
+    private enum StackType {
+        case tmpParamInts
+        case tmpParamF32s
+        case tmpParamF64s
+    }
+
+    private static func structFieldRaiseFragment(
+        field: ExportedProperty,
+        allStructs: [ExportedStruct]
+    ) -> IntrinsicJSFragment {
+        switch field.type {
+        case .string:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let strVar = scope.variable("string")
+                    printer.write("const \(strVar) = \(JSGlueVariableScope.reservedTmpRetStrings).pop();")
+                    return [strVar]
+                }
+            )
+        case .bool:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let bVar = scope.variable("bool")
+                    printer.write("const \(bVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop() !== 0;")
+                    return [bVar]
+                }
+            )
+        case .int:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let iVar = scope.variable("int")
+                    printer.write("const \(iVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    return [iVar]
+                }
+            )
+        case .float:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let fVar = scope.variable("f32")
+                    printer.write("const \(fVar) = \(JSGlueVariableScope.reservedTmpRetF32s).pop();")
+                    return [fVar]
+                }
+            )
+        case .double:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let dVar = scope.variable("f64")
+                    printer.write("const \(dVar) = \(JSGlueVariableScope.reservedTmpRetF64s).pop();")
+                    return [dVar]
+                }
+            )
+        case .optional(let wrappedType):
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let isSomeVar = scope.variable("isSome")
+                    let optVar = scope.variable("optional")
+                    printer.write("const \(isSomeVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    printer.write("let \(optVar);")
+                    printer.write("if (\(isSomeVar)) {")
+                    printer.indent {
+                        // Special handling for associated value enum - in struct fields, case ID is pushed to tmpRetInts
+                        if case .associatedValueEnum(let enumName) = wrappedType {
+                            let base = enumName.components(separatedBy: ".").last ?? enumName
+                            let caseIdVar = scope.variable("enumCaseId")
+                            printer.write("const \(caseIdVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                            printer.write(
+                                "\(optVar) = enumHelpers.\(base).raise(\(caseIdVar), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
+                            )
+                        } else {
+                            let wrappedFragment = structFieldRaiseFragment(
+                                field: ExportedProperty(
+                                    name: field.name,
+                                    type: wrappedType,
+                                    isReadonly: true,
+                                    isStatic: false
+                                ),
+                                allStructs: allStructs
+                            )
+                            let wrappedResults = wrappedFragment.printCode([], scope, printer, cleanup)
+                            if let wrappedResult = wrappedResults.first {
+                                printer.write("\(optVar) = \(wrappedResult);")
+                            } else {
+                                printer.write("\(optVar) = undefined;")
+                            }
+                        }
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("\(optVar) = null;")
+                    }
+                    printer.write("}")
+                    return [optVar]
+                }
+            )
+        case .swiftStruct(let nestedName):
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let structVar = scope.variable("struct")
+                    printer.write(
+                        "const \(structVar) = structHelpers.\(nestedName).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
+                    )
+                    return [structVar]
+                }
+            )
+        case .caseEnum:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let varName = scope.variable("value")
+                    printer.write("const \(varName) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    return [varName]
+                }
+            )
+        case .rawValueEnum(_, let rawType):
+            switch rawType {
+            case .string:
+                return IntrinsicJSFragment(
+                    parameters: [],
+                    printCode: { arguments, scope, printer, cleanup in
+                        let varName = scope.variable("value")
+                        printer.write("const \(varName) = \(JSGlueVariableScope.reservedTmpRetStrings).pop();")
+                        return [varName]
+                    }
+                )
+            default:
+                return IntrinsicJSFragment(
+                    parameters: [],
+                    printCode: { arguments, scope, printer, cleanup in
+                        let varName = scope.variable("value")
+                        printer.write("const \(varName) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                        return [varName]
+                    }
+                )
+            }
+        case .swiftHeapObject(let className):
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let ptrVar = scope.variable("ptr")
+                    let varName = scope.variable("value")
+                    printer.write("const \(ptrVar) = \(JSGlueVariableScope.reservedTmpRetPointers).pop();")
+                    printer.write("const \(varName) = _exports['\(className)'].__construct(\(ptrVar));")
+                    return [varName]
+                }
+            )
+        case .jsObject:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let objectIdVar = scope.variable("objectId")
+                    let varName = scope.variable("value")
+                    printer.write("const \(objectIdVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    printer.write("let \(varName);")
+                    printer.write("if (\(objectIdVar) !== 0) {")
+                    printer.indent {
+                        printer.write(
+                            "\(varName) = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(objectIdVar));"
+                        )
+                        printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(objectIdVar));")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("\(varName) = null;")
+                    }
+                    printer.write("}")
+                    return [varName]
+                }
+            )
+        case .associatedValueEnum(let fullName):
+            let base = fullName.components(separatedBy: ".").last ?? fullName
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let varName = scope.variable("value")
+                    printer.write(
+                        "const \(varName) = enumHelpers.\(base).raise(\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
+                    )
+                    return [varName]
+                }
+            )
+        case .void, .swiftProtocol, .namespaceEnum, .closure:
+            // These types should not appear as struct fields
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("throw new Error(\"Unsupported struct field type: \(field.type)\");")
+                    return []
                 }
             )
         }

@@ -316,6 +316,15 @@ public protocol _BridgedSwiftAssociatedValueEnum: _BridgedSwiftTypeLoweredIntoVo
     @_spi(BridgeJS) consuming func bridgeJSLowerReturn() -> Void
 }
 
+/// A protocol that Swift struct types conform to.
+///
+/// The conformance is automatically synthesized by the BridgeJS code generator.
+public protocol _BridgedSwiftStruct: _BridgedSwiftTypeLoweredIntoVoidType {
+    // MARK: ExportSwift
+    @_spi(BridgeJS) static func bridgeJSLiftParameter() -> Self
+    @_spi(BridgeJS) consuming func bridgeJSLowerReturn() -> Void
+}
+
 extension _BridgedSwiftEnumNoPayload where Self: RawRepresentable, RawValue == String {
     // MARK: ImportTS
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 { rawValue.bridgeJSLowerParameter() }
@@ -614,6 +623,24 @@ func _swift_js_return_optional_double(_ isSome: Int32, _ value: Float64)
 #else
 /// Sets the optional double for return value storage
 func _swift_js_return_optional_double(_ isSome: Int32, _ value: Float64) {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_push_pointer")
+@_spi(BridgeJS) public func _swift_js_push_pointer(_ pointer: UnsafeMutableRawPointer)
+#else
+@_spi(BridgeJS) public func _swift_js_push_pointer(_ pointer: UnsafeMutableRawPointer) {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_pop_param_pointer")
+@_spi(BridgeJS) public func _swift_js_pop_param_pointer() -> UnsafeMutableRawPointer
+#else
+@_spi(BridgeJS) public func _swift_js_pop_param_pointer() -> UnsafeMutableRawPointer {
     _onlyAvailableOnWasm()
 }
 #endif
@@ -1222,6 +1249,30 @@ extension Optional where Wrapped: _BridgedSwiftAssociatedValueEnum {
             _swift_js_push_tag(-1)  // Use -1 as sentinel for null
         case .some(let value):
             value.bridgeJSLowerReturn()
+        }
+    }
+}
+
+// MARK: Optional Struct Support
+
+extension Optional where Wrapped: _BridgedSwiftStruct {
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32) -> Wrapped? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return Wrapped.bridgeJSLiftParameter()
+        }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        switch consume self {
+        case .none:
+            _swift_js_push_int(0)  // Push only isSome=0 (no struct fields)
+        case .some(let value):
+            value.bridgeJSLowerReturn()  // Push all struct fields FIRST
+            _swift_js_push_int(1)  // Then push isSome=1 LAST (so it's popped FIRST by JS)
         }
     }
 }

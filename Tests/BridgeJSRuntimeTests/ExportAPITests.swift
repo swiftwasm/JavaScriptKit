@@ -1232,6 +1232,128 @@ enum APIOptionalResult {
     }
 }
 
+// MARK: - Struct Tests
+
+@JS struct DataPoint {
+    let x: Double
+    let y: Double
+    var label: String
+    var optCount: Int?
+    var optFlag: Bool?
+
+    @JS init(x: Double, y: Double, label: String, optCount: Int?, optFlag: Bool?) {
+        self.x = x
+        self.y = y
+        self.label = label
+        self.optCount = optCount
+        self.optFlag = optFlag
+    }
+}
+
+@JS struct Address {
+    var street: String
+    var city: String
+    var zipCode: Int?
+}
+
+@JS struct Contact {
+    var name: String
+    var age: Int
+    var address: Address
+    var email: String?
+    var secondaryAddress: Address?
+}
+
+@JS struct Config {
+    var name: String
+    var theme: Theme?
+    var direction: Direction?
+    var status: Status
+}
+
+@JS struct SessionData {
+    var id: Int
+    var owner: Greeter?
+}
+
+@JS struct ValidationReport {
+    var id: Int
+    var result: APIResult
+    var status: Status?
+    var outcome: APIResult?
+}
+
+@JS struct MathOperations {
+    @JS init() {}
+    @JS func add(a: Double, b: Double) -> Double {
+        return a + b
+    }
+
+    @JS func multiply(a: Double, b: Double) -> Double {
+        return a * b
+    }
+
+    @JS static func subtract(a: Double, b: Double) -> Double {
+        return a - b
+    }
+}
+
+@JS struct ConfigStruct {
+    var name: String
+    var value: Int
+
+    @JS nonisolated(unsafe) static var defaultConfig: String = "production"
+    @JS static let maxRetries: Int = 3
+    @JS nonisolated(unsafe) static var timeout: Double = 30.0
+
+    @JS static var computedSetting: String {
+        return "Config: \(defaultConfig)"
+    }
+}
+
+@JS func roundTripDataPoint(_ data: DataPoint) -> DataPoint {
+    return data
+}
+
+@JS func roundTripContact(_ contact: Contact) -> Contact {
+    return contact
+}
+
+@JS func roundTripConfig(_ config: Config) -> Config {
+    return config
+}
+
+@JS func roundTripSessionData(_ session: SessionData) -> SessionData {
+    return session
+}
+
+@JS func roundTripValidationReport(_ report: ValidationReport) -> ValidationReport {
+    return report
+}
+
+@JS func updateValidationReport(_ newResult: APIResult?, _ report: ValidationReport) -> ValidationReport {
+    return ValidationReport(
+        id: report.id,
+        result: newResult ?? report.result,
+        status: report.status,
+        outcome: report.outcome
+    )
+}
+
+@JS class Container {
+    @JS var location: DataPoint
+    @JS var config: Config?
+
+    @JS init(location: DataPoint, config: Config?) {
+        self.location = location
+        self.config = config
+    }
+}
+
+@JS func testContainerWithStruct(_ point: DataPoint) -> Container {
+    return Container(location: point, config: nil)
+}
+
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false

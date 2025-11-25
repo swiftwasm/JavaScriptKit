@@ -710,6 +710,7 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 
     testProtocolSupport(exports);
     testClosureSupport(exports);
+    testStructSupport(exports);
 }
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 function testClosureSupport(exports) {
@@ -905,6 +906,100 @@ function testClosureSupport(exports) {
     processor.release();
 }
 
+/** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
+function testStructSupport(exports) {
+    const data1 = { x: 1.5, y: 2.5, label: "Point", optCount: 42, optFlag: true };
+    assert.deepEqual(exports.roundTripDataPoint(data1), data1);
+    const data2 = { x: 0.0, y: 0.0, label: "", optCount: null, optFlag: null };
+    assert.deepEqual(exports.roundTripDataPoint(data2), data2);
+
+    const contact1 = {
+        name: "Alice",
+        age: 30,
+        address: { street: "123 Main St", city: "NYC", zipCode: 10001 },
+        email: "alice@test.com",
+        secondaryAddress: { street: "456 Oak Ave", city: "LA", zipCode: null }
+    };
+    assert.deepEqual(exports.roundTripContact(contact1), contact1);
+    const contact2 = {
+        name: "Bob",
+        age: 25,
+        address: { street: "789 Pine Rd", city: "SF", zipCode: null },
+        email: null,
+        secondaryAddress: null
+    };
+    assert.deepEqual(exports.roundTripContact(contact2), contact2);
+
+    const config1 = {
+        name: "prod",
+        theme: exports.Theme.Dark,
+        direction: exports.Direction.North,
+        status: exports.Status.Success
+    };
+    assert.deepEqual(exports.roundTripConfig(config1), config1);
+    const config2 = {
+        name: "dev",
+        theme: null,
+        direction: null,
+        status: exports.Status.Loading
+    };
+    assert.deepEqual(exports.roundTripConfig(config2), config2);
+
+    const owner1 = new exports.Greeter("TestUser");
+    const session1 = { id: 123, owner: owner1 };
+    const resultSession1 = exports.roundTripSessionData(session1);
+    assert.equal(resultSession1.id, 123);
+    assert.equal(resultSession1.owner.greet(), "Hello, TestUser!");
+    const session2 = { id: 456, owner: null };
+    assert.deepEqual(exports.roundTripSessionData(session2), session2);
+    owner1.release();
+    resultSession1.owner.release();
+
+    const report1 = {
+        id: 100,
+        result: { tag: exports.APIResult.Tag.Success, param0: "ok" },
+        status: exports.Status.Success,
+        outcome: { tag: exports.APIResult.Tag.Info }
+    };
+    assert.deepEqual(exports.roundTripValidationReport(report1), report1);
+    const report2 = {
+        id: 200,
+        result: { tag: exports.APIResult.Tag.Failure, param0: 404 },
+        status: null,
+        outcome: null
+    };
+    assert.deepEqual(exports.roundTripValidationReport(report2), report2);
+
+    const origReport = {
+        id: 999,
+        result: { tag: exports.APIResult.Tag.Failure, param0: 500 },
+        status: exports.Status.Error,
+        outcome: { tag: exports.APIResult.Tag.Info }
+    };
+    const updatedReport = exports.updateValidationReport(
+        { tag: exports.APIResult.Tag.Success, param0: "updated" },
+        origReport
+    );
+    assert.deepEqual(updatedReport.result, { tag: exports.APIResult.Tag.Success, param0: "updated" });
+    assert.deepEqual(exports.updateValidationReport(null, origReport).result, origReport.result);
+
+    assert.equal(exports.MathOperations.subtract(10.0, 4.0), 6.0);
+    const mathOps = exports.MathOperations.init();
+    assert.equal(mathOps.add(5.0, 3.0), 8.0);
+    assert.equal(mathOps.multiply(4.0, 7.0), 28.0);
+
+    const container = exports.testContainerWithStruct({ x: 5.0, y: 10.0, label: "test", optCount: null, optFlag: true });
+    assert.equal(container.location.x, 5.0);
+    assert.equal(container.config, null);
+    container.release();
+
+    assert.equal(exports.ConfigStruct.defaultConfig, "production");
+    assert.equal(exports.ConfigStruct.maxRetries, 3);
+    assert.equal(exports.ConfigStruct.computedSetting, "Config: production");
+    exports.ConfigStruct.defaultConfig = "staging";
+    assert.equal(exports.ConfigStruct.computedSetting, "Config: staging");
+    exports.ConfigStruct.defaultConfig = "production";
+}
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 async function BridgeJSRuntimeTests_runAsyncWorks(exports) {

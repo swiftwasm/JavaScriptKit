@@ -726,5 +726,8 @@
   "moduleName" : "Benchmarks",
   "protocols" : [
 
+  ],
+  "structs" : [
+
   ]
 }

@@ -333,5 +333,8 @@
   "moduleName" : "TestModule",
   "protocols" : [
 
+  ],
+  "structs" : [
+
   ]
 }

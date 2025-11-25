@@ -32,6 +32,8 @@ export async function createInstantiator(options, swift) {
     let tmpParamInts = [];
     let tmpParamF32s = [];
     let tmpParamF64s = [];
+    let tmpRetPointers = [];
+    let tmpParamPointers = [];
     
     let _exports = null;
     let bjs = null;
@@ -96,6 +98,12 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_param_f64"] = function() {
                 return tmpParamF64s.pop();
+            }
+            bjs["swift_js_push_pointer"] = function(pointer) {
+                tmpRetPointers.push(pointer);
+            }
+            bjs["swift_js_pop_param_pointer"] = function() {
+                return tmpParamPointers.pop();
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
