@@ -362,17 +362,18 @@ public func _bjs_EnumRoundtrip_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension EnumRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "Benchmarks", name: "bjs_EnumRoundtrip_wrap")
-        func _bjs_EnumRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_EnumRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_EnumRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_EnumRoundtrip_wrap")
+fileprivate func _bjs_EnumRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_EnumRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_ComplexResultRoundtrip_init")
 @_cdecl("bjs_ComplexResultRoundtrip_init")
@@ -491,17 +492,18 @@ public func _bjs_ComplexResultRoundtrip_deinit(pointer: UnsafeMutableRawPointer)
 
 extension ComplexResultRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "Benchmarks", name: "bjs_ComplexResultRoundtrip_wrap")
-        func _bjs_ComplexResultRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_ComplexResultRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_ComplexResultRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_ComplexResultRoundtrip_wrap")
+fileprivate func _bjs_ComplexResultRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_ComplexResultRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_StringRoundtrip_init")
 @_cdecl("bjs_StringRoundtrip_init")
@@ -543,14 +545,15 @@ public func _bjs_StringRoundtrip_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension StringRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "Benchmarks", name: "bjs_StringRoundtrip_wrap")
-        func _bjs_StringRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_StringRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_StringRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_StringRoundtrip_wrap")
+fileprivate func _bjs_StringRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_StringRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif

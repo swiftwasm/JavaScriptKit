@@ -6,21 +6,31 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
+#if arch(wasm32)
+@_extern(wasm, module: "PlayBridgeJS", name: "bjs_createTS2Skeleton")
+func bjs_createTS2Skeleton() -> Int32
+#else
+func bjs_createTS2Skeleton() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 func createTS2Skeleton() throws(JSException) -> TS2Skeleton {
-    #if arch(wasm32)
-    @_extern(wasm, module: "PlayBridgeJS", name: "bjs_createTS2Skeleton")
-    func bjs_createTS2Skeleton() -> Int32
-    #else
-    func bjs_createTS2Skeleton() -> Int32 {
-        fatalError("Only available on WebAssembly")
-    }
-    #endif
     let ret = bjs_createTS2Skeleton()
     if let error = _swift_js_take_exception() {
         throw error
     }
     return TS2Skeleton.bridgeJSLiftReturn(ret)
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "PlayBridgeJS", name: "bjs_TS2Skeleton_convert")
+func bjs_TS2Skeleton_convert(_ self: Int32, _ ts: Int32) -> Int32
+#else
+func bjs_TS2Skeleton_convert(_ self: Int32, _ ts: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 struct TS2Skeleton: _JSBridgedClass {
     let jsObject: JSObject
@@ -30,14 +40,6 @@ struct TS2Skeleton: _JSBridgedClass {
     }
 
     func convert(_ ts: String) throws(JSException) -> String {
-        #if arch(wasm32)
-        @_extern(wasm, module: "PlayBridgeJS", name: "bjs_TS2Skeleton_convert")
-        func bjs_TS2Skeleton_convert(_ self: Int32, _ ts: Int32) -> Int32
-        #else
-        func bjs_TS2Skeleton_convert(_ self: Int32, _ ts: Int32) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         let ret = bjs_TS2Skeleton_convert(self.bridgeJSLowerParameter(), ts.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
