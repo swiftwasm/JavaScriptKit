@@ -12,7 +12,6 @@ struct BridgeJSLink {
     var exportedSkeletons: [ExportedSkeleton] = []
     var importedSkeletons: [ImportedModuleSkeleton] = []
     let sharedMemory: Bool
-    var exposeToGlobal: Bool
     private let namespaceBuilder = NamespaceBuilder()
 
     init(
@@ -23,15 +22,11 @@ struct BridgeJSLink {
         self.exportedSkeletons = exportedSkeletons
         self.importedSkeletons = importedSkeletons
         self.sharedMemory = sharedMemory
-        self.exposeToGlobal = exportedSkeletons.contains { $0.exposeToGlobal }
     }
 
     mutating func addExportedSkeletonFile(data: Data) throws {
         let skeleton = try JSONDecoder().decode(ExportedSkeleton.self, from: data)
         exportedSkeletons.append(skeleton)
-        if skeleton.exposeToGlobal {
-            exposeToGlobal = true
-        }
     }
 
     mutating func addImportedSkeletonFile(data: Data) throws {
@@ -929,7 +924,6 @@ struct BridgeJSLink {
         // Type definitions section (namespace declarations, class definitions, imported types)
         let namespaceDeclarationsLines = namespaceBuilder.namespaceDeclarations(
             exportedSkeletons: exportedSkeletons,
-            exposeToGlobal: exposeToGlobal,
             renderTSSignatureCallback: { parameters, returnType, effects in
                 self.renderTSSignature(parameters: parameters, returnType: returnType, effects: effects)
             }
@@ -1012,8 +1006,7 @@ struct BridgeJSLink {
         printer.write(lines: data.topLevelEnumLines)
 
         let topLevelNamespaceCode = namespaceBuilder.buildTopLevelNamespaceInitialization(
-            exportedSkeletons: exportedSkeletons,
-            exposeToGlobal: exposeToGlobal
+            exportedSkeletons: exportedSkeletons
         )
         printer.write(lines: topLevelNamespaceCode)
 
@@ -1076,16 +1069,14 @@ struct BridgeJSLink {
                 printer.write(lines: data.classLines)
 
                 let namespaceInitCode = namespaceBuilder.buildNamespaceInitialization(
-                    exportedSkeletons: exportedSkeletons,
-                    exposeToGlobal: exposeToGlobal
+                    exportedSkeletons: exportedSkeletons
                 )
                 printer.write(lines: namespaceInitCode)
 
                 let propertyAssignments = try generateNamespacePropertyAssignments(
                     data: data,
                     exportedSkeletons: exportedSkeletons,
-                    namespaceBuilder: namespaceBuilder,
-                    exposeToGlobal: exposeToGlobal
+                    namespaceBuilder: namespaceBuilder
                 )
                 printer.write(lines: propertyAssignments)
             }
@@ -1157,12 +1148,13 @@ struct BridgeJSLink {
     private func generateNamespacePropertyAssignments(
         data: LinkData,
         exportedSkeletons: [ExportedSkeleton],
-        namespaceBuilder: NamespaceBuilder,
-        exposeToGlobal: Bool
+        namespaceBuilder: NamespaceBuilder
     ) throws -> [String] {
         let printer = CodeFragmentPrinter()
 
-        if exposeToGlobal {
+        // Only include enum static assignments for modules with exposeToGlobal
+        let hasAnyGlobalExposure = exportedSkeletons.contains { $0.exposeToGlobal }
+        if hasAnyGlobalExposure {
             printer.write(lines: data.enumStaticAssignments)
         }
 
@@ -1182,10 +1174,8 @@ struct BridgeJSLink {
         printer.write("};")
         printer.write("_exports = exports;")
 
-        if exposeToGlobal {
-            let globalThisLines = namespaceBuilder.buildGlobalThisAssignments(exportedSkeletons: exportedSkeletons)
-            printer.write(lines: globalThisLines)
-        }
+        let globalThisLines = namespaceBuilder.buildGlobalThisAssignments(exportedSkeletons: exportedSkeletons)
+        printer.write(lines: globalThisLines)
 
         printer.write("return exports;")
 
@@ -2243,20 +2233,21 @@ extension BridgeJSLink {
             )
         }
 
-        func buildNamespaceInitialization(exportedSkeletons: [ExportedSkeleton], exposeToGlobal: Bool) -> [String] {
-            guard exposeToGlobal else { return [] }
-            let allNamespacePaths = collectAllNamespacePaths(exportedSkeletons: exportedSkeletons)
+        func buildNamespaceInitialization(exportedSkeletons: [ExportedSkeleton]) -> [String] {
+            let globalSkeletons = exportedSkeletons.filter { $0.exposeToGlobal }
+            guard !globalSkeletons.isEmpty else { return [] }
+            let allNamespacePaths = collectAllNamespacePaths(exportedSkeletons: globalSkeletons)
             return generateNamespaceInitializationCode(namespacePaths: allNamespacePaths)
         }
 
         func buildTopLevelNamespaceInitialization(
-            exportedSkeletons: [ExportedSkeleton],
-            exposeToGlobal: Bool
+            exportedSkeletons: [ExportedSkeleton]
         ) -> [String] {
-            guard exposeToGlobal else { return [] }
+            let globalSkeletons = exportedSkeletons.filter { $0.exposeToGlobal }
+            guard !globalSkeletons.isEmpty else { return [] }
 
             var namespacedEnumPaths: Set<[String]> = []
-            for skeleton in exportedSkeletons {
+            for skeleton in globalSkeletons {
                 for enumDef in skeleton.enums where enumDef.namespace != nil && enumDef.enumType != .namespace {
                     namespacedEnumPaths.insert(enumDef.namespace!)
                 }
@@ -2267,7 +2258,7 @@ extension BridgeJSLink {
             let printer = CodeFragmentPrinter()
             printer.write(lines: initCode)
 
-            for skeleton in exportedSkeletons {
+            for skeleton in globalSkeletons {
                 for enumDef in skeleton.enums where enumDef.namespace != nil && enumDef.enumType != .namespace {
                     let namespacePath = enumDef.namespace!.joined(separator: ".")
                     printer.write("globalThis.\(namespacePath).\(enumDef.valuesName) = \(enumDef.valuesName);")
@@ -2280,7 +2271,7 @@ extension BridgeJSLink {
         func buildGlobalThisAssignments(exportedSkeletons: [ExportedSkeleton]) -> [String] {
             let printer = CodeFragmentPrinter()
 
-            for skeleton in exportedSkeletons {
+            for skeleton in exportedSkeletons where skeleton.exposeToGlobal {
                 for klass in skeleton.classes where klass.namespace != nil {
                     let namespacePath = klass.namespace!.joined(separator: ".")
                     printer.write("globalThis.\(namespacePath).\(klass.name) = exports.\(namespacePath).\(klass.name);")
@@ -2645,25 +2636,60 @@ extension BridgeJSLink {
         /// - Returns: Array of TypeScript declaration lines defining the global namespace structure
         func namespaceDeclarations(
             exportedSkeletons: [ExportedSkeleton],
-            exposeToGlobal: Bool,
             renderTSSignatureCallback: @escaping ([Parameter], BridgeType, Effects) -> String
         ) -> [String] {
             let printer = CodeFragmentPrinter()
-            let rootNode = NamespaceNode(name: "")
-
-            buildExportsTree(rootNode: rootNode, exportedSkeletons: exportedSkeletons)
-
-            guard !rootNode.children.isEmpty else {
-                return printer.lines
+            
+            let globalSkeletons = exportedSkeletons.filter { $0.exposeToGlobal }
+            let nonGlobalSkeletons = exportedSkeletons.filter { !$0.exposeToGlobal }
+            
+            if !globalSkeletons.isEmpty {
+                let globalRootNode = NamespaceNode(name: "")
+                buildExportsTree(rootNode: globalRootNode, exportedSkeletons: globalSkeletons)
+                
+                if !globalRootNode.children.isEmpty {
+                    printer.write("export {};")
+                    printer.nextLine()
+                    printer.write("declare global {")
+                    printer.indent()
+                    generateNamespaceDeclarationsForNode(
+                        node: globalRootNode,
+                        depth: 1,
+                        printer: printer,
+                        exposeToGlobal: true,
+                        renderTSSignatureCallback: renderTSSignatureCallback
+                    )
+                    printer.unindent()
+                    printer.write("}")
+                    printer.nextLine()
+                }
+            }
+            
+            if !nonGlobalSkeletons.isEmpty {
+                let localRootNode = NamespaceNode(name: "")
+                buildExportsTree(rootNode: localRootNode, exportedSkeletons: nonGlobalSkeletons)
+                
+                if !localRootNode.children.isEmpty {
+                    generateNamespaceDeclarationsForNode(
+                        node: localRootNode,
+                        depth: 1,
+                        printer: printer,
+                        exposeToGlobal: false,
+                        renderTSSignatureCallback: renderTSSignatureCallback
+                    )
+                }
             }
 
-            if exposeToGlobal {
-                printer.write("export {};")
-                printer.nextLine()
-                printer.write("declare global {")
-                printer.indent()
-            }
-
+            return printer.lines
+        }
+        
+        private func generateNamespaceDeclarationsForNode(
+            node: NamespaceNode,
+            depth: Int,
+            printer: CodeFragmentPrinter,
+            exposeToGlobal: Bool,
+            renderTSSignatureCallback: @escaping ([Parameter], BridgeType, Effects) -> String
+        ) {
             func hasContent(node: NamespaceNode) -> Bool {
                 // Enums are always included
                 if !node.content.enums.isEmpty {
@@ -2845,22 +2871,14 @@ extension BridgeJSLink {
                         }
                     }
 
-                    generateNamespaceDeclarations(node: childNode, depth: depth + 1)
+                    generateNamespaceDeclarationsForNode(node: childNode, depth: depth + 1, printer: printer, exposeToGlobal: exposeToGlobal, renderTSSignatureCallback: renderTSSignatureCallback)
 
                     printer.unindent()
                     printer.write("}")
                 }
             }
-
-            generateNamespaceDeclarations(node: rootNode, depth: 1)
-
-            if exposeToGlobal {
-                printer.unindent()
-                printer.write("}")
-                printer.nextLine()
-            }
-
-            return printer.lines
+            
+            generateNamespaceDeclarations(node: node, depth: depth)
         }
     }
 
