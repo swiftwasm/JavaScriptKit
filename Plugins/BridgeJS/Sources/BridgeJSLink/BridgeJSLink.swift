@@ -1127,13 +1127,13 @@ struct BridgeJSLink {
         }
 
         // Generate wrapper functions for each module
-        for (moduleName, classes) in modulesByName {
+        for (moduleName, classes) in modulesByName.sorted(by: { $0.key < $1.key }) {
             wrapperLines.append("// Wrapper functions for module: \(moduleName)")
             wrapperLines.append("if (!importObject[\"\(moduleName)\"]) {")
             wrapperLines.append("    importObject[\"\(moduleName)\"] = {};")
             wrapperLines.append("}")
 
-            for klass in classes {
+            for klass in classes.sorted(by: { $0.name < $1.name }) {
                 let wrapperFunctionName = "bjs_\(klass.name)_wrap"
                 wrapperLines.append("importObject[\"\(moduleName)\"][\"\(wrapperFunctionName)\"] = function(pointer) {")
                 wrapperLines.append("    const obj = \(klass.name).__construct(pointer);")
@@ -2639,14 +2639,14 @@ extension BridgeJSLink {
             renderTSSignatureCallback: @escaping ([Parameter], BridgeType, Effects) -> String
         ) -> [String] {
             let printer = CodeFragmentPrinter()
-            
+
             let globalSkeletons = exportedSkeletons.filter { $0.exposeToGlobal }
             let nonGlobalSkeletons = exportedSkeletons.filter { !$0.exposeToGlobal }
-            
+
             if !globalSkeletons.isEmpty {
                 let globalRootNode = NamespaceNode(name: "")
                 buildExportsTree(rootNode: globalRootNode, exportedSkeletons: globalSkeletons)
-                
+
                 if !globalRootNode.children.isEmpty {
                     printer.write("export {};")
                     printer.nextLine()
@@ -2664,11 +2664,11 @@ extension BridgeJSLink {
                     printer.nextLine()
                 }
             }
-            
+
             if !nonGlobalSkeletons.isEmpty {
                 let localRootNode = NamespaceNode(name: "")
                 buildExportsTree(rootNode: localRootNode, exportedSkeletons: nonGlobalSkeletons)
-                
+
                 if !localRootNode.children.isEmpty {
                     generateNamespaceDeclarationsForNode(
                         node: localRootNode,
@@ -2682,7 +2682,7 @@ extension BridgeJSLink {
 
             return printer.lines
         }
-        
+
         private func generateNamespaceDeclarationsForNode(
             node: NamespaceNode,
             depth: Int,
@@ -2871,13 +2871,19 @@ extension BridgeJSLink {
                         }
                     }
 
-                    generateNamespaceDeclarationsForNode(node: childNode, depth: depth + 1, printer: printer, exposeToGlobal: exposeToGlobal, renderTSSignatureCallback: renderTSSignatureCallback)
+                    generateNamespaceDeclarationsForNode(
+                        node: childNode,
+                        depth: depth + 1,
+                        printer: printer,
+                        exposeToGlobal: exposeToGlobal,
+                        renderTSSignatureCallback: renderTSSignatureCallback
+                    )
 
                     printer.unindent()
                     printer.write("}")
                 }
             }
-            
+
             generateNamespaceDeclarations(node: node, depth: depth)
         }
     }

@@ -120,17 +120,18 @@ public func _bjs_Converter_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension Utils.Converter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "TestModule", name: "bjs_Converter_wrap")
-        func _bjs_Converter_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_Converter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Converter_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_Converter_wrap")
+fileprivate func _bjs_Converter_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_Converter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_HTTPServer_init")
 @_cdecl("bjs_HTTPServer_init")
@@ -161,17 +162,18 @@ public func _bjs_HTTPServer_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension Networking.API.HTTPServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "TestModule", name: "bjs_HTTPServer_wrap")
-        func _bjs_HTTPServer_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_HTTPServer_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_HTTPServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_HTTPServer_wrap")
+fileprivate func _bjs_HTTPServer_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_HTTPServer_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_TestServer_init")
 @_cdecl("bjs_TestServer_init")
@@ -202,14 +204,15 @@ public func _bjs_TestServer_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension Internal.TestServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "TestModule", name: "bjs_TestServer_wrap")
-        func _bjs_TestServer_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_TestServer_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_TestServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_TestServer_wrap")
+fileprivate func _bjs_TestServer_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_TestServer_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif

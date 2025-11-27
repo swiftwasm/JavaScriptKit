@@ -185,16 +185,8 @@ export async function createInstantiator(options, swift) {
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
             }
-            importObject["TestModule"]["bjs_Converter_wrap"] = function(pointer) {
-                const obj = Converter.__construct(pointer);
-                return swift.memory.retain(obj);
-            };
-            importObject["TestModule"]["bjs_Greeter_wrap"] = function(pointer) {
-                const obj = Greeter.__construct(pointer);
-                return swift.memory.retain(obj);
-            };
-            importObject["TestModule"]["bjs_UUID_wrap"] = function(pointer) {
-                const obj = UUID.__construct(pointer);
+            importObject["TestModule"]["bjs_PrivateClass_wrap"] = function(pointer) {
+                const obj = PrivateClass.__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },
@@ -228,79 +220,30 @@ export async function createInstantiator(options, swift) {
                     this.deinit(this.pointer);
                 }
             }
-            class Greeter extends SwiftHeapObject {
+            class PrivateClass extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Greeter_deinit, Greeter.prototype);
-                }
-            
-                constructor(name) {
-                    const nameBytes = textEncoder.encode(name);
-                    const nameId = swift.memory.retain(nameBytes);
-                    const ret = instance.exports.bjs_Greeter_init(nameId, nameBytes.length);
-                    swift.memory.release(nameId);
-                    return Greeter.__construct(ret);
-                }
-                greet() {
-                    instance.exports.bjs_Greeter_greet(this.pointer);
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    return ret;
-                }
-            }
-            class Converter extends SwiftHeapObject {
-                static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Converter_deinit, Converter.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PrivateClass_deinit, PrivateClass.prototype);
                 }
             
                 constructor() {
-                    const ret = instance.exports.bjs_Converter_init();
-                    return Converter.__construct(ret);
+                    const ret = instance.exports.bjs_PrivateClass_init();
+                    return PrivateClass.__construct(ret);
                 }
-                toString(value) {
-                    instance.exports.bjs_Converter_toString(this.pointer, value);
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    return ret;
-                }
-            }
-            class UUID extends SwiftHeapObject {
-                static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_UUID_deinit, UUID.prototype);
-                }
-            
-                uuidString() {
-                    instance.exports.bjs_UUID_uuidString(this.pointer);
+                greet() {
+                    instance.exports.bjs_PrivateClass_greet(this.pointer);
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;
                 }
             }
             const exports = {
-                plainFunction: function bjs_plainFunction() {
-                    instance.exports.bjs_plainFunction();
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    return ret;
-                },
-                MyModule: {
-                    Utils: {
-                        namespacedFunction: function bjs_MyModule_Utils_namespacedFunction() {
-                            instance.exports.bjs_MyModule_Utils_namespacedFunction();
-                            const ret = tmpRetString;
-                            tmpRetString = undefined;
-                            return ret;
-                        },
-                    },
-                },
-                Utils: {
-                    Converters: {
-                        Converter,
-                    },
-                },
-                __Swift: {
-                    Foundation: {
-                        Greeter,
-                        UUID,
+                PrivateAPI: {
+                    PrivateClass,
+                    privateFunction: function bjs_PrivateAPI_privateFunction() {
+                        instance.exports.bjs_PrivateAPI_privateFunction();
+                        const ret = tmpRetString;
+                        tmpRetString = undefined;
+                        return ret;
                     },
                 },
             };

@@ -7403,23 +7403,6 @@
       }
     },
     {
-      "abiName" : "bjs_getAllStaticPropertyValues",
-      "effects" : {
-        "isAsync" : false,
-        "isStatic" : false,
-        "isThrows" : false
-      },
-      "name" : "getAllStaticPropertyValues",
-      "parameters" : [
-
-      ],
-      "returnType" : {
-        "string" : {
-
-        }
-      }
-    },
-    {
       "abiName" : "bjs_formatName",
       "effects" : {
         "isAsync" : false,

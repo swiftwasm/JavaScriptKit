@@ -872,12 +872,6 @@ enum APIOptionalResult {
     }
 }
 
-// Test functions for static properties
-@JS func getAllStaticPropertyValues() -> String {
-    return
-        "const:\(StaticPropertyHolder.staticConstant),var:\(StaticPropertyHolder.staticVariable),computed:\(StaticPropertyHolder.computedProperty),readonly:\(StaticPropertyHolder.readOnlyComputed)"
-}
-
 // MARK: - Protocol Tests
 
 @JS protocol DataProcessor {

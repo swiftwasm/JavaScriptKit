@@ -91,4 +91,25 @@ import Testing
         let bridgeJSLink: BridgeJSLink = BridgeJSLink(exportedSkeletons: [outputSkeleton], sharedMemory: false)
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Global.Export")
     }
+
+    @Test
+    func snapshotMixedModuleExposure() throws {
+        let globalURL = Self.inputsDirectory.appendingPathComponent("MixedGlobal.swift")
+        let globalSourceFile = Parser.parse(source: try String(contentsOf: globalURL, encoding: .utf8))
+        let globalAPI = ExportSwift(progress: .silent, moduleName: "GlobalModule", exposeToGlobal: true)
+        try globalAPI.addSourceFile(globalSourceFile, "MixedGlobal.swift")
+        let (_, globalSkeleton) = try #require(try globalAPI.finalize())
+
+        let privateURL = Self.inputsDirectory.appendingPathComponent("MixedPrivate.swift")
+        let privateSourceFile = Parser.parse(source: try String(contentsOf: privateURL, encoding: .utf8))
+        let privateAPI = ExportSwift(progress: .silent, moduleName: "PrivateModule", exposeToGlobal: false)
+        try privateAPI.addSourceFile(privateSourceFile, "MixedPrivate.swift")
+        let (_, privateSkeleton) = try #require(try privateAPI.finalize())
+
+        let bridgeJSLink = BridgeJSLink(
+            exportedSkeletons: [globalSkeleton, privateSkeleton],
+            sharedMemory: false
+        )
+        try snapshot(bridgeJSLink: bridgeJSLink, name: "MixedModules.Export")
+    }
 }

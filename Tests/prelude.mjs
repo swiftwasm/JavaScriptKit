@@ -88,7 +88,12 @@ export async function setupOptions(options, context) {
                 }
                 return BridgeJSRuntimeTests_runJsWorks(getInstance(), exports);
             }
+            const bridgeJSGlobalTests = importObject["BridgeJSGlobalTests"] || {};
+            bridgeJSGlobalTests["runJsWorksGlobal"] = () => {
+                return BridgeJSGlobalTests_runJsWorksGlobal();
+            }
             importObject["BridgeJSRuntimeTests"] = bridgeJSRuntimeTests;
+            importObject["BridgeJSGlobalTests"] = bridgeJSGlobalTests;
         }
     }
 }
@@ -895,6 +900,51 @@ function testClosureSupport(exports) {
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 async function BridgeJSRuntimeTests_runAsyncWorks(exports) {
     await exports.asyncRoundTripVoid();
+}
+
+function BridgeJSGlobalTests_runJsWorksGlobal() {
+    assert.equal(globalThis.GlobalNetworking.API.CallMethodValues.Get, 0);
+    assert.equal(globalThis.GlobalNetworking.API.CallMethodValues.Post, 1);
+    assert.equal(globalThis.GlobalNetworking.API.CallMethodValues.Put, 2);
+    assert.equal(globalThis.GlobalNetworking.API.CallMethodValues.Delete, 3);
+
+    assert.equal(globalThis.GlobalConfiguration.PublicLogLevelValues.Debug, "debug");
+    assert.equal(globalThis.GlobalConfiguration.PublicLogLevelValues.Info, "info");
+    assert.equal(globalThis.GlobalConfiguration.PublicLogLevelValues.Warning, "warning");
+    assert.equal(globalThis.GlobalConfiguration.PublicLogLevelValues.Error, "error");
+    assert.equal(globalThis.GlobalConfiguration.AvailablePortValues.Http, 80);
+    assert.equal(globalThis.GlobalConfiguration.AvailablePortValues.Https, 443);
+    assert.equal(globalThis.GlobalConfiguration.AvailablePortValues.Development, 3000);
+
+    assert.equal(globalThis.GlobalNetworking.APIV2.Internal.SupportedServerMethodValues.Get, 0);
+    assert.equal(globalThis.GlobalNetworking.APIV2.Internal.SupportedServerMethodValues.Post, 1);
+
+    const globalConverter = new globalThis.GlobalUtils.PublicConverter();
+    assert.equal(globalConverter.toString(99), "99");
+    globalConverter.release();
+
+    const globalHttpServer = new globalThis.GlobalNetworking.API.TestHTTPServer();
+    globalHttpServer.call(globalThis.GlobalNetworking.API.CallMethodValues.Get);
+    globalHttpServer.release();
+
+    const globalTestServer = new globalThis.GlobalNetworking.APIV2.Internal.TestInternalServer();
+    globalTestServer.call(globalThis.GlobalNetworking.APIV2.Internal.SupportedServerMethodValues.Post);
+    globalTestServer.release();
+
+    assert.equal(globalThis.GlobalStaticPropertyNamespace.namespaceProperty, "namespace");
+    assert.equal(globalThis.GlobalStaticPropertyNamespace.namespaceConstant, "constant");
+
+    globalThis.GlobalStaticPropertyNamespace.namespaceProperty = "further modified";
+    assert.equal(globalThis.GlobalStaticPropertyNamespace.namespaceProperty, "further modified");
+
+    assert.equal(globalThis.GlobalStaticPropertyNamespace.NestedProperties.nestedProperty, 999);
+    assert.equal(globalThis.GlobalStaticPropertyNamespace.NestedProperties.nestedConstant, "nested");
+    assert.equal(globalThis.GlobalStaticPropertyNamespace.NestedProperties.nestedDouble, 1.414);
+
+    globalThis.GlobalStaticPropertyNamespace.NestedProperties.nestedProperty = 2000;
+    globalThis.GlobalStaticPropertyNamespace.NestedProperties.nestedDouble = 3.141;
+    assert.equal(globalThis.GlobalStaticPropertyNamespace.NestedProperties.nestedProperty, 2000);
+    assert.equal(globalThis.GlobalStaticPropertyNamespace.NestedProperties.nestedDouble, 3.141);
 }
 
 function setupTestGlobals(global) {

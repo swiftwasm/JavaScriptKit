@@ -1,0 +1,537 @@
+{
+  "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_TestHTTPServer_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_TestHTTPServer_call",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "call",
+          "namespace" : [
+            "GlobalNetworking",
+            "API"
+          ],
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "method",
+              "type" : {
+                "caseEnum" : {
+                  "_0" : "GlobalNetworking.API.CallMethod"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "TestHTTPServer",
+      "namespace" : [
+        "GlobalNetworking",
+        "API"
+      ],
+      "properties" : [
+
+      ],
+      "swiftCallName" : "GlobalNetworking.API.TestHTTPServer"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_TestInternalServer_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_TestInternalServer_call",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "call",
+          "namespace" : [
+            "GlobalNetworking",
+            "APIV2",
+            "Internal"
+          ],
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "method",
+              "type" : {
+                "caseEnum" : {
+                  "_0" : "Internal.SupportedServerMethod"
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "TestInternalServer",
+      "namespace" : [
+        "GlobalNetworking",
+        "APIV2",
+        "Internal"
+      ],
+      "properties" : [
+
+      ],
+      "swiftCallName" : "Internal.TestInternalServer"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_PublicConverter_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_PublicConverter_toString",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "toString",
+          "namespace" : [
+            "GlobalUtils"
+          ],
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "PublicConverter",
+      "namespace" : [
+        "GlobalUtils"
+      ],
+      "properties" : [
+
+      ],
+      "swiftCallName" : "GlobalUtils.PublicConverter"
+    }
+  ],
+  "enums" : [
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "GlobalNetworking",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "GlobalNetworking",
+      "tsFullPath" : "GlobalNetworking"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "API",
+      "namespace" : [
+        "GlobalNetworking"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "GlobalNetworking.API",
+      "tsFullPath" : "GlobalNetworking.API"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "get"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "post"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "put"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "delete"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "CallMethod",
+      "namespace" : [
+        "GlobalNetworking",
+        "API"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "GlobalNetworking.API.CallMethod",
+      "tsFullPath" : "GlobalNetworking.API.CallMethod"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "GlobalConfiguration",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "GlobalConfiguration",
+      "tsFullPath" : "GlobalConfiguration"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "debug",
+          "rawValue" : "debug"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "info",
+          "rawValue" : "info"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "warning",
+          "rawValue" : "warning"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "error",
+          "rawValue" : "error"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "PublicLogLevel",
+      "namespace" : [
+        "GlobalConfiguration"
+      ],
+      "rawType" : "String",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "GlobalConfiguration.PublicLogLevel",
+      "tsFullPath" : "GlobalConfiguration.PublicLogLevel"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "http",
+          "rawValue" : "80"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "https",
+          "rawValue" : "443"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "development",
+          "rawValue" : "3000"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "AvailablePort",
+      "namespace" : [
+        "GlobalConfiguration"
+      ],
+      "rawType" : "Int",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "GlobalConfiguration.AvailablePort",
+      "tsFullPath" : "GlobalConfiguration.AvailablePort"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Internal",
+      "namespace" : [
+        "GlobalNetworking",
+        "APIV2"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Internal",
+      "tsFullPath" : "GlobalNetworking.APIV2.Internal"
+    },
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "get"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "post"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "SupportedServerMethod",
+      "namespace" : [
+        "GlobalNetworking",
+        "APIV2",
+        "Internal"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Internal.SupportedServerMethod",
+      "tsFullPath" : "GlobalNetworking.APIV2.Internal.SupportedServerMethod"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "GlobalStaticPropertyNamespace",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "namespaceProperty",
+          "namespace" : [
+            "GlobalStaticPropertyNamespace"
+          ],
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "namespaceConstant",
+          "namespace" : [
+            "GlobalStaticPropertyNamespace"
+          ],
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "GlobalStaticPropertyNamespace",
+      "tsFullPath" : "GlobalStaticPropertyNamespace"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "NestedProperties",
+      "namespace" : [
+        "GlobalStaticPropertyNamespace"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "nestedProperty",
+          "namespace" : [
+            "GlobalStaticPropertyNamespace",
+            "NestedProperties"
+          ],
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "nestedConstant",
+          "namespace" : [
+            "GlobalStaticPropertyNamespace",
+            "NestedProperties"
+          ],
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "nestedDouble",
+          "namespace" : [
+            "GlobalStaticPropertyNamespace",
+            "NestedProperties"
+          ],
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          },
+          "type" : {
+            "double" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "GlobalStaticPropertyNamespace.NestedProperties",
+      "tsFullPath" : "GlobalStaticPropertyNamespace.NestedProperties"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "GlobalUtils",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "GlobalUtils",
+      "tsFullPath" : "GlobalUtils"
+    }
+  ],
+  "exposeToGlobal" : true,
+  "functions" : [
+
+  ],
+  "moduleName" : "BridgeJSGlobalTests",
+  "protocols" : [
+
+  ]
+}
