@@ -175,7 +175,6 @@ public struct ImportTS {
                         )
                     ),
                     body: CodeBlockSyntax {
-                        self.renderImportDecl()
                         body
                     }
                 )
@@ -200,7 +199,6 @@ public struct ImportTS {
                         effectSpecifiers: ImportTS.buildFunctionEffect(throws: true, async: false)
                     ),
                     bodyBuilder: {
-                        self.renderImportDecl()
                         body
                     }
                 )
@@ -228,6 +226,7 @@ public struct ImportTS {
         }
         builder.call(returnType: function.returnType)
         try builder.liftReturnValue(returnType: function.returnType)
+        topLevelDecls.append(builder.renderImportDecl())
         return [
             builder.renderThunkDecl(
                 name: function.name,
@@ -249,6 +248,7 @@ public struct ImportTS {
             }
             builder.call(returnType: method.returnType)
             try builder.liftReturnValue(returnType: method.returnType)
+            topLevelDecls.append(builder.renderImportDecl())
             return [
                 builder.renderThunkDecl(
                     name: method.name,
@@ -266,6 +266,7 @@ public struct ImportTS {
             }
             builder.call(returnType: .jsObject(name))
             builder.assignThis(returnType: .jsObject(name))
+            topLevelDecls.append(builder.renderImportDecl())
             return [
                 builder.renderConstructorDecl(parameters: constructor.parameters)
             ]
@@ -279,11 +280,11 @@ public struct ImportTS {
             try builder.lowerParameter(param: Parameter(label: nil, name: "self", type: .jsObject(name)))
             builder.call(returnType: property.type)
             try builder.liftReturnValue(returnType: property.type)
+            topLevelDecls.append(builder.renderImportDecl())
             return AccessorDeclSyntax(
                 accessorSpecifier: .keyword(.get),
                 effectSpecifiers: Self.buildAccessorEffect(throws: true, async: false),
                 body: CodeBlockSyntax {
-                    builder.renderImportDecl()
                     builder.body
                 }
             )
@@ -298,6 +299,7 @@ public struct ImportTS {
             try builder.lowerParameter(param: Parameter(label: nil, name: "self", type: .jsObject(name)))
             try builder.lowerParameter(param: newValue)
             builder.call(returnType: .void)
+            topLevelDecls.append(builder.renderImportDecl())
             return builder.renderThunkDecl(
                 name: "set\(property.name.capitalizedFirstLetter)",
                 parameters: [newValue],
