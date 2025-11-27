@@ -6,15 +6,16 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs_checkNumber")
+fileprivate func bjs_checkNumber() -> Float64
+#else
+fileprivate func bjs_checkNumber() -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 func checkNumber() throws(JSException) -> Double {
-    #if arch(wasm32)
-    @_extern(wasm, module: "Check", name: "bjs_checkNumber")
-    func bjs_checkNumber() -> Float64
-    #else
-    func bjs_checkNumber() -> Float64 {
-        fatalError("Only available on WebAssembly")
-    }
-    #endif
     let ret = bjs_checkNumber()
     if let error = _swift_js_take_exception() {
         throw error
@@ -22,15 +23,16 @@ func checkNumber() throws(JSException) -> Double {
     return Double.bridgeJSLiftReturn(ret)
 }
 
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs_checkBoolean")
+fileprivate func bjs_checkBoolean() -> Int32
+#else
+fileprivate func bjs_checkBoolean() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 func checkBoolean() throws(JSException) -> Bool {
-    #if arch(wasm32)
-    @_extern(wasm, module: "Check", name: "bjs_checkBoolean")
-    func bjs_checkBoolean() -> Int32
-    #else
-    func bjs_checkBoolean() -> Int32 {
-        fatalError("Only available on WebAssembly")
-    }
-    #endif
     let ret = bjs_checkBoolean()
     if let error = _swift_js_take_exception() {
         throw error

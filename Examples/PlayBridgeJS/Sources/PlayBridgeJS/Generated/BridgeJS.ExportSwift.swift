@@ -50,17 +50,18 @@ public func _bjs_PlayBridgeJS_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension PlayBridgeJS: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "PlayBridgeJS", name: "bjs_PlayBridgeJS_wrap")
-        func _bjs_PlayBridgeJS_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_PlayBridgeJS_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_PlayBridgeJS_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "PlayBridgeJS", name: "bjs_PlayBridgeJS_wrap")
+fileprivate func _bjs_PlayBridgeJS_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_PlayBridgeJS_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_PlayBridgeJSOutput_outputJs")
 @_cdecl("bjs_PlayBridgeJSOutput_outputJs")
@@ -114,14 +115,15 @@ public func _bjs_PlayBridgeJSOutput_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension PlayBridgeJSOutput: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "PlayBridgeJS", name: "bjs_PlayBridgeJSOutput_wrap")
-        func _bjs_PlayBridgeJSOutput_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_PlayBridgeJSOutput_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_PlayBridgeJSOutput_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "PlayBridgeJS", name: "bjs_PlayBridgeJSOutput_wrap")
+fileprivate func _bjs_PlayBridgeJSOutput_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_PlayBridgeJSOutput_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif

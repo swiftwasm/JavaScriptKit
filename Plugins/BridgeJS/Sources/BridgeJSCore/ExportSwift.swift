@@ -1497,12 +1497,12 @@ public class ExportSwift {
         }
 
         for signature in closureSignatures.sorted(by: { $0.mangleName < $1.mangleName }) {
-            decls.append(try closureCodegen.renderClosureHelper(signature: signature))
+            decls.append(contentsOf: try closureCodegen.renderClosureHelper(signature: signature))
             decls.append(try closureCodegen.renderClosureInvokeHandler(signature: signature))
         }
 
         for proto in exportedProtocols {
-            decls.append(try renderProtocolWrapper(protocol: proto))
+            decls.append(contentsOf: try renderProtocolWrapper(protocol: proto))
         }
 
         for enumDef in exportedEnums {
@@ -1547,6 +1547,7 @@ public class ExportSwift {
         var parameters: [Parameter] = []
         var abiParameterSignatures: [(name: String, type: WasmCoreType)] = []
         var abiReturnType: WasmCoreType?
+        var externDecls: [DeclSyntax] = []
         let effects: Effects
 
         init(effects: Effects) {
@@ -1839,7 +1840,7 @@ public class ExportSwift {
             return lines.isEmpty ? "" : lines.joined(separator: "\n") + "\n"
         }
 
-        func renderClosureHelper(signature: ClosureSignature) throws -> DeclSyntax {
+        func renderClosureHelper(signature: ClosureSignature) throws -> [DeclSyntax] {
             let mangledName = signature.mangleName
             let helperName = "_BJS_Closure_\(mangledName)"
             let boxClassName = "_BJS_ClosureBox_\(mangledName)"
@@ -1899,25 +1900,31 @@ public class ExportSwift {
                 invokeReturnType = "Void"
             }
 
+            let externName = "invoke_js_callback_\(signature.moduleName)_\(mangledName)"
+
             let returnLifting: String
             if signature.returnType == .void {
-                returnLifting = "_invoke(\(invokeCallArgs.joined(separator: ", ")))"
+                returnLifting = "\(externName)(\(invokeCallArgs.joined(separator: ", ")))"
             } else if case .optional = signature.returnType {
                 returnLifting = """
-                    _invoke(\(invokeCallArgs.joined(separator: ", ")))
+                    \(externName)(\(invokeCallArgs.joined(separator: ", ")))
                                 return \(signature.returnType.swiftType).bridgeJSLiftReturnFromSideChannel()
                     """
             } else {
                 returnLifting = """
-                    let resultId = _invoke(\(invokeCallArgs.joined(separator: ", ")))
+                    let resultId = \(externName)(\(invokeCallArgs.joined(separator: ", ")))
                                 return \(signature.returnType.swiftType).bridgeJSLiftReturn(resultId)
                     """
             }
 
-            let externName = "invoke_js_callback_\(signature.moduleName)_\(mangledName)"
             let optionalLoweringCode = try generateOptionalParameterLowering(signature: signature)
 
-            return """
+            let externDecl: DeclSyntax = """
+                @_extern(wasm, module: "bjs", name: "\(raw: externName)")
+                fileprivate func \(raw: externName)(\(raw: invokeSignature)) -> \(raw: invokeReturnType)
+                """
+
+            let boxDecl: DeclSyntax = """
                 private final class \(raw: boxClassName): _BridgedSwiftClosureBox {
                     let closure: \(raw: closureType)
                     init(_ closure: @escaping \(raw: closureType)) {
@@ -1935,16 +1942,15 @@ public class ExportSwift {
                             let callback = JSObject.bridgeJSLiftParameter(callbackId)
                             return { [callback] \(raw: signature.parameters.indices.map { "param\($0)" }.joined(separator: ", ")) in
                                 #if arch(wasm32)
-                                @_extern(wasm, module: "bjs", name: "\(raw: externName)")
-                                func _invoke(\(raw: invokeSignature)) -> \(raw: invokeReturnType)
                                 \(raw: optionalLoweringCode)\(raw: returnLifting)
                                 #else
                                 fatalError("Only available on WebAssembly")
-                                 #endif
+                                #endif
                             }
                         }
                 }
                 """
+            return [externDecl, boxDecl]
         }
 
         func renderClosureInvokeHandler(signature: ClosureSignature) throws -> DeclSyntax {
@@ -2051,28 +2057,28 @@ public class ExportSwift {
         func renderAssociatedValueEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
             let typeName = enumDef.swiftCallName
             return """
-                extension \(raw: typeName): _BridgedSwiftAssociatedValueEnum {                    
+                extension \(raw: typeName): _BridgedSwiftAssociatedValueEnum {
                     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> \(raw: typeName) {
                         switch caseId {
                         \(raw: generateStackLiftSwitchCases(enumDef: enumDef).joined(separator: "\n"))
                         default: fatalError("Unknown \(raw: typeName) case ID: \\(caseId)")
                         }
                     }
-                    
+
                     // MARK: Protocol Export
-                    
+
                     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
                         switch self {
                         \(raw: generateLowerParameterSwitchCases(enumDef: enumDef).joined(separator: "\n"))
                         }
                     }
-                    
+
                     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> \(raw: typeName) {
                         return _bridgeJSLiftFromCaseId(caseId)
                     }
-                    
+
                     // MARK: ExportSwift
-                    
+
                     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> \(raw: typeName) {
                         return _bridgeJSLiftFromCaseId(caseId)
                     }
@@ -2460,7 +2466,7 @@ public class ExportSwift {
         }
 
         // Generate ConvertibleToJSValue extension
-        decls.append(renderConvertibleToJSValueExtension(klass: klass))
+        decls.append(contentsOf: renderConvertibleToJSValueExtension(klass: klass))
 
         return decls
     }
@@ -2495,42 +2501,46 @@ public class ExportSwift {
     /// ```swift
     /// extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     ///     var jsValue: JSValue {
-    ///         @_extern(wasm, module: "MyModule", name: "bjs_Greeter_wrap")
-    ///         func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
     ///         return JSObject(id: UInt32(bitPattern: _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque())))
     ///     }
     /// }
+    /// @_extern(wasm, module: "MyModule", name: "bjs_Greeter_wrap")
+    /// fileprivate func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
     /// ```
-    func renderConvertibleToJSValueExtension(klass: ExportedClass) -> DeclSyntax {
+    func renderConvertibleToJSValueExtension(klass: ExportedClass) -> [DeclSyntax] {
         let wrapFunctionName = "_bjs_\(klass.name)_wrap"
         let externFunctionName = "bjs_\(klass.name)_wrap"
 
         // If the class has an explicit access control, we need to add it to the extension declaration.
         let accessControl = klass.explicitAccessControl.map { "\($0) " } ?? ""
-        return """
+        let extensionDecl: DeclSyntax = """
             extension \(raw: klass.swiftCallName): ConvertibleToJSValue, _BridgedSwiftHeapObject {
                 \(raw: accessControl)var jsValue: JSValue {
-                    #if arch(wasm32)
-                    @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: externFunctionName)")
-                    func \(raw: wrapFunctionName)(_: UnsafeMutableRawPointer) -> Int32
-                    #else
-                    func \(raw: wrapFunctionName)(_: UnsafeMutableRawPointer) -> Int32 {
-                        fatalError("Only available on WebAssembly")
-                    }
-                    #endif
                     return .object(JSObject(id: UInt32(bitPattern: \(raw: wrapFunctionName)(Unmanaged.passRetained(self).toOpaque()))))
                 }
             }
             """
+        let externDecl: DeclSyntax = """
+            #if arch(wasm32)
+            @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: externFunctionName)")
+            fileprivate func \(raw: wrapFunctionName)(_: UnsafeMutableRawPointer) -> Int32
+            #else
+            fileprivate func \(raw: wrapFunctionName)(_: UnsafeMutableRawPointer) -> Int32 {
+                fatalError("Only available on WebAssembly")
+            }
+            #endif
+            """
+        return [extensionDecl, externDecl]
     }
 
     /// Creates a struct that wraps a JSObject and implements protocol methods
     /// by calling `@_extern(wasm)` functions that forward to JavaScript via JSObject ID
-    func renderProtocolWrapper(protocol proto: ExportedProtocol) throws -> DeclSyntax {
+    func renderProtocolWrapper(protocol proto: ExportedProtocol) throws -> [DeclSyntax] {
         let wrapperName = "Any\(proto.name)"
         let protocolName = proto.name
 
         var methodDecls: [DeclSyntax] = []
+        var externDecls: [DeclSyntax] = []
 
         for method in proto.methods {
             var swiftParams: [String] = []
@@ -2617,10 +2627,16 @@ public class ExportSwift {
                         """
                 }
             }
+
+            externDecls.append(
+                """
+                @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: method.abiName)")
+                fileprivate func _extern_\(raw: method.name)(\(raw: externParams.joined(separator: ", ")))\(raw: externReturnType)
+                """
+            )
+
             let methodImplementation: DeclSyntax = """
                 func \(raw: method.name)(\(raw: swiftParams.joined(separator: ", ")))\(raw: returnTypeStr) {
-                    @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: method.abiName)")
-                    func _extern_\(raw: method.name)(\(raw: externParams.joined(separator: ", ")))\(raw: externReturnType)
                     \(raw: callCode)
                 }
                 """
@@ -2631,34 +2647,36 @@ public class ExportSwift {
         var propertyDecls: [DeclSyntax] = []
 
         for property in proto.properties {
-            let propertyImpl = try renderProtocolProperty(
+            let (propertyImpl, propertyExternDecls) = try renderProtocolProperty(
                 property: property,
                 protocolName: protocolName,
                 moduleName: moduleName
             )
             propertyDecls.append(propertyImpl)
+            externDecls.append(contentsOf: propertyExternDecls)
         }
 
         let allDecls = (methodDecls + propertyDecls).map { $0.description }.joined(separator: "\n\n")
 
-        return """
+        let structDecl: DeclSyntax = """
             struct \(raw: wrapperName): \(raw: protocolName), _BridgedSwiftProtocolWrapper {
                 let jsObject: JSObject
-                
+
                 \(raw: allDecls)
-                
+
                 static func bridgeJSLiftParameter(_ value: Int32) -> Self {
                     return \(raw: wrapperName)(jsObject: JSObject(id: UInt32(bitPattern: value)))
                 }
             }
             """
+        return [structDecl] + externDecls
     }
 
     private func renderProtocolProperty(
         property: ExportedProtocolProperty,
         protocolName: String,
         moduleName: String
-    ) throws -> DeclSyntax {
+    ) throws -> (propertyDecl: DeclSyntax, externDecls: [DeclSyntax]) {
         let getterAbiName = ABINameGenerator.generateABIName(
             baseName: property.name,
             operation: "get",
@@ -2679,33 +2697,39 @@ public class ExportSwift {
             // Optional case/raw enums use side-channel reading (Void return)
             getterReturnType = ""
             getterBody = """
-                _extern_get(this: Int32(bitPattern: jsObject.id))
+                \(getterAbiName)(this: Int32(bitPattern: jsObject.id))
                         return \(property.type.swiftType).bridgeJSLiftReturnFromSideChannel()
                 """
         } else if let abiType = liftingInfo.valueToLift {
             getterReturnType = " -> \(abiType.swiftType)"
             getterBody = """
-                let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+                let ret = \(getterAbiName)(this: Int32(bitPattern: jsObject.id))
                         return \(property.type.swiftType).bridgeJSLiftReturn(ret)
                 """
         } else {
             getterReturnType = ""
             getterBody = """
-                _extern_get(this: Int32(bitPattern: jsObject.id))
+                \(getterAbiName)(this: Int32(bitPattern: jsObject.id))
                         return \(property.type.swiftType).bridgeJSLiftReturn()
                 """
         }
 
+        let getterExternDecl: DeclSyntax = """
+            @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: getterAbiName)")
+            fileprivate func \(raw: getterAbiName)(this: Int32)\(raw: getterReturnType)
+            """
+
         if property.isReadonly {
-            return """
+            return (
+                """
                 var \(raw: property.name): \(raw: property.type.swiftType) {
                     get {
-                        @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: getterAbiName)")
-                        func _extern_get(this: Int32)\(raw: getterReturnType)
                         \(raw: getterBody)
                     }
                 }
-                """
+                """,
+                [getterExternDecl]
+            )
         } else {
             let loweringInfo = try property.type.loweringParameterInfo(context: .exportSwift)
 
@@ -2720,28 +2744,32 @@ public class ExportSwift {
                 let wrappedParam = loweringInfo.loweredParameters[1].name
                 setterBody = """
                     let (\(isSomeParam), \(wrappedParam)) = newValue.bridgeJSLowerParameterWithPresence()
-                            _extern_set(this: Int32(bitPattern: jsObject.id), \(isSomeParam): \(isSomeParam), \(wrappedParam): \(wrappedParam))
+                            \(setterAbiName)(this: Int32(bitPattern: jsObject.id), \(isSomeParam): \(isSomeParam), \(wrappedParam): \(wrappedParam))
                     """
             } else {
                 let paramName = loweringInfo.loweredParameters[0].name
                 setterBody =
-                    "_extern_set(this: Int32(bitPattern: jsObject.id), \(paramName): newValue.bridgeJSLowerParameter())"
+                    "\(setterAbiName)(this: Int32(bitPattern: jsObject.id), \(paramName): newValue.bridgeJSLowerParameter())"
             }
 
-            return """
+            let setterExternDecl: DeclSyntax = """
+                @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: setterAbiName)")
+                fileprivate func \(raw: setterAbiName)(\(raw: setterParams))
+                """
+
+            return (
+                """
                 var \(raw: property.name): \(raw: property.type.swiftType) {
                     get {
-                        @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: getterAbiName)")
-                        func _extern_get(this: Int32)\(raw: getterReturnType)
                         \(raw: getterBody)
                     }
                     set {
-                        @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: setterAbiName)")
-                        func _extern_set(\(raw: setterParams))
                         \(raw: setterBody)
                     }
                 }
-                """
+                """,
+                [getterExternDecl, setterExternDecl]
+            )
         }
     }
 }

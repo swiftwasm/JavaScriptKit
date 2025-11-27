@@ -6,45 +6,48 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkHelperNoop")
+fileprivate func bjs_benchmarkHelperNoop() -> Void
+#else
+fileprivate func bjs_benchmarkHelperNoop() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 func benchmarkHelperNoop() throws(JSException) -> Void {
-    #if arch(wasm32)
-    @_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkHelperNoop")
-    func bjs_benchmarkHelperNoop() -> Void
-    #else
-    func bjs_benchmarkHelperNoop() -> Void {
-        fatalError("Only available on WebAssembly")
-    }
-    #endif
     bjs_benchmarkHelperNoop()
     if let error = _swift_js_take_exception() {
         throw error
     }
 }
 
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkHelperNoopWithNumber")
+fileprivate func bjs_benchmarkHelperNoopWithNumber(_ n: Float64) -> Void
+#else
+fileprivate func bjs_benchmarkHelperNoopWithNumber(_ n: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 func benchmarkHelperNoopWithNumber(_ n: Double) throws(JSException) -> Void {
-    #if arch(wasm32)
-    @_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkHelperNoopWithNumber")
-    func bjs_benchmarkHelperNoopWithNumber(_ n: Float64) -> Void
-    #else
-    func bjs_benchmarkHelperNoopWithNumber(_ n: Float64) -> Void {
-        fatalError("Only available on WebAssembly")
-    }
-    #endif
     bjs_benchmarkHelperNoopWithNumber(n.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error
     }
 }
 
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkRunner")
+fileprivate func bjs_benchmarkRunner(_ name: Int32, _ body: Int32) -> Void
+#else
+fileprivate func bjs_benchmarkRunner(_ name: Int32, _ body: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 func benchmarkRunner(_ name: String, _ body: JSObject) throws(JSException) -> Void {
-    #if arch(wasm32)
-    @_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkRunner")
-    func bjs_benchmarkRunner(_ name: Int32, _ body: Int32) -> Void
-    #else
-    func bjs_benchmarkRunner(_ name: Int32, _ body: Int32) -> Void {
-        fatalError("Only available on WebAssembly")
-    }
-    #endif
     bjs_benchmarkRunner(name.bridgeJSLowerParameter(), body.bridgeJSLowerParameter())
     if let error = _swift_js_take_exception() {
         throw error

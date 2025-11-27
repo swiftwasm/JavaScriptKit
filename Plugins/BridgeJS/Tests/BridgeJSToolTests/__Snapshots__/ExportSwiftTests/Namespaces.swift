@@ -58,17 +58,18 @@ public func _bjs_Greeter_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "TestModule", name: "bjs_Greeter_wrap")
-        func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_Greeter_wrap")
+fileprivate func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_Converter_init")
 @_cdecl("bjs_Converter_init")
@@ -100,17 +101,18 @@ public func _bjs_Converter_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension Converter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "TestModule", name: "bjs_Converter_wrap")
-        func _bjs_Converter_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_Converter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Converter_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_Converter_wrap")
+fileprivate func _bjs_Converter_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_Converter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_UUID_uuidString")
 @_cdecl("bjs_UUID_uuidString")
@@ -131,14 +133,15 @@ public func _bjs_UUID_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension UUID: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "TestModule", name: "bjs_UUID_wrap")
-        func _bjs_UUID_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_UUID_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_UUID_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_UUID_wrap")
+fileprivate func _bjs_UUID_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_UUID_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
