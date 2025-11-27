@@ -232,17 +232,18 @@ public func _bjs_Greeter_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "TestModule", name: "bjs_Greeter_wrap")
-        func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_Greeter_wrap")
+fileprivate func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_OptionalPropertyHolder_init")
 @_cdecl("bjs_OptionalPropertyHolder_init")
@@ -326,14 +327,15 @@ public func _bjs_OptionalPropertyHolder_deinit(pointer: UnsafeMutableRawPointer)
 
 extension OptionalPropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "TestModule", name: "bjs_OptionalPropertyHolder_wrap")
-        func _bjs_OptionalPropertyHolder_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_OptionalPropertyHolder_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_OptionalPropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_OptionalPropertyHolder_wrap")
+fileprivate func _bjs_OptionalPropertyHolder_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_OptionalPropertyHolder_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif

@@ -6,6 +6,60 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs_Greeter_init")
+func bjs_Greeter_init(_ name: Int32) -> Int32
+#else
+func bjs_Greeter_init(_ name: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs_Greeter_name_get")
+func bjs_Greeter_name_get(_ self: Int32) -> Int32
+#else
+func bjs_Greeter_name_get(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs_Greeter_name_set")
+func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
+#else
+func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs_Greeter_age_get")
+func bjs_Greeter_age_get(_ self: Int32) -> Float64
+#else
+func bjs_Greeter_age_get(_ self: Int32) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs_Greeter_greet")
+func bjs_Greeter_greet(_ self: Int32) -> Int32
+#else
+func bjs_Greeter_greet(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs_Greeter_changeName")
+func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) -> Void
+#else
+func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 struct Greeter: _JSBridgedClass {
     let jsObject: JSObject
 
@@ -14,14 +68,6 @@ struct Greeter: _JSBridgedClass {
     }
 
     init(_ name: String) throws(JSException) {
-        #if arch(wasm32)
-        @_extern(wasm, module: "Check", name: "bjs_Greeter_init")
-        func bjs_Greeter_init(_ name: Int32) -> Int32
-        #else
-        func bjs_Greeter_init(_ name: Int32) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         let ret = bjs_Greeter_init(name.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
@@ -31,14 +77,6 @@ struct Greeter: _JSBridgedClass {
 
     var name: String {
         get throws(JSException) {
-            #if arch(wasm32)
-            @_extern(wasm, module: "Check", name: "bjs_Greeter_name_get")
-            func bjs_Greeter_name_get(_ self: Int32) -> Int32
-            #else
-            func bjs_Greeter_name_get(_ self: Int32) -> Int32 {
-                fatalError("Only available on WebAssembly")
-            }
-            #endif
             let ret = bjs_Greeter_name_get(self.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
@@ -48,14 +86,6 @@ struct Greeter: _JSBridgedClass {
     }
 
     func setName(_ newValue: String) throws(JSException) -> Void {
-        #if arch(wasm32)
-        @_extern(wasm, module: "Check", name: "bjs_Greeter_name_set")
-        func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
-        #else
-        func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         bjs_Greeter_name_set(self.bridgeJSLowerParameter(), newValue.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
@@ -64,14 +94,6 @@ struct Greeter: _JSBridgedClass {
 
     var age: Double {
         get throws(JSException) {
-            #if arch(wasm32)
-            @_extern(wasm, module: "Check", name: "bjs_Greeter_age_get")
-            func bjs_Greeter_age_get(_ self: Int32) -> Float64
-            #else
-            func bjs_Greeter_age_get(_ self: Int32) -> Float64 {
-                fatalError("Only available on WebAssembly")
-            }
-            #endif
             let ret = bjs_Greeter_age_get(self.bridgeJSLowerParameter())
             if let error = _swift_js_take_exception() {
                 throw error
@@ -81,14 +103,6 @@ struct Greeter: _JSBridgedClass {
     }
 
     func greet() throws(JSException) -> String {
-        #if arch(wasm32)
-        @_extern(wasm, module: "Check", name: "bjs_Greeter_greet")
-        func bjs_Greeter_greet(_ self: Int32) -> Int32
-        #else
-        func bjs_Greeter_greet(_ self: Int32) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         let ret = bjs_Greeter_greet(self.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
@@ -97,14 +111,6 @@ struct Greeter: _JSBridgedClass {
     }
 
     func changeName(_ name: String) throws(JSException) -> Void {
-        #if arch(wasm32)
-        @_extern(wasm, module: "Check", name: "bjs_Greeter_changeName")
-        func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) -> Void
-        #else
-        func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) -> Void {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         bjs_Greeter_changeName(self.bridgeJSLowerParameter(), name.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error

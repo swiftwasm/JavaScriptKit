@@ -206,17 +206,18 @@ public func _bjs_DefaultGreeter_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension DefaultGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "TestModule", name: "bjs_DefaultGreeter_wrap")
-        func _bjs_DefaultGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_DefaultGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_DefaultGreeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_DefaultGreeter_wrap")
+fileprivate func _bjs_DefaultGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_DefaultGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_EmptyGreeter_init")
 @_cdecl("bjs_EmptyGreeter_init")
@@ -237,17 +238,18 @@ public func _bjs_EmptyGreeter_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension EmptyGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "TestModule", name: "bjs_EmptyGreeter_wrap")
-        func _bjs_EmptyGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_EmptyGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_EmptyGreeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_EmptyGreeter_wrap")
+fileprivate func _bjs_EmptyGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_EmptyGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_ConstructorDefaults_init")
 @_cdecl("bjs_ConstructorDefaults_init")
@@ -384,14 +386,15 @@ public func _bjs_ConstructorDefaults_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension ConstructorDefaults: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "TestModule", name: "bjs_ConstructorDefaults_wrap")
-        func _bjs_ConstructorDefaults_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_ConstructorDefaults_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_ConstructorDefaults_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_ConstructorDefaults_wrap")
+fileprivate func _bjs_ConstructorDefaults_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_ConstructorDefaults_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif

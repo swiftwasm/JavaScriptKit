@@ -6,21 +6,40 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs_returnAnimatable")
+func bjs_returnAnimatable() -> Int32
+#else
+func bjs_returnAnimatable() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 func returnAnimatable() throws(JSException) -> Animatable {
-    #if arch(wasm32)
-    @_extern(wasm, module: "Check", name: "bjs_returnAnimatable")
-    func bjs_returnAnimatable() -> Int32
-    #else
-    func bjs_returnAnimatable() -> Int32 {
-        fatalError("Only available on WebAssembly")
-    }
-    #endif
     let ret = bjs_returnAnimatable()
     if let error = _swift_js_take_exception() {
         throw error
     }
     return Animatable.bridgeJSLiftReturn(ret)
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs_Animatable_animate")
+func bjs_Animatable_animate(_ self: Int32, _ keyframes: Int32, _ options: Int32) -> Int32
+#else
+func bjs_Animatable_animate(_ self: Int32, _ keyframes: Int32, _ options: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs_Animatable_getAnimations")
+func bjs_Animatable_getAnimations(_ self: Int32, _ options: Int32) -> Int32
+#else
+func bjs_Animatable_getAnimations(_ self: Int32, _ options: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 struct Animatable: _JSBridgedClass {
     let jsObject: JSObject
@@ -30,14 +49,6 @@ struct Animatable: _JSBridgedClass {
     }
 
     func animate(_ keyframes: JSObject, _ options: JSObject) throws(JSException) -> JSObject {
-        #if arch(wasm32)
-        @_extern(wasm, module: "Check", name: "bjs_Animatable_animate")
-        func bjs_Animatable_animate(_ self: Int32, _ keyframes: Int32, _ options: Int32) -> Int32
-        #else
-        func bjs_Animatable_animate(_ self: Int32, _ keyframes: Int32, _ options: Int32) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         let ret = bjs_Animatable_animate(self.bridgeJSLowerParameter(), keyframes.bridgeJSLowerParameter(), options.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error
@@ -46,14 +57,6 @@ struct Animatable: _JSBridgedClass {
     }
 
     func getAnimations(_ options: JSObject) throws(JSException) -> JSObject {
-        #if arch(wasm32)
-        @_extern(wasm, module: "Check", name: "bjs_Animatable_getAnimations")
-        func bjs_Animatable_getAnimations(_ self: Int32, _ options: Int32) -> Int32
-        #else
-        func bjs_Animatable_getAnimations(_ self: Int32, _ options: Int32) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         let ret = bjs_Animatable_getAnimations(self.bridgeJSLowerParameter(), options.bridgeJSLowerParameter())
         if let error = _swift_js_take_exception() {
             throw error

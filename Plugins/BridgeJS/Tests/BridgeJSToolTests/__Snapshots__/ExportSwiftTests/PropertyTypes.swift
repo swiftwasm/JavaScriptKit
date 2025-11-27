@@ -334,14 +334,15 @@ public func _bjs_PropertyHolder_deinit(pointer: UnsafeMutableRawPointer) {
 
 extension PropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        #if arch(wasm32)
-        @_extern(wasm, module: "TestModule", name: "bjs_PropertyHolder_wrap")
-        func _bjs_PropertyHolder_wrap(_: UnsafeMutableRawPointer) -> Int32
-        #else
-        func _bjs_PropertyHolder_wrap(_: UnsafeMutableRawPointer) -> Int32 {
-            fatalError("Only available on WebAssembly")
-        }
-        #endif
         return .object(JSObject(id: UInt32(bitPattern: _bjs_PropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_PropertyHolder_wrap")
+fileprivate func _bjs_PropertyHolder_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_PropertyHolder_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
