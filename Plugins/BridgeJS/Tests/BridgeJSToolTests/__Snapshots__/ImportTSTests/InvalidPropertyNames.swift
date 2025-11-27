@@ -8,9 +8,9 @@
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_createArrayBuffer")
-func bjs_createArrayBuffer() -> Int32
+fileprivate func bjs_createArrayBuffer() -> Int32
 #else
-func bjs_createArrayBuffer() -> Int32 {
+fileprivate func bjs_createArrayBuffer() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -25,9 +25,9 @@ func createArrayBuffer() throws(JSException) -> ArrayBufferLike {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_createWeirdObject")
-func bjs_createWeirdObject() -> Int32
+fileprivate func bjs_createWeirdObject() -> Int32
 #else
-func bjs_createWeirdObject() -> Int32 {
+fileprivate func bjs_createWeirdObject() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -42,18 +42,18 @@ func createWeirdObject() throws(JSException) -> WeirdNaming {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_ArrayBufferLike_byteLength_get")
-func bjs_ArrayBufferLike_byteLength_get(_ self: Int32) -> Float64
+fileprivate func bjs_ArrayBufferLike_byteLength_get(_ self: Int32) -> Float64
 #else
-func bjs_ArrayBufferLike_byteLength_get(_ self: Int32) -> Float64 {
+fileprivate func bjs_ArrayBufferLike_byteLength_get(_ self: Int32) -> Float64 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_ArrayBufferLike_slice")
-func bjs_ArrayBufferLike_slice(_ self: Int32, _ begin: Float64, _ end: Float64) -> Int32
+fileprivate func bjs_ArrayBufferLike_slice(_ self: Int32, _ begin: Float64, _ end: Float64) -> Int32
 #else
-func bjs_ArrayBufferLike_slice(_ self: Int32, _ begin: Float64, _ end: Float64) -> Int32 {
+fileprivate func bjs_ArrayBufferLike_slice(_ self: Int32, _ begin: Float64, _ end: Float64) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -87,63 +87,63 @@ struct ArrayBufferLike: _JSBridgedClass {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_WeirdNaming_normalProperty_get")
-func bjs_WeirdNaming_normalProperty_get(_ self: Int32) -> Int32
+fileprivate func bjs_WeirdNaming_normalProperty_get(_ self: Int32) -> Int32
 #else
-func bjs_WeirdNaming_normalProperty_get(_ self: Int32) -> Int32 {
+fileprivate func bjs_WeirdNaming_normalProperty_get(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_WeirdNaming_normalProperty_set")
-func bjs_WeirdNaming_normalProperty_set(_ self: Int32, _ newValue: Int32) -> Void
+fileprivate func bjs_WeirdNaming_normalProperty_set(_ self: Int32, _ newValue: Int32) -> Void
 #else
-func bjs_WeirdNaming_normalProperty_set(_ self: Int32, _ newValue: Int32) -> Void {
+fileprivate func bjs_WeirdNaming_normalProperty_set(_ self: Int32, _ newValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_WeirdNaming_for_get")
-func bjs_WeirdNaming_for_get(_ self: Int32) -> Int32
+fileprivate func bjs_WeirdNaming_for_get(_ self: Int32) -> Int32
 #else
-func bjs_WeirdNaming_for_get(_ self: Int32) -> Int32 {
+fileprivate func bjs_WeirdNaming_for_get(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_WeirdNaming_for_set")
-func bjs_WeirdNaming_for_set(_ self: Int32, _ newValue: Int32) -> Void
+fileprivate func bjs_WeirdNaming_for_set(_ self: Int32, _ newValue: Int32) -> Void
 #else
-func bjs_WeirdNaming_for_set(_ self: Int32, _ newValue: Int32) -> Void {
+fileprivate func bjs_WeirdNaming_for_set(_ self: Int32, _ newValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_WeirdNaming_Any_get")
-func bjs_WeirdNaming_Any_get(_ self: Int32) -> Int32
+fileprivate func bjs_WeirdNaming_Any_get(_ self: Int32) -> Int32
 #else
-func bjs_WeirdNaming_Any_get(_ self: Int32) -> Int32 {
+fileprivate func bjs_WeirdNaming_Any_get(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_WeirdNaming_Any_set")
-func bjs_WeirdNaming_Any_set(_ self: Int32, _ newValue: Int32) -> Void
+fileprivate func bjs_WeirdNaming_Any_set(_ self: Int32, _ newValue: Int32) -> Void
 #else
-func bjs_WeirdNaming_Any_set(_ self: Int32, _ newValue: Int32) -> Void {
+fileprivate func bjs_WeirdNaming_Any_set(_ self: Int32, _ newValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_WeirdNaming_as")
-func bjs_WeirdNaming_as(_ self: Int32) -> Void
+fileprivate func bjs_WeirdNaming_as(_ self: Int32) -> Void
 #else
-func bjs_WeirdNaming_as(_ self: Int32) -> Void {
+fileprivate func bjs_WeirdNaming_as(_ self: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif

@@ -116,6 +116,9 @@ public struct ImportTS {
 
         func renderImportDecl() -> DeclSyntax {
             let baseDecl = FunctionDeclSyntax(
+                modifiers: DeclModifierListSyntax(itemsBuilder: {
+                    DeclModifierSyntax(name: .keyword(.fileprivate)).with(\.trailingTrivia, .space)
+                }),
                 funcKeyword: .keyword(.func).with(\.trailingTrivia, .space),
                 name: .identifier(abiName),
                 signature: FunctionSignatureSyntax(

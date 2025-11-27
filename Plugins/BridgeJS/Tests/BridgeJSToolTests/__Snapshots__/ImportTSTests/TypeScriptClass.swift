@@ -8,54 +8,54 @@
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_Greeter_init")
-func bjs_Greeter_init(_ name: Int32) -> Int32
+fileprivate func bjs_Greeter_init(_ name: Int32) -> Int32
 #else
-func bjs_Greeter_init(_ name: Int32) -> Int32 {
+fileprivate func bjs_Greeter_init(_ name: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_Greeter_name_get")
-func bjs_Greeter_name_get(_ self: Int32) -> Int32
+fileprivate func bjs_Greeter_name_get(_ self: Int32) -> Int32
 #else
-func bjs_Greeter_name_get(_ self: Int32) -> Int32 {
+fileprivate func bjs_Greeter_name_get(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_Greeter_name_set")
-func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
+fileprivate func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
 #else
-func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
+fileprivate func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_Greeter_age_get")
-func bjs_Greeter_age_get(_ self: Int32) -> Float64
+fileprivate func bjs_Greeter_age_get(_ self: Int32) -> Float64
 #else
-func bjs_Greeter_age_get(_ self: Int32) -> Float64 {
+fileprivate func bjs_Greeter_age_get(_ self: Int32) -> Float64 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_Greeter_greet")
-func bjs_Greeter_greet(_ self: Int32) -> Int32
+fileprivate func bjs_Greeter_greet(_ self: Int32) -> Int32
 #else
-func bjs_Greeter_greet(_ self: Int32) -> Int32 {
+fileprivate func bjs_Greeter_greet(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_Greeter_changeName")
-func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) -> Void
+fileprivate func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) -> Void
 #else
-func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) -> Void {
+fileprivate func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif

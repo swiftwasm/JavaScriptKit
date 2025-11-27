@@ -8,9 +8,9 @@
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_createTS2Skeleton")
-func bjs_createTS2Skeleton() -> Int32
+fileprivate func bjs_createTS2Skeleton() -> Int32
 #else
-func bjs_createTS2Skeleton() -> Int32 {
+fileprivate func bjs_createTS2Skeleton() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -25,9 +25,9 @@ func createTS2Skeleton() throws(JSException) -> TypeScriptProcessor {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_createCodeGenerator")
-func bjs_createCodeGenerator(_ format: Int32) -> Int32
+fileprivate func bjs_createCodeGenerator(_ format: Int32) -> Int32
 #else
-func bjs_createCodeGenerator(_ format: Int32) -> Int32 {
+fileprivate func bjs_createCodeGenerator(_ format: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -42,27 +42,27 @@ func createCodeGenerator(_ format: String) throws(JSException) -> CodeGenerator 
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_TypeScriptProcessor_version_get")
-func bjs_TypeScriptProcessor_version_get(_ self: Int32) -> Int32
+fileprivate func bjs_TypeScriptProcessor_version_get(_ self: Int32) -> Int32
 #else
-func bjs_TypeScriptProcessor_version_get(_ self: Int32) -> Int32 {
+fileprivate func bjs_TypeScriptProcessor_version_get(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_TypeScriptProcessor_convert")
-func bjs_TypeScriptProcessor_convert(_ self: Int32, _ ts: Int32) -> Int32
+fileprivate func bjs_TypeScriptProcessor_convert(_ self: Int32, _ ts: Int32) -> Int32
 #else
-func bjs_TypeScriptProcessor_convert(_ self: Int32, _ ts: Int32) -> Int32 {
+fileprivate func bjs_TypeScriptProcessor_convert(_ self: Int32, _ ts: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_TypeScriptProcessor_validate")
-func bjs_TypeScriptProcessor_validate(_ self: Int32, _ ts: Int32) -> Int32
+fileprivate func bjs_TypeScriptProcessor_validate(_ self: Int32, _ ts: Int32) -> Int32
 #else
-func bjs_TypeScriptProcessor_validate(_ self: Int32, _ ts: Int32) -> Int32 {
+fileprivate func bjs_TypeScriptProcessor_validate(_ self: Int32, _ ts: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -104,18 +104,18 @@ struct TypeScriptProcessor: _JSBridgedClass {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_CodeGenerator_outputFormat_get")
-func bjs_CodeGenerator_outputFormat_get(_ self: Int32) -> Int32
+fileprivate func bjs_CodeGenerator_outputFormat_get(_ self: Int32) -> Int32
 #else
-func bjs_CodeGenerator_outputFormat_get(_ self: Int32) -> Int32 {
+fileprivate func bjs_CodeGenerator_outputFormat_get(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_CodeGenerator_generate")
-func bjs_CodeGenerator_generate(_ self: Int32, _ input: Int32) -> Int32
+fileprivate func bjs_CodeGenerator_generate(_ self: Int32, _ input: Int32) -> Int32
 #else
-func bjs_CodeGenerator_generate(_ self: Int32, _ input: Int32) -> Int32 {
+fileprivate func bjs_CodeGenerator_generate(_ self: Int32, _ input: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

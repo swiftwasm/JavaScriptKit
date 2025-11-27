@@ -8,9 +8,9 @@
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripVoid")
-func bjs_jsRoundTripVoid() -> Void
+fileprivate func bjs_jsRoundTripVoid() -> Void
 #else
-func bjs_jsRoundTripVoid() -> Void {
+fileprivate func bjs_jsRoundTripVoid() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -24,9 +24,9 @@ func jsRoundTripVoid() throws(JSException) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripNumber")
-func bjs_jsRoundTripNumber(_ v: Float64) -> Float64
+fileprivate func bjs_jsRoundTripNumber(_ v: Float64) -> Float64
 #else
-func bjs_jsRoundTripNumber(_ v: Float64) -> Float64 {
+fileprivate func bjs_jsRoundTripNumber(_ v: Float64) -> Float64 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -41,9 +41,9 @@ func jsRoundTripNumber(_ v: Double) throws(JSException) -> Double {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripBool")
-func bjs_jsRoundTripBool(_ v: Int32) -> Int32
+fileprivate func bjs_jsRoundTripBool(_ v: Int32) -> Int32
 #else
-func bjs_jsRoundTripBool(_ v: Int32) -> Int32 {
+fileprivate func bjs_jsRoundTripBool(_ v: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -58,9 +58,9 @@ func jsRoundTripBool(_ v: Bool) throws(JSException) -> Bool {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripString")
-func bjs_jsRoundTripString(_ v: Int32) -> Int32
+fileprivate func bjs_jsRoundTripString(_ v: Int32) -> Int32
 #else
-func bjs_jsRoundTripString(_ v: Int32) -> Int32 {
+fileprivate func bjs_jsRoundTripString(_ v: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -75,9 +75,9 @@ func jsRoundTripString(_ v: String) throws(JSException) -> String {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsThrowOrVoid")
-func bjs_jsThrowOrVoid(_ shouldThrow: Int32) -> Void
+fileprivate func bjs_jsThrowOrVoid(_ shouldThrow: Int32) -> Void
 #else
-func bjs_jsThrowOrVoid(_ shouldThrow: Int32) -> Void {
+fileprivate func bjs_jsThrowOrVoid(_ shouldThrow: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -91,9 +91,9 @@ func jsThrowOrVoid(_ shouldThrow: Bool) throws(JSException) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsThrowOrNumber")
-func bjs_jsThrowOrNumber(_ shouldThrow: Int32) -> Float64
+fileprivate func bjs_jsThrowOrNumber(_ shouldThrow: Int32) -> Float64
 #else
-func bjs_jsThrowOrNumber(_ shouldThrow: Int32) -> Float64 {
+fileprivate func bjs_jsThrowOrNumber(_ shouldThrow: Int32) -> Float64 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -108,9 +108,9 @@ func jsThrowOrNumber(_ shouldThrow: Bool) throws(JSException) -> Double {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsThrowOrBool")
-func bjs_jsThrowOrBool(_ shouldThrow: Int32) -> Int32
+fileprivate func bjs_jsThrowOrBool(_ shouldThrow: Int32) -> Int32
 #else
-func bjs_jsThrowOrBool(_ shouldThrow: Int32) -> Int32 {
+fileprivate func bjs_jsThrowOrBool(_ shouldThrow: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -125,9 +125,9 @@ func jsThrowOrBool(_ shouldThrow: Bool) throws(JSException) -> Bool {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsThrowOrString")
-func bjs_jsThrowOrString(_ shouldThrow: Int32) -> Int32
+fileprivate func bjs_jsThrowOrString(_ shouldThrow: Int32) -> Int32
 #else
-func bjs_jsThrowOrString(_ shouldThrow: Int32) -> Int32 {
+fileprivate func bjs_jsThrowOrString(_ shouldThrow: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -142,9 +142,9 @@ func jsThrowOrString(_ shouldThrow: Bool) throws(JSException) -> String {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_runAsyncWorks")
-func bjs_runAsyncWorks() -> Int32
+fileprivate func bjs_runAsyncWorks() -> Int32
 #else
-func bjs_runAsyncWorks() -> Int32 {
+fileprivate func bjs_runAsyncWorks() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -159,54 +159,54 @@ func runAsyncWorks() throws(JSException) -> JSPromise {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_init")
-func bjs_JsGreeter_init(_ name: Int32, _ prefix: Int32) -> Int32
+fileprivate func bjs_JsGreeter_init(_ name: Int32, _ prefix: Int32) -> Int32
 #else
-func bjs_JsGreeter_init(_ name: Int32, _ prefix: Int32) -> Int32 {
+fileprivate func bjs_JsGreeter_init(_ name: Int32, _ prefix: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_name_get")
-func bjs_JsGreeter_name_get(_ self: Int32) -> Int32
+fileprivate func bjs_JsGreeter_name_get(_ self: Int32) -> Int32
 #else
-func bjs_JsGreeter_name_get(_ self: Int32) -> Int32 {
+fileprivate func bjs_JsGreeter_name_get(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_name_set")
-func bjs_JsGreeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
+fileprivate func bjs_JsGreeter_name_set(_ self: Int32, _ newValue: Int32) -> Void
 #else
-func bjs_JsGreeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
+fileprivate func bjs_JsGreeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_prefix_get")
-func bjs_JsGreeter_prefix_get(_ self: Int32) -> Int32
+fileprivate func bjs_JsGreeter_prefix_get(_ self: Int32) -> Int32
 #else
-func bjs_JsGreeter_prefix_get(_ self: Int32) -> Int32 {
+fileprivate func bjs_JsGreeter_prefix_get(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_greet")
-func bjs_JsGreeter_greet(_ self: Int32) -> Int32
+fileprivate func bjs_JsGreeter_greet(_ self: Int32) -> Int32
 #else
-func bjs_JsGreeter_greet(_ self: Int32) -> Int32 {
+fileprivate func bjs_JsGreeter_greet(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_changeName")
-func bjs_JsGreeter_changeName(_ self: Int32, _ name: Int32) -> Void
+fileprivate func bjs_JsGreeter_changeName(_ self: Int32, _ name: Int32) -> Void
 #else
-func bjs_JsGreeter_changeName(_ self: Int32, _ name: Int32) -> Void {
+fileprivate func bjs_JsGreeter_changeName(_ self: Int32, _ name: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif

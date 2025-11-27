@@ -8,9 +8,9 @@
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_createDatabaseConnection")
-func bjs_createDatabaseConnection(_ config: Int32) -> Int32
+fileprivate func bjs_createDatabaseConnection(_ config: Int32) -> Int32
 #else
-func bjs_createDatabaseConnection(_ config: Int32) -> Int32 {
+fileprivate func bjs_createDatabaseConnection(_ config: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -25,9 +25,9 @@ func createDatabaseConnection(_ config: JSObject) throws(JSException) -> Databas
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_createLogger")
-func bjs_createLogger(_ level: Int32) -> Int32
+fileprivate func bjs_createLogger(_ level: Int32) -> Int32
 #else
-func bjs_createLogger(_ level: Int32) -> Int32 {
+fileprivate func bjs_createLogger(_ level: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -42,9 +42,9 @@ func createLogger(_ level: String) throws(JSException) -> Logger {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_getConfigManager")
-func bjs_getConfigManager() -> Int32
+fileprivate func bjs_getConfigManager() -> Int32
 #else
-func bjs_getConfigManager() -> Int32 {
+fileprivate func bjs_getConfigManager() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -59,45 +59,45 @@ func getConfigManager() throws(JSException) -> ConfigManager {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_DatabaseConnection_isConnected_get")
-func bjs_DatabaseConnection_isConnected_get(_ self: Int32) -> Int32
+fileprivate func bjs_DatabaseConnection_isConnected_get(_ self: Int32) -> Int32
 #else
-func bjs_DatabaseConnection_isConnected_get(_ self: Int32) -> Int32 {
+fileprivate func bjs_DatabaseConnection_isConnected_get(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_DatabaseConnection_connectionTimeout_get")
-func bjs_DatabaseConnection_connectionTimeout_get(_ self: Int32) -> Float64
+fileprivate func bjs_DatabaseConnection_connectionTimeout_get(_ self: Int32) -> Float64
 #else
-func bjs_DatabaseConnection_connectionTimeout_get(_ self: Int32) -> Float64 {
+fileprivate func bjs_DatabaseConnection_connectionTimeout_get(_ self: Int32) -> Float64 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_DatabaseConnection_connectionTimeout_set")
-func bjs_DatabaseConnection_connectionTimeout_set(_ self: Int32, _ newValue: Float64) -> Void
+fileprivate func bjs_DatabaseConnection_connectionTimeout_set(_ self: Int32, _ newValue: Float64) -> Void
 #else
-func bjs_DatabaseConnection_connectionTimeout_set(_ self: Int32, _ newValue: Float64) -> Void {
+fileprivate func bjs_DatabaseConnection_connectionTimeout_set(_ self: Int32, _ newValue: Float64) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_DatabaseConnection_connect")
-func bjs_DatabaseConnection_connect(_ self: Int32, _ url: Int32) -> Void
+fileprivate func bjs_DatabaseConnection_connect(_ self: Int32, _ url: Int32) -> Void
 #else
-func bjs_DatabaseConnection_connect(_ self: Int32, _ url: Int32) -> Void {
+fileprivate func bjs_DatabaseConnection_connect(_ self: Int32, _ url: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_DatabaseConnection_execute")
-func bjs_DatabaseConnection_execute(_ self: Int32, _ query: Int32) -> Int32
+fileprivate func bjs_DatabaseConnection_execute(_ self: Int32, _ query: Int32) -> Int32
 #else
-func bjs_DatabaseConnection_execute(_ self: Int32, _ query: Int32) -> Int32 {
+fileprivate func bjs_DatabaseConnection_execute(_ self: Int32, _ query: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -155,27 +155,27 @@ struct DatabaseConnection: _JSBridgedClass {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_Logger_level_get")
-func bjs_Logger_level_get(_ self: Int32) -> Int32
+fileprivate func bjs_Logger_level_get(_ self: Int32) -> Int32
 #else
-func bjs_Logger_level_get(_ self: Int32) -> Int32 {
+fileprivate func bjs_Logger_level_get(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_Logger_log")
-func bjs_Logger_log(_ self: Int32, _ message: Int32) -> Void
+fileprivate func bjs_Logger_log(_ self: Int32, _ message: Int32) -> Void
 #else
-func bjs_Logger_log(_ self: Int32, _ message: Int32) -> Void {
+fileprivate func bjs_Logger_log(_ self: Int32, _ message: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_Logger_error")
-func bjs_Logger_error(_ self: Int32, _ message: Int32, _ error: Int32) -> Void
+fileprivate func bjs_Logger_error(_ self: Int32, _ message: Int32, _ error: Int32) -> Void
 #else
-func bjs_Logger_error(_ self: Int32, _ message: Int32, _ error: Int32) -> Void {
+fileprivate func bjs_Logger_error(_ self: Int32, _ message: Int32, _ error: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -215,27 +215,27 @@ struct Logger: _JSBridgedClass {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_ConfigManager_configPath_get")
-func bjs_ConfigManager_configPath_get(_ self: Int32) -> Int32
+fileprivate func bjs_ConfigManager_configPath_get(_ self: Int32) -> Int32
 #else
-func bjs_ConfigManager_configPath_get(_ self: Int32) -> Int32 {
+fileprivate func bjs_ConfigManager_configPath_get(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_ConfigManager_get")
-func bjs_ConfigManager_get(_ self: Int32, _ key: Int32) -> Int32
+fileprivate func bjs_ConfigManager_get(_ self: Int32, _ key: Int32) -> Int32
 #else
-func bjs_ConfigManager_get(_ self: Int32, _ key: Int32) -> Int32 {
+fileprivate func bjs_ConfigManager_get(_ self: Int32, _ key: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_ConfigManager_set")
-func bjs_ConfigManager_set(_ self: Int32, _ key: Int32, _ value: Int32) -> Void
+fileprivate func bjs_ConfigManager_set(_ self: Int32, _ key: Int32, _ value: Int32) -> Void
 #else
-func bjs_ConfigManager_set(_ self: Int32, _ key: Int32, _ value: Int32) -> Void {
+fileprivate func bjs_ConfigManager_set(_ self: Int32, _ key: Int32, _ value: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif

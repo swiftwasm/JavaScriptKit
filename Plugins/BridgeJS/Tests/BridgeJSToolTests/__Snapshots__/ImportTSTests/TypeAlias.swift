@@ -8,9 +8,9 @@
 
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_checkSimple")
-func bjs_checkSimple(_ a: Float64) -> Void
+fileprivate func bjs_checkSimple(_ a: Float64) -> Void
 #else
-func bjs_checkSimple(_ a: Float64) -> Void {
+fileprivate func bjs_checkSimple(_ a: Float64) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif

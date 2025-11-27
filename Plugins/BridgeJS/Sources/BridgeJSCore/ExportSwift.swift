@@ -2501,11 +2501,11 @@ public class ExportSwift {
     /// ```swift
     /// extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     ///     var jsValue: JSValue {
-    ///         @_extern(wasm, module: "MyModule", name: "bjs_Greeter_wrap")
-    ///         func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
     ///         return JSObject(id: UInt32(bitPattern: _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque())))
     ///     }
     /// }
+    /// @_extern(wasm, module: "MyModule", name: "bjs_Greeter_wrap")
+    /// fileprivate func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
     /// ```
     func renderConvertibleToJSValueExtension(klass: ExportedClass) -> [DeclSyntax] {
         let wrapFunctionName = "_bjs_\(klass.name)_wrap"

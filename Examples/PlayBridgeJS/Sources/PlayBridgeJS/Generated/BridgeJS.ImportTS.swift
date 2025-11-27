@@ -8,9 +8,9 @@
 
 #if arch(wasm32)
 @_extern(wasm, module: "PlayBridgeJS", name: "bjs_createTS2Skeleton")
-func bjs_createTS2Skeleton() -> Int32
+fileprivate func bjs_createTS2Skeleton() -> Int32
 #else
-func bjs_createTS2Skeleton() -> Int32 {
+fileprivate func bjs_createTS2Skeleton() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -25,9 +25,9 @@ func createTS2Skeleton() throws(JSException) -> TS2Skeleton {
 
 #if arch(wasm32)
 @_extern(wasm, module: "PlayBridgeJS", name: "bjs_TS2Skeleton_convert")
-func bjs_TS2Skeleton_convert(_ self: Int32, _ ts: Int32) -> Int32
+fileprivate func bjs_TS2Skeleton_convert(_ self: Int32, _ ts: Int32) -> Int32
 #else
-func bjs_TS2Skeleton_convert(_ self: Int32, _ ts: Int32) -> Int32 {
+fileprivate func bjs_TS2Skeleton_convert(_ self: Int32, _ ts: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

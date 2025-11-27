@@ -8,9 +8,9 @@
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkHelperNoop")
-func bjs_benchmarkHelperNoop() -> Void
+fileprivate func bjs_benchmarkHelperNoop() -> Void
 #else
-func bjs_benchmarkHelperNoop() -> Void {
+fileprivate func bjs_benchmarkHelperNoop() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -24,9 +24,9 @@ func benchmarkHelperNoop() throws(JSException) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkHelperNoopWithNumber")
-func bjs_benchmarkHelperNoopWithNumber(_ n: Float64) -> Void
+fileprivate func bjs_benchmarkHelperNoopWithNumber(_ n: Float64) -> Void
 #else
-func bjs_benchmarkHelperNoopWithNumber(_ n: Float64) -> Void {
+fileprivate func bjs_benchmarkHelperNoopWithNumber(_ n: Float64) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -40,9 +40,9 @@ func benchmarkHelperNoopWithNumber(_ n: Double) throws(JSException) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkRunner")
-func bjs_benchmarkRunner(_ name: Int32, _ body: Int32) -> Void
+fileprivate func bjs_benchmarkRunner(_ name: Int32, _ body: Int32) -> Void
 #else
-func bjs_benchmarkRunner(_ name: Int32, _ body: Int32) -> Void {
+fileprivate func bjs_benchmarkRunner(_ name: Int32, _ body: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
