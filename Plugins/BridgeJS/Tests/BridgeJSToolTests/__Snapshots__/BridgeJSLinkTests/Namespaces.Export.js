@@ -185,12 +185,12 @@ export async function createInstantiator(options, swift) {
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
             }
-            importObject["TestModule"]["bjs_Greeter_wrap"] = function(pointer) {
-                const obj = Greeter.__construct(pointer);
-                return swift.memory.retain(obj);
-            };
             importObject["TestModule"]["bjs_Converter_wrap"] = function(pointer) {
                 const obj = Converter.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
+            importObject["TestModule"]["bjs_Greeter_wrap"] = function(pointer) {
+                const obj = Greeter.__construct(pointer);
                 return swift.memory.retain(obj);
             };
             importObject["TestModule"]["bjs_UUID_wrap"] = function(pointer) {
@@ -275,24 +275,6 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
             }
-            if (typeof globalThis.MyModule === 'undefined') {
-                globalThis.MyModule = {};
-            }
-            if (typeof globalThis.MyModule.Utils === 'undefined') {
-                globalThis.MyModule.Utils = {};
-            }
-            if (typeof globalThis.Utils === 'undefined') {
-                globalThis.Utils = {};
-            }
-            if (typeof globalThis.Utils.Converters === 'undefined') {
-                globalThis.Utils.Converters = {};
-            }
-            if (typeof globalThis.__Swift === 'undefined') {
-                globalThis.__Swift = {};
-            }
-            if (typeof globalThis.__Swift.Foundation === 'undefined') {
-                globalThis.__Swift.Foundation = {};
-            }
             const exports = {
                 plainFunction: function bjs_plainFunction() {
                     instance.exports.bjs_plainFunction();
@@ -323,10 +305,6 @@ export async function createInstantiator(options, swift) {
                 },
             };
             _exports = exports;
-            globalThis.__Swift.Foundation.Greeter = exports.__Swift.Foundation.Greeter;
-            globalThis.Utils.Converters.Converter = exports.Utils.Converters.Converter;
-            globalThis.__Swift.Foundation.UUID = exports.__Swift.Foundation.UUID;
-            globalThis.MyModule.Utils.namespacedFunction = exports.MyModule.Utils.namespacedFunction;
             return exports;
         },
     }

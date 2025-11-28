@@ -265,6 +265,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
 
     public let name: String
     public let swiftCallName: String
+    public let tsFullPath: String
     public let explicitAccessControl: String?
     public var cases: [EnumCase]
     public let rawType: SwiftEnumRawType?
@@ -293,6 +294,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
     public init(
         name: String,
         swiftCallName: String,
+        tsFullPath: String,
         explicitAccessControl: String?,
         cases: [EnumCase],
         rawType: SwiftEnumRawType?,
@@ -303,6 +305,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable {
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
+        self.tsFullPath = tsFullPath
         self.explicitAccessControl = explicitAccessControl
         self.cases = cases
         self.rawType = rawType
@@ -496,19 +499,27 @@ public struct ExportedSkeleton: Codable {
     public let classes: [ExportedClass]
     public let enums: [ExportedEnum]
     public let protocols: [ExportedProtocol]
+    /// Whether to expose exported APIs to the global namespace.
+    ///
+    /// When `true`, exported functions, classes, and namespaces are available
+    /// via `globalThis` in JavaScript. When `false`, they are only available
+    /// through the exports object.
+    public var exposeToGlobal: Bool
 
     public init(
         moduleName: String,
         functions: [ExportedFunction],
         classes: [ExportedClass],
         enums: [ExportedEnum],
-        protocols: [ExportedProtocol] = []
+        protocols: [ExportedProtocol] = [],
+        exposeToGlobal: Bool
     ) {
         self.moduleName = moduleName
         self.functions = functions
         self.classes = classes
         self.enums = enums
         self.protocols = protocols
+        self.exposeToGlobal = exposeToGlobal
     }
 }
 

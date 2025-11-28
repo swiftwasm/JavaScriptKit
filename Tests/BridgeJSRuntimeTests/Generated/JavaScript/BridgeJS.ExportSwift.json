@@ -3156,7 +3156,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Direction"
+      "swiftCallName" : "Direction",
+      "tsFullPath" : "Direction"
     },
     {
       "cases" : [
@@ -3187,7 +3188,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Status"
+      "swiftCallName" : "Status",
+      "tsFullPath" : "Status"
     },
     {
       "cases" : [
@@ -3222,7 +3224,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Theme"
+      "swiftCallName" : "Theme",
+      "tsFullPath" : "Theme"
     },
     {
       "cases" : [
@@ -3264,7 +3267,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "HttpStatus"
+      "swiftCallName" : "HttpStatus",
+      "tsFullPath" : "HttpStatus"
     },
     {
       "cases" : [
@@ -3301,7 +3305,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "TSDirection"
+      "swiftCallName" : "TSDirection",
+      "tsFullPath" : "TSDirection"
     },
     {
       "cases" : [
@@ -3336,7 +3341,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "TSTheme"
+      "swiftCallName" : "TSTheme",
+      "tsFullPath" : "TSTheme"
     },
     {
       "cases" : [
@@ -3350,7 +3356,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Utils"
+      "swiftCallName" : "Utils",
+      "tsFullPath" : "Utils"
     },
     {
       "cases" : [
@@ -3364,7 +3371,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Networking"
+      "swiftCallName" : "Networking",
+      "tsFullPath" : "Networking"
     },
     {
       "cases" : [
@@ -3381,7 +3389,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Networking.API"
+      "swiftCallName" : "Networking.API",
+      "tsFullPath" : "Networking.API"
     },
     {
       "cases" : [
@@ -3422,7 +3431,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Networking.API.Method"
+      "swiftCallName" : "Networking.API.Method",
+      "tsFullPath" : "Networking.API.Method"
     },
     {
       "cases" : [
@@ -3436,7 +3446,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Configuration"
+      "swiftCallName" : "Configuration",
+      "tsFullPath" : "Configuration"
     },
     {
       "cases" : [
@@ -3481,7 +3492,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Configuration.LogLevel"
+      "swiftCallName" : "Configuration.LogLevel",
+      "tsFullPath" : "Configuration.LogLevel"
     },
     {
       "cases" : [
@@ -3519,7 +3531,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Configuration.Port"
+      "swiftCallName" : "Configuration.Port",
+      "tsFullPath" : "Configuration.Port"
     },
     {
       "cases" : [
@@ -3537,7 +3550,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Internal"
+      "swiftCallName" : "Internal",
+      "tsFullPath" : "Networking.APIV2.Internal"
     },
     {
       "cases" : [
@@ -3567,7 +3581,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Internal.SupportedMethod"
+      "swiftCallName" : "Internal.SupportedMethod",
+      "tsFullPath" : "Networking.APIV2.Internal.SupportedMethod"
     },
     {
       "cases" : [
@@ -3646,7 +3661,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "APIResult"
+      "swiftCallName" : "APIResult",
+      "tsFullPath" : "APIResult"
     },
     {
       "cases" : [
@@ -3842,7 +3858,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "ComplexResult"
+      "swiftCallName" : "ComplexResult",
+      "tsFullPath" : "ComplexResult"
     },
     {
       "cases" : [
@@ -3856,7 +3873,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Utilities"
+      "swiftCallName" : "Utilities",
+      "tsFullPath" : "Utilities"
     },
     {
       "cases" : [
@@ -3929,7 +3947,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Utilities.Result"
+      "swiftCallName" : "Utilities.Result",
+      "tsFullPath" : "Utilities.Result"
     },
     {
       "cases" : [
@@ -3943,7 +3962,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "API"
+      "swiftCallName" : "API",
+      "tsFullPath" : "API"
     },
     {
       "cases" : [
@@ -3990,7 +4010,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "API.NetworkingResult"
+      "swiftCallName" : "API.NetworkingResult",
+      "tsFullPath" : "API.NetworkingResult"
     },
     {
       "cases" : [
@@ -4084,7 +4105,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "APIOptionalResult"
+      "swiftCallName" : "APIOptionalResult",
+      "tsFullPath" : "APIOptionalResult"
     },
     {
       "cases" : [
@@ -4138,7 +4160,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "StaticCalculator"
+      "swiftCallName" : "StaticCalculator",
+      "tsFullPath" : "StaticCalculator"
     },
     {
       "cases" : [
@@ -4152,7 +4175,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "StaticUtils"
+      "swiftCallName" : "StaticUtils",
+      "tsFullPath" : "StaticUtils"
     },
     {
       "cases" : [
@@ -4202,7 +4226,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "StaticUtils.Nested"
+      "swiftCallName" : "StaticUtils.Nested",
+      "tsFullPath" : "StaticUtils.Nested"
     },
     {
       "cases" : [
@@ -4316,7 +4341,8 @@
           }
         }
       ],
-      "swiftCallName" : "StaticPropertyEnum"
+      "swiftCallName" : "StaticPropertyEnum",
+      "tsFullPath" : "StaticPropertyEnum"
     },
     {
       "cases" : [
@@ -4365,7 +4391,8 @@
           }
         }
       ],
-      "swiftCallName" : "StaticPropertyNamespace"
+      "swiftCallName" : "StaticPropertyNamespace",
+      "tsFullPath" : "StaticPropertyNamespace"
     },
     {
       "cases" : [
@@ -4438,9 +4465,11 @@
           }
         }
       ],
-      "swiftCallName" : "StaticPropertyNamespace.NestedProperties"
+      "swiftCallName" : "StaticPropertyNamespace.NestedProperties",
+      "tsFullPath" : "StaticPropertyNamespace.NestedProperties"
     }
   ],
+  "exposeToGlobal" : false,
   "functions" : [
     {
       "abiName" : "bjs_roundTripVoid",
@@ -7370,23 +7399,6 @@
       "returnType" : {
         "swiftHeapObject" : {
           "_0" : "StaticPropertyHolder"
-        }
-      }
-    },
-    {
-      "abiName" : "bjs_getAllStaticPropertyValues",
-      "effects" : {
-        "isAsync" : false,
-        "isStatic" : false,
-        "isThrows" : false
-      },
-      "name" : "getAllStaticPropertyValues",
-      "parameters" : [
-
-      ],
-      "returnType" : {
-        "string" : {
-
         }
       }
     },

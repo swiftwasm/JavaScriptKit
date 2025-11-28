@@ -3265,17 +3265,6 @@ public func _bjs_testEmptyInit(object: UnsafeMutableRawPointer) -> UnsafeMutable
     #endif
 }
 
-@_expose(wasm, "bjs_getAllStaticPropertyValues")
-@_cdecl("bjs_getAllStaticPropertyValues")
-public func _bjs_getAllStaticPropertyValues() -> Void {
-    #if arch(wasm32)
-    let ret = getAllStaticPropertyValues()
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
 @_expose(wasm, "bjs_formatName")
 @_cdecl("bjs_formatName")
 public func _bjs_formatName(nameBytes: Int32, nameLength: Int32, transform: Int32) -> Void {

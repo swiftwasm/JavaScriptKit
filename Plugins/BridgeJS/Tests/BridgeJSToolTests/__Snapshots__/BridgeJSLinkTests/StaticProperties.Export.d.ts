@@ -16,20 +16,6 @@ export type PropertyEnumObject = typeof PropertyEnumValues & {
     computedEnum: string;
 };
 
-export {};
-
-declare global {
-    namespace PropertyNamespace {
-        var namespaceConstant: string;
-        let namespaceProperty: string;
-        namespace Nested {
-            var nestedConstant: string;
-            let nestedDouble: number;
-            let nestedProperty: number;
-        }
-    }
-}
-
 /// Represents a Swift heap object like a class instance or an actor instance.
 export interface SwiftHeapObject {
     /// Release the heap object.

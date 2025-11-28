@@ -107,6 +107,8 @@ extension BridgeJSCommandPlugin.Context {
                 "export",
                 "--module-name",
                 target.name,
+                "--target-dir",
+                target.directoryURL.path,
                 "--output-skeleton",
                 generatedJavaScriptDirectory.appending(path: "BridgeJS.ExportSwift.json").path,
                 "--output-swift",

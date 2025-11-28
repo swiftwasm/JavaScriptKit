@@ -285,7 +285,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Direction"
+      "swiftCallName" : "Direction",
+      "tsFullPath" : "Direction"
     },
     {
       "cases" : [
@@ -313,7 +314,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "ExampleEnum"
+      "swiftCallName" : "ExampleEnum",
+      "tsFullPath" : "ExampleEnum"
     },
     {
       "cases" : [
@@ -350,7 +352,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Result"
+      "swiftCallName" : "Result",
+      "tsFullPath" : "Result"
     },
     {
       "cases" : [
@@ -385,9 +388,11 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Priority"
+      "swiftCallName" : "Priority",
+      "tsFullPath" : "Priority"
     }
   ],
+  "exposeToGlobal" : false,
   "functions" : [
 
   ],

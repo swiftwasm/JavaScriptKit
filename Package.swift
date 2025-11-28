@@ -180,5 +180,18 @@ let package = Package(
             ],
             linkerSettings: testingLinkerFlags
         ),
+        .testTarget(
+            name: "BridgeJSGlobalTests",
+            dependencies: ["JavaScriptKit", "JavaScriptEventLoop"],
+            exclude: [
+                "bridge-js.config.json",
+                "bridge-js.d.ts",
+                "Generated/JavaScript",
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("Extern")
+            ],
+            linkerSettings: testingLinkerFlags
+        ),
     ]
 )

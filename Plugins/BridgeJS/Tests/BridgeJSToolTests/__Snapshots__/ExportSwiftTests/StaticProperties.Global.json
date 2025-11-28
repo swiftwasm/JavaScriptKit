@@ -1,0 +1,337 @@
+{
+  "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_PropertyClass_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+
+      ],
+      "name" : "PropertyClass",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "staticConstant",
+          "staticContext" : {
+            "className" : {
+              "_0" : "PropertyClass"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "staticVariable",
+          "staticContext" : {
+            "className" : {
+              "_0" : "PropertyClass"
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "jsObjectProperty",
+          "staticContext" : {
+            "className" : {
+              "_0" : "PropertyClass"
+            }
+          },
+          "type" : {
+            "jsObject" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "classVariable",
+          "staticContext" : {
+            "className" : {
+              "_0" : "PropertyClass"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "computedProperty",
+          "staticContext" : {
+            "className" : {
+              "_0" : "PropertyClass"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "readOnlyComputed",
+          "staticContext" : {
+            "className" : {
+              "_0" : "PropertyClass"
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "optionalProperty",
+          "staticContext" : {
+            "className" : {
+              "_0" : "PropertyClass"
+            }
+          },
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "PropertyClass"
+    }
+  ],
+  "enums" : [
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "value1"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "value2"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "PropertyEnum",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "enumProperty",
+          "staticContext" : {
+            "enumName" : {
+              "_0" : "PropertyEnum"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "enumConstant",
+          "staticContext" : {
+            "enumName" : {
+              "_0" : "PropertyEnum"
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "computedEnum",
+          "staticContext" : {
+            "enumName" : {
+              "_0" : "PropertyEnum"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "PropertyEnum",
+      "tsFullPath" : "PropertyEnum"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "PropertyNamespace",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "namespaceProperty",
+          "namespace" : [
+            "PropertyNamespace"
+          ],
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "namespaceConstant",
+          "namespace" : [
+            "PropertyNamespace"
+          ],
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "PropertyNamespace",
+      "tsFullPath" : "PropertyNamespace"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "Nested",
+      "namespace" : [
+        "PropertyNamespace"
+      ],
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "nestedProperty",
+          "namespace" : [
+            "PropertyNamespace",
+            "Nested"
+          ],
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "nestedConstant",
+          "namespace" : [
+            "PropertyNamespace",
+            "Nested"
+          ],
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "nestedDouble",
+          "namespace" : [
+            "PropertyNamespace",
+            "Nested"
+          ],
+          "staticContext" : {
+            "namespaceEnum" : {
+
+            }
+          },
+          "type" : {
+            "double" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "PropertyNamespace.Nested",
+      "tsFullPath" : "PropertyNamespace.Nested"
+    }
+  ],
+  "exposeToGlobal" : true,
+  "functions" : [
+
+  ],
+  "moduleName" : "TestModule",
+  "protocols" : [
+
+  ]
+}

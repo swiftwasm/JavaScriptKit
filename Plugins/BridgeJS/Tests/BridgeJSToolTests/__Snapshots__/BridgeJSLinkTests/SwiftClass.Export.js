@@ -189,12 +189,12 @@ export async function createInstantiator(options, swift) {
                 const obj = Greeter.__construct(pointer);
                 return swift.memory.retain(obj);
             };
-            importObject["TestModule"]["bjs_PublicGreeter_wrap"] = function(pointer) {
-                const obj = PublicGreeter.__construct(pointer);
-                return swift.memory.retain(obj);
-            };
             importObject["TestModule"]["bjs_PackageGreeter_wrap"] = function(pointer) {
                 const obj = PackageGreeter.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
+            importObject["TestModule"]["bjs_PublicGreeter_wrap"] = function(pointer) {
+                const obj = PublicGreeter.__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },

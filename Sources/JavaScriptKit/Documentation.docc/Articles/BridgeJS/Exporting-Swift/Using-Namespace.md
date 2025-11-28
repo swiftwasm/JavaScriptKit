@@ -73,17 +73,19 @@ import JavaScriptKit
 }
 ```
 
-In JavaScript, this class is accessible through its namespace in two ways:
+In JavaScript, this class is accessible through its namespace:
 
 ```javascript
-// Recommended: Access via the exports object (supports multiple WASM instances)
+// Always available: Access via the exports object (supports multiple WASM instances)
 const greeter = new exports.__Swift.Foundation.Greeter("World");
 console.log(greeter.greet()); // "Hello, World!"
 
-// Alternative: Access via globalThis and through its namespace
+// When exposeToGlobal: true - Also available via globalThis
 const greeter = new globalThis.__Swift.Foundation.Greeter("World");
 console.log(greeter.greet()); // "Hello, World!"
 ```
+
+> Note: Global namespace access via `globalThis` is only available when `exposeToGlobal: true` is set in your `bridge-js.config.json`. See <doc:BridgeJS-Configuration> for more details.
 
 The generated TypeScript declaration will organize the class within its namespace:
 

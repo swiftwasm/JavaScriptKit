@@ -20,7 +20,7 @@ import BridgeJSUtilities
 public class ExportSwift {
     let progress: ProgressReporting
     let moduleName: String
-
+    private let exposeToGlobal: Bool
     private var exportedFunctions: [ExportedFunction] = []
     private var exportedClasses: [ExportedClass] = []
     private var exportedEnums: [ExportedEnum] = []
@@ -30,9 +30,10 @@ public class ExportSwift {
     private let enumCodegen: EnumCodegen = EnumCodegen()
     private let closureCodegen = ClosureCodegen()
 
-    public init(progress: ProgressReporting, moduleName: String) {
+    public init(progress: ProgressReporting, moduleName: String, exposeToGlobal: Bool) {
         self.progress = progress
         self.moduleName = moduleName
+        self.exposeToGlobal = exposeToGlobal
     }
 
     /// Processes a Swift source file to find declarations marked with @JS
@@ -55,6 +56,8 @@ public class ExportSwift {
 
     /// Finalizes the export process and generates the bridge code
     ///
+    /// - Parameters:
+    ///   - exposeToGlobal: Whether to expose exported APIs to the global namespace (default: false)
     /// - Returns: A tuple containing the generated Swift code and a skeleton
     /// describing the exported APIs
     public func finalize() throws -> (outputSwift: String, outputSkeleton: ExportedSkeleton)? {
@@ -68,7 +71,8 @@ public class ExportSwift {
                 functions: exportedFunctions,
                 classes: exportedClasses,
                 enums: exportedEnums,
-                protocols: exportedProtocols
+                protocols: exportedProtocols,
+                exposeToGlobal: exposeToGlobal
             )
         )
     }
@@ -882,10 +886,18 @@ public class ExportSwift {
                 message: "Enum visibility must be at least internal"
             )
 
+            let tsFullPath: String
+            if let namespace = namespaceResult.namespace, !namespace.isEmpty {
+                tsFullPath = namespace.joined(separator: ".") + "." + name
+            } else {
+                tsFullPath = name
+            }
+
             // Create enum directly in dictionary
             let exportedEnum = ExportedEnum(
                 name: name,
                 swiftCallName: swiftCallName,
+                tsFullPath: tsFullPath,
                 explicitAccessControl: explicitAccessControl,
                 cases: [],  // Will be populated in visit(EnumCaseDeclSyntax)
                 rawType: SwiftEnumRawType(rawType),

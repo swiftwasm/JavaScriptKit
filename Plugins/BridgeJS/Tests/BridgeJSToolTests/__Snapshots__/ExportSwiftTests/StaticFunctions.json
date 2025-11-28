@@ -186,7 +186,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Calculator"
+      "swiftCallName" : "Calculator",
+      "tsFullPath" : "Calculator"
     },
     {
       "cases" : [
@@ -252,7 +253,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "APIResult"
+      "swiftCallName" : "APIResult",
+      "tsFullPath" : "APIResult"
     },
     {
       "cases" : [
@@ -266,7 +268,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Utils"
+      "swiftCallName" : "Utils",
+      "tsFullPath" : "Utils"
     },
     {
       "cases" : [
@@ -316,9 +319,11 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Utils.String"
+      "swiftCallName" : "Utils.String",
+      "tsFullPath" : "Utils.String"
     }
   ],
+  "exposeToGlobal" : false,
   "functions" : [
 
   ],

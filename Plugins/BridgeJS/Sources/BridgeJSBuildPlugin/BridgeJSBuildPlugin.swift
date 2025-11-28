@@ -44,6 +44,8 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
                 "export",
                 "--module-name",
                 target.name,
+                "--target-dir",
+                target.directoryURL.path,
                 "--output-skeleton",
                 outputSkeletonPath.path,
                 "--output-swift",

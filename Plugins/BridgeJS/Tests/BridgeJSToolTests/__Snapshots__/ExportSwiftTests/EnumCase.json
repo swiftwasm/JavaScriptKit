@@ -38,7 +38,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Direction"
+      "swiftCallName" : "Direction",
+      "tsFullPath" : "Direction"
     },
     {
       "cases" : [
@@ -69,7 +70,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Status"
+      "swiftCallName" : "Status",
+      "tsFullPath" : "Status"
     },
     {
       "cases" : [
@@ -106,7 +108,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "TSDirection"
+      "swiftCallName" : "TSDirection",
+      "tsFullPath" : "TSDirection"
     },
     {
       "cases" : [
@@ -126,9 +129,11 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "PublicStatus"
+      "swiftCallName" : "PublicStatus",
+      "tsFullPath" : "PublicStatus"
     }
   ],
+  "exposeToGlobal" : false,
   "functions" : [
     {
       "abiName" : "bjs_setDirection",

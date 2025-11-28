@@ -135,6 +135,7 @@
   "enums" : [
 
   ],
+  "exposeToGlobal" : false,
   "functions" : [
 
   ],

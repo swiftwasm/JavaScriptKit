@@ -1,0 +1,74 @@
+{
+  "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_GlobalClass_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_GlobalClass_greet",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "greet",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "GlobalClass",
+      "namespace" : [
+        "GlobalAPI"
+      ],
+      "properties" : [
+
+      ],
+      "swiftCallName" : "GlobalClass"
+    }
+  ],
+  "enums" : [
+
+  ],
+  "exposeToGlobal" : false,
+  "functions" : [
+    {
+      "abiName" : "bjs_GlobalAPI_globalFunction",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "globalFunction",
+      "namespace" : [
+        "GlobalAPI"
+      ],
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    }
+  ],
+  "moduleName" : "TestModule",
+  "protocols" : [
+
+  ]
+}

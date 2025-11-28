@@ -29,25 +29,6 @@ export const SupportedMethodValues = {
     Post: 1,
 };
 
-if (typeof globalThis.Configuration === 'undefined') {
-    globalThis.Configuration = {};
-}
-if (typeof globalThis.Networking === 'undefined') {
-    globalThis.Networking = {};
-}
-if (typeof globalThis.Networking.API === 'undefined') {
-    globalThis.Networking.API = {};
-}
-if (typeof globalThis.Networking.APIV2 === 'undefined') {
-    globalThis.Networking.APIV2 = {};
-}
-if (typeof globalThis.Networking.APIV2.Internal === 'undefined') {
-    globalThis.Networking.APIV2.Internal = {};
-}
-globalThis.Networking.API.MethodValues = MethodValues;
-globalThis.Configuration.LogLevelValues = LogLevelValues;
-globalThis.Configuration.PortValues = PortValues;
-globalThis.Networking.APIV2.Internal.SupportedMethodValues = SupportedMethodValues;
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -314,24 +295,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_TestServer_call(this.pointer, method);
                 }
             }
-            if (typeof globalThis.Configuration === 'undefined') {
-                globalThis.Configuration = {};
-            }
-            if (typeof globalThis.Networking === 'undefined') {
-                globalThis.Networking = {};
-            }
-            if (typeof globalThis.Networking.API === 'undefined') {
-                globalThis.Networking.API = {};
-            }
-            if (typeof globalThis.Networking.APIV2 === 'undefined') {
-                globalThis.Networking.APIV2 = {};
-            }
-            if (typeof globalThis.Networking.APIV2.Internal === 'undefined') {
-                globalThis.Networking.APIV2.Internal = {};
-            }
-            if (typeof globalThis.Utils === 'undefined') {
-                globalThis.Utils = {};
-            }
             const exports = {
                 Configuration: {
                     LogLevel: LogLevelValues,
@@ -354,9 +317,6 @@ export async function createInstantiator(options, swift) {
                 },
             };
             _exports = exports;
-            globalThis.Utils.Converter = exports.Utils.Converter;
-            globalThis.Networking.API.HTTPServer = exports.Networking.API.HTTPServer;
-            globalThis.Networking.APIV2.Internal.TestServer = exports.Networking.APIV2.Internal.TestServer;
             return exports;
         },
     }

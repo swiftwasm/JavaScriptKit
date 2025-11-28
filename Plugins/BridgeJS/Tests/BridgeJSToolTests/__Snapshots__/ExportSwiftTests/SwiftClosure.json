@@ -899,7 +899,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Direction"
+      "swiftCallName" : "Direction",
+      "tsFullPath" : "Direction"
     },
     {
       "cases" : [
@@ -934,7 +935,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "Theme"
+      "swiftCallName" : "Theme",
+      "tsFullPath" : "Theme"
     },
     {
       "cases" : [
@@ -976,7 +978,8 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "HttpStatus"
+      "swiftCallName" : "HttpStatus",
+      "tsFullPath" : "HttpStatus"
     },
     {
       "cases" : [
@@ -1055,9 +1058,11 @@
       "staticProperties" : [
 
       ],
-      "swiftCallName" : "APIResult"
+      "swiftCallName" : "APIResult",
+      "tsFullPath" : "APIResult"
     }
   ],
+  "exposeToGlobal" : false,
   "functions" : [
 
   ],

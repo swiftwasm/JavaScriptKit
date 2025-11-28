@@ -162,6 +162,10 @@ import TS2Skeleton
                         help: "The name of the module for external function references",
                         required: true
                     ),
+                    "target-dir": OptionRule(
+                        help: "The SwiftPM package target directory",
+                        required: true
+                    ),
                     "output-skeleton": OptionRule(
                         help: "The output file path for the skeleton of the exported Swift APIs",
                         required: true
@@ -181,7 +185,13 @@ import TS2Skeleton
                 arguments: Array(arguments.dropFirst())
             )
             let progress = ProgressReporting(verbose: doubleDashOptions["verbose"] == "true")
-            let exporter = ExportSwift(progress: progress, moduleName: doubleDashOptions["module-name"]!)
+            let targetDirectory = URL(fileURLWithPath: doubleDashOptions["target-dir"]!)
+            let config = try BridgeJSConfig.load(targetDirectory: targetDirectory)
+            let exporter = ExportSwift(
+                progress: progress,
+                moduleName: doubleDashOptions["module-name"]!,
+                exposeToGlobal: config.exposeToGlobal
+            )
             for inputFile in positionalArguments.sorted() {
                 let sourceURL = URL(fileURLWithPath: inputFile)
                 guard sourceURL.pathExtension == "swift" else { continue }
