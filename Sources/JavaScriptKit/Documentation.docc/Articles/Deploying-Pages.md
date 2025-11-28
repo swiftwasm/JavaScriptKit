@@ -11,7 +11,7 @@ Once you've built your application with JavaScriptKit, you'll need to deploy it 
 Build your application using [Vite](https://vite.dev/) build tool:
 
 ```bash
-# Build the Swift package for WebAssembly
+# Build the Swift package for WebAssembly with release configuration
 $ swift package --swift-sdk wasm32-unknown-wasi js -c release
 
 # Create a minimal HTML file (if you don't have one)

@@ -53,6 +53,9 @@ Check out the [examples](https://github.com/swiftwasm/JavaScriptKit/tree/main/Ex
 
 - <doc:Deploying-Pages>
 - <doc:JavaScript-Environment-Requirements>
+- <doc:Debugging>
+- <doc:Profiling-Performance-Issues>
+- <doc:Profiling-Memory-Usage>
 
 ### BridgeJS
 

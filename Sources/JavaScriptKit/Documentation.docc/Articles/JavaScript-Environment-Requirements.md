@@ -1,5 +1,7 @@
 # JavaScript Environment Requirements
 
+Understand the JavaScript features required by JavaScriptKit and ensure your target environment supports them.
+
 ## Required JavaScript Features
 
 The JavaScript package produced by the JavaScriptKit packaging plugin requires the following JavaScript features:
