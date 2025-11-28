@@ -451,7 +451,7 @@ public final class WebWorkerTaskExecutor: TaskExecutor {
                 swjs_listen_message_from_worker_thread(tid)
             }
             #else
-            fatalError("Unsupported platform")
+            fatalError("Unsupported platform. WebWorkerTaskExecutor requires Swift SDK for wasip1-threads target.")
             #endif
         }
 
