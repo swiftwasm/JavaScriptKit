@@ -243,6 +243,7 @@ public class JSValueDecoder {
     ///
     /// - Parameter T: The type of the value to decode.
     /// - Parameter value: The `JSValue` to decode from.
+    /// - Parameter userInfo: Additional information to pass to the decoder.
     public func decode<T>(
         _: T.Type = T.self,
         from value: JSValue,

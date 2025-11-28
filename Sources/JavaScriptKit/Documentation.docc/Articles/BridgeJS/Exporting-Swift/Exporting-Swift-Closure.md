@@ -15,22 +15,22 @@ import JavaScriptKit
 
 @JS class TextProcessor {
     private var transform: (String) -> String
-    
+
     @JS init(transform: @escaping (String) -> String) {
         self.transform = transform
     }
-    
+
     @JS func processWithPerson(_ person: Person, formatter: (Person) -> String) -> String {
         return formatter(person)
     }
-    
+
     @JS func makePersonCreator(defaultName: String) -> (String) -> Person {
         return { name in
             let fullName = name.isEmpty ? defaultName : name
             return Person(name: fullName)
         }
     }
-    
+
     @JS func getTransform() -> (String) -> String {
         return transform
     }
@@ -83,8 +83,8 @@ export interface TextProcessor extends SwiftHeapObject {
 }
 
 export type Exports = {
-    TextProcessor: { 
-        new(transform: (arg0: string) => string): TextProcessor 
+    TextProcessor: {
+        new(transform: (arg0: string) => string): TextProcessor
     };
 }
 ```
@@ -111,4 +111,4 @@ Both directions use automatic memory management - no manual cleanup required.
 
 ## See Also
 
-- <doc:Supported-Types> - Complete list of supported types across BridgeJS
+- <doc:Supported-Types>

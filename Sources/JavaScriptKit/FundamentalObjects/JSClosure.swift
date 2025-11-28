@@ -49,6 +49,8 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
     /// - Parameters:
     ///   - priority: The priority of the new unstructured Task created under the hood.
     ///   - body: The Swift function to call asynchronously.
+    ///   - file: The file identifier where the function is defined.
+    ///   - line: The line number where the function is defined.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(
         priority: TaskPriority? = nil,
@@ -65,6 +67,8 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
     ///   - taskExecutor: The executor preference of the new unstructured Task created under the hood.
     ///   - priority: The priority of the new unstructured Task created under the hood.
     ///   - body: The Swift function to call asynchronously.
+    ///   - file: The file identifier where the function is defined.
+    ///   - line: The line number where the function is defined.
     @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
     public static func async(
         executorPreference taskExecutor: (any TaskExecutor)? = nil,
@@ -171,6 +175,8 @@ public class JSClosure: JSObject, JSClosureProtocol {
     /// - Parameters:
     ///   - priority: The priority of the new unstructured Task created under the hood.
     ///   - body: The Swift function to call asynchronously.
+    ///   - file: The file identifier where the function is defined.
+    ///   - line: The line number where the function is defined.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(
         priority: TaskPriority? = nil,
@@ -187,6 +193,8 @@ public class JSClosure: JSObject, JSClosureProtocol {
     ///   - taskExecutor: The executor preference of the new unstructured Task created under the hood.
     ///   - priority: The priority of the new unstructured Task created under the hood.
     ///   - body: The Swift function to call asynchronously.
+    ///   - file: The file identifier where the function is defined.
+    ///   - line: The line number where the function is defined.
     @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
     public static func async(
         executorPreference taskExecutor: (any TaskExecutor)? = nil,
