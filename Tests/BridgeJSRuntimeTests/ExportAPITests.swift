@@ -528,6 +528,32 @@ typealias OptionalAge = Int?
     return value
 }
 
+@JS func compareAPIResults(_ r1: APIResult?, _ r2: APIResult?) -> String {
+    let r1Str: String
+    switch r1 {
+    case .none: r1Str = "nil"
+    case .some(.success(let msg)): r1Str = "success:\(msg)"
+    case .some(.failure(let code)): r1Str = "failure:\(code)"
+    case .some(.info): r1Str = "info"
+    case .some(.flag(let b)): r1Str = "flag:\(b)"
+    case .some(.rate(let r)): r1Str = "rate:\(r)"
+    case .some(.precise(let p)): r1Str = "precise:\(p)"
+    }
+
+    let r2Str: String
+    switch r2 {
+    case .none: r2Str = "nil"
+    case .some(.success(let msg)): r2Str = "success:\(msg)"
+    case .some(.failure(let code)): r2Str = "failure:\(code)"
+    case .some(.info): r2Str = "info"
+    case .some(.flag(let b)): r2Str = "flag:\(b)"
+    case .some(.rate(let r)): r2Str = "rate:\(r)"
+    case .some(.precise(let p)): r2Str = "precise:\(p)"
+    }
+
+    return "r1:\(r1Str),r2:\(r2Str)"
+}
+
 @JS func roundTripOptionalComplexResult(_ result: ComplexResult?) -> ComplexResult? {
     return result
 }

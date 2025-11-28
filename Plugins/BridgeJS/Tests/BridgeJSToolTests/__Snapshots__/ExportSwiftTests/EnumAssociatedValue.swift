@@ -612,7 +612,9 @@ public func _bjs_roundTripOptionalAPIOptionalResult(resultIsSome: Int32, resultC
 @_cdecl("bjs_compareAPIResults")
 public func _bjs_compareAPIResults(result1IsSome: Int32, result1CaseId: Int32, result2IsSome: Int32, result2CaseId: Int32) -> Void {
     #if arch(wasm32)
-    let ret = compareAPIResults(result1: Optional<APIOptionalResult>.bridgeJSLiftParameter(result1IsSome, result1CaseId), result2: Optional<APIOptionalResult>.bridgeJSLiftParameter(result2IsSome, result2CaseId))
+    let _tmp_result2 = Optional<APIOptionalResult>.bridgeJSLiftParameter(result2IsSome, result2CaseId)
+    let _tmp_result1 = Optional<APIOptionalResult>.bridgeJSLiftParameter(result1IsSome, result1CaseId)
+    let ret = compareAPIResults(result1: _tmp_result1, result2: _tmp_result2)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

@@ -6827,6 +6827,48 @@
       }
     },
     {
+      "abiName" : "bjs_compareAPIResults",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "compareAPIResults",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "r1",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              }
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "r2",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
       "abiName" : "bjs_roundTripOptionalComplexResult",
       "effects" : {
         "isAsync" : false,

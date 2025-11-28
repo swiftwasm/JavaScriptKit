@@ -45,7 +45,7 @@ enum Utilities {
     case failure(String, Int)
 }
 
-@JS func roundTripOptionalNetworkingResult(result: NetworkingResult?) -> NetworkingResult? 
+@JS func roundTripOptionalNetworkingResult(result: NetworkingResult?) -> NetworkingResult?
 
 @JS
 enum APIOptionalResult {

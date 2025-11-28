@@ -1667,6 +1667,7 @@ public class ExportSwift {
         }
 
         func call(name: String, returnType: BridgeType) {
+            generateParameterLifting()
             let item = renderCallStatement(callee: "\(raw: name)", returnType: returnType)
             append(item)
         }
@@ -1694,6 +1695,7 @@ public class ExportSwift {
 
         func callMethod(klassName: String, methodName: String, returnType: BridgeType) {
             let (_, selfExpr) = removeFirstLiftedParameter()
+            generateParameterLifting()
             let item = renderCallStatement(
                 callee: "\(raw: selfExpr).\(raw: methodName)",
                 returnType: returnType
@@ -1826,6 +1828,29 @@ public class ExportSwift {
 
         func returnSignature() -> String {
             return abiReturnType?.swiftType ?? "Void"
+        }
+
+        /// Generates intermediate variables for stack-using parameters if needed for LIFO compatibility
+        private func generateParameterLifting() {
+            let stackParamIndices = parameters.enumerated().compactMap { index, param -> Int? in
+                switch param.type {
+                case .optional(.associatedValueEnum):
+                    return index
+                default:
+                    return nil
+                }
+            }
+
+            guard stackParamIndices.count > 1 else { return }
+
+            for index in stackParamIndices.reversed() {
+                let param = parameters[index]
+                let expr = liftedParameterExprs[index]
+                let varName = "_tmp_\(param.name)"
+
+                append("let \(raw: varName) = \(expr)")
+                liftedParameterExprs[index] = ExprSyntax(DeclReferenceExprSyntax(baseName: .identifier(varName)))
+            }
         }
     }
 
