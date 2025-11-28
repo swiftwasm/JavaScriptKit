@@ -10,12 +10,8 @@ enum APIResult {
 
 @JS func handle(result: APIResult)
 @JS func getResult() -> APIResult
-@JS func roundtripAPIResult(result: APIResult) -> APIResult {
-    return result
-}
-@JS func roundTripOptionalAPIResult(result: APIResult?) -> APIResult? {
-    return result
-}
+@JS func roundtripAPIResult(result: APIResult) -> APIResult
+@JS func roundTripOptionalAPIResult(result: APIResult?) -> APIResult?
 
 @JS
 enum ComplexResult {
@@ -29,12 +25,8 @@ enum ComplexResult {
 
 @JS func handleComplex(result: ComplexResult)
 @JS func getComplexResult() -> ComplexResult
-@JS func roundtripComplexResult(_ result: ComplexResult) -> ComplexResult {
-    return result
-}
-@JS func roundTripOptionalComplexResult(result: ComplexResult?) -> ComplexResult? {
-    return result
-}
+@JS func roundtripComplexResult(_ result: ComplexResult) -> ComplexResult
+@JS func roundTripOptionalComplexResult(result: ComplexResult?) -> ComplexResult?
 
 @JS
 enum Utilities {
@@ -45,9 +37,7 @@ enum Utilities {
     }
 }
 
-@JS func roundTripOptionalUtilitiesResult(result: Utilities.Result?) -> Utilities.Result? {
-    return result
-}
+@JS func roundTripOptionalUtilitiesResult(result: Utilities.Result?) -> Utilities.Result?
 
 @JS(namespace: "API")
 @JS enum NetworkingResult {
@@ -55,9 +45,7 @@ enum Utilities {
     case failure(String, Int)
 }
 
-@JS func roundTripOptionalNetworkingResult(result: NetworkingResult?) -> NetworkingResult? {
-    return result
-}
+@JS func roundTripOptionalNetworkingResult(result: NetworkingResult?) -> NetworkingResult?
 
 @JS
 enum APIOptionalResult {
@@ -65,6 +53,5 @@ enum APIOptionalResult {
     case failure(Int?, Bool?)
     case status(Bool?, Int?, String?)
 }
-@JS func roundTripOptionalAPIOptionalResult(result: APIOptionalResult?) -> APIOptionalResult? {
-    return result
-}
+@JS func roundTripOptionalAPIOptionalResult(result: APIOptionalResult?) -> APIOptionalResult?
+@JS func compareAPIResults(result1: APIOptionalResult?, result2: APIOptionalResult?) -> APIOptionalResult?

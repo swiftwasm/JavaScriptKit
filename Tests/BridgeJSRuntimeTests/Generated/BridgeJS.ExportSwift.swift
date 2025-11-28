@@ -3079,6 +3079,19 @@ public func _bjs_roundTripOptionalAPIResult(valueIsSome: Int32, valueCaseId: Int
     #endif
 }
 
+@_expose(wasm, "bjs_compareAPIResults")
+@_cdecl("bjs_compareAPIResults")
+public func _bjs_compareAPIResults(r1IsSome: Int32, r1CaseId: Int32, r2IsSome: Int32, r2CaseId: Int32) -> Void {
+    #if arch(wasm32)
+    let _tmp_r2 = Optional<APIResult>.bridgeJSLiftParameter(r2IsSome, r2CaseId)
+    let _tmp_r1 = Optional<APIResult>.bridgeJSLiftParameter(r1IsSome, r1CaseId)
+    let ret = compareAPIResults(_: _tmp_r1, _: _tmp_r2)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundTripOptionalComplexResult")
 @_cdecl("bjs_roundTripOptionalComplexResult")
 public func _bjs_roundTripOptionalComplexResult(resultIsSome: Int32, resultCaseId: Int32) -> Void {

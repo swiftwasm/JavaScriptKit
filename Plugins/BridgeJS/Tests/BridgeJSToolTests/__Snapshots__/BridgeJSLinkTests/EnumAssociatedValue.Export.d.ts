@@ -86,6 +86,7 @@ export type Exports = {
     roundTripOptionalUtilitiesResult(result: Utilities.ResultTag | null): Utilities.ResultTag | null;
     roundTripOptionalNetworkingResult(result: API.NetworkingResultTag | null): API.NetworkingResultTag | null;
     roundTripOptionalAPIOptionalResult(result: APIOptionalResultTag | null): APIOptionalResultTag | null;
+    compareAPIResults(result1: APIOptionalResultTag | null, result2: APIOptionalResultTag | null): APIOptionalResultTag | null;
     APIResult: APIResultObject
     ComplexResult: ComplexResultObject
     APIOptionalResult: APIOptionalResultObject

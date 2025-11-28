@@ -571,6 +571,15 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.deepEqual(exports.roundTripOptionalAPIResult(p1), p1);
     assert.deepEqual(exports.roundTripOptionalComplexResult(cl1), cl1);
 
+    const apiSuccess = { tag: exports.APIResult.Tag.Success, param0: "test success" };
+    const apiFailure = { tag: exports.APIResult.Tag.Failure, param0: 404 };
+    const apiInfo = { tag: exports.APIResult.Tag.Info };
+   
+    assert.equal(exports.compareAPIResults(apiSuccess, apiFailure), "r1:success:test success,r2:failure:404");
+    assert.equal(exports.compareAPIResults(null, apiInfo), "r1:nil,r2:info");
+    assert.equal(exports.compareAPIResults(apiFailure, null), "r1:failure:404,r2:nil");
+    assert.equal(exports.compareAPIResults(null, null), "r1:nil,r2:nil");
+
     const optionalGreeter = new exports.Greeter("Schrödinger");
     const optionalGreeter2 = exports.roundTripOptionalClass(optionalGreeter);
     assert.equal(optionalGreeter2?.greet() ?? "", "Hello, Schrödinger!");
