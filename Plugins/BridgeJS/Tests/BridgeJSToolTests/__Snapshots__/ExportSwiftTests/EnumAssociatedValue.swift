@@ -607,3 +607,14 @@ public func _bjs_roundTripOptionalAPIOptionalResult(resultIsSome: Int32, resultC
     fatalError("Only available on WebAssembly")
     #endif
 }
+
+@_expose(wasm, "bjs_compareAPIResults")
+@_cdecl("bjs_compareAPIResults")
+public func _bjs_compareAPIResults(result1IsSome: Int32, result1CaseId: Int32, result2IsSome: Int32, result2CaseId: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = compareAPIResults(result1: Optional<APIOptionalResult>.bridgeJSLiftParameter(result1IsSome, result1CaseId), result2: Optional<APIOptionalResult>.bridgeJSLiftParameter(result2IsSome, result2CaseId))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}

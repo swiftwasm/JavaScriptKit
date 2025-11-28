@@ -814,6 +814,33 @@ export async function createInstantiator(options, swift) {
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;
                 },
+                compareAPIResults: function bjs_compareAPIResults(result1, result2) {
+                    const isSome = result1 != null;
+                    let result1CaseId, result1Cleanup;
+                    if (isSome) {
+                        const enumResult = enumHelpers.APIOptionalResult.lower(result1);
+                        result1CaseId = enumResult.caseId;
+                        result1Cleanup = enumResult.cleanup;
+                    }
+                    const isSome1 = result2 != null;
+                    let result2CaseId, result2Cleanup;
+                    if (isSome1) {
+                        const enumResult1 = enumHelpers.APIOptionalResult.lower(result2);
+                        result2CaseId = enumResult1.caseId;
+                        result2Cleanup = enumResult1.cleanup;
+                    }
+                    instance.exports.bjs_compareAPIResults(+isSome, isSome ? result1CaseId : 0, +isSome1, isSome1 ? result2CaseId : 0);
+                    const isNull = (tmpRetTag === -1);
+                    let optResult;
+                    if (isNull) {
+                        optResult = null;
+                    } else {
+                        optResult = enumHelpers.APIOptionalResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    }
+                    if (result1Cleanup) { result1Cleanup(); }
+                    if (result2Cleanup) { result2Cleanup(); }
+                    return optResult;
+                },
                 APIResult: APIResultValues,
                 ComplexResult: ComplexResultValues,
                 APIOptionalResult: APIOptionalResultValues,

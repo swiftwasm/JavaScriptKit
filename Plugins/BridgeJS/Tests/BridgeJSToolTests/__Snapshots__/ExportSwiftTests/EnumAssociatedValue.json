@@ -787,6 +787,52 @@
           }
         }
       }
+    },
+    {
+      "abiName" : "bjs_compareAPIResults",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "compareAPIResults",
+      "parameters" : [
+        {
+          "label" : "result1",
+          "name" : "result1",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIOptionalResult"
+                }
+              }
+            }
+          }
+        },
+        {
+          "label" : "result2",
+          "name" : "result2",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIOptionalResult"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "associatedValueEnum" : {
+              "_0" : "APIOptionalResult"
+            }
+          }
+        }
+      }
     }
   ],
   "moduleName" : "TestModule",
