@@ -1,6 +1,6 @@
 import type { InstantiateOptions, ModuleSource/* #if HAS_IMPORTS */, Imports/* #endif */ } from "../instantiate.js"
 
-export function defaultBrowserSetup(options?: {
+export function defaultBrowserSetup(options: {
     module: ModuleSource,
 /* #if IS_WASI */
     args?: string[],

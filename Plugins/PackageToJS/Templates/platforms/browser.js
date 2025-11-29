@@ -102,9 +102,9 @@ class DefaultBrowserThreadRegistry {
 /** @type {import('./browser.d.ts').defaultBrowserSetup} */
 export async function defaultBrowserSetup(options) {
 /* #if IS_WASI */
-    const args = options?.args ?? []
-    const onStdoutLine = options?.onStdoutLine ?? ((line) => console.log(line))
-    const onStderrLine = options?.onStderrLine ?? ((line) => console.error(line))
+    const args = options.args ?? []
+    const onStdoutLine = options.onStdoutLine ?? ((line) => console.log(line))
+    const onStderrLine = options.onStderrLine ?? ((line) => console.error(line))
     const wasi = new WASI(/* args */[MODULE_PATH, ...args], /* env */[], /* fd */[
         new OpenFile(new File([])), // stdin
         ConsoleStdout.lineBuffered((stdout) => {
@@ -118,13 +118,13 @@ export async function defaultBrowserSetup(options) {
 /* #endif */
 /* #if USE_SHARED_MEMORY */
     const memory = new WebAssembly.Memory(MEMORY_TYPE);
-    const threadChannel = new DefaultBrowserThreadRegistry(options?.spawnWorker || createDefaultWorkerFactory())
+    const threadChannel = new DefaultBrowserThreadRegistry(options.spawnWorker || createDefaultWorkerFactory())
 /* #endif */
 
     return {
-        module: options?.module,
+        module: options.module,
 /* #if HAS_IMPORTS */
-        getImports() { return options?.getImports() },
+        getImports() { return options.getImports() },
 /* #endif */
 /* #if IS_WASI */
         wasi: Object.assign(wasi, {
