@@ -1,6 +1,6 @@
 import type { InstantiateOptions, ModuleSource/* #if HAS_IMPORTS */, Imports/* #endif */ } from "../instantiate.js"
 
-export function defaultBrowserSetup(options: {
+export function defaultBrowserSetup(options?: {
     module: ModuleSource,
 /* #if IS_WASI */
     args?: string[],
@@ -11,7 +11,7 @@ export function defaultBrowserSetup(options: {
     getImports: () => Imports,
 /* #endif */
 /* #if USE_SHARED_MEMORY */
-    spawnWorker: (module: WebAssembly.Module, memory: WebAssembly.Memory, startArg: any) => Worker,
+    spawnWorker?: (module: WebAssembly.Module, memory: WebAssembly.Memory, startArg: any) => Worker,
 /* #endif */
 }): Promise<InstantiateOptions>
 
