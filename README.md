@@ -49,7 +49,3 @@ Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details on
 ## Sponsoring
 
 [Become a gold or platinum sponsor](https://github.com/sponsors/swiftwasm/) and contact maintainers to add your logo on our README on Github with a link to your site.
-
-<a href="https://www.emergetools.com/">
-  <img src="https://github.com/swiftwasm/swift/raw/swiftwasm-distribution/assets/sponsors/emergetools.png" width="30%">
-</a>
