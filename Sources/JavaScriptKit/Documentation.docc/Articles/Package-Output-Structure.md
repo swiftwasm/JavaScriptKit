@@ -55,7 +55,7 @@ async function main() {
 main();
 ```
 
-> Tip: For a complete Node.js setup example, see the [NodeJS example](https://github.com/swiftwasm/JavaScriptKit/tree/main/Examples/NodeJS).
+> Tip: For a complete Node.js setup example, see the [Node.js example](https://github.com/swiftwasm/JavaScriptKit/tree/main/Examples/NodeJS).
 
 ### With Bundlers (Vite, Webpack, etc.)
 
