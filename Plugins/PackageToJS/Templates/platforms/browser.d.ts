@@ -11,7 +11,7 @@ export function defaultBrowserSetup(options: {
     getImports: () => Imports,
 /* #endif */
 /* #if USE_SHARED_MEMORY */
-    spawnWorker: (module: WebAssembly.Module, memory: WebAssembly.Memory, startArg: any) => Worker,
+    spawnWorker?: (module: WebAssembly.Module, memory: WebAssembly.Memory, startArg: any) => Worker,
 /* #endif */
 }): Promise<InstantiateOptions>
 

@@ -113,7 +113,7 @@ class DefaultNodeThreadRegistry {
 /* #endif */
 
 /** @type {import('./node.d.ts').defaultNodeSetup} */
-export async function defaultNodeSetup(options) {
+export async function defaultNodeSetup(options = {}) {
     const path = await import("node:path");
     const { fileURLToPath } = await import("node:url");
     const { readFile } = await import("node:fs/promises")
@@ -134,7 +134,7 @@ export async function defaultNodeSetup(options) {
     const module = await WebAssembly.compile(new Uint8Array(await readFile(path.join(pkgDir, MODULE_PATH))))
 /* #if USE_SHARED_MEMORY */
     const memory = new WebAssembly.Memory(MEMORY_TYPE);
-    const threadChannel = new DefaultNodeThreadRegistry(options.spawnWorker)
+    const threadChannel = new DefaultNodeThreadRegistry(options.spawnWorker || createDefaultWorkerFactory())
 /* #endif */
 
     return {

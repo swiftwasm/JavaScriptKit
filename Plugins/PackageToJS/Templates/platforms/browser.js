@@ -118,7 +118,7 @@ export async function defaultBrowserSetup(options) {
 /* #endif */
 /* #if USE_SHARED_MEMORY */
     const memory = new WebAssembly.Memory(MEMORY_TYPE);
-    const threadChannel = new DefaultBrowserThreadRegistry(options.spawnWorker)
+    const threadChannel = new DefaultBrowserThreadRegistry(options.spawnWorker || createDefaultWorkerFactory())
 /* #endif */
 
     return {
