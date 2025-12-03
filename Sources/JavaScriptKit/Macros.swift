@@ -107,3 +107,22 @@ public enum JSEnumStyle: String {
 /// - Important: This feature is still experimental. No API stability is guaranteed, and the API may change in future releases.
 @attached(peer)
 public macro JS(namespace: String? = nil, enumStyle: JSEnumStyle = .const) = Builtin.ExternalMacro
+
+@attached(accessor)
+public macro JSImportVariable(from: String, jsName: String) = #externalMacro(module: "JavaScriptKitMacros", type: "JSImportVariableMacro")
+
+@attached(body)
+@attached(peer)
+public macro JSImportFunction(from: String, jsName: String) = #externalMacro(module: "JavaScriptKitMacros", type: "JSImportFunctionMacro")
+
+// @JSImportVariable(from: "globalThis", jsName: "console")
+public var console: JSObject {
+    @_extern(wasm, module: "globalThis", name: "console")
+    func console() -> UInt32
+}
+
+@JSImportFunction(from: "globalThis", jsName: "document")
+public var document: JSObject
+
+@JSImportFunction(from: "globalThis", jsName: "alert")
+public func alert(message: String) -> Void
