@@ -8,7 +8,8 @@
         "strict": true,
         "target": "es2017",
         "lib": ["es2020", "DOM", "ESNext.WeakRef"],
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "isolatedModules": true
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules"]

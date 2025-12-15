@@ -10,7 +10,7 @@ import * as JSValue from "./js-value.js";
 import { deserializeError, MainToWorkerMessage, MessageBroker, ResponseMessage, ITCInterface, serializeError, SwiftRuntimeThreadChannel, WorkerToMainMessage } from "./itc.js";
 import { decodeObjectRefs } from "./js-value.js";
 import { JSObjectSpace } from "./object-heap.js";
-export { SwiftRuntimeThreadChannel };
+export type { SwiftRuntimeThreadChannel };
 
 export type SwiftRuntimeOptions = {
     /**
