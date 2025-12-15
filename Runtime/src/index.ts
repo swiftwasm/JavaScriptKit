@@ -11,6 +11,7 @@ import { deserializeError, MainToWorkerMessage, MessageBroker, ResponseMessage, 
 import { decodeObjectRefs } from "./js-value.js";
 import { JSObjectSpace } from "./object-heap.js";
 export type { SwiftRuntimeThreadChannel };
+export { createBridgeJSStubs } from "./bridge-js.js";
 
 export type SwiftRuntimeOptions = {
     /**
