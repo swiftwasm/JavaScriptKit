@@ -3118,6 +3118,71 @@
 
       ],
       "swiftCallName" : "TextProcessor"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_Container_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "location",
+            "name" : "location",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "DataPoint"
+              }
+            }
+          },
+          {
+            "label" : "config",
+            "name" : "config",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "swiftStruct" : {
+                    "_0" : "Config"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+
+      ],
+      "name" : "Container",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "location",
+          "type" : {
+            "swiftStruct" : {
+              "_0" : "DataPoint"
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "config",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "swiftStruct" : {
+                  "_0" : "Config"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "Container"
     }
   ],
   "enums" : [
@@ -7578,6 +7643,194 @@
           }
         }
       }
+    },
+    {
+      "abiName" : "bjs_roundTripDataPoint",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripDataPoint",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "data",
+          "type" : {
+            "swiftStruct" : {
+              "_0" : "DataPoint"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "swiftStruct" : {
+          "_0" : "DataPoint"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripContact",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripContact",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "contact",
+          "type" : {
+            "swiftStruct" : {
+              "_0" : "Contact"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "swiftStruct" : {
+          "_0" : "Contact"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripConfig",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripConfig",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "config",
+          "type" : {
+            "swiftStruct" : {
+              "_0" : "Config"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "swiftStruct" : {
+          "_0" : "Config"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripSessionData",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripSessionData",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "session",
+          "type" : {
+            "swiftStruct" : {
+              "_0" : "SessionData"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "swiftStruct" : {
+          "_0" : "SessionData"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripValidationReport",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripValidationReport",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "report",
+          "type" : {
+            "swiftStruct" : {
+              "_0" : "ValidationReport"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "swiftStruct" : {
+          "_0" : "ValidationReport"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_updateValidationReport",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "updateValidationReport",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "newResult",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              }
+            }
+          }
+        },
+        {
+          "label" : "_",
+          "name" : "report",
+          "type" : {
+            "swiftStruct" : {
+              "_0" : "ValidationReport"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "swiftStruct" : {
+          "_0" : "ValidationReport"
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testContainerWithStruct",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testContainerWithStruct",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "point",
+          "type" : {
+            "swiftStruct" : {
+              "_0" : "DataPoint"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "swiftHeapObject" : {
+          "_0" : "Container"
+        }
+      }
     }
   ],
   "moduleName" : "BridgeJSRuntimeTests",
@@ -7960,6 +8213,612 @@
           }
         }
       ]
+    }
+  ],
+  "structs" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_DataPoint_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "x",
+            "name" : "x",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "label" : "y",
+            "name" : "y",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "label" : "label",
+            "name" : "label",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "label" : "optCount",
+            "name" : "optCount",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label" : "optFlag",
+            "name" : "optFlag",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+
+      ],
+      "name" : "DataPoint",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "x",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "y",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "label",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "optCount",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "int" : {
+
+                }
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "optFlag",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "bool" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "DataPoint"
+    },
+    {
+      "methods" : [
+
+      ],
+      "name" : "Address",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "street",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "city",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "zipCode",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "int" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "Address"
+    },
+    {
+      "methods" : [
+
+      ],
+      "name" : "Contact",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "age",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "address",
+          "type" : {
+            "swiftStruct" : {
+              "_0" : "Address"
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "email",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "secondaryAddress",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "swiftStruct" : {
+                  "_0" : "Address"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "Contact"
+    },
+    {
+      "methods" : [
+
+      ],
+      "name" : "Config",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "theme",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "Theme",
+                  "_1" : "String"
+                }
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "direction",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "caseEnum" : {
+                  "_0" : "Direction"
+                }
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "status",
+          "type" : {
+            "caseEnum" : {
+              "_0" : "Status"
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "Config"
+    },
+    {
+      "methods" : [
+
+      ],
+      "name" : "SessionData",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "id",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "owner",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "swiftHeapObject" : {
+                  "_0" : "Greeter"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "SessionData"
+    },
+    {
+      "methods" : [
+
+      ],
+      "name" : "ValidationReport",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "id",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "result",
+          "type" : {
+            "associatedValueEnum" : {
+              "_0" : "APIResult"
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "status",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "caseEnum" : {
+                  "_0" : "Status"
+                }
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "outcome",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "ValidationReport"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_MathOperations_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_MathOperations_add",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "add",
+          "parameters" : [
+            {
+              "label" : "a",
+              "name" : "a",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "label" : "b",
+              "name" : "b",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MathOperations_multiply",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "multiply",
+          "parameters" : [
+            {
+              "label" : "a",
+              "name" : "a",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "label" : "b",
+              "name" : "b",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MathOperations_static_subtract",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "subtract",
+          "parameters" : [
+            {
+              "label" : "a",
+              "name" : "a",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "label" : "b",
+              "name" : "b",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "double" : {
+
+            }
+          },
+          "staticContext" : {
+            "structName" : {
+              "_0" : "MathOperations"
+            }
+          }
+        }
+      ],
+      "name" : "MathOperations",
+      "properties" : [
+
+      ],
+      "swiftCallName" : "MathOperations"
+    },
+    {
+      "methods" : [
+
+      ],
+      "name" : "ConfigStruct",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "value",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "defaultConfig",
+          "staticContext" : {
+            "structName" : {
+              "_0" : "ConfigStruct"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "maxRetries",
+          "staticContext" : {
+            "structName" : {
+              "_0" : "ConfigStruct"
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "timeout",
+          "staticContext" : {
+            "structName" : {
+              "_0" : "ConfigStruct"
+            }
+          },
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "computedSetting",
+          "staticContext" : {
+            "structName" : {
+              "_0" : "ConfigStruct"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "ConfigStruct"
     }
   ]
 }

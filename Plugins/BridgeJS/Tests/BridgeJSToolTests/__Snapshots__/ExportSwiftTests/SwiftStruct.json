@@ -1,0 +1,448 @@
+{
+  "classes" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_Greeter_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_Greeter_greet",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "greet",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "Greeter",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "Greeter"
+    }
+  ],
+  "enums" : [
+
+  ],
+  "exposeToGlobal" : false,
+  "functions" : [
+    {
+      "abiName" : "bjs_roundtrip",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "roundtrip",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "session",
+          "type" : {
+            "swiftStruct" : {
+              "_0" : "Person"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "swiftStruct" : {
+          "_0" : "Person"
+        }
+      }
+    }
+  ],
+  "moduleName" : "TestModule",
+  "protocols" : [
+
+  ],
+  "structs" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_DataPoint_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "x",
+            "name" : "x",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "label" : "y",
+            "name" : "y",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "label" : "label",
+            "name" : "label",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "label" : "optCount",
+            "name" : "optCount",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label" : "optFlag",
+            "name" : "optFlag",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+
+      ],
+      "name" : "DataPoint",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "x",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "y",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "label",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "optCount",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "int" : {
+
+                }
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "optFlag",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "bool" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "DataPoint"
+    },
+    {
+      "methods" : [
+
+      ],
+      "name" : "Address",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "street",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "city",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "zipCode",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "int" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "Address"
+    },
+    {
+      "methods" : [
+
+      ],
+      "name" : "Person",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "age",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "address",
+          "type" : {
+            "swiftStruct" : {
+              "_0" : "Address"
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "email",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "Person"
+    },
+    {
+      "methods" : [
+
+      ],
+      "name" : "Session",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "id",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "owner",
+          "type" : {
+            "swiftHeapObject" : {
+              "_0" : "Greeter"
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "Session"
+    },
+    {
+      "methods" : [
+        {
+          "abiName" : "bjs_ConfigStruct_static_update",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "update",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "timeout",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "double" : {
+
+            }
+          },
+          "staticContext" : {
+            "structName" : {
+              "_0" : "ConfigStruct"
+            }
+          }
+        }
+      ],
+      "name" : "ConfigStruct",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "maxRetries",
+          "staticContext" : {
+            "structName" : {
+              "_0" : "ConfigStruct"
+            }
+          },
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "defaultConfig",
+          "staticContext" : {
+            "structName" : {
+              "_0" : "ConfigStruct"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "isStatic" : true,
+          "name" : "timeout",
+          "staticContext" : {
+            "structName" : {
+              "_0" : "ConfigStruct"
+            }
+          },
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : true,
+          "name" : "computedSetting",
+          "staticContext" : {
+            "structName" : {
+              "_0" : "ConfigStruct"
+            }
+          },
+          "type" : {
+            "string" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "ConfigStruct"
+    }
+  ]
+}

@@ -2008,6 +2008,312 @@ public func _bjs_StaticPropertyNamespace_NestedProperties_static_nestedDouble_se
     #endif
 }
 
+extension DataPoint: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> DataPoint {
+        let optFlag = Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let optCount = Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let label = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let y = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
+        let x = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
+        return DataPoint(x: x, y: y, label: label, optCount: optCount, optFlag: optFlag)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_f64(self.x)
+        _swift_js_push_f64(self.y)
+        var __bjs_label = self.label
+        __bjs_label.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        let __bjs_isSome_optCount = self.optCount != nil
+        if let __bjs_unwrapped_optCount = self.optCount {
+            _swift_js_push_int(Int32(__bjs_unwrapped_optCount))
+        }
+        _swift_js_push_int(__bjs_isSome_optCount ? 1 : 0)
+        let __bjs_isSome_optFlag = self.optFlag != nil
+        if let __bjs_unwrapped_optFlag = self.optFlag {
+            _swift_js_push_int(__bjs_unwrapped_optFlag ? 1 : 0)
+        }
+        _swift_js_push_int(__bjs_isSome_optFlag ? 1 : 0)
+    }
+}
+
+@_expose(wasm, "bjs_DataPoint_init")
+@_cdecl("bjs_DataPoint_init")
+public func _bjs_DataPoint_init(x: Float64, y: Float64, labelBytes: Int32, labelLength: Int32, optCountIsSome: Int32, optCountValue: Int32, optFlagIsSome: Int32, optFlagValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = DataPoint(x: Double.bridgeJSLiftParameter(x), y: Double.bridgeJSLiftParameter(y), label: String.bridgeJSLiftParameter(labelBytes, labelLength), optCount: Optional<Int>.bridgeJSLiftParameter(optCountIsSome, optCountValue), optFlag: Optional<Bool>.bridgeJSLiftParameter(optFlagIsSome, optFlagValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension Address: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Address {
+        let zipCode = Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let city = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let street = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        return Address(street: street, city: city, zipCode: zipCode)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        var __bjs_street = self.street
+        __bjs_street.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        var __bjs_city = self.city
+        __bjs_city.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        let __bjs_isSome_zipCode = self.zipCode != nil
+        if let __bjs_unwrapped_zipCode = self.zipCode {
+            _swift_js_push_int(Int32(__bjs_unwrapped_zipCode))
+        }
+        _swift_js_push_int(__bjs_isSome_zipCode ? 1 : 0)
+    }
+}
+
+extension Contact: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Contact {
+        let secondaryAddress = Optional<Address>.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let email = Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let address = Address.bridgeJSLiftParameter()
+        let age = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let name = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        return Contact(name: name, age: age, address: address, email: email, secondaryAddress: secondaryAddress)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        var __bjs_name = self.name
+        __bjs_name.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        _swift_js_push_int(Int32(self.age))
+        self.address.bridgeJSLowerReturn()
+        let __bjs_isSome_email = self.email != nil
+        if let __bjs_unwrapped_email = self.email {
+            var __bjs_str_email = __bjs_unwrapped_email
+            __bjs_str_email.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+        }
+        _swift_js_push_int(__bjs_isSome_email ? 1 : 0)
+        let __bjs_isSome_secondaryAddress = self.secondaryAddress != nil
+        if let __bjs_unwrapped_secondaryAddress = self.secondaryAddress {
+            __bjs_unwrapped_secondaryAddress.bridgeJSLowerReturn()
+        }
+        _swift_js_push_int(__bjs_isSome_secondaryAddress ? 1 : 0)
+    }
+}
+
+extension Config: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Config {
+        let status = Status.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let direction = Optional<Direction>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let theme = Optional<Theme>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let name = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        return Config(name: name, theme: theme, direction: direction, status: status)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        var __bjs_name = self.name
+        __bjs_name.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        let __bjs_isSome_theme = self.theme != nil
+        if let __bjs_unwrapped_theme = self.theme {
+            var __bjs_str_theme = __bjs_unwrapped_theme.rawValue
+            __bjs_str_theme.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+        }
+        _swift_js_push_int(__bjs_isSome_theme ? 1 : 0)
+        let __bjs_isSome_direction = self.direction != nil
+        if let __bjs_unwrapped_direction = self.direction {
+            _swift_js_push_int(__bjs_unwrapped_direction.bridgeJSLowerParameter())
+        }
+        _swift_js_push_int(__bjs_isSome_direction ? 1 : 0)
+        _swift_js_push_int(Int32(self.status.bridgeJSLowerParameter()))
+    }
+}
+
+extension SessionData: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> SessionData {
+        let owner = Optional<Greeter>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_pointer())
+        let id = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        return SessionData(id: id, owner: owner)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_int(Int32(self.id))
+        let __bjs_isSome_owner = self.owner != nil
+        if let __bjs_unwrapped_owner = self.owner {
+            _swift_js_push_pointer(__bjs_unwrapped_owner.bridgeJSLowerReturn())
+        }
+        _swift_js_push_int(__bjs_isSome_owner ? 1 : 0)
+    }
+}
+
+extension ValidationReport: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> ValidationReport {
+        let outcome = Optional<APIResult>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let status = Optional<Status>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let result = APIResult.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let id = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        return ValidationReport(id: id, result: result, status: status, outcome: outcome)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_int(Int32(self.id))
+        self.result.bridgeJSLowerReturn()
+        let __bjs_isSome_status = self.status != nil
+        if let __bjs_unwrapped_status = self.status {
+            _swift_js_push_int(__bjs_unwrapped_status.bridgeJSLowerParameter())
+        }
+        _swift_js_push_int(__bjs_isSome_status ? 1 : 0)
+        let __bjs_isSome_outcome = self.outcome != nil
+        if let __bjs_unwrapped_outcome = self.outcome {
+            _swift_js_push_int(__bjs_unwrapped_outcome.bridgeJSLowerParameter())
+        }
+        _swift_js_push_int(__bjs_isSome_outcome ? 1 : 0)
+    }
+}
+
+extension MathOperations: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> MathOperations {
+        return MathOperations()
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+
+    }
+}
+
+@_expose(wasm, "bjs_MathOperations_init")
+@_cdecl("bjs_MathOperations_init")
+public func _bjs_MathOperations_init() -> Void {
+    #if arch(wasm32)
+    let ret = MathOperations()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MathOperations_add")
+@_cdecl("bjs_MathOperations_add")
+public func _bjs_MathOperations_add(a: Float64, b: Float64) -> Float64 {
+    #if arch(wasm32)
+    let ret = MathOperations.bridgeJSLiftParameter().add(a: Double.bridgeJSLiftParameter(a), b: Double.bridgeJSLiftParameter(b))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MathOperations_multiply")
+@_cdecl("bjs_MathOperations_multiply")
+public func _bjs_MathOperations_multiply(a: Float64, b: Float64) -> Float64 {
+    #if arch(wasm32)
+    let ret = MathOperations.bridgeJSLiftParameter().multiply(a: Double.bridgeJSLiftParameter(a), b: Double.bridgeJSLiftParameter(b))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MathOperations_static_subtract")
+@_cdecl("bjs_MathOperations_static_subtract")
+public func _bjs_MathOperations_static_subtract(a: Float64, b: Float64) -> Float64 {
+    #if arch(wasm32)
+    let ret = MathOperations.subtract(a: Double.bridgeJSLiftParameter(a), b: Double.bridgeJSLiftParameter(b))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension ConfigStruct: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> ConfigStruct {
+        let value = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let name = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        return ConfigStruct(name: name, value: value)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        var __bjs_name = self.name
+        __bjs_name.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        _swift_js_push_int(Int32(self.value))
+    }
+}
+
+@_expose(wasm, "bjs_ConfigStruct_static_defaultConfig_get")
+@_cdecl("bjs_ConfigStruct_static_defaultConfig_get")
+public func _bjs_ConfigStruct_static_defaultConfig_get() -> Void {
+    #if arch(wasm32)
+    let ret = ConfigStruct.defaultConfig
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConfigStruct_static_defaultConfig_set")
+@_cdecl("bjs_ConfigStruct_static_defaultConfig_set")
+public func _bjs_ConfigStruct_static_defaultConfig_set(valueBytes: Int32, valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    ConfigStruct.defaultConfig = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConfigStruct_static_maxRetries_get")
+@_cdecl("bjs_ConfigStruct_static_maxRetries_get")
+public func _bjs_ConfigStruct_static_maxRetries_get() -> Int32 {
+    #if arch(wasm32)
+    let ret = ConfigStruct.maxRetries
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConfigStruct_static_timeout_get")
+@_cdecl("bjs_ConfigStruct_static_timeout_get")
+public func _bjs_ConfigStruct_static_timeout_get() -> Float64 {
+    #if arch(wasm32)
+    let ret = ConfigStruct.timeout
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConfigStruct_static_timeout_set")
+@_cdecl("bjs_ConfigStruct_static_timeout_set")
+public func _bjs_ConfigStruct_static_timeout_set(value: Float64) -> Void {
+    #if arch(wasm32)
+    ConfigStruct.timeout = Double.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ConfigStruct_static_computedSetting_get")
+@_cdecl("bjs_ConfigStruct_static_computedSetting_get")
+public func _bjs_ConfigStruct_static_computedSetting_get() -> Void {
+    #if arch(wasm32)
+    let ret = ConfigStruct.computedSetting
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundTripVoid")
 @_cdecl("bjs_roundTripVoid")
 public func _bjs_roundTripVoid() -> Void {
@@ -3306,6 +3612,85 @@ public func _bjs_makeAdder(base: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = makeAdder(base: Int.bridgeJSLiftParameter(base))
     return _BJS_Closure_20BridgeJSRuntimeTestsSi_Si.bridgeJSLower(ret)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripDataPoint")
+@_cdecl("bjs_roundTripDataPoint")
+public func _bjs_roundTripDataPoint() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripDataPoint(_: DataPoint.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripContact")
+@_cdecl("bjs_roundTripContact")
+public func _bjs_roundTripContact() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripContact(_: Contact.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripConfig")
+@_cdecl("bjs_roundTripConfig")
+public func _bjs_roundTripConfig() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripConfig(_: Config.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripSessionData")
+@_cdecl("bjs_roundTripSessionData")
+public func _bjs_roundTripSessionData() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripSessionData(_: SessionData.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripValidationReport")
+@_cdecl("bjs_roundTripValidationReport")
+public func _bjs_roundTripValidationReport() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripValidationReport(_: ValidationReport.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_updateValidationReport")
+@_cdecl("bjs_updateValidationReport")
+public func _bjs_updateValidationReport(newResultIsSome: Int32, newResultCaseId: Int32) -> Void {
+    #if arch(wasm32)
+    let _tmp_report = ValidationReport.bridgeJSLiftParameter()
+    let _tmp_newResult = Optional<APIResult>.bridgeJSLiftParameter(newResultIsSome, newResultCaseId)
+    let ret = updateValidationReport(_: _tmp_newResult, _: _tmp_report)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testContainerWithStruct")
+@_cdecl("bjs_testContainerWithStruct")
+public func _bjs_testContainerWithStruct() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = testContainerWithStruct(_: DataPoint.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5459,6 +5844,82 @@ extension TextProcessor: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 fileprivate func _bjs_TextProcessor_wrap(_: UnsafeMutableRawPointer) -> Int32
 #else
 fileprivate func _bjs_TextProcessor_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+@_expose(wasm, "bjs_Container_init")
+@_cdecl("bjs_Container_init")
+public func _bjs_Container_init(config: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let _tmp_config = Optional<Config>.bridgeJSLiftParameter(config)
+    let _tmp_location = DataPoint.bridgeJSLiftParameter()
+    let ret = Container(location: _tmp_location, config: _tmp_config)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Container_location_get")
+@_cdecl("bjs_Container_location_get")
+public func _bjs_Container_location_get(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = Container.bridgeJSLiftParameter(_self).location
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Container_location_set")
+@_cdecl("bjs_Container_location_set")
+public func _bjs_Container_location_set(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Container.bridgeJSLiftParameter(_self).location = DataPoint.bridgeJSLiftParameter()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Container_config_get")
+@_cdecl("bjs_Container_config_get")
+public func _bjs_Container_config_get(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = Container.bridgeJSLiftParameter(_self).config
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Container_config_set")
+@_cdecl("bjs_Container_config_set")
+public func _bjs_Container_config_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+    #if arch(wasm32)
+    Container.bridgeJSLiftParameter(_self).config = Optional<Config>.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Container_deinit")
+@_cdecl("bjs_Container_deinit")
+public func _bjs_Container_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<Container>.fromOpaque(pointer).release()
+}
+
+extension Container: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_Container_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Container_wrap")
+fileprivate func _bjs_Container_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_Container_wrap(_: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

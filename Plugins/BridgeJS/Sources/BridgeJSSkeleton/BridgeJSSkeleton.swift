@@ -25,7 +25,7 @@ public struct ABINameGenerator {
         let contextPart: String?
         if let staticContext = staticContext {
             switch staticContext {
-            case .className(let name), .enumName(let name):
+            case .className(let name), .enumName(let name), .structName(let name):
                 contextPart = name
             case .namespaceEnum:
                 contextPart = namespacePart
@@ -115,6 +115,7 @@ public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case associatedValueEnum(String)
     case namespaceEnum(String)
     case swiftProtocol(String)
+    case swiftStruct(String)
     indirect case closure(ClosureSignature)
 }
 
@@ -205,8 +206,49 @@ public struct Effects: Codable, Equatable, Sendable {
 
 public enum StaticContext: Codable, Equatable, Sendable {
     case className(String)
+    case structName(String)
     case enumName(String)
     case namespaceEnum
+}
+
+// MARK: - Struct Skeleton
+
+public struct StructField: Codable, Equatable, Sendable {
+    public let name: String
+    public let type: BridgeType
+
+    public init(name: String, type: BridgeType) {
+        self.name = name
+        self.type = type
+    }
+}
+
+public struct ExportedStruct: Codable, Equatable, Sendable {
+    public let name: String
+    public let swiftCallName: String
+    public let explicitAccessControl: String?
+    public var properties: [ExportedProperty]
+    public var constructor: ExportedConstructor?
+    public var methods: [ExportedFunction]
+    public let namespace: [String]?
+
+    public init(
+        name: String,
+        swiftCallName: String,
+        explicitAccessControl: String?,
+        properties: [ExportedProperty] = [],
+        constructor: ExportedConstructor? = nil,
+        methods: [ExportedFunction] = [],
+        namespace: [String]?
+    ) {
+        self.name = name
+        self.swiftCallName = swiftCallName
+        self.explicitAccessControl = explicitAccessControl
+        self.properties = properties
+        self.constructor = constructor
+        self.methods = methods
+        self.namespace = namespace
+    }
 }
 
 // MARK: - Enum Skeleton
@@ -416,7 +458,7 @@ public struct ExportedClass: Codable {
     }
 }
 
-public struct ExportedConstructor: Codable {
+public struct ExportedConstructor: Codable, Equatable, Sendable {
     public var abiName: String
     public var parameters: [Parameter]
     public var effects: Effects
@@ -457,7 +499,7 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
     public func callName(prefix: String? = nil) -> String {
         if let staticContext = staticContext {
             switch staticContext {
-            case .className(let baseName), .enumName(let baseName):
+            case .className(let baseName), .enumName(let baseName), .structName(let baseName):
                 return "\(baseName).\(name)"
             case .namespaceEnum:
                 if let namespace = namespace, !namespace.isEmpty {
@@ -498,6 +540,7 @@ public struct ExportedSkeleton: Codable {
     public let functions: [ExportedFunction]
     public let classes: [ExportedClass]
     public let enums: [ExportedEnum]
+    public let structs: [ExportedStruct]
     public let protocols: [ExportedProtocol]
     /// Whether to expose exported APIs to the global namespace.
     ///
@@ -511,6 +554,7 @@ public struct ExportedSkeleton: Codable {
         functions: [ExportedFunction],
         classes: [ExportedClass],
         enums: [ExportedEnum],
+        structs: [ExportedStruct] = [],
         protocols: [ExportedProtocol] = [],
         exposeToGlobal: Bool
     ) {
@@ -518,6 +562,7 @@ public struct ExportedSkeleton: Codable {
         self.functions = functions
         self.classes = classes
         self.enums = enums
+        self.structs = structs
         self.protocols = protocols
         self.exposeToGlobal = exposeToGlobal
     }
@@ -624,6 +669,9 @@ extension BridgeType {
         case .swiftProtocol:
             // Protocols pass JSObject IDs as Int32
             return .i32
+        case .swiftStruct:
+            // Structs use stack-based return (no direct WASM return type)
+            return nil
         case .closure:
             // Closures pass callback ID as Int32
             return .i32
@@ -660,6 +708,8 @@ extension BridgeType {
             return "\(name.count)\(name)O"
         case .swiftProtocol(let name):
             return "\(name.count)\(name)P"
+        case .swiftStruct(let name):
+            return "\(name.count)\(name)V"
         case .closure(let signature):
             let params =
                 signature.parameters.isEmpty

@@ -24,6 +24,7 @@ public class ExportSwift {
     private var exportedFunctions: [ExportedFunction] = []
     private var exportedClasses: [ExportedClass] = []
     private var exportedEnums: [ExportedEnum] = []
+    private var exportedStructs: [ExportedStruct] = []
     private var exportedProtocols: [ExportedProtocol] = []
     private var exportedProtocolNameByKey: [String: String] = [:]
     private var typeDeclResolver: TypeDeclResolver = TypeDeclResolver()
@@ -71,6 +72,7 @@ public class ExportSwift {
                 functions: exportedFunctions,
                 classes: exportedClasses,
                 enums: exportedEnums,
+                structs: exportedStructs,
                 protocols: exportedProtocols,
                 exposeToGlobal: exposeToGlobal
             )
@@ -88,6 +90,9 @@ public class ExportSwift {
         /// The names of the exported protocols, in the order they were written in the source file
         var exportedProtocolNames: [String] = []
         var exportedProtocolByName: [String: ExportedProtocol] = [:]
+        /// The names of the exported structs, in the order they were written in the source file
+        var exportedStructNames: [String] = []
+        var exportedStructByName: [String: ExportedStruct] = [:]
         var errors: [DiagnosticError] = []
 
         /// Creates a unique key by combining name and namespace
@@ -132,6 +137,7 @@ public class ExportSwift {
             case classBody(name: String, key: String)
             case enumBody(name: String, key: String)
             case protocolBody(name: String, key: String)
+            case structBody(name: String, key: String)
         }
 
         struct StateStack {
@@ -516,6 +522,14 @@ public class ExportSwift {
             case .protocolBody(_, _):
                 // Protocol methods are handled in visitProtocolMethod during protocol parsing
                 return .skipChildren
+            case .structBody(let structName, let structKey):
+                if let exportedFunction = visitFunction(node: node, isStatic: isStatic, structName: structName) {
+                    if var currentStruct = exportedStructByName[structKey] {
+                        currentStruct.methods.append(exportedFunction)
+                        exportedStructByName[structKey] = currentStruct
+                    }
+                }
+                return .skipChildren
             }
         }
 
@@ -524,7 +538,8 @@ public class ExportSwift {
             isStatic: Bool,
             className: String? = nil,
             classKey: String? = nil,
-            enumName: String? = nil
+            enumName: String? = nil,
+            structName: String? = nil
         ) -> ExportedFunction? {
             guard let jsAttribute = node.attributes.firstJSAttribute else {
                 return nil
@@ -600,12 +615,21 @@ public class ExportSwift {
                 staticContext = isNamespaceEnum ? .namespaceEnum : .enumName(enumName)
             case .protocolBody(_, _):
                 return nil
+            case .structBody(let structName, _):
+                if isStatic {
+                    staticContext = .structName(structName)
+                } else {
+                    staticContext = nil
+                }
             }
 
             let classNameForABI: String?
-            if case .classBody(let className, _) = state {
+            switch state {
+            case .classBody(let className, _):
                 classNameForABI = className
-            } else {
+            case .structBody(let structName, _):
+                classNameForABI = structName
+            default:
                 classNameForABI = nil
             }
             abiName = ABINameGenerator.generateABIName(
@@ -691,37 +715,59 @@ public class ExportSwift {
 
         override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
             guard let jsAttribute = node.attributes.firstJSAttribute else { return .skipChildren }
-            guard case .classBody(let className, _) = state else {
-                if case .enumBody(_, _) = state {
-                    diagnose(node: node, message: "Initializers are not supported inside enums")
-                } else {
-                    diagnose(node: node, message: "@JS init must be inside a @JS class")
+
+            switch state {
+            case .classBody(let className, let classKey):
+                if extractNamespace(from: jsAttribute) != nil {
+                    diagnose(
+                        node: jsAttribute,
+                        message: "Namespace is not supported for initializer declarations",
+                        hint: "Remove the namespace from @JS attribute"
+                    )
                 }
-                return .skipChildren
-            }
 
-            if extractNamespace(from: jsAttribute) != nil {
-                diagnose(
-                    node: jsAttribute,
-                    message: "Namespace is not supported for initializer declarations",
-                    hint: "Remove the namespace from @JS attribute"
+                let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: true)
+
+                guard let effects = collectEffects(signature: node.signature) else {
+                    return .skipChildren
+                }
+
+                let constructor = ExportedConstructor(
+                    abiName: "bjs_\(className)_init",
+                    parameters: parameters,
+                    effects: effects
                 )
-            }
-
-            let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: true)
-
-            guard let effects = collectEffects(signature: node.signature) else {
-                return .skipChildren
-            }
-
-            let constructor = ExportedConstructor(
-                abiName: "bjs_\(className)_init",
-                parameters: parameters,
-                effects: effects
-            )
-            if case .classBody(_, let classKey) = state {
                 exportedClassByName[classKey]?.constructor = constructor
+
+            case .structBody(let structName, let structKey):
+                if extractNamespace(from: jsAttribute) != nil {
+                    diagnose(
+                        node: jsAttribute,
+                        message: "Namespace is not supported for initializer declarations",
+                        hint: "Remove the namespace from @JS attribute"
+                    )
+                }
+
+                let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: true)
+
+                guard let effects = collectEffects(signature: node.signature) else {
+                    return .skipChildren
+                }
+
+                let constructor = ExportedConstructor(
+                    abiName: "bjs_\(structName)_init",
+                    parameters: parameters,
+                    effects: effects
+                )
+                exportedStructByName[structKey]?.constructor = constructor
+
+            case .enumBody(_, _):
+                diagnose(node: node, message: "Initializers are not supported inside enums")
+
+            case .topLevel, .protocolBody(_, _):
+                diagnose(node: node, message: "@JS init must be inside a @JS class or struct")
             }
+
             return .skipChildren
         }
 
@@ -753,27 +799,29 @@ public class ExportSwift {
 
             // Determine static context and validate placement
             let staticContext: StaticContext?
-            let classKey: String
 
             switch state {
-            case .classBody(let className, let key):
-                classKey = key
+            case .classBody(let className, _):
                 staticContext = isStatic ? .className(className) : nil
             case .enumBody(let enumName, let enumKey):
                 if !isStatic {
                     diagnose(node: node, message: "Only static properties are supported in enums")
                     return .skipChildren
                 }
-                classKey = enumKey
-
                 let isNamespaceEnum = exportedEnumByName[enumKey]?.cases.isEmpty ?? true
                 staticContext = isStatic ? (isNamespaceEnum ? .namespaceEnum : .enumName(enumName)) : nil
-
             case .topLevel:
                 diagnose(node: node, message: "@JS var must be inside a @JS class or enum")
                 return .skipChildren
             case .protocolBody(let protocolName, let protocolKey):
                 return visitProtocolProperty(node: node, protocolName: protocolName, protocolKey: protocolKey)
+            case .structBody(let structName, _):
+                if isStatic {
+                    staticContext = .structName(structName)
+                } else {
+                    diagnose(node: node, message: "@JS var must be static in structs (instance fields don't need @JS)")
+                    return .skipChildren
+                }
             }
 
             // Process each binding (variable declaration)
@@ -810,13 +858,15 @@ public class ExportSwift {
                     staticContext: staticContext
                 )
 
-                if case .enumBody(_, let enumKey) = state {
-                    if var currentEnum = exportedEnumByName[enumKey] {
+                if case .enumBody(_, let key) = state {
+                    if var currentEnum = exportedEnumByName[key] {
                         currentEnum.staticProperties.append(exportedProperty)
-                        exportedEnumByName[enumKey] = currentEnum
+                        exportedEnumByName[key] = currentEnum
                     }
-                } else {
-                    exportedClassByName[classKey]?.properties.append(exportedProperty)
+                } else if case .structBody(_, let key) = state {
+                    exportedStructByName[key]?.properties.append(exportedProperty)
+                } else if case .classBody(_, let key) = state {
+                    exportedClassByName[key]?.properties.append(exportedProperty)
                 }
             }
 
@@ -937,7 +987,6 @@ public class ExportSwift {
             let emitStyle = exportedEnum.emitStyle
 
             if case .tsEnum = emitStyle {
-                // Check for Bool raw type limitation
                 if exportedEnum.rawType == .bool {
                     diagnose(
                         node: jsAttribute,
@@ -945,8 +994,6 @@ public class ExportSwift {
                         hint: "Use enumStyle: .const or change the raw type to String or a numeric type"
                     )
                 }
-
-                // Check for static functions limitation
                 if !exportedEnum.staticMethods.isEmpty {
                     diagnose(
                         node: jsAttribute,
@@ -1053,6 +1100,98 @@ public class ExportSwift {
             parent.exportedProtocolNameByKey[protocolUniqueKey] = name
 
             return .skipChildren
+        }
+
+        override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
+            guard let jsAttribute = node.attributes.firstJSAttribute else {
+                return .skipChildren
+            }
+
+            let name = node.name.text
+
+            let namespaceResult = resolveNamespace(from: jsAttribute, for: node, declarationType: "struct")
+            guard namespaceResult.isValid else {
+                return .skipChildren
+            }
+            let swiftCallName = ExportSwift.computeSwiftCallName(for: node, itemName: name)
+            let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
+                for: node,
+                message: "Struct visibility must be at least internal"
+            )
+
+            var properties: [ExportedProperty] = []
+
+            // Process all variables in struct as readonly (value semantics) and don't require @JS
+            for member in node.memberBlock.members {
+                if let varDecl = member.decl.as(VariableDeclSyntax.self) {
+                    let isStatic = varDecl.modifiers.contains { modifier in
+                        modifier.name.tokenKind == .keyword(.static) || modifier.name.tokenKind == .keyword(.class)
+                    }
+
+                    // Handled with error in visitVariable
+                    if varDecl.attributes.hasJSAttribute() {
+                        continue
+                    }
+                    // Skips static non-@JS properties
+                    if isStatic {
+                        continue
+                    }
+
+                    for binding in varDecl.bindings {
+                        guard let pattern = binding.pattern.as(IdentifierPatternSyntax.self) else {
+                            continue
+                        }
+
+                        let fieldName = pattern.identifier.text
+
+                        guard let typeAnnotation = binding.typeAnnotation else {
+                            diagnose(node: binding, message: "Struct field must have explicit type annotation")
+                            continue
+                        }
+
+                        guard let fieldType = self.parent.lookupType(for: typeAnnotation.type) else {
+                            diagnoseUnsupportedType(
+                                node: typeAnnotation.type,
+                                type: typeAnnotation.type.trimmedDescription
+                            )
+                            continue
+                        }
+
+                        let property = ExportedProperty(
+                            name: fieldName,
+                            type: fieldType,
+                            isReadonly: true,
+                            isStatic: false,
+                            namespace: namespaceResult.namespace,
+                            staticContext: nil
+                        )
+                        properties.append(property)
+                    }
+                }
+            }
+
+            let structUniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
+            let exportedStruct = ExportedStruct(
+                name: name,
+                swiftCallName: swiftCallName,
+                explicitAccessControl: explicitAccessControl,
+                properties: properties,
+                methods: [],
+                namespace: namespaceResult.namespace
+            )
+
+            exportedStructByName[structUniqueKey] = exportedStruct
+            exportedStructNames.append(structUniqueKey)
+
+            stateStack.push(state: .structBody(name: name, key: structUniqueKey))
+
+            return .visitChildren
+        }
+
+        override func visitPost(_ node: StructDeclSyntax) {
+            if case .structBody(_, _) = stateStack.current {
+                stateStack.pop()
+            }
         }
 
         private func visitProtocolMethod(
@@ -1314,6 +1453,11 @@ public class ExportSwift {
                 collector.exportedProtocolByName[$0]!
             }
         )
+        exportedStructs.append(
+            contentsOf: collector.exportedStructNames.map {
+                collector.exportedStructByName[$0]!
+            }
+        )
 
         return collector.errors
     }
@@ -1463,6 +1607,11 @@ public class ExportSwift {
             }
         }
 
+        if let structDecl = typeDecl.as(StructDeclSyntax.self) {
+            let swiftCallName = ExportSwift.computeSwiftCallName(for: structDecl, itemName: structDecl.name.text)
+            return .swiftStruct(swiftCallName)
+        }
+
         guard typeDecl.is(ClassDeclSyntax.self) || typeDecl.is(ActorDeclSyntax.self) else {
             return nil
         }
@@ -1484,7 +1633,7 @@ public class ExportSwift {
         var decls: [DeclSyntax] = []
         guard
             exportedFunctions.count > 0 || exportedClasses.count > 0 || exportedEnums.count > 0
-                || exportedProtocols.count > 0
+                || exportedProtocols.count > 0 || exportedStructs.count > 0
         else {
             return nil
         }
@@ -1543,6 +1692,12 @@ public class ExportSwift {
             }
         }
 
+        let structCodegen = StructCodegen()
+        for structDef in exportedStructs {
+            decls.append(structCodegen.renderStructHelpers(structDef))
+            decls.append(contentsOf: try renderSingleExportedStruct(struct: structDef))
+        }
+
         for function in exportedFunctions {
             decls.append(try renderSingleExportedFunction(function: function))
         }
@@ -1592,6 +1747,9 @@ public class ExportSwift {
             case .closure(let signature):
                 typeNameForIntrinsic = param.type.swiftType
                 liftingExpr = ExprSyntax("_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(\(raw: param.name))")
+            case .swiftStruct(let structName):
+                typeNameForIntrinsic = structName
+                liftingExpr = ExprSyntax("\(raw: structName).bridgeJSLiftParameter()")
             case .optional(let wrappedType):
                 typeNameForIntrinsic = "Optional<\(wrappedType.swiftType)>"
                 liftingExpr = ExprSyntax(
@@ -1701,6 +1859,30 @@ public class ExportSwift {
                 returnType: returnType
             )
             append(item)
+        }
+
+        /// Generates intermediate variables for stack-using parameters if needed for LIFO compatibility
+        private func generateParameterLifting() {
+            let stackParamIndices = parameters.enumerated().compactMap { index, param -> Int? in
+                switch param.type {
+                case .swiftStruct, .optional(.swiftStruct),
+                    .associatedValueEnum, .optional(.associatedValueEnum):
+                    return index
+                default:
+                    return nil
+                }
+            }
+
+            guard stackParamIndices.count > 1 else { return }
+
+            for index in stackParamIndices.reversed() {
+                let param = parameters[index]
+                let expr = liftedParameterExprs[index]
+                let varName = "_tmp_\(param.name)"
+
+                append("let \(raw: varName) = \(expr)")
+                liftedParameterExprs[index] = ExprSyntax(DeclReferenceExprSyntax(baseName: .identifier(varName)))
+            }
         }
 
         func callPropertyGetter(klassName: String, propertyName: String, returnType: BridgeType) {
@@ -1830,28 +2012,6 @@ public class ExportSwift {
             return abiReturnType?.swiftType ?? "Void"
         }
 
-        /// Generates intermediate variables for stack-using parameters if needed for LIFO compatibility
-        private func generateParameterLifting() {
-            let stackParamIndices = parameters.enumerated().compactMap { index, param -> Int? in
-                switch param.type {
-                case .optional(.associatedValueEnum):
-                    return index
-                default:
-                    return nil
-                }
-            }
-
-            guard stackParamIndices.count > 1 else { return }
-
-            for index in stackParamIndices.reversed() {
-                let param = parameters[index]
-                let expr = liftedParameterExprs[index]
-                let varName = "_tmp_\(param.name)"
-
-                append("let \(raw: varName) = \(expr)")
-                liftedParameterExprs[index] = ExprSyntax(DeclReferenceExprSyntax(baseName: .identifier(varName)))
-            }
-        }
     }
 
     private struct ClosureCodegen {
@@ -2051,7 +2211,220 @@ public class ExportSwift {
 
     }
 
+    /// Helper for stack-based lifting and lowering operations.
+    private struct StackCodegen {
+        /// Generates an expression to lift a value from the parameter stack.
+        /// - Parameter type: The BridgeType to lift
+        /// - Returns: An ExprSyntax representing the lift expression
+        func liftExpression(for type: BridgeType) -> ExprSyntax {
+            switch type {
+            case .string:
+                return "String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+            case .int:
+                return "Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            case .bool:
+                return "Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            case .float:
+                return "Float.bridgeJSLiftParameter(_swift_js_pop_param_f32())"
+            case .double:
+                return "Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())"
+            case .jsObject:
+                return "JSObject.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            case .swiftHeapObject(let className):
+                return "\(raw: className).bridgeJSLiftParameter(_swift_js_pop_param_pointer())"
+            case .swiftProtocol:
+                // Protocols are handled via JSObject
+                return "JSObject.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            case .caseEnum(let enumName):
+                return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            case .rawValueEnum(let enumName, let rawType):
+                switch rawType {
+                case .string:
+                    return
+                        "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+                case .bool, .int, .int32, .int64, .uint, .uint32, .uint64, .float, .double:
+                    return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+                }
+            case .associatedValueEnum(let enumName):
+                return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            case .swiftStruct(let structName):
+                return "\(raw: structName).bridgeJSLiftParameter()"
+            case .optional(let wrappedType):
+                return liftOptionalExpression(wrappedType: wrappedType)
+            case .void:
+                // Void shouldn't be lifted, but return a placeholder
+                return "()"
+            case .namespaceEnum:
+                // Namespace enums are not passed as values
+                return "()"
+            case .closure:
+                return "JSObject.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            }
+        }
+
+        private func liftOptionalExpression(wrappedType: BridgeType) -> ExprSyntax {
+            switch wrappedType {
+            case .string:
+                return
+                    "Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+            case .int:
+                return "Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+            case .bool:
+                return "Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+            case .float:
+                return "Optional<Float>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f32())"
+            case .double:
+                return "Optional<Double>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f64())"
+            case .caseEnum(let enumName):
+                return
+                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+            case .rawValueEnum(let enumName, let rawType):
+                switch rawType {
+                case .string:
+                    return
+                        "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+                case .bool, .int, .float, .double, .int32, .int64, .uint, .uint32, .uint64:
+                    return
+                        "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+                }
+            case .swiftStruct(let nestedName):
+                return "Optional<\(raw: nestedName)>.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            case .swiftHeapObject(let className):
+                return
+                    "Optional<\(raw: className)>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_pointer())"
+            case .associatedValueEnum(let enumName):
+                return
+                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+            case .jsObject:
+                return
+                    "Optional<JSObject>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+            default:
+                // Fallback for other optional types
+                return "Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+            }
+        }
+
+        /// Generates statements to lower/push a value onto the stack.
+        /// - Parameters:
+        ///   - type: The BridgeType to lower
+        ///   - accessor: The expression to access the value (e.g., "self.name" or "paramName")
+        ///   - varPrefix: A unique prefix for intermediate variables
+        /// - Returns: An array of CodeBlockItemSyntax representing the lowering statements
+        func lowerStatements(
+            for type: BridgeType,
+            accessor: String,
+            varPrefix: String
+        ) -> [CodeBlockItemSyntax] {
+            switch type {
+            case .string:
+                return [
+                    "var __bjs_\(raw: varPrefix) = \(raw: accessor)",
+                    "__bjs_\(raw: varPrefix).withUTF8 { ptr in _swift_js_push_string(ptr.baseAddress, Int32(ptr.count)) }",
+                ]
+            case .int:
+                return ["_swift_js_push_int(Int32(\(raw: accessor)))"]
+            case .bool:
+                return ["_swift_js_push_int(\(raw: accessor) ? 1 : 0)"]
+            case .float:
+                return ["_swift_js_push_f32(\(raw: accessor))"]
+            case .double:
+                return ["_swift_js_push_f64(\(raw: accessor))"]
+            case .jsObject:
+                return ["_swift_js_push_int(\(raw: accessor).bridgeJSLowerParameter())"]
+            case .swiftHeapObject:
+                return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
+            case .swiftProtocol:
+                return ["_swift_js_push_int(\(raw: accessor).bridgeJSLowerParameter())"]
+            case .caseEnum:
+                return ["_swift_js_push_int(Int32(\(raw: accessor).bridgeJSLowerParameter()))"]
+            case .rawValueEnum:
+                return ["_swift_js_push_int(Int32(\(raw: accessor).bridgeJSLowerParameter()))"]
+            case .associatedValueEnum:
+                return ["\(raw: accessor).bridgeJSLowerReturn()"]
+            case .swiftStruct:
+                return ["\(raw: accessor).bridgeJSLowerReturn()"]
+            case .optional(let wrappedType):
+                return lowerOptionalStatements(wrappedType: wrappedType, accessor: accessor, varPrefix: varPrefix)
+            case .void:
+                return []
+            case .namespaceEnum:
+                return []
+            case .closure:
+                return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
+            }
+        }
+
+        private func lowerOptionalStatements(
+            wrappedType: BridgeType,
+            accessor: String,
+            varPrefix: String
+        ) -> [CodeBlockItemSyntax] {
+            var statements: [CodeBlockItemSyntax] = []
+            statements.append("let __bjs_isSome_\(raw: varPrefix) = \(raw: accessor) != nil")
+            statements.append("if let __bjs_unwrapped_\(raw: varPrefix) = \(raw: accessor) {")
+
+            let innerStatements = lowerUnwrappedOptionalStatements(
+                wrappedType: wrappedType,
+                unwrappedVar: "__bjs_unwrapped_\(varPrefix)",
+                varPrefix: varPrefix
+            )
+            for stmt in innerStatements {
+                statements.append(stmt)
+            }
+
+            statements.append("}")
+            statements.append("_swift_js_push_int(__bjs_isSome_\(raw: varPrefix) ? 1 : 0)")
+            return statements
+        }
+
+        private func lowerUnwrappedOptionalStatements(
+            wrappedType: BridgeType,
+            unwrappedVar: String,
+            varPrefix: String
+        ) -> [CodeBlockItemSyntax] {
+            switch wrappedType {
+            case .string:
+                return [
+                    "var __bjs_str_\(raw: varPrefix) = \(raw: unwrappedVar)",
+                    "__bjs_str_\(raw: varPrefix).withUTF8 { ptr in _swift_js_push_string(ptr.baseAddress, Int32(ptr.count)) }",
+                ]
+            case .int:
+                return ["_swift_js_push_int(Int32(\(raw: unwrappedVar)))"]
+            case .bool:
+                return ["_swift_js_push_int(\(raw: unwrappedVar) ? 1 : 0)"]
+            case .float:
+                return ["_swift_js_push_f32(\(raw: unwrappedVar))"]
+            case .double:
+                return ["_swift_js_push_f64(\(raw: unwrappedVar))"]
+            case .caseEnum:
+                return ["_swift_js_push_int(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
+            case .rawValueEnum(_, let rawType):
+                switch rawType {
+                case .string:
+                    return [
+                        "var __bjs_str_\(raw: varPrefix) = \(raw: unwrappedVar).rawValue",
+                        "__bjs_str_\(raw: varPrefix).withUTF8 { ptr in _swift_js_push_string(ptr.baseAddress, Int32(ptr.count)) }",
+                    ]
+                default:
+                    return ["_swift_js_push_int(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
+                }
+            case .swiftStruct:
+                return ["\(raw: unwrappedVar).bridgeJSLowerReturn()"]
+            case .swiftHeapObject:
+                return ["_swift_js_push_pointer(\(raw: unwrappedVar).bridgeJSLowerReturn())"]
+            case .associatedValueEnum:
+                return ["_swift_js_push_int(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
+            case .jsObject:
+                return ["_swift_js_push_int(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
+            default:
+                return ["preconditionFailure(\"BridgeJS: unsupported optional wrapped type\")"]
+            }
+        }
+    }
+
     private struct EnumCodegen {
+        private let stackCodegen = StackCodegen()
+
         func renderCaseEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
             let typeName = enumDef.swiftCallName
             var initCases: [String] = []
@@ -2138,47 +2511,14 @@ public class ExportSwift {
                     var lines: [String] = []
                     lines.append("case \(caseIndex):")
                     let argList = enumCase.associatedValues.map { associatedValue in
-                        let paramName: String
+                        let labelPrefix: String
                         if let label = associatedValue.label {
-                            paramName = "\(label): "
+                            labelPrefix = "\(label): "
                         } else {
-                            paramName = ""
+                            labelPrefix = ""
                         }
-                        switch associatedValue.type {
-                        case .string:
-                            return
-                                "\(paramName)String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
-                        case .int:
-                            return "\(paramName)Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
-                        case .bool:
-                            return "\(paramName)Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
-                        case .float:
-                            return "\(paramName)Float.bridgeJSLiftParameter(_swift_js_pop_param_f32())"
-                        case .double:
-                            return "\(paramName)Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())"
-                        case .optional(let wrappedType):
-                            switch wrappedType {
-                            case .string:
-                                return
-                                    "\(paramName)Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
-                            case .int:
-                                return
-                                    "\(paramName)Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
-                            case .bool:
-                                return
-                                    "\(paramName)Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
-                            case .float:
-                                return
-                                    "\(paramName)Optional<Float>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f32())"
-                            case .double:
-                                return
-                                    "\(paramName)Optional<Double>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f64())"
-                            default:
-                                return ""
-                            }
-                        default:
-                            return "\(paramName)Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
-                        }
+                        let liftExpr = stackCodegen.liftExpression(for: associatedValue.type)
+                        return "\(labelPrefix)\(liftExpr)"
                     }
                     lines.append("return .\(enumCase.name)(\(argList.joined(separator: ", ")))")
                     cases.append(lines.joined(separator: "\n"))
@@ -2193,48 +2533,13 @@ public class ExportSwift {
             var bodyLines: [String] = []
             for (index, associatedValue) in associatedValues.enumerated() {
                 let paramName = associatedValue.label ?? "param\(index)"
-                switch associatedValue.type {
-                case .string:
-                    bodyLines.append("var __bjs_\(paramName) = \(paramName)")
-                    bodyLines.append("__bjs_\(paramName).withUTF8 { ptr in")
-                    bodyLines.append("_swift_js_push_string(ptr.baseAddress, Int32(ptr.count))")
-                    bodyLines.append("}")
-                case .int:
-                    bodyLines.append("_swift_js_push_int(Int32(\(paramName)))")
-                case .bool:
-                    bodyLines.append("_swift_js_push_int(\(paramName) ? 1 : 0)")
-                case .float:
-                    bodyLines.append("_swift_js_push_f32(\(paramName))")
-                case .double:
-                    bodyLines.append("_swift_js_push_f64(\(paramName))")
-                case .optional(let wrappedType):
-                    bodyLines.append("let __bjs_isSome_\(paramName) = \(paramName) != nil")
-                    bodyLines.append("if let __bjs_unwrapped_\(paramName) = \(paramName) {")
-                    switch wrappedType {
-                    case .string:
-                        bodyLines.append("var __bjs_str_\(paramName) = __bjs_unwrapped_\(paramName)")
-                        bodyLines.append("__bjs_str_\(paramName).withUTF8 { ptr in")
-                        bodyLines.append("_swift_js_push_string(ptr.baseAddress, Int32(ptr.count))")
-                        bodyLines.append("}")
-                    case .int:
-                        bodyLines.append("_swift_js_push_int(Int32(__bjs_unwrapped_\(paramName)))")
-                    case .bool:
-                        bodyLines.append("_swift_js_push_int(__bjs_unwrapped_\(paramName) ? 1 : 0)")
-                    case .float:
-                        bodyLines.append("_swift_js_push_f32(__bjs_unwrapped_\(paramName))")
-                    case .double:
-                        bodyLines.append("_swift_js_push_f64(__bjs_unwrapped_\(paramName))")
-                    default:
-                        bodyLines.append(
-                            "preconditionFailure(\"BridgeJS: unsupported optional wrapped type in generated code\")"
-                        )
-                    }
-                    bodyLines.append("}")
-                    bodyLines.append("_swift_js_push_int(__bjs_isSome_\(paramName) ? 1 : 0)")
-                default:
-                    bodyLines.append(
-                        "preconditionFailure(\"BridgeJS: unsupported associated value type in generated code\")"
-                    )
+                let statements = stackCodegen.lowerStatements(
+                    for: associatedValue.type,
+                    accessor: paramName,
+                    varPrefix: paramName
+                )
+                for stmt in statements {
+                    bodyLines.append(stmt.description)
                 }
             }
             return bodyLines
@@ -2279,11 +2584,69 @@ public class ExportSwift {
         }
     }
 
+    private struct StructCodegen {
+        private let stackCodegen = StackCodegen()
+
+        func renderStructHelpers(_ structDef: ExportedStruct) -> DeclSyntax {
+            let typeName = structDef.swiftCallName
+            let liftCode = generateStructLiftCode(structDef: structDef)
+            let lowerCode = generateStructLowerCode(structDef: structDef)
+
+            return """
+                extension \(raw: typeName): _BridgedSwiftStruct {
+                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> \(raw: typeName) {
+                        \(raw: liftCode.joined(separator: "\n"))
+                    }
+
+                    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+                        \(raw: lowerCode.joined(separator: "\n"))
+                    }
+                }
+                """
+        }
+
+        private func generateStructLiftCode(structDef: ExportedStruct) -> [String] {
+            var lines: [String] = []
+            let instanceProps = structDef.properties.filter { !$0.isStatic }
+
+            for property in instanceProps.reversed() {
+                let fieldName = property.name
+                let liftExpr = stackCodegen.liftExpression(for: property.type)
+                lines.append("let \(fieldName) = \(liftExpr)")
+            }
+
+            let initArgs = instanceProps.map { "\($0.name): \($0.name)" }.joined(separator: ", ")
+            lines.append("return \(structDef.swiftCallName)(\(initArgs))")
+
+            return lines
+        }
+
+        private func generateStructLowerCode(structDef: ExportedStruct) -> [String] {
+            var lines: [String] = []
+            let instanceProps = structDef.properties.filter { !$0.isStatic }
+
+            for property in instanceProps {
+                let accessor = "self.\(property.name)"
+                let statements = stackCodegen.lowerStatements(
+                    for: property.type,
+                    accessor: accessor,
+                    varPrefix: property.name
+                )
+                for stmt in statements {
+                    lines.append(stmt.description)
+                }
+            }
+
+            return lines
+        }
+    }
+
     /// Context for property rendering that determines call behavior and ABI generation
     private enum PropertyRenderingContext {
         case enumStatic(enumDef: ExportedEnum)
         case classStatic(klass: ExportedClass)
         case classInstance(klass: ExportedClass)
+        case structStatic(structDef: ExportedStruct)
     }
 
     /// Renders getter and setter Swift thunk code for a property in any context
@@ -2309,6 +2672,10 @@ public class ExportSwift {
             callName = property.callName()
             className = klass.name
             isStatic = false
+        case .structStatic(let structDef):
+            callName = property.callName(prefix: structDef.swiftCallName)
+            className = structDef.name
+            isStatic = true
         }
 
         let getterBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false, isStatic: isStatic))
@@ -2369,7 +2736,7 @@ public class ExportSwift {
         if function.effects.isStatic, let staticContext = function.staticContext {
             let callName: String
             switch staticContext {
-            case .className(let baseName), .enumName(let baseName):
+            case .className(let baseName), .enumName(let baseName), .structName(let baseName):
                 callName = "\(baseName).\(function.name)"
             case .namespaceEnum:
                 if let namespace = function.namespace, !namespace.isEmpty {
@@ -2385,6 +2752,57 @@ public class ExportSwift {
 
         try builder.lowerReturnValue(returnType: function.returnType)
         return builder.render(abiName: function.abiName)
+    }
+
+    func renderSingleExportedStruct(struct structDef: ExportedStruct) throws -> [DeclSyntax] {
+        var decls: [DeclSyntax] = []
+
+        if let constructor = structDef.constructor {
+            let builder = ExportedThunkBuilder(effects: constructor.effects)
+            for param in constructor.parameters {
+                try builder.liftParameter(param: param)
+            }
+            builder.call(name: structDef.swiftCallName, returnType: .swiftStruct(structDef.swiftCallName))
+            try builder.lowerReturnValue(returnType: .swiftStruct(structDef.swiftCallName))
+            decls.append(builder.render(abiName: constructor.abiName))
+        }
+
+        for property in structDef.properties where property.isStatic {
+            decls.append(
+                contentsOf: try renderSingleExportedProperty(
+                    property: property,
+                    context: .structStatic(structDef: structDef)
+                )
+            )
+        }
+
+        for method in structDef.methods {
+            let builder = ExportedThunkBuilder(effects: method.effects)
+
+            if method.effects.isStatic {
+                for param in method.parameters {
+                    try builder.liftParameter(param: param)
+                }
+                builder.call(name: "\(structDef.swiftCallName).\(method.name)", returnType: method.returnType)
+            } else {
+                try builder.liftParameter(
+                    param: Parameter(label: nil, name: "_self", type: .swiftStruct(structDef.swiftCallName))
+                )
+                for param in method.parameters {
+                    try builder.liftParameter(param: param)
+                }
+                builder.callMethod(
+                    klassName: structDef.swiftCallName,
+                    methodName: method.name,
+                    returnType: method.returnType
+                )
+            }
+
+            try builder.lowerReturnValue(returnType: method.returnType)
+            decls.append(builder.render(abiName: method.abiName))
+        }
+
+        return decls
     }
 
     /// # Example
@@ -2879,6 +3297,7 @@ extension BridgeType {
         case .caseEnum(let name): return name
         case .rawValueEnum(let name, _): return name
         case .associatedValueEnum(let name): return name
+        case .swiftStruct(let name): return name
         case .namespaceEnum(let name): return name
         case .closure(let signature):
             let paramTypes = signature.parameters.map { $0.swiftType }.joined(separator: ", ")
@@ -2935,6 +3354,8 @@ extension BridgeType {
             }
         case .associatedValueEnum:
             return .associatedValueEnum
+        case .swiftStruct:
+            return LiftingIntrinsicInfo(parameters: [])
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
         case .closure:
@@ -2956,6 +3377,7 @@ extension BridgeType {
         static let caseEnum = LoweringIntrinsicInfo(returnType: .i32)
         static let rawValueEnum = LoweringIntrinsicInfo(returnType: .i32)
         static let associatedValueEnum = LoweringIntrinsicInfo(returnType: nil)
+        static let swiftStruct = LoweringIntrinsicInfo(returnType: nil)
         static let optional = LoweringIntrinsicInfo(returnType: nil)
     }
 
@@ -2987,6 +3409,8 @@ extension BridgeType {
             }
         case .associatedValueEnum:
             return .associatedValueEnum
+        case .swiftStruct:
+            return .swiftStruct
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
         case .closure:

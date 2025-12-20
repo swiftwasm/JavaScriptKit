@@ -142,5 +142,8 @@
   "moduleName" : "PlayBridgeJS",
   "protocols" : [
 
+  ],
+  "structs" : [
+
   ]
 }
