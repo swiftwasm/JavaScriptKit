@@ -2182,19 +2182,20 @@ extension ValidationReport: _BridgedSwiftStruct {
 
 extension MathOperations: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> MathOperations {
-        return MathOperations()
+        let baseValue = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
+        return MathOperations(baseValue: baseValue)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-
+        _swift_js_push_f64(self.baseValue)
     }
 }
 
 @_expose(wasm, "bjs_MathOperations_init")
 @_cdecl("bjs_MathOperations_init")
-public func _bjs_MathOperations_init() -> Void {
+public func _bjs_MathOperations_init(baseValue: Float64) -> Void {
     #if arch(wasm32)
-    let ret = MathOperations()
+    let ret = MathOperations(baseValue: Double.bridgeJSLiftParameter(baseValue))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -3612,6 +3613,17 @@ public func _bjs_makeAdder(base: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = makeAdder(base: Int.bridgeJSLiftParameter(base))
     return _BJS_Closure_20BridgeJSRuntimeTestsSi_Si.bridgeJSLower(ret)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_testStructDefault")
+@_cdecl("bjs_testStructDefault")
+public func _bjs_testStructDefault() -> Void {
+    #if arch(wasm32)
+    let ret = testStructDefault(point: DataPoint.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

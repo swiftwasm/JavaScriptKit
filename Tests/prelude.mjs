@@ -574,7 +574,7 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     const apiSuccess = { tag: exports.APIResult.Tag.Success, param0: "test success" };
     const apiFailure = { tag: exports.APIResult.Tag.Failure, param0: 404 };
     const apiInfo = { tag: exports.APIResult.Tag.Info };
-   
+
     assert.equal(exports.compareAPIResults(apiSuccess, apiFailure), "r1:success:test success,r2:failure:404");
     assert.equal(exports.compareAPIResults(null, apiInfo), "r1:nil,r2:info");
     assert.equal(exports.compareAPIResults(apiFailure, null), "r1:failure:404,r2:nil");
@@ -985,8 +985,20 @@ function testStructSupport(exports) {
 
     assert.equal(exports.MathOperations.subtract(10.0, 4.0), 6.0);
     const mathOps = exports.MathOperations.init();
+    assert.equal(mathOps.baseValue, 0.0);
     assert.equal(mathOps.add(5.0, 3.0), 8.0);
     assert.equal(mathOps.multiply(4.0, 7.0), 28.0);
+
+    const mathOps2 = exports.MathOperations.init(100.0);
+    assert.equal(mathOps2.baseValue, 100.0);
+    assert.equal(mathOps2.add(5.0, 3.0), 108.0);
+
+    assert.equal(mathOps.add(5.0), 15.0);
+    assert.equal(mathOps2.add(5.0), 115.0);
+
+    assert.equal(exports.testStructDefault(), "1.0,2.0,default");
+    const customPoint = { x: 10.0, y: 20.0, label: "custom", optCount: null, optFlag: null };
+    assert.equal(exports.testStructDefault(customPoint), "10.0,20.0,custom");
 
     const container = exports.testContainerWithStruct({ x: 5.0, y: 10.0, label: "test", optCount: null, optFlag: true });
     assert.equal(container.location.x, 5.0);

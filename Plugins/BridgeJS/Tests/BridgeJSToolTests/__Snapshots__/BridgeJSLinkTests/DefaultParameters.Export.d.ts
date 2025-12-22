@@ -11,6 +11,19 @@ export const StatusValues: {
 };
 export type StatusTag = typeof StatusValues[keyof typeof StatusValues];
 
+export interface Config {
+    name: string;
+    value: number;
+    enabled: boolean;
+}
+export interface MathOperations {
+    baseValue: number;
+    /**
+     * @param b - Optional parameter (default: 10.0)
+     */
+    add(a: number, b?: number): number;
+    multiply(a: number, b: number): number;
+}
 export type StatusObject = typeof StatusValues;
 
 /// Represents a Swift heap object like a class instance or an actor instance.
@@ -26,7 +39,6 @@ export interface DefaultGreeter extends SwiftHeapObject {
 export interface EmptyGreeter extends SwiftHeapObject {
 }
 export interface ConstructorDefaults extends SwiftHeapObject {
-    describe(): string;
     name: string;
     count: number;
     enabled: boolean;
@@ -96,7 +108,25 @@ export type Exports = {
      * @param greeter - Optional parameter (default: new EmptyGreeter())
      */
     testEmptyInit(greeter?: EmptyGreeter): EmptyGreeter;
+    /**
+     * @param point - Optional parameter (default: null)
+     */
+    testOptionalStructDefault(point?: Config | null): Config | null;
+    /**
+     * @param point - Optional parameter (default: { name: "default", value: 42, enabled: true })
+     */
+    testOptionalStructWithValueDefault(point?: Config | null): Config | null;
     Status: StatusObject
+    MathOperations: {
+        /**
+         * @param baseValue - Optional parameter (default: 0.0)
+         */
+        init(baseValue?: number): MathOperations;
+        /**
+         * @param b - Optional parameter (default: 5.0)
+         */
+        subtract(a: number, b?: number): number;
+    }
 }
 export type Imports = {
 }

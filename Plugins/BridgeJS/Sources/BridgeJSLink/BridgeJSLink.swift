@@ -1254,16 +1254,6 @@ struct BridgeJSLink {
             ]
         }
 
-        func generateParameterList(parameters: [Parameter]) -> String {
-            parameters.map { param in
-                if let defaultValue = param.defaultValue {
-                    let defaultJs = DefaultValueGenerator().generate(defaultValue, format: .javascript)
-                    return "\(param.name) = \(defaultJs)"
-                }
-                return param.name
-            }.joined(separator: ", ")
-        }
-
         func renderFunction(
             name: String,
             parameters: [Parameter],
@@ -1272,7 +1262,7 @@ struct BridgeJSLink {
         ) -> [String] {
             let printer = CodeFragmentPrinter()
 
-            let parameterList = generateParameterList(parameters: parameters)
+            let parameterList = DefaultValueUtils.formatParameterList(parameters)
 
             printer.write(
                 "\(declarationPrefixKeyword.map { "\($0) "} ?? "")\(name)(\(parameterList)) {"
@@ -1350,74 +1340,8 @@ struct BridgeJSLink {
 
     /// Helper method to append JSDoc comments for parameters with default values
     private func appendJSDocIfNeeded(for parameters: [Parameter], to lines: inout [String]) {
-        let jsDocLines = DefaultValueGenerator().generateJSDoc(for: parameters)
+        let jsDocLines = DefaultValueUtils.formatJSDoc(for: parameters)
         lines.append(contentsOf: jsDocLines)
-    }
-
-    /// Helper struct for generating default value representations
-    private struct DefaultValueGenerator {
-        enum OutputFormat {
-            case javascript
-            case typescript
-        }
-
-        /// Generates default value representation for JavaScript or TypeScript
-        func generate(_ defaultValue: DefaultValue, format: OutputFormat) -> String {
-            switch defaultValue {
-            case .string(let value):
-                let escapedValue =
-                    format == .javascript
-                    ? escapeForJavaScript(value)
-                    : value  // TypeScript doesn't need escape in doc comments
-                return "\"\(escapedValue)\""
-            case .int(let value):
-                return "\(value)"
-            case .float(let value):
-                return "\(value)"
-            case .double(let value):
-                return "\(value)"
-            case .bool(let value):
-                return value ? "true" : "false"
-            case .null:
-                return "null"
-            case .enumCase(let enumName, let caseName):
-                let simpleName = enumName.components(separatedBy: ".").last ?? enumName
-                let jsEnumName = format == .javascript ? "\(simpleName)\(ExportedEnum.valuesSuffix)" : simpleName
-                return "\(jsEnumName).\(caseName.capitalizedFirstLetter)"
-            case .object(let className):
-                return "new \(className)()"
-            case .objectWithArguments(let className, let args):
-                let argStrings = args.map { arg in
-                    generate(arg, format: format)
-                }
-                return "new \(className)(\(argStrings.joined(separator: ", ")))"
-            }
-        }
-
-        private func escapeForJavaScript(_ string: String) -> String {
-            return
-                string
-                .replacingOccurrences(of: "\\", with: "\\\\")
-                .replacingOccurrences(of: "\"", with: "\\\"")
-        }
-
-        /// Generates JSDoc comment lines for parameters with default values
-        func generateJSDoc(for parameters: [Parameter]) -> [String] {
-            let paramsWithDefaults = parameters.filter { $0.hasDefault }
-            guard !paramsWithDefaults.isEmpty else {
-                return []
-            }
-
-            var jsDocLines: [String] = ["/**"]
-            for param in paramsWithDefaults {
-                if let defaultValue = param.defaultValue {
-                    let defaultDoc = generate(defaultValue, format: .typescript)
-                    jsDocLines.append(" * @param \(param.name) - Optional parameter (default: \(defaultDoc))")
-                }
-            }
-            jsDocLines.append(" */")
-            return jsDocLines
-        }
     }
 
     func renderExportedStruct(
@@ -1437,6 +1361,8 @@ struct BridgeJSLink {
                 dtsTypePrinter.write("\(property.name): \(tsType);")
             }
             for method in structDefinition.methods where !method.effects.isStatic {
+                let jsDocLines = DefaultValueUtils.formatJSDoc(for: method.parameters)
+                dtsTypePrinter.write(lines: jsDocLines)
                 let signature = renderTSSignature(
                     parameters: method.parameters,
                     returnType: method.returnType,
@@ -1466,7 +1392,7 @@ struct BridgeJSLink {
                 )
 
                 let constructorPrinter = CodeFragmentPrinter()
-                let paramList = thunkBuilder.generateParameterList(parameters: constructor.parameters)
+                let paramList = DefaultValueUtils.formatParameterList(constructor.parameters)
                 constructorPrinter.write("init: function(\(paramList)) {")
                 constructorPrinter.indent {
                     constructorPrinter.write(contentsOf: thunkBuilder.body)
@@ -1499,6 +1425,8 @@ struct BridgeJSLink {
         dtsExportEntryPrinter.write("\(structName): {")
         dtsExportEntryPrinter.indent {
             if let constructor = structDefinition.constructor {
+                let jsDocLines = DefaultValueUtils.formatJSDoc(for: constructor.parameters)
+                dtsExportEntryPrinter.write(lines: jsDocLines)
                 dtsExportEntryPrinter.write(
                     "init\(renderTSSignature(parameters: constructor.parameters, returnType: .swiftStruct(structDefinition.swiftCallName), effects: constructor.effects));"
                 )
@@ -1508,6 +1436,8 @@ struct BridgeJSLink {
                 dtsExportEntryPrinter.write("\(readonly)\(property.name): \(resolveTypeScriptType(property.type));")
             }
             for method in staticMethods {
+                let jsDocLines = DefaultValueUtils.formatJSDoc(for: method.parameters)
+                dtsExportEntryPrinter.write(lines: jsDocLines)
                 dtsExportEntryPrinter.write(
                     "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                 )
@@ -1930,7 +1860,7 @@ extension BridgeJSLink {
                 try thunkBuilder.lowerParameter(param: param)
             }
 
-            let constructorParamList = thunkBuilder.generateParameterList(parameters: constructor.parameters)
+            let constructorParamList = DefaultValueUtils.formatParameterList(constructor.parameters)
 
             jsPrinter.indent {
                 jsPrinter.write("constructor(\(constructorParamList)) {")
@@ -1945,7 +1875,7 @@ extension BridgeJSLink {
             }
 
             dtsExportEntryPrinter.indent {
-                let jsDocLines = DefaultValueGenerator().generateJSDoc(for: constructor.parameters)
+                let jsDocLines = DefaultValueUtils.formatJSDoc(for: constructor.parameters)
                 for line in jsDocLines {
                     dtsExportEntryPrinter.write(line)
                 }
@@ -3170,6 +3100,88 @@ extension BridgeJSLink {
             returnType: method.returnType
         )
         importObjectBuilder.assignToImportObject(name: method.abiName, function: funcLines)
+    }
+}
+
+/// Utility enum for generating default value representations in JavaScript/TypeScript
+enum DefaultValueUtils {
+    enum OutputFormat {
+        case javascript
+        case typescript
+    }
+
+    /// Generates default value representation for JavaScript or TypeScript
+    static func format(_ defaultValue: DefaultValue, as format: OutputFormat) -> String {
+        switch defaultValue {
+        case .string(let value):
+            let escapedValue =
+                format == .javascript
+                ? escapeForJavaScript(value)
+                : value  // TypeScript doesn't need escape in doc comments
+            return "\"\(escapedValue)\""
+        case .int(let value):
+            return "\(value)"
+        case .float(let value):
+            return "\(value)"
+        case .double(let value):
+            return "\(value)"
+        case .bool(let value):
+            return value ? "true" : "false"
+        case .null:
+            return "null"
+        case .enumCase(let enumName, let caseName):
+            let simpleName = enumName.components(separatedBy: ".").last ?? enumName
+            let jsEnumName = format == .javascript ? "\(simpleName)\(ExportedEnum.valuesSuffix)" : simpleName
+            return "\(jsEnumName).\(caseName.capitalizedFirstLetter)"
+        case .object(let className):
+            return "new \(className)()"
+        case .objectWithArguments(let className, let args):
+            let argStrings = args.map { arg in
+                Self.format(arg, as: format)
+            }
+            return "new \(className)(\(argStrings.joined(separator: ", ")))"
+        case .structLiteral(_, let fields):
+            let fieldStrings = fields.map { field in
+                "\(field.name): \(Self.format(field.value, as: format))"
+            }
+            return "{ \(fieldStrings.joined(separator: ", ")) }"
+        }
+    }
+
+    private static func escapeForJavaScript(_ string: String) -> String {
+        return
+            string
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+    }
+
+    /// Generates JSDoc comment lines for parameters with default values
+    static func formatJSDoc(for parameters: [Parameter]) -> [String] {
+        let paramsWithDefaults = parameters.filter { $0.hasDefault }
+        guard !paramsWithDefaults.isEmpty else {
+            return []
+        }
+
+        var jsDocLines: [String] = ["/**"]
+        for param in paramsWithDefaults {
+            if let defaultValue = param.defaultValue {
+                let defaultDoc = format(defaultValue, as: .typescript)
+                jsDocLines.append(" * @param \(param.name) - Optional parameter (default: \(defaultDoc))")
+            }
+        }
+        jsDocLines.append(" */")
+        return jsDocLines
+    }
+
+    /// Generates a JavaScript parameter list with default values
+    static func formatParameterList(_ parameters: [Parameter]) -> String {
+        return parameters.map { param in
+            if let defaultValue = param.defaultValue {
+                let defaultJs = format(defaultValue, as: .javascript)
+                return "\(param.name) = \(defaultJs)"
+            }
+            return param.name
+        }.joined(separator: ", ")
     }
 }
 

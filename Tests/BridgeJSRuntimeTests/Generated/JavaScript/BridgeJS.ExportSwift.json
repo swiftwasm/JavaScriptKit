@@ -7645,6 +7645,78 @@
       }
     },
     {
+      "abiName" : "bjs_testStructDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testStructDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "structLiteral" : {
+              "_0" : "DataPoint",
+              "_1" : [
+                {
+                  "name" : "x",
+                  "value" : {
+                    "float" : {
+                      "_0" : 1
+                    }
+                  }
+                },
+                {
+                  "name" : "y",
+                  "value" : {
+                    "float" : {
+                      "_0" : 2
+                    }
+                  }
+                },
+                {
+                  "name" : "label",
+                  "value" : {
+                    "string" : {
+                      "_0" : "default"
+                    }
+                  }
+                },
+                {
+                  "name" : "optCount",
+                  "value" : {
+                    "null" : {
+
+                    }
+                  }
+                },
+                {
+                  "name" : "optFlag",
+                  "value" : {
+                    "null" : {
+
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "label" : "point",
+          "name" : "point",
+          "type" : {
+            "swiftStruct" : {
+              "_0" : "DataPoint"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
+    },
+    {
       "abiName" : "bjs_roundTripDataPoint",
       "effects" : {
         "isAsync" : false,
@@ -8613,7 +8685,20 @@
           "isThrows" : false
         },
         "parameters" : [
+          {
+            "defaultValue" : {
+              "double" : {
+                "_0" : 0
+              }
+            },
+            "label" : "baseValue",
+            "name" : "baseValue",
+            "type" : {
+              "double" : {
 
+              }
+            }
+          }
         ]
       },
       "methods" : [
@@ -8636,6 +8721,11 @@
               }
             },
             {
+              "defaultValue" : {
+                "double" : {
+                  "_0" : 10
+                }
+              },
               "label" : "b",
               "name" : "b",
               "type" : {
@@ -8727,7 +8817,16 @@
       ],
       "name" : "MathOperations",
       "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "baseValue",
+          "type" : {
+            "double" : {
 
+            }
+          }
+        }
       ],
       "swiftCallName" : "MathOperations"
     },

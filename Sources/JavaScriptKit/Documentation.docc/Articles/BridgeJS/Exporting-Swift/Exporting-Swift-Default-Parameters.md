@@ -107,41 +107,45 @@ The following default value types are supported for both function and constructo
 | Nil for optionals | `nil` | `null` |
 | Enum cases (shorthand) | `.north` | `Direction.North` |
 | Enum cases (qualified) | `Direction.north` | `Direction.North` |
-| Object initialization (no args) | `MyClass()` | `new MyClass()` |
-| Object initialization (literal args) | `MyClass("value", 42)` | `new MyClass("value", 42)` |
+| Class initialization (no args) | `MyClass()` | `new MyClass()` |
+| Class initialization (literal args) | `MyClass("value", 42)` | `new MyClass("value", 42)` |
+| Struct initialization | `Point(x: 1.0, y: 2.0)` | `{ x: 1.0, y: 2.0 }` |
 
-## Working with Class Instances as Default Parameters
+## Working with Class and Struct Defaults
 
-You can use class initialization expressions as default values:
+You can use class or struct initialization expressions as default values:
 
 ```swift
+@JS struct Point {
+    var x: Double
+    var y: Double
+}
+
 @JS class Config {
     var setting: String
-    
-    @JS init(setting: String) {
-        self.setting = setting
-    }
+    @JS init(setting: String) { self.setting = setting }
 }
 
-@JS public func process(config: Config = Config(setting: "default")) -> String {
-    return "Using: \(config.setting)"
-}
+@JS public func processPoint(point: Point = Point(x: 0.0, y: 0.0)) -> String
+@JS public func processConfig(config: Config = Config(setting: "default")) -> String
 ```
 
-In JavaScript:
+In JavaScript, structs become object literals while classes use constructor calls:
 
 ```javascript
-exports.process();  // "Using: default"
+exports.processPoint();                     // uses default { x: 0.0, y: 0.0 }
+exports.processPoint({ x: 5.0, y: 10.0 });  // custom struct
 
+exports.processConfig();                    // uses default new Config("default")
 const custom = new exports.Config("custom");
-exports.process(custom);  // "Using: custom"
+exports.processConfig(custom);              // custom instance
 custom.release();
 ```
 
-**Limitations for object initialization:**
-- Constructor arguments must be literal values (`"text"`, `42`, `true`, `false`, `nil`)
-- Complex expressions in constructor arguments are not supported
-- Computed properties or method calls as arguments are not supported
+**Requirements:**
+- Constructor/initializer arguments must be literal values (`"text"`, `42`, `true`, `false`, `nil`)
+- Struct initializers must use labeled arguments (e.g., `Point(x: 1.0, y: 2.0)`)
+- Complex expressions, computed properties, or method calls are not supported
 
 ## Unsupported Default Value Types
 
