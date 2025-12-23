@@ -246,6 +246,106 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
     }
 }
 
+extension SimpleStruct: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> SimpleStruct {
+        let precise = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
+        let rate = Float.bridgeJSLiftParameter(_swift_js_pop_param_f32())
+        let flag = Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let count = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let name = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        return SimpleStruct(name: name, count: count, flag: flag, rate: rate, precise: precise)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        var __bjs_name = self.name
+        __bjs_name.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        _swift_js_push_int(Int32(self.count))
+        _swift_js_push_int(self.flag ? 1 : 0)
+        _swift_js_push_f32(self.rate)
+        _swift_js_push_f64(self.precise)
+    }
+}
+
+extension Address: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Address {
+        let zipCode = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let city = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let street = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        return Address(street: street, city: city, zipCode: zipCode)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        var __bjs_street = self.street
+        __bjs_street.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        var __bjs_city = self.city
+        __bjs_city.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        _swift_js_push_int(Int32(self.zipCode))
+    }
+}
+
+extension Person: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Person {
+        let email = Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let address = Address.bridgeJSLiftParameter()
+        let age = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let name = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        return Person(name: name, age: age, address: address, email: email)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        var __bjs_name = self.name
+        __bjs_name.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        _swift_js_push_int(Int32(self.age))
+        self.address.bridgeJSLowerReturn()
+        let __bjs_isSome_email = self.email != nil
+        if let __bjs_unwrapped_email = self.email {
+            var __bjs_str_email = __bjs_unwrapped_email
+            __bjs_str_email.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+        }
+        _swift_js_push_int(__bjs_isSome_email ? 1 : 0)
+    }
+}
+
+extension ComplexStruct: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> ComplexStruct {
+        let metadata = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let tags = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let score = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
+        let active = Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let title = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let id = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        return ComplexStruct(id: id, title: title, active: active, score: score, tags: tags, metadata: metadata)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_int(Int32(self.id))
+        var __bjs_title = self.title
+        __bjs_title.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        _swift_js_push_int(self.active ? 1 : 0)
+        _swift_js_push_f64(self.score)
+        var __bjs_tags = self.tags
+        __bjs_tags.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        var __bjs_metadata = self.metadata
+        __bjs_metadata.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+    }
+}
+
 @_expose(wasm, "bjs_run")
 @_cdecl("bjs_run")
 public func _bjs_run() -> Void {
@@ -554,6 +654,494 @@ extension StringRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 fileprivate func _bjs_StringRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
 #else
 fileprivate func _bjs_StringRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+@_expose(wasm, "bjs_StructRoundtrip_init")
+@_cdecl("bjs_StructRoundtrip_init")
+public func _bjs_StructRoundtrip_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = StructRoundtrip()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StructRoundtrip_takeSimple")
+@_cdecl("bjs_StructRoundtrip_takeSimple")
+public func _bjs_StructRoundtrip_takeSimple(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    StructRoundtrip.bridgeJSLiftParameter(_self).takeSimple(_: SimpleStruct.bridgeJSLiftParameter())
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StructRoundtrip_makeSimple")
+@_cdecl("bjs_StructRoundtrip_makeSimple")
+public func _bjs_StructRoundtrip_makeSimple(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).makeSimple()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StructRoundtrip_roundtripSimple")
+@_cdecl("bjs_StructRoundtrip_roundtripSimple")
+public func _bjs_StructRoundtrip_roundtripSimple(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).roundtripSimple(_: SimpleStruct.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StructRoundtrip_takeAddress")
+@_cdecl("bjs_StructRoundtrip_takeAddress")
+public func _bjs_StructRoundtrip_takeAddress(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    StructRoundtrip.bridgeJSLiftParameter(_self).takeAddress(_: Address.bridgeJSLiftParameter())
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StructRoundtrip_makeAddress")
+@_cdecl("bjs_StructRoundtrip_makeAddress")
+public func _bjs_StructRoundtrip_makeAddress(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).makeAddress()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StructRoundtrip_roundtripAddress")
+@_cdecl("bjs_StructRoundtrip_roundtripAddress")
+public func _bjs_StructRoundtrip_roundtripAddress(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).roundtripAddress(_: Address.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StructRoundtrip_takePerson")
+@_cdecl("bjs_StructRoundtrip_takePerson")
+public func _bjs_StructRoundtrip_takePerson(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    StructRoundtrip.bridgeJSLiftParameter(_self).takePerson(_: Person.bridgeJSLiftParameter())
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StructRoundtrip_makePerson")
+@_cdecl("bjs_StructRoundtrip_makePerson")
+public func _bjs_StructRoundtrip_makePerson(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).makePerson()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StructRoundtrip_roundtripPerson")
+@_cdecl("bjs_StructRoundtrip_roundtripPerson")
+public func _bjs_StructRoundtrip_roundtripPerson(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).roundtripPerson(_: Person.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StructRoundtrip_takeComplex")
+@_cdecl("bjs_StructRoundtrip_takeComplex")
+public func _bjs_StructRoundtrip_takeComplex(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    StructRoundtrip.bridgeJSLiftParameter(_self).takeComplex(_: ComplexStruct.bridgeJSLiftParameter())
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StructRoundtrip_makeComplex")
+@_cdecl("bjs_StructRoundtrip_makeComplex")
+public func _bjs_StructRoundtrip_makeComplex(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).makeComplex()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StructRoundtrip_roundtripComplex")
+@_cdecl("bjs_StructRoundtrip_roundtripComplex")
+public func _bjs_StructRoundtrip_roundtripComplex(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).roundtripComplex(_: ComplexStruct.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StructRoundtrip_deinit")
+@_cdecl("bjs_StructRoundtrip_deinit")
+public func _bjs_StructRoundtrip_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<StructRoundtrip>.fromOpaque(pointer).release()
+}
+
+extension StructRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_StructRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_StructRoundtrip_wrap")
+fileprivate func _bjs_StructRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_StructRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+@_expose(wasm, "bjs_SimpleClass_init")
+@_cdecl("bjs_SimpleClass_init")
+public func _bjs_SimpleClass_init(nameBytes: Int32, nameLength: Int32, count: Int32, flag: Int32, rate: Float32, precise: Float64) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = SimpleClass(name: String.bridgeJSLiftParameter(nameBytes, nameLength), count: Int.bridgeJSLiftParameter(count), flag: Bool.bridgeJSLiftParameter(flag), rate: Float.bridgeJSLiftParameter(rate), precise: Double.bridgeJSLiftParameter(precise))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClass_name_get")
+@_cdecl("bjs_SimpleClass_name_get")
+public func _bjs_SimpleClass_name_get(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = SimpleClass.bridgeJSLiftParameter(_self).name
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClass_name_set")
+@_cdecl("bjs_SimpleClass_name_set")
+public func _bjs_SimpleClass_name_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    SimpleClass.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClass_count_get")
+@_cdecl("bjs_SimpleClass_count_get")
+public func _bjs_SimpleClass_count_get(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = SimpleClass.bridgeJSLiftParameter(_self).count
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClass_count_set")
+@_cdecl("bjs_SimpleClass_count_set")
+public func _bjs_SimpleClass_count_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+    #if arch(wasm32)
+    SimpleClass.bridgeJSLiftParameter(_self).count = Int.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClass_flag_get")
+@_cdecl("bjs_SimpleClass_flag_get")
+public func _bjs_SimpleClass_flag_get(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = SimpleClass.bridgeJSLiftParameter(_self).flag
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClass_flag_set")
+@_cdecl("bjs_SimpleClass_flag_set")
+public func _bjs_SimpleClass_flag_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+    #if arch(wasm32)
+    SimpleClass.bridgeJSLiftParameter(_self).flag = Bool.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClass_rate_get")
+@_cdecl("bjs_SimpleClass_rate_get")
+public func _bjs_SimpleClass_rate_get(_self: UnsafeMutableRawPointer) -> Float32 {
+    #if arch(wasm32)
+    let ret = SimpleClass.bridgeJSLiftParameter(_self).rate
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClass_rate_set")
+@_cdecl("bjs_SimpleClass_rate_set")
+public func _bjs_SimpleClass_rate_set(_self: UnsafeMutableRawPointer, value: Float32) -> Void {
+    #if arch(wasm32)
+    SimpleClass.bridgeJSLiftParameter(_self).rate = Float.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClass_precise_get")
+@_cdecl("bjs_SimpleClass_precise_get")
+public func _bjs_SimpleClass_precise_get(_self: UnsafeMutableRawPointer) -> Float64 {
+    #if arch(wasm32)
+    let ret = SimpleClass.bridgeJSLiftParameter(_self).precise
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClass_precise_set")
+@_cdecl("bjs_SimpleClass_precise_set")
+public func _bjs_SimpleClass_precise_set(_self: UnsafeMutableRawPointer, value: Float64) -> Void {
+    #if arch(wasm32)
+    SimpleClass.bridgeJSLiftParameter(_self).precise = Double.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClass_deinit")
+@_cdecl("bjs_SimpleClass_deinit")
+public func _bjs_SimpleClass_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<SimpleClass>.fromOpaque(pointer).release()
+}
+
+extension SimpleClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_SimpleClass_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_SimpleClass_wrap")
+fileprivate func _bjs_SimpleClass_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_SimpleClass_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+@_expose(wasm, "bjs_AddressClass_init")
+@_cdecl("bjs_AddressClass_init")
+public func _bjs_AddressClass_init(streetBytes: Int32, streetLength: Int32, cityBytes: Int32, cityLength: Int32, zipCode: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = AddressClass(street: String.bridgeJSLiftParameter(streetBytes, streetLength), city: String.bridgeJSLiftParameter(cityBytes, cityLength), zipCode: Int.bridgeJSLiftParameter(zipCode))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_AddressClass_street_get")
+@_cdecl("bjs_AddressClass_street_get")
+public func _bjs_AddressClass_street_get(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = AddressClass.bridgeJSLiftParameter(_self).street
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_AddressClass_street_set")
+@_cdecl("bjs_AddressClass_street_set")
+public func _bjs_AddressClass_street_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    AddressClass.bridgeJSLiftParameter(_self).street = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_AddressClass_city_get")
+@_cdecl("bjs_AddressClass_city_get")
+public func _bjs_AddressClass_city_get(_self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = AddressClass.bridgeJSLiftParameter(_self).city
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_AddressClass_city_set")
+@_cdecl("bjs_AddressClass_city_set")
+public func _bjs_AddressClass_city_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    AddressClass.bridgeJSLiftParameter(_self).city = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_AddressClass_zipCode_get")
+@_cdecl("bjs_AddressClass_zipCode_get")
+public func _bjs_AddressClass_zipCode_get(_self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = AddressClass.bridgeJSLiftParameter(_self).zipCode
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_AddressClass_zipCode_set")
+@_cdecl("bjs_AddressClass_zipCode_set")
+public func _bjs_AddressClass_zipCode_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+    #if arch(wasm32)
+    AddressClass.bridgeJSLiftParameter(_self).zipCode = Int.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_AddressClass_deinit")
+@_cdecl("bjs_AddressClass_deinit")
+public func _bjs_AddressClass_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<AddressClass>.fromOpaque(pointer).release()
+}
+
+extension AddressClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_AddressClass_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_AddressClass_wrap")
+fileprivate func _bjs_AddressClass_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_AddressClass_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+@_expose(wasm, "bjs_ClassRoundtrip_init")
+@_cdecl("bjs_ClassRoundtrip_init")
+public func _bjs_ClassRoundtrip_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = ClassRoundtrip()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassRoundtrip_takeSimpleClass")
+@_cdecl("bjs_ClassRoundtrip_takeSimpleClass")
+public func _bjs_ClassRoundtrip_takeSimpleClass(_self: UnsafeMutableRawPointer, value: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    ClassRoundtrip.bridgeJSLiftParameter(_self).takeSimpleClass(_: SimpleClass.bridgeJSLiftParameter(value))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassRoundtrip_makeSimpleClass")
+@_cdecl("bjs_ClassRoundtrip_makeSimpleClass")
+public func _bjs_ClassRoundtrip_makeSimpleClass(_self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = ClassRoundtrip.bridgeJSLiftParameter(_self).makeSimpleClass()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassRoundtrip_roundtripSimpleClass")
+@_cdecl("bjs_ClassRoundtrip_roundtripSimpleClass")
+public func _bjs_ClassRoundtrip_roundtripSimpleClass(_self: UnsafeMutableRawPointer, value: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = ClassRoundtrip.bridgeJSLiftParameter(_self).roundtripSimpleClass(_: SimpleClass.bridgeJSLiftParameter(value))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassRoundtrip_takeAddressClass")
+@_cdecl("bjs_ClassRoundtrip_takeAddressClass")
+public func _bjs_ClassRoundtrip_takeAddressClass(_self: UnsafeMutableRawPointer, value: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    ClassRoundtrip.bridgeJSLiftParameter(_self).takeAddressClass(_: AddressClass.bridgeJSLiftParameter(value))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassRoundtrip_makeAddressClass")
+@_cdecl("bjs_ClassRoundtrip_makeAddressClass")
+public func _bjs_ClassRoundtrip_makeAddressClass(_self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = ClassRoundtrip.bridgeJSLiftParameter(_self).makeAddressClass()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassRoundtrip_roundtripAddressClass")
+@_cdecl("bjs_ClassRoundtrip_roundtripAddressClass")
+public func _bjs_ClassRoundtrip_roundtripAddressClass(_self: UnsafeMutableRawPointer, value: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = ClassRoundtrip.bridgeJSLiftParameter(_self).roundtripAddressClass(_: AddressClass.bridgeJSLiftParameter(value))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassRoundtrip_deinit")
+@_cdecl("bjs_ClassRoundtrip_deinit")
+public func _bjs_ClassRoundtrip_deinit(pointer: UnsafeMutableRawPointer) {
+    Unmanaged<ClassRoundtrip>.fromOpaque(pointer).release()
+}
+
+extension ClassRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_ClassRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_ClassRoundtrip_wrap")
+fileprivate func _bjs_ClassRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_ClassRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

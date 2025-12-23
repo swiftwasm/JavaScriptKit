@@ -3,7 +3,7 @@ import { defaultNodeSetup } from "./.build/plugins/PackageToJS/outputs/Package/p
 import fs from 'fs';
 import path from 'path';
 import { parseArgs } from "util";
-import { APIResult, ComplexResult } from "./.build/plugins/PackageToJS/outputs/Package/bridge-js.js";
+import { APIResultValues as APIResult, ComplexResultValues as ComplexResult } from "./.build/plugins/PackageToJS/outputs/Package/bridge-js.js";
 
 /**
  * Update progress bar on the current line
@@ -452,6 +452,136 @@ async function singleRun(results, nameFilter) {
     benchmarkRunner("StringRoundtrip/makeString", () => {
         for (let i = 0; i < iterations; i++) {
             stringRoundtrip.make()
+        }
+    })
+
+    // Struct performance tests
+    const structRoundtrip = new exports.StructRoundtrip();
+
+    benchmarkRunner("StructRoundtrip/takeSimple", () => {
+        for (let i = 0; i < iterations; i++) {
+            structRoundtrip.takeSimple({ name: "Hello", count: 42, flag: true, rate: 0.5, precise: 3.14159 })
+        }
+    })
+    benchmarkRunner("StructRoundtrip/makeSimple", () => {
+        for (let i = 0; i < iterations; i++) {
+            structRoundtrip.makeSimple()
+        }
+    })
+    benchmarkRunner("StructRoundtrip/roundtripSimple", () => {
+        for (let i = 0; i < iterations; i++) {
+            structRoundtrip.roundtripSimple({ name: "Hello", count: 42, flag: true, rate: 0.5, precise: 3.14159 })
+        }
+    })
+
+    benchmarkRunner("StructRoundtrip/takeAddress", () => {
+        for (let i = 0; i < iterations; i++) {
+            structRoundtrip.takeAddress({ street: "123 Main St", city: "San Francisco", zipCode: 94102 })
+        }
+    })
+    benchmarkRunner("StructRoundtrip/makeAddress", () => {
+        for (let i = 0; i < iterations; i++) {
+            structRoundtrip.makeAddress()
+        }
+    })
+    benchmarkRunner("StructRoundtrip/roundtripAddress", () => {
+        for (let i = 0; i < iterations; i++) {
+            structRoundtrip.roundtripAddress({ street: "123 Main St", city: "San Francisco", zipCode: 94102 })
+        }
+    })
+
+    benchmarkRunner("StructRoundtrip/takePerson", () => {
+        for (let i = 0; i < iterations; i++) {
+            structRoundtrip.takePerson({
+                name: "John Doe",
+                age: 30,
+                address: { street: "456 Oak Ave", city: "New York", zipCode: 10001 },
+                email: "john@example.com"
+            })
+        }
+    })
+    benchmarkRunner("StructRoundtrip/makePerson", () => {
+        for (let i = 0; i < iterations; i++) {
+            structRoundtrip.makePerson()
+        }
+    })
+    benchmarkRunner("StructRoundtrip/roundtripPerson", () => {
+        for (let i = 0; i < iterations; i++) {
+            structRoundtrip.roundtripPerson({
+                name: "John Doe",
+                age: 30,
+                address: { street: "456 Oak Ave", city: "New York", zipCode: 10001 },
+                email: "john@example.com"
+            })
+        }
+    })
+
+    benchmarkRunner("StructRoundtrip/takeComplex", () => {
+        for (let i = 0; i < iterations; i++) {
+            structRoundtrip.takeComplex({
+                id: 12345,
+                title: "Test Item",
+                active: true,
+                score: 98.6,
+                tags: "swift,wasm,benchmark",
+                metadata: "{\"version\":1}"
+            })
+        }
+    })
+    benchmarkRunner("StructRoundtrip/makeComplex", () => {
+        for (let i = 0; i < iterations; i++) {
+            structRoundtrip.makeComplex()
+        }
+    })
+    benchmarkRunner("StructRoundtrip/roundtripComplex", () => {
+        for (let i = 0; i < iterations; i++) {
+            structRoundtrip.roundtripComplex({
+                id: 12345,
+                title: "Test Item",
+                active: true,
+                score: 98.6,
+                tags: "swift,wasm,benchmark",
+                metadata: "{\"version\":1}"
+            })
+        }
+    })
+
+    // Class vs Struct comparison tests
+    const classRoundtrip = new exports.ClassRoundtrip();
+
+    benchmarkRunner("ClassRoundtrip/takeSimpleClass", () => {
+        const simple = new exports.SimpleClass("Hello", 42, true, 0.5, 3.14159)
+        for (let i = 0; i < iterations; i++) {
+            classRoundtrip.takeSimpleClass(simple)
+        }
+    })
+    benchmarkRunner("ClassRoundtrip/makeSimpleClass", () => {
+        for (let i = 0; i < iterations; i++) {
+            classRoundtrip.makeSimpleClass()
+        }
+    })
+    benchmarkRunner("ClassRoundtrip/roundtripSimpleClass", () => {
+        const simple = new exports.SimpleClass("Hello", 42, true, 0.5, 3.14159)
+        for (let i = 0; i < iterations; i++) {
+            classRoundtrip.roundtripSimpleClass(simple)
+        }
+    })
+
+    benchmarkRunner("ClassRoundtrip/takeAddressClass", () => {
+        const address = new exports.AddressClass("123 Main St", "San Francisco", 94102)
+        for (let i = 0; i < iterations; i++) {
+            classRoundtrip.takeAddressClass(address)
+        }
+    })
+    benchmarkRunner("ClassRoundtrip/makeAddressClass", () => {
+        for (let i = 0; i < iterations; i++) {
+            classRoundtrip.makeAddressClass()
+        }
+    })
+    benchmarkRunner("ClassRoundtrip/roundtripAddressClass", () => {
+        const address = new exports.AddressClass("123 Main St", "San Francisco", 94102)
+        for (let i = 0; i < iterations; i++) {
+            classRoundtrip.roundtripAddressClass(address)
         }
     })
 }
