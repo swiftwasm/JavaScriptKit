@@ -316,50 +316,77 @@ public class ExportSwift {
                 return nil
             }
 
-            let className = calledExpr.baseName.text
-            let expectedClassName: String?
+            let typeName = calledExpr.baseName.text
+
+            let isStructType: Bool
+            let expectedTypeName: String?
             switch type {
-            case .swiftHeapObject(let name):
-                expectedClassName = name.split(separator: ".").last.map(String.init)
-            case .optional(.swiftHeapObject(let name)):
-                expectedClassName = name.split(separator: ".").last.map(String.init)
+            case .swiftStruct(let name), .optional(.swiftStruct(let name)):
+                isStructType = true
+                expectedTypeName = name.split(separator: ".").last.map(String.init)
+            case .swiftHeapObject(let name), .optional(.swiftHeapObject(let name)):
+                isStructType = false
+                expectedTypeName = name.split(separator: ".").last.map(String.init)
             default:
                 diagnose(
                     node: funcCall,
-                    message: "Constructor calls are only supported for class types",
-                    hint: "Parameter type should be a Swift class"
+                    message: "Constructor calls are only supported for class and struct types",
+                    hint: "Parameter type should be a Swift class or struct"
                 )
                 return nil
             }
 
-            guard let expectedClassName = expectedClassName, className == expectedClassName else {
+            guard let expectedTypeName = expectedTypeName, typeName == expectedTypeName else {
                 diagnose(
                     node: funcCall,
-                    message: "Constructor class name '\(className)' doesn't match parameter type",
+                    message: "Constructor type name '\(typeName)' doesn't match parameter type",
                     hint: "Ensure the constructor matches the parameter type"
                 )
                 return nil
             }
 
-            if funcCall.arguments.isEmpty {
-                return .object(className)
-            }
-
-            var constructorArgs: [DefaultValue] = []
-            for argument in funcCall.arguments {
-                guard let argValue = extractLiteralValue(from: argument.expression) else {
-                    diagnose(
-                        node: argument.expression,
-                        message: "Constructor argument must be a literal value",
-                        hint: "Use simple literals like \"text\", 42, true, false in constructor arguments"
-                    )
-                    return nil
+            if isStructType {
+                // For structs, extract field name/value pairs
+                var fields: [DefaultValueField] = []
+                for argument in funcCall.arguments {
+                    guard let fieldName = argument.label?.text else {
+                        diagnose(
+                            node: argument,
+                            message: "Struct initializer arguments must have labels",
+                            hint: "Use labeled arguments like MyStruct(x: 1, y: 2)"
+                        )
+                        return nil
+                    }
+                    guard let fieldValue = extractLiteralValue(from: argument.expression) else {
+                        diagnose(
+                            node: argument.expression,
+                            message: "Struct field value must be a literal",
+                            hint: "Use simple literals like \"text\", 42, true, false in struct fields"
+                        )
+                        return nil
+                    }
+                    fields.append(DefaultValueField(name: fieldName, value: fieldValue))
+                }
+                return .structLiteral(typeName, fields)
+            } else {
+                if funcCall.arguments.isEmpty {
+                    return .object(typeName)
                 }
 
-                constructorArgs.append(argValue)
+                var constructorArgs: [DefaultValue] = []
+                for argument in funcCall.arguments {
+                    guard let argValue = extractLiteralValue(from: argument.expression) else {
+                        diagnose(
+                            node: argument.expression,
+                            message: "Constructor argument must be a literal value",
+                            hint: "Use simple literals like \"text\", 42, true, false in constructor arguments"
+                        )
+                        return nil
+                    }
+                    constructorArgs.append(argValue)
+                }
+                return .objectWithArguments(typeName, constructorArgs)
             }
-
-            return .objectWithArguments(className, constructorArgs)
         }
 
         /// Extracts a literal value from an expression with optional type checking

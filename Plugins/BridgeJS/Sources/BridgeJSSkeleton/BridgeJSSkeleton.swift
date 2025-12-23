@@ -160,6 +160,17 @@ public enum SwiftEnumRawType: String, CaseIterable, Codable, Sendable {
     }
 }
 
+/// Represents a struct field with name and default value for default parameter values
+public struct DefaultValueField: Codable, Equatable, Sendable {
+    public let name: String
+    public let value: DefaultValue
+
+    public init(name: String, value: DefaultValue) {
+        self.name = name
+        self.value = value
+    }
+}
+
 public enum DefaultValue: Codable, Equatable, Sendable {
     case string(String)
     case int(Int)
@@ -170,6 +181,7 @@ public enum DefaultValue: Codable, Equatable, Sendable {
     case enumCase(String, String)  // enumName, caseName
     case object(String)  // className for parameterless constructor
     case objectWithArguments(String, [DefaultValue])  // className, constructor argument values
+    case structLiteral(String, [DefaultValueField])  // structName, field name/value pairs
 }
 
 public struct Parameter: Codable, Equatable, Sendable {

@@ -28,13 +28,11 @@
 
 @JS class DefaultGreeter {
     @JS var name: String
-    @JS init(name: String) {
-        self.name = name
-    }
+    @JS init(name: String)
 }
 
 @JS class EmptyGreeter {
-    @JS init() {}
+    @JS init()
 }
 
 @JS public func testComplexInit(greeter: DefaultGreeter = DefaultGreeter(name: "DefaultUser")) -> DefaultGreeter
@@ -53,22 +51,25 @@
         enabled: Bool = true,
         status: Status = .active,
         tag: String? = nil
-    ) {
-        self.name = name
-        self.count = count
-        self.enabled = enabled
-        self.status = status
-        self.tag = tag
-    }
+    )
+}
 
-    @JS func describe() -> String {
-        let tagStr = tag ?? "nil"
-        let statusStr: String
-        switch status {
-        case .active: statusStr = "active"
-        case .inactive: statusStr = "inactive"
-        case .pending: statusStr = "pending"
-        }
-        return "\(name):\(count):\(enabled):\(statusStr):\(tagStr)"
-    }
+@JS struct Config {
+    var name: String
+    var value: Int
+    var enabled: Bool
+}
+
+@JS public func testOptionalStructDefault(point: Config? = nil) -> Config?
+@JS public func testOptionalStructWithValueDefault(
+    point: Config? = Config(name: "default", value: 42, enabled: true)
+) -> Config?
+
+@JS struct MathOperations {
+    var baseValue: Double
+
+    @JS init(baseValue: Double = 0.0)
+    @JS func add(a: Double, b: Double = 10.0) -> Double
+    @JS func multiply(a: Double, b: Double) -> Double
+    @JS static func subtract(a: Double, b: Double = 5.0) -> Double
 }

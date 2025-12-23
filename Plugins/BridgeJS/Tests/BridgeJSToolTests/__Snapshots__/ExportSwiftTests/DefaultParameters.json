@@ -146,23 +146,7 @@
         ]
       },
       "methods" : [
-        {
-          "abiName" : "bjs_ConstructorDefaults_describe",
-          "effects" : {
-            "isAsync" : false,
-            "isStatic" : false,
-            "isThrows" : false
-          },
-          "name" : "describe",
-          "parameters" : [
 
-          ],
-          "returnType" : {
-            "string" : {
-
-            }
-          }
-        }
       ],
       "name" : "ConstructorDefaults",
       "properties" : [
@@ -642,6 +626,108 @@
           "_0" : "EmptyGreeter"
         }
       }
+    },
+    {
+      "abiName" : "bjs_testOptionalStructDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testOptionalStructDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "null" : {
+
+            }
+          },
+          "label" : "point",
+          "name" : "point",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "swiftStruct" : {
+                  "_0" : "Config"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "swiftStruct" : {
+              "_0" : "Config"
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testOptionalStructWithValueDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testOptionalStructWithValueDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "structLiteral" : {
+              "_0" : "Config",
+              "_1" : [
+                {
+                  "name" : "name",
+                  "value" : {
+                    "string" : {
+                      "_0" : "default"
+                    }
+                  }
+                },
+                {
+                  "name" : "value",
+                  "value" : {
+                    "int" : {
+                      "_0" : 42
+                    }
+                  }
+                },
+                {
+                  "name" : "enabled",
+                  "value" : {
+                    "bool" : {
+                      "_0" : true
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "label" : "point",
+          "name" : "point",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "swiftStruct" : {
+                  "_0" : "Config"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "optional" : {
+          "_0" : {
+            "swiftStruct" : {
+              "_0" : "Config"
+            }
+          }
+        }
+      }
     }
   ],
   "moduleName" : "TestModule",
@@ -649,6 +735,203 @@
 
   ],
   "structs" : [
+    {
+      "methods" : [
 
+      ],
+      "name" : "Config",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "value",
+          "type" : {
+            "int" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "enabled",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "Config"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_MathOperations_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "defaultValue" : {
+              "double" : {
+                "_0" : 0
+              }
+            },
+            "label" : "baseValue",
+            "name" : "baseValue",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_MathOperations_add",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "add",
+          "parameters" : [
+            {
+              "label" : "a",
+              "name" : "a",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "defaultValue" : {
+                "double" : {
+                  "_0" : 10
+                }
+              },
+              "label" : "b",
+              "name" : "b",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MathOperations_multiply",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "multiply",
+          "parameters" : [
+            {
+              "label" : "a",
+              "name" : "a",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "label" : "b",
+              "name" : "b",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_MathOperations_static_subtract",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "subtract",
+          "parameters" : [
+            {
+              "label" : "a",
+              "name" : "a",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "defaultValue" : {
+                "double" : {
+                  "_0" : 5
+                }
+              },
+              "label" : "b",
+              "name" : "b",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "double" : {
+
+            }
+          },
+          "staticContext" : {
+            "structName" : {
+              "_0" : "MathOperations"
+            }
+          }
+        }
+      ],
+      "name" : "MathOperations",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "baseValue",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "MathOperations"
+    }
   ]
 }

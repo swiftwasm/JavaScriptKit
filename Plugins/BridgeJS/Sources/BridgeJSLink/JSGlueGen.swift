@@ -2135,8 +2135,9 @@ struct IntrinsicJSFragment: Sendable {
 
             // Attach instance methods to the struct instance
             for method in structDef.methods where !method.effects.isStatic {
+                let paramList = DefaultValueUtils.formatParameterList(method.parameters)
                 printer.write(
-                    "\(instanceVar).\(method.name) = function(\(method.parameters.map { $0.name }.joined(separator: ", "))) {"
+                    "\(instanceVar).\(method.name) = function(\(paramList)) {"
                 )
                 printer.indent {
                     let methodScope = JSGlueVariableScope()

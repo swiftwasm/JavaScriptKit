@@ -34,9 +34,57 @@ export async function createInstantiator(options, swift) {
     let tmpParamF64s = [];
     let tmpRetPointers = [];
     let tmpParamPointers = [];
+    const structHelpers = {};
     
     let _exports = null;
     let bjs = null;
+    const __bjs_createConfigHelpers = () => {
+        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers) => ({
+            lower: (value) => {
+                const bytes = textEncoder.encode(value.name);
+                const id = swift.memory.retain(bytes);
+                tmpParamInts.push(bytes.length);
+                tmpParamInts.push(id);
+                tmpParamInts.push((value.value | 0));
+                tmpParamInts.push(value.enabled ? 1 : 0);
+                const cleanup = () => {
+                    swift.memory.release(id);
+                };
+                return { cleanup };
+            },
+            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+                const bool = tmpRetInts.pop() !== 0;
+                const int = tmpRetInts.pop();
+                const string = tmpRetStrings.pop();
+                return { name: string, value: int, enabled: bool };
+            }
+        });
+    };
+    const __bjs_createMathOperationsHelpers = () => {
+        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers) => ({
+            lower: (value) => {
+                tmpParamF64s.push(value.baseValue);
+                return { cleanup: undefined };
+            },
+            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+                const f64 = tmpRetF64s.pop();
+                const instance1 = { baseValue: f64 };
+                instance1.add = function(a, b = 10.0) {
+                    const { cleanup: structCleanup } = structHelpers.MathOperations.lower(this);
+                    const ret = instance.exports.bjs_MathOperations_add(a, b);
+                    if (structCleanup) { structCleanup(); }
+                    return ret;
+                }.bind(instance1);
+                instance1.multiply = function(a, b) {
+                    const { cleanup: structCleanup } = structHelpers.MathOperations.lower(this);
+                    const ret = instance.exports.bjs_MathOperations_multiply(a, b);
+                    if (structCleanup) { structCleanup(); }
+                    return ret;
+                }.bind(instance1);
+                return instance1;
+            }
+        });
+    };
 
     return {
         /**
@@ -298,12 +346,6 @@ export async function createInstantiator(options, swift) {
                     }
                     return ConstructorDefaults.__construct(ret);
                 }
-                describe() {
-                    instance.exports.bjs_ConstructorDefaults_describe(this.pointer);
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    return ret;
-                }
                 get name() {
                     instance.exports.bjs_ConstructorDefaults_name_get(this.pointer);
                     const ret = tmpRetString;
@@ -356,6 +398,12 @@ export async function createInstantiator(options, swift) {
                     }
                 }
             }
+            const ConfigHelpers = __bjs_createConfigHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
+            structHelpers.Config = ConfigHelpers;
+            
+            const MathOperationsHelpers = __bjs_createMathOperationsHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
+            structHelpers.MathOperations = MathOperationsHelpers;
+            
             const exports = {
                 DefaultGreeter,
                 EmptyGreeter,
@@ -436,7 +484,54 @@ export async function createInstantiator(options, swift) {
                     const ret = instance.exports.bjs_testEmptyInit(greeter.pointer);
                     return EmptyGreeter.__construct(ret);
                 },
+                testOptionalStructDefault: function bjs_testOptionalStructDefault(point = null) {
+                    const isSome = point != null;
+                    let pointCleanup;
+                    if (isSome) {
+                        const structResult = structHelpers.Config.lower(point);
+                        pointCleanup = structResult.cleanup;
+                    }
+                    instance.exports.bjs_testOptionalStructDefault(+isSome);
+                    const isSome1 = tmpRetInts.pop();
+                    let optResult;
+                    if (isSome1) {
+                        optResult = structHelpers.Config.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    } else {
+                        optResult = null;
+                    }
+                    if (pointCleanup) { pointCleanup(); }
+                    return optResult;
+                },
+                testOptionalStructWithValueDefault: function bjs_testOptionalStructWithValueDefault(point = { name: "default", value: 42, enabled: true }) {
+                    const isSome = point != null;
+                    let pointCleanup;
+                    if (isSome) {
+                        const structResult = structHelpers.Config.lower(point);
+                        pointCleanup = structResult.cleanup;
+                    }
+                    instance.exports.bjs_testOptionalStructWithValueDefault(+isSome);
+                    const isSome1 = tmpRetInts.pop();
+                    let optResult;
+                    if (isSome1) {
+                        optResult = structHelpers.Config.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    } else {
+                        optResult = null;
+                    }
+                    if (pointCleanup) { pointCleanup(); }
+                    return optResult;
+                },
                 Status: StatusValues,
+                MathOperations: {
+                    init: function(baseValue = 0.0) {
+                        instance.exports.bjs_MathOperations_init(baseValue);
+                        const structValue = structHelpers.MathOperations.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        return structValue;
+                    },
+                    subtract: function(a, b) {
+                        const ret = instance.exports.bjs_MathOperations_static_subtract(a, b);
+                        return ret;
+                    },
+                },
             };
             _exports = exports;
             return exports;
