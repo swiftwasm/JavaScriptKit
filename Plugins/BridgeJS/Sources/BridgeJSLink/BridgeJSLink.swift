@@ -1254,6 +1254,16 @@ struct BridgeJSLink {
             ]
         }
 
+        /// Renders the thunk body (body code, cleanup, exception handling, and optional return) into a printer.
+        func renderFunctionBody(into printer: CodeFragmentPrinter, returnExpr: String?) {
+            printer.write(contentsOf: body)
+            printer.write(contentsOf: cleanupCode)
+            printer.write(lines: checkExceptionLines())
+            if let returnExpr = returnExpr {
+                printer.write("return \(returnExpr);")
+            }
+        }
+
         func renderFunction(
             name: String,
             parameters: [Parameter],
@@ -1268,12 +1278,7 @@ struct BridgeJSLink {
                 "\(declarationPrefixKeyword.map { "\($0) "} ?? "")\(name)(\(parameterList)) {"
             )
             printer.indent {
-                printer.write(contentsOf: body)
-                printer.write(contentsOf: cleanupCode)
-                printer.write(lines: checkExceptionLines())
-                if let returnExpr = returnExpr {
-                    printer.write("return \(returnExpr);")
-                }
+                renderFunctionBody(into: printer, returnExpr: returnExpr)
             }
             printer.write("}")
 
@@ -1300,16 +1305,10 @@ struct BridgeJSLink {
                     if enumDef.name == name || enumDef.swiftCallName == name {
                         // Use the stored tsFullPath which has the full namespace
                         switch type {
-                        case .caseEnum:
-                            return "\(enumDef.tsFullPath)Tag"
-                        case .rawValueEnum:
-                            return "\(enumDef.tsFullPath)Tag"
-                        case .associatedValueEnum:
-                            return "\(enumDef.tsFullPath)Tag"
                         case .namespaceEnum:
                             return enumDef.tsFullPath
                         default:
-                            return type.tsType
+                            return "\(enumDef.tsFullPath)Tag"
                         }
                     }
                 }
@@ -1395,12 +1394,7 @@ struct BridgeJSLink {
                 let paramList = DefaultValueUtils.formatParameterList(constructor.parameters)
                 constructorPrinter.write("init: function(\(paramList)) {")
                 constructorPrinter.indent {
-                    constructorPrinter.write(contentsOf: thunkBuilder.body)
-                    constructorPrinter.write(contentsOf: thunkBuilder.cleanupCode)
-                    constructorPrinter.write(lines: thunkBuilder.checkExceptionLines())
-                    if let returnExpr = returnExpr {
-                        constructorPrinter.write("return \(returnExpr);")
-                    }
+                    thunkBuilder.renderFunctionBody(into: constructorPrinter, returnExpr: returnExpr)
                 }
                 constructorPrinter.write("},")
                 jsPrinter.write(lines: constructorPrinter.lines)
@@ -1709,12 +1703,7 @@ extension BridgeJSLink {
         let printer = CodeFragmentPrinter()
         printer.write("\(function.name)(\(function.parameters.map { $0.name }.joined(separator: ", "))) {")
         printer.indent {
-            printer.write(contentsOf: thunkBuilder.body)
-            printer.write(contentsOf: thunkBuilder.cleanupCode)
-            printer.write(lines: thunkBuilder.checkExceptionLines())
-            if let returnExpr = returnExpr {
-                printer.write("return \(returnExpr);")
-            }
+            thunkBuilder.renderFunctionBody(into: printer, returnExpr: returnExpr)
         }
         printer.write("},")
 
@@ -1766,12 +1755,7 @@ extension BridgeJSLink {
             "\(method.name): function(\(method.parameters.map { $0.name }.joined(separator: ", "))) {"
         )
         methodPrinter.indent {
-            methodPrinter.write(contentsOf: thunkBuilder.body)
-            methodPrinter.write(contentsOf: thunkBuilder.cleanupCode)
-            methodPrinter.write(lines: thunkBuilder.checkExceptionLines())
-            if let returnExpr = returnExpr {
-                methodPrinter.write("return \(returnExpr);")
-            }
+            thunkBuilder.renderFunctionBody(into: methodPrinter, returnExpr: returnExpr)
         }
         methodPrinter.write("},")
         return methodPrinter.lines
@@ -1795,12 +1779,7 @@ extension BridgeJSLink {
 
         propertyPrinter.write("get \(property.name)() {")
         propertyPrinter.indent {
-            propertyPrinter.write(contentsOf: getterThunkBuilder.body)
-            propertyPrinter.write(contentsOf: getterThunkBuilder.cleanupCode)
-            propertyPrinter.write(lines: getterThunkBuilder.checkExceptionLines())
-            if let returnExpr = getterReturnExpr {
-                propertyPrinter.write("return \(returnExpr);")
-            }
+            getterThunkBuilder.renderFunctionBody(into: propertyPrinter, returnExpr: getterReturnExpr)
         }
         propertyPrinter.write("},")
 
@@ -1821,9 +1800,7 @@ extension BridgeJSLink {
 
             propertyPrinter.write("set \(property.name)(value) {")
             propertyPrinter.indent {
-                propertyPrinter.write(contentsOf: setterThunkBuilder.body)
-                propertyPrinter.write(contentsOf: setterThunkBuilder.cleanupCode)
-                propertyPrinter.write(lines: setterThunkBuilder.checkExceptionLines())
+                setterThunkBuilder.renderFunctionBody(into: propertyPrinter, returnExpr: nil)
             }
             propertyPrinter.write("},")
         }
@@ -1866,10 +1843,10 @@ extension BridgeJSLink {
                 jsPrinter.write("constructor(\(constructorParamList)) {")
                 let returnExpr = thunkBuilder.callConstructor(abiName: constructor.abiName)
                 jsPrinter.indent {
-                    jsPrinter.write(contentsOf: thunkBuilder.body)
-                    jsPrinter.write(contentsOf: thunkBuilder.cleanupCode)
-                    jsPrinter.write(lines: thunkBuilder.checkExceptionLines())
-                    jsPrinter.write("return \(klass.name).__construct(\(returnExpr));")
+                    thunkBuilder.renderFunctionBody(
+                        into: jsPrinter,
+                        returnExpr: "\(klass.name).__construct(\(returnExpr))"
+                    )
                 }
                 jsPrinter.write("}")
             }
@@ -1938,107 +1915,13 @@ extension BridgeJSLink {
 
         // Generate property getters and setters
         for property in klass.properties {
-            if property.isStatic {
-                // Generate static property getter
-                let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
-                let getterReturnExpr = try getterThunkBuilder.call(
-                    abiName: property.getterAbiName(),
-                    returnType: property.type
-                )
-
-                jsPrinter.indent {
-                    jsPrinter.write(
-                        lines: getterThunkBuilder.renderFunction(
-                            name: property.name,
-                            parameters: [],
-                            returnExpr: getterReturnExpr,
-                            declarationPrefixKeyword: "static get"
-                        )
-                    )
-                }
-
-                // Generate static property setter if not readonly
-                if !property.isReadonly {
-                    let setterThunkBuilder = ExportedThunkBuilder(
-                        effects: Effects(isAsync: false, isThrows: false)
-                    )
-                    try setterThunkBuilder.lowerParameter(
-                        param: Parameter(label: "value", name: "value", type: property.type)
-                    )
-                    _ = try setterThunkBuilder.call(
-                        abiName: property.setterAbiName(),
-                        returnType: .void
-                    )
-
-                    jsPrinter.indent {
-                        jsPrinter.write(
-                            lines: setterThunkBuilder.renderFunction(
-                                name: property.name,
-                                parameters: [.init(label: nil, name: "value", type: property.type)],
-                                returnExpr: nil,
-                                declarationPrefixKeyword: "static set"
-                            )
-                        )
-                    }
-                }
-
-                // Add static property to TypeScript exports definition (not instance interface)
-                let readonly = property.isReadonly ? "readonly " : ""
-                dtsExportEntryPrinter.indent {
-                    dtsExportEntryPrinter.write("\(readonly)\(property.name): \(property.type.tsType);")
-                }
-            } else {
-                // Generate instance property getter
-                let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
-                getterThunkBuilder.lowerSelf()
-                let getterReturnExpr = try getterThunkBuilder.call(
-                    abiName: property.getterAbiName(className: klass.name),
-                    returnType: property.type
-                )
-
-                jsPrinter.indent {
-                    jsPrinter.write(
-                        lines: getterThunkBuilder.renderFunction(
-                            name: property.name,
-                            parameters: [],
-                            returnExpr: getterReturnExpr,
-                            declarationPrefixKeyword: "get"
-                        )
-                    )
-                }
-
-                // Generate instance property setter if not readonly
-                if !property.isReadonly {
-                    let setterThunkBuilder = ExportedThunkBuilder(
-                        effects: Effects(isAsync: false, isThrows: false)
-                    )
-                    setterThunkBuilder.lowerSelf()
-                    try setterThunkBuilder.lowerParameter(
-                        param: Parameter(label: "value", name: "value", type: property.type)
-                    )
-                    _ = try setterThunkBuilder.call(
-                        abiName: property.setterAbiName(className: klass.name),
-                        returnType: .void
-                    )
-
-                    jsPrinter.indent {
-                        jsPrinter.write(
-                            lines: setterThunkBuilder.renderFunction(
-                                name: property.name,
-                                parameters: [.init(label: nil, name: "value", type: property.type)],
-                                returnExpr: nil,
-                                declarationPrefixKeyword: "set"
-                            )
-                        )
-                    }
-                }
-
-                // Add instance property to TypeScript interface definition
-                let readonly = property.isReadonly ? "readonly " : ""
-                dtsTypePrinter.indent {
-                    dtsTypePrinter.write("\(readonly)\(property.name): \(property.type.tsType);")
-                }
-            }
+            try renderClassProperty(
+                property: property,
+                className: klass.name,
+                isStatic: property.isStatic,
+                jsPrinter: jsPrinter,
+                dtsPrinter: property.isStatic ? dtsExportEntryPrinter : dtsTypePrinter
+            )
         }
 
         jsPrinter.write("}")
@@ -2046,6 +1929,66 @@ extension BridgeJSLink {
         dtsExportEntryPrinter.write("}")
 
         return (jsPrinter.lines, dtsTypePrinter.lines, dtsExportEntryPrinter.lines)
+    }
+
+    private func renderClassProperty(
+        property: ExportedProperty,
+        className: String,
+        isStatic: Bool,
+        jsPrinter: CodeFragmentPrinter,
+        dtsPrinter: CodeFragmentPrinter
+    ) throws {
+        let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+        if !isStatic {
+            getterThunkBuilder.lowerSelf()
+        }
+
+        let getterAbiName = isStatic ? property.getterAbiName() : property.getterAbiName(className: className)
+        let getterReturnExpr = try getterThunkBuilder.call(abiName: getterAbiName, returnType: property.type)
+
+        let getterKeyword = isStatic ? "static get" : "get"
+        jsPrinter.indent {
+            jsPrinter.write(
+                lines: getterThunkBuilder.renderFunction(
+                    name: property.name,
+                    parameters: [],
+                    returnExpr: getterReturnExpr,
+                    declarationPrefixKeyword: getterKeyword
+                )
+            )
+        }
+
+        // Generate setter if not readonly
+        if !property.isReadonly {
+            let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+            if !isStatic {
+                setterThunkBuilder.lowerSelf()
+            }
+            try setterThunkBuilder.lowerParameter(
+                param: Parameter(label: "value", name: "value", type: property.type)
+            )
+
+            let setterAbiName = isStatic ? property.setterAbiName() : property.setterAbiName(className: className)
+            _ = try setterThunkBuilder.call(abiName: setterAbiName, returnType: .void)
+
+            let setterKeyword = isStatic ? "static set" : "set"
+            jsPrinter.indent {
+                jsPrinter.write(
+                    lines: setterThunkBuilder.renderFunction(
+                        name: property.name,
+                        parameters: [.init(label: nil, name: "value", type: property.type)],
+                        returnExpr: nil,
+                        declarationPrefixKeyword: setterKeyword
+                    )
+                )
+            }
+        }
+
+        // Add instance property to TypeScript interface definition
+        let readonly = property.isReadonly ? "readonly " : ""
+        dtsPrinter.indent {
+            dtsPrinter.write("\(readonly)\(property.name): \(property.type.tsType);")
+        }
     }
 
     class ImportedThunkBuilder {

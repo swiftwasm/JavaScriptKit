@@ -1,5 +1,6 @@
 import XCTest
 import JavaScriptKit
+import JavaScriptEventLoop
 
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "runJsWorks")
 @_extern(c)
@@ -1383,7 +1384,7 @@ class ExportAPITests: XCTestCase {
         XCTAssertTrue(hasDeinitCalculator, "Calculator (without @JS init) should have been deinitialized")
     }
 
-    // func testAllAsync() async throws {
-    //     _ = try await runAsyncWorks().value()
-    // }
+    func testAllAsync() async throws {
+        _ = try await runAsyncWorks().value()
+    }
 }
