@@ -111,6 +111,136 @@ enum ComplexResult {
     }
 }
 
+// MARK: - Struct Performance Tests
+
+@JS struct SimpleStruct {
+    var name: String
+    var count: Int
+    var flag: Bool
+    var rate: Float
+    var precise: Double
+}
+
+@JS struct Address {
+    var street: String
+    var city: String
+    var zipCode: Int
+}
+
+@JS struct Person {
+    var name: String
+    var age: Int
+    var address: Address
+    var email: String?
+}
+
+@JS struct ComplexStruct {
+    var id: Int
+    var title: String
+    var active: Bool
+    var score: Double
+    var tags: String
+    var metadata: String
+}
+
+@JS class StructRoundtrip {
+    @JS init() {}
+
+    @JS func takeSimple(_ value: SimpleStruct) {}
+    @JS func makeSimple() -> SimpleStruct {
+        return SimpleStruct(name: "Hello", count: 42, flag: true, rate: 0.5, precise: 3.14159)
+    }
+    @JS func roundtripSimple(_ value: SimpleStruct) -> SimpleStruct {
+        return value
+    }
+
+    @JS func takeAddress(_ value: Address) {}
+    @JS func makeAddress() -> Address {
+        return Address(street: "123 Main St", city: "San Francisco", zipCode: 94102)
+    }
+    @JS func roundtripAddress(_ value: Address) -> Address {
+        return value
+    }
+
+    @JS func takePerson(_ value: Person) {}
+    @JS func makePerson() -> Person {
+        return Person(
+            name: "John Doe",
+            age: 30,
+            address: Address(street: "456 Oak Ave", city: "New York", zipCode: 10001),
+            email: "john@example.com"
+        )
+    }
+    @JS func roundtripPerson(_ value: Person) -> Person {
+        return value
+    }
+
+    @JS func takeComplex(_ value: ComplexStruct) {}
+    @JS func makeComplex() -> ComplexStruct {
+        return ComplexStruct(
+            id: 12345,
+            title: "Test Item",
+            active: true,
+            score: 98.6,
+            tags: "swift,wasm,benchmark",
+            metadata: "{\"version\":1}"
+        )
+    }
+    @JS func roundtripComplex(_ value: ComplexStruct) -> ComplexStruct {
+        return value
+    }
+}
+
+// MARK: - Class vs Struct Comparison Tests
+
+@JS class SimpleClass {
+    @JS var name: String
+    @JS var count: Int
+    @JS var flag: Bool
+    @JS var rate: Float
+    @JS var precise: Double
+
+    @JS init(name: String, count: Int, flag: Bool, rate: Float, precise: Double) {
+        self.name = name
+        self.count = count
+        self.flag = flag
+        self.rate = rate
+        self.precise = precise
+    }
+}
+
+@JS class AddressClass {
+    @JS var street: String
+    @JS var city: String
+    @JS var zipCode: Int
+
+    @JS init(street: String, city: String, zipCode: Int) {
+        self.street = street
+        self.city = city
+        self.zipCode = zipCode
+    }
+}
+
+@JS class ClassRoundtrip {
+    @JS init() {}
+
+    @JS func takeSimpleClass(_ value: SimpleClass) {}
+    @JS func makeSimpleClass() -> SimpleClass {
+        return SimpleClass(name: "Hello", count: 42, flag: true, rate: 0.5, precise: 3.14159)
+    }
+    @JS func roundtripSimpleClass(_ value: SimpleClass) -> SimpleClass {
+        return value
+    }
+
+    @JS func takeAddressClass(_ value: AddressClass) {}
+    @JS func makeAddressClass() -> AddressClass {
+        return AddressClass(street: "123 Main St", city: "San Francisco", zipCode: 94102)
+    }
+    @JS func roundtripAddressClass(_ value: AddressClass) -> AddressClass {
+        return value
+    }
+}
+
 @JS func run() {
 
     let call = Benchmark("Call")
