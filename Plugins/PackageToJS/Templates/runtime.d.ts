@@ -158,6 +158,44 @@ type WorkerToMainMessage = {
     data: number;
 } | RequestMessage | ResponseMessage;
 
+/**
+ * Create a set of throwing stub functions for the BridgeJS API.
+ * If no generate BridgeJS code is used, pass this object as "bjs" in the wasm imports.
+ * @returns A set of throwing stub functions for the BridgeJS API.
+ */
+declare function createBridgeJSStubs(): {
+    swift_js_return_string: () => never;
+    swift_js_init_memory: () => never;
+    swift_js_make_js_string: () => never;
+    swift_js_init_memory_with_result: () => never;
+    swift_js_throw: () => never;
+    swift_js_retain: () => never;
+    swift_js_release: () => never;
+    swift_js_push_tag: () => never;
+    swift_js_push_int: () => never;
+    swift_js_push_f32: () => never;
+    swift_js_push_f64: () => never;
+    swift_js_push_string: () => never;
+    swift_js_pop_param_int32: () => never;
+    swift_js_pop_param_f32: () => never;
+    swift_js_pop_param_f64: () => never;
+    swift_js_return_optional_bool: () => never;
+    swift_js_return_optional_int: () => never;
+    swift_js_return_optional_string: () => never;
+    swift_js_return_optional_double: () => never;
+    swift_js_return_optional_float: () => never;
+    swift_js_return_optional_heap_object: () => never;
+    swift_js_return_optional_object: () => never;
+    swift_js_get_optional_int_presence: () => never;
+    swift_js_get_optional_int_value: () => never;
+    swift_js_get_optional_string: () => never;
+    swift_js_get_optional_float_presence: () => never;
+    swift_js_get_optional_float_value: () => never;
+    swift_js_get_optional_double_presence: () => never;
+    swift_js_get_optional_double_value: () => never;
+    swift_js_get_optional_heap_object_pointer: () => never;
+};
+
 type SwiftRuntimeOptions = {
     /**
      * If `true`, the memory space of the WebAssembly instance can be shared
@@ -206,5 +244,5 @@ declare class SwiftRuntime {
 declare class UnsafeEventLoopYield extends Error {
 }
 
-export { SwiftRuntime };
+export { SwiftRuntime, createBridgeJSStubs };
 export type { SwiftRuntimeOptions, SwiftRuntimeThreadChannel };
