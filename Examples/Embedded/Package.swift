@@ -14,7 +14,7 @@ let package = Package(
                 "JavaScriptKit"
             ],
             swiftSettings: [
-                .enableExperimentalFeature("Extern"),
+                .enableExperimentalFeature("Extern")
             ],
         )
     ],
