@@ -2613,6 +2613,8 @@ struct StackCodegen {
             return "Float.bridgeJSLiftParameter(_swift_js_pop_param_f32())"
         case .double:
             return "Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())"
+        case .jsPromise:
+            return "JSPromise.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
         case .jsObject:
             return "JSObject.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
         case .swiftHeapObject(let className):
@@ -2713,7 +2715,7 @@ struct StackCodegen {
             return ["_swift_js_push_f32(\(raw: accessor))"]
         case .double:
             return ["_swift_js_push_f64(\(raw: accessor))"]
-        case .jsObject:
+        case .jsObject, .jsPromise:
             return ["_swift_js_push_int(\(raw: accessor).bridgeJSLowerParameter())"]
         case .swiftHeapObject:
             return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
@@ -3346,6 +3348,7 @@ extension BridgeType {
         case .float: return "Float"
         case .double: return "Double"
         case .string: return "String"
+        case .jsPromise(let type): return type.swiftType
         case .jsObject(nil): return "JSObject"
         case .jsObject(let name?): return name
         case .swiftHeapObject(let name): return name
@@ -3388,7 +3391,7 @@ extension BridgeType {
         case .float: return .float
         case .double: return .double
         case .string: return .string
-        case .jsObject: return .jsObject
+        case .jsObject, .jsPromise: return .jsObject
         case .swiftHeapObject: return .swiftHeapObject
         case .swiftProtocol: return .jsObject
         case .void: return .void
@@ -3435,7 +3438,7 @@ extension BridgeType {
         case .float: return .float
         case .double: return .double
         case .string: return .string
-        case .jsObject: return .jsObject
+        case .jsObject, .jsPromise: return .jsObject
         case .swiftHeapObject: return .swiftHeapObject
         case .swiftProtocol: return .jsObject
         case .void: return .void
