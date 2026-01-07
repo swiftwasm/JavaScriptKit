@@ -114,7 +114,7 @@ These changes require updating the pre-generated Swift bindings committed to the
 
 **Adding new BridgeJS intrinsics:** 
 
-If you add new `@_extern(wasm, module: "bjs")` functions to [`BridgeJSInstrincics.swift`](Sources/JavaScriptKit/BridgeJSInstrincics.swift), also add corresponding stub entries to [`Plugins/PackageToJS/Templates/instantiate.js`](Plugins/PackageToJS/Templates/instantiate.js) in the `importObject["bjs"]` object. This allows packages without BridgeJS-generated code to instantiate successfully.
+If you add new `@_extern(wasm, module: "bjs")` functions to [`BridgeJSIntrinsics.swift`](Sources/JavaScriptKit/BridgeJSIntrinsics.swift), also add corresponding stub entries to [`Plugins/PackageToJS/Templates/instantiate.js`](Plugins/PackageToJS/Templates/instantiate.js) in the `importObject["bjs"]` object. This allows packages without BridgeJS-generated code to instantiate successfully.
 
 ## Support
 If you have any questions or need assistance, feel free to reach out via [GitHub Issues](https://github.com/swiftwasm/JavaScriptKit/issues) or [Discord](https://discord.gg/ashJW8T8yp).

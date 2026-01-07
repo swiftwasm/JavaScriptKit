@@ -1,5 +1,5 @@
-#ifndef _CJavaScriptKit_BridgeJSInstrincics_h
-#define _CJavaScriptKit_BridgeJSInstrincics_h
+#ifndef _CJavaScriptKit_BridgeJSIntrinsics_h
+#define _CJavaScriptKit_BridgeJSIntrinsics_h
 
 #include <stdint.h>
 #include "WasmGlobalMacros.h"

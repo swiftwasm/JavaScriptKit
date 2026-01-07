@@ -78,7 +78,7 @@ final class JSGlueVariableScope {
 
 /// A fragment of JS code used to convert a value between Swift and JS.
 ///
-/// See `BridgeJSInstrincics.swift` in the main JavaScriptKit module for Swift side lowering/lifting implementation.
+/// See `BridgeJSIntrinsics.swift` in the main JavaScriptKit module for Swift side lowering/lifting implementation.
 struct IntrinsicJSFragment: Sendable {
     /// The names of the parameters that the fragment expects.
     let parameters: [String]
