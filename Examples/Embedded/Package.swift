@@ -5,13 +5,13 @@ import PackageDescription
 let package = Package(
     name: "Embedded",
     dependencies: [
-        .package(name: "JavaScriptKit", path: "../../"),
+        .package(name: "JavaScriptKit", path: "../../")
     ],
     targets: [
         .executableTarget(
             name: "EmbeddedApp",
             dependencies: [
-                "JavaScriptKit",
+                "JavaScriptKit"
             ],
             swiftSettings: [
                 .enableExperimentalFeature("Embedded"),
