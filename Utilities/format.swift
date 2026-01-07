@@ -38,7 +38,7 @@ func which(_ executable: String) -> URL? {
 
 /// Runs the `swift-format` command with the given arguments in the project root.
 func swiftFormat(_ arguments: [String]) throws {
-    guard let swiftFormat = which("swift-format") else {
+    guard let swiftFormat = which("swift") else {
         print("swift-format not found in PATH")
         exit(1)
     }
@@ -93,7 +93,7 @@ switch arguments.first {
 case "lint":
     try swiftFormat(["lint", "--parallel", "--recursive"] + filesToFormat())
 case "format", nil:
-    try swiftFormat(["format", "--parallel", "--in-place", "--recursive"] + filesToFormat())
+    try swiftFormat(["format", "format", "--parallel", "--in-place", "--recursive"] + filesToFormat())
 case let subcommand?:
     print("Unknown subcommand: \(subcommand)")
     print("Usage: format.swift lint|format")
