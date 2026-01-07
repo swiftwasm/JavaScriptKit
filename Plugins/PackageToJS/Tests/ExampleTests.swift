@@ -353,6 +353,8 @@ extension Trait where Self == ConditionTrait {
         }
     }
 
+    // FIXME: This test fails on the current main snapshot
+    #if !compiler(>=6.3)
     @Test(.requireEmbeddedSwiftInSwiftSDK())
     func embeddedWasmUnknownWasi() throws {
         let swiftSDKID = try #require(Self.getEmbeddedSwiftSDKID())
