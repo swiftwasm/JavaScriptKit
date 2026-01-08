@@ -54,7 +54,7 @@ let package = Package(
                 "BridgeJSLink",
                 "TS2Skeleton",
             ],
-            exclude: ["__Snapshots__", "Inputs"]
+            exclude: ["__Snapshots__", "Inputs", "MultifileInputs"]
         ),
     ]
 )
