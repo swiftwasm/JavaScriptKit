@@ -5,32 +5,17 @@ import PackageDescription
 let package = Package(
     name: "Embedded",
     dependencies: [
-        .package(name: "JavaScriptKit", path: "../../"),
-        .package(url: "https://github.com/swiftwasm/swift-dlmalloc", branch: "0.1.0"),
+        .package(name: "JavaScriptKit", path: "../../")
     ],
     targets: [
         .executableTarget(
             name: "EmbeddedApp",
             dependencies: [
-                "JavaScriptKit",
-                .product(name: "dlmalloc", package: "swift-dlmalloc"),
+                "JavaScriptKit"
             ],
-            cSettings: [.unsafeFlags(["-fdeclspec"])],
             swiftSettings: [
-                .enableExperimentalFeature("Embedded"),
-                .enableExperimentalFeature("Extern"),
-                .unsafeFlags([
-                    "-Xfrontend", "-gnone",
-                    "-Xfrontend", "-disable-stack-protector",
-                ]),
+                .enableExperimentalFeature("Extern")
             ],
-            linkerSettings: [
-                .unsafeFlags([
-                    "-Xclang-linker", "-nostdlib",
-                    "-Xlinker", "--no-entry",
-                    "-Xlinker", "--export-if-defined=__main_argc_argv",
-                ])
-            ]
         )
     ],
     swiftLanguageModes: [.v5]

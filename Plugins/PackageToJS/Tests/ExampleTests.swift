@@ -355,18 +355,6 @@ extension Trait where Self == ConditionTrait {
 
     // FIXME: This test fails on the current main snapshot
     #if !compiler(>=6.3)
-    @Test(.requireEmbeddedSwiftInToolchain(triple: "wasm32-unknown-none-wasm"))
-    func embeddedWasmUnknownNone() throws {
-        try withPackage(at: "Examples/Embedded") { packageDir, _, runSwift in
-            try runSwift(
-                ["package", "--triple", "wasm32-unknown-none-wasm", "js", "-c", "release"],
-                [
-                    "JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM": "true"
-                ]
-            )
-        }
-    }
-
     @Test(.requireEmbeddedSwiftInSwiftSDK())
     func embeddedWasmUnknownWasi() throws {
         let swiftSDKID = try #require(Self.getEmbeddedSwiftSDKID())
