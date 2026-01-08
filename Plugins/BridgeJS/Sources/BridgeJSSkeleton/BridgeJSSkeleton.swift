@@ -117,6 +117,7 @@ public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case swiftProtocol(String)
     case swiftStruct(String)
     indirect case closure(ClosureSignature)
+    indirect case jsPromise(BridgeType)
 }
 
 public enum WasmCoreType: String, Codable, Sendable {
@@ -664,7 +665,7 @@ extension BridgeType {
         case .float: return .f32
         case .double: return .f64
         case .string: return nil
-        case .jsObject: return .i32
+        case .jsObject, .jsPromise: return .i32
         case .swiftHeapObject:
             // UnsafeMutableRawPointer is returned as an i32 pointer
             return .pointer
@@ -708,6 +709,9 @@ extension BridgeType {
         case .void: return "y"
         case .jsObject(let name):
             let typeName = name ?? "JSObject"
+            return "\(typeName.count)\(typeName)C"
+        case .jsPromise:
+            let typeName = "JSPromise"
             return "\(typeName.count)\(typeName)C"
         case .swiftHeapObject(let name):
             return "\(name.count)\(name)C"

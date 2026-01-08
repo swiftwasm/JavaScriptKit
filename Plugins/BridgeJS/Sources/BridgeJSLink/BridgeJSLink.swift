@@ -3147,6 +3147,8 @@ extension BridgeType {
             return "number"
         case .bool:
             return "boolean"
+        case .jsPromise(let type):
+            return "Promise<\(type.tsType)>"
         case .jsObject(let name):
             return name ?? "any"
         case .swiftHeapObject(let name):

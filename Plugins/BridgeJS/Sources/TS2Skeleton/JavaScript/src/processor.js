@@ -352,6 +352,8 @@ export class TypeProcessor {
      * @private
      */
     visitType(type, node) {
+        const awaitedType = this.checker.getAwaitedType(type);
+
         // Treat A<B> and A<C> as the same type
         if (isTypeReference(type)) {
             type = type.target;
@@ -379,13 +381,13 @@ export class TypeProcessor {
                 "object": { "jsObject": {} },
                 "symbol": { "jsObject": {} },
                 "never": { "void": {} },
-                "Promise": {
-                    "jsObject": {
-                        "_0": "JSPromise"
-                    }
-                },
+                "Promise": { "jsPromise": {} },
             };
             const typeString = type.getSymbol()?.name ?? this.checker.typeToString(type);
+            if (typeString === "Promise" && awaitedType) {
+                return { "jsPromise": {"_0": convert(awaitedType)} };
+            }
+
             if (typeMap[typeString]) {
                 return typeMap[typeString];
             }
