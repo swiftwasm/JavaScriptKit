@@ -28,6 +28,7 @@ public class ExportSwift {
     private var exportedProtocols: [ExportedProtocol] = []
     private var exportedProtocolNameByKey: [String: String] = [:]
     private var typeDeclResolver: TypeDeclResolver = TypeDeclResolver()
+    private var sourceFiles: [(sourceFile: SourceFileSyntax, inputFilePath: String)] = []
 
     public init(progress: ProgressReporting, moduleName: String, exposeToGlobal: Bool) {
         self.progress = progress
@@ -41,16 +42,9 @@ public class ExportSwift {
     ///   - sourceFile: The parsed Swift source file to process
     ///   - inputFilePath: The file path for error reporting
     public func addSourceFile(_ sourceFile: SourceFileSyntax, _ inputFilePath: String) throws {
-        progress.print("Processing \(inputFilePath)")
+        // First, register type declarations before walking for exposed APIs
         typeDeclResolver.addSourceFile(sourceFile)
-
-        let errors = try parseSingleFile(sourceFile)
-        if errors.count > 0 {
-            throw BridgeJSCoreError(
-                errors.map { $0.formattedDescription(fileName: inputFilePath) }
-                    .joined(separator: "\n")
-            )
-        }
+        sourceFiles.append((sourceFile, inputFilePath))
     }
 
     /// Finalizes the export process and generates the bridge code
@@ -60,6 +54,27 @@ public class ExportSwift {
     /// - Returns: A tuple containing the generated Swift code and a skeleton
     /// describing the exported APIs
     public func finalize() throws -> (outputSwift: String, outputSkeleton: ExportedSkeleton)? {
+        // Walk through each source file and collect exported APIs
+        var perSourceErrors: [(inputFilePath: String, errors: [DiagnosticError])] = []
+        for (sourceFile, inputFilePath) in sourceFiles {
+            progress.print("Processing \(inputFilePath)")
+            let errors = try parseSingleFile(sourceFile)
+            if errors.count > 0 {
+                perSourceErrors.append((inputFilePath: inputFilePath, errors: errors))
+            }
+        }
+
+        if !perSourceErrors.isEmpty {
+            // Aggregate and throw all errors
+            var allErrors: [String] = []
+            for (inputFilePath, errors) in perSourceErrors {
+                for error in errors {
+                    allErrors.append(error.formattedDescription(fileName: inputFilePath))
+                }
+            }
+            throw BridgeJSCoreError(allErrors.joined(separator: "\n"))
+        }
+
         guard let outputSwift = try renderSwiftGlue() else {
             return nil
         }
