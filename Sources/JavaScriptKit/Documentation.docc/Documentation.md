@@ -51,6 +51,7 @@ Check out the [examples](https://github.com/swiftwasm/JavaScriptKit/tree/main/Ex
 
 ### Articles
 
+- <doc:JavaScript-Interop-Cheat-Sheet>
 - <doc:Package-Output-Structure>
 - <doc:Deploying-Pages>
 - <doc:JavaScript-Environment-Requirements>
