@@ -114,7 +114,6 @@ export async function createInstantiator(options, swift) {
         addImports: (importObject, importsContext) => {
             bjs = {};
             importObject["bjs"] = bjs;
-            const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 tmpRetString = textDecoder.decode(bytes);
