@@ -313,8 +313,12 @@ struct BridgeJSLink {
                 printer.write(lines: [
                     "bjs = {};",
                     "importObject[\"bjs\"] = bjs;",
-                    "const imports = options.getImports(importsContext);",
                 ])
+                if self.importedSkeletons.count > 0 {
+                    printer.write(lines: [
+                        "const imports = options.getImports(importsContext);"
+                    ])
+                }
                 printer.write("bjs[\"swift_js_return_string\"] = function(ptr, len) {")
                 printer.indent {
                     printer.write(
