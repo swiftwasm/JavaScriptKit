@@ -34,6 +34,16 @@ extension JavaScriptEventLoop: SchedulingExecutor {
         tolerance: C.Duration?,
         clock: C
     ) {
+#if hasFeature(Embedded)
+            // Hand-off the scheduling work to Clock implementation for unknown clocks
+            clock.enqueue(
+                job,
+                on: self,
+                at: clock.now.advanced(by: delay),
+                tolerance: tolerance
+            )
+            return
+#else
         let duration: Duration
         // Handle clocks we know
         if let _ = clock as? ContinuousClock {
@@ -55,6 +65,7 @@ extension JavaScriptEventLoop: SchedulingExecutor {
             UnownedJob(job),
             withDelay: milliseconds
         )
+#endif
     }
 
     private static func delayInMilliseconds(from swiftDuration: Duration) -> Double {
