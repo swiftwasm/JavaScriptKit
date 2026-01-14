@@ -157,6 +157,13 @@ public struct ImportTS {
         }
 
         func renderThunkDecl(name: String, parameters: [Parameter], returnType: BridgeType) -> DeclSyntax {
+            let isAsync: Bool
+            if case .jsPromise = returnType {
+                print(returnType)
+                isAsync = true
+            } else {
+                isAsync = false
+            }
             return DeclSyntax(
                 FunctionDeclSyntax(
                     name: .identifier(name.backtickIfNeeded()),
@@ -171,7 +178,7 @@ public struct ImportTS {
                                 )
                             }
                         }),
-                        effectSpecifiers: ImportTS.buildFunctionEffect(throws: true, async: false),
+                        effectSpecifiers: ImportTS.buildFunctionEffect(throws: true, async: isAsync),
                         returnClause: ReturnClauseSyntax(
                             arrow: .arrowToken(),
                             type: IdentifierTypeSyntax(name: .identifier(returnType.swiftType))
@@ -436,7 +443,7 @@ extension BridgeType {
         case .float: return .float
         case .double: return .double
         case .string: return .string
-        case .jsObject: return .jsObject
+        case .jsObject, .jsPromise: return .jsObject
         case .void: return .void
         case .closure:
             throw BridgeJSCoreError("Closure types are not yet supported in TypeScript imports")
@@ -519,7 +526,7 @@ extension BridgeType {
         case .float: return .float
         case .double: return .double
         case .string: return .string
-        case .jsObject: return .jsObject
+        case .jsObject, .jsPromise: return .jsObject
         case .void: return .void
         case .closure:
             throw BridgeJSCoreError("Closure types are not yet supported in TypeScript imports")

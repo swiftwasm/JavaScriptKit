@@ -1302,7 +1302,7 @@ struct IntrinsicJSFragment: Sendable {
         switch type {
         case .int, .float, .double, .bool: return .identity
         case .string: return .stringLowerParameter
-        case .jsObject: return .jsObjectLowerParameter
+        case .jsObject, .jsPromise: return .jsObjectLowerParameter
         case .swiftHeapObject:
             return .swiftHeapObjectLowerParameter
         case .swiftProtocol: return .jsObjectLowerParameter
@@ -1344,7 +1344,7 @@ struct IntrinsicJSFragment: Sendable {
         case .int, .float, .double: return .identity
         case .bool: return .boolLiftReturn
         case .string: return .stringLiftReturn
-        case .jsObject: return .jsObjectLiftReturn
+        case .jsObject, .jsPromise: return .jsObjectLiftReturn
         case .swiftHeapObject(let name): return .swiftHeapObjectLiftReturn(name)
         case .swiftProtocol: return .jsObjectLiftReturn
         case .void: return .void
@@ -1387,7 +1387,7 @@ struct IntrinsicJSFragment: Sendable {
         case .int, .float, .double: return .identity
         case .bool: return .boolLiftParameter
         case .string: return .stringLiftParameter
-        case .jsObject: return .jsObjectLiftParameter
+        case .jsObject, .jsPromise: return .jsObjectLiftParameter
         case .swiftHeapObject(let name):
             switch context {
             case .importTS:
@@ -1475,7 +1475,7 @@ struct IntrinsicJSFragment: Sendable {
         case .int, .float, .double: return .identity
         case .bool: return .boolLowerReturn
         case .string: return .stringLowerReturn
-        case .jsObject: return .jsObjectLowerReturn
+        case .jsObject, .jsPromise: return .jsObjectLowerReturn
         case .swiftHeapObject(let name):
             switch context {
             case .importTS:
@@ -2249,7 +2249,7 @@ struct IntrinsicJSFragment: Sendable {
                     return []
                 }
             )
-        case .jsObject:
+        case .jsObject, .jsPromise:
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, scope, printer, cleanup in
@@ -2777,7 +2777,7 @@ struct IntrinsicJSFragment: Sendable {
                     return [varName]
                 }
             )
-        case .jsObject:
+        case .jsObject, .jsPromise:
             return IntrinsicJSFragment(
                 parameters: [],
                 printCode: { arguments, scope, printer, cleanup in

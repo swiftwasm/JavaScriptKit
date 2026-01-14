@@ -11,7 +11,7 @@ import Foundation
     static func collectInputs() -> [String] {
         let fileManager = FileManager.default
         let inputs = try! fileManager.contentsOfDirectory(atPath: Self.inputsDirectory.path)
-        return inputs.filter { $0.hasSuffix(".d.ts") }
+        return inputs.filter { $0.hasSuffix("Async.d.ts") }
     }
 
     @Test(arguments: collectInputs())

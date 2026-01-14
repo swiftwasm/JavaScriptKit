@@ -5,6 +5,7 @@ export type BridgeType =
     | { "string": {} }
     | { "bool": {} }
     | { "jsObject": { "_0": string } | {} }
+    | { "jsPromise": { "_0": string } | {} }
     | { "void": {} }
 
 export type Parameter = {
