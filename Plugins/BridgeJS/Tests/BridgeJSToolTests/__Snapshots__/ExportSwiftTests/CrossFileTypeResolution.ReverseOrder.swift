@@ -8,7 +8,7 @@
 
 @_expose(wasm, "bjs_ClassA_linkedB_get")
 @_cdecl("bjs_ClassA_linkedB_get")
-public func _bjs_ClassA_linkedB_get(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_ClassA_linkedB_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ClassA.bridgeJSLiftParameter(_self).linkedB
     return ret.bridgeJSLowerReturn()
@@ -19,7 +19,7 @@ public func _bjs_ClassA_linkedB_get(_self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_ClassA_linkedB_set")
 @_cdecl("bjs_ClassA_linkedB_set")
-public func _bjs_ClassA_linkedB_set(_self: UnsafeMutableRawPointer, valueIsSome: Int32, valueValue: UnsafeMutableRawPointer) -> Void {
+public func _bjs_ClassA_linkedB_set(_ _self: UnsafeMutableRawPointer, _ valueIsSome: Int32, _ valueValue: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     ClassA.bridgeJSLiftParameter(_self).linkedB = Optional<ClassB>.bridgeJSLiftParameter(valueIsSome, valueValue)
     #else
@@ -29,8 +29,12 @@ public func _bjs_ClassA_linkedB_set(_self: UnsafeMutableRawPointer, valueIsSome:
 
 @_expose(wasm, "bjs_ClassA_deinit")
 @_cdecl("bjs_ClassA_deinit")
-public func _bjs_ClassA_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_ClassA_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<ClassA>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension ClassA: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -41,9 +45,9 @@ extension ClassA: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_ClassA_wrap")
-fileprivate func _bjs_ClassA_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_ClassA_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_ClassA_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_ClassA_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -61,8 +65,12 @@ public func _bjs_ClassB_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_ClassB_deinit")
 @_cdecl("bjs_ClassB_deinit")
-public func _bjs_ClassB_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_ClassB_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<ClassB>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension ClassB: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -73,9 +81,9 @@ extension ClassB: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_ClassB_wrap")
-fileprivate func _bjs_ClassB_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_ClassB_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_ClassB_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_ClassB_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

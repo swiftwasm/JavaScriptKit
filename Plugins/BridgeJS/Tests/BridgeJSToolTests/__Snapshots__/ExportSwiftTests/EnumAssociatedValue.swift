@@ -491,7 +491,7 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
 
 @_expose(wasm, "bjs_handle")
 @_cdecl("bjs_handle")
-public func _bjs_handle(result: Int32) -> Void {
+public func _bjs_handle(_ result: Int32) -> Void {
     #if arch(wasm32)
     handle(result: APIResult.bridgeJSLiftParameter(result))
     #else
@@ -512,7 +512,7 @@ public func _bjs_getResult() -> Void {
 
 @_expose(wasm, "bjs_roundtripAPIResult")
 @_cdecl("bjs_roundtripAPIResult")
-public func _bjs_roundtripAPIResult(result: Int32) -> Void {
+public func _bjs_roundtripAPIResult(_ result: Int32) -> Void {
     #if arch(wasm32)
     let ret = roundtripAPIResult(result: APIResult.bridgeJSLiftParameter(result))
     return ret.bridgeJSLowerReturn()
@@ -523,7 +523,7 @@ public func _bjs_roundtripAPIResult(result: Int32) -> Void {
 
 @_expose(wasm, "bjs_roundTripOptionalAPIResult")
 @_cdecl("bjs_roundTripOptionalAPIResult")
-public func _bjs_roundTripOptionalAPIResult(resultIsSome: Int32, resultCaseId: Int32) -> Void {
+public func _bjs_roundTripOptionalAPIResult(_ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalAPIResult(result: Optional<APIResult>.bridgeJSLiftParameter(resultIsSome, resultCaseId))
     return ret.bridgeJSLowerReturn()
@@ -534,7 +534,7 @@ public func _bjs_roundTripOptionalAPIResult(resultIsSome: Int32, resultCaseId: I
 
 @_expose(wasm, "bjs_handleComplex")
 @_cdecl("bjs_handleComplex")
-public func _bjs_handleComplex(result: Int32) -> Void {
+public func _bjs_handleComplex(_ result: Int32) -> Void {
     #if arch(wasm32)
     handleComplex(result: ComplexResult.bridgeJSLiftParameter(result))
     #else
@@ -555,7 +555,7 @@ public func _bjs_getComplexResult() -> Void {
 
 @_expose(wasm, "bjs_roundtripComplexResult")
 @_cdecl("bjs_roundtripComplexResult")
-public func _bjs_roundtripComplexResult(result: Int32) -> Void {
+public func _bjs_roundtripComplexResult(_ result: Int32) -> Void {
     #if arch(wasm32)
     let ret = roundtripComplexResult(_: ComplexResult.bridgeJSLiftParameter(result))
     return ret.bridgeJSLowerReturn()
@@ -566,7 +566,7 @@ public func _bjs_roundtripComplexResult(result: Int32) -> Void {
 
 @_expose(wasm, "bjs_roundTripOptionalComplexResult")
 @_cdecl("bjs_roundTripOptionalComplexResult")
-public func _bjs_roundTripOptionalComplexResult(resultIsSome: Int32, resultCaseId: Int32) -> Void {
+public func _bjs_roundTripOptionalComplexResult(_ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalComplexResult(result: Optional<ComplexResult>.bridgeJSLiftParameter(resultIsSome, resultCaseId))
     return ret.bridgeJSLowerReturn()
@@ -577,7 +577,7 @@ public func _bjs_roundTripOptionalComplexResult(resultIsSome: Int32, resultCaseI
 
 @_expose(wasm, "bjs_roundTripOptionalUtilitiesResult")
 @_cdecl("bjs_roundTripOptionalUtilitiesResult")
-public func _bjs_roundTripOptionalUtilitiesResult(resultIsSome: Int32, resultCaseId: Int32) -> Void {
+public func _bjs_roundTripOptionalUtilitiesResult(_ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalUtilitiesResult(result: Optional<Utilities.Result>.bridgeJSLiftParameter(resultIsSome, resultCaseId))
     return ret.bridgeJSLowerReturn()
@@ -588,7 +588,7 @@ public func _bjs_roundTripOptionalUtilitiesResult(resultIsSome: Int32, resultCas
 
 @_expose(wasm, "bjs_roundTripOptionalNetworkingResult")
 @_cdecl("bjs_roundTripOptionalNetworkingResult")
-public func _bjs_roundTripOptionalNetworkingResult(resultIsSome: Int32, resultCaseId: Int32) -> Void {
+public func _bjs_roundTripOptionalNetworkingResult(_ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalNetworkingResult(result: Optional<NetworkingResult>.bridgeJSLiftParameter(resultIsSome, resultCaseId))
     return ret.bridgeJSLowerReturn()
@@ -599,7 +599,7 @@ public func _bjs_roundTripOptionalNetworkingResult(resultIsSome: Int32, resultCa
 
 @_expose(wasm, "bjs_roundTripOptionalAPIOptionalResult")
 @_cdecl("bjs_roundTripOptionalAPIOptionalResult")
-public func _bjs_roundTripOptionalAPIOptionalResult(resultIsSome: Int32, resultCaseId: Int32) -> Void {
+public func _bjs_roundTripOptionalAPIOptionalResult(_ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalAPIOptionalResult(result: Optional<APIOptionalResult>.bridgeJSLiftParameter(resultIsSome, resultCaseId))
     return ret.bridgeJSLowerReturn()
@@ -610,7 +610,7 @@ public func _bjs_roundTripOptionalAPIOptionalResult(resultIsSome: Int32, resultC
 
 @_expose(wasm, "bjs_compareAPIResults")
 @_cdecl("bjs_compareAPIResults")
-public func _bjs_compareAPIResults(result1IsSome: Int32, result1CaseId: Int32, result2IsSome: Int32, result2CaseId: Int32) -> Void {
+public func _bjs_compareAPIResults(_ result1IsSome: Int32, _ result1CaseId: Int32, _ result2IsSome: Int32, _ result2CaseId: Int32) -> Void {
     #if arch(wasm32)
     let _tmp_result2 = Optional<APIOptionalResult>.bridgeJSLiftParameter(result2IsSome, result2CaseId)
     let _tmp_result1 = Optional<APIOptionalResult>.bridgeJSLiftParameter(result1IsSome, result1CaseId)

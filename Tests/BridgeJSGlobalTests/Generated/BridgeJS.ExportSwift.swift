@@ -103,7 +103,7 @@ public func _bjs_GlobalStaticPropertyNamespace_static_namespaceProperty_get() ->
 
 @_expose(wasm, "bjs_GlobalStaticPropertyNamespace_static_namespaceProperty_set")
 @_cdecl("bjs_GlobalStaticPropertyNamespace_static_namespaceProperty_set")
-public func _bjs_GlobalStaticPropertyNamespace_static_namespaceProperty_set(valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_GlobalStaticPropertyNamespace_static_namespaceProperty_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     GlobalStaticPropertyNamespace.namespaceProperty = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
@@ -135,7 +135,7 @@ public func _bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedPro
 
 @_expose(wasm, "bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedProperty_set")
 @_cdecl("bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedProperty_set")
-public func _bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedProperty_set(value: Int32) -> Void {
+public func _bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedProperty_set(_ value: Int32) -> Void {
     #if arch(wasm32)
     GlobalStaticPropertyNamespace.NestedProperties.nestedProperty = Int.bridgeJSLiftParameter(value)
     #else
@@ -167,7 +167,7 @@ public func _bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedDou
 
 @_expose(wasm, "bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedDouble_set")
 @_cdecl("bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedDouble_set")
-public func _bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedDouble_set(value: Float64) -> Void {
+public func _bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedDouble_set(_ value: Float64) -> Void {
     #if arch(wasm32)
     GlobalStaticPropertyNamespace.NestedProperties.nestedDouble = Double.bridgeJSLiftParameter(value)
     #else
@@ -188,7 +188,7 @@ public func _bjs_TestHTTPServer_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_TestHTTPServer_call")
 @_cdecl("bjs_TestHTTPServer_call")
-public func _bjs_TestHTTPServer_call(_self: UnsafeMutableRawPointer, method: Int32) -> Void {
+public func _bjs_TestHTTPServer_call(_ _self: UnsafeMutableRawPointer, _ method: Int32) -> Void {
     #if arch(wasm32)
     GlobalNetworking.API.TestHTTPServer.bridgeJSLiftParameter(_self).call(_: GlobalNetworking.API.CallMethod.bridgeJSLiftParameter(method))
     #else
@@ -198,8 +198,12 @@ public func _bjs_TestHTTPServer_call(_self: UnsafeMutableRawPointer, method: Int
 
 @_expose(wasm, "bjs_TestHTTPServer_deinit")
 @_cdecl("bjs_TestHTTPServer_deinit")
-public func _bjs_TestHTTPServer_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_TestHTTPServer_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<GlobalNetworking.API.TestHTTPServer>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension GlobalNetworking.API.TestHTTPServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -210,9 +214,9 @@ extension GlobalNetworking.API.TestHTTPServer: ConvertibleToJSValue, _BridgedSwi
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSGlobalTests", name: "bjs_TestHTTPServer_wrap")
-fileprivate func _bjs_TestHTTPServer_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_TestHTTPServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_TestHTTPServer_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_TestHTTPServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -230,7 +234,7 @@ public func _bjs_TestInternalServer_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_TestInternalServer_call")
 @_cdecl("bjs_TestInternalServer_call")
-public func _bjs_TestInternalServer_call(_self: UnsafeMutableRawPointer, method: Int32) -> Void {
+public func _bjs_TestInternalServer_call(_ _self: UnsafeMutableRawPointer, _ method: Int32) -> Void {
     #if arch(wasm32)
     Internal.TestInternalServer.bridgeJSLiftParameter(_self).call(_: Internal.SupportedServerMethod.bridgeJSLiftParameter(method))
     #else
@@ -240,8 +244,12 @@ public func _bjs_TestInternalServer_call(_self: UnsafeMutableRawPointer, method:
 
 @_expose(wasm, "bjs_TestInternalServer_deinit")
 @_cdecl("bjs_TestInternalServer_deinit")
-public func _bjs_TestInternalServer_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_TestInternalServer_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<Internal.TestInternalServer>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension Internal.TestInternalServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -252,9 +260,9 @@ extension Internal.TestInternalServer: ConvertibleToJSValue, _BridgedSwiftHeapOb
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSGlobalTests", name: "bjs_TestInternalServer_wrap")
-fileprivate func _bjs_TestInternalServer_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_TestInternalServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_TestInternalServer_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_TestInternalServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -272,7 +280,7 @@ public func _bjs_PublicConverter_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_PublicConverter_toString")
 @_cdecl("bjs_PublicConverter_toString")
-public func _bjs_PublicConverter_toString(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+public func _bjs_PublicConverter_toString(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
     let ret = GlobalUtils.PublicConverter.bridgeJSLiftParameter(_self).toString(value: Int.bridgeJSLiftParameter(value))
     return ret.bridgeJSLowerReturn()
@@ -283,8 +291,12 @@ public func _bjs_PublicConverter_toString(_self: UnsafeMutableRawPointer, value:
 
 @_expose(wasm, "bjs_PublicConverter_deinit")
 @_cdecl("bjs_PublicConverter_deinit")
-public func _bjs_PublicConverter_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_PublicConverter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<GlobalUtils.PublicConverter>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension GlobalUtils.PublicConverter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -295,9 +307,9 @@ extension GlobalUtils.PublicConverter: ConvertibleToJSValue, _BridgedSwiftHeapOb
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSGlobalTests", name: "bjs_PublicConverter_wrap")
-fileprivate func _bjs_PublicConverter_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_PublicConverter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_PublicConverter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_PublicConverter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

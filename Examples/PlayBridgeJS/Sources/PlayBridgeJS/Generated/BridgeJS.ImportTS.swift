@@ -40,7 +40,9 @@ struct TS2Skeleton: _JSBridgedClass {
     }
 
     func convert(_ ts: String) throws(JSException) -> String {
-        let ret = bjs_TS2Skeleton_convert(self.bridgeJSLowerParameter(), ts.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let tsValue = ts.bridgeJSLowerParameter()
+        let ret = bjs_TS2Skeleton_convert(selfValue, tsValue)
         if let error = _swift_js_take_exception() {
             throw error
         }

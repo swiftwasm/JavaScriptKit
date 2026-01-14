@@ -8,7 +8,7 @@
 
 @_expose(wasm, "bjs_takeGreeter")
 @_cdecl("bjs_takeGreeter")
-public func _bjs_takeGreeter(greeter: UnsafeMutableRawPointer) -> Void {
+public func _bjs_takeGreeter(_ greeter: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     takeGreeter(greeter: Greeter.bridgeJSLiftParameter(greeter))
     #else
@@ -18,7 +18,7 @@ public func _bjs_takeGreeter(greeter: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_Greeter_init")
 @_cdecl("bjs_Greeter_init")
-public func _bjs_Greeter_init(nameBytes: Int32, nameLength: Int32) -> UnsafeMutableRawPointer {
+public func _bjs_Greeter_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = Greeter(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
     return ret.bridgeJSLowerReturn()
@@ -29,7 +29,7 @@ public func _bjs_Greeter_init(nameBytes: Int32, nameLength: Int32) -> UnsafeMuta
 
 @_expose(wasm, "bjs_Greeter_greet")
 @_cdecl("bjs_Greeter_greet")
-public func _bjs_Greeter_greet(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_Greeter_greet(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = Greeter.bridgeJSLiftParameter(_self).greet()
     return ret.bridgeJSLowerReturn()
@@ -40,7 +40,7 @@ public func _bjs_Greeter_greet(_self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_Greeter_changeName")
 @_cdecl("bjs_Greeter_changeName")
-public func _bjs_Greeter_changeName(_self: UnsafeMutableRawPointer, nameBytes: Int32, nameLength: Int32) -> Void {
+public func _bjs_Greeter_changeName(_ _self: UnsafeMutableRawPointer, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
     #if arch(wasm32)
     Greeter.bridgeJSLiftParameter(_self).changeName(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
     #else
@@ -50,7 +50,7 @@ public func _bjs_Greeter_changeName(_self: UnsafeMutableRawPointer, nameBytes: I
 
 @_expose(wasm, "bjs_Greeter_name_get")
 @_cdecl("bjs_Greeter_name_get")
-public func _bjs_Greeter_name_get(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_Greeter_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = Greeter.bridgeJSLiftParameter(_self).name
     return ret.bridgeJSLowerReturn()
@@ -61,7 +61,7 @@ public func _bjs_Greeter_name_get(_self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_Greeter_name_set")
 @_cdecl("bjs_Greeter_name_set")
-public func _bjs_Greeter_name_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_Greeter_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     Greeter.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
@@ -71,8 +71,12 @@ public func _bjs_Greeter_name_set(_self: UnsafeMutableRawPointer, valueBytes: In
 
 @_expose(wasm, "bjs_Greeter_deinit")
 @_cdecl("bjs_Greeter_deinit")
-public func _bjs_Greeter_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_Greeter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<Greeter>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -83,17 +87,21 @@ extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Greeter_wrap")
-fileprivate func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 @_expose(wasm, "bjs_PublicGreeter_deinit")
 @_cdecl("bjs_PublicGreeter_deinit")
-public func _bjs_PublicGreeter_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_PublicGreeter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<PublicGreeter>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension PublicGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -104,17 +112,21 @@ extension PublicGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_PublicGreeter_wrap")
-fileprivate func _bjs_PublicGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_PublicGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_PublicGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_PublicGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 @_expose(wasm, "bjs_PackageGreeter_deinit")
 @_cdecl("bjs_PackageGreeter_deinit")
-public func _bjs_PackageGreeter_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_PackageGreeter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<PackageGreeter>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension PackageGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -125,9 +137,9 @@ extension PackageGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_PackageGreeter_wrap")
-fileprivate func _bjs_PackageGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_PackageGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_PackageGreeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_PackageGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

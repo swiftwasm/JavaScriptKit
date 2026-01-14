@@ -49,7 +49,10 @@ struct Animatable: _JSBridgedClass {
     }
 
     func animate(_ keyframes: JSObject, _ options: JSObject) throws(JSException) -> JSObject {
-        let ret = bjs_Animatable_animate(self.bridgeJSLowerParameter(), keyframes.bridgeJSLowerParameter(), options.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let keyframesValue = keyframes.bridgeJSLowerParameter()
+        let optionsValue = options.bridgeJSLowerParameter()
+        let ret = bjs_Animatable_animate(selfValue, keyframesValue, optionsValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -57,7 +60,9 @@ struct Animatable: _JSBridgedClass {
     }
 
     func getAnimations(_ options: JSObject) throws(JSException) -> JSObject {
-        let ret = bjs_Animatable_getAnimations(self.bridgeJSLowerParameter(), options.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let optionsValue = options.bridgeJSLowerParameter()
+        let ret = bjs_Animatable_getAnimations(selfValue, optionsValue)
         if let error = _swift_js_take_exception() {
             throw error
         }

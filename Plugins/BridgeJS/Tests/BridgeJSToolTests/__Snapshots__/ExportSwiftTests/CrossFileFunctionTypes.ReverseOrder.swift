@@ -8,7 +8,7 @@
 
 @_expose(wasm, "bjs_standaloneFunction")
 @_cdecl("bjs_standaloneFunction")
-public func _bjs_standaloneFunction(b: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_standaloneFunction(_ b: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = standaloneFunction(b: FunctionB.bridgeJSLiftParameter(b))
     return ret.bridgeJSLowerReturn()
@@ -30,7 +30,7 @@ public func _bjs_FunctionA_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_FunctionA_processB")
 @_cdecl("bjs_FunctionA_processB")
-public func _bjs_FunctionA_processB(_self: UnsafeMutableRawPointer, b: UnsafeMutableRawPointer) -> Void {
+public func _bjs_FunctionA_processB(_ _self: UnsafeMutableRawPointer, _ b: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = FunctionA.bridgeJSLiftParameter(_self).processB(b: FunctionB.bridgeJSLiftParameter(b))
     return ret.bridgeJSLowerReturn()
@@ -41,7 +41,7 @@ public func _bjs_FunctionA_processB(_self: UnsafeMutableRawPointer, b: UnsafeMut
 
 @_expose(wasm, "bjs_FunctionA_createB")
 @_cdecl("bjs_FunctionA_createB")
-public func _bjs_FunctionA_createB(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> UnsafeMutableRawPointer {
+public func _bjs_FunctionA_createB(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = FunctionA.bridgeJSLiftParameter(_self).createB(value: String.bridgeJSLiftParameter(valueBytes, valueLength))
     return ret.bridgeJSLowerReturn()
@@ -52,8 +52,12 @@ public func _bjs_FunctionA_createB(_self: UnsafeMutableRawPointer, valueBytes: I
 
 @_expose(wasm, "bjs_FunctionA_deinit")
 @_cdecl("bjs_FunctionA_deinit")
-public func _bjs_FunctionA_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_FunctionA_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<FunctionA>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension FunctionA: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -64,16 +68,16 @@ extension FunctionA: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_FunctionA_wrap")
-fileprivate func _bjs_FunctionA_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_FunctionA_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_FunctionA_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_FunctionA_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 @_expose(wasm, "bjs_FunctionB_init")
 @_cdecl("bjs_FunctionB_init")
-public func _bjs_FunctionB_init(valueBytes: Int32, valueLength: Int32) -> UnsafeMutableRawPointer {
+public func _bjs_FunctionB_init(_ valueBytes: Int32, _ valueLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = FunctionB(value: String.bridgeJSLiftParameter(valueBytes, valueLength))
     return ret.bridgeJSLowerReturn()
@@ -84,7 +88,7 @@ public func _bjs_FunctionB_init(valueBytes: Int32, valueLength: Int32) -> Unsafe
 
 @_expose(wasm, "bjs_FunctionB_value_get")
 @_cdecl("bjs_FunctionB_value_get")
-public func _bjs_FunctionB_value_get(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_FunctionB_value_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = FunctionB.bridgeJSLiftParameter(_self).value
     return ret.bridgeJSLowerReturn()
@@ -95,7 +99,7 @@ public func _bjs_FunctionB_value_get(_self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_FunctionB_value_set")
 @_cdecl("bjs_FunctionB_value_set")
-public func _bjs_FunctionB_value_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_FunctionB_value_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     FunctionB.bridgeJSLiftParameter(_self).value = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
@@ -105,8 +109,12 @@ public func _bjs_FunctionB_value_set(_self: UnsafeMutableRawPointer, valueBytes:
 
 @_expose(wasm, "bjs_FunctionB_deinit")
 @_cdecl("bjs_FunctionB_deinit")
-public func _bjs_FunctionB_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_FunctionB_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<FunctionB>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension FunctionB: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -117,9 +125,9 @@ extension FunctionB: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_FunctionB_wrap")
-fileprivate func _bjs_FunctionB_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_FunctionB_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_FunctionB_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_FunctionB_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

@@ -43,7 +43,7 @@ extension Calculator: _BridgedSwiftCaseEnum {
 
 @_expose(wasm, "bjs_Calculator_static_square")
 @_cdecl("bjs_Calculator_static_square")
-public func _bjs_Calculator_static_square(value: Int32) -> Int32 {
+public func _bjs_Calculator_static_square(_ value: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = Calculator.square(value: Int.bridgeJSLiftParameter(value))
     return ret.bridgeJSLowerReturn()
@@ -107,7 +107,7 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
 
 @_expose(wasm, "bjs_APIResult_static_roundtrip")
 @_cdecl("bjs_APIResult_static_roundtrip")
-public func _bjs_APIResult_static_roundtrip(value: Int32) -> Void {
+public func _bjs_APIResult_static_roundtrip(_ value: Int32) -> Void {
     #if arch(wasm32)
     let ret = APIResult.roundtrip(value: APIResult.bridgeJSLiftParameter(value))
     return ret.bridgeJSLowerReturn()
@@ -118,7 +118,7 @@ public func _bjs_APIResult_static_roundtrip(value: Int32) -> Void {
 
 @_expose(wasm, "bjs_Utils_String_static_uppercase")
 @_cdecl("bjs_Utils_String_static_uppercase")
-public func _bjs_Utils_String_static_uppercase(textBytes: Int32, textLength: Int32) -> Void {
+public func _bjs_Utils_String_static_uppercase(_ textBytes: Int32, _ textLength: Int32) -> Void {
     #if arch(wasm32)
     let ret = Utils.String.uppercase(_: String.bridgeJSLiftParameter(textBytes, textLength))
     return ret.bridgeJSLowerReturn()
@@ -140,7 +140,7 @@ public func _bjs_MathUtils_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_MathUtils_static_subtract")
 @_cdecl("bjs_MathUtils_static_subtract")
-public func _bjs_MathUtils_static_subtract(a: Int32, b: Int32) -> Int32 {
+public func _bjs_MathUtils_static_subtract(_ a: Int32, _ b: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = MathUtils.subtract(a: Int.bridgeJSLiftParameter(a), b: Int.bridgeJSLiftParameter(b))
     return ret.bridgeJSLowerReturn()
@@ -151,7 +151,7 @@ public func _bjs_MathUtils_static_subtract(a: Int32, b: Int32) -> Int32 {
 
 @_expose(wasm, "bjs_MathUtils_static_add")
 @_cdecl("bjs_MathUtils_static_add")
-public func _bjs_MathUtils_static_add(a: Int32, b: Int32) -> Int32 {
+public func _bjs_MathUtils_static_add(_ a: Int32, _ b: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = MathUtils.add(a: Int.bridgeJSLiftParameter(a), b: Int.bridgeJSLiftParameter(b))
     return ret.bridgeJSLowerReturn()
@@ -162,7 +162,7 @@ public func _bjs_MathUtils_static_add(a: Int32, b: Int32) -> Int32 {
 
 @_expose(wasm, "bjs_MathUtils_multiply")
 @_cdecl("bjs_MathUtils_multiply")
-public func _bjs_MathUtils_multiply(_self: UnsafeMutableRawPointer, x: Int32, y: Int32) -> Int32 {
+public func _bjs_MathUtils_multiply(_ _self: UnsafeMutableRawPointer, _ x: Int32, _ y: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = MathUtils.bridgeJSLiftParameter(_self).multiply(x: Int.bridgeJSLiftParameter(x), y: Int.bridgeJSLiftParameter(y))
     return ret.bridgeJSLowerReturn()
@@ -173,8 +173,12 @@ public func _bjs_MathUtils_multiply(_self: UnsafeMutableRawPointer, x: Int32, y:
 
 @_expose(wasm, "bjs_MathUtils_deinit")
 @_cdecl("bjs_MathUtils_deinit")
-public func _bjs_MathUtils_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_MathUtils_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<MathUtils>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension MathUtils: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -185,9 +189,9 @@ extension MathUtils: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MathUtils_wrap")
-fileprivate func _bjs_MathUtils_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_MathUtils_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_MathUtils_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_MathUtils_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

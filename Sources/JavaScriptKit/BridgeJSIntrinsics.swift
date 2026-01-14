@@ -78,7 +78,6 @@ import _CJavaScriptKit
 // - `func bridgeJSLowerReturn() -> <#WasmCoreType#>`: lower the given higher-level return value to a Wasm core type
 //
 // Optional types (ExportSwift only) additionally define:
-// - `func bridgeJSLowerParameterWithPresence()`: lower optional as (isSome, value) tuple for protocol setters/parameters (borrows object)
 // - `func bridgeJSLowerParameterWithRetain()`: lower optional heap object with ownership transfer for escaping closures
 // - `func bridgeJSLiftReturnFromSideChannel()`: lift optional from side-channel storage for protocol property getters
 //
@@ -653,7 +652,7 @@ extension Optional where Wrapped == Bool {
 
     // MARK: ExportSwift
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithPresence() -> (
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
         isSome: Int32, value: Int32
     ) {
         switch consume self {
@@ -703,7 +702,7 @@ extension Optional where Wrapped == Int {
 
     // MARK: ExportSwift
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithPresence() -> (
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
         isSome: Int32, value: Int32
     ) {
         switch consume self {
@@ -743,7 +742,7 @@ extension Optional where Wrapped == Int {
 extension Optional where Wrapped == String {
     // MARK: ExportSwift
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithPresence() -> (
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
         isSome: Int32, value: Int32
     ) {
         switch consume self {
@@ -786,7 +785,7 @@ extension Optional where Wrapped == String {
 extension Optional where Wrapped == JSObject {
     // MARK: ExportSwift
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithPresence() -> (
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
         isSome: Int32, value: Int32
     ) {
         switch consume self {
@@ -840,18 +839,7 @@ extension Optional where Wrapped: _BridgedSwiftProtocolWrapper {
 
 /// Optional support for Swift heap objects
 extension Optional where Wrapped: _BridgedSwiftHeapObject {
-    // MARK: ImportTS
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
-        switch consume self {
-        case .none:
-            // Return null pointer for nil
-            return UnsafeMutableRawPointer(bitPattern: 0).unsafelyUnwrapped
-        case .some(let value):
-            // Pass unretained pointer since JS will manage the lifetime
-            return Unmanaged.passUnretained(value).toOpaque()
-        }
-    }
-
+    // MARK: ExportSwift
     /// Lowers optional Swift heap object as (isSome, pointer) tuple for protocol parameters.
     ///
     /// This method uses `passUnretained()` because the caller (JavaScript protocol implementation)
@@ -859,7 +847,7 @@ extension Optional where Wrapped: _BridgedSwiftHeapObject {
     /// duration of the call.
     ///
     /// - Returns: A tuple containing presence flag (0 for nil, 1 for some) and unretained pointer
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithPresence() -> (
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
         isSome: Int32, pointer: UnsafeMutableRawPointer
     ) {
         switch consume self {
@@ -931,12 +919,18 @@ extension Optional where Wrapped: _BridgedSwiftHeapObject {
     }
 }
 extension Optional where Wrapped == Float {
-    // MARK: ImportTS
-
-    @available(*, unavailable, message: "Optional Float type is not supported to be passed to imported JS functions")
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
-
     // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
+        isSome: Int32, value: Float32
+    ) {
+        switch consume self {
+        case .none:
+            return (isSome: 0, value: 0.0)
+        case .some(let wrapped):
+            return (isSome: 1, value: wrapped.bridgeJSLowerParameter())
+        }
+    }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float32) -> Float? {
         if isSome == 0 {
@@ -967,12 +961,18 @@ extension Optional where Wrapped == Float {
 
 /// Optional support for Double
 extension Optional where Wrapped == Double {
-    // MARK: ImportTS
-
-    @available(*, unavailable, message: "Optional Double type is not supported to be passed to imported JS functions")
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
-
     // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
+        isSome: Int32, value: Float64
+    ) {
+        switch consume self {
+        case .none:
+            return (isSome: 0, value: 0.0)
+        case .some(let wrapped):
+            return (isSome: 1, value: wrapped.bridgeJSLowerParameter())
+        }
+    }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float64) -> Double? {
         if isSome == 0 {
@@ -1005,7 +1005,7 @@ extension Optional where Wrapped == Double {
 extension Optional where Wrapped: _BridgedSwiftCaseEnum {
     // MARK: ExportSwift
 
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameterWithPresence() -> (isSome: Int32, value: Int32) {
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Int32) {
         switch consume self {
         case .none:
             return (isSome: 0, value: 0)
@@ -1061,7 +1061,7 @@ extension Optional where Wrapped: _BridgedSwiftTypeLoweredIntoVoidType {
 extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == String {
     // MARK: ExportSwift
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithPresence() -> (
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
         isSome: Int32, value: Int32
     ) {
         switch consume self {
@@ -1099,7 +1099,7 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
 
 extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Int {
     // MARK: ExportSwift
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameterWithPresence() -> (isSome: Int32, value: Int32) {
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Int32) {
         switch consume self {
         case .none:
             return (isSome: 0, value: 0)
@@ -1146,7 +1146,7 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
 extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Float {
     // MARK: ExportSwift
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithPresence() -> (
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
         isSome: Int32, value: Float32
     ) {
         switch consume self {
@@ -1181,7 +1181,7 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
 extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Double {
     // MARK: ExportSwift
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithPresence() -> (
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
         isSome: Int32, value: Float64
     ) {
         switch consume self {
@@ -1218,7 +1218,7 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
 extension Optional where Wrapped: _BridgedSwiftAssociatedValueEnum {
     // MARK: ExportSwift
 
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameterWithPresence() -> (isSome: Int32, caseId: Int32) {
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, caseId: Int32) {
         switch consume self {
         case .none:
             return (isSome: 0, caseId: 0)

@@ -54,7 +54,7 @@ public func _bjs_PropertyEnum_static_enumProperty_get() -> Void {
 
 @_expose(wasm, "bjs_PropertyEnum_static_enumProperty_set")
 @_cdecl("bjs_PropertyEnum_static_enumProperty_set")
-public func _bjs_PropertyEnum_static_enumProperty_set(valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_PropertyEnum_static_enumProperty_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     PropertyEnum.enumProperty = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
@@ -86,7 +86,7 @@ public func _bjs_PropertyEnum_static_computedEnum_get() -> Void {
 
 @_expose(wasm, "bjs_PropertyEnum_static_computedEnum_set")
 @_cdecl("bjs_PropertyEnum_static_computedEnum_set")
-public func _bjs_PropertyEnum_static_computedEnum_set(valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_PropertyEnum_static_computedEnum_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     PropertyEnum.computedEnum = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
@@ -107,7 +107,7 @@ public func _bjs_PropertyNamespace_static_namespaceProperty_get() -> Void {
 
 @_expose(wasm, "bjs_PropertyNamespace_static_namespaceProperty_set")
 @_cdecl("bjs_PropertyNamespace_static_namespaceProperty_set")
-public func _bjs_PropertyNamespace_static_namespaceProperty_set(valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_PropertyNamespace_static_namespaceProperty_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     PropertyNamespace.namespaceProperty = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
@@ -139,7 +139,7 @@ public func _bjs_PropertyNamespace_Nested_static_nestedProperty_get() -> Int32 {
 
 @_expose(wasm, "bjs_PropertyNamespace_Nested_static_nestedProperty_set")
 @_cdecl("bjs_PropertyNamespace_Nested_static_nestedProperty_set")
-public func _bjs_PropertyNamespace_Nested_static_nestedProperty_set(value: Int32) -> Void {
+public func _bjs_PropertyNamespace_Nested_static_nestedProperty_set(_ value: Int32) -> Void {
     #if arch(wasm32)
     PropertyNamespace.Nested.nestedProperty = Int.bridgeJSLiftParameter(value)
     #else
@@ -171,7 +171,7 @@ public func _bjs_PropertyNamespace_Nested_static_nestedDouble_get() -> Float64 {
 
 @_expose(wasm, "bjs_PropertyNamespace_Nested_static_nestedDouble_set")
 @_cdecl("bjs_PropertyNamespace_Nested_static_nestedDouble_set")
-public func _bjs_PropertyNamespace_Nested_static_nestedDouble_set(value: Float64) -> Void {
+public func _bjs_PropertyNamespace_Nested_static_nestedDouble_set(_ value: Float64) -> Void {
     #if arch(wasm32)
     PropertyNamespace.Nested.nestedDouble = Double.bridgeJSLiftParameter(value)
     #else
@@ -214,7 +214,7 @@ public func _bjs_PropertyClass_static_staticVariable_get() -> Int32 {
 
 @_expose(wasm, "bjs_PropertyClass_static_staticVariable_set")
 @_cdecl("bjs_PropertyClass_static_staticVariable_set")
-public func _bjs_PropertyClass_static_staticVariable_set(value: Int32) -> Void {
+public func _bjs_PropertyClass_static_staticVariable_set(_ value: Int32) -> Void {
     #if arch(wasm32)
     PropertyClass.staticVariable = Int.bridgeJSLiftParameter(value)
     #else
@@ -235,7 +235,7 @@ public func _bjs_PropertyClass_static_jsObjectProperty_get() -> Int32 {
 
 @_expose(wasm, "bjs_PropertyClass_static_jsObjectProperty_set")
 @_cdecl("bjs_PropertyClass_static_jsObjectProperty_set")
-public func _bjs_PropertyClass_static_jsObjectProperty_set(value: Int32) -> Void {
+public func _bjs_PropertyClass_static_jsObjectProperty_set(_ value: Int32) -> Void {
     #if arch(wasm32)
     PropertyClass.jsObjectProperty = JSObject.bridgeJSLiftParameter(value)
     #else
@@ -256,7 +256,7 @@ public func _bjs_PropertyClass_static_classVariable_get() -> Void {
 
 @_expose(wasm, "bjs_PropertyClass_static_classVariable_set")
 @_cdecl("bjs_PropertyClass_static_classVariable_set")
-public func _bjs_PropertyClass_static_classVariable_set(valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_PropertyClass_static_classVariable_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     PropertyClass.classVariable = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
@@ -277,7 +277,7 @@ public func _bjs_PropertyClass_static_computedProperty_get() -> Void {
 
 @_expose(wasm, "bjs_PropertyClass_static_computedProperty_set")
 @_cdecl("bjs_PropertyClass_static_computedProperty_set")
-public func _bjs_PropertyClass_static_computedProperty_set(valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_PropertyClass_static_computedProperty_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     PropertyClass.computedProperty = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
@@ -309,7 +309,7 @@ public func _bjs_PropertyClass_static_optionalProperty_get() -> Void {
 
 @_expose(wasm, "bjs_PropertyClass_static_optionalProperty_set")
 @_cdecl("bjs_PropertyClass_static_optionalProperty_set")
-public func _bjs_PropertyClass_static_optionalProperty_set(valueIsSome: Int32, valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_PropertyClass_static_optionalProperty_set(_ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     PropertyClass.optionalProperty = Optional<String>.bridgeJSLiftParameter(valueIsSome, valueBytes, valueLength)
     #else
@@ -319,8 +319,12 @@ public func _bjs_PropertyClass_static_optionalProperty_set(valueIsSome: Int32, v
 
 @_expose(wasm, "bjs_PropertyClass_deinit")
 @_cdecl("bjs_PropertyClass_deinit")
-public func _bjs_PropertyClass_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_PropertyClass_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<PropertyClass>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension PropertyClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -331,9 +335,9 @@ extension PropertyClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_PropertyClass_wrap")
-fileprivate func _bjs_PropertyClass_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_PropertyClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_PropertyClass_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_PropertyClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

@@ -30,7 +30,7 @@ public func _bjs_PrivateClass_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_PrivateClass_greet")
 @_cdecl("bjs_PrivateClass_greet")
-public func _bjs_PrivateClass_greet(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_PrivateClass_greet(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = PrivateClass.bridgeJSLiftParameter(_self).greet()
     return ret.bridgeJSLowerReturn()
@@ -41,8 +41,12 @@ public func _bjs_PrivateClass_greet(_self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_PrivateClass_deinit")
 @_cdecl("bjs_PrivateClass_deinit")
-public func _bjs_PrivateClass_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_PrivateClass_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<PrivateClass>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension PrivateClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -53,9 +57,9 @@ extension PrivateClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_PrivateClass_wrap")
-fileprivate func _bjs_PrivateClass_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_PrivateClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_PrivateClass_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_PrivateClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

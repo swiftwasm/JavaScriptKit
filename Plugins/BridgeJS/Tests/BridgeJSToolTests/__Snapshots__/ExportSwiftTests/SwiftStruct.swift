@@ -38,7 +38,7 @@ extension DataPoint: _BridgedSwiftStruct {
 
 @_expose(wasm, "bjs_DataPoint_init")
 @_cdecl("bjs_DataPoint_init")
-public func _bjs_DataPoint_init(x: Float64, y: Float64, labelBytes: Int32, labelLength: Int32, optCountIsSome: Int32, optCountValue: Int32, optFlagIsSome: Int32, optFlagValue: Int32) -> Void {
+public func _bjs_DataPoint_init(_ x: Float64, _ y: Float64, _ labelBytes: Int32, _ labelLength: Int32, _ optCountIsSome: Int32, _ optCountValue: Int32, _ optFlagIsSome: Int32, _ optFlagValue: Int32) -> Void {
     #if arch(wasm32)
     let ret = DataPoint(x: Double.bridgeJSLiftParameter(x), y: Double.bridgeJSLiftParameter(y), label: String.bridgeJSLiftParameter(labelBytes, labelLength), optCount: Optional<Int>.bridgeJSLiftParameter(optCountIsSome, optCountValue), optFlag: Optional<Bool>.bridgeJSLiftParameter(optFlagIsSome, optFlagValue))
     return ret.bridgeJSLowerReturn()
@@ -146,7 +146,7 @@ public func _bjs_ConfigStruct_static_defaultConfig_get() -> Void {
 
 @_expose(wasm, "bjs_ConfigStruct_static_defaultConfig_set")
 @_cdecl("bjs_ConfigStruct_static_defaultConfig_set")
-public func _bjs_ConfigStruct_static_defaultConfig_set(valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_ConfigStruct_static_defaultConfig_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     ConfigStruct.defaultConfig = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
@@ -167,7 +167,7 @@ public func _bjs_ConfigStruct_static_timeout_get() -> Float64 {
 
 @_expose(wasm, "bjs_ConfigStruct_static_timeout_set")
 @_cdecl("bjs_ConfigStruct_static_timeout_set")
-public func _bjs_ConfigStruct_static_timeout_set(value: Float64) -> Void {
+public func _bjs_ConfigStruct_static_timeout_set(_ value: Float64) -> Void {
     #if arch(wasm32)
     ConfigStruct.timeout = Double.bridgeJSLiftParameter(value)
     #else
@@ -188,7 +188,7 @@ public func _bjs_ConfigStruct_static_computedSetting_get() -> Void {
 
 @_expose(wasm, "bjs_ConfigStruct_static_update")
 @_cdecl("bjs_ConfigStruct_static_update")
-public func _bjs_ConfigStruct_static_update(timeout: Float64) -> Float64 {
+public func _bjs_ConfigStruct_static_update(_ timeout: Float64) -> Float64 {
     #if arch(wasm32)
     let ret = ConfigStruct.update(_: Double.bridgeJSLiftParameter(timeout))
     return ret.bridgeJSLowerReturn()
@@ -210,7 +210,7 @@ public func _bjs_roundtrip() -> Void {
 
 @_expose(wasm, "bjs_Greeter_init")
 @_cdecl("bjs_Greeter_init")
-public func _bjs_Greeter_init(nameBytes: Int32, nameLength: Int32) -> UnsafeMutableRawPointer {
+public func _bjs_Greeter_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = Greeter(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
     return ret.bridgeJSLowerReturn()
@@ -221,7 +221,7 @@ public func _bjs_Greeter_init(nameBytes: Int32, nameLength: Int32) -> UnsafeMuta
 
 @_expose(wasm, "bjs_Greeter_greet")
 @_cdecl("bjs_Greeter_greet")
-public func _bjs_Greeter_greet(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_Greeter_greet(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = Greeter.bridgeJSLiftParameter(_self).greet()
     return ret.bridgeJSLowerReturn()
@@ -232,7 +232,7 @@ public func _bjs_Greeter_greet(_self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_Greeter_name_get")
 @_cdecl("bjs_Greeter_name_get")
-public func _bjs_Greeter_name_get(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_Greeter_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = Greeter.bridgeJSLiftParameter(_self).name
     return ret.bridgeJSLowerReturn()
@@ -243,7 +243,7 @@ public func _bjs_Greeter_name_get(_self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_Greeter_name_set")
 @_cdecl("bjs_Greeter_name_set")
-public func _bjs_Greeter_name_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_Greeter_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     Greeter.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
@@ -253,8 +253,12 @@ public func _bjs_Greeter_name_set(_self: UnsafeMutableRawPointer, valueBytes: In
 
 @_expose(wasm, "bjs_Greeter_deinit")
 @_cdecl("bjs_Greeter_deinit")
-public func _bjs_Greeter_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_Greeter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<Greeter>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -265,9 +269,9 @@ extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Greeter_wrap")
-fileprivate func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

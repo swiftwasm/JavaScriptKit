@@ -30,7 +30,7 @@ public func _bjs_GlobalClass_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_GlobalClass_greet")
 @_cdecl("bjs_GlobalClass_greet")
-public func _bjs_GlobalClass_greet(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_GlobalClass_greet(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = GlobalClass.bridgeJSLiftParameter(_self).greet()
     return ret.bridgeJSLowerReturn()
@@ -41,8 +41,12 @@ public func _bjs_GlobalClass_greet(_self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_GlobalClass_deinit")
 @_cdecl("bjs_GlobalClass_deinit")
-public func _bjs_GlobalClass_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_GlobalClass_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<GlobalClass>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension GlobalClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -53,9 +57,9 @@ extension GlobalClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_GlobalClass_wrap")
-fileprivate func _bjs_GlobalClass_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_GlobalClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_GlobalClass_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_GlobalClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

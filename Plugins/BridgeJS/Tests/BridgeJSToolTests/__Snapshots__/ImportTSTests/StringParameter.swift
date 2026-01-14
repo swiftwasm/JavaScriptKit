@@ -16,7 +16,8 @@ fileprivate func bjs_checkString(_ a: Int32) -> Void {
 #endif
 
 func checkString(_ a: String) throws(JSException) -> Void {
-    bjs_checkString(a.bridgeJSLowerParameter())
+    let aValue = a.bridgeJSLowerParameter()
+    bjs_checkString(aValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -32,7 +33,9 @@ fileprivate func bjs_checkStringWithLength(_ a: Int32, _ b: Float64) -> Void {
 #endif
 
 func checkStringWithLength(_ a: String, _ b: Double) throws(JSException) -> Void {
-    bjs_checkStringWithLength(a.bridgeJSLowerParameter(), b.bridgeJSLowerParameter())
+    let aValue = a.bridgeJSLowerParameter()
+    let bValue = b.bridgeJSLowerParameter()
+    bjs_checkStringWithLength(aValue, bValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
