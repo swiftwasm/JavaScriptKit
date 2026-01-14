@@ -67,7 +67,8 @@ struct ArrayBufferLike: _JSBridgedClass {
 
     var byteLength: Double {
         get throws(JSException) {
-            let ret = bjs_ArrayBufferLike_byteLength_get(self.bridgeJSLowerParameter())
+            let selfValue = self.bridgeJSLowerParameter()
+            let ret = bjs_ArrayBufferLike_byteLength_get(selfValue)
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -76,7 +77,10 @@ struct ArrayBufferLike: _JSBridgedClass {
     }
 
     func slice(_ begin: Double, _ end: Double) throws(JSException) -> ArrayBufferLike {
-        let ret = bjs_ArrayBufferLike_slice(self.bridgeJSLowerParameter(), begin.bridgeJSLowerParameter(), end.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let beginValue = begin.bridgeJSLowerParameter()
+        let endValue = end.bridgeJSLowerParameter()
+        let ret = bjs_ArrayBufferLike_slice(selfValue, beginValue, endValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -157,7 +161,8 @@ struct WeirdNaming: _JSBridgedClass {
 
     var normalProperty: String {
         get throws(JSException) {
-            let ret = bjs_WeirdNaming_normalProperty_get(self.bridgeJSLowerParameter())
+            let selfValue = self.bridgeJSLowerParameter()
+            let ret = bjs_WeirdNaming_normalProperty_get(selfValue)
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -166,7 +171,9 @@ struct WeirdNaming: _JSBridgedClass {
     }
 
     func setNormalProperty(_ newValue: String) throws(JSException) -> Void {
-        bjs_WeirdNaming_normalProperty_set(self.bridgeJSLowerParameter(), newValue.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let newValueValue = newValue.bridgeJSLowerParameter()
+        bjs_WeirdNaming_normalProperty_set(selfValue, newValueValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -174,7 +181,8 @@ struct WeirdNaming: _JSBridgedClass {
 
     var `for`: String {
         get throws(JSException) {
-            let ret = bjs_WeirdNaming_for_get(self.bridgeJSLowerParameter())
+            let selfValue = self.bridgeJSLowerParameter()
+            let ret = bjs_WeirdNaming_for_get(selfValue)
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -183,7 +191,9 @@ struct WeirdNaming: _JSBridgedClass {
     }
 
     func setFor(_ newValue: String) throws(JSException) -> Void {
-        bjs_WeirdNaming_for_set(self.bridgeJSLowerParameter(), newValue.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let newValueValue = newValue.bridgeJSLowerParameter()
+        bjs_WeirdNaming_for_set(selfValue, newValueValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -191,7 +201,8 @@ struct WeirdNaming: _JSBridgedClass {
 
     var `Any`: String {
         get throws(JSException) {
-            let ret = bjs_WeirdNaming_Any_get(self.bridgeJSLowerParameter())
+            let selfValue = self.bridgeJSLowerParameter()
+            let ret = bjs_WeirdNaming_Any_get(selfValue)
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -200,14 +211,17 @@ struct WeirdNaming: _JSBridgedClass {
     }
 
     func setAny(_ newValue: String) throws(JSException) -> Void {
-        bjs_WeirdNaming_Any_set(self.bridgeJSLowerParameter(), newValue.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let newValueValue = newValue.bridgeJSLowerParameter()
+        bjs_WeirdNaming_Any_set(selfValue, newValueValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
     }
 
     func `as`() throws(JSException) -> Void {
-        bjs_WeirdNaming_as(self.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        bjs_WeirdNaming_as(selfValue)
         if let error = _swift_js_take_exception() {
             throw error
         }

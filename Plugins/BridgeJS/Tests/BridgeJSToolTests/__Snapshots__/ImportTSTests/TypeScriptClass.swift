@@ -68,7 +68,8 @@ struct Greeter: _JSBridgedClass {
     }
 
     init(_ name: String) throws(JSException) {
-        let ret = bjs_Greeter_init(name.bridgeJSLowerParameter())
+        let nameValue = name.bridgeJSLowerParameter()
+        let ret = bjs_Greeter_init(nameValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -77,7 +78,8 @@ struct Greeter: _JSBridgedClass {
 
     var name: String {
         get throws(JSException) {
-            let ret = bjs_Greeter_name_get(self.bridgeJSLowerParameter())
+            let selfValue = self.bridgeJSLowerParameter()
+            let ret = bjs_Greeter_name_get(selfValue)
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -86,7 +88,9 @@ struct Greeter: _JSBridgedClass {
     }
 
     func setName(_ newValue: String) throws(JSException) -> Void {
-        bjs_Greeter_name_set(self.bridgeJSLowerParameter(), newValue.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let newValueValue = newValue.bridgeJSLowerParameter()
+        bjs_Greeter_name_set(selfValue, newValueValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -94,7 +98,8 @@ struct Greeter: _JSBridgedClass {
 
     var age: Double {
         get throws(JSException) {
-            let ret = bjs_Greeter_age_get(self.bridgeJSLowerParameter())
+            let selfValue = self.bridgeJSLowerParameter()
+            let ret = bjs_Greeter_age_get(selfValue)
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -103,7 +108,8 @@ struct Greeter: _JSBridgedClass {
     }
 
     func greet() throws(JSException) -> String {
-        let ret = bjs_Greeter_greet(self.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let ret = bjs_Greeter_greet(selfValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -111,7 +117,9 @@ struct Greeter: _JSBridgedClass {
     }
 
     func changeName(_ name: String) throws(JSException) -> Void {
-        bjs_Greeter_changeName(self.bridgeJSLowerParameter(), name.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let nameValue = name.bridgeJSLowerParameter()
+        bjs_Greeter_changeName(selfValue, nameValue)
         if let error = _swift_js_take_exception() {
             throw error
         }

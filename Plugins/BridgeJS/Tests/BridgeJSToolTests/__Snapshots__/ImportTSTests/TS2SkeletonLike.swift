@@ -33,7 +33,8 @@ fileprivate func bjs_createCodeGenerator(_ format: Int32) -> Int32 {
 #endif
 
 func createCodeGenerator(_ format: String) throws(JSException) -> CodeGenerator {
-    let ret = bjs_createCodeGenerator(format.bridgeJSLowerParameter())
+    let formatValue = format.bridgeJSLowerParameter()
+    let ret = bjs_createCodeGenerator(formatValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -76,7 +77,8 @@ struct TypeScriptProcessor: _JSBridgedClass {
 
     var version: String {
         get throws(JSException) {
-            let ret = bjs_TypeScriptProcessor_version_get(self.bridgeJSLowerParameter())
+            let selfValue = self.bridgeJSLowerParameter()
+            let ret = bjs_TypeScriptProcessor_version_get(selfValue)
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -85,7 +87,9 @@ struct TypeScriptProcessor: _JSBridgedClass {
     }
 
     func convert(_ ts: String) throws(JSException) -> String {
-        let ret = bjs_TypeScriptProcessor_convert(self.bridgeJSLowerParameter(), ts.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let tsValue = ts.bridgeJSLowerParameter()
+        let ret = bjs_TypeScriptProcessor_convert(selfValue, tsValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -93,7 +97,9 @@ struct TypeScriptProcessor: _JSBridgedClass {
     }
 
     func validate(_ ts: String) throws(JSException) -> Bool {
-        let ret = bjs_TypeScriptProcessor_validate(self.bridgeJSLowerParameter(), ts.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let tsValue = ts.bridgeJSLowerParameter()
+        let ret = bjs_TypeScriptProcessor_validate(selfValue, tsValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -129,7 +135,8 @@ struct CodeGenerator: _JSBridgedClass {
 
     var outputFormat: String {
         get throws(JSException) {
-            let ret = bjs_CodeGenerator_outputFormat_get(self.bridgeJSLowerParameter())
+            let selfValue = self.bridgeJSLowerParameter()
+            let ret = bjs_CodeGenerator_outputFormat_get(selfValue)
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -138,7 +145,9 @@ struct CodeGenerator: _JSBridgedClass {
     }
 
     func generate(_ input: JSObject) throws(JSException) -> String {
-        let ret = bjs_CodeGenerator_generate(self.bridgeJSLowerParameter(), input.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let inputValue = input.bridgeJSLowerParameter()
+        let ret = bjs_CodeGenerator_generate(selfValue, inputValue)
         if let error = _swift_js_take_exception() {
             throw error
         }

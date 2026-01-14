@@ -16,7 +16,8 @@ fileprivate func bjs_checkArray(_ a: Int32) -> Void {
 #endif
 
 func checkArray(_ a: JSObject) throws(JSException) -> Void {
-    bjs_checkArray(a.bridgeJSLowerParameter())
+    let aValue = a.bridgeJSLowerParameter()
+    bjs_checkArray(aValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -32,7 +33,9 @@ fileprivate func bjs_checkArrayWithLength(_ a: Int32, _ b: Float64) -> Void {
 #endif
 
 func checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> Void {
-    bjs_checkArrayWithLength(a.bridgeJSLowerParameter(), b.bridgeJSLowerParameter())
+    let aValue = a.bridgeJSLowerParameter()
+    let bValue = b.bridgeJSLowerParameter()
+    bjs_checkArrayWithLength(aValue, bValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -48,7 +51,8 @@ fileprivate func bjs_checkArray(_ a: Int32) -> Void {
 #endif
 
 func checkArray(_ a: JSObject) throws(JSException) -> Void {
-    bjs_checkArray(a.bridgeJSLowerParameter())
+    let aValue = a.bridgeJSLowerParameter()
+    bjs_checkArray(aValue)
     if let error = _swift_js_take_exception() {
         throw error
     }

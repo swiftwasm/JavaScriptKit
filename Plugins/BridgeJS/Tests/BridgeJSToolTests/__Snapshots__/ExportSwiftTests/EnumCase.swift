@@ -164,7 +164,7 @@ extension PublicStatus: _BridgedSwiftCaseEnum {
 
 @_expose(wasm, "bjs_setDirection")
 @_cdecl("bjs_setDirection")
-public func _bjs_setDirection(direction: Int32) -> Void {
+public func _bjs_setDirection(_ direction: Int32) -> Void {
     #if arch(wasm32)
     setDirection(_: Direction.bridgeJSLiftParameter(direction))
     #else
@@ -185,7 +185,7 @@ public func _bjs_getDirection() -> Int32 {
 
 @_expose(wasm, "bjs_processDirection")
 @_cdecl("bjs_processDirection")
-public func _bjs_processDirection(input: Int32) -> Int32 {
+public func _bjs_processDirection(_ input: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = processDirection(_: Direction.bridgeJSLiftParameter(input))
     return ret.bridgeJSLowerReturn()
@@ -196,7 +196,7 @@ public func _bjs_processDirection(input: Int32) -> Int32 {
 
 @_expose(wasm, "bjs_roundTripOptionalDirection")
 @_cdecl("bjs_roundTripOptionalDirection")
-public func _bjs_roundTripOptionalDirection(inputIsSome: Int32, inputValue: Int32) -> Void {
+public func _bjs_roundTripOptionalDirection(_ inputIsSome: Int32, _ inputValue: Int32) -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalDirection(_: Optional<Direction>.bridgeJSLiftParameter(inputIsSome, inputValue))
     return ret.bridgeJSLowerReturn()
@@ -207,7 +207,7 @@ public func _bjs_roundTripOptionalDirection(inputIsSome: Int32, inputValue: Int3
 
 @_expose(wasm, "bjs_setTSDirection")
 @_cdecl("bjs_setTSDirection")
-public func _bjs_setTSDirection(direction: Int32) -> Void {
+public func _bjs_setTSDirection(_ direction: Int32) -> Void {
     #if arch(wasm32)
     setTSDirection(_: TSDirection.bridgeJSLiftParameter(direction))
     #else
@@ -228,7 +228,7 @@ public func _bjs_getTSDirection() -> Int32 {
 
 @_expose(wasm, "bjs_roundTripOptionalTSDirection")
 @_cdecl("bjs_roundTripOptionalTSDirection")
-public func _bjs_roundTripOptionalTSDirection(inputIsSome: Int32, inputValue: Int32) -> Void {
+public func _bjs_roundTripOptionalTSDirection(_ inputIsSome: Int32, _ inputValue: Int32) -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalTSDirection(_: Optional<TSDirection>.bridgeJSLiftParameter(inputIsSome, inputValue))
     return ret.bridgeJSLowerReturn()

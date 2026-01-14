@@ -369,7 +369,7 @@ public func _bjs_EnumRoundtrip_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_EnumRoundtrip_take")
 @_cdecl("bjs_EnumRoundtrip_take")
-public func _bjs_EnumRoundtrip_take(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+public func _bjs_EnumRoundtrip_take(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
     EnumRoundtrip.bridgeJSLiftParameter(_self).take(_: APIResult.bridgeJSLiftParameter(value))
     #else
@@ -379,7 +379,7 @@ public func _bjs_EnumRoundtrip_take(_self: UnsafeMutableRawPointer, value: Int32
 
 @_expose(wasm, "bjs_EnumRoundtrip_makeSuccess")
 @_cdecl("bjs_EnumRoundtrip_makeSuccess")
-public func _bjs_EnumRoundtrip_makeSuccess(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_EnumRoundtrip_makeSuccess(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).makeSuccess()
     return ret.bridgeJSLowerReturn()
@@ -390,7 +390,7 @@ public func _bjs_EnumRoundtrip_makeSuccess(_self: UnsafeMutableRawPointer) -> Vo
 
 @_expose(wasm, "bjs_EnumRoundtrip_makeFailure")
 @_cdecl("bjs_EnumRoundtrip_makeFailure")
-public func _bjs_EnumRoundtrip_makeFailure(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_EnumRoundtrip_makeFailure(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).makeFailure()
     return ret.bridgeJSLowerReturn()
@@ -401,7 +401,7 @@ public func _bjs_EnumRoundtrip_makeFailure(_self: UnsafeMutableRawPointer) -> Vo
 
 @_expose(wasm, "bjs_EnumRoundtrip_makeFlag")
 @_cdecl("bjs_EnumRoundtrip_makeFlag")
-public func _bjs_EnumRoundtrip_makeFlag(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_EnumRoundtrip_makeFlag(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).makeFlag()
     return ret.bridgeJSLowerReturn()
@@ -412,7 +412,7 @@ public func _bjs_EnumRoundtrip_makeFlag(_self: UnsafeMutableRawPointer) -> Void 
 
 @_expose(wasm, "bjs_EnumRoundtrip_makeRate")
 @_cdecl("bjs_EnumRoundtrip_makeRate")
-public func _bjs_EnumRoundtrip_makeRate(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_EnumRoundtrip_makeRate(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).makeRate()
     return ret.bridgeJSLowerReturn()
@@ -423,7 +423,7 @@ public func _bjs_EnumRoundtrip_makeRate(_self: UnsafeMutableRawPointer) -> Void 
 
 @_expose(wasm, "bjs_EnumRoundtrip_makePrecise")
 @_cdecl("bjs_EnumRoundtrip_makePrecise")
-public func _bjs_EnumRoundtrip_makePrecise(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_EnumRoundtrip_makePrecise(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).makePrecise()
     return ret.bridgeJSLowerReturn()
@@ -434,7 +434,7 @@ public func _bjs_EnumRoundtrip_makePrecise(_self: UnsafeMutableRawPointer) -> Vo
 
 @_expose(wasm, "bjs_EnumRoundtrip_makeInfo")
 @_cdecl("bjs_EnumRoundtrip_makeInfo")
-public func _bjs_EnumRoundtrip_makeInfo(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_EnumRoundtrip_makeInfo(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).makeInfo()
     return ret.bridgeJSLowerReturn()
@@ -445,7 +445,7 @@ public func _bjs_EnumRoundtrip_makeInfo(_self: UnsafeMutableRawPointer) -> Void 
 
 @_expose(wasm, "bjs_EnumRoundtrip_roundtrip")
 @_cdecl("bjs_EnumRoundtrip_roundtrip")
-public func _bjs_EnumRoundtrip_roundtrip(_self: UnsafeMutableRawPointer, result: Int32) -> Void {
+public func _bjs_EnumRoundtrip_roundtrip(_ _self: UnsafeMutableRawPointer, _ result: Int32) -> Void {
     #if arch(wasm32)
     let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).roundtrip(_: APIResult.bridgeJSLiftParameter(result))
     return ret.bridgeJSLowerReturn()
@@ -456,8 +456,12 @@ public func _bjs_EnumRoundtrip_roundtrip(_self: UnsafeMutableRawPointer, result:
 
 @_expose(wasm, "bjs_EnumRoundtrip_deinit")
 @_cdecl("bjs_EnumRoundtrip_deinit")
-public func _bjs_EnumRoundtrip_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_EnumRoundtrip_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<EnumRoundtrip>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension EnumRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -468,9 +472,9 @@ extension EnumRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_EnumRoundtrip_wrap")
-fileprivate func _bjs_EnumRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_EnumRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_EnumRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_EnumRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -488,7 +492,7 @@ public func _bjs_ComplexResultRoundtrip_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_ComplexResultRoundtrip_take")
 @_cdecl("bjs_ComplexResultRoundtrip_take")
-public func _bjs_ComplexResultRoundtrip_take(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+public func _bjs_ComplexResultRoundtrip_take(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
     ComplexResultRoundtrip.bridgeJSLiftParameter(_self).take(_: ComplexResult.bridgeJSLiftParameter(value))
     #else
@@ -498,7 +502,7 @@ public func _bjs_ComplexResultRoundtrip_take(_self: UnsafeMutableRawPointer, val
 
 @_expose(wasm, "bjs_ComplexResultRoundtrip_makeSuccess")
 @_cdecl("bjs_ComplexResultRoundtrip_makeSuccess")
-public func _bjs_ComplexResultRoundtrip_makeSuccess(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_ComplexResultRoundtrip_makeSuccess(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeSuccess()
     return ret.bridgeJSLowerReturn()
@@ -509,7 +513,7 @@ public func _bjs_ComplexResultRoundtrip_makeSuccess(_self: UnsafeMutableRawPoint
 
 @_expose(wasm, "bjs_ComplexResultRoundtrip_makeError")
 @_cdecl("bjs_ComplexResultRoundtrip_makeError")
-public func _bjs_ComplexResultRoundtrip_makeError(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_ComplexResultRoundtrip_makeError(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeError()
     return ret.bridgeJSLowerReturn()
@@ -520,7 +524,7 @@ public func _bjs_ComplexResultRoundtrip_makeError(_self: UnsafeMutableRawPointer
 
 @_expose(wasm, "bjs_ComplexResultRoundtrip_makeLocation")
 @_cdecl("bjs_ComplexResultRoundtrip_makeLocation")
-public func _bjs_ComplexResultRoundtrip_makeLocation(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_ComplexResultRoundtrip_makeLocation(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeLocation()
     return ret.bridgeJSLowerReturn()
@@ -531,7 +535,7 @@ public func _bjs_ComplexResultRoundtrip_makeLocation(_self: UnsafeMutableRawPoin
 
 @_expose(wasm, "bjs_ComplexResultRoundtrip_makeStatus")
 @_cdecl("bjs_ComplexResultRoundtrip_makeStatus")
-public func _bjs_ComplexResultRoundtrip_makeStatus(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_ComplexResultRoundtrip_makeStatus(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeStatus()
     return ret.bridgeJSLowerReturn()
@@ -542,7 +546,7 @@ public func _bjs_ComplexResultRoundtrip_makeStatus(_self: UnsafeMutableRawPointe
 
 @_expose(wasm, "bjs_ComplexResultRoundtrip_makeCoordinates")
 @_cdecl("bjs_ComplexResultRoundtrip_makeCoordinates")
-public func _bjs_ComplexResultRoundtrip_makeCoordinates(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_ComplexResultRoundtrip_makeCoordinates(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeCoordinates()
     return ret.bridgeJSLowerReturn()
@@ -553,7 +557,7 @@ public func _bjs_ComplexResultRoundtrip_makeCoordinates(_self: UnsafeMutableRawP
 
 @_expose(wasm, "bjs_ComplexResultRoundtrip_makeComprehensive")
 @_cdecl("bjs_ComplexResultRoundtrip_makeComprehensive")
-public func _bjs_ComplexResultRoundtrip_makeComprehensive(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_ComplexResultRoundtrip_makeComprehensive(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeComprehensive()
     return ret.bridgeJSLowerReturn()
@@ -564,7 +568,7 @@ public func _bjs_ComplexResultRoundtrip_makeComprehensive(_self: UnsafeMutableRa
 
 @_expose(wasm, "bjs_ComplexResultRoundtrip_makeInfo")
 @_cdecl("bjs_ComplexResultRoundtrip_makeInfo")
-public func _bjs_ComplexResultRoundtrip_makeInfo(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_ComplexResultRoundtrip_makeInfo(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeInfo()
     return ret.bridgeJSLowerReturn()
@@ -575,7 +579,7 @@ public func _bjs_ComplexResultRoundtrip_makeInfo(_self: UnsafeMutableRawPointer)
 
 @_expose(wasm, "bjs_ComplexResultRoundtrip_roundtrip")
 @_cdecl("bjs_ComplexResultRoundtrip_roundtrip")
-public func _bjs_ComplexResultRoundtrip_roundtrip(_self: UnsafeMutableRawPointer, result: Int32) -> Void {
+public func _bjs_ComplexResultRoundtrip_roundtrip(_ _self: UnsafeMutableRawPointer, _ result: Int32) -> Void {
     #if arch(wasm32)
     let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).roundtrip(_: ComplexResult.bridgeJSLiftParameter(result))
     return ret.bridgeJSLowerReturn()
@@ -586,8 +590,12 @@ public func _bjs_ComplexResultRoundtrip_roundtrip(_self: UnsafeMutableRawPointer
 
 @_expose(wasm, "bjs_ComplexResultRoundtrip_deinit")
 @_cdecl("bjs_ComplexResultRoundtrip_deinit")
-public func _bjs_ComplexResultRoundtrip_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_ComplexResultRoundtrip_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<ComplexResultRoundtrip>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension ComplexResultRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -598,9 +606,9 @@ extension ComplexResultRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject 
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_ComplexResultRoundtrip_wrap")
-fileprivate func _bjs_ComplexResultRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_ComplexResultRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_ComplexResultRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_ComplexResultRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -618,7 +626,7 @@ public func _bjs_StringRoundtrip_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_StringRoundtrip_take")
 @_cdecl("bjs_StringRoundtrip_take")
-public func _bjs_StringRoundtrip_take(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_StringRoundtrip_take(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     StringRoundtrip.bridgeJSLiftParameter(_self).take(_: String.bridgeJSLiftParameter(valueBytes, valueLength))
     #else
@@ -628,7 +636,7 @@ public func _bjs_StringRoundtrip_take(_self: UnsafeMutableRawPointer, valueBytes
 
 @_expose(wasm, "bjs_StringRoundtrip_make")
 @_cdecl("bjs_StringRoundtrip_make")
-public func _bjs_StringRoundtrip_make(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_StringRoundtrip_make(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = StringRoundtrip.bridgeJSLiftParameter(_self).make()
     return ret.bridgeJSLowerReturn()
@@ -639,8 +647,12 @@ public func _bjs_StringRoundtrip_make(_self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_StringRoundtrip_deinit")
 @_cdecl("bjs_StringRoundtrip_deinit")
-public func _bjs_StringRoundtrip_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_StringRoundtrip_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<StringRoundtrip>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension StringRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -651,9 +663,9 @@ extension StringRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_StringRoundtrip_wrap")
-fileprivate func _bjs_StringRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_StringRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_StringRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_StringRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -671,7 +683,7 @@ public func _bjs_StructRoundtrip_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_StructRoundtrip_takeSimple")
 @_cdecl("bjs_StructRoundtrip_takeSimple")
-public func _bjs_StructRoundtrip_takeSimple(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_StructRoundtrip_takeSimple(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     StructRoundtrip.bridgeJSLiftParameter(_self).takeSimple(_: SimpleStruct.bridgeJSLiftParameter())
     #else
@@ -681,7 +693,7 @@ public func _bjs_StructRoundtrip_takeSimple(_self: UnsafeMutableRawPointer) -> V
 
 @_expose(wasm, "bjs_StructRoundtrip_makeSimple")
 @_cdecl("bjs_StructRoundtrip_makeSimple")
-public func _bjs_StructRoundtrip_makeSimple(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_StructRoundtrip_makeSimple(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = StructRoundtrip.bridgeJSLiftParameter(_self).makeSimple()
     return ret.bridgeJSLowerReturn()
@@ -692,7 +704,7 @@ public func _bjs_StructRoundtrip_makeSimple(_self: UnsafeMutableRawPointer) -> V
 
 @_expose(wasm, "bjs_StructRoundtrip_roundtripSimple")
 @_cdecl("bjs_StructRoundtrip_roundtripSimple")
-public func _bjs_StructRoundtrip_roundtripSimple(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_StructRoundtrip_roundtripSimple(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = StructRoundtrip.bridgeJSLiftParameter(_self).roundtripSimple(_: SimpleStruct.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
@@ -703,7 +715,7 @@ public func _bjs_StructRoundtrip_roundtripSimple(_self: UnsafeMutableRawPointer)
 
 @_expose(wasm, "bjs_StructRoundtrip_takeAddress")
 @_cdecl("bjs_StructRoundtrip_takeAddress")
-public func _bjs_StructRoundtrip_takeAddress(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_StructRoundtrip_takeAddress(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     StructRoundtrip.bridgeJSLiftParameter(_self).takeAddress(_: Address.bridgeJSLiftParameter())
     #else
@@ -713,7 +725,7 @@ public func _bjs_StructRoundtrip_takeAddress(_self: UnsafeMutableRawPointer) -> 
 
 @_expose(wasm, "bjs_StructRoundtrip_makeAddress")
 @_cdecl("bjs_StructRoundtrip_makeAddress")
-public func _bjs_StructRoundtrip_makeAddress(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_StructRoundtrip_makeAddress(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = StructRoundtrip.bridgeJSLiftParameter(_self).makeAddress()
     return ret.bridgeJSLowerReturn()
@@ -724,7 +736,7 @@ public func _bjs_StructRoundtrip_makeAddress(_self: UnsafeMutableRawPointer) -> 
 
 @_expose(wasm, "bjs_StructRoundtrip_roundtripAddress")
 @_cdecl("bjs_StructRoundtrip_roundtripAddress")
-public func _bjs_StructRoundtrip_roundtripAddress(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_StructRoundtrip_roundtripAddress(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = StructRoundtrip.bridgeJSLiftParameter(_self).roundtripAddress(_: Address.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
@@ -735,7 +747,7 @@ public func _bjs_StructRoundtrip_roundtripAddress(_self: UnsafeMutableRawPointer
 
 @_expose(wasm, "bjs_StructRoundtrip_takePerson")
 @_cdecl("bjs_StructRoundtrip_takePerson")
-public func _bjs_StructRoundtrip_takePerson(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_StructRoundtrip_takePerson(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     StructRoundtrip.bridgeJSLiftParameter(_self).takePerson(_: Person.bridgeJSLiftParameter())
     #else
@@ -745,7 +757,7 @@ public func _bjs_StructRoundtrip_takePerson(_self: UnsafeMutableRawPointer) -> V
 
 @_expose(wasm, "bjs_StructRoundtrip_makePerson")
 @_cdecl("bjs_StructRoundtrip_makePerson")
-public func _bjs_StructRoundtrip_makePerson(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_StructRoundtrip_makePerson(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = StructRoundtrip.bridgeJSLiftParameter(_self).makePerson()
     return ret.bridgeJSLowerReturn()
@@ -756,7 +768,7 @@ public func _bjs_StructRoundtrip_makePerson(_self: UnsafeMutableRawPointer) -> V
 
 @_expose(wasm, "bjs_StructRoundtrip_roundtripPerson")
 @_cdecl("bjs_StructRoundtrip_roundtripPerson")
-public func _bjs_StructRoundtrip_roundtripPerson(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_StructRoundtrip_roundtripPerson(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = StructRoundtrip.bridgeJSLiftParameter(_self).roundtripPerson(_: Person.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
@@ -767,7 +779,7 @@ public func _bjs_StructRoundtrip_roundtripPerson(_self: UnsafeMutableRawPointer)
 
 @_expose(wasm, "bjs_StructRoundtrip_takeComplex")
 @_cdecl("bjs_StructRoundtrip_takeComplex")
-public func _bjs_StructRoundtrip_takeComplex(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_StructRoundtrip_takeComplex(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     StructRoundtrip.bridgeJSLiftParameter(_self).takeComplex(_: ComplexStruct.bridgeJSLiftParameter())
     #else
@@ -777,7 +789,7 @@ public func _bjs_StructRoundtrip_takeComplex(_self: UnsafeMutableRawPointer) -> 
 
 @_expose(wasm, "bjs_StructRoundtrip_makeComplex")
 @_cdecl("bjs_StructRoundtrip_makeComplex")
-public func _bjs_StructRoundtrip_makeComplex(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_StructRoundtrip_makeComplex(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = StructRoundtrip.bridgeJSLiftParameter(_self).makeComplex()
     return ret.bridgeJSLowerReturn()
@@ -788,7 +800,7 @@ public func _bjs_StructRoundtrip_makeComplex(_self: UnsafeMutableRawPointer) -> 
 
 @_expose(wasm, "bjs_StructRoundtrip_roundtripComplex")
 @_cdecl("bjs_StructRoundtrip_roundtripComplex")
-public func _bjs_StructRoundtrip_roundtripComplex(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_StructRoundtrip_roundtripComplex(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = StructRoundtrip.bridgeJSLiftParameter(_self).roundtripComplex(_: ComplexStruct.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
@@ -799,8 +811,12 @@ public func _bjs_StructRoundtrip_roundtripComplex(_self: UnsafeMutableRawPointer
 
 @_expose(wasm, "bjs_StructRoundtrip_deinit")
 @_cdecl("bjs_StructRoundtrip_deinit")
-public func _bjs_StructRoundtrip_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_StructRoundtrip_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<StructRoundtrip>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension StructRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -811,16 +827,16 @@ extension StructRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_StructRoundtrip_wrap")
-fileprivate func _bjs_StructRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_StructRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_StructRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_StructRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 @_expose(wasm, "bjs_SimpleClass_init")
 @_cdecl("bjs_SimpleClass_init")
-public func _bjs_SimpleClass_init(nameBytes: Int32, nameLength: Int32, count: Int32, flag: Int32, rate: Float32, precise: Float64) -> UnsafeMutableRawPointer {
+public func _bjs_SimpleClass_init(_ nameBytes: Int32, _ nameLength: Int32, _ count: Int32, _ flag: Int32, _ rate: Float32, _ precise: Float64) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = SimpleClass(name: String.bridgeJSLiftParameter(nameBytes, nameLength), count: Int.bridgeJSLiftParameter(count), flag: Bool.bridgeJSLiftParameter(flag), rate: Float.bridgeJSLiftParameter(rate), precise: Double.bridgeJSLiftParameter(precise))
     return ret.bridgeJSLowerReturn()
@@ -831,7 +847,7 @@ public func _bjs_SimpleClass_init(nameBytes: Int32, nameLength: Int32, count: In
 
 @_expose(wasm, "bjs_SimpleClass_name_get")
 @_cdecl("bjs_SimpleClass_name_get")
-public func _bjs_SimpleClass_name_get(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_SimpleClass_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = SimpleClass.bridgeJSLiftParameter(_self).name
     return ret.bridgeJSLowerReturn()
@@ -842,7 +858,7 @@ public func _bjs_SimpleClass_name_get(_self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_SimpleClass_name_set")
 @_cdecl("bjs_SimpleClass_name_set")
-public func _bjs_SimpleClass_name_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_SimpleClass_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     SimpleClass.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
@@ -852,7 +868,7 @@ public func _bjs_SimpleClass_name_set(_self: UnsafeMutableRawPointer, valueBytes
 
 @_expose(wasm, "bjs_SimpleClass_count_get")
 @_cdecl("bjs_SimpleClass_count_get")
-public func _bjs_SimpleClass_count_get(_self: UnsafeMutableRawPointer) -> Int32 {
+public func _bjs_SimpleClass_count_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = SimpleClass.bridgeJSLiftParameter(_self).count
     return ret.bridgeJSLowerReturn()
@@ -863,7 +879,7 @@ public func _bjs_SimpleClass_count_get(_self: UnsafeMutableRawPointer) -> Int32 
 
 @_expose(wasm, "bjs_SimpleClass_count_set")
 @_cdecl("bjs_SimpleClass_count_set")
-public func _bjs_SimpleClass_count_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+public func _bjs_SimpleClass_count_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
     SimpleClass.bridgeJSLiftParameter(_self).count = Int.bridgeJSLiftParameter(value)
     #else
@@ -873,7 +889,7 @@ public func _bjs_SimpleClass_count_set(_self: UnsafeMutableRawPointer, value: In
 
 @_expose(wasm, "bjs_SimpleClass_flag_get")
 @_cdecl("bjs_SimpleClass_flag_get")
-public func _bjs_SimpleClass_flag_get(_self: UnsafeMutableRawPointer) -> Int32 {
+public func _bjs_SimpleClass_flag_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = SimpleClass.bridgeJSLiftParameter(_self).flag
     return ret.bridgeJSLowerReturn()
@@ -884,7 +900,7 @@ public func _bjs_SimpleClass_flag_get(_self: UnsafeMutableRawPointer) -> Int32 {
 
 @_expose(wasm, "bjs_SimpleClass_flag_set")
 @_cdecl("bjs_SimpleClass_flag_set")
-public func _bjs_SimpleClass_flag_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+public func _bjs_SimpleClass_flag_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
     SimpleClass.bridgeJSLiftParameter(_self).flag = Bool.bridgeJSLiftParameter(value)
     #else
@@ -894,7 +910,7 @@ public func _bjs_SimpleClass_flag_set(_self: UnsafeMutableRawPointer, value: Int
 
 @_expose(wasm, "bjs_SimpleClass_rate_get")
 @_cdecl("bjs_SimpleClass_rate_get")
-public func _bjs_SimpleClass_rate_get(_self: UnsafeMutableRawPointer) -> Float32 {
+public func _bjs_SimpleClass_rate_get(_ _self: UnsafeMutableRawPointer) -> Float32 {
     #if arch(wasm32)
     let ret = SimpleClass.bridgeJSLiftParameter(_self).rate
     return ret.bridgeJSLowerReturn()
@@ -905,7 +921,7 @@ public func _bjs_SimpleClass_rate_get(_self: UnsafeMutableRawPointer) -> Float32
 
 @_expose(wasm, "bjs_SimpleClass_rate_set")
 @_cdecl("bjs_SimpleClass_rate_set")
-public func _bjs_SimpleClass_rate_set(_self: UnsafeMutableRawPointer, value: Float32) -> Void {
+public func _bjs_SimpleClass_rate_set(_ _self: UnsafeMutableRawPointer, _ value: Float32) -> Void {
     #if arch(wasm32)
     SimpleClass.bridgeJSLiftParameter(_self).rate = Float.bridgeJSLiftParameter(value)
     #else
@@ -915,7 +931,7 @@ public func _bjs_SimpleClass_rate_set(_self: UnsafeMutableRawPointer, value: Flo
 
 @_expose(wasm, "bjs_SimpleClass_precise_get")
 @_cdecl("bjs_SimpleClass_precise_get")
-public func _bjs_SimpleClass_precise_get(_self: UnsafeMutableRawPointer) -> Float64 {
+public func _bjs_SimpleClass_precise_get(_ _self: UnsafeMutableRawPointer) -> Float64 {
     #if arch(wasm32)
     let ret = SimpleClass.bridgeJSLiftParameter(_self).precise
     return ret.bridgeJSLowerReturn()
@@ -926,7 +942,7 @@ public func _bjs_SimpleClass_precise_get(_self: UnsafeMutableRawPointer) -> Floa
 
 @_expose(wasm, "bjs_SimpleClass_precise_set")
 @_cdecl("bjs_SimpleClass_precise_set")
-public func _bjs_SimpleClass_precise_set(_self: UnsafeMutableRawPointer, value: Float64) -> Void {
+public func _bjs_SimpleClass_precise_set(_ _self: UnsafeMutableRawPointer, _ value: Float64) -> Void {
     #if arch(wasm32)
     SimpleClass.bridgeJSLiftParameter(_self).precise = Double.bridgeJSLiftParameter(value)
     #else
@@ -936,8 +952,12 @@ public func _bjs_SimpleClass_precise_set(_self: UnsafeMutableRawPointer, value: 
 
 @_expose(wasm, "bjs_SimpleClass_deinit")
 @_cdecl("bjs_SimpleClass_deinit")
-public func _bjs_SimpleClass_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_SimpleClass_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<SimpleClass>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension SimpleClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -948,16 +968,16 @@ extension SimpleClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_SimpleClass_wrap")
-fileprivate func _bjs_SimpleClass_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_SimpleClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_SimpleClass_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_SimpleClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 @_expose(wasm, "bjs_AddressClass_init")
 @_cdecl("bjs_AddressClass_init")
-public func _bjs_AddressClass_init(streetBytes: Int32, streetLength: Int32, cityBytes: Int32, cityLength: Int32, zipCode: Int32) -> UnsafeMutableRawPointer {
+public func _bjs_AddressClass_init(_ streetBytes: Int32, _ streetLength: Int32, _ cityBytes: Int32, _ cityLength: Int32, _ zipCode: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = AddressClass(street: String.bridgeJSLiftParameter(streetBytes, streetLength), city: String.bridgeJSLiftParameter(cityBytes, cityLength), zipCode: Int.bridgeJSLiftParameter(zipCode))
     return ret.bridgeJSLowerReturn()
@@ -968,7 +988,7 @@ public func _bjs_AddressClass_init(streetBytes: Int32, streetLength: Int32, city
 
 @_expose(wasm, "bjs_AddressClass_street_get")
 @_cdecl("bjs_AddressClass_street_get")
-public func _bjs_AddressClass_street_get(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_AddressClass_street_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = AddressClass.bridgeJSLiftParameter(_self).street
     return ret.bridgeJSLowerReturn()
@@ -979,7 +999,7 @@ public func _bjs_AddressClass_street_get(_self: UnsafeMutableRawPointer) -> Void
 
 @_expose(wasm, "bjs_AddressClass_street_set")
 @_cdecl("bjs_AddressClass_street_set")
-public func _bjs_AddressClass_street_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_AddressClass_street_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     AddressClass.bridgeJSLiftParameter(_self).street = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
@@ -989,7 +1009,7 @@ public func _bjs_AddressClass_street_set(_self: UnsafeMutableRawPointer, valueBy
 
 @_expose(wasm, "bjs_AddressClass_city_get")
 @_cdecl("bjs_AddressClass_city_get")
-public func _bjs_AddressClass_city_get(_self: UnsafeMutableRawPointer) -> Void {
+public func _bjs_AddressClass_city_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = AddressClass.bridgeJSLiftParameter(_self).city
     return ret.bridgeJSLowerReturn()
@@ -1000,7 +1020,7 @@ public func _bjs_AddressClass_city_get(_self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_AddressClass_city_set")
 @_cdecl("bjs_AddressClass_city_set")
-public func _bjs_AddressClass_city_set(_self: UnsafeMutableRawPointer, valueBytes: Int32, valueLength: Int32) -> Void {
+public func _bjs_AddressClass_city_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     AddressClass.bridgeJSLiftParameter(_self).city = String.bridgeJSLiftParameter(valueBytes, valueLength)
     #else
@@ -1010,7 +1030,7 @@ public func _bjs_AddressClass_city_set(_self: UnsafeMutableRawPointer, valueByte
 
 @_expose(wasm, "bjs_AddressClass_zipCode_get")
 @_cdecl("bjs_AddressClass_zipCode_get")
-public func _bjs_AddressClass_zipCode_get(_self: UnsafeMutableRawPointer) -> Int32 {
+public func _bjs_AddressClass_zipCode_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = AddressClass.bridgeJSLiftParameter(_self).zipCode
     return ret.bridgeJSLowerReturn()
@@ -1021,7 +1041,7 @@ public func _bjs_AddressClass_zipCode_get(_self: UnsafeMutableRawPointer) -> Int
 
 @_expose(wasm, "bjs_AddressClass_zipCode_set")
 @_cdecl("bjs_AddressClass_zipCode_set")
-public func _bjs_AddressClass_zipCode_set(_self: UnsafeMutableRawPointer, value: Int32) -> Void {
+public func _bjs_AddressClass_zipCode_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
     AddressClass.bridgeJSLiftParameter(_self).zipCode = Int.bridgeJSLiftParameter(value)
     #else
@@ -1031,8 +1051,12 @@ public func _bjs_AddressClass_zipCode_set(_self: UnsafeMutableRawPointer, value:
 
 @_expose(wasm, "bjs_AddressClass_deinit")
 @_cdecl("bjs_AddressClass_deinit")
-public func _bjs_AddressClass_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_AddressClass_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<AddressClass>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension AddressClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -1043,9 +1067,9 @@ extension AddressClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_AddressClass_wrap")
-fileprivate func _bjs_AddressClass_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_AddressClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_AddressClass_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_AddressClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -1063,7 +1087,7 @@ public func _bjs_ClassRoundtrip_init() -> UnsafeMutableRawPointer {
 
 @_expose(wasm, "bjs_ClassRoundtrip_takeSimpleClass")
 @_cdecl("bjs_ClassRoundtrip_takeSimpleClass")
-public func _bjs_ClassRoundtrip_takeSimpleClass(_self: UnsafeMutableRawPointer, value: UnsafeMutableRawPointer) -> Void {
+public func _bjs_ClassRoundtrip_takeSimpleClass(_ _self: UnsafeMutableRawPointer, _ value: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     ClassRoundtrip.bridgeJSLiftParameter(_self).takeSimpleClass(_: SimpleClass.bridgeJSLiftParameter(value))
     #else
@@ -1073,7 +1097,7 @@ public func _bjs_ClassRoundtrip_takeSimpleClass(_self: UnsafeMutableRawPointer, 
 
 @_expose(wasm, "bjs_ClassRoundtrip_makeSimpleClass")
 @_cdecl("bjs_ClassRoundtrip_makeSimpleClass")
-public func _bjs_ClassRoundtrip_makeSimpleClass(_self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_ClassRoundtrip_makeSimpleClass(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = ClassRoundtrip.bridgeJSLiftParameter(_self).makeSimpleClass()
     return ret.bridgeJSLowerReturn()
@@ -1084,7 +1108,7 @@ public func _bjs_ClassRoundtrip_makeSimpleClass(_self: UnsafeMutableRawPointer) 
 
 @_expose(wasm, "bjs_ClassRoundtrip_roundtripSimpleClass")
 @_cdecl("bjs_ClassRoundtrip_roundtripSimpleClass")
-public func _bjs_ClassRoundtrip_roundtripSimpleClass(_self: UnsafeMutableRawPointer, value: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_ClassRoundtrip_roundtripSimpleClass(_ _self: UnsafeMutableRawPointer, _ value: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = ClassRoundtrip.bridgeJSLiftParameter(_self).roundtripSimpleClass(_: SimpleClass.bridgeJSLiftParameter(value))
     return ret.bridgeJSLowerReturn()
@@ -1095,7 +1119,7 @@ public func _bjs_ClassRoundtrip_roundtripSimpleClass(_self: UnsafeMutableRawPoin
 
 @_expose(wasm, "bjs_ClassRoundtrip_takeAddressClass")
 @_cdecl("bjs_ClassRoundtrip_takeAddressClass")
-public func _bjs_ClassRoundtrip_takeAddressClass(_self: UnsafeMutableRawPointer, value: UnsafeMutableRawPointer) -> Void {
+public func _bjs_ClassRoundtrip_takeAddressClass(_ _self: UnsafeMutableRawPointer, _ value: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     ClassRoundtrip.bridgeJSLiftParameter(_self).takeAddressClass(_: AddressClass.bridgeJSLiftParameter(value))
     #else
@@ -1105,7 +1129,7 @@ public func _bjs_ClassRoundtrip_takeAddressClass(_self: UnsafeMutableRawPointer,
 
 @_expose(wasm, "bjs_ClassRoundtrip_makeAddressClass")
 @_cdecl("bjs_ClassRoundtrip_makeAddressClass")
-public func _bjs_ClassRoundtrip_makeAddressClass(_self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_ClassRoundtrip_makeAddressClass(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = ClassRoundtrip.bridgeJSLiftParameter(_self).makeAddressClass()
     return ret.bridgeJSLowerReturn()
@@ -1116,7 +1140,7 @@ public func _bjs_ClassRoundtrip_makeAddressClass(_self: UnsafeMutableRawPointer)
 
 @_expose(wasm, "bjs_ClassRoundtrip_roundtripAddressClass")
 @_cdecl("bjs_ClassRoundtrip_roundtripAddressClass")
-public func _bjs_ClassRoundtrip_roundtripAddressClass(_self: UnsafeMutableRawPointer, value: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_ClassRoundtrip_roundtripAddressClass(_ _self: UnsafeMutableRawPointer, _ value: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = ClassRoundtrip.bridgeJSLiftParameter(_self).roundtripAddressClass(_: AddressClass.bridgeJSLiftParameter(value))
     return ret.bridgeJSLowerReturn()
@@ -1127,8 +1151,12 @@ public func _bjs_ClassRoundtrip_roundtripAddressClass(_self: UnsafeMutableRawPoi
 
 @_expose(wasm, "bjs_ClassRoundtrip_deinit")
 @_cdecl("bjs_ClassRoundtrip_deinit")
-public func _bjs_ClassRoundtrip_deinit(pointer: UnsafeMutableRawPointer) {
+public func _bjs_ClassRoundtrip_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
     Unmanaged<ClassRoundtrip>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension ClassRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
@@ -1139,9 +1167,9 @@ extension ClassRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_ClassRoundtrip_wrap")
-fileprivate func _bjs_ClassRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_ClassRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_ClassRoundtrip_wrap(_: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_ClassRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

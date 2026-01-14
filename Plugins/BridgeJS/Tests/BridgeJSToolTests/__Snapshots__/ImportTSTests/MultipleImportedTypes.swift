@@ -16,7 +16,8 @@ fileprivate func bjs_createDatabaseConnection(_ config: Int32) -> Int32 {
 #endif
 
 func createDatabaseConnection(_ config: JSObject) throws(JSException) -> DatabaseConnection {
-    let ret = bjs_createDatabaseConnection(config.bridgeJSLowerParameter())
+    let configValue = config.bridgeJSLowerParameter()
+    let ret = bjs_createDatabaseConnection(configValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -33,7 +34,8 @@ fileprivate func bjs_createLogger(_ level: Int32) -> Int32 {
 #endif
 
 func createLogger(_ level: String) throws(JSException) -> Logger {
-    let ret = bjs_createLogger(level.bridgeJSLowerParameter())
+    let levelValue = level.bridgeJSLowerParameter()
+    let ret = bjs_createLogger(levelValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -111,7 +113,8 @@ struct DatabaseConnection: _JSBridgedClass {
 
     var isConnected: Bool {
         get throws(JSException) {
-            let ret = bjs_DatabaseConnection_isConnected_get(self.bridgeJSLowerParameter())
+            let selfValue = self.bridgeJSLowerParameter()
+            let ret = bjs_DatabaseConnection_isConnected_get(selfValue)
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -121,7 +124,8 @@ struct DatabaseConnection: _JSBridgedClass {
 
     var connectionTimeout: Double {
         get throws(JSException) {
-            let ret = bjs_DatabaseConnection_connectionTimeout_get(self.bridgeJSLowerParameter())
+            let selfValue = self.bridgeJSLowerParameter()
+            let ret = bjs_DatabaseConnection_connectionTimeout_get(selfValue)
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -130,21 +134,27 @@ struct DatabaseConnection: _JSBridgedClass {
     }
 
     func setConnectionTimeout(_ newValue: Double) throws(JSException) -> Void {
-        bjs_DatabaseConnection_connectionTimeout_set(self.bridgeJSLowerParameter(), newValue.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let newValueValue = newValue.bridgeJSLowerParameter()
+        bjs_DatabaseConnection_connectionTimeout_set(selfValue, newValueValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
     }
 
     func connect(_ url: String) throws(JSException) -> Void {
-        bjs_DatabaseConnection_connect(self.bridgeJSLowerParameter(), url.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let urlValue = url.bridgeJSLowerParameter()
+        bjs_DatabaseConnection_connect(selfValue, urlValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
     }
 
     func execute(_ query: String) throws(JSException) -> JSObject {
-        let ret = bjs_DatabaseConnection_execute(self.bridgeJSLowerParameter(), query.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let queryValue = query.bridgeJSLowerParameter()
+        let ret = bjs_DatabaseConnection_execute(selfValue, queryValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -189,7 +199,8 @@ struct Logger: _JSBridgedClass {
 
     var level: String {
         get throws(JSException) {
-            let ret = bjs_Logger_level_get(self.bridgeJSLowerParameter())
+            let selfValue = self.bridgeJSLowerParameter()
+            let ret = bjs_Logger_level_get(selfValue)
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -198,14 +209,19 @@ struct Logger: _JSBridgedClass {
     }
 
     func log(_ message: String) throws(JSException) -> Void {
-        bjs_Logger_log(self.bridgeJSLowerParameter(), message.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let messageValue = message.bridgeJSLowerParameter()
+        bjs_Logger_log(selfValue, messageValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
     }
 
     func error(_ message: String, _ error: JSObject) throws(JSException) -> Void {
-        bjs_Logger_error(self.bridgeJSLowerParameter(), message.bridgeJSLowerParameter(), error.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let messageValue = message.bridgeJSLowerParameter()
+        let errorValue = error.bridgeJSLowerParameter()
+        bjs_Logger_error(selfValue, messageValue, errorValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -249,7 +265,8 @@ struct ConfigManager: _JSBridgedClass {
 
     var configPath: String {
         get throws(JSException) {
-            let ret = bjs_ConfigManager_configPath_get(self.bridgeJSLowerParameter())
+            let selfValue = self.bridgeJSLowerParameter()
+            let ret = bjs_ConfigManager_configPath_get(selfValue)
             if let error = _swift_js_take_exception() {
                 throw error
             }
@@ -258,7 +275,9 @@ struct ConfigManager: _JSBridgedClass {
     }
 
     func get(_ key: String) throws(JSException) -> JSObject {
-        let ret = bjs_ConfigManager_get(self.bridgeJSLowerParameter(), key.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let keyValue = key.bridgeJSLowerParameter()
+        let ret = bjs_ConfigManager_get(selfValue, keyValue)
         if let error = _swift_js_take_exception() {
             throw error
         }
@@ -266,7 +285,10 @@ struct ConfigManager: _JSBridgedClass {
     }
 
     func set(_ key: String, _ value: JSObject) throws(JSException) -> Void {
-        bjs_ConfigManager_set(self.bridgeJSLowerParameter(), key.bridgeJSLowerParameter(), value.bridgeJSLowerParameter())
+        let selfValue = self.bridgeJSLowerParameter()
+        let keyValue = key.bridgeJSLowerParameter()
+        let valueValue = value.bridgeJSLowerParameter()
+        bjs_ConfigManager_set(selfValue, keyValue, valueValue)
         if let error = _swift_js_take_exception() {
             throw error
         }

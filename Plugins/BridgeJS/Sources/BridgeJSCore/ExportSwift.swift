@@ -1986,10 +1986,10 @@ public class ExportSwift {
             let body: CodeBlockItemListSyntax
             if effects.isAsync {
                 body = """
-                        let ret = JSPromise.async {
-                            \(CodeBlockItemListSyntax(self.body))
-                        }.jsObject
-                        return ret.bridgeJSLowerReturn()
+                    let ret = JSPromise.async {
+                        \(CodeBlockItemListSyntax(self.body))
+                    }.jsObject
+                    return ret.bridgeJSLowerReturn()
                     """
             } else if effects.isThrows {
                 body = """
@@ -2012,17 +2012,20 @@ public class ExportSwift {
             } else {
                 body = CodeBlockItemListSyntax(self.body)
             }
-            return """
-                @_expose(wasm, "\(raw: abiName)")
-                @_cdecl("\(raw: abiName)")
-                public func _\(raw: abiName)(\(raw: parameterSignature())) -> \(raw: returnSignature()) {
-                    #if arch(wasm32)
-                \(body)
-                    #else
-                    fatalError("Only available on WebAssembly")
-                    #endif
-                }
-                """
+            // Build function signature using SwiftSignatureBuilder
+            let signature = SwiftSignatureBuilder.buildABIFunctionSignature(
+                abiParameters: abiParameterSignatures,
+                returnType: abiReturnType
+            )
+
+            // Build function declaration using helper function
+            let funcDecl = SwiftCodePattern.buildExposedFunctionDecl(
+                abiName: abiName,
+                signature: signature,
+                body: body
+            )
+
+            return DeclSyntax(funcDecl)
         }
 
         private func returnPlaceholderStmt() -> String {
@@ -2035,19 +2038,6 @@ public class ExportSwift {
             case .none: return "return"
             }
         }
-
-        func parameterSignature() -> String {
-            var nameAndType: [(name: String, abiType: String)] = []
-            for (name, type) in abiParameterSignatures {
-                nameAndType.append((name, type.swiftType))
-            }
-            return nameAndType.map { "\($0.name): \($0.abiType)" }.joined(separator: ", ")
-        }
-
-        func returnSignature() -> String {
-            return abiReturnType?.swiftType ?? "Void"
-        }
-
     }
 
     /// Context for property rendering that determines call behavior and ABI generation
@@ -2330,15 +2320,17 @@ public class ExportSwift {
         }
 
         do {
-            decls.append(
-                """
-                @_expose(wasm, "bjs_\(raw: klass.name)_deinit")
-                @_cdecl("bjs_\(raw: klass.name)_deinit")
-                public func _bjs_\(raw: klass.name)_deinit(pointer: UnsafeMutableRawPointer) {
-                    Unmanaged<\(raw: klass.swiftCallName)>.fromOpaque(pointer).release()
+            let funcDecl = SwiftCodePattern.buildExposedFunctionDecl(
+                abiName: "bjs_\(klass.name)_deinit",
+                signature: SwiftSignatureBuilder.buildABIFunctionSignature(
+                    abiParameters: [("pointer", .pointer)],
+                    returnType: nil
+                ),
+                body: CodeBlockItemListSyntax {
+                    "Unmanaged<\(raw: klass.swiftCallName)>.fromOpaque(pointer).release()"
                 }
-                """
             )
+            decls.append(DeclSyntax(funcDecl))
         }
 
         // Generate ConvertibleToJSValue extension
@@ -2375,16 +2367,40 @@ public class ExportSwift {
                 }
             }
             """
-        let externDecl: DeclSyntax = """
-            #if arch(wasm32)
-            @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: externFunctionName)")
-            fileprivate func \(raw: wrapFunctionName)(_: UnsafeMutableRawPointer) -> Int32
-            #else
-            fileprivate func \(raw: wrapFunctionName)(_: UnsafeMutableRawPointer) -> Int32 {
-                fatalError("Only available on WebAssembly")
+        // Build common function signature
+        let funcSignature = SwiftSignatureBuilder.buildABIFunctionSignature(
+            abiParameters: [("pointer", .pointer)],
+            returnType: .i32
+        )
+
+        // Build extern function declaration (no body)
+        let externFuncDecl = SwiftCodePattern.buildExternFunctionDecl(
+            moduleName: moduleName,
+            abiName: externFunctionName,
+            functionName: wrapFunctionName,
+            signature: funcSignature
+        )
+
+        // Build stub function declaration (with fatalError body)
+        let stubFuncDecl = FunctionDeclSyntax(
+            modifiers: DeclModifierListSyntax {
+                DeclModifierSyntax(name: .keyword(.fileprivate))
+            },
+            funcKeyword: .keyword(.func),
+            name: .identifier(wrapFunctionName),
+            signature: funcSignature,
+            body: CodeBlockSyntax {
+                "fatalError(\"Only available on WebAssembly\")"
             }
-            #endif
-            """
+        )
+
+        // Use helper function for conditional compilation
+        let externDecl = DeclSyntax(
+            SwiftCodePattern.buildWasmConditionalCompilationDecls(
+                wasmDecl: DeclSyntax(externFuncDecl),
+                elseDecl: DeclSyntax(stubFuncDecl)
+            )
+        )
         return [extensionDecl, externDecl]
     }
 }
@@ -2413,28 +2429,6 @@ struct ClosureCodegen {
         }
     }
 
-    private func generateOptionalParameterLowering(_ signature: ClosureSignature) throws -> String {
-        var lines: [String] = []
-
-        for (index, paramType) in signature.parameters.enumerated() {
-            guard case .optional(let wrappedType) = paramType else {
-                continue
-            }
-            let paramName = "param\(index)"
-            if case .swiftHeapObject = wrappedType {
-                lines.append(
-                    "let (\(paramName)IsSome, \(paramName)Value) = \(paramName).bridgeJSLowerParameterWithRetain()"
-                )
-            } else {
-                lines.append(
-                    "let (\(paramName)IsSome, \(paramName)Value) = \(paramName).bridgeJSLowerParameterWithPresence()"
-                )
-            }
-        }
-
-        return lines.isEmpty ? "" : lines.joined(separator: "\n") + "\n"
-    }
-
     func renderClosureHelpers(_ signature: ClosureSignature) throws -> [DeclSyntax] {
         let mangledName = signature.mangleName
         let helperName = "_BJS_Closure_\(mangledName)"
@@ -2448,111 +2442,139 @@ struct ClosureCodegen {
         let swiftReturnType = signature.returnType.swiftType
         let closureType = "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
 
-        var invokeParams: [(name: String, type: String)] = [("_", "Int32")]
-        var invokeCallArgs: [String] = ["callback.bridgeJSLowerParameter()"]
-
-        for (index, paramType) in signature.parameters.enumerated() {
-            let paramName = "param\(index)"
-
-            if case .optional(let wrappedType) = paramType {
-                invokeParams.append(("_", "Int32"))
-
-                switch wrappedType {
-                case .swiftHeapObject:
-                    invokeParams.append(("_", "UnsafeMutableRawPointer"))
-                case .string, .rawValueEnum(_, .string):
-                    invokeParams.append(("_", "Int32"))
-                default:
-                    let lowerInfo = try wrappedType.loweringReturnInfo()
-                    if let wasmType = lowerInfo.returnType {
-                        invokeParams.append(("_", wasmType.swiftType))
-                    } else {
-                        invokeParams.append(("_", "Int32"))
-                    }
-                }
-
-                invokeCallArgs.append("\(paramName)IsSome")
-                invokeCallArgs.append("\(paramName)Value")
-            } else {
-                let lowerInfo = try paramType.loweringReturnInfo()
-                if let wasmType = lowerInfo.returnType {
-                    invokeParams.append(("_", wasmType.swiftType))
-                    invokeCallArgs.append("\(paramName).bridgeJSLowerParameter()")
-                } else {
-                    invokeParams.append(("_", "Int32"))
-                    invokeCallArgs.append("\(paramName).bridgeJSLowerParameter()")
-                }
-            }
-        }
-
-        let invokeSignature = invokeParams.map { "\($0.name): \($0.type)" }.joined(separator: ", ")
-        let invokeReturnType: String
-        if case .optional = signature.returnType {
-            invokeReturnType = "Void"
-        } else if let wasmType = try signature.returnType.liftingReturnInfo(context: .exportSwift).valueToLift {
-            invokeReturnType = wasmType.swiftType
-        } else {
-            invokeReturnType = "Void"
-        }
-
         let externName = "invoke_js_callback_\(signature.moduleName)_\(mangledName)"
 
-        let returnLifting: String
-        if signature.returnType == .void {
-            returnLifting = "\(externName)(\(invokeCallArgs.joined(separator: ", ")))"
-        } else if case .optional = signature.returnType {
-            returnLifting = """
-                \(externName)(\(invokeCallArgs.joined(separator: ", ")))
-                            return \(signature.returnType.swiftType).bridgeJSLiftReturnFromSideChannel()
-                """
-        } else {
-            returnLifting = """
-                let resultId = \(externName)(\(invokeCallArgs.joined(separator: ", ")))
-                            return \(signature.returnType.swiftType).bridgeJSLiftReturn(resultId)
-                """
+        // Use CallJSEmission to generate the callback invocation
+        let builder = ImportTS.CallJSEmission(
+            moduleName: "bjs",
+            abiName: externName,
+            context: .exportSwift
+        )
+
+        // Lower the callback parameter
+        try builder.lowerParameter(param: Parameter(label: nil, name: "callback", type: .jsObject(nil)))
+
+        // Lower each closure parameter
+        for (index, paramType) in signature.parameters.enumerated() {
+            try builder.lowerParameter(param: Parameter(label: nil, name: "param\(index)", type: paramType))
         }
 
-        let optionalLoweringCode = try generateOptionalParameterLowering(signature)
+        // Generate the call and return value lifting
+        try builder.call(returnType: signature.returnType)
+        try builder.liftReturnValue(returnType: signature.returnType)
 
-        let externDecl: DeclSyntax = """
-            @_extern(wasm, module: "bjs", name: "\(raw: externName)")
-            fileprivate func \(raw: externName)(\(raw: invokeSignature)) -> \(raw: invokeReturnType)
-            """
+        // Get the body code
+        let bodyCode = builder.getBody()
 
-        let boxDecl: DeclSyntax = """
+        // Generate extern declaration using CallJSEmission
+        let externDecl = builder.renderImportDecl()
+
+        let boxClassDecl: DeclSyntax = """
             private final class \(raw: boxClassName): _BridgedSwiftClosureBox {
                 let closure: \(raw: closureType)
                 init(_ closure: @escaping \(raw: closureType)) {
                     self.closure = closure
                 }
             }
-
-            private enum \(raw: helperName) {
-                static func bridgeJSLower(_ closure: @escaping \(raw: closureType)) -> UnsafeMutableRawPointer {
-                    let box = \(raw: boxClassName)(closure)
-                    return Unmanaged.passRetained(box).toOpaque()
-                }
-
-                static func bridgeJSLift(_ callbackId: Int32) -> \(raw: closureType) {
-                        let callback = JSObject.bridgeJSLiftParameter(callbackId)
-                        return { [callback] \(raw: signature.parameters.indices.map { "param\($0)" }.joined(separator: ", ")) in
-                            #if arch(wasm32)
-                            \(raw: optionalLoweringCode)\(raw: returnLifting)
-                            #else
-                            fatalError("Only available on WebAssembly")
-                            #endif
-                        }
-                    }
-            }
             """
-        return [externDecl, boxDecl]
+
+        let helperEnumDecl = EnumDeclSyntax(
+            modifiers: DeclModifierListSyntax {
+                DeclModifierSyntax(name: .keyword(.private))
+            },
+            name: .identifier(helperName),
+            memberBlockBuilder: {
+                DeclSyntax(
+                    FunctionDeclSyntax(
+                        modifiers: DeclModifierListSyntax {
+                            DeclModifierSyntax(name: .keyword(.static))
+                        },
+                        name: .identifier("bridgeJSLower"),
+                        signature: FunctionSignatureSyntax(
+                            parameterClause: FunctionParameterClauseSyntax {
+                                FunctionParameterSyntax(
+                                    firstName: .wildcardToken(),
+                                    secondName: .identifier("closure"),
+                                    colon: .colonToken(),
+                                    type: TypeSyntax("@escaping \(raw: closureType)")
+                                )
+                            },
+                            returnClause: ReturnClauseSyntax(
+                                arrow: .arrowToken(),
+                                type: IdentifierTypeSyntax(name: .identifier("UnsafeMutableRawPointer"))
+                            )
+                        ),
+                        body: CodeBlockSyntax {
+                            "let box = \(raw: boxClassName)(closure)"
+                            "return Unmanaged.passRetained(box).toOpaque()"
+                        }
+                    )
+                )
+
+                DeclSyntax(
+                    FunctionDeclSyntax(
+                        modifiers: DeclModifierListSyntax {
+                            DeclModifierSyntax(name: .keyword(.static))
+                        },
+                        name: .identifier("bridgeJSLift"),
+                        signature: FunctionSignatureSyntax(
+                            parameterClause: FunctionParameterClauseSyntax {
+                                FunctionParameterSyntax(
+                                    firstName: .wildcardToken(),
+                                    secondName: .identifier("callbackId"),
+                                    colon: .colonToken(),
+                                    type: IdentifierTypeSyntax(name: .identifier("Int32"))
+                                )
+                            },
+                            returnClause: ReturnClauseSyntax(
+                                arrow: .arrowToken(),
+                                type: IdentifierTypeSyntax(name: .identifier(closureType))
+                            )
+                        ),
+                        body: CodeBlockSyntax {
+                            "let callback = JSObject.bridgeJSLiftParameter(callbackId)"
+                            ReturnStmtSyntax(
+                                expression: ClosureExprSyntax(
+                                    leftBrace: .leftBraceToken(),
+                                    signature: ClosureSignatureSyntax(
+                                        capture: ClosureCaptureClauseSyntax(
+                                            leftSquare: .leftSquareToken(),
+                                            items: ClosureCaptureListSyntax {
+                                                ClosureCaptureSyntax(
+                                                    expression: ExprSyntax("callback")
+                                                )
+                                            },
+                                            rightSquare: .rightSquareToken()
+                                        ),
+                                        parameterClause: .simpleInput(
+                                            ClosureShorthandParameterListSyntax {
+                                                for (index, _) in signature.parameters.enumerated() {
+                                                    ClosureShorthandParameterSyntax(name: .identifier("param\(index)"))
+                                                }
+                                            }
+                                        ),
+                                        inKeyword: .keyword(.in)
+                                    ),
+                                    statements: CodeBlockItemListSyntax {
+                                        SwiftCodePattern.buildWasmConditionalCompilation(wasmBody: bodyCode.statements)
+                                    },
+                                    rightBrace: .rightBraceToken()
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
+        return [externDecl, boxClassDecl, DeclSyntax(helperEnumDecl)]
     }
 
     func renderClosureInvokeHandler(_ signature: ClosureSignature) throws -> DeclSyntax {
         let boxClassName = "_BJS_ClosureBox_\(signature.mangleName)"
         let abiName = "invoke_swift_closure_\(signature.moduleName)_\(signature.mangleName)"
 
-        var abiParams: [(name: String, type: String)] = [("boxPtr", "UnsafeMutableRawPointer")]
+        // Build ABI parameters directly with WasmCoreType (no string conversion needed)
+        var abiParams: [(name: String, type: WasmCoreType)] = [("boxPtr", .pointer)]
         var liftedParams: [String] = []
 
         for (index, paramType) in signature.parameters.enumerated() {
@@ -2562,7 +2584,7 @@ struct ClosureCodegen {
             for (argName, wasmType) in liftInfo.parameters {
                 let fullName =
                     liftInfo.parameters.count > 1 ? "\(paramName)\(argName.capitalizedFirstLetter)" : paramName
-                abiParams.append((fullName, wasmType.swiftType))
+                abiParams.append((fullName, wasmType))
             }
 
             let argNames = liftInfo.parameters.map { (argName, _) in
@@ -2571,40 +2593,43 @@ struct ClosureCodegen {
             liftedParams.append("\(paramType.swiftType).bridgeJSLiftParameter(\(argNames.joined(separator: ", ")))")
         }
 
-        let paramSignature = abiParams.map { "\($0.name): \($0.type)" }.joined(separator: ", ")
-        let closureCall = "box.closure(\(liftedParams.joined(separator: ", ")))"
+        let closureCallExpr = ExprSyntax("box.closure(\(raw: liftedParams.joined(separator: ", ")))")
 
-        let returnCode: String
+        // Determine return type
+        let abiReturnWasmType: WasmCoreType?
         if signature.returnType == .void {
-            returnCode = closureCall
-        } else {
-            returnCode = """
-                let result = \(closureCall)
-                return result.bridgeJSLowerReturn()
-                """
-        }
-
-        let abiReturnType: String
-        if signature.returnType == .void {
-            abiReturnType = "Void"
+            abiReturnWasmType = nil
         } else if let wasmType = try signature.returnType.loweringReturnInfo().returnType {
-            abiReturnType = wasmType.swiftType
+            abiReturnWasmType = wasmType
         } else {
-            abiReturnType = "Void"
+            abiReturnWasmType = nil
         }
 
-        return """
-            @_expose(wasm, "\(raw: abiName)")
-            @_cdecl("\(raw: abiName)")
-            public func _\(raw: abiName)(\(raw: paramSignature)) -> \(raw: abiReturnType) {
-                #if arch(wasm32)
-                let box = Unmanaged<\(raw: boxClassName)>.fromOpaque(boxPtr).takeUnretainedValue()
-                \(raw: returnCode)
-                #else
-                fatalError("Only available on WebAssembly")
-                #endif
+        // Build signature using SwiftSignatureBuilder
+        let funcSignature = SwiftSignatureBuilder.buildABIFunctionSignature(
+            abiParameters: abiParams,
+            returnType: abiReturnWasmType
+        )
+
+        // Build body
+        let body = CodeBlockItemListSyntax {
+            "let box = Unmanaged<\(raw: boxClassName)>.fromOpaque(boxPtr).takeUnretainedValue()"
+            if signature.returnType == .void {
+                closureCallExpr
+            } else {
+                "let result = \(closureCallExpr)"
+                "return result.bridgeJSLowerReturn()"
             }
-            """
+        }
+
+        // Build function declaration using helper
+        let funcDecl = SwiftCodePattern.buildExposedFunctionDecl(
+            abiName: abiName,
+            signature: funcSignature,
+            body: body
+        )
+
+        return DeclSyntax(funcDecl)
     }
 
 }
@@ -3072,103 +3097,44 @@ struct ProtocolCodegen {
         var externDecls: [DeclSyntax] = []
 
         for method in proto.methods {
-            var swiftParams: [String] = []
+            let builder = ImportTS.CallJSEmission(
+                moduleName: moduleName,
+                abiName: "_extern_\(method.name)",
+                context: .exportSwift
+            )
+            try builder.lowerParameter(param: Parameter(label: nil, name: "jsObject", type: .jsObject(nil)))
             for param in method.parameters {
-                let label = param.label ?? param.name
-                if label == param.name {
-                    swiftParams.append("\(param.name): \(param.type.swiftType)")
-                } else {
-                    swiftParams.append("\(label) \(param.name): \(param.type.swiftType)")
-                }
+                try builder.lowerParameter(param: param)
             }
+            try builder.call(returnType: method.returnType)
+            try builder.liftReturnValue(returnType: method.returnType)
 
-            var externParams: [String] = ["this: Int32"]
-            for param in method.parameters {
-                let loweringInfo = try param.type.loweringParameterInfo(context: .exportSwift)
-                for (paramName, wasmType) in loweringInfo.loweredParameters {
-                    let fullParamName =
-                        loweringInfo.loweredParameters.count > 1
-                        ? "\(param.name)\(paramName.capitalizedFirstLetter)" : param.name
-                    externParams.append("\(fullParamName): \(wasmType.swiftType)")
-                }
-            }
-
-            var preCallStatements: [String] = []
-            var callArgs: [String] = ["this: Int32(bitPattern: jsObject.id)"]
-            for param in method.parameters {
-                let loweringInfo = try param.type.loweringParameterInfo(context: .exportSwift)
-                if case .optional = param.type, loweringInfo.loweredParameters.count > 1 {
-                    let isSomeName = "\(param.name)\(loweringInfo.loweredParameters[0].name.capitalizedFirstLetter)"
-                    let wrappedName = "\(param.name)\(loweringInfo.loweredParameters[1].name.capitalizedFirstLetter)"
-                    preCallStatements.append(
-                        "let (\(isSomeName), \(wrappedName)) = \(param.name).bridgeJSLowerParameterWithPresence()"
-                    )
-                    callArgs.append("\(isSomeName): \(isSomeName)")
-                    callArgs.append("\(wrappedName): \(wrappedName)")
-                } else {
-                    callArgs.append("\(param.name): \(param.name).bridgeJSLowerParameter()")
-                }
-            }
-
-            let returnTypeStr: String
-            let externReturnType: String
-            let callCode: DeclSyntax
-
-            let preCallCode = preCallStatements.isEmpty ? "" : preCallStatements.joined(separator: "\n") + "\n"
-
-            if method.returnType == .void {
-                returnTypeStr = ""
-                externReturnType = ""
-                callCode = """
-                    \(raw: preCallCode)_extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
-                    """
-            } else {
-                returnTypeStr = " -> \(method.returnType.swiftType)"
-                let liftingInfo = try method.returnType.liftingReturnInfo(
-                    context: .exportSwift
-                )
-
-                if case .optional = method.returnType {
-                    if let abiType = liftingInfo.valueToLift {
-                        externReturnType = " -> \(abiType.swiftType)"
-                        callCode = """
-                            \(raw: preCallCode)let ret = _extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
-                                return \(raw: method.returnType.swiftType).bridgeJSLiftReturn(ret)
-                            """
-                    } else {
-                        externReturnType = ""
-                        callCode = """
-                            \(raw: preCallCode)_extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
-                                return \(raw: method.returnType.swiftType).bridgeJSLiftReturn()
-                            """
-                    }
-                } else if let abiType = liftingInfo.valueToLift {
-                    externReturnType = " -> \(abiType.swiftType)"
-                    callCode = """
-                        \(raw: preCallCode)let ret = _extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
-                            return \(raw: method.returnType.swiftType).bridgeJSLiftReturn(ret)
-                        """
-                } else {
-                    externReturnType = ""
-                    callCode = """
-                        \(raw: preCallCode)_extern_\(raw: method.name)(\(raw: callArgs.joined(separator: ", ")))
-                            return \(raw: method.returnType.swiftType).bridgeJSLiftReturn()
-                        """
-                }
-            }
-
-            externDecls.append(
-                """
-                @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: method.abiName)")
-                fileprivate func _extern_\(raw: method.name)(\(raw: externParams.joined(separator: ", ")))\(raw: externReturnType)
-                """
+            // Build function signature using SwiftSignatureBuilder
+            let signature = SwiftSignatureBuilder.buildFunctionSignature(
+                parameters: method.parameters,
+                returnType: method.returnType,
+                effects: nil
             )
 
-            let methodImplementation: DeclSyntax = """
-                func \(raw: method.name)(\(raw: swiftParams.joined(separator: ", ")))\(raw: returnTypeStr) {
-                    \(raw: callCode)
-                }
-                """
+            // Build extern declaration using helper function
+            let externSignature = SwiftSignatureBuilder.buildABIFunctionSignature(
+                abiParameters: builder.abiParameterSignatures,
+                returnType: builder.abiReturnType
+            )
+            let externFuncDecl = SwiftCodePattern.buildExternFunctionDecl(
+                moduleName: moduleName,
+                abiName: method.abiName,
+                functionName: "_extern_\(method.name)",
+                signature: externSignature
+            )
+            externDecls.append(DeclSyntax(externFuncDecl))
+            let methodImplementation = DeclSyntax(
+                FunctionDeclSyntax(
+                    name: .identifier(method.name),
+                    signature: signature,
+                    body: builder.getBody()
+                )
+            )
 
             methodDecls.append(methodImplementation)
         }
@@ -3185,20 +3151,35 @@ struct ProtocolCodegen {
             externDecls.append(contentsOf: propertyExternDecls)
         }
 
-        let allDecls = (methodDecls + propertyDecls).map { $0.description }.joined(separator: "\n\n")
-
-        let structDecl: DeclSyntax = """
-            struct \(raw: wrapperName): \(raw: protocolName), _BridgedSwiftProtocolWrapper {
-                let jsObject: JSObject
-
-                \(raw: allDecls)
-
-                static func bridgeJSLiftParameter(_ value: Int32) -> Self {
-                    return \(raw: wrapperName)(jsObject: JSObject(id: UInt32(bitPattern: value)))
+        let structDecl = StructDeclSyntax(
+            name: .identifier(wrapperName),
+            inheritanceClause: InheritanceClauseSyntax(
+                inheritedTypesBuilder: {
+                    InheritedTypeSyntax(type: IdentifierTypeSyntax(name: .identifier(protocolName)))
+                    InheritedTypeSyntax(type: IdentifierTypeSyntax(name: .identifier("_BridgedSwiftProtocolWrapper")))
                 }
+            ),
+            memberBlockBuilder: {
+                DeclSyntax(
+                    """
+                    let jsObject: JSObject
+                    """
+                ).with(\.trailingTrivia, .newlines(2))
+
+                for decl in methodDecls + propertyDecls {
+                    decl.with(\.trailingTrivia, .newlines(2))
+                }
+
+                DeclSyntax(
+                    """
+                    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+                        return \(raw: wrapperName)(jsObject: JSObject(id: UInt32(bitPattern: value)))
+                    }
+                    """
+                )
             }
-            """
-        return [structDecl] + externDecls
+        )
+        return [DeclSyntax(structDecl)] + externDecls
     }
 
     private func renderProtocolProperty(
@@ -3217,87 +3198,98 @@ struct ProtocolCodegen {
             className: protocolName
         )
 
-        let usesSideChannel = property.type.usesSideChannelForOptionalReturn()
-        let liftingInfo = try property.type.liftingReturnInfo(context: .exportSwift)
-        let getterReturnType: String
-        let getterBody: String
+        let getterBuilder = ImportTS.CallJSEmission(
+            moduleName: moduleName,
+            abiName: getterAbiName,
+            context: .exportSwift
+        )
+        try getterBuilder.lowerParameter(param: Parameter(label: nil, name: "jsObject", type: .jsObject(nil)))
+        try getterBuilder.call(returnType: property.type)
+        try getterBuilder.liftReturnValue(returnType: property.type)
 
-        if usesSideChannel {
-            getterReturnType = ""
-            getterBody = """
-                \(getterAbiName)(this: Int32(bitPattern: jsObject.id))
-                        return \(property.type.swiftType).bridgeJSLiftReturnFromSideChannel()
-                """
-        } else if let abiType = liftingInfo.valueToLift {
-            getterReturnType = " -> \(abiType.swiftType)"
-            getterBody = """
-                let ret = \(getterAbiName)(this: Int32(bitPattern: jsObject.id))
-                        return \(property.type.swiftType).bridgeJSLiftReturn(ret)
-                """
-        } else {
-            getterReturnType = ""
-            getterBody = """
-                \(getterAbiName)(this: Int32(bitPattern: jsObject.id))
-                        return \(property.type.swiftType).bridgeJSLiftReturn()
-                """
-        }
-
-        let getterExternDecl: DeclSyntax = """
-            @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: getterAbiName)")
-            fileprivate func \(raw: getterAbiName)(this: Int32)\(raw: getterReturnType)
-            """
+        // Build getter extern declaration using helper function
+        let getterExternSignature = SwiftSignatureBuilder.buildABIFunctionSignature(
+            abiParameters: getterBuilder.abiParameterSignatures,
+            returnType: getterBuilder.abiReturnType
+        )
+        let getterExternDecl = SwiftCodePattern.buildExternFunctionDecl(
+            moduleName: moduleName,
+            abiName: getterAbiName,
+            functionName: getterAbiName,
+            signature: getterExternSignature
+        )
 
         if property.isReadonly {
-            return (
-                """
-                var \(raw: property.name): \(raw: property.type.swiftType) {
-                    get {
-                        \(raw: getterBody)
-                    }
+            let propertyDecl = VariableDeclSyntax(
+                bindingSpecifier: .keyword(.var),
+                bindings: PatternBindingListSyntax {
+                    PatternBindingSyntax(
+                        pattern: IdentifierPatternSyntax(identifier: .identifier(property.name)),
+                        typeAnnotation: TypeAnnotationSyntax(
+                            type: IdentifierTypeSyntax(name: .identifier(property.type.swiftType))
+                        ),
+                        accessorBlock: AccessorBlockSyntax(
+                            accessors: .accessors(
+                                AccessorDeclListSyntax {
+                                    AccessorDeclSyntax(
+                                        accessorSpecifier: .keyword(.get),
+                                        body: getterBuilder.getBody()
+                                    )
+                                }
+                            )
+                        )
+                    )
                 }
-                """,
-                [getterExternDecl]
             )
+            return (DeclSyntax(propertyDecl), [DeclSyntax(getterExternDecl)])
         } else {
-            let loweringInfo = try property.type.loweringParameterInfo(context: .exportSwift)
-
-            let setterParams =
-                (["this: Int32"] + loweringInfo.loweredParameters.map { "\($0.name): \($0.type.swiftType)" }).joined(
-                    separator: ", "
-                )
-
-            let setterBody: String
-            if case .optional = property.type, loweringInfo.loweredParameters.count > 1 {
-                let isSomeParam = loweringInfo.loweredParameters[0].name
-                let wrappedParam = loweringInfo.loweredParameters[1].name
-                setterBody = """
-                    let (\(isSomeParam), \(wrappedParam)) = newValue.bridgeJSLowerParameterWithPresence()
-                            \(setterAbiName)(this: Int32(bitPattern: jsObject.id), \(isSomeParam): \(isSomeParam), \(wrappedParam): \(wrappedParam))
-                    """
-            } else {
-                let paramName = loweringInfo.loweredParameters[0].name
-                setterBody =
-                    "\(setterAbiName)(this: Int32(bitPattern: jsObject.id), \(paramName): newValue.bridgeJSLowerParameter())"
-            }
-
-            let setterExternDecl: DeclSyntax = """
-                @_extern(wasm, module: "\(raw: moduleName)", name: "\(raw: setterAbiName)")
-                fileprivate func \(raw: setterAbiName)(\(raw: setterParams))
-                """
-
-            return (
-                """
-                var \(raw: property.name): \(raw: property.type.swiftType) {
-                    get {
-                        \(raw: getterBody)
-                    }
-                    set {
-                        \(raw: setterBody)
-                    }
-                }
-                """,
-                [getterExternDecl, setterExternDecl]
+            let setterBuilder = ImportTS.CallJSEmission(
+                moduleName: moduleName,
+                abiName: setterAbiName,
+                context: .exportSwift
             )
+            try setterBuilder.lowerParameter(param: Parameter(label: nil, name: "jsObject", type: .jsObject(nil)))
+            try setterBuilder.lowerParameter(param: Parameter(label: nil, name: "newValue", type: property.type))
+            try setterBuilder.call(returnType: .void)
+
+            // Build setter extern declaration using helper function
+            let setterExternSignature = SwiftSignatureBuilder.buildABIFunctionSignature(
+                abiParameters: setterBuilder.abiParameterSignatures,
+                returnType: setterBuilder.abiReturnType
+            )
+            let setterExternDecl = SwiftCodePattern.buildExternFunctionDecl(
+                moduleName: moduleName,
+                abiName: setterAbiName,
+                functionName: setterAbiName,
+                signature: setterExternSignature
+            )
+
+            let propertyDecl = VariableDeclSyntax(
+                bindingSpecifier: .keyword(.var),
+                bindings: PatternBindingListSyntax {
+                    PatternBindingSyntax(
+                        pattern: IdentifierPatternSyntax(identifier: .identifier(property.name)),
+                        typeAnnotation: TypeAnnotationSyntax(
+                            type: IdentifierTypeSyntax(name: .identifier(property.type.swiftType))
+                        ),
+                        accessorBlock: AccessorBlockSyntax(
+                            accessors: .accessors(
+                                AccessorDeclListSyntax {
+                                    AccessorDeclSyntax(
+                                        accessorSpecifier: .keyword(.get),
+                                        body: getterBuilder.getBody()
+                                    )
+                                    AccessorDeclSyntax(
+                                        accessorSpecifier: .keyword(.set),
+                                        body: setterBuilder.getBody()
+                                    )
+                                }
+                            )
+                        )
+                    )
+                }
+            )
+            return (DeclSyntax(propertyDecl), [DeclSyntax(getterExternDecl), DeclSyntax(setterExternDecl)])
         }
     }
 }

@@ -32,7 +32,8 @@ fileprivate func bjs_benchmarkHelperNoopWithNumber(_ n: Float64) -> Void {
 #endif
 
 func benchmarkHelperNoopWithNumber(_ n: Double) throws(JSException) -> Void {
-    bjs_benchmarkHelperNoopWithNumber(n.bridgeJSLowerParameter())
+    let nValue = n.bridgeJSLowerParameter()
+    bjs_benchmarkHelperNoopWithNumber(nValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -48,7 +49,9 @@ fileprivate func bjs_benchmarkRunner(_ name: Int32, _ body: Int32) -> Void {
 #endif
 
 func benchmarkRunner(_ name: String, _ body: JSObject) throws(JSException) -> Void {
-    bjs_benchmarkRunner(name.bridgeJSLowerParameter(), body.bridgeJSLowerParameter())
+    let nameValue = name.bridgeJSLowerParameter()
+    let bodyValue = body.bridgeJSLowerParameter()
+    bjs_benchmarkRunner(nameValue, bodyValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
