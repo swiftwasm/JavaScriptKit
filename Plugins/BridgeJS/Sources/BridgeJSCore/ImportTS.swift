@@ -483,18 +483,6 @@ public struct ImportTS {
         return Trivia(pieces: lines.flatMap { [TriviaPiece.docLineComment("/// \($0)"), .newlines(1)] })
     }
 
-    static func buildFunctionEffect(throws: Bool, async: Bool) -> FunctionEffectSpecifiersSyntax {
-        return FunctionEffectSpecifiersSyntax(
-            asyncSpecifier: `async` ? .keyword(.async) : nil,
-            throwsClause: `throws`
-                ? ThrowsClauseSyntax(
-                    throwsSpecifier: .keyword(.throws),
-                    leftParen: .leftParenToken(),
-                    type: IdentifierTypeSyntax(name: .identifier("JSException")),
-                    rightParen: .rightParenToken()
-                ) : nil
-        )
-    }
     static func buildAccessorEffect(throws: Bool, async: Bool) -> AccessorEffectSpecifiersSyntax {
         return AccessorEffectSpecifiersSyntax(
             asyncSpecifier: `async` ? .keyword(.async) : nil,
@@ -678,33 +666,6 @@ struct SwiftSignatureBuilder {
     static func buildTypeSyntax(from type: BridgeType) -> TypeSyntax {
         let identifierType = IdentifierTypeSyntax(name: .identifier(type.swiftType))
         return TypeSyntax(identifierType)
-    }
-
-    /// Formats a FunctionSignatureSyntax to a string representation
-    ///
-    /// Useful when string interpolation is needed (e.g., in renderExternDecl)
-    static func formatSignatureToString(_ signature: FunctionSignatureSyntax) -> String {
-        let format = BasicFormat()
-        return signature.formatted(using: format).description
-    }
-
-    /// Formats a FunctionParameterClauseSyntax to a string representation
-    ///
-    /// Useful for building parameter signature strings
-    static func formatParameterClauseToString(_ clause: FunctionParameterClauseSyntax) -> String {
-        let format = BasicFormat()
-        return clause.formatted(using: format).description
-    }
-
-    /// Formats a ReturnClauseSyntax to a string representation
-    ///
-    /// Useful for building return type signature strings
-    static func formatReturnClauseToString(_ clause: ReturnClauseSyntax?) -> String {
-        guard let clause = clause else {
-            return ""
-        }
-        let format = BasicFormat()
-        return clause.formatted(using: format).description
     }
 }
 
