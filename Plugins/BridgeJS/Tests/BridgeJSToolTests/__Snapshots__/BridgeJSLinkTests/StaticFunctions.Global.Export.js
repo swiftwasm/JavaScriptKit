@@ -80,6 +80,7 @@ export async function createInstantiator(options, swift) {
     let tmpRetPointers = [];
     let tmpParamPointers = [];
     const enumHelpers = {};
+    const structHelpers = {};
     
     let _exports = null;
     let bjs = null;

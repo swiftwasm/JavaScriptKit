@@ -30,6 +30,8 @@ final class JSGlueVariableScope {
     static let reservedTmpParamF64s = "tmpParamF64s"
     static let reservedTmpRetPointers = "tmpRetPointers"
     static let reservedTmpParamPointers = "tmpParamPointers"
+    static let reservedEnumHelpers = "enumHelpers"
+    static let reservedStructHelpers = "structHelpers"
 
     private var variables: Set<String> = [
         reservedSwift,
@@ -56,6 +58,8 @@ final class JSGlueVariableScope {
         reservedTmpParamF64s,
         reservedTmpRetPointers,
         reservedTmpParamPointers,
+        reservedEnumHelpers,
+        reservedStructHelpers,
     ]
 
     /// Returns a unique variable name in the scope based on the given name hint.
@@ -248,7 +252,7 @@ struct IntrinsicJSFragment: Sendable {
                 let caseIdName = "\(value)CaseId"
                 let cleanupName = "\(value)Cleanup"
                 printer.write(
-                    "const { caseId: \(caseIdName), cleanup: \(cleanupName) } = enumHelpers.\(enumBase).lower(\(value));"
+                    "const { caseId: \(caseIdName), cleanup: \(cleanupName) } = \(JSGlueVariableScope.reservedEnumHelpers).\(enumBase).lower(\(value));"
                 )
                 cleanup.write("if (\(cleanupName)) { \(cleanupName)(); }")
                 return [caseIdName]
@@ -262,7 +266,7 @@ struct IntrinsicJSFragment: Sendable {
             printCode: { _, scope, printer, _ in
                 let retName = scope.variable("ret")
                 printer.write(
-                    "const \(retName) = enumHelpers.\(enumBase).raise(\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
+                    "const \(retName) = \(JSGlueVariableScope.reservedEnumHelpers).\(enumBase).raise(\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
                 )
                 return [retName]
             }
@@ -325,7 +329,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("if (\(isSome)) {")
                     printer.indent {
                         printer.write(
-                            "\(enumVar) = enumHelpers.\(base).raise(\(wrappedValue), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
+                            "\(enumVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).raise(\(wrappedValue), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
                         )
                     }
                     printer.write("}")
@@ -337,7 +341,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("if (\(isSome)) {")
                     printer.indent {
                         printer.write(
-                            "\(structVar) = structHelpers.\(base).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
+                            "\(structVar) = \(JSGlueVariableScope.reservedStructHelpers).\(base).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
                         )
                     }
                     printer.write("} else {")
@@ -371,7 +375,9 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
                         let resultVar = scope.variable("structResult")
-                        printer.write("const \(resultVar) = structHelpers.\(base).lower(\(value));")
+                        printer.write(
+                            "const \(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(base).lower(\(value));"
+                        )
                         printer.write("\(cleanupVar) = \(resultVar).cleanup;")
                     }
                     printer.write("}")
@@ -404,7 +410,9 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
                         let resultVar = scope.variable("enumResult")
-                        printer.write("const \(resultVar) = enumHelpers.\(base).lower(\(value));")
+                        printer.write(
+                            "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
+                        )
                         printer.write("\(caseIdVar) = \(resultVar).caseId;")
                         printer.write("\(cleanupVar) = \(resultVar).cleanup;")
                     }
@@ -525,7 +533,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("} else {")
                     printer.indent {
                         printer.write(
-                            "\(resultVar) = enumHelpers.\(base).raise(\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
+                            "\(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).raise(\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
                         )
                     }
                     printer.write("}")
@@ -537,7 +545,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
                         printer.write(
-                            "\(resultVar) = structHelpers.\(base).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
+                            "\(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(base).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
                         )
                     }
                     printer.write("} else {")
@@ -657,7 +665,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
                         printer.write(
-                            "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = enumHelpers.\(base).lower(\(value));"
+                            "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
                         )
                         printer.write("return \(caseIdVar);")
                     }
@@ -817,7 +825,7 @@ struct IntrinsicJSFragment: Sendable {
                     let targetVar = arguments[1]
                     let base = fullName.components(separatedBy: ".").last ?? fullName
                     printer.write(
-                        "let \(targetVar) = enumHelpers.\(base).raise(\(caseId), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
+                        "let \(targetVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).raise(\(caseId), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
                     )
                     return []
                 }
@@ -884,7 +892,7 @@ struct IntrinsicJSFragment: Sendable {
                 case .associatedValueEnum(let fullName):
                     let base = fullName.components(separatedBy: ".").last ?? fullName
                     printer.write(
-                        "\(targetVar) = enumHelpers.\(base).raise(\(value), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
+                        "\(targetVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).raise(\(value), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
                     )
                 default:
                     fatalError("Unsupported optional wrapped type in closure parameter lifting: \(wrappedType)")
@@ -1016,7 +1024,7 @@ struct IntrinsicJSFragment: Sendable {
                     let caseIdVar = scope.variable("caseId")
                     let cleanupVar = scope.variable("cleanup")
                     printer.write(
-                        "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = enumHelpers.\(base).lower(\(result));"
+                        "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(result));"
                     )
                     cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
                     printer.write("return \(caseIdVar);")
@@ -1083,7 +1091,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("if (\(result)) {")
                     printer.indent()
                     printer.write(
-                        "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = enumHelpers.\(base).lower(\(result));"
+                        "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(result));"
                     )
                     printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = \(caseIdVar);")
                     cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
@@ -1212,7 +1220,7 @@ struct IntrinsicJSFragment: Sendable {
                     let base = fullName.components(separatedBy: ".").last ?? fullName
                     let resultVar = scope.variable("result")
                     printer.write(
-                        "const \(resultVar) = enumHelpers.\(base).raise(\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
+                        "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).raise(\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
                     )
                     printer.write("return \(resultVar);")
                     return []
@@ -1425,7 +1433,7 @@ struct IntrinsicJSFragment: Sendable {
                         let caseId = arguments[0]
                         let resultVar = scope.variable("enumValue")
                         printer.write(
-                            "const \(resultVar) = enumHelpers.\(base).raise(\(caseId), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
+                            "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).raise(\(caseId), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
                         )
                         return [resultVar]
                     }
@@ -1445,7 +1453,7 @@ struct IntrinsicJSFragment: Sendable {
                     printCode: { arguments, scope, printer, cleanupCode in
                         let resultVar = scope.variable("structValue")
                         printer.write(
-                            "const \(resultVar) = structHelpers.\(base).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
+                            "const \(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(base).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
                         )
                         return [resultVar]
                     }
@@ -1535,7 +1543,7 @@ struct IntrinsicJSFragment: Sendable {
                 let caseIdVar = scope.variable("caseId")
                 let cleanupVar = scope.variable("cleanup")
                 printer.write(
-                    "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = enumHelpers.\(base).lower(\(value));"
+                    "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
                 )
                 cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
                 printer.write("return \(caseIdVar);")
@@ -1982,7 +1990,7 @@ struct IntrinsicJSFragment: Sendable {
                 let value = arguments[0]
                 let cleanupVar = scope.variable("cleanup")
                 printer.write(
-                    "const { cleanup: \(cleanupVar) } = structHelpers.\(base).lower(\(value));"
+                    "const { cleanup: \(cleanupVar) } = \(JSGlueVariableScope.reservedStructHelpers).\(base).lower(\(value));"
                 )
                 cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
                 return []
@@ -1997,7 +2005,7 @@ struct IntrinsicJSFragment: Sendable {
                 let value = arguments[0]
                 let cleanupVar = scope.variable("cleanup")
                 printer.write(
-                    "const { cleanup: \(cleanupVar) } = structHelpers.\(structBase).lower(\(value));"
+                    "const { cleanup: \(cleanupVar) } = \(JSGlueVariableScope.reservedStructHelpers).\(structBase).lower(\(value));"
                 )
                 cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
                 return []
@@ -2011,7 +2019,7 @@ struct IntrinsicJSFragment: Sendable {
             printCode: { arguments, scope, printer, cleanupCode in
                 let resultVar = scope.variable("structValue")
                 printer.write(
-                    "const \(resultVar) = structHelpers.\(structBase).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
+                    "const \(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(structBase).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
                 )
                 return [resultVar]
             }
@@ -2029,7 +2037,7 @@ struct IntrinsicJSFragment: Sendable {
                 printer.write("const __bjs_create\(structName)Helpers = () => {")
                 printer.indent()
                 printer.write(
-                    "return (\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTmpParamPointers), \(JSGlueVariableScope.reservedTmpRetPointers), textEncoder, \(JSGlueVariableScope.reservedSwift), enumHelpers) => ({"
+                    "return (\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTmpParamPointers), \(JSGlueVariableScope.reservedTmpRetPointers), textEncoder, \(JSGlueVariableScope.reservedSwift), \(JSGlueVariableScope.reservedEnumHelpers)) => ({"
                 )
                 printer.indent()
 
@@ -2146,7 +2154,7 @@ struct IntrinsicJSFragment: Sendable {
                     // Lower the struct instance (this) using the helper's lower function
                     let structCleanupVar = methodScope.variable("structCleanup")
                     printer.write(
-                        "const { cleanup: \(structCleanupVar) } = structHelpers.\(structDef.name).lower(this);"
+                        "const { cleanup: \(structCleanupVar) } = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lower(this);"
                     )
 
                     // Lower each parameter and collect forwarding expressions
@@ -2353,7 +2361,9 @@ struct IntrinsicJSFragment: Sendable {
                         printer.write("if (\(isSomeVar)) {")
                         printer.indent {
                             let structResultVar = scope.variable("structResult")
-                            printer.write("const \(structResultVar) = structHelpers.\(structName).lower(\(value));")
+                            printer.write(
+                                "const \(structResultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(structName).lower(\(value));"
+                            )
                             printer.write("\(nestedCleanupVar) = \(structResultVar).cleanup;")
                         }
                         printer.write("}")
@@ -2455,7 +2465,9 @@ struct IntrinsicJSFragment: Sendable {
                             printer.write("if (\(isSomeVar)) {")
                             printer.indent {
                                 let enumResultVar = scope.variable("enumResult")
-                                printer.write("const \(enumResultVar) = enumHelpers.\(base).lower(\(value));")
+                                printer.write(
+                                    "const \(enumResultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
+                                )
                                 printer.write("\(caseIdVar) = \(enumResultVar).caseId;")
                                 printer.write("\(enumCleanupVar) = \(enumResultVar).cleanup;")
                                 printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(caseIdVar));")
@@ -2495,7 +2507,9 @@ struct IntrinsicJSFragment: Sendable {
                 printCode: { arguments, scope, printer, cleanup in
                     let value = arguments[0]
                     let structResultVar = scope.variable("structResult")
-                    printer.write("const \(structResultVar) = structHelpers.\(nestedName).lower(\(value));")
+                    printer.write(
+                        "const \(structResultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(nestedName).lower(\(value));"
+                    )
                     cleanup.write("if (\(structResultVar).cleanup) { \(structResultVar).cleanup(); }")
                     return []
                 }
@@ -2518,7 +2532,7 @@ struct IntrinsicJSFragment: Sendable {
                     let caseIdVar = scope.variable("caseId")
                     let cleanupVar = scope.variable("enumCleanup")
                     printer.write(
-                        "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = enumHelpers.\(base).lower(\(value));"
+                        "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
                     )
                     printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(caseIdVar));")
                     cleanup.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
@@ -2683,7 +2697,7 @@ struct IntrinsicJSFragment: Sendable {
                             let caseIdVar = scope.variable("enumCaseId")
                             printer.write("const \(caseIdVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
                             printer.write(
-                                "\(optVar) = enumHelpers.\(base).raise(\(caseIdVar), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
+                                "\(optVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).raise(\(caseIdVar), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
                             )
                         } else {
                             let wrappedFragment = structFieldRaiseFragment(
@@ -2717,7 +2731,7 @@ struct IntrinsicJSFragment: Sendable {
                 printCode: { arguments, scope, printer, cleanup in
                     let structVar = scope.variable("struct")
                     printer.write(
-                        "const \(structVar) = structHelpers.\(nestedName).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
+                        "const \(structVar) = \(JSGlueVariableScope.reservedStructHelpers).\(nestedName).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
                     )
                     return [structVar]
                 }
@@ -2793,7 +2807,7 @@ struct IntrinsicJSFragment: Sendable {
                 printCode: { arguments, scope, printer, cleanup in
                     let varName = scope.variable("value")
                     printer.write(
-                        "const \(varName) = enumHelpers.\(base).raise(\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
+                        "const \(varName) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).raise(\(JSGlueVariableScope.reservedTmpRetTag), \(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s));"
                     )
                     return [varName]
                 }

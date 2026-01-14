@@ -209,11 +209,7 @@ struct BridgeJSLink {
     }
 
     private func generateVariableDeclarations() -> [String] {
-        let hasAssociatedValueEnums = exportedSkeletons.contains { skeleton in
-            skeleton.enums.contains { $0.enumType == .associatedValue }
-        }
-
-        var declarations = [
+        return [
             "let \(JSGlueVariableScope.reservedInstance);",
             "let \(JSGlueVariableScope.reservedMemory);",
             "let \(JSGlueVariableScope.reservedSetException);",
@@ -237,25 +233,12 @@ struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedTmpParamF64s) = [];",
             "let \(JSGlueVariableScope.reservedTmpRetPointers) = [];",
             "let \(JSGlueVariableScope.reservedTmpParamPointers) = [];",
+            "const \(JSGlueVariableScope.reservedEnumHelpers) = {};",
+            "const \(JSGlueVariableScope.reservedStructHelpers) = {};",
+            "",
+            "let _exports = null;",
+            "let bjs = null;",
         ]
-
-        let hasStructs = exportedSkeletons.contains { skeleton in
-            !skeleton.structs.isEmpty
-        }
-
-        if hasAssociatedValueEnums {
-            declarations.append("const enumHelpers = {};")
-        }
-
-        if hasStructs {
-            declarations.append("const structHelpers = {};")
-        }
-
-        declarations.append("")
-        declarations.append("let _exports = null;")
-        declarations.append("let bjs = null;")
-
-        return declarations
     }
 
     /// Checks if a skeleton contains any closure types
@@ -1050,7 +1033,7 @@ struct BridgeJSLink {
                 printer.write(
                     "const \(enumDef.name)Helpers = __bjs_create\(enumDef.valuesName)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift));"
                 )
-                printer.write("enumHelpers.\(enumDef.name) = \(enumDef.name)Helpers;")
+                printer.write("\(JSGlueVariableScope.reservedEnumHelpers).\(enumDef.name) = \(enumDef.name)Helpers;")
                 printer.nextLine()
             }
         }
@@ -1064,9 +1047,11 @@ struct BridgeJSLink {
         for skeleton in exportedSkeletons {
             for structDef in skeleton.structs {
                 printer.write(
-                    "const \(structDef.name)Helpers = __bjs_create\(structDef.name)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTmpParamPointers), \(JSGlueVariableScope.reservedTmpRetPointers), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift), enumHelpers);"
+                    "const \(structDef.name)Helpers = __bjs_create\(structDef.name)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTmpParamPointers), \(JSGlueVariableScope.reservedTmpRetPointers), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift), \(JSGlueVariableScope.reservedEnumHelpers));"
                 )
-                printer.write("structHelpers.\(structDef.name) = \(structDef.name)Helpers;")
+                printer.write(
+                    "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.name) = \(structDef.name)Helpers;"
+                )
                 printer.nextLine()
             }
         }
