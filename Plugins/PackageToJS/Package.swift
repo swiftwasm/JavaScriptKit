@@ -10,7 +10,7 @@ let package = Package(
         .testTarget(
             name: "PackageToJSTests",
             dependencies: ["PackageToJS"],
-            exclude: ["__Snapshots__"]
+            exclude: ["__Snapshots__", "Inputs"]
         ),
     ]
 )
