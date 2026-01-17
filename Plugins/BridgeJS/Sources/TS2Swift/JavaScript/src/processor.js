@@ -5,7 +5,6 @@
 
 // @ts-check
 import ts from 'typescript';
-import path from 'path';
 
 /** @typedef {import('./index.d.ts').Parameter} Parameter */
 /** @typedef {import('./index.d.ts').BridgeType} BridgeType */
@@ -64,11 +63,9 @@ export class TypeProcessor {
      * @returns {{ content: string, hasAny: boolean }} Rendered Swift code
      */
     processTypeDeclarations(program, inputFilePath) {
-        const normalizedInput = path.resolve(inputFilePath);
-        const sourceFiles = program.getSourceFiles().filter(sf => {
-            if (!sf.isDeclarationFile) return true;
-            return path.resolve(sf.fileName) === normalizedInput;
-        });
+        const sourceFiles = program.getSourceFiles().filter(
+            sf => !sf.isDeclarationFile || sf.fileName === inputFilePath
+        );
 
         // Add prelude
         this.swiftLines.push(

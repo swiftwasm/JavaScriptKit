@@ -92,13 +92,13 @@
             }
           },
           {
-            "abiName" : "bjs_PlayBridgeJSOutput_importSwiftGlue",
+            "abiName" : "bjs_PlayBridgeJSOutput_importSwiftMacroDecls",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
               "isThrows" : false
             },
-            "name" : "importSwiftGlue",
+            "name" : "importSwiftMacroDecls",
             "parameters" : [
 
             ],
@@ -109,13 +109,13 @@
             }
           },
           {
-            "abiName" : "bjs_PlayBridgeJSOutput_exportSwiftGlue",
+            "abiName" : "bjs_PlayBridgeJSOutput_swiftGlue",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
               "isThrows" : false
             },
-            "name" : "exportSwiftGlue",
+            "name" : "swiftGlue",
             "parameters" : [
 
             ],

@@ -38,20 +38,20 @@ export class EditorSystem {
                     modelUri: 'Playground.d.ts'
                 },
                 {
-                    key: 'import-glue',
-                    id: 'importGlueOutput',
+                    key: 'swift-import-macros',
+                    id: 'swiftImportMacrosOutput',
                     language: 'swift',
-                    placeholder: '// Import Swift Glue will appear here...',
+                    placeholder: '// Import Swift Macros will appear here...',
                     readOnly: true,
-                    modelUri: 'ImportTS.swift'
+                    modelUri: 'BridgeJS.Macros.swift'
                 },
                 {
-                    key: 'export-glue',
-                    id: 'exportGlueOutput',
+                    key: 'swift-glue',
+                    id: 'swiftGlueOutput',
                     language: 'swift',
-                    placeholder: '// Export Swift Glue will appear here...',
+                    placeholder: '// Swift Glue will appear here...',
                     readOnly: true,
-                    modelUri: 'ExportTS.swift'
+                    modelUri: 'BridgeJS.swift'
                 },
                 {
                     key: 'js-generated',
@@ -206,8 +206,8 @@ export class EditorSystem {
 
     updateOutputs(result) {
         const outputMap = {
-            'import-glue': () => result.importSwiftGlue(),
-            'export-glue': () => result.exportSwiftGlue(),
+            'swift-glue': () => result.swiftGlue(),
+            'swift-import-macros': () => result.importSwiftMacroDecls(),
             'js-generated': () => result.outputJs(),
             'dts-generated': () => result.outputDts()
         };

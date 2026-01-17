@@ -22,7 +22,6 @@ import SwiftParser
         let nodePath = try #require(which("node"))
         let tsconfigPath = url.deletingLastPathComponent().appendingPathComponent("tsconfig.json")
 
-        // Use the new workflow: invokeTS2Swift -> ImportSwiftMacros -> ImportTS
         let swiftSource = try invokeTS2Swift(
             dtsFile: url.path,
             tsconfigPath: tsconfigPath.path,
@@ -42,12 +41,7 @@ import SwiftParser
         importSwift.addSourceFile(sourceFile, "\(name).Macros.swift")
         let importResult = try importSwift.finalize()
 
-        var api = ImportTS(progress: .silent, moduleName: "Check")
-        for child in importResult.outputSkeleton.children {
-            api.addSkeleton(child)
-        }
-
-        let outputSwift = try #require(try api.finalize())
+        let outputSwift = try #require(importResult.outputSwift)
         try assertSnapshot(
             name: name,
             filePath: #filePath,

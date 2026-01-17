@@ -90,22 +90,22 @@ public func _bjs_PlayBridgeJSOutput_outputDts(_ _self: UnsafeMutableRawPointer) 
     #endif
 }
 
-@_expose(wasm, "bjs_PlayBridgeJSOutput_importSwiftGlue")
-@_cdecl("bjs_PlayBridgeJSOutput_importSwiftGlue")
-public func _bjs_PlayBridgeJSOutput_importSwiftGlue(_ _self: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_PlayBridgeJSOutput_importSwiftMacroDecls")
+@_cdecl("bjs_PlayBridgeJSOutput_importSwiftMacroDecls")
+public func _bjs_PlayBridgeJSOutput_importSwiftMacroDecls(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = PlayBridgeJSOutput.bridgeJSLiftParameter(_self).importSwiftGlue()
+    let ret = PlayBridgeJSOutput.bridgeJSLiftParameter(_self).importSwiftMacroDecls()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
 }
 
-@_expose(wasm, "bjs_PlayBridgeJSOutput_exportSwiftGlue")
-@_cdecl("bjs_PlayBridgeJSOutput_exportSwiftGlue")
-public func _bjs_PlayBridgeJSOutput_exportSwiftGlue(_ _self: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_PlayBridgeJSOutput_swiftGlue")
+@_cdecl("bjs_PlayBridgeJSOutput_swiftGlue")
+public func _bjs_PlayBridgeJSOutput_swiftGlue(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = PlayBridgeJSOutput.bridgeJSLiftParameter(_self).exportSwiftGlue()
+    let ret = PlayBridgeJSOutput.bridgeJSLiftParameter(_self).swiftGlue()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

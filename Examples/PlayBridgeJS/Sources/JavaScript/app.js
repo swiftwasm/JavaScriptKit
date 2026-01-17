@@ -250,9 +250,9 @@ export class BridgeJSPlayground {
                 // Process the TypeScript definitions to generate skeleton
                 const processor = new TypeProcessor(tsProgram.getTypeChecker(), diagnosticEngine);
 
-                const skeleton = processor.processTypeDeclarations(tsProgram, virtualFilePath);
+                const { content } = processor.processTypeDeclarations(tsProgram, virtualFilePath);
 
-                return JSON.stringify(skeleton);
+                return content;
             }
         }
     }
