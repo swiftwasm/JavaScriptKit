@@ -9,6 +9,7 @@
 @preconcurrency import class Foundation.JSONDecoder
 @preconcurrency import class Foundation.ProcessInfo
 import SwiftParser
+import SwiftSyntax
 
 #if canImport(BridgeJSCore)
 import BridgeJSCore
@@ -16,8 +17,11 @@ import BridgeJSCore
 #if canImport(BridgeJSSkeleton)
 import BridgeJSSkeleton
 #endif
-#if canImport(TS2Skeleton)
-import TS2Skeleton
+#if canImport(TS2Swift)
+import TS2Swift
+#endif
+#if canImport(BridgeJSUtilities)
+import BridgeJSUtilities
 #endif
 
 /// BridgeJS Tool
@@ -29,10 +33,7 @@ import TS2Skeleton
 /// 2. Export: Generate JavaScript bindings for Swift declarations
 ///
 /// Usage:
-///   For importing TypeScript:
-///     $ bridge-js import --module-name <name> --output-swift <path> --output-skeleton <path> --project <tsconfig.json> <input.d.ts>
-///   For exporting Swift:
-///     $ bridge-js export --output-swift <path> --output-skeleton <path> <input.swift>
+///     $ bridge-js generate --module-name <name> --target-dir <dir> --output-swift <path> --output-skeleton <path> [--output-import-swift <path>] [--output-import-skeleton <path>] [--project <tsconfig.json>] <input.swift>... [<input-macro.swift>...]
 ///
 /// This tool is intended to be used through the Swift Package Manager plugin system
 /// and is not typically called directly by end users.
@@ -40,11 +41,10 @@ import TS2Skeleton
 
     static func help() -> String {
         return """
-                Usage: \(CommandLine.arguments.first ?? "bridge-js-tool") <subcommand> [options]
+                Usage: \(CommandLine.arguments.first ?? "bridge-js-tool") generate [options] <input.swift>...
 
-                Subcommands:
-                    import   Generate binding code to import TypeScript APIs into Swift
-                    export   Generate binding code to export Swift APIs to JavaScript
+                Generate bridge code for both exporting Swift APIs and importing TypeScript APIs.
+                Input files can be Swift source files (for export) or macro-annotated Swift files (for import).
             """
     }
 
@@ -69,16 +69,16 @@ import TS2Skeleton
             )
         }
         switch subcommand {
-        case "import":
+        case "generate":
             let parser = ArgumentParser(
                 singleDashOptions: [:],
                 doubleDashOptions: [
                     "module-name": OptionRule(
-                        help: "The name of the module to import the TypeScript API into",
+                        help: "The name of the module",
                         required: true
                     ),
                     "always-write": OptionRule(
-                        help: "Always write the output files even if no APIs are imported",
+                        help: "Always write the output files even if no APIs are found",
                         required: false
                     ),
                     "verbose": OptionRule(
@@ -89,14 +89,13 @@ import TS2Skeleton
                         help: "The SwiftPM package target directory",
                         required: true
                     ),
-                    "output-swift": OptionRule(help: "The output file path for the Swift source code", required: true),
-                    "output-skeleton": OptionRule(
-                        help: "The output file path for the skeleton of the imported TypeScript APIs",
+                    "output-dir": OptionRule(
+                        help: "The output directory for generated code",
                         required: true
                     ),
                     "project": OptionRule(
-                        help: "The path to the TypeScript project configuration file",
-                        required: true
+                        help: "The path to the TypeScript project configuration file (required for .d.ts files)",
+                        required: false
                     ),
                 ]
             )
@@ -104,140 +103,90 @@ import TS2Skeleton
                 arguments: Array(arguments.dropFirst())
             )
             let progress = ProgressReporting(verbose: doubleDashOptions["verbose"] == "true")
-            var importer = ImportTS(progress: progress, moduleName: doubleDashOptions["module-name"]!)
+            let moduleName = doubleDashOptions["module-name"]!
             let targetDirectory = URL(fileURLWithPath: doubleDashOptions["target-dir"]!)
+            let outputDirectory = URL(fileURLWithPath: doubleDashOptions["output-dir"]!)
             let config = try BridgeJSConfig.load(targetDirectory: targetDirectory)
             let nodePath: URL = try config.findTool("node", targetDirectory: targetDirectory)
-            for inputFile in positionalArguments {
-                if inputFile.hasSuffix(".json") {
-                    let sourceURL = URL(fileURLWithPath: inputFile)
-                    let skeleton = try JSONDecoder().decode(
-                        ImportedFileSkeleton.self,
-                        from: Data(contentsOf: sourceURL)
-                    )
-                    importer.addSkeleton(skeleton)
-                } else if inputFile.hasSuffix(".d.ts") {
-                    let tsconfigPath = URL(fileURLWithPath: doubleDashOptions["project"]!)
-                    try importer.addSourceFile(inputFile, tsconfigPath: tsconfigPath.path, nodePath: nodePath)
+
+            let bridgeJsDtsPath = targetDirectory.appending(path: "bridge-js.d.ts")
+            if FileManager.default.fileExists(atPath: bridgeJsDtsPath.path) {
+                guard let tsconfigPath = doubleDashOptions["project"] else {
+                    throw BridgeJSToolError("--project option is required when processing .d.ts files")
                 }
+                let bridgeJSMacrosPath = outputDirectory.appending(path: "BridgeJS.Macros.swift")
+                _ = try invokeTS2Swift(
+                    dtsFile: bridgeJsDtsPath.path,
+                    tsconfigPath: tsconfigPath,
+                    nodePath: nodePath,
+                    progress: progress,
+                    outputPath: bridgeJSMacrosPath.path
+                )
             }
 
-            let outputSwift = try importer.finalize()
-            let shouldWrite = doubleDashOptions["always-write"] == "true" || outputSwift != nil
-            guard shouldWrite else {
-                progress.print("No imported TypeScript APIs found")
-                return
-            }
-
-            let outputSwiftURL = URL(fileURLWithPath: doubleDashOptions["output-swift"]!)
-            try FileManager.default.createDirectory(
-                at: outputSwiftURL.deletingLastPathComponent(),
-                withIntermediateDirectories: true,
-                attributes: nil
-            )
-            try (outputSwift ?? "").write(to: outputSwiftURL, atomically: true, encoding: .utf8)
-
-            let outputSkeletonsURL = URL(fileURLWithPath: doubleDashOptions["output-skeleton"]!)
-            try FileManager.default.createDirectory(
-                at: outputSkeletonsURL.deletingLastPathComponent(),
-                withIntermediateDirectories: true,
-                attributes: nil
-            )
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            try encoder.encode(importer.skeleton).write(to: outputSkeletonsURL)
-
-            progress.print(
-                """
-                Imported TypeScript APIs:
-                  - \(outputSwiftURL.path)
-                  - \(outputSkeletonsURL.path)
-                """
-            )
-        case "export":
-            let parser = ArgumentParser(
-                singleDashOptions: [:],
-                doubleDashOptions: [
-                    "module-name": OptionRule(
-                        help: "The name of the module for external function references",
-                        required: true
-                    ),
-                    "target-dir": OptionRule(
-                        help: "The SwiftPM package target directory",
-                        required: true
-                    ),
-                    "output-skeleton": OptionRule(
-                        help: "The output file path for the skeleton of the exported Swift APIs",
-                        required: true
-                    ),
-                    "output-swift": OptionRule(help: "The output file path for the Swift source code", required: true),
-                    "always-write": OptionRule(
-                        help: "Always write the output files even if no APIs are exported",
-                        required: false
-                    ),
-                    "verbose": OptionRule(
-                        help: "Print verbose output",
-                        required: false
-                    ),
-                ]
-            )
-            let (positionalArguments, _, doubleDashOptions) = try parser.parse(
-                arguments: Array(arguments.dropFirst())
-            )
-            let progress = ProgressReporting(verbose: doubleDashOptions["verbose"] == "true")
-            let targetDirectory = URL(fileURLWithPath: doubleDashOptions["target-dir"]!)
-            let config = try BridgeJSConfig.load(targetDirectory: targetDirectory)
+            let inputFiles = inputSwiftFiles(targetDirectory: targetDirectory, positionalArguments: positionalArguments)
             let exporter = ExportSwift(
                 progress: progress,
-                moduleName: doubleDashOptions["module-name"]!,
+                moduleName: moduleName,
                 exposeToGlobal: config.exposeToGlobal
             )
-            for inputFile in positionalArguments.sorted() {
-                let sourceURL = URL(fileURLWithPath: inputFile)
-                guard sourceURL.pathExtension == "swift" else { continue }
-                let sourceContent = try String(contentsOf: sourceURL, encoding: .utf8)
-                let sourceFile = Parser.parse(source: sourceContent)
-                try exporter.addSourceFile(sourceFile, sourceURL.path)
+            let importSwift = ImportSwiftMacros(progress: progress, moduleName: moduleName)
+
+            for inputFile in inputFiles.sorted() {
+                let content = try String(contentsOf: URL(fileURLWithPath: inputFile), encoding: .utf8)
+                if hasBridgeJSSkipComment(content) {
+                    continue
+                }
+
+                let sourceFile = Parser.parse(source: content)
+                try exporter.addSourceFile(sourceFile, inputFile)
+                importSwift.addSourceFile(sourceFile, inputFile)
             }
 
-            // Finalize the export
-            let output = try exporter.finalize()
-            let outputSwiftURL = URL(fileURLWithPath: doubleDashOptions["output-swift"]!)
-            let outputSkeletonURL = URL(fileURLWithPath: doubleDashOptions["output-skeleton"]!)
+            let importResult = try importSwift.finalize()
+            let exportResult = try exporter.finalize()
+            let importSkeleton = importResult.outputSkeleton
 
-            let shouldWrite = doubleDashOptions["always-write"] == "true" || output != nil
-            guard shouldWrite else {
-                progress.print("No exported Swift APIs found")
-                return
+            // Combine and write unified Swift output
+            let outputSwiftURL = outputDirectory.appending(path: "BridgeJS.swift")
+            let combinedSwift = [exportResult?.outputSwift, importResult.outputSwift].compactMap { $0 }
+            let outputSwift = combineGeneratedSwift(combinedSwift)
+            let shouldWrite = doubleDashOptions["always-write"] == "true" || !outputSwift.isEmpty
+            if shouldWrite {
+                try FileManager.default.createDirectory(
+                    at: outputSwiftURL.deletingLastPathComponent(),
+                    withIntermediateDirectories: true,
+                    attributes: nil
+                )
+                try outputSwift.write(to: outputSwiftURL, atomically: true, encoding: .utf8)
             }
 
-            // Create the output directory if it doesn't exist
-            try FileManager.default.createDirectory(
-                at: outputSwiftURL.deletingLastPathComponent(),
-                withIntermediateDirectories: true,
-                attributes: nil
+            // Write unified skeleton
+            let outputSkeletonURL = outputDirectory.appending(path: "JavaScript/BridgeJS.json")
+            let unifiedSkeleton = BridgeJSSkeleton(
+                moduleName: moduleName,
+                exported: exportResult?.outputSkeleton,
+                imported: importSkeleton
             )
             try FileManager.default.createDirectory(
                 at: outputSkeletonURL.deletingLastPathComponent(),
                 withIntermediateDirectories: true,
                 attributes: nil
             )
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            let skeletonData = try encoder.encode(unifiedSkeleton)
+            try skeletonData.write(to: outputSkeletonURL)
 
-            // Write the output Swift file
-            try (output?.outputSwift ?? "").write(to: outputSwiftURL, atomically: true, encoding: .utf8)
-
-            if let outputSkeleton = output?.outputSkeleton {
-                // Write the output skeleton file
-                let encoder = JSONEncoder()
-                encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-                let outputSkeletonData = try encoder.encode(outputSkeleton)
-                try outputSkeletonData.write(to: outputSkeletonURL)
+            if exportResult != nil || importResult.outputSwift != nil {
+                progress.print("Generated BridgeJS code")
             }
-            progress.print(
+        case "export", "import":
+            throw BridgeJSToolError(
                 """
-                Exported Swift APIs:
-                  - \(outputSwiftURL.path)
-                  - \(outputSkeletonURL.path)
+                Error: Subcommands 'export' and 'import' have been unified into 'generate'.
+
+                \(BridgeJSTool.help())
                 """
             )
         default:
@@ -262,6 +211,53 @@ struct BridgeJSToolError: Swift.Error, CustomStringConvertible {
 
 private func printStderr(_ message: String) {
     fputs(message + "\n", stderr)
+}
+
+private func hasBridgeJSSkipComment(_ content: String) -> Bool {
+    BridgeJSGeneratedFile.hasSkipComment(content)
+}
+
+private func combineGeneratedSwift(_ pieces: [String]) -> String {
+    let trimmedPieces =
+        pieces
+        .map { $0.trimmingCharacters(in: .newlines) }
+        .filter { !$0.isEmpty }
+    guard !trimmedPieces.isEmpty else { return "" }
+
+    return ([BridgeJSGeneratedFile.swiftPreamble] + trimmedPieces).joined(separator: "\n\n")
+}
+
+private func recursivelyCollectSwiftFiles(from directory: URL) -> [URL] {
+    var swiftFiles: [URL] = []
+    let fileManager = FileManager.default
+
+    guard
+        let enumerator = fileManager.enumerator(
+            at: directory,
+            includingPropertiesForKeys: [.isRegularFileKey, .isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        )
+    else {
+        return []
+    }
+
+    for case let fileURL as URL in enumerator {
+        if fileURL.pathExtension == "swift" {
+            let resourceValues = try? fileURL.resourceValues(forKeys: [.isRegularFileKey])
+            if resourceValues?.isRegularFile == true {
+                swiftFiles.append(fileURL)
+            }
+        }
+    }
+
+    return swiftFiles.sorted { $0.path < $1.path }
+}
+
+private func inputSwiftFiles(targetDirectory: URL, positionalArguments: [String]) -> [String] {
+    if positionalArguments.isEmpty {
+        return recursivelyCollectSwiftFiles(from: targetDirectory).map(\.path)
+    }
+    return positionalArguments
 }
 
 // MARK: - Minimal Argument Parsing

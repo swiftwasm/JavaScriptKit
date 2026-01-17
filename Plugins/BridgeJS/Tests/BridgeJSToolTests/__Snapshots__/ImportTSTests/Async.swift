@@ -1,11 +1,3 @@
-// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
-// DO NOT EDIT.
-//
-// To update this file, just rebuild your project or run
-// `swift package bridge-js`.
-
-@_spi(BridgeJS) import JavaScriptKit
-
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_asyncReturnVoid")
 fileprivate func bjs_asyncReturnVoid() -> Int32
@@ -15,7 +7,7 @@ fileprivate func bjs_asyncReturnVoid() -> Int32 {
 }
 #endif
 
-func asyncReturnVoid() throws(JSException) -> JSPromise {
+func _$asyncReturnVoid() throws(JSException) -> JSPromise {
     let ret = bjs_asyncReturnVoid()
     if let error = _swift_js_take_exception() {
         throw error
@@ -32,7 +24,7 @@ fileprivate func bjs_asyncRoundTripInt(_ v: Float64) -> Int32 {
 }
 #endif
 
-func asyncRoundTripInt(_ v: Double) throws(JSException) -> JSPromise {
+func _$asyncRoundTripInt(_ v: Double) throws(JSException) -> JSPromise {
     let vValue = v.bridgeJSLowerParameter()
     let ret = bjs_asyncRoundTripInt(vValue)
     if let error = _swift_js_take_exception() {
@@ -50,7 +42,7 @@ fileprivate func bjs_asyncRoundTripString(_ v: Int32) -> Int32 {
 }
 #endif
 
-func asyncRoundTripString(_ v: String) throws(JSException) -> JSPromise {
+func _$asyncRoundTripString(_ v: String) throws(JSException) -> JSPromise {
     let vValue = v.bridgeJSLowerParameter()
     let ret = bjs_asyncRoundTripString(vValue)
     if let error = _swift_js_take_exception() {
@@ -68,7 +60,7 @@ fileprivate func bjs_asyncRoundTripBool(_ v: Int32) -> Int32 {
 }
 #endif
 
-func asyncRoundTripBool(_ v: Bool) throws(JSException) -> JSPromise {
+func _$asyncRoundTripBool(_ v: Bool) throws(JSException) -> JSPromise {
     let vValue = v.bridgeJSLowerParameter()
     let ret = bjs_asyncRoundTripBool(vValue)
     if let error = _swift_js_take_exception() {
@@ -86,7 +78,7 @@ fileprivate func bjs_asyncRoundTripFloat(_ v: Float64) -> Int32 {
 }
 #endif
 
-func asyncRoundTripFloat(_ v: Double) throws(JSException) -> JSPromise {
+func _$asyncRoundTripFloat(_ v: Double) throws(JSException) -> JSPromise {
     let vValue = v.bridgeJSLowerParameter()
     let ret = bjs_asyncRoundTripFloat(vValue)
     if let error = _swift_js_take_exception() {
@@ -104,7 +96,7 @@ fileprivate func bjs_asyncRoundTripDouble(_ v: Float64) -> Int32 {
 }
 #endif
 
-func asyncRoundTripDouble(_ v: Double) throws(JSException) -> JSPromise {
+func _$asyncRoundTripDouble(_ v: Double) throws(JSException) -> JSPromise {
     let vValue = v.bridgeJSLowerParameter()
     let ret = bjs_asyncRoundTripDouble(vValue)
     if let error = _swift_js_take_exception() {
@@ -122,7 +114,7 @@ fileprivate func bjs_asyncRoundTripJSObject(_ v: Int32) -> Int32 {
 }
 #endif
 
-func asyncRoundTripJSObject(_ v: JSObject) throws(JSException) -> JSPromise {
+func _$asyncRoundTripJSObject(_ v: JSObject) throws(JSException) -> JSPromise {
     let vValue = v.bridgeJSLowerParameter()
     let ret = bjs_asyncRoundTripJSObject(vValue)
     if let error = _swift_js_take_exception() {

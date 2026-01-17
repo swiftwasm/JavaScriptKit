@@ -42,7 +42,7 @@ let package = Package(
     targets: [
         .target(
             name: "JavaScriptKit",
-            dependencies: ["_CJavaScriptKit"],
+            dependencies: ["_CJavaScriptKit", "BridgeJSMacros"],
             exclude: useLegacyResourceBundling ? [] : ["Runtime"],
             resources: useLegacyResourceBundling ? [.copy("Runtime")] : [],
             cSettings: shouldBuildForEmbedded
@@ -59,6 +59,14 @@ let package = Package(
                     ] : [])
         ),
         .target(name: "_CJavaScriptKit"),
+        .macro(
+            name: "BridgeJSMacros",
+            dependencies: [
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+            ]
+        ),
+
         .testTarget(
             name: "JavaScriptKitTests",
             dependencies: ["JavaScriptKit"],
@@ -165,7 +173,7 @@ let package = Package(
                 .product(name: "SwiftBasicFormat", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
             ],
-            exclude: ["TS2Skeleton/JavaScript", "README.md"]
+            exclude: ["TS2Swift/JavaScript", "README.md"]
         ),
         .testTarget(
             name: "BridgeJSRuntimeTests",

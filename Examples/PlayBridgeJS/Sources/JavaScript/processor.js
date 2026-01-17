@@ -1,1 +1,1 @@
-../../../../Plugins/BridgeJS/Sources/TS2Skeleton/JavaScript/src/processor.js
+../../../../Plugins/BridgeJS/Sources/TS2Swift/JavaScript/src/processor.js

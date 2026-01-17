@@ -102,11 +102,11 @@ export class BridgeJSPlayground {
             // Import the BridgeJS module
             this.setProgress('Loading BridgeJS…', 50);
             const { init } = await import("../../Bundle/index.js");
-            const virtualHost = await this.createTS2SkeletonFactory();
+            const virtualHost = await this.createTS2SwiftFactory();
             this.setProgress('Preparing TypeScript host…', 60);
             const { exports } = await init({
                 getImports: () => ({
-                    createTS2Skeleton: () => this.createTS2Skeleton(virtualHost)
+                    createTS2Swift: () => this.createTS2Swift(virtualHost)
                 })
             });
             this.setProgress('Creating runtime…', 65);
@@ -193,7 +193,7 @@ export class BridgeJSPlayground {
         });
     }
 
-    async createTS2SkeletonFactory() {
+    async createTS2SwiftFactory() {
         const createVirtualHost = async () => {
           const fsMap = await createDefaultMapFromCDN(
             { target: ts.ScriptTarget.ES2015 },
@@ -217,7 +217,7 @@ export class BridgeJSPlayground {
     /**
      * @param {ReturnType<typeof createVirtualCompilerHost>} virtualHost
      */
-    createTS2Skeleton(virtualHost) {
+    createTS2Swift(virtualHost) {
         return {
             /**
              * @param {string} dtsCode
@@ -250,9 +250,9 @@ export class BridgeJSPlayground {
                 // Process the TypeScript definitions to generate skeleton
                 const processor = new TypeProcessor(tsProgram.getTypeChecker(), diagnosticEngine);
 
-                const skeleton = processor.processTypeDeclarations(tsProgram, virtualFilePath);
+                const { content } = processor.processTypeDeclarations(tsProgram, virtualFilePath);
 
-                return JSON.stringify(skeleton);
+                return content;
             }
         }
     }

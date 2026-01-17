@@ -19,13 +19,12 @@ import BridgeJSUtilities
 public struct ImportTS {
     public let progress: ProgressReporting
     public private(set) var skeleton: ImportedModuleSkeleton
-    private var moduleName: String {
-        skeleton.moduleName
-    }
+    private let moduleName: String
 
     public init(progress: ProgressReporting, moduleName: String) {
         self.progress = progress
-        self.skeleton = ImportedModuleSkeleton(moduleName: moduleName, children: [])
+        self.moduleName = moduleName
+        self.skeleton = ImportedModuleSkeleton(children: [])
     }
 
     /// Adds a skeleton to the importer's state
@@ -52,8 +51,7 @@ public struct ImportTS {
         }
 
         let format = BasicFormat()
-        let allDecls: [DeclSyntax] = [Self.prelude] + decls
-        return allDecls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
+        return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
     }
 
     class CallJSEmission {
@@ -302,15 +300,27 @@ public struct ImportTS {
         }
     }
 
-    static let prelude: DeclSyntax = """
-        // NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
-        // DO NOT EDIT.
-        //
-        // To update this file, just rebuild your project or run
-        // `swift package bridge-js`.
+    private static func thunkName(function: ImportedFunctionSkeleton) -> String {
+        "_$\(function.name)"
+    }
 
-        @_spi(BridgeJS) import JavaScriptKit
-        """
+    private static func thunkName(type: ImportedTypeSkeleton, method: ImportedFunctionSkeleton) -> String {
+        "_$\(type.name)_\(method.name)"
+    }
+
+    private static func thunkName(type: ImportedTypeSkeleton) -> String {
+        "_$\(type.name)_init"
+    }
+
+    private static func thunkName(
+        type: ImportedTypeSkeleton,
+        propertyName: String,
+        operation: String
+    )
+        -> String
+    {
+        "_$\(type.name)_\(propertyName)_\(operation)"
+    }
 
     func renderSwiftThunk(
         _ function: ImportedFunctionSkeleton,
@@ -325,7 +335,7 @@ public struct ImportTS {
         topLevelDecls.append(builder.renderImportDecl())
         return [
             builder.renderThunkDecl(
-                name: function.name,
+                name: Self.thunkName(function: function),
                 parameters: function.parameters,
                 returnType: function.returnType
             )
@@ -334,11 +344,12 @@ public struct ImportTS {
     }
 
     func renderSwiftType(_ type: ImportedTypeSkeleton, topLevelDecls: inout [DeclSyntax]) throws -> [DeclSyntax] {
-        let name = type.name
+        let selfParameter = Parameter(label: nil, name: "self", type: .jsObject(nil))
+        var decls: [DeclSyntax] = []
 
         func renderMethod(method: ImportedFunctionSkeleton) throws -> [DeclSyntax] {
             let builder = CallJSEmission(moduleName: moduleName, abiName: method.abiName(context: type))
-            try builder.lowerParameter(param: Parameter(label: nil, name: "self", type: .jsObject(name)))
+            try builder.lowerParameter(param: selfParameter)
             for param in method.parameters {
                 try builder.lowerParameter(param: param)
             }
@@ -347,11 +358,10 @@ public struct ImportTS {
             topLevelDecls.append(builder.renderImportDecl())
             return [
                 builder.renderThunkDecl(
-                    name: method.name,
-                    parameters: method.parameters,
+                    name: Self.thunkName(type: type, method: method),
+                    parameters: [selfParameter] + method.parameters,
                     returnType: method.returnType
                 )
-                .with(\.leadingTrivia, Self.renderDocumentation(documentation: method.documentation))
             ]
         }
 
@@ -360,119 +370,78 @@ public struct ImportTS {
             for param in constructor.parameters {
                 try builder.lowerParameter(param: param)
             }
-            try builder.call(returnType: .jsObject(name))
-            builder.assignThis(returnType: .jsObject(name))
+            try builder.call(returnType: .jsObject(nil))
+            try builder.liftReturnValue(returnType: .jsObject(nil))
             topLevelDecls.append(builder.renderImportDecl())
             return [
-                builder.renderConstructorDecl(parameters: constructor.parameters)
+                builder.renderThunkDecl(
+                    name: Self.thunkName(type: type),
+                    parameters: constructor.parameters,
+                    returnType: .jsObject(nil)
+                )
             ]
         }
 
-        func renderGetterDecl(property: ImportedPropertySkeleton) throws -> AccessorDeclSyntax {
+        func renderGetterDecl(getter: ImportedGetterSkeleton) throws -> DeclSyntax {
             let builder = CallJSEmission(
                 moduleName: moduleName,
-                abiName: property.getterAbiName(context: type)
+                abiName: getter.abiName(context: type)
             )
-            try builder.lowerParameter(param: Parameter(label: nil, name: "self", type: .jsObject(name)))
-            try builder.call(returnType: property.type)
-            try builder.liftReturnValue(returnType: property.type)
+            try builder.lowerParameter(param: selfParameter)
+            try builder.call(returnType: getter.type)
+            try builder.liftReturnValue(returnType: getter.type)
             topLevelDecls.append(builder.renderImportDecl())
-            return AccessorDeclSyntax(
-                accessorSpecifier: .keyword(.get),
-                effectSpecifiers: Self.buildAccessorEffect(throws: true, async: false),
-                body: CodeBlockSyntax {
-                    builder.body
-                }
+            return DeclSyntax(
+                builder.renderThunkDecl(
+                    name: Self.thunkName(type: type, propertyName: getter.name, operation: "get"),
+                    parameters: [selfParameter],
+                    returnType: getter.type
+                )
             )
         }
 
-        func renderSetterDecl(property: ImportedPropertySkeleton) throws -> DeclSyntax {
+        func renderSetterDecl(setter: ImportedSetterSkeleton) throws -> DeclSyntax {
             let builder = CallJSEmission(
                 moduleName: moduleName,
-                abiName: property.setterAbiName(context: type)
+                abiName: setter.abiName(context: type)
             )
-            let newValue = Parameter(label: nil, name: "newValue", type: property.type)
-            try builder.lowerParameter(param: Parameter(label: nil, name: "self", type: .jsObject(name)))
+            let newValue = Parameter(label: nil, name: "newValue", type: setter.type)
+            try builder.lowerParameter(param: selfParameter)
             try builder.lowerParameter(param: newValue)
             try builder.call(returnType: .void)
             topLevelDecls.append(builder.renderImportDecl())
+            // Use functionName if available (has lowercase first char), otherwise derive from name
+            let propertyNameForThunk: String
+            if let functionName = setter.functionName, functionName.hasSuffix("_set") {
+                // Extract base name from functionName (e.g., "any_set" -> "any")
+                propertyNameForThunk = String(functionName.dropLast(4))
+            } else {
+                // Lowercase first character of property name for thunk
+                propertyNameForThunk = setter.name.prefix(1).lowercased() + setter.name.dropFirst()
+            }
             return builder.renderThunkDecl(
-                name: "set\(property.name.capitalizedFirstLetter)",
-                parameters: [newValue],
+                name: Self.thunkName(type: type, propertyName: propertyNameForThunk, operation: "set"),
+                parameters: [selfParameter, newValue],
                 returnType: .void
             )
         }
-
-        func renderPropertyDecl(property: ImportedPropertySkeleton) throws -> [DeclSyntax] {
-            let accessorDecls: [AccessorDeclSyntax] = [try renderGetterDecl(property: property)]
-            var decls: [DeclSyntax] = [
-                DeclSyntax(
-                    VariableDeclSyntax(
-                        leadingTrivia: Self.renderDocumentation(documentation: property.documentation),
-                        bindingSpecifier: .keyword(.var),
-                        bindingsBuilder: {
-                            PatternBindingListSyntax {
-                                PatternBindingSyntax(
-                                    pattern: IdentifierPatternSyntax(
-                                        identifier: .identifier(property.name.backtickIfNeeded())
-                                    ),
-                                    typeAnnotation: TypeAnnotationSyntax(
-                                        type: IdentifierTypeSyntax(name: .identifier(property.type.swiftType))
-                                    ),
-                                    accessorBlock: AccessorBlockSyntax(
-                                        accessors: .accessors(
-                                            AccessorDeclListSyntax(accessorDecls)
-                                        )
-                                    )
-                                )
-                            }
-                        }
-                    )
-                )
-            ]
-            if !property.isReadonly {
-                decls.append(try renderSetterDecl(property: property))
-            }
-            return decls
+        if let constructor = type.constructor {
+            decls.append(contentsOf: try renderConstructorDecl(constructor: constructor))
         }
-        let classDecl = try StructDeclSyntax(
-            leadingTrivia: Self.renderDocumentation(documentation: type.documentation),
-            name: .identifier(name),
-            inheritanceClause: InheritanceClauseSyntax(
-                inheritedTypesBuilder: {
-                    InheritedTypeSyntax(type: TypeSyntax("_JSBridgedClass"))
-                }
-            ),
-            memberBlockBuilder: {
-                DeclSyntax(
-                    """
-                    let jsObject: JSObject
-                    """
-                ).with(\.trailingTrivia, .newlines(2))
 
-                DeclSyntax(
-                    """
-                    init(unsafelyWrapping jsObject: JSObject) {
-                        self.jsObject = jsObject
-                    }
-                    """
-                ).with(\.trailingTrivia, .newlines(2))
+        for getter in type.getters {
+            decls.append(try renderGetterDecl(getter: getter))
+        }
 
-                if let constructor = type.constructor {
-                    try renderConstructorDecl(constructor: constructor).map { $0.with(\.trailingTrivia, .newlines(2)) }
-                }
+        for setter in type.setters {
+            decls.append(try renderSetterDecl(setter: setter))
+        }
 
-                for property in type.properties {
-                    try renderPropertyDecl(property: property).map { $0.with(\.trailingTrivia, .newlines(2)) }
-                }
+        for method in type.methods {
+            decls.append(contentsOf: try renderMethod(method: method))
+        }
 
-                for method in type.methods {
-                    try renderMethod(method: method).map { $0.with(\.trailingTrivia, .newlines(2)) }
-                }
-            }
-        )
-
-        return [DeclSyntax(classDecl)]
+        return decls
     }
 
     static func renderDocumentation(documentation: String?) -> Trivia {

@@ -1,11 +1,3 @@
-// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
-// DO NOT EDIT.
-//
-// To update this file, just rebuild your project or run
-// `swift package bridge-js`.
-
-@_spi(BridgeJS) import JavaScriptKit
-
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_createDatabaseConnection")
 fileprivate func bjs_createDatabaseConnection(_ config: Int32) -> Int32
@@ -15,7 +7,7 @@ fileprivate func bjs_createDatabaseConnection(_ config: Int32) -> Int32 {
 }
 #endif
 
-func createDatabaseConnection(_ config: JSObject) throws(JSException) -> DatabaseConnection {
+func _$createDatabaseConnection(_ config: JSObject) throws(JSException) -> DatabaseConnection {
     let configValue = config.bridgeJSLowerParameter()
     let ret = bjs_createDatabaseConnection(configValue)
     if let error = _swift_js_take_exception() {
@@ -33,7 +25,7 @@ fileprivate func bjs_createLogger(_ level: Int32) -> Int32 {
 }
 #endif
 
-func createLogger(_ level: String) throws(JSException) -> Logger {
+func _$createLogger(_ level: String) throws(JSException) -> Logger {
     let levelValue = level.bridgeJSLowerParameter()
     let ret = bjs_createLogger(levelValue)
     if let error = _swift_js_take_exception() {
@@ -51,7 +43,7 @@ fileprivate func bjs_getConfigManager() -> Int32 {
 }
 #endif
 
-func getConfigManager() throws(JSException) -> ConfigManager {
+func _$getConfigManager() throws(JSException) -> ConfigManager {
     let ret = bjs_getConfigManager()
     if let error = _swift_js_take_exception() {
         throw error
@@ -104,63 +96,50 @@ fileprivate func bjs_DatabaseConnection_execute(_ self: Int32, _ query: Int32) -
 }
 #endif
 
-struct DatabaseConnection: _JSBridgedClass {
-    let jsObject: JSObject
-
-    init(unsafelyWrapping jsObject: JSObject) {
-        self.jsObject = jsObject
+func _$DatabaseConnection_isConnected_get(_ self: JSObject) throws(JSException) -> Bool {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_DatabaseConnection_isConnected_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
+    return Bool.bridgeJSLiftReturn(ret)
+}
 
-    var isConnected: Bool {
-        get throws(JSException) {
-            let selfValue = self.bridgeJSLowerParameter()
-            let ret = bjs_DatabaseConnection_isConnected_get(selfValue)
-            if let error = _swift_js_take_exception() {
-                throw error
-            }
-            return Bool.bridgeJSLiftReturn(ret)
-        }
+func _$DatabaseConnection_connectionTimeout_get(_ self: JSObject) throws(JSException) -> Double {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_DatabaseConnection_connectionTimeout_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
+    return Double.bridgeJSLiftReturn(ret)
+}
 
-    var connectionTimeout: Double {
-        get throws(JSException) {
-            let selfValue = self.bridgeJSLowerParameter()
-            let ret = bjs_DatabaseConnection_connectionTimeout_get(selfValue)
-            if let error = _swift_js_take_exception() {
-                throw error
-            }
-            return Double.bridgeJSLiftReturn(ret)
-        }
+func _$DatabaseConnection_connectionTimeout_set(_ self: JSObject, _ newValue: Double) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let newValueValue = newValue.bridgeJSLowerParameter()
+    bjs_DatabaseConnection_connectionTimeout_set(selfValue, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
+}
 
-    func setConnectionTimeout(_ newValue: Double) throws(JSException) -> Void {
-        let selfValue = self.bridgeJSLowerParameter()
-        let newValueValue = newValue.bridgeJSLowerParameter()
-        bjs_DatabaseConnection_connectionTimeout_set(selfValue, newValueValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
+func _$DatabaseConnection_connect(_ self: JSObject, _ url: String) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let urlValue = url.bridgeJSLowerParameter()
+    bjs_DatabaseConnection_connect(selfValue, urlValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
+}
 
-    func connect(_ url: String) throws(JSException) -> Void {
-        let selfValue = self.bridgeJSLowerParameter()
-        let urlValue = url.bridgeJSLowerParameter()
-        bjs_DatabaseConnection_connect(selfValue, urlValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
+func _$DatabaseConnection_execute(_ self: JSObject, _ query: String) throws(JSException) -> JSObject {
+    let selfValue = self.bridgeJSLowerParameter()
+    let queryValue = query.bridgeJSLowerParameter()
+    let ret = bjs_DatabaseConnection_execute(selfValue, queryValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
-
-    func execute(_ query: String) throws(JSException) -> JSObject {
-        let selfValue = self.bridgeJSLowerParameter()
-        let queryValue = query.bridgeJSLowerParameter()
-        let ret = bjs_DatabaseConnection_execute(selfValue, queryValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
-        return JSObject.bridgeJSLiftReturn(ret)
-    }
-
+    return JSObject.bridgeJSLiftReturn(ret)
 }
 
 #if arch(wasm32)
@@ -190,43 +169,32 @@ fileprivate func bjs_Logger_error(_ self: Int32, _ message: Int32, _ error: Int3
 }
 #endif
 
-struct Logger: _JSBridgedClass {
-    let jsObject: JSObject
-
-    init(unsafelyWrapping jsObject: JSObject) {
-        self.jsObject = jsObject
+func _$Logger_level_get(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_Logger_level_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
+    return String.bridgeJSLiftReturn(ret)
+}
 
-    var level: String {
-        get throws(JSException) {
-            let selfValue = self.bridgeJSLowerParameter()
-            let ret = bjs_Logger_level_get(selfValue)
-            if let error = _swift_js_take_exception() {
-                throw error
-            }
-            return String.bridgeJSLiftReturn(ret)
-        }
+func _$Logger_log(_ self: JSObject, _ message: String) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let messageValue = message.bridgeJSLowerParameter()
+    bjs_Logger_log(selfValue, messageValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
+}
 
-    func log(_ message: String) throws(JSException) -> Void {
-        let selfValue = self.bridgeJSLowerParameter()
-        let messageValue = message.bridgeJSLowerParameter()
-        bjs_Logger_log(selfValue, messageValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
+func _$Logger_error(_ self: JSObject, _ message: String, _ error: JSObject) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let messageValue = message.bridgeJSLowerParameter()
+    let errorValue = error.bridgeJSLowerParameter()
+    bjs_Logger_error(selfValue, messageValue, errorValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
-
-    func error(_ message: String, _ error: JSObject) throws(JSException) -> Void {
-        let selfValue = self.bridgeJSLowerParameter()
-        let messageValue = message.bridgeJSLowerParameter()
-        let errorValue = error.bridgeJSLowerParameter()
-        bjs_Logger_error(selfValue, messageValue, errorValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
-    }
-
 }
 
 #if arch(wasm32)
@@ -256,42 +224,31 @@ fileprivate func bjs_ConfigManager_set(_ self: Int32, _ key: Int32, _ value: Int
 }
 #endif
 
-struct ConfigManager: _JSBridgedClass {
-    let jsObject: JSObject
-
-    init(unsafelyWrapping jsObject: JSObject) {
-        self.jsObject = jsObject
+func _$ConfigManager_configPath_get(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_ConfigManager_configPath_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
+    return String.bridgeJSLiftReturn(ret)
+}
 
-    var configPath: String {
-        get throws(JSException) {
-            let selfValue = self.bridgeJSLowerParameter()
-            let ret = bjs_ConfigManager_configPath_get(selfValue)
-            if let error = _swift_js_take_exception() {
-                throw error
-            }
-            return String.bridgeJSLiftReturn(ret)
-        }
+func _$ConfigManager_get(_ self: JSObject, _ key: String) throws(JSException) -> JSObject {
+    let selfValue = self.bridgeJSLowerParameter()
+    let keyValue = key.bridgeJSLowerParameter()
+    let ret = bjs_ConfigManager_get(selfValue, keyValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
 
-    func get(_ key: String) throws(JSException) -> JSObject {
-        let selfValue = self.bridgeJSLowerParameter()
-        let keyValue = key.bridgeJSLowerParameter()
-        let ret = bjs_ConfigManager_get(selfValue, keyValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
-        return JSObject.bridgeJSLiftReturn(ret)
+func _$ConfigManager_set(_ self: JSObject, _ key: String, _ value: JSObject) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let keyValue = key.bridgeJSLowerParameter()
+    let valueValue = value.bridgeJSLowerParameter()
+    bjs_ConfigManager_set(selfValue, keyValue, valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
-
-    func set(_ key: String, _ value: JSObject) throws(JSException) -> Void {
-        let selfValue = self.bridgeJSLowerParameter()
-        let keyValue = key.bridgeJSLowerParameter()
-        let valueValue = value.bridgeJSLowerParameter()
-        bjs_ConfigManager_set(selfValue, keyValue, valueValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
-    }
-
 }

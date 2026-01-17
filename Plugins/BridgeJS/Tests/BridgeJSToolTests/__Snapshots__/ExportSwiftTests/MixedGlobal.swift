@@ -1,11 +1,3 @@
-// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
-// DO NOT EDIT.
-//
-// To update this file, just rebuild your project or run
-// `swift package bridge-js`.
-
-@_spi(BridgeJS) import JavaScriptKit
-
 @_expose(wasm, "bjs_GlobalAPI_globalFunction")
 @_cdecl("bjs_GlobalAPI_globalFunction")
 public func _bjs_GlobalAPI_globalFunction() -> Void {

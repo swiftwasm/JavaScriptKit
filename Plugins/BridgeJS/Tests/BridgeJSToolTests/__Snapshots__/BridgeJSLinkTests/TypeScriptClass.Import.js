@@ -211,15 +211,6 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_Greeter_name_set"] = function bjs_Greeter_name_set(self, newValue) {
-                try {
-                    const newValueObject = swift.memory.getObject(newValue);
-                    swift.memory.release(newValue);
-                    swift.memory.getObject(self).name = newValueObject;
-                } catch (error) {
-                    setException(error);
-                }
-            }
             TestModule["bjs_Greeter_age_get"] = function bjs_Greeter_age_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).age;
@@ -227,6 +218,15 @@ export async function createInstantiator(options, swift) {
                 } catch (error) {
                     setException(error);
                     return 0
+                }
+            }
+            TestModule["bjs_Greeter_name_set"] = function bjs_Greeter_name_set(self, newValue) {
+                try {
+                    const newValueObject = swift.memory.getObject(newValue);
+                    swift.memory.release(newValue);
+                    swift.memory.getObject(self).name = newValueObject;
+                } catch (error) {
+                    setException(error);
                 }
             }
             TestModule["bjs_Greeter_greet"] = function bjs_Greeter_greet(self) {
