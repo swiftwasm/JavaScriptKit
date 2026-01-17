@@ -199,7 +199,7 @@ struct PackageToJSPlugin: CommandPlugin {
             exit(1)
         }
         let skeletonCollector = SkeletonCollector(context: context)
-        let (exportedSkeletons, importedSkeletons) = skeletonCollector.collectFromProduct(name: productName)
+        let skeletons = skeletonCollector.collectFromProduct(name: productName)
         let productArtifact = try build.findWasmArtifact(for: productName)
         let outputDir =
             if let outputPath = buildOptions.packageOptions.outputPath {
@@ -215,8 +215,7 @@ struct PackageToJSPlugin: CommandPlugin {
             options: buildOptions.packageOptions,
             context: context,
             selfPackage: selfPackage,
-            exportedSkeletons: exportedSkeletons,
-            importedSkeletons: importedSkeletons,
+            skeletons: skeletons,
             outputDir: outputDir,
             wasmProductArtifact: productArtifact,
             wasmFilename: productArtifact.lastPathComponent
@@ -263,7 +262,7 @@ struct PackageToJSPlugin: CommandPlugin {
         }
 
         let skeletonCollector = SkeletonCollector(context: context)
-        let (exportedSkeletons, importedSkeletons) = skeletonCollector.collectFromTests()
+        let skeletons = skeletonCollector.collectFromTests()
 
         // NOTE: Find the product artifact from the default build directory
         //       because PackageManager.BuildResult doesn't include the
@@ -300,8 +299,7 @@ struct PackageToJSPlugin: CommandPlugin {
             options: testOptions.packageOptions,
             context: context,
             selfPackage: selfPackage,
-            exportedSkeletons: exportedSkeletons,
-            importedSkeletons: importedSkeletons,
+            skeletons: skeletons,
             outputDir: outputDir,
             wasmProductArtifact: productArtifact,
             // If the product artifact doesn't have a .wasm extension, add it
@@ -714,17 +712,15 @@ class SkeletonCollector {
         self.context = context
     }
 
-    func collectFromProduct(name: String) -> (exportedSkeletons: [URL], importedSkeletons: [URL]) {
+    func collectFromProduct(name: String) -> [URL] {
         guard let product = context.package.products.first(where: { $0.name == name }) else {
-            return ([], [])
+            return []
         }
         visit(product: product, package: context.package)
-        // Unified skeleton files contain both exported and imported parts
-        // Return the same list for both since BridgeJSLink.addSkeletonFile handles the unified format
-        return (skeletons, skeletons)
+        return skeletons
     }
 
-    func collectFromTests() -> (exportedSkeletons: [URL], importedSkeletons: [URL]) {
+    func collectFromTests() -> [URL] {
         let tests = context.package.targets.filter {
             guard let target = $0 as? SwiftSourceModuleTarget else { return false }
             return target.kind == .test
@@ -732,9 +728,7 @@ class SkeletonCollector {
         for test in tests {
             visit(target: test, package: context.package)
         }
-        // Unified skeleton files contain both exported and imported parts
-        // Return the same list for both since BridgeJSLink.addSkeletonFile handles the unified format
-        return (skeletons, skeletons)
+        return skeletons
     }
 
     private func visit(product: Product, package: Package) {
@@ -794,8 +788,7 @@ extension PackagingPlanner {
         options: PackageToJS.PackageOptions,
         context: PluginContext,
         selfPackage: Package,
-        exportedSkeletons: [URL],
-        importedSkeletons: [URL],
+        skeletons: [URL],
         outputDir: URL,
         wasmProductArtifact: URL,
         wasmFilename: String
@@ -810,8 +803,7 @@ extension PackagingPlanner {
                 absolute: context.pluginWorkDirectoryURL.appending(path: outputBaseName + ".tmp").path
             ),
             selfPackageDir: BuildPath(absolute: selfPackage.directoryURL.path),
-            exportedSkeletons: exportedSkeletons.map { BuildPath(absolute: $0.path) },
-            importedSkeletons: importedSkeletons.map { BuildPath(absolute: $0.path) },
+            skeletons: skeletons.map { BuildPath(absolute: $0.path) },
             outputDir: BuildPath(absolute: outputDir.path),
             wasmProductArtifact: BuildPath(absolute: wasmProductArtifact.path),
             wasmFilename: wasmFilename,

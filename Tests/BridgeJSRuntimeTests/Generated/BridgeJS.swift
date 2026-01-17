@@ -5,7 +5,7 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-@_spi(BridgeJS) @_spi(Experimental) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests10HttpStatusO_Si")

@@ -55,7 +55,7 @@ import Testing
         let (_, outputSkeleton) = try #require(try swiftAPI.finalize())
         let bridgeJSLink: BridgeJSLink = BridgeJSLink(
             skeletons: [
-                BridgeJSSkeleton(moduleName: "TestModule", exported: outputSkeleton),
+                BridgeJSSkeleton(moduleName: "TestModule", exported: outputSkeleton)
             ],
             sharedMemory: false
         )
@@ -116,7 +116,7 @@ import Testing
         let (_, outputSkeleton) = try #require(try swiftAPI.finalize())
         let bridgeJSLink: BridgeJSLink = BridgeJSLink(
             skeletons: [
-                BridgeJSSkeleton(moduleName: "TestModule", exported: outputSkeleton),
+                BridgeJSSkeleton(moduleName: "TestModule", exported: outputSkeleton)
             ],
             sharedMemory: false
         )

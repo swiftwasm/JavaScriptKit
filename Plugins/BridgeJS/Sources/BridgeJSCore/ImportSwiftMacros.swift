@@ -155,7 +155,6 @@ public final class ImportSwiftMacros {
                 }
             }
 
-
             /// Extracts the jsName argument value from a @JSSetter attribute, if present.
             static func extractJSName(from attribute: AttributeSyntax) -> String? {
                 guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else {
@@ -163,8 +162,8 @@ public final class ImportSwiftMacros {
                 }
                 for argument in arguments {
                     if argument.label?.text == "jsName",
-                       let stringLiteral = argument.expression.as(StringLiteralExprSyntax.self),
-                       let segment = stringLiteral.segments.first?.as(StringSegmentSyntax.self)
+                        let stringLiteral = argument.expression.as(StringLiteralExprSyntax.self),
+                        let segment = stringLiteral.segments.first?.as(StringSegmentSyntax.self)
                     {
                         return segment.content.text
                     }
@@ -217,7 +216,8 @@ public final class ImportSwiftMacros {
             jsSetter: AttributeSyntax,
             enclosingTypeName: String?
         ) -> SetterValidationResult? {
-            guard let effects = validateEffects(node.signature.effectSpecifiers, node: node, attributeName: "JSSetter") else {
+            guard let effects = validateEffects(node.signature.effectSpecifiers, node: node, attributeName: "JSSetter")
+            else {
                 return nil
             }
 
@@ -270,7 +270,8 @@ public final class ImportSwiftMacros {
                     return (propertyName: propertyName, functionBaseName: functionBaseName)
                 }
 
-                let rawFunctionName = functionName.hasPrefix("`") && functionName.hasSuffix("`") && functionName.count > 2
+                let rawFunctionName =
+                    functionName.hasPrefix("`") && functionName.hasSuffix("`") && functionName.count > 2
                     ? String(functionName.dropFirst().dropLast())
                     : functionName
 
@@ -367,7 +368,8 @@ public final class ImportSwiftMacros {
 
         private func handleTopLevelFunction(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
             if AttributeChecker.hasJSFunctionAttribute(node.attributes),
-               let function = parseFunction(node, enclosingTypeName: nil, isStaticMember: true) {
+                let function = parseFunction(node, enclosingTypeName: nil, isStaticMember: true)
+            {
                 importedFunctions.append(function)
                 return .skipChildren
             }
@@ -392,9 +394,13 @@ public final class ImportSwiftMacros {
         ) -> Bool {
             if AttributeChecker.hasJSFunctionAttribute(node.attributes) {
                 if isStaticMember {
-                    parseFunction(node, enclosingTypeName: typeName, isStaticMember: true).map { importedFunctions.append($0) }
+                    parseFunction(node, enclosingTypeName: typeName, isStaticMember: true).map {
+                        importedFunctions.append($0)
+                    }
                 } else {
-                    parseFunction(node, enclosingTypeName: typeName, isStaticMember: false).map { type.methods.append($0) }
+                    parseFunction(node, enclosingTypeName: typeName, isStaticMember: false).map {
+                        type.methods.append($0)
+                    }
                 }
                 return true
             }
@@ -404,11 +410,13 @@ public final class ImportSwiftMacros {
                     errors.append(
                         DiagnosticError(
                             node: node,
-                            message: "@JSSetter is not supported for static members. Use it only for instance members in @JSClass types."
+                            message:
+                                "@JSSetter is not supported for static members. Use it only for instance members in @JSClass types."
                         )
                     )
                 } else if let jsSetter = AttributeChecker.firstJSSetterAttribute(node.attributes),
-                          let setter = parseSetterSkeleton(jsSetter, node, enclosingTypeName: typeName) {
+                    let setter = parseSetterSkeleton(jsSetter, node, enclosingTypeName: typeName)
+                {
                     type.setters.append(setter)
                 }
                 return true
@@ -440,7 +448,8 @@ public final class ImportSwiftMacros {
                     errors.append(
                         DiagnosticError(
                             node: node,
-                            message: "@JSGetter is not supported for static members. Use it only for instance members in @JSClass types."
+                            message:
+                                "@JSGetter is not supported for static members. Use it only for instance members in @JSClass types."
                         )
                     )
                 } else if let getter = parseGetterSkeleton(node, enclosingTypeName: typeName) {
@@ -481,29 +490,32 @@ public final class ImportSwiftMacros {
             }
         }
 
-
         // MARK: - Member Collection
 
         private func collectStaticMembers(in members: MemberBlockItemListSyntax, typeName: String) {
             for member in members {
                 if let function = member.decl.as(FunctionDeclSyntax.self) {
                     if AttributeChecker.hasJSFunctionAttribute(function.attributes),
-                       let parsed = parseFunction(function, enclosingTypeName: typeName, isStaticMember: true) {
+                        let parsed = parseFunction(function, enclosingTypeName: typeName, isStaticMember: true)
+                    {
                         importedFunctions.append(parsed)
                     } else if AttributeChecker.hasJSSetterAttribute(function.attributes) {
                         errors.append(
                             DiagnosticError(
                                 node: function,
-                                message: "@JSSetter is not supported for static members. Use it only for instance members in @JSClass types."
+                                message:
+                                    "@JSSetter is not supported for static members. Use it only for instance members in @JSClass types."
                             )
                         )
                     }
                 } else if let variable = member.decl.as(VariableDeclSyntax.self),
-                          AttributeChecker.hasJSGetterAttribute(variable.attributes) {
+                    AttributeChecker.hasJSGetterAttribute(variable.attributes)
+                {
                     errors.append(
                         DiagnosticError(
                             node: variable,
-                            message: "@JSGetter is not supported for static members. Use it only for instance members in @JSClass types."
+                            message:
+                                "@JSGetter is not supported for static members. Use it only for instance members in @JSClass types."
                         )
                     )
                 }
@@ -516,7 +528,10 @@ public final class ImportSwiftMacros {
             _ initializer: InitializerDeclSyntax,
             typeName: String
         ) -> ImportedConstructorSkeleton? {
-            guard validateEffects(initializer.signature.effectSpecifiers, node: initializer, attributeName: "JSFunction") != nil else {
+            guard
+                validateEffects(initializer.signature.effectSpecifiers, node: initializer, attributeName: "JSFunction")
+                    != nil
+            else {
                 return nil
             }
             return ImportedConstructorSkeleton(
@@ -532,7 +547,8 @@ public final class ImportSwiftMacros {
             enclosingTypeName: String?,
             isStaticMember: Bool
         ) -> ImportedFunctionSkeleton? {
-            guard validateEffects(node.signature.effectSpecifiers, node: node, attributeName: "JSFunction") != nil else {
+            guard validateEffects(node.signature.effectSpecifiers, node: node, attributeName: "JSFunction") != nil
+            else {
                 return nil
             }
 
@@ -562,15 +578,15 @@ public final class ImportSwiftMacros {
             )
         }
 
-
         /// Extracts property info from a VariableDeclSyntax (binding, identifier, type)
         private func extractPropertyInfo(
             _ node: VariableDeclSyntax,
             errorMessage: String = "@JSGetter must declare a single stored property with an explicit type."
         ) -> (identifier: IdentifierPatternSyntax, type: TypeSyntax)? {
             guard let binding = node.bindings.first,
-                  let identifier = binding.pattern.as(IdentifierPatternSyntax.self),
-                  let typeAnnotation = binding.typeAnnotation else {
+                let identifier = binding.pattern.as(IdentifierPatternSyntax.self),
+                let typeAnnotation = binding.typeAnnotation
+            else {
                 errors.append(DiagnosticError(node: node, message: errorMessage))
                 return nil
             }
@@ -605,11 +621,13 @@ public final class ImportSwiftMacros {
             }
 
             let functionName = node.name.text
-            guard let (propertyName, functionBaseName) = PropertyNameResolver.resolve(
-                functionName: functionName,
-                jsName: validation.jsName,
-                normalizeIdentifier: normalizeIdentifier
-            ) else {
+            guard
+                let (propertyName, functionBaseName) = PropertyNameResolver.resolve(
+                    functionName: functionName,
+                    jsName: validation.jsName,
+                    normalizeIdentifier: normalizeIdentifier
+                )
+            else {
                 return nil
             }
 
@@ -620,7 +638,6 @@ public final class ImportSwiftMacros {
                 functionName: "\(functionBaseName)_set"
             )
         }
-
 
         // MARK: - Type and Parameter Parsing
 
@@ -647,7 +664,6 @@ public final class ImportSwiftMacros {
                 return Parameter(label: label, name: name, type: bridgeType)
             }
         }
-
 
         private func parseType(_ type: TypeSyntax, enclosingTypeName: String?) -> BridgeType {
             guard let identifier = type.as(IdentifierTypeSyntax.self) else {

@@ -5,7 +5,7 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-@_spi(BridgeJS) @_spi(Experimental) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @_expose(wasm, "bjs_PlayBridgeJS_init")
 @_cdecl("bjs_PlayBridgeJS_init")

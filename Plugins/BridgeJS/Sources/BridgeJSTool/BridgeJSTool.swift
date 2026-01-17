@@ -218,7 +218,8 @@ private func hasBridgeJSSkipComment(_ content: String) -> Bool {
 }
 
 private func combineGeneratedSwift(_ pieces: [String]) -> String {
-    let trimmedPieces = pieces
+    let trimmedPieces =
+        pieces
         .map { $0.trimmingCharacters(in: .newlines) }
         .filter { !$0.isEmpty }
     guard !trimmedPieces.isEmpty else { return "" }

@@ -394,10 +394,8 @@ struct PackagingPlanner {
     let selfPackageDir: BuildPath
     /// The path of this file itself, used to capture changes of planner code
     let selfPath: BuildPath
-    /// The exported API skeletons source files
-    let exportedSkeletons: [BuildPath]
-    /// The imported API skeletons source files
-    let importedSkeletons: [BuildPath]
+    /// The BridgeJS API skeletons source files
+    let skeletons: [BuildPath]
     /// The directory for the final output
     let outputDir: BuildPath
     /// The directory for intermediate files
@@ -418,8 +416,7 @@ struct PackagingPlanner {
         packageId: String,
         intermediatesDir: BuildPath,
         selfPackageDir: BuildPath,
-        exportedSkeletons: [BuildPath],
-        importedSkeletons: [BuildPath],
+        skeletons: [BuildPath],
         outputDir: BuildPath,
         wasmProductArtifact: BuildPath,
         wasmFilename: String,
@@ -431,8 +428,7 @@ struct PackagingPlanner {
         self.options = options
         self.packageId = packageId
         self.selfPackageDir = selfPackageDir
-        self.exportedSkeletons = exportedSkeletons
-        self.importedSkeletons = importedSkeletons
+        self.skeletons = skeletons
         self.outputDir = outputDir
         self.intermediatesDir = intermediatesDir
         self.wasmFilename = wasmFilename
@@ -592,7 +588,7 @@ struct PackagingPlanner {
         )
         packageInputs.append(packageJsonTask)
 
-        if exportedSkeletons.count > 0 || importedSkeletons.count > 0 {
+        if skeletons.count > 0 {
             if ProcessInfo.processInfo.environment["JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS"] == nil {
                 fatalError(
                     "BridgeJS is still an experimental feature. Set the environment variable JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1 to enable."
@@ -601,18 +597,13 @@ struct PackagingPlanner {
             let bridgeJs = outputDir.appending(path: "bridge-js.js")
             let bridgeDts = outputDir.appending(path: "bridge-js.d.ts")
             packageInputs.append(
-                make.addTask(inputFiles: exportedSkeletons + importedSkeletons, output: bridgeJs) { _, scope in
+                make.addTask(inputFiles: skeletons, output: bridgeJs) { _, scope in
                     var link = BridgeJSLink(
-                        exportedSkeletons: [],
-                        importedSkeletons: [],
                         sharedMemory: Self.isSharedMemoryEnabled(triple: triple)
                     )
 
-                    // Decode unified skeleton format
-                    // Unified skeleton files can contain both exported and imported parts
-                    // Deduplicate file paths since we may have the same file in both lists
-                    let allSkeletonPaths = Set(exportedSkeletons + importedSkeletons)
-                    for skeletonPath in allSkeletonPaths {
+                    // Decode skeleton format
+                    for skeletonPath in skeletons {
                         let data = try Data(contentsOf: URL(fileURLWithPath: scope.resolve(path: skeletonPath).path))
                         try link.addSkeletonFile(data: data)
                     }
@@ -734,8 +725,8 @@ struct PackagingPlanner {
             "USE_SHARED_MEMORY": Self.isSharedMemoryEnabled(triple: triple),
             "IS_WASI": triple.hasPrefix("wasm32-unknown-wasi"),
             "USE_WASI_CDN": options.useCDN,
-            "HAS_BRIDGE": exportedSkeletons.count > 0 || importedSkeletons.count > 0,
-            "HAS_IMPORTS": importedSkeletons.count > 0,
+            "HAS_BRIDGE": skeletons.count > 0,
+            "HAS_IMPORTS": skeletons.count > 0,
             "TARGET_DEFAULT_PLATFORM_NODE": options.defaultPlatform == .node,
             "TARGET_DEFAULT_PLATFORM_BROWSER": options.defaultPlatform == .browser,
         ]

@@ -4,7 +4,7 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-import JavaScriptKit
+@_spi(Experimental) import JavaScriptKit
 
 @JSFunction func createArrayBuffer() throws (JSException) -> ArrayBufferLike
 

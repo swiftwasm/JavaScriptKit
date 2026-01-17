@@ -5,7 +5,7 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-@_spi(BridgeJS) @_spi(Experimental) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 extension GlobalNetworking.API.CallMethod: _BridgedSwiftCaseEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {

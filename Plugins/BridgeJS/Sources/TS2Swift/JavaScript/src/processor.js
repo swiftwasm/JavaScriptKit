@@ -78,7 +78,7 @@ export class TypeProcessor {
             "// To update this file, just rebuild your project or run",
             "// `swift package bridge-js`.",
             "",
-            "import JavaScriptKit",
+            "@_spi(Experimental) import JavaScriptKit",
             ""
         );
 
@@ -142,7 +142,7 @@ export class TypeProcessor {
         const returnType = this.renderBridgeType(this.visitType(signature.getReturnType(), node), node);
         const effects = this.renderEffects({ isAsync: false });
         const swiftName = this.renderIdentifier(name);
-        
+
         this.swiftLines.push(`@JSFunction func ${swiftName}(${params}) ${effects} -> ${returnType}`);
         this.swiftLines.push("");
     }
@@ -276,7 +276,7 @@ export class TypeProcessor {
         // Collect all declarations with their positions to preserve order
         /** @type {Array<{ decl: ts.Node, symbol: ts.Symbol, position: number }>} */
         const allDecls = [];
-        
+
         for (const symbol of members) {
             for (const decl of symbol.getDeclarations() ?? []) {
                 const sourceFile = decl.getSourceFile();
@@ -284,10 +284,10 @@ export class TypeProcessor {
                 allDecls.push({ decl, symbol, position: pos });
             }
         }
-        
+
         // Sort by position to preserve declaration order
         allDecls.sort((a, b) => a.position - b.position);
-        
+
         // Process declarations in order
         for (const { decl, symbol } of allDecls) {
             if (symbol.flags & ts.SymbolFlags.Property) {
@@ -410,10 +410,10 @@ export class TypeProcessor {
 
         const type = this.renderBridgeType(property.type, node);
         const name = this.renderIdentifier(property.name);
-        
+
         // Always render getter
         this.swiftLines.push(`    @JSGetter var ${name}: ${type}`);
-        
+
         // Render setter if not readonly
         if (!property.isReadonly) {
             const capitalizedName = property.name.charAt(0).toUpperCase() + property.name.slice(1);
@@ -441,7 +441,7 @@ export class TypeProcessor {
         const returnType = this.renderBridgeType(this.visitType(signature.getReturnType(), node), node);
         const effects = this.renderEffects({ isAsync: false });
         const swiftName = this.renderIdentifier(name);
-        
+
         this.swiftLines.push(`    @JSFunction func ${swiftName}(${params}) ${effects} -> ${returnType}`);
     }
 

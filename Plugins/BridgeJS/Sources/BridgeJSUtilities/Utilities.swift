@@ -1,5 +1,3 @@
-import Foundation
-
 extension String {
     public var capitalizedFirstLetter: String {
         guard !isEmpty else { return self }
@@ -8,6 +6,7 @@ extension String {
 }
 
 public enum BridgeJSGeneratedFile {
+    /// The magic comment to skip processing by BridgeJS.
     public static let skipLine = "// bridge-js: skip"
 
     public static func hasSkipComment(_ content: String) -> Bool {
@@ -15,6 +14,7 @@ public enum BridgeJSGeneratedFile {
     }
 
     public static var swiftPreamble: String {
+        // The generated Swift file itself should not be processed by BridgeJS again.
         """
         \(skipLine)
         // NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
@@ -23,7 +23,7 @@ public enum BridgeJSGeneratedFile {
         // To update this file, just rebuild your project or run
         // `swift package bridge-js`.
 
-        @_spi(BridgeJS) @_spi(Experimental) import JavaScriptKit
-        """.trimmingCharacters(in: .newlines)
+        @_spi(BridgeJS) import JavaScriptKit
+        """
     }
 }

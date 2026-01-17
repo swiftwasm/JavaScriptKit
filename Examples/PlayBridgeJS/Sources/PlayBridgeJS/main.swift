@@ -17,11 +17,12 @@ import class Foundation.JSONDecoder
     }
 
     func _update(swiftSource: String, dtsSource: String) throws -> PlayBridgeJSOutput {
-        let exportSwift = ExportSwift(progress: .silent, moduleName: "Playground", exposeToGlobal: false)
+        let moduleName = "Playground"
+        let exportSwift = ExportSwift(progress: .silent, moduleName: moduleName, exposeToGlobal: false)
         let sourceFile = Parser.parse(source: swiftSource)
         try exportSwift.addSourceFile(sourceFile, "Playground.swift")
         let exportResult = try exportSwift.finalize()
-        var importTS = ImportTS(progress: .silent, moduleName: "Playground")
+        var importTS = ImportTS(progress: .silent, moduleName: moduleName)
         let ts2swift = try createTS2Swift()
         let skeletonJSONString = try ts2swift.convert(dtsSource)
         let decoder = JSONDecoder()
@@ -32,16 +33,12 @@ import class Foundation.JSONDecoder
         importTS.addSkeleton(importSkeleton)
         let importSwiftGlue = try importTS.finalize()
 
-        let linker = BridgeJSLink(
-            exportedSkeletons: exportResult.map { [$0.outputSkeleton] } ?? [],
-            importedSkeletons: [
-                ImportedModuleSkeleton(
-                    moduleName: "Playground",
-                    children: [importSkeleton]
-                )
-            ],
-            sharedMemory: false
+        let skeleton = BridgeJSSkeleton(
+            moduleName: moduleName,
+            exported: exportResult.map { $0.outputSkeleton },
+            imported: ImportedModuleSkeleton(children: [importSkeleton])
         )
+        let linker = BridgeJSLink(skeletons: [skeleton], sharedMemory: false)
         let linked = try linker.link()
 
         return PlayBridgeJSOutput(
