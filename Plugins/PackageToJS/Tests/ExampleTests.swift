@@ -236,10 +236,9 @@ extension Trait where Self == ConditionTrait {
     /// FIXME: swift-testing uses too much stack space, so we need to increase the stack size for tests using swift-testing.
     static var stackSizeLinkerFlags: [String] {
         [
-            "-Xlinker", "--stack-first",
-            "-Xlinker", "-z",
-            "-Xlinker", "stack-size=524288",
-            "-Xlinker", "--global-base=524288",
+            "--toolset",
+            URL(fileURLWithPath: #filePath).deletingLastPathComponent().appending(path: "Inputs/example-toolset.json")
+                .path,
         ]
     }
 
