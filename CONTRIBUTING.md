@@ -18,41 +18,24 @@ Thank you for considering contributing to JavaScriptKit! We welcome contribution
    cd JavaScriptKit
    ```
 
-2. Install **OSS** Swift toolchain (not the one from Xcode):
-    <details>
-    <summary>For macOS users</summary>
-
+2. Install **OSS** Swift toolchain via `swiftly`
+3. Install Swift SDK for Wasm corresponding to the Swift version:
     ```bash
     (
-        SWIFT_TOOLCHAIN_CHANNEL=swift-6.0.2-release;
-        SWIFT_TOOLCHAIN_TAG="swift-6.0.2-RELEASE";
-        SWIFT_SDK_TAG="swift-wasm-6.0.2-RELEASE";
-        SWIFT_SDK_CHECKSUM="6ffedb055cb9956395d9f435d03d53ebe9f6a8d45106b979d1b7f53358e1dcb4";
-        pkg="$(mktemp -d)/InstallMe.pkg"; set -ex;
-        curl -o "$pkg" "https://download.swift.org/$SWIFT_TOOLCHAIN_CHANNEL/xcode/$SWIFT_TOOLCHAIN_TAG/$SWIFT_TOOLCHAIN_TAG-osx.pkg";
-        installer -pkg "$pkg" -target CurrentUserHomeDirectory;
-        export TOOLCHAINS="$(plutil -extract CFBundleIdentifier raw ~/Library/Developer/Toolchains/$SWIFT_TOOLCHAIN_TAG.xctoolchain/Info.plist)";
-        swift sdk install "https://github.com/swiftwasm/swift/releases/download/$SWIFT_SDK_TAG/$SWIFT_SDK_TAG-wasm32-unknown-wasi.artifactbundle.zip" --checksum "$SWIFT_SDK_CHECKSUM";
+      set -eo pipefail; \
+      V="$(swiftc --version | head -n1)"; \
+      TAG="$(curl -sL "https://raw.githubusercontent.com/swiftwasm/swift-sdk-index/refs/heads/main/v1/tag-by-version.json" | jq -e -r --arg v "$V" '.[$v] | .[-1]')"; \
+      curl -sL "https://raw.githubusercontent.com/swiftwasm/swift-sdk-index/refs/heads/main/v1/builds/$TAG.json" | \
+      jq -r '.["swift-sdks"]["wasm32-unknown-wasip1"] | "swift sdk install \"\(.url)\" --checksum \"\(.checksum)\""' | sh -x
+    );
+    export SWIFT_SDK_ID=$(
+      V="$(swiftc --version | head -n1)"; \
+      TAG="$(curl -sL "https://raw.githubusercontent.com/swiftwasm/swift-sdk-index/refs/heads/main/v1/tag-by-version.json" | jq -e -r --arg v "$V" '.[$v] | .[-1]')"; \
+      curl -sL "https://raw.githubusercontent.com/swiftwasm/swift-sdk-index/refs/heads/main/v1/builds/$TAG.json" | \
+      jq -r '.["swift-sdks"]["wasm32-unknown-wasip1"]["id"]'
     )
     ```
-
-    </details>
-
-    <details>
-    <summary>For Linux users</summary>
-    Install Swift 6.0.2 by following the instructions on the <a href="https://www.swift.org/install/linux/tarball/">official Swift website</a>.
-
-    ```bash
-    (
-        SWIFT_SDK_TAG="swift-wasm-6.0.2-RELEASE";
-        SWIFT_SDK_CHECKSUM="6ffedb055cb9956395d9f435d03d53ebe9f6a8d45106b979d1b7f53358e1dcb4";
-        swift sdk install "https://github.com/swiftwasm/swift/releases/download/$SWIFT_SDK_TAG/$SWIFT_SDK_TAG-wasm32-unknown-wasi.artifactbundle.zip" --checksum "$SWIFT_SDK_CHECKSUM";
-    )
-    ```
-
-    </details>
-
-3. Install dependencies:
+4. Install dependencies:
    ```bash
    make bootstrap
    ```
@@ -62,7 +45,7 @@ Thank you for considering contributing to JavaScriptKit! We welcome contribution
 Unit tests running on WebAssembly:
 
 ```bash
-make unittest SWIFT_SDK_ID=wasm32-unknown-wasi
+make unittest
 ```
 
 Tests for `PackageToJS` plugin:
@@ -112,7 +95,7 @@ Run this script when you've made changes to:
 
 These changes require updating the pre-generated Swift bindings committed to the repository.
 
-**Adding new BridgeJS intrinsics:** 
+**Adding new BridgeJS intrinsics:**
 
 If you add new `@_extern(wasm, module: "bjs")` functions to [`BridgeJSIntrinsics.swift`](Sources/JavaScriptKit/BridgeJSIntrinsics.swift), also add corresponding stub entries to [`Plugins/PackageToJS/Templates/instantiate.js`](Plugins/PackageToJS/Templates/instantiate.js) in the `importObject["bjs"]` object. This allows packages without BridgeJS-generated code to instantiate successfully.
 
