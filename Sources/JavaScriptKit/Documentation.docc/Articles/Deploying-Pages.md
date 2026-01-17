@@ -63,7 +63,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    container: swift:6.0.3
+    container: swift:6.2
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

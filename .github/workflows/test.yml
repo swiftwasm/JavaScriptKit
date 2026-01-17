@@ -11,11 +11,6 @@ jobs:
         entry:
           - os: ubuntu-22.04
             toolchain:
-              download-url: https://download.swift.org/swift-6.0.2-release/ubuntu2204/swift-6.0.2-RELEASE/swift-6.0.2-RELEASE-ubuntu22.04.tar.gz
-            wasi-backend: Node
-            target: "wasm32-unknown-wasi"
-          - os: ubuntu-22.04
-            toolchain:
               download-url: https://download.swift.org/swift-6.1-release/ubuntu2204/swift-6.1-RELEASE/swift-6.1-RELEASE-ubuntu22.04.tar.gz
             wasi-backend: Node
             target: "wasm32-unknown-wasi"
