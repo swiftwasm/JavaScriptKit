@@ -81,7 +81,6 @@ public class ExportSwift {
         return (
             outputSwift: outputSwift,
             outputSkeleton: ExportedSkeleton(
-                moduleName: moduleName,
                 functions: exportedFunctions,
                 classes: exportedClasses,
                 enums: exportedEnums,
@@ -1659,16 +1658,6 @@ public class ExportSwift {
         return .swiftHeapObject(swiftCallName)
     }
 
-    static let prelude: DeclSyntax = """
-        // NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
-        // DO NOT EDIT.
-        //
-        // To update this file, just rebuild your project or run
-        // `swift package bridge-js`.
-
-        @_spi(BridgeJS) import JavaScriptKit
-        """
-
     func renderSwiftGlue() throws -> String? {
         var decls: [DeclSyntax] = []
         guard
@@ -1677,7 +1666,6 @@ public class ExportSwift {
         else {
             return nil
         }
-        decls.append(Self.prelude)
 
         let closureCodegen = ClosureCodegen()
         var closureSignatures: Set<ClosureSignature> = []

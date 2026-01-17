@@ -11,95 +11,58 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
         guard let swiftSourceModuleTarget = target as? SwiftSourceModuleTarget else {
             return []
         }
-        var commands: [Command] = []
-        commands.append(try createExportSwiftCommand(context: context, target: swiftSourceModuleTarget))
-        if let importCommand = try createImportTSCommand(context: context, target: swiftSourceModuleTarget) {
-            commands.append(importCommand)
-        }
-        return commands
+        return [try createGenerateCommand(context: context, target: swiftSourceModuleTarget)]
     }
 
     private func pathToConfigFile(target: SwiftSourceModuleTarget) -> URL {
         return target.directoryURL.appending(path: "bridge-js.config.json")
     }
 
-    private func createExportSwiftCommand(context: PluginContext, target: SwiftSourceModuleTarget) throws -> Command {
-        let outputSwiftPath = context.pluginWorkDirectoryURL.appending(path: "BridgeJS.ExportSwift.swift")
-        let outputSkeletonPath = context.pluginWorkDirectoryURL.appending(path: "BridgeJS.ExportSwift.json")
+    private func createGenerateCommand(context: PluginContext, target: SwiftSourceModuleTarget) throws -> Command {
+        let outputSwiftPath = context.pluginWorkDirectoryURL.appending(path: "BridgeJS.swift")
+
         let inputSwiftFiles = target.sourceFiles.filter {
             !$0.url.path.hasPrefix(context.pluginWorkDirectoryURL.path + "/")
         }
         .map(\.url)
-        let configFile = pathToConfigFile(target: target)
-        let inputFiles: [URL]
-        if FileManager.default.fileExists(atPath: configFile.path) {
-            inputFiles = inputSwiftFiles + [configFile]
-        } else {
-            inputFiles = inputSwiftFiles
-        }
-        return .buildCommand(
-            displayName: "Export Swift API",
-            executable: try context.tool(named: "BridgeJSTool").url,
-            arguments: [
-                "export",
-                "--module-name",
-                target.name,
-                "--target-dir",
-                target.directoryURL.path,
-                "--output-skeleton",
-                outputSkeletonPath.path,
-                "--output-swift",
-                outputSwiftPath.path,
-                // Generate the output files even if nothing is exported not to surprise
-                // the build system.
-                "--always-write", "true",
-            ] + inputSwiftFiles.map(\.path),
-            inputFiles: inputFiles,
-            outputFiles: [
-                outputSwiftPath
-            ]
-        )
-    }
 
-    private func createImportTSCommand(context: PluginContext, target: SwiftSourceModuleTarget) throws -> Command? {
-        let outputSwiftPath = context.pluginWorkDirectoryURL.appending(path: "BridgeJS.ImportTS.swift")
-        let outputSkeletonPath = context.pluginWorkDirectoryURL.appending(path: "BridgeJS.ImportTS.json")
+        let configFile = pathToConfigFile(target: target)
+        var inputFiles: [URL] = inputSwiftFiles
+        if FileManager.default.fileExists(atPath: configFile.path) {
+            inputFiles.append(configFile)
+        }
+
         let inputTSFile = target.directoryURL.appending(path: "bridge-js.d.ts")
-        guard FileManager.default.fileExists(atPath: inputTSFile.path) else {
-            return nil
+        let tsconfigPath = context.package.directoryURL.appending(path: "tsconfig.json")
+
+        var arguments: [String] = [
+            "generate",
+            "--module-name",
+            target.name,
+            "--target-dir",
+            target.directoryURL.path,
+            "--output-dir",
+            context.pluginWorkDirectoryURL.path,
+            "--always-write", "true",
+        ]
+
+        if FileManager.default.fileExists(atPath: inputTSFile.path) {
+            // Add .d.ts file and tsconfig.json as inputs
+            inputFiles.append(contentsOf: [inputTSFile, tsconfigPath])
+            arguments.append(contentsOf: [
+                "--project",
+                tsconfigPath.path,
+            ])
         }
 
-        let configFile = pathToConfigFile(target: target)
-        let inputFiles: [URL]
-        if FileManager.default.fileExists(atPath: configFile.path) {
-            inputFiles = [inputTSFile, configFile]
-        } else {
-            inputFiles = [inputTSFile]
-        }
+        arguments.append(contentsOf: inputSwiftFiles.map(\.path))
+
         return .buildCommand(
-            displayName: "Import TypeScript API",
+            displayName: "Generate BridgeJS code",
             executable: try context.tool(named: "BridgeJSTool").url,
-            arguments: [
-                "import",
-                "--target-dir",
-                target.directoryURL.path,
-                "--output-skeleton",
-                outputSkeletonPath.path,
-                "--output-swift",
-                outputSwiftPath.path,
-                "--module-name",
-                target.name,
-                // Generate the output files even if nothing is imported not to surprise
-                // the build system.
-                "--always-write", "true",
-                "--project",
-                context.package.directoryURL.appending(path: "tsconfig.json").path,
-                inputTSFile.path,
-            ],
+            arguments: arguments,
             inputFiles: inputFiles,
-            outputFiles: [
-                outputSwiftPath
-            ]
+            outputFiles: [outputSwiftPath]
         )
     }
 }

@@ -8,30 +8,35 @@ import BridgeJSUtilities
 #endif
 
 struct BridgeJSLink {
-    /// The exported skeletons
-    var exportedSkeletons: [ExportedSkeleton] = []
-    var importedSkeletons: [ImportedModuleSkeleton] = []
+    var skeletons: [BridgeJSSkeleton] = []
     let sharedMemory: Bool
     private let namespaceBuilder = NamespaceBuilder()
 
     init(
-        exportedSkeletons: [ExportedSkeleton] = [],
-        importedSkeletons: [ImportedModuleSkeleton] = [],
+        skeletons: [BridgeJSSkeleton] = [],
         sharedMemory: Bool
     ) {
-        self.exportedSkeletons = exportedSkeletons
-        self.importedSkeletons = importedSkeletons
+        self.skeletons = skeletons
         self.sharedMemory = sharedMemory
     }
 
-    mutating func addExportedSkeletonFile(data: Data) throws {
-        let skeleton = try JSONDecoder().decode(ExportedSkeleton.self, from: data)
-        exportedSkeletons.append(skeleton)
-    }
+    mutating func addSkeletonFile(data: Data) throws {
+        do {
+            let unified = try JSONDecoder().decode(BridgeJSSkeleton.self, from: data)
+            skeletons.append(unified)
+        } catch {
+            struct SkeletonDecodingError: Error, CustomStringConvertible {
+                let description: String
+            }
+            throw SkeletonDecodingError(
+                description: """
+                    Failed to decode skeleton file: \(error)
 
-    mutating func addImportedSkeletonFile(data: Data) throws {
-        let skeletons = try JSONDecoder().decode(ImportedModuleSkeleton.self, from: data)
-        importedSkeletons.append(skeletons)
+                    This file appears to be in an old format. Please regenerate skeleton files using:
+                      bridge-js generate --module-name <name> --target-dir <dir> --output-skeleton <path> ...
+                    """
+            )
+        }
     }
 
     let swiftHeapObjectClassDts = """
@@ -81,7 +86,7 @@ struct BridgeJSLink {
         var data = LinkData()
 
         // Swift heap object class definitions
-        if exportedSkeletons.contains(where: { $0.classes.count > 0 }) {
+        if skeletons.contains(where: { $0.exported?.classes.isEmpty == false }) {
             data.classLines.append(
                 contentsOf: swiftHeapObjectClassJs.split(separator: "\n", omittingEmptySubsequences: false).map {
                     String($0)
@@ -95,7 +100,8 @@ struct BridgeJSLink {
         }
 
         // Process exported skeletons
-        for skeleton in exportedSkeletons {
+        for unified in skeletons {
+            guard let skeleton = unified.exported else { continue }
             // Process classes
             for klass in skeleton.classes {
                 let (jsType, dtsType, dtsExportEntry) = try renderExportedClass(klass)
@@ -162,9 +168,10 @@ struct BridgeJSLink {
         }
 
         // Process imported skeletons
-        for skeletonSet in importedSkeletons {
-            let importObjectBuilder = ImportObjectBuilder(moduleName: skeletonSet.moduleName)
-            for fileSkeleton in skeletonSet.children {
+        for unified in skeletons {
+            guard let imported = unified.imported else { continue }
+            let importObjectBuilder = ImportObjectBuilder(moduleName: unified.moduleName)
+            for fileSkeleton in imported.children {
                 for function in fileSkeleton.functions {
                     try renderImportedFunction(importObjectBuilder: importObjectBuilder, function: function)
                 }
@@ -175,14 +182,16 @@ struct BridgeJSLink {
             data.importObjectBuilders.append(importObjectBuilder)
         }
 
-        for skeleton in exportedSkeletons {
+        for unified in skeletons {
+            guard let skeleton = unified.exported else { continue }
+            let moduleName = unified.moduleName
             if !skeleton.protocols.isEmpty {
                 let importObjectBuilder: ImportObjectBuilder
-                if let existingBuilder = data.importObjectBuilders.first(where: { $0.moduleName == skeleton.moduleName }
+                if let existingBuilder = data.importObjectBuilders.first(where: { $0.moduleName == moduleName }
                 ) {
                     importObjectBuilder = existingBuilder
                 } else {
-                    importObjectBuilder = ImportObjectBuilder(moduleName: skeleton.moduleName)
+                    importObjectBuilder = ImportObjectBuilder(moduleName: moduleName)
                     data.importObjectBuilders.append(importObjectBuilder)
                 }
 
@@ -297,7 +306,7 @@ struct BridgeJSLink {
                     "bjs = {};",
                     "importObject[\"bjs\"] = bjs;",
                 ])
-                if self.importedSkeletons.count > 0 {
+                if skeletons.contains(where: { $0.imported != nil }) {
                     printer.write(lines: [
                         "const imports = options.getImports(importsContext);"
                     ])
@@ -576,14 +585,16 @@ struct BridgeJSLink {
                 }
                 printer.write("}")
 
-                for skeleton in exportedSkeletons {
+                for unified in skeletons {
+                    guard let skeleton = unified.exported else { continue }
+                    let moduleName = unified.moduleName
                     var closureSignatures: Set<ClosureSignature> = []
                     collectClosureSignatures(from: skeleton, into: &closureSignatures)
 
                     guard !closureSignatures.isEmpty else { continue }
 
                     for signature in closureSignatures.sorted(by: { $0.mangleName < $1.mangleName }) {
-                        let invokeFuncName = "invoke_js_callback_\(skeleton.moduleName)_\(signature.mangleName)"
+                        let invokeFuncName = "invoke_js_callback_\(moduleName)_\(signature.mangleName)"
                         printer.write(
                             lines: generateInvokeFunction(
                                 signature: signature,
@@ -591,7 +602,7 @@ struct BridgeJSLink {
                             )
                         )
 
-                        let lowerFuncName = "lower_closure_\(skeleton.moduleName)_\(signature.mangleName)"
+                        let lowerFuncName = "lower_closure_\(moduleName)_\(signature.mangleName)"
                         printer.write(
                             lines: generateLowerClosureFunction(
                                 signature: signature,
@@ -779,6 +790,8 @@ struct BridgeJSLink {
         let printer = CodeFragmentPrinter(header: header)
         printer.nextLine()
 
+        let exportedSkeletons = skeletons.compactMap(\.exported)
+
         for skeleton in exportedSkeletons {
             for proto in skeleton.protocols {
                 printer.write("export interface \(proto.name) {")
@@ -922,6 +935,7 @@ struct BridgeJSLink {
 
         printer.write(lines: data.topLevelTypeLines)
 
+        let exportedSkeletons = skeletons.compactMap(\.exported)
         let topLevelNamespaceCode = namespaceBuilder.buildTopLevelNamespaceInitialization(
             exportedSkeletons: exportedSkeletons
         )
@@ -1028,7 +1042,7 @@ struct BridgeJSLink {
     private func enumHelperAssignments() -> CodeFragmentPrinter {
         let printer = CodeFragmentPrinter()
 
-        for skeleton in exportedSkeletons {
+        for skeleton in skeletons.compactMap(\.exported) {
             for enumDef in skeleton.enums where enumDef.enumType == .associatedValue {
                 printer.write(
                     "const \(enumDef.name)Helpers = __bjs_create\(enumDef.valuesName)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift));"
@@ -1044,7 +1058,7 @@ struct BridgeJSLink {
     private func structHelperAssignments() -> CodeFragmentPrinter {
         let printer = CodeFragmentPrinter()
 
-        for skeleton in exportedSkeletons {
+        for skeleton in skeletons.compactMap(\.exported) {
             for structDef in skeleton.structs {
                 printer.write(
                     "const \(structDef.name)Helpers = __bjs_create\(structDef.name)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTmpParamPointers), \(JSGlueVariableScope.reservedTmpRetPointers), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift), \(JSGlueVariableScope.reservedEnumHelpers));"
@@ -1064,13 +1078,15 @@ struct BridgeJSLink {
         var modulesByName: [String: [ExportedClass]] = [:]
 
         // Group classes by their module name
-        for skeleton in exportedSkeletons {
+        for unified in skeletons {
+            guard let skeleton = unified.exported else { continue }
             if skeleton.classes.isEmpty { continue }
+            let moduleName = unified.moduleName
 
-            if modulesByName[skeleton.moduleName] == nil {
-                modulesByName[skeleton.moduleName] = []
+            if modulesByName[moduleName] == nil {
+                modulesByName[moduleName] = []
             }
-            modulesByName[skeleton.moduleName]?.append(contentsOf: skeleton.classes)
+            modulesByName[moduleName]?.append(contentsOf: skeleton.classes)
         }
 
         // Generate wrapper functions for each module
@@ -1132,7 +1148,8 @@ struct BridgeJSLink {
     private func generateImportedTypeDefinitions() -> [String] {
         let printer = CodeFragmentPrinter()
 
-        for skeletonSet in importedSkeletons {
+        for unified in skeletons {
+            guard let skeletonSet = unified.imported else { continue }
             for fileSkeleton in skeletonSet.children {
                 for type in fileSkeleton.types {
                     printer.write("export interface \(type.name) {")
@@ -1145,13 +1162,20 @@ struct BridgeJSLink {
                         printer.write(methodSignature)
                     }
 
-                    // Add properties
-                    for property in type.properties {
+                    // Add properties from getters
+                    var propertyNames = Set<String>()
+                    for getter in type.getters {
+                        propertyNames.insert(getter.name)
+                        let hasSetter = type.setters.contains { $0.name == getter.name }
                         let propertySignature =
-                            property.isReadonly
-                            ? "readonly \(property.name): \(resolveTypeScriptType(property.type));"
-                            : "\(property.name): \(resolveTypeScriptType(property.type));"
+                            hasSetter
+                            ? "\(getter.name): \(resolveTypeScriptType(getter.type));"
+                            : "readonly \(getter.name): \(resolveTypeScriptType(getter.type));"
                         printer.write(propertySignature)
+                    }
+                    // Add setters that don't have corresponding getters
+                    for setter in type.setters where !propertyNames.contains(setter.name) {
+                        printer.write("\(setter.name): \(resolveTypeScriptType(setter.type));")
                     }
 
                     printer.unindent()
@@ -1279,7 +1303,7 @@ struct BridgeJSLink {
     /// If the type is an enum, looks up the ExportedEnum and uses its tsFullPath
     /// Otherwise, uses the default tsType property
     private func resolveTypeScriptType(_ type: BridgeType) -> String {
-        return Self.resolveTypeScriptType(type, exportedSkeletons: exportedSkeletons)
+        return Self.resolveTypeScriptType(type, exportedSkeletons: skeletons.compactMap(\.exported))
     }
 
     /// Static helper for resolving TypeScript types with full enum paths
@@ -2868,34 +2892,34 @@ extension BridgeJSLink {
                 constructor: constructor
             )
         }
-        for property in type.properties {
-            let getterAbiName = property.getterAbiName(context: type)
-            let (js, dts) = try renderImportedProperty(
-                property: property,
+        for getter in type.getters {
+            let getterAbiName = getter.abiName(context: type)
+            let (js, dts) = try renderImportedGetter(
+                getter: getter,
                 abiName: getterAbiName,
                 emitCall: { thunkBuilder in
-                    return try thunkBuilder.callPropertyGetter(name: property.name, returnType: property.type)
+                    return try thunkBuilder.callPropertyGetter(name: getter.name, returnType: getter.type)
                 }
             )
             importObjectBuilder.assignToImportObject(name: getterAbiName, function: js)
             importObjectBuilder.appendDts(dts)
+        }
 
-            if !property.isReadonly {
-                let setterAbiName = property.setterAbiName(context: type)
-                let (js, dts) = try renderImportedProperty(
-                    property: property,
-                    abiName: setterAbiName,
-                    emitCall: { thunkBuilder in
-                        try thunkBuilder.liftParameter(
-                            param: Parameter(label: nil, name: "newValue", type: property.type)
-                        )
-                        thunkBuilder.callPropertySetter(name: property.name, returnType: property.type)
-                        return nil
-                    }
-                )
-                importObjectBuilder.assignToImportObject(name: setterAbiName, function: js)
-                importObjectBuilder.appendDts(dts)
-            }
+        for setter in type.setters {
+            let setterAbiName = setter.abiName(context: type)
+            let (js, dts) = try renderImportedSetter(
+                setter: setter,
+                abiName: setterAbiName,
+                emitCall: { thunkBuilder in
+                    try thunkBuilder.liftParameter(
+                        param: Parameter(label: nil, name: "newValue", type: setter.type)
+                    )
+                    thunkBuilder.callPropertySetter(name: setter.name, returnType: setter.type)
+                    return nil
+                }
+            )
+            importObjectBuilder.assignToImportObject(name: setterAbiName, function: js)
+            importObjectBuilder.appendDts(dts)
         }
         for method in type.methods {
             let (js, dts) = try renderImportedMethod(context: type, method: method)
@@ -2935,8 +2959,8 @@ extension BridgeJSLink {
         importObjectBuilder.appendDts(dtsPrinter.lines)
     }
 
-    func renderImportedProperty(
-        property: ImportedPropertySkeleton,
+    func renderImportedGetter(
+        getter: ImportedGetterSkeleton,
         abiName: String,
         emitCall: (ImportedThunkBuilder) throws -> String?
     ) throws -> (js: [String], dts: [String]) {
@@ -2946,7 +2970,23 @@ extension BridgeJSLink {
         let funcLines = thunkBuilder.renderFunction(
             name: abiName,
             returnExpr: returnExpr,
-            returnType: property.type
+            returnType: getter.type
+        )
+        return (funcLines, [])
+    }
+
+    func renderImportedSetter(
+        setter: ImportedSetterSkeleton,
+        abiName: String,
+        emitCall: (ImportedThunkBuilder) throws -> String?
+    ) throws -> (js: [String], dts: [String]) {
+        let thunkBuilder = ImportedThunkBuilder()
+        thunkBuilder.liftSelf()
+        let returnExpr = try emitCall(thunkBuilder)
+        let funcLines = thunkBuilder.renderFunction(
+            name: abiName,
+            returnExpr: returnExpr,
+            returnType: .void
         )
         return (funcLines, [])
     }

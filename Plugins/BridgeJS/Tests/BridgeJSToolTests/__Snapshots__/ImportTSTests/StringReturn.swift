@@ -1,11 +1,3 @@
-// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
-// DO NOT EDIT.
-//
-// To update this file, just rebuild your project or run
-// `swift package bridge-js`.
-
-@_spi(BridgeJS) import JavaScriptKit
-
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_checkString")
 fileprivate func bjs_checkString() -> Int32
@@ -15,7 +7,7 @@ fileprivate func bjs_checkString() -> Int32 {
 }
 #endif
 
-func checkString() throws(JSException) -> String {
+func _$checkString() throws(JSException) -> String {
     let ret = bjs_checkString()
     if let error = _swift_js_take_exception() {
         throw error

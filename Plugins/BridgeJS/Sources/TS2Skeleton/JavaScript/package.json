@@ -1,9 +1,0 @@
-{
-    "type": "module",
-    "dependencies": {
-        "typescript": "5.8.2"
-    },
-    "bin": {
-        "ts2skeleton": "./bin/ts2skeleton.js"
-    }
-}

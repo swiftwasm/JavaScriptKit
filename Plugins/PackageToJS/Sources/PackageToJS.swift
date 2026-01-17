@@ -602,19 +602,21 @@ struct PackagingPlanner {
             let bridgeDts = outputDir.appending(path: "bridge-js.d.ts")
             packageInputs.append(
                 make.addTask(inputFiles: exportedSkeletons + importedSkeletons, output: bridgeJs) { _, scope in
-                    let link = try BridgeJSLink(
-                        exportedSkeletons: exportedSkeletons.map {
-                            let decoder = JSONDecoder()
-                            let data = try Data(contentsOf: URL(fileURLWithPath: scope.resolve(path: $0).path))
-                            return try decoder.decode(ExportedSkeleton.self, from: data)
-                        },
-                        importedSkeletons: importedSkeletons.map {
-                            let decoder = JSONDecoder()
-                            let data = try Data(contentsOf: URL(fileURLWithPath: scope.resolve(path: $0).path))
-                            return try decoder.decode(ImportedModuleSkeleton.self, from: data)
-                        },
+                    var link = BridgeJSLink(
+                        exportedSkeletons: [],
+                        importedSkeletons: [],
                         sharedMemory: Self.isSharedMemoryEnabled(triple: triple)
                     )
+
+                    // Decode unified skeleton format
+                    // Unified skeleton files can contain both exported and imported parts
+                    // Deduplicate file paths since we may have the same file in both lists
+                    let allSkeletonPaths = Set(exportedSkeletons + importedSkeletons)
+                    for skeletonPath in allSkeletonPaths {
+                        let data = try Data(contentsOf: URL(fileURLWithPath: scope.resolve(path: skeletonPath).path))
+                        try link.addSkeletonFile(data: data)
+                    }
+
                     let (outputJs, outputDts) = try link.link()
                     try system.writeFile(atPath: scope.resolve(path: bridgeJs).path, content: Data(outputJs.utf8))
                     try system.writeFile(atPath: scope.resolve(path: bridgeDts).path, content: Data(outputDts.utf8))

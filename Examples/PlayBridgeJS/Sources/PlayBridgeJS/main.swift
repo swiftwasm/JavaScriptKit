@@ -22,8 +22,8 @@ import class Foundation.JSONDecoder
         try exportSwift.addSourceFile(sourceFile, "Playground.swift")
         let exportResult = try exportSwift.finalize()
         var importTS = ImportTS(progress: .silent, moduleName: "Playground")
-        let ts2skeleton = try createTS2Skeleton()
-        let skeletonJSONString = try ts2skeleton.convert(dtsSource)
+        let ts2swift = try createTS2Swift()
+        let skeletonJSONString = try ts2swift.convert(dtsSource)
         let decoder = JSONDecoder()
         let importSkeleton = try decoder.decode(
             ImportedFileSkeleton.self,

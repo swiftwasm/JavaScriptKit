@@ -1,0 +1,209 @@
+{
+  "exported" : {
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_PlayBridgeJS_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_PlayBridgeJS_update",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "update",
+            "parameters" : [
+              {
+                "label" : "swiftSource",
+                "name" : "swiftSource",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "label" : "dtsSource",
+                "name" : "dtsSource",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "PlayBridgeJSOutput"
+              }
+            }
+          }
+        ],
+        "name" : "PlayBridgeJS",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "PlayBridgeJS"
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_PlayBridgeJSOutput_outputJs",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "outputJs",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_PlayBridgeJSOutput_outputDts",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "outputDts",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_PlayBridgeJSOutput_importSwiftGlue",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "importSwiftGlue",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_PlayBridgeJSOutput_exportSwiftGlue",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "exportSwiftGlue",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "PlayBridgeJSOutput",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "PlayBridgeJSOutput"
+      }
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "createTS2Swift",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "jsObject" : {
+                "_0" : "TS2Swift"
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "name" : "convert",
+                "parameters" : [
+                  {
+                    "name" : "ts",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "TS2Swift",
+            "setters" : [
+
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "PlayBridgeJS"
+}

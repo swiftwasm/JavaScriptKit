@@ -1,11 +1,3 @@
-// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
-// DO NOT EDIT.
-//
-// To update this file, just rebuild your project or run
-// `swift package bridge-js`.
-
-@_spi(BridgeJS) import JavaScriptKit
-
 @_expose(wasm, "bjs_ClassA_linkedB_get")
 @_cdecl("bjs_ClassA_linkedB_get")
 public func _bjs_ClassA_linkedB_get(_ _self: UnsafeMutableRawPointer) -> Void {

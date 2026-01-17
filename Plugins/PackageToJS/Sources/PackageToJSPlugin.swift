@@ -166,7 +166,7 @@ struct PackageToJSPlugin: CommandPlugin {
         }
     }
 
-    static let JAVASCRIPTKIT_PRODUCT_ID: Product.ID = "JavaScriptKit"
+    static let JAVASCRIPTEVENTLOOP_PRODUCT_ID: Product.ID = "JavaScriptEventLoop"
 
     func performBuildCommand(context: PluginContext, arguments: [String]) throws {
         if arguments.contains(where: { ["-h", "--help"].contains($0) }) {
@@ -396,7 +396,11 @@ struct PackageToJSPlugin: CommandPlugin {
         guard
             let selfPackage = findPackageInDependencies(
                 package: package,
-                including: Self.JAVASCRIPTKIT_PRODUCT_ID
+                // NOTE: We use JavaScriptEventLoop product to find the JavaScriptKit package
+                // instead of JavaScriptKit product because SwiftPM in 6.0 does not returns
+                // product information for JavaScriptKit product for some reason (very likely
+                // a bug in SwiftPM).
+                including: Self.JAVASCRIPTEVENTLOOP_PRODUCT_ID
             )
         else {
             throw PackageToJSError("Failed to find JavaScriptKit in dependencies!?")
@@ -702,10 +706,8 @@ class SkeletonCollector {
     private var visitedProducts: Set<Product.ID> = []
     private var visitedTargets: Set<Target.ID> = []
 
-    var exportedSkeletons: [URL] = []
-    var importedSkeletons: [URL] = []
-    let exportedSkeletonFile = "BridgeJS.ExportSwift.json"
-    let importedSkeletonFile = "BridgeJS.ImportTS.json"
+    var skeletons: [URL] = []
+    let skeletonFile = "BridgeJS.json"
     let context: PluginContext
 
     init(context: PluginContext) {
@@ -717,7 +719,9 @@ class SkeletonCollector {
             return ([], [])
         }
         visit(product: product, package: context.package)
-        return (exportedSkeletons, importedSkeletons)
+        // Unified skeleton files contain both exported and imported parts
+        // Return the same list for both since BridgeJSLink.addSkeletonFile handles the unified format
+        return (skeletons, skeletons)
     }
 
     func collectFromTests() -> (exportedSkeletons: [URL], importedSkeletons: [URL]) {
@@ -728,7 +732,9 @@ class SkeletonCollector {
         for test in tests {
             visit(target: test, package: context.package)
         }
-        return (exportedSkeletons, importedSkeletons)
+        // Unified skeleton files contain both exported and imported parts
+        // Return the same list for both since BridgeJSLink.addSkeletonFile handles the unified format
+        return (skeletons, skeletons)
     }
 
     private func visit(product: Product, package: Package) {
@@ -742,6 +748,11 @@ class SkeletonCollector {
     private func visit(target: Target, package: Package) {
         if visitedTargets.contains(target.id) { return }
         visitedTargets.insert(target.id)
+        if let sourceModuleTarget = target as? SourceModuleTarget {
+            if sourceModuleTarget.kind == .macro {
+                return
+            }
+        }
         if let target = target as? SwiftSourceModuleTarget {
             let directories = [
                 target.directoryURL.appending(path: "Generated/JavaScript"),
@@ -751,13 +762,9 @@ class SkeletonCollector {
                     .appending(path: "outputs/\(package.id)/\(target.name)/destination/BridgeJS"),
             ]
             for directory in directories {
-                let exportedSkeletonURL = directory.appending(path: exportedSkeletonFile)
-                let importedSkeletonURL = directory.appending(path: importedSkeletonFile)
-                if FileManager.default.fileExists(atPath: exportedSkeletonURL.path) {
-                    exportedSkeletons.append(exportedSkeletonURL)
-                }
-                if FileManager.default.fileExists(atPath: importedSkeletonURL.path) {
-                    importedSkeletons.append(importedSkeletonURL)
+                let skeletonURL = directory.appending(path: skeletonFile)
+                if FileManager.default.fileExists(atPath: skeletonURL.path) {
+                    skeletons.append(skeletonURL)
                 }
             }
         }

@@ -111,9 +111,8 @@ This command will:
 For example, with a target named "MyApp", it will create:
 
 ```
-Sources/MyApp/Generated/ExportSwift.swift  # Generated code for Swift exports
-Sources/MyApp/Generated/ImportTS.swift     # Generated code for TypeScript imports
-Sources/MyApp/Generated/JavaScript/        # Generated JSON skeletons
+Sources/MyApp/Generated/BridgeJS.swift     # Generated code for both exports and imports
+Sources/MyApp/Generated/JavaScript/BridgeJS.json  # Unified skeleton JSON
 ```
 
 ### Step 6: Add Generated Files to Version Control

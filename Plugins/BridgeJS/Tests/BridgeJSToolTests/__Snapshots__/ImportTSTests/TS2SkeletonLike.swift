@@ -1,11 +1,3 @@
-// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
-// DO NOT EDIT.
-//
-// To update this file, just rebuild your project or run
-// `swift package bridge-js`.
-
-@_spi(BridgeJS) import JavaScriptKit
-
 #if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_createTS2Skeleton")
 fileprivate func bjs_createTS2Skeleton() -> Int32
@@ -15,7 +7,7 @@ fileprivate func bjs_createTS2Skeleton() -> Int32 {
 }
 #endif
 
-func createTS2Skeleton() throws(JSException) -> TypeScriptProcessor {
+func _$createTS2Skeleton() throws(JSException) -> TypeScriptProcessor {
     let ret = bjs_createTS2Skeleton()
     if let error = _swift_js_take_exception() {
         throw error
@@ -32,7 +24,7 @@ fileprivate func bjs_createCodeGenerator(_ format: Int32) -> Int32 {
 }
 #endif
 
-func createCodeGenerator(_ format: String) throws(JSException) -> CodeGenerator {
+func _$createCodeGenerator(_ format: String) throws(JSException) -> CodeGenerator {
     let formatValue = format.bridgeJSLowerParameter()
     let ret = bjs_createCodeGenerator(formatValue)
     if let error = _swift_js_take_exception() {
@@ -68,44 +60,33 @@ fileprivate func bjs_TypeScriptProcessor_validate(_ self: Int32, _ ts: Int32) ->
 }
 #endif
 
-struct TypeScriptProcessor: _JSBridgedClass {
-    let jsObject: JSObject
-
-    init(unsafelyWrapping jsObject: JSObject) {
-        self.jsObject = jsObject
+func _$TypeScriptProcessor_version_get(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_TypeScriptProcessor_version_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
+    return String.bridgeJSLiftReturn(ret)
+}
 
-    var version: String {
-        get throws(JSException) {
-            let selfValue = self.bridgeJSLowerParameter()
-            let ret = bjs_TypeScriptProcessor_version_get(selfValue)
-            if let error = _swift_js_take_exception() {
-                throw error
-            }
-            return String.bridgeJSLiftReturn(ret)
-        }
+func _$TypeScriptProcessor_convert(_ self: JSObject, _ ts: String) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let tsValue = ts.bridgeJSLowerParameter()
+    let ret = bjs_TypeScriptProcessor_convert(selfValue, tsValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
+    return String.bridgeJSLiftReturn(ret)
+}
 
-    func convert(_ ts: String) throws(JSException) -> String {
-        let selfValue = self.bridgeJSLowerParameter()
-        let tsValue = ts.bridgeJSLowerParameter()
-        let ret = bjs_TypeScriptProcessor_convert(selfValue, tsValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
-        return String.bridgeJSLiftReturn(ret)
+func _$TypeScriptProcessor_validate(_ self: JSObject, _ ts: String) throws(JSException) -> Bool {
+    let selfValue = self.bridgeJSLowerParameter()
+    let tsValue = ts.bridgeJSLowerParameter()
+    let ret = bjs_TypeScriptProcessor_validate(selfValue, tsValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
-
-    func validate(_ ts: String) throws(JSException) -> Bool {
-        let selfValue = self.bridgeJSLowerParameter()
-        let tsValue = ts.bridgeJSLowerParameter()
-        let ret = bjs_TypeScriptProcessor_validate(selfValue, tsValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
-        return Bool.bridgeJSLiftReturn(ret)
-    }
-
+    return Bool.bridgeJSLiftReturn(ret)
 }
 
 #if arch(wasm32)
@@ -126,32 +107,21 @@ fileprivate func bjs_CodeGenerator_generate(_ self: Int32, _ input: Int32) -> In
 }
 #endif
 
-struct CodeGenerator: _JSBridgedClass {
-    let jsObject: JSObject
-
-    init(unsafelyWrapping jsObject: JSObject) {
-        self.jsObject = jsObject
+func _$CodeGenerator_outputFormat_get(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_CodeGenerator_outputFormat_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
+    return String.bridgeJSLiftReturn(ret)
+}
 
-    var outputFormat: String {
-        get throws(JSException) {
-            let selfValue = self.bridgeJSLowerParameter()
-            let ret = bjs_CodeGenerator_outputFormat_get(selfValue)
-            if let error = _swift_js_take_exception() {
-                throw error
-            }
-            return String.bridgeJSLiftReturn(ret)
-        }
+func _$CodeGenerator_generate(_ self: JSObject, _ input: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let inputValue = input.bridgeJSLowerParameter()
+    let ret = bjs_CodeGenerator_generate(selfValue, inputValue)
+    if let error = _swift_js_take_exception() {
+        throw error
     }
-
-    func generate(_ input: JSObject) throws(JSException) -> String {
-        let selfValue = self.bridgeJSLowerParameter()
-        let inputValue = input.bridgeJSLowerParameter()
-        let ret = bjs_CodeGenerator_generate(selfValue, inputValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
-        return String.bridgeJSLiftReturn(ret)
-    }
-
+    return String.bridgeJSLiftReturn(ret)
 }

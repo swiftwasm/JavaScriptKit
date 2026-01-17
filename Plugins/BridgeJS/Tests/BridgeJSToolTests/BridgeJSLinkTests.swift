@@ -4,7 +4,8 @@ import SwiftParser
 import Testing
 @testable import BridgeJSLink
 @testable import BridgeJSCore
-@testable import TS2Skeleton
+@testable import TS2Swift
+@testable import BridgeJSSkeleton
 
 @Suite struct BridgeJSLinkTests {
     private func snapshot(
@@ -52,26 +53,51 @@ import Testing
         let name = url.deletingPathExtension().lastPathComponent
 
         let (_, outputSkeleton) = try #require(try swiftAPI.finalize())
-        let bridgeJSLink: BridgeJSLink = BridgeJSLink(exportedSkeletons: [outputSkeleton], sharedMemory: false)
+        let bridgeJSLink: BridgeJSLink = BridgeJSLink(
+            skeletons: [
+                BridgeJSSkeleton(moduleName: "TestModule", exported: outputSkeleton),
+            ],
+            sharedMemory: false
+        )
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Export")
     }
 
     @Test(arguments: collectInputs(extension: ".d.ts"))
     func snapshotImport(input: String) throws {
         let url = Self.inputsDirectory.appendingPathComponent(input)
+        let name = url.deletingPathExtension().deletingPathExtension().lastPathComponent
         let tsconfigPath = url.deletingLastPathComponent().appendingPathComponent("tsconfig.json")
 
-        var importTS = ImportTS(progress: .silent, moduleName: "TestModule")
         let nodePath = try #require(which("node"))
-        try importTS.addSourceFile(url.path, tsconfigPath: tsconfigPath.path, nodePath: nodePath)
-        let name = url.deletingPathExtension().deletingPathExtension().lastPathComponent
+        let swiftSource = try invokeTS2Swift(
+            dtsFile: url.path,
+            tsconfigPath: tsconfigPath.path,
+            nodePath: nodePath,
+            progress: .silent
+        )
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        let outputSkeletonData = try encoder.encode(importTS.skeleton)
+        let sourceFile = Parser.parse(source: swiftSource)
+        let importSwift = ImportSwiftMacros(progress: .silent, moduleName: "TestModule")
+        importSwift.addSourceFile(sourceFile, "\(name).Macros.swift")
+        let importResult = try importSwift.finalize()
+
+        var importTS = ImportTS(progress: .silent, moduleName: "TestModule")
+        for child in importResult.outputSkeleton.children {
+            importTS.addSkeleton(child)
+        }
+        let importSkeleton = importTS.skeleton
 
         var bridgeJSLink = BridgeJSLink(sharedMemory: false)
-        try bridgeJSLink.addImportedSkeletonFile(data: outputSkeletonData)
+        // Create unified skeleton for test
+        let unifiedSkeleton = BridgeJSSkeleton(
+            moduleName: "TestModule",
+            exported: nil,
+            imported: importSkeleton
+        )
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let unifiedData = try encoder.encode(unifiedSkeleton)
+        try bridgeJSLink.addSkeletonFile(data: unifiedData)
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Import")
     }
 
@@ -88,7 +114,12 @@ import Testing
         try swiftAPI.addSourceFile(sourceFile, inputFile)
         let name = url.deletingPathExtension().lastPathComponent
         let (_, outputSkeleton) = try #require(try swiftAPI.finalize())
-        let bridgeJSLink: BridgeJSLink = BridgeJSLink(exportedSkeletons: [outputSkeleton], sharedMemory: false)
+        let bridgeJSLink: BridgeJSLink = BridgeJSLink(
+            skeletons: [
+                BridgeJSSkeleton(moduleName: "TestModule", exported: outputSkeleton),
+            ],
+            sharedMemory: false
+        )
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Global.Export")
     }
 
@@ -107,7 +138,10 @@ import Testing
         let (_, privateSkeleton) = try #require(try privateAPI.finalize())
 
         let bridgeJSLink = BridgeJSLink(
-            exportedSkeletons: [globalSkeleton, privateSkeleton],
+            skeletons: [
+                BridgeJSSkeleton(moduleName: "GlobalModule", exported: globalSkeleton),
+                BridgeJSSkeleton(moduleName: "PrivateModule", exported: privateSkeleton),
+            ],
             sharedMemory: false
         )
         try snapshot(bridgeJSLink: bridgeJSLink, name: "MixedModules.Export")

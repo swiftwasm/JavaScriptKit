@@ -1,5 +1,5 @@
-export interface TS2Skeleton {
+export interface TS2Swift {
     convert(ts: string): string;
 }
 
-export function createTS2Skeleton(): TS2Skeleton;
+export function createTS2Swift(): TS2Swift;

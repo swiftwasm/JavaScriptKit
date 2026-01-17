@@ -1,5 +1,6 @@
 // swift-tools-version: 6.0
 
+import CompilerPluginSupport
 import PackageDescription
 
 let package = Package(
@@ -14,11 +15,11 @@ let package = Package(
             name: "BridgeJSTool",
             dependencies: [
                 "BridgeJSCore",
-                "TS2Skeleton",
+                "TS2Swift",
             ]
         ),
         .target(
-            name: "TS2Skeleton",
+            name: "TS2Swift",
             dependencies: [
                 "BridgeJSCore",
                 "BridgeJSSkeleton",
@@ -52,9 +53,23 @@ let package = Package(
             dependencies: [
                 "BridgeJSCore",
                 "BridgeJSLink",
-                "TS2Skeleton",
+                "TS2Swift",
             ],
             exclude: ["__Snapshots__", "Inputs", "MultifileInputs"]
+        ),
+        .macro(
+            name: "BridgeJSMacros",
+            dependencies: [
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+            ]
+        ),
+        .testTarget(
+            name: "BridgeJSMacrosTests",
+            dependencies: [
+                "BridgeJSMacros",
+                .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
+            ]
         ),
     ]
 )
