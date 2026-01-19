@@ -1,0 +1,1660 @@
+{
+  "exported" : {
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_EnumRoundtrip_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_EnumRoundtrip_take",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "take",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "associatedValueEnum" : {
+                    "_0" : "APIResult"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_EnumRoundtrip_makeSuccess",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeSuccess",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "APIResult"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_EnumRoundtrip_makeFailure",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeFailure",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "APIResult"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_EnumRoundtrip_makeFlag",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeFlag",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "APIResult"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_EnumRoundtrip_makeRate",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeRate",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "APIResult"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_EnumRoundtrip_makePrecise",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makePrecise",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "APIResult"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_EnumRoundtrip_makeInfo",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeInfo",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "APIResult"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_EnumRoundtrip_roundtrip",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtrip",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "result",
+                "type" : {
+                  "associatedValueEnum" : {
+                    "_0" : "APIResult"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "APIResult"
+              }
+            }
+          }
+        ],
+        "name" : "EnumRoundtrip",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "EnumRoundtrip"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_ComplexResultRoundtrip_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_ComplexResultRoundtrip_take",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "take",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "associatedValueEnum" : {
+                    "_0" : "ComplexResult"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ComplexResultRoundtrip_makeSuccess",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeSuccess",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "ComplexResult"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ComplexResultRoundtrip_makeError",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeError",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "ComplexResult"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ComplexResultRoundtrip_makeLocation",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeLocation",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "ComplexResult"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ComplexResultRoundtrip_makeStatus",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeStatus",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "ComplexResult"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ComplexResultRoundtrip_makeCoordinates",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeCoordinates",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "ComplexResult"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ComplexResultRoundtrip_makeComprehensive",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeComprehensive",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "ComplexResult"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ComplexResultRoundtrip_makeInfo",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeInfo",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "ComplexResult"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ComplexResultRoundtrip_roundtrip",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtrip",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "result",
+                "type" : {
+                  "associatedValueEnum" : {
+                    "_0" : "ComplexResult"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "ComplexResult"
+              }
+            }
+          }
+        ],
+        "name" : "ComplexResultRoundtrip",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "ComplexResultRoundtrip"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_StringRoundtrip_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_StringRoundtrip_take",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "take",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringRoundtrip_make",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "make",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "StringRoundtrip",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "StringRoundtrip"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_StructRoundtrip_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_StructRoundtrip_takeSimple",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takeSimple",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "SimpleStruct"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StructRoundtrip_makeSimple",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeSimple",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "SimpleStruct"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StructRoundtrip_roundtripSimple",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripSimple",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "SimpleStruct"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "SimpleStruct"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StructRoundtrip_takeAddress",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takeAddress",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "Address"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StructRoundtrip_makeAddress",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeAddress",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Address"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StructRoundtrip_roundtripAddress",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripAddress",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "Address"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Address"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StructRoundtrip_takePerson",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takePerson",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "Person"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StructRoundtrip_makePerson",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makePerson",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Person"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StructRoundtrip_roundtripPerson",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripPerson",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "Person"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Person"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StructRoundtrip_takeComplex",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takeComplex",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "ComplexStruct"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StructRoundtrip_makeComplex",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeComplex",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "ComplexStruct"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StructRoundtrip_roundtripComplex",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripComplex",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "ComplexStruct"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "ComplexStruct"
+              }
+            }
+          }
+        ],
+        "name" : "StructRoundtrip",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "StructRoundtrip"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_SimpleClass_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "count",
+              "name" : "count",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "label" : "flag",
+              "name" : "flag",
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "label" : "rate",
+              "name" : "rate",
+              "type" : {
+                "float" : {
+
+                }
+              }
+            },
+            {
+              "label" : "precise",
+              "name" : "precise",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "SimpleClass",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "count",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "flag",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "rate",
+            "type" : {
+              "float" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "precise",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "SimpleClass"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_AddressClass_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "street",
+              "name" : "street",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "city",
+              "name" : "city",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "zipCode",
+              "name" : "zipCode",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "AddressClass",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "street",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "city",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "zipCode",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "AddressClass"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_ClassRoundtrip_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_ClassRoundtrip_takeSimpleClass",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takeSimpleClass",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftHeapObject" : {
+                    "_0" : "SimpleClass"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ClassRoundtrip_makeSimpleClass",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeSimpleClass",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "SimpleClass"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ClassRoundtrip_roundtripSimpleClass",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripSimpleClass",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftHeapObject" : {
+                    "_0" : "SimpleClass"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "SimpleClass"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ClassRoundtrip_takeAddressClass",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takeAddressClass",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftHeapObject" : {
+                    "_0" : "AddressClass"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ClassRoundtrip_makeAddressClass",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeAddressClass",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "AddressClass"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ClassRoundtrip_roundtripAddressClass",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripAddressClass",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftHeapObject" : {
+                    "_0" : "AddressClass"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "AddressClass"
+              }
+            }
+          }
+        ],
+        "name" : "ClassRoundtrip",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "ClassRoundtrip"
+      }
+    ],
+    "enums" : [
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "success"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "failure"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "flag"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "float" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "rate"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "precise"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "info"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "APIResult",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "APIResult",
+        "tsFullPath" : "APIResult"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "success"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "error"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "location"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "status"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "coordinates"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "comprehensive"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "info"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "ComplexResult",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "ComplexResult",
+        "tsFullPath" : "ComplexResult"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_run",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "run",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+      {
+        "methods" : [
+
+        ],
+        "name" : "SimpleStruct",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "count",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "flag",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "rate",
+            "type" : {
+              "float" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "precise",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "SimpleStruct"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "Address",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "street",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "city",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "zipCode",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Address"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "Person",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "age",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "address",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "Address"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "email",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Person"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "ComplexStruct",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "id",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "title",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "active",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "score",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "tags",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "metadata",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "ComplexStruct"
+      }
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+
+        ]
+      },
+      {
+        "functions" : [
+          {
+            "name" : "benchmarkHelperNoop",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "name" : "benchmarkHelperNoopWithNumber",
+            "parameters" : [
+              {
+                "name" : "n",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "name" : "benchmarkRunner",
+            "parameters" : [
+              {
+                "name" : "name",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "body",
+                "type" : {
+                  "jsObject" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "Benchmarks"
+}

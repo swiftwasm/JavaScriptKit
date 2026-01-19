@@ -244,7 +244,6 @@ export async function createInstantiator(options, swift) {
                     swift.memory.getObject(self).connectionTimeout = newValue;
                 } catch (error) {
                     setException(error);
-                    return 0
                 }
             }
             TestModule["bjs_DatabaseConnection_connect"] = function bjs_DatabaseConnection_connect(self, url) {

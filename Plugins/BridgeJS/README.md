@@ -13,34 +13,39 @@ BridgeJS provides easy interoperability between Swift and JavaScript/TypeScript.
 1. **Importing TypeScript APIs into Swift**: Use TypeScript/JavaScript APIs directly from Swift code
 2. **Exporting Swift APIs to JavaScript**: Make your Swift APIs available to JavaScript code
 
+The workflow is:
+1. `ts2swift` converts TypeScript definitions (`bridge-js.d.ts`) to macro-annotated Swift declarations (`BridgeJS.Macros.swift`)
+2. `bridge-js generate` processes both Swift source files (for export) and macro-annotated Swift files (for import) to generate:
+   - `BridgeJS.swift` (Swift glue code)
+   - `JavaScript/BridgeJS.json` (a unified skeleton for linking)
+3. `bridge-js link` combines module skeletons (`JavaScript/BridgeJS.json`) to produce JavaScript glue code (`bridge-js.js` and `bridge-js.d.ts`)
+
 ## Architecture Diagram
 
 ```mermaid
 graph LR
-    E1 --> G3[ExportSwift.json]
     subgraph ModuleA
-        A.swift --> E1[[bridge-js export]]
-        B.swift --> E1
-        E1 --> G1[ExportSwift.swift]
-        B1[bridge-js.d.ts]-->I1[[bridge-js import]]
-        I1 --> G2[ImportTS.swift]
+        A.swift --> G1[bridge-js generate]
+        B.swift --> G1
+        B1[bridge-js.d.ts] --> T1[[ts2swift]]
+        T1 --> M1[BridgeJS.Macros.swift]
+        M1 --> G1
+        G1 --> G3[BridgeJS.json]
+        G1 --> G2[BridgeJS.swift]
     end
-    I1 --> G4[ImportTS.json]
 
-    E2 --> G7[ExportSwift.json]
     subgraph ModuleB
-        C.swift --> E2[[bridge-js export]]
-        D.swift --> E2
-        E2 --> G5[ExportSwift.swift]
-        B2[bridge-js.d.ts]-->I2[[bridge-js import]]
-        I2 --> G6[ImportTS.swift]
+        C.swift --> G4[bridge-js generate]
+        D.swift --> G4
+        B2[bridge-js.d.ts] --> T2[[ts2swift]]
+        T2 --> M2[BridgeJS.Macros.swift]
+        M2 --> G4
+        G4 --> G5[BridgeJS.swift]
+        G4 --> G6[BridgeJS.json]
     end
-    I2 --> G8[ImportTS.json]
 
     G3 --> L1[[bridge-js link]]
-    G4 --> L1
-    G7 --> L1
-    G8 --> L1
+    G6 --> L1
 
     L1 --> F1[bridge-js.js]
     L1 --> F2[bridge-js.d.ts]

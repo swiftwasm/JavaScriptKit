@@ -237,29 +237,11 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WeirdNaming_normalProperty_set"] = function bjs_WeirdNaming_normalProperty_set(self, newValue) {
-                try {
-                    const newValueObject = swift.memory.getObject(newValue);
-                    swift.memory.release(newValue);
-                    swift.memory.getObject(self).normalProperty = newValueObject;
-                } catch (error) {
-                    setException(error);
-                }
-            }
             TestModule["bjs_WeirdNaming_for_get"] = function bjs_WeirdNaming_for_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).for;
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_WeirdNaming_for_set"] = function bjs_WeirdNaming_for_set(self, newValue) {
-                try {
-                    const newValueObject = swift.memory.getObject(newValue);
-                    swift.memory.release(newValue);
-                    swift.memory.getObject(self).for = newValueObject;
                 } catch (error) {
                     setException(error);
                 }
@@ -273,7 +255,25 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WeirdNaming_Any_set"] = function bjs_WeirdNaming_Any_set(self, newValue) {
+            TestModule["bjs_WeirdNaming_normalProperty_set"] = function bjs_WeirdNaming_normalProperty_set(self, newValue) {
+                try {
+                    const newValueObject = swift.memory.getObject(newValue);
+                    swift.memory.release(newValue);
+                    swift.memory.getObject(self).normalProperty = newValueObject;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WeirdNaming_for_set"] = function bjs_WeirdNaming_for_set(self, newValue) {
+                try {
+                    const newValueObject = swift.memory.getObject(newValue);
+                    swift.memory.release(newValue);
+                    swift.memory.getObject(self).for = newValueObject;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WeirdNaming_any_set"] = function bjs_WeirdNaming_any_set(self, newValue) {
                 try {
                     const newValueObject = swift.memory.getObject(newValue);
                     swift.memory.release(newValue);

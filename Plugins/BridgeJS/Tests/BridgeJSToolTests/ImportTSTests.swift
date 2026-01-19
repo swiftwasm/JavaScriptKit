@@ -1,7 +1,8 @@
 import Testing
 import Foundation
+import SwiftParser
 @testable import BridgeJSCore
-@testable import TS2Skeleton
+@testable import TS2Swift
 
 @Suite struct ImportTSTests {
     static let inputsDirectory = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent(
@@ -16,13 +17,31 @@ import Foundation
 
     @Test(arguments: collectInputs())
     func snapshot(input: String) throws {
-        var api = ImportTS(progress: .silent, moduleName: "Check")
         let url = Self.inputsDirectory.appendingPathComponent(input)
+        let name = url.deletingPathExtension().deletingPathExtension().deletingPathExtension().lastPathComponent
         let nodePath = try #require(which("node"))
         let tsconfigPath = url.deletingLastPathComponent().appendingPathComponent("tsconfig.json")
-        try api.addSourceFile(url.path, tsconfigPath: tsconfigPath.path, nodePath: nodePath)
-        let outputSwift = try #require(try api.finalize())
-        let name = url.deletingPathExtension().deletingPathExtension().deletingPathExtension().lastPathComponent
+
+        let swiftSource = try invokeTS2Swift(
+            dtsFile: url.path,
+            tsconfigPath: tsconfigPath.path,
+            nodePath: nodePath,
+            progress: .silent
+        )
+        try assertSnapshot(
+            name: name + ".Macros",
+            filePath: #filePath,
+            function: #function,
+            input: swiftSource.data(using: .utf8)!,
+            fileExtension: "swift"
+        )
+
+        let sourceFile = Parser.parse(source: swiftSource)
+        let importSwift = ImportSwiftMacros(progress: .silent, moduleName: "Check")
+        importSwift.addSourceFile(sourceFile, "\(name).Macros.swift")
+        let importResult = try importSwift.finalize()
+
+        let outputSwift = try #require(importResult.outputSwift)
         try assertSnapshot(
             name: name,
             filePath: #filePath,

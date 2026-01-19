@@ -107,3 +107,81 @@ public enum JSEnumStyle: String {
 /// - Important: This feature is still experimental. No API stability is guaranteed, and the API may change in future releases.
 @attached(peer)
 public macro JS(namespace: String? = nil, enumStyle: JSEnumStyle = .const) = Builtin.ExternalMacro
+
+/// A macro that generates a Swift getter that reads a value from JavaScript.
+///
+/// This macro is used by BridgeJS-generated Swift declarations.
+///
+/// Example:
+///
+/// ```swift
+/// @_spi(Experimental) import JavaScriptKit
+///
+/// @JSGetter var count: Int
+///
+/// struct Greeter {
+///     @JSGetter var name: String
+/// }
+/// ```
+@attached(accessor)
+@_spi(Experimental)
+public macro JSGetter() =
+    #externalMacro(module: "BridgeJSMacros", type: "JSGetterMacro")
+
+/// A macro that generates a Swift function body that writes a value to JavaScript.
+///
+/// This macro is used by BridgeJS-generated Swift declarations.
+///
+/// - Parameter jsName: An optional string that specifies the name of the JavaScript property to write to.
+///   If not provided, automatically derived from the Swift property name. (e.g. "setName" -> "name")
+///
+/// Example:
+///
+/// ```swift
+/// @_spi(Experimental) import JavaScriptKit
+///
+/// @JSSetter func setName(_ value: String) throws (JSException)
+/// ```
+@attached(body)
+@_spi(Experimental)
+public macro JSSetter(jsName: String? = nil) =
+    #externalMacro(module: "BridgeJSMacros", type: "JSSetterMacro")
+
+/// A macro that generates a Swift function body that calls a JavaScript function.
+///
+/// This macro is used by BridgeJS-generated Swift declarations.
+///
+/// Example:
+///
+/// ```swift
+/// @_spi(Experimental) import JavaScriptKit
+///
+/// @JSFunction func greet() throws (JSException) -> String
+/// @JSFunction init(_ name: String) throws (JSException)
+/// ```
+@attached(body)
+@_spi(Experimental)
+public macro JSFunction() =
+    #externalMacro(module: "BridgeJSMacros", type: "JSFunctionMacro")
+
+/// A macro that adds bridging members for a Swift type that represents a JavaScript class.
+///
+/// This macro is used by BridgeJS-generated Swift declarations.
+///
+/// Example:
+///
+/// ```swift
+/// @_spi(Experimental) import JavaScriptKit
+///
+/// @JSClass
+/// struct JsGreeter: _JSBridgedClass {
+///     @JSGetter var name: String
+///     @JSSetter func setName(_ value: String) throws (JSException)
+///     @JSFunction init(_ name: String) throws (JSException)
+///     @JSFunction func greet() throws (JSException) -> String
+/// }
+/// ```
+@attached(member, names: arbitrary)
+@_spi(Experimental)
+public macro JSClass() =
+    #externalMacro(module: "BridgeJSMacros", type: "JSClassMacro")

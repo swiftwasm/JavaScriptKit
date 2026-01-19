@@ -1,6 +1,6 @@
 import Testing
 import Foundation
-@testable import TS2Skeleton
+@testable import TS2Swift
 @testable import BridgeJSCore
 
 @Suite struct WhichTests {

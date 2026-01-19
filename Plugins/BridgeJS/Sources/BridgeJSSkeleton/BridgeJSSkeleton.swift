@@ -548,7 +548,6 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
 }
 
 public struct ExportedSkeleton: Codable {
-    public let moduleName: String
     public let functions: [ExportedFunction]
     public let classes: [ExportedClass]
     public let enums: [ExportedEnum]
@@ -562,7 +561,6 @@ public struct ExportedSkeleton: Codable {
     public var exposeToGlobal: Bool
 
     public init(
-        moduleName: String,
         functions: [ExportedFunction],
         classes: [ExportedClass],
         enums: [ExportedEnum],
@@ -570,7 +568,6 @@ public struct ExportedSkeleton: Codable {
         protocols: [ExportedProtocol] = [],
         exposeToGlobal: Bool
     ) {
-        self.moduleName = moduleName
         self.functions = functions
         self.classes = classes
         self.enums = enums
@@ -588,6 +585,13 @@ public struct ImportedFunctionSkeleton: Codable {
     public let returnType: BridgeType
     public let documentation: String?
 
+    public init(name: String, parameters: [Parameter], returnType: BridgeType, documentation: String? = nil) {
+        self.name = name
+        self.parameters = parameters
+        self.returnType = returnType
+        self.documentation = documentation
+    }
+
     public func abiName(context: ImportedTypeSkeleton?) -> String {
         return ABINameGenerator.generateImportedABIName(
             baseName: name,
@@ -599,6 +603,10 @@ public struct ImportedFunctionSkeleton: Codable {
 public struct ImportedConstructorSkeleton: Codable {
     public let parameters: [Parameter]
 
+    public init(parameters: [Parameter]) {
+        self.parameters = parameters
+    }
+
     public func abiName(context: ImportedTypeSkeleton) -> String {
         return ABINameGenerator.generateImportedABIName(
             baseName: "init",
@@ -607,21 +615,68 @@ public struct ImportedConstructorSkeleton: Codable {
     }
 }
 
-public struct ImportedPropertySkeleton: Codable {
+public struct ImportedGetterSkeleton: Codable {
     public let name: String
-    public let isReadonly: Bool
     public let type: BridgeType
     public let documentation: String?
+    /// Name of the getter function if it's a separate function (from @JSGetter)
+    public let functionName: String?
 
-    public func getterAbiName(context: ImportedTypeSkeleton) -> String {
+    public init(
+        name: String,
+        type: BridgeType,
+        documentation: String? = nil,
+        functionName: String? = nil
+    ) {
+        self.name = name
+        self.type = type
+        self.documentation = documentation
+        self.functionName = functionName
+    }
+
+    public func abiName(context: ImportedTypeSkeleton) -> String {
+        if let functionName = functionName {
+            return ABINameGenerator.generateImportedABIName(
+                baseName: functionName,
+                context: context,
+                operation: nil
+            )
+        }
         return ABINameGenerator.generateImportedABIName(
             baseName: name,
             context: context,
             operation: "get"
         )
     }
+}
 
-    public func setterAbiName(context: ImportedTypeSkeleton) -> String {
+public struct ImportedSetterSkeleton: Codable {
+    public let name: String
+    public let type: BridgeType
+    public let documentation: String?
+    /// Name of the setter function if it's a separate function (from @JSSetter)
+    public let functionName: String?
+
+    public init(
+        name: String,
+        type: BridgeType,
+        documentation: String? = nil,
+        functionName: String? = nil
+    ) {
+        self.name = name
+        self.type = type
+        self.documentation = documentation
+        self.functionName = functionName
+    }
+
+    public func abiName(context: ImportedTypeSkeleton) -> String {
+        if let functionName = functionName {
+            return ABINameGenerator.generateImportedABIName(
+                baseName: functionName,
+                context: context,
+                operation: nil
+            )
+        }
         return ABINameGenerator.generateImportedABIName(
             baseName: name,
             context: context,
@@ -634,22 +689,57 @@ public struct ImportedTypeSkeleton: Codable {
     public let name: String
     public let constructor: ImportedConstructorSkeleton?
     public let methods: [ImportedFunctionSkeleton]
-    public let properties: [ImportedPropertySkeleton]
+    public let getters: [ImportedGetterSkeleton]
+    public let setters: [ImportedSetterSkeleton]
     public let documentation: String?
+
+    public init(
+        name: String,
+        constructor: ImportedConstructorSkeleton? = nil,
+        methods: [ImportedFunctionSkeleton],
+        getters: [ImportedGetterSkeleton] = [],
+        setters: [ImportedSetterSkeleton] = [],
+        documentation: String? = nil
+    ) {
+        self.name = name
+        self.constructor = constructor
+        self.methods = methods
+        self.getters = getters
+        self.setters = setters
+        self.documentation = documentation
+    }
 }
 
 public struct ImportedFileSkeleton: Codable {
     public let functions: [ImportedFunctionSkeleton]
     public let types: [ImportedTypeSkeleton]
+
+    public init(functions: [ImportedFunctionSkeleton], types: [ImportedTypeSkeleton]) {
+        self.functions = functions
+        self.types = types
+    }
 }
 
 public struct ImportedModuleSkeleton: Codable {
-    public let moduleName: String
     public var children: [ImportedFileSkeleton]
 
-    public init(moduleName: String, children: [ImportedFileSkeleton]) {
-        self.moduleName = moduleName
+    public init(children: [ImportedFileSkeleton]) {
         self.children = children
+    }
+}
+
+// MARK: - Unified Skeleton
+
+/// Unified skeleton containing both exported and imported API definitions
+public struct BridgeJSSkeleton: Codable {
+    public let moduleName: String
+    public let exported: ExportedSkeleton?
+    public let imported: ImportedModuleSkeleton?
+
+    public init(moduleName: String, exported: ExportedSkeleton? = nil, imported: ImportedModuleSkeleton? = nil) {
+        self.moduleName = moduleName
+        self.exported = exported
+        self.imported = imported
     }
 }
 

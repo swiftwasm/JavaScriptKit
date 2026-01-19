@@ -97,54 +97,41 @@ extension BridgeJSCommandPlugin.Context {
     ) throws {
         printStderr("Generating bridge code for \(target.name)...")
 
-        printVerbose("Exporting Swift API for \(target.name)...")
-
         let generatedDirectory = target.directoryURL.appending(path: "Generated")
         let generatedJavaScriptDirectory = generatedDirectory.appending(path: "JavaScript")
 
-        try runBridgeJSTool(
-            arguments: [
-                "export",
-                "--module-name",
-                target.name,
-                "--target-dir",
-                target.directoryURL.path,
-                "--output-skeleton",
-                generatedJavaScriptDirectory.appending(path: "BridgeJS.ExportSwift.json").path,
-                "--output-swift",
-                generatedDirectory.appending(path: "BridgeJS.ExportSwift.swift").path,
-                "--verbose",
-                options.verbose ? "true" : "false",
-            ]
-                + target.sourceFiles.filter {
-                    !$0.url.path.hasPrefix(generatedDirectory.path + "/")
-                }.map(\.url.path) + remainingArguments
-        )
-
-        printVerbose("Importing TypeScript API for \(target.name)...")
-
         let bridgeDtsPath = target.directoryURL.appending(path: "bridge-js.d.ts")
-        // Execute import only if bridge-js.d.ts exists
+        let tsconfigPath = context.package.directoryURL.appending(path: "tsconfig.json")
+
+        // Unified generate command
+        var generateArguments: [String] = [
+            "generate",
+            "--module-name",
+            target.name,
+            "--target-dir",
+            target.directoryURL.path,
+            "--output-dir",
+            generatedDirectory.path,
+            "--verbose",
+            options.verbose ? "true" : "false",
+        ]
+
         if FileManager.default.fileExists(atPath: bridgeDtsPath.path) {
-            try runBridgeJSTool(
-                arguments: [
-                    "import",
-                    "--target-dir",
-                    target.directoryURL.path,
-                    "--output-skeleton",
-                    generatedJavaScriptDirectory.appending(path: "BridgeJS.ImportTS.json").path,
-                    "--output-swift",
-                    generatedDirectory.appending(path: "BridgeJS.ImportTS.swift").path,
-                    "--verbose",
-                    options.verbose ? "true" : "false",
-                    "--module-name",
-                    target.name,
-                    "--project",
-                    context.package.directoryURL.appending(path: "tsconfig.json").path,
-                    bridgeDtsPath.path,
-                ] + remainingArguments
-            )
+            generateArguments.append(contentsOf: [
+                "--project",
+                tsconfigPath.path,
+                bridgeDtsPath.path,
+            ])
         }
+
+        generateArguments.append(
+            contentsOf: target.sourceFiles.filter {
+                !$0.url.path.hasPrefix(generatedDirectory.path + "/")
+            }.map(\.url.path)
+        )
+        generateArguments.append(contentsOf: remainingArguments)
+
+        try runBridgeJSTool(arguments: generateArguments)
     }
 
     private func runBridgeJSTool(arguments: [String]) throws {
