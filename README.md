@@ -1,7 +1,7 @@
 # JavaScriptKit
 
 [![Run unit tests](https://github.com/swiftwasm/JavaScriptKit/actions/workflows/test.yml/badge.svg)](https://github.com/swiftwasm/JavaScriptKit/actions/workflows/test.yml)
-[![](https://img.shields.io/badge/docc-read_documentation-blue)](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation)
+[![Documentation](https://img.shields.io/badge/docc-read_documentation-blue)](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation)
 
 Swift framework to interact with JavaScript through WebAssembly.
 
@@ -40,7 +40,81 @@ button.onclick = .object(JSClosure { _ in
 _ = document.body.appendChild(button)
 ```
 
-Check out the [examples](https://github.com/swiftwasm/JavaScriptKit/tree/main/Examples) for more detailed usage.
+**Learn more:** [JavaScript Interop Cheat Sheet](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/javascript-interop-cheat-sheet)
+
+## BridgeJS Plugin
+
+> **Note:** BridgeJS is experimental. APIs may change in future releases.
+
+BridgeJS provides easy interoperability between Swift and JavaScript/TypeScript. It enables:
+
+- **Exporting Swift APIs to JavaScript**: Make your Swift code callable from JavaScript
+- **Importing TypeScript APIs into Swift**: Use JavaScript APIs with type safety in Swift
+
+For architecture details, see the [BridgeJS Plugin README](Plugins/BridgeJS/README.md).
+
+### Exporting Swift to JavaScript
+
+Mark Swift code with `@JS` to make it callable from JavaScript:
+
+```swift
+import JavaScriptKit
+
+@JS class Greeter {
+    @JS var name: String
+
+    @JS init(name: String) {
+        self.name = name
+    }
+
+    @JS func greet() -> String {
+        return "Hello, \(name)!"
+    }
+}
+```
+
+**JavaScript usage:**
+```javascript
+const greeter = new exports.Greeter("World");
+console.log(greeter.greet()); // "Hello, World!"
+```
+
+**Learn more:** [Exporting Swift to JavaScript](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/exporting-swift-to-javascript)
+
+### Importing TypeScript into Swift
+
+Define TypeScript interfaces and BridgeJS generates type-safe Swift bindings:
+
+```typescript
+// bridge-js.d.ts
+interface Document {
+    title: string;
+    getElementById(id: string): HTMLElement;
+    createElement(tagName: string): HTMLElement;
+}
+
+export function getDocument(): Document;
+```
+
+**Swift usage:**
+```swift
+@JS func run() throws(JSException) {
+    let document = try getDocument()
+    try document.setTitle("My Swift App")
+    let button = try document.createElement("button")
+    try button.setInnerText("Click Me")
+}
+```
+
+**Learn more:** [Importing TypeScript into Swift](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/importing-typescript-into-swift)
+
+### Try It Online
+
+Use the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/) to preview what interfaces will be exposed on the Swift/TypeScript sides.
+
+## Examples
+
+Check out the [examples](https://github.com/swiftwasm/JavaScriptKit/tree/main/Examples) for more detailed usage patterns.
 
 ## Contributing
 
