@@ -8,7 +8,7 @@
 
 @JSFunction func returnAnimatable() throws (JSException) -> Animatable
 
-@JSClass struct Animatable: _JSBridgedClass {
+@JSClass struct Animatable {
     @JSFunction func animate(_ keyframes: JSObject, _ options: JSObject) throws (JSException) -> JSObject
     @JSFunction func getAnimations(_ options: JSObject) throws (JSException) -> JSObject
 }

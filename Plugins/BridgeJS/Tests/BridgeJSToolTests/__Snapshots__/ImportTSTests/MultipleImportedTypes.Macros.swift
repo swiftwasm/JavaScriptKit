@@ -8,7 +8,7 @@
 
 @JSFunction func createDatabaseConnection(_ config: JSObject) throws (JSException) -> DatabaseConnection
 
-@JSClass struct DatabaseConnection: _JSBridgedClass {
+@JSClass struct DatabaseConnection {
     @JSFunction func connect(_ url: String) throws (JSException) -> Void
     @JSFunction func execute(_ query: String) throws (JSException) -> JSObject
     @JSGetter var isConnected: Bool
@@ -18,7 +18,7 @@
 
 @JSFunction func createLogger(_ level: String) throws (JSException) -> Logger
 
-@JSClass struct Logger: _JSBridgedClass {
+@JSClass struct Logger {
     @JSFunction func log(_ message: String) throws (JSException) -> Void
     @JSFunction func error(_ message: String, _ error: JSObject) throws (JSException) -> Void
     @JSGetter var level: String
@@ -26,7 +26,7 @@
 
 @JSFunction func getConfigManager() throws (JSException) -> ConfigManager
 
-@JSClass struct ConfigManager: _JSBridgedClass {
+@JSClass struct ConfigManager {
     @JSFunction func get(_ key: String) throws (JSException) -> JSObject
     @JSFunction func set(_ key: String, _ value: JSObject) throws (JSException) -> Void
     @JSGetter var configPath: String

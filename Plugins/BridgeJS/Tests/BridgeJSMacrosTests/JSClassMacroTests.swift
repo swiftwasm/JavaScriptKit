@@ -1,5 +1,6 @@
 import SwiftDiagnostics
 import SwiftSyntax
+import SwiftSyntaxMacroExpansion
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
 import Testing
@@ -7,6 +8,9 @@ import BridgeJSMacros
 
 @Suite struct JSClassMacroTests {
     private let indentationWidth: Trivia = .spaces(4)
+    private let macroSpecs: [String: MacroSpec] = [
+        "JSClass": MacroSpec(type: JSClassMacro.self, conformances: ["_JSBridgedClass"])
+    ]
 
     @Test func emptyStruct() {
         assertMacroExpansion(
@@ -23,8 +27,11 @@ import BridgeJSMacros
                         self.jsObject = jsObject
                     }
                 }
+
+                extension MyClass: _JSBridgedClass {
+                }
                 """,
-            macros: ["JSClass": JSClassMacro.self],
+            macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
     }
@@ -45,8 +52,11 @@ import BridgeJSMacros
                         self.jsObject = jsObject
                     }
                 }
+
+                extension MyClass: _JSBridgedClass {
+                }
                 """,
-            macros: ["JSClass": JSClassMacro.self],
+            macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
     }
@@ -69,8 +79,11 @@ import BridgeJSMacros
                         self.jsObject = jsObject
                     }
                 }
+
+                extension MyClass: _JSBridgedClass {
+                }
                 """,
-            macros: ["JSClass": JSClassMacro.self],
+            macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
     }
@@ -95,8 +108,11 @@ import BridgeJSMacros
                         self.jsObject = jsObject
                     }
                 }
+
+                extension MyClass: _JSBridgedClass {
+                }
                 """,
-            macros: ["JSClass": JSClassMacro.self],
+            macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
     }
@@ -119,8 +135,11 @@ import BridgeJSMacros
                         self.jsObject = jsObject
                     }
                 }
+
+                extension MyClass: _JSBridgedClass {
+                }
                 """,
-            macros: ["JSClass": JSClassMacro.self],
+            macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
     }
@@ -140,8 +159,11 @@ import BridgeJSMacros
                         self.jsObject = jsObject
                     }
                 }
+
+                extension MyClass: _JSBridgedClass {
+                }
                 """,
-            macros: ["JSClass": JSClassMacro.self],
+            macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
     }
@@ -161,8 +183,11 @@ import BridgeJSMacros
                         self.jsObject = jsObject
                     }
                 }
+
+                extension MyEnum: _JSBridgedClass {
+                }
                 """,
-            macros: ["JSClass": JSClassMacro.self],
+            macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
     }
@@ -182,8 +207,11 @@ import BridgeJSMacros
                         self.jsObject = jsObject
                     }
                 }
+
+                extension MyActor: _JSBridgedClass {
+                }
                 """,
-            macros: ["JSClass": JSClassMacro.self],
+            macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
     }
@@ -206,8 +234,11 @@ import BridgeJSMacros
                         self.jsObject = jsObject
                     }
                 }
+
+                extension MyClass: _JSBridgedClass {
+                }
                 """,
-            macros: ["JSClass": JSClassMacro.self],
+            macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
     }
@@ -232,8 +263,11 @@ import BridgeJSMacros
                         self.jsObject = jsObject
                     }
                 }
+
+                extension MyClass: _JSBridgedClass {
+                }
                 """,
-            macros: ["JSClass": JSClassMacro.self],
+            macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
     }
@@ -258,8 +292,11 @@ import BridgeJSMacros
                         self.jsObject = jsObject
                     }
                 }
+
+                extension MyClass: _JSBridgedClass {
+                }
                 """,
-            macros: ["JSClass": JSClassMacro.self],
+            macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
     }
@@ -281,8 +318,32 @@ import BridgeJSMacros
                         self.jsObject = jsObject
                     }
                 }
+
+                extension MyClass: _JSBridgedClass {
+                }
                 """,
-            macros: ["JSClass": JSClassMacro.self],
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth
+        )
+    }
+
+    @Test func structAlreadyConforms() {
+        assertMacroExpansion(
+            """
+            @JSClass
+            struct MyClass: _JSBridgedClass {
+            }
+            """,
+            expandedSource: """
+                struct MyClass: _JSBridgedClass {
+                    let jsObject: JSObject
+
+                    init(unsafelyWrapping jsObject: JSObject) {
+                        self.jsObject = jsObject
+                    }
+                }
+                """,
+            macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
     }

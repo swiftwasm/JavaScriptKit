@@ -6,7 +6,7 @@
 
 @_spi(Experimental) import JavaScriptKit
 
-@JSClass struct Greeter: _JSBridgedClass {
+@JSClass struct Greeter {
     @JSGetter var name: String
     @JSSetter func setName(_ value: String) throws (JSException)
     @JSGetter var age: Double

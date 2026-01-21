@@ -213,7 +213,7 @@ export class TypeProcessor {
         if (!node.name) return;
 
         const className = this.renderIdentifier(node.name.text);
-        this.swiftLines.push(`@JSClass struct ${className}: _JSBridgedClass {`);
+        this.swiftLines.push(`@JSClass struct ${className} {`);
 
         // Process members in declaration order
         for (const member of node.members) {
@@ -268,7 +268,7 @@ export class TypeProcessor {
      */
     visitStructuredType(name, members) {
         const typeName = this.renderIdentifier(name);
-        this.swiftLines.push(`@JSClass struct ${typeName}: _JSBridgedClass {`);
+        this.swiftLines.push(`@JSClass struct ${typeName} {`);
 
         // Collect all declarations with their positions to preserve order
         /** @type {Array<{ decl: ts.Node, symbol: ts.Symbol, position: number }>} */

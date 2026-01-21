@@ -8,14 +8,14 @@
 
 @JSFunction func createArrayBuffer() throws (JSException) -> ArrayBufferLike
 
-@JSClass struct ArrayBufferLike: _JSBridgedClass {
+@JSClass struct ArrayBufferLike {
     @JSGetter var byteLength: Double
     @JSFunction func slice(_ begin: Double, _ end: Double) throws (JSException) -> ArrayBufferLike
 }
 
 @JSFunction func createWeirdObject() throws (JSException) -> WeirdNaming
 
-@JSClass struct WeirdNaming: _JSBridgedClass {
+@JSClass struct WeirdNaming {
     @JSGetter var normalProperty: String
     @JSSetter func setNormalProperty(_ value: String) throws (JSException)
     @JSGetter var `for`: String
