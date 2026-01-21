@@ -8,6 +8,6 @@
 
 @JSFunction func createTS2Swift() throws (JSException) -> TS2Swift
 
-@JSClass struct TS2Swift: _JSBridgedClass {
+@JSClass struct TS2Swift {
     @JSFunction func convert(_ ts: String) throws (JSException) -> String
 }

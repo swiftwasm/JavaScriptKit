@@ -22,7 +22,7 @@
 
 @JSFunction func jsThrowOrString(_ shouldThrow: Bool) throws (JSException) -> String
 
-@JSClass struct JsGreeter: _JSBridgedClass {
+@JSClass struct JsGreeter {
     @JSGetter var name: String
     @JSSetter func setName(_ value: String) throws (JSException)
     @JSGetter var `prefix`: String

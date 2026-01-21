@@ -174,7 +174,7 @@ public macro JSFunction() =
 /// @_spi(Experimental) import JavaScriptKit
 ///
 /// @JSClass
-/// struct JsGreeter: _JSBridgedClass {
+/// struct JsGreeter {
 ///     @JSGetter var name: String
 ///     @JSSetter func setName(_ value: String) throws (JSException)
 ///     @JSFunction init(_ name: String) throws (JSException)
@@ -182,6 +182,7 @@ public macro JSFunction() =
 /// }
 /// ```
 @attached(member, names: arbitrary)
+@attached(extension, conformances: _JSBridgedClass)
 @_spi(Experimental)
 public macro JSClass() =
     #externalMacro(module: "BridgeJSMacros", type: "JSClassMacro")

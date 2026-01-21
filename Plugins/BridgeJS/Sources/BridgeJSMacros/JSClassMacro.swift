@@ -9,6 +9,7 @@ extension JSClassMacro: MemberMacro {
     public static func expansion(
         of node: AttributeSyntax,
         providingMembersOf declaration: some DeclGroupSyntax,
+        conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
         var members: [DeclSyntax] = []
@@ -47,5 +48,22 @@ extension JSClassMacro: MemberMacro {
         }
 
         return members
+    }
+}
+
+extension JSClassMacro: ExtensionMacro {
+    public static func expansion(
+        of node: AttributeSyntax,
+        attachedTo declaration: some DeclGroupSyntax,
+        providingExtensionsOf type: some TypeSyntaxProtocol,
+        conformingTo protocols: [TypeSyntax],
+        in context: some MacroExpansionContext
+    ) throws -> [ExtensionDeclSyntax] {
+        guard !protocols.isEmpty else { return [] }
+
+        let conformanceList = protocols.map { $0.trimmed.description }.joined(separator: ", ")
+        return [
+            try ExtensionDeclSyntax("extension \(type.trimmed): \(raw: conformanceList) {}")
+        ]
     }
 }
