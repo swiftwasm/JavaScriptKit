@@ -128,7 +128,7 @@ exports.PropertyEnum.enumProperty = "updated";
 
 ## Namespace Enum Static Properties
 
-Namespace enums organize related static properties and are assigned to `globalThis`:
+Namespace enums organize related static properties and are assigned to `globalThis`. See <doc:Using-Namespace> for more details on namespace organization.
 
 ```swift
 @JS enum PropertyNamespace {
@@ -173,8 +173,8 @@ const value: number = PropertyNamespace.Nested.nestedProperty;
 
 ## Supported Features
 
-| Swift Static Property Feature | Status |
-|:------------------------------|:-------|
+| Swift Feature | Status |
+|:--------------|:-------|
 | Class `static let` | ✅ |
 | Class `static var` | ✅ |
 | Class `class var` | ✅ |

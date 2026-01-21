@@ -1,4 +1,4 @@
-# Exporting Swift Closures
+# Exporting Swift Closures to JS
 
 Learn how to use closure/function types as parameters and return values in BridgeJS.
 
@@ -89,18 +89,20 @@ export type Exports = {
 }
 ```
 
-## Memory Management
+## How It Works
 
-When JavaScript passes a function to Swift, it's automatically stored in `swift.memory` with reference counting. When Swift's closure wrapper is deallocated by ARC, the JavaScript function is released.
+Closures use **reference semantics** when crossing the Swift/JavaScript boundary:
 
-When Swift returns a closure to JavaScript, the Swift closure is boxed and automatically released when the JavaScript function is garbage collected.
+1. **JavaScript → Swift**: When JavaScript passes a function to Swift, it's stored in `swift.memory` with reference counting. When Swift's closure wrapper is deallocated by ARC, the JavaScript function is released.
+2. **Swift → JavaScript**: When Swift returns a closure to JavaScript, the Swift closure is boxed and automatically released when the JavaScript function is garbage collected.
+3. **Memory Management**: Both directions use automatic memory management via `FinalizationRegistry` - no manual cleanup required.
 
-Both directions use automatic memory management - no manual cleanup required.
+This differs from structs and arrays, which use copy semantics and transfer data by value.
 
 ## Supported Features
 
-| Feature | Status |
-|:--------|:-------|
+| Swift Feature | Status |
+|:--------------|:-------|
 | Closure Parameters with Supported Types `(String, Int) -> Person` | ✅ |
 | Closure Return Value with Supported Types `() -> Person` | ✅ |
 | `@escaping` closures | ✅ |

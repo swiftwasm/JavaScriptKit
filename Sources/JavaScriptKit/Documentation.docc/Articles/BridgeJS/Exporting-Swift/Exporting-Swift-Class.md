@@ -76,6 +76,17 @@ export type Exports = {
 }
 ```
 
+## How It Works
+
+Classes use **reference semantics** when crossing the Swift/JavaScript boundary:
+
+1. **Object Creation**: When you create a class instance (via `new` in JS), the object lives on the Swift heap
+2. **Reference Passing**: JavaScript receives a reference (handle) to the Swift object, not a copy
+3. **Shared State**: Changes made through either Swift or JavaScript affect the same object
+4. **Memory Management**: `FinalizationRegistry` automatically releases Swift objects when they're garbage collected in JavaScript. You can optionally call `release()` for deterministic cleanup.
+
+This differs from structs, which use copy semantics and transfer data by value.
+
 ## Supported Features
 
 | Swift Feature | Status |

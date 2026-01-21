@@ -104,33 +104,9 @@ exports.Config.defaultTimeout = 60.0;
 console.log(exports.Config.maxRetries);      // 3 (readonly)
 ```
 
-## Struct Methods
+## Struct Methods and Initializers
 
-Structs can have instance and static methods, both require @JS annotation:
-
-```swift
-@JS struct Calculator {
-    @JS func add(a: Double, b: Double) -> Double {
-        return a + b
-    }
-    
-    @JS static func multiply(x: Double, y: Double) -> Double {
-        return x * y
-    }
-}
-```
-
-In JavaScript:
-
-```javascript
-const calc = {};
-console.log(exports.useMathOperations(calc, 5.0, 3.0)); // Uses instance methods
-console.log(exports.Calculator.multiply(4.0, 5.0));      // Static method
-```
-
-## Struct Initializers
-
-Struct initializers are exported as static `init` methods, not constructors:
+Structs can have instance methods, static methods, and initializers. All require `@JS` annotation:
 
 ```swift
 @JS struct Point {
@@ -141,30 +117,46 @@ Struct initializers are exported as static `init` methods, not constructors:
         self.x = x
         self.y = y
     }
+
+    @JS func distanceFromOrigin() -> Double {
+        return (x * x + y * y).squareRoot()
+    }
+
+    @JS static func origin() -> Point {
+        return Point(x: 0, y: 0)
+    }
 }
 ```
 
 In JavaScript:
 
 ```javascript
-const point = exports.Point.init(10.0, 20.0);
-console.log(point.x); // 10.0
+// Create via static init method (not constructor)
+const point = exports.Point.init(3.0, 4.0);
+console.log(point.distanceFromOrigin()); // 5.0
+
+// Static method
+const origin = exports.Point.origin();
+console.log(origin.x); // 0.0
 ```
 
-This differs from classes, where `@JS init` maps to a JavaScript constructor using `new`:
+Note: Struct initializers are exported as static `init` methods. This differs from classes, where `@JS init` maps to a JavaScript constructor using `new`.
 
-```javascript
-// Class: uses `new`
-const cart = new exports.ShoppingCart();
+## How It Works
 
-// Struct: uses static `init` method
-const point = exports.Point.init(10.0, 20.0);
-```
+Structs use **copy semantics** when crossing the Swift/JavaScript boundary:
+
+1. **Data Transfer**: Struct fields are pushed to type-specific stacks and reconstructed as plain JavaScript objects
+2. **No Shared State**: Each side has its own copy - modifications don't affect the other
+3. **No Memory Management**: No `release()` needed since there's no shared reference
+4. **Plain Objects**: In JavaScript, structs become plain objects matching the TypeScript interface
+
+This differs from classes, which use reference semantics and share state across the boundary.
 
 ## Supported Features
 
-| Feature | Status |
-|:--------|:-------|
+| Swift Feature | Status |
+|:--------------|:-------|
 | Stored fields with supported types | ✅ |
 | Optional fields | ✅ |
 | Nested structs | ✅ |

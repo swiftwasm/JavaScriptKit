@@ -19,9 +19,7 @@ BridgeJS generates separate objects with descriptive naming for `.const` enums:
 - **`EnumNameTag`**: Represents the union type for enums
 - **`EnumNameObject`**: Object type for all const-style enums, contains static members for enums with methods/properties or references the values type for simple enums
 
-#### Case Enums
-
-**Swift Definition:**
+### Case Enums
 
 ```swift
 @JS enum Direction {
@@ -45,7 +43,7 @@ BridgeJS generates separate objects with descriptive naming for `.const` enums:
 }
 ```
 
-**Generated TypeScript Declaration:**
+Generated TypeScript declarations:
 
 ```typescript
 // Const object style (default)
@@ -73,7 +71,7 @@ export const StatusValues: {
 export type StatusTag = typeof StatusValues[keyof typeof StatusValues];
 ```
 
-**Usage in TypeScript:**
+In TypeScript:
 
 ```typescript
 const direction: DirectionTag = DirectionValues.North;
@@ -100,66 +98,9 @@ function handleDirection(direction: DirectionTag) {
 }
 ```
 
-BridgeJS also generates convenience initializers and computed properties for each case-style enum, allowing the rest of the Swift glue code to remain minimal and consistent. This avoids repetitive switch statements in every function that passes enum values between JavaScript and Swift.
+### Raw Value Enums
 
-```swift
-extension Direction {
-    init?(bridgeJSRawValue: Int32) {
-        switch bridgeJSRawValue {
-        case 0:
-            self = .north
-        case 1:
-            self = .south
-        case 2:
-            self = .east
-        case 3:
-            self = .west
-        default:
-            return nil
-        }
-    }
-
-    var bridgeJSRawValue: Int32 {
-        switch self {
-        case .north:
-            return 0
-        case .south:
-            return 1
-        case .east:
-            return 2
-        case .west:
-            return 3
-        }
-    }
-}
-...
-@_expose(wasm, "bjs_setDirection")
-@_cdecl("bjs_setDirection")
-public func _bjs_setDirection(direction: Int32) -> Void {
-    #if arch(wasm32)
-    setDirection(_: Direction(bridgeJSRawValue: direction)!)
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_getDirection")
-@_cdecl("bjs_getDirection")
-public func _bjs_getDirection() -> Int32 {
-    #if arch(wasm32)
-    let ret = getDirection()
-    return ret.bridgeJSRawValue
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-```
-
-#### Raw Value Enums
-
-##### String Raw Values
-
-**Swift Definition:**
+#### String Raw Values
 
 ```swift
 // Default const object style
@@ -177,7 +118,7 @@ public func _bjs_getDirection() -> Int32 {
 }
 ```
 
-**Generated TypeScript Declaration:**
+Generated TypeScript declarations:
 
 ```typescript
 // Const object style (default)
@@ -196,7 +137,7 @@ export enum TSTheme {
 }
 ```
 
-**Usage in TypeScript:**
+In TypeScript:
 
 ```typescript
 // Raw value enums work similarly to case enums
@@ -209,9 +150,7 @@ const currentTheme: ThemeTag = exports.getTheme();
 const status: HttpStatusTag = exports.processTheme(ThemeValues.Auto);
 ```
 
-##### Integer Raw Values
-
-**Swift Definition:**
+#### Integer Raw Values
 
 ```swift
 // Default const object style
@@ -237,7 +176,7 @@ const status: HttpStatusTag = exports.processTheme(ThemeValues.Auto);
 }
 ```
 
-**Generated TypeScript Declaration:**
+Generated TypeScript declarations:
 
 ```typescript
 // Const object style (default)
@@ -265,7 +204,7 @@ export const PriorityValues: {
 export type PriorityTag = typeof PriorityValues[keyof typeof PriorityValues];
 ```
 
-**Usage in TypeScript:**
+In TypeScript:
 
 ```typescript
 const status: HttpStatusTag = HttpStatusValues.Ok;
@@ -280,9 +219,7 @@ const convertedPriority: PriorityTag = exports.convertPriority(HttpStatusValues.
 
 ### Namespace Enums
 
-Namespace enums are empty enums (containing no cases) used for organizing related types and functions into hierarchical namespaces.
-
-**Swift Definition:**
+Namespace enums are empty enums (containing no cases) used for organizing related types and functions into hierarchical namespaces. See <doc:Using-Namespace> for more details on namespace organization.
 
 ```swift
 @JS enum Utils {
@@ -325,7 +262,7 @@ enum Internal {
 }
 ```
 
-**Generated TypeScript Declaration:**
+Generated TypeScript declarations:
 
 ```typescript
 declare global {
@@ -364,7 +301,7 @@ declare global {
 }
 ```
 
-**Usage in TypeScript:**
+In TypeScript:
 
 ```typescript
 // Access nested classes through namespaces (no globalThis prefix needed)
@@ -386,7 +323,7 @@ Things to remember when using enums for namespacing:
 2. Top-level enums can use `@JS(namespace: "Custom.Path")` to place themselves in custom namespaces, which will be used as "base namespace" for all nested elements as well
 3. Classes and enums nested within namespace enums **cannot** use `@JS(namespace:)` - this would create conflicting namespace declarations
 
-**Invalid Usage:**
+Invalid usage:
 
 ```swift
 @JS enum Utils {
@@ -397,7 +334,7 @@ Things to remember when using enums for namespacing:
 }
 ```
 
-**Valid Usage:**
+Valid usage:
 
 ```swift
 // Valid - top-level enum with explicit namespace
@@ -409,11 +346,9 @@ enum Helper {
 }
 ```
 
-#### Associated Value Enums
+### Associated Value Enums
 
 Associated value enums are supported and allow you to pass data along with each enum case. BridgeJS generates TypeScript discriminated union types. Associated values are encoded into a binary format for efficient transfer between JavaScript and WebAssembly
-
-**Swift Definition:**
 
 ```swift
 @JS
@@ -440,7 +375,7 @@ enum ComplexResult {
 @JS func getResult() -> APIResult
 ```
 
-**Generated TypeScript Declaration:**
+Generated TypeScript declarations:
 
 ```typescript
 export const APIResultValues: {
@@ -482,7 +417,7 @@ export type ComplexResultTag =
   { tag: typeof ComplexResultValues.Tag.Info }
 ```
 
-**Usage in TypeScript:**
+In TypeScript:
 
 ```typescript
 const successResult: APIResultTag = {
@@ -528,21 +463,54 @@ function processResult(result: APIResultTag) {
 }
 ```
 
-**Supported Features:**
+## How It Works
+
+Enums use **copy semantics** when crossing the Swift/JavaScript boundary:
+
+1. **Case Enums**: Passed as integer tag values (0, 1, 2, ...) representing each case
+2. **Raw Value Enums**: Passed using their raw value type (string or integer)
+3. **Associated Value Enums**: Tag value passed directly, associated data pushed to type-specific stacks and reconstructed on the receiving side
+
+BridgeJS generates convenience initializers and computed properties for each enum, keeping the glue code minimal and consistent:
+
+```swift
+extension Direction {
+    init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0: self = .north
+        case 1: self = .south
+        // ...
+        default: return nil
+        }
+    }
+
+    var bridgeJSRawValue: Int32 {
+        switch self {
+        case .north: return 0
+        case .south: return 1
+        // ...
+        }
+    }
+}
+```
+
+This differs from classes, which use reference semantics and share state across the boundary.
+
+## Supported Features
 
 | Swift Feature | Status |
 |:--------------|:-------|
-| Associated values: `String` | ✅ |
-| Associated values: `Int` | ✅ |
-| Associated values: `Bool` | ✅ |
-| Associated values: `Float` | ✅ |
-| Associated values: `Double` | ✅ |
+| Case enums | ✅ |
+| Raw value enums (`String`) | ✅ |
+| Raw value enums (`Int`, `Int32`, etc.) | ✅ |
+| Namespace enums (empty enums) | ✅ |
+| Associated value enums | ✅ |
+| `.tsEnum` style option | ✅ |
+| Static functions | ✅ |
+| Static properties | ✅ |
+| Associated values: `String`, `Int`, `Bool`, `Float`, `Double` | ✅ |
 | Associated values: Custom classes/structs | ❌ |
 | Associated values: Other enums | ❌ |
 | Associated values: Arrays/Collections | ❌ |
 | Associated values: Optionals | ❌ |
-| Use as exported function parameters | ✅ |
-| Use as exported function return values | ✅ |
-| Use as imported function parameters | ❌ |
-| Use as imported function return values | ❌ |
-| Namespace support | ✅ |
+| Generics | ❌ |
