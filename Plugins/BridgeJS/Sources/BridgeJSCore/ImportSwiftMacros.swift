@@ -44,7 +44,8 @@ public final class ImportSwiftMacros {
             importedFiles.append(
                 ImportedFileSkeleton(
                     functions: collector.importedFunctions,
-                    types: collector.importedTypes
+                    types: collector.importedTypes,
+                    globalGetters: collector.importedGlobalGetters
                 )
             )
         }
@@ -94,6 +95,7 @@ public final class ImportSwiftMacros {
     fileprivate final class APICollector: SyntaxAnyVisitor {
         var importedFunctions: [ImportedFunctionSkeleton] = []
         var importedTypes: [ImportedTypeSkeleton] = []
+        var importedGlobalGetters: [ImportedGetterSkeleton] = []
         var errors: [DiagnosticError] = []
 
         private let inputFilePath: String
@@ -432,12 +434,9 @@ public final class ImportSwiftMacros {
 
             switch state {
             case .topLevel:
-                errors.append(
-                    DiagnosticError(
-                        node: node,
-                        message: "@JSGetter is not supported at top-level. Use it only in @JSClass types."
-                    )
-                )
+                if let getter = parseGetterSkeleton(node, enclosingTypeName: nil) {
+                    importedGlobalGetters.append(getter)
+                }
                 return .skipChildren
 
             case .jsClassBody(let typeName):
