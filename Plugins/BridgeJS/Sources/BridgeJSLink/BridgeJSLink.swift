@@ -2163,7 +2163,11 @@ extension BridgeJSLink {
                 returnExpr = resultVariable
             }
 
-            return try lowerReturnValue(returnType: returnType, returnExpr: returnExpr, loweringFragment: loweringFragment)
+            return try lowerReturnValue(
+                returnType: returnType,
+                returnExpr: returnExpr,
+                loweringFragment: loweringFragment
+            )
         }
 
         private func lowerReturnValue(
