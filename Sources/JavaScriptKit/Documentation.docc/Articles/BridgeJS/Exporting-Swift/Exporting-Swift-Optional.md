@@ -112,8 +112,8 @@ export type UserProfile = {
 
 ## Supported Features
 
-| Swift Optional Feature | Status |
-|:----------------------|:-------|
+| Swift Feature | Status |
+|:--------------|:-------|
 | Optional primitive parameters: `Int?`, `String?`, etc. | ✅ |
 | Optional primitive return values | ✅ |
 | Optional object parameters: `MyClass?`, `JSObject?` | ✅ |

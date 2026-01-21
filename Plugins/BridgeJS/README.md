@@ -4,7 +4,7 @@
 > This feature is still experimental, and the API may change frequently. Use at your own risk with `JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1` environment variable.
 
 > [!NOTE]
-> This documentation is intended for JavaScriptKit developers, not JavaScriptKit users.
+> This documentation is intended for JavaScriptKit developers, not JavaScriptKit users. For user documentation, see [Exporting Swift to JavaScript](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/exporting-swift-to-javascript) and [Importing TypeScript into Swift](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/importing-typescript-into-swift).
 
 ## Overview
 
@@ -14,6 +14,7 @@ BridgeJS provides easy interoperability between Swift and JavaScript/TypeScript.
 2. **Exporting Swift APIs to JavaScript**: Make your Swift APIs available to JavaScript code
 
 The workflow is:
+
 1. `ts2swift` converts TypeScript definitions (`bridge-js.d.ts`) to macro-annotated Swift declarations (`BridgeJS.Macros.swift`)
 2. `bridge-js generate` processes both Swift source files (for export) and macro-annotated Swift files (for import) to generate:
    - `BridgeJS.swift` (Swift glue code)
@@ -59,27 +60,53 @@ graph LR
 
 ## Type Mapping
 
-### Primitive Type Conversions
+### Primitive Types
 
-TBD
+| Swift Type    | TypeScript Type | Wasm Core Type |
+|:--------------|:----------------|:---------------|
+| `Int`         | `number`        | `i32`          |
+| `UInt`        | `number`        | `i32`          |
+| `Int8`        | `number`        | `i32`          |
+| `UInt8`       | `number`        | `i32`          |
+| `Int16`       | `number`        | `i32`          |
+| `UInt16`      | `number`        | `i32`          |
+| `Int32`       | `number`        | `i32`          |
+| `UInt32`      | `number`        | `i32`          |
+| `Int64`       | `bigint`        | `i64`          |
+| `UInt64`      | `bigint`        | `i64`          |
+| `Float`       | `number`        | `f32`          |
+| `Double`      | `number`        | `f64`          |
+| `Bool`        | `boolean`       | `i32`          |
+| `Void`        | `void`          | -              |
 
-| Swift Type    | JS Type    | Wasm Core Type |
-|:--------------|:-----------|:---------------|
-| `Int`         | `number`   | `i32`          |
-| `UInt`        | `number`   | `i32`          |
-| `Int8`        | `number`   | `i32`          |
-| `UInt8`       | `number`   | `i32`          |
-| `Int16`       | `number`   | `i32`          |
-| `UInt16`      | `number`   | `i32`          |
-| `Int32`       | `number`   | `i32`          |
-| `UInt32`      | `number`   | `i32`          |
-| `Int64`       | `bigint`   | `i64`          |
-| `UInt64`      | `bigint`   | `i64`          |
-| `Float`       | `number`   | `f32`          |
-| `Double`      | `number`   | `f64`          |
-| `Bool`        | `boolean`  | `i32`          |
-| `Void`        | `void`     | -              |
-| `String`      | `string`   | `i32`          |
+### Complex Types
+
+| Swift Type | TypeScript Type | Semantics | Status |
+|:-----------|:----------------|:----------|:-------|
+| `String` | `string` | Copy | ✅ |
+| `@JS class` | `interface` + constructor | Reference (pointer) | ✅ |
+| `@JS struct` | `interface` | Copy (fields via stacks) | ✅ |
+| `@JS enum` (case) | const object + tag type | Copy (integer) | ✅ |
+| `@JS enum` (raw value) | const object + tag type | Copy (raw value) | ✅ |
+| `@JS enum` (associated) | discriminated union | Copy (fields via stacks) | ✅ |
+| `@JS protocol` | `interface` | Reference (wrapper) | ✅ |
+| `Optional<T>` | `T \| null` | Depends on T | ✅ |
+| `(T) -> U` | `(arg: T) => U` | Reference (boxed) | ✅ |
+| `JSObject` | `any` / `object` | Reference | ✅ |
+| `Array<T>` | `T[]` | Copy | ✅ |
+| `Array<Array<T>>` | `T[][]` | Copy | ✅ |
+| `Dictionary<K, V>` | `Record<K, V>` | - | [#495](https://github.com/swiftwasm/JavaScriptKit/issues/495) |
+| `Set<T>` | `Set<T>` | - | [#397](https://github.com/swiftwasm/JavaScriptKit/issues/397) |
+| `Foundation.URL` | `string` | - | [#496](https://github.com/swiftwasm/JavaScriptKit/issues/496) |
+| Generics | - | - | [#398](https://github.com/swiftwasm/JavaScriptKit/issues/398) |
+
+### Import-specific (TypeScript → Swift)
+
+| TypeScript Type | Swift Type | Status |
+|:----------------|:-----------|:-------|
+| `T \| null` | `Optional<T>` | [#475](https://github.com/swiftwasm/JavaScriptKit/issues/475) |
+| `T \| undefined` | `Optional<T>` | [#475](https://github.com/swiftwasm/JavaScriptKit/issues/475) |
+| `enum` | `@JS enum` | [#489](https://github.com/swiftwasm/JavaScriptKit/issues/489) |
 
 ## Type Modeling
 
@@ -109,23 +136,37 @@ The ABI will not be stable, and not meant to be interposed by other tools.
 
 ### Parameter Passing
 
-Parameter passing follows Wasm calling conventions, with custom handling for complex types like strings and objects.
+Parameter passing follows Wasm calling conventions, with custom handling for complex types:
 
-TBD
+- **Primitives**: Passed directly as Wasm arguments (`i32`, `i64`, `f32`, `f64`)
+- **Strings**: UTF-8 bytes stored in `swift.memory`, ID + length passed as Wasm arguments
+- **Swift Classes**: Raw Swift heap pointer passed as `i32`
+- **JSObjects**: Object stored in `swift.memory.heap`, object ID passed as `i32`
+- **Structs/Arrays**: Fields/elements pushed to type-specific stacks, Swift pops in reverse order
+- **Closures**: Boxed and retained in memory, handle passed as `i32`
 
 ### Return Values
 
-TBD
+Return values use direct Wasm returns for primitives, and imported intrinsic functions for complex types:
+
+- **Primitives**: Returned directly via Wasm return value
+- **Strings**: Swift writes UTF-8 bytes to shared memory, JS decodes
+- **Swift Classes**: Pointer returned directly, JS wraps in `SwiftHeapObject` with `FinalizationRegistry`
+- **Structs/Arrays**: Swift pushes fields/elements to type-specific stacks, JS reconstructs
+
+### Memory Management
+
+- **Swift Classes**: Live on Swift heap. JS holds pointer wrapped in `SwiftHeapObject`. `FinalizationRegistry` calls `deinit` on GC. Optional `release()` for deterministic cleanup.
+- **JSObjects**: Live in `swift.memory.heap` (JS side). Swift holds ID wrapped in `JSObject`. Reference counted via `retain`/`release`.
+- **Structs/Arrays/Enums**: Copy semantics - data serialized across boundary. No cleanup needed.
+- **Closures**: Boxed on source side, released when GC'd on either side.
+
+For detailed semantics, see the [How It Works sections](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/exporting-swift-class#How-It-Works) in the user documentation.
 
 ## Future Work
 
-- [ ] Struct on parameter or return type
-- [ ] Throws functions
-- [ ] Async functions
 - [ ] Cast between TS interface
-- [ ] Closure support
-- [ ] Simplify constructor pattern
-    * https://github.com/ocsigen/ts2ocaml/blob/main/docs/js_of_ocaml.md#feature-immediate-constructor
+- [ ] Simplify constructor pattern ([reference](https://github.com/ocsigen/ts2ocaml/blob/main/docs/js_of_ocaml.md#feature-immediate-constructor))
     ```typescript
     interface Foo = {
       someMethod(value: number): void;
@@ -141,3 +182,8 @@ TBD
     ```
 - [ ] Use `externref` once it's widely available
 - [ ] Test SwiftObject roundtrip
+- [ ] Import TS `enum` as Swift enum ([#489](https://github.com/swiftwasm/JavaScriptKit/issues/489))
+- [ ] Support `T | null` and `T | undefined` imports ([#475](https://github.com/swiftwasm/JavaScriptKit/issues/475))
+- [ ] Support `@JS var` for global scope imports ([#466](https://github.com/swiftwasm/JavaScriptKit/issues/466))
+- [ ] Support `export { thing } from 'pkg'` form ([#437](https://github.com/swiftwasm/JavaScriptKit/issues/437))
+- [ ] Support imported TS type usage on exported interface ([#497](https://github.com/swiftwasm/JavaScriptKit/issues/497))

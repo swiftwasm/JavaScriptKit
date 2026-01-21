@@ -1,4 +1,4 @@
-# Exporting Swift Protocols
+# Exporting Swift Protocols to JS
 
 Learn how to expose Swift protocols to JavaScript as TypeScript interfaces.
 
@@ -114,63 +114,6 @@ export type Exports = {
 }
 ```
 
-## Generated Wrapper
-
-BridgeJS generates a Swift wrapper struct for each `@JS` protocol. This wrapper holds a `JSObject` reference and forwards protocol method calls to the JavaScript implementation:
-
-```swift
-struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
-    let jsObject: JSObject
-
-    var count: Int {
-        get {
-            @_extern(wasm, module: "TestModule", name: "bjs_Counter_count_get")
-            func _extern_get(this: Int32) -> Int32
-            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
-            return Int.bridgeJSLiftReturn(ret)
-        }
-        set {
-            @_extern(wasm, module: "TestModule", name: "bjs_Counter_count_set")
-            func _extern_set(this: Int32, value: Int32)
-            _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
-        }
-    }
-
-    var name: String {
-        @_extern(wasm, module: "TestModule", name: "bjs_Counter_name_get")
-        func _extern_get(this: Int32)
-        _extern_get(this: Int32(bitPattern: jsObject.id))
-        return String.bridgeJSLiftReturn()
-    }
-
-    func increment(by amount: Int) {
-        @_extern(wasm, module: "TestModule", name: "bjs_Counter_increment")
-        func _extern_increment(this: Int32, amount: Int32)
-        _extern_increment(
-            this: Int32(bitPattern: jsObject.id), 
-            amount: amount.bridgeJSLowerParameter()
-        )
-    }
-
-    func reset() {
-        @_extern(wasm, module: "TestModule", name: "bjs_Counter_reset")
-        func _extern_reset(this: Int32)
-        _extern_reset(this: Int32(bitPattern: jsObject.id))
-    }
-
-    func getValue() -> Int {
-        @_extern(wasm, module: "TestModule", name: "bjs_Counter_getValue")
-        func _extern_getValue(this: Int32) -> Int32
-        let ret = _extern_getValue(this: Int32(bitPattern: jsObject.id))
-        return Int.bridgeJSLiftReturn(ret)
-    }
-
-    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
-        return AnyCounter(jsObject: JSObject(id: UInt32(bitPattern: value)))
-    }
-}
-```
-
 ## Swift Implementation
 
 You can also implement protocols in Swift and use them from JavaScript:
@@ -223,12 +166,47 @@ console.log(counter.getValue()); // 0
 
 ## How It Works
 
-When you pass a JavaScript object implementing a protocol to Swift:
+Protocols use **reference semantics** when crossing the Swift/JavaScript boundary:
 
-1. **JavaScript Side**: The object is stored in JavaScriptKit's memory heap and its ID is passed as an `Int32` to Swift
-2. **Swift Side**: BridgeJS creates an `Any{ProtocolName}` wrapper that holds a `JSObject` reference
-3. **Method Calls**: Protocol method calls are forwarded through WASM to the JavaScript implementation
-4. **Memory Management**: The `JSObject` reference keeps the JavaScript object alive using JavaScriptKit's retain/release system. When the Swift wrapper is deallocated, the JavaScript object is automatically released.
+1. **JavaScript → Swift**: The JavaScript object is stored in JavaScriptKit's memory heap and its ID is passed as an `Int32` to Swift
+2. **Wrapper Generation**: BridgeJS generates an `Any{ProtocolName}` wrapper struct that holds a `JSObject` reference and forwards protocol method calls through WASM to the JavaScript implementation
+3. **Swift → JavaScript**: When returning a Swift protocol implementation to JavaScript, the object is stored on the Swift heap and JavaScript receives a reference
+4. **Memory Management**: `FinalizationRegistry` automatically handles cleanup. The `JSObject` reference keeps the JavaScript object alive, and when the Swift wrapper is deallocated, the JavaScript object is released.
+
+### Generated Wrapper
+
+BridgeJS generates a Swift wrapper struct for each `@JS` protocol:
+
+```swift
+struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    var count: Int {
+        get {
+            @_extern(wasm, module: "TestModule", name: "bjs_Counter_count_get")
+            func _extern_get(this: Int32) -> Int32
+            let ret = _extern_get(this: Int32(bitPattern: jsObject.id))
+            return Int.bridgeJSLiftReturn(ret)
+        }
+        set {
+            @_extern(wasm, module: "TestModule", name: "bjs_Counter_count_set")
+            func _extern_set(this: Int32, value: Int32)
+            _extern_set(this: Int32(bitPattern: jsObject.id), value: newValue.bridgeJSLowerParameter())
+        }
+    }
+
+    func increment(by amount: Int) {
+        @_extern(wasm, module: "TestModule", name: "bjs_Counter_increment")
+        func _extern_increment(this: Int32, amount: Int32)
+        _extern_increment(
+            this: Int32(bitPattern: jsObject.id),
+            amount: amount.bridgeJSLowerParameter()
+        )
+    }
+
+    // ... other protocol requirements
+}
+```
 
 ## Supported Features
 

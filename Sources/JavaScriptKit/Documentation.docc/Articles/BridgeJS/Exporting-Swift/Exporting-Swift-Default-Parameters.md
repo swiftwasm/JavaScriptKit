@@ -143,6 +143,7 @@ custom.release();
 ```
 
 **Requirements:**
+
 - Constructor/initializer arguments must be literal values (`"text"`, `42`, `true`, `false`, `nil`)
 - Struct initializers must use labeled arguments (e.g., `Point(x: 1.0, y: 2.0)`)
 - Complex expressions, computed properties, or method calls are not supported

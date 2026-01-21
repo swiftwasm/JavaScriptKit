@@ -122,7 +122,7 @@ const result: number = exports.Calculator.square(5);  // 25
 
 ## Namespace Enum Static Functions
 
-Namespace enums organize related utility functions and are assigned to `globalThis`:
+Namespace enums organize related utility functions and are assigned to `globalThis`. See <doc:Using-Namespace> for more details on namespace organization.
 
 ```swift
 @JS enum Utils {
@@ -156,8 +156,8 @@ const result: string = Utils.String.uppercase("world");
 
 ## Supported Features
 
-| Swift Static Function Feature | Status |
-|:------------------------------|:-------|
+| Swift Feature | Status |
+|:--------------|:-------|
 | Class `static func` | ✅ |
 | Class `class func` | ✅ |
 | Enum `static func` | ✅ |
