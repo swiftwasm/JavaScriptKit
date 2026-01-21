@@ -36,6 +36,10 @@ public struct ImportTS {
     public func finalize() throws -> String? {
         var decls: [DeclSyntax] = []
         for skeleton in self.skeleton.children {
+            for getter in skeleton.globalGetters {
+                let getterDecls = try renderSwiftGlobalGetter(getter, topLevelDecls: &decls)
+                decls.append(contentsOf: getterDecls)
+            }
             for function in skeleton.functions {
                 let thunkDecls = try renderSwiftThunk(function, topLevelDecls: &decls)
                 decls.append(contentsOf: thunkDecls)
@@ -52,6 +56,24 @@ public struct ImportTS {
 
         let format = BasicFormat()
         return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
+    }
+
+    func renderSwiftGlobalGetter(
+        _ getter: ImportedGetterSkeleton,
+        topLevelDecls: inout [DeclSyntax]
+    ) throws -> [DeclSyntax] {
+        let builder = CallJSEmission(moduleName: moduleName, abiName: getter.abiName(context: nil))
+        try builder.call(returnType: getter.type)
+        try builder.liftReturnValue(returnType: getter.type)
+        topLevelDecls.append(builder.renderImportDecl())
+        return [
+            builder.renderThunkDecl(
+                name: "_$\(getter.name)_get",
+                parameters: [],
+                returnType: getter.type
+            )
+            .with(\.leadingTrivia, Self.renderDocumentation(documentation: getter.documentation))
+        ]
     }
 
     class CallJSEmission {

@@ -172,6 +172,9 @@ struct BridgeJSLink {
             guard let imported = unified.imported else { continue }
             let importObjectBuilder = ImportObjectBuilder(moduleName: unified.moduleName)
             for fileSkeleton in imported.children {
+                for getter in fileSkeleton.globalGetters {
+                    try renderImportedGlobalGetter(importObjectBuilder: importObjectBuilder, getter: getter)
+                }
                 for function in fileSkeleton.functions {
                     try renderImportedFunction(importObjectBuilder: importObjectBuilder, function: function)
                 }
@@ -2142,6 +2145,27 @@ extension BridgeJSLink {
             body.write("\(call);")
         }
 
+        func getImportProperty(name: String, returnType: BridgeType) throws -> String? {
+            if returnType == .void {
+                throw BridgeJSLinkError(message: "Void is not supported for imported JS properties")
+            }
+
+            let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: returnType, context: context)
+            let expr = "imports[\"\(name)\"]"
+
+            let returnExpr: String?
+            if loweringFragment.parameters.count == 0 {
+                body.write("\(expr);")
+                returnExpr = nil
+            } else {
+                let resultVariable = scope.variable("ret")
+                body.write("let \(resultVariable) = \(expr);")
+                returnExpr = resultVariable
+            }
+
+            return try lowerReturnValue(returnType: returnType, returnExpr: returnExpr, loweringFragment: loweringFragment)
+        }
+
         private func lowerReturnValue(
             returnType: BridgeType,
             returnExpr: String?,
@@ -2879,6 +2903,22 @@ extension BridgeJSLink {
             ]
         )
         importObjectBuilder.assignToImportObject(name: function.abiName(context: nil), function: funcLines)
+    }
+
+    func renderImportedGlobalGetter(
+        importObjectBuilder: ImportObjectBuilder,
+        getter: ImportedGetterSkeleton
+    ) throws {
+        let thunkBuilder = ImportedThunkBuilder()
+        let returnExpr = try thunkBuilder.getImportProperty(name: getter.name, returnType: getter.type)
+        let abiName = getter.abiName(context: nil)
+        let funcLines = thunkBuilder.renderFunction(
+            name: abiName,
+            returnExpr: returnExpr,
+            returnType: getter.type
+        )
+        importObjectBuilder.appendDts(["readonly \(getter.name): \(getter.type.tsType);"])
+        importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
     }
 
     func renderImportedType(

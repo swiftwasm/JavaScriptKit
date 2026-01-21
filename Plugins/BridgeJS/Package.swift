@@ -55,7 +55,7 @@ let package = Package(
                 "BridgeJSLink",
                 "TS2Swift",
             ],
-            exclude: ["__Snapshots__", "Inputs", "MultifileInputs"]
+            exclude: ["__Snapshots__", "Inputs", "MultifileInputs", "ImportMacroInputs"]
         ),
         .macro(
             name: "BridgeJSMacros",

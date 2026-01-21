@@ -634,7 +634,7 @@ public struct ImportedGetterSkeleton: Codable {
         self.functionName = functionName
     }
 
-    public func abiName(context: ImportedTypeSkeleton) -> String {
+    public func abiName(context: ImportedTypeSkeleton?) -> String {
         if let functionName = functionName {
             return ABINameGenerator.generateImportedABIName(
                 baseName: functionName,
@@ -669,7 +669,7 @@ public struct ImportedSetterSkeleton: Codable {
         self.functionName = functionName
     }
 
-    public func abiName(context: ImportedTypeSkeleton) -> String {
+    public func abiName(context: ImportedTypeSkeleton?) -> String {
         if let functionName = functionName {
             return ABINameGenerator.generateImportedABIName(
                 baseName: functionName,
@@ -713,10 +713,48 @@ public struct ImportedTypeSkeleton: Codable {
 public struct ImportedFileSkeleton: Codable {
     public let functions: [ImportedFunctionSkeleton]
     public let types: [ImportedTypeSkeleton]
+    /// Global-scope imported properties (e.g. `@JSGetter var console: JSConsole`)
+    public let globalGetters: [ImportedGetterSkeleton]
+    /// Global-scope imported properties (future use; not currently emitted by macros)
+    public let globalSetters: [ImportedSetterSkeleton]
 
-    public init(functions: [ImportedFunctionSkeleton], types: [ImportedTypeSkeleton]) {
+    public init(
+        functions: [ImportedFunctionSkeleton],
+        types: [ImportedTypeSkeleton],
+        globalGetters: [ImportedGetterSkeleton] = [],
+        globalSetters: [ImportedSetterSkeleton] = []
+    ) {
         self.functions = functions
         self.types = types
+        self.globalGetters = globalGetters
+        self.globalSetters = globalSetters
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case functions
+        case types
+        case globalGetters
+        case globalSetters
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.functions = try container.decode([ImportedFunctionSkeleton].self, forKey: .functions)
+        self.types = try container.decode([ImportedTypeSkeleton].self, forKey: .types)
+        self.globalGetters = try container.decodeIfPresent([ImportedGetterSkeleton].self, forKey: .globalGetters) ?? []
+        self.globalSetters = try container.decodeIfPresent([ImportedSetterSkeleton].self, forKey: .globalSetters) ?? []
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(functions, forKey: .functions)
+        try container.encode(types, forKey: .types)
+        if !globalGetters.isEmpty {
+            try container.encode(globalGetters, forKey: .globalGetters)
+        }
+        if !globalSetters.isEmpty {
+            try container.encode(globalSetters, forKey: .globalSetters)
+        }
     }
 }
 

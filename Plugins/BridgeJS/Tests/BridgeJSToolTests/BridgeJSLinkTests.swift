@@ -38,10 +38,19 @@ import Testing
         "Inputs"
     )
 
+    static let importMacroInputsDirectory = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+        .appendingPathComponent("ImportMacroInputs")
+
     static func collectInputs(extension: String) -> [String] {
         let fileManager = FileManager.default
         let inputs = try! fileManager.contentsOfDirectory(atPath: Self.inputsDirectory.path)
         return inputs.filter { $0.hasSuffix(`extension`) }
+    }
+
+    static func collectImportMacroInputs() -> [String] {
+        let fileManager = FileManager.default
+        let inputs = try! fileManager.contentsOfDirectory(atPath: Self.importMacroInputsDirectory.path)
+        return inputs.filter { $0.hasSuffix(".swift") }
     }
 
     @Test(arguments: collectInputs(extension: ".swift"))
@@ -99,6 +108,35 @@ import Testing
         let unifiedData = try encoder.encode(unifiedSkeleton)
         try bridgeJSLink.addSkeletonFile(data: unifiedData)
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Import")
+    }
+
+    @Test(arguments: collectImportMacroInputs())
+    func snapshotImportMacroInput(input: String) throws {
+        let url = Self.importMacroInputsDirectory.appendingPathComponent(input)
+        let name = url.deletingPathExtension().lastPathComponent
+
+        let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
+        let importSwift = ImportSwiftMacros(progress: .silent, moduleName: "TestModule")
+        importSwift.addSourceFile(sourceFile, "\(name).swift")
+        let importResult = try importSwift.finalize()
+
+        var importTS = ImportTS(progress: .silent, moduleName: "TestModule")
+        for child in importResult.outputSkeleton.children {
+            importTS.addSkeleton(child)
+        }
+        let importSkeleton = importTS.skeleton
+
+        var bridgeJSLink = BridgeJSLink(sharedMemory: false)
+        let unifiedSkeleton = BridgeJSSkeleton(
+            moduleName: "TestModule",
+            exported: nil,
+            imported: importSkeleton
+        )
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let unifiedData = try encoder.encode(unifiedSkeleton)
+        try bridgeJSLink.addSkeletonFile(data: unifiedData)
+        try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".ImportMacros")
     }
 
     @Test(arguments: [
