@@ -20,7 +20,7 @@ let testingLinkerFlags: [LinkerSetting] = [
 let package = Package(
     name: "JavaScriptKit",
     platforms: [
-        .macOS(.v10_15),
+        .macOS(.v13),
         .iOS(.v13),
         .tvOS(.v13),
         .watchOS(.v6),
@@ -37,7 +37,7 @@ let package = Package(
         .plugin(name: "BridgeJSCommandPlugin", targets: ["BridgeJSCommandPlugin"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..<"603.0.0")
+        .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..<"601.0.0")
     ],
     targets: [
         .target(
