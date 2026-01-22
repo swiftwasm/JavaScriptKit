@@ -54,6 +54,9 @@ export class TypeProcessor {
         this.seenTypes = new Map();
         /** @type {string[]} Collected Swift code lines */
         this.swiftLines = [];
+
+        /** @type {Set<string>} */
+        this.visitedDeclarationKeys = new Set();
     }
 
     /**
@@ -117,6 +120,69 @@ export class TypeProcessor {
             this.visitFunctionDeclaration(node);
         } else if (ts.isClassDeclaration(node)) {
             this.visitClassDecl(node);
+        } else if (ts.isExportDeclaration(node)) {
+            this.visitExportDeclaration(node);
+        }
+    }
+
+    /**
+     * Visit an export declaration and process re-exports like:
+     * - export { Thing } from "./module";
+     * - export { Thing as Alias } from "./module";
+     * - export * from "./module";
+     * @param {ts.ExportDeclaration} node
+     */
+    visitExportDeclaration(node) {
+        if (!node.moduleSpecifier) return;
+
+        const moduleSymbol = this.checker.getSymbolAtLocation(node.moduleSpecifier);
+        if (!moduleSymbol) {
+            this.diagnosticEngine.print("warning", "Failed to resolve module for export declaration", node);
+            return;
+        }
+
+        /** @type {ts.Symbol[]} */
+        let targetSymbols = [];
+
+        if (!node.exportClause) {
+            // export * from "..."
+            targetSymbols = this.checker.getExportsOfModule(moduleSymbol);
+        } else if (ts.isNamedExports(node.exportClause)) {
+            const moduleExports = this.checker.getExportsOfModule(moduleSymbol);
+            for (const element of node.exportClause.elements) {
+                const originalName = element.propertyName?.text ?? element.name.text;
+
+                const match = moduleExports.find(s => s.name === originalName);
+                if (match) {
+                    targetSymbols.push(match);
+                    continue;
+                }
+
+                // Fallback for unusual bindings/resolution failures.
+                const fallback = this.checker.getSymbolAtLocation(element.propertyName ?? element.name);
+                if (fallback) {
+                    targetSymbols.push(fallback);
+                    continue;
+                }
+
+                this.diagnosticEngine.print("warning", `Failed to resolve re-exported symbol '${originalName}'`, node);
+            }
+        } else {
+            // export * as ns from "..." is not currently supported by BridgeJS imports.
+            return;
+        }
+
+        for (const symbol of targetSymbols) {
+            const declarations = symbol.getDeclarations() ?? [];
+            for (const declaration of declarations) {
+                // Avoid duplicate emission when the same declaration is reached via multiple re-exports.
+                const sourceFile = declaration.getSourceFile();
+                const key = `${sourceFile.fileName}:${declaration.pos}:${declaration.end}`;
+                if (this.visitedDeclarationKeys.has(key)) continue;
+                this.visitedDeclarationKeys.add(key);
+
+                this.visitNode(declaration);
+            }
         }
     }
 
