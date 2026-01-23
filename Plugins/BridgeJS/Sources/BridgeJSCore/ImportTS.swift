@@ -734,16 +734,32 @@ enum SwiftCodePattern {
     /// Builds the standard @_expose and @_cdecl attributes for WebAssembly-exposed functions
     static func buildExposeAttributes(abiName: String) -> AttributeListSyntax {
         return AttributeListSyntax {
+            #if canImport(SwiftSyntax602)
+            let exposeAttrArgs = AttributeSyntax.Arguments.argumentList(
+                [
+                    LabeledExprSyntax(label: nil, expression: DeclReferenceExprSyntax(baseName: "wasm")),
+                    LabeledExprSyntax(label: nil, expression: StringLiteralExprSyntax(content: abiName)),
+                ]
+            )
+            let cdeclAttrArgs = AttributeSyntax.Arguments.argumentList(
+                [
+                    LabeledExprSyntax(label: nil, expression: StringLiteralExprSyntax(content: abiName))
+                ]
+            )
+            #else
+            let exposeAttrArgs = AttributeSyntax.Arguments.exposeAttributeArguments(
+                ExposeAttributeArgumentsSyntax(
+                    language: .identifier("wasm"),
+                    comma: .commaToken(),
+                    cxxName: StringLiteralExprSyntax(content: abiName)
+                )
+            )
+            let cdeclAttrArgs = AttributeSyntax.Arguments.string(StringLiteralExprSyntax(content: abiName))
+            #endif
             AttributeSyntax(
                 attributeName: IdentifierTypeSyntax(name: .identifier("_expose")),
                 leftParen: .leftParenToken(),
-                arguments: .exposeAttributeArguments(
-                    ExposeAttributeArgumentsSyntax(
-                        language: .identifier("wasm"),
-                        comma: .commaToken(),
-                        cxxName: StringLiteralExprSyntax(content: abiName)
-                    )
-                ),
+                arguments: exposeAttrArgs,
                 rightParen: .rightParenToken()
             )
             .with(\.trailingTrivia, .newline)
@@ -751,7 +767,7 @@ enum SwiftCodePattern {
             AttributeSyntax(
                 attributeName: IdentifierTypeSyntax(name: .identifier("_cdecl")),
                 leftParen: .leftParenToken(),
-                arguments: .string(StringLiteralExprSyntax(content: abiName)),
+                arguments: cdeclAttrArgs,
                 rightParen: .rightParenToken()
             )
             .with(\.trailingTrivia, .newline)
