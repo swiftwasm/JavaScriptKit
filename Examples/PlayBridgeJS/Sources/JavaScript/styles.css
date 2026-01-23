@@ -49,13 +49,12 @@ body {
     background-color: var(--color-fill);
     color: var(--color-text);
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
     line-height: 1.5;
 }
 
 .container {
-    height: 100vh;
+    min-height: 100vh;
     padding: 24px;
     display: flex;
     flex-direction: column;
@@ -383,13 +382,24 @@ body {
 }
 
 @media (max-width: 768px) {
+    body {
+        overflow: auto;
+    }
+
     .main-content {
         grid-template-columns: 1fr;
         gap: 16px;
+        flex: none;
     }
 
     .container {
+        height: auto;
+        min-height: 100vh;
         padding: 12px;
+    }
+
+    .editor-container {
+        min-height: 300px;
     }
 
     .header h1 {
