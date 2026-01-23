@@ -2528,9 +2528,20 @@ struct ClosureCodegen {
                                         capture: ClosureCaptureClauseSyntax(
                                             leftSquare: .leftSquareToken(),
                                             items: ClosureCaptureListSyntax {
+                                                #if canImport(SwiftSyntax602)
+                                                ClosureCaptureSyntax(
+                                                    name: .identifier("", presence: .missing), initializer: InitializerClauseSyntax(
+                                                        equal: .equalToken(presence: .missing),
+                                                        nil,
+                                                        value: ExprSyntax("callback")
+                                                    ),
+                                                    trailingTrivia: nil
+                                                )
+                                                #else
                                                 ClosureCaptureSyntax(
                                                     expression: ExprSyntax("callback")
                                                 )
+                                                #endif
                                             },
                                             rightSquare: .rightSquareToken()
                                         ),
