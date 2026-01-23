@@ -743,7 +743,7 @@ enum SwiftCodePattern {
             )
             let cdeclAttrArgs = AttributeSyntax.Arguments.argumentList(
                 [
-                    LabeledExprSyntax(label: nil, expression: StringLiteralExprSyntax(content: abiName)),
+                    LabeledExprSyntax(label: nil, expression: StringLiteralExprSyntax(content: abiName))
                 ]
             )
             #else

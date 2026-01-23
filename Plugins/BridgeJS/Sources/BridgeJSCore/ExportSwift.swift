@@ -2530,7 +2530,8 @@ struct ClosureCodegen {
                                             items: ClosureCaptureListSyntax {
                                                 #if canImport(SwiftSyntax602)
                                                 ClosureCaptureSyntax(
-                                                    name: .identifier("", presence: .missing), initializer: InitializerClauseSyntax(
+                                                    name: .identifier("", presence: .missing),
+                                                    initializer: InitializerClauseSyntax(
                                                         equal: .equalToken(presence: .missing),
                                                         nil,
                                                         value: ExprSyntax("callback")
