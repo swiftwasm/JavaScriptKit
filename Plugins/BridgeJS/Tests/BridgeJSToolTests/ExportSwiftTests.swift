@@ -4,16 +4,19 @@ import SwiftParser
 import Testing
 
 @testable import BridgeJSCore
+@testable import BridgeJSSkeleton
 
 @Suite struct ExportSwiftTests {
     private func snapshot(
-        swiftAPI: ExportSwift,
+        skeleton: BridgeJSSkeleton,
         name: String? = nil,
         filePath: String = #filePath,
         function: String = #function,
         sourceLocation: Testing.SourceLocation = #_sourceLocation
     ) throws {
-        let (outputSwift, outputSkeleton) = try #require(try swiftAPI.finalize())
+        guard let exported = skeleton.exported else { return }
+        let exportSwift = ExportSwift(progress: .silent, moduleName: skeleton.moduleName, skeleton: exported)
+        let outputSwift = try #require(try exportSwift.finalize())
         try assertSnapshot(
             name: name,
             filePath: filePath,
@@ -24,7 +27,7 @@ import Testing
         )
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        let outputSkeletonData = try encoder.encode(outputSkeleton)
+        let outputSkeletonData = try encoder.encode(exported)
         try assertSnapshot(
             name: name,
             filePath: filePath,
@@ -52,12 +55,12 @@ import Testing
 
     @Test(arguments: collectInputs())
     func snapshot(input: String) throws {
-        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        try swiftAPI.addSourceFile(sourceFile, input)
+        swiftAPI.addSourceFile(sourceFile, inputFilePath: input)
         let name = url.deletingPathExtension().lastPathComponent
-        try snapshot(swiftAPI: swiftAPI, name: name)
+        try snapshot(skeleton: swiftAPI.finalize(), name: name)
     }
 
     @Test(arguments: [
@@ -67,80 +70,80 @@ import Testing
         "EnumNamespace.swift",
     ])
     func snapshotWithGlobal(input: String) throws {
-        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule", exposeToGlobal: true)
+        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: true)
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        try swiftAPI.addSourceFile(sourceFile, input)
+        swiftAPI.addSourceFile(sourceFile, inputFilePath: input)
         let name = url.deletingPathExtension().lastPathComponent
-        try snapshot(swiftAPI: swiftAPI, name: name + ".Global")
+        try snapshot(skeleton: swiftAPI.finalize(), name: name + ".Global")
     }
 
     @Test
     func snapshotCrossFileTypeResolution() throws {
         // Test that types defined in one file can be referenced from another file
         // This tests the fix for cross-file type resolution in BridgeJS
-        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
 
         // Add ClassB first, then ClassA (which references ClassB)
         let classBURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileClassB.swift")
         let classBSourceFile = Parser.parse(source: try String(contentsOf: classBURL, encoding: .utf8))
-        try swiftAPI.addSourceFile(classBSourceFile, "CrossFileClassB.swift")
+        swiftAPI.addSourceFile(classBSourceFile, inputFilePath: "CrossFileClassB.swift")
 
         let classAURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileClassA.swift")
         let classASourceFile = Parser.parse(source: try String(contentsOf: classAURL, encoding: .utf8))
-        try swiftAPI.addSourceFile(classASourceFile, "CrossFileClassA.swift")
+        swiftAPI.addSourceFile(classASourceFile, inputFilePath: "CrossFileClassA.swift")
 
-        try snapshot(swiftAPI: swiftAPI, name: "CrossFileTypeResolution")
+        try snapshot(skeleton: swiftAPI.finalize(), name: "CrossFileTypeResolution")
     }
 
     @Test
     func snapshotCrossFileTypeResolutionReverseOrder() throws {
         // Test that types can be resolved regardless of the order files are added
         // Add ClassA first (which references ClassB), then ClassB
-        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
 
         let classAURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileClassA.swift")
         let classASourceFile = Parser.parse(source: try String(contentsOf: classAURL, encoding: .utf8))
-        try swiftAPI.addSourceFile(classASourceFile, "CrossFileClassA.swift")
+        swiftAPI.addSourceFile(classASourceFile, inputFilePath: "CrossFileClassA.swift")
 
         let classBURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileClassB.swift")
         let classBSourceFile = Parser.parse(source: try String(contentsOf: classBURL, encoding: .utf8))
-        try swiftAPI.addSourceFile(classBSourceFile, "CrossFileClassB.swift")
+        swiftAPI.addSourceFile(classBSourceFile, inputFilePath: "CrossFileClassB.swift")
 
-        try snapshot(swiftAPI: swiftAPI, name: "CrossFileTypeResolution.ReverseOrder")
+        try snapshot(skeleton: swiftAPI.finalize(), name: "CrossFileTypeResolution.ReverseOrder")
     }
 
     @Test
     func snapshotCrossFileFunctionTypes() throws {
         // Test that functions and methods can use cross-file types as parameters and return types
-        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
 
         // Add FunctionB first, then FunctionA (which references FunctionB in methods and functions)
         let functionBURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileFunctionB.swift")
         let functionBSourceFile = Parser.parse(source: try String(contentsOf: functionBURL, encoding: .utf8))
-        try swiftAPI.addSourceFile(functionBSourceFile, "CrossFileFunctionB.swift")
+        swiftAPI.addSourceFile(functionBSourceFile, inputFilePath: "CrossFileFunctionB.swift")
 
         let functionAURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileFunctionA.swift")
         let functionASourceFile = Parser.parse(source: try String(contentsOf: functionAURL, encoding: .utf8))
-        try swiftAPI.addSourceFile(functionASourceFile, "CrossFileFunctionA.swift")
+        swiftAPI.addSourceFile(functionASourceFile, inputFilePath: "CrossFileFunctionA.swift")
 
-        try snapshot(swiftAPI: swiftAPI, name: "CrossFileFunctionTypes")
+        try snapshot(skeleton: swiftAPI.finalize(), name: "CrossFileFunctionTypes")
     }
 
     @Test
     func snapshotCrossFileFunctionTypesReverseOrder() throws {
         // Test that function types can be resolved regardless of the order files are added
-        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
 
         // Add FunctionA first (which references FunctionB), then FunctionB
         let functionAURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileFunctionA.swift")
         let functionASourceFile = Parser.parse(source: try String(contentsOf: functionAURL, encoding: .utf8))
-        try swiftAPI.addSourceFile(functionASourceFile, "CrossFileFunctionA.swift")
+        swiftAPI.addSourceFile(functionASourceFile, inputFilePath: "CrossFileFunctionA.swift")
 
         let functionBURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileFunctionB.swift")
         let functionBSourceFile = Parser.parse(source: try String(contentsOf: functionBURL, encoding: .utf8))
-        try swiftAPI.addSourceFile(functionBSourceFile, "CrossFileFunctionB.swift")
+        swiftAPI.addSourceFile(functionBSourceFile, inputFilePath: "CrossFileFunctionB.swift")
 
-        try snapshot(swiftAPI: swiftAPI, name: "CrossFileFunctionTypes.ReverseOrder")
+        try snapshot(skeleton: swiftAPI.finalize(), name: "CrossFileFunctionTypes.ReverseOrder")
     }
 }
