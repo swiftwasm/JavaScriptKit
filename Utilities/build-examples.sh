@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-EXCLUDED_EXAMPLES=("Embedded")
+EXCLUDED_EXAMPLES=()
 
 for example in Examples/*; do
     skip_example=false
