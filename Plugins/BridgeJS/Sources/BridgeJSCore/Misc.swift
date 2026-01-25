@@ -1,3 +1,63 @@
+// MARK: - ProgressReporting
+
+public struct ProgressReporting {
+    let print: (String) -> Void
+
+    public init(verbose: Bool) {
+        self.init(print: verbose ? { Swift.print($0) } : { _ in })
+    }
+
+    private init(print: @escaping (String) -> Void) {
+        self.print = print
+    }
+
+    public static var silent: ProgressReporting {
+        return ProgressReporting(print: { _ in })
+    }
+
+    public func print(_ message: String) {
+        self.print(message)
+    }
+}
+
+// MARK: - DiagnosticError
+
+import SwiftSyntax
+
+struct DiagnosticError: Error {
+    let node: Syntax
+    let message: String
+    let hint: String?
+
+    init(node: some SyntaxProtocol, message: String, hint: String? = nil) {
+        self.node = Syntax(node)
+        self.message = message
+        self.hint = hint
+    }
+
+    func formattedDescription(fileName: String) -> String {
+        let locationConverter = SourceLocationConverter(fileName: fileName, tree: node.root)
+        let location = locationConverter.location(for: node.position)
+        var description = "\(fileName):\(location.line):\(location.column): error: \(message)"
+        if let hint {
+            description += "\nHint: \(hint)"
+        }
+        return description
+    }
+}
+
+// MARK: - BridgeJSCoreError
+
+public struct BridgeJSCoreError: Swift.Error, CustomStringConvertible {
+    public let description: String
+
+    public init(_ message: String) {
+        self.description = message
+    }
+}
+
+// MARK: - BridgeJSConfig
+
 import struct Foundation.URL
 import struct Foundation.Data
 import class Foundation.FileManager
