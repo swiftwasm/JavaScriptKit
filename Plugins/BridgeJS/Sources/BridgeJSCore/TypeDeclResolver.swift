@@ -63,6 +63,12 @@ class TypeDeclResolver {
         override func visitPost(_ node: EnumDeclSyntax) {
             visitPostNominalDecl()
         }
+        override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
+            return visitNominalDecl(node)
+        }
+        override func visitPost(_ node: ProtocolDeclSyntax) {
+            visitPostNominalDecl()
+        }
 
         override func visit(_ node: TypeAliasDeclSyntax) -> SyntaxVisitorContinueKind {
             let name = node.name.text
