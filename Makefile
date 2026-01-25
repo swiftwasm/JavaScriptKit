@@ -1,4 +1,4 @@
-SWIFT_SDK_ID ?= wasm32-unknown-wasi
+SWIFT_SDK_ID ?=
 
 .PHONY: bootstrap
 bootstrap:
@@ -7,6 +7,10 @@ bootstrap:
 .PHONY: unittest
 unittest:
 	@echo Running unit tests
+	@test -n "$(SWIFT_SDK_ID)" || { \
+		echo "SWIFT_SDK_ID is not set. Run 'swift sdk list' and pass a matching SDK, e.g. 'make unittest SWIFT_SDK_ID=<id>'."; \
+		exit 2; \
+	}
 	env JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1 swift package --swift-sdk "$(SWIFT_SDK_ID)" \
 	    --disable-sandbox \
 	    js test --prelude ./Tests/prelude.mjs -Xnode --expose-gc
