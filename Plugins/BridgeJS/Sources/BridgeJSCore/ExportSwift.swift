@@ -26,7 +26,6 @@ public class ExportSwift {
     private var exportedEnums: [ExportedEnum] = []
     private var exportedStructs: [ExportedStruct] = []
     private var exportedProtocols: [ExportedProtocol] = []
-    private var exportedProtocolNameByKey: [String: String] = [:]
     private var typeDeclResolver: TypeDeclResolver = TypeDeclResolver()
     private var sourceFiles: [(sourceFile: SourceFileSyntax, inputFilePath: String)] = []
 
@@ -1136,8 +1135,6 @@ public class ExportSwift {
 
             stateStack.pop()
 
-            parent.exportedProtocolNameByKey[protocolUniqueKey] = name
-
             return .skipChildren
         }
 
@@ -1596,11 +1593,6 @@ public class ExportSwift {
         let typeName = type.trimmedDescription
         if let primitiveType = BridgeType(swiftType: typeName) {
             return primitiveType
-        }
-
-        let protocolKey = typeName
-        if let protocolName = exportedProtocolNameByKey[protocolKey] {
-            return .swiftProtocol(protocolName)
         }
 
         guard let typeDecl = typeDeclResolver.resolve(type) else {
