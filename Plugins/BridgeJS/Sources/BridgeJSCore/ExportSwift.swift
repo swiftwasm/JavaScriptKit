@@ -1674,29 +1674,6 @@ struct ProtocolCodegen {
     }
 }
 
-extension BridgeType {
-    init?(swiftType: String) {
-        switch swiftType {
-        case "Int":
-            self = .int
-        case "Float":
-            self = .float
-        case "Double":
-            self = .double
-        case "String":
-            self = .string
-        case "Bool":
-            self = .bool
-        case "Void":
-            self = .void
-        case "JSObject":
-            self = .jsObject(nil)
-        default:
-            return nil
-        }
-    }
-}
-
 extension WasmCoreType {
     var swiftType: String {
         switch self {

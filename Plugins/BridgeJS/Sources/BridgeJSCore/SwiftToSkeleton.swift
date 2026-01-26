@@ -25,6 +25,13 @@ public final class SwiftToSkeleton {
         self.moduleName = moduleName
         self.exposeToGlobal = exposeToGlobal
         self.typeDeclResolver = TypeDeclResolver()
+
+        // Index known types provided by JavaScriptKit
+        self.typeDeclResolver.addSourceFile(
+            """
+            @JSClass struct JSPromise {}
+            """
+        )
     }
 
     public func addSourceFile(_ sourceFile: SourceFileSyntax, inputFilePath: String) {
@@ -47,13 +54,15 @@ public final class SwiftToSkeleton {
             typeNameCollector.walk(sourceFile)
             let importCollector = ImportSwiftMacrosAPICollector(
                 inputFilePath: inputFilePath,
-                knownJSClassNames: typeNameCollector.typeNames
+                knownJSClassNames: typeNameCollector.typeNames,
+                parent: self
             )
             importCollector.walk(sourceFile)
 
-            if !exportCollector.errors.isEmpty || !importCollector.errors.isEmpty {
+            let importErrorsFatal = importCollector.errors.filter { !$0.message.contains("Unsupported type '") }
+            if !exportCollector.errors.isEmpty || !importErrorsFatal.isEmpty {
                 perSourceErrors.append(
-                    (inputFilePath: inputFilePath, errors: exportCollector.errors + importCollector.errors)
+                    (inputFilePath: inputFilePath, errors: exportCollector.errors + importErrorsFatal)
                 )
             }
 
@@ -84,22 +93,22 @@ public final class SwiftToSkeleton {
         return BridgeJSSkeleton(moduleName: moduleName, exported: exported, imported: importedSkeleton)
     }
 
-    func lookupType(for type: TypeSyntax) -> BridgeType? {
+    func lookupType(for type: TypeSyntax, errors: inout [DiagnosticError]) -> BridgeType? {
         if let attributedType = type.as(AttributedTypeSyntax.self) {
-            return lookupType(for: attributedType.baseType)
+            return lookupType(for: attributedType.baseType, errors: &errors)
         }
 
         // (T1, T2, ...) -> R
         if let functionType = type.as(FunctionTypeSyntax.self) {
             var parameters: [BridgeType] = []
             for param in functionType.parameters {
-                guard let paramType = lookupType(for: param.type) else {
+                guard let paramType = lookupType(for: param.type, errors: &errors) else {
                     return nil
                 }
                 parameters.append(paramType)
             }
 
-            guard let returnType = lookupType(for: functionType.returnClause.type) else {
+            guard let returnType = lookupType(for: functionType.returnClause.type, errors: &errors) else {
                 return nil
             }
 
@@ -120,7 +129,7 @@ public final class SwiftToSkeleton {
         // T?
         if let optionalType = type.as(OptionalTypeSyntax.self) {
             let wrappedType = optionalType.wrappedType
-            if let baseType = lookupType(for: wrappedType) {
+            if let baseType = lookupType(for: wrappedType, errors: &errors) {
                 return .optional(baseType)
             }
         }
@@ -131,7 +140,7 @@ public final class SwiftToSkeleton {
             genericArgs.count == 1,
             let argType = TypeSyntax(genericArgs.first?.argument)
         {
-            if let baseType = lookupType(for: argType) {
+            if let baseType = lookupType(for: argType, errors: &errors) {
                 return .optional(baseType)
             }
         }
@@ -144,22 +153,34 @@ public final class SwiftToSkeleton {
             genericArgs.count == 1,
             let argType = TypeSyntax(genericArgs.first?.argument)
         {
-            if let wrappedType = lookupType(for: argType) {
+            if let wrappedType = lookupType(for: argType, errors: &errors) {
                 return .optional(wrappedType)
             }
         }
         if let aliasDecl = typeDeclResolver.resolveTypeAlias(type) {
-            if let resolvedType = lookupType(for: aliasDecl.initializer.value) {
+            if let resolvedType = lookupType(for: aliasDecl.initializer.value, errors: &errors) {
                 return resolvedType
             }
         }
 
-        let typeName = type.trimmedDescription
+        let typeName: String
+        if let identifier = type.as(IdentifierTypeSyntax.self) {
+            typeName = Self.normalizeIdentifier(identifier.name.text)
+        } else {
+            typeName = type.trimmedDescription
+        }
         if let primitiveType = BridgeType(swiftType: typeName) {
             return primitiveType
         }
 
         guard let typeDecl = typeDeclResolver.resolve(type) else {
+            errors.append(
+                DiagnosticError(
+                    node: type,
+                    message: "Unsupported type '\(type.trimmedDescription)'.",
+                    hint: "Only primitive types and types defined in the same module are allowed"
+                )
+            )
             return nil
         }
 
@@ -204,6 +225,9 @@ public final class SwiftToSkeleton {
 
         if let structDecl = typeDecl.as(StructDeclSyntax.self) {
             let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: structDecl, itemName: structDecl.name.text)
+            if structDecl.attributes.hasAttribute(name: "JSClass") {
+                return .jsObject(swiftCallName)
+            }
             return .swiftStruct(swiftCallName)
         }
 
@@ -236,6 +260,14 @@ public final class SwiftToSkeleton {
         }
     }
 
+    /// Strips surrounding backticks from an identifier (e.g. "`Foo`" -> "Foo").
+    static func normalizeIdentifier(_ name: String) -> String {
+        guard name.hasPrefix("`"), name.hasSuffix("`"), name.count >= 2 else {
+            return name
+        }
+        return String(name.dropFirst().dropLast())
+    }
+
 }
 
 private enum ExportSwiftConstants {
@@ -251,6 +283,14 @@ extension AttributeListSyntax {
         first(where: {
             $0.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "JS"
         })?.as(AttributeSyntax.self)
+    }
+
+    /// Returns true if any attribute has the given name (e.g. "JSClass").
+    func hasAttribute(name: String) -> Bool {
+        contains { attribute in
+            guard let syntax = attribute.as(AttributeSyntax.self) else { return false }
+            return syntax.attributeName.trimmedDescription == name
+        }
     }
 }
 
@@ -356,12 +396,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         errors.append(DiagnosticError(node: node, message: message, hint: hint))
     }
 
-    private func diagnoseUnsupportedType(node: some SyntaxProtocol, type: String) {
-        diagnose(
-            node: node,
-            message: "Unsupported type: \(type)",
-            hint: "Only primitive types and types defined in the same module are allowed"
-        )
+    private func withLookupErrors<T>(_ body: (inout [DiagnosticError]) -> T) -> T {
+        var errs = self.errors
+        defer { self.errors = errs }
+        return body(&errs)
     }
 
     private func diagnoseNestedOptional(node: some SyntaxProtocol, type: String) {
@@ -641,8 +679,11 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         var parameters: [Parameter] = []
 
         for param in parameterClause.parameters {
-            let resolvedType = self.parent.lookupType(for: param.type)
-            if let type = resolvedType, case .closure(let signature) = type {
+            let resolvedType = withLookupErrors { self.parent.lookupType(for: param.type, errors: &$0) }
+            guard let type = resolvedType else {
+                continue  // Skip unsupported types
+            }
+            if case .closure(let signature) = type {
                 if signature.isAsync {
                     diagnose(
                         node: param.type,
@@ -658,17 +699,12 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                     continue
                 }
             }
-            if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
+            if case .optional(let wrappedType) = type, wrappedType.isOptional {
                 diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)
                 continue
             }
-            if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
+            if case .optional(let wrappedType) = type, wrappedType.isOptional {
                 diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)
-                continue
-            }
-
-            guard let type = resolvedType else {
-                diagnoseUnsupportedType(node: param.type, type: param.type.trimmedDescription)
                 continue
             }
 
@@ -787,17 +823,14 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: true)
         let returnType: BridgeType
         if let returnClause = node.signature.returnClause {
-            let resolvedType = self.parent.lookupType(for: returnClause.type)
+            let resolvedType = withLookupErrors { self.parent.lookupType(for: returnClause.type, errors: &$0) }
 
             if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
                 diagnoseNestedOptional(node: returnClause.type, type: returnClause.type.trimmedDescription)
                 return nil
             }
 
-            guard let type = resolvedType else {
-                diagnoseUnsupportedType(node: returnClause.type, type: returnClause.type.trimmedDescription)
-                return nil
-            }
+            guard let type = resolvedType else { return nil }
             returnType = type
         } else {
             returnType = .void
@@ -1048,8 +1081,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 continue
             }
 
-            guard let propertyType = self.parent.lookupType(for: typeAnnotation.type) else {
-                diagnoseUnsupportedType(node: typeAnnotation.type, type: typeAnnotation.type.trimmedDescription)
+            guard let propertyType = withLookupErrors({ self.parent.lookupType(for: typeAnnotation.type, errors: &$0) })
+            else {
                 continue
             }
 
@@ -1357,11 +1390,11 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                         continue
                     }
 
-                    guard let fieldType = self.parent.lookupType(for: typeAnnotation.type) else {
-                        diagnoseUnsupportedType(
-                            node: typeAnnotation.type,
-                            type: typeAnnotation.type.trimmedDescription
-                        )
+                    guard
+                        let fieldType = withLookupErrors({
+                            self.parent.lookupType(for: typeAnnotation.type, errors: &$0)
+                        })
+                    else {
                         continue
                     }
 
@@ -1413,17 +1446,14 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
 
         let returnType: BridgeType
         if let returnClause = node.signature.returnClause {
-            let resolvedType = self.parent.lookupType(for: returnClause.type)
+            let resolvedType = withLookupErrors { self.parent.lookupType(for: returnClause.type, errors: &$0) }
 
             if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
                 diagnoseNestedOptional(node: returnClause.type, type: returnClause.type.trimmedDescription)
                 return nil
             }
 
-            guard let type = resolvedType else {
-                diagnoseUnsupportedType(node: returnClause.type, type: returnClause.type.trimmedDescription)
-                return nil
-            }
+            guard let type = resolvedType else { return nil }
             returnType = type
         } else {
             returnType = .void
@@ -1468,8 +1498,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 continue
             }
 
-            guard let propertyType = self.parent.lookupType(for: typeAnnotation.type) else {
-                diagnoseUnsupportedType(node: typeAnnotation.type, type: typeAnnotation.type.trimmedDescription)
+            guard let propertyType = withLookupErrors({ self.parent.lookupType(for: typeAnnotation.type, errors: &$0) })
+            else {
                 continue
             }
 
@@ -1565,12 +1595,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             }
             if let parameterClause = element.parameterClause {
                 for param in parameterClause.parameters {
-                    guard let bridgeType = parent.lookupType(for: param.type) else {
-                        diagnose(
-                            node: param.type,
-                            message: "Unsupported associated value type: \(param.type.trimmedDescription)",
-                            hint: "Only primitive types and types defined in the same module are allowed"
-                        )
+                    guard let bridgeType = withLookupErrors({ parent.lookupType(for: param.type, errors: &$0) }) else {
                         continue
                     }
 
@@ -1691,6 +1716,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     private let inputFilePath: String
     private var jsClassNames: Set<String>
+    private let parent: SwiftToSkeleton
 
     // MARK: - State Management
 
@@ -1804,11 +1830,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     }
 
     /// Validates a setter function and extracts common information
-    private func validateSetter(
-        _ node: FunctionDeclSyntax,
-        jsSetter: AttributeSyntax,
-        enclosingTypeName: String?
-    ) -> SetterValidationResult? {
+    private func validateSetter(_ node: FunctionDeclSyntax, jsSetter: AttributeSyntax) -> SetterValidationResult? {
         guard let effects = validateEffects(node.signature.effectSpecifiers, node: node, attributeName: "JSSetter")
         else {
             return nil
@@ -1837,11 +1859,15 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             return nil
         }
 
+        guard let valueType = withLookupErrors({ parent.lookupType(for: firstParam.type, errors: &$0) }) else {
+            return nil
+        }
+
         return SetterValidationResult(
             effects: effects,
             jsName: jsName,
             firstParam: firstParam,
-            valueType: parseType(firstParam.type, enclosingTypeName: enclosingTypeName)
+            valueType: valueType
         )
     }
 
@@ -1879,10 +1905,17 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
     }
 
-    init(inputFilePath: String, knownJSClassNames: Set<String>) {
+    init(inputFilePath: String, knownJSClassNames: Set<String>, parent: SwiftToSkeleton) {
         self.inputFilePath = inputFilePath
         self.jsClassNames = knownJSClassNames
+        self.parent = parent
         super.init(viewMode: .sourceAccurate)
+    }
+
+    private func withLookupErrors<T>(_ body: (inout [DiagnosticError]) -> T) -> T {
+        var errs = self.errors
+        defer { self.errors = errs }
+        return body(&errs)
     }
 
     private func enterJSClass(_ typeName: String) {
@@ -2008,7 +2041,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                     )
                 )
             } else if let jsSetter = AttributeChecker.firstJSSetterAttribute(node.attributes),
-                let setter = parseSetterSkeleton(jsSetter, node, enclosingTypeName: typeName)
+                let setter = parseSetterSkeleton(jsSetter, node)
             {
                 type.setters.append(setter)
             }
@@ -2025,7 +2058,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
         switch state {
         case .topLevel:
-            if let getter = parseGetterSkeleton(node, enclosingTypeName: nil) {
+            if let getter = parseGetterSkeleton(node) {
                 importedGlobalGetters.append(getter)
             }
             return .skipChildren
@@ -2042,7 +2075,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                             "@JSGetter is not supported for static members. Use it only for instance members in @JSClass types."
                     )
                 )
-            } else if let getter = parseGetterSkeleton(node, enclosingTypeName: typeName) {
+            } else if let getter = parseGetterSkeleton(node) {
                 type.getters.append(getter)
                 currentType = type
             }
@@ -2125,10 +2158,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             return nil
         }
         return ImportedConstructorSkeleton(
-            parameters: parseParameters(
-                from: initializer.signature.parameterClause,
-                enclosingTypeName: typeName
-            )
+            parameters: parseParameters(from: initializer.signature.parameterClause)
         )
     }
 
@@ -2142,7 +2172,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             return nil
         }
 
-        let baseName = normalizeIdentifier(node.name.text)
+        let baseName = SwiftToSkeleton.normalizeIdentifier(node.name.text)
         let name: String
         if isStaticMember, let enclosingTypeName {
             name = "\(enclosingTypeName)_\(baseName)"
@@ -2150,13 +2180,13 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             name = baseName
         }
 
-        let parameters = parseParameters(
-            from: node.signature.parameterClause,
-            enclosingTypeName: enclosingTypeName
-        )
+        let parameters = parseParameters(from: node.signature.parameterClause)
         let returnType: BridgeType
         if let returnTypeSyntax = node.signature.returnClause?.type {
-            returnType = parseType(returnTypeSyntax, enclosingTypeName: enclosingTypeName)
+            guard let resolved = withLookupErrors({ parent.lookupType(for: returnTypeSyntax, errors: &$0) }) else {
+                return nil
+            }
+            returnType = resolved
         } else {
             returnType = .void
         }
@@ -2183,15 +2213,14 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         return (identifier, typeAnnotation.type)
     }
 
-    private func parseGetterSkeleton(
-        _ node: VariableDeclSyntax,
-        enclosingTypeName: String?
-    ) -> ImportedGetterSkeleton? {
+    private func parseGetterSkeleton(_ node: VariableDeclSyntax) -> ImportedGetterSkeleton? {
         guard let (identifier, type) = extractPropertyInfo(node) else {
             return nil
         }
-        let propertyType = parseType(type, enclosingTypeName: enclosingTypeName)
-        let propertyName = normalizeIdentifier(identifier.identifier.text)
+        guard let propertyType = withLookupErrors({ parent.lookupType(for: type, errors: &$0) }) else {
+            return nil
+        }
+        let propertyName = SwiftToSkeleton.normalizeIdentifier(identifier.identifier.text)
         return ImportedGetterSkeleton(
             name: propertyName,
             type: propertyType,
@@ -2203,10 +2232,9 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     /// Parses a setter as part of a type's property system (for instance setters)
     private func parseSetterSkeleton(
         _ jsSetter: AttributeSyntax,
-        _ node: FunctionDeclSyntax,
-        enclosingTypeName: String?
+        _ node: FunctionDeclSyntax
     ) -> ImportedSetterSkeleton? {
-        guard let validation = validateSetter(node, jsSetter: jsSetter, enclosingTypeName: enclosingTypeName) else {
+        guard let validation = validateSetter(node, jsSetter: jsSetter) else {
             return nil
         }
 
@@ -2215,7 +2243,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             let (propertyName, functionBaseName) = PropertyNameResolver.resolve(
                 functionName: functionName,
                 jsName: validation.jsName,
-                normalizeIdentifier: normalizeIdentifier
+                normalizeIdentifier: SwiftToSkeleton.normalizeIdentifier
             )
         else {
             return nil
@@ -2231,10 +2259,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     // MARK: - Type and Parameter Parsing
 
-    private func parseParameters(
-        from clause: FunctionParameterClauseSyntax,
-        enclosingTypeName: String?
-    ) -> [Parameter] {
+    private func parseParameters(from clause: FunctionParameterClauseSyntax) -> [Parameter] {
         clause.parameters.compactMap { param in
             let type = param.type
             if type.is(MissingTypeSyntax.self) {
@@ -2246,31 +2271,15 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                 )
                 return nil
             }
+            guard let bridgeType = withLookupErrors({ parent.lookupType(for: type, errors: &$0) }) else {
+                return nil
+            }
             let nameToken = param.secondName ?? param.firstName
-            let name = normalizeIdentifier(nameToken.text)
+            let name = SwiftToSkeleton.normalizeIdentifier(nameToken.text)
             let labelToken = param.secondName == nil ? nil : param.firstName
             let label = labelToken?.text == "_" ? nil : labelToken?.text
-            let bridgeType = parseType(type, enclosingTypeName: enclosingTypeName)
             return Parameter(label: label, name: name, type: bridgeType)
         }
-    }
-
-    private func parseType(_ type: TypeSyntax, enclosingTypeName: String?) -> BridgeType {
-        guard let identifier = type.as(IdentifierTypeSyntax.self) else {
-            errors.append(
-                DiagnosticError(
-                    node: type,
-                    message: "Unsupported @JS type '\(type.trimmedDescription)'."
-                )
-            )
-            return .void
-        }
-
-        let name = normalizeIdentifier(identifier.name.text)
-        if name == "Self", let enclosingTypeName {
-            return .jsObject(enclosingTypeName)
-        }
-        return BridgeType(swiftType: name) ?? .jsObject(name)
     }
 
     // MARK: - Helper Methods
@@ -2289,12 +2298,5 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         return modifiers.contains { modifier in
             modifier.name.tokenKind == .keyword(.static) || modifier.name.tokenKind == .keyword(.class)
         }
-    }
-
-    private func normalizeIdentifier(_ name: String) -> String {
-        guard name.hasPrefix("`"), name.hasSuffix("`"), name.count >= 2 else {
-            return name
-        }
-        return String(name.dropFirst().dropLast())
     }
 }
