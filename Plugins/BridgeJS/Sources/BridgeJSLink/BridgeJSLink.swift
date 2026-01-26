@@ -1202,17 +1202,20 @@ public struct BridgeJSLink {
                     // Add properties from getters
                     var propertyNames = Set<String>()
                     for getter in type.getters {
-                        propertyNames.insert(getter.name)
-                        let hasSetter = type.setters.contains { $0.name == getter.name }
+                        let propertyName = getter.jsName ?? getter.name
+                        propertyNames.insert(propertyName)
+                        let hasSetter = type.setters.contains { ($0.jsName ?? $0.name) == propertyName }
                         let propertySignature =
                             hasSetter
-                            ? "\(getter.name): \(resolveTypeScriptType(getter.type));"
-                            : "readonly \(getter.name): \(resolveTypeScriptType(getter.type));"
+                            ? "\(renderTSPropertyName(propertyName)): \(resolveTypeScriptType(getter.type));"
+                            : "readonly \(renderTSPropertyName(propertyName)): \(resolveTypeScriptType(getter.type));"
                         printer.write(propertySignature)
                     }
                     // Add setters that don't have corresponding getters
-                    for setter in type.setters where !propertyNames.contains(setter.name) {
-                        printer.write("\(setter.name): \(resolveTypeScriptType(setter.type));")
+                    for setter in type.setters {
+                        let propertyName = setter.jsName ?? setter.name
+                        guard !propertyNames.contains(propertyName) else { continue }
+                        printer.write("\(renderTSPropertyName(propertyName)): \(resolveTypeScriptType(setter.type));")
                     }
 
                     printer.unindent()
@@ -1385,6 +1388,20 @@ public struct BridgeJSLink {
             return "\(param.name)\(optional): \(resolveTypeScriptType(param.type))"
         }
         return "(\(parameterSignatures.joined(separator: ", "))): \(returnTypeWithEffect)"
+    }
+
+    private func renderTSPropertyName(_ name: String) -> String {
+        // TypeScript allows quoted property names for keys that aren't valid identifiers.
+        if name.range(of: #"^[$A-Z_][0-9A-Z_$]*$"#, options: [.regularExpression, .caseInsensitive]) != nil {
+            return name
+        }
+        return "\"\(Self.escapeForJavaScriptStringLiteral(name))\""
+    }
+
+    fileprivate static func escapeForJavaScriptStringLiteral(_ string: String) -> String {
+        string
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
     }
 
     /// Helper method to append JSDoc comments for parameters with default values
@@ -2151,6 +2168,9 @@ extension BridgeJSLink {
         }
 
         func callPropertyGetter(name: String, returnType: BridgeType) throws -> String? {
+            let escapedName = BridgeJSLink.escapeForJavaScriptStringLiteral(name)
+            let accessExpr =
+                "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)[\"\(escapedName)\"]"
             if context == .exportSwift, returnType.usesSideChannelForOptionalReturn() {
                 guard case .optional(let wrappedType) = returnType else {
                     fatalError("usesSideChannelForOptionalReturn returned true for non-optional type")
@@ -2158,7 +2178,7 @@ extension BridgeJSLink {
 
                 let resultVar = scope.variable("ret")
                 body.write(
-                    "let \(resultVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(self).\(name);"
+                    "let \(resultVar) = \(accessExpr);"
                 )
 
                 let fragment = try IntrinsicJSFragment.protocolPropertyOptionalToSideChannel(wrappedType: wrappedType)
@@ -2168,14 +2188,15 @@ extension BridgeJSLink {
             }
 
             return try call(
-                callExpr: "\(JSGlueVariableScope.reservedSwift).memory.getObject(self).\(name)",
+                callExpr: accessExpr,
                 returnType: returnType
             )
         }
 
         func callPropertySetter(name: String, returnType: BridgeType) {
+            let escapedName = BridgeJSLink.escapeForJavaScriptStringLiteral(name)
             let call =
-                "\(JSGlueVariableScope.reservedSwift).memory.getObject(self).\(name) = \(parameterForwardings.joined(separator: ", "))"
+                "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)[\"\(escapedName)\"] = \(parameterForwardings.joined(separator: ", "))"
             body.write("\(call);")
         }
 
@@ -2185,7 +2206,8 @@ extension BridgeJSLink {
             }
 
             let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: returnType, context: context)
-            let expr = "imports[\"\(name)\"]"
+            let escapedName = BridgeJSLink.escapeForJavaScriptStringLiteral(name)
+            let expr = "imports[\"\(escapedName)\"]"
 
             let returnExpr: String?
             if loweringFragment.parameters.count == 0 {
@@ -2948,14 +2970,15 @@ extension BridgeJSLink {
         getter: ImportedGetterSkeleton
     ) throws {
         let thunkBuilder = ImportedThunkBuilder()
-        let returnExpr = try thunkBuilder.getImportProperty(name: getter.name, returnType: getter.type)
+        let jsName = getter.jsName ?? getter.name
+        let returnExpr = try thunkBuilder.getImportProperty(name: jsName, returnType: getter.type)
         let abiName = getter.abiName(context: nil)
         let funcLines = thunkBuilder.renderFunction(
             name: abiName,
             returnExpr: returnExpr,
             returnType: getter.type
         )
-        importObjectBuilder.appendDts(["readonly \(getter.name): \(getter.type.tsType);"])
+        importObjectBuilder.appendDts(["readonly \(renderTSPropertyName(jsName)): \(getter.type.tsType);"])
         importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
     }
 
@@ -2976,7 +2999,10 @@ extension BridgeJSLink {
                 getter: getter,
                 abiName: getterAbiName,
                 emitCall: { thunkBuilder in
-                    return try thunkBuilder.callPropertyGetter(name: getter.name, returnType: getter.type)
+                    return try thunkBuilder.callPropertyGetter(
+                        name: getter.jsName ?? getter.name,
+                        returnType: getter.type
+                    )
                 }
             )
             importObjectBuilder.assignToImportObject(name: getterAbiName, function: js)
@@ -2992,7 +3018,7 @@ extension BridgeJSLink {
                     try thunkBuilder.liftParameter(
                         param: Parameter(label: nil, name: "newValue", type: setter.type)
                     )
-                    thunkBuilder.callPropertySetter(name: setter.name, returnType: setter.type)
+                    thunkBuilder.callPropertySetter(name: setter.jsName ?? setter.name, returnType: setter.type)
                     return nil
                 }
             )

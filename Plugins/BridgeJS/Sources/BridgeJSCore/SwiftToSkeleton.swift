@@ -1762,6 +1762,12 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             hasAttribute(attributes, name: "JSGetter")
         }
 
+        static func firstJSGetterAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
+            attributes?.first { attribute in
+                attribute.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "JSGetter"
+            }?.as(AttributeSyntax.self)
+        }
+
         static func hasJSSetterAttribute(_ attributes: AttributeListSyntax?) -> Bool {
             hasAttribute(attributes, name: "JSSetter")
         }
@@ -1784,7 +1790,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             }
         }
 
-        /// Extracts the jsName argument value from a @JSSetter attribute, if present.
+        /// Extracts the `jsName` argument value from an attribute, if present.
         static func extractJSName(from attribute: AttributeSyntax) -> String? {
             guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else {
                 return nil
@@ -1883,22 +1889,15 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     // MARK: - Property Name Resolution
 
-    /// Helper for resolving property names from setter function names and jsName attributes
+    /// Helper for resolving property names from setter function names.
     private struct PropertyNameResolver {
-        /// Resolves property name and function base name from a setter function and optional jsName
-        /// - Returns: (propertyName, functionBaseName) where propertyName preserves case for getter matching,
-        ///   and functionBaseName has lowercase first char for ABI generation
+        /// Resolves property name and function base name from a setter function.
+        /// - Returns: (propertyName, functionBaseName) where `propertyName` is derived from the setter name,
+        ///   and `functionBaseName` has lowercase first char for ABI generation.
         static func resolve(
             functionName: String,
-            jsName: String?,
             normalizeIdentifier: (String) -> String
         ) -> (propertyName: String, functionBaseName: String)? {
-            if let jsName = jsName {
-                let propertyName = normalizeIdentifier(jsName)
-                let functionBaseName = propertyName.prefix(1).lowercased() + propertyName.dropFirst()
-                return (propertyName: propertyName, functionBaseName: functionBaseName)
-            }
-
             let rawFunctionName =
                 functionName.hasPrefix("`") && functionName.hasSuffix("`") && functionName.count > 2
                 ? String(functionName.dropFirst().dropLast())
@@ -2065,10 +2064,13 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         guard AttributeChecker.hasJSGetterAttribute(node.attributes) else {
             return .visitChildren
         }
+        guard let jsGetter = AttributeChecker.firstJSGetterAttribute(node.attributes) else {
+            return .skipChildren
+        }
 
         switch state {
         case .topLevel:
-            if let getter = parseGetterSkeleton(node) {
+            if let getter = parseGetterSkeleton(jsGetter, node) {
                 importedGlobalGetters.append(getter)
             }
             return .skipChildren
@@ -2085,7 +2087,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                             "@JSGetter is not supported for static members. Use it only for instance members in @JSClass types."
                     )
                 )
-            } else if let getter = parseGetterSkeleton(node) {
+            } else if let getter = parseGetterSkeleton(jsGetter, node) {
                 type.getters.append(getter)
                 currentType = type
             }
@@ -2223,7 +2225,10 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         return (identifier, typeAnnotation.type)
     }
 
-    private func parseGetterSkeleton(_ node: VariableDeclSyntax) -> ImportedGetterSkeleton? {
+    private func parseGetterSkeleton(
+        _ jsGetter: AttributeSyntax,
+        _ node: VariableDeclSyntax
+    ) -> ImportedGetterSkeleton? {
         guard let (identifier, type) = extractPropertyInfo(node) else {
             return nil
         }
@@ -2231,8 +2236,10 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             return nil
         }
         let propertyName = SwiftToSkeleton.normalizeIdentifier(identifier.identifier.text)
+        let jsName = AttributeChecker.extractJSName(from: jsGetter)
         return ImportedGetterSkeleton(
             name: propertyName,
+            jsName: jsName,
             type: propertyType,
             documentation: nil,
             functionName: nil
@@ -2252,7 +2259,6 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         guard
             let (propertyName, functionBaseName) = PropertyNameResolver.resolve(
                 functionName: functionName,
-                jsName: validation.jsName,
                 normalizeIdentifier: SwiftToSkeleton.normalizeIdentifier
             )
         else {
@@ -2261,6 +2267,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
         return ImportedSetterSkeleton(
             name: propertyName,
+            jsName: validation.jsName,
             type: validation.valueType,
             documentation: nil,
             functionName: "\(functionBaseName)_set"

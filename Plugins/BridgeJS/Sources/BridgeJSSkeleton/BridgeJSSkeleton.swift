@@ -626,6 +626,8 @@ public struct ImportedConstructorSkeleton: Codable {
 
 public struct ImportedGetterSkeleton: Codable {
     public let name: String
+    /// The JavaScript property name to read from, if different from `name`.
+    public let jsName: String?
     public let type: BridgeType
     public let documentation: String?
     /// Name of the getter function if it's a separate function (from @JSGetter)
@@ -633,11 +635,13 @@ public struct ImportedGetterSkeleton: Codable {
 
     public init(
         name: String,
+        jsName: String? = nil,
         type: BridgeType,
         documentation: String? = nil,
         functionName: String? = nil
     ) {
         self.name = name
+        self.jsName = jsName
         self.type = type
         self.documentation = documentation
         self.functionName = functionName
@@ -661,6 +665,8 @@ public struct ImportedGetterSkeleton: Codable {
 
 public struct ImportedSetterSkeleton: Codable {
     public let name: String
+    /// The JavaScript property name to write to, if different from `name`.
+    public let jsName: String?
     public let type: BridgeType
     public let documentation: String?
     /// Name of the setter function if it's a separate function (from @JSSetter)
@@ -668,11 +674,13 @@ public struct ImportedSetterSkeleton: Codable {
 
     public init(
         name: String,
+        jsName: String? = nil,
         type: BridgeType,
         documentation: String? = nil,
         functionName: String? = nil
     ) {
         self.name = name
+        self.jsName = jsName
         self.type = type
         self.documentation = documentation
         self.functionName = functionName

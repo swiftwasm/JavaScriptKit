@@ -212,7 +212,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_ArrayBufferLike_byteLength_get"] = function bjs_ArrayBufferLike_byteLength_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self).byteLength;
+                    let ret = swift.memory.getObject(self)["byteLength"];
                     return ret;
                 } catch (error) {
                     setException(error);
@@ -230,7 +230,52 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_WeirdNaming_normalProperty_get"] = function bjs_WeirdNaming_normalProperty_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self).normalProperty;
+                    let ret = swift.memory.getObject(self)["normalProperty"];
+                    tmpRetBytes = textEncoder.encode(ret);
+                    return tmpRetBytes.length;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WeirdNaming_property_with_dashes_get"] = function bjs_WeirdNaming_property_with_dashes_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self)["property-with-dashes"];
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_WeirdNaming__123invalidStart_get"] = function bjs_WeirdNaming__123invalidStart_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self)["123invalidStart"];
+                    return ret ? 1 : 0;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_WeirdNaming_property_with_spaces_get"] = function bjs_WeirdNaming_property_with_spaces_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self)["property with spaces"];
+                    tmpRetBytes = textEncoder.encode(ret);
+                    return tmpRetBytes.length;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WeirdNaming__specialChar_get"] = function bjs_WeirdNaming__specialChar_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self)["@specialChar"];
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_WeirdNaming_constructor_get"] = function bjs_WeirdNaming_constructor_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self)["constructor"];
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
@@ -239,7 +284,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_WeirdNaming_for_get"] = function bjs_WeirdNaming_for_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self).for;
+                    let ret = swift.memory.getObject(self)["for"];
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
@@ -248,7 +293,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_WeirdNaming_Any_get"] = function bjs_WeirdNaming_Any_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self).Any;
+                    let ret = swift.memory.getObject(self)["Any"];
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
@@ -259,7 +304,46 @@ export async function createInstantiator(options, swift) {
                 try {
                     const newValueObject = swift.memory.getObject(newValue);
                     swift.memory.release(newValue);
-                    swift.memory.getObject(self).normalProperty = newValueObject;
+                    swift.memory.getObject(self)["normalProperty"] = newValueObject;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WeirdNaming_property_with_dashes_set"] = function bjs_WeirdNaming_property_with_dashes_set(self, newValue) {
+                try {
+                    swift.memory.getObject(self)["property-with-dashes"] = newValue;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WeirdNaming__123invalidStart_set"] = function bjs_WeirdNaming__123invalidStart_set(self, newValue) {
+                try {
+                    swift.memory.getObject(self)["123invalidStart"] = newValue !== 0;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WeirdNaming_property_with_spaces_set"] = function bjs_WeirdNaming_property_with_spaces_set(self, newValue) {
+                try {
+                    const newValueObject = swift.memory.getObject(newValue);
+                    swift.memory.release(newValue);
+                    swift.memory.getObject(self)["property with spaces"] = newValueObject;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WeirdNaming__specialChar_set"] = function bjs_WeirdNaming__specialChar_set(self, newValue) {
+                try {
+                    swift.memory.getObject(self)["@specialChar"] = newValue;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WeirdNaming_constructor_set"] = function bjs_WeirdNaming_constructor_set(self, newValue) {
+                try {
+                    const newValueObject = swift.memory.getObject(newValue);
+                    swift.memory.release(newValue);
+                    swift.memory.getObject(self)["constructor"] = newValueObject;
                 } catch (error) {
                     setException(error);
                 }
@@ -268,7 +352,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     const newValueObject = swift.memory.getObject(newValue);
                     swift.memory.release(newValue);
-                    swift.memory.getObject(self).for = newValueObject;
+                    swift.memory.getObject(self)["for"] = newValueObject;
                 } catch (error) {
                     setException(error);
                 }
@@ -277,7 +361,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     const newValueObject = swift.memory.getObject(newValue);
                     swift.memory.release(newValue);
-                    swift.memory.getObject(self).Any = newValueObject;
+                    swift.memory.getObject(self)["Any"] = newValueObject;
                 } catch (error) {
                     setException(error);
                 }

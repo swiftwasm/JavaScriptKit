@@ -11,6 +11,11 @@ export interface ArrayBufferLike {
 export interface WeirdNaming {
     as(): void;
     normalProperty: string;
+    "property-with-dashes": number;
+    "123invalidStart": boolean;
+    "property with spaces": string;
+    "@specialChar": number;
+    constructor: string;
     for: string;
     Any: string;
 }

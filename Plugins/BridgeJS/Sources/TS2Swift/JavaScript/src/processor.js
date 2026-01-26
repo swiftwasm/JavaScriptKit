@@ -390,21 +390,28 @@ export class TypeProcessor {
 
     /**
      * @param {ts.PropertyDeclaration | ts.PropertySignature} node
-     * @returns {{ name: string, type: string, isReadonly: boolean, documentation: string | undefined } | null}
+     * @returns {{ jsName: string, swiftName: string, type: string, isReadonly: boolean, documentation: string | undefined } | null}
      */
     visitPropertyDecl(node) {
         if (!node.name) return null;
-
-        const propertyName = node.name.getText();
-        if (!isValidSwiftDeclName(propertyName)) {
+        /** @type {string | null} */
+        let jsName = null;
+        if (ts.isIdentifier(node.name)) {
+            jsName = node.name.text;
+        } else if (ts.isStringLiteral(node.name) || ts.isNumericLiteral(node.name)) {
+            jsName = node.name.text;
+        } else {
+            // Computed property names like `[Symbol.iterator]` are not supported yet.
             return null;
         }
+
+        const swiftName = isValidSwiftDeclName(jsName) ? jsName : makeValidSwiftIdentifier(jsName, { emptyFallback: "_" });
 
         const type = this.checker.getTypeAtLocation(node)
         const swiftType = this.visitType(type, node);
         const isReadonly = node.modifiers?.some(m => m.kind === ts.SyntaxKind.ReadonlyKeyword) ?? false;
         const documentation = this.getFullJSDocText(node);
-        return { name: propertyName, type: swiftType, isReadonly, documentation };
+        return { jsName, swiftName, type: swiftType, isReadonly, documentation };
     }
 
     /**
@@ -626,17 +633,21 @@ export class TypeProcessor {
         if (!property) return;
 
         const type = property.type;
-        const name = this.renderIdentifier(property.name);
+        const swiftName = this.renderIdentifier(property.swiftName);
+        const needsJSGetterName = property.jsName !== property.swiftName;
+        const escapedJSName = property.jsName.replaceAll("\\", "\\\\").replaceAll("\"", "\\\\\"");
+        const getterAnnotation = needsJSGetterName ? `@JSGetter(jsName: "${escapedJSName}")` : "@JSGetter";
 
         // Always render getter
-        this.swiftLines.push(`    @JSGetter var ${name}: ${type}`);
+        this.swiftLines.push(`    ${getterAnnotation} var ${swiftName}: ${type}`);
 
         // Render setter if not readonly
         if (!property.isReadonly) {
-            const capitalizedName = property.name.charAt(0).toUpperCase() + property.name.slice(1);
-            const needsJSNameField = property.name.charAt(0) != capitalizedName.charAt(0).toLowerCase();
-            const setterName = `set${capitalizedName}`;
-            const annotation = needsJSNameField ? `@JSSetter(jsName: "${property.name}")` : "@JSSetter";
+            const capitalizedSwiftName = property.swiftName.charAt(0).toUpperCase() + property.swiftName.slice(1);
+            const derivedPropertyName = property.swiftName.charAt(0).toLowerCase() + property.swiftName.slice(1);
+            const needsJSNameField = property.jsName !== derivedPropertyName;
+            const setterName = `set${capitalizedSwiftName}`;
+            const annotation = needsJSNameField ? `@JSSetter(jsName: "${escapedJSName}")` : "@JSSetter";
             this.swiftLines.push(`    ${annotation} func ${this.renderIdentifier(setterName)}(_ value: ${type}) ${this.renderEffects({ isAsync: false })}`);
         }
     }

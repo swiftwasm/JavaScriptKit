@@ -112,6 +112,9 @@ public macro JS(namespace: String? = nil, enumStyle: JSEnumStyle = .const) = Bui
 ///
 /// This macro is used by BridgeJS-generated Swift declarations.
 ///
+/// - Parameter jsName: An optional string that specifies the name of the JavaScript property to read from.
+///   If not provided, the Swift property name is used.
+///
 /// Example:
 ///
 /// ```swift
@@ -125,7 +128,7 @@ public macro JS(namespace: String? = nil, enumStyle: JSEnumStyle = .const) = Bui
 /// ```
 @attached(accessor)
 @_spi(Experimental)
-public macro JSGetter() =
+public macro JSGetter(jsName: String? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSGetterMacro")
 
 /// A macro that generates a Swift function body that writes a value to JavaScript.

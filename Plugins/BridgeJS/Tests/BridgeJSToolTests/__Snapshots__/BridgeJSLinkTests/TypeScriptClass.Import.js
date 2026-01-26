@@ -204,7 +204,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_Greeter_name_get"] = function bjs_Greeter_name_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self).name;
+                    let ret = swift.memory.getObject(self)["name"];
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
@@ -213,7 +213,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_Greeter_age_get"] = function bjs_Greeter_age_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self).age;
+                    let ret = swift.memory.getObject(self)["age"];
                     return ret;
                 } catch (error) {
                     setException(error);
@@ -224,7 +224,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     const newValueObject = swift.memory.getObject(newValue);
                     swift.memory.release(newValue);
-                    swift.memory.getObject(self).name = newValueObject;
+                    swift.memory.getObject(self)["name"] = newValueObject;
                 } catch (error) {
                     setException(error);
                 }
