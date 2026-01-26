@@ -538,6 +538,52 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y(_ callback: Int32, _ param0: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y(_ callback: Int32, _ param0: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSi_y: _BridgedSwiftClosureBox {
+    let closure: (Int) -> Void
+    init(_ closure: @escaping (Int) -> Void) {
+        self.closure = closure
+    }
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestsSi_y {
+    static func bridgeJSLower(_ closure: @escaping (Int) -> Void) -> UnsafeMutableRawPointer {
+        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSi_y(closure)
+        return Unmanaged.passRetained(box).toOpaque()
+    }
+    static func bridgeJSLift(_ callbackId: Int32) -> (Int) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let param0Value = param0.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y(callbackValue, param0Value)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
+    #if arch(wasm32)
+    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSi_y>.fromOpaque(boxPtr).takeUnretainedValue()
+    box.closure(Int.bridgeJSLiftParameter(param0))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS")
 fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32
 #else
@@ -6431,4 +6477,97 @@ func _$JsGreeter_changeName(_ self: JSObject, _ name: String) throws(JSException
     if let error = _swift_js_take_exception() {
         throw error
     }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsApplyInt")
+fileprivate func bjs_jsApplyInt(_ value: Int32, _ transform: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func bjs_jsApplyInt(_ value: Int32, _ transform: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsApplyInt(_ value: Int, _ transform: @escaping (Int) -> Int) throws(JSException) -> Int {
+    let valueValue = value.bridgeJSLowerParameter()
+    let transformPointer = _BJS_Closure_20BridgeJSRuntimeTestsSi_Si.bridgeJSLower(transform)
+    let ret = bjs_jsApplyInt(valueValue, transformPointer)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsMakeAdder")
+fileprivate func bjs_jsMakeAdder(_ base: Int32) -> Int32
+#else
+fileprivate func bjs_jsMakeAdder(_ base: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsMakeAdder(_ base: Int) throws(JSException) -> (Int) -> Int {
+    let baseValue = base.bridgeJSLowerParameter()
+    let ret = bjs_jsMakeAdder(baseValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return _BJS_Closure_20BridgeJSRuntimeTestsSi_Si.bridgeJSLift(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsMapString")
+fileprivate func bjs_jsMapString(_ value: Int32, _ transform: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func bjs_jsMapString(_ value: Int32, _ transform: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsMapString(_ value: String, _ transform: @escaping (String) -> String) throws(JSException) -> String {
+    let valueValue = value.bridgeJSLowerParameter()
+    let transformPointer = _BJS_Closure_20BridgeJSRuntimeTestsSS_SS.bridgeJSLower(transform)
+    let ret = bjs_jsMapString(valueValue, transformPointer)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsMakePrefixer")
+fileprivate func bjs_jsMakePrefixer(_ prefix: Int32) -> Int32
+#else
+fileprivate func bjs_jsMakePrefixer(_ prefix: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsMakePrefixer(_ prefix: String) throws(JSException) -> (String) -> String {
+    let prefixValue = prefix.bridgeJSLowerParameter()
+    let ret = bjs_jsMakePrefixer(prefixValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return _BJS_Closure_20BridgeJSRuntimeTestsSS_SS.bridgeJSLift(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsCallTwice")
+fileprivate func bjs_jsCallTwice(_ value: Int32, _ callback: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func bjs_jsCallTwice(_ value: Int32, _ callback: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsCallTwice(_ value: Int, _ callback: @escaping (Int) -> Void) throws(JSException) -> Int {
+    let valueValue = value.bridgeJSLowerParameter()
+    let callbackPointer = _BJS_Closure_20BridgeJSRuntimeTestsSi_y.bridgeJSLower(callback)
+    let ret = bjs_jsCallTwice(valueValue, callbackPointer)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
 }

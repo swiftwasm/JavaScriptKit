@@ -55,7 +55,7 @@ fileprivate func bjs_applyInt(_ value: Int32, _ transform: UnsafeMutableRawPoint
 }
 #endif
 
-func _$applyInt(_ value: Int, _ transform: (Int) -> Int) throws(JSException) -> Int {
+func _$applyInt(_ value: Int, _ transform: @escaping (Int) -> Int) throws(JSException) -> Int {
     let valueValue = value.bridgeJSLowerParameter()
     let transformPointer = _BJS_Closure_5CheckSi_Si.bridgeJSLower(transform)
     let ret = bjs_applyInt(valueValue, transformPointer)

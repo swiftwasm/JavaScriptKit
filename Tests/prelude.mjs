@@ -71,6 +71,23 @@ export async function setupOptions(options, context) {
                     }
                     BridgeJSRuntimeTests_runAsyncWorks(exports);
                     return;
+                },
+                jsApplyInt: (v, fn) => {
+                    return fn(v);
+                },
+                jsMakeAdder: (base) => {
+                    return (v) => base + v;
+                },
+                jsMapString: (value, fn) => {
+                    return fn(value);
+                },
+                jsMakePrefixer: (prefix) => {
+                    return (name) => `${prefix}${name}`;
+                },
+                jsCallTwice: (v, fn) => {
+                    fn(v);
+                    fn(v);
+                    return v;
                 }
             };
         },
@@ -241,7 +258,7 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(ph.intValue, 777); // Should have parsed and set intValue
     assert.equal(ph.computedReadWrite, "Value: 777");
 
-    // Test computed readonly property  
+    // Test computed readonly property
     assert.equal(ph.computedReadonly, 1554); // intValue * 2 = 777 * 2
 
     // Test property with observers

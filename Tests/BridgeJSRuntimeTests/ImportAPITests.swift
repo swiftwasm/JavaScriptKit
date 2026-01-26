@@ -84,4 +84,34 @@ class ImportAPITests: XCTestCase {
 
         XCTAssertEqual(try greeter.prefix, "Hello")
     }
+
+    func testClosureParameterIntToInt() throws {
+        let result = try jsApplyInt(21) { $0 * 2 }
+        XCTAssertEqual(result, 42)
+    }
+
+    func testClosureReturnIntToInt() throws {
+        let add10 = try jsMakeAdder(10)
+        XCTAssertEqual(add10(0), 10)
+        XCTAssertEqual(add10(32), 42)
+    }
+
+    func testClosureParameterStringToString() throws {
+        let result = try jsMapString("Hello") { value in
+            value + ", world!"
+        }
+        XCTAssertEqual(result, "Hello, world!")
+    }
+
+    func testClosureReturnStringToString() throws {
+        let prefixer = try jsMakePrefixer("Hello, ")
+        XCTAssertEqual(prefixer("world!"), "Hello, world!")
+    }
+
+    func testClosureParameterIntToVoid() throws {
+        var total = 0
+        let ret = try jsCallTwice(5) { total += $0 }
+        XCTAssertEqual(ret, 5)
+        XCTAssertEqual(total, 10)
+    }
 }
