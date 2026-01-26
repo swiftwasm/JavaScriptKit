@@ -6308,6 +6308,24 @@ func _$jsThrowOrString(_ shouldThrow: Bool) throws(JSException) -> String {
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripFeatureFlag")
+fileprivate func bjs_jsRoundTripFeatureFlag(_ flag: Int32) -> Int32
+#else
+fileprivate func bjs_jsRoundTripFeatureFlag(_ flag: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsRoundTripFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> FeatureFlag {
+    let flagValue = flag.bridgeJSLowerParameter()
+    let ret = bjs_jsRoundTripFeatureFlag(flagValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return FeatureFlag.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_runAsyncWorks")
 fileprivate func bjs_runAsyncWorks() -> Int32
 #else

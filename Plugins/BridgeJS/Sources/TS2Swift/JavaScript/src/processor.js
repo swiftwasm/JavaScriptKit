@@ -53,6 +53,10 @@ export class TypeProcessor {
         this.seenTypes = new Map();
         /** @type {string[]} Collected Swift code lines */
         this.swiftLines = [];
+        /** @type {Set<string>} */
+        this.emittedEnumNames = new Set();
+        /** @type {Set<string>} */
+        this.emittedStructuredTypeNames = new Set();
 
         /** @type {Set<string>} */
         this.visitedDeclarationKeys = new Set();
@@ -92,6 +96,10 @@ export class TypeProcessor {
 
                     for (const [type, node] of this.seenTypes) {
                         this.seenTypes.delete(type);
+                        if (this.isEnumType(type)) {
+                            this.visitEnumType(type, node);
+                            continue;
+                        }
                         const typeString = this.checker.typeToString(type);
                         const members = type.getProperties();
                         if (members) {
@@ -119,6 +127,8 @@ export class TypeProcessor {
             this.visitFunctionDeclaration(node);
         } else if (ts.isClassDeclaration(node)) {
             this.visitClassDecl(node);
+        } else if (ts.isEnumDeclaration(node)) {
+            this.visitEnumDeclaration(node);
         } else if (ts.isExportDeclaration(node)) {
             this.visitExportDeclaration(node);
         }
@@ -183,6 +193,145 @@ export class TypeProcessor {
                 this.visitNode(declaration);
             }
         }
+    }
+
+    /**
+     * @param {ts.Type} type
+     * @returns {boolean}
+     * @private
+     */
+    isEnumType(type) {
+        const symbol = type.getSymbol() ?? type.aliasSymbol;
+        if (!symbol) return false;
+        return (symbol.flags & ts.SymbolFlags.Enum) !== 0;
+    }
+
+    /**
+     * @param {ts.EnumDeclaration} node
+     * @private
+     */
+    visitEnumDeclaration(node) {
+        const name = node.name?.text;
+        if (!name) return;
+        this.emitEnumFromDeclaration(name, node, node);
+    }
+
+    /**
+     * @param {ts.Type} type
+     * @param {ts.Node} node
+     * @private
+     */
+    visitEnumType(type, node) {
+        const symbol = type.getSymbol() ?? type.aliasSymbol;
+        const name = symbol?.name;
+        if (!name) return;
+        const decl = symbol?.getDeclarations()?.find(d => ts.isEnumDeclaration(d));
+        if (!decl || !ts.isEnumDeclaration(decl)) {
+            this.diagnosticEngine.print("warning", `Enum declaration not found for type: ${name}`, node);
+            return;
+        }
+        this.emitEnumFromDeclaration(name, decl, node);
+    }
+
+    /**
+     * @param {string} enumName
+     * @param {ts.EnumDeclaration} decl
+     * @param {ts.Node} diagnosticNode
+     * @private
+     */
+    emitEnumFromDeclaration(enumName, decl, diagnosticNode) {
+        if (this.emittedEnumNames.has(enumName)) return;
+        this.emittedEnumNames.add(enumName);
+
+        const members = decl.members ?? [];
+        if (members.length === 0) {
+            this.diagnosticEngine.print("warning", `Empty enum is not supported: ${enumName}`, diagnosticNode);
+            this.swiftLines.push(`typealias ${this.renderIdentifier(enumName)} = String`);
+            this.swiftLines.push("");
+            return;
+        }
+
+        /** @type {{ name: string, raw: string }[]} */
+        const stringMembers = [];
+        /** @type {{ name: string, raw: number }[]} */
+        const intMembers = [];
+        let canBeStringEnum = true;
+        let canBeIntEnum = true;
+        let nextAutoValue = 0;
+
+        for (const member of members) {
+            const rawMemberName = member.name.getText();
+            const unquotedName = rawMemberName.replace(/^["']|["']$/g, "");
+            const swiftCaseNameBase = makeValidSwiftIdentifier(unquotedName, { emptyFallback: "_case" });
+
+            if (member.initializer && ts.isStringLiteral(member.initializer)) {
+                stringMembers.push({ name: swiftCaseNameBase, raw: member.initializer.text });
+                canBeIntEnum = false;
+                continue;
+            }
+
+            if (member.initializer && ts.isNumericLiteral(member.initializer)) {
+                const rawValue = Number(member.initializer.text);
+                if (!Number.isInteger(rawValue)) {
+                    canBeIntEnum = false;
+                } else {
+                    intMembers.push({ name: swiftCaseNameBase, raw: rawValue });
+                    nextAutoValue = rawValue + 1;
+                    canBeStringEnum = false;
+                    continue;
+                }
+            }
+
+            if (!member.initializer) {
+                intMembers.push({ name: swiftCaseNameBase, raw: nextAutoValue });
+                nextAutoValue += 1;
+                canBeStringEnum = false;
+                continue;
+            }
+
+            canBeStringEnum = false;
+            canBeIntEnum = false;
+        }
+        const swiftEnumName = this.renderIdentifier(enumName);
+        const dedupeNames = (items) => {
+            const seen = new Map();
+            return items.map(item => {
+                const count = seen.get(item.name) ?? 0;
+                seen.set(item.name, count + 1);
+                if (count === 0) return item;
+                return { ...item, name: `${item.name}_${count + 1}` };
+            });
+        };
+
+        if (canBeStringEnum && stringMembers.length > 0) {
+            this.swiftLines.push(`enum ${swiftEnumName}: String {`);
+            for (const { name, raw } of dedupeNames(stringMembers)) {
+                this.swiftLines.push(`    case ${this.renderIdentifier(name)} = "${raw.replaceAll("\"", "\\\\\"")}"`);
+            }
+            this.swiftLines.push("}");
+            this.swiftLines.push(`extension ${swiftEnumName}: _BridgedSwiftEnumNoPayload {}`);
+            this.swiftLines.push("");
+            return;
+        }
+
+        if (canBeIntEnum && intMembers.length > 0) {
+            this.swiftLines.push(`enum ${swiftEnumName}: Int {`);
+            for (const { name, raw } of dedupeNames(intMembers)) {
+                this.swiftLines.push(`    case ${this.renderIdentifier(name)} = ${raw}`);
+            }
+            this.swiftLines.push("}");
+            this.swiftLines.push(`extension ${swiftEnumName}: _BridgedSwiftEnumNoPayload {}`);
+            this.swiftLines.push("");
+            return;
+        }
+
+        this.diagnosticEngine.print(
+            "warning",
+            `Unsupported enum (only string or int enums are supported): ${enumName}`,
+            diagnosticNode
+        );
+        this.swiftLines.push(`typealias ${swiftEnumName} = String`);
+        this.swiftLines.push("");
     }
 
     /**
@@ -332,6 +481,9 @@ export class TypeProcessor {
      * @private
      */
     visitStructuredType(name, members) {
+        if (this.emittedStructuredTypeNames.has(name)) return;
+        this.emittedStructuredTypeNames.add(name);
+
         const typeName = this.renderIdentifier(name);
         this.swiftLines.push(`@JSClass struct ${typeName} {`);
 
@@ -413,6 +565,13 @@ export class TypeProcessor {
             const typeString = type.getSymbol()?.name ?? this.checker.typeToString(type);
             if (typeMap[typeString]) {
                 return typeMap[typeString];
+            }
+
+            const symbol = type.getSymbol() ?? type.aliasSymbol;
+            if (symbol && (symbol.flags & ts.SymbolFlags.Enum) !== 0) {
+                const typeName = symbol.name;
+                this.seenTypes.set(type, node);
+                return this.renderIdentifier(typeName);
             }
 
             if (this.checker.isArrayType(type) || this.checker.isTupleType(type) || type.getCallSignatures().length > 0) {
@@ -622,4 +781,34 @@ export function isValidSwiftDeclName(name) {
     // https://docs.swift.org/swift-book/documentation/the-swift-programming-language/lexicalstructure/
     const swiftIdentifierRegex = /^[_\p{ID_Start}][\p{ID_Continue}\u{200C}\u{200D}]*$/u;
     return swiftIdentifierRegex.test(name);
+}
+
+/**
+ * Convert an arbitrary string into a valid Swift identifier.
+ * @param {string} name
+ * @param {{ emptyFallback?: string }} options
+ * @returns {string}
+ */
+function makeValidSwiftIdentifier(name, options = {}) {
+    const emptyFallback = options.emptyFallback ?? "_";
+    let result = "";
+    for (const ch of name) {
+        const isIdentifierChar = /^[_\p{ID_Continue}\u{200C}\u{200D}]$/u.test(ch);
+        result += isIdentifierChar ? ch : "_";
+    }
+    if (!result) result = emptyFallback;
+    if (!/^[_\p{ID_Start}]$/u.test(result[0])) {
+        result = "_" + result;
+    }
+    if (!isValidSwiftDeclName(result)) {
+        result = result.replace(/[^_\p{ID_Continue}\u{200C}\u{200D}]/gu, "_");
+        if (!result) result = emptyFallback;
+        if (!/^[_\p{ID_Start}]$/u.test(result[0])) {
+            result = "_" + result;
+        }
+    }
+    if (isSwiftKeyword(result)) {
+        result = result + "_";
+    }
+    return result;
 }

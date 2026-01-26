@@ -47,6 +47,9 @@ export async function setupOptions(options, context) {
                     }
                     return "Hello, world!";
                 },
+                "jsRoundTripFeatureFlag": (flag) => {
+                    return flag;
+                },
                 JsGreeter: class {
                     /**
                      * @param {string} name
