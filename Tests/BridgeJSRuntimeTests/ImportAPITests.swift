@@ -35,6 +35,12 @@ class ImportAPITests: XCTestCase {
         }
     }
 
+    func testRoundTripFeatureFlag() throws {
+        for v in [FeatureFlag.foo, .bar] {
+            try XCTAssertEqual(jsRoundTripFeatureFlag(v), v)
+        }
+    }
+
     func ensureThrows<T>(_ f: (Bool) throws(JSException) -> T) throws {
         do {
             _ = try f(true)

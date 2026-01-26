@@ -22,6 +22,14 @@
 
 @JSFunction func jsThrowOrString(_ shouldThrow: Bool) throws (JSException) -> String
 
+enum FeatureFlag: String {
+    case foo = "foo"
+    case bar = "bar"
+}
+extension FeatureFlag: _BridgedSwiftEnumNoPayload {}
+
+@JSFunction func jsRoundTripFeatureFlag(_ flag: FeatureFlag) throws (JSException) -> FeatureFlag
+
 @JSClass struct JsGreeter {
     @JSGetter var name: String
     @JSSetter func setName(_ value: String) throws (JSException)

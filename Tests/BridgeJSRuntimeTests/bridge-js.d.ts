@@ -7,6 +7,13 @@ export function jsThrowOrNumber(shouldThrow: boolean): number
 export function jsThrowOrBool(shouldThrow: boolean): boolean
 export function jsThrowOrString(shouldThrow: boolean): string
 
+export enum FeatureFlag {
+    foo = "foo",
+    bar = "bar",
+}
+
+export function jsRoundTripFeatureFlag(flag: FeatureFlag): FeatureFlag
+
 export class JsGreeter {
     name: string;
     readonly prefix: string;

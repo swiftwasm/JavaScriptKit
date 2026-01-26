@@ -9071,6 +9071,26 @@
             }
           },
           {
+            "name" : "jsRoundTripFeatureFlag",
+            "parameters" : [
+              {
+                "name" : "flag",
+                "type" : {
+                  "rawValueEnum" : {
+                    "_0" : "FeatureFlag",
+                    "_1" : "String"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "rawValueEnum" : {
+                "_0" : "FeatureFlag",
+                "_1" : "String"
+              }
+            }
+          },
+          {
             "name" : "runAsyncWorks",
             "parameters" : [
 

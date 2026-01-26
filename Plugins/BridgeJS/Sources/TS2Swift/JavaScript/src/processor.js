@@ -251,35 +251,6 @@ export class TypeProcessor {
             return;
         }
 
-        /**
-         * Convert a TypeScript enum member name into a valid Swift identifier.
-         * @param {string} name
-         * @returns {string}
-         */
-        const toSwiftCaseName = (name) => {
-            const swiftIdentifierRegex = /^[_\p{ID_Start}][\p{ID_Continue}\u{200C}\u{200D}]*$/u;
-            let result = "";
-            for (const ch of name) {
-                const isIdentifierChar = /^[_\p{ID_Continue}\u{200C}\u{200D}]$/u.test(ch);
-                result += isIdentifierChar ? ch : "_";
-            }
-            if (!result) result = "_case";
-            if (!/^[_\p{ID_Start}]$/u.test(result[0])) {
-                result = "_" + result;
-            }
-            if (!swiftIdentifierRegex.test(result)) {
-                result = result.replace(/[^_\p{ID_Continue}\u{200C}\u{200D}]/gu, "_");
-                if (!result) result = "_case";
-                if (!/^[_\p{ID_Start}]$/u.test(result[0])) {
-                    result = "_" + result;
-                }
-            }
-            if (isSwiftKeyword(result)) {
-                result = result + "_";
-            }
-            return result;
-        };
-
         /** @type {{ name: string, raw: string }[]} */
         const stringMembers = [];
         /** @type {{ name: string, raw: number }[]} */
@@ -291,7 +262,7 @@ export class TypeProcessor {
         for (const member of members) {
             const rawMemberName = member.name.getText();
             const unquotedName = rawMemberName.replace(/^["']|["']$/g, "");
-            const swiftCaseNameBase = toSwiftCaseName(unquotedName);
+            const swiftCaseNameBase = makeValidSwiftIdentifier(unquotedName, { emptyFallback: "_case" });
 
             if (member.initializer && ts.isStringLiteral(member.initializer)) {
                 stringMembers.push({ name: swiftCaseNameBase, raw: member.initializer.text });
@@ -810,4 +781,34 @@ export function isValidSwiftDeclName(name) {
     // https://docs.swift.org/swift-book/documentation/the-swift-programming-language/lexicalstructure/
     const swiftIdentifierRegex = /^[_\p{ID_Start}][\p{ID_Continue}\u{200C}\u{200D}]*$/u;
     return swiftIdentifierRegex.test(name);
+}
+
+/**
+ * Convert an arbitrary string into a valid Swift identifier.
+ * @param {string} name
+ * @param {{ emptyFallback?: string }} options
+ * @returns {string}
+ */
+function makeValidSwiftIdentifier(name, options = {}) {
+    const emptyFallback = options.emptyFallback ?? "_";
+    let result = "";
+    for (const ch of name) {
+        const isIdentifierChar = /^[_\p{ID_Continue}\u{200C}\u{200D}]$/u.test(ch);
+        result += isIdentifierChar ? ch : "_";
+    }
+    if (!result) result = emptyFallback;
+    if (!/^[_\p{ID_Start}]$/u.test(result[0])) {
+        result = "_" + result;
+    }
+    if (!isValidSwiftDeclName(result)) {
+        result = result.replace(/[^_\p{ID_Continue}\u{200C}\u{200D}]/gu, "_");
+        if (!result) result = emptyFallback;
+        if (!/^[_\p{ID_Start}]$/u.test(result[0])) {
+            result = "_" + result;
+        }
+    }
+    if (isSwiftKeyword(result)) {
+        result = result + "_";
+    }
+    return result;
 }
