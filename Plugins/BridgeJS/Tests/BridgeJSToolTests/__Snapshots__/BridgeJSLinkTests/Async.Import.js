@@ -41,7 +41,6 @@ export async function createInstantiator(options, swift) {
         addImports: (importObject, importsContext) => {
             bjs = {};
             importObject["bjs"] = bjs;
-            const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 tmpRetString = textDecoder.decode(bytes);
@@ -190,72 +189,6 @@ export async function createInstantiator(options, swift) {
                 const pointer = tmpRetOptionalHeapObject;
                 tmpRetOptionalHeapObject = undefined;
                 return pointer || 0;
-            }
-            const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
-            TestModule["bjs_asyncReturnVoid"] = function bjs_asyncReturnVoid() {
-                try {
-                    let ret = imports.asyncReturnVoid();
-                    return swift.memory.retain(ret);
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
-            }
-            TestModule["bjs_asyncRoundTripInt"] = function bjs_asyncRoundTripInt(v) {
-                try {
-                    let ret = imports.asyncRoundTripInt(v);
-                    return swift.memory.retain(ret);
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
-            }
-            TestModule["bjs_asyncRoundTripString"] = function bjs_asyncRoundTripString(v) {
-                try {
-                    const vObject = swift.memory.getObject(v);
-                    swift.memory.release(v);
-                    let ret = imports.asyncRoundTripString(vObject);
-                    return swift.memory.retain(ret);
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
-            }
-            TestModule["bjs_asyncRoundTripBool"] = function bjs_asyncRoundTripBool(v) {
-                try {
-                    let ret = imports.asyncRoundTripBool(v !== 0);
-                    return swift.memory.retain(ret);
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
-            }
-            TestModule["bjs_asyncRoundTripFloat"] = function bjs_asyncRoundTripFloat(v) {
-                try {
-                    let ret = imports.asyncRoundTripFloat(v);
-                    return swift.memory.retain(ret);
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
-            }
-            TestModule["bjs_asyncRoundTripDouble"] = function bjs_asyncRoundTripDouble(v) {
-                try {
-                    let ret = imports.asyncRoundTripDouble(v);
-                    return swift.memory.retain(ret);
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
-            }
-            TestModule["bjs_asyncRoundTripJSObject"] = function bjs_asyncRoundTripJSObject(v) {
-                try {
-                    let ret = imports.asyncRoundTripJSObject(swift.memory.getObject(v));
-                    return swift.memory.retain(ret);
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
             }
         },
         setInstance: (i) => {

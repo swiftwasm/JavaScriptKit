@@ -793,6 +793,28 @@ public struct BridgeJSSkeleton: Codable {
 // MARK: - BridgeType extension
 
 extension BridgeType {
+    /// Maps Swift primitive type names to BridgeType. Returns nil for unknown types.
+    public init?(swiftType: String) {
+        switch swiftType {
+        case "Int":
+            self = .int
+        case "Float":
+            self = .float
+        case "Double":
+            self = .double
+        case "String":
+            self = .string
+        case "Bool":
+            self = .bool
+        case "Void":
+            self = .void
+        case "JSObject":
+            self = .jsObject(nil)
+        default:
+            return nil
+        }
+    }
+
     public var abiReturnType: WasmCoreType? {
         switch self {
         case .void: return nil
