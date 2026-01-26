@@ -4730,6 +4730,31 @@
         }
       },
       {
+        "abiName" : "bjs_makeImportedFoo",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "makeImportedFoo",
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "jsObject" : {
+            "_0" : "Foo"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_throwsSwiftError",
         "effects" : {
           "isAsync" : false,
@@ -8928,7 +8953,37 @@
 
         ],
         "types" : [
+          {
+            "constructor" : {
+              "parameters" : [
+                {
+                  "name" : "value",
+                  "type" : {
+                    "string" : {
 
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "methods" : [
+
+            ],
+            "name" : "Foo",
+            "setters" : [
+
+            ]
+          }
         ]
       },
       {
