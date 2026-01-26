@@ -46,7 +46,7 @@ jobs:
       - name: Configure environment variables
         run: |
           echo "SWIFT_SDK_ID=${{ steps.setup-swiftwasm.outputs.swift-sdk-id }}" >> $GITHUB_ENV
-          echo "SWIFT_PATH=$(dirname $(which swiftc))" >> $GITHUB_ENV
+          echo "SWIFT_BIN_PATH=$(dirname $(which swiftc))" >> $GITHUB_ENV
       - run: make bootstrap
       - run: make unittest
         # Skip unit tests with uwasi because its proc_exit throws

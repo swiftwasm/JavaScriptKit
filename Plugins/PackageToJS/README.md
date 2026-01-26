@@ -41,5 +41,5 @@ swift test --package-path ./Plugins/PackageToJS
 Please define the following environment variables when you want to run E2E tests:
 
 - `SWIFT_SDK_ID`: Specifies the Swift SDK identifier to use
-- `SWIFT_PATH`: Specifies the `bin` path to the Swift toolchain to use
+- `SWIFT_BIN_PATH`: Specifies the `bin` path to the Swift toolchain to use
 
