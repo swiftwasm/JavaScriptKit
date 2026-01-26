@@ -7,12 +7,12 @@ import BridgeJSSkeleton
 import BridgeJSUtilities
 #endif
 
-struct BridgeJSLink {
+public struct BridgeJSLink {
     var skeletons: [BridgeJSSkeleton] = []
     let sharedMemory: Bool
     private let namespaceBuilder = NamespaceBuilder()
 
-    init(
+    public init(
         skeletons: [BridgeJSSkeleton] = [],
         sharedMemory: Bool
     ) {
@@ -1035,7 +1035,7 @@ struct BridgeJSLink {
         return printer.lines.joined(separator: "\n")
     }
 
-    func link() throws -> (outputJs: String, outputDts: String) {
+    public func link() throws -> (outputJs: String, outputDts: String) {
         let data = try collectLinkData()
         let outputJs = try generateJavaScript(data: data)
         let outputDts = generateTypeScript(data: data)

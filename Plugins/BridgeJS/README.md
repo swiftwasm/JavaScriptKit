@@ -163,6 +163,26 @@ Return values use direct Wasm returns for primitives, and imported intrinsic fun
 
 For detailed semantics, see the [How It Works sections](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/exporting-swift-class#How-It-Works) in the user documentation.
 
+## Debug utilities
+
+`BridgeJSToolInternal` exposes pipeline stages for debugging:
+
+- `emit-skeleton` - Parse Swift files (or `-` for stdin) and print the BridgeJS skeleton as JSON.
+- `emit-swift-thunks` — Read skeleton JSON (from a file or `-` for stdin) and print the generated Swift glue (export and import thunks).
+- `emit-js` / `emit-dts` - Read skeleton JSON files (or `-` for stdin) and print the .js/.d.ts
+
+Use these to inspect parser output and generated code without running the full generate/link pipeline.
+
+```console
+$ cat <<EOS | ./Plugins/BridgeJS/.build/debug/BridgeJSToolInternal emit-skeleton - | ./Plugins/BridgeJS/.build/debug/BridgeJSToolInternal emit-dts -
+@JSFunction func foo() throws(JSException) -> Int
+@JS class Bar {
+  @JS init() {}
+  @JS func baz() {}
+}
+EOS
+```
+
 ## Future Work
 
 - [ ] Cast between TS interface

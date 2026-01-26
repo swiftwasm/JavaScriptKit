@@ -7,7 +7,9 @@ let package = Package(
     name: "BridgeJS",
     platforms: [.macOS(.v13)],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1")
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1"),
+        // Development dependencies
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.7.0"),
     ],
     targets: [
         .target(name: "BridgeJSBuildPlugin"),
@@ -69,6 +71,15 @@ let package = Package(
             dependencies: [
                 "BridgeJSMacros",
                 .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
+            ]
+        ),
+
+        .executableTarget(
+            name: "BridgeJSToolInternal",
+            dependencies: [
+                "BridgeJSCore",
+                "BridgeJSLink",
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
     ]
