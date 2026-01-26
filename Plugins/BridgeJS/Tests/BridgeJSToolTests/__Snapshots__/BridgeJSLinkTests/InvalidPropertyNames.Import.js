@@ -212,7 +212,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_ArrayBufferLike_byteLength_get"] = function bjs_ArrayBufferLike_byteLength_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self)["byteLength"];
+                    let ret = swift.memory.getObject(self).byteLength;
                     return ret;
                 } catch (error) {
                     setException(error);
@@ -230,7 +230,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_WeirdNaming_normalProperty_get"] = function bjs_WeirdNaming_normalProperty_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self)["normalProperty"];
+                    let ret = swift.memory.getObject(self).normalProperty;
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
@@ -275,7 +275,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_WeirdNaming_constructor_get"] = function bjs_WeirdNaming_constructor_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self)["constructor"];
+                    let ret = swift.memory.getObject(self).constructor;
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
@@ -284,7 +284,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_WeirdNaming_for_get"] = function bjs_WeirdNaming_for_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self)["for"];
+                    let ret = swift.memory.getObject(self).for;
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
@@ -293,7 +293,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_WeirdNaming_Any_get"] = function bjs_WeirdNaming_Any_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self)["Any"];
+                    let ret = swift.memory.getObject(self).Any;
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
@@ -304,7 +304,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     const newValueObject = swift.memory.getObject(newValue);
                     swift.memory.release(newValue);
-                    swift.memory.getObject(self)["normalProperty"] = newValueObject;
+                    swift.memory.getObject(self).normalProperty = newValueObject;
                 } catch (error) {
                     setException(error);
                 }
@@ -343,7 +343,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     const newValueObject = swift.memory.getObject(newValue);
                     swift.memory.release(newValue);
-                    swift.memory.getObject(self)["constructor"] = newValueObject;
+                    swift.memory.getObject(self).constructor = newValueObject;
                 } catch (error) {
                     setException(error);
                 }
@@ -352,7 +352,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     const newValueObject = swift.memory.getObject(newValue);
                     swift.memory.release(newValue);
-                    swift.memory.getObject(self)["for"] = newValueObject;
+                    swift.memory.getObject(self).for = newValueObject;
                 } catch (error) {
                     setException(error);
                 }
@@ -361,7 +361,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     const newValueObject = swift.memory.getObject(newValue);
                     swift.memory.release(newValue);
-                    swift.memory.getObject(self)["Any"] = newValueObject;
+                    swift.memory.getObject(self).Any = newValueObject;
                 } catch (error) {
                     setException(error);
                 }

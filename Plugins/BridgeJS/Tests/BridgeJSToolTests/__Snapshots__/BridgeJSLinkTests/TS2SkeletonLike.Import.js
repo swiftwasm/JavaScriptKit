@@ -214,7 +214,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_TypeScriptProcessor_version_get"] = function bjs_TypeScriptProcessor_version_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self)["version"];
+                    let ret = swift.memory.getObject(self).version;
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
@@ -245,7 +245,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_CodeGenerator_outputFormat_get"] = function bjs_CodeGenerator_outputFormat_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self)["outputFormat"];
+                    let ret = swift.memory.getObject(self).outputFormat;
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {

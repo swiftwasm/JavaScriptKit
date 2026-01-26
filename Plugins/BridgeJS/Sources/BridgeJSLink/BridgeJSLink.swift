@@ -2168,9 +2168,8 @@ extension BridgeJSLink {
         }
 
         func callPropertyGetter(name: String, returnType: BridgeType) throws -> String? {
-            let escapedName = BridgeJSLink.escapeForJavaScriptStringLiteral(name)
-            let accessExpr =
-                "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)[\"\(escapedName)\"]"
+            let objectExpr = "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)"
+            let accessExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
             if context == .exportSwift, returnType.usesSideChannelForOptionalReturn() {
                 guard case .optional(let wrappedType) = returnType else {
                     fatalError("usesSideChannelForOptionalReturn returned true for non-optional type")
@@ -2194,9 +2193,9 @@ extension BridgeJSLink {
         }
 
         func callPropertySetter(name: String, returnType: BridgeType) {
-            let escapedName = BridgeJSLink.escapeForJavaScriptStringLiteral(name)
-            let call =
-                "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)[\"\(escapedName)\"] = \(parameterForwardings.joined(separator: ", "))"
+            let objectExpr = "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)"
+            let accessExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
+            let call = "\(accessExpr) = \(parameterForwardings.joined(separator: ", "))"
             body.write("\(call);")
         }
 
@@ -2235,6 +2234,14 @@ extension BridgeJSLink {
             let loweredValues = loweringFragment.printCode(returnExpr.map { [$0] } ?? [], scope, body, cleanupCode)
             assert(loweredValues.count <= 1, "Lowering fragment should produce at most one value")
             return loweredValues.first
+        }
+
+        private static func propertyAccessExpr(objectExpr: String, propertyName: String) -> String {
+            if propertyName.range(of: #"^[$A-Z_][0-9A-Z_$]*$"#, options: [.regularExpression, .caseInsensitive]) != nil {
+                return "\(objectExpr).\(propertyName)"
+            }
+            let escapedName = BridgeJSLink.escapeForJavaScriptStringLiteral(propertyName)
+            return "\(objectExpr)[\"\(escapedName)\"]"
         }
     }
 

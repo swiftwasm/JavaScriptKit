@@ -223,7 +223,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_DatabaseConnection_isConnected_get"] = function bjs_DatabaseConnection_isConnected_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self)["isConnected"];
+                    let ret = swift.memory.getObject(self).isConnected;
                     return ret ? 1 : 0;
                 } catch (error) {
                     setException(error);
@@ -232,7 +232,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_DatabaseConnection_connectionTimeout_get"] = function bjs_DatabaseConnection_connectionTimeout_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self)["connectionTimeout"];
+                    let ret = swift.memory.getObject(self).connectionTimeout;
                     return ret;
                 } catch (error) {
                     setException(error);
@@ -241,7 +241,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_DatabaseConnection_connectionTimeout_set"] = function bjs_DatabaseConnection_connectionTimeout_set(self, newValue) {
                 try {
-                    swift.memory.getObject(self)["connectionTimeout"] = newValue;
+                    swift.memory.getObject(self).connectionTimeout = newValue;
                 } catch (error) {
                     setException(error);
                 }
@@ -268,7 +268,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_Logger_level_get"] = function bjs_Logger_level_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self)["level"];
+                    let ret = swift.memory.getObject(self).level;
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
@@ -295,7 +295,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_ConfigManager_configPath_get"] = function bjs_ConfigManager_configPath_get(self) {
                 try {
-                    let ret = swift.memory.getObject(self)["configPath"];
+                    let ret = swift.memory.getObject(self).configPath;
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
