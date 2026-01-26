@@ -1,0 +1,413 @@
+{
+  "classes" : [
+
+  ],
+  "enums" : [
+
+  ],
+  "exposeToGlobal" : false,
+  "functions" : [
+    {
+      "abiName" : "bjs_takeUnsafeRawPointer",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "takeUnsafeRawPointer",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "p",
+          "type" : {
+            "unsafePointer" : {
+              "_0" : {
+                "kind" : "unsafeRawPointer"
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_takeUnsafeMutableRawPointer",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "takeUnsafeMutableRawPointer",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "p",
+          "type" : {
+            "unsafePointer" : {
+              "_0" : {
+                "kind" : "unsafeMutableRawPointer"
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_takeOpaquePointer",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "takeOpaquePointer",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "p",
+          "type" : {
+            "unsafePointer" : {
+              "_0" : {
+                "kind" : "opaquePointer"
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_takeUnsafePointer",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "takeUnsafePointer",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "p",
+          "type" : {
+            "unsafePointer" : {
+              "_0" : {
+                "kind" : "unsafePointer",
+                "pointee" : "UInt8"
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_takeUnsafeMutablePointer",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "takeUnsafeMutablePointer",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "p",
+          "type" : {
+            "unsafePointer" : {
+              "_0" : {
+                "kind" : "unsafeMutablePointer",
+                "pointee" : "UInt8"
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "void" : {
+
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_returnUnsafeRawPointer",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "returnUnsafeRawPointer",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "unsafePointer" : {
+          "_0" : {
+            "kind" : "unsafeRawPointer"
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_returnUnsafeMutableRawPointer",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "returnUnsafeMutableRawPointer",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "unsafePointer" : {
+          "_0" : {
+            "kind" : "unsafeMutableRawPointer"
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_returnOpaquePointer",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "returnOpaquePointer",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "unsafePointer" : {
+          "_0" : {
+            "kind" : "opaquePointer"
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_returnUnsafePointer",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "returnUnsafePointer",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "unsafePointer" : {
+          "_0" : {
+            "kind" : "unsafePointer",
+            "pointee" : "UInt8"
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_returnUnsafeMutablePointer",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "returnUnsafeMutablePointer",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "unsafePointer" : {
+          "_0" : {
+            "kind" : "unsafeMutablePointer",
+            "pointee" : "UInt8"
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_roundTripPointerFields",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "roundTripPointerFields",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "value",
+          "type" : {
+            "swiftStruct" : {
+              "_0" : "PointerFields"
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "swiftStruct" : {
+          "_0" : "PointerFields"
+        }
+      }
+    }
+  ],
+  "protocols" : [
+
+  ],
+  "structs" : [
+    {
+      "constructor" : {
+        "abiName" : "bjs_PointerFields_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "raw",
+            "name" : "raw",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafeRawPointer"
+                }
+              }
+            }
+          },
+          {
+            "label" : "mutRaw",
+            "name" : "mutRaw",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafeMutableRawPointer"
+                }
+              }
+            }
+          },
+          {
+            "label" : "opaque",
+            "name" : "opaque",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "opaquePointer"
+                }
+              }
+            }
+          },
+          {
+            "label" : "ptr",
+            "name" : "ptr",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafePointer",
+                  "pointee" : "UInt8"
+                }
+              }
+            }
+          },
+          {
+            "label" : "mutPtr",
+            "name" : "mutPtr",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafeMutablePointer",
+                  "pointee" : "UInt8"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+
+      ],
+      "name" : "PointerFields",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "raw",
+          "type" : {
+            "unsafePointer" : {
+              "_0" : {
+                "kind" : "unsafeRawPointer"
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "mutRaw",
+          "type" : {
+            "unsafePointer" : {
+              "_0" : {
+                "kind" : "unsafeMutableRawPointer"
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "opaque",
+          "type" : {
+            "unsafePointer" : {
+              "_0" : {
+                "kind" : "opaquePointer"
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "ptr",
+          "type" : {
+            "unsafePointer" : {
+              "_0" : {
+                "kind" : "unsafePointer",
+                "pointee" : "UInt8"
+              }
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "mutPtr",
+          "type" : {
+            "unsafePointer" : {
+              "_0" : {
+                "kind" : "unsafeMutablePointer",
+                "pointee" : "UInt8"
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "PointerFields"
+    }
+  ]
+}

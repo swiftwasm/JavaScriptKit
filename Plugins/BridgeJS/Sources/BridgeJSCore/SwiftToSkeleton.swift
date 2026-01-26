@@ -163,6 +163,11 @@ public final class SwiftToSkeleton {
             }
         }
 
+        // UnsafePointer family
+        if let unsafePointerType = Self.parseUnsafePointerType(type) {
+            return .unsafePointer(unsafePointerType)
+        }
+
         let typeName: String
         if let identifier = type.as(IdentifierTypeSyntax.self) {
             typeName = Self.normalizeIdentifier(identifier.name.text)
@@ -246,6 +251,55 @@ public final class SwiftToSkeleton {
         }
 
         return .swiftHeapObject(swiftCallName)
+    }
+
+    fileprivate static func parseUnsafePointerType(_ type: TypeSyntax) -> UnsafePointerType? {
+        func parse(baseName: String, genericArg: TypeSyntax?) -> UnsafePointerType? {
+            let pointee = genericArg?.trimmedDescription
+            switch baseName {
+            case "UnsafePointer":
+                return .init(kind: .unsafePointer, pointee: pointee)
+            case "UnsafeMutablePointer":
+                return .init(kind: .unsafeMutablePointer, pointee: pointee)
+            case "UnsafeRawPointer":
+                return .init(kind: .unsafeRawPointer)
+            case "UnsafeMutableRawPointer":
+                return .init(kind: .unsafeMutableRawPointer)
+            case "OpaquePointer":
+                return .init(kind: .opaquePointer)
+            default:
+                return nil
+            }
+        }
+
+        if let identifier = type.as(IdentifierTypeSyntax.self) {
+            let baseName = identifier.name.text
+            if (baseName == "UnsafePointer" || baseName == "UnsafeMutablePointer"),
+                let genericArgs = identifier.genericArgumentClause?.arguments,
+                genericArgs.count == 1,
+                let argType = TypeSyntax(genericArgs.first?.argument)
+            {
+                return parse(baseName: baseName, genericArg: argType)
+            }
+            return parse(baseName: baseName, genericArg: nil)
+        }
+
+        if let member = type.as(MemberTypeSyntax.self),
+            let base = member.baseType.as(IdentifierTypeSyntax.self),
+            base.name.text == "Swift"
+        {
+            let baseName = member.name.text
+            if (baseName == "UnsafePointer" || baseName == "UnsafeMutablePointer"),
+                let genericArgs = member.genericArgumentClause?.arguments,
+                genericArgs.count == 1,
+                let argType = TypeSyntax(genericArgs.first?.argument)
+            {
+                return parse(baseName: baseName, genericArg: argType)
+            }
+            return parse(baseName: baseName, genericArg: nil)
+        }
+
+        return nil
     }
 
     /// Computes the full Swift call name by walking up the AST hierarchy to find all parent enums

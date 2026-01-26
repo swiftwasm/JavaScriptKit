@@ -875,6 +875,8 @@ extension BridgeType {
         case .closure:
             // Swift closure is boxed and passed to JS as a pointer.
             return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
+        case .unsafePointer:
+            return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
         case .swiftHeapObject(let className):
             switch context {
             case .importTS:
@@ -959,6 +961,8 @@ extension BridgeType {
         case .closure:
             // JS returns a callback ID for closures, which Swift lifts to a typed closure.
             return LiftingReturnInfo(valueToLift: .i32)
+        case .unsafePointer:
+            return LiftingReturnInfo(valueToLift: .pointer)
         case .swiftHeapObject(let className):
             switch context {
             case .importTS:

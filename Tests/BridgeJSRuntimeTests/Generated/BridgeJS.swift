@@ -2212,6 +2212,36 @@ public func _bjs_StaticPropertyNamespace_NestedProperties_static_nestedDouble_se
     #endif
 }
 
+extension PointerFields: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> PointerFields {
+        let mutPtr = UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
+        let ptr = UnsafePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
+        let opaque = OpaquePointer.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
+        let mutRaw = UnsafeMutableRawPointer.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
+        let raw = UnsafeRawPointer.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
+        return PointerFields(raw: raw, mutRaw: mutRaw, opaque: opaque, ptr: ptr, mutPtr: mutPtr)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_pointer(self.raw.bridgeJSLowerReturn())
+        _swift_js_push_pointer(self.mutRaw.bridgeJSLowerReturn())
+        _swift_js_push_pointer(self.opaque.bridgeJSLowerReturn())
+        _swift_js_push_pointer(self.ptr.bridgeJSLowerReturn())
+        _swift_js_push_pointer(self.mutPtr.bridgeJSLowerReturn())
+    }
+}
+
+@_expose(wasm, "bjs_PointerFields_init")
+@_cdecl("bjs_PointerFields_init")
+public func _bjs_PointerFields_init(_ raw: UnsafeMutableRawPointer, _ mutRaw: UnsafeMutableRawPointer, _ opaque: UnsafeMutableRawPointer, _ ptr: UnsafeMutableRawPointer, _ mutPtr: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = PointerFields(raw: UnsafeRawPointer.bridgeJSLiftParameter(raw), mutRaw: UnsafeMutableRawPointer.bridgeJSLiftParameter(mutRaw), opaque: OpaquePointer.bridgeJSLiftParameter(opaque), ptr: UnsafePointer<UInt8>.bridgeJSLiftParameter(ptr), mutPtr: UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(mutPtr))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 extension DataPoint: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> DataPoint {
         let optFlag = Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
@@ -2595,11 +2625,77 @@ public func _bjs_roundTripSwiftHeapObject(_ v: UnsafeMutableRawPointer) -> Unsaf
     #endif
 }
 
+@_expose(wasm, "bjs_roundTripUnsafeRawPointer")
+@_cdecl("bjs_roundTripUnsafeRawPointer")
+public func _bjs_roundTripUnsafeRawPointer(_ v: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = roundTripUnsafeRawPointer(v: UnsafeRawPointer.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripUnsafeMutableRawPointer")
+@_cdecl("bjs_roundTripUnsafeMutableRawPointer")
+public func _bjs_roundTripUnsafeMutableRawPointer(_ v: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = roundTripUnsafeMutableRawPointer(v: UnsafeMutableRawPointer.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripOpaquePointer")
+@_cdecl("bjs_roundTripOpaquePointer")
+public func _bjs_roundTripOpaquePointer(_ v: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = roundTripOpaquePointer(v: OpaquePointer.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripUnsafePointer")
+@_cdecl("bjs_roundTripUnsafePointer")
+public func _bjs_roundTripUnsafePointer(_ v: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = roundTripUnsafePointer(v: UnsafePointer<UInt8>.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripUnsafeMutablePointer")
+@_cdecl("bjs_roundTripUnsafeMutablePointer")
+public func _bjs_roundTripUnsafeMutablePointer(_ v: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = roundTripUnsafeMutablePointer(v: UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundTripJSObject")
 @_cdecl("bjs_roundTripJSObject")
 public func _bjs_roundTripJSObject(_ v: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = roundTripJSObject(v: JSObject.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripPointerFields")
+@_cdecl("bjs_roundTripPointerFields")
+public func _bjs_roundTripPointerFields() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripPointerFields(_: PointerFields.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

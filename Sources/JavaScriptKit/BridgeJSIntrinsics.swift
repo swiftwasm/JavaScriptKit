@@ -644,6 +644,114 @@ func _swift_js_return_optional_double(_ isSome: Int32, _ value: Float64) {
 }
 #endif
 
+// MARK: - UnsafePointer family
+
+extension UnsafeMutableRawPointer {
+    // MARK: ImportTS
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer { self }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer)
+        -> UnsafeMutableRawPointer
+    {
+        pointer
+    }
+
+    // MARK: ExportSwift
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ pointer: UnsafeMutableRawPointer)
+        -> UnsafeMutableRawPointer
+    {
+        pointer
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> UnsafeMutableRawPointer { self }
+}
+
+extension UnsafeRawPointer {
+    // MARK: ImportTS
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
+        UnsafeMutableRawPointer(mutating: self)
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer)
+        -> UnsafeRawPointer
+    {
+        UnsafeRawPointer(pointer)
+    }
+
+    // MARK: ExportSwift
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ pointer: UnsafeMutableRawPointer)
+        -> UnsafeRawPointer
+    {
+        UnsafeRawPointer(pointer)
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> UnsafeMutableRawPointer {
+        bridgeJSLowerParameter()
+    }
+}
+
+extension OpaquePointer {
+    // MARK: ImportTS
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
+        UnsafeMutableRawPointer(mutating: UnsafeRawPointer(self))
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer)
+        -> OpaquePointer
+    {
+        OpaquePointer(UnsafeRawPointer(pointer))
+    }
+
+    // MARK: ExportSwift
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ pointer: UnsafeMutableRawPointer)
+        -> OpaquePointer
+    {
+        OpaquePointer(UnsafeRawPointer(pointer))
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> UnsafeMutableRawPointer {
+        bridgeJSLowerParameter()
+    }
+}
+
+extension UnsafePointer {
+    // MARK: ImportTS
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
+        UnsafeMutableRawPointer(mutating: UnsafeRawPointer(self))
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer)
+        -> UnsafePointer<Pointee>
+    {
+        UnsafeRawPointer(pointer).assumingMemoryBound(to: Pointee.self)
+    }
+
+    // MARK: ExportSwift
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ pointer: UnsafeMutableRawPointer)
+        -> UnsafePointer<Pointee>
+    {
+        UnsafeRawPointer(pointer).assumingMemoryBound(to: Pointee.self)
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> UnsafeMutableRawPointer {
+        bridgeJSLowerParameter()
+    }
+}
+
+extension UnsafeMutablePointer {
+    // MARK: ImportTS
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
+        UnsafeMutableRawPointer(self)
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer)
+        -> UnsafeMutablePointer<Pointee>
+    {
+        pointer.assumingMemoryBound(to: Pointee.self)
+    }
+
+    // MARK: ExportSwift
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ pointer: UnsafeMutableRawPointer)
+        -> UnsafeMutablePointer<Pointee>
+    {
+        pointer.assumingMemoryBound(to: Pointee.self)
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> UnsafeMutableRawPointer {
+        bridgeJSLowerParameter()
+    }
+}
+
 extension Optional where Wrapped == Bool {
     // MARK: ImportTS
 
