@@ -30,6 +30,7 @@ public struct ImportTS {
     /// Finalizes the import process and generates Swift code
     public func finalize() throws -> String? {
         var decls: [DeclSyntax] = []
+
         for skeleton in self.skeleton.children {
             for getter in skeleton.globalGetters {
                 let getterDecls = try renderSwiftGlobalGetter(getter, topLevelDecls: &decls)
@@ -97,6 +98,16 @@ public struct ImportTS {
                 "\(param.name)\($0.name.capitalizedFirstLetter)"
             }
 
+            let initializerExpr: ExprSyntax
+            switch param.type {
+            case .closure(let signature):
+                initializerExpr = ExprSyntax(
+                    "_BJS_Closure_\(raw: signature.mangleName).bridgeJSLower(\(raw: param.name))"
+                )
+            default:
+                initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
+            }
+
             // Always add destructuring statement to body (unified for single and multiple)
             let pattern: PatternSyntax
             if destructuredNames.count == 1 {
@@ -123,7 +134,7 @@ public struct ImportTS {
                                     PatternBindingSyntax(
                                         pattern: pattern,
                                         initializer: InitializerClauseSyntax(
-                                            value: ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
+                                            value: initializerExpr
                                         )
                                     )
                                 }
@@ -209,10 +220,15 @@ public struct ImportTS {
             } else {
                 abiReturnType = liftingInfo.valueToLift
                 let liftExpr: ExprSyntax
-                if liftingInfo.valueToLift != nil {
-                    liftExpr = "\(raw: returnType.swiftType).bridgeJSLiftReturn(ret)"
-                } else {
-                    liftExpr = "\(raw: returnType.swiftType).bridgeJSLiftReturn()"
+                switch returnType {
+                case .closure(let signature):
+                    liftExpr = ExprSyntax("_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(ret)")
+                default:
+                    if liftingInfo.valueToLift != nil {
+                        liftExpr = "\(raw: returnType.swiftType).bridgeJSLiftReturn(ret)"
+                    } else {
+                        liftExpr = "\(raw: returnType.swiftType).bridgeJSLiftReturn()"
+                    }
                 }
                 body.append(
                     CodeBlockItemSyntax(
@@ -543,13 +559,14 @@ struct SwiftSignatureBuilder {
     ) -> FunctionParameterClauseSyntax {
         return FunctionParameterClauseSyntax(parametersBuilder: {
             for param in parameters {
+                let paramTypeSyntax = buildParameterTypeSyntax(from: param.type)
                 if useWildcardLabels {
                     // Always use wildcard labels: "_ name: Type"
                     FunctionParameterSyntax(
                         firstName: .wildcardToken(),
                         secondName: .identifier(param.name),
                         colon: .colonToken(),
-                        type: buildTypeSyntax(from: param.type)
+                        type: paramTypeSyntax
                     )
                 } else {
                     let label = param.label ?? param.name
@@ -559,7 +576,7 @@ struct SwiftSignatureBuilder {
                             firstName: .identifier(label),
                             secondName: nil,
                             colon: .colonToken(),
-                            type: buildTypeSyntax(from: param.type)
+                            type: paramTypeSyntax
                         )
                     } else if param.label == nil {
                         // No label specified: use wildcard "_ name: Type"
@@ -567,7 +584,7 @@ struct SwiftSignatureBuilder {
                             firstName: .wildcardToken(),
                             secondName: .identifier(param.name),
                             colon: .colonToken(),
-                            type: buildTypeSyntax(from: param.type)
+                            type: paramTypeSyntax
                         )
                     } else {
                         // External label differs: "label count: Int"
@@ -575,7 +592,7 @@ struct SwiftSignatureBuilder {
                             firstName: .identifier(label),
                             secondName: .identifier(param.name),
                             colon: .colonToken(),
-                            type: buildTypeSyntax(from: param.type)
+                            type: paramTypeSyntax
                         )
                     }
                 }
@@ -652,6 +669,18 @@ struct SwiftSignatureBuilder {
     static func buildTypeSyntax(from type: BridgeType) -> TypeSyntax {
         let identifierType = IdentifierTypeSyntax(name: .identifier(type.swiftType))
         return TypeSyntax(identifierType)
+    }
+
+    /// Builds a parameter type syntax from a BridgeType.
+    ///
+    /// Swift closure parameters must be `@escaping` because they are boxed and can be invoked from JavaScript.
+    static func buildParameterTypeSyntax(from type: BridgeType) -> TypeSyntax {
+        switch type {
+        case .closure:
+            return TypeSyntax("@escaping \(raw: type.swiftType)")
+        default:
+            return buildTypeSyntax(from: type)
+        }
     }
 }
 
@@ -844,7 +873,8 @@ extension BridgeType {
         case .jsObject: return .jsObject
         case .void: return .void
         case .closure:
-            throw BridgeJSCoreError("Closure types are not yet supported in TypeScript imports")
+            // Swift closure is boxed and passed to JS as a pointer.
+            return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
         case .swiftHeapObject(let className):
             switch context {
             case .importTS:
@@ -927,7 +957,8 @@ extension BridgeType {
         case .jsObject: return .jsObject
         case .void: return .void
         case .closure:
-            throw BridgeJSCoreError("Closure types are not yet supported in TypeScript imports")
+            // JS returns a callback ID for closures, which Swift lifts to a typed closure.
+            return LiftingReturnInfo(valueToLift: .i32)
         case .swiftHeapObject(let className):
             switch context {
             case .importTS:

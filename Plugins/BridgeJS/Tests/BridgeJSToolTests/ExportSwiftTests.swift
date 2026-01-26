@@ -15,8 +15,17 @@ import Testing
         sourceLocation: Testing.SourceLocation = #_sourceLocation
     ) throws {
         guard let exported = skeleton.exported else { return }
-        let exportSwift = ExportSwift(progress: .silent, moduleName: skeleton.moduleName, skeleton: exported)
-        let outputSwift = try #require(try exportSwift.finalize())
+        let exportSwift = ExportSwift(
+            progress: .silent,
+            moduleName: skeleton.moduleName,
+            skeleton: exported
+        )
+        let closureSupport = try ClosureCodegen().renderSupport(for: skeleton)
+        let exportResult = try #require(try exportSwift.finalize())
+        let outputSwift = ([closureSupport, exportResult] as [String?])
+            .compactMap { $0?.trimmingCharacters(in: .newlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n\n")
         try assertSnapshot(
             name: name,
             filePath: filePath,

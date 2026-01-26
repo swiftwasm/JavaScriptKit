@@ -589,10 +589,14 @@ public struct BridgeJSLink {
                 printer.write("}")
 
                 for unified in skeletons {
-                    guard let skeleton = unified.exported else { continue }
                     let moduleName = unified.moduleName
                     var closureSignatures: Set<ClosureSignature> = []
-                    collectClosureSignatures(from: skeleton, into: &closureSignatures)
+                    if let exported = unified.exported {
+                        collectClosureSignatures(from: exported, into: &closureSignatures)
+                    }
+                    if let imported = unified.imported {
+                        collectClosureSignatures(from: imported, into: &closureSignatures)
+                    }
 
                     guard !closureSignatures.isEmpty else { continue }
 
@@ -636,6 +640,36 @@ public struct BridgeJSLink {
             }
             for property in klass.properties {
                 collectClosureSignatures(from: property.type, into: &signatures)
+            }
+        }
+    }
+
+    private func collectClosureSignatures(
+        from skeleton: ImportedModuleSkeleton,
+        into signatures: inout Set<ClosureSignature>
+    ) {
+        for fileSkeleton in skeleton.children {
+            for getter in fileSkeleton.globalGetters {
+                collectClosureSignatures(from: getter.type, into: &signatures)
+            }
+            for function in fileSkeleton.functions {
+                collectClosureSignatures(from: function.parameters, into: &signatures)
+                collectClosureSignatures(from: function.returnType, into: &signatures)
+            }
+            for type in fileSkeleton.types {
+                if let constructor = type.constructor {
+                    collectClosureSignatures(from: constructor.parameters, into: &signatures)
+                }
+                for getter in type.getters {
+                    collectClosureSignatures(from: getter.type, into: &signatures)
+                }
+                for setter in type.setters {
+                    collectClosureSignatures(from: setter.type, into: &signatures)
+                }
+                for method in type.methods {
+                    collectClosureSignatures(from: method.parameters, into: &signatures)
+                    collectClosureSignatures(from: method.returnType, into: &signatures)
+                }
             }
         }
     }

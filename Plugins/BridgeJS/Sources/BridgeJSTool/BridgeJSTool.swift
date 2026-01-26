@@ -152,15 +152,22 @@ import BridgeJSUtilities
             }
             var importer: ImportTS?
             if let skeleton = skeleton.imported {
-                importer = ImportTS(progress: progress, moduleName: moduleName, skeleton: skeleton)
+                importer = ImportTS(
+                    progress: progress,
+                    moduleName: moduleName,
+                    skeleton: skeleton
+                )
             }
+
+            // Generate unified closure support for both import/export to avoid duplicate symbols when concatenating.
+            let closureSupport = try ClosureCodegen().renderSupport(for: skeleton)
 
             let importResult = try importer?.finalize()
             let exportResult = try exporter?.finalize()
 
             // Combine and write unified Swift output
             let outputSwiftURL = outputDirectory.appending(path: "BridgeJS.swift")
-            let combinedSwift = [exportResult, importResult].compactMap { $0 }
+            let combinedSwift = [closureSupport, exportResult, importResult].compactMap { $0 }
             let outputSwift = combineGeneratedSwift(combinedSwift)
             let shouldWrite = doubleDashOptions["always-write"] == "true" || !outputSwift.isEmpty
             if shouldWrite {

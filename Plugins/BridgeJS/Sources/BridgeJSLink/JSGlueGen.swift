@@ -1459,8 +1459,14 @@ struct IntrinsicJSFragment: Sendable {
                     }
                 )
             }
-        case .closure:
-            throw BridgeJSLinkError(message: "Closure parameters not yet implemented for imported JS functions")
+        case .closure(let signature):
+            let lowerFuncName = "lower_closure_\(signature.moduleName)_\(signature.mangleName)"
+            return IntrinsicJSFragment(
+                parameters: ["boxPtr"],
+                printCode: { arguments, scope, printer, cleanupCode in
+                    return ["bjs[\"\(lowerFuncName)\"](\(arguments[0]))"]
+                }
+            )
         case .namespaceEnum(let string):
             throw BridgeJSLinkError(
                 message:
@@ -1524,7 +1530,18 @@ struct IntrinsicJSFragment: Sendable {
                 return swiftStructLowerReturn(fullName: fullName)
             }
         case .closure:
-            throw BridgeJSLinkError(message: "Closure return values not yet implemented for imported JS functions")
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanupCode in
+                    let value = arguments[0]
+                    printer.write("if (typeof \(value) !== \"function\") {")
+                    printer.indent {
+                        printer.write("throw new TypeError(\"Expected a function\")")
+                    }
+                    printer.write("}")
+                    return ["\(JSGlueVariableScope.reservedSwift).memory.retain(\(value))"]
+                }
+            )
         case .namespaceEnum(let string):
             throw BridgeJSLinkError(
                 message: "Namespace enums are not supported to be returned from imported JS functions: \(string)"
