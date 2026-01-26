@@ -1,5 +1,5 @@
 import XCTest
-import JavaScriptKit
+@_spi(Experimental) import JavaScriptKit
 import JavaScriptEventLoop
 
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "runJsWorks")
@@ -31,6 +31,15 @@ func runJsWorks() -> Void
 
 @JS func roundTripJSObject(v: JSObject) -> JSObject {
     return v
+}
+
+@JSClass struct Foo {
+    @JSGetter var value: String
+    @JSFunction init(_ value: String) throws(JSException)
+}
+
+@JS func makeImportedFoo(value: String) throws(JSException) -> Foo {
+    return try Foo(value)
 }
 
 struct TestError: Error {

@@ -235,6 +235,16 @@ public final class SwiftToSkeleton {
             return nil
         }
         let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: typeDecl, itemName: typeDecl.name.text)
+
+        // A type annotated with @JSClass is a JavaScript object wrapper (imported),
+        // even if it is declared as a Swift class.
+        if let classDecl = typeDecl.as(ClassDeclSyntax.self), classDecl.attributes.hasAttribute(name: "JSClass") {
+            return .jsObject(swiftCallName)
+        }
+        if let actorDecl = typeDecl.as(ActorDeclSyntax.self), actorDecl.attributes.hasAttribute(name: "JSClass") {
+            return .jsObject(swiftCallName)
+        }
+
         return .swiftHeapObject(swiftCallName)
     }
 

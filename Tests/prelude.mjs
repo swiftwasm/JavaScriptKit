@@ -67,6 +67,7 @@ export async function setupOptions(options, context) {
                         this.name = name;
                     }
                 },
+                Foo: ImportedFoo,
                 runAsyncWorks: async () => {
                     const exports = importsContext.getExports();
                     if (!exports) {
@@ -102,6 +103,13 @@ export async function setupOptions(options, context) {
 }
 
 import assert from "node:assert";
+
+class ImportedFoo {
+    /** @param {string} value */
+    constructor(value) {
+        this.value = value;
+    }
+}
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
@@ -175,6 +183,10 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     g2.release();
 
     g.release();
+
+    const foo = exports.makeImportedFoo("hello");
+    assert.ok(foo instanceof ImportedFoo);
+    assert.equal(foo.value, "hello");
 
     // Test PropertyHolder with various types
     const testObj = { testProp: "test" };

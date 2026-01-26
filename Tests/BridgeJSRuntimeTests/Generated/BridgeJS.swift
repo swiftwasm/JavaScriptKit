@@ -2560,6 +2560,31 @@ public func _bjs_roundTripJSObject(_ v: Int32) -> Int32 {
     #endif
 }
 
+@_expose(wasm, "bjs_makeImportedFoo")
+@_cdecl("bjs_makeImportedFoo")
+public func _bjs_makeImportedFoo(_ valueBytes: Int32, _ valueLength: Int32) -> Int32 {
+    #if arch(wasm32)
+    do {
+        let ret = try makeImportedFoo(value: String.bridgeJSLiftParameter(valueBytes, valueLength))
+        return ret.bridgeJSLowerReturn()
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: String(describing: error))
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return 0
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_throwsSwiftError")
 @_cdecl("bjs_throwsSwiftError")
 public func _bjs_throwsSwiftError(_ shouldThrow: Int32) -> Void {
@@ -6165,6 +6190,42 @@ fileprivate func _bjs_Container_wrap(_ pointer: UnsafeMutableRawPointer) -> Int3
     fatalError("Only available on WebAssembly")
 }
 #endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Foo_init")
+fileprivate func bjs_Foo_init(_ value: Int32) -> Int32
+#else
+fileprivate func bjs_Foo_init(_ value: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Foo_value_get")
+fileprivate func bjs_Foo_value_get(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_Foo_value_get(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$Foo_init(_ value: String) throws(JSException) -> JSObject {
+    let valueValue = value.bridgeJSLowerParameter()
+    let ret = bjs_Foo_init(valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$Foo_value_get(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_Foo_value_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripVoid")
