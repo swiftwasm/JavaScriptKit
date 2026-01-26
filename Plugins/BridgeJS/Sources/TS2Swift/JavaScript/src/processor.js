@@ -7,7 +7,6 @@
 import ts from 'typescript';
 
 /** @typedef {import('./index.d.ts').Parameter} Parameter */
-/** @typedef {import('./index.d.ts').BridgeType} BridgeType */
 
 /**
  * @typedef {{
@@ -48,7 +47,7 @@ export class TypeProcessor {
         this.diagnosticEngine = diagnosticEngine;
         this.options = options;
 
-        /** @type {Map<ts.Type, BridgeType>} */
+        /** @type {Map<ts.Type, string>} */
         this.processedTypes = new Map();
         /** @type {Map<ts.Type, ts.Node>} Seen position by type */
         this.seenTypes = new Map();
@@ -202,7 +201,7 @@ export class TypeProcessor {
         if (!signature) return;
 
         const params = this.renderParameters(signature.getParameters(), node);
-        const returnType = this.renderBridgeType(this.visitType(signature.getReturnType(), node), node);
+        const returnType = this.visitType(signature.getReturnType(), node);
         const effects = this.renderEffects({ isAsync: false });
         const swiftName = this.renderIdentifier(name);
 
@@ -242,7 +241,7 @@ export class TypeProcessor {
 
     /**
      * @param {ts.PropertyDeclaration | ts.PropertySignature} node
-     * @returns {{ name: string, type: BridgeType, isReadonly: boolean, documentation: string | undefined } | null}
+     * @returns {{ name: string, type: string, isReadonly: boolean, documentation: string | undefined } | null}
      */
     visitPropertyDecl(node) {
         if (!node.name) return null;
@@ -253,10 +252,10 @@ export class TypeProcessor {
         }
 
         const type = this.checker.getTypeAtLocation(node)
-        const bridgeType = this.visitType(type, node);
+        const swiftType = this.visitType(type, node);
         const isReadonly = node.modifiers?.some(m => m.kind === ts.SyntaxKind.ReadonlyKeyword) ?? false;
         const documentation = this.getFullJSDocText(node);
-        return { name: propertyName, type: bridgeType, isReadonly, documentation };
+        return { name: propertyName, type: swiftType, isReadonly, documentation };
     }
 
     /**
@@ -266,8 +265,8 @@ export class TypeProcessor {
      */
     visitSignatureParameter(symbol, node) {
         const type = this.checker.getTypeOfSymbolAtLocation(symbol, node);
-        const bridgeType = this.visitType(type, node);
-        return { name: symbol.name, type: bridgeType };
+        const swiftType = this.visitType(type, node);
+        return { name: symbol.name, type: swiftType };
     }
 
     /**
@@ -375,10 +374,10 @@ export class TypeProcessor {
     }
 
     /**
-     * Convert TypeScript type string to BridgeType
-     * @param {ts.Type} type - TypeScript type string
+     * Convert TypeScript type to Swift type string
+     * @param {ts.Type} type - TypeScript type
      * @param {ts.Node} node - Node
-     * @returns {BridgeType} Bridge type
+     * @returns {string} Swift type string
      * @private
      */
     visitType(type, node) {
@@ -392,28 +391,24 @@ export class TypeProcessor {
         }
         /**
          * @param {ts.Type} type
-         * @returns {BridgeType}
+         * @returns {string}
          */
         const convert = (type) => {
-            /** @type {Record<string, BridgeType>} */
+            /** @type {Record<string, string>} */
             const typeMap = {
-                "number": { "double": {} },
-                "string": { "string": {} },
-                "boolean": { "bool": {} },
-                "void": { "void": {} },
-                "any": { "jsObject": {} },
-                "unknown": { "jsObject": {} },
-                "null": { "void": {} },
-                "undefined": { "void": {} },
-                "bigint": { "int": {} },
-                "object": { "jsObject": {} },
-                "symbol": { "jsObject": {} },
-                "never": { "void": {} },
-                "Promise": {
-                    "jsObject": {
-                        "_0": "JSPromise"
-                    }
-                },
+                "number": "Double",
+                "string": "String",
+                "boolean": "Bool",
+                "void": "Void",
+                "any": "JSObject",
+                "unknown": "JSObject",
+                "null": "Void",
+                "undefined": "Void",
+                "bigint": "Int",
+                "object": "JSObject",
+                "symbol": "JSObject",
+                "never": "Void",
+                "Promise": "JSPromise",
             };
             const typeString = type.getSymbol()?.name ?? this.checker.typeToString(type);
             if (typeMap[typeString]) {
@@ -421,27 +416,27 @@ export class TypeProcessor {
             }
 
             if (this.checker.isArrayType(type) || this.checker.isTupleType(type) || type.getCallSignatures().length > 0) {
-                return { "jsObject": {} };
+                return "JSObject";
             }
             // "a" | "b" -> string
             if (this.checker.isTypeAssignableTo(type, this.checker.getStringType())) {
-                return { "string": {} };
+                return "String";
             }
             if (type.isTypeParameter()) {
-                return { "jsObject": {} };
+                return "JSObject";
             }
 
             const typeName = this.deriveTypeName(type);
             if (!typeName) {
                 this.diagnosticEngine.print("warning", `Unknown non-nominal type: ${typeString}`, node);
-                return { "jsObject": {} };
+                return "JSObject";
             }
             this.seenTypes.set(type, node);
-            return { "jsObject": { "_0": typeName } };
+            return this.renderIdentifier(typeName);
         }
-        const bridgeType = convert(type);
-        this.processedTypes.set(type, bridgeType);
-        return bridgeType;
+        const swiftType = convert(type);
+        this.processedTypes.set(type, swiftType);
+        return swiftType;
     }
 
     /**
@@ -471,7 +466,7 @@ export class TypeProcessor {
         const property = this.visitPropertyDecl(node);
         if (!property) return;
 
-        const type = this.renderBridgeType(property.type, node);
+        const type = property.type;
         const name = this.renderIdentifier(property.name);
 
         // Always render getter
@@ -501,7 +496,7 @@ export class TypeProcessor {
         if (!signature) return;
 
         const params = this.renderParameters(signature.getParameters(), node);
-        const returnType = this.renderBridgeType(this.visitType(signature.getReturnType(), node), node);
+        const returnType = this.visitType(signature.getReturnType(), node);
         const effects = this.renderEffects({ isAsync: false });
         const swiftName = this.renderIdentifier(name);
 
@@ -538,33 +533,12 @@ export class TypeProcessor {
     renderParameters(parameters, node) {
         const params = [];
         for (const p of parameters) {
-            const bridgeType = this.visitSignatureParameter(p, node);
+            const param = this.visitSignatureParameter(p, node);
             const paramName = this.renderIdentifier(p.name);
-            const type = this.renderBridgeType(bridgeType.type, node);
+            const type = param.type;
             params.push(`_ ${paramName}: ${type}`);
         }
         return params.join(", ");
-    }
-
-    /**
-     * Render bridge type to Swift type
-     * @param {BridgeType} bridgeType
-     * @param {ts.Node} node
-     * @returns {string}
-     * @private
-     */
-    renderBridgeType(bridgeType, node) {
-        if ("int" in bridgeType) return "Int";
-        if ("float" in bridgeType) return "Float";
-        if ("double" in bridgeType) return "Double";
-        if ("string" in bridgeType) return "String";
-        if ("bool" in bridgeType) return "Bool";
-        if ("void" in bridgeType) return "Void";
-        if ("jsObject" in bridgeType) {
-            const name = "_0" in bridgeType.jsObject ? bridgeType.jsObject._0 : undefined;
-            return name ? this.renderIdentifier(name) : "JSObject";
-        }
-        return "JSObject";
     }
 
     /**
