@@ -210,6 +210,15 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
+            TestModule["bjs_createWeirdClass"] = function bjs_createWeirdClass() {
+                try {
+                    let ret = imports.createWeirdClass();
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
             TestModule["bjs_ArrayBufferLike_byteLength_get"] = function bjs_ArrayBufferLike_byteLength_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).byteLength;
@@ -369,6 +378,28 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_WeirdNaming_as"] = function bjs_WeirdNaming_as(self) {
                 try {
                     swift.memory.getObject(self).as();
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WeirdNaming_try"] = function bjs_WeirdNaming_try(self) {
+                try {
+                    swift.memory.getObject(self).try();
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs__Weird_init"] = function bjs__Weird_init() {
+                try {
+                    return swift.memory.retain(new imports.$Weird());
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs__Weird_method_with_dashes"] = function bjs__Weird_method_with_dashes(self) {
+                try {
+                    swift.memory.getObject(self)["method-with-dashes"]();
                 } catch (error) {
                     setException(error);
                 }

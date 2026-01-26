@@ -590,12 +590,21 @@ public struct ExportedSkeleton: Codable {
 
 public struct ImportedFunctionSkeleton: Codable {
     public let name: String
+    /// The JavaScript function/method name to call, if different from `name`.
+    public let jsName: String?
     public let parameters: [Parameter]
     public let returnType: BridgeType
     public let documentation: String?
 
-    public init(name: String, parameters: [Parameter], returnType: BridgeType, documentation: String? = nil) {
+    public init(
+        name: String,
+        jsName: String? = nil,
+        parameters: [Parameter],
+        returnType: BridgeType,
+        documentation: String? = nil
+    ) {
         self.name = name
+        self.jsName = jsName
         self.parameters = parameters
         self.returnType = returnType
         self.documentation = documentation
@@ -704,6 +713,8 @@ public struct ImportedSetterSkeleton: Codable {
 
 public struct ImportedTypeSkeleton: Codable {
     public let name: String
+    /// The JavaScript constructor name to use for `init(...)`, if different from `name`.
+    public let jsName: String?
     public let constructor: ImportedConstructorSkeleton?
     public let methods: [ImportedFunctionSkeleton]
     public let getters: [ImportedGetterSkeleton]
@@ -712,6 +723,7 @@ public struct ImportedTypeSkeleton: Codable {
 
     public init(
         name: String,
+        jsName: String? = nil,
         constructor: ImportedConstructorSkeleton? = nil,
         methods: [ImportedFunctionSkeleton],
         getters: [ImportedGetterSkeleton] = [],
@@ -719,6 +731,7 @@ public struct ImportedTypeSkeleton: Codable {
         documentation: String? = nil
     ) {
         self.name = name
+        self.jsName = jsName
         self.constructor = constructor
         self.methods = methods
         self.getters = getters

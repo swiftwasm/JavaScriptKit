@@ -33,6 +33,23 @@ func _$createWeirdObject() throws(JSException) -> WeirdNaming {
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs_createWeirdClass")
+fileprivate func bjs_createWeirdClass() -> Int32
+#else
+fileprivate func bjs_createWeirdClass() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$createWeirdClass() throws(JSException) -> _Weird {
+    let ret = bjs_createWeirdClass()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return _Weird.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "Check", name: "bjs_ArrayBufferLike_byteLength_get")
 fileprivate func bjs_ArrayBufferLike_byteLength_get(_ self: Int32) -> Float64
 #else
@@ -223,6 +240,15 @@ fileprivate func bjs_WeirdNaming_as(_ self: Int32) -> Void {
 }
 #endif
 
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs_WeirdNaming_try")
+fileprivate func bjs_WeirdNaming_try(_ self: Int32) -> Void
+#else
+fileprivate func bjs_WeirdNaming_try(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 func _$WeirdNaming_normalProperty_get(_ self: JSObject) throws(JSException) -> String {
     let selfValue = self.bridgeJSLowerParameter()
     let ret = bjs_WeirdNaming_normalProperty_get(selfValue)
@@ -370,6 +396,48 @@ func _$WeirdNaming_any_set(_ self: JSObject, _ newValue: String) throws(JSExcept
 func _$WeirdNaming_as(_ self: JSObject) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
     bjs_WeirdNaming_as(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$WeirdNaming_try(_ self: JSObject) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_WeirdNaming_try(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs__Weird_init")
+fileprivate func bjs__Weird_init() -> Int32
+#else
+fileprivate func bjs__Weird_init() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "Check", name: "bjs__Weird_method_with_dashes")
+fileprivate func bjs__Weird_method_with_dashes(_ self: Int32) -> Void
+#else
+fileprivate func bjs__Weird_method_with_dashes(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$_Weird_init() throws(JSException) -> JSObject {
+    let ret = bjs__Weird_init()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$_Weird_method_with_dashes(_ self: JSObject) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs__Weird_method_with_dashes(selfValue)
     if let error = _swift_js_take_exception() {
         throw error
     }

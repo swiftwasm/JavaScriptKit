@@ -33,4 +33,15 @@
     @JSGetter var `Any`: String
     @JSSetter(jsName: "Any") func setAny(_ value: String) throws (JSException)
     @JSFunction func `as`() throws (JSException) -> Void
+    @JSFunction func `try`() throws (JSException) -> Void
+}
+
+@JSClass(jsName: "$Weird") struct _Weird {
+    @JSFunction init() throws (JSException)
+    @JSFunction(jsName: "method-with-dashes") func method_with_dashes() throws (JSException) -> Void
+}
+
+@JSFunction func createWeirdClass() throws (JSException) -> _Weird
+
+@JSClass(jsName: "$Weird") struct _Weird {
 }

@@ -60,6 +60,33 @@ export class TypeProcessor {
 
         /** @type {Set<string>} */
         this.visitedDeclarationKeys = new Set();
+
+        /** @type {Map<string, string>} */
+        this.swiftTypeNameByJSTypeName = new Map();
+    }
+
+    /**
+     * Convert a TypeScript type name to a valid Swift type identifier.
+     * @param {string} jsTypeName
+     * @returns {string}
+     * @private
+     */
+    swiftTypeName(jsTypeName) {
+        const cached = this.swiftTypeNameByJSTypeName.get(jsTypeName);
+        if (cached) return cached;
+        const swiftName = isValidSwiftDeclName(jsTypeName) ? jsTypeName : makeValidSwiftIdentifier(jsTypeName, { emptyFallback: "_" });
+        this.swiftTypeNameByJSTypeName.set(jsTypeName, swiftName);
+        return swiftName;
+    }
+
+    /**
+     * Render a Swift type identifier from a TypeScript type name.
+     * @param {string} jsTypeName
+     * @returns {string}
+     * @private
+     */
+    renderTypeIdentifier(jsTypeName) {
+        return this.renderIdentifier(this.swiftTypeName(jsTypeName));
     }
 
     /**
@@ -292,7 +319,7 @@ export class TypeProcessor {
             canBeStringEnum = false;
             canBeIntEnum = false;
         }
-        const swiftEnumName = this.renderIdentifier(enumName);
+        const swiftEnumName = this.renderTypeIdentifier(enumName);
         const dedupeNames = (items) => {
             const seen = new Map();
             return items.map(item => {
@@ -341,10 +368,10 @@ export class TypeProcessor {
      */
     visitFunctionDeclaration(node) {
         if (!node.name) return;
-        const name = node.name.getText();
-        if (!isValidSwiftDeclName(name)) {
-            return;
-        }
+        const jsName = node.name.text;
+        const swiftName = this.swiftTypeName(jsName);
+        const escapedJSName = jsName.replaceAll("\\", "\\\\").replaceAll("\"", "\\\\\"");
+        const annotation = jsName !== swiftName ? `@JSFunction(jsName: "${escapedJSName}")` : "@JSFunction";
 
         const signature = this.checker.getSignatureFromDeclaration(node);
         if (!signature) return;
@@ -352,9 +379,9 @@ export class TypeProcessor {
         const params = this.renderParameters(signature.getParameters(), node);
         const returnType = this.visitType(signature.getReturnType(), node);
         const effects = this.renderEffects({ isAsync: false });
-        const swiftName = this.renderIdentifier(name);
+        const swiftFuncName = this.renderIdentifier(swiftName);
 
-        this.swiftLines.push(`@JSFunction func ${swiftName}(${params}) ${effects} -> ${returnType}`);
+        this.swiftLines.push(`${annotation} func ${swiftFuncName}(${params}) ${effects} -> ${returnType}`);
         this.swiftLines.push("");
     }
 
@@ -433,8 +460,12 @@ export class TypeProcessor {
     visitClassDecl(node) {
         if (!node.name) return;
 
-        const className = this.renderIdentifier(node.name.text);
-        this.swiftLines.push(`@JSClass struct ${className} {`);
+        const jsName = node.name.text;
+        const swiftName = this.swiftTypeName(jsName);
+        const escapedJSName = jsName.replaceAll("\\", "\\\\").replaceAll("\"", "\\\\\"");
+        const annotation = jsName !== swiftName ? `@JSClass(jsName: "${escapedJSName}")` : "@JSClass";
+        const className = this.renderIdentifier(swiftName);
+        this.swiftLines.push(`${annotation} struct ${className} {`);
 
         // Process members in declaration order
         for (const member of node.members) {
@@ -491,8 +522,11 @@ export class TypeProcessor {
         if (this.emittedStructuredTypeNames.has(name)) return;
         this.emittedStructuredTypeNames.add(name);
 
-        const typeName = this.renderIdentifier(name);
-        this.swiftLines.push(`@JSClass struct ${typeName} {`);
+        const swiftName = this.swiftTypeName(name);
+        const escapedJSName = name.replaceAll("\\", "\\\\").replaceAll("\"", "\\\\\"");
+        const annotation = name !== swiftName ? `@JSClass(jsName: "${escapedJSName}")` : "@JSClass";
+        const typeName = this.renderIdentifier(swiftName);
+        this.swiftLines.push(`${annotation} struct ${typeName} {`);
 
         // Collect all declarations with their positions to preserve order
         /** @type {Array<{ decl: ts.Node, symbol: ts.Symbol, position: number }>} */
@@ -578,7 +612,7 @@ export class TypeProcessor {
             if (symbol && (symbol.flags & ts.SymbolFlags.Enum) !== 0) {
                 const typeName = symbol.name;
                 this.seenTypes.set(type, node);
-                return this.renderIdentifier(typeName);
+                return this.renderTypeIdentifier(typeName);
             }
 
             if (this.checker.isArrayType(type) || this.checker.isTupleType(type) || type.getCallSignatures().length > 0) {
@@ -598,7 +632,7 @@ export class TypeProcessor {
                 return "JSObject";
             }
             this.seenTypes.set(type, node);
-            return this.renderIdentifier(typeName);
+            return this.renderTypeIdentifier(typeName);
         }
         const swiftType = convert(type);
         this.processedTypes.set(type, swiftType);
@@ -659,8 +693,21 @@ export class TypeProcessor {
      */
     renderMethod(node) {
         if (!node.name) return;
-        const name = node.name.getText();
-        if (!isValidSwiftDeclName(name)) return;
+        /** @type {string | null} */
+        let jsName = null;
+        if (ts.isIdentifier(node.name)) {
+            jsName = node.name.text;
+        } else if (ts.isStringLiteral(node.name) || ts.isNumericLiteral(node.name)) {
+            jsName = node.name.text;
+        } else {
+            // Computed property names like `[Symbol.iterator]` are not supported yet.
+            return;
+        }
+
+        const swiftName = this.swiftTypeName(jsName);
+        const needsJSNameField = jsName !== swiftName;
+        const escapedJSName = jsName.replaceAll("\\", "\\\\").replaceAll("\"", "\\\\\"");
+        const annotation = needsJSNameField ? `@JSFunction(jsName: "${escapedJSName}")` : "@JSFunction";
 
         const signature = this.checker.getSignatureFromDeclaration(node);
         if (!signature) return;
@@ -668,9 +715,9 @@ export class TypeProcessor {
         const params = this.renderParameters(signature.getParameters(), node);
         const returnType = this.visitType(signature.getReturnType(), node);
         const effects = this.renderEffects({ isAsync: false });
-        const swiftName = this.renderIdentifier(name);
+        const swiftMethodName = this.renderIdentifier(swiftName);
 
-        this.swiftLines.push(`    @JSFunction func ${swiftName}(${params}) ${effects} -> ${returnType}`);
+        this.swiftLines.push(`    ${annotation} func ${swiftMethodName}(${params}) ${effects} -> ${returnType}`);
     }
 
     /**
