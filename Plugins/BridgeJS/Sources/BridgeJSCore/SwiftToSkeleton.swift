@@ -25,6 +25,13 @@ public final class SwiftToSkeleton {
         self.moduleName = moduleName
         self.exposeToGlobal = exposeToGlobal
         self.typeDeclResolver = TypeDeclResolver()
+
+        // Index known types provided by JavaScriptKit
+        self.typeDeclResolver.addSourceFile(
+            """
+            @JSClass struct JSPromise {}
+            """
+        )
     }
 
     public func addSourceFile(_ sourceFile: SourceFileSyntax, inputFilePath: String) {

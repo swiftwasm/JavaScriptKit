@@ -7,6 +7,13 @@
 export type Exports = {
 }
 export type Imports = {
+    asyncReturnVoid(): JSPromise;
+    asyncRoundTripInt(v: number): JSPromise;
+    asyncRoundTripString(v: string): JSPromise;
+    asyncRoundTripBool(v: boolean): JSPromise;
+    asyncRoundTripFloat(v: number): JSPromise;
+    asyncRoundTripDouble(v: number): JSPromise;
+    asyncRoundTripJSObject(v: any): JSPromise;
 }
 export function createInstantiator(options: {
     imports: Imports;
