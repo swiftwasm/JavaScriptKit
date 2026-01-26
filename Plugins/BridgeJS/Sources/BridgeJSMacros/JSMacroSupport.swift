@@ -5,6 +5,7 @@ import SwiftDiagnostics
 
 enum JSMacroMessage: String, DiagnosticMessage {
     case unsupportedDeclaration = "@JSFunction can only be applied to functions or initializers."
+    case unsupportedJSClassDeclaration = "@JSClass can only be applied to structs."
     case unsupportedVariable = "@JSGetter can only be applied to single-variable declarations."
     case unsupportedSetterDeclaration = "@JSSetter can only be applied to functions."
     case invalidSetterName =

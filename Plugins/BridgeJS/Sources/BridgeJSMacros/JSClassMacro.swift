@@ -12,6 +12,13 @@ extension JSClassMacro: MemberMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
+        guard declaration.is(StructDeclSyntax.self) else {
+            context.diagnose(
+                Diagnostic(node: Syntax(declaration), message: JSMacroMessage.unsupportedJSClassDeclaration)
+            )
+            return []
+        }
+
         var members: [DeclSyntax] = []
 
         let existingMembers = declaration.memberBlock.members
@@ -59,6 +66,7 @@ extension JSClassMacro: ExtensionMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
+        guard declaration.is(StructDeclSyntax.self) else { return [] }
         guard !protocols.isEmpty else { return [] }
 
         let conformanceList = protocols.map { $0.trimmed.description }.joined(separator: ", ")
