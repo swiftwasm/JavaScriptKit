@@ -538,17 +538,5 @@
 
     ]
   },
-  "imported" : {
-    "children" : [
-      {
-        "functions" : [
-
-        ],
-        "types" : [
-
-        ]
-      }
-    ]
-  },
   "moduleName" : "BridgeJSGlobalTests"
 }

@@ -125,13 +125,11 @@ import BridgeJSUtilities
             }
 
             let inputFiles = inputSwiftFiles(targetDirectory: targetDirectory, positionalArguments: positionalArguments)
-            let exporter = ExportSwift(
+            let swiftToSkeleton = SwiftToSkeleton(
                 progress: progress,
                 moduleName: moduleName,
                 exposeToGlobal: config.exposeToGlobal
             )
-            let importSwift = ImportSwiftMacros(progress: progress, moduleName: moduleName)
-
             for inputFile in inputFiles.sorted() {
                 let content = try String(contentsOf: URL(fileURLWithPath: inputFile), encoding: .utf8)
                 if hasBridgeJSSkipComment(content) {
@@ -139,17 +137,30 @@ import BridgeJSUtilities
                 }
 
                 let sourceFile = Parser.parse(source: content)
-                try exporter.addSourceFile(sourceFile, inputFile)
-                importSwift.addSourceFile(sourceFile, inputFile)
+                swiftToSkeleton.addSourceFile(sourceFile, inputFilePath: inputFile)
             }
 
-            let importResult = try importSwift.finalize()
-            let exportResult = try exporter.finalize()
-            let importSkeleton = importResult.outputSkeleton
+            let skeleton = try swiftToSkeleton.finalize()
+
+            var exporter: ExportSwift?
+            if let skeleton = skeleton.exported {
+                exporter = ExportSwift(
+                    progress: progress,
+                    moduleName: moduleName,
+                    skeleton: skeleton
+                )
+            }
+            var importer: ImportTS?
+            if let skeleton = skeleton.imported {
+                importer = ImportTS(progress: progress, moduleName: moduleName, skeleton: skeleton)
+            }
+
+            let importResult = try importer?.finalize()
+            let exportResult = try exporter?.finalize()
 
             // Combine and write unified Swift output
             let outputSwiftURL = outputDirectory.appending(path: "BridgeJS.swift")
-            let combinedSwift = [exportResult?.outputSwift, importResult.outputSwift].compactMap { $0 }
+            let combinedSwift = [exportResult, importResult].compactMap { $0 }
             let outputSwift = combineGeneratedSwift(combinedSwift)
             let shouldWrite = doubleDashOptions["always-write"] == "true" || !outputSwift.isEmpty
             if shouldWrite {
@@ -163,11 +174,6 @@ import BridgeJSUtilities
 
             // Write unified skeleton
             let outputSkeletonURL = outputDirectory.appending(path: "JavaScript/BridgeJS.json")
-            let unifiedSkeleton = BridgeJSSkeleton(
-                moduleName: moduleName,
-                exported: exportResult?.outputSkeleton,
-                imported: importSkeleton
-            )
             try FileManager.default.createDirectory(
                 at: outputSkeletonURL.deletingLastPathComponent(),
                 withIntermediateDirectories: true,
@@ -175,10 +181,10 @@ import BridgeJSUtilities
             )
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            let skeletonData = try encoder.encode(unifiedSkeleton)
+            let skeletonData = try encoder.encode(skeleton)
             try skeletonData.write(to: outputSkeletonURL)
 
-            if exportResult != nil || importResult.outputSwift != nil {
+            if skeleton.exported != nil || skeleton.imported != nil {
                 progress.print("Generated BridgeJS code")
             }
         case "export", "import":

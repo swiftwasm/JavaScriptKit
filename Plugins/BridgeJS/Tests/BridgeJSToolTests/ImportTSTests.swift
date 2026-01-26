@@ -37,11 +37,14 @@ import SwiftParser
         )
 
         let sourceFile = Parser.parse(source: swiftSource)
-        let importSwift = ImportSwiftMacros(progress: .silent, moduleName: "Check")
-        importSwift.addSourceFile(sourceFile, "\(name).Macros.swift")
-        let importResult = try importSwift.finalize()
+        let importSwift = SwiftToSkeleton(progress: .silent, moduleName: "Check", exposeToGlobal: false)
+        importSwift.addSourceFile(sourceFile, inputFilePath: "\(name).Macros.swift")
+        let skeleton = try importSwift.finalize()
 
-        let outputSwift = try #require(importResult.outputSwift)
+        guard let imported = skeleton.imported else { return }
+
+        let importTS = ImportTS(progress: .silent, moduleName: "Check", skeleton: imported)
+        let outputSwift = try #require(try importTS.finalize())
         try assertSnapshot(
             name: name,
             filePath: #filePath,

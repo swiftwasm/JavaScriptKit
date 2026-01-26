@@ -21,15 +21,10 @@ public struct ImportTS {
     public private(set) var skeleton: ImportedModuleSkeleton
     private let moduleName: String
 
-    public init(progress: ProgressReporting, moduleName: String) {
+    public init(progress: ProgressReporting, moduleName: String, skeleton: ImportedModuleSkeleton) {
         self.progress = progress
         self.moduleName = moduleName
-        self.skeleton = ImportedModuleSkeleton(children: [])
-    }
-
-    /// Adds a skeleton to the importer's state
-    public mutating func addSkeleton(_ skeleton: ImportedFileSkeleton) {
-        self.skeleton.children.append(skeleton)
+        self.skeleton = skeleton
     }
 
     /// Finalizes the import process and generates Swift code

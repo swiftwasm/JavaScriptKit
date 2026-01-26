@@ -57,15 +57,13 @@ import Testing
     func snapshotExport(input: String) throws {
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
-        try swiftAPI.addSourceFile(sourceFile, input)
+        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        swiftAPI.addSourceFile(sourceFile, inputFilePath: input)
         let name = url.deletingPathExtension().lastPathComponent
 
-        let (_, outputSkeleton) = try #require(try swiftAPI.finalize())
+        let outputSkeleton = try swiftAPI.finalize()
         let bridgeJSLink: BridgeJSLink = BridgeJSLink(
-            skeletons: [
-                BridgeJSSkeleton(moduleName: "TestModule", exported: outputSkeleton)
-            ],
+            skeletons: [outputSkeleton],
             sharedMemory: false
         )
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Export")
@@ -86,27 +84,13 @@ import Testing
         )
 
         let sourceFile = Parser.parse(source: swiftSource)
-        let importSwift = ImportSwiftMacros(progress: .silent, moduleName: "TestModule")
-        importSwift.addSourceFile(sourceFile, "\(name).Macros.swift")
-        let importResult = try importSwift.finalize()
-
-        var importTS = ImportTS(progress: .silent, moduleName: "TestModule")
-        for child in importResult.outputSkeleton.children {
-            importTS.addSkeleton(child)
-        }
-        let importSkeleton = importTS.skeleton
-
-        var bridgeJSLink = BridgeJSLink(sharedMemory: false)
-        // Create unified skeleton for test
-        let unifiedSkeleton = BridgeJSSkeleton(
-            moduleName: "TestModule",
-            exported: nil,
-            imported: importSkeleton
+        let importSwift = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        importSwift.addSourceFile(sourceFile, inputFilePath: "\(name).Macros.swift")
+        let skeleton = try importSwift.finalize()
+        let bridgeJSLink = BridgeJSLink(
+            skeletons: [skeleton],
+            sharedMemory: false
         )
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        let unifiedData = try encoder.encode(unifiedSkeleton)
-        try bridgeJSLink.addSkeletonFile(data: unifiedData)
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Import")
     }
 
@@ -116,25 +100,13 @@ import Testing
         let name = url.deletingPathExtension().lastPathComponent
 
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let importSwift = ImportSwiftMacros(progress: .silent, moduleName: "TestModule")
-        importSwift.addSourceFile(sourceFile, "\(name).swift")
+        let importSwift = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        importSwift.addSourceFile(sourceFile, inputFilePath: "\(name).swift")
         let importResult = try importSwift.finalize()
-
-        var importTS = ImportTS(progress: .silent, moduleName: "TestModule")
-        for child in importResult.outputSkeleton.children {
-            importTS.addSkeleton(child)
-        }
-        let importSkeleton = importTS.skeleton
-
         var bridgeJSLink = BridgeJSLink(sharedMemory: false)
-        let unifiedSkeleton = BridgeJSSkeleton(
-            moduleName: "TestModule",
-            exported: nil,
-            imported: importSkeleton
-        )
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        let unifiedData = try encoder.encode(unifiedSkeleton)
+        let unifiedData = try encoder.encode(importResult)
         try bridgeJSLink.addSkeletonFile(data: unifiedData)
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".ImportMacros")
     }
@@ -148,13 +120,13 @@ import Testing
     func snapshotExportWithGlobal(inputFile: String) throws {
         let url = Self.inputsDirectory.appendingPathComponent(inputFile)
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let swiftAPI = ExportSwift(progress: .silent, moduleName: "TestModule", exposeToGlobal: true)
-        try swiftAPI.addSourceFile(sourceFile, inputFile)
+        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: true)
+        swiftAPI.addSourceFile(sourceFile, inputFilePath: inputFile)
         let name = url.deletingPathExtension().lastPathComponent
-        let (_, outputSkeleton) = try #require(try swiftAPI.finalize())
+        let outputSkeleton = try swiftAPI.finalize()
         let bridgeJSLink: BridgeJSLink = BridgeJSLink(
             skeletons: [
-                BridgeJSSkeleton(moduleName: "TestModule", exported: outputSkeleton)
+                outputSkeleton
             ],
             sharedMemory: false
         )
@@ -165,20 +137,20 @@ import Testing
     func snapshotMixedModuleExposure() throws {
         let globalURL = Self.inputsDirectory.appendingPathComponent("MixedGlobal.swift")
         let globalSourceFile = Parser.parse(source: try String(contentsOf: globalURL, encoding: .utf8))
-        let globalAPI = ExportSwift(progress: .silent, moduleName: "GlobalModule", exposeToGlobal: true)
-        try globalAPI.addSourceFile(globalSourceFile, "MixedGlobal.swift")
-        let (_, globalSkeleton) = try #require(try globalAPI.finalize())
+        let globalAPI = SwiftToSkeleton(progress: .silent, moduleName: "GlobalModule", exposeToGlobal: true)
+        globalAPI.addSourceFile(globalSourceFile, inputFilePath: "MixedGlobal.swift")
+        let globalSkeleton = try globalAPI.finalize()
 
         let privateURL = Self.inputsDirectory.appendingPathComponent("MixedPrivate.swift")
         let privateSourceFile = Parser.parse(source: try String(contentsOf: privateURL, encoding: .utf8))
-        let privateAPI = ExportSwift(progress: .silent, moduleName: "PrivateModule", exposeToGlobal: false)
-        try privateAPI.addSourceFile(privateSourceFile, "MixedPrivate.swift")
-        let (_, privateSkeleton) = try #require(try privateAPI.finalize())
+        let privateAPI = SwiftToSkeleton(progress: .silent, moduleName: "PrivateModule", exposeToGlobal: false)
+        privateAPI.addSourceFile(privateSourceFile, inputFilePath: "MixedPrivate.swift")
+        let privateSkeleton = try privateAPI.finalize()
 
         let bridgeJSLink = BridgeJSLink(
             skeletons: [
-                BridgeJSSkeleton(moduleName: "GlobalModule", exported: globalSkeleton),
-                BridgeJSSkeleton(moduleName: "PrivateModule", exported: privateSkeleton),
+                globalSkeleton,
+                privateSkeleton,
             ],
             sharedMemory: false
         )

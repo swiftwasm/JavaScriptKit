@@ -548,11 +548,11 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
 }
 
 public struct ExportedSkeleton: Codable {
-    public let functions: [ExportedFunction]
-    public let classes: [ExportedClass]
-    public let enums: [ExportedEnum]
-    public let structs: [ExportedStruct]
-    public let protocols: [ExportedProtocol]
+    public var functions: [ExportedFunction]
+    public var classes: [ExportedClass]
+    public var enums: [ExportedEnum]
+    public var structs: [ExportedStruct]
+    public var protocols: [ExportedProtocol]
     /// Whether to expose exported APIs to the global namespace.
     ///
     /// When `true`, exported functions, classes, and namespaces are available
@@ -574,6 +574,15 @@ public struct ExportedSkeleton: Codable {
         self.structs = structs
         self.protocols = protocols
         self.exposeToGlobal = exposeToGlobal
+    }
+
+    public mutating func append(_ other: ExportedSkeleton) {
+        self.functions.append(contentsOf: other.functions)
+        self.classes.append(contentsOf: other.classes)
+        self.enums.append(contentsOf: other.enums)
+        self.structs.append(contentsOf: other.structs)
+        self.protocols.append(contentsOf: other.protocols)
+        assert(self.exposeToGlobal == other.exposeToGlobal)
     }
 }
 
