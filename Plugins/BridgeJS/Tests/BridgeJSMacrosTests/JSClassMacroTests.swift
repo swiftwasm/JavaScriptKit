@@ -153,16 +153,15 @@ import BridgeJSMacros
             """,
             expandedSource: """
                 class MyClass {
-                    let jsObject: JSObject
-
-                    init(unsafelyWrapping jsObject: JSObject) {
-                        self.jsObject = jsObject
-                    }
-                }
-
-                extension MyClass: _JSBridgedClass {
                 }
                 """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "@JSClass can only be applied to structs.",
+                    line: 1,
+                    column: 1
+                )
+            ],
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
@@ -177,16 +176,15 @@ import BridgeJSMacros
             """,
             expandedSource: """
                 enum MyEnum {
-                    let jsObject: JSObject
-
-                    init(unsafelyWrapping jsObject: JSObject) {
-                        self.jsObject = jsObject
-                    }
-                }
-
-                extension MyEnum: _JSBridgedClass {
                 }
                 """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "@JSClass can only be applied to structs.",
+                    line: 1,
+                    column: 1
+                )
+            ],
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
@@ -201,16 +199,15 @@ import BridgeJSMacros
             """,
             expandedSource: """
                 actor MyActor {
-                    let jsObject: JSObject
-
-                    init(unsafelyWrapping jsObject: JSObject) {
-                        self.jsObject = jsObject
-                    }
-                }
-
-                extension MyActor: _JSBridgedClass {
                 }
                 """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "@JSClass can only be applied to structs.",
+                    line: 1,
+                    column: 1
+                )
+            ],
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth
         )
