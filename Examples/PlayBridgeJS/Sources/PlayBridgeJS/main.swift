@@ -18,22 +18,27 @@ import class Foundation.JSONDecoder
 
     func _update(swiftSource: String, dtsSource: String) throws -> PlayBridgeJSOutput {
         let moduleName = "Playground"
-        let exportSwift = ExportSwift(progress: .silent, moduleName: moduleName, exposeToGlobal: false)
-        let sourceFile = Parser.parse(source: swiftSource)
-        try exportSwift.addSourceFile(sourceFile, "Playground.swift")
-        let exportResult = try exportSwift.finalize()
+
+        let swiftToSkeleton = SwiftToSkeleton(progress: .silent, moduleName: moduleName, exposeToGlobal: false)
+        swiftToSkeleton.addSourceFile(Parser.parse(source: swiftSource), inputFilePath: "Playground.swift")
+
         let ts2swift = try createTS2Swift()
         let importSwiftMacroDecls = try ts2swift.convert(dtsSource)
-        let importSwift = ImportSwiftMacros(progress: .silent, moduleName: moduleName)
-        let importSourceFile = Parser.parse(source: importSwiftMacroDecls)
-        importSwift.addSourceFile(importSourceFile, "Playground.Macros.swift")
-        importSwift.addSourceFile(sourceFile, "Playground.swift")
-        let importResult = try importSwift.finalize()
-        let skeleton = BridgeJSSkeleton(
-            moduleName: moduleName,
-            exported: exportResult.map { $0.outputSkeleton },
-            imported: importResult.outputSkeleton
+        swiftToSkeleton.addSourceFile(
+            Parser.parse(source: importSwiftMacroDecls),
+            inputFilePath: "Playground.Macros.swift"
         )
+
+        let skeleton = try swiftToSkeleton.finalize()
+
+        let exportResult = try skeleton.exported.flatMap {
+            let exportSwift = ExportSwift(progress: .silent, moduleName: moduleName, skeleton: $0)
+            return try exportSwift.finalize()
+        }
+        let importResult = try skeleton.imported.flatMap {
+            let importTS = ImportTS(progress: .silent, moduleName: moduleName, skeleton: $0)
+            return try importTS.finalize()
+        }
         let linker = BridgeJSLink(skeletons: [skeleton], sharedMemory: false)
         let linked = try linker.link()
 
@@ -41,7 +46,7 @@ import class Foundation.JSONDecoder
             outputJs: linked.outputJs,
             outputDts: linked.outputDts,
             importSwiftMacroDecls: importSwiftMacroDecls,
-            swiftGlue: (importResult.outputSwift ?? "") + "\n\n" + (exportResult?.outputSwift ?? "")
+            swiftGlue: (importResult ?? "") + "\n\n" + (exportResult ?? "")
         )
     }
 }
