@@ -461,6 +461,9 @@ export class TypeProcessor {
         if (!node.name) return;
 
         const jsName = node.name.text;
+        if (this.emittedStructuredTypeNames.has(jsName)) return;
+        this.emittedStructuredTypeNames.add(jsName);
+
         const swiftName = this.swiftTypeName(jsName);
         const escapedJSName = jsName.replaceAll("\\", "\\\\").replaceAll("\"", "\\\\\"");
         const annotation = jsName !== swiftName ? `@JSClass(jsName: "${escapedJSName}")` : "@JSClass";

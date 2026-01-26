@@ -42,6 +42,3 @@
 }
 
 @JSFunction func createWeirdClass() throws (JSException) -> _Weird
-
-@JSClass(jsName: "$Weird") struct _Weird {
-}

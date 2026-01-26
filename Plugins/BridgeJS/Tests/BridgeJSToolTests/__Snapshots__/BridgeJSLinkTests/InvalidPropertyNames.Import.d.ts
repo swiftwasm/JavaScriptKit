@@ -23,8 +23,6 @@ export interface WeirdNaming {
 export interface _Weird {
     "method-with-dashes"(): void;
 }
-export interface _Weird {
-}
 export type Exports = {
 }
 export type Imports = {
