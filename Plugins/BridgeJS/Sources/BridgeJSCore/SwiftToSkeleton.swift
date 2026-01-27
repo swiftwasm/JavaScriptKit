@@ -1947,7 +1947,14 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     private func enterJSClass(_ typeName: String, jsName: String?) {
         stateStack.append(.jsClassBody(name: typeName))
-        currentType = CurrentType(name: typeName, jsName: jsName, constructor: nil, methods: [], getters: [], setters: [])
+        currentType = CurrentType(
+            name: typeName,
+            jsName: jsName,
+            constructor: nil,
+            methods: [],
+            getters: [],
+            setters: []
+        )
     }
 
     private func exitJSClass() {

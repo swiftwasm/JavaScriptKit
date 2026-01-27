@@ -2242,7 +2242,8 @@ extension BridgeJSLink {
         }
 
         private static func propertyAccessExpr(objectExpr: String, propertyName: String) -> String {
-            if propertyName.range(of: #"^[$A-Z_][0-9A-Z_$]*$"#, options: [.regularExpression, .caseInsensitive]) != nil {
+            if propertyName.range(of: #"^[$A-Z_][0-9A-Z_$]*$"#, options: [.regularExpression, .caseInsensitive]) != nil
+            {
                 return "\(objectExpr).\(propertyName)"
             }
             let escapedName = BridgeJSLink.escapeForJavaScriptStringLiteral(propertyName)
