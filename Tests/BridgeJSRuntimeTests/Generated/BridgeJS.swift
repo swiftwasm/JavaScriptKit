@@ -6450,6 +6450,23 @@ func _$runAsyncWorks() throws(JSException) -> JSPromise {
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs__jsWeirdFunction")
+fileprivate func bjs__jsWeirdFunction() -> Float64
+#else
+fileprivate func bjs__jsWeirdFunction() -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$_jsWeirdFunction() throws(JSException) -> Double {
+    let ret = bjs__jsWeirdFunction()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_init")
 fileprivate func bjs_JsGreeter_init(_ name: Int32, _ prefix: Int32) -> Int32
 #else
@@ -6556,6 +6573,41 @@ func _$JsGreeter_changeName(_ self: JSObject, _ name: String) throws(JSException
     if let error = _swift_js_take_exception() {
         throw error
     }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs__WeirdClass_init")
+fileprivate func bjs__WeirdClass_init() -> Int32
+#else
+fileprivate func bjs__WeirdClass_init() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs__WeirdClass_method_with_dashes")
+fileprivate func bjs__WeirdClass_method_with_dashes(_ self: Int32) -> Int32
+#else
+fileprivate func bjs__WeirdClass_method_with_dashes(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$_WeirdClass_init() throws(JSException) -> JSObject {
+    let ret = bjs__WeirdClass_init()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$_WeirdClass_method_with_dashes(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs__WeirdClass_method_with_dashes(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
 }
 
 #if arch(wasm32)

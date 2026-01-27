@@ -50,6 +50,9 @@ export async function setupOptions(options, context) {
                 "jsRoundTripFeatureFlag": (flag) => {
                     return flag;
                 },
+                "$jsWeirdFunction": () => {
+                    return 42;
+                },
                 JsGreeter: class {
                     /**
                      * @param {string} name
@@ -65,6 +68,13 @@ export async function setupOptions(options, context) {
                     /** @param {string} name */
                     changeName(name) {
                         this.name = name;
+                    }
+                },
+                $WeirdClass: class {
+                    constructor() {
+                    }
+                    ["method-with-dashes"]() {
+                        return "ok";
                     }
                 },
                 Foo: ImportedFoo,

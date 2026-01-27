@@ -120,4 +120,11 @@ class ImportAPITests: XCTestCase {
         XCTAssertEqual(ret, 5)
         XCTAssertEqual(total, 10)
     }
+
+    func testJSNameFunctionAndClass() throws {
+        XCTAssertEqual(try _jsWeirdFunction(), 42)
+
+        let obj = try _WeirdClass()
+        XCTAssertEqual(try obj.method_with_dashes(), "ok")
+    }
 }

@@ -9155,6 +9155,18 @@
                 "_0" : "JSPromise"
               }
             }
+          },
+          {
+            "jsName" : "$jsWeirdFunction",
+            "name" : "_jsWeirdFunction",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "double" : {
+
+              }
+            }
           }
         ],
         "types" : [
@@ -9239,6 +9251,35 @@
                   }
                 }
               }
+            ]
+          },
+          {
+            "constructor" : {
+              "parameters" : [
+
+              ]
+            },
+            "getters" : [
+
+            ],
+            "jsName" : "$WeirdClass",
+            "methods" : [
+              {
+                "jsName" : "method-with-dashes",
+                "name" : "method_with_dashes",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "_WeirdClass",
+            "setters" : [
+
             ]
           }
         ]
