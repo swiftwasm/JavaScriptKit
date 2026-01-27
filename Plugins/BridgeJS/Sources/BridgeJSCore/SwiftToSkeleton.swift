@@ -157,6 +157,36 @@ public final class SwiftToSkeleton {
                 return .optional(wrappedType)
             }
         }
+        // [T]
+        if let arrayType = type.as(ArrayTypeSyntax.self) {
+            if let elementType = lookupType(for: arrayType.element, errors: &errors) {
+                return .array(elementType)
+            }
+        }
+        // Array<T>
+        if let identifierType = type.as(IdentifierTypeSyntax.self),
+            identifierType.name.text == "Array",
+            let genericArgs = identifierType.genericArgumentClause?.arguments,
+            genericArgs.count == 1,
+            let argType = TypeSyntax(genericArgs.first?.argument)
+        {
+            if let elementType = lookupType(for: argType, errors: &errors) {
+                return .array(elementType)
+            }
+        }
+        // Swift.Array<T>
+        if let memberType = type.as(MemberTypeSyntax.self),
+            let baseType = memberType.baseType.as(IdentifierTypeSyntax.self),
+            baseType.name.text == "Swift",
+            memberType.name.text == "Array",
+            let genericArgs = memberType.genericArgumentClause?.arguments,
+            genericArgs.count == 1,
+            let argType = TypeSyntax(genericArgs.first?.argument)
+        {
+            if let elementType = lookupType(for: argType, errors: &errors) {
+                return .array(elementType)
+            }
+        }
         if let aliasDecl = typeDeclResolver.resolveTypeAlias(type) {
             if let resolvedType = lookupType(for: aliasDecl.initializer.value, errors: &errors) {
                 return resolvedType
@@ -479,7 +509,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         let expression = initClause.value
 
         // Function calls are checked later in extractDefaultValue (as constructors are allowed)
-        if expression.is(ArrayExprSyntax.self) { return false }
+        // Array literals are allowed but checked in extractArrayDefaultValue
         if expression.is(DictionaryExprSyntax.self) { return false }
         if expression.is(BinaryOperatorExprSyntax.self) { return false }
         if expression.is(ClosureExprSyntax.self) { return false }
@@ -573,6 +603,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
 
         if let funcCall = expr.as(FunctionCallExprSyntax.self) {
             return extractConstructorDefaultValue(from: funcCall, type: type)
+        }
+
+        if let arrayExpr = expr.as(ArrayExprSyntax.self) {
+            return extractArrayDefaultValue(from: arrayExpr, type: type)
         }
 
         if let literalValue = extractLiteralValue(from: expr, type: type) {
@@ -733,6 +767,43 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         }
 
         return nil
+    }
+
+    /// Extracts default value from an array literal expression
+    private func extractArrayDefaultValue(
+        from arrayExpr: ArrayExprSyntax,
+        type: BridgeType
+    ) -> DefaultValue? {
+        // Verify the type is an array type
+        let elementType: BridgeType?
+        switch type {
+        case .array(let element):
+            elementType = element
+        case .optional(.array(let element)):
+            elementType = element
+        default:
+            diagnose(
+                node: arrayExpr,
+                message: "Array literal is only valid for array parameters",
+                hint: "Parameter type should be an array like [Int] or [String]"
+            )
+            return nil
+        }
+
+        var elements: [DefaultValue] = []
+        for element in arrayExpr.elements {
+            guard let elementValue = extractLiteralValue(from: element.expression, type: elementType) else {
+                diagnose(
+                    node: element.expression,
+                    message: "Array element must be a literal value",
+                    hint: "Use simple literals like \"text\", 42, true, false in array elements"
+                )
+                return nil
+            }
+            elements.append(elementValue)
+        }
+
+        return .array(elements)
     }
 
     /// Shared parameter parsing logic used by functions, initializers, and protocol methods

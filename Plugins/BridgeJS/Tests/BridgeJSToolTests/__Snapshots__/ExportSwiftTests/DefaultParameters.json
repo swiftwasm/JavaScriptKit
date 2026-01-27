@@ -728,6 +728,340 @@
           }
         }
       }
+    },
+    {
+      "abiName" : "bjs_testIntArrayDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testIntArrayDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "array" : {
+              "_0" : [
+                {
+                  "int" : {
+                    "_0" : 1
+                  }
+                },
+                {
+                  "int" : {
+                    "_0" : 2
+                  }
+                },
+                {
+                  "int" : {
+                    "_0" : 3
+                  }
+                }
+              ]
+            }
+          },
+          "label" : "values",
+          "name" : "values",
+          "type" : {
+            "array" : {
+              "_0" : {
+                "int" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "array" : {
+          "_0" : {
+            "int" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testStringArrayDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testStringArrayDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "array" : {
+              "_0" : [
+                {
+                  "string" : {
+                    "_0" : "a"
+                  }
+                },
+                {
+                  "string" : {
+                    "_0" : "b"
+                  }
+                },
+                {
+                  "string" : {
+                    "_0" : "c"
+                  }
+                }
+              ]
+            }
+          },
+          "label" : "names",
+          "name" : "names",
+          "type" : {
+            "array" : {
+              "_0" : {
+                "string" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "array" : {
+          "_0" : {
+            "string" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testDoubleArrayDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testDoubleArrayDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "array" : {
+              "_0" : [
+                {
+                  "double" : {
+                    "_0" : 1.5
+                  }
+                },
+                {
+                  "double" : {
+                    "_0" : 2.5
+                  }
+                },
+                {
+                  "double" : {
+                    "_0" : 3.5
+                  }
+                }
+              ]
+            }
+          },
+          "label" : "values",
+          "name" : "values",
+          "type" : {
+            "array" : {
+              "_0" : {
+                "double" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "array" : {
+          "_0" : {
+            "double" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testBoolArrayDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testBoolArrayDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "array" : {
+              "_0" : [
+                {
+                  "bool" : {
+                    "_0" : true
+                  }
+                },
+                {
+                  "bool" : {
+                    "_0" : false
+                  }
+                },
+                {
+                  "bool" : {
+                    "_0" : true
+                  }
+                }
+              ]
+            }
+          },
+          "label" : "flags",
+          "name" : "flags",
+          "type" : {
+            "array" : {
+              "_0" : {
+                "bool" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "array" : {
+          "_0" : {
+            "bool" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testEmptyArrayDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testEmptyArrayDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "array" : {
+              "_0" : [
+
+              ]
+            }
+          },
+          "label" : "items",
+          "name" : "items",
+          "type" : {
+            "array" : {
+              "_0" : {
+                "int" : {
+
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "array" : {
+          "_0" : {
+            "int" : {
+
+            }
+          }
+        }
+      }
+    },
+    {
+      "abiName" : "bjs_testMixedWithArrayDefault",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "testMixedWithArrayDefault",
+      "parameters" : [
+        {
+          "defaultValue" : {
+            "string" : {
+              "_0" : "test"
+            }
+          },
+          "label" : "name",
+          "name" : "name",
+          "type" : {
+            "string" : {
+
+            }
+          }
+        },
+        {
+          "defaultValue" : {
+            "array" : {
+              "_0" : [
+                {
+                  "int" : {
+                    "_0" : 10
+                  }
+                },
+                {
+                  "int" : {
+                    "_0" : 20
+                  }
+                },
+                {
+                  "int" : {
+                    "_0" : 30
+                  }
+                }
+              ]
+            }
+          },
+          "label" : "values",
+          "name" : "values",
+          "type" : {
+            "array" : {
+              "_0" : {
+                "int" : {
+
+                }
+              }
+            }
+          }
+        },
+        {
+          "defaultValue" : {
+            "bool" : {
+              "_0" : true
+            }
+          },
+          "label" : "enabled",
+          "name" : "enabled",
+          "type" : {
+            "bool" : {
+
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "string" : {
+
+        }
+      }
     }
   ],
   "protocols" : [

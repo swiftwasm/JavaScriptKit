@@ -93,6 +93,8 @@ export async function createInstantiator(options, swift) {
     let tmpRetPointers = [];
     let tmpParamPointers = [];
     let tmpStructCleanups = [];
+    let tmpRetArrayLengths = [];
+    let tmpParamArrayLengths = [];
     const enumHelpers = {};
     const structHelpers = {};
     
@@ -164,6 +166,12 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_param_pointer"] = function() {
                 return tmpParamPointers.pop();
+            }
+            bjs["swift_js_push_array_length"] = function(len) {
+                tmpRetArrayLengths.push(len | 0);
+            }
+            bjs["swift_js_pop_param_array_length"] = function() {
+                return tmpParamArrayLengths.pop();
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }
@@ -269,6 +277,10 @@ export async function createInstantiator(options, swift) {
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
             }
+            importObject["TestModule"]["bjs_DelegateManager_wrap"] = function(pointer) {
+                const obj = DelegateManager.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
             importObject["TestModule"]["bjs_Helper_wrap"] = function(pointer) {
                 const obj = Helper.__construct(pointer);
                 return swift.memory.retain(obj);
@@ -680,9 +692,73 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_MyViewController_secondDelegate_set(this.pointer, +isSome, isSome ? swift.memory.retain(value) : 0);
                 }
             }
+            class DelegateManager extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_DelegateManager_deinit, DelegateManager.prototype);
+                }
+            
+                constructor(delegates) {
+                    const arrayCleanups = [];
+                    for (const elem of delegates) {
+                        const objId = swift.memory.retain(elem);
+                        tmpParamInts.push(objId);
+                    }
+                    tmpParamArrayLengths.push(delegates.length);
+                    const ret = instance.exports.bjs_DelegateManager_init();
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return DelegateManager.__construct(ret);
+                }
+                notifyAll() {
+                    instance.exports.bjs_DelegateManager_notifyAll(this.pointer);
+                }
+                get delegates() {
+                    instance.exports.bjs_DelegateManager_delegates_get(this.pointer);
+                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const objId = tmpRetInts.pop();
+                        const obj = swift.memory.getObject(objId);
+                        swift.memory.release(objId);
+                        arrayResult.push(obj);
+                    }
+                    arrayResult.reverse();
+                    return arrayResult;
+                }
+                set delegates(value) {
+                    const arrayCleanups = [];
+                    for (const elem of value) {
+                        const objId = swift.memory.retain(elem);
+                        tmpParamInts.push(objId);
+                    }
+                    tmpParamArrayLengths.push(value.length);
+                    instance.exports.bjs_DelegateManager_delegates_set(this.pointer);
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                }
+            }
             const exports = {
                 Helper,
                 MyViewController,
+                DelegateManager,
+                processDelegates: function bjs_processDelegates(delegates) {
+                    const arrayCleanups = [];
+                    for (const elem of delegates) {
+                        const objId = swift.memory.retain(elem);
+                        tmpParamInts.push(objId);
+                    }
+                    tmpParamArrayLengths.push(delegates.length);
+                    instance.exports.bjs_processDelegates();
+                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const objId1 = tmpRetInts.pop();
+                        const obj = swift.memory.getObject(objId1);
+                        swift.memory.release(objId1);
+                        arrayResult.push(obj);
+                    }
+                    arrayResult.reverse();
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return arrayResult;
+                },
                 Direction: DirectionValues,
                 ExampleEnum: ExampleEnumValues,
                 Result: ResultValues,

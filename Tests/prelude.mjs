@@ -778,6 +778,7 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 
     testProtocolSupport(exports);
     testClosureSupport(exports);
+    testArraySupport(exports);
 }
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 function testClosureSupport(exports) {
@@ -1298,6 +1299,129 @@ function setupTestGlobals(global) {
         sym: Symbol("s"),
         bi: BigInt(3)
     };
+}
+
+/** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
+function testArraySupport(exports) {
+    const { Direction, Status, Theme, HttpStatus, Greeter } = exports;
+
+    // Primitive arrays
+    assert.deepEqual(exports.roundTripIntArray([1, 2, 3, -10, 2147483647]), [1, 2, 3, -10, 2147483647]);
+    assert.deepEqual(exports.roundTripIntArray([]), []);
+    assert.deepEqual(exports.roundTripStringArray(["Hello", "World", ""]), ["Hello", "World", ""]);
+    const doubles = exports.roundTripDoubleArray([1.5, 0.0, -1.5, Infinity, NaN]);
+    assert.equal(doubles[0], 1.5);
+    assert(Number.isNaN(doubles[4]));
+    assert.deepEqual(exports.roundTripBoolArray([true, false, true]), [true, false, true]);
+
+    // Enum arrays
+    assert.deepEqual(exports.roundTripDirectionArray([Direction.North, Direction.South]), [Direction.North, Direction.South]);
+    assert.deepEqual(exports.roundTripStatusArray([Status.Loading, Status.Success]), [Status.Loading, Status.Success]);
+    assert.deepEqual(exports.roundTripThemeArray([Theme.Light, Theme.Dark]), [Theme.Light, Theme.Dark]);
+    assert.deepEqual(exports.roundTripHttpStatusArray([HttpStatus.Ok, HttpStatus.NotFound]), [HttpStatus.Ok, HttpStatus.NotFound]);
+
+    // Struct arrays
+    const points = [
+        { x: 1.0, y: 2.0, label: "A", optCount: 10, optFlag: true },
+        { x: 3.0, y: 4.0, label: "B", optCount: null, optFlag: null }
+    ];
+    const pointResult = exports.roundTripDataPointArray(points);
+    assert.equal(pointResult[0].optCount, 10);
+    assert.equal(pointResult[1].optCount, null);
+
+    // Class arrays
+    const g1 = new Greeter("Alice");
+    const g2 = new Greeter("Bob");
+    const gResult = exports.roundTripGreeterArray([g1, g2]);
+    assert.equal(gResult[0].name, "Alice");
+    assert.equal(gResult[1].greet(), "Hello, Bob!");
+    g1.release(); g2.release();
+    gResult.forEach(g => g.release());
+
+    // Arrays of optional elements
+    assert.deepEqual(exports.roundTripOptionalIntArray([1, null, 3]), [1, null, 3]);
+    assert.deepEqual(exports.roundTripOptionalStringArray(["a", null, "b"]), ["a", null, "b"]);
+    const optPoint = { x: 1.0, y: 2.0, label: "", optCount: null, optFlag: null };
+    const optPoints = exports.roundTripOptionalDataPointArray([optPoint, null]);
+    assert.deepEqual(optPoints[0], optPoint);
+    assert.equal(optPoints[1], null);
+    assert.deepEqual(exports.roundTripOptionalDirectionArray([Direction.North, null]), [Direction.North, null]);
+    assert.deepEqual(exports.roundTripOptionalStatusArray([Status.Success, null]), [Status.Success, null]);
+
+    // Optional arrays
+    assert.deepEqual(exports.roundTripOptionalIntArrayType([1, 2, 3]), [1, 2, 3]);
+    assert.equal(exports.roundTripOptionalIntArrayType(null), null);
+    assert.deepEqual(exports.roundTripOptionalStringArrayType(["a", "b"]), ["a", "b"]);
+    assert.equal(exports.roundTripOptionalStringArrayType(null), null);
+    const og1 = new Greeter("OptGreeter");
+    const optGreeterResult = exports.roundTripOptionalGreeterArrayType([og1]);
+    assert.equal(optGreeterResult[0].name, "OptGreeter");
+    assert.equal(exports.roundTripOptionalGreeterArrayType(null), null);
+    og1.release();
+    optGreeterResult.forEach(g => g.release());
+
+    // Nested arrays
+    assert.deepEqual(exports.roundTripNestedIntArray([[1, 2], [3]]), [[1, 2], [3]]);
+    assert.deepEqual(exports.roundTripNestedIntArray([[1, 2], [], [3]]), [[1, 2], [], [3]]);
+    assert.deepEqual(exports.roundTripNestedStringArray([["a", "b"], ["c"]]), [["a", "b"], ["c"]]);
+    assert.deepEqual(exports.roundTripNestedDoubleArray([[1.5], [2.5]]), [[1.5], [2.5]]);
+    assert.deepEqual(exports.roundTripNestedBoolArray([[true], [false]]), [[true], [false]]);
+    const nestedPoint = { x: 1.0, y: 2.0, label: "A", optCount: null, optFlag: null };
+    assert.deepEqual(exports.roundTripNestedDataPointArray([[nestedPoint]])[0][0], nestedPoint);
+    assert.deepEqual(exports.roundTripNestedDirectionArray([[Direction.North], [Direction.South]]), [[Direction.North], [Direction.South]]);
+    const ng1 = new Greeter("Nested1");
+    const ng2 = new Greeter("Nested2");
+    const nestedGreeters = exports.roundTripNestedGreeterArray([[ng1], [ng2]]);
+    assert.equal(nestedGreeters[0][0].name, "Nested1");
+    assert.equal(nestedGreeters[1][0].greet(), "Hello, Nested2!");
+    ng1.release(); ng2.release();
+    nestedGreeters.forEach(row => row.forEach(g => g.release()));
+
+    // UnsafePointer-family arrays
+    const pointerValues = [1, 4, 1024, 65536, 2147483647];
+    assert.deepEqual(exports.roundTripUnsafeRawPointerArray(pointerValues), pointerValues);
+    assert.deepEqual(exports.roundTripUnsafeMutableRawPointerArray(pointerValues), pointerValues);
+    assert.deepEqual(exports.roundTripOpaquePointerArray(pointerValues), pointerValues);
+    assert.deepEqual(exports.roundTripUnsafeRawPointerArray([]), []);
+
+    // Default values
+    assert.equal(exports.arrayWithDefault(), 6);
+    assert.equal(exports.arrayWithDefault([10, 20]), 30);
+    assert.equal(exports.arrayWithOptionalDefault(), -1);
+    assert.equal(exports.arrayWithOptionalDefault(null), -1);
+    assert.equal(exports.arrayWithOptionalDefault([5, 5]), 10);
+    assert.equal(exports.arrayMixedDefaults(), "Sum: 30!");
+    assert.equal(exports.arrayMixedDefaults("Total"), "Total: 30!");
+    assert.equal(exports.arrayMixedDefaults("Total", [1, 2, 3]), "Total: 6!");
+    assert.equal(exports.arrayMixedDefaults("Val", [100], "?"), "Val: 100?");
+    assert.equal(exports.arrayMixedDefaults(undefined, [5, 5]), "Sum: 10!");
+    assert.equal(exports.arrayMixedDefaults(undefined, undefined, "?"), "Sum: 30?");
+
+    const helper1 = new exports.Greeter("Helper1");
+    const jsProcessor1 = {
+        count: 1, name: "Processor1", optionalTag: null, optionalCount: null,
+        direction: null, optionalTheme: null, httpStatus: null, apiResult: null,
+        helper: helper1, optionalHelper: null,
+        increment(by) { this.count += by; },
+        getValue() { return this.count; },
+        setLabelElements(a, b) { }, getLabel() { return ""; },
+        isEven() { return this.count % 2 === 0; },
+        processGreeter(g) { return ""; }, createGreeter() { return new exports.Greeter("P1"); },
+        processOptionalGreeter(g) { return ""; }, createOptionalGreeter() { return null; },
+        handleAPIResult(r) { }, getAPIResult() { return null; }
+    };
+
+    const consumeResult = exports.consumeDataProcessorArrayType([jsProcessor1]);
+    assert.equal(consumeResult, 1);
+
+    const processors = [jsProcessor1];
+    const result = exports.roundTripDataProcessorArrayType(processors);
+
+    assert.equal(result.length, 1);
+    assert.equal(result[0], jsProcessor1);
+    assert.equal(result[0].count, 1);
+
+    helper1.release();
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

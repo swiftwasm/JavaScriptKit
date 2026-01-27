@@ -110,6 +110,7 @@ The following default value types are supported for both function and constructo
 | Class initialization (no args) | `MyClass()` | `new MyClass()` |
 | Class initialization (literal args) | `MyClass("value", 42)` | `new MyClass("value", 42)` |
 | Struct initialization | `Point(x: 1.0, y: 2.0)` | `{ x: 1.0, y: 2.0 }` |
+| Array literals | `[1, 2, 3]` | `[1, 2, 3]` |
 
 ## Working with Class and Struct Defaults
 
@@ -156,7 +157,6 @@ The following expressions are **not supported** as default parameter values:
 |:----------------|:--------|:-------|
 | Method calls | `Date().description` | ❌ |
 | Closures | `{ "computed" }()` | ❌ |
-| Array literals | `[1, 2, 3]` | ❌ |
 | Dictionary literals | `["key": "value"]` | ❌ |
 | Binary operations | `10 + 20` | ❌ |
 | Complex member access | `Config.shared.value` | ❌ |

@@ -130,10 +130,43 @@ public class ExportSwift {
             case .swiftStruct(let structName):
                 typeNameForIntrinsic = structName
                 liftingExpr = ExprSyntax("\(raw: structName).bridgeJSLiftParameter()")
+            case .array:
+                typeNameForIntrinsic = param.type.swiftType
+                liftingExpr = StackCodegen().liftExpression(for: param.type)
             case .optional(let wrappedType):
-                typeNameForIntrinsic = "Optional<\(wrappedType.swiftType)>"
+                if case .array(let elementType) = wrappedType {
+                    let arrayLift = StackCodegen().liftArrayExpression(elementType: elementType)
+                    let isSomeParam = argumentsToLift[0]
+                    let swiftTypeName = elementType.swiftType
+                    typeNameForIntrinsic = "Optional<[\(swiftTypeName)]>"
+                    liftingExpr = ExprSyntax(
+                        """
+                        {
+                            if \(raw: isSomeParam) == 0 {
+                                return Optional<[\(raw: swiftTypeName)]>.none
+                            } else {
+                                return \(arrayLift)
+                            }
+                        }()
+                        """
+                    )
+                } else if case .swiftProtocol(let protocolName) = wrappedType {
+                    let wrapperName = "Any\(protocolName)"
+                    typeNameForIntrinsic = "Optional<\(wrapperName)>"
+                    liftingExpr = ExprSyntax(
+                        "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
+                    )
+                } else {
+                    typeNameForIntrinsic = "Optional<\(wrappedType.swiftType)>"
+                    liftingExpr = ExprSyntax(
+                        "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
+                    )
+                }
+            case .swiftProtocol(let protocolName):
+                let wrapperName = "Any\(protocolName)"
+                typeNameForIntrinsic = wrapperName
                 liftingExpr = ExprSyntax(
-                    "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
+                    "\(raw: wrapperName).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
                 )
             default:
                 typeNameForIntrinsic = param.type.swiftType
@@ -246,7 +279,8 @@ public class ExportSwift {
             let stackParamIndices = parameters.enumerated().compactMap { index, param -> Int? in
                 switch param.type {
                 case .swiftStruct, .optional(.swiftStruct),
-                    .associatedValueEnum, .optional(.associatedValueEnum):
+                    .associatedValueEnum, .optional(.associatedValueEnum),
+                    .array:
                     return index
                 default:
                     return nil
@@ -319,9 +353,15 @@ public class ExportSwift {
                 return
             }
 
-            if case .closure(let signature) = returnType {
+            switch returnType {
+            case .closure(let signature):
                 append("return _BJS_Closure_\(raw: signature.mangleName).bridgeJSLower(ret)")
-            } else {
+            case .array, .optional(.array):
+                let stackCodegen = StackCodegen()
+                for stmt in stackCodegen.lowerStatements(for: returnType, accessor: "ret", varPrefix: "ret") {
+                    append(stmt)
+                }
+            default:
                 append("return ret.bridgeJSLowerReturn()")
             }
         }
@@ -774,9 +814,10 @@ struct StackCodegen {
             return "\(raw: className).bridgeJSLiftParameter(_swift_js_pop_param_pointer())"
         case .unsafePointer:
             return "\(raw: type.swiftType).bridgeJSLiftParameter(_swift_js_pop_param_pointer())"
-        case .swiftProtocol:
-            // Protocols are handled via JSObject
-            return "JSObject.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+        case .swiftProtocol(let protocolName):
+            // Protocols use their Any wrapper type for lifting
+            let wrapperName = "Any\(protocolName)"
+            return "\(raw: wrapperName).bridgeJSLiftParameter(_swift_js_pop_param_int32())"
         case .caseEnum(let enumName):
             return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_param_int32())"
         case .rawValueEnum(let enumName, let rawType):
@@ -805,7 +846,26 @@ struct StackCodegen {
             return "()"
         case .closure:
             return "JSObject.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+        case .array(let elementType):
+            return liftArrayExpression(elementType: elementType)
         }
+    }
+
+    func liftArrayExpression(elementType: BridgeType) -> ExprSyntax {
+        let elementLift = liftExpression(for: elementType)
+        let swiftTypeName = elementType.swiftType
+        return """
+            {
+                let __count = Int(_swift_js_pop_param_array_length())
+                var __result: [\(raw: swiftTypeName)] = []
+                __result.reserveCapacity(__count)
+                for _ in 0..<__count {
+                    __result.append(\(elementLift))
+                }
+                __result.reverse()
+                return __result
+            }()
+            """
     }
 
     private func liftOptionalExpression(wrappedType: BridgeType) -> ExprSyntax {
@@ -849,6 +909,19 @@ struct StackCodegen {
                 "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
         case .jsObject:
             return "Optional<JSObject>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+        case .array(let elementType):
+            let arrayLift = liftArrayExpression(elementType: elementType)
+            let swiftTypeName = elementType.swiftType
+            return """
+                {
+                    let __isSome = _swift_js_pop_param_int32()
+                    if __isSome == 0 {
+                        return Optional<[\(raw: swiftTypeName)]>.none
+                    } else {
+                        return \(arrayLift)
+                    }
+                }()
+                """
         default:
             // Fallback for other optional types
             return "Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
@@ -886,8 +959,9 @@ struct StackCodegen {
             return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
         case .unsafePointer:
             return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
-        case .swiftProtocol:
-            return ["_swift_js_push_int(\(raw: accessor).bridgeJSLowerParameter())"]
+        case .swiftProtocol(let protocolName):
+            let wrapperName = "Any\(protocolName)"
+            return ["_swift_js_push_int((\(raw: accessor) as! \(raw: wrapperName)).bridgeJSLowerReturn())"]
         case .caseEnum:
             return ["_swift_js_push_int(Int32(\(raw: accessor).bridgeJSLowerParameter()))"]
         case .rawValueEnum(_, let rawType):
@@ -916,7 +990,32 @@ struct StackCodegen {
             return []
         case .closure:
             return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
+        case .array(let elementType):
+            return lowerArrayStatements(elementType: elementType, accessor: accessor, varPrefix: varPrefix)
         }
+    }
+
+    private func lowerArrayStatements(
+        elementType: BridgeType,
+        accessor: String,
+        varPrefix: String
+    ) -> [CodeBlockItemSyntax] {
+        var statements: [CodeBlockItemSyntax] = []
+        let elementVarName = "__bjs_elem_\(varPrefix)"
+        statements.append("for \(raw: elementVarName) in \(raw: accessor) {")
+
+        let elementStatements = lowerStatements(
+            for: elementType,
+            accessor: elementVarName,
+            varPrefix: "\(varPrefix)_elem"
+        )
+        for stmt in elementStatements {
+            statements.append(stmt)
+        }
+
+        statements.append("}")
+        statements.append("_swift_js_push_array_length(Int32(\(raw: accessor).count))")
+        return statements
     }
 
     private func lowerOptionalStatements(
@@ -985,6 +1084,8 @@ struct StackCodegen {
             return ["_swift_js_push_int(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
         case .jsObject:
             return ["_swift_js_push_int(\(raw: unwrappedVar).bridgeJSLowerReturn())"]
+        case .array(let elementType):
+            return lowerArrayStatements(elementType: elementType, accessor: unwrappedVar, varPrefix: varPrefix)
         default:
             return ["preconditionFailure(\"BridgeJS: unsupported optional wrapped type\")"]
         }
@@ -1552,6 +1653,7 @@ extension BridgeType {
         case .swiftProtocol(let name): return "Any\(name)"
         case .void: return "Void"
         case .optional(let wrappedType): return "Optional<\(wrappedType.swiftType)>"
+        case .array(let elementType): return "[\(elementType.swiftType)]"
         case .caseEnum(let name): return name
         case .rawValueEnum(let name, _): return name
         case .associatedValueEnum(let name): return name
@@ -1609,6 +1711,8 @@ extension BridgeType {
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
         case .closure:
             return LiftingIntrinsicInfo(parameters: [("callbackId", .i32)])
+        case .array:
+            return LiftingIntrinsicInfo(parameters: [])
         }
     }
 
@@ -1629,6 +1733,7 @@ extension BridgeType {
         static let associatedValueEnum = LoweringIntrinsicInfo(returnType: nil)
         static let swiftStruct = LoweringIntrinsicInfo(returnType: nil)
         static let optional = LoweringIntrinsicInfo(returnType: nil)
+        static let array = LoweringIntrinsicInfo(returnType: nil)
     }
 
     func loweringReturnInfo() throws -> LoweringIntrinsicInfo {
@@ -1655,6 +1760,8 @@ extension BridgeType {
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
         case .closure:
             return .swiftHeapObject
+        case .array:
+            return .array
         }
     }
 }

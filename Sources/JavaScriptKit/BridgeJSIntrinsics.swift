@@ -282,6 +282,10 @@ extension _BridgedSwiftProtocolWrapper {
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 {
         jsObject.bridgeJSLowerReturn()
     }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+        jsObject.bridgeJSLowerParameter()
+    }
 }
 
 /// A protocol that Swift enum types that do not have a payload can conform to.
@@ -453,6 +457,26 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 @_spi(BridgeJS) public func _swift_js_pop_param_f64() -> Float64
 #else
 @_spi(BridgeJS) public func _swift_js_pop_param_f64() -> Float64 {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+// MARK: Array length operations
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_push_array_length")
+@_spi(BridgeJS) public func _swift_js_push_array_length(_ length: Int32)
+#else
+@_spi(BridgeJS) public func _swift_js_push_array_length(_ length: Int32) {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_pop_param_array_length")
+@_spi(BridgeJS) public func _swift_js_pop_param_array_length() -> Int32
+#else
+@_spi(BridgeJS) public func _swift_js_pop_param_array_length() -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif

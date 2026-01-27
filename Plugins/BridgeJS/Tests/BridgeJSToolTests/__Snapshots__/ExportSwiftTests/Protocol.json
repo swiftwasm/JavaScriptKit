@@ -247,6 +247,68 @@
         }
       ],
       "swiftCallName" : "MyViewController"
+    },
+    {
+      "constructor" : {
+        "abiName" : "bjs_DelegateManager_init",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "parameters" : [
+          {
+            "label" : "delegates",
+            "name" : "delegates",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "swiftProtocol" : {
+                    "_0" : "MyViewControllerDelegate"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "methods" : [
+        {
+          "abiName" : "bjs_DelegateManager_notifyAll",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "notifyAll",
+          "parameters" : [
+
+          ],
+          "returnType" : {
+            "void" : {
+
+            }
+          }
+        }
+      ],
+      "name" : "DelegateManager",
+      "properties" : [
+        {
+          "isReadonly" : false,
+          "isStatic" : false,
+          "name" : "delegates",
+          "type" : {
+            "array" : {
+              "_0" : {
+                "swiftProtocol" : {
+                  "_0" : "MyViewControllerDelegate"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "DelegateManager"
     }
   ],
   "enums" : [
@@ -394,7 +456,39 @@
   ],
   "exposeToGlobal" : false,
   "functions" : [
-
+    {
+      "abiName" : "bjs_processDelegates",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "processDelegates",
+      "parameters" : [
+        {
+          "label" : "_",
+          "name" : "delegates",
+          "type" : {
+            "array" : {
+              "_0" : {
+                "swiftProtocol" : {
+                  "_0" : "MyViewControllerDelegate"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "returnType" : {
+        "array" : {
+          "_0" : {
+            "swiftProtocol" : {
+              "_0" : "MyViewControllerDelegate"
+            }
+          }
+        }
+      }
+    }
   ],
   "protocols" : [
     {

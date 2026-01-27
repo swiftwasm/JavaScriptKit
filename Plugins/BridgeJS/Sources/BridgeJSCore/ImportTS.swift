@@ -933,6 +933,13 @@ extension BridgeType {
                 params.append(contentsOf: wrappedInfo.loweredParameters)
                 return LoweringParameterInfo(loweredParameters: params)
             }
+        case .array:
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("Array types are not yet supported in TypeScript imports")
+            case .exportSwift:
+                return LoweringParameterInfo(loweredParameters: [])
+            }
         }
     }
 
@@ -1017,6 +1024,13 @@ extension BridgeType {
             case .exportSwift:
                 let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
                 return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
+            }
+        case .array:
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("Array types are not yet supported in TypeScript imports")
+            case .exportSwift:
+                return LiftingReturnInfo(valueToLift: nil)
             }
         }
     }

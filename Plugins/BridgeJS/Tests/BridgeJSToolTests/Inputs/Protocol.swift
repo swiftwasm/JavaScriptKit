@@ -96,3 +96,21 @@ import JavaScriptKit
         delegate.onHelperUpdated(helper)
     }
 }
+
+// Protocol array support
+@JS class DelegateManager {
+    @JS
+    var delegates: [MyViewControllerDelegate]
+
+    @JS init(delegates: [MyViewControllerDelegate]) {
+        self.delegates = delegates
+    }
+
+    @JS func notifyAll() {
+        for delegate in delegates {
+            delegate.onSomethingHappened()
+        }
+    }
+}
+
+@JS func processDelegates(_ delegates: [MyViewControllerDelegate]) -> [MyViewControllerDelegate]
