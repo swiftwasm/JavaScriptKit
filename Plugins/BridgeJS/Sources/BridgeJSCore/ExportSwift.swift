@@ -881,7 +881,7 @@ struct StackCodegen {
         case .double:
             return ["_swift_js_push_f64(\(raw: accessor))"]
         case .jsObject:
-            return ["_swift_js_push_int(\(raw: accessor).bridgeJSLowerParameter())"]
+            return ["_swift_js_push_int(\(raw: accessor).bridgeJSLowerReturn())"]
         case .swiftHeapObject:
             return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
         case .unsafePointer:
@@ -984,7 +984,7 @@ struct StackCodegen {
         case .associatedValueEnum:
             return ["_swift_js_push_int(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
         case .jsObject:
-            return ["_swift_js_push_int(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
+            return ["_swift_js_push_int(\(raw: unwrappedVar).bridgeJSLowerReturn())"]
         default:
             return ["preconditionFailure(\"BridgeJS: unsupported optional wrapped type\")"]
         }

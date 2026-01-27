@@ -204,6 +204,18 @@ struct IntrinsicJSFragment: Sendable {
             return [resultLabel]
         }
     )
+    static let jsObjectLiftRetainedObjectId = IntrinsicJSFragment(
+        parameters: ["objectId"],
+        printCode: { arguments, scope, printer, cleanupCode in
+            let resultLabel = scope.variable("value")
+            let objectId = arguments[0]
+            printer.write(
+                "const \(resultLabel) = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(objectId));"
+            )
+            printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(objectId));")
+            return [resultLabel]
+        }
+    )
     static let jsObjectLiftParameter = IntrinsicJSFragment(
         parameters: ["objectId"],
         printCode: { arguments, scope, printer, cleanupCode in
@@ -1446,10 +1458,7 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftStruct(let fullName):
             switch context {
             case .importTS:
-                throw BridgeJSLinkError(
-                    message:
-                        "Swift structs are not supported to be passed as parameters to imported JS functions: \(fullName)"
-                )
+                return .jsObjectLiftRetainedObjectId
             case .exportSwift:
                 let base = fullName.components(separatedBy: ".").last ?? fullName
                 return IntrinsicJSFragment(
@@ -1527,10 +1536,8 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftStruct(let fullName):
             switch context {
             case .importTS:
-                throw BridgeJSLinkError(
-                    message:
-                        "Swift structs are not supported to be returned from imported JS functions: \(fullName)"
-                )
+                // ImportTS expects Swift structs to come back as a retained JS object ID.
+                return .jsObjectLowerReturn
             case .exportSwift:
                 return swiftStructLowerReturn(fullName: fullName)
             }

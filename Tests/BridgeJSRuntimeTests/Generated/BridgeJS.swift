@@ -2218,6 +2218,51 @@ public func _bjs_StaticPropertyNamespace_NestedProperties_static_nestedDouble_se
     #endif
 }
 
+extension Point: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Point {
+        let y = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let x = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        return Point(x: x, y: y)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_int(Int32(self.x))
+        _swift_js_push_int(Int32(self.y))
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _bjs_struct_lower_Point(jsObject.bridgeJSLowerParameter())
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Point()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Point")
+fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Point")
+fileprivate func _bjs_struct_raise_Point() -> Int32
+#else
+fileprivate func _bjs_struct_raise_Point() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 extension PointerFields: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> PointerFields {
         let mutPtr = UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
@@ -2644,6 +2689,146 @@ fileprivate func _bjs_struct_raise_ValidationReport() -> Int32 {
 }
 #endif
 
+extension AdvancedConfig: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> AdvancedConfig {
+        let overrideDefaults = Optional<ConfigStruct>.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let defaults = ConfigStruct.bridgeJSLiftParameter()
+        let location = Optional<DataPoint>.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let metadata = Optional<JSObject>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let result = Optional<APIResult>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let status = Status.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let theme = Theme.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let enabled = Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let title = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let id = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        return AdvancedConfig(id: id, title: title, enabled: enabled, theme: theme, status: status, result: result, metadata: metadata, location: location, defaults: defaults, overrideDefaults: overrideDefaults)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_int(Int32(self.id))
+        var __bjs_title = self.title
+        __bjs_title.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        _swift_js_push_int(self.enabled ? 1 : 0)
+        var __bjs_theme = self.theme.rawValue
+        __bjs_theme.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        _swift_js_push_int(Int32(self.status.bridgeJSLowerParameter()))
+        let __bjs_isSome_result = self.result != nil
+        if let __bjs_unwrapped_result = self.result {
+            _swift_js_push_int(__bjs_unwrapped_result.bridgeJSLowerParameter())
+        }
+        _swift_js_push_int(__bjs_isSome_result ? 1 : 0)
+        let __bjs_isSome_metadata = self.metadata != nil
+        if let __bjs_unwrapped_metadata = self.metadata {
+            _swift_js_push_int(__bjs_unwrapped_metadata.bridgeJSLowerReturn())
+        }
+        _swift_js_push_int(__bjs_isSome_metadata ? 1 : 0)
+        let __bjs_isSome_location = self.location != nil
+        if let __bjs_unwrapped_location = self.location {
+            __bjs_unwrapped_location.bridgeJSLowerReturn()
+        }
+        _swift_js_push_int(__bjs_isSome_location ? 1 : 0)
+        self.defaults.bridgeJSLowerReturn()
+        let __bjs_isSome_overrideDefaults = self.overrideDefaults != nil
+        if let __bjs_unwrapped_overrideDefaults = self.overrideDefaults {
+            __bjs_unwrapped_overrideDefaults.bridgeJSLowerReturn()
+        }
+        _swift_js_push_int(__bjs_isSome_overrideDefaults ? 1 : 0)
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _bjs_struct_lower_AdvancedConfig(jsObject.bridgeJSLowerParameter())
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_AdvancedConfig()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_AdvancedConfig")
+fileprivate func _bjs_struct_lower_AdvancedConfig(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_AdvancedConfig(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_AdvancedConfig")
+fileprivate func _bjs_struct_raise_AdvancedConfig() -> Int32
+#else
+fileprivate func _bjs_struct_raise_AdvancedConfig() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+extension MeasurementConfig: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> MeasurementConfig {
+        let optionalRatio = Optional<Ratio>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f64())
+        let optionalPrecision = Optional<Precision>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f32())
+        let ratio = Ratio.bridgeJSLiftParameter(_swift_js_pop_param_f64())
+        let precision = Precision.bridgeJSLiftParameter(_swift_js_pop_param_f32())
+        return MeasurementConfig(precision: precision, ratio: ratio, optionalPrecision: optionalPrecision, optionalRatio: optionalRatio)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_f32(self.precision.bridgeJSLowerParameter())
+        _swift_js_push_f64(self.ratio.bridgeJSLowerParameter())
+        let __bjs_isSome_optionalPrecision = self.optionalPrecision != nil
+        if let __bjs_unwrapped_optionalPrecision = self.optionalPrecision {
+            _swift_js_push_f32(__bjs_unwrapped_optionalPrecision.bridgeJSLowerParameter())
+        }
+        _swift_js_push_int(__bjs_isSome_optionalPrecision ? 1 : 0)
+        let __bjs_isSome_optionalRatio = self.optionalRatio != nil
+        if let __bjs_unwrapped_optionalRatio = self.optionalRatio {
+            _swift_js_push_f64(__bjs_unwrapped_optionalRatio.bridgeJSLowerParameter())
+        }
+        _swift_js_push_int(__bjs_isSome_optionalRatio ? 1 : 0)
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _bjs_struct_lower_MeasurementConfig(jsObject.bridgeJSLowerParameter())
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_MeasurementConfig()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_MeasurementConfig")
+fileprivate func _bjs_struct_lower_MeasurementConfig(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_MeasurementConfig(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_MeasurementConfig")
+fileprivate func _bjs_struct_raise_MeasurementConfig() -> Int32
+#else
+fileprivate func _bjs_struct_raise_MeasurementConfig() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 extension MathOperations: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> MathOperations {
         let baseValue = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
@@ -2904,63 +3089,6 @@ public func _bjs_CopyableNestedCart_static_fromJSObject(_ object: Int32) -> Void
     #endif
 }
 
-extension MeasurementConfig: _BridgedSwiftStruct {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> MeasurementConfig {
-        let optionalRatio = Optional<Ratio>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f64())
-        let optionalPrecision = Optional<Precision>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f32())
-        let ratio = Ratio.bridgeJSLiftParameter(_swift_js_pop_param_f64())
-        let precision = Precision.bridgeJSLiftParameter(_swift_js_pop_param_f32())
-        return MeasurementConfig(precision: precision, ratio: ratio, optionalPrecision: optionalPrecision, optionalRatio: optionalRatio)
-    }
-
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        _swift_js_push_f32(self.precision.bridgeJSLowerParameter())
-        _swift_js_push_f64(self.ratio.bridgeJSLowerParameter())
-        let __bjs_isSome_optionalPrecision = self.optionalPrecision != nil
-        if let __bjs_unwrapped_optionalPrecision = self.optionalPrecision {
-            _swift_js_push_f32(__bjs_unwrapped_optionalPrecision.bridgeJSLowerParameter())
-        }
-        _swift_js_push_int(__bjs_isSome_optionalPrecision ? 1 : 0)
-        let __bjs_isSome_optionalRatio = self.optionalRatio != nil
-        if let __bjs_unwrapped_optionalRatio = self.optionalRatio {
-            _swift_js_push_f64(__bjs_unwrapped_optionalRatio.bridgeJSLowerParameter())
-        }
-        _swift_js_push_int(__bjs_isSome_optionalRatio ? 1 : 0)
-    }
-
-    init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _bjs_struct_lower_MeasurementConfig(jsObject.bridgeJSLowerParameter())
-        defer {
-            _swift_js_struct_cleanup(__bjs_cleanupId)
-        }
-        self = Self.bridgeJSLiftParameter()
-    }
-
-    func toJSObject() -> JSObject {
-        var __bjs_self = self
-        __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_MeasurementConfig()))
-    }
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_MeasurementConfig")
-fileprivate func _bjs_struct_lower_MeasurementConfig(_ objectId: Int32) -> Int32
-#else
-fileprivate func _bjs_struct_lower_MeasurementConfig(_ objectId: Int32) -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_MeasurementConfig")
-fileprivate func _bjs_struct_raise_MeasurementConfig() -> Int32
-#else
-fileprivate func _bjs_struct_raise_MeasurementConfig() -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
 extension ConfigStruct: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> ConfigStruct {
         let value = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
@@ -3209,17 +3337,6 @@ public func _bjs_roundTripUnsafeMutablePointer(_ v: UnsafeMutableRawPointer) -> 
 public func _bjs_roundTripJSObject(_ v: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = roundTripJSObject(v: JSObject.bridgeJSLiftParameter(v))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripPointerFields")
-@_cdecl("bjs_roundTripPointerFields")
-public func _bjs_roundTripPointerFields() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripPointerFields(_: PointerFields.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -4467,6 +4584,17 @@ public func _bjs_makeAdder(_ base: Int32) -> UnsafeMutableRawPointer {
     #endif
 }
 
+@_expose(wasm, "bjs_roundTripPointerFields")
+@_cdecl("bjs_roundTripPointerFields")
+public func _bjs_roundTripPointerFields() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripPointerFields(_: PointerFields.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_testStructDefault")
 @_cdecl("bjs_testStructDefault")
 public func _bjs_testStructDefault() -> Void {
@@ -4494,17 +4622,6 @@ public func _bjs_cartToJSObject() -> Int32 {
 public func _bjs_nestedCartToJSObject() -> Int32 {
     #if arch(wasm32)
     let ret = nestedCartToJSObject(_: CopyableNestedCart.bridgeJSLiftParameter())
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripMeasurementConfig")
-@_cdecl("bjs_roundTripMeasurementConfig")
-public func _bjs_roundTripMeasurementConfig() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripMeasurementConfig(_: MeasurementConfig.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -4560,6 +4677,28 @@ public func _bjs_roundTripSessionData() -> Void {
 public func _bjs_roundTripValidationReport() -> Void {
     #if arch(wasm32)
     let ret = roundTripValidationReport(_: ValidationReport.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripAdvancedConfig")
+@_cdecl("bjs_roundTripAdvancedConfig")
+public func _bjs_roundTripAdvancedConfig() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripAdvancedConfig(_: AdvancedConfig.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripMeasurementConfig")
+@_cdecl("bjs_roundTripMeasurementConfig")
+public func _bjs_roundTripMeasurementConfig() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripMeasurementConfig(_: MeasurementConfig.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -7553,4 +7692,24 @@ func _$jsCallTwice(_ value: Int, _ callback: @escaping (Int) -> Void) throws(JSE
         throw error
     }
     return Int.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsTranslatePoint")
+fileprivate func bjs_jsTranslatePoint(_ point: Int32, _ dx: Int32, _ dy: Int32) -> Int32
+#else
+fileprivate func bjs_jsTranslatePoint(_ point: Int32, _ dx: Int32, _ dy: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsTranslatePoint(_ point: Point, _ dx: Int, _ dy: Int) throws(JSException) -> Point {
+    let pointObjectId = point.bridgeJSLowerParameter()
+    let dxValue = dx.bridgeJSLowerParameter()
+    let dyValue = dy.bridgeJSLowerParameter()
+    let ret = bjs_jsTranslatePoint(pointObjectId, dxValue, dyValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Point.bridgeJSLiftReturn(ret)
 }
