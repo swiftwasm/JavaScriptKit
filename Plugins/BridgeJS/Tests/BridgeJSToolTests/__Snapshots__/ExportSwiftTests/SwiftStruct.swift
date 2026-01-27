@@ -28,7 +28,7 @@ extension DataPoint: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _DataPointHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_DataPoint(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -38,16 +38,6 @@ extension DataPoint: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _DataPointHelpers.raise()
-    }
-}
-
-fileprivate enum _DataPointHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_DataPoint(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_DataPoint()))
     }
 }
@@ -106,7 +96,7 @@ extension Address: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _AddressHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_Address(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -116,16 +106,6 @@ extension Address: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _AddressHelpers.raise()
-    }
-}
-
-fileprivate enum _AddressHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_Address(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Address()))
     }
 }
@@ -175,7 +155,7 @@ extension Person: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _PersonHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_Person(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -185,16 +165,6 @@ extension Person: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _PersonHelpers.raise()
-    }
-}
-
-fileprivate enum _PersonHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_Person(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Person()))
     }
 }
@@ -230,7 +200,7 @@ extension Session: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _SessionHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_Session(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -240,16 +210,6 @@ extension Session: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _SessionHelpers.raise()
-    }
-}
-
-fileprivate enum _SessionHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_Session(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Session()))
     }
 }
@@ -282,7 +242,7 @@ extension ConfigStruct: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _ConfigStructHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_ConfigStruct(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -292,16 +252,6 @@ extension ConfigStruct: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _ConfigStructHelpers.raise()
-    }
-}
-
-fileprivate enum _ConfigStructHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_ConfigStruct(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_ConfigStruct()))
     }
 }

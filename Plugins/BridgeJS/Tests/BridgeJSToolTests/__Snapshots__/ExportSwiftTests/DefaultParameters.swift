@@ -55,7 +55,7 @@ extension Config: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _ConfigHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_Config(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -65,16 +65,6 @@ extension Config: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _ConfigHelpers.raise()
-    }
-}
-
-fileprivate enum _ConfigHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_Config(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Config()))
     }
 }
@@ -108,7 +98,7 @@ extension MathOperations: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _MathOperationsHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_MathOperations(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -118,16 +108,6 @@ extension MathOperations: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _MathOperationsHelpers.raise()
-    }
-}
-
-fileprivate enum _MathOperationsHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_MathOperations(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_MathOperations()))
     }
 }
