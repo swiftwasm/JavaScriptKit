@@ -808,6 +808,9 @@ struct StackCodegen {
             return "Float.bridgeJSLiftParameter(_swift_js_pop_param_f32())"
         case .double:
             return "Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())"
+        case .jsValue:
+            return
+                "JSValue.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_f64())"
         case .jsObject:
             return "JSObject.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
         case .swiftHeapObject(let className):
@@ -953,6 +956,8 @@ struct StackCodegen {
             return ["_swift_js_push_f32(\(raw: accessor))"]
         case .double:
             return ["_swift_js_push_f64(\(raw: accessor))"]
+        case .jsValue:
+            return ["\(raw: accessor).bridgeJSLowerReturn()"]
         case .jsObject:
             return ["_swift_js_push_int(\(raw: accessor).bridgeJSLowerReturn())"]
         case .swiftHeapObject:
@@ -1646,6 +1651,7 @@ extension BridgeType {
         case .float: return "Float"
         case .double: return "Double"
         case .string: return "String"
+        case .jsValue: return "JSValue"
         case .jsObject(nil): return "JSObject"
         case .jsObject(let name?): return name
         case .swiftHeapObject(let name): return name
@@ -1674,6 +1680,7 @@ extension BridgeType {
         static let float = LiftingIntrinsicInfo(parameters: [("value", .f32)])
         static let double = LiftingIntrinsicInfo(parameters: [("value", .f64)])
         static let string = LiftingIntrinsicInfo(parameters: [("bytes", .i32), ("length", .i32)])
+        static let jsValue = LiftingIntrinsicInfo(parameters: [("kind", .i32), ("payload1", .i32), ("payload2", .f64)])
         static let jsObject = LiftingIntrinsicInfo(parameters: [("value", .i32)])
         static let swiftHeapObject = LiftingIntrinsicInfo(parameters: [("value", .pointer)])
         static let unsafePointer = LiftingIntrinsicInfo(parameters: [("pointer", .pointer)])
@@ -1691,6 +1698,7 @@ extension BridgeType {
         case .float: return .float
         case .double: return .double
         case .string: return .string
+        case .jsValue: return .jsValue
         case .jsObject: return .jsObject
         case .swiftHeapObject: return .swiftHeapObject
         case .unsafePointer: return .unsafePointer
@@ -1724,6 +1732,7 @@ extension BridgeType {
         static let float = LoweringIntrinsicInfo(returnType: .f32)
         static let double = LoweringIntrinsicInfo(returnType: .f64)
         static let string = LoweringIntrinsicInfo(returnType: nil)
+        static let jsValue = LoweringIntrinsicInfo(returnType: nil)
         static let jsObject = LoweringIntrinsicInfo(returnType: .i32)
         static let swiftHeapObject = LoweringIntrinsicInfo(returnType: .pointer)
         static let unsafePointer = LoweringIntrinsicInfo(returnType: .pointer)
@@ -1743,6 +1752,7 @@ extension BridgeType {
         case .float: return .float
         case .double: return .double
         case .string: return .string
+        case .jsValue: return .jsValue
         case .jsObject: return .jsObject
         case .swiftHeapObject: return .swiftHeapObject
         case .unsafePointer: return .unsafePointer

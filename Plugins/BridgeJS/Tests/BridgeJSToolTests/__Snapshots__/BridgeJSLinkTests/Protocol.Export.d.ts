@@ -10,6 +10,7 @@ export interface MyViewControllerDelegate {
     onCountUpdated(count: number): boolean;
     onLabelUpdated(prefix: string, suffix: string): void;
     isCountEven(): boolean;
+    onRawEvent(value: any): any;
     onHelperUpdated(helper: Helper): void;
     createHelper(): Helper;
     onOptionalHelperUpdated(helper: Helper | null): void;
@@ -19,6 +20,7 @@ export interface MyViewControllerDelegate {
     getResult(): ResultTag;
     eventCount: number;
     readonly delegateName: string;
+    rawEvent: any;
     optionalName: string | null;
     optionalRawEnum: ExampleEnumTag | null;
     rawStringEnum: ExampleEnumTag;

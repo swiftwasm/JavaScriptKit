@@ -18,6 +18,8 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
+    let tmpRetJSValuePayload1;
+    let tmpRetJSValuePayload2;
     let tmpRetTag;
     let tmpRetStrings = [];
     let tmpRetInts = [];
@@ -209,6 +211,16 @@ export async function createInstantiator(options, swift) {
                 const pointer = tmpRetOptionalHeapObject;
                 tmpRetOptionalHeapObject = undefined;
                 return pointer || 0;
+            }
+            bjs["swift_js_get_jsvalue_payload1"] = function() {
+                const payload1 = tmpRetJSValuePayload1;
+                tmpRetJSValuePayload1 = 0;
+                return payload1;
+            }
+            bjs["swift_js_get_jsvalue_payload2"] = function() {
+                const payload2 = tmpRetJSValuePayload2;
+                tmpRetJSValuePayload2 = 0.0;
+                return payload2;
             }
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_createArrayBuffer"] = function bjs_createArrayBuffer() {

@@ -38,6 +38,7 @@ import JavaScriptKit
 @JS protocol MyViewControllerDelegate {
     var eventCount: Int { get set }
     var delegateName: String { get }
+    var rawEvent: JSValue { get set }
     var optionalName: String? { get set }
     var optionalRawEnum: ExampleEnum? { get set }
     var rawStringEnum: ExampleEnum { get set }
@@ -52,6 +53,7 @@ import JavaScriptKit
     func onCountUpdated(count: Int) -> Bool
     func onLabelUpdated(_ prefix: String, _ suffix: String)
     func isCountEven() -> Bool
+    func onRawEvent(_ value: JSValue) -> JSValue
     func onHelperUpdated(_ helper: Helper)
     func createHelper() -> Helper
     func onOptionalHelperUpdated(_ helper: Helper?)

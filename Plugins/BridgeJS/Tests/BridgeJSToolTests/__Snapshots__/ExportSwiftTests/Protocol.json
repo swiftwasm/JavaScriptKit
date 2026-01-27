@@ -612,6 +612,31 @@
           }
         },
         {
+          "abiName" : "bjs_MyViewControllerDelegate_onRawEvent",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "name" : "onRawEvent",
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "value",
+              "type" : {
+                "jsValue" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "jsValue" : {
+
+            }
+          }
+        },
+        {
           "abiName" : "bjs_MyViewControllerDelegate_onHelperUpdated",
           "effects" : {
             "isAsync" : false,
@@ -780,6 +805,15 @@
           "name" : "delegateName",
           "type" : {
             "string" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : false,
+          "name" : "rawEvent",
+          "type" : {
+            "jsValue" : {
 
             }
           }

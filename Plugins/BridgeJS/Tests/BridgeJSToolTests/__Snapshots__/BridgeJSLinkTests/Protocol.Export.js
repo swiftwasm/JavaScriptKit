@@ -82,6 +82,8 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
+    let tmpRetJSValuePayload1;
+    let tmpRetJSValuePayload2;
     let tmpRetTag;
     let tmpRetStrings = [];
     let tmpRetInts = [];
@@ -273,6 +275,16 @@ export async function createInstantiator(options, swift) {
                 tmpRetOptionalHeapObject = undefined;
                 return pointer || 0;
             }
+            bjs["swift_js_get_jsvalue_payload1"] = function() {
+                const payload1 = tmpRetJSValuePayload1;
+                tmpRetJSValuePayload1 = 0;
+                return payload1;
+            }
+            bjs["swift_js_get_jsvalue_payload2"] = function() {
+                const payload2 = tmpRetJSValuePayload2;
+                tmpRetJSValuePayload2 = 0.0;
+                return payload2;
+            }
             // Wrapper functions for module: TestModule
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
@@ -311,6 +323,43 @@ export async function createInstantiator(options, swift) {
                     let ret = swift.memory.getObject(self).delegateName;
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_rawEvent_get"] = function bjs_MyViewControllerDelegate_rawEvent_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).rawEvent;
+                    const kind = (ret === null) ? 4 : (ret === undefined) ? 5 : (typeof ret === "boolean") ? 0 : (typeof ret === "string") ? 1 : (typeof ret === "number") ? 2 : (typeof ret === "symbol") ? 7 : (typeof ret === "bigint") ? 8 : 3;
+                    let payload1 = 0;
+                    let payload2 = 0.0;
+                    switch (kind | 0) {
+                        case 0: { payload1 = ret ? 1 : 0; break; }
+                        case 2: { payload2 = +ret; break; }
+                        case 1: case 3: case 7: case 8: { payload1 = swift.memory.retain(ret); break; }
+                        case 4: case 5: { break; }
+                        default: { throw new Error("Unknown JSValue kind: " + String(kind)); }
+                    }
+                    tmpRetJSValuePayload1 = payload1;
+                    tmpRetJSValuePayload2 = payload2;
+                    return kind;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_rawEvent_set"] = function bjs_MyViewControllerDelegate_rawEvent_set(self, valueKind, valuePayload1, valuePayload2) {
+                try {
+                    let value;
+                    switch (valueKind | 0) {
+                        case 0: { value = (valuePayload1 !== 0); break; }
+                        case 2: { value = valuePayload2; break; }
+                        case 1: case 3: case 7: case 8: { value = swift.memory.getObject(valuePayload1); break; }
+                        case 4: { value = null; break; }
+                        case 5: { value = undefined; break; }
+                        default: { throw new Error("Unknown JSValue kind passed from Swift: " + String(valueKind)); }
+                    }
+                    swift.memory.getObject(self).rawEvent = value;
                 } catch (error) {
                     setException(error);
                 }
@@ -518,6 +567,36 @@ export async function createInstantiator(options, swift) {
                 try {
                     let ret = swift.memory.getObject(self).isCountEven();
                     return ret ? 1 : 0;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_onRawEvent"] = function bjs_MyViewControllerDelegate_onRawEvent(self, valueKind, valuePayload1, valuePayload2) {
+                try {
+                    let value;
+                    switch (valueKind | 0) {
+                        case 0: { value = (valuePayload1 !== 0); break; }
+                        case 2: { value = valuePayload2; break; }
+                        case 1: case 3: case 7: case 8: { value = swift.memory.getObject(valuePayload1); break; }
+                        case 4: { value = null; break; }
+                        case 5: { value = undefined; break; }
+                        default: { throw new Error("Unknown JSValue kind passed from Swift: " + String(valueKind)); }
+                    }
+                    let ret = swift.memory.getObject(self).onRawEvent(value);
+                    const kind = (ret === null) ? 4 : (ret === undefined) ? 5 : (typeof ret === "boolean") ? 0 : (typeof ret === "string") ? 1 : (typeof ret === "number") ? 2 : (typeof ret === "symbol") ? 7 : (typeof ret === "bigint") ? 8 : 3;
+                    let payload1 = 0;
+                    let payload2 = 0.0;
+                    switch (kind | 0) {
+                        case 0: { payload1 = ret ? 1 : 0; break; }
+                        case 2: { payload2 = +ret; break; }
+                        case 1: case 3: case 7: case 8: { payload1 = swift.memory.retain(ret); break; }
+                        case 4: case 5: { break; }
+                        default: { throw new Error("Unknown JSValue kind: " + String(kind)); }
+                    }
+                    tmpRetJSValuePayload1 = payload1;
+                    tmpRetJSValuePayload2 = payload2;
+                    return kind;
                 } catch (error) {
                     setException(error);
                     return 0

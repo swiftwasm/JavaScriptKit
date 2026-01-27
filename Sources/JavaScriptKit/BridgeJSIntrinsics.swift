@@ -221,6 +221,58 @@ extension JSObject {
     }
 }
 
+extension JSValue {
+    // MARK: ImportTS
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (
+        kind: Int32, payload1: Int32, payload2: Float64
+    ) {
+        self.withRawJSValue { raw in
+            (
+                kind: Int32(bitPattern: raw.kind.rawValue),
+                payload1: Int32(bitPattern: UInt32(raw.payload1)),
+                payload2: raw.payload2
+            )
+        }
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ kind: Int32) -> JSValue {
+        let payload1 = _swift_js_get_jsvalue_payload1()
+        let payload2 = _swift_js_get_jsvalue_payload2()
+        let rawKind = JavaScriptValueKind(rawValue: UInt32(bitPattern: kind)) ?? .undefined
+        let raw = RawJSValue(kind: rawKind, payload1: JavaScriptPayload1(UInt32(bitPattern: payload1)), payload2: payload2)
+        return raw.jsValue
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(
+        _ kind: Int32,
+        _ payload1: Int32,
+        _ payload2: Float64
+    ) -> JSValue {
+        let rawKind = JavaScriptValueKind(rawValue: UInt32(bitPattern: kind)) ?? .undefined
+        let raw = RawJSValue(kind: rawKind, payload1: JavaScriptPayload1(UInt32(bitPattern: payload1)), payload2: payload2)
+        return raw.jsValue
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        self.withRawJSValue { raw in
+            _swift_js_push_tag(Int32(bitPattern: raw.kind.rawValue))
+            switch raw.kind {
+            case .boolean:
+                _swift_js_push_int(Int32(bitPattern: UInt32(raw.payload1)))
+            case .number:
+                _swift_js_push_f64(raw.payload2)
+            case .string, .object, .symbol, .bigInt:
+                _swift_js_push_int(_swift_js_retain(Int32(bitPattern: UInt32(raw.payload1))))
+            case .null, .undefined:
+                break
+            }
+        }
+    }
+}
+
 /// A protocol that Swift heap objects exposed to JavaScript via `@JS class` must conform to.
 ///
 /// The conformance is automatically synthesized by the BridgeJS code generator.
@@ -607,6 +659,24 @@ func _swift_js_return_optional_object(_ isSome: Int32, _ objectId: Int32) {
 func _swift_js_get_optional_heap_object_pointer() -> UnsafeMutableRawPointer
 #else
 func _swift_js_get_optional_heap_object_pointer() -> UnsafeMutableRawPointer {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_get_jsvalue_payload1")
+func _swift_js_get_jsvalue_payload1() -> Int32
+#else
+func _swift_js_get_jsvalue_payload1() -> Int32 {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_get_jsvalue_payload2")
+func _swift_js_get_jsvalue_payload2() -> Float64
+#else
+func _swift_js_get_jsvalue_payload2() -> Float64 {
     _onlyAvailableOnWasm()
 }
 #endif
