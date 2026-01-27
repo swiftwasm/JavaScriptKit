@@ -107,8 +107,28 @@ public struct ClosureSignature: Codable, Equatable, Hashable, Sendable {
     }
 }
 
+public enum UnsafePointerKind: String, Codable, Equatable, Hashable, Sendable {
+    case unsafePointer
+    case unsafeMutablePointer
+    case unsafeRawPointer
+    case unsafeMutableRawPointer
+    case opaquePointer
+}
+
+public struct UnsafePointerType: Codable, Equatable, Hashable, Sendable {
+    public let kind: UnsafePointerKind
+    /// The pointee type name for generic pointer types (e.g. `UInt8` for `UnsafePointer<UInt8>`).
+    public let pointee: String?
+
+    public init(kind: UnsafePointerKind, pointee: String? = nil) {
+        self.kind = kind
+        self.pointee = pointee
+    }
+}
+
 public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case int, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
+    case unsafePointer(UnsafePointerType)
     indirect case optional(BridgeType)
     case caseEnum(String)
     case rawValueEnum(String, SwiftEnumRawType)
@@ -831,6 +851,12 @@ extension BridgeType {
             self = .void
         case "JSObject":
             self = .jsObject(nil)
+        case "UnsafeRawPointer":
+            self = .unsafePointer(.init(kind: .unsafeRawPointer))
+        case "UnsafeMutableRawPointer":
+            self = .unsafePointer(.init(kind: .unsafeMutableRawPointer))
+        case "OpaquePointer":
+            self = .unsafePointer(.init(kind: .opaquePointer))
         default:
             return nil
         }
@@ -847,6 +873,8 @@ extension BridgeType {
         case .jsObject: return .i32
         case .swiftHeapObject:
             // UnsafeMutableRawPointer is returned as an i32 pointer
+            return .pointer
+        case .unsafePointer:
             return .pointer
         case .optional(_):
             return nil
@@ -891,6 +919,23 @@ extension BridgeType {
             return "\(typeName.count)\(typeName)C"
         case .swiftHeapObject(let name):
             return "\(name.count)\(name)C"
+        case .unsafePointer(let ptr):
+            func sanitize(_ s: String) -> String {
+                s.filter { $0.isNumber || $0.isLetter }
+            }
+            let kindCode: String =
+                switch ptr.kind {
+                case .unsafePointer: "Sup"
+                case .unsafeMutablePointer: "Sump"
+                case .unsafeRawPointer: "Surp"
+                case .unsafeMutableRawPointer: "Sumrp"
+                case .opaquePointer: "Sop"
+                }
+            if let pointee = ptr.pointee, !pointee.isEmpty {
+                let p = sanitize(pointee)
+                return "\(kindCode)\(p.count)\(p)"
+            }
+            return kindCode
         case .optional(let wrapped):
             return "Sq\(wrapped.mangleTypeName)"
         case .caseEnum(let name),

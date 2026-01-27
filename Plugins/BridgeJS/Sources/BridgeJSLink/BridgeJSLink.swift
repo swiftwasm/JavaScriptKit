@@ -3298,6 +3298,8 @@ extension BridgeType {
             return name ?? "any"
         case .swiftHeapObject(let name):
             return name
+        case .unsafePointer:
+            return "number"
         case .optional(let wrappedType):
             return "\(wrappedType.tsType) | null"
         case .caseEnum(let name):

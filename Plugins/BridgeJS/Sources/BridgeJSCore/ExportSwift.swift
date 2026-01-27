@@ -772,6 +772,8 @@ struct StackCodegen {
             return "JSObject.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
         case .swiftHeapObject(let className):
             return "\(raw: className).bridgeJSLiftParameter(_swift_js_pop_param_pointer())"
+        case .unsafePointer:
+            return "\(raw: type.swiftType).bridgeJSLiftParameter(_swift_js_pop_param_pointer())"
         case .swiftProtocol:
             // Protocols are handled via JSObject
             return "JSObject.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
@@ -871,6 +873,8 @@ struct StackCodegen {
         case .jsObject:
             return ["_swift_js_push_int(\(raw: accessor).bridgeJSLowerParameter())"]
         case .swiftHeapObject:
+            return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
+        case .unsafePointer:
             return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
         case .swiftProtocol:
             return ["_swift_js_push_int(\(raw: accessor).bridgeJSLowerParameter())"]
@@ -1421,6 +1425,23 @@ extension WasmCoreType {
     }
 }
 
+extension UnsafePointerType {
+    var swiftType: String {
+        switch kind {
+        case .unsafePointer:
+            return "UnsafePointer<\(pointee ?? "Never")>"
+        case .unsafeMutablePointer:
+            return "UnsafeMutablePointer<\(pointee ?? "Never")>"
+        case .unsafeRawPointer:
+            return "UnsafeRawPointer"
+        case .unsafeMutableRawPointer:
+            return "UnsafeMutableRawPointer"
+        case .opaquePointer:
+            return "OpaquePointer"
+        }
+    }
+}
+
 extension BridgeType {
     var swiftType: String {
         switch self {
@@ -1432,6 +1453,7 @@ extension BridgeType {
         case .jsObject(nil): return "JSObject"
         case .jsObject(let name?): return name
         case .swiftHeapObject(let name): return name
+        case .unsafePointer(let ptr): return ptr.swiftType
         case .swiftProtocol(let name): return "Any\(name)"
         case .void: return "Void"
         case .optional(let wrappedType): return "Optional<\(wrappedType.swiftType)>"
@@ -1457,6 +1479,7 @@ extension BridgeType {
         static let string = LiftingIntrinsicInfo(parameters: [("bytes", .i32), ("length", .i32)])
         static let jsObject = LiftingIntrinsicInfo(parameters: [("value", .i32)])
         static let swiftHeapObject = LiftingIntrinsicInfo(parameters: [("value", .pointer)])
+        static let unsafePointer = LiftingIntrinsicInfo(parameters: [("pointer", .pointer)])
         static let void = LiftingIntrinsicInfo(parameters: [])
         static let caseEnum = LiftingIntrinsicInfo(parameters: [("value", .i32)])
         static let associatedValueEnum = LiftingIntrinsicInfo(parameters: [
@@ -1473,6 +1496,7 @@ extension BridgeType {
         case .string: return .string
         case .jsObject: return .jsObject
         case .swiftHeapObject: return .swiftHeapObject
+        case .unsafePointer: return .unsafePointer
         case .swiftProtocol: return .jsObject
         case .void: return .void
         case .optional(let wrappedType):
@@ -1503,6 +1527,7 @@ extension BridgeType {
         static let string = LoweringIntrinsicInfo(returnType: nil)
         static let jsObject = LoweringIntrinsicInfo(returnType: .i32)
         static let swiftHeapObject = LoweringIntrinsicInfo(returnType: .pointer)
+        static let unsafePointer = LoweringIntrinsicInfo(returnType: .pointer)
         static let void = LoweringIntrinsicInfo(returnType: nil)
         static let caseEnum = LoweringIntrinsicInfo(returnType: .i32)
         static let rawValueEnum = LoweringIntrinsicInfo(returnType: .i32)
@@ -1520,6 +1545,7 @@ extension BridgeType {
         case .string: return .string
         case .jsObject: return .jsObject
         case .swiftHeapObject: return .swiftHeapObject
+        case .unsafePointer: return .unsafePointer
         case .swiftProtocol: return .jsObject
         case .void: return .void
         case .optional: return .optional

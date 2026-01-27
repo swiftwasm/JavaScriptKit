@@ -176,6 +176,14 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
         assert.equal(exports.roundTripString(v), v);
     }
 
+    for (const p of [1, 4, 1024, 65536, 2147483647]) {
+        assert.equal(exports.roundTripUnsafeRawPointer(p), p);
+        assert.equal(exports.roundTripUnsafeMutableRawPointer(p), p);
+        assert.equal(exports.roundTripOpaquePointer(p), p);
+        assert.equal(exports.roundTripUnsafePointer(p), p);
+        assert.equal(exports.roundTripUnsafeMutablePointer(p), p);
+    }
+
     const g = new exports.Greeter("John");
     assert.equal(g.greet(), "Hello, John!");
 
@@ -954,6 +962,9 @@ function testStructSupport(exports) {
     assert.deepEqual(exports.roundTripDataPoint(data1), data1);
     const data2 = { x: 0.0, y: 0.0, label: "", optCount: null, optFlag: null };
     assert.deepEqual(exports.roundTripDataPoint(data2), data2);
+
+    const pointerFields1 = { raw: 1, mutRaw: 4, opaque: 1024, ptr: 65536, mutPtr: 2 };
+    assert.deepEqual(exports.roundTripPointerFields(pointerFields1), pointerFields1);
 
     const contact1 = {
         name: "Alice",

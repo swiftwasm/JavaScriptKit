@@ -4705,6 +4705,155 @@
         }
       },
       {
+        "abiName" : "bjs_roundTripUnsafeRawPointer",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUnsafeRawPointer",
+        "parameters" : [
+          {
+            "label" : "v",
+            "name" : "v",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafeRawPointer"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "unsafePointer" : {
+            "_0" : {
+              "kind" : "unsafeRawPointer"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripUnsafeMutableRawPointer",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUnsafeMutableRawPointer",
+        "parameters" : [
+          {
+            "label" : "v",
+            "name" : "v",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafeMutableRawPointer"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "unsafePointer" : {
+            "_0" : {
+              "kind" : "unsafeMutableRawPointer"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripOpaquePointer",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripOpaquePointer",
+        "parameters" : [
+          {
+            "label" : "v",
+            "name" : "v",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "opaquePointer"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "unsafePointer" : {
+            "_0" : {
+              "kind" : "opaquePointer"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripUnsafePointer",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUnsafePointer",
+        "parameters" : [
+          {
+            "label" : "v",
+            "name" : "v",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafePointer",
+                  "pointee" : "UInt8"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "unsafePointer" : {
+            "_0" : {
+              "kind" : "unsafePointer",
+              "pointee" : "UInt8"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripUnsafeMutablePointer",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUnsafeMutablePointer",
+        "parameters" : [
+          {
+            "label" : "v",
+            "name" : "v",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafeMutablePointer",
+                  "pointee" : "UInt8"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "unsafePointer" : {
+            "_0" : {
+              "kind" : "unsafeMutablePointer",
+              "pointee" : "UInt8"
+            }
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripJSObject",
         "effects" : {
           "isAsync" : false,
@@ -4726,6 +4875,31 @@
         "returnType" : {
           "jsObject" : {
 
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripPointerFields",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripPointerFields",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "PointerFields"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "PointerFields"
           }
         }
       },
@@ -8313,6 +8487,144 @@
       }
     ],
     "structs" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_PointerFields_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "raw",
+              "name" : "raw",
+              "type" : {
+                "unsafePointer" : {
+                  "_0" : {
+                    "kind" : "unsafeRawPointer"
+                  }
+                }
+              }
+            },
+            {
+              "label" : "mutRaw",
+              "name" : "mutRaw",
+              "type" : {
+                "unsafePointer" : {
+                  "_0" : {
+                    "kind" : "unsafeMutableRawPointer"
+                  }
+                }
+              }
+            },
+            {
+              "label" : "opaque",
+              "name" : "opaque",
+              "type" : {
+                "unsafePointer" : {
+                  "_0" : {
+                    "kind" : "opaquePointer"
+                  }
+                }
+              }
+            },
+            {
+              "label" : "ptr",
+              "name" : "ptr",
+              "type" : {
+                "unsafePointer" : {
+                  "_0" : {
+                    "kind" : "unsafePointer",
+                    "pointee" : "UInt8"
+                  }
+                }
+              }
+            },
+            {
+              "label" : "mutPtr",
+              "name" : "mutPtr",
+              "type" : {
+                "unsafePointer" : {
+                  "_0" : {
+                    "kind" : "unsafeMutablePointer",
+                    "pointee" : "UInt8"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "PointerFields",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "raw",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafeRawPointer"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "mutRaw",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafeMutableRawPointer"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "opaque",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "opaquePointer"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "ptr",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafePointer",
+                  "pointee" : "UInt8"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "mutPtr",
+            "type" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafeMutablePointer",
+                  "pointee" : "UInt8"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "PointerFields"
+      },
       {
         "constructor" : {
           "abiName" : "bjs_DataPoint_init",

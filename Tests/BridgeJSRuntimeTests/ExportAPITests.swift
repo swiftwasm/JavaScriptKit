@@ -29,9 +29,49 @@ func runJsWorks() -> Void
     return v
 }
 
+@JS func roundTripUnsafeRawPointer(v: UnsafeRawPointer) -> UnsafeRawPointer {
+    return v
+}
+@JS func roundTripUnsafeMutableRawPointer(v: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    return v
+}
+@JS func roundTripOpaquePointer(v: OpaquePointer) -> OpaquePointer {
+    return v
+}
+@JS func roundTripUnsafePointer(v: UnsafePointer<UInt8>) -> UnsafePointer<UInt8> {
+    return v
+}
+@JS func roundTripUnsafeMutablePointer(v: UnsafeMutablePointer<UInt8>) -> UnsafeMutablePointer<UInt8> {
+    return v
+}
+
 @JS func roundTripJSObject(v: JSObject) -> JSObject {
     return v
 }
+
+@JS struct PointerFields {
+    var raw: UnsafeRawPointer
+    var mutRaw: UnsafeMutableRawPointer
+    var opaque: OpaquePointer
+    var ptr: UnsafePointer<UInt8>
+    var mutPtr: UnsafeMutablePointer<UInt8>
+
+    @JS init(
+        raw: UnsafeRawPointer,
+        mutRaw: UnsafeMutableRawPointer,
+        opaque: OpaquePointer,
+        ptr: UnsafePointer<UInt8>,
+        mutPtr: UnsafeMutablePointer<UInt8>
+    ) {
+        self.raw = raw
+        self.mutRaw = mutRaw
+        self.opaque = opaque
+        self.ptr = ptr
+        self.mutPtr = mutPtr
+    }
+}
+
+@JS func roundTripPointerFields(_ value: PointerFields) -> PointerFields { value }
 
 @JSClass struct Foo {
     @JSGetter var value: String

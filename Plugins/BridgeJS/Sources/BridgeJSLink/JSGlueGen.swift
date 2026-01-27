@@ -1300,7 +1300,7 @@ struct IntrinsicJSFragment: Sendable {
     /// Returns a fragment that lowers a JS value to Wasm core values for parameters
     static func lowerParameter(type: BridgeType) throws -> IntrinsicJSFragment {
         switch type {
-        case .int, .float, .double, .bool: return .identity
+        case .int, .float, .double, .bool, .unsafePointer: return .identity
         case .string: return .stringLowerParameter
         case .jsObject: return .jsObjectLowerParameter
         case .swiftHeapObject:
@@ -1346,6 +1346,7 @@ struct IntrinsicJSFragment: Sendable {
         case .string: return .stringLiftReturn
         case .jsObject: return .jsObjectLiftReturn
         case .swiftHeapObject(let name): return .swiftHeapObjectLiftReturn(name)
+        case .unsafePointer: return .identity
         case .swiftProtocol: return .jsObjectLiftReturn
         case .void: return .void
         case .optional(let wrappedType): return .optionalLiftReturn(wrappedType: wrappedType)
@@ -1388,6 +1389,7 @@ struct IntrinsicJSFragment: Sendable {
         case .bool: return .boolLiftParameter
         case .string: return .stringLiftParameter
         case .jsObject: return .jsObjectLiftParameter
+        case .unsafePointer: return .identity
         case .swiftHeapObject(let name):
             switch context {
             case .importTS:
@@ -1482,6 +1484,7 @@ struct IntrinsicJSFragment: Sendable {
         case .bool: return .boolLowerReturn
         case .string: return .stringLowerReturn
         case .jsObject: return .jsObjectLowerReturn
+        case .unsafePointer: return .identity
         case .swiftHeapObject(let name):
             switch context {
             case .importTS:
@@ -2266,6 +2269,14 @@ struct IntrinsicJSFragment: Sendable {
                     return []
                 }
             )
+        case .unsafePointer:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamPointers).push((\(arguments[0]) | 0));")
+                    return []
+                }
+            )
         case .jsObject:
             return IntrinsicJSFragment(
                 parameters: ["value"],
@@ -2696,6 +2707,15 @@ struct IntrinsicJSFragment: Sendable {
                     let dVar = scope.variable("f64")
                     printer.write("const \(dVar) = \(JSGlueVariableScope.reservedTmpRetF64s).pop();")
                     return [dVar]
+                }
+            )
+        case .unsafePointer:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let pVar = scope.variable("pointer")
+                    printer.write("const \(pVar) = \(JSGlueVariableScope.reservedTmpRetPointers).pop();")
+                    return [pVar]
                 }
             )
         case .optional(let wrappedType):
