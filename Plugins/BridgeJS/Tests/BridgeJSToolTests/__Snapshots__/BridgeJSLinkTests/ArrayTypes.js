@@ -31,7 +31,7 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tmpRetTag;
+    let tmpRetTag = [];
     let tmpRetStrings = [];
     let tmpRetInts = [];
     let tmpRetF32s = [];
@@ -98,7 +98,7 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
             bjs["swift_js_push_tag"] = function(tag) {
-                tmpRetTag = tag;
+                tmpRetTag.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
                 tmpRetInts.push(v | 0);
@@ -382,9 +382,9 @@ export async function createInstantiator(options, swift) {
                 processPointArray: function bjs_processPointArray(points) {
                     const arrayCleanups = [];
                     for (const elem of points) {
-                        const { cleanup: cleanup } = structHelpers.Point.lower(elem);
+                        const { cleanup: structCleanup } = structHelpers.Point.lower(elem);
                         arrayCleanups.push(() => {
-                            if (cleanup) { cleanup(); }
+                            if (structCleanup) { structCleanup(); }
                         });
                     }
                     tmpParamInts.push(points.length);
@@ -446,9 +446,9 @@ export async function createInstantiator(options, swift) {
                 findFirstPoint: function bjs_findFirstPoint(points, matching) {
                     const arrayCleanups = [];
                     for (const elem of points) {
-                        const { cleanup: cleanup } = structHelpers.Point.lower(elem);
+                        const { cleanup: structCleanup } = structHelpers.Point.lower(elem);
                         arrayCleanups.push(() => {
-                            if (cleanup) { cleanup(); }
+                            if (structCleanup) { structCleanup(); }
                         });
                     }
                     tmpParamInts.push(points.length);
@@ -610,8 +610,8 @@ export async function createInstantiator(options, swift) {
                     for (const elem of points) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
-                            const { cleanup: cleanup } = structHelpers.Point.lower(elem);
-                            arrayCleanups.push(() => { if (cleanup) { cleanup(); } });
+                            const { cleanup: structCleanup } = structHelpers.Point.lower(elem);
+                            arrayCleanups.push(() => { if (structCleanup) { structCleanup(); } });
                         } else {
                         }
                         tmpParamInts.push(isSome);
@@ -766,9 +766,9 @@ export async function createInstantiator(options, swift) {
                     for (const elem of points) {
                         const arrayCleanups1 = [];
                         for (const elem1 of elem) {
-                            const { cleanup: cleanup } = structHelpers.Point.lower(elem1);
+                            const { cleanup: structCleanup } = structHelpers.Point.lower(elem1);
                             arrayCleanups1.push(() => {
-                                if (cleanup) { cleanup(); }
+                                if (structCleanup) { structCleanup(); }
                             });
                         }
                         tmpParamInts.push(elem.length);
@@ -805,7 +805,7 @@ export async function createInstantiator(options, swift) {
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const ptr = tmpRetPointers.pop();
-                        const obj = Item.__construct(ptr);
+                        const obj = _exports['Item'].__construct(ptr);
                         arrayResult.push(obj);
                     }
                     arrayResult.reverse();
@@ -833,7 +833,7 @@ export async function createInstantiator(options, swift) {
                         const arrayResult1 = [];
                         for (let i1 = 0; i1 < arrayLen1; i1++) {
                             const ptr = tmpRetPointers.pop();
-                            const obj = Item.__construct(ptr);
+                            const obj = _exports['Item'].__construct(ptr);
                             arrayResult1.push(obj);
                         }
                         arrayResult1.reverse();

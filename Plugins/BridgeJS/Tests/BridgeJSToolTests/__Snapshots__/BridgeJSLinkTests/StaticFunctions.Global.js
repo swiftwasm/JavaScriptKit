@@ -15,46 +15,6 @@ export const APIResultValues = {
         Failure: 1,
     },
 };
-
-const __bjs_createAPIResultValuesHelpers = () => {
-    return (tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift) => ({
-        lower: (value) => {
-            const enumTag = value.tag;
-            switch (enumTag) {
-                case APIResultValues.Tag.Success: {
-                    const bytes = textEncoder.encode(value.param0);
-                    const id = swift.memory.retain(bytes);
-                    tmpParamInts.push(bytes.length);
-                    tmpParamInts.push(id);
-                    const cleanup = () => {
-                        swift.memory.release(id);
-                    };
-                    return { caseId: APIResultValues.Tag.Success, cleanup };
-                }
-                case APIResultValues.Tag.Failure: {
-                    tmpParamInts.push((value.param0 | 0));
-                    const cleanup = undefined;
-                    return { caseId: APIResultValues.Tag.Failure, cleanup };
-                }
-                default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
-            }
-        },
-        lift: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
-            const tag = tmpRetTag | 0;
-            switch (tag) {
-                case APIResultValues.Tag.Success: {
-                    const string = tmpRetStrings.pop();
-                    return { tag: APIResultValues.Tag.Success, param0: string };
-                }
-                case APIResultValues.Tag.Failure: {
-                    const int = tmpRetInts.pop();
-                    return { tag: APIResultValues.Tag.Failure, param0: int };
-                }
-                default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
-            }
-        }
-    });
-};
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -69,7 +29,7 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tmpRetTag;
+    let tmpRetTag = [];
     let tmpRetStrings = [];
     let tmpRetInts = [];
     let tmpRetF32s = [];
@@ -85,6 +45,45 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
+    const __bjs_createAPIResultValuesHelpers = () => {
+        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers) => ({
+            lower: (value) => {
+                const enumTag = value.tag;
+                switch (enumTag) {
+                    case APIResultValues.Tag.Success: {
+                        const bytes = textEncoder.encode(value.param0);
+                        const id = swift.memory.retain(bytes);
+                        tmpParamInts.push(bytes.length);
+                        tmpParamInts.push(id);
+                        const cleanup = () => {
+                            swift.memory.release(id);
+                        };
+                        return { caseId: APIResultValues.Tag.Success, cleanup };
+                    }
+                    case APIResultValues.Tag.Failure: {
+                        tmpParamInts.push((value.param0 | 0));
+                        const cleanup = undefined;
+                        return { caseId: APIResultValues.Tag.Failure, cleanup };
+                    }
+                    default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
+                }
+            },
+            lift: (tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+                tag = tag | 0;
+                switch (tag) {
+                    case APIResultValues.Tag.Success: {
+                        const string = tmpRetStrings.pop();
+                        return { tag: APIResultValues.Tag.Success, param0: string };
+                    }
+                    case APIResultValues.Tag.Failure: {
+                        const int = tmpRetInts.pop();
+                        return { tag: APIResultValues.Tag.Failure, param0: int };
+                    }
+                    default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
+                }
+            }
+        });
+    };
 
     return {
         /**
@@ -121,7 +120,7 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
             bjs["swift_js_push_tag"] = function(tag) {
-                tmpRetTag = tag;
+                tmpRetTag.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
                 tmpRetInts.push(v | 0);
@@ -265,9 +264,6 @@ export async function createInstantiator(options, swift) {
             instance = i;
             memory = instance.exports.memory;
 
-            const APIResultHelpers = __bjs_createAPIResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift);
-            enumHelpers.APIResult = APIResultHelpers;
-
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
             }
@@ -316,6 +312,9 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
             }
+            const APIResultHelpers = __bjs_createAPIResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers);
+            enumHelpers.APIResult = APIResultHelpers;
+
             if (typeof globalThis.Utils === 'undefined') {
                 globalThis.Utils = {};
             }
@@ -336,7 +335,7 @@ export async function createInstantiator(options, swift) {
                     roundtrip: function(value) {
                         const { caseId: valueCaseId, cleanup: valueCleanup } = enumHelpers.APIResult.lower(value);
                         instance.exports.bjs_APIResult_static_roundtrip(valueCaseId);
-                        const ret = enumHelpers.APIResult.lift(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                        const ret = enumHelpers.APIResult.lift(tmpRetTag.pop(), tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                         if (valueCleanup) { valueCleanup(); }
                         return ret;
                     }

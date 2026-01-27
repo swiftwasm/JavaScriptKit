@@ -23,7 +23,7 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tmpRetTag;
+    let tmpRetTag = [];
     let tmpRetStrings = [];
     let tmpRetInts = [];
     let tmpRetF32s = [];
@@ -183,9 +183,9 @@ export async function createInstantiator(options, swift) {
             },
             lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
                 const ptr = tmpRetPointers.pop();
-                const value = _exports['Greeter'].__construct(ptr);
+                const obj = _exports['Greeter'].__construct(ptr);
                 const int = tmpRetInts.pop();
-                return { id: int, owner: value };
+                return { id: int, owner: obj };
             }
         });
     };
@@ -207,14 +207,14 @@ export async function createInstantiator(options, swift) {
                 const isSome = tmpRetInts.pop();
                 let optional;
                 if (isSome) {
-                    const value = tmpRetF32s.pop();
-                    optional = value;
+                    const rawValue = tmpRetF32s.pop();
+                    optional = rawValue;
                 } else {
                     optional = null;
                 }
-                const value1 = tmpRetF32s.pop();
+                const rawValue1 = tmpRetF32s.pop();
                 const f64 = tmpRetF64s.pop();
-                return { value: f64, precision: value1, optionalPrecision: optional };
+                return { value: f64, precision: rawValue1, optionalPrecision: optional };
             }
         });
     };
@@ -328,7 +328,7 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
             bjs["swift_js_push_tag"] = function(tag) {
-                tmpRetTag = tag;
+                tmpRetTag.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
                 tmpRetInts.push(v | 0);

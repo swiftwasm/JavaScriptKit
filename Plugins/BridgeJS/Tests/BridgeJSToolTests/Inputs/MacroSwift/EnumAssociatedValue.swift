@@ -55,3 +55,66 @@ enum APIOptionalResult {
 }
 @JS func roundTripOptionalAPIOptionalResult(result: APIOptionalResult?) -> APIOptionalResult?
 @JS func compareAPIResults(result1: APIOptionalResult?, result2: APIOptionalResult?) -> APIOptionalResult?
+
+@JS enum Precision: Float {
+    case rough = 0.1
+    case fine = 0.001
+}
+
+@JS enum CardinalDirection {
+    case north
+    case south
+    case east
+    case west
+}
+
+@JS
+enum TypedPayloadResult {
+    case precision(Precision)
+    case direction(CardinalDirection)
+    case optPrecision(Precision?)
+    case optDirection(CardinalDirection?)
+    case empty
+}
+
+@JS func roundTripTypedPayloadResult(_ result: TypedPayloadResult) -> TypedPayloadResult
+@JS func roundTripOptionalTypedPayloadResult(_ result: TypedPayloadResult?) -> TypedPayloadResult?
+
+@JS struct Point {
+    var x: Double
+    var y: Double
+}
+
+@JS class User {
+    var name: String
+
+    init(name: String) {
+        self.name = name
+    }
+}
+
+@JS
+enum AllTypesResult {
+    case structPayload(Point)
+    case classPayload(User)
+    case jsObjectPayload(JSObject)
+    case nestedEnum(APIResult)
+    case arrayPayload([Int])
+    case empty
+}
+
+@JS func roundTripAllTypesResult(_ result: AllTypesResult) -> AllTypesResult
+@JS func roundTripOptionalAllTypesResult(_ result: AllTypesResult?) -> AllTypesResult?
+
+@JS
+enum OptionalAllTypesResult {
+    case optStruct(Point?)
+    case optClass(User?)
+    case optJSObject(JSObject?)
+    case optNestedEnum(APIResult?)
+    case optArray([Int]?)
+    case empty
+}
+
+@JS func roundTripOptionalPayloadResult(_ result: OptionalAllTypesResult) -> OptionalAllTypesResult
+@JS func roundTripOptionalPayloadResultOpt(_ result: OptionalAllTypesResult?) -> OptionalAllTypesResult?

@@ -1,7 +1,7 @@
 // @ts-check
 
 import {
-    DirectionValues, StatusValues, ThemeValues, HttpStatusValues, TSDirection, TSTheme, APIResultValues, ComplexResultValues, APIOptionalResultValues, StaticCalculatorValues, StaticPropertyEnumValues
+    DirectionValues, StatusValues, ThemeValues, HttpStatusValues, TSDirection, TSTheme, APIResultValues, ComplexResultValues, APIOptionalResultValues, StaticCalculatorValues, StaticPropertyEnumValues, PrecisionValues, TypedPayloadResultValues, AllTypesResultValues, OptionalAllTypesResultValues
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
@@ -780,6 +780,129 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor9), aor9);
     assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor10), aor10);
     assert.equal(exports.roundTripOptionalAPIOptionalResult(null), null);
+
+    // TypedPayloadResult — rawValueEnum and caseEnum as associated value payloads
+    assert.equal(exports.Precision.Rough, 0.1);
+    assert.equal(exports.Precision.Fine, 0.001);
+
+    const tpr_precision = { tag: exports.TypedPayloadResult.Tag.Precision, param0: Math.fround(0.1) };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_precision), tpr_precision);
+
+    const tpr_direction = { tag: exports.TypedPayloadResult.Tag.Direction, param0: exports.Direction.North };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_direction), tpr_direction);
+
+    const tpr_dirSouth = { tag: exports.TypedPayloadResult.Tag.Direction, param0: exports.Direction.South };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_dirSouth), tpr_dirSouth);
+
+    const tpr_optPrecisionSome = { tag: exports.TypedPayloadResult.Tag.OptPrecision, param0: Math.fround(0.001) };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_optPrecisionSome), tpr_optPrecisionSome);
+
+    const tpr_optPrecisionNull = { tag: exports.TypedPayloadResult.Tag.OptPrecision, param0: null };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_optPrecisionNull), tpr_optPrecisionNull);
+
+    const tpr_optDirectionSome = { tag: exports.TypedPayloadResult.Tag.OptDirection, param0: exports.Direction.East };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_optDirectionSome), tpr_optDirectionSome);
+
+    const tpr_optDirectionNull = { tag: exports.TypedPayloadResult.Tag.OptDirection, param0: null };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_optDirectionNull), tpr_optDirectionNull);
+
+    const tpr_empty = { tag: exports.TypedPayloadResult.Tag.Empty };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_empty), tpr_empty);
+
+    // Optional TypedPayloadResult roundtrip
+    assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_precision), tpr_precision);
+    assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_direction), tpr_direction);
+    assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_optPrecisionSome), tpr_optPrecisionSome);
+    assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_optPrecisionNull), tpr_optPrecisionNull);
+    assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_empty), tpr_empty);
+    assert.equal(exports.roundTripOptionalTypedPayloadResult(null), null);
+
+    // AllTypesResult — struct, class, JSObject, nested enum, array as associated value payloads
+    const atr_struct = { tag: AllTypesResultValues.Tag.StructPayload, param0: { street: "100 Main St", city: "Boston", zipCode: 2101 } };
+    assert.deepEqual(exports.roundTripAllTypesResult(atr_struct), atr_struct);
+
+    const atr_class = { tag: AllTypesResultValues.Tag.ClassPayload, param0: new exports.Greeter("EnumUser") };
+    const atr_class_result = exports.roundTripAllTypesResult(atr_class);
+    assert.equal(atr_class_result.tag, AllTypesResultValues.Tag.ClassPayload);
+    assert.equal(atr_class_result.param0.name, "EnumUser");
+
+    const atr_jsObject = { tag: AllTypesResultValues.Tag.JsObjectPayload, param0: { custom: "data", value: 42 } };
+    const atr_jsObject_result = exports.roundTripAllTypesResult(atr_jsObject);
+    assert.equal(atr_jsObject_result.tag, AllTypesResultValues.Tag.JsObjectPayload);
+    assert.equal(atr_jsObject_result.param0.custom, "data");
+    assert.equal(atr_jsObject_result.param0.value, 42);
+
+    const atr_nestedEnum = { tag: AllTypesResultValues.Tag.NestedEnum, param0: { tag: APIResultValues.Tag.Success, param0: "nested!" } };
+    assert.deepEqual(exports.roundTripAllTypesResult(atr_nestedEnum), atr_nestedEnum);
+
+    const atr_array = { tag: AllTypesResultValues.Tag.ArrayPayload, param0: [10, 20, 30] };
+    assert.deepEqual(exports.roundTripAllTypesResult(atr_array), atr_array);
+
+    const atr_jsClass = { tag: AllTypesResultValues.Tag.JsClassPayload, param0: new ImportedFoo("enumFoo") };
+    const atr_jsClass_result = exports.roundTripAllTypesResult(atr_jsClass);
+    assert.equal(atr_jsClass_result.tag, AllTypesResultValues.Tag.JsClassPayload);
+    assert.equal(atr_jsClass_result.param0.value, "enumFoo");
+
+    const atr_empty = { tag: AllTypesResultValues.Tag.Empty };
+    assert.deepEqual(exports.roundTripAllTypesResult(atr_empty), atr_empty);
+
+    // Optional AllTypesResult roundtrip
+    assert.deepEqual(exports.roundTripOptionalAllTypesResult(atr_struct), atr_struct);
+    assert.deepEqual(exports.roundTripOptionalAllTypesResult(atr_array), atr_array);
+    assert.deepEqual(exports.roundTripOptionalAllTypesResult(atr_empty), atr_empty);
+    assert.equal(exports.roundTripOptionalAllTypesResult(null), null);
+
+    // OptionalAllTypesResult — optional struct, class, JSObject, nested enum, array as associated value payloads
+    const oatr_structSome = { tag: OptionalAllTypesResultValues.Tag.OptStruct, param0: { street: "200 Oak St", city: "Denver", zipCode: null } };
+    assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_structSome), oatr_structSome);
+
+    const oatr_structNone = { tag: OptionalAllTypesResultValues.Tag.OptStruct, param0: null };
+    assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_structNone), oatr_structNone);
+
+    const oatr_classSome = { tag: OptionalAllTypesResultValues.Tag.OptClass, param0: new exports.Greeter("OptEnumUser") };
+    const oatr_classSome_result = exports.roundTripOptionalPayloadResult(oatr_classSome);
+    assert.equal(oatr_classSome_result.tag, OptionalAllTypesResultValues.Tag.OptClass);
+    assert.equal(oatr_classSome_result.param0.name, "OptEnumUser");
+
+    const oatr_classNone = { tag: OptionalAllTypesResultValues.Tag.OptClass, param0: null };
+    assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_classNone), oatr_classNone);
+
+    const oatr_jsObjectSome = { tag: OptionalAllTypesResultValues.Tag.OptJSObject, param0: { key: "value" } };
+    const oatr_jsObjectSome_result = exports.roundTripOptionalPayloadResult(oatr_jsObjectSome);
+    assert.equal(oatr_jsObjectSome_result.tag, OptionalAllTypesResultValues.Tag.OptJSObject);
+    assert.equal(oatr_jsObjectSome_result.param0.key, "value");
+
+    const oatr_jsObjectNone = { tag: OptionalAllTypesResultValues.Tag.OptJSObject, param0: null };
+    assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_jsObjectNone), oatr_jsObjectNone);
+
+    const oatr_nestedEnumSome = { tag: OptionalAllTypesResultValues.Tag.OptNestedEnum, param0: { tag: APIResultValues.Tag.Failure, param0: 404 } };
+    assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_nestedEnumSome), oatr_nestedEnumSome);
+
+    const oatr_nestedEnumNone = { tag: OptionalAllTypesResultValues.Tag.OptNestedEnum, param0: null };
+    assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_nestedEnumNone), oatr_nestedEnumNone);
+
+    const oatr_arraySome = { tag: OptionalAllTypesResultValues.Tag.OptArray, param0: [1, 2, 3] };
+    assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_arraySome), oatr_arraySome);
+
+    const oatr_arrayNone = { tag: OptionalAllTypesResultValues.Tag.OptArray, param0: null };
+    assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_arrayNone), oatr_arrayNone);
+
+    const oatr_jsClassSome = { tag: OptionalAllTypesResultValues.Tag.OptJsClass, param0: new ImportedFoo("optEnumFoo") };
+    const oatr_jsClassSome_result = exports.roundTripOptionalPayloadResult(oatr_jsClassSome);
+    assert.equal(oatr_jsClassSome_result.tag, OptionalAllTypesResultValues.Tag.OptJsClass);
+    assert.equal(oatr_jsClassSome_result.param0.value, "optEnumFoo");
+
+    const oatr_jsClassNone = { tag: OptionalAllTypesResultValues.Tag.OptJsClass, param0: null };
+    assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_jsClassNone), oatr_jsClassNone);
+
+    const oatr_empty = { tag: OptionalAllTypesResultValues.Tag.Empty };
+    assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_empty), oatr_empty);
+
+    // Optional OptionalAllTypesResult roundtrip
+    assert.deepEqual(exports.roundTripOptionalPayloadResultOpt(oatr_structSome), oatr_structSome);
+    assert.deepEqual(exports.roundTripOptionalPayloadResultOpt(oatr_structNone), oatr_structNone);
+    assert.deepEqual(exports.roundTripOptionalPayloadResultOpt(oatr_empty), oatr_empty);
+    assert.equal(exports.roundTripOptionalPayloadResultOpt(null), null);
 
     assert.equal(exports.MathUtils.add(2147483647, 0), 2147483647);
     assert.equal(exports.StaticCalculator.roundtrip(42), 42);
