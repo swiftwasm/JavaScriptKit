@@ -38,6 +38,22 @@ extension Status: _BridgedSwiftCaseEnum {
 }
 
 extension Config: _BridgedSwiftStruct {
+    // MARK: ImportTS
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        // Transfer ownership of the bridged JS object ID to JavaScript.
+        // JS glue will "take" this by releasing the ID after retrieving the object.
+        return toJSObject().bridgeJSLowerReturn()
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ objectId: Int32) -> Config {
+        // Take the retained object ID and copy out fields to build the Swift struct.
+        let jsObject = JSObject.bridgeJSLiftReturn(objectId)
+        return Self(unsafelyCopying: jsObject)
+    }
+
+    // MARK: ExportSwift
+
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Config {
         let enabled = Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32())
         let value = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
@@ -98,6 +114,22 @@ fileprivate func _bjs_struct_raise_Config() -> Int32 {
 #endif
 
 extension MathOperations: _BridgedSwiftStruct {
+    // MARK: ImportTS
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        // Transfer ownership of the bridged JS object ID to JavaScript.
+        // JS glue will "take" this by releasing the ID after retrieving the object.
+        return toJSObject().bridgeJSLowerReturn()
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ objectId: Int32) -> MathOperations {
+        // Take the retained object ID and copy out fields to build the Swift struct.
+        let jsObject = JSObject.bridgeJSLiftReturn(objectId)
+        return Self(unsafelyCopying: jsObject)
+    }
+
+    // MARK: ExportSwift
+
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> MathOperations {
         let baseValue = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
         return MathOperations(baseValue: baseValue)

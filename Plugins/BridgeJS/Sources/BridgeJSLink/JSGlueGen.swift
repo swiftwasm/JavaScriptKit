@@ -1446,10 +1446,9 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftStruct(let fullName):
             switch context {
             case .importTS:
-                throw BridgeJSLinkError(
-                    message:
-                        "Swift structs are not supported to be passed as parameters to imported JS functions: \(fullName)"
-                )
+                // ImportTS passes Swift structs as retained JS object IDs (same ABI as JSObject).
+                // Use "take" semantics to balance the retain done on the Swift side.
+                return .jsObjectLiftReturn
             case .exportSwift:
                 let base = fullName.components(separatedBy: ".").last ?? fullName
                 return IntrinsicJSFragment(
@@ -1527,10 +1526,8 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftStruct(let fullName):
             switch context {
             case .importTS:
-                throw BridgeJSLinkError(
-                    message:
-                        "Swift structs are not supported to be returned from imported JS functions: \(fullName)"
-                )
+                // ImportTS expects Swift structs to come back as a retained JS object ID.
+                return .jsObjectLowerReturn
             case .exportSwift:
                 return swiftStructLowerReturn(fullName: fullName)
             }

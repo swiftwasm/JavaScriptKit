@@ -916,7 +916,8 @@ extension BridgeType {
         case .swiftStruct:
             switch context {
             case .importTS:
-                throw BridgeJSCoreError("Swift structs are not yet supported in TypeScript imports")
+                // Swift structs are bridged as JS objects (object IDs) in imported signatures.
+                return LoweringParameterInfo(loweredParameters: [("objectId", .i32)])
             case .exportSwift:
                 return LoweringParameterInfo(loweredParameters: [])
             }
@@ -1002,7 +1003,8 @@ extension BridgeType {
         case .swiftStruct:
             switch context {
             case .importTS:
-                throw BridgeJSCoreError("Swift structs are not yet supported in TypeScript imports")
+                // Swift structs are bridged as JS objects (object IDs) in imported signatures.
+                return LiftingReturnInfo(valueToLift: .i32)
             case .exportSwift:
                 return LiftingReturnInfo(valueToLift: nil)
             }
