@@ -458,6 +458,13 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(HttpStatusValues.ServerError, 500);
     assert.equal(HttpStatusValues.Unknown, -1);
 
+    assert.equal(exports.Precision.Rough, 0.1);
+    assert.equal(exports.Precision.Normal, 0.01);
+    assert.equal(exports.Precision.Fine, 0.001);
+    assert.equal(exports.Ratio.Quarter, 0.25);
+    assert.equal(exports.Ratio.Half, 0.5);
+    assert.equal(exports.Ratio.Golden, 1.618);
+
     assert.equal(exports.setTheme(exports.Theme.Light), exports.Theme.Light);
     assert.equal(exports.setTheme(exports.Theme.Dark), exports.Theme.Dark);
     assert.equal(exports.getTheme(), ThemeValues.Light);
@@ -1089,6 +1096,22 @@ function testStructSupport(exports) {
     exports.ConfigStruct.defaultConfig = "staging";
     assert.equal(exports.ConfigStruct.computedSetting, "Config: staging");
     exports.ConfigStruct.defaultConfig = "production";
+
+    const { Precision, Ratio } = exports;
+    const mc1 = {
+        precision: Math.fround(Precision.Rough),
+        ratio: Ratio.Golden,
+        optionalPrecision: Math.fround(Precision.Fine),
+        optionalRatio: Ratio.Half
+    };
+    assert.deepEqual(exports.roundTripMeasurementConfig(mc1), mc1);
+    const mc2 = {
+        precision: Math.fround(Precision.Normal),
+        ratio: Ratio.Quarter,
+        optionalPrecision: null,
+        optionalRatio: null
+    };
+    assert.deepEqual(exports.roundTripMeasurementConfig(mc2), mc2);
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

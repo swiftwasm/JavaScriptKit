@@ -35,6 +35,17 @@
 
 @JS func roundtrip(_ session: Person) -> Person
 
+@JS enum Precision: Float {
+    case rough = 0.1
+    case fine = 0.001
+}
+
+@JS struct Measurement {
+    var value: Double
+    var precision: Precision
+    var optionalPrecision: Precision?
+}
+
 @JS struct ConfigStruct {
     @JS static let maxRetries: Int = 3
     @JS nonisolated(unsafe) static var defaultConfig: String = "production"

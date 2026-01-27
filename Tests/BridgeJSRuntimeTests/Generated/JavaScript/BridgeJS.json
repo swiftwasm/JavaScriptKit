@@ -3342,6 +3342,78 @@
             "associatedValues" : [
 
             ],
+            "name" : "rough",
+            "rawValue" : "0.1"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "normal",
+            "rawValue" : "0.01"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "fine",
+            "rawValue" : "0.001"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Precision",
+        "rawType" : "Float",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Precision",
+        "tsFullPath" : "Precision"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "quarter",
+            "rawValue" : "0.25"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "half",
+            "rawValue" : "0.5"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "golden",
+            "rawValue" : "1.618"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Ratio",
+        "rawType" : "Double",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Ratio",
+        "tsFullPath" : "Ratio"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
             "name" : "north"
           },
           {
@@ -7967,6 +8039,31 @@
         }
       },
       {
+        "abiName" : "bjs_roundTripMeasurementConfig",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripMeasurementConfig",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "config",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "MeasurementConfig"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "MeasurementConfig"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripDataPoint",
         "effects" : {
           "isAsync" : false,
@@ -9379,6 +9476,67 @@
           }
         ],
         "swiftCallName" : "CopyableNestedCart"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "MeasurementConfig",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "precision",
+            "type" : {
+              "rawValueEnum" : {
+                "_0" : "Precision",
+                "_1" : "Float"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "ratio",
+            "type" : {
+              "rawValueEnum" : {
+                "_0" : "Ratio",
+                "_1" : "Double"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "optionalPrecision",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "Precision",
+                    "_1" : "Float"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "optionalRatio",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "Ratio",
+                    "_1" : "Double"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "MeasurementConfig"
       },
       {
         "methods" : [

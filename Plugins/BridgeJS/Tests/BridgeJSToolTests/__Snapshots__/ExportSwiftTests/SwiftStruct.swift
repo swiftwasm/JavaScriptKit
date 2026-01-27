@@ -1,3 +1,6 @@
+extension Precision: _BridgedSwiftEnumNoPayload {
+}
+
 extension DataPoint: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> DataPoint {
         let optFlag = Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
@@ -228,6 +231,57 @@ fileprivate func _bjs_struct_lower_Session(_ objectId: Int32) -> Int32 {
 fileprivate func _bjs_struct_raise_Session() -> Int32
 #else
 fileprivate func _bjs_struct_raise_Session() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+extension Measurement: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Measurement {
+        let optionalPrecision = Optional<Precision>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f32())
+        let precision = Precision.bridgeJSLiftParameter(_swift_js_pop_param_f32())
+        let value = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
+        return Measurement(value: value, precision: precision, optionalPrecision: optionalPrecision)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_f64(self.value)
+        _swift_js_push_f32(self.precision.bridgeJSLowerParameter())
+        let __bjs_isSome_optionalPrecision = self.optionalPrecision != nil
+        if let __bjs_unwrapped_optionalPrecision = self.optionalPrecision {
+            _swift_js_push_f32(__bjs_unwrapped_optionalPrecision.bridgeJSLowerParameter())
+        }
+        _swift_js_push_int(__bjs_isSome_optionalPrecision ? 1 : 0)
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _bjs_struct_lower_Measurement(jsObject.bridgeJSLowerParameter())
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Measurement()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Measurement")
+fileprivate func _bjs_struct_lower_Measurement(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_Measurement(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Measurement")
+fileprivate func _bjs_struct_raise_Measurement() -> Int32
+#else
+fileprivate func _bjs_struct_raise_Measurement() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

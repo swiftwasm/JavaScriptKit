@@ -2357,6 +2357,32 @@ struct IntrinsicJSFragment: Sendable {
                                 "if(\(idVar) !== undefined) { \(JSGlueVariableScope.reservedSwift).memory.release(\(idVar)); }"
                             )
                             return [idVar]
+                        case .float:
+                            printer.write("if (\(isSomeVar)) {")
+                            printer.indent {
+                                printer.write(
+                                    "\(JSGlueVariableScope.reservedTmpParamF32s).push(Math.fround(\(value)));"
+                                )
+                            }
+                            printer.write("} else {")
+                            printer.indent {
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamF32s).push(0.0);")
+                            }
+                            printer.write("}")
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                            return []
+                        case .double:
+                            printer.write("if (\(isSomeVar)) {")
+                            printer.indent {
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamF64s).push(\(value));")
+                            }
+                            printer.write("} else {")
+                            printer.indent {
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamF64s).push(0.0);")
+                            }
+                            printer.write("}")
+                            printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                            return []
                         default:
                             printer.write("if (\(isSomeVar)) {")
                             printer.indent {
@@ -2596,6 +2622,22 @@ struct IntrinsicJSFragment: Sendable {
                         return [idVar]
                     }
                 )
+            case .float:
+                return IntrinsicJSFragment(
+                    parameters: ["value"],
+                    printCode: { arguments, scope, printer, cleanup in
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamF32s).push(Math.fround(\(arguments[0])));")
+                        return []
+                    }
+                )
+            case .double:
+                return IntrinsicJSFragment(
+                    parameters: ["value"],
+                    printCode: { arguments, scope, printer, cleanup in
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamF64s).push(\(arguments[0]));")
+                        return []
+                    }
+                )
             default:
                 return IntrinsicJSFragment(
                     parameters: ["value"],
@@ -2792,6 +2834,24 @@ struct IntrinsicJSFragment: Sendable {
                     printCode: { arguments, scope, printer, cleanup in
                         let varName = scope.variable("value")
                         printer.write("const \(varName) = \(JSGlueVariableScope.reservedTmpRetStrings).pop();")
+                        return [varName]
+                    }
+                )
+            case .float:
+                return IntrinsicJSFragment(
+                    parameters: [],
+                    printCode: { arguments, scope, printer, cleanup in
+                        let varName = scope.variable("value")
+                        printer.write("const \(varName) = \(JSGlueVariableScope.reservedTmpRetF32s).pop();")
+                        return [varName]
+                    }
+                )
+            case .double:
+                return IntrinsicJSFragment(
+                    parameters: [],
+                    printCode: { arguments, scope, printer, cleanup in
+                        let varName = scope.variable("value")
+                        printer.write("const \(varName) = \(JSGlueVariableScope.reservedTmpRetF64s).pop();")
                         return [varName]
                     }
                 )
