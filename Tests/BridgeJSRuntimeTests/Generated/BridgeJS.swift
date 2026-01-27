@@ -2240,7 +2240,49 @@ extension DataPoint: _BridgedSwiftStruct {
         }
         _swift_js_push_int(__bjs_isSome_optFlag ? 1 : 0)
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _DataPointHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _DataPointHelpers.raise()
+    }
 }
+
+fileprivate enum _DataPointHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_DataPoint(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_DataPoint()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_DataPoint")
+fileprivate func _bjs_struct_lower_DataPoint(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_DataPoint(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_DataPoint")
+fileprivate func _bjs_struct_raise_DataPoint() -> Int32
+#else
+fileprivate func _bjs_struct_raise_DataPoint() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_DataPoint_init")
 @_cdecl("bjs_DataPoint_init")
@@ -2276,7 +2318,49 @@ extension Address: _BridgedSwiftStruct {
         }
         _swift_js_push_int(__bjs_isSome_zipCode ? 1 : 0)
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _AddressHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _AddressHelpers.raise()
+    }
 }
+
+fileprivate enum _AddressHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_Address(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Address()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Address")
+fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Address")
+fileprivate func _bjs_struct_raise_Address() -> Int32
+#else
+fileprivate func _bjs_struct_raise_Address() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 extension Contact: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Contact {
@@ -2309,7 +2393,49 @@ extension Contact: _BridgedSwiftStruct {
         }
         _swift_js_push_int(__bjs_isSome_secondaryAddress ? 1 : 0)
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _ContactHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _ContactHelpers.raise()
+    }
 }
+
+fileprivate enum _ContactHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_Contact(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Contact()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Contact")
+fileprivate func _bjs_struct_lower_Contact(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_Contact(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Contact")
+fileprivate func _bjs_struct_raise_Contact() -> Int32
+#else
+fileprivate func _bjs_struct_raise_Contact() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 extension Config: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Config {
@@ -2340,7 +2466,49 @@ extension Config: _BridgedSwiftStruct {
         _swift_js_push_int(__bjs_isSome_direction ? 1 : 0)
         _swift_js_push_int(Int32(self.status.bridgeJSLowerParameter()))
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _ConfigHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _ConfigHelpers.raise()
+    }
 }
+
+fileprivate enum _ConfigHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_Config(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Config()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Config")
+fileprivate func _bjs_struct_lower_Config(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_Config(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Config")
+fileprivate func _bjs_struct_raise_Config() -> Int32
+#else
+fileprivate func _bjs_struct_raise_Config() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 extension SessionData: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> SessionData {
@@ -2357,7 +2525,49 @@ extension SessionData: _BridgedSwiftStruct {
         }
         _swift_js_push_int(__bjs_isSome_owner ? 1 : 0)
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _SessionDataHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _SessionDataHelpers.raise()
+    }
 }
+
+fileprivate enum _SessionDataHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_SessionData(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_SessionData()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_SessionData")
+fileprivate func _bjs_struct_lower_SessionData(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_SessionData(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_SessionData")
+fileprivate func _bjs_struct_raise_SessionData() -> Int32
+#else
+fileprivate func _bjs_struct_raise_SessionData() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 extension ValidationReport: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> ValidationReport {
@@ -2382,7 +2592,49 @@ extension ValidationReport: _BridgedSwiftStruct {
         }
         _swift_js_push_int(__bjs_isSome_outcome ? 1 : 0)
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _ValidationReportHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _ValidationReportHelpers.raise()
+    }
 }
+
+fileprivate enum _ValidationReportHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_ValidationReport(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_ValidationReport()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_ValidationReport")
+fileprivate func _bjs_struct_lower_ValidationReport(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_ValidationReport(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_ValidationReport")
+fileprivate func _bjs_struct_raise_ValidationReport() -> Int32
+#else
+fileprivate func _bjs_struct_raise_ValidationReport() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 extension MathOperations: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> MathOperations {
@@ -2393,7 +2645,49 @@ extension MathOperations: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
         _swift_js_push_f64(self.baseValue)
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _MathOperationsHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _MathOperationsHelpers.raise()
+    }
 }
+
+fileprivate enum _MathOperationsHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_MathOperations(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_MathOperations()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_MathOperations")
+fileprivate func _bjs_struct_lower_MathOperations(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_MathOperations(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_MathOperations")
+fileprivate func _bjs_struct_raise_MathOperations() -> Int32
+#else
+fileprivate func _bjs_struct_raise_MathOperations() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_MathOperations_init")
 @_cdecl("bjs_MathOperations_init")
@@ -2439,6 +2733,209 @@ public func _bjs_MathOperations_static_subtract(_ a: Float64, _ b: Float64) -> F
     #endif
 }
 
+extension CopyableCart: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> CopyableCart {
+        let note = Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let x = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        return CopyableCart(x: x, note: note)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_int(Int32(self.x))
+        let __bjs_isSome_note = self.note != nil
+        if let __bjs_unwrapped_note = self.note {
+            var __bjs_str_note = __bjs_unwrapped_note
+            __bjs_str_note.withUTF8 { ptr in
+                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+            }
+        }
+        _swift_js_push_int(__bjs_isSome_note ? 1 : 0)
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _CopyableCartHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _CopyableCartHelpers.raise()
+    }
+}
+
+fileprivate enum _CopyableCartHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_CopyableCart(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_CopyableCart()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_CopyableCart")
+fileprivate func _bjs_struct_lower_CopyableCart(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_CopyableCart(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_CopyableCart")
+fileprivate func _bjs_struct_raise_CopyableCart() -> Int32
+#else
+fileprivate func _bjs_struct_raise_CopyableCart() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+@_expose(wasm, "bjs_CopyableCart_static_fromJSObject")
+@_cdecl("bjs_CopyableCart_static_fromJSObject")
+public func _bjs_CopyableCart_static_fromJSObject(_ object: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = CopyableCart.fromJSObject(_: JSObject.bridgeJSLiftParameter(object))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension CopyableCartItem: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> CopyableCartItem {
+        let quantity = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let sku = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        return CopyableCartItem(sku: sku, quantity: quantity)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        var __bjs_sku = self.sku
+        __bjs_sku.withUTF8 { ptr in
+            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        }
+        _swift_js_push_int(Int32(self.quantity))
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _CopyableCartItemHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _CopyableCartItemHelpers.raise()
+    }
+}
+
+fileprivate enum _CopyableCartItemHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_CopyableCartItem(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_CopyableCartItem()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_CopyableCartItem")
+fileprivate func _bjs_struct_lower_CopyableCartItem(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_CopyableCartItem(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_CopyableCartItem")
+fileprivate func _bjs_struct_raise_CopyableCartItem() -> Int32
+#else
+fileprivate func _bjs_struct_raise_CopyableCartItem() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+extension CopyableNestedCart: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> CopyableNestedCart {
+        let shippingAddress = Optional<Address>.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let item = CopyableCartItem.bridgeJSLiftParameter()
+        let id = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        return CopyableNestedCart(id: id, item: item, shippingAddress: shippingAddress)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_int(Int32(self.id))
+        self.item.bridgeJSLowerReturn()
+        let __bjs_isSome_shippingAddress = self.shippingAddress != nil
+        if let __bjs_unwrapped_shippingAddress = self.shippingAddress {
+            __bjs_unwrapped_shippingAddress.bridgeJSLowerReturn()
+        }
+        _swift_js_push_int(__bjs_isSome_shippingAddress ? 1 : 0)
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _CopyableNestedCartHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _CopyableNestedCartHelpers.raise()
+    }
+}
+
+fileprivate enum _CopyableNestedCartHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_CopyableNestedCart(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_CopyableNestedCart()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_CopyableNestedCart")
+fileprivate func _bjs_struct_lower_CopyableNestedCart(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_CopyableNestedCart(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_CopyableNestedCart")
+fileprivate func _bjs_struct_raise_CopyableNestedCart() -> Int32
+#else
+fileprivate func _bjs_struct_raise_CopyableNestedCart() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+@_expose(wasm, "bjs_CopyableNestedCart_static_fromJSObject")
+@_cdecl("bjs_CopyableNestedCart_static_fromJSObject")
+public func _bjs_CopyableNestedCart_static_fromJSObject(_ object: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = CopyableNestedCart.fromJSObject(_: JSObject.bridgeJSLiftParameter(object))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 extension ConfigStruct: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> ConfigStruct {
         let value = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
@@ -2453,7 +2950,49 @@ extension ConfigStruct: _BridgedSwiftStruct {
         }
         _swift_js_push_int(Int32(self.value))
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _ConfigStructHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _ConfigStructHelpers.raise()
+    }
 }
+
+fileprivate enum _ConfigStructHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_ConfigStruct(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_ConfigStruct()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_ConfigStruct")
+fileprivate func _bjs_struct_lower_ConfigStruct(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_ConfigStruct(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_ConfigStruct")
+fileprivate func _bjs_struct_raise_ConfigStruct() -> Int32
+#else
+fileprivate func _bjs_struct_raise_ConfigStruct() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_ConfigStruct_static_defaultConfig_get")
 @_cdecl("bjs_ConfigStruct_static_defaultConfig_get")
@@ -3852,6 +4391,28 @@ public func _bjs_makeAdder(_ base: Int32) -> UnsafeMutableRawPointer {
 public func _bjs_testStructDefault() -> Void {
     #if arch(wasm32)
     let ret = testStructDefault(point: DataPoint.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_cartToJSObject")
+@_cdecl("bjs_cartToJSObject")
+public func _bjs_cartToJSObject() -> Int32 {
+    #if arch(wasm32)
+    let ret = cartToJSObject(_: CopyableCart.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_nestedCartToJSObject")
+@_cdecl("bjs_nestedCartToJSObject")
+public func _bjs_nestedCartToJSObject() -> Int32 {
+    #if arch(wasm32)
+    let ret = nestedCartToJSObject(_: CopyableNestedCart.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

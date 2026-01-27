@@ -1318,6 +1318,38 @@ enum APIOptionalResult {
     return "\(point.x),\(point.y),\(point.label)"
 }
 
+@JS struct CopyableCart {
+    var x: Int
+    var note: String?
+
+    @JS static func fromJSObject(_ object: JSObject) -> CopyableCart {
+        CopyableCart(unsafelyCopying: object)
+    }
+}
+
+@JS func cartToJSObject(_ cart: CopyableCart) -> JSObject {
+    cart.toJSObject()
+}
+
+@JS struct CopyableCartItem {
+    var sku: String
+    var quantity: Int
+}
+
+@JS struct CopyableNestedCart {
+    var id: Int
+    var item: CopyableCartItem
+    var shippingAddress: Address?
+
+    @JS static func fromJSObject(_ object: JSObject) -> CopyableNestedCart {
+        CopyableNestedCart(unsafelyCopying: object)
+    }
+}
+
+@JS func nestedCartToJSObject(_ cart: CopyableNestedCart) -> JSObject {
+    cart.toJSObject()
+}
+
 @JS struct ConfigStruct {
     var name: String
     var value: Int

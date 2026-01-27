@@ -441,6 +441,17 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 }
 #endif
 
+// MARK: Struct bridging helpers (JS-side lowering/raising)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_cleanup")
+@_spi(BridgeJS) public func _swift_js_struct_cleanup(_ cleanupId: Int32)
+#else
+@_spi(BridgeJS) public func _swift_js_struct_cleanup(_ cleanupId: Int32) {
+    _onlyAvailableOnWasm()
+}
+#endif
+
 // MARK: Wasm externs used by type lowering/lifting
 
 #if arch(wasm32)

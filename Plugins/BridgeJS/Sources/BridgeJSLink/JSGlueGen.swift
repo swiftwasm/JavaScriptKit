@@ -30,6 +30,7 @@ final class JSGlueVariableScope {
     static let reservedTmpParamF64s = "tmpParamF64s"
     static let reservedTmpRetPointers = "tmpRetPointers"
     static let reservedTmpParamPointers = "tmpParamPointers"
+    static let reservedTmpStructCleanups = "tmpStructCleanups"
     static let reservedEnumHelpers = "enumHelpers"
     static let reservedStructHelpers = "structHelpers"
 
@@ -58,6 +59,7 @@ final class JSGlueVariableScope {
         reservedTmpParamF64s,
         reservedTmpRetPointers,
         reservedTmpParamPointers,
+        reservedTmpStructCleanups,
         reservedEnumHelpers,
         reservedStructHelpers,
     ]

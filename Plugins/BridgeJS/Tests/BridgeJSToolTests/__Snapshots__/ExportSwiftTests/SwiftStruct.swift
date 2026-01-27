@@ -26,7 +26,49 @@ extension DataPoint: _BridgedSwiftStruct {
         }
         _swift_js_push_int(__bjs_isSome_optFlag ? 1 : 0)
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _DataPointHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _DataPointHelpers.raise()
+    }
 }
+
+fileprivate enum _DataPointHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_DataPoint(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_DataPoint()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_DataPoint")
+fileprivate func _bjs_struct_lower_DataPoint(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_DataPoint(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_DataPoint")
+fileprivate func _bjs_struct_raise_DataPoint() -> Int32
+#else
+fileprivate func _bjs_struct_raise_DataPoint() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_DataPoint_init")
 @_cdecl("bjs_DataPoint_init")
@@ -62,7 +104,49 @@ extension Address: _BridgedSwiftStruct {
         }
         _swift_js_push_int(__bjs_isSome_zipCode ? 1 : 0)
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _AddressHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _AddressHelpers.raise()
+    }
 }
+
+fileprivate enum _AddressHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_Address(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Address()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Address")
+fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Address")
+fileprivate func _bjs_struct_raise_Address() -> Int32
+#else
+fileprivate func _bjs_struct_raise_Address() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 extension Person: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Person {
@@ -89,7 +173,49 @@ extension Person: _BridgedSwiftStruct {
         }
         _swift_js_push_int(__bjs_isSome_email ? 1 : 0)
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _PersonHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _PersonHelpers.raise()
+    }
 }
+
+fileprivate enum _PersonHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_Person(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Person()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Person")
+fileprivate func _bjs_struct_lower_Person(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_Person(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Person")
+fileprivate func _bjs_struct_raise_Person() -> Int32
+#else
+fileprivate func _bjs_struct_raise_Person() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 extension Session: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Session {
@@ -102,7 +228,49 @@ extension Session: _BridgedSwiftStruct {
         _swift_js_push_int(Int32(self.id))
         _swift_js_push_pointer(self.owner.bridgeJSLowerReturn())
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _SessionHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _SessionHelpers.raise()
+    }
 }
+
+fileprivate enum _SessionHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_Session(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Session()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Session")
+fileprivate func _bjs_struct_lower_Session(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_Session(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Session")
+fileprivate func _bjs_struct_raise_Session() -> Int32
+#else
+fileprivate func _bjs_struct_raise_Session() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 extension ConfigStruct: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> ConfigStruct {
@@ -112,7 +280,49 @@ extension ConfigStruct: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
 
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _ConfigStructHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _ConfigStructHelpers.raise()
+    }
 }
+
+fileprivate enum _ConfigStructHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_ConfigStruct(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_ConfigStruct()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_ConfigStruct")
+fileprivate func _bjs_struct_lower_ConfigStruct(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_ConfigStruct(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_ConfigStruct")
+fileprivate func _bjs_struct_raise_ConfigStruct() -> Int32
+#else
+fileprivate func _bjs_struct_raise_ConfigStruct() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_ConfigStruct_static_maxRetries_get")
 @_cdecl("bjs_ConfigStruct_static_maxRetries_get")

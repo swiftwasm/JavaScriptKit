@@ -1032,6 +1032,31 @@ function testStructSupport(exports) {
     const customPoint = { x: 10.0, y: 20.0, label: "custom", optCount: null, optFlag: null };
     assert.equal(exports.testStructDefault(customPoint), "10.0,20.0,custom");
 
+    // Test @JS struct init(unsafelyCopying:) + toJSObject()
+    const cart1 = { x: 123, note: "hello" };
+    assert.deepEqual(exports.CopyableCart.fromJSObject(cart1), cart1);
+    assert.deepEqual(exports.cartToJSObject(cart1), cart1);
+
+    const cart2 = { x: 1 };
+    assert.deepEqual(exports.CopyableCart.fromJSObject(cart2), { x: 1, note: null });
+    assert.deepEqual(exports.cartToJSObject(cart2), { x: 1, note: null });
+
+    const nestedCart1 = {
+        id: 7,
+        item: { sku: "ABC-123", quantity: 2 },
+        shippingAddress: { street: "1 Swift Way", city: "WasmCity", zipCode: 12345 },
+    };
+    assert.deepEqual(exports.CopyableNestedCart.fromJSObject(nestedCart1), nestedCart1);
+    assert.deepEqual(exports.nestedCartToJSObject(nestedCart1), nestedCart1);
+
+    const nestedCart2 = {
+        id: 8,
+        item: { sku: "XYZ-999", quantity: 0 },
+        shippingAddress: null,
+    };
+    assert.deepEqual(exports.CopyableNestedCart.fromJSObject(nestedCart2), nestedCart2);
+    assert.deepEqual(exports.nestedCartToJSObject(nestedCart2), nestedCart2);
+
     const container = exports.testContainerWithStruct({ x: 5.0, y: 10.0, label: "test", optCount: null, optFlag: true });
     assert.equal(container.location.x, 5.0);
     assert.equal(container.config, null);

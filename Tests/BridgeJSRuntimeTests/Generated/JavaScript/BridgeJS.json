@@ -7743,6 +7743,56 @@
         }
       },
       {
+        "abiName" : "bjs_cartToJSObject",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "cartToJSObject",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "cart",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "CopyableCart"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "jsObject" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_nestedCartToJSObject",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "nestedCartToJSObject",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "cart",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "CopyableNestedCart"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "jsObject" : {
+
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripDataPoint",
         "effects" : {
           "isAsync" : false,
@@ -8854,6 +8904,169 @@
           }
         ],
         "swiftCallName" : "MathOperations"
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_CopyableCart_static_fromJSObject",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "fromJSObject",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "object",
+                "type" : {
+                  "jsObject" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "CopyableCart"
+              }
+            },
+            "staticContext" : {
+              "structName" : {
+                "_0" : "CopyableCart"
+              }
+            }
+          }
+        ],
+        "name" : "CopyableCart",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "x",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "note",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "CopyableCart"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "CopyableCartItem",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "sku",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "quantity",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "CopyableCartItem"
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_CopyableNestedCart_static_fromJSObject",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "fromJSObject",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "object",
+                "type" : {
+                  "jsObject" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "CopyableNestedCart"
+              }
+            },
+            "staticContext" : {
+              "structName" : {
+                "_0" : "CopyableNestedCart"
+              }
+            }
+          }
+        ],
+        "name" : "CopyableNestedCart",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "id",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "item",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "CopyableCartItem"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "shippingAddress",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "swiftStruct" : {
+                    "_0" : "Address"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "CopyableNestedCart"
       },
       {
         "methods" : [

@@ -34,6 +34,7 @@ export async function createInstantiator(options, swift) {
     let tmpParamF64s = [];
     let tmpRetPointers = [];
     let tmpParamPointers = [];
+    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
     
@@ -152,6 +153,38 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_param_pointer"] = function() {
                 return tmpParamPointers.pop();
+            }
+            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
+                if (cleanupId === 0) { return; }
+                const index = (cleanupId | 0) - 1;
+                const cleanup = tmpStructCleanups[index];
+                tmpStructCleanups[index] = null;
+                if (cleanup) { cleanup(); }
+                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
+                    tmpStructCleanups.pop();
+                }
+            }
+            bjs["swift_js_struct_lower_Config"] = function(objectId) {
+                const { cleanup: cleanup } = structHelpers.Config.lower(swift.memory.getObject(objectId));
+                if (cleanup) {
+                    return tmpStructCleanups.push(cleanup);
+                }
+                return 0;
+            }
+            bjs["swift_js_struct_raise_Config"] = function() {
+                const value = structHelpers.Config.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                return swift.memory.retain(value);
+            }
+            bjs["swift_js_struct_lower_MathOperations"] = function(objectId) {
+                const { cleanup: cleanup } = structHelpers.MathOperations.lower(swift.memory.getObject(objectId));
+                if (cleanup) {
+                    return tmpStructCleanups.push(cleanup);
+                }
+                return 0;
+            }
+            bjs["swift_js_struct_raise_MathOperations"] = function() {
+                const value = structHelpers.MathOperations.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
