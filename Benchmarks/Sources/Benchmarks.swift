@@ -111,6 +111,22 @@ enum ComplexResult {
     }
 }
 
+@JS class OptionalReturnRoundtrip {
+    @JS init() {}
+
+    @JS func makeIntSome() -> Int? { 42 }
+    @JS func makeIntNone() -> Int? { nil }
+
+    @JS func makeBoolSome() -> Bool? { true }
+    @JS func makeBoolNone() -> Bool? { nil }
+
+    @JS func makeDoubleSome() -> Double? { 0.5 }
+    @JS func makeDoubleNone() -> Double? { nil }
+
+    @JS func makeStringSome() -> String? { "Hello, world" }
+    @JS func makeStringNone() -> String? { nil }
+}
+
 // MARK: - Struct Performance Tests
 
 @JS struct SimpleStruct {

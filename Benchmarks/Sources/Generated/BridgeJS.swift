@@ -839,6 +839,130 @@ fileprivate func _bjs_StringRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -
 }
 #endif
 
+@_expose(wasm, "bjs_OptionalReturnRoundtrip_init")
+@_cdecl("bjs_OptionalReturnRoundtrip_init")
+public func _bjs_OptionalReturnRoundtrip_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = OptionalReturnRoundtrip()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalReturnRoundtrip_makeIntSome")
+@_cdecl("bjs_OptionalReturnRoundtrip_makeIntSome")
+public func _bjs_OptionalReturnRoundtrip_makeIntSome(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeIntSome()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalReturnRoundtrip_makeIntNone")
+@_cdecl("bjs_OptionalReturnRoundtrip_makeIntNone")
+public func _bjs_OptionalReturnRoundtrip_makeIntNone(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeIntNone()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalReturnRoundtrip_makeBoolSome")
+@_cdecl("bjs_OptionalReturnRoundtrip_makeBoolSome")
+public func _bjs_OptionalReturnRoundtrip_makeBoolSome(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeBoolSome()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalReturnRoundtrip_makeBoolNone")
+@_cdecl("bjs_OptionalReturnRoundtrip_makeBoolNone")
+public func _bjs_OptionalReturnRoundtrip_makeBoolNone(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeBoolNone()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalReturnRoundtrip_makeDoubleSome")
+@_cdecl("bjs_OptionalReturnRoundtrip_makeDoubleSome")
+public func _bjs_OptionalReturnRoundtrip_makeDoubleSome(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeDoubleSome()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalReturnRoundtrip_makeDoubleNone")
+@_cdecl("bjs_OptionalReturnRoundtrip_makeDoubleNone")
+public func _bjs_OptionalReturnRoundtrip_makeDoubleNone(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeDoubleNone()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalReturnRoundtrip_makeStringSome")
+@_cdecl("bjs_OptionalReturnRoundtrip_makeStringSome")
+public func _bjs_OptionalReturnRoundtrip_makeStringSome(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeStringSome()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalReturnRoundtrip_makeStringNone")
+@_cdecl("bjs_OptionalReturnRoundtrip_makeStringNone")
+public func _bjs_OptionalReturnRoundtrip_makeStringNone(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeStringNone()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalReturnRoundtrip_deinit")
+@_cdecl("bjs_OptionalReturnRoundtrip_deinit")
+public func _bjs_OptionalReturnRoundtrip_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<OptionalReturnRoundtrip>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension OptionalReturnRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_OptionalReturnRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_OptionalReturnRoundtrip_wrap")
+fileprivate func _bjs_OptionalReturnRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_OptionalReturnRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 @_expose(wasm, "bjs_StructRoundtrip_init")
 @_cdecl("bjs_StructRoundtrip_init")
 public func _bjs_StructRoundtrip_init() -> UnsafeMutableRawPointer {

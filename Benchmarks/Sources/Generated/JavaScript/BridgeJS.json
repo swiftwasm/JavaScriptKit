@@ -426,6 +426,194 @@
       },
       {
         "constructor" : {
+          "abiName" : "bjs_OptionalReturnRoundtrip_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_OptionalReturnRoundtrip_makeIntSome",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeIntSome",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "optional" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalReturnRoundtrip_makeIntNone",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeIntNone",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "optional" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalReturnRoundtrip_makeBoolSome",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeBoolSome",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "optional" : {
+                "_0" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalReturnRoundtrip_makeBoolNone",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeBoolNone",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "optional" : {
+                "_0" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalReturnRoundtrip_makeDoubleSome",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeDoubleSome",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "optional" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalReturnRoundtrip_makeDoubleNone",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeDoubleNone",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "optional" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalReturnRoundtrip_makeStringSome",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeStringSome",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalReturnRoundtrip_makeStringNone",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeStringNone",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "name" : "OptionalReturnRoundtrip",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "OptionalReturnRoundtrip"
+      },
+      {
+        "constructor" : {
           "abiName" : "bjs_StructRoundtrip_init",
           "effects" : {
             "isAsync" : false,
