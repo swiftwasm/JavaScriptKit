@@ -28,6 +28,7 @@ export async function createInstantiator(options, swift) {
     let tmpParamF64s = [];
     let tmpRetPointers = [];
     let tmpParamPointers = [];
+    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
     
@@ -259,6 +260,71 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_param_pointer"] = function() {
                 return tmpParamPointers.pop();
+            }
+            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
+                if (cleanupId === 0) { return; }
+                const index = (cleanupId | 0) - 1;
+                const cleanup = tmpStructCleanups[index];
+                tmpStructCleanups[index] = null;
+                if (cleanup) { cleanup(); }
+                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
+                    tmpStructCleanups.pop();
+                }
+            }
+            bjs["swift_js_struct_lower_DataPoint"] = function(objectId) {
+                const { cleanup: cleanup } = structHelpers.DataPoint.lower(swift.memory.getObject(objectId));
+                if (cleanup) {
+                    return tmpStructCleanups.push(cleanup);
+                }
+                return 0;
+            }
+            bjs["swift_js_struct_raise_DataPoint"] = function() {
+                const value = structHelpers.DataPoint.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                return swift.memory.retain(value);
+            }
+            bjs["swift_js_struct_lower_Address"] = function(objectId) {
+                const { cleanup: cleanup } = structHelpers.Address.lower(swift.memory.getObject(objectId));
+                if (cleanup) {
+                    return tmpStructCleanups.push(cleanup);
+                }
+                return 0;
+            }
+            bjs["swift_js_struct_raise_Address"] = function() {
+                const value = structHelpers.Address.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                return swift.memory.retain(value);
+            }
+            bjs["swift_js_struct_lower_Person"] = function(objectId) {
+                const { cleanup: cleanup } = structHelpers.Person.lower(swift.memory.getObject(objectId));
+                if (cleanup) {
+                    return tmpStructCleanups.push(cleanup);
+                }
+                return 0;
+            }
+            bjs["swift_js_struct_raise_Person"] = function() {
+                const value = structHelpers.Person.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                return swift.memory.retain(value);
+            }
+            bjs["swift_js_struct_lower_Session"] = function(objectId) {
+                const { cleanup: cleanup } = structHelpers.Session.lower(swift.memory.getObject(objectId));
+                if (cleanup) {
+                    return tmpStructCleanups.push(cleanup);
+                }
+                return 0;
+            }
+            bjs["swift_js_struct_raise_Session"] = function() {
+                const value = structHelpers.Session.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                return swift.memory.retain(value);
+            }
+            bjs["swift_js_struct_lower_ConfigStruct"] = function(objectId) {
+                const { cleanup: cleanup } = structHelpers.ConfigStruct.lower(swift.memory.getObject(objectId));
+                if (cleanup) {
+                    return tmpStructCleanups.push(cleanup);
+                }
+                return 0;
+            }
+            bjs["swift_js_struct_raise_ConfigStruct"] = function() {
+                const value = structHelpers.ConfigStruct.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {

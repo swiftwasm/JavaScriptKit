@@ -245,6 +245,7 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedTmpParamF64s) = [];",
             "let \(JSGlueVariableScope.reservedTmpRetPointers) = [];",
             "let \(JSGlueVariableScope.reservedTmpParamPointers) = [];",
+            "let \(JSGlueVariableScope.reservedTmpStructCleanups) = [];",
             "const \(JSGlueVariableScope.reservedEnumHelpers) = {};",
             "const \(JSGlueVariableScope.reservedStructHelpers) = {};",
             "",
@@ -295,6 +296,7 @@ public struct BridgeJSLink {
 
     private func generateAddImports() -> CodeFragmentPrinter {
         let printer = CodeFragmentPrinter()
+        let allStructs = skeletons.compactMap { $0.exported?.structs }.flatMap { $0 }
         printer.write("return {")
         printer.indent {
             printer.write(lines: [
@@ -427,6 +429,53 @@ public struct BridgeJSLink {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamPointers).pop();")
                 }
                 printer.write("}")
+
+                printer.write("bjs[\"swift_js_struct_cleanup\"] = function(cleanupId) {")
+                printer.indent {
+                    printer.write("if (cleanupId === 0) { return; }")
+                    printer.write("const index = (cleanupId | 0) - 1;")
+                    printer.write("const cleanup = \(JSGlueVariableScope.reservedTmpStructCleanups)[index];")
+                    printer.write("\(JSGlueVariableScope.reservedTmpStructCleanups)[index] = null;")
+                    printer.write("if (cleanup) { cleanup(); }")
+                    printer.write(
+                        "while (\(JSGlueVariableScope.reservedTmpStructCleanups).length > 0 && \(JSGlueVariableScope.reservedTmpStructCleanups)[\(JSGlueVariableScope.reservedTmpStructCleanups).length - 1] == null) {"
+                    )
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedTmpStructCleanups).pop();")
+                    }
+                    printer.write("}")
+                }
+                printer.write("}")
+
+                if !allStructs.isEmpty {
+                    for structDef in allStructs {
+                        printer.write("bjs[\"swift_js_struct_lower_\(structDef.name)\"] = function(objectId) {")
+                        printer.indent {
+                            printer.write(
+                                "const { cleanup: cleanup } = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lower(\(JSGlueVariableScope.reservedSwift).memory.getObject(objectId));"
+                            )
+                            printer.write("if (cleanup) {")
+                            printer.indent {
+                                printer.write(
+                                    "return \(JSGlueVariableScope.reservedTmpStructCleanups).push(cleanup);"
+                                )
+                            }
+                            printer.write("}")
+                            printer.write("return 0;")
+                        }
+                        printer.write("}")
+
+                        printer.write("bjs[\"swift_js_struct_raise_\(structDef.name)\"] = function() {")
+                        printer.indent {
+                            printer.write(
+                                "const value = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
+                            )
+                            printer.write("return \(JSGlueVariableScope.reservedSwift).memory.retain(value);")
+                        }
+                        printer.write("}")
+                    }
+                }
+
                 printer.write("bjs[\"swift_js_return_optional_bool\"] = function(isSome, value) {")
                 printer.indent {
                     printer.write("if (isSome === 0) {")

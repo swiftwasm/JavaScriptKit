@@ -74,7 +74,7 @@ public class ExportSwift {
 
         let structCodegen = StructCodegen()
         for structDef in skeleton.structs {
-            decls.append(structCodegen.renderStructHelpers(structDef))
+            decls.append(contentsOf: structCodegen.renderStructHelpers(structDef))
             decls.append(contentsOf: try renderSingleExportedStruct(struct: structDef))
         }
 
@@ -1151,12 +1151,19 @@ struct EnumCodegen {
 struct StructCodegen {
     private let stackCodegen = StackCodegen()
 
-    func renderStructHelpers(_ structDef: ExportedStruct) -> DeclSyntax {
+    func renderStructHelpers(_ structDef: ExportedStruct) -> [DeclSyntax] {
         let typeName = structDef.swiftCallName
         let liftCode = generateStructLiftCode(structDef: structDef)
         let lowerCode = generateStructLowerCode(structDef: structDef)
+        let accessControl = structDef.explicitAccessControl.map { "\($0) " } ?? ""
 
-        return """
+        let helpersTypeName = "_\(structDef.name)Helpers"
+        let lowerExternName = "swift_js_struct_lower_\(structDef.name)"
+        let raiseExternName = "swift_js_struct_raise_\(structDef.name)"
+        let lowerFunctionName = "_bjs_struct_lower_\(structDef.name)"
+        let raiseFunctionName = "_bjs_struct_raise_\(structDef.name)"
+
+        let bridgedStructExtension: DeclSyntax = """
             extension \(raw: typeName): _BridgedSwiftStruct {
                 @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> \(raw: typeName) {
                     \(raw: liftCode.joined(separator: "\n"))
@@ -1165,8 +1172,83 @@ struct StructCodegen {
                 @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
                     \(raw: lowerCode.joined(separator: "\n"))
                 }
+
+                \(raw: accessControl)init(unsafelyCopying jsObject: JSObject) {
+                    let __bjs_cleanupId = \(raw: helpersTypeName).lower(jsObject)
+                    defer { _swift_js_struct_cleanup(__bjs_cleanupId) }
+                    self = Self.bridgeJSLiftParameter()
+                }
+
+                \(raw: accessControl)func toJSObject() -> JSObject {
+                    var __bjs_self = self
+                    __bjs_self.bridgeJSLowerReturn()
+                    return \(raw: helpersTypeName).raise()
+                }
             }
             """
+
+        let helpersType: DeclSyntax = """
+            fileprivate enum \(raw: helpersTypeName) {
+                static func lower(_ jsObject: JSObject) -> Int32 {
+                    return \(raw: lowerFunctionName)(jsObject.bridgeJSLowerParameter())
+                }
+
+                static func raise() -> JSObject {
+                    return JSObject(id: UInt32(bitPattern: \(raw: raiseFunctionName)()))
+                }
+            }
+            """
+
+        let lowerExternDecl = Self.renderStructExtern(
+            externName: lowerExternName,
+            functionName: lowerFunctionName,
+            signature: SwiftSignatureBuilder.buildABIFunctionSignature(
+                abiParameters: [("objectId", .i32)],
+                returnType: .i32
+            )
+        )
+        let raiseExternDecl = Self.renderStructExtern(
+            externName: raiseExternName,
+            functionName: raiseFunctionName,
+            signature: SwiftSignatureBuilder.buildABIFunctionSignature(
+                abiParameters: [],
+                returnType: .i32
+            )
+        )
+
+        return [bridgedStructExtension, helpersType, lowerExternDecl, raiseExternDecl]
+    }
+
+    private static func renderStructExtern(
+        externName: String,
+        functionName: String,
+        signature: FunctionSignatureSyntax
+    ) -> DeclSyntax {
+        let externFuncDecl = SwiftCodePattern.buildExternFunctionDecl(
+            moduleName: "bjs",
+            abiName: externName,
+            functionName: functionName,
+            signature: signature
+        )
+
+        let stubFuncDecl = FunctionDeclSyntax(
+            modifiers: DeclModifierListSyntax {
+                DeclModifierSyntax(name: .keyword(.fileprivate))
+            },
+            funcKeyword: .keyword(.func),
+            name: .identifier(functionName),
+            signature: signature,
+            body: CodeBlockSyntax {
+                "fatalError(\"Only available on WebAssembly\")"
+            }
+        )
+
+        return DeclSyntax(
+            SwiftCodePattern.buildWasmConditionalCompilationDecls(
+                wasmDecl: DeclSyntax(externFuncDecl),
+                elseDecl: DeclSyntax(stubFuncDecl)
+            )
+        )
     }
 
     private func generateStructLiftCode(structDef: ExportedStruct) -> [String] {
