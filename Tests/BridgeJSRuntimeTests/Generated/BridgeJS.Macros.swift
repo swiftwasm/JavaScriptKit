@@ -40,3 +40,10 @@ extension FeatureFlag: _BridgedSwiftEnumNoPayload {}
 }
 
 @JSFunction func runAsyncWorks() throws (JSException) -> JSPromise
+
+@JSFunction(jsName: "$jsWeirdFunction") func _jsWeirdFunction() throws (JSException) -> Double
+
+@JSClass(jsName: "$WeirdClass") struct _WeirdClass {
+    @JSFunction init() throws (JSException)
+    @JSFunction(jsName: "method-with-dashes") func method_with_dashes() throws (JSException) -> String
+}

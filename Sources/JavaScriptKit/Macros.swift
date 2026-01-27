@@ -112,6 +112,9 @@ public macro JS(namespace: String? = nil, enumStyle: JSEnumStyle = .const) = Bui
 ///
 /// This macro is used by BridgeJS-generated Swift declarations.
 ///
+/// - Parameter jsName: An optional string that specifies the name of the JavaScript property to read from.
+///   If not provided, the Swift property name is used.
+///
 /// Example:
 ///
 /// ```swift
@@ -125,7 +128,7 @@ public macro JS(namespace: String? = nil, enumStyle: JSEnumStyle = .const) = Bui
 /// ```
 @attached(accessor)
 @_spi(Experimental)
-public macro JSGetter() =
+public macro JSGetter(jsName: String? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSGetterMacro")
 
 /// A macro that generates a Swift function body that writes a value to JavaScript.
@@ -159,9 +162,12 @@ public macro JSSetter(jsName: String? = nil) =
 /// @JSFunction func greet() throws (JSException) -> String
 /// @JSFunction init(_ name: String) throws (JSException)
 /// ```
+///
+/// - Parameter jsName: An optional string that specifies the name of the JavaScript function or method to call.
+///   If not provided, the Swift function name is used.
 @attached(body)
 @_spi(Experimental)
-public macro JSFunction() =
+public macro JSFunction(jsName: String? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSFunctionMacro")
 
 /// A macro that adds bridging members for a Swift type that represents a JavaScript class.
@@ -184,5 +190,5 @@ public macro JSFunction() =
 @attached(member, names: arbitrary)
 @attached(extension, conformances: _JSBridgedClass)
 @_spi(Experimental)
-public macro JSClass() =
+public macro JSClass(jsName: String? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSClassMacro")

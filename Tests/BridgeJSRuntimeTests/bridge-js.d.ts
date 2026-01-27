@@ -23,3 +23,11 @@ export class JsGreeter {
 }
 
 export function runAsyncWorks(): Promise<void>;
+
+// jsName tests
+export function $jsWeirdFunction(): number;
+
+export class $WeirdClass {
+    constructor();
+    "method-with-dashes"(): string;
+}

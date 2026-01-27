@@ -1743,6 +1743,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     // Current type being collected (when in jsClassBody state)
     private struct CurrentType {
         let name: String
+        let jsName: String?
         var constructor: ImportedConstructorSkeleton?
         var methods: [ImportedFunctionSkeleton]
         var getters: [ImportedGetterSkeleton]
@@ -1758,8 +1759,20 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             hasAttribute(attributes, name: "JSFunction")
         }
 
+        static func firstJSFunctionAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
+            attributes?.first { attribute in
+                attribute.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "JSFunction"
+            }?.as(AttributeSyntax.self)
+        }
+
         static func hasJSGetterAttribute(_ attributes: AttributeListSyntax?) -> Bool {
             hasAttribute(attributes, name: "JSGetter")
+        }
+
+        static func firstJSGetterAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
+            attributes?.first { attribute in
+                attribute.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "JSGetter"
+            }?.as(AttributeSyntax.self)
         }
 
         static func hasJSSetterAttribute(_ attributes: AttributeListSyntax?) -> Bool {
@@ -1776,6 +1789,12 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             hasAttribute(attributes, name: "JSClass")
         }
 
+        static func firstJSClassAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
+            attributes?.first { attribute in
+                attribute.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "JSClass"
+            }?.as(AttributeSyntax.self)
+        }
+
         static func hasAttribute(_ attributes: AttributeListSyntax?, name: String) -> Bool {
             guard let attributes else { return false }
             return attributes.contains { attribute in
@@ -1784,7 +1803,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             }
         }
 
-        /// Extracts the jsName argument value from a @JSSetter attribute, if present.
+        /// Extracts the `jsName` argument value from an attribute, if present.
         static func extractJSName(from attribute: AttributeSyntax) -> String? {
             guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else {
                 return nil
@@ -1883,22 +1902,15 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     // MARK: - Property Name Resolution
 
-    /// Helper for resolving property names from setter function names and jsName attributes
+    /// Helper for resolving property names from setter function names.
     private struct PropertyNameResolver {
-        /// Resolves property name and function base name from a setter function and optional jsName
-        /// - Returns: (propertyName, functionBaseName) where propertyName preserves case for getter matching,
-        ///   and functionBaseName has lowercase first char for ABI generation
+        /// Resolves property name and function base name from a setter function.
+        /// - Returns: (propertyName, functionBaseName) where `propertyName` is derived from the setter name,
+        ///   and `functionBaseName` has lowercase first char for ABI generation.
         static func resolve(
             functionName: String,
-            jsName: String?,
             normalizeIdentifier: (String) -> String
         ) -> (propertyName: String, functionBaseName: String)? {
-            if let jsName = jsName {
-                let propertyName = normalizeIdentifier(jsName)
-                let functionBaseName = propertyName.prefix(1).lowercased() + propertyName.dropFirst()
-                return (propertyName: propertyName, functionBaseName: functionBaseName)
-            }
-
             let rawFunctionName =
                 functionName.hasPrefix("`") && functionName.hasSuffix("`") && functionName.count > 2
                 ? String(functionName.dropFirst().dropLast())
@@ -1930,7 +1942,19 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     private func enterJSClass(_ typeName: String) {
         stateStack.append(.jsClassBody(name: typeName))
-        currentType = CurrentType(name: typeName, constructor: nil, methods: [], getters: [], setters: [])
+        currentType = CurrentType(name: typeName, jsName: nil, constructor: nil, methods: [], getters: [], setters: [])
+    }
+
+    private func enterJSClass(_ typeName: String, jsName: String?) {
+        stateStack.append(.jsClassBody(name: typeName))
+        currentType = CurrentType(
+            name: typeName,
+            jsName: jsName,
+            constructor: nil,
+            methods: [],
+            getters: [],
+            setters: []
+        )
     }
 
     private func exitJSClass() {
@@ -1938,6 +1962,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             importedTypes.append(
                 ImportedTypeSkeleton(
                     name: type.name,
+                    jsName: type.jsName,
                     constructor: type.constructor,
                     methods: type.methods,
                     getters: type.getters,
@@ -1952,7 +1977,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
         if AttributeChecker.hasJSClassAttribute(node.attributes) {
-            enterJSClass(node.name.text)
+            let jsName = AttributeChecker.firstJSClassAttribute(node.attributes).flatMap(AttributeChecker.extractJSName)
+            enterJSClass(node.name.text, jsName: jsName)
         }
         return .visitChildren
     }
@@ -1965,7 +1991,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
         if AttributeChecker.hasJSClassAttribute(node.attributes) {
-            enterJSClass(node.name.text)
+            let jsName = AttributeChecker.firstJSClassAttribute(node.attributes).flatMap(AttributeChecker.extractJSName)
+            enterJSClass(node.name.text, jsName: jsName)
         }
         return .visitChildren
     }
@@ -2003,8 +2030,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     }
 
     private func handleTopLevelFunction(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
-        if AttributeChecker.hasJSFunctionAttribute(node.attributes),
-            let function = parseFunction(node, enclosingTypeName: nil, isStaticMember: true)
+        if let jsFunction = AttributeChecker.firstJSFunctionAttribute(node.attributes),
+            let function = parseFunction(jsFunction, node, enclosingTypeName: nil, isStaticMember: true)
         {
             importedFunctions.append(function)
             return .skipChildren
@@ -2028,13 +2055,13 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         isStaticMember: Bool,
         type: inout CurrentType
     ) -> Bool {
-        if AttributeChecker.hasJSFunctionAttribute(node.attributes) {
+        if let jsFunction = AttributeChecker.firstJSFunctionAttribute(node.attributes) {
             if isStaticMember {
-                parseFunction(node, enclosingTypeName: typeName, isStaticMember: true).map {
+                parseFunction(jsFunction, node, enclosingTypeName: typeName, isStaticMember: true).map {
                     importedFunctions.append($0)
                 }
             } else {
-                parseFunction(node, enclosingTypeName: typeName, isStaticMember: false).map {
+                parseFunction(jsFunction, node, enclosingTypeName: typeName, isStaticMember: false).map {
                     type.methods.append($0)
                 }
             }
@@ -2065,10 +2092,13 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         guard AttributeChecker.hasJSGetterAttribute(node.attributes) else {
             return .visitChildren
         }
+        guard let jsGetter = AttributeChecker.firstJSGetterAttribute(node.attributes) else {
+            return .skipChildren
+        }
 
         switch state {
         case .topLevel:
-            if let getter = parseGetterSkeleton(node) {
+            if let getter = parseGetterSkeleton(jsGetter, node) {
                 importedGlobalGetters.append(getter)
             }
             return .skipChildren
@@ -2085,7 +2115,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                             "@JSGetter is not supported for static members. Use it only for instance members in @JSClass types."
                     )
                 )
-            } else if let getter = parseGetterSkeleton(node) {
+            } else if let getter = parseGetterSkeleton(jsGetter, node) {
                 type.getters.append(getter)
                 currentType = type
             }
@@ -2128,8 +2158,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     private func collectStaticMembers(in members: MemberBlockItemListSyntax, typeName: String) {
         for member in members {
             if let function = member.decl.as(FunctionDeclSyntax.self) {
-                if AttributeChecker.hasJSFunctionAttribute(function.attributes),
-                    let parsed = parseFunction(function, enclosingTypeName: typeName, isStaticMember: true)
+                if let jsFunction = AttributeChecker.firstJSFunctionAttribute(function.attributes),
+                    let parsed = parseFunction(jsFunction, function, enclosingTypeName: typeName, isStaticMember: true)
                 {
                     importedFunctions.append(parsed)
                 } else if AttributeChecker.hasJSSetterAttribute(function.attributes) {
@@ -2173,6 +2203,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     }
 
     private func parseFunction(
+        _ jsFunction: AttributeSyntax,
         _ node: FunctionDeclSyntax,
         enclosingTypeName: String?,
         isStaticMember: Bool
@@ -2183,6 +2214,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
 
         let baseName = SwiftToSkeleton.normalizeIdentifier(node.name.text)
+        let jsName = AttributeChecker.extractJSName(from: jsFunction)
         let name: String
         if isStaticMember, let enclosingTypeName {
             name = "\(enclosingTypeName)_\(baseName)"
@@ -2202,6 +2234,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
         return ImportedFunctionSkeleton(
             name: name,
+            jsName: jsName,
             parameters: parameters,
             returnType: returnType,
             documentation: nil
@@ -2223,7 +2256,10 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         return (identifier, typeAnnotation.type)
     }
 
-    private func parseGetterSkeleton(_ node: VariableDeclSyntax) -> ImportedGetterSkeleton? {
+    private func parseGetterSkeleton(
+        _ jsGetter: AttributeSyntax,
+        _ node: VariableDeclSyntax
+    ) -> ImportedGetterSkeleton? {
         guard let (identifier, type) = extractPropertyInfo(node) else {
             return nil
         }
@@ -2231,8 +2267,10 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             return nil
         }
         let propertyName = SwiftToSkeleton.normalizeIdentifier(identifier.identifier.text)
+        let jsName = AttributeChecker.extractJSName(from: jsGetter)
         return ImportedGetterSkeleton(
             name: propertyName,
+            jsName: jsName,
             type: propertyType,
             documentation: nil,
             functionName: nil
@@ -2252,7 +2290,6 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         guard
             let (propertyName, functionBaseName) = PropertyNameResolver.resolve(
                 functionName: functionName,
-                jsName: validation.jsName,
                 normalizeIdentifier: SwiftToSkeleton.normalizeIdentifier
             )
         else {
@@ -2261,6 +2298,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
         return ImportedSetterSkeleton(
             name: propertyName,
+            jsName: validation.jsName,
             type: validation.valueType,
             documentation: nil,
             functionName: "\(functionBaseName)_set"

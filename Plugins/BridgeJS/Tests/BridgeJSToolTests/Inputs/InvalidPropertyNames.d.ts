@@ -21,3 +21,10 @@ interface WeirdNaming {
 
 export function createArrayBuffer(): ArrayBufferLike;
 export function createWeirdObject(): WeirdNaming;
+
+export class $Weird {
+    constructor();
+    "method-with-dashes"(): void;
+}
+
+export function createWeirdClass(): $Weird;

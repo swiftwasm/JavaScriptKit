@@ -10,15 +10,28 @@ export interface ArrayBufferLike {
 }
 export interface WeirdNaming {
     as(): void;
+    try(): void;
     normalProperty: string;
+    "property-with-dashes": number;
+    "123invalidStart": boolean;
+    "property with spaces": string;
+    "@specialChar": number;
+    constructor: string;
     for: string;
     Any: string;
+}
+export interface _Weird {
+    "method-with-dashes"(): void;
 }
 export type Exports = {
 }
 export type Imports = {
     createArrayBuffer(): ArrayBufferLike;
     createWeirdObject(): WeirdNaming;
+    createWeirdClass(): _Weird;
+    _Weird: {
+        new(): _Weird;
+    }
 }
 export function createInstantiator(options: {
     imports: Imports;
