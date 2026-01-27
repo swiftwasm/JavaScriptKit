@@ -277,7 +277,7 @@ extension SimpleStruct: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_SimpleStruct()))
     }
@@ -330,7 +330,7 @@ extension Address: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Address()))
     }
@@ -389,7 +389,7 @@ extension Person: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Person()))
     }
@@ -451,7 +451,7 @@ extension ComplexStruct: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_ComplexStruct()))
     }

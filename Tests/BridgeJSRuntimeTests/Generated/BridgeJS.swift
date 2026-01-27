@@ -2239,7 +2239,7 @@ extension PointerFields: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_PointerFields()))
     }
@@ -2312,7 +2312,7 @@ extension DataPoint: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_DataPoint()))
     }
@@ -2380,7 +2380,7 @@ extension Address: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Address()))
     }
@@ -2445,7 +2445,7 @@ extension Contact: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Contact()))
     }
@@ -2508,7 +2508,7 @@ extension Config: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Config()))
     }
@@ -2557,7 +2557,7 @@ extension SessionData: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_SessionData()))
     }
@@ -2614,7 +2614,7 @@ extension ValidationReport: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_ValidationReport()))
     }
@@ -2657,7 +2657,7 @@ extension MathOperations: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_MathOperations()))
     }
@@ -2753,7 +2753,7 @@ extension CopyableCart: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_CopyableCart()))
     }
@@ -2812,7 +2812,7 @@ extension CopyableCartItem: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_CopyableCartItem()))
     }
@@ -2863,7 +2863,7 @@ extension CopyableNestedCart: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_CopyableNestedCart()))
     }
@@ -2922,7 +2922,7 @@ extension ConfigStruct: _BridgedSwiftStruct {
     }
 
     func toJSObject() -> JSObject {
-        var __bjs_self = self
+        let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_ConfigStruct()))
     }
