@@ -17,9 +17,17 @@ function updateProgress(current, total, label = '', width) {
     const completed = Math.round(width * (percent / 100));
     const remaining = width - completed;
     const bar = '█'.repeat(completed) + '░'.repeat(remaining);
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
-    process.stdout.write(`${label} [${bar}] ${current}/${total}`);
+    const canUpdateLine =
+        process.stdout.isTTY &&
+        typeof process.stdout.clearLine === "function" &&
+        typeof process.stdout.cursorTo === "function";
+    if (canUpdateLine) {
+        process.stdout.clearLine();
+        process.stdout.cursorTo(0);
+        process.stdout.write(`${label} [${bar}] ${current}/${total}`);
+    } else if (current === 0 || current === total) {
+        console.log(`${label} [${bar}] ${current}/${total}`);
+    }
 }
 
 /**
@@ -263,13 +271,20 @@ function saveJsonResults(filePath, data) {
 /**
  * Run a single benchmark iteration
  * @param {Object} results - Results object to store benchmark data
+ * @param {(name: string) => boolean} nameFilter - Name filter
+ * @param {number} iterations - Loop iterations per JS benchmark
  * @returns {Promise<void>}
  */
-async function singleRun(results, nameFilter) {
+async function singleRun(results, nameFilter, iterations) {
     const options = await defaultNodeSetup({})
     const benchmarkRunner = (name, body) => {
         if (nameFilter && !nameFilter(name)) {
             return;
+        }
+        // Warmup to reduce JIT/IC noise.
+        body();
+        if (typeof globalThis.gc === "function") {
+            globalThis.gc();
         }
         const startTime = performance.now();
         body();
@@ -291,7 +306,6 @@ async function singleRun(results, nameFilter) {
     exports.run();
 
     const enumRoundtrip = new exports.EnumRoundtrip();
-    const iterations = 100_000;
     benchmarkRunner("EnumRoundtrip/takeEnum success", () => {
         for (let i = 0; i < iterations; i++) {
             enumRoundtrip.take({ tag: APIResult.Tag.Success, param0: "Hello, world" })
@@ -455,6 +469,48 @@ async function singleRun(results, nameFilter) {
         }
     })
 
+    const optionalReturnRoundtrip = new exports.OptionalReturnRoundtrip();
+    benchmarkRunner("OptionalReturnRoundtrip/makeIntSome", () => {
+        for (let i = 0; i < iterations; i++) {
+            optionalReturnRoundtrip.makeIntSome()
+        }
+    })
+    benchmarkRunner("OptionalReturnRoundtrip/makeIntNone", () => {
+        for (let i = 0; i < iterations; i++) {
+            optionalReturnRoundtrip.makeIntNone()
+        }
+    })
+    benchmarkRunner("OptionalReturnRoundtrip/makeBoolSome", () => {
+        for (let i = 0; i < iterations; i++) {
+            optionalReturnRoundtrip.makeBoolSome()
+        }
+    })
+    benchmarkRunner("OptionalReturnRoundtrip/makeBoolNone", () => {
+        for (let i = 0; i < iterations; i++) {
+            optionalReturnRoundtrip.makeBoolNone()
+        }
+    })
+    benchmarkRunner("OptionalReturnRoundtrip/makeDoubleSome", () => {
+        for (let i = 0; i < iterations; i++) {
+            optionalReturnRoundtrip.makeDoubleSome()
+        }
+    })
+    benchmarkRunner("OptionalReturnRoundtrip/makeDoubleNone", () => {
+        for (let i = 0; i < iterations; i++) {
+            optionalReturnRoundtrip.makeDoubleNone()
+        }
+    })
+    benchmarkRunner("OptionalReturnRoundtrip/makeStringSome", () => {
+        for (let i = 0; i < iterations; i++) {
+            optionalReturnRoundtrip.makeStringSome()
+        }
+    })
+    benchmarkRunner("OptionalReturnRoundtrip/makeStringNone", () => {
+        for (let i = 0; i < iterations; i++) {
+            optionalReturnRoundtrip.makeStringNone()
+        }
+    })
+
     // Struct performance tests
     const structRoundtrip = new exports.StructRoundtrip();
 
@@ -590,9 +646,10 @@ async function singleRun(results, nameFilter) {
  * Run until the coefficient of variation of measurements is below the threshold
  * @param {Object} results - Benchmark results object
  * @param {Object} options - Adaptive sampling options
+ * @param {number} iterations - Loop iterations per JS benchmark
  * @returns {Promise<void>}
  */
-async function runUntilStable(results, options, width, nameFilter, filterArg) {
+async function runUntilStable(results, options, width, nameFilter, filterArg, iterations) {
     const {
         minRuns = 5,
         maxRuns = 50,
@@ -611,7 +668,7 @@ async function runUntilStable(results, options, width, nameFilter, filterArg) {
         // Update progress with estimated completion
         updateProgress(runs, maxRuns, "Benchmark Progress:", width);
 
-        await singleRun(results, nameFilter);
+        await singleRun(results, nameFilter, iterations);
         runs++;
 
         if (runs === 1 && Object.keys(results).length === 0) {
@@ -674,6 +731,7 @@ Usage: node run.js [options]
 
 Options:
   --runs=NUMBER         Number of benchmark runs (default: 10)
+  --iterations=NUMBER   Loop iterations per JS benchmark (default: 100000)
   --output=FILENAME     Save JSON results to specified file
   --baseline=FILENAME   Compare results with baseline JSON file
   --adaptive            Enable adaptive sampling (run until stable)
@@ -689,6 +747,7 @@ async function main() {
     const args = parseArgs({
         options: {
             runs: { type: 'string', default: '10' },
+            iterations: { type: 'string', default: '100000' },
             output: { type: 'string' },
             baseline: { type: 'string' },
             help: { type: 'boolean', default: false },
@@ -710,6 +769,12 @@ async function main() {
     const filterArg = args.values.filter;
     const nameFilter = createNameFilter(filterArg);
 
+    const iterations = parseInt(args.values.iterations, 10);
+    if (isNaN(iterations) || iterations <= 0) {
+        console.error('Invalid --iterations value:', args.values.iterations);
+        process.exit(1);
+    }
+
     if (args.values.adaptive) {
         // Adaptive sampling mode
         const options = {
@@ -723,7 +788,7 @@ async function main() {
             console.log(`Results will be saved to: ${args.values.output}`);
         }
 
-        await runUntilStable(results, options, width, nameFilter, filterArg);
+        await runUntilStable(results, options, width, nameFilter, filterArg, iterations);
     } else {
         // Fixed number of runs mode
         const runs = parseInt(args.values.runs, 10);
@@ -745,7 +810,7 @@ async function main() {
         console.log("\nOverall Progress:");
         for (let i = 0; i < runs; i++) {
             updateProgress(i, runs, "Benchmark Runs:", width);
-            await singleRun(results, nameFilter);
+            await singleRun(results, nameFilter, iterations);
             if (i === 0 && Object.keys(results).length === 0) {
                 process.stdout.write("\n");
                 console.error(`No benchmarks matched filter: ${filterArg}`);
