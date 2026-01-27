@@ -902,13 +902,14 @@ extension BridgeType {
             func sanitize(_ s: String) -> String {
                 s.filter { $0.isNumber || $0.isLetter }
             }
-            let kindCode: String = switch ptr.kind {
-            case .unsafePointer: "Sup"
-            case .unsafeMutablePointer: "Sump"
-            case .unsafeRawPointer: "Surp"
-            case .unsafeMutableRawPointer: "Sumrp"
-            case .opaquePointer: "Sop"
-            }
+            let kindCode: String =
+                switch ptr.kind {
+                case .unsafePointer: "Sup"
+                case .unsafeMutablePointer: "Sump"
+                case .unsafeRawPointer: "Surp"
+                case .unsafeMutableRawPointer: "Sumrp"
+                case .opaquePointer: "Sop"
+                }
             if let pointee = ptr.pointee, !pointee.isEmpty {
                 let p = sanitize(pointee)
                 return "\(kindCode)\(p.count)\(p)"

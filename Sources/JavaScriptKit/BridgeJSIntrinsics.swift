@@ -649,14 +649,18 @@ func _swift_js_return_optional_double(_ isSome: Int32, _ value: Float64) {
 extension UnsafeMutableRawPointer {
     // MARK: ImportTS
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer { self }
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer)
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(
+        _ pointer: UnsafeMutableRawPointer
+    )
         -> UnsafeMutableRawPointer
     {
         pointer
     }
 
     // MARK: ExportSwift
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ pointer: UnsafeMutableRawPointer)
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(
+        _ pointer: UnsafeMutableRawPointer
+    )
         -> UnsafeMutableRawPointer
     {
         pointer
@@ -669,14 +673,18 @@ extension UnsafeRawPointer {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
         UnsafeMutableRawPointer(mutating: self)
     }
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer)
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(
+        _ pointer: UnsafeMutableRawPointer
+    )
         -> UnsafeRawPointer
     {
         UnsafeRawPointer(pointer)
     }
 
     // MARK: ExportSwift
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ pointer: UnsafeMutableRawPointer)
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(
+        _ pointer: UnsafeMutableRawPointer
+    )
         -> UnsafeRawPointer
     {
         UnsafeRawPointer(pointer)
@@ -691,14 +699,18 @@ extension OpaquePointer {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
         UnsafeMutableRawPointer(mutating: UnsafeRawPointer(self))
     }
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer)
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(
+        _ pointer: UnsafeMutableRawPointer
+    )
         -> OpaquePointer
     {
         OpaquePointer(UnsafeRawPointer(pointer))
     }
 
     // MARK: ExportSwift
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ pointer: UnsafeMutableRawPointer)
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(
+        _ pointer: UnsafeMutableRawPointer
+    )
         -> OpaquePointer
     {
         OpaquePointer(UnsafeRawPointer(pointer))
@@ -713,14 +725,18 @@ extension UnsafePointer {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
         UnsafeMutableRawPointer(mutating: UnsafeRawPointer(self))
     }
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer)
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(
+        _ pointer: UnsafeMutableRawPointer
+    )
         -> UnsafePointer<Pointee>
     {
         UnsafeRawPointer(pointer).assumingMemoryBound(to: Pointee.self)
     }
 
     // MARK: ExportSwift
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ pointer: UnsafeMutableRawPointer)
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(
+        _ pointer: UnsafeMutableRawPointer
+    )
         -> UnsafePointer<Pointee>
     {
         UnsafeRawPointer(pointer).assumingMemoryBound(to: Pointee.self)
@@ -735,14 +751,18 @@ extension UnsafeMutablePointer {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
         UnsafeMutableRawPointer(self)
     }
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer)
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(
+        _ pointer: UnsafeMutableRawPointer
+    )
         -> UnsafeMutablePointer<Pointee>
     {
         pointer.assumingMemoryBound(to: Pointee.self)
     }
 
     // MARK: ExportSwift
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ pointer: UnsafeMutableRawPointer)
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(
+        _ pointer: UnsafeMutableRawPointer
+    )
         -> UnsafeMutablePointer<Pointee>
     {
         pointer.assumingMemoryBound(to: Pointee.self)
