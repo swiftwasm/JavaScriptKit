@@ -1798,6 +1798,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     private struct CurrentType {
         let name: String
         let jsName: String?
+        let from: JSImportFrom?
         var constructor: ImportedConstructorSkeleton?
         var methods: [ImportedFunctionSkeleton]
         var getters: [ImportedGetterSkeleton]
@@ -1869,6 +1870,22 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                 {
                     return segment.content.text
                 }
+            }
+            return nil
+        }
+
+        /// Extracts the `from` argument value from an attribute, if present.
+        static func extractJSImportFrom(from attribute: AttributeSyntax) -> JSImportFrom? {
+            guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else {
+                return nil
+            }
+            for argument in arguments {
+                guard argument.label?.text == "from" else { continue }
+
+                // Accept `.global`, `JSImportFrom.global`, etc.
+                let description = argument.expression.trimmedDescription
+                let caseName = description.split(separator: ".").last.map(String.init) ?? description
+                return JSImportFrom(rawValue: caseName)
             }
             return nil
         }
@@ -1996,14 +2013,23 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     private func enterJSClass(_ typeName: String) {
         stateStack.append(.jsClassBody(name: typeName))
-        currentType = CurrentType(name: typeName, jsName: nil, constructor: nil, methods: [], getters: [], setters: [])
+        currentType = CurrentType(
+            name: typeName,
+            jsName: nil,
+            from: nil,
+            constructor: nil,
+            methods: [],
+            getters: [],
+            setters: []
+        )
     }
 
-    private func enterJSClass(_ typeName: String, jsName: String?) {
+    private func enterJSClass(_ typeName: String, jsName: String?, from: JSImportFrom?) {
         stateStack.append(.jsClassBody(name: typeName))
         currentType = CurrentType(
             name: typeName,
             jsName: jsName,
+            from: from,
             constructor: nil,
             methods: [],
             getters: [],
@@ -2017,6 +2043,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                 ImportedTypeSkeleton(
                     name: type.name,
                     jsName: type.jsName,
+                    from: type.from,
                     constructor: type.constructor,
                     methods: type.methods,
                     getters: type.getters,
@@ -2031,8 +2058,10 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
         if AttributeChecker.hasJSClassAttribute(node.attributes) {
-            let jsName = AttributeChecker.firstJSClassAttribute(node.attributes).flatMap(AttributeChecker.extractJSName)
-            enterJSClass(node.name.text, jsName: jsName)
+            let attribute = AttributeChecker.firstJSClassAttribute(node.attributes)
+            let jsName = attribute.flatMap(AttributeChecker.extractJSName)
+            let from = attribute.flatMap(AttributeChecker.extractJSImportFrom)
+            enterJSClass(node.name.text, jsName: jsName, from: from)
         }
         return .visitChildren
     }
@@ -2045,8 +2074,10 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
         if AttributeChecker.hasJSClassAttribute(node.attributes) {
-            let jsName = AttributeChecker.firstJSClassAttribute(node.attributes).flatMap(AttributeChecker.extractJSName)
-            enterJSClass(node.name.text, jsName: jsName)
+            let attribute = AttributeChecker.firstJSClassAttribute(node.attributes)
+            let jsName = attribute.flatMap(AttributeChecker.extractJSName)
+            let from = attribute.flatMap(AttributeChecker.extractJSImportFrom)
+            enterJSClass(node.name.text, jsName: jsName, from: from)
         }
         return .visitChildren
     }
@@ -2269,6 +2300,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
         let baseName = SwiftToSkeleton.normalizeIdentifier(node.name.text)
         let jsName = AttributeChecker.extractJSName(from: jsFunction)
+        let from = AttributeChecker.extractJSImportFrom(from: jsFunction)
         let name: String
         if isStaticMember, let enclosingTypeName {
             name = "\(enclosingTypeName)_\(baseName)"
@@ -2289,6 +2321,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         return ImportedFunctionSkeleton(
             name: name,
             jsName: jsName,
+            from: from,
             parameters: parameters,
             returnType: returnType,
             documentation: nil
@@ -2322,9 +2355,11 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
         let propertyName = SwiftToSkeleton.normalizeIdentifier(identifier.identifier.text)
         let jsName = AttributeChecker.extractJSName(from: jsGetter)
+        let from = AttributeChecker.extractJSImportFrom(from: jsGetter)
         return ImportedGetterSkeleton(
             name: propertyName,
             jsName: jsName,
+            from: from,
             type: propertyType,
             documentation: nil,
             functionName: nil

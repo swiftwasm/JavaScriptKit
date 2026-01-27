@@ -80,6 +80,7 @@ public struct BridgeJSLink {
         var topLevelDtsTypeLines: [String] = []
         var importObjectBuilders: [ImportObjectBuilder] = []
         var enumStaticAssignments: [String] = []
+        var needsImportsObject: Bool = false
     }
 
     private func collectLinkData() throws -> LinkData {
@@ -173,12 +174,21 @@ public struct BridgeJSLink {
             let importObjectBuilder = ImportObjectBuilder(moduleName: unified.moduleName)
             for fileSkeleton in imported.children {
                 for getter in fileSkeleton.globalGetters {
+                    if getter.from == nil {
+                        data.needsImportsObject = true
+                    }
                     try renderImportedGlobalGetter(importObjectBuilder: importObjectBuilder, getter: getter)
                 }
                 for function in fileSkeleton.functions {
+                    if function.from == nil {
+                        data.needsImportsObject = true
+                    }
                     try renderImportedFunction(importObjectBuilder: importObjectBuilder, function: function)
                 }
                 for type in fileSkeleton.types {
+                    if type.constructor != nil, type.from == nil {
+                        data.needsImportsObject = true
+                    }
                     try renderImportedType(importObjectBuilder: importObjectBuilder, type: type)
                 }
             }
@@ -294,7 +304,7 @@ public struct BridgeJSLink {
         }
     }
 
-    private func generateAddImports() -> CodeFragmentPrinter {
+    private func generateAddImports(needsImportsObject: Bool) -> CodeFragmentPrinter {
         let printer = CodeFragmentPrinter()
         let allStructs = skeletons.compactMap { $0.exported?.structs }.flatMap { $0 }
         printer.write("return {")
@@ -311,7 +321,7 @@ public struct BridgeJSLink {
                     "bjs = {};",
                     "importObject[\"bjs\"] = bjs;",
                 ])
-                if skeletons.contains(where: { $0.imported != nil }) {
+                if needsImportsObject {
                     printer.write(lines: [
                         "const imports = options.getImports(importsContext);"
                     ])
@@ -1043,7 +1053,7 @@ public struct BridgeJSLink {
                 printer.write(lines: structPrinter.lines)
             }
             printer.nextLine()
-            printer.write(contentsOf: generateAddImports())
+            printer.write(contentsOf: generateAddImports(needsImportsObject: data.needsImportsObject))
         }
         printer.indent()
 
@@ -2176,9 +2186,13 @@ extension BridgeJSLink {
             return printer.lines
         }
 
-        func call(name: String, returnType: BridgeType) throws -> String? {
-            let calleeExpr = Self.propertyAccessExpr(objectExpr: "imports", propertyName: name)
+        func call(name: String, fromObjectExpr: String, returnType: BridgeType) throws -> String? {
+            let calleeExpr = Self.propertyAccessExpr(objectExpr: fromObjectExpr, propertyName: name)
             return try self.call(calleeExpr: calleeExpr, returnType: returnType)
+        }
+
+        func call(name: String, returnType: BridgeType) throws -> String? {
+            return try call(name: name, fromObjectExpr: "imports", returnType: returnType)
         }
 
         private func call(calleeExpr: String, returnType: BridgeType) throws -> String? {
@@ -2204,12 +2218,16 @@ extension BridgeJSLink {
             )
         }
 
-        func callConstructor(jsName: String, swiftTypeName: String) throws -> String? {
-            let ctorExpr = Self.propertyAccessExpr(objectExpr: "imports", propertyName: jsName)
+        func callConstructor(jsName: String, swiftTypeName: String, fromObjectExpr: String) throws -> String? {
+            let ctorExpr = Self.propertyAccessExpr(objectExpr: fromObjectExpr, propertyName: jsName)
             let call = "new \(ctorExpr)(\(parameterForwardings.joined(separator: ", ")))"
             let type: BridgeType = .jsObject(swiftTypeName)
             let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: type, context: context)
             return try lowerReturnValue(returnType: type, returnExpr: call, loweringFragment: loweringFragment)
+        }
+
+        func callConstructor(jsName: String, swiftTypeName: String) throws -> String? {
+            return try callConstructor(jsName: jsName, swiftTypeName: swiftTypeName, fromObjectExpr: "imports")
         }
 
         func callMethod(name: String, returnType: BridgeType) throws -> String? {
@@ -2253,14 +2271,13 @@ extension BridgeJSLink {
             body.write("\(call);")
         }
 
-        func getImportProperty(name: String, returnType: BridgeType) throws -> String? {
+        func getImportProperty(name: String, fromObjectExpr: String, returnType: BridgeType) throws -> String? {
             if returnType == .void {
                 throw BridgeJSLinkError(message: "Void is not supported for imported JS properties")
             }
 
             let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: returnType, context: context)
-            let escapedName = BridgeJSLink.escapeForJavaScriptStringLiteral(name)
-            let expr = "imports[\"\(escapedName)\"]"
+            let expr = Self.propertyAccessExpr(objectExpr: fromObjectExpr, propertyName: name)
 
             let returnExpr: String?
             if loweringFragment.parameters.count == 0 {
@@ -2277,6 +2294,10 @@ extension BridgeJSLink {
                 returnExpr: returnExpr,
                 loweringFragment: loweringFragment
             )
+        }
+
+        func getImportProperty(name: String, returnType: BridgeType) throws -> String? {
+            return try getImportProperty(name: name, fromObjectExpr: "imports", returnType: returnType)
         }
 
         private func lowerReturnValue(
@@ -3013,18 +3034,25 @@ extension BridgeJSLink {
             try thunkBuilder.liftParameter(param: param)
         }
         let jsName = function.jsName ?? function.name
-        let returnExpr = try thunkBuilder.call(name: jsName, returnType: function.returnType)
+        let importRootExpr = function.from == .global ? "globalThis" : "imports"
+        let returnExpr = try thunkBuilder.call(
+            name: jsName,
+            fromObjectExpr: importRootExpr,
+            returnType: function.returnType
+        )
         let funcLines = thunkBuilder.renderFunction(
             name: function.abiName(context: nil),
             returnExpr: returnExpr,
             returnType: function.returnType
         )
         let effects = Effects(isAsync: false, isThrows: false)
-        importObjectBuilder.appendDts(
-            [
-                "\(renderTSPropertyName(jsName))\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: effects));"
-            ]
-        )
+        if function.from == nil {
+            importObjectBuilder.appendDts(
+                [
+                    "\(renderTSPropertyName(jsName))\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: effects));"
+                ]
+            )
+        }
         importObjectBuilder.assignToImportObject(name: function.abiName(context: nil), function: funcLines)
     }
 
@@ -3034,14 +3062,21 @@ extension BridgeJSLink {
     ) throws {
         let thunkBuilder = ImportedThunkBuilder()
         let jsName = getter.jsName ?? getter.name
-        let returnExpr = try thunkBuilder.getImportProperty(name: jsName, returnType: getter.type)
+        let importRootExpr = getter.from == .global ? "globalThis" : "imports"
+        let returnExpr = try thunkBuilder.getImportProperty(
+            name: jsName,
+            fromObjectExpr: importRootExpr,
+            returnType: getter.type
+        )
         let abiName = getter.abiName(context: nil)
         let funcLines = thunkBuilder.renderFunction(
             name: abiName,
             returnExpr: returnExpr,
             returnType: getter.type
         )
-        importObjectBuilder.appendDts(["readonly \(renderTSPropertyName(jsName)): \(getter.type.tsType);"])
+        if getter.from == nil {
+            importObjectBuilder.appendDts(["readonly \(renderTSPropertyName(jsName)): \(getter.type.tsType);"])
+        }
         importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
     }
 
@@ -3105,7 +3140,12 @@ extension BridgeJSLink {
             try thunkBuilder.liftParameter(param: param)
         }
         let returnType = BridgeType.jsObject(type.name)
-        let returnExpr = try thunkBuilder.callConstructor(jsName: type.jsName ?? type.name, swiftTypeName: type.name)
+        let importRootExpr = type.from == .global ? "globalThis" : "imports"
+        let returnExpr = try thunkBuilder.callConstructor(
+            jsName: type.jsName ?? type.name,
+            swiftTypeName: type.name,
+            fromObjectExpr: importRootExpr
+        )
         let abiName = constructor.abiName(context: type)
         let funcLines = thunkBuilder.renderFunction(
             name: abiName,
@@ -3114,16 +3154,18 @@ extension BridgeJSLink {
         )
         importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
 
-        let dtsPrinter = CodeFragmentPrinter()
-        dtsPrinter.write("\(type.name): {")
-        dtsPrinter.indent {
-            dtsPrinter.write(
-                "new\(renderTSSignature(parameters: constructor.parameters, returnType: returnType, effects: Effects(isAsync: false, isThrows: false)));"
-            )
-        }
-        dtsPrinter.write("}")
+        if type.from == nil {
+            let dtsPrinter = CodeFragmentPrinter()
+            dtsPrinter.write("\(type.name): {")
+            dtsPrinter.indent {
+                dtsPrinter.write(
+                    "new\(renderTSSignature(parameters: constructor.parameters, returnType: returnType, effects: Effects(isAsync: false, isThrows: false)));"
+                )
+            }
+            dtsPrinter.write("}")
 
-        importObjectBuilder.appendDts(dtsPrinter.lines)
+            importObjectBuilder.appendDts(dtsPrinter.lines)
+        }
     }
 
     func renderImportedGetter(

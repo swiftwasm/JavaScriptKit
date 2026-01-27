@@ -181,6 +181,7 @@ let package = Package(
             exclude: [
                 "bridge-js.config.json",
                 "bridge-js.d.ts",
+                "bridge-js.global.d.ts",
                 "Generated/JavaScript",
             ],
             swiftSettings: [

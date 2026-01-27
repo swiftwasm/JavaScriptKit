@@ -205,7 +205,7 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_console_get"] = function bjs_console_get() {
                 try {
-                    let ret = imports["console"];
+                    let ret = imports.console;
                     return swift.memory.retain(ret);
                 } catch (error) {
                     setException(error);

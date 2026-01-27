@@ -24,9 +24,10 @@ export class TypeProcessor {
      * @param {ts.CompilerOptions} options - Compiler options
      * @returns {ts.Program} TypeScript program object
      */
-    static createProgram(filePath, options) {
+    static createProgram(filePaths, options) {
         const host = ts.createCompilerHost(options);
-        return ts.createProgram([filePath], options, host);
+        const roots = Array.isArray(filePaths) ? filePaths : [filePaths];
+        return ts.createProgram(roots, options, host);
     }
 
     /**
@@ -63,6 +64,43 @@ export class TypeProcessor {
 
         /** @type {Map<string, string>} */
         this.swiftTypeNameByJSTypeName = new Map();
+
+        /** @type {boolean} */
+        this.defaultImportFromGlobal = options.defaultImportFromGlobal ?? false;
+    }
+
+    /**
+     * Escape a string for a Swift string literal inside macro arguments.
+     * @param {string} value
+     * @returns {string}
+     * @private
+     */
+    escapeForSwiftStringLiteral(value) {
+        return value.replaceAll("\\", "\\\\").replaceAll("\"", "\\\\\"");
+    }
+
+    /**
+     * Render a `jsName:` macro argument if the JS name differs from the default.
+     * @param {string} jsName
+     * @param {string} defaultName
+     * @returns {string | null}
+     * @private
+     */
+    renderOptionalJSNameArg(jsName, defaultName) {
+        if (jsName === defaultName) return null;
+        return `jsName: "${this.escapeForSwiftStringLiteral(jsName)}"`;
+    }
+
+    /**
+     * Render a macro annotation with optional labeled arguments.
+     * @param {string} macroName
+     * @param {string[]} args
+     * @returns {string}
+     * @private
+     */
+    renderMacroAnnotation(macroName, args) {
+        if (!args.length) return `@${macroName}`;
+        return `@${macroName}(${args.join(", ")})`;
     }
 
     /**
@@ -100,18 +138,6 @@ export class TypeProcessor {
             sf => !sf.isDeclarationFile || sf.fileName === inputFilePath
         );
 
-        // Add prelude
-        this.swiftLines.push(
-            "// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,",
-            "// DO NOT EDIT.",
-            "//",
-            "// To update this file, just rebuild your project or run",
-            "// `swift package bridge-js`.",
-            "",
-            "@_spi(Experimental) import JavaScriptKit",
-            ""
-        );
-
         for (const sourceFile of sourceFiles) {
             if (sourceFile.fileName.includes('node_modules/typescript/lib')) continue;
 
@@ -140,7 +166,7 @@ export class TypeProcessor {
         }
 
         const content = this.swiftLines.join("\n").trimEnd() + "\n";
-        const hasAny = this.swiftLines.length > 9; // More than just the prelude
+        const hasAny = content.trim().length > 0;
         return { content, hasAny };
     }
 
@@ -154,6 +180,8 @@ export class TypeProcessor {
             this.visitFunctionDeclaration(node);
         } else if (ts.isClassDeclaration(node)) {
             this.visitClassDecl(node);
+        } else if (ts.isVariableStatement(node)) {
+            this.visitVariableStatement(node);
         } else if (ts.isEnumDeclaration(node)) {
             this.visitEnumDeclaration(node);
         } else if (ts.isExportDeclaration(node)) {
@@ -219,6 +247,41 @@ export class TypeProcessor {
 
                 this.visitNode(declaration);
             }
+        }
+    }
+
+    /**
+     * Visit an exported variable statement and render Swift global getter(s).
+     * Supports simple `export const foo: T` / `export let foo: T` declarations.
+     *
+     * @param {ts.VariableStatement} node
+     * @private
+     */
+    visitVariableStatement(node) {
+        const isExported = node.modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword) ?? false;
+        if (!isExported) return;
+
+        const fromArg = this.renderDefaultJSImportFromArgument();
+
+        for (const decl of node.declarationList.declarations) {
+            if (!ts.isIdentifier(decl.name)) continue;
+
+            const jsName = decl.name.text;
+            const swiftName = this.swiftTypeName(jsName);
+            const swiftVarName = this.renderIdentifier(swiftName);
+
+            const type = this.checker.getTypeAtLocation(decl);
+            const swiftType = this.visitType(type, decl);
+
+            /** @type {string[]} */
+            const args = [];
+            const jsNameArg = this.renderOptionalJSNameArg(jsName, swiftName);
+            if (jsNameArg) args.push(jsNameArg);
+            if (fromArg) args.push(fromArg);
+            const annotation = this.renderMacroAnnotation("JSGetter", args);
+
+            this.swiftLines.push(`${annotation} var ${swiftVarName}: ${swiftType}`);
+            this.swiftLines.push("");
         }
     }
 
@@ -370,8 +433,13 @@ export class TypeProcessor {
         if (!node.name) return;
         const jsName = node.name.text;
         const swiftName = this.swiftTypeName(jsName);
-        const escapedJSName = jsName.replaceAll("\\", "\\\\").replaceAll("\"", "\\\\\"");
-        const annotation = jsName !== swiftName ? `@JSFunction(jsName: "${escapedJSName}")` : "@JSFunction";
+        const fromArg = this.renderDefaultJSImportFromArgument();
+        /** @type {string[]} */
+        const args = [];
+        const jsNameArg = this.renderOptionalJSNameArg(jsName, swiftName);
+        if (jsNameArg) args.push(jsNameArg);
+        if (fromArg) args.push(fromArg);
+        const annotation = this.renderMacroAnnotation("JSFunction", args);
 
         const signature = this.checker.getSignatureFromDeclaration(node);
         if (!signature) return;
@@ -400,6 +468,12 @@ export class TypeProcessor {
         }
         if (parts.length === 0) return undefined;
         return parts.join("\n");
+    }
+
+    /** @returns {string} */
+    renderDefaultJSImportFromArgument() {
+        if (this.defaultImportFromGlobal) return "from: .global";
+        return "";
     }
 
     /**
@@ -465,8 +539,13 @@ export class TypeProcessor {
         this.emittedStructuredTypeNames.add(jsName);
 
         const swiftName = this.swiftTypeName(jsName);
-        const escapedJSName = jsName.replaceAll("\\", "\\\\").replaceAll("\"", "\\\\\"");
-        const annotation = jsName !== swiftName ? `@JSClass(jsName: "${escapedJSName}")` : "@JSClass";
+        const fromArg = this.renderDefaultJSImportFromArgument();
+        /** @type {string[]} */
+        const args = [];
+        const jsNameArg = this.renderOptionalJSNameArg(jsName, swiftName);
+        if (jsNameArg) args.push(jsNameArg);
+        if (fromArg) args.push(fromArg);
+        const annotation = this.renderMacroAnnotation("JSClass", args);
         const className = this.renderIdentifier(swiftName);
         this.swiftLines.push(`${annotation} struct ${className} {`);
 
@@ -526,8 +605,11 @@ export class TypeProcessor {
         this.emittedStructuredTypeNames.add(name);
 
         const swiftName = this.swiftTypeName(name);
-        const escapedJSName = name.replaceAll("\\", "\\\\").replaceAll("\"", "\\\\\"");
-        const annotation = name !== swiftName ? `@JSClass(jsName: "${escapedJSName}")` : "@JSClass";
+        /** @type {string[]} */
+        const args = [];
+        const jsNameArg = this.renderOptionalJSNameArg(name, swiftName);
+        if (jsNameArg) args.push(jsNameArg);
+        const annotation = this.renderMacroAnnotation("JSClass", args);
         const typeName = this.renderIdentifier(swiftName);
         this.swiftLines.push(`${annotation} struct ${typeName} {`);
 
@@ -672,8 +754,14 @@ export class TypeProcessor {
         const type = property.type;
         const swiftName = this.renderIdentifier(property.swiftName);
         const needsJSGetterName = property.jsName !== property.swiftName;
-        const escapedJSName = property.jsName.replaceAll("\\", "\\\\").replaceAll("\"", "\\\\\"");
-        const getterAnnotation = needsJSGetterName ? `@JSGetter(jsName: "${escapedJSName}")` : "@JSGetter";
+        // Note: `from: .global` is only meaningful for top-level imports and constructors.
+        // Instance member access always comes from the JS object itself.
+        const fromArg = "";
+        /** @type {string[]} */
+        const getterArgs = [];
+        if (needsJSGetterName) getterArgs.push(`jsName: "${this.escapeForSwiftStringLiteral(property.jsName)}"`);
+        if (fromArg) getterArgs.push(fromArg);
+        const getterAnnotation = this.renderMacroAnnotation("JSGetter", getterArgs);
 
         // Always render getter
         this.swiftLines.push(`    ${getterAnnotation} var ${swiftName}: ${type}`);
@@ -684,7 +772,11 @@ export class TypeProcessor {
             const derivedPropertyName = property.swiftName.charAt(0).toLowerCase() + property.swiftName.slice(1);
             const needsJSNameField = property.jsName !== derivedPropertyName;
             const setterName = `set${capitalizedSwiftName}`;
-            const annotation = needsJSNameField ? `@JSSetter(jsName: "${escapedJSName}")` : "@JSSetter";
+            /** @type {string[]} */
+            const setterArgs = [];
+            if (needsJSNameField) setterArgs.push(`jsName: "${this.escapeForSwiftStringLiteral(property.jsName)}"`);
+            if (fromArg) setterArgs.push(fromArg);
+            const annotation = this.renderMacroAnnotation("JSSetter", setterArgs);
             this.swiftLines.push(`    ${annotation} func ${this.renderIdentifier(setterName)}(_ value: ${type}) ${this.renderEffects({ isAsync: false })}`);
         }
     }
@@ -709,8 +801,14 @@ export class TypeProcessor {
 
         const swiftName = this.swiftTypeName(jsName);
         const needsJSNameField = jsName !== swiftName;
-        const escapedJSName = jsName.replaceAll("\\", "\\\\").replaceAll("\"", "\\\\\"");
-        const annotation = needsJSNameField ? `@JSFunction(jsName: "${escapedJSName}")` : "@JSFunction";
+        // Note: `from: .global` is only meaningful for top-level imports and constructors.
+        // Instance member calls always come from the JS object itself.
+        const fromArg = "";
+        /** @type {string[]} */
+        const args = [];
+        if (needsJSNameField) args.push(`jsName: "${this.escapeForSwiftStringLiteral(jsName)}"`);
+        if (fromArg) args.push(fromArg);
+        const annotation = this.renderMacroAnnotation("JSFunction", args);
 
         const signature = this.checker.getSignatureFromDeclaration(node);
         if (!signature) return;

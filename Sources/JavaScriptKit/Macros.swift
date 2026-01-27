@@ -6,6 +6,13 @@ public enum JSEnumStyle: String {
     case tsEnum
 }
 
+/// Controls where BridgeJS reads imported JS values from.
+///
+/// - `global`: Read from `globalThis`.
+public enum JSImportFrom: String {
+    case global
+}
+
 /// A macro that exposes Swift functions, classes, and methods to JavaScript.
 ///
 /// Apply this macro to Swift declarations that you want to make callable from JavaScript:
@@ -126,9 +133,12 @@ public macro JS(namespace: String? = nil, enumStyle: JSEnumStyle = .const) = Bui
 ///     @JSGetter var name: String
 /// }
 /// ```
+///
+/// - Parameter from: Selects where the property is read from.
+///   Use `.global` to read from `globalThis` (e.g. `console`, `document`).
 @attached(accessor)
 @_spi(Experimental)
-public macro JSGetter(jsName: String? = nil) =
+public macro JSGetter(jsName: String? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSGetterMacro")
 
 /// A macro that generates a Swift function body that writes a value to JavaScript.
@@ -147,7 +157,7 @@ public macro JSGetter(jsName: String? = nil) =
 /// ```
 @attached(body)
 @_spi(Experimental)
-public macro JSSetter(jsName: String? = nil) =
+public macro JSSetter(jsName: String? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSSetterMacro")
 
 /// A macro that generates a Swift function body that calls a JavaScript function.
@@ -165,9 +175,11 @@ public macro JSSetter(jsName: String? = nil) =
 ///
 /// - Parameter jsName: An optional string that specifies the name of the JavaScript function or method to call.
 ///   If not provided, the Swift function name is used.
+/// - Parameter from: Selects where the function is looked up from.
+///   Use `.global` to call a function on `globalThis` (e.g. `setTimeout`).
 @attached(body)
 @_spi(Experimental)
-public macro JSFunction(jsName: String? = nil) =
+public macro JSFunction(jsName: String? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSFunctionMacro")
 
 /// A macro that adds bridging members for a Swift type that represents a JavaScript class.
@@ -187,8 +199,11 @@ public macro JSFunction(jsName: String? = nil) =
 ///     @JSFunction func greet() throws (JSException) -> String
 /// }
 /// ```
+///
+/// - Parameter from: Selects where the constructor is looked up from.
+///   Use `.global` to construct globals like `WebSocket` via `globalThis`.
 @attached(member, names: arbitrary)
 @attached(extension, conformances: _JSBridgedClass)
 @_spi(Experimental)
-public macro JSClass(jsName: String? = nil) =
+public macro JSClass(jsName: String? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSClassMacro")
