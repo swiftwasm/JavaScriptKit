@@ -31,7 +31,7 @@ public final class JSPromise: JSBridgedClass {
     /// is not an object and is not an instance of JavaScript `Promise`, this function will
     /// return `nil`.
     public static func construct(from value: JSValue) -> Self? {
-        guard case .object(let jsObject) = value else { return nil }
+        guard let jsObject = value.object else { return nil }
         return Self(jsObject)
     }
 

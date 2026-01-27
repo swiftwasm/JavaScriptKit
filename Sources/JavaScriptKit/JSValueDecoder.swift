@@ -159,7 +159,11 @@ private struct _UnkeyedDecodingContainer: UnkeyedDecodingContainer {
 
     init(decoder: _Decoder, ref: JSObject) {
         self.decoder = decoder
-        count = ref.length.number.map(Int.init)
+        if let count = ref.length.number {
+            self.count = Int(count)
+        } else {
+            self.count = nil
+        }
         self.ref = ref
     }
 

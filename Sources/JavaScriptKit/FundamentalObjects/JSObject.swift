@@ -249,7 +249,7 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     }
 
     public static func construct(from value: JSValue) -> Self? {
-        switch value {
+        switch value.storage {
         case .boolean,
             .string,
             .number,

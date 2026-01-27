@@ -21,8 +21,8 @@ class JavaScriptKitTests: XCTestCase {
             let prop = JSString("prop_\(index)")
             setJSValue(this: global, name: prop, value: input)
             let got = getJSValue(this: global, name: prop)
-            switch (got, input) {
-            case (.number(let lhs), .number(let rhs)):
+            switch (got.number, input.number) {
+            case (let lhs?, let rhs?):
                 // Compare bitPattern because nan == nan is always false
                 XCTAssertEqual(lhs.bitPattern, rhs.bitPattern)
             default:

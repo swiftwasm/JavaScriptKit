@@ -2,20 +2,55 @@ import _CJavaScriptKit
 
 /// `JSValue` represents a value in JavaScript.
 @dynamicMemberLookup
-public enum JSValue: Equatable {
-    case boolean(Bool)
-    case string(JSString)
-    case number(Double)
-    case object(JSObject)
-    case null
-    case undefined
-    case symbol(JSSymbol)
-    case bigInt(JSBigInt)
+public struct JSValue: Equatable {
+    /// The internal storage of the JSValue, which is intentionally not public
+    /// to leave the flexibility to change the storage.
+    internal enum Storage: Equatable {
+        case boolean(Bool)
+        case string(JSString)
+        case number(Double)
+        case object(JSObject)
+        case null
+        case undefined
+        case symbol(JSSymbol)
+        case bigInt(JSBigInt)
+    }
+
+    internal var storage: Storage
+
+    internal init(storage: Storage) {
+        self.storage = storage
+    }
+
+    public static func boolean(_ value: Bool) -> JSValue {
+        .init(storage: .boolean(value))
+    }
+    public static func string(_ value: JSString) -> JSValue {
+        .init(storage: .string(value))
+    }
+    public static func number(_ value: Double) -> JSValue {
+        .init(storage: .number(value))
+    }
+    public static func object(_ value: JSObject) -> JSValue {
+        .init(storage: .object(value))
+    }
+    public static var null: JSValue {
+        .init(storage: .null)
+    }
+    public static var undefined: JSValue {
+        .init(storage: .undefined)
+    }
+    public static func symbol(_ value: JSSymbol) -> JSValue {
+        .init(storage: .symbol(value))
+    }
+    public static func bigInt(_ value: JSBigInt) -> JSValue {
+        .init(storage: .bigInt(value))
+    }
 
     /// Returns the `Bool` value of this JS value if its type is boolean.
     /// If not, returns `nil`.
     public var boolean: Bool? {
-        switch self {
+        switch storage {
         case .boolean(let boolean): return boolean
         default: return nil
         }
@@ -35,7 +70,7 @@ public enum JSValue: Equatable {
     /// If not, returns `nil`.
     ///
     public var jsString: JSString? {
-        switch self {
+        switch storage {
         case .string(let string): return string
         default: return nil
         }
@@ -44,7 +79,7 @@ public enum JSValue: Equatable {
     /// Returns the `Double` value of this JS value if the type is number.
     /// If not, returns `nil`.
     public var number: Double? {
-        switch self {
+        switch storage {
         case .number(let number): return number
         default: return nil
         }
@@ -53,7 +88,7 @@ public enum JSValue: Equatable {
     /// Returns the `JSObject` of this JS value if its type is object.
     /// If not, returns `nil`.
     public var object: JSObject? {
-        switch self {
+        switch storage {
         case .object(let object): return object
         default: return nil
         }
@@ -65,7 +100,7 @@ public enum JSValue: Equatable {
     /// Returns the `JSSymbol` of this JS value if its type is function.
     /// If not, returns `nil`.
     public var symbol: JSSymbol? {
-        switch self {
+        switch storage {
         case .symbol(let symbol): return symbol
         default: return nil
         }
@@ -74,7 +109,7 @@ public enum JSValue: Equatable {
     /// Returns the `JSBigInt` of this JS value if its type is function.
     /// If not, returns `nil`.
     public var bigInt: JSBigInt? {
-        switch self {
+        switch storage {
         case .bigInt(let bigInt): return bigInt
         default: return nil
         }
@@ -83,13 +118,13 @@ public enum JSValue: Equatable {
     /// Returns the `true` if this JS value is null.
     /// If not, returns `false`.
     public var isNull: Bool {
-        return self == .null
+        return storage == .null
     }
 
     /// Returns the `true` if this JS value is undefined.
     /// If not, returns `false`.
     public var isUndefined: Bool {
-        return self == .undefined
+        return storage == .undefined
     }
 }
 
@@ -132,7 +167,7 @@ extension JSValue {
 
 extension JSValue {
     public static func string(_ value: String) -> JSValue {
-        .string(JSString(value))
+        .init(storage: .string(JSString(value)))
     }
 
     /// Deprecated: Please create `JSClosure` directly and manage its lifetime manually.
@@ -161,7 +196,7 @@ extension JSValue {
     /// ```
     @available(*, deprecated, message: "Please create JSClosure directly and manage its lifetime manually.")
     public static func function(_ body: @escaping ([JSValue]) -> JSValue) -> JSValue {
-        .object(JSClosure(body))
+        .init(storage: .object(JSClosure(body)))
     }
 
     @available(
@@ -171,34 +206,34 @@ extension JSValue {
         message: "JSClosure is no longer a subclass of JSFunction. Use .object(closure) instead."
     )
     public static func function(_ closure: JSClosure) -> JSValue {
-        .object(closure)
+        .init(storage: .object(closure))
     }
 
     @available(*, deprecated, renamed: "object", message: "Use .object(function) instead")
-    public static func function(_ function: JSObject) -> JSValue { .object(function) }
+    public static func function(_ function: JSObject) -> JSValue { .init(storage: .object(function)) }
 }
 
 extension JSValue: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
-        self = .string(JSString(value))
+        self = .init(storage: .string(JSString(value)))
     }
 }
 
 extension JSValue: ExpressibleByIntegerLiteral {
     public init(integerLiteral value: Int32) {
-        self = .number(Double(value))
+        self = .init(storage: .number(Double(value)))
     }
 }
 
 extension JSValue: ExpressibleByFloatLiteral {
     public init(floatLiteral value: Double) {
-        self = .number(value)
+        self = .init(storage: .number(value))
     }
 }
 
 extension JSValue: ExpressibleByNilLiteral {
     public init(nilLiteral _: ()) {
-        self = .null
+        self = .init(storage: .null)
     }
 }
 
@@ -268,7 +303,7 @@ extension JSValue {
     /// - Parameter constructor: The constructor function to check.
     /// - Returns: The result of `instanceof` in the JavaScript environment.
     public func isInstanceOf(_ constructor: JSObject) -> Bool {
-        switch self {
+        switch storage {
         case .boolean, .string, .number, .null, .undefined, .symbol, .bigInt:
             return false
         case .object(let ref):

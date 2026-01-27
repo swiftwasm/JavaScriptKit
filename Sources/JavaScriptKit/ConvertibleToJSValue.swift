@@ -222,7 +222,7 @@ extension JSValue {
         let kind: JavaScriptValueKind
         let payload1: JavaScriptPayload1
         var payload2: JavaScriptPayload2 = 0
-        switch self {
+        switch self.storage {
         case .boolean(let boolValue):
             kind = .boolean
             payload1 = boolValue ? 1 : 0
