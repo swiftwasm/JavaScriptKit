@@ -102,6 +102,9 @@ export async function setupOptions(options, context) {
                     fn(v);
                     fn(v);
                     return v;
+                },
+                jsTranslatePoint: (point, dx, dy) => {
+                    return { x: (point.x | 0) + (dx | 0), y: (point.y | 0) + (dy | 0) };
                 }
             };
         },

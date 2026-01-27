@@ -127,4 +127,11 @@ class ImportAPITests: XCTestCase {
         let obj = try _WeirdClass()
         XCTAssertEqual(try obj.method_with_dashes(), "ok")
     }
+
+    func testSwiftStructInImportedSignature() throws {
+        let point = Point(x: 1, y: 2)
+        let moved = try jsTranslatePoint(point, dx: 3, dy: -1)
+        XCTAssertEqual(moved.x, 4)
+        XCTAssertEqual(moved.y, 1)
+    }
 }
