@@ -7883,3 +7883,113 @@ func _$jsTranslatePoint(_ point: Point, _ dx: Int, _ dy: Int) throws(JSException
     }
     return Point.bridgeJSLiftReturn(ret)
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsObservePointLifetime")
+fileprivate func bjs_jsObservePointLifetime(_ point: Int32, _ token: Int32) -> Void
+#else
+fileprivate func bjs_jsObservePointLifetime(_ point: Int32, _ token: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsObservePointLifetime(_ point: Point, _ token: Int) throws(JSException) -> Void {
+    let pointObjectId = point.bridgeJSLowerParameter()
+    let tokenValue = token.bridgeJSLowerParameter()
+    bjs_jsObservePointLifetime(pointObjectId, tokenValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsStorePointStrong")
+fileprivate func bjs_jsStorePointStrong(_ point: Int32, _ token: Int32) -> Int32
+#else
+fileprivate func bjs_jsStorePointStrong(_ point: Int32, _ token: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsStorePointStrong(_ point: Point, _ token: Int) throws(JSException) -> Int {
+    let pointObjectId = point.bridgeJSLowerParameter()
+    let tokenValue = token.bridgeJSLowerParameter()
+    let ret = bjs_jsStorePointStrong(pointObjectId, tokenValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsReleaseStoredPoint")
+fileprivate func bjs_jsReleaseStoredPoint(_ handle: Int32) -> Void
+#else
+fileprivate func bjs_jsReleaseStoredPoint(_ handle: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsReleaseStoredPoint(_ handle: Int) throws(JSException) -> Void {
+    let handleValue = handle.bridgeJSLowerParameter()
+    bjs_jsReleaseStoredPoint(handleValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsIsPointFinalized")
+fileprivate func bjs_jsIsPointFinalized(_ token: Int32) -> Int32
+#else
+fileprivate func bjs_jsIsPointFinalized(_ token: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsIsPointFinalized(_ token: Int) throws(JSException) -> Bool {
+    let tokenValue = token.bridgeJSLowerParameter()
+    let ret = bjs_jsIsPointFinalized(tokenValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Bool.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsIsPointWeakAlive")
+fileprivate func bjs_jsIsPointWeakAlive(_ token: Int32) -> Int32
+#else
+fileprivate func bjs_jsIsPointWeakAlive(_ token: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsIsPointWeakAlive(_ token: Int) throws(JSException) -> Bool {
+    let tokenValue = token.bridgeJSLowerParameter()
+    let ret = bjs_jsIsPointWeakAlive(tokenValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Bool.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsMakePoint")
+fileprivate func bjs_jsMakePoint(_ token: Int32, _ x: Int32, _ y: Int32) -> Int32
+#else
+fileprivate func bjs_jsMakePoint(_ token: Int32, _ x: Int32, _ y: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsMakePoint(_ token: Int, _ x: Int, _ y: Int) throws(JSException) -> Point {
+    let tokenValue = token.bridgeJSLowerParameter()
+    let xValue = x.bridgeJSLowerParameter()
+    let yValue = y.bridgeJSLowerParameter()
+    let ret = bjs_jsMakePoint(tokenValue, xValue, yValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Point.bridgeJSLiftReturn(ret)
+}

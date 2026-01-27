@@ -8,6 +8,26 @@ import {
 export async function setupOptions(options, context) {
     Error.stackTraceLimit = 100;
     setupTestGlobals(globalThis);
+
+    // BridgeJSRuntimeTests: Swift struct lifetime tests for imported signatures.
+    // These rely on Node.js `--expose-gc` and WeakRef/FinalizationRegistry support.
+    const __bjs_pointFinalized = new Set();
+    const __bjs_pointWeakRefs = new Map();
+    /** @type {any[]} */
+    const __bjs_pointStrongStore = [];
+    const __bjs_pointRegistry = typeof FinalizationRegistry !== "undefined"
+        ? new FinalizationRegistry((token) => {
+            __bjs_pointFinalized.add(token);
+        })
+        : null;
+    const __bjs_observePoint = (point, token) => {
+        if (!__bjs_pointRegistry || typeof WeakRef === "undefined") {
+            return;
+        }
+        __bjs_pointRegistry.register(point, token);
+        __bjs_pointWeakRefs.set(token, new WeakRef(point));
+    };
+
     return {
         ...options,
         getImports: (importsContext) => {
@@ -105,6 +125,33 @@ export async function setupOptions(options, context) {
                 },
                 jsTranslatePoint: (point, dx, dy) => {
                     return { x: (point.x | 0) + (dx | 0), y: (point.y | 0) + (dy | 0) };
+                },
+                jsObservePointLifetime: (point, token) => {
+                    __bjs_observePoint(point, token);
+                },
+                jsStorePointStrong: (point, token) => {
+                    __bjs_observePoint(point, token);
+                    __bjs_pointStrongStore.push(point);
+                    // Return 1-based handle.
+                    return __bjs_pointStrongStore.length;
+                },
+                jsReleaseStoredPoint: (handle) => {
+                    const index = (handle | 0) - 1;
+                    if (index >= 0 && index < __bjs_pointStrongStore.length) {
+                        __bjs_pointStrongStore[index] = null;
+                    }
+                },
+                jsIsPointFinalized: (token) => {
+                    return __bjs_pointFinalized.has(token);
+                },
+                jsIsPointWeakAlive: (token) => {
+                    const ref = __bjs_pointWeakRefs.get(token);
+                    return ref ? ref.deref() !== undefined : false;
+                },
+                jsMakePoint: (token, x, y) => {
+                    const point = { x: x | 0, y: y | 0 };
+                    __bjs_observePoint(point, token);
+                    return point;
                 }
             };
         },

@@ -10236,6 +10236,146 @@
                 "_0" : "Point"
               }
             }
+          },
+          {
+            "name" : "jsObservePointLifetime",
+            "parameters" : [
+              {
+                "name" : "point",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "Point"
+                  }
+                }
+              },
+              {
+                "name" : "token",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsStorePointStrong",
+            "parameters" : [
+              {
+                "name" : "point",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "Point"
+                  }
+                }
+              },
+              {
+                "name" : "token",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsReleaseStoredPoint",
+            "parameters" : [
+              {
+                "name" : "handle",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsIsPointFinalized",
+            "parameters" : [
+              {
+                "name" : "token",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsIsPointWeakAlive",
+            "parameters" : [
+              {
+                "name" : "token",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsMakePoint",
+            "parameters" : [
+              {
+                "name" : "token",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "x",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "y",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Point"
+              }
+            }
           }
         ],
         "types" : [
