@@ -204,6 +204,18 @@ struct IntrinsicJSFragment: Sendable {
             return [resultLabel]
         }
     )
+    static let jsObjectLiftRetainedObjectId = IntrinsicJSFragment(
+        parameters: ["objectId"],
+        printCode: { arguments, scope, printer, cleanupCode in
+            let resultLabel = scope.variable("value")
+            let objectId = arguments[0]
+            printer.write(
+                "const \(resultLabel) = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(objectId));"
+            )
+            printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(objectId));")
+            return [resultLabel]
+        }
+    )
     static let jsObjectLiftParameter = IntrinsicJSFragment(
         parameters: ["objectId"],
         printCode: { arguments, scope, printer, cleanupCode in
@@ -1446,9 +1458,7 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftStruct(let fullName):
             switch context {
             case .importTS:
-                // ImportTS passes Swift structs as retained JS object IDs (same ABI as JSObject).
-                // Use "take" semantics to balance the retain done on the Swift side.
-                return .jsObjectLiftReturn
+                return .jsObjectLiftRetainedObjectId
             case .exportSwift:
                 let base = fullName.components(separatedBy: ".").last ?? fullName
                 return IntrinsicJSFragment(

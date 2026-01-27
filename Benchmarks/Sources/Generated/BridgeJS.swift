@@ -248,21 +248,14 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
 }
 
 extension SimpleStruct: _BridgedSwiftStruct {
-    // MARK: ImportTS
-
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
-        // Transfer ownership of the bridged JS object ID to JavaScript.
-        // JS glue will "take" this by releasing the ID after retrieving the object.
         return toJSObject().bridgeJSLowerReturn()
     }
 
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ objectId: Int32) -> SimpleStruct {
-        // Take the retained object ID and copy out fields to build the Swift struct.
         let jsObject = JSObject.bridgeJSLiftReturn(objectId)
         return Self(unsafelyCopying: jsObject)
     }
-
-    // MARK: ExportSwift
 
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> SimpleStruct {
         let precise = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
@@ -328,21 +321,14 @@ fileprivate func _bjs_struct_raise_SimpleStruct() -> Int32 {
 #endif
 
 extension Address: _BridgedSwiftStruct {
-    // MARK: ImportTS
-
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
-        // Transfer ownership of the bridged JS object ID to JavaScript.
-        // JS glue will "take" this by releasing the ID after retrieving the object.
         return toJSObject().bridgeJSLowerReturn()
     }
 
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ objectId: Int32) -> Address {
-        // Take the retained object ID and copy out fields to build the Swift struct.
         let jsObject = JSObject.bridgeJSLiftReturn(objectId)
         return Self(unsafelyCopying: jsObject)
     }
-
-    // MARK: ExportSwift
 
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Address {
         let zipCode = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
@@ -407,21 +393,14 @@ fileprivate func _bjs_struct_raise_Address() -> Int32 {
 #endif
 
 extension Person: _BridgedSwiftStruct {
-    // MARK: ImportTS
-
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
-        // Transfer ownership of the bridged JS object ID to JavaScript.
-        // JS glue will "take" this by releasing the ID after retrieving the object.
         return toJSObject().bridgeJSLowerReturn()
     }
 
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ objectId: Int32) -> Person {
-        // Take the retained object ID and copy out fields to build the Swift struct.
         let jsObject = JSObject.bridgeJSLiftReturn(objectId)
         return Self(unsafelyCopying: jsObject)
     }
-
-    // MARK: ExportSwift
 
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Person {
         let email = Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())
@@ -492,21 +471,14 @@ fileprivate func _bjs_struct_raise_Person() -> Int32 {
 #endif
 
 extension ComplexStruct: _BridgedSwiftStruct {
-    // MARK: ImportTS
-
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
-        // Transfer ownership of the bridged JS object ID to JavaScript.
-        // JS glue will "take" this by releasing the ID after retrieving the object.
         return toJSObject().bridgeJSLowerReturn()
     }
 
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ objectId: Int32) -> ComplexStruct {
-        // Take the retained object ID and copy out fields to build the Swift struct.
         let jsObject = JSObject.bridgeJSLiftReturn(objectId)
         return Self(unsafelyCopying: jsObject)
     }
-
-    // MARK: ExportSwift
 
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> ComplexStruct {
         let metadata = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())

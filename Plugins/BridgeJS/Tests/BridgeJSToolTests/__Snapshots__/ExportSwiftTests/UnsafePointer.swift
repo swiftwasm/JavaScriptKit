@@ -1,19 +1,12 @@
 extension PointerFields: _BridgedSwiftStruct {
-    // MARK: ImportTS
-
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
-        // Transfer ownership of the bridged JS object ID to JavaScript.
-        // JS glue will "take" this by releasing the ID after retrieving the object.
         return toJSObject().bridgeJSLowerReturn()
     }
 
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ objectId: Int32) -> PointerFields {
-        // Take the retained object ID and copy out fields to build the Swift struct.
         let jsObject = JSObject.bridgeJSLiftReturn(objectId)
         return Self(unsafelyCopying: jsObject)
     }
-
-    // MARK: ExportSwift
 
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> PointerFields {
         let mutPtr = UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_param_pointer())

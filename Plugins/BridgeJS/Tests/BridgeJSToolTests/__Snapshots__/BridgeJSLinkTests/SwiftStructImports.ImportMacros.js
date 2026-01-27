@@ -230,10 +230,10 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_translate"] = function bjs_translate(point, dx, dy) {
                 try {
-                    const ret = swift.memory.getObject(point);
+                    const value = swift.memory.getObject(point);
                     swift.memory.release(point);
-                    let ret1 = imports.translate(ret, dx, dy);
-                    return swift.memory.retain(ret1);
+                    let ret = imports.translate(value, dx, dy);
+                    return swift.memory.retain(ret);
                 } catch (error) {
                     setException(error);
                 }
