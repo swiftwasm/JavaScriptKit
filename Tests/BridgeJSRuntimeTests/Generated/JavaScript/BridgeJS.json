@@ -9692,6 +9692,36 @@
 
               }
             }
+          },
+          {
+            "from" : "global",
+            "name" : "parseInt",
+            "parameters" : [
+              {
+                "name" : "string",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "double" : {
+
+              }
+            }
+          }
+        ],
+        "globalGetters" : [
+          {
+            "from" : "global",
+            "name" : "globalObject1",
+            "type" : {
+              "jsObject" : {
+
+              }
+            }
           }
         ],
         "types" : [
@@ -9806,7 +9836,126 @@
             "setters" : [
 
             ]
+          },
+          {
+            "constructor" : {
+              "parameters" : [
+                {
+                  "name" : "name",
+                  "type" : {
+                    "string" : {
+
+                    }
+                  }
+                },
+                {
+                  "name" : "age",
+                  "type" : {
+                    "double" : {
+
+                    }
+                  }
+                },
+                {
+                  "name" : "isCat",
+                  "type" : {
+                    "bool" : {
+
+                    }
+                  }
+                }
+              ]
+            },
+            "from" : "global",
+            "getters" : [
+              {
+                "name" : "name",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "age",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "isCat",
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            ],
+            "methods" : [
+              {
+                "name" : "bark",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "getIsCat",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "Animal",
+            "setters" : [
+              {
+                "functionName" : "name_set",
+                "name" : "name",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "functionName" : "age_set",
+                "name" : "age",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "functionName" : "isCat_set",
+                "name" : "isCat",
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            ]
           }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+
         ]
       },
       {

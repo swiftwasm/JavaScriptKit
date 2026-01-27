@@ -2229,7 +2229,49 @@ extension PointerFields: _BridgedSwiftStruct {
         _swift_js_push_pointer(self.ptr.bridgeJSLowerReturn())
         _swift_js_push_pointer(self.mutPtr.bridgeJSLowerReturn())
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _PointerFieldsHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _PointerFieldsHelpers.raise()
+    }
 }
+
+fileprivate enum _PointerFieldsHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_PointerFields(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_PointerFields()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_PointerFields")
+fileprivate func _bjs_struct_lower_PointerFields(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_PointerFields(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_PointerFields")
+fileprivate func _bjs_struct_raise_PointerFields() -> Int32
+#else
+fileprivate func _bjs_struct_raise_PointerFields() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_PointerFields_init")
 @_cdecl("bjs_PointerFields_init")
@@ -6931,6 +6973,23 @@ func _$Foo_value_get(_ self: JSObject) throws(JSException) -> String {
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_globalObject1_get")
+fileprivate func bjs_globalObject1_get() -> Int32
+#else
+fileprivate func bjs_globalObject1_get() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$globalObject1_get() throws(JSException) -> JSObject {
+    let ret = bjs_globalObject1_get()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripVoid")
 fileprivate func bjs_jsRoundTripVoid() -> Void
 #else
@@ -7124,6 +7183,24 @@ func _$_jsWeirdFunction() throws(JSException) -> Double {
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_parseInt")
+fileprivate func bjs_parseInt(_ string: Int32) -> Float64
+#else
+fileprivate func bjs_parseInt(_ string: Int32) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$parseInt(_ string: String) throws(JSException) -> Double {
+    let stringValue = string.bridgeJSLowerParameter()
+    let ret = bjs_parseInt(stringValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_init")
 fileprivate func bjs_JsGreeter_init(_ name: Int32, _ prefix: Int32) -> Int32
 #else
@@ -7265,6 +7342,170 @@ func _$_WeirdClass_method_with_dashes(_ self: JSObject) throws(JSException) -> S
         throw error
     }
     return String.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Animal_init")
+fileprivate func bjs_Animal_init(_ name: Int32, _ age: Float64, _ isCat: Int32) -> Int32
+#else
+fileprivate func bjs_Animal_init(_ name: Int32, _ age: Float64, _ isCat: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Animal_name_get")
+fileprivate func bjs_Animal_name_get(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_Animal_name_get(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Animal_age_get")
+fileprivate func bjs_Animal_age_get(_ self: Int32) -> Float64
+#else
+fileprivate func bjs_Animal_age_get(_ self: Int32) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Animal_isCat_get")
+fileprivate func bjs_Animal_isCat_get(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_Animal_isCat_get(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Animal_name_set")
+fileprivate func bjs_Animal_name_set(_ self: Int32, _ newValue: Int32) -> Void
+#else
+fileprivate func bjs_Animal_name_set(_ self: Int32, _ newValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Animal_age_set")
+fileprivate func bjs_Animal_age_set(_ self: Int32, _ newValue: Float64) -> Void
+#else
+fileprivate func bjs_Animal_age_set(_ self: Int32, _ newValue: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Animal_isCat_set")
+fileprivate func bjs_Animal_isCat_set(_ self: Int32, _ newValue: Int32) -> Void
+#else
+fileprivate func bjs_Animal_isCat_set(_ self: Int32, _ newValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Animal_bark")
+fileprivate func bjs_Animal_bark(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_Animal_bark(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Animal_getIsCat")
+fileprivate func bjs_Animal_getIsCat(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_Animal_getIsCat(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$Animal_init(_ name: String, _ age: Double, _ isCat: Bool) throws(JSException) -> JSObject {
+    let nameValue = name.bridgeJSLowerParameter()
+    let ageValue = age.bridgeJSLowerParameter()
+    let isCatValue = isCat.bridgeJSLowerParameter()
+    let ret = bjs_Animal_init(nameValue, ageValue, isCatValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$Animal_name_get(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_Animal_name_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+func _$Animal_age_get(_ self: JSObject) throws(JSException) -> Double {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_Animal_age_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+func _$Animal_isCat_get(_ self: JSObject) throws(JSException) -> Bool {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_Animal_isCat_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Bool.bridgeJSLiftReturn(ret)
+}
+
+func _$Animal_name_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let newValueValue = newValue.bridgeJSLowerParameter()
+    bjs_Animal_name_set(selfValue, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$Animal_age_set(_ self: JSObject, _ newValue: Double) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let newValueValue = newValue.bridgeJSLowerParameter()
+    bjs_Animal_age_set(selfValue, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$Animal_isCat_set(_ self: JSObject, _ newValue: Bool) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let newValueValue = newValue.bridgeJSLowerParameter()
+    bjs_Animal_isCat_set(selfValue, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$Animal_bark(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_Animal_bark(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+func _$Animal_getIsCat(_ self: JSObject) throws(JSException) -> Bool {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_Animal_getIsCat(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Bool.bridgeJSLiftReturn(ret)
 }
 
 #if arch(wasm32)

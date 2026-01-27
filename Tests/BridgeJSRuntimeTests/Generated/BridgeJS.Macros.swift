@@ -47,3 +47,19 @@ extension FeatureFlag: _BridgedSwiftEnumNoPayload {}
     @JSFunction init() throws (JSException)
     @JSFunction(jsName: "method-with-dashes") func method_with_dashes() throws (JSException) -> String
 }
+
+@JSFunction(from: .global) func parseInt(_ string: String) throws (JSException) -> Double
+
+@JSClass(from: .global) struct Animal {
+    @JSGetter var name: String
+    @JSSetter func setName(_ value: String) throws (JSException)
+    @JSGetter var age: Double
+    @JSSetter func setAge(_ value: Double) throws (JSException)
+    @JSGetter var isCat: Bool
+    @JSSetter func setIsCat(_ value: Bool) throws (JSException)
+    @JSFunction init(_ name: String, _ age: Double, _ isCat: Bool) throws (JSException)
+    @JSFunction func bark() throws (JSException) -> String
+    @JSFunction func getIsCat() throws (JSException) -> Bool
+}
+
+@JSGetter(from: .global) var globalObject1: JSObject

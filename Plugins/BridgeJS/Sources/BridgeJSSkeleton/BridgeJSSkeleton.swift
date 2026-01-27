@@ -608,10 +608,19 @@ public struct ExportedSkeleton: Codable {
 
 // MARK: - Imported Skeleton
 
+/// Controls where BridgeJS reads imported JS values from.
+///
+/// - `global`: Read from `globalThis`.
+public enum JSImportFrom: String, Codable {
+    case global
+}
+
 public struct ImportedFunctionSkeleton: Codable {
     public let name: String
     /// The JavaScript function/method name to call, if different from `name`.
     public let jsName: String?
+    /// Where this function is looked up from in JavaScript.
+    public let from: JSImportFrom?
     public let parameters: [Parameter]
     public let returnType: BridgeType
     public let documentation: String?
@@ -619,12 +628,14 @@ public struct ImportedFunctionSkeleton: Codable {
     public init(
         name: String,
         jsName: String? = nil,
+        from: JSImportFrom? = nil,
         parameters: [Parameter],
         returnType: BridgeType,
         documentation: String? = nil
     ) {
         self.name = name
         self.jsName = jsName
+        self.from = from
         self.parameters = parameters
         self.returnType = returnType
         self.documentation = documentation
@@ -657,6 +668,8 @@ public struct ImportedGetterSkeleton: Codable {
     public let name: String
     /// The JavaScript property name to read from, if different from `name`.
     public let jsName: String?
+    /// Where this property is looked up from in JavaScript (only used for global getters).
+    public let from: JSImportFrom?
     public let type: BridgeType
     public let documentation: String?
     /// Name of the getter function if it's a separate function (from @JSGetter)
@@ -665,12 +678,14 @@ public struct ImportedGetterSkeleton: Codable {
     public init(
         name: String,
         jsName: String? = nil,
+        from: JSImportFrom? = nil,
         type: BridgeType,
         documentation: String? = nil,
         functionName: String? = nil
     ) {
         self.name = name
         self.jsName = jsName
+        self.from = from
         self.type = type
         self.documentation = documentation
         self.functionName = functionName
@@ -735,6 +750,8 @@ public struct ImportedTypeSkeleton: Codable {
     public let name: String
     /// The JavaScript constructor name to use for `init(...)`, if different from `name`.
     public let jsName: String?
+    /// Where this constructor is looked up from in JavaScript.
+    public let from: JSImportFrom?
     public let constructor: ImportedConstructorSkeleton?
     public let methods: [ImportedFunctionSkeleton]
     public let getters: [ImportedGetterSkeleton]
@@ -744,6 +761,7 @@ public struct ImportedTypeSkeleton: Codable {
     public init(
         name: String,
         jsName: String? = nil,
+        from: JSImportFrom? = nil,
         constructor: ImportedConstructorSkeleton? = nil,
         methods: [ImportedFunctionSkeleton],
         getters: [ImportedGetterSkeleton] = [],
@@ -752,6 +770,7 @@ public struct ImportedTypeSkeleton: Codable {
     ) {
         self.name = name
         self.jsName = jsName
+        self.from = from
         self.constructor = constructor
         self.methods = methods
         self.getters = getters

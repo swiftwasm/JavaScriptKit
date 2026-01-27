@@ -34,26 +34,6 @@ export async function createInstantiator(options, swift) {
     
     let _exports = null;
     let bjs = null;
-    const __bjs_createPointerFieldsHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers) => ({
-            lower: (value) => {
-                tmpParamPointers.push((value.raw | 0));
-                tmpParamPointers.push((value.mutRaw | 0));
-                tmpParamPointers.push((value.opaque | 0));
-                tmpParamPointers.push((value.ptr | 0));
-                tmpParamPointers.push((value.mutPtr | 0));
-                return { cleanup: undefined };
-            },
-            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
-                const pointer = tmpRetPointers.pop();
-                const pointer1 = tmpRetPointers.pop();
-                const pointer2 = tmpRetPointers.pop();
-                const pointer3 = tmpRetPointers.pop();
-                const pointer4 = tmpRetPointers.pop();
-                return { raw: pointer4, mutRaw: pointer3, opaque: pointer2, ptr: pointer1, mutPtr: pointer };
-            }
-        });
-    };
 
     return {
         /**
@@ -130,17 +110,6 @@ export async function createInstantiator(options, swift) {
                 while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
                     tmpStructCleanups.pop();
                 }
-            }
-            bjs["swift_js_struct_lower_PointerFields"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.PointerFields.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
-            }
-            bjs["swift_js_struct_raise_PointerFields"] = function() {
-                const value = structHelpers.PointerFields.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
-                return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -232,6 +201,53 @@ export async function createInstantiator(options, swift) {
                 tmpRetOptionalHeapObject = undefined;
                 return pointer || 0;
             }
+            const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
+            TestModule["bjs_console_get"] = function bjs_console_get() {
+                try {
+                    let ret = globalThis.console;
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_parseInt"] = function bjs_parseInt(string) {
+                try {
+                    const stringObject = swift.memory.getObject(string);
+                    swift.memory.release(string);
+                    let ret = globalThis.parseInt(stringObject);
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_JSConsole_log"] = function bjs_JSConsole_log(self, message) {
+                try {
+                    const messageObject = swift.memory.getObject(message);
+                    swift.memory.release(message);
+                    swift.memory.getObject(self).log(messageObject);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WebSocket_init"] = function bjs_WebSocket_init(url) {
+                try {
+                    const urlObject = swift.memory.getObject(url);
+                    swift.memory.release(url);
+                    return swift.memory.retain(new globalThis.WebSocket(urlObject));
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_WebSocket_close"] = function bjs_WebSocket_close(self) {
+                try {
+                    swift.memory.getObject(self).close();
+                } catch (error) {
+                    setException(error);
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;
@@ -244,59 +260,7 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const PointerFieldsHelpers = __bjs_createPointerFieldsHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
-            structHelpers.PointerFields = PointerFieldsHelpers;
-            
             const exports = {
-                takeUnsafeRawPointer: function bjs_takeUnsafeRawPointer(p) {
-                    instance.exports.bjs_takeUnsafeRawPointer(p);
-                },
-                takeUnsafeMutableRawPointer: function bjs_takeUnsafeMutableRawPointer(p) {
-                    instance.exports.bjs_takeUnsafeMutableRawPointer(p);
-                },
-                takeOpaquePointer: function bjs_takeOpaquePointer(p) {
-                    instance.exports.bjs_takeOpaquePointer(p);
-                },
-                takeUnsafePointer: function bjs_takeUnsafePointer(p) {
-                    instance.exports.bjs_takeUnsafePointer(p);
-                },
-                takeUnsafeMutablePointer: function bjs_takeUnsafeMutablePointer(p) {
-                    instance.exports.bjs_takeUnsafeMutablePointer(p);
-                },
-                returnUnsafeRawPointer: function bjs_returnUnsafeRawPointer() {
-                    const ret = instance.exports.bjs_returnUnsafeRawPointer();
-                    return ret;
-                },
-                returnUnsafeMutableRawPointer: function bjs_returnUnsafeMutableRawPointer() {
-                    const ret = instance.exports.bjs_returnUnsafeMutableRawPointer();
-                    return ret;
-                },
-                returnOpaquePointer: function bjs_returnOpaquePointer() {
-                    const ret = instance.exports.bjs_returnOpaquePointer();
-                    return ret;
-                },
-                returnUnsafePointer: function bjs_returnUnsafePointer() {
-                    const ret = instance.exports.bjs_returnUnsafePointer();
-                    return ret;
-                },
-                returnUnsafeMutablePointer: function bjs_returnUnsafeMutablePointer() {
-                    const ret = instance.exports.bjs_returnUnsafeMutablePointer();
-                    return ret;
-                },
-                roundTripPointerFields: function bjs_roundTripPointerFields(value) {
-                    const { cleanup: cleanup } = structHelpers.PointerFields.lower(value);
-                    instance.exports.bjs_roundTripPointerFields();
-                    const structValue = structHelpers.PointerFields.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
-                    if (cleanup) { cleanup(); }
-                    return structValue;
-                },
-                PointerFields: {
-                    init: function(raw, mutRaw, opaque, ptr, mutPtr) {
-                        instance.exports.bjs_PointerFields_init(raw, mutRaw, opaque, ptr, mutPtr);
-                        const structValue = structHelpers.PointerFields.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
-                        return structValue;
-                    },
-                },
             };
             _exports = exports;
             return exports;

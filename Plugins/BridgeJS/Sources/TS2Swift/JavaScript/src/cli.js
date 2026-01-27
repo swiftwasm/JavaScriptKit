@@ -73,7 +73,7 @@ class DiagnosticEngine {
 }
 
 function printUsage() {
-    console.error('Usage: ts2swift <d.ts file path> -p <tsconfig.json path> [-o output.swift]');
+    console.error('Usage: ts2swift <d.ts file path> -p <tsconfig.json path> [--global <d.ts>]... [-o output.swift]');
 }
 
 /**
@@ -93,6 +93,10 @@ export function main(args) {
             project: {
                 type: 'string',
                 short: 'p',
+            },
+            global: {
+                type: 'string',
+                multiple: true,
             },
             "log-level": {
                 type: 'string',
@@ -131,15 +135,44 @@ export function main(args) {
         process.exit(1);
     }
 
-    const program = TypeProcessor.createProgram(filePath, configParseResult.options);
+    /** @type {string[]} */
+    const globalFiles = Array.isArray(options.values.global)
+        ? options.values.global
+        : (options.values.global ? [options.values.global] : []);
+
+    const program = TypeProcessor.createProgram([filePath, ...globalFiles], configParseResult.options);
     const diagnostics = program.getSemanticDiagnostics();
     if (diagnostics.length > 0) {
         diagnosticEngine.tsDiagnose(diagnostics);
         process.exit(1);
     }
 
-    const processor = new TypeProcessor(program.getTypeChecker(), diagnosticEngine);
-    const { content: swiftOutput, hasAny } = processor.processTypeDeclarations(program, filePath);
+    const prelude = [
+        "// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,",
+        "// DO NOT EDIT.",
+        "//",
+        "// To update this file, just rebuild your project or run",
+        "// `swift package bridge-js`.",
+        "",
+        "@_spi(Experimental) import JavaScriptKit",
+        "",
+        "",
+    ].join("\n");
+
+    /** @type {string[]} */
+    const bodies = [];
+    const globalFileSet = new Set(globalFiles);
+    for (const inputPath of [filePath, ...globalFiles]) {
+        const processor = new TypeProcessor(program.getTypeChecker(), diagnosticEngine, {
+            defaultImportFromGlobal: globalFileSet.has(inputPath),
+        });
+        const result = processor.processTypeDeclarations(program, inputPath);
+        const body = result.content.trim();
+        if (body.length > 0) bodies.push(body);
+    }
+
+    const hasAny = bodies.length > 0;
+    const swiftOutput = hasAny ? prelude + bodies.join("\n\n") + "\n" : "";
 
     if (options.values.output) {
         if (hasAny) {

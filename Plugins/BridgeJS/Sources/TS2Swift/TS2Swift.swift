@@ -87,6 +87,7 @@ extension BridgeJSConfig {
 /// - Returns: The generated Swift source code (always collected from stdout for return value)
 public func invokeTS2Swift(
     dtsFile: String,
+    globalDtsFiles: [String] = [],
     tsconfigPath: String,
     nodePath: URL,
     progress: ProgressReporting,
@@ -98,6 +99,9 @@ public func invokeTS2Swift(
         .appendingPathComponent("bin")
         .appendingPathComponent("ts2swift.js")
     var arguments = [ts2swiftPath.path, dtsFile, "--project", tsconfigPath]
+    for global in globalDtsFiles {
+        arguments.append(contentsOf: ["--global", global])
+    }
     if let outputPath = outputPath {
         arguments.append(contentsOf: ["--output", outputPath])
     }

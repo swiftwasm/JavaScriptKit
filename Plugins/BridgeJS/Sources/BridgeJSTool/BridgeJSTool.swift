@@ -110,13 +110,19 @@ import BridgeJSUtilities
             let nodePath: URL = try config.findTool("node", targetDirectory: targetDirectory)
 
             let bridgeJsDtsPath = targetDirectory.appending(path: "bridge-js.d.ts")
-            if FileManager.default.fileExists(atPath: bridgeJsDtsPath.path) {
+            let bridgeJsGlobalDtsPath = targetDirectory.appending(path: "bridge-js.global.d.ts")
+            let hasDts = FileManager.default.fileExists(atPath: bridgeJsDtsPath.path)
+            let hasGlobalDts = FileManager.default.fileExists(atPath: bridgeJsGlobalDtsPath.path)
+            if hasDts || hasGlobalDts {
                 guard let tsconfigPath = doubleDashOptions["project"] else {
                     throw BridgeJSToolError("--project option is required when processing .d.ts files")
                 }
                 let bridgeJSMacrosPath = outputDirectory.appending(path: "BridgeJS.Macros.swift")
+                let primaryDtsPath = hasDts ? bridgeJsDtsPath.path : bridgeJsGlobalDtsPath.path
+                let globalDtsFiles = (hasDts && hasGlobalDts) ? [bridgeJsGlobalDtsPath.path] : []
                 _ = try invokeTS2Swift(
-                    dtsFile: bridgeJsDtsPath.path,
+                    dtsFile: primaryDtsPath,
+                    globalDtsFiles: globalDtsFiles,
                     tsconfigPath: tsconfigPath,
                     nodePath: nodePath,
                     progress: progress,
