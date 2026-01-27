@@ -1,7 +1,7 @@
 // @ts-check
 
 import {
-    DirectionValues, StatusValues, ThemeValues, HttpStatusValues, TSDirection, TSTheme, APIResultValues, ComplexResultValues, APIOptionalResultValues, StaticCalculatorValues, StaticPropertyEnumValues
+    DirectionValues, StatusValues, ThemeValues, HttpStatusValues, TSDirection, TSTheme, APIResultValues, ComplexResultValues, APIOptionalResultValues, StaticCalculatorValues, StaticPropertyEnumValues, PrecisionValues, TypedPayloadResultValues
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
@@ -760,6 +760,42 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor9), aor9);
     assert.deepEqual(exports.roundTripOptionalAPIOptionalResult(aor10), aor10);
     assert.equal(exports.roundTripOptionalAPIOptionalResult(null), null);
+
+    // TypedPayloadResult — rawValueEnum and caseEnum as associated value payloads
+    assert.equal(exports.Precision.Rough, 0.1);
+    assert.equal(exports.Precision.Fine, 0.001);
+
+    const tpr_precision = { tag: exports.TypedPayloadResult.Tag.Precision, param0: Math.fround(0.1) };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_precision), tpr_precision);
+
+    const tpr_direction = { tag: exports.TypedPayloadResult.Tag.Direction, param0: exports.Direction.North };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_direction), tpr_direction);
+
+    const tpr_dirSouth = { tag: exports.TypedPayloadResult.Tag.Direction, param0: exports.Direction.South };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_dirSouth), tpr_dirSouth);
+
+    const tpr_optPrecisionSome = { tag: exports.TypedPayloadResult.Tag.OptPrecision, param0: Math.fround(0.001) };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_optPrecisionSome), tpr_optPrecisionSome);
+
+    const tpr_optPrecisionNull = { tag: exports.TypedPayloadResult.Tag.OptPrecision, param0: null };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_optPrecisionNull), tpr_optPrecisionNull);
+
+    const tpr_optDirectionSome = { tag: exports.TypedPayloadResult.Tag.OptDirection, param0: exports.Direction.East };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_optDirectionSome), tpr_optDirectionSome);
+
+    const tpr_optDirectionNull = { tag: exports.TypedPayloadResult.Tag.OptDirection, param0: null };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_optDirectionNull), tpr_optDirectionNull);
+
+    const tpr_empty = { tag: exports.TypedPayloadResult.Tag.Empty };
+    assert.deepEqual(exports.roundTripTypedPayloadResult(tpr_empty), tpr_empty);
+
+    // Optional TypedPayloadResult roundtrip
+    assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_precision), tpr_precision);
+    assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_direction), tpr_direction);
+    assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_optPrecisionSome), tpr_optPrecisionSome);
+    assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_optPrecisionNull), tpr_optPrecisionNull);
+    assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_empty), tpr_empty);
+    assert.equal(exports.roundTripOptionalTypedPayloadResult(null), null);
 
     assert.equal(exports.MathUtils.add(2147483647, 0), 2147483647);
     assert.equal(exports.StaticCalculator.roundtrip(42), 42);

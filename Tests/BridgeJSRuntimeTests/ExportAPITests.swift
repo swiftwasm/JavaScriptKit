@@ -578,6 +578,22 @@ typealias OptionalAge = Int?
     return value
 }
 
+@JS enum TypedPayloadResult {
+    case precision(Precision)
+    case direction(Direction)
+    case optPrecision(Precision?)
+    case optDirection(Direction?)
+    case empty
+}
+
+@JS func roundTripTypedPayloadResult(_ result: TypedPayloadResult) -> TypedPayloadResult {
+    return result
+}
+
+@JS func roundTripOptionalTypedPayloadResult(_ result: TypedPayloadResult?) -> TypedPayloadResult? {
+    return result
+}
+
 @JS func compareAPIResults(_ r1: APIResult?, _ r2: APIResult?) -> String {
     let r1Str: String
     switch r1 {

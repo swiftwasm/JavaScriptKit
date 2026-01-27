@@ -1945,6 +1945,64 @@ struct IntrinsicJSFragment: Sendable {
                     return []
                 }
             )
+        case .caseEnum:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push((\(arguments[0]) | 0));")
+                    return []
+                }
+            )
+        case .rawValueEnum(_, let rawType):
+            switch rawType {
+            case .string:
+                return IntrinsicJSFragment(
+                    parameters: ["value"],
+                    printCode: { arguments, scope, printer, cleanup in
+                        let value = arguments[0]
+                        let bytesVar = scope.variable("bytes")
+                        let idVar = scope.variable("id")
+                        printer.write(
+                            "const \(bytesVar) = \(JSGlueVariableScope.reservedTextEncoder).encode(\(value));"
+                        )
+                        printer.write(
+                            "const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));"
+                        )
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(bytesVar).length);")
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar));")
+                        cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
+                        return []
+                    }
+                )
+            case .float:
+                return IntrinsicJSFragment(
+                    parameters: ["value"],
+                    printCode: { arguments, scope, printer, cleanup in
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedTmpParamF32s).push(Math.fround(\(arguments[0])));"
+                        )
+                        return []
+                    }
+                )
+            case .double:
+                return IntrinsicJSFragment(
+                    parameters: ["value"],
+                    printCode: { arguments, scope, printer, cleanup in
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamF64s).push(\(arguments[0]));")
+                        return []
+                    }
+                )
+            default:
+                return IntrinsicJSFragment(
+                    parameters: ["value"],
+                    printCode: { arguments, scope, printer, cleanup in
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedTmpParamInts).push((\(arguments[0]) | 0));"
+                        )
+                        return []
+                    }
+                )
+            }
         case .nullable(let wrappedType, let kind):
             return IntrinsicJSFragment(
                 parameters: ["value"],
@@ -1999,6 +2057,68 @@ struct IntrinsicJSFragment: Sendable {
                             "\(JSGlueVariableScope.reservedTmpParamF64s).push(\(isSomeVar) ? \(value) : 0.0);"
                         )
                         printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                    case .caseEnum:
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? (\(value) | 0) : 0);"
+                        )
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                    case .rawValueEnum(_, let rawType):
+                        switch rawType {
+                        case .string:
+                            let idVar = scope.variable("id")
+                            printer.write("let \(idVar);")
+                            printer.write("if (\(isSomeVar)) {")
+                            printer.indent {
+                                let bytesVar = scope.variable("bytes")
+                                printer.write(
+                                    "let \(bytesVar) = \(JSGlueVariableScope.reservedTextEncoder).encode(\(value));"
+                                )
+                                printer.write(
+                                    "\(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));"
+                                )
+                                printer.write(
+                                    "\(JSGlueVariableScope.reservedTmpParamInts).push(\(bytesVar).length);"
+                                )
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar));")
+                            }
+                            printer.write("} else {")
+                            printer.indent {
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
+                                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(0);")
+                            }
+                            printer.write("}")
+                            printer.write(
+                                "\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);"
+                            )
+                            cleanup.write("if(\(idVar)) {")
+                            cleanup.indent {
+                                cleanup.write(
+                                    "\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));"
+                                )
+                            }
+                            cleanup.write("}")
+                        case .float:
+                            printer.write(
+                                "\(JSGlueVariableScope.reservedTmpParamF32s).push(\(isSomeVar) ? Math.fround(\(value)) : 0.0);"
+                            )
+                            printer.write(
+                                "\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);"
+                            )
+                        case .double:
+                            printer.write(
+                                "\(JSGlueVariableScope.reservedTmpParamF64s).push(\(isSomeVar) ? \(value) : 0.0);"
+                            )
+                            printer.write(
+                                "\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);"
+                            )
+                        default:
+                            printer.write(
+                                "\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? (\(value) | 0) : 0);"
+                            )
+                            printer.write(
+                                "\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);"
+                            )
+                        }
                     default:
                         printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
                     }
@@ -2063,6 +2183,62 @@ struct IntrinsicJSFragment: Sendable {
                     return [dVar]
                 }
             )
+        case .caseEnum:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, scope, printer, cleanup in
+                    let iVar = scope.variable("int")
+                    printer.write("const \(iVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    return [iVar]
+                }
+            )
+        case .rawValueEnum(_, let rawType):
+            switch rawType {
+            case .string:
+                return IntrinsicJSFragment(
+                    parameters: [],
+                    printCode: { arguments, scope, printer, cleanup in
+                        let strVar = scope.variable("string")
+                        printer.write(
+                            "const \(strVar) = \(JSGlueVariableScope.reservedTmpRetStrings).pop();"
+                        )
+                        return [strVar]
+                    }
+                )
+            case .float:
+                return IntrinsicJSFragment(
+                    parameters: [],
+                    printCode: { arguments, scope, printer, cleanup in
+                        let fVar = scope.variable("f32")
+                        printer.write(
+                            "const \(fVar) = \(JSGlueVariableScope.reservedTmpRetF32s).pop();"
+                        )
+                        return [fVar]
+                    }
+                )
+            case .double:
+                return IntrinsicJSFragment(
+                    parameters: [],
+                    printCode: { arguments, scope, printer, cleanup in
+                        let dVar = scope.variable("f64")
+                        printer.write(
+                            "const \(dVar) = \(JSGlueVariableScope.reservedTmpRetF64s).pop();"
+                        )
+                        return [dVar]
+                    }
+                )
+            default:
+                return IntrinsicJSFragment(
+                    parameters: [],
+                    printCode: { arguments, scope, printer, cleanup in
+                        let iVar = scope.variable("int")
+                        printer.write(
+                            "const \(iVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();"
+                        )
+                        return [iVar]
+                    }
+                )
+            }
         case .nullable(let wrappedType, let kind):
             return IntrinsicJSFragment(
                 parameters: [],

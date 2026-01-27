@@ -492,6 +492,153 @@
         ],
         "swiftCallName" : "APIOptionalResult",
         "tsFullPath" : "APIOptionalResult"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "rough",
+            "rawValue" : "0.1"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "fine",
+            "rawValue" : "0.001"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Precision",
+        "rawType" : "Float",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Precision",
+        "tsFullPath" : "Precision"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "north"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "south"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "east"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "west"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "CardinalDirection",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "CardinalDirection",
+        "tsFullPath" : "CardinalDirection"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "rawValueEnum" : {
+                    "_0" : "Precision",
+                    "_1" : "Float"
+                  }
+                }
+              }
+            ],
+            "name" : "precision"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "caseEnum" : {
+                    "_0" : "CardinalDirection"
+                  }
+                }
+              }
+            ],
+            "name" : "direction"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "Precision",
+                        "_1" : "Float"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "name" : "optPrecision"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "caseEnum" : {
+                        "_0" : "CardinalDirection"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "name" : "optDirection"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "empty"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "TypedPayloadResult",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "TypedPayloadResult",
+        "tsFullPath" : "TypedPayloadResult"
       }
     ],
     "exposeToGlobal" : false,
@@ -848,6 +995,66 @@
             "_0" : {
               "associatedValueEnum" : {
                 "_0" : "APIOptionalResult"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripTypedPayloadResult",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripTypedPayloadResult",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "result",
+            "type" : {
+              "associatedValueEnum" : {
+                "_0" : "TypedPayloadResult"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "associatedValueEnum" : {
+            "_0" : "TypedPayloadResult"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripOptionalTypedPayloadResult",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripOptionalTypedPayloadResult",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "result",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "associatedValueEnum" : {
+                    "_0" : "TypedPayloadResult"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "associatedValueEnum" : {
+                "_0" : "TypedPayloadResult"
               }
             },
             "_1" : "null"

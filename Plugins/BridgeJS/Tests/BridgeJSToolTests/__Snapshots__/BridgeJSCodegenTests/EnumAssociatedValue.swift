@@ -397,6 +397,137 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
     }
 }
 
+extension Precision: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
+}
+
+extension CardinalDirection: _BridgedSwiftCaseEnum {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> CardinalDirection {
+        return bridgeJSLiftParameter(value)
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> CardinalDirection {
+        return CardinalDirection(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSLowerParameter()
+    }
+
+    private init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .north
+        case 1:
+            self = .south
+        case 2:
+            self = .east
+        case 3:
+            self = .west
+        default:
+            return nil
+        }
+    }
+
+    private var bridgeJSRawValue: Int32 {
+        switch self {
+        case .north:
+            return 0
+        case .south:
+            return 1
+        case .east:
+            return 2
+        case .west:
+            return 3
+        }
+    }
+}
+
+extension TypedPayloadResult: _BridgedSwiftAssociatedValueEnum {
+    private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> TypedPayloadResult {
+        switch caseId {
+        case 0:
+            return .precision(Precision.bridgeJSLiftParameter(_swift_js_pop_f32()))
+        case 1:
+            return .direction(CardinalDirection.bridgeJSLiftParameter(_swift_js_pop_i32()))
+        case 2:
+            return .optPrecision(Optional<Precision>.bridgeJSLiftParameter())
+        case 3:
+            return .optDirection(Optional<CardinalDirection>.bridgeJSLiftParameter())
+        case 4:
+            return .empty
+        default:
+            fatalError("Unknown TypedPayloadResult case ID: \(caseId)")
+        }
+    }
+
+    // MARK: Protocol Export
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch self {
+        case .precision(let param0):
+            param0.bridgeJSLowerStackReturn()
+            return Int32(0)
+        case .direction(let param0):
+            param0.bridgeJSLowerStackReturn()
+            return Int32(1)
+        case .optPrecision(let param0):
+            let __bjs_isSome_param0 = param0 != nil
+            if let __bjs_unwrapped_param0 = param0 {
+                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            }
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
+            return Int32(2)
+        case .optDirection(let param0):
+            let __bjs_isSome_param0 = param0 != nil
+            if let __bjs_unwrapped_param0 = param0 {
+                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            }
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
+            return Int32(3)
+        case .empty:
+            return Int32(4)
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> TypedPayloadResult {
+        return _bridgeJSLiftFromCaseId(caseId)
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> TypedPayloadResult {
+        return _bridgeJSLiftFromCaseId(caseId)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        switch self {
+        case .precision(let param0):
+            _swift_js_push_tag(Int32(0))
+            param0.bridgeJSLowerStackReturn()
+        case .direction(let param0):
+            _swift_js_push_tag(Int32(1))
+            param0.bridgeJSLowerStackReturn()
+        case .optPrecision(let param0):
+            _swift_js_push_tag(Int32(2))
+            let __bjs_isSome_param0 = param0 != nil
+            if let __bjs_unwrapped_param0 = param0 {
+                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            }
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
+        case .optDirection(let param0):
+            _swift_js_push_tag(Int32(3))
+            let __bjs_isSome_param0 = param0 != nil
+            if let __bjs_unwrapped_param0 = param0 {
+                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            }
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
+        case .empty:
+            _swift_js_push_tag(Int32(4))
+        }
+    }
+}
+
 @_expose(wasm, "bjs_handle")
 @_cdecl("bjs_handle")
 public func _bjs_handle(_ result: Int32) -> Void {
@@ -523,6 +654,28 @@ public func _bjs_compareAPIResults(_ result1IsSome: Int32, _ result1CaseId: Int3
     let _tmp_result2 = Optional<APIOptionalResult>.bridgeJSLiftParameter(result2IsSome, result2CaseId)
     let _tmp_result1 = Optional<APIOptionalResult>.bridgeJSLiftParameter(result1IsSome, result1CaseId)
     let ret = compareAPIResults(result1: _tmp_result1, result2: _tmp_result2)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripTypedPayloadResult")
+@_cdecl("bjs_roundTripTypedPayloadResult")
+public func _bjs_roundTripTypedPayloadResult(_ result: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripTypedPayloadResult(_: TypedPayloadResult.bridgeJSLiftParameter(result))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripOptionalTypedPayloadResult")
+@_cdecl("bjs_roundTripOptionalTypedPayloadResult")
+public func _bjs_roundTripOptionalTypedPayloadResult(_ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripOptionalTypedPayloadResult(_: Optional<TypedPayloadResult>.bridgeJSLiftParameter(resultIsSome, resultCaseId))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

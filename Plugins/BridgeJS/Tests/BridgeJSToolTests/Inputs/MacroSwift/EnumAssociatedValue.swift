@@ -55,3 +55,27 @@ enum APIOptionalResult {
 }
 @JS func roundTripOptionalAPIOptionalResult(result: APIOptionalResult?) -> APIOptionalResult?
 @JS func compareAPIResults(result1: APIOptionalResult?, result2: APIOptionalResult?) -> APIOptionalResult?
+
+@JS enum Precision: Float {
+    case rough = 0.1
+    case fine = 0.001
+}
+
+@JS enum CardinalDirection {
+    case north
+    case south
+    case east
+    case west
+}
+
+@JS
+enum TypedPayloadResult {
+    case precision(Precision)
+    case direction(CardinalDirection)
+    case optPrecision(Precision?)
+    case optDirection(CardinalDirection?)
+    case empty
+}
+
+@JS func roundTripTypedPayloadResult(_ result: TypedPayloadResult) -> TypedPayloadResult
+@JS func roundTripOptionalTypedPayloadResult(_ result: TypedPayloadResult?) -> TypedPayloadResult?

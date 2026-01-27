@@ -43,6 +43,33 @@ export const APIOptionalResultValues: {
 export type APIOptionalResultTag =
   { tag: typeof APIOptionalResultValues.Tag.Success; param0: string | null } | { tag: typeof APIOptionalResultValues.Tag.Failure; param0: number | null; param1: boolean | null } | { tag: typeof APIOptionalResultValues.Tag.Status; param0: boolean | null; param1: number | null; param2: string | null }
 
+export const PrecisionValues: {
+    readonly Rough: 0.1;
+    readonly Fine: 0.001;
+};
+export type PrecisionTag = typeof PrecisionValues[keyof typeof PrecisionValues];
+
+export const CardinalDirectionValues: {
+    readonly North: 0;
+    readonly South: 1;
+    readonly East: 2;
+    readonly West: 3;
+};
+export type CardinalDirectionTag = typeof CardinalDirectionValues[keyof typeof CardinalDirectionValues];
+
+export const TypedPayloadResultValues: {
+    readonly Tag: {
+        readonly Precision: 0;
+        readonly Direction: 1;
+        readonly OptPrecision: 2;
+        readonly OptDirection: 3;
+        readonly Empty: 4;
+    };
+};
+
+export type TypedPayloadResultTag =
+  { tag: typeof TypedPayloadResultValues.Tag.Precision; param0: PrecisionTag } | { tag: typeof TypedPayloadResultValues.Tag.Direction; param0: CardinalDirectionTag } | { tag: typeof TypedPayloadResultValues.Tag.OptPrecision; param0: PrecisionTag | null } | { tag: typeof TypedPayloadResultValues.Tag.OptDirection; param0: CardinalDirectionTag | null } | { tag: typeof TypedPayloadResultValues.Tag.Empty }
+
 export type APIResultObject = typeof APIResultValues;
 
 export type ComplexResultObject = typeof ComplexResultValues;
@@ -52,6 +79,12 @@ export type ResultObject = typeof Utilities.ResultValues;
 export type NetworkingResultObject = typeof API.NetworkingResultValues;
 
 export type APIOptionalResultObject = typeof APIOptionalResultValues;
+
+export type PrecisionObject = typeof PrecisionValues;
+
+export type CardinalDirectionObject = typeof CardinalDirectionValues;
+
+export type TypedPayloadResultObject = typeof TypedPayloadResultValues;
 
 export namespace API {
     const NetworkingResultValues: {
@@ -87,9 +120,14 @@ export type Exports = {
     roundTripOptionalNetworkingResult(result: API.NetworkingResultTag | null): API.NetworkingResultTag | null;
     roundTripOptionalAPIOptionalResult(result: APIOptionalResultTag | null): APIOptionalResultTag | null;
     compareAPIResults(result1: APIOptionalResultTag | null, result2: APIOptionalResultTag | null): APIOptionalResultTag | null;
+    roundTripTypedPayloadResult(result: TypedPayloadResultTag): TypedPayloadResultTag;
+    roundTripOptionalTypedPayloadResult(result: TypedPayloadResultTag | null): TypedPayloadResultTag | null;
     APIResult: APIResultObject
     ComplexResult: ComplexResultObject
     APIOptionalResult: APIOptionalResultObject
+    Precision: PrecisionObject
+    CardinalDirection: CardinalDirectionObject
+    TypedPayloadResult: TypedPayloadResultObject
     API: {
         NetworkingResult: NetworkingResultObject
     },

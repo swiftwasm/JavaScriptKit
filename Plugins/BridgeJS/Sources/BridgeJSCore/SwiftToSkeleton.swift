@@ -1428,18 +1428,18 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             for enumCase in exportedEnum.cases {
                 for associatedValue in enumCase.associatedValues {
                     switch associatedValue.type {
-                    case .string, .int, .float, .double, .bool:
+                    case .string, .int, .float, .double, .bool, .caseEnum, .rawValueEnum:
                         break
                     case .nullable(let wrappedType, _):
                         switch wrappedType {
-                        case .string, .int, .float, .double, .bool:
+                        case .string, .int, .float, .double, .bool, .caseEnum, .rawValueEnum:
                             break
                         default:
                             diagnose(
                                 node: node,
                                 message: "Unsupported associated value type: \(associatedValue.type.swiftType)",
                                 hint:
-                                    "Only primitive types and optional primitives (String?, Int?, Float?, Double?, Bool?) are supported in associated-value enums"
+                                    "Only primitive types, enums, and their optionals are supported in associated-value enums"
                             )
                         }
                     default:
@@ -1447,7 +1447,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                             node: node,
                             message: "Unsupported associated value type: \(associatedValue.type.swiftType)",
                             hint:
-                                "Only primitive types and optional primitives (String?, Int?, Float?, Double?, Bool?) are supported in associated-value enums"
+                                "Only primitive types, enums, and their optionals are supported in associated-value enums"
                         )
                     }
                 }

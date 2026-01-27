@@ -510,7 +510,7 @@ This differs from classes, which use reference semantics and share state across 
 | Static properties | ✅ |
 | Associated values: `String`, `Int`, `Bool`, `Float`, `Double` | ✅ |
 | Associated values: Custom classes/structs | ❌ |
-| Associated values: Other enums | ❌ |
+| Associated values: Other enums (case and raw value) | ✅ |
 | Associated values: Arrays/Collections | ❌ |
 | Associated values: Optionals | ❌ |
 | Generics | ❌ |

@@ -4363,6 +4363,86 @@
             "associatedValues" : [
               {
                 "type" : {
+                  "rawValueEnum" : {
+                    "_0" : "Precision",
+                    "_1" : "Float"
+                  }
+                }
+              }
+            ],
+            "name" : "precision"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "caseEnum" : {
+                    "_0" : "Direction"
+                  }
+                }
+              }
+            ],
+            "name" : "direction"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "Precision",
+                        "_1" : "Float"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "name" : "optPrecision"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "caseEnum" : {
+                        "_0" : "Direction"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "name" : "optDirection"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "empty"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "TypedPayloadResult",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "TypedPayloadResult",
+        "tsFullPath" : "TypedPayloadResult"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
                   "nullable" : {
                     "_0" : {
                       "string" : {
@@ -7491,6 +7571,66 @@
             "_0" : {
               "associatedValueEnum" : {
                 "_0" : "APIResult"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripTypedPayloadResult",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripTypedPayloadResult",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "result",
+            "type" : {
+              "associatedValueEnum" : {
+                "_0" : "TypedPayloadResult"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "associatedValueEnum" : {
+            "_0" : "TypedPayloadResult"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripOptionalTypedPayloadResult",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripOptionalTypedPayloadResult",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "result",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "associatedValueEnum" : {
+                    "_0" : "TypedPayloadResult"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "associatedValueEnum" : {
+                "_0" : "TypedPayloadResult"
               }
             },
             "_1" : "null"

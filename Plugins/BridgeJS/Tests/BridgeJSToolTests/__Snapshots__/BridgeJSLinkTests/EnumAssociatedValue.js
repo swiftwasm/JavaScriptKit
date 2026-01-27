@@ -479,6 +479,103 @@ const __bjs_createAPIOptionalResultValuesHelpers = () => {
         }
     });
 };
+export const PrecisionValues = {
+    Rough: 0.1,
+    Fine: 0.001,
+};
+
+export const CardinalDirectionValues = {
+    North: 0,
+    South: 1,
+    East: 2,
+    West: 3,
+};
+
+export const TypedPayloadResultValues = {
+    Tag: {
+        Precision: 0,
+        Direction: 1,
+        OptPrecision: 2,
+        OptDirection: 3,
+        Empty: 4,
+    },
+};
+
+const __bjs_createTypedPayloadResultValuesHelpers = () => {
+    return (tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift) => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case TypedPayloadResultValues.Tag.Precision: {
+                    tmpParamF32s.push(Math.fround(value.param0));
+                    const cleanup = undefined;
+                    return { caseId: TypedPayloadResultValues.Tag.Precision, cleanup };
+                }
+                case TypedPayloadResultValues.Tag.Direction: {
+                    tmpParamInts.push((value.param0 | 0));
+                    const cleanup = undefined;
+                    return { caseId: TypedPayloadResultValues.Tag.Direction, cleanup };
+                }
+                case TypedPayloadResultValues.Tag.OptPrecision: {
+                    const isSome = value.param0 != null;
+                    tmpParamF32s.push(isSome ? Math.fround(value.param0) : 0.0);
+                    tmpParamInts.push(isSome ? 1 : 0);
+                    const cleanup = undefined;
+                    return { caseId: TypedPayloadResultValues.Tag.OptPrecision, cleanup };
+                }
+                case TypedPayloadResultValues.Tag.OptDirection: {
+                    const isSome = value.param0 != null;
+                    tmpParamInts.push(isSome ? (value.param0 | 0) : 0);
+                    tmpParamInts.push(isSome ? 1 : 0);
+                    const cleanup = undefined;
+                    return { caseId: TypedPayloadResultValues.Tag.OptDirection, cleanup };
+                }
+                case TypedPayloadResultValues.Tag.Empty: {
+                    const cleanup = undefined;
+                    return { caseId: TypedPayloadResultValues.Tag.Empty, cleanup };
+                }
+                default: throw new Error("Unknown TypedPayloadResultValues tag: " + String(enumTag));
+            }
+        },
+        lift: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
+            const tag = tmpRetTag | 0;
+            switch (tag) {
+                case TypedPayloadResultValues.Tag.Precision: {
+                    const f32 = tmpRetF32s.pop();
+                    return { tag: TypedPayloadResultValues.Tag.Precision, param0: f32 };
+                }
+                case TypedPayloadResultValues.Tag.Direction: {
+                    const int = tmpRetInts.pop();
+                    return { tag: TypedPayloadResultValues.Tag.Direction, param0: int };
+                }
+                case TypedPayloadResultValues.Tag.OptPrecision: {
+                    const isSome = tmpRetInts.pop();
+                    let optional;
+                    if (isSome) {
+                        const f32 = tmpRetF32s.pop();
+                        optional = f32;
+                    } else {
+                        optional = null;
+                    }
+                    return { tag: TypedPayloadResultValues.Tag.OptPrecision, param0: optional };
+                }
+                case TypedPayloadResultValues.Tag.OptDirection: {
+                    const isSome = tmpRetInts.pop();
+                    let optional;
+                    if (isSome) {
+                        const int = tmpRetInts.pop();
+                        optional = int;
+                    } else {
+                        optional = null;
+                    }
+                    return { tag: TypedPayloadResultValues.Tag.OptDirection, param0: optional };
+                }
+                case TypedPayloadResultValues.Tag.Empty: return { tag: TypedPayloadResultValues.Tag.Empty };
+                default: throw new Error("Unknown TypedPayloadResultValues tag returned from Swift: " + String(tag));
+            }
+        }
+    });
+};
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -696,6 +793,9 @@ export async function createInstantiator(options, swift) {
             const APIOptionalResultHelpers = __bjs_createAPIOptionalResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift);
             enumHelpers.APIOptionalResult = APIOptionalResultHelpers;
 
+            const TypedPayloadResultHelpers = __bjs_createTypedPayloadResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift);
+            enumHelpers.TypedPayloadResult = TypedPayloadResultHelpers;
+
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
             }
@@ -860,9 +960,38 @@ export async function createInstantiator(options, swift) {
                     if (result2Cleanup) { result2Cleanup(); }
                     return optResult;
                 },
+                roundTripTypedPayloadResult: function bjs_roundTripTypedPayloadResult(result) {
+                    const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.TypedPayloadResult.lower(result);
+                    instance.exports.bjs_roundTripTypedPayloadResult(resultCaseId);
+                    const ret = enumHelpers.TypedPayloadResult.lift(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    if (resultCleanup) { resultCleanup(); }
+                    return ret;
+                },
+                roundTripOptionalTypedPayloadResult: function bjs_roundTripOptionalTypedPayloadResult(result) {
+                    const isSome = result != null;
+                    let resultCaseId, resultCleanup;
+                    if (isSome) {
+                        const enumResult = enumHelpers.TypedPayloadResult.lower(result);
+                        resultCaseId = enumResult.caseId;
+                        resultCleanup = enumResult.cleanup;
+                    }
+                    instance.exports.bjs_roundTripOptionalTypedPayloadResult(+isSome, isSome ? resultCaseId : 0);
+                    const isNull = (tmpRetTag === -1);
+                    let optResult;
+                    if (isNull) {
+                        optResult = null;
+                    } else {
+                        optResult = enumHelpers.TypedPayloadResult.lift(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    }
+                    if (resultCleanup) { resultCleanup(); }
+                    return optResult;
+                },
                 APIResult: APIResultValues,
                 ComplexResult: ComplexResultValues,
                 APIOptionalResult: APIOptionalResultValues,
+                Precision: PrecisionValues,
+                CardinalDirection: CardinalDirectionValues,
+                TypedPayloadResult: TypedPayloadResultValues,
                 API: {
                     NetworkingResult: NetworkingResultValues,
                 },
