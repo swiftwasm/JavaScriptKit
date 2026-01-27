@@ -2229,7 +2229,49 @@ extension PointerFields: _BridgedSwiftStruct {
         _swift_js_push_pointer(self.ptr.bridgeJSLowerReturn())
         _swift_js_push_pointer(self.mutPtr.bridgeJSLowerReturn())
     }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _PointerFieldsHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _PointerFieldsHelpers.raise()
+    }
 }
+
+fileprivate enum _PointerFieldsHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_PointerFields(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_PointerFields()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_PointerFields")
+fileprivate func _bjs_struct_lower_PointerFields(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_PointerFields(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_PointerFields")
+fileprivate func _bjs_struct_raise_PointerFields() -> Int32
+#else
+fileprivate func _bjs_struct_raise_PointerFields() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 @_expose(wasm, "bjs_PointerFields_init")
 @_cdecl("bjs_PointerFields_init")
