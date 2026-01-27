@@ -2231,7 +2231,7 @@ extension PointerFields: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _PointerFieldsHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_PointerFields(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -2241,16 +2241,6 @@ extension PointerFields: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _PointerFieldsHelpers.raise()
-    }
-}
-
-fileprivate enum _PointerFieldsHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_PointerFields(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_PointerFields()))
     }
 }
@@ -2314,7 +2304,7 @@ extension DataPoint: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _DataPointHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_DataPoint(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -2324,16 +2314,6 @@ extension DataPoint: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _DataPointHelpers.raise()
-    }
-}
-
-fileprivate enum _DataPointHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_DataPoint(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_DataPoint()))
     }
 }
@@ -2392,7 +2372,7 @@ extension Address: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _AddressHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_Address(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -2402,16 +2382,6 @@ extension Address: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _AddressHelpers.raise()
-    }
-}
-
-fileprivate enum _AddressHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_Address(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Address()))
     }
 }
@@ -2467,7 +2437,7 @@ extension Contact: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _ContactHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_Contact(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -2477,16 +2447,6 @@ extension Contact: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _ContactHelpers.raise()
-    }
-}
-
-fileprivate enum _ContactHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_Contact(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Contact()))
     }
 }
@@ -2540,7 +2500,7 @@ extension Config: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _ConfigHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_Config(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -2550,16 +2510,6 @@ extension Config: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _ConfigHelpers.raise()
-    }
-}
-
-fileprivate enum _ConfigHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_Config(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Config()))
     }
 }
@@ -2599,7 +2549,7 @@ extension SessionData: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _SessionDataHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_SessionData(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -2609,16 +2559,6 @@ extension SessionData: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _SessionDataHelpers.raise()
-    }
-}
-
-fileprivate enum _SessionDataHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_SessionData(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_SessionData()))
     }
 }
@@ -2666,7 +2606,7 @@ extension ValidationReport: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _ValidationReportHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_ValidationReport(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -2676,16 +2616,6 @@ extension ValidationReport: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _ValidationReportHelpers.raise()
-    }
-}
-
-fileprivate enum _ValidationReportHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_ValidationReport(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_ValidationReport()))
     }
 }
@@ -2719,7 +2649,7 @@ extension MathOperations: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _MathOperationsHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_MathOperations(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -2729,16 +2659,6 @@ extension MathOperations: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _MathOperationsHelpers.raise()
-    }
-}
-
-fileprivate enum _MathOperationsHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_MathOperations(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_MathOperations()))
     }
 }
@@ -2825,7 +2745,7 @@ extension CopyableCart: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _CopyableCartHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_CopyableCart(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -2835,16 +2755,6 @@ extension CopyableCart: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _CopyableCartHelpers.raise()
-    }
-}
-
-fileprivate enum _CopyableCartHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_CopyableCart(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_CopyableCart()))
     }
 }
@@ -2894,7 +2804,7 @@ extension CopyableCartItem: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _CopyableCartItemHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_CopyableCartItem(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -2904,16 +2814,6 @@ extension CopyableCartItem: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _CopyableCartItemHelpers.raise()
-    }
-}
-
-fileprivate enum _CopyableCartItemHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_CopyableCartItem(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_CopyableCartItem()))
     }
 }
@@ -2955,7 +2855,7 @@ extension CopyableNestedCart: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _CopyableNestedCartHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_CopyableNestedCart(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -2965,16 +2865,6 @@ extension CopyableNestedCart: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _CopyableNestedCartHelpers.raise()
-    }
-}
-
-fileprivate enum _CopyableNestedCartHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_CopyableNestedCart(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_CopyableNestedCart()))
     }
 }
@@ -3024,7 +2914,7 @@ extension ConfigStruct: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _ConfigStructHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_ConfigStruct(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -3034,16 +2924,6 @@ extension ConfigStruct: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _ConfigStructHelpers.raise()
-    }
-}
-
-fileprivate enum _ConfigStructHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_ConfigStruct(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_ConfigStruct()))
     }
 }

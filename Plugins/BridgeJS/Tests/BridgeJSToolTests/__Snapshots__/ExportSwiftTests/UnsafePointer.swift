@@ -17,7 +17,7 @@ extension PointerFields: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _PointerFieldsHelpers.lower(jsObject)
+        let __bjs_cleanupId = _bjs_struct_lower_PointerFields(jsObject.bridgeJSLowerParameter())
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
@@ -27,16 +27,6 @@ extension PointerFields: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         var __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return _PointerFieldsHelpers.raise()
-    }
-}
-
-fileprivate enum _PointerFieldsHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_PointerFields(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
         return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_PointerFields()))
     }
 }

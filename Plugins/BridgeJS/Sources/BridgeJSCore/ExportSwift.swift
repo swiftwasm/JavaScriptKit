@@ -1157,7 +1157,6 @@ struct StructCodegen {
         let lowerCode = generateStructLowerCode(structDef: structDef)
         let accessControl = structDef.explicitAccessControl.map { "\($0) " } ?? ""
 
-        let helpersTypeName = "_\(structDef.name)Helpers"
         let lowerExternName = "swift_js_struct_lower_\(structDef.name)"
         let raiseExternName = "swift_js_struct_raise_\(structDef.name)"
         let lowerFunctionName = "_bjs_struct_lower_\(structDef.name)"
@@ -1174,7 +1173,7 @@ struct StructCodegen {
                 }
 
                 \(raw: accessControl)init(unsafelyCopying jsObject: JSObject) {
-                    let __bjs_cleanupId = \(raw: helpersTypeName).lower(jsObject)
+                    let __bjs_cleanupId = \(raw: lowerFunctionName)(jsObject.bridgeJSLowerParameter())
                     defer { _swift_js_struct_cleanup(__bjs_cleanupId) }
                     self = Self.bridgeJSLiftParameter()
                 }
@@ -1182,18 +1181,6 @@ struct StructCodegen {
                 \(raw: accessControl)func toJSObject() -> JSObject {
                     var __bjs_self = self
                     __bjs_self.bridgeJSLowerReturn()
-                    return \(raw: helpersTypeName).raise()
-                }
-            }
-            """
-
-        let helpersType: DeclSyntax = """
-            fileprivate enum \(raw: helpersTypeName) {
-                static func lower(_ jsObject: JSObject) -> Int32 {
-                    return \(raw: lowerFunctionName)(jsObject.bridgeJSLowerParameter())
-                }
-
-                static func raise() -> JSObject {
                     return JSObject(id: UInt32(bitPattern: \(raw: raiseFunctionName)()))
                 }
             }
@@ -1216,7 +1203,7 @@ struct StructCodegen {
             )
         )
 
-        return [bridgedStructExtension, helpersType, lowerExternDecl, raiseExternDecl]
+        return [bridgedStructExtension, lowerExternDecl, raiseExternDecl]
     }
 
     private static func renderStructExtern(
