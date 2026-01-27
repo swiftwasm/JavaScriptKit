@@ -1179,7 +1179,7 @@ struct StructCodegen {
                 }
 
                 \(raw: accessControl)func toJSObject() -> JSObject {
-                    var __bjs_self = self
+                    let __bjs_self = self
                     __bjs_self.bridgeJSLowerReturn()
                     return JSObject(id: UInt32(bitPattern: \(raw: raiseFunctionName)()))
                 }
