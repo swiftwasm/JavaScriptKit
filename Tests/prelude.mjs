@@ -169,6 +169,13 @@ export async function setupOptions(options, context) {
                 }
                 return BridgeJSRuntimeTests_runJsWorks(getInstance(), exports);
             }
+            bridgeJSRuntimeTests["runJsStructWorks"] = () => {
+                const exports = getExports();
+                if (!exports) {
+                    throw new Error("No exports!?");
+                }
+                return BridgeJSRuntimeTests_runJsStructWorks(exports);
+            }
             const bridgeJSGlobalTests = importObject["BridgeJSGlobalTests"] || {};
             bridgeJSGlobalTests["runJsWorksGlobal"] = () => {
                 return BridgeJSGlobalTests_runJsWorksGlobal();
@@ -810,7 +817,6 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 
     testProtocolSupport(exports);
     testClosureSupport(exports);
-    testStructSupport(exports);
 }
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 function testClosureSupport(exports) {
@@ -1144,6 +1150,11 @@ function testStructSupport(exports) {
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 async function BridgeJSRuntimeTests_runAsyncWorks(exports) {
     await exports.asyncRoundTripVoid();
+}
+
+/** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
+function BridgeJSRuntimeTests_runJsStructWorks(exports) {
+    testStructSupport(exports);
 }
 
 function BridgeJSGlobalTests_runJsWorksGlobal() {

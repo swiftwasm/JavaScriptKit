@@ -2212,6 +2212,70 @@ public func _bjs_StaticPropertyNamespace_NestedProperties_static_nestedDouble_se
     #endif
 }
 
+extension Point: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return toJSObject().bridgeJSLowerReturn()
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ objectId: Int32) -> Point {
+        let jsObject = JSObject.bridgeJSLiftReturn(objectId)
+        return Self(unsafelyCopying: jsObject)
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Point {
+        let y = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let x = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        return Point(x: x, y: y)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_int(Int32(self.x))
+        _swift_js_push_int(Int32(self.y))
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _PointHelpers.lower(jsObject)
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return _PointHelpers.raise()
+    }
+}
+
+fileprivate enum _PointHelpers {
+    static func lower(_ jsObject: JSObject) -> Int32 {
+        return _bjs_struct_lower_Point(jsObject.bridgeJSLowerParameter())
+    }
+
+    static func raise() -> JSObject {
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Point()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Point")
+fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Point")
+fileprivate func _bjs_struct_raise_Point() -> Int32
+#else
+fileprivate func _bjs_struct_raise_Point() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 extension PointerFields: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         return toJSObject().bridgeJSLowerReturn()
@@ -3238,70 +3302,6 @@ public func _bjs_ConfigStruct_static_computedSetting_get() -> Void {
     #endif
 }
 
-extension Point: _BridgedSwiftStruct {
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
-        return toJSObject().bridgeJSLowerReturn()
-    }
-
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ objectId: Int32) -> Point {
-        let jsObject = JSObject.bridgeJSLiftReturn(objectId)
-        return Self(unsafelyCopying: jsObject)
-    }
-
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Point {
-        let y = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
-        let x = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
-        return Point(x: x, y: y)
-    }
-
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        _swift_js_push_int(Int32(self.x))
-        _swift_js_push_int(Int32(self.y))
-    }
-
-    init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _PointHelpers.lower(jsObject)
-        defer {
-            _swift_js_struct_cleanup(__bjs_cleanupId)
-        }
-        self = Self.bridgeJSLiftParameter()
-    }
-
-    func toJSObject() -> JSObject {
-        var __bjs_self = self
-        __bjs_self.bridgeJSLowerReturn()
-        return _PointHelpers.raise()
-    }
-}
-
-fileprivate enum _PointHelpers {
-    static func lower(_ jsObject: JSObject) -> Int32 {
-        return _bjs_struct_lower_Point(jsObject.bridgeJSLowerParameter())
-    }
-
-    static func raise() -> JSObject {
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Point()))
-    }
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Point")
-fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Int32
-#else
-fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Point")
-fileprivate func _bjs_struct_raise_Point() -> Int32
-#else
-fileprivate func _bjs_struct_raise_Point() -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
 @_expose(wasm, "bjs_roundTripVoid")
 @_cdecl("bjs_roundTripVoid")
 public func _bjs_roundTripVoid() -> Void {
@@ -3438,17 +3438,6 @@ public func _bjs_roundTripUnsafeMutablePointer(_ v: UnsafeMutableRawPointer) -> 
 public func _bjs_roundTripJSObject(_ v: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = roundTripJSObject(v: JSObject.bridgeJSLiftParameter(v))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripPointerFields")
-@_cdecl("bjs_roundTripPointerFields")
-public func _bjs_roundTripPointerFields() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripPointerFields(_: PointerFields.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -4691,6 +4680,17 @@ public func _bjs_makeAdder(_ base: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = makeAdder(base: Int.bridgeJSLiftParameter(base))
     return _BJS_Closure_20BridgeJSRuntimeTestsSi_Si.bridgeJSLower(ret)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripPointerFields")
+@_cdecl("bjs_roundTripPointerFields")
+public func _bjs_roundTripPointerFields() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripPointerFields(_: PointerFields.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

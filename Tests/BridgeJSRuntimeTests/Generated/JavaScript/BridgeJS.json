@@ -4879,31 +4879,6 @@
         }
       },
       {
-        "abiName" : "bjs_roundTripPointerFields",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripPointerFields",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "value",
-            "type" : {
-              "swiftStruct" : {
-                "_0" : "PointerFields"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "swiftStruct" : {
-            "_0" : "PointerFields"
-          }
-        }
-      },
-      {
         "abiName" : "bjs_makeImportedFoo",
         "effects" : {
           "isAsync" : false,
@@ -7845,6 +7820,31 @@
         }
       },
       {
+        "abiName" : "bjs_roundTripPointerFields",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripPointerFields",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "PointerFields"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "PointerFields"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_testStructDefault",
         "effects" : {
           "isAsync" : false,
@@ -8537,6 +8537,35 @@
       }
     ],
     "structs" : [
+      {
+        "methods" : [
+
+        ],
+        "name" : "Point",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "x",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "y",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Point"
+      },
       {
         "constructor" : {
           "abiName" : "bjs_PointerFields_init",
@@ -9468,35 +9497,6 @@
           }
         ],
         "swiftCallName" : "ConfigStruct"
-      },
-      {
-        "methods" : [
-
-        ],
-        "name" : "Point",
-        "properties" : [
-          {
-            "isReadonly" : true,
-            "isStatic" : false,
-            "name" : "x",
-            "type" : {
-              "int" : {
-
-              }
-            }
-          },
-          {
-            "isReadonly" : true,
-            "isStatic" : false,
-            "name" : "y",
-            "type" : {
-              "int" : {
-
-              }
-            }
-          }
-        ],
-        "swiftCallName" : "Point"
       }
     ]
   },
@@ -10377,6 +10377,22 @@
               }
             }
           }
+        ],
+        "types" : [
+
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+
+        ]
+      },
+      {
+        "functions" : [
+
         ],
         "types" : [
 
