@@ -322,6 +322,22 @@ public protocol _BridgedSwiftStruct: _BridgedSwiftTypeLoweredIntoVoidType {
     // MARK: ExportSwift
     @_spi(BridgeJS) static func bridgeJSLiftParameter() -> Self
     @_spi(BridgeJS) consuming func bridgeJSLowerReturn() -> Void
+
+    /// Initializes a Swift struct by copying the fields from a bridged JS object.
+    init(unsafelyCopying jsObject: JSObject)
+    /// Converts the struct into a bridged JS object by copying its fields.
+    func toJSObject() -> JSObject
+}
+
+extension _BridgedSwiftStruct {
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+        return toJSObject().bridgeJSLowerReturn()
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ objectId: Int32) -> Self {
+        let jsObject = JSObject.bridgeJSLiftReturn(objectId)
+        return Self(unsafelyCopying: jsObject)
+    }
 }
 
 extension _BridgedSwiftEnumNoPayload where Self: RawRepresentable, RawValue == String {

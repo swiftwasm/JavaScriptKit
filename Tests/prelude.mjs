@@ -8,6 +8,7 @@ import {
 export async function setupOptions(options, context) {
     Error.stackTraceLimit = 100;
     setupTestGlobals(globalThis);
+
     return {
         ...options,
         getImports: (importsContext) => {
@@ -102,6 +103,9 @@ export async function setupOptions(options, context) {
                     fn(v);
                     fn(v);
                     return v;
+                },
+                jsTranslatePoint: (point, dx, dy) => {
+                    return { x: (point.x | 0) + (dx | 0), y: (point.y | 0) + (dy | 0) };
                 }
             };
         },
@@ -118,6 +122,13 @@ export async function setupOptions(options, context) {
                     throw new Error("No exports!?");
                 }
                 return BridgeJSRuntimeTests_runJsWorks(getInstance(), exports);
+            }
+            bridgeJSRuntimeTests["runJsStructWorks"] = () => {
+                const exports = getExports();
+                if (!exports) {
+                    throw new Error("No exports!?");
+                }
+                return BridgeJSRuntimeTests_runJsStructWorks(exports);
             }
             const bridgeJSGlobalTests = importObject["BridgeJSGlobalTests"] || {};
             bridgeJSGlobalTests["runJsWorksGlobal"] = () => {
@@ -767,7 +778,6 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 
     testProtocolSupport(exports);
     testClosureSupport(exports);
-    testStructSupport(exports);
 }
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 function testClosureSupport(exports) {
@@ -1043,6 +1053,34 @@ function testStructSupport(exports) {
     assert.deepEqual(updatedReport.result, { tag: exports.APIResult.Tag.Success, param0: "updated" });
     assert.deepEqual(exports.updateValidationReport(null, origReport).result, origReport.result);
 
+    const advancedConfig1 = {
+        id: 42,
+        title: "Primary",
+        enabled: true,
+        theme: exports.Theme.Dark,
+        status: exports.Status.Success,
+        result: { tag: exports.APIResult.Tag.Success, param0: "ok" },
+        metadata: { note: "extra" },
+        location: data1,
+        defaults: { name: "base", value: 10 },
+        overrideDefaults: { name: "override", value: 20 },
+    };
+    assert.deepEqual(exports.roundTripAdvancedConfig(advancedConfig1), advancedConfig1);
+
+    const advancedConfig2 = {
+        id: 99,
+        title: "",
+        enabled: false,
+        theme: exports.Theme.Light,
+        status: exports.Status.Loading,
+        result: null,
+        metadata: null,
+        location: null,
+        defaults: { name: "base", value: 0 },
+        overrideDefaults: null,
+    };
+    assert.deepEqual(exports.roundTripAdvancedConfig(advancedConfig2), advancedConfig2);
+
     assert.equal(exports.MathOperations.subtract(10.0, 4.0), 6.0);
     const mathOps = exports.MathOperations.init();
     assert.equal(mathOps.baseValue, 0.0);
@@ -1117,6 +1155,11 @@ function testStructSupport(exports) {
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 async function BridgeJSRuntimeTests_runAsyncWorks(exports) {
     await exports.asyncRoundTripVoid();
+}
+
+/** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
+function BridgeJSRuntimeTests_runJsStructWorks(exports) {
+    testStructSupport(exports);
 }
 
 function BridgeJSGlobalTests_runJsWorksGlobal() {

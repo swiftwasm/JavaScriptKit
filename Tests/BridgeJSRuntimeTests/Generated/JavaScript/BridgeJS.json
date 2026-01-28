@@ -4951,31 +4951,6 @@
         }
       },
       {
-        "abiName" : "bjs_roundTripPointerFields",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripPointerFields",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "value",
-            "type" : {
-              "swiftStruct" : {
-                "_0" : "PointerFields"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "swiftStruct" : {
-            "_0" : "PointerFields"
-          }
-        }
-      },
-      {
         "abiName" : "bjs_makeImportedFoo",
         "effects" : {
           "isAsync" : false,
@@ -7917,6 +7892,31 @@
         }
       },
       {
+        "abiName" : "bjs_roundTripPointerFields",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripPointerFields",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "PointerFields"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "PointerFields"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_testStructDefault",
         "effects" : {
           "isAsync" : false,
@@ -8035,31 +8035,6 @@
         "returnType" : {
           "jsObject" : {
 
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripMeasurementConfig",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripMeasurementConfig",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "config",
-            "type" : {
-              "swiftStruct" : {
-                "_0" : "MeasurementConfig"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "swiftStruct" : {
-            "_0" : "MeasurementConfig"
           }
         }
       },
@@ -8185,6 +8160,56 @@
         "returnType" : {
           "swiftStruct" : {
             "_0" : "ValidationReport"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripAdvancedConfig",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripAdvancedConfig",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "config",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "AdvancedConfig"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "AdvancedConfig"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripMeasurementConfig",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripMeasurementConfig",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "config",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "MeasurementConfig"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "MeasurementConfig"
           }
         }
       },
@@ -8634,6 +8659,35 @@
       }
     ],
     "structs" : [
+      {
+        "methods" : [
+
+        ],
+        "name" : "Point",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "x",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "y",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Point"
+      },
       {
         "constructor" : {
           "abiName" : "bjs_PointerFields_init",
@@ -9161,6 +9215,193 @@
         "swiftCallName" : "ValidationReport"
       },
       {
+        "methods" : [
+
+        ],
+        "name" : "AdvancedConfig",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "id",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "title",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "enabled",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "theme",
+            "type" : {
+              "rawValueEnum" : {
+                "_0" : "Theme",
+                "_1" : "String"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "status",
+            "type" : {
+              "caseEnum" : {
+                "_0" : "Status"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "result",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "associatedValueEnum" : {
+                    "_0" : "APIResult"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "metadata",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "jsObject" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "location",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "swiftStruct" : {
+                    "_0" : "DataPoint"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "defaults",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "ConfigStruct"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "overrideDefaults",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "swiftStruct" : {
+                    "_0" : "ConfigStruct"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "AdvancedConfig"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "MeasurementConfig",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "precision",
+            "type" : {
+              "rawValueEnum" : {
+                "_0" : "Precision",
+                "_1" : "Float"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "ratio",
+            "type" : {
+              "rawValueEnum" : {
+                "_0" : "Ratio",
+                "_1" : "Double"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "optionalPrecision",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "Precision",
+                    "_1" : "Float"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "optionalRatio",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "Ratio",
+                    "_1" : "Double"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "MeasurementConfig"
+      },
+      {
         "constructor" : {
           "abiName" : "bjs_MathOperations_init",
           "effects" : {
@@ -9476,67 +9717,6 @@
           }
         ],
         "swiftCallName" : "CopyableNestedCart"
-      },
-      {
-        "methods" : [
-
-        ],
-        "name" : "MeasurementConfig",
-        "properties" : [
-          {
-            "isReadonly" : true,
-            "isStatic" : false,
-            "name" : "precision",
-            "type" : {
-              "rawValueEnum" : {
-                "_0" : "Precision",
-                "_1" : "Float"
-              }
-            }
-          },
-          {
-            "isReadonly" : true,
-            "isStatic" : false,
-            "name" : "ratio",
-            "type" : {
-              "rawValueEnum" : {
-                "_0" : "Ratio",
-                "_1" : "Double"
-              }
-            }
-          },
-          {
-            "isReadonly" : true,
-            "isStatic" : false,
-            "name" : "optionalPrecision",
-            "type" : {
-              "optional" : {
-                "_0" : {
-                  "rawValueEnum" : {
-                    "_0" : "Precision",
-                    "_1" : "Float"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "isReadonly" : true,
-            "isStatic" : false,
-            "name" : "optionalRatio",
-            "type" : {
-              "optional" : {
-                "_0" : {
-                  "rawValueEnum" : {
-                    "_0" : "Ratio",
-                    "_1" : "Double"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "swiftCallName" : "MeasurementConfig"
       },
       {
         "methods" : [
@@ -10325,6 +10505,63 @@
               }
             }
           }
+        ],
+        "types" : [
+
+        ]
+      },
+      {
+        "functions" : [
+          {
+            "name" : "jsTranslatePoint",
+            "parameters" : [
+              {
+                "name" : "point",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "Point"
+                  }
+                }
+              },
+              {
+                "name" : "dx",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "dy",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Point"
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+
+        ]
+      },
+      {
+        "functions" : [
+
         ],
         "types" : [
 
