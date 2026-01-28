@@ -67,7 +67,7 @@ export async function createInstantiator(options, swift) {
                 };
                 return { cleanup };
             },
-            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
                 const isSome = tmpRetInts.pop();
                 let optional;
                 if (isSome) {
@@ -115,7 +115,7 @@ export async function createInstantiator(options, swift) {
                 };
                 return { cleanup };
             },
-            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
                 const isSome = tmpRetInts.pop();
                 let optional;
                 if (isSome) {
@@ -158,7 +158,7 @@ export async function createInstantiator(options, swift) {
                 };
                 return { cleanup };
             },
-            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
                 const isSome = tmpRetInts.pop();
                 let optional;
                 if (isSome) {
@@ -167,7 +167,7 @@ export async function createInstantiator(options, swift) {
                 } else {
                     optional = null;
                 }
-                const struct = structHelpers.Address.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                const struct = structHelpers.Address.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                 const int = tmpRetInts.pop();
                 const string1 = tmpRetStrings.pop();
                 return { name: string1, age: int, address: struct, email: optional };
@@ -181,7 +181,7 @@ export async function createInstantiator(options, swift) {
                 tmpParamPointers.push(value.owner.pointer);
                 return { cleanup: undefined };
             },
-            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
                 const ptr = tmpRetPointers.pop();
                 const value = _exports['Greeter'].__construct(ptr);
                 const int = tmpRetInts.pop();
@@ -203,7 +203,7 @@ export async function createInstantiator(options, swift) {
                 tmpParamInts.push(isSome ? 1 : 0);
                 return { cleanup: undefined };
             },
-            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
                 const isSome = tmpRetInts.pop();
                 let optional;
                 if (isSome) {
@@ -223,7 +223,7 @@ export async function createInstantiator(options, swift) {
             lower: (value) => {
                 return { cleanup: undefined };
             },
-            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
                 return {  };
             }
         });
@@ -312,8 +312,8 @@ export async function createInstantiator(options, swift) {
                 }
                 return 0;
             }
-            bjs["swift_js_struct_raise_DataPoint"] = function() {
-                const value = structHelpers.DataPoint.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+            bjs["swift_js_struct_lift_DataPoint"] = function() {
+                const value = structHelpers.DataPoint.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Address"] = function(objectId) {
@@ -323,8 +323,8 @@ export async function createInstantiator(options, swift) {
                 }
                 return 0;
             }
-            bjs["swift_js_struct_raise_Address"] = function() {
-                const value = structHelpers.Address.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+            bjs["swift_js_struct_lift_Address"] = function() {
+                const value = structHelpers.Address.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Person"] = function(objectId) {
@@ -334,8 +334,8 @@ export async function createInstantiator(options, swift) {
                 }
                 return 0;
             }
-            bjs["swift_js_struct_raise_Person"] = function() {
-                const value = structHelpers.Person.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+            bjs["swift_js_struct_lift_Person"] = function() {
+                const value = structHelpers.Person.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Session"] = function(objectId) {
@@ -345,8 +345,8 @@ export async function createInstantiator(options, swift) {
                 }
                 return 0;
             }
-            bjs["swift_js_struct_raise_Session"] = function() {
-                const value = structHelpers.Session.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+            bjs["swift_js_struct_lift_Session"] = function() {
+                const value = structHelpers.Session.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Measurement"] = function(objectId) {
@@ -356,8 +356,8 @@ export async function createInstantiator(options, swift) {
                 }
                 return 0;
             }
-            bjs["swift_js_struct_raise_Measurement"] = function() {
-                const value = structHelpers.Measurement.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+            bjs["swift_js_struct_lift_Measurement"] = function() {
+                const value = structHelpers.Measurement.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_ConfigStruct"] = function(objectId) {
@@ -367,8 +367,8 @@ export async function createInstantiator(options, swift) {
                 }
                 return 0;
             }
-            bjs["swift_js_struct_raise_ConfigStruct"] = function() {
-                const value = structHelpers.ConfigStruct.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+            bjs["swift_js_struct_lift_ConfigStruct"] = function() {
+                const value = structHelpers.ConfigStruct.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                 return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
@@ -554,7 +554,7 @@ export async function createInstantiator(options, swift) {
                 roundtrip: function bjs_roundtrip(session) {
                     const { cleanup: cleanup } = structHelpers.Person.lower(session);
                     instance.exports.bjs_roundtrip();
-                    const structValue = structHelpers.Person.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const structValue = structHelpers.Person.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                     if (cleanup) { cleanup(); }
                     return structValue;
                 },
@@ -566,7 +566,7 @@ export async function createInstantiator(options, swift) {
                         const isSome = optCount != null;
                         const isSome1 = optFlag != null;
                         instance.exports.bjs_DataPoint_init(x, y, labelId, labelBytes.length, +isSome, isSome ? optCount : 0, +isSome1, isSome1 ? optFlag : 0);
-                        const structValue = structHelpers.DataPoint.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        const structValue = structHelpers.DataPoint.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                         swift.memory.release(labelId);
                         return structValue;
                     },

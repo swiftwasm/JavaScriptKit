@@ -57,7 +57,7 @@ const __bjs_createAPIResultValuesHelpers = () => {
                 default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
             }
         },
-        raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
+        lift: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
             const tag = tmpRetTag | 0;
             switch (tag) {
                 case APIResultValues.Tag.Success: {
@@ -175,7 +175,7 @@ const __bjs_createComplexResultValuesHelpers = () => {
                 default: throw new Error("Unknown ComplexResultValues tag: " + String(enumTag));
             }
         },
-        raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
+        lift: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
             const tag = tmpRetTag | 0;
             switch (tag) {
                 case ComplexResultValues.Tag.Success: {
@@ -266,7 +266,7 @@ const __bjs_createResultValuesHelpers = () => {
                 default: throw new Error("Unknown ResultValues tag: " + String(enumTag));
             }
         },
-        raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
+        lift: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
             const tag = tmpRetTag | 0;
             switch (tag) {
                 case ResultValues.Tag.Success: {
@@ -325,7 +325,7 @@ const __bjs_createNetworkingResultValuesHelpers = () => {
                 default: throw new Error("Unknown NetworkingResultValues tag: " + String(enumTag));
             }
         },
-        raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
+        lift: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
             const tag = tmpRetTag | 0;
             switch (tag) {
                 case NetworkingResultValues.Tag.Success: {
@@ -414,7 +414,7 @@ const __bjs_createAPIOptionalResultValuesHelpers = () => {
                 default: throw new Error("Unknown APIOptionalResultValues tag: " + String(enumTag));
             }
         },
-        raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
+        lift: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
             const tag = tmpRetTag | 0;
             switch (tag) {
                 case APIOptionalResultValues.Tag.Success: {
@@ -711,13 +711,13 @@ export async function createInstantiator(options, swift) {
                 },
                 getResult: function bjs_getResult() {
                     instance.exports.bjs_getResult();
-                    const ret = enumHelpers.APIResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    const ret = enumHelpers.APIResult.lift(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     return ret;
                 },
                 roundtripAPIResult: function bjs_roundtripAPIResult(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.APIResult.lower(result);
                     instance.exports.bjs_roundtripAPIResult(resultCaseId);
-                    const ret = enumHelpers.APIResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    const ret = enumHelpers.APIResult.lift(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
@@ -735,7 +735,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.APIResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                        optResult = enumHelpers.APIResult.lift(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     }
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;
@@ -747,13 +747,13 @@ export async function createInstantiator(options, swift) {
                 },
                 getComplexResult: function bjs_getComplexResult() {
                     instance.exports.bjs_getComplexResult();
-                    const ret = enumHelpers.ComplexResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    const ret = enumHelpers.ComplexResult.lift(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     return ret;
                 },
                 roundtripComplexResult: function bjs_roundtripComplexResult(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.ComplexResult.lower(result);
                     instance.exports.bjs_roundtripComplexResult(resultCaseId);
-                    const ret = enumHelpers.ComplexResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    const ret = enumHelpers.ComplexResult.lift(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
@@ -771,7 +771,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.ComplexResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                        optResult = enumHelpers.ComplexResult.lift(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     }
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;
@@ -790,7 +790,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.Result.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                        optResult = enumHelpers.Result.lift(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     }
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;
@@ -809,7 +809,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.NetworkingResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                        optResult = enumHelpers.NetworkingResult.lift(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     }
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;
@@ -828,7 +828,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.APIOptionalResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                        optResult = enumHelpers.APIOptionalResult.lift(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     }
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;
@@ -854,7 +854,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.APIOptionalResult.raise(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                        optResult = enumHelpers.APIOptionalResult.lift(tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     }
                     if (result1Cleanup) { result1Cleanup(); }
                     if (result2Cleanup) { result2Cleanup(); }

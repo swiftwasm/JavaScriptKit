@@ -77,7 +77,7 @@ const __bjs_createAPIResultValuesHelpers = () => {
                 default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
             }
         },
-        raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
+        lift: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
             const tag = tmpRetTag | 0;
             switch (tag) {
                 case APIResultValues.Tag.Success: {
@@ -423,7 +423,7 @@ export async function createInstantiator(options, swift) {
             bjs["invoke_js_callback_TestModule_10TestModule9APIResultO_SS"] = function(callbackId, param0Id) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
-                    let param0 = enumHelpers.APIResult.raise(param0Id, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    let param0 = enumHelpers.APIResult.lift(param0Id, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     const result = callback(param0);
                     if (typeof result !== "string") {
                         throw new TypeError("Callback must return a string");
@@ -685,7 +685,7 @@ export async function createInstantiator(options, swift) {
                     const callback = swift.memory.getObject(callbackId);
                     let param0;
                     if (param0IsSome) {
-                        param0 = enumHelpers.APIResult.raise(param0Value, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                        param0 = enumHelpers.APIResult.lift(param0Value, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     } else {
                         param0 = null;
                     }

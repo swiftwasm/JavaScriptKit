@@ -2241,7 +2241,7 @@ extension Point: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Point()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Point()))
     }
 }
 
@@ -2255,10 +2255,10 @@ fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Int32 {
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Point")
-fileprivate func _bjs_struct_raise_Point() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Point")
+fileprivate func _bjs_struct_lift_Point() -> Int32
 #else
-fileprivate func _bjs_struct_raise_Point() -> Int32 {
+fileprivate func _bjs_struct_lift_Point() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -2292,7 +2292,7 @@ extension PointerFields: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_PointerFields()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_PointerFields()))
     }
 }
 
@@ -2306,10 +2306,10 @@ fileprivate func _bjs_struct_lower_PointerFields(_ objectId: Int32) -> Int32 {
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_PointerFields")
-fileprivate func _bjs_struct_raise_PointerFields() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_PointerFields")
+fileprivate func _bjs_struct_lift_PointerFields() -> Int32
 #else
-fileprivate func _bjs_struct_raise_PointerFields() -> Int32 {
+fileprivate func _bjs_struct_lift_PointerFields() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -2365,7 +2365,7 @@ extension DataPoint: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_DataPoint()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_DataPoint()))
     }
 }
 
@@ -2379,10 +2379,10 @@ fileprivate func _bjs_struct_lower_DataPoint(_ objectId: Int32) -> Int32 {
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_DataPoint")
-fileprivate func _bjs_struct_raise_DataPoint() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_DataPoint")
+fileprivate func _bjs_struct_lift_DataPoint() -> Int32
 #else
-fileprivate func _bjs_struct_raise_DataPoint() -> Int32 {
+fileprivate func _bjs_struct_lift_DataPoint() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -2433,7 +2433,7 @@ extension Address: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Address()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Address()))
     }
 }
 
@@ -2447,10 +2447,10 @@ fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Int32 {
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Address")
-fileprivate func _bjs_struct_raise_Address() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Address")
+fileprivate func _bjs_struct_lift_Address() -> Int32
 #else
-fileprivate func _bjs_struct_raise_Address() -> Int32 {
+fileprivate func _bjs_struct_lift_Address() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -2498,7 +2498,7 @@ extension Contact: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Contact()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Contact()))
     }
 }
 
@@ -2512,10 +2512,10 @@ fileprivate func _bjs_struct_lower_Contact(_ objectId: Int32) -> Int32 {
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Contact")
-fileprivate func _bjs_struct_raise_Contact() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Contact")
+fileprivate func _bjs_struct_lift_Contact() -> Int32
 #else
-fileprivate func _bjs_struct_raise_Contact() -> Int32 {
+fileprivate func _bjs_struct_lift_Contact() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -2561,7 +2561,7 @@ extension Config: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_Config()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Config()))
     }
 }
 
@@ -2575,10 +2575,10 @@ fileprivate func _bjs_struct_lower_Config(_ objectId: Int32) -> Int32 {
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_Config")
-fileprivate func _bjs_struct_raise_Config() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Config")
+fileprivate func _bjs_struct_lift_Config() -> Int32
 #else
-fileprivate func _bjs_struct_raise_Config() -> Int32 {
+fileprivate func _bjs_struct_lift_Config() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -2610,7 +2610,7 @@ extension SessionData: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_SessionData()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_SessionData()))
     }
 }
 
@@ -2624,10 +2624,10 @@ fileprivate func _bjs_struct_lower_SessionData(_ objectId: Int32) -> Int32 {
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_SessionData")
-fileprivate func _bjs_struct_raise_SessionData() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_SessionData")
+fileprivate func _bjs_struct_lift_SessionData() -> Int32
 #else
-fileprivate func _bjs_struct_raise_SessionData() -> Int32 {
+fileprivate func _bjs_struct_lift_SessionData() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -2667,7 +2667,7 @@ extension ValidationReport: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_ValidationReport()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_ValidationReport()))
     }
 }
 
@@ -2681,10 +2681,10 @@ fileprivate func _bjs_struct_lower_ValidationReport(_ objectId: Int32) -> Int32 
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_ValidationReport")
-fileprivate func _bjs_struct_raise_ValidationReport() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_ValidationReport")
+fileprivate func _bjs_struct_lift_ValidationReport() -> Int32
 #else
-fileprivate func _bjs_struct_raise_ValidationReport() -> Int32 {
+fileprivate func _bjs_struct_lift_ValidationReport() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -2750,7 +2750,7 @@ extension AdvancedConfig: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_AdvancedConfig()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_AdvancedConfig()))
     }
 }
 
@@ -2764,10 +2764,10 @@ fileprivate func _bjs_struct_lower_AdvancedConfig(_ objectId: Int32) -> Int32 {
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_AdvancedConfig")
-fileprivate func _bjs_struct_raise_AdvancedConfig() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_AdvancedConfig")
+fileprivate func _bjs_struct_lift_AdvancedConfig() -> Int32
 #else
-fileprivate func _bjs_struct_raise_AdvancedConfig() -> Int32 {
+fileprivate func _bjs_struct_lift_AdvancedConfig() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -2807,7 +2807,7 @@ extension MeasurementConfig: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_MeasurementConfig()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_MeasurementConfig()))
     }
 }
 
@@ -2821,10 +2821,10 @@ fileprivate func _bjs_struct_lower_MeasurementConfig(_ objectId: Int32) -> Int32
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_MeasurementConfig")
-fileprivate func _bjs_struct_raise_MeasurementConfig() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_MeasurementConfig")
+fileprivate func _bjs_struct_lift_MeasurementConfig() -> Int32
 #else
-fileprivate func _bjs_struct_raise_MeasurementConfig() -> Int32 {
+fileprivate func _bjs_struct_lift_MeasurementConfig() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -2850,7 +2850,7 @@ extension MathOperations: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_MathOperations()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_MathOperations()))
     }
 }
 
@@ -2864,10 +2864,10 @@ fileprivate func _bjs_struct_lower_MathOperations(_ objectId: Int32) -> Int32 {
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_MathOperations")
-fileprivate func _bjs_struct_raise_MathOperations() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_MathOperations")
+fileprivate func _bjs_struct_lift_MathOperations() -> Int32
 #else
-fileprivate func _bjs_struct_raise_MathOperations() -> Int32 {
+fileprivate func _bjs_struct_lift_MathOperations() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -2946,7 +2946,7 @@ extension CopyableCart: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_CopyableCart()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_CopyableCart()))
     }
 }
 
@@ -2960,10 +2960,10 @@ fileprivate func _bjs_struct_lower_CopyableCart(_ objectId: Int32) -> Int32 {
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_CopyableCart")
-fileprivate func _bjs_struct_raise_CopyableCart() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_CopyableCart")
+fileprivate func _bjs_struct_lift_CopyableCart() -> Int32
 #else
-fileprivate func _bjs_struct_raise_CopyableCart() -> Int32 {
+fileprivate func _bjs_struct_lift_CopyableCart() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -3005,7 +3005,7 @@ extension CopyableCartItem: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_CopyableCartItem()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_CopyableCartItem()))
     }
 }
 
@@ -3019,10 +3019,10 @@ fileprivate func _bjs_struct_lower_CopyableCartItem(_ objectId: Int32) -> Int32 
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_CopyableCartItem")
-fileprivate func _bjs_struct_raise_CopyableCartItem() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_CopyableCartItem")
+fileprivate func _bjs_struct_lift_CopyableCartItem() -> Int32
 #else
-fileprivate func _bjs_struct_raise_CopyableCartItem() -> Int32 {
+fileprivate func _bjs_struct_lift_CopyableCartItem() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -3056,7 +3056,7 @@ extension CopyableNestedCart: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_CopyableNestedCart()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_CopyableNestedCart()))
     }
 }
 
@@ -3070,10 +3070,10 @@ fileprivate func _bjs_struct_lower_CopyableNestedCart(_ objectId: Int32) -> Int3
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_CopyableNestedCart")
-fileprivate func _bjs_struct_raise_CopyableNestedCart() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_CopyableNestedCart")
+fileprivate func _bjs_struct_lift_CopyableNestedCart() -> Int32
 #else
-fileprivate func _bjs_struct_raise_CopyableNestedCart() -> Int32 {
+fileprivate func _bjs_struct_lift_CopyableNestedCart() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -3115,7 +3115,7 @@ extension ConfigStruct: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_ConfigStruct()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_ConfigStruct()))
     }
 }
 
@@ -3129,10 +3129,10 @@ fileprivate func _bjs_struct_lower_ConfigStruct(_ objectId: Int32) -> Int32 {
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_ConfigStruct")
-fileprivate func _bjs_struct_raise_ConfigStruct() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_ConfigStruct")
+fileprivate func _bjs_struct_lift_ConfigStruct() -> Int32
 #else
-fileprivate func _bjs_struct_raise_ConfigStruct() -> Int32 {
+fileprivate func _bjs_struct_lift_ConfigStruct() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

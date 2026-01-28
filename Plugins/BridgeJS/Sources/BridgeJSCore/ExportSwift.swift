@@ -1184,9 +1184,9 @@ struct StructCodegen {
         let accessControl = structDef.explicitAccessControl.map { "\($0) " } ?? ""
 
         let lowerExternName = "swift_js_struct_lower_\(structDef.name)"
-        let raiseExternName = "swift_js_struct_raise_\(structDef.name)"
+        let liftExternName = "swift_js_struct_lift_\(structDef.name)"
         let lowerFunctionName = "_bjs_struct_lower_\(structDef.name)"
-        let raiseFunctionName = "_bjs_struct_raise_\(structDef.name)"
+        let liftFunctionName = "_bjs_struct_lift_\(structDef.name)"
 
         let bridgedStructExtension: DeclSyntax = """
             extension \(raw: typeName): _BridgedSwiftStruct {
@@ -1207,7 +1207,7 @@ struct StructCodegen {
                 \(raw: accessControl)func toJSObject() -> JSObject {
                     let __bjs_self = self
                     __bjs_self.bridgeJSLowerReturn()
-                    return JSObject(id: UInt32(bitPattern: \(raw: raiseFunctionName)()))
+                    return JSObject(id: UInt32(bitPattern: \(raw: liftFunctionName)()))
                 }
             }
             """
@@ -1220,16 +1220,16 @@ struct StructCodegen {
                 returnType: .i32
             )
         )
-        let raiseExternDecl = Self.renderStructExtern(
-            externName: raiseExternName,
-            functionName: raiseFunctionName,
+        let liftExternDecl = Self.renderStructExtern(
+            externName: liftExternName,
+            functionName: liftFunctionName,
             signature: SwiftSignatureBuilder.buildABIFunctionSignature(
                 abiParameters: [],
                 returnType: .i32
             )
         )
 
-        return [bridgedStructExtension, lowerExternDecl, raiseExternDecl]
+        return [bridgedStructExtension, lowerExternDecl, liftExternDecl]
     }
 
     private static func renderStructExtern(

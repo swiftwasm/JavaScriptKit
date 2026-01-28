@@ -27,7 +27,7 @@ extension PointerFields: _BridgedSwiftStruct {
     func toJSObject() -> JSObject {
         let __bjs_self = self
         __bjs_self.bridgeJSLowerReturn()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_PointerFields()))
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_PointerFields()))
     }
 }
 
@@ -41,10 +41,10 @@ fileprivate func _bjs_struct_lower_PointerFields(_ objectId: Int32) -> Int32 {
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_PointerFields")
-fileprivate func _bjs_struct_raise_PointerFields() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_PointerFields")
+fileprivate func _bjs_struct_lift_PointerFields() -> Int32
 #else
-fileprivate func _bjs_struct_raise_PointerFields() -> Int32 {
+fileprivate func _bjs_struct_lift_PointerFields() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
