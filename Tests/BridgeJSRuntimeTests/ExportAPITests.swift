@@ -226,6 +226,18 @@ struct TestError: Error {
     case unknown = -1
 }
 
+@JS enum Precision: Float {
+    case rough = 0.1
+    case normal = 0.01
+    case fine = 0.001
+}
+
+@JS enum Ratio: Double {
+    case quarter = 0.25
+    case half = 0.5
+    case golden = 1.618
+}
+
 @JS(enumStyle: .tsEnum) enum TSDirection {
     case north
     case south
@@ -1388,6 +1400,17 @@ enum APIOptionalResult {
 
 @JS func nestedCartToJSObject(_ cart: CopyableNestedCart) -> JSObject {
     cart.toJSObject()
+}
+
+@JS struct MeasurementConfig {
+    var precision: Precision
+    var ratio: Ratio
+    var optionalPrecision: Precision?
+    var optionalRatio: Ratio?
+}
+
+@JS func roundTripMeasurementConfig(_ config: MeasurementConfig) -> MeasurementConfig {
+    return config
 }
 
 @JS struct ConfigStruct {

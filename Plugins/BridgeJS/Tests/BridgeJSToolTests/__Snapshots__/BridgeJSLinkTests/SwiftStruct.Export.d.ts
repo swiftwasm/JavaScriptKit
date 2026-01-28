@@ -4,6 +4,12 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export const PrecisionValues: {
+    readonly Rough: 0.1;
+    readonly Fine: 0.001;
+};
+export type PrecisionTag = typeof PrecisionValues[keyof typeof PrecisionValues];
+
 export interface DataPoint {
     x: number;
     y: number;
@@ -26,8 +32,15 @@ export interface Session {
     id: number;
     owner: Greeter;
 }
+export interface Measurement {
+    value: number;
+    precision: PrecisionTag;
+    optionalPrecision: PrecisionTag | null;
+}
 export interface ConfigStruct {
 }
+export type PrecisionObject = typeof PrecisionValues;
+
 /// Represents a Swift heap object like a class instance or an actor instance.
 export interface SwiftHeapObject {
     /// Release the heap object.
@@ -44,6 +57,7 @@ export type Exports = {
         new(name: string): Greeter;
     }
     roundtrip(session: Person): Person;
+    Precision: PrecisionObject
     DataPoint: {
         init(x: number, y: number, label: string, optCount: number | null, optFlag: boolean | null): DataPoint;
     }

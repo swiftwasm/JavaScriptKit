@@ -56,7 +56,35 @@
     }
   ],
   "enums" : [
+    {
+      "cases" : [
+        {
+          "associatedValues" : [
 
+          ],
+          "name" : "rough",
+          "rawValue" : "0.1"
+        },
+        {
+          "associatedValues" : [
+
+          ],
+          "name" : "fine",
+          "rawValue" : "0.001"
+        }
+      ],
+      "emitStyle" : "const",
+      "name" : "Precision",
+      "rawType" : "Float",
+      "staticMethods" : [
+
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "Precision",
+      "tsFullPath" : "Precision"
+    }
   ],
   "exposeToGlobal" : false,
   "functions" : [
@@ -344,6 +372,51 @@
         }
       ],
       "swiftCallName" : "Session"
+    },
+    {
+      "methods" : [
+
+      ],
+      "name" : "Measurement",
+      "properties" : [
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "value",
+          "type" : {
+            "double" : {
+
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "precision",
+          "type" : {
+            "rawValueEnum" : {
+              "_0" : "Precision",
+              "_1" : "Float"
+            }
+          }
+        },
+        {
+          "isReadonly" : true,
+          "isStatic" : false,
+          "name" : "optionalPrecision",
+          "type" : {
+            "optional" : {
+              "_0" : {
+                "rawValueEnum" : {
+                  "_0" : "Precision",
+                  "_1" : "Float"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "swiftCallName" : "Measurement"
     },
     {
       "methods" : [

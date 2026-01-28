@@ -1298,6 +1298,12 @@ extension Theme: _BridgedSwiftEnumNoPayload {
 extension HttpStatus: _BridgedSwiftEnumNoPayload {
 }
 
+extension Precision: _BridgedSwiftEnumNoPayload {
+}
+
+extension Ratio: _BridgedSwiftEnumNoPayload {
+}
+
 extension TSDirection: _BridgedSwiftCaseEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         return bridgeJSRawValue
@@ -2898,6 +2904,63 @@ public func _bjs_CopyableNestedCart_static_fromJSObject(_ object: Int32) -> Void
     #endif
 }
 
+extension MeasurementConfig: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> MeasurementConfig {
+        let optionalRatio = Optional<Ratio>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f64())
+        let optionalPrecision = Optional<Precision>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f32())
+        let ratio = Ratio.bridgeJSLiftParameter(_swift_js_pop_param_f64())
+        let precision = Precision.bridgeJSLiftParameter(_swift_js_pop_param_f32())
+        return MeasurementConfig(precision: precision, ratio: ratio, optionalPrecision: optionalPrecision, optionalRatio: optionalRatio)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_f32(self.precision.bridgeJSLowerParameter())
+        _swift_js_push_f64(self.ratio.bridgeJSLowerParameter())
+        let __bjs_isSome_optionalPrecision = self.optionalPrecision != nil
+        if let __bjs_unwrapped_optionalPrecision = self.optionalPrecision {
+            _swift_js_push_f32(__bjs_unwrapped_optionalPrecision.bridgeJSLowerParameter())
+        }
+        _swift_js_push_int(__bjs_isSome_optionalPrecision ? 1 : 0)
+        let __bjs_isSome_optionalRatio = self.optionalRatio != nil
+        if let __bjs_unwrapped_optionalRatio = self.optionalRatio {
+            _swift_js_push_f64(__bjs_unwrapped_optionalRatio.bridgeJSLowerParameter())
+        }
+        _swift_js_push_int(__bjs_isSome_optionalRatio ? 1 : 0)
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _bjs_struct_lower_MeasurementConfig(jsObject.bridgeJSLowerParameter())
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        var __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_raise_MeasurementConfig()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_MeasurementConfig")
+fileprivate func _bjs_struct_lower_MeasurementConfig(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_MeasurementConfig(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_raise_MeasurementConfig")
+fileprivate func _bjs_struct_raise_MeasurementConfig() -> Int32
+#else
+fileprivate func _bjs_struct_raise_MeasurementConfig() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 extension ConfigStruct: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> ConfigStruct {
         let value = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
@@ -4431,6 +4494,17 @@ public func _bjs_cartToJSObject() -> Int32 {
 public func _bjs_nestedCartToJSObject() -> Int32 {
     #if arch(wasm32)
     let ret = nestedCartToJSObject(_: CopyableNestedCart.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripMeasurementConfig")
+@_cdecl("bjs_roundTripMeasurementConfig")
+public func _bjs_roundTripMeasurementConfig() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripMeasurementConfig(_: MeasurementConfig.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

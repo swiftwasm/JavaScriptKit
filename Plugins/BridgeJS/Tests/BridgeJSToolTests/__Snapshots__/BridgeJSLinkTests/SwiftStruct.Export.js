@@ -4,6 +4,11 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export const PrecisionValues = {
+    Rough: 0.1,
+    Fine: 0.001,
+};
+
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -184,6 +189,35 @@ export async function createInstantiator(options, swift) {
             }
         });
     };
+    const __bjs_createMeasurementHelpers = () => {
+        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers) => ({
+            lower: (value) => {
+                tmpParamF64s.push(value.value);
+                tmpParamF32s.push(Math.fround(value.precision));
+                const isSome = value.optionalPrecision != null;
+                if (isSome) {
+                    tmpParamF32s.push(Math.fround(value.optionalPrecision));
+                } else {
+                    tmpParamF32s.push(0.0);
+                }
+                tmpParamInts.push(isSome ? 1 : 0);
+                return { cleanup: undefined };
+            },
+            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+                const isSome = tmpRetInts.pop();
+                let optional;
+                if (isSome) {
+                    const value = tmpRetF32s.pop();
+                    optional = value;
+                } else {
+                    optional = null;
+                }
+                const value1 = tmpRetF32s.pop();
+                const f64 = tmpRetF64s.pop();
+                return { value: f64, precision: value1, optionalPrecision: optional };
+            }
+        });
+    };
     const __bjs_createConfigStructHelpers = () => {
         return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers) => ({
             lower: (value) => {
@@ -313,6 +347,17 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_struct_raise_Session"] = function() {
                 const value = structHelpers.Session.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                return swift.memory.retain(value);
+            }
+            bjs["swift_js_struct_lower_Measurement"] = function(objectId) {
+                const { cleanup: cleanup } = structHelpers.Measurement.lower(swift.memory.getObject(objectId));
+                if (cleanup) {
+                    return tmpStructCleanups.push(cleanup);
+                }
+                return 0;
+            }
+            bjs["swift_js_struct_raise_Measurement"] = function() {
+                const value = structHelpers.Measurement.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_ConfigStruct"] = function(objectId) {
@@ -498,6 +543,9 @@ export async function createInstantiator(options, swift) {
             const SessionHelpers = __bjs_createSessionHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.Session = SessionHelpers;
             
+            const MeasurementHelpers = __bjs_createMeasurementHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
+            structHelpers.Measurement = MeasurementHelpers;
+            
             const ConfigStructHelpers = __bjs_createConfigStructHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.ConfigStruct = ConfigStructHelpers;
             
@@ -510,6 +558,7 @@ export async function createInstantiator(options, swift) {
                     if (cleanup) { cleanup(); }
                     return structValue;
                 },
+                Precision: PrecisionValues,
                 DataPoint: {
                     init: function(x, y, label, optCount, optFlag) {
                         const labelBytes = textEncoder.encode(label);
