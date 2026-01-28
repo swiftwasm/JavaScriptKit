@@ -1,0 +1,208 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+
+        ]
+      },
+      {
+        "functions" : [
+          {
+            "from" : "global",
+            "name" : "alert",
+            "parameters" : [
+              {
+                "name" : "message",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
+        ],
+        "globalGetters" : [
+          {
+            "from" : "global",
+            "name" : "document",
+            "type" : {
+              "jsObject" : {
+                "_0" : "JSDocument"
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "from" : "global",
+            "getters" : [
+              {
+                "name" : "body",
+                "type" : {
+                  "jsObject" : {
+                    "_0" : "JSHTMLElement"
+                  }
+                }
+              }
+            ],
+            "jsName" : "Document",
+            "methods" : [
+              {
+                "name" : "createElement",
+                "parameters" : [
+                  {
+                    "name" : "tagName",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "JSHTMLElement"
+                  }
+                }
+              }
+            ],
+            "name" : "JSDocument",
+            "setters" : [
+
+            ]
+          },
+          {
+            "from" : "global",
+            "getters" : [
+              {
+                "name" : "innerText",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "jsName" : "HTMLElement",
+            "methods" : [
+              {
+                "name" : "appendChild",
+                "parameters" : [
+                  {
+                    "name" : "element",
+                    "type" : {
+                      "jsObject" : {
+                        "_0" : "JSHTMLElement"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "JSHTMLElement",
+            "setters" : [
+              {
+                "functionName" : "innerText_set",
+                "name" : "innerText",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from" : "global",
+            "getters" : [
+              {
+                "name" : "onclick",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "5Basicy_y",
+                      "moduleName" : "Basic",
+                      "parameters" : [
+
+                      ],
+                      "returnType" : {
+                        "void" : {
+
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "jsName" : "HTMLButtonElement",
+            "methods" : [
+
+            ],
+            "name" : "JSHTMLButtonElement",
+            "setters" : [
+              {
+                "functionName" : "onclick_set",
+                "name" : "onclick",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "5Basicy_y",
+                      "moduleName" : "Basic",
+                      "parameters" : [
+
+                      ],
+                      "returnType" : {
+                        "void" : {
+
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "Basic"
+}

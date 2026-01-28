@@ -1,23 +1,41 @@
 import JavaScriptEventLoop
-import JavaScriptKit
+@_spi(Experimental) import JavaScriptKit
 
-let alert = JSObject.global.alert.object!
-let document = JSObject.global.document
+@JSFunction(from: .global) func alert(_ message: String) throws(JSException)
 
-let divElement = document.createElement("div")
-divElement.innerText = "Hello, world"
-_ = document.body.appendChild(divElement)
+@JSClass(jsName: "Document", from: .global)
+struct JSDocument {
+    @JSGetter var body: JSHTMLElement
+    @JSFunction func createElement(_ tagName: String) throws(JSException) -> JSHTMLElement
+}
 
-let buttonElement = document.createElement("button")
-buttonElement.innerText = "Alert demo"
-buttonElement.onclick = .object(
-    JSClosure { _ in
-        alert("Swift is running on browser!")
-        return .undefined
-    }
-)
+@JSClass(jsName: "HTMLElement", from: .global)
+struct JSHTMLElement {
+    @JSGetter var innerText: String
+    @JSSetter func setInnerText(_ value: String) throws(JSException)
+    @JSFunction func appendChild(_ element: JSHTMLElement) throws(JSException)
+}
 
-_ = document.body.appendChild(buttonElement)
+@JSClass(jsName: "HTMLButtonElement", from: .global)
+struct JSHTMLButtonElement {
+    @JSGetter var onclick: () -> Void
+    @JSSetter func setOnclick(_ handler: @escaping () -> Void) throws(JSException)
+}
+
+@JSGetter(from: .global) var document: JSDocument
+
+var divElement = try document.createElement("div")
+try divElement.setInnerText("Hello, world")
+try document.body.appendChild(divElement)
+
+var buttonElement = try document.createElement("button")
+try buttonElement.setInnerText("Alert demo")
+let buttonHTMLElement = JSHTMLButtonElement(unsafelyWrapping: buttonElement.jsObject)
+try buttonHTMLElement.setOnclick {
+    try! alert("Swift is running on browser!")
+}
+
+_ = try document.body.appendChild(buttonElement)
 
 private let jsFetch = JSObject.global.fetch.object!
 func fetch(_ url: String) -> JSPromise {
@@ -30,23 +48,19 @@ struct Response: Decodable {
     let uuid: String
 }
 
-let asyncButtonElement = document.createElement("button")
-asyncButtonElement.innerText = "Fetch UUID demo"
-asyncButtonElement.onclick = .object(
-    JSClosure { _ in
-        Task {
-            do {
-                let response = try await fetch("https://httpbin.org/uuid").value
-                let json = try await JSPromise(response.json().object!)!.value
-                let parsedResponse = try JSValueDecoder().decode(Response.self, from: json)
-                alert(parsedResponse.uuid)
-            } catch {
-                print(error)
-            }
+var asyncButtonElement = try document.createElement("button")
+try asyncButtonElement.setInnerText("Fetch UUID demo")
+try JSHTMLButtonElement(unsafelyWrapping: asyncButtonElement.jsObject).setOnclick {
+    Task {
+        do {
+            let response = try await fetch("https://httpbin.org/uuid").value
+            let json = try await JSPromise(response.json().object!)!.value
+            let parsedResponse = try JSValueDecoder().decode(Response.self, from: json)
+            try alert(parsedResponse.uuid)
+        } catch {
+            print(error)
         }
-
-        return .undefined
     }
-)
+}
 
-_ = document.body.appendChild(asyncButtonElement)
+try document.body.appendChild(asyncButtonElement)

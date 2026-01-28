@@ -14,6 +14,9 @@ let package = Package(
             dependencies: [
                 "JavaScriptKit",
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("Extern"),
             ]
         )
     ],
