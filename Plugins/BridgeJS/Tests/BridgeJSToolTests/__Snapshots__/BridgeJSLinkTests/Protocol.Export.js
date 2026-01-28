@@ -46,7 +46,7 @@ const __bjs_createResultValuesHelpers = () => {
                 default: throw new Error("Unknown ResultValues tag: " + String(enumTag));
             }
         },
-        raise: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
+        lift: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
             const tag = tmpRetTag | 0;
             switch (tag) {
                 case ResultValues.Tag.Success: {
@@ -372,7 +372,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_MyViewControllerDelegate_result_set"] = function bjs_MyViewControllerDelegate_result_set(self, value) {
                 try {
-                    const enumValue = enumHelpers.Result.raise(value, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    const enumValue = enumHelpers.Result.lift(value, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     swift.memory.getObject(self).result = enumValue;
                 } catch (error) {
                     setException(error);
@@ -396,7 +396,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     let enumValue;
                     if (valueIsSome) {
-                        enumValue = enumHelpers.Result.raise(valueWrappedValue, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                        enumValue = enumHelpers.Result.lift(valueWrappedValue, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     }
                     swift.memory.getObject(self).optionalResult = valueIsSome ? enumValue : null;
                 } catch (error) {
@@ -553,7 +553,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_MyViewControllerDelegate_handleResult"] = function bjs_MyViewControllerDelegate_handleResult(self, result) {
                 try {
-                    const enumValue = enumHelpers.Result.raise(result, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    const enumValue = enumHelpers.Result.lift(result, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
                     swift.memory.getObject(self).handleResult(enumValue);
                 } catch (error) {
                     setException(error);

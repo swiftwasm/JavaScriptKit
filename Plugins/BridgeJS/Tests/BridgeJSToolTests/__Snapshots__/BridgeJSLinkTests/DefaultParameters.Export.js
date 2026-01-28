@@ -54,7 +54,7 @@ export async function createInstantiator(options, swift) {
                 };
                 return { cleanup };
             },
-            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
                 const bool = tmpRetInts.pop() !== 0;
                 const int = tmpRetInts.pop();
                 const string = tmpRetStrings.pop();
@@ -68,7 +68,7 @@ export async function createInstantiator(options, swift) {
                 tmpParamF64s.push(value.baseValue);
                 return { cleanup: undefined };
             },
-            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
                 const f64 = tmpRetF64s.pop();
                 const instance1 = { baseValue: f64 };
                 instance1.add = function(a, b = 10.0) {
@@ -171,8 +171,8 @@ export async function createInstantiator(options, swift) {
                 }
                 return 0;
             }
-            bjs["swift_js_struct_raise_Config"] = function() {
-                const value = structHelpers.Config.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+            bjs["swift_js_struct_lift_Config"] = function() {
+                const value = structHelpers.Config.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_MathOperations"] = function(objectId) {
@@ -182,8 +182,8 @@ export async function createInstantiator(options, swift) {
                 }
                 return 0;
             }
-            bjs["swift_js_struct_raise_MathOperations"] = function() {
-                const value = structHelpers.MathOperations.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+            bjs["swift_js_struct_lift_MathOperations"] = function() {
+                const value = structHelpers.MathOperations.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                 return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
@@ -528,7 +528,7 @@ export async function createInstantiator(options, swift) {
                     const isSome1 = tmpRetInts.pop();
                     let optResult;
                     if (isSome1) {
-                        optResult = structHelpers.Config.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        optResult = structHelpers.Config.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                     } else {
                         optResult = null;
                     }
@@ -546,7 +546,7 @@ export async function createInstantiator(options, swift) {
                     const isSome1 = tmpRetInts.pop();
                     let optResult;
                     if (isSome1) {
-                        optResult = structHelpers.Config.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        optResult = structHelpers.Config.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                     } else {
                         optResult = null;
                     }
@@ -557,7 +557,7 @@ export async function createInstantiator(options, swift) {
                 MathOperations: {
                     init: function(baseValue = 0.0) {
                         instance.exports.bjs_MathOperations_init(baseValue);
-                        const structValue = structHelpers.MathOperations.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        const structValue = structHelpers.MathOperations.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                         return structValue;
                     },
                     subtract: function(a, b) {

@@ -41,7 +41,7 @@ export async function createInstantiator(options, swift) {
                 tmpParamInts.push((value.y | 0));
                 return { cleanup: undefined };
             },
-            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
                 const int = tmpRetInts.pop();
                 const int1 = tmpRetInts.pop();
                 return { x: int1, y: int };
@@ -133,8 +133,8 @@ export async function createInstantiator(options, swift) {
                 }
                 return 0;
             }
-            bjs["swift_js_struct_raise_Point"] = function() {
-                const value = structHelpers.Point.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+            bjs["swift_js_struct_lift_Point"] = function() {
+                const value = structHelpers.Point.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                 return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {

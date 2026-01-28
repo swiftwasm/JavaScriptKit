@@ -475,10 +475,10 @@ public struct BridgeJSLink {
                         }
                         printer.write("}")
 
-                        printer.write("bjs[\"swift_js_struct_raise_\(structDef.name)\"] = function() {")
+                        printer.write("bjs[\"swift_js_struct_lift_\(structDef.name)\"] = function() {")
                         printer.indent {
                             printer.write(
-                                "const value = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).raise(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
+                                "const value = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lift(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
                             )
                             printer.write("return \(JSGlueVariableScope.reservedSwift).memory.retain(value);")
                         }

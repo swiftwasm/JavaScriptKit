@@ -44,7 +44,7 @@ export async function createInstantiator(options, swift) {
                 tmpParamPointers.push((value.mutPtr | 0));
                 return { cleanup: undefined };
             },
-            raise: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
                 const pointer = tmpRetPointers.pop();
                 const pointer1 = tmpRetPointers.pop();
                 const pointer2 = tmpRetPointers.pop();
@@ -138,8 +138,8 @@ export async function createInstantiator(options, swift) {
                 }
                 return 0;
             }
-            bjs["swift_js_struct_raise_PointerFields"] = function() {
-                const value = structHelpers.PointerFields.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+            bjs["swift_js_struct_lift_PointerFields"] = function() {
+                const value = structHelpers.PointerFields.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                 return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
@@ -286,14 +286,14 @@ export async function createInstantiator(options, swift) {
                 roundTripPointerFields: function bjs_roundTripPointerFields(value) {
                     const { cleanup: cleanup } = structHelpers.PointerFields.lower(value);
                     instance.exports.bjs_roundTripPointerFields();
-                    const structValue = structHelpers.PointerFields.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const structValue = structHelpers.PointerFields.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                     if (cleanup) { cleanup(); }
                     return structValue;
                 },
                 PointerFields: {
                     init: function(raw, mutRaw, opaque, ptr, mutPtr) {
                         instance.exports.bjs_PointerFields_init(raw, mutRaw, opaque, ptr, mutPtr);
-                        const structValue = structHelpers.PointerFields.raise(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        const structValue = structHelpers.PointerFields.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                         return structValue;
                     },
                 },
