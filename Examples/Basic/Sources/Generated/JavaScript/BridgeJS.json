@@ -1,0 +1,234 @@
+{
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "from" : "global",
+            "name" : "alert",
+            "parameters" : [
+              {
+                "name" : "message",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "from" : "global",
+            "name" : "fetch",
+            "parameters" : [
+              {
+                "name" : "url",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "jsObject" : {
+
+              }
+            }
+          }
+        ],
+        "globalGetters" : [
+          {
+            "from" : "global",
+            "name" : "document",
+            "type" : {
+              "jsObject" : {
+                "_0" : "JSDocument"
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "from" : "global",
+            "getters" : [
+              {
+                "name" : "body",
+                "type" : {
+                  "jsObject" : {
+                    "_0" : "JSHTMLElement"
+                  }
+                }
+              }
+            ],
+            "jsName" : "Document",
+            "methods" : [
+              {
+                "name" : "createElement",
+                "parameters" : [
+                  {
+                    "name" : "tagName",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "JSHTMLElement"
+                  }
+                }
+              }
+            ],
+            "name" : "JSDocument",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "from" : "global",
+            "getters" : [
+              {
+                "name" : "innerText",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "jsName" : "HTMLElement",
+            "methods" : [
+              {
+                "name" : "appendChild",
+                "parameters" : [
+                  {
+                    "name" : "element",
+                    "type" : {
+                      "jsObject" : {
+                        "_0" : "JSHTMLElement"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "JSHTMLElement",
+            "setters" : [
+              {
+                "functionName" : "innerText_set",
+                "name" : "innerText",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "from" : "global",
+            "getters" : [
+              {
+                "name" : "onclick",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "5Basicy_y",
+                      "moduleName" : "Basic",
+                      "parameters" : [
+
+                      ],
+                      "returnType" : {
+                        "void" : {
+
+                        }
+                      }
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              }
+            ],
+            "jsName" : "HTMLButtonElement",
+            "methods" : [
+
+            ],
+            "name" : "JSHTMLButtonElement",
+            "setters" : [
+              {
+                "functionName" : "onclick_set",
+                "name" : "onclick",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "5Basicy_y",
+                      "moduleName" : "Basic",
+                      "parameters" : [
+
+                      ],
+                      "returnType" : {
+                        "void" : {
+
+                        }
+                      }
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              }
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "getters" : [
+              {
+                "name" : "uuid",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "methods" : [
+
+            ],
+            "name" : "Response",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "Basic"
+}

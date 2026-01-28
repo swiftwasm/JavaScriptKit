@@ -7,3 +7,12 @@ $ swift sdk install https://github.com/swiftwasm/swift/releases/download/swift-w
 $ ./build.sh
 $ npx serve
 ```
+
+## Re-generating BridgeJS code
+
+You need to re-generate files under `Sources/Generated` when you make changes to bridged interfaces:
+
+```sh
+$ swift package plugin --allow-writing-to-package-directory bridge-js
+```
+
