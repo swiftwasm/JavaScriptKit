@@ -1,4 +1,4 @@
-#if JAVASCRIPTKIT_ENABLE_TRACING
+#if Tracing
 
 /// Hooks for tracing Swift <-> JavaScript bridge calls.
 public struct JSTracing {
@@ -6,7 +6,7 @@ public struct JSTracing {
 
     public enum JSCallInfo {
         case function(function: JSObject, arguments: [JSValue])
-        case method(receiver: JSObject, methodName: String, arguments: [JSValue])
+        case method(receiver: JSObject, methodName: String?, arguments: [JSValue])
     }
 
     /// Register a hook for Swift to JavaScript calls.
@@ -24,7 +24,7 @@ public struct JSTracing {
 
     public struct JSClosureCallInfo {
         /// The file identifier where the called `JSClosure` was created.
-        public let fileID: StaticString
+        public let fileID: String
         /// The line number where the called `JSClosure` was created.
         public let line: UInt
     }

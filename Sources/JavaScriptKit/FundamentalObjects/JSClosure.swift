@@ -19,7 +19,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 
     public init(
-        file: StaticString = #fileID,
+        file: String = #fileID,
         line: UInt32 = #line,
         _ body: @escaping (sending [JSValue]) -> JSValue
     ) {
@@ -28,7 +28,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
 
         // 2. Create a new JavaScript function which calls the given Swift function.
         hostFuncRef = JavaScriptHostFuncRef(bitPattern: ObjectIdentifier(self))
-        _id = withExtendedLifetime(JSString(String(file))) { file in
+        _id = withExtendedLifetime(JSString(file)) { file in
             swjs_create_oneshot_function(hostFuncRef, line, file.asInternalJSRef())
         }
 
@@ -60,7 +60,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(
         priority: TaskPriority? = nil,
-        file: StaticString = #fileID,
+        file: String = #fileID,
         line: UInt32 = #line,
         _ body: @escaping (sending [JSValue]) async throws(JSException) -> JSValue
     ) -> JSOneshotClosure {
@@ -79,7 +79,7 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
     public static func async(
         executorPreference taskExecutor: (any TaskExecutor)? = nil,
         priority: TaskPriority? = nil,
-        file: StaticString = #fileID,
+        file: String = #fileID,
         line: UInt32 = #line,
         _ body: @escaping (sending [JSValue]) async throws(JSException) -> JSValue
     ) -> JSOneshotClosure {
@@ -122,7 +122,7 @@ public class JSClosure: JSObject, JSClosureProtocol {
         struct Entry {
             let object: JSObject
             let body: (sending [JSValue]) -> JSValue
-            let fileID: StaticString
+            let fileID: String
             let line: UInt32
         }
         private var storage: [JavaScriptHostFuncRef: Entry] = [:]
@@ -160,7 +160,7 @@ public class JSClosure: JSObject, JSClosureProtocol {
     }
 
     public init(
-        file: StaticString = #fileID,
+        file: String = #fileID,
         line: UInt32 = #line,
         _ body: @escaping (sending [JSValue]) -> JSValue
     ) {
@@ -169,7 +169,7 @@ public class JSClosure: JSObject, JSClosureProtocol {
 
         // 2. Create a new JavaScript function which calls the given Swift function.
         hostFuncRef = JavaScriptHostFuncRef(bitPattern: ObjectIdentifier(self))
-        _id = withExtendedLifetime(JSString(String(file))) { file in
+        _id = withExtendedLifetime(JSString(file)) { file in
             swjs_create_function(hostFuncRef, line, file.asInternalJSRef())
         }
 
@@ -198,7 +198,7 @@ public class JSClosure: JSObject, JSClosureProtocol {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public static func async(
         priority: TaskPriority? = nil,
-        file: StaticString = #fileID,
+        file: String = #fileID,
         line: UInt32 = #line,
         _ body: @escaping @isolated(any) (sending [JSValue]) async throws(JSException) -> JSValue
     ) -> JSClosure {
@@ -217,7 +217,7 @@ public class JSClosure: JSObject, JSClosureProtocol {
     public static func async(
         executorPreference taskExecutor: (any TaskExecutor)? = nil,
         priority: TaskPriority? = nil,
-        file: StaticString = #fileID,
+        file: String = #fileID,
         line: UInt32 = #line,
         _ body: @escaping (sending [JSValue]) async throws(JSException) -> JSValue
     ) -> JSClosure {
@@ -338,7 +338,7 @@ func _call_host_function_impl(
     guard let entry = JSClosure.sharedClosures.wrappedValue[hostFuncRef] else {
         return true
     }
-#if JAVASCRIPTKIT_ENABLE_TRACING
+#if Tracing
     let traceEnd = JSTracingHooks.beginJSClosureCall(
         JSTracing.JSClosureCallInfo(fileID: entry.fileID, line: UInt(entry.line))
     )
@@ -347,7 +347,7 @@ func _call_host_function_impl(
     for i in 0..<Int(argc) {
         arguments.append(argv[i].jsValue)
     }
-#if JAVASCRIPTKIT_ENABLE_TRACING
+#if Tracing
     defer { traceEnd?() }
 #endif
     let result = entry.body(arguments)

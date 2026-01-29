@@ -9,7 +9,7 @@ let useLegacyResourceBundling =
     Context.environment["JAVASCRIPTKIT_USE_LEGACY_RESOURCE_BUNDLING"].flatMap(Bool.init) ?? false
 
 let tracingTrait = Trait(
-    name: "JavaScriptKitTracing",
+    name: "Tracing",
     description: "Enable opt-in Swift <-> JavaScript bridge tracing hooks.",
     enabledTraits: []
 )
@@ -57,8 +57,7 @@ let package = Package(
                     .unsafeFlags(["-fdeclspec"])
                 ] : nil,
             swiftSettings: [
-                .enableExperimentalFeature("Extern"),
-                .define("JAVASCRIPTKIT_ENABLE_TRACING", .when(traits: ["JavaScriptKitTracing"])),
+                .enableExperimentalFeature("Extern")
             ]
                 + (shouldBuildForEmbedded
                     ? [

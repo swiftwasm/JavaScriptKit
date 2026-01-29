@@ -60,10 +60,10 @@ See [the DevTools team's official introduction](https://developer.chrome.com/blo
 
 ## Bridge Call Tracing
 
-Enable the `JavaScriptKitTracing` package trait to compile lightweight hook points for Swift <-> JavaScript calls. Tracing is off by default and adds no runtime overhead unless the trait is enabled:
+Enable the `Tracing` package trait to compile lightweight hook points for Swift <-> JavaScript calls. Tracing is off by default and adds no runtime overhead unless the trait is enabled:
 
 ```bash
-swift build --traits JavaScriptKitTracing
+swift build --traits Tracing
 ```
 
 The hooks are invoked at the start and end of each bridge crossing without collecting data for you. For example:

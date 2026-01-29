@@ -52,7 +52,7 @@ extension JSObject {
     /// - Parameter arguments: Arguments to be passed to this constructor function.
     /// - Returns: A new instance of this constructor.
     public func new(arguments: [ConvertibleToJSValue]) -> JSObject {
-        #if JAVASCRIPTKIT_ENABLE_TRACING
+        #if Tracing
         let jsValues = arguments.map { $0.jsValue }
         return new(arguments: jsValues)
         #else
@@ -105,7 +105,7 @@ extension JSObject {
     /// - Parameter arguments: Arguments to be passed to this constructor function.
     /// - Returns: A new instance of this constructor.
     public func new(arguments: [JSValue]) -> JSObject {
-        #if JAVASCRIPTKIT_ENABLE_TRACING
+        #if Tracing
         let traceEnd = JSTracingHooks.beginJSCall(.function(function: self, arguments: arguments))
         defer { traceEnd?() }
         #endif
@@ -122,11 +122,11 @@ extension JSObject {
     }
 
     final func invokeNonThrowingJSFunction(arguments: [JSValue]) -> RawJSValue {
-        #if JAVASCRIPTKIT_ENABLE_TRACING
+        #if Tracing
         let traceEnd = JSTracingHooks.beginJSCall(.function(function: self, arguments: arguments))
         #endif
         let result = arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0) }
-        #if JAVASCRIPTKIT_ENABLE_TRACING
+        #if Tracing
         traceEnd?()
         #endif
         return result
@@ -135,17 +135,13 @@ extension JSObject {
     final func invokeNonThrowingJSFunction(
         arguments: [JSValue],
         this: JSObject
-        #if JAVASCRIPTKIT_ENABLE_TRACING
+        #if Tracing
         , tracedMethodName: String? = nil
         #endif
     ) -> RawJSValue {
-        #if JAVASCRIPTKIT_ENABLE_TRACING
+        #if Tracing
         let traceEnd = JSTracingHooks.beginJSCall(
-            .method(
-                receiver: this,
-                methodName: tracedMethodName ?? "<unknown>",
-                arguments: arguments
-            )
+            .method(receiver: this, methodName: tracedMethodName, arguments: arguments)
         )
         #endif
         let result = arguments.withRawJSValues {
@@ -154,7 +150,7 @@ extension JSObject {
                 this: this
             )
         }
-        #if JAVASCRIPTKIT_ENABLE_TRACING
+        #if Tracing
         traceEnd?()
         #endif
         return result
@@ -162,7 +158,7 @@ extension JSObject {
 
     #if !hasFeature(Embedded)
     final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue]) -> RawJSValue {
-        #if JAVASCRIPTKIT_ENABLE_TRACING
+        #if Tracing
         let jsValues = arguments.map { $0.jsValue }
         return invokeNonThrowingJSFunction(arguments: jsValues)
         #else
@@ -173,11 +169,11 @@ extension JSObject {
     final func invokeNonThrowingJSFunction(
         arguments: [ConvertibleToJSValue],
         this: JSObject
-        #if JAVASCRIPTKIT_ENABLE_TRACING
+        #if Tracing
         , tracedMethodName: String? = nil
         #endif
     ) -> RawJSValue {
-        #if JAVASCRIPTKIT_ENABLE_TRACING
+        #if Tracing
         let jsValues = arguments.map { $0.jsValue }
         return invokeNonThrowingJSFunction(
             arguments: jsValues,
