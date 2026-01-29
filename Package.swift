@@ -4,7 +4,6 @@ import CompilerPluginSupport
 import PackageDescription
 
 // NOTE: needed for embedded customizations, ideally this will not be necessary at all in the future, or can be replaced with traits
-let shouldBuildForEmbedded = Context.environment["JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM"].flatMap(Bool.init) ?? false
 let useLegacyResourceBundling =
     Context.environment["JAVASCRIPTKIT_USE_LEGACY_RESOURCE_BUNDLING"].flatMap(Bool.init) ?? false
 
@@ -45,18 +44,9 @@ let package = Package(
             dependencies: ["_CJavaScriptKit", "BridgeJSMacros"],
             exclude: useLegacyResourceBundling ? [] : ["Runtime"],
             resources: useLegacyResourceBundling ? [.copy("Runtime")] : [],
-            cSettings: shouldBuildForEmbedded
-                ? [
-                    .unsafeFlags(["-fdeclspec"])
-                ] : nil,
             swiftSettings: [
                 .enableExperimentalFeature("Extern")
             ]
-                + (shouldBuildForEmbedded
-                    ? [
-                        .enableExperimentalFeature("Embedded"),
-                        .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"]),
-                    ] : [])
         ),
         .target(name: "_CJavaScriptKit"),
         .macro(
@@ -78,12 +68,7 @@ let package = Package(
 
         .target(
             name: "JavaScriptBigIntSupport",
-            dependencies: ["_CJavaScriptBigIntSupport", "JavaScriptKit"],
-            swiftSettings: shouldBuildForEmbedded
-                ? [
-                    .enableExperimentalFeature("Embedded"),
-                    .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"]),
-                ] : []
+            dependencies: ["_CJavaScriptBigIntSupport", "JavaScriptKit"]
         ),
         .target(name: "_CJavaScriptBigIntSupport", dependencies: ["_CJavaScriptKit"]),
         .testTarget(
@@ -94,12 +79,7 @@ let package = Package(
 
         .target(
             name: "JavaScriptEventLoop",
-            dependencies: ["JavaScriptKit", "_CJavaScriptEventLoop"],
-            swiftSettings: shouldBuildForEmbedded
-                ? [
-                    .enableExperimentalFeature("Embedded"),
-                    .unsafeFlags(["-Xfrontend", "-emit-empty-object-file"]),
-                ] : []
+            dependencies: ["JavaScriptKit", "_CJavaScriptEventLoop"]
         ),
         .target(name: "_CJavaScriptEventLoop"),
         .testTarget(
