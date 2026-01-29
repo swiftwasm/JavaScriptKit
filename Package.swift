@@ -8,6 +8,12 @@ let shouldBuildForEmbedded = Context.environment["JAVASCRIPTKIT_EXPERIMENTAL_EMB
 let useLegacyResourceBundling =
     Context.environment["JAVASCRIPTKIT_USE_LEGACY_RESOURCE_BUNDLING"].flatMap(Bool.init) ?? false
 
+let tracingTrait = Trait(
+    name: "JavaScriptKitTracing",
+    description: "Enable opt-in Swift <-> JavaScript bridge tracing hooks.",
+    enabledTraits: []
+)
+
 let testingLinkerFlags: [LinkerSetting] = [
     .unsafeFlags([
         "-Xlinker", "--stack-first",
@@ -36,6 +42,7 @@ let package = Package(
         .plugin(name: "BridgeJS", targets: ["BridgeJS"]),
         .plugin(name: "BridgeJSCommandPlugin", targets: ["BridgeJSCommandPlugin"]),
     ],
+    traits: [tracingTrait],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..<"603.0.0")
     ],
@@ -50,7 +57,8 @@ let package = Package(
                     .unsafeFlags(["-fdeclspec"])
                 ] : nil,
             swiftSettings: [
-                .enableExperimentalFeature("Extern")
+                .enableExperimentalFeature("Extern"),
+                .define("JAVASCRIPTKIT_ENABLE_TRACING", .when(traits: ["JavaScriptKitTracing"])),
             ]
                 + (shouldBuildForEmbedded
                     ? [

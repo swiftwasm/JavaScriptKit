@@ -94,7 +94,15 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     public subscript(_ name: String) -> ((ConvertibleToJSValue...) -> JSValue)? {
         guard let function = self[name].function else { return nil }
         return { (arguments: ConvertibleToJSValue...) in
-            function(this: self, arguments: arguments)
+            #if JAVASCRIPTKIT_ENABLE_TRACING
+            return function.invokeNonThrowingJSFunction(
+                arguments: arguments,
+                this: self,
+                tracedMethodName: name
+            ).jsValue
+            #else
+            return function.invokeNonThrowingJSFunction(arguments: arguments, this: self).jsValue
+            #endif
         }
     }
 
@@ -112,7 +120,15 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     public subscript(_ name: JSString) -> ((ConvertibleToJSValue...) -> JSValue)? {
         guard let function = self[name].function else { return nil }
         return { (arguments: ConvertibleToJSValue...) in
-            function(this: self, arguments: arguments)
+            #if JAVASCRIPTKIT_ENABLE_TRACING
+            return function.invokeNonThrowingJSFunction(
+                arguments: arguments,
+                this: self,
+                tracedMethodName: String(name)
+            ).jsValue
+            #else
+            return function.invokeNonThrowingJSFunction(arguments: arguments, this: self).jsValue
+            #endif
         }
     }
 
