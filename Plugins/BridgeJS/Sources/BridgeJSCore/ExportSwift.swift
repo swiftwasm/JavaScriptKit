@@ -794,8 +794,10 @@ struct StackCodegen {
     func liftExpression(for type: BridgeType) -> ExprSyntax {
         switch type {
         case .string, .int, .uint, .bool, .float, .double,
-            .jsObject, .swiftStruct, .swiftHeapObject:
+            .jsObject(nil), .swiftStruct, .swiftHeapObject:
             return "\(raw: type.swiftType).bridgeJSLiftParameter()"
+        case .jsObject(let className?):
+            return "\(raw: className)(unsafelyWrapping: JSObject.bridgeJSLiftParameter())"
         case .unsafePointer:
             return "\(raw: type.swiftType).bridgeJSLiftParameter()"
         case .swiftProtocol(let protocolName):
@@ -830,9 +832,11 @@ struct StackCodegen {
     func liftArrayExpression(elementType: BridgeType) -> ExprSyntax {
         switch elementType {
         case .int, .uint, .float, .double, .string, .bool,
-            .jsObject, .swiftStruct, .caseEnum, .swiftHeapObject,
+            .jsObject(nil), .swiftStruct, .caseEnum, .swiftHeapObject,
             .unsafePointer, .rawValueEnum, .associatedValueEnum:
             return "[\(raw: elementType.swiftType)].bridgeJSLiftParameter()"
+        case .jsObject(_?):
+            return liftArrayExpressionInline(elementType: elementType)
         case .swiftProtocol(let protocolName):
             return "[Any\(raw: protocolName)].bridgeJSLiftParameter()"
         case .optional, .array, .closure:
@@ -861,9 +865,11 @@ struct StackCodegen {
 
     private func liftOptionalExpression(wrappedType: BridgeType) -> ExprSyntax {
         switch wrappedType {
-        case .string, .int, .uint, .bool, .float, .double, .jsObject,
+        case .string, .int, .uint, .bool, .float, .double, .jsObject(nil),
             .swiftStruct, .swiftHeapObject, .caseEnum, .associatedValueEnum, .rawValueEnum:
             return "Optional<\(raw: wrappedType.swiftType)>.bridgeJSLiftParameter()"
+        case .jsObject(let className?):
+            return "Optional<JSObject>.bridgeJSLiftParameter().map { \(raw: className)(unsafelyWrapping: $0) }"
         case .array(let elementType):
             let arrayLift = liftArrayExpression(elementType: elementType)
             let swiftTypeName = elementType.swiftType
@@ -896,8 +902,10 @@ struct StackCodegen {
         switch type {
         case .string, .int, .uint, .bool, .float, .double:
             return ["\(raw: accessor).bridgeJSLowerStackReturn()"]
-        case .jsObject:
+        case .jsObject(nil):
             return ["\(raw: accessor).bridgeJSLowerStackReturn()"]
+        case .jsObject(_?):
+            return ["\(raw: accessor).jsObject.bridgeJSLowerStackReturn()"]
         case .swiftHeapObject, .unsafePointer, .closure:
             return ["\(raw: accessor).bridgeJSLowerStackReturn()"]
         case .swiftProtocol(let protocolName):
@@ -923,9 +931,11 @@ struct StackCodegen {
     ) -> [CodeBlockItemSyntax] {
         switch elementType {
         case .int, .uint, .float, .double, .string, .bool,
-            .jsObject, .swiftStruct, .caseEnum, .swiftHeapObject,
+            .jsObject(nil), .swiftStruct, .caseEnum, .swiftHeapObject,
             .unsafePointer, .rawValueEnum, .associatedValueEnum:
             return ["\(raw: accessor).bridgeJSLowerReturn()"]
+        case .jsObject(_?):
+            return ["\(raw: accessor).map { $0.jsObject }.bridgeJSLowerReturn()"]
         case .swiftProtocol(let protocolName):
             return ["\(raw: accessor).map { $0 as! Any\(raw: protocolName) }.bridgeJSLowerReturn()"]
         case .optional, .array, .closure:
@@ -1003,8 +1013,10 @@ struct StackCodegen {
         case .associatedValueEnum:
             // Push payloads via bridgeJSLowerParameter(), then push the returned case ID
             return ["_swift_js_push_i32(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
-        case .jsObject:
+        case .jsObject(nil):
             return ["\(raw: unwrappedVar).bridgeJSLowerStackReturn()"]
+        case .jsObject(_?):
+            return ["\(raw: unwrappedVar).jsObject.bridgeJSLowerStackReturn()"]
         case .array(let elementType):
             return lowerArrayStatements(elementType: elementType, accessor: unwrappedVar, varPrefix: varPrefix)
         default:

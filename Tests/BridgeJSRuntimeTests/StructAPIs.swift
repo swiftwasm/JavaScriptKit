@@ -214,3 +214,23 @@
 @JS func testContainerWithStruct(_ point: DataPoint) -> Container {
     return Container(location: point, config: nil)
 }
+
+// Struct with JSObject fields
+@JS struct JSObjectContainer {
+    var object: JSObject
+    var optionalObject: JSObject?
+}
+
+@JS func roundTripJSObjectContainer(_ container: JSObjectContainer) -> JSObjectContainer {
+    return container
+}
+
+// Struct with @JSClass fields (Foo is defined in ExportAPITests.swift)
+@JS struct FooContainer {
+    var foo: Foo
+    var optionalFoo: Foo?
+}
+
+@JS func roundTripFooContainer(_ container: FooContainer) -> FooContainer {
+    return container
+}

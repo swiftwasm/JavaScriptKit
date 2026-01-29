@@ -1443,6 +1443,22 @@ enum GraphOperations {
     return processors
 }
 
+@JS func roundTripJSObjectArray(_ objects: [JSObject]) -> [JSObject] {
+    return objects
+}
+
+@JS func roundTripOptionalJSObjectArray(_ objects: [JSObject?]) -> [JSObject?] {
+    return objects
+}
+
+@JS func roundTripFooArray(_ foos: [Foo]) -> [Foo] {
+    return foos
+}
+
+@JS func roundTripOptionalFooArray(_ foos: [Foo?]) -> [Foo?] {
+    return foos
+}
+
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false

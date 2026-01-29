@@ -113,6 +113,31 @@
             "_0" : "Person"
           }
         }
+      },
+      {
+        "abiName" : "bjs_roundtripContainer",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripContainer",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "container",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "Container"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "Container"
+          }
+        }
       }
     ],
     "protocols" : [
@@ -516,6 +541,39 @@
           }
         ],
         "swiftCallName" : "ConfigStruct"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "Container",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "object",
+            "type" : {
+              "jsObject" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "optionalObject",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "jsObject" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Container"
       }
     ]
   },

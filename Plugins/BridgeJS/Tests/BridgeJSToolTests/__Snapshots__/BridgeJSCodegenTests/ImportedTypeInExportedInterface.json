@@ -24,13 +24,144 @@
             "_0" : "Foo"
           }
         }
+      },
+      {
+        "abiName" : "bjs_processFooArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "processFooArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "foos",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "jsObject" : {
+                    "_0" : "Foo"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "jsObject" : {
+                "_0" : "Foo"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_processOptionalFooArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "processOptionalFooArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "foos",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "optional" : {
+                    "_0" : {
+                      "jsObject" : {
+                        "_0" : "Foo"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "optional" : {
+                "_0" : {
+                  "jsObject" : {
+                    "_0" : "Foo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundtripFooContainer",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripFooContainer",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "container",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "FooContainer"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "FooContainer"
+          }
+        }
       }
     ],
     "protocols" : [
 
     ],
     "structs" : [
+      {
+        "methods" : [
 
+        ],
+        "name" : "FooContainer",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "foo",
+            "type" : {
+              "jsObject" : {
+                "_0" : "Foo"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "optionalFoo",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "jsObject" : {
+                    "_0" : "Foo"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "FooContainer"
+      }
     ]
   },
   "imported" : {

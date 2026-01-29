@@ -388,11 +388,71 @@ public func _bjs_ConfigStruct_static_update(_ timeout: Float64) -> Float64 {
     #endif
 }
 
+extension Container: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Container {
+        let optionalObject = Optional<JSObject>.bridgeJSLiftParameter()
+        let object = JSObject.bridgeJSLiftParameter()
+        return Container(object: object, optionalObject: optionalObject)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        self.object.bridgeJSLowerStackReturn()
+        let __bjs_isSome_optionalObject = self.optionalObject != nil
+        if let __bjs_unwrapped_optionalObject = self.optionalObject {
+            __bjs_unwrapped_optionalObject.bridgeJSLowerStackReturn()
+        }
+        _swift_js_push_i32(__bjs_isSome_optionalObject ? 1 : 0)
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _bjs_struct_lower_Container(jsObject.bridgeJSLowerParameter())
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Container()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Container")
+fileprivate func _bjs_struct_lower_Container(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_Container(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Container")
+fileprivate func _bjs_struct_lift_Container() -> Int32
+#else
+fileprivate func _bjs_struct_lift_Container() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 @_expose(wasm, "bjs_roundtrip")
 @_cdecl("bjs_roundtrip")
 public func _bjs_roundtrip() -> Void {
     #if arch(wasm32)
     let ret = roundtrip(_: Person.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundtripContainer")
+@_cdecl("bjs_roundtripContainer")
+public func _bjs_roundtripContainer() -> Void {
+    #if arch(wasm32)
+    let ret = roundtripContainer(_: Container.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

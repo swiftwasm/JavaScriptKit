@@ -4,10 +4,17 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export interface FooContainer {
+    foo: Foo;
+    optionalFoo: Foo | null;
+}
 export interface Foo {
 }
 export type Exports = {
     makeFoo(): Foo;
+    processFooArray(foos: Foo[]): Foo[];
+    processOptionalFooArray(foos: (Foo | null)[]): (Foo | null)[];
+    roundtripFooContainer(container: FooContainer): FooContainer;
 }
 export type Imports = {
     Foo: {
