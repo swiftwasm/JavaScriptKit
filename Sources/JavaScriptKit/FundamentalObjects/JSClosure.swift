@@ -338,18 +338,18 @@ func _call_host_function_impl(
     guard let entry = JSClosure.sharedClosures.wrappedValue[hostFuncRef] else {
         return true
     }
-#if Tracing
+    #if Tracing
     let traceEnd = JSTracingHooks.beginJSClosureCall(
         JSTracing.JSClosureCallInfo(fileID: entry.fileID, line: UInt(entry.line))
     )
-#endif
+    #endif
     var arguments: [JSValue] = []
     for i in 0..<Int(argc) {
         arguments.append(argv[i].jsValue)
     }
-#if Tracing
+    #if Tracing
     defer { traceEnd?() }
-#endif
+    #endif
     let result = entry.body(arguments)
     let callbackFuncRef = JSObject(id: callbackFuncRef)
     _ = callbackFuncRef(result)
