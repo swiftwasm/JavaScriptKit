@@ -640,6 +640,235 @@ async function singleRun(results, nameFilter, iterations) {
             classRoundtrip.roundtripAddressClass(address)
         }
     })
+
+    // Array performance tests
+    const arrayRoundtrip = new exports.ArrayRoundtrip();
+
+    // Primitive Arrays - Int
+    benchmarkRunner("ArrayRoundtrip/takeIntArray", () => {
+        const arr = Array.from({length: 1000}, (_, i) => i + 1)
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.takeIntArray(arr)
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/makeIntArray", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.makeIntArray()
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/roundtripIntArray", () => {
+        const arr = Array.from({length: 1000}, (_, i) => i + 1)
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.roundtripIntArray(arr)
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/makeIntArrayLarge", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.makeIntArrayLarge()
+        }
+    })
+
+    // Primitive Arrays - Double
+    benchmarkRunner("ArrayRoundtrip/takeDoubleArray", () => {
+        const arr = Array.from({length: 1000}, (_, i) => (i + 1) * 1.1)
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.takeDoubleArray(arr)
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/makeDoubleArray", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.makeDoubleArray()
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/roundtripDoubleArray", () => {
+        const arr = Array.from({length: 1000}, (_, i) => (i + 1) * 1.1)
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.roundtripDoubleArray(arr)
+        }
+    })
+
+    // Primitive Arrays - String
+    benchmarkRunner("ArrayRoundtrip/takeStringArray", () => {
+        const arr = ["one", "two", "three", "four", "five"]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.takeStringArray(arr)
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/makeStringArray", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.makeStringArray()
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/roundtripStringArray", () => {
+        const arr = ["one", "two", "three", "four", "five"]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.roundtripStringArray(arr)
+        }
+    })
+
+    // Struct Arrays
+    benchmarkRunner("ArrayRoundtrip/takePointArray", () => {
+        const arr = [
+            { x: 0.0, y: 0.0 },
+            { x: 1.0, y: 1.0 },
+            { x: 2.0, y: 2.0 },
+            { x: 3.0, y: 3.0 },
+            { x: 4.0, y: 4.0 }
+        ]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.takePointArray(arr)
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/makePointArray", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.makePointArray()
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/roundtripPointArray", () => {
+        const arr = [
+            { x: 0.0, y: 0.0 },
+            { x: 1.0, y: 1.0 },
+            { x: 2.0, y: 2.0 },
+            { x: 3.0, y: 3.0 },
+            { x: 4.0, y: 4.0 }
+        ]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.roundtripPointArray(arr)
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/makePointArrayLarge", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.makePointArrayLarge()
+        }
+    })
+
+    // Nested Arrays
+    benchmarkRunner("ArrayRoundtrip/takeNestedIntArray", () => {
+        const arr = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.takeNestedIntArray(arr)
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/makeNestedIntArray", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.makeNestedIntArray()
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/roundtripNestedIntArray", () => {
+        const arr = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.roundtripNestedIntArray(arr)
+        }
+    })
+
+    benchmarkRunner("ArrayRoundtrip/takeNestedPointArray", () => {
+        const arr = [
+            [{ x: 0.0, y: 0.0 }, { x: 1.0, y: 1.0 }],
+            [{ x: 2.0, y: 2.0 }, { x: 3.0, y: 3.0 }],
+            [{ x: 4.0, y: 4.0 }, { x: 5.0, y: 5.0 }]
+        ]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.takeNestedPointArray(arr)
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/makeNestedPointArray", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.makeNestedPointArray()
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/roundtripNestedPointArray", () => {
+        const arr = [
+            [{ x: 0.0, y: 0.0 }, { x: 1.0, y: 1.0 }],
+            [{ x: 2.0, y: 2.0 }, { x: 3.0, y: 3.0 }],
+            [{ x: 4.0, y: 4.0 }, { x: 5.0, y: 5.0 }]
+        ]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.roundtripNestedPointArray(arr)
+        }
+    })
+
+    // Optional Element Arrays
+    benchmarkRunner("ArrayRoundtrip/takeOptionalIntArray", () => {
+        const arr = [1, null, 3, null, 5, null, 7, null, 9, null]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.takeOptionalIntArray(arr)
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/makeOptionalIntArray", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.makeOptionalIntArray()
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/roundtripOptionalIntArray", () => {
+        const arr = [1, null, 3, null, 5, null, 7, null, 9, null]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.roundtripOptionalIntArray(arr)
+        }
+    })
+
+    benchmarkRunner("ArrayRoundtrip/takeOptionalPointArray", () => {
+        const arr = [
+            { x: 0.0, y: 0.0 },
+            null,
+            { x: 2.0, y: 2.0 },
+            null,
+            { x: 4.0, y: 4.0 }
+        ]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.takeOptionalPointArray(arr)
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/makeOptionalPointArray", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.makeOptionalPointArray()
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/roundtripOptionalPointArray", () => {
+        const arr = [
+            { x: 0.0, y: 0.0 },
+            null,
+            { x: 2.0, y: 2.0 },
+            null,
+            { x: 4.0, y: 4.0 }
+        ]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.roundtripOptionalPointArray(arr)
+        }
+    })
+
+    // Optional Arrays
+    benchmarkRunner("ArrayRoundtrip/takeOptionalArraySome", () => {
+        const arr = [1, 2, 3, 4, 5]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.takeOptionalArray(arr)
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/takeOptionalArrayNone", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.takeOptionalArray(null)
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/makeOptionalArraySome", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.makeOptionalArraySome()
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/makeOptionalArrayNone", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.makeOptionalArrayNone()
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/roundtripOptionalArraySome", () => {
+        const arr = [1, 2, 3, 4, 5]
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.roundtripOptionalArray(arr)
+        }
+    })
+    benchmarkRunner("ArrayRoundtrip/roundtripOptionalArrayNone", () => {
+        for (let i = 0; i < iterations; i++) {
+            arrayRoundtrip.roundtripOptionalArray(null)
+        }
+    })
 }
 
 /**
