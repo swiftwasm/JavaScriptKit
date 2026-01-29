@@ -1,7 +1,7 @@
 #if Tracing
 
 /// Hooks for tracing Swift <-> JavaScript bridge calls.
-public struct JSTracing {
+public struct JSTracing: Sendable {
     public static let `default` = JSTracing()
 
     public enum JSCallInfo {

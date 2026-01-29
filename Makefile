@@ -12,6 +12,7 @@ unittest:
 		exit 2; \
 	}
 	env JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1 swift package --swift-sdk "$(SWIFT_SDK_ID)" \
+	    --traits Tracing \
 	    --disable-sandbox \
 	    js test --prelude ./Tests/prelude.mjs -Xnode --expose-gc
 
