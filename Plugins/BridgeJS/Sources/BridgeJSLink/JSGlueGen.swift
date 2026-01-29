@@ -18,6 +18,8 @@ final class JSGlueVariableScope {
     static let reservedStorageToReturnOptionalFloat = "tmpRetOptionalFloat"
     static let reservedStorageToReturnOptionalDouble = "tmpRetOptionalDouble"
     static let reservedStorageToReturnOptionalHeapObject = "tmpRetOptionalHeapObject"
+    static let reservedStorageToReturnJSValuePayload1 = "tmpRetJSValuePayload1"
+    static let reservedStorageToReturnJSValuePayload2 = "tmpRetJSValuePayload2"
     static let reservedTextEncoder = "textEncoder"
     static let reservedTextDecoder = "textDecoder"
     static let reservedTmpRetTag = "tmpRetTag"
@@ -49,6 +51,8 @@ final class JSGlueVariableScope {
         reservedStorageToReturnOptionalFloat,
         reservedStorageToReturnOptionalDouble,
         reservedStorageToReturnOptionalHeapObject,
+        reservedStorageToReturnJSValuePayload1,
+        reservedStorageToReturnJSValuePayload2,
         reservedTextEncoder,
         reservedTextDecoder,
         reservedTmpRetTag,
@@ -230,6 +234,143 @@ struct IntrinsicJSFragment: Sendable {
         parameters: ["value"],
         printCode: { arguments, scope, printer, cleanupCode in
             return ["\(JSGlueVariableScope.reservedSwift).memory.retain(\(arguments[0]))"]
+        }
+    )
+
+    private static func jsValueKindExpression(for valueExpr: String) -> String {
+        // JavaScriptValueKind:
+        // 0: boolean, 1: string, 2: number, 3: object, 4: null, 5: undefined, 7: symbol, 8: bigint
+        "(\(valueExpr) === null) ? 4 : (\(valueExpr) === undefined) ? 5 : (typeof \(valueExpr) === \"boolean\") ? 0 : (typeof \(valueExpr) === \"string\") ? 1 : (typeof \(valueExpr) === \"number\") ? 2 : (typeof \(valueExpr) === \"symbol\") ? 7 : (typeof \(valueExpr) === \"bigint\") ? 8 : 3"
+    }
+
+    /// Lowers a JS value into the (kind, payload1, payload2) triple used by BridgeJS for `JSValue`.
+    ///
+    /// - kind: i32 JavaScriptValueKind tag
+    /// - payload1: i32 (boolean as 0/1, or retained SwiftRuntimeHeap id for string/object/symbol/bigint)
+    /// - payload2: f64 (number payload)
+    static let jsValueLowerParameter = IntrinsicJSFragment(
+        parameters: ["value"],
+        printCode: { arguments, scope, printer, cleanupCode in
+            let value = arguments[0]
+            let kindVar = scope.variable("kind")
+            let payload1Var = scope.variable("payload1")
+            let payload2Var = scope.variable("payload2")
+
+            printer.write("const \(kindVar) = \(jsValueKindExpression(for: value));")
+            printer.write("let \(payload1Var) = 0;")
+            printer.write("let \(payload2Var) = 0.0;")
+
+            printer.write("switch (\(kindVar) | 0) {")
+            printer.indent {
+                printer.write("case 0: { \(payload1Var) = \(value) ? 1 : 0; break; }")
+                printer.write("case 2: { \(payload2Var) = +\(value); break; }")
+                printer.write(
+                    "case 1: case 3: case 7: case 8: { \(payload1Var) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value)); break; }"
+                )
+                printer.write("case 4: case 5: { break; }")
+                printer.write("default: { throw new Error(\"Unknown JSValue kind: \" + String(\(kindVar))); }")
+            }
+            printer.write("}")
+
+            return [kindVar, payload1Var, payload2Var]
+        }
+    )
+
+    /// Lifts a Swift-returned `JSValue` from the (tag + tmpRet payload stacks) side channel.
+    static let jsValueLiftReturn = IntrinsicJSFragment(
+        parameters: [],
+        printCode: { _, scope, printer, cleanupCode in
+            let kindVar = scope.variable("kind")
+            let resultVar = scope.variable("ret")
+            printer.write("const \(kindVar) = (\(JSGlueVariableScope.reservedTmpRetTag) | 0);")
+            printer.write("let \(resultVar);")
+            printer.write("switch (\(kindVar)) {")
+            printer.indent {
+                printer.write("case 0: {")
+                printer.indent {
+                    printer.write("const b = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    printer.write("\(resultVar) = (b !== 0);")
+                }
+                printer.write("break; }")
+                printer.write("case 2: {")
+                printer.indent {
+                    printer.write("\(resultVar) = \(JSGlueVariableScope.reservedTmpRetF64s).pop();")
+                }
+                printer.write("break; }")
+                printer.write("case 4: { \(resultVar) = null; break; }")
+                printer.write("case 5: { \(resultVar) = undefined; break; }")
+                printer.write("case 1: case 3: case 7: case 8: {")
+                printer.indent {
+                    printer.write("const objectId = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    printer.write("\(resultVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(objectId);")
+                    printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(objectId);")
+                }
+                printer.write("break; }")
+                printer.write(
+                    "default: { throw new Error(\"Unknown JSValue kind returned from Swift: \" + String(\(kindVar))); }"
+                )
+            }
+            printer.write("}")
+            return [resultVar]
+        }
+    )
+
+    /// Lifts a Swift-sent `JSValue` parameter from the (kind, payload1, payload2) triple.
+    static let jsValueLiftParameter = IntrinsicJSFragment(
+        parameters: ["kind", "payload1", "payload2"],
+        printCode: { arguments, scope, printer, cleanupCode in
+            let kind = arguments[0]
+            let payload1 = arguments[1]
+            let payload2 = arguments[2]
+            let resultVar = scope.variable("value")
+
+            printer.write("let \(resultVar);")
+            printer.write("switch (\(kind) | 0) {")
+            printer.indent {
+                printer.write("case 0: { \(resultVar) = (\(payload1) !== 0); break; }")
+                printer.write("case 2: { \(resultVar) = \(payload2); break; }")
+                printer.write(
+                    "case 1: case 3: case 7: case 8: { \(resultVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(payload1)); break; }"
+                )
+                printer.write("case 4: { \(resultVar) = null; break; }")
+                printer.write("case 5: { \(resultVar) = undefined; break; }")
+                printer.write(
+                    "default: { throw new Error(\"Unknown JSValue kind passed from Swift: \" + String(\(kind))); }"
+                )
+            }
+            printer.write("}")
+            return [resultVar]
+        }
+    )
+
+    /// Lowers a JS `JSValue` return into an i32 kind, storing payloads in side-channel vars.
+    static let jsValueLowerReturn = IntrinsicJSFragment(
+        parameters: ["value"],
+        printCode: { arguments, scope, printer, cleanupCode in
+            let value = arguments[0]
+            let kindVar = scope.variable("kind")
+            let payload1Var = scope.variable("payload1")
+            let payload2Var = scope.variable("payload2")
+
+            printer.write("const \(kindVar) = \(jsValueKindExpression(for: value));")
+            printer.write("let \(payload1Var) = 0;")
+            printer.write("let \(payload2Var) = 0.0;")
+
+            printer.write("switch (\(kindVar) | 0) {")
+            printer.indent {
+                printer.write("case 0: { \(payload1Var) = \(value) ? 1 : 0; break; }")
+                printer.write("case 2: { \(payload2Var) = +\(value); break; }")
+                printer.write(
+                    "case 1: case 3: case 7: case 8: { \(payload1Var) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value)); break; }"
+                )
+                printer.write("case 4: case 5: { break; }")
+                printer.write("default: { throw new Error(\"Unknown JSValue kind: \" + String(\(kindVar))); }")
+            }
+            printer.write("}")
+
+            printer.write("\(JSGlueVariableScope.reservedStorageToReturnJSValuePayload1) = \(payload1Var);")
+            printer.write("\(JSGlueVariableScope.reservedStorageToReturnJSValuePayload2) = \(payload2Var);")
+            return [kindVar]
         }
     )
 
@@ -1372,6 +1513,7 @@ struct IntrinsicJSFragment: Sendable {
         switch type {
         case .int, .float, .double, .bool, .unsafePointer: return .identity
         case .string: return .stringLowerParameter
+        case .jsValue: return .jsValueLowerParameter
         case .jsObject: return .jsObjectLowerParameter
         case .swiftHeapObject:
             return .swiftHeapObjectLowerParameter
@@ -1416,6 +1558,7 @@ struct IntrinsicJSFragment: Sendable {
         case .int, .float, .double: return .identity
         case .bool: return .boolLiftReturn
         case .string: return .stringLiftReturn
+        case .jsValue: return .jsValueLiftReturn
         case .jsObject: return .jsObjectLiftReturn
         case .swiftHeapObject(let name): return .swiftHeapObjectLiftReturn(name)
         case .unsafePointer: return .identity
@@ -1462,6 +1605,7 @@ struct IntrinsicJSFragment: Sendable {
         case .int, .float, .double: return .identity
         case .bool: return .boolLiftParameter
         case .string: return .stringLiftParameter
+        case .jsValue: return .jsValueLiftParameter
         case .jsObject: return .jsObjectLiftParameter
         case .unsafePointer: return .identity
         case .swiftHeapObject(let name):
@@ -1563,6 +1707,7 @@ struct IntrinsicJSFragment: Sendable {
         case .int, .float, .double: return .identity
         case .bool: return .boolLowerReturn
         case .string: return .stringLowerReturn
+        case .jsValue: return .jsValueLowerReturn
         case .jsObject: return .jsObjectLowerReturn
         case .unsafePointer: return .identity
         case .swiftHeapObject(let name):
@@ -2756,6 +2901,13 @@ struct IntrinsicJSFragment: Sendable {
         allStructs: [ExportedStruct]
     ) -> IntrinsicJSFragment {
         switch field.type {
+        case .jsValue:
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { _, _, _, _ in
+                    fatalError("JSValue is not supported as a Swift struct field in BridgeJS")
+                }
+            )
         case .string:
             return IntrinsicJSFragment(
                 parameters: ["value"],
@@ -3242,6 +3394,13 @@ struct IntrinsicJSFragment: Sendable {
         allStructs: [ExportedStruct]
     ) -> IntrinsicJSFragment {
         switch field.type {
+        case .jsValue:
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { _, _, _, _ in
+                    fatalError("JSValue is not supported as a Swift struct field in BridgeJS")
+                }
+            )
         case .string:
             return IntrinsicJSFragment(
                 parameters: [],

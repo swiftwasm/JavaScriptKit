@@ -107,30 +107,9 @@ public struct ClosureSignature: Codable, Equatable, Hashable, Sendable {
     }
 }
 
-public enum UnsafePointerKind: String, Codable, Equatable, Hashable, Sendable {
-    case unsafePointer
-    case unsafeMutablePointer
-    case unsafeRawPointer
-    case unsafeMutableRawPointer
-    case opaquePointer
-}
-
-public struct UnsafePointerType: Codable, Equatable, Hashable, Sendable {
-    public let kind: UnsafePointerKind
-    /// The pointee type name for generic pointer types (e.g. `UInt8` for `UnsafePointer<UInt8>`).
-    public let pointee: String?
-
-    public init(kind: UnsafePointerKind, pointee: String? = nil) {
-        self.kind = kind
-        self.pointee = pointee
-    }
-}
-
 public enum BridgeType: Codable, Equatable, Hashable, Sendable {
-    case int, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
-    case unsafePointer(UnsafePointerType)
+    case int, float, double, string, bool, jsValue, jsObject(String?), swiftHeapObject(String), void
     indirect case optional(BridgeType)
-    indirect case array(BridgeType)
     case caseEnum(String)
     case rawValueEnum(String, SwiftEnumRawType)
     case associatedValueEnum(String)
@@ -203,7 +182,6 @@ public enum DefaultValue: Codable, Equatable, Sendable {
     case object(String)  // className for parameterless constructor
     case objectWithArguments(String, [DefaultValue])  // className, constructor argument values
     case structLiteral(String, [DefaultValueField])  // structName, field name/value pairs
-    indirect case array([DefaultValue])  // array literal with element values
 }
 
 public struct Parameter: Codable, Equatable, Sendable {
@@ -610,34 +588,14 @@ public struct ExportedSkeleton: Codable {
 
 // MARK: - Imported Skeleton
 
-/// Controls where BridgeJS reads imported JS values from.
-///
-/// - `global`: Read from `globalThis`.
-public enum JSImportFrom: String, Codable {
-    case global
-}
-
 public struct ImportedFunctionSkeleton: Codable {
     public let name: String
-    /// The JavaScript function/method name to call, if different from `name`.
-    public let jsName: String?
-    /// Where this function is looked up from in JavaScript.
-    public let from: JSImportFrom?
     public let parameters: [Parameter]
     public let returnType: BridgeType
     public let documentation: String?
 
-    public init(
-        name: String,
-        jsName: String? = nil,
-        from: JSImportFrom? = nil,
-        parameters: [Parameter],
-        returnType: BridgeType,
-        documentation: String? = nil
-    ) {
+    public init(name: String, parameters: [Parameter], returnType: BridgeType, documentation: String? = nil) {
         self.name = name
-        self.jsName = jsName
-        self.from = from
         self.parameters = parameters
         self.returnType = returnType
         self.documentation = documentation
@@ -668,10 +626,6 @@ public struct ImportedConstructorSkeleton: Codable {
 
 public struct ImportedGetterSkeleton: Codable {
     public let name: String
-    /// The JavaScript property name to read from, if different from `name`.
-    public let jsName: String?
-    /// Where this property is looked up from in JavaScript (only used for global getters).
-    public let from: JSImportFrom?
     public let type: BridgeType
     public let documentation: String?
     /// Name of the getter function if it's a separate function (from @JSGetter)
@@ -679,15 +633,11 @@ public struct ImportedGetterSkeleton: Codable {
 
     public init(
         name: String,
-        jsName: String? = nil,
-        from: JSImportFrom? = nil,
         type: BridgeType,
         documentation: String? = nil,
         functionName: String? = nil
     ) {
         self.name = name
-        self.jsName = jsName
-        self.from = from
         self.type = type
         self.documentation = documentation
         self.functionName = functionName
@@ -711,8 +661,6 @@ public struct ImportedGetterSkeleton: Codable {
 
 public struct ImportedSetterSkeleton: Codable {
     public let name: String
-    /// The JavaScript property name to write to, if different from `name`.
-    public let jsName: String?
     public let type: BridgeType
     public let documentation: String?
     /// Name of the setter function if it's a separate function (from @JSSetter)
@@ -720,13 +668,11 @@ public struct ImportedSetterSkeleton: Codable {
 
     public init(
         name: String,
-        jsName: String? = nil,
         type: BridgeType,
         documentation: String? = nil,
         functionName: String? = nil
     ) {
         self.name = name
-        self.jsName = jsName
         self.type = type
         self.documentation = documentation
         self.functionName = functionName
@@ -750,10 +696,6 @@ public struct ImportedSetterSkeleton: Codable {
 
 public struct ImportedTypeSkeleton: Codable {
     public let name: String
-    /// The JavaScript constructor name to use for `init(...)`, if different from `name`.
-    public let jsName: String?
-    /// Where this constructor is looked up from in JavaScript.
-    public let from: JSImportFrom?
     public let constructor: ImportedConstructorSkeleton?
     public let methods: [ImportedFunctionSkeleton]
     public let getters: [ImportedGetterSkeleton]
@@ -762,8 +704,6 @@ public struct ImportedTypeSkeleton: Codable {
 
     public init(
         name: String,
-        jsName: String? = nil,
-        from: JSImportFrom? = nil,
         constructor: ImportedConstructorSkeleton? = nil,
         methods: [ImportedFunctionSkeleton],
         getters: [ImportedGetterSkeleton] = [],
@@ -771,8 +711,6 @@ public struct ImportedTypeSkeleton: Codable {
         documentation: String? = nil
     ) {
         self.name = name
-        self.jsName = jsName
-        self.from = from
         self.constructor = constructor
         self.methods = methods
         self.getters = getters
@@ -870,14 +808,10 @@ extension BridgeType {
             self = .bool
         case "Void":
             self = .void
+        case "JSValue":
+            self = .jsValue
         case "JSObject":
             self = .jsObject(nil)
-        case "UnsafeRawPointer":
-            self = .unsafePointer(.init(kind: .unsafeRawPointer))
-        case "UnsafeMutableRawPointer":
-            self = .unsafePointer(.init(kind: .unsafeMutableRawPointer))
-        case "OpaquePointer":
-            self = .unsafePointer(.init(kind: .opaquePointer))
         default:
             return nil
         }
@@ -891,11 +825,10 @@ extension BridgeType {
         case .float: return .f32
         case .double: return .f64
         case .string: return nil
+        case .jsValue: return .i32
         case .jsObject: return .i32
         case .swiftHeapObject:
             // UnsafeMutableRawPointer is returned as an i32 pointer
-            return .pointer
-        case .unsafePointer:
             return .pointer
         case .optional(_):
             return nil
@@ -916,9 +849,6 @@ extension BridgeType {
         case .closure:
             // Closures pass callback ID as Int32
             return .i32
-        case .array:
-            // Arrays use stack-based return with length prefix (no direct WASM return type)
-            return nil
         }
     }
 
@@ -938,28 +868,13 @@ extension BridgeType {
         case .string: return "SS"
         case .bool: return "Sb"
         case .void: return "y"
+        case .jsValue:
+            return "7JSValueO"
         case .jsObject(let name):
             let typeName = name ?? "JSObject"
             return "\(typeName.count)\(typeName)C"
         case .swiftHeapObject(let name):
             return "\(name.count)\(name)C"
-        case .unsafePointer(let ptr):
-            func sanitize(_ s: String) -> String {
-                s.filter { $0.isNumber || $0.isLetter }
-            }
-            let kindCode: String =
-                switch ptr.kind {
-                case .unsafePointer: "Sup"
-                case .unsafeMutablePointer: "Sump"
-                case .unsafeRawPointer: "Surp"
-                case .unsafeMutableRawPointer: "Sumrp"
-                case .opaquePointer: "Sop"
-                }
-            if let pointee = ptr.pointee, !pointee.isEmpty {
-                let p = sanitize(pointee)
-                return "\(kindCode)\(p.count)\(p)"
-            }
-            return kindCode
         case .optional(let wrapped):
             return "Sq\(wrapped.mangleTypeName)"
         case .caseEnum(let name),
@@ -977,9 +892,6 @@ extension BridgeType {
                 ? "y"
                 : signature.parameters.map { $0.mangleTypeName }.joined()
             return "K\(params)_\(signature.returnType.mangleTypeName)"
-        case .array(let elementType):
-            // Array mangling: "Sa" prefix followed by element type
-            return "Sa\(elementType.mangleTypeName)"
         }
     }
 
@@ -991,7 +903,7 @@ extension BridgeType {
         guard case .optional(let wrappedType) = self else { return false }
 
         switch wrappedType {
-        case .string, .int, .float, .double, .jsObject, .swiftProtocol:
+        case .string, .int, .float, .double, .jsValue, .jsObject, .swiftProtocol:
             return true
         case .rawValueEnum(_, let rawType):
             switch rawType {

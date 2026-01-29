@@ -245,6 +245,8 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);",
             "let \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);",
             "let \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);",
+            "let \(JSGlueVariableScope.reservedStorageToReturnJSValuePayload1);",
+            "let \(JSGlueVariableScope.reservedStorageToReturnJSValuePayload2);",
             "let \(JSGlueVariableScope.reservedTmpRetTag);",
             "let \(JSGlueVariableScope.reservedTmpRetStrings) = [];",
             "let \(JSGlueVariableScope.reservedTmpRetInts) = [];",
@@ -655,6 +657,20 @@ public struct BridgeJSLink {
                     printer.write("const pointer = \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);")
                     printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = undefined;")
                     printer.write("return pointer || 0;")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_jsvalue_payload1\"] = function() {")
+                printer.indent {
+                    printer.write("const payload1 = \(JSGlueVariableScope.reservedStorageToReturnJSValuePayload1);")
+                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnJSValuePayload1) = 0;")
+                    printer.write("return payload1;")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_get_jsvalue_payload2\"] = function() {")
+                printer.indent {
+                    printer.write("const payload2 = \(JSGlueVariableScope.reservedStorageToReturnJSValuePayload2);")
+                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnJSValuePayload2) = 0.0;")
+                    printer.write("return payload2;")
                 }
                 printer.write("}")
 
@@ -3409,6 +3425,8 @@ extension BridgeType {
             return "number"
         case .bool:
             return "boolean"
+        case .jsValue:
+            return "any"
         case .jsObject(let name):
             return name ?? "any"
         case .swiftHeapObject(let name):

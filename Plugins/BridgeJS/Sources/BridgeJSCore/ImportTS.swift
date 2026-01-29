@@ -859,6 +859,13 @@ extension BridgeType {
         static let float = LoweringParameterInfo(loweredParameters: [("value", .f32)])
         static let double = LoweringParameterInfo(loweredParameters: [("value", .f64)])
         static let string = LoweringParameterInfo(loweredParameters: [("value", .i32)])
+        static let jsValue = LoweringParameterInfo(
+            loweredParameters: [
+                ("kind", .i32),
+                ("payload1", .i32),
+                ("payload2", .f64),
+            ]
+        )
         static let jsObject = LoweringParameterInfo(loweredParameters: [("value", .i32)])
         static let void = LoweringParameterInfo(loweredParameters: [])
     }
@@ -870,6 +877,7 @@ extension BridgeType {
         case .float: return .float
         case .double: return .double
         case .string: return .string
+        case .jsValue: return .jsValue
         case .jsObject: return .jsObject
         case .void: return .void
         case .closure:
@@ -951,6 +959,7 @@ extension BridgeType {
         static let float = LiftingReturnInfo(valueToLift: .f32)
         static let double = LiftingReturnInfo(valueToLift: .f64)
         static let string = LiftingReturnInfo(valueToLift: .i32)
+        static let jsValue = LiftingReturnInfo(valueToLift: .i32)
         static let jsObject = LiftingReturnInfo(valueToLift: .i32)
         static let void = LiftingReturnInfo(valueToLift: nil)
     }
@@ -964,6 +973,7 @@ extension BridgeType {
         case .float: return .float
         case .double: return .double
         case .string: return .string
+        case .jsValue: return .jsValue
         case .jsObject: return .jsObject
         case .void: return .void
         case .closure:

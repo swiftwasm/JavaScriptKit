@@ -32,6 +32,13 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
         return Bool.bridgeJSLiftReturn(ret)
     }
 
+    func onRawEvent(_ value: JSValue) -> JSValue {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let (valueKind, valuePayload1, valuePayload2) = value.bridgeJSLowerParameter()
+        let ret = _extern_onRawEvent(jsObjectValue, valueKind, valuePayload1, valuePayload2)
+        return JSValue.bridgeJSLiftReturn(ret)
+    }
+
     func onHelperUpdated(_ helper: Helper) -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let helperPointer = helper.bridgeJSLowerParameter()
@@ -92,6 +99,19 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let ret = bjs_MyViewControllerDelegate_delegateName_get(jsObjectValue)
             return String.bridgeJSLiftReturn(ret)
+        }
+    }
+
+    var rawEvent: JSValue {
+        get {
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            let ret = bjs_MyViewControllerDelegate_rawEvent_get(jsObjectValue)
+            return JSValue.bridgeJSLiftReturn(ret)
+        }
+        set {
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            let (newValueKind, newValuePayload1, newValuePayload2) = newValue.bridgeJSLowerParameter()
+            bjs_MyViewControllerDelegate_rawEvent_set(jsObjectValue, newValueKind, newValuePayload1, newValuePayload2)
         }
     }
 
@@ -232,6 +252,9 @@ fileprivate func _extern_onLabelUpdated(_ jsObject: Int32, _ prefix: Int32, _ su
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_isCountEven")
 fileprivate func _extern_isCountEven(_ jsObject: Int32) -> Int32
 
+@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onRawEvent")
+fileprivate func _extern_onRawEvent(_ jsObject: Int32, _ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Int32
+
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onHelperUpdated")
 fileprivate func _extern_onHelperUpdated(_ jsObject: Int32, _ helper: UnsafeMutableRawPointer) -> Void
 
@@ -261,6 +284,12 @@ fileprivate func bjs_MyViewControllerDelegate_eventCount_set(_ jsObject: Int32, 
 
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_delegateName_get")
 fileprivate func bjs_MyViewControllerDelegate_delegateName_get(_ jsObject: Int32) -> Int32
+
+@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_rawEvent_get")
+fileprivate func bjs_MyViewControllerDelegate_rawEvent_get(_ jsObject: Int32) -> Int32
+
+@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_rawEvent_set")
+fileprivate func bjs_MyViewControllerDelegate_rawEvent_set(_ jsObject: Int32, _ newValueKind: Int32, _ newValuePayload1: Int32, _ newValuePayload2: Float64) -> Void
 
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalName_get")
 fileprivate func bjs_MyViewControllerDelegate_optionalName_get(_ jsObject: Int32) -> Void
