@@ -864,6 +864,22 @@ enum APIOptionalResult {
     }
 }
 
+@JS func arrayWithDefault(_ values: [Int] = [1, 2, 3]) -> Int {
+    return values.reduce(0, +)
+}
+
+@JS func arrayWithOptionalDefault(_ values: [Int]? = nil) -> Int {
+    return values?.reduce(0, +) ?? -1
+}
+
+@JS func arrayMixedDefaults(
+    prefix: String = "Sum",
+    values: [Int] = [10, 20],
+    suffix: String = "!"
+) -> String {
+    return "\(prefix): \(values.reduce(0, +))\(suffix)"
+}
+
 // MARK: - Static Properties
 
 @JS class StaticPropertyHolder {
@@ -1267,6 +1283,134 @@ enum APIOptionalResult {
             }
         }
     }
+}
+
+// MARK: - Array Tests
+
+// Primitive arrays
+@JS func roundTripIntArray(_ values: [Int]) -> [Int] {
+    return values
+}
+
+@JS func roundTripStringArray(_ values: [String]) -> [String] {
+    return values
+}
+
+@JS func roundTripDoubleArray(_ values: [Double]) -> [Double] {
+    return values
+}
+
+@JS func roundTripBoolArray(_ values: [Bool]) -> [Bool] {
+    return values
+}
+
+// Enum arrays
+@JS func roundTripDirectionArray(_ values: [Direction]) -> [Direction] {
+    return values
+}
+
+@JS func roundTripStatusArray(_ values: [Status]) -> [Status] {
+    return values
+}
+
+@JS func roundTripThemeArray(_ values: [Theme]) -> [Theme] {
+    return values
+}
+
+@JS func roundTripHttpStatusArray(_ values: [HttpStatus]) -> [HttpStatus] {
+    return values
+}
+
+// Struct arrays
+@JS func roundTripDataPointArray(_ points: [DataPoint]) -> [DataPoint] {
+    return points
+}
+
+// Class arrays
+@JS func roundTripGreeterArray(_ greeters: [Greeter]) -> [Greeter] {
+    return greeters
+}
+
+// Arrays of optional elements
+@JS func roundTripOptionalIntArray(_ values: [Int?]) -> [Int?] {
+    return values
+}
+
+@JS func roundTripOptionalStringArray(_ values: [String?]) -> [String?] {
+    return values
+}
+
+@JS func roundTripOptionalDataPointArray(_ points: [DataPoint?]) -> [DataPoint?] {
+    return points
+}
+
+@JS func roundTripOptionalDirectionArray(_ directions: [Direction?]) -> [Direction?] {
+    return directions
+}
+
+@JS func roundTripOptionalStatusArray(_ statuses: [Status?]) -> [Status?] {
+    return statuses
+}
+
+// Optional arrays
+@JS func roundTripOptionalIntArrayType(_ values: [Int]?) -> [Int]? {
+    return values
+}
+
+@JS func roundTripOptionalStringArrayType(_ values: [String]?) -> [String]? {
+    return values
+}
+
+@JS func roundTripOptionalGreeterArrayType(_ greeters: [Greeter]?) -> [Greeter]? {
+    return greeters
+}
+
+// Nested arrays
+
+@JS func roundTripNestedIntArray(_ values: [[Int]]) -> [[Int]] {
+    return values
+}
+
+@JS func roundTripNestedStringArray(_ values: [[String]]) -> [[String]] {
+    return values
+}
+
+@JS func roundTripNestedDoubleArray(_ values: [[Double]]) -> [[Double]] {
+    return values
+}
+
+@JS func roundTripNestedBoolArray(_ values: [[Bool]]) -> [[Bool]] {
+    return values
+}
+
+@JS func roundTripNestedDataPointArray(_ points: [[DataPoint]]) -> [[DataPoint]] {
+    return points
+}
+
+@JS func roundTripNestedDirectionArray(_ directions: [[Direction]]) -> [[Direction]] {
+    return directions
+}
+
+@JS func roundTripNestedGreeterArray(_ greeters: [[Greeter]]) -> [[Greeter]] {
+    return greeters
+}
+
+@JS func roundTripUnsafeRawPointerArray(_ values: [UnsafeRawPointer]) -> [UnsafeRawPointer] {
+    return values
+}
+@JS func roundTripUnsafeMutableRawPointerArray(_ values: [UnsafeMutableRawPointer]) -> [UnsafeMutableRawPointer] {
+    return values
+}
+@JS func roundTripOpaquePointerArray(_ values: [OpaquePointer]) -> [OpaquePointer] {
+    return values
+}
+
+@JS func consumeDataProcessorArrayType(_ processors: [DataProcessor]) -> Int {
+    return processors.count
+}
+
+@JS func roundTripDataProcessorArrayType(_ processors: [DataProcessor]) -> [DataProcessor] {
+    return processors
 }
 
 class ExportAPITests: XCTestCase {

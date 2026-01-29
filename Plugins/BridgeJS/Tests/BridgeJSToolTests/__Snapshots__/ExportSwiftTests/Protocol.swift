@@ -418,6 +418,28 @@ extension Result: _BridgedSwiftAssociatedValueEnum {
 extension Priority: _BridgedSwiftEnumNoPayload {
 }
 
+@_expose(wasm, "bjs_processDelegates")
+@_cdecl("bjs_processDelegates")
+public func _bjs_processDelegates() -> Void {
+    #if arch(wasm32)
+    let ret = processDelegates(_: {
+        let __count = Int(_swift_js_pop_param_array_length())
+        var __result: [AnyMyViewControllerDelegate] = []
+        __result.reserveCapacity(__count)
+        for _ in 0 ..< __count {
+            __result.append(AnyMyViewControllerDelegate.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+        }
+        __result.reverse()
+        return __result
+        }())
+    for __bjs_elem_ret in ret {
+    _swift_js_push_int((__bjs_elem_ret as! AnyMyViewControllerDelegate).bridgeJSLowerReturn())}
+    _swift_js_push_array_length(Int32(ret.count))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_Helper_init")
 @_cdecl("bjs_Helper_init")
 public func _bjs_Helper_init(_ value: Int32) -> UnsafeMutableRawPointer {
@@ -623,6 +645,93 @@ extension MyViewController: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 fileprivate func _bjs_MyViewController_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
 fileprivate func _bjs_MyViewController_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+@_expose(wasm, "bjs_DelegateManager_init")
+@_cdecl("bjs_DelegateManager_init")
+public func _bjs_DelegateManager_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = DelegateManager(delegates: {
+        let __count = Int(_swift_js_pop_param_array_length())
+        var __result: [AnyMyViewControllerDelegate] = []
+        __result.reserveCapacity(__count)
+        for _ in 0 ..< __count {
+            __result.append(AnyMyViewControllerDelegate.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+        }
+        __result.reverse()
+        return __result
+        }())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DelegateManager_notifyAll")
+@_cdecl("bjs_DelegateManager_notifyAll")
+public func _bjs_DelegateManager_notifyAll(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    DelegateManager.bridgeJSLiftParameter(_self).notifyAll()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DelegateManager_delegates_get")
+@_cdecl("bjs_DelegateManager_delegates_get")
+public func _bjs_DelegateManager_delegates_get(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = DelegateManager.bridgeJSLiftParameter(_self).delegates
+    for __bjs_elem_ret in ret {
+    _swift_js_push_int((__bjs_elem_ret as! AnyMyViewControllerDelegate).bridgeJSLowerReturn())}
+    _swift_js_push_array_length(Int32(ret.count))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DelegateManager_delegates_set")
+@_cdecl("bjs_DelegateManager_delegates_set")
+public func _bjs_DelegateManager_delegates_set(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    DelegateManager.bridgeJSLiftParameter(_self).delegates = {
+        let __count = Int(_swift_js_pop_param_array_length())
+        var __result: [AnyMyViewControllerDelegate] = []
+        __result.reserveCapacity(__count)
+        for _ in 0 ..< __count {
+            __result.append(AnyMyViewControllerDelegate.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+        }
+        __result.reverse()
+        return __result
+    }()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DelegateManager_deinit")
+@_cdecl("bjs_DelegateManager_deinit")
+public func _bjs_DelegateManager_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<DelegateManager>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension DelegateManager: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_DelegateManager_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_DelegateManager_wrap")
+fileprivate func _bjs_DelegateManager_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_DelegateManager_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

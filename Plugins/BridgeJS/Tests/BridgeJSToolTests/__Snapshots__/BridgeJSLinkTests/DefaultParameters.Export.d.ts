@@ -116,6 +116,32 @@ export type Exports = {
      * @param point - Optional parameter (default: { name: "default", value: 42, enabled: true })
      */
     testOptionalStructWithValueDefault(point?: Config | null): Config | null;
+    /**
+     * @param values - Optional parameter (default: [1, 2, 3])
+     */
+    testIntArrayDefault(values?: number[]): number[];
+    /**
+     * @param names - Optional parameter (default: ["a", "b", "c"])
+     */
+    testStringArrayDefault(names?: string[]): string[];
+    /**
+     * @param values - Optional parameter (default: [1.5, 2.5, 3.5])
+     */
+    testDoubleArrayDefault(values?: number[]): number[];
+    /**
+     * @param flags - Optional parameter (default: [true, false, true])
+     */
+    testBoolArrayDefault(flags?: boolean[]): boolean[];
+    /**
+     * @param items - Optional parameter (default: [])
+     */
+    testEmptyArrayDefault(items?: number[]): number[];
+    /**
+     * @param name - Optional parameter (default: "test")
+     * @param values - Optional parameter (default: [10, 20, 30])
+     * @param enabled - Optional parameter (default: true)
+     */
+    testMixedWithArrayDefault(name?: string, values?: number[], enabled?: boolean): string;
     Status: StatusObject
     MathOperations: {
         /**

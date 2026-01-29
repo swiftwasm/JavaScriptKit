@@ -66,6 +66,7 @@ This command will:
 - <doc:Exporting-Swift-Function>
 - <doc:Exporting-Swift-Class>
 - <doc:Exporting-Swift-Struct>
+- <doc:Exporting-Swift-Array>
 - <doc:Exporting-Swift-Enum>
 - <doc:Exporting-Swift-Closure>
 - <doc:Exporting-Swift-Protocols>

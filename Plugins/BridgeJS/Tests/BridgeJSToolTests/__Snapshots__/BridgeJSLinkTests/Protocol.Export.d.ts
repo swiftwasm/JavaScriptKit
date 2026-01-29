@@ -90,6 +90,10 @@ export interface MyViewController extends SwiftHeapObject {
     delegate: MyViewControllerDelegate;
     secondDelegate: MyViewControllerDelegate | null;
 }
+export interface DelegateManager extends SwiftHeapObject {
+    notifyAll(): void;
+    delegates: MyViewControllerDelegate[];
+}
 export type Exports = {
     Helper: {
         new(value: number): Helper;
@@ -97,6 +101,10 @@ export type Exports = {
     MyViewController: {
         new(delegate: MyViewControllerDelegate): MyViewController;
     }
+    DelegateManager: {
+        new(delegates: MyViewControllerDelegate[]): DelegateManager;
+    }
+    processDelegates(delegates: MyViewControllerDelegate[]): MyViewControllerDelegate[];
     Direction: DirectionObject
     ExampleEnum: ExampleEnumObject
     Result: ResultObject

@@ -256,6 +256,8 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedTmpRetPointers) = [];",
             "let \(JSGlueVariableScope.reservedTmpParamPointers) = [];",
             "let \(JSGlueVariableScope.reservedTmpStructCleanups) = [];",
+            "let \(JSGlueVariableScope.reservedTmpRetArrayLengths) = [];",
+            "let \(JSGlueVariableScope.reservedTmpParamArrayLengths) = [];",
             "const \(JSGlueVariableScope.reservedEnumHelpers) = {};",
             "const \(JSGlueVariableScope.reservedStructHelpers) = {};",
             "",
@@ -439,7 +441,16 @@ public struct BridgeJSLink {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamPointers).pop();")
                 }
                 printer.write("}")
-
+                printer.write("bjs[\"swift_js_push_array_length\"] = function(len) {")
+                printer.indent {
+                    printer.write("\(JSGlueVariableScope.reservedTmpRetArrayLengths).push(len | 0);")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_pop_param_array_length\"] = function() {")
+                printer.indent {
+                    printer.write("return \(JSGlueVariableScope.reservedTmpParamArrayLengths).pop();")
+                }
+                printer.write("}")
                 printer.write("bjs[\"swift_js_struct_cleanup\"] = function(cleanupId) {")
                 printer.indent {
                     printer.write("if (cleanupId === 0) { return; }")
@@ -1431,6 +1442,14 @@ public struct BridgeJSLink {
             return name.components(separatedBy: ".").last ?? name
         case .optional(let wrapped):
             return "\(resolveTypeScriptType(wrapped, exportedSkeletons: exportedSkeletons)) | null"
+        case .array(let elementType):
+            let elementTypeStr = resolveTypeScriptType(elementType, exportedSkeletons: exportedSkeletons)
+            // Parenthesize compound types so `[]` binds correctly in TypeScript
+            // e.g. `(string | null)[]` not `string | null[]`, `((x: number) => void)[]` not `(x: number) => void[]`
+            if elementTypeStr.contains("|") || elementTypeStr.contains("=>") {
+                return "(\(elementTypeStr))[]"
+            }
+            return "\(elementTypeStr)[]"
         default:
             return type.tsType
         }
@@ -3326,6 +3345,11 @@ enum DefaultValueUtils {
                 "\(field.name): \(Self.format(field.value, as: format))"
             }
             return "{ \(fieldStrings.joined(separator: ", ")) }"
+        case .array(let elements):
+            let elementStrings = elements.map { element in
+                DefaultValueUtils.format(element, as: format)
+            }
+            return "[\(elementStrings.joined(separator: ", "))]"
         }
     }
 
@@ -3410,6 +3434,12 @@ extension BridgeType {
                 "arg\(index): \(param.tsType)"
             }.joined(separator: ", ")
             return "(\(paramTypes)) => \(signature.returnType.tsType)"
+        case .array(let elementType):
+            let inner = elementType.tsType
+            if inner.contains("|") || inner.contains("=>") {
+                return "(\(inner))[]"
+            }
+            return "\(inner)[]"
         }
     }
 }

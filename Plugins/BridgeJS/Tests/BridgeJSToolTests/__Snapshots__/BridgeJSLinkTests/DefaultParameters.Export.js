@@ -35,6 +35,8 @@ export async function createInstantiator(options, swift) {
     let tmpRetPointers = [];
     let tmpParamPointers = [];
     let tmpStructCleanups = [];
+    let tmpRetArrayLengths = [];
+    let tmpParamArrayLengths = [];
     const enumHelpers = {};
     const structHelpers = {};
     
@@ -153,6 +155,12 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_param_pointer"] = function() {
                 return tmpParamPointers.pop();
+            }
+            bjs["swift_js_push_array_length"] = function(len) {
+                tmpRetArrayLengths.push(len | 0);
+            }
+            bjs["swift_js_pop_param_array_length"] = function() {
+                return tmpParamArrayLengths.pop();
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }
@@ -552,6 +560,112 @@ export async function createInstantiator(options, swift) {
                     }
                     if (pointCleanup) { pointCleanup(); }
                     return optResult;
+                },
+                testIntArrayDefault: function bjs_testIntArrayDefault(values = [1, 2, 3]) {
+                    const arrayCleanups = [];
+                    for (const elem of values) {
+                        tmpParamInts.push((elem | 0));
+                    }
+                    tmpParamArrayLengths.push(values.length);
+                    instance.exports.bjs_testIntArrayDefault();
+                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const int = tmpRetInts.pop();
+                        arrayResult.push(int);
+                    }
+                    arrayResult.reverse();
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return arrayResult;
+                },
+                testStringArrayDefault: function bjs_testStringArrayDefault(names = ["a", "b", "c"]) {
+                    const arrayCleanups = [];
+                    for (const elem of names) {
+                        const bytes = textEncoder.encode(elem);
+                        const id = swift.memory.retain(bytes);
+                        tmpParamInts.push(bytes.length);
+                        tmpParamInts.push(id);
+                        arrayCleanups.push(() => {
+                            swift.memory.release(id);
+                        });
+                    }
+                    tmpParamArrayLengths.push(names.length);
+                    instance.exports.bjs_testStringArrayDefault();
+                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const string = tmpRetStrings.pop();
+                        arrayResult.push(string);
+                    }
+                    arrayResult.reverse();
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return arrayResult;
+                },
+                testDoubleArrayDefault: function bjs_testDoubleArrayDefault(values = [1.5, 2.5, 3.5]) {
+                    const arrayCleanups = [];
+                    for (const elem of values) {
+                        tmpParamF64s.push(elem);
+                    }
+                    tmpParamArrayLengths.push(values.length);
+                    instance.exports.bjs_testDoubleArrayDefault();
+                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const f64 = tmpRetF64s.pop();
+                        arrayResult.push(f64);
+                    }
+                    arrayResult.reverse();
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return arrayResult;
+                },
+                testBoolArrayDefault: function bjs_testBoolArrayDefault(flags = [true, false, true]) {
+                    const arrayCleanups = [];
+                    for (const elem of flags) {
+                        tmpParamInts.push(elem ? 1 : 0);
+                    }
+                    tmpParamArrayLengths.push(flags.length);
+                    instance.exports.bjs_testBoolArrayDefault();
+                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const bool = tmpRetInts.pop() !== 0;
+                        arrayResult.push(bool);
+                    }
+                    arrayResult.reverse();
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return arrayResult;
+                },
+                testEmptyArrayDefault: function bjs_testEmptyArrayDefault(items = []) {
+                    const arrayCleanups = [];
+                    for (const elem of items) {
+                        tmpParamInts.push((elem | 0));
+                    }
+                    tmpParamArrayLengths.push(items.length);
+                    instance.exports.bjs_testEmptyArrayDefault();
+                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const int = tmpRetInts.pop();
+                        arrayResult.push(int);
+                    }
+                    arrayResult.reverse();
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return arrayResult;
+                },
+                testMixedWithArrayDefault: function bjs_testMixedWithArrayDefault(name = "test", values = [10, 20, 30], enabled = true) {
+                    const nameBytes = textEncoder.encode(name);
+                    const nameId = swift.memory.retain(nameBytes);
+                    const arrayCleanups = [];
+                    for (const elem of values) {
+                        tmpParamInts.push((elem | 0));
+                    }
+                    tmpParamArrayLengths.push(values.length);
+                    instance.exports.bjs_testMixedWithArrayDefault(nameId, nameBytes.length, enabled);
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
+                    swift.memory.release(nameId);
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return ret;
                 },
                 Status: StatusValues,
                 MathOperations: {

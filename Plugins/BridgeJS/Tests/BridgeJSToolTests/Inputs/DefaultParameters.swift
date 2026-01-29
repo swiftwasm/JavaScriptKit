@@ -73,3 +73,15 @@
     @JS func multiply(a: Double, b: Double) -> Double
     @JS static func subtract(a: Double, b: Double = 5.0) -> Double
 }
+
+// Array default values
+@JS public func testIntArrayDefault(values: [Int] = [1, 2, 3]) -> [Int]
+@JS public func testStringArrayDefault(names: [String] = ["a", "b", "c"]) -> [String]
+@JS public func testDoubleArrayDefault(values: [Double] = [1.5, 2.5, 3.5]) -> [Double]
+@JS public func testBoolArrayDefault(flags: [Bool] = [true, false, true]) -> [Bool]
+@JS public func testEmptyArrayDefault(items: [Int] = []) -> [Int]
+@JS public func testMixedWithArrayDefault(
+    name: String = "test",
+    values: [Int] = [10, 20, 30],
+    enabled: Bool = true
+) -> String

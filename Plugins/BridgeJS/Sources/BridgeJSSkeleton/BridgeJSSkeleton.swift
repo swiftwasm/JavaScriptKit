@@ -130,6 +130,7 @@ public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case int, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
     case unsafePointer(UnsafePointerType)
     indirect case optional(BridgeType)
+    indirect case array(BridgeType)
     case caseEnum(String)
     case rawValueEnum(String, SwiftEnumRawType)
     case associatedValueEnum(String)
@@ -202,6 +203,7 @@ public enum DefaultValue: Codable, Equatable, Sendable {
     case object(String)  // className for parameterless constructor
     case objectWithArguments(String, [DefaultValue])  // className, constructor argument values
     case structLiteral(String, [DefaultValueField])  // structName, field name/value pairs
+    indirect case array([DefaultValue])  // array literal with element values
 }
 
 public struct Parameter: Codable, Equatable, Sendable {
@@ -914,6 +916,9 @@ extension BridgeType {
         case .closure:
             // Closures pass callback ID as Int32
             return .i32
+        case .array:
+            // Arrays use stack-based return with length prefix (no direct WASM return type)
+            return nil
         }
     }
 
@@ -972,6 +977,9 @@ extension BridgeType {
                 ? "y"
                 : signature.parameters.map { $0.mangleTypeName }.joined()
             return "K\(params)_\(signature.returnType.mangleTypeName)"
+        case .array(let elementType):
+            // Array mangling: "Sa" prefix followed by element type
+            return "Sa\(elementType.mangleTypeName)"
         }
     }
 
