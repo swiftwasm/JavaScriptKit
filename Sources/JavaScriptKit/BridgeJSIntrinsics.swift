@@ -240,7 +240,11 @@ extension JSValue {
         let payload1 = _swift_js_get_jsvalue_payload1()
         let payload2 = _swift_js_get_jsvalue_payload2()
         let rawKind = JavaScriptValueKind(rawValue: UInt32(bitPattern: kind)) ?? .undefined
-        let raw = RawJSValue(kind: rawKind, payload1: JavaScriptPayload1(UInt32(bitPattern: payload1)), payload2: payload2)
+        let raw = RawJSValue(
+            kind: rawKind,
+            payload1: JavaScriptPayload1(UInt32(bitPattern: payload1)),
+            payload2: payload2
+        )
         return raw.jsValue
     }
 
@@ -252,7 +256,11 @@ extension JSValue {
         _ payload2: Float64
     ) -> JSValue {
         let rawKind = JavaScriptValueKind(rawValue: UInt32(bitPattern: kind)) ?? .undefined
-        let raw = RawJSValue(kind: rawKind, payload1: JavaScriptPayload1(UInt32(bitPattern: payload1)), payload2: payload2)
+        let raw = RawJSValue(
+            kind: rawKind,
+            payload1: JavaScriptPayload1(UInt32(bitPattern: payload1)),
+            payload2: payload2
+        )
         return raw.jsValue
     }
 
