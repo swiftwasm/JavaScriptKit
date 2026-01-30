@@ -1,1 +1,1 @@
-@JS func check(a: Int, b: Float, c: Double, d: Bool) {}
+@JS func check(a: Int, b: UInt, c: Float, d: Double, e: Bool) {}

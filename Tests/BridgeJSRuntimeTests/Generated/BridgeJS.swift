@@ -3222,6 +3222,17 @@ public func _bjs_roundTripInt(_ v: Int32) -> Int32 {
     #endif
 }
 
+@_expose(wasm, "bjs_roundTripUInt")
+@_cdecl("bjs_roundTripUInt")
+public func _bjs_roundTripUInt(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = roundTripUInt(v: UInt.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundTripFloat")
 @_cdecl("bjs_roundTripFloat")
 public func _bjs_roundTripFloat(_ v: Float32) -> Float32 {

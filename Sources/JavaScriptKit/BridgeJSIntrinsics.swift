@@ -128,6 +128,23 @@ extension Int: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
     }
 }
 
+extension UInt: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
+    // MARK: ImportTS
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        Int32(bitPattern: UInt32(self))
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> UInt {
+        UInt(UInt32(bitPattern: value))
+    }
+    // MARK: ExportSwift
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> UInt {
+        UInt(UInt32(bitPattern: value))
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        Int32(bitPattern: UInt32(self))
+    }
+}
+
 extension Float: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
     // MARK: ImportTS
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Float32 {
@@ -906,6 +923,52 @@ extension Optional where Wrapped == Int {
             return nil
         } else {
             return Int.bridgeJSLiftReturn(_swift_js_get_optional_int_value())
+        }
+    }
+
+    @_spi(BridgeJS) public func bridgeJSLowerReturn() -> Void {
+        switch self {
+        case .none:
+            _swift_js_return_optional_int(0, 0)
+        case .some(let value):
+            _swift_js_return_optional_int(1, value.bridgeJSLowerReturn())
+        }
+    }
+}
+
+extension Optional where Wrapped == UInt {
+    // MARK: ImportTS
+
+    @available(*, unavailable, message: "Optional UInt type is not supported to be passed to imported JS functions")
+    @_spi(BridgeJS) public func bridgeJSLowerParameter() -> Void {}
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithPresence() -> (
+        isSome: Int32, value: Int32
+    ) {
+        switch consume self {
+        case .none:
+            return (isSome: 0, value: 0)
+        case .some(let wrapped):
+            return (isSome: 1, value: wrapped.bridgeJSLowerParameter())
+        }
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> UInt? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return UInt.bridgeJSLiftParameter(wrappedValue)
+        }
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> UInt? {
+        let isSome = _swift_js_get_optional_int_presence()
+        if isSome == 0 {
+            return nil
+        } else {
+            return UInt.bridgeJSLiftReturn(_swift_js_get_optional_int_value())
         }
     }
 

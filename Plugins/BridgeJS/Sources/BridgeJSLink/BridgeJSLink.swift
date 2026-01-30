@@ -3401,7 +3401,7 @@ extension BridgeType {
             return "void"
         case .string:
             return "string"
-        case .int:
+        case .int, .uint:
             return "number"
         case .float:
             return "number"
