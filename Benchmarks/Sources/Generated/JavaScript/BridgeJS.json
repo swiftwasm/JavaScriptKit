@@ -1243,6 +1243,920 @@
 
         ],
         "swiftCallName" : "ClassRoundtrip"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_ArrayRoundtrip_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_ArrayRoundtrip_takeIntArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takeIntArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_makeIntArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeIntArray",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_roundtripIntArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripIntArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_makeIntArrayLarge",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeIntArrayLarge",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_takeDoubleArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takeDoubleArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_makeDoubleArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeDoubleArray",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_roundtripDoubleArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripDoubleArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_takeStringArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takeStringArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_makeStringArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeStringArray",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_roundtripStringArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripStringArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_takePointArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takePointArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "points",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "swiftStruct" : {
+                        "_0" : "Point"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_makePointArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makePointArray",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "swiftStruct" : {
+                    "_0" : "Point"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_roundtripPointArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripPointArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "points",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "swiftStruct" : {
+                        "_0" : "Point"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "swiftStruct" : {
+                    "_0" : "Point"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_makePointArrayLarge",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makePointArrayLarge",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "swiftStruct" : {
+                    "_0" : "Point"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_takeNestedIntArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takeNestedIntArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_makeNestedIntArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeNestedIntArray",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_roundtripNestedIntArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripNestedIntArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_takeNestedPointArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takeNestedPointArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "points",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "swiftStruct" : {
+                            "_0" : "Point"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_makeNestedPointArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeNestedPointArray",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "swiftStruct" : {
+                        "_0" : "Point"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_roundtripNestedPointArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripNestedPointArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "points",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "swiftStruct" : {
+                            "_0" : "Point"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "swiftStruct" : {
+                        "_0" : "Point"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_takeOptionalIntArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takeOptionalIntArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "optional" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_makeOptionalIntArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeOptionalIntArray",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "optional" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_roundtripOptionalIntArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripOptionalIntArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "optional" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "optional" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_takeOptionalPointArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takeOptionalPointArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "points",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "optional" : {
+                        "_0" : {
+                          "swiftStruct" : {
+                            "_0" : "Point"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_makeOptionalPointArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeOptionalPointArray",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "optional" : {
+                    "_0" : {
+                      "swiftStruct" : {
+                        "_0" : "Point"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_roundtripOptionalPointArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripOptionalPointArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "points",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "optional" : {
+                        "_0" : {
+                          "swiftStruct" : {
+                            "_0" : "Point"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "optional" : {
+                    "_0" : {
+                      "swiftStruct" : {
+                        "_0" : "Point"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_takeOptionalArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "takeOptionalArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_makeOptionalArraySome",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeOptionalArraySome",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "optional" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_makeOptionalArrayNone",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeOptionalArrayNone",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "optional" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayRoundtrip_roundtripOptionalArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripOptionalArray",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "optional" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "name" : "ArrayRoundtrip",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "ArrayRoundtrip"
       }
     ],
     "enums" : [
@@ -1767,6 +2681,35 @@
           }
         ],
         "swiftCallName" : "ComplexStruct"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "Point",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "x",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "y",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Point"
       }
     ]
   },

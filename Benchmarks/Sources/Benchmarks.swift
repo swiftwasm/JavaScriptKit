@@ -257,6 +257,134 @@ enum ComplexResult {
     }
 }
 
+// MARK: - Array Performance Tests
+
+@JS struct Point {
+    var x: Double
+    var y: Double
+}
+
+@JS class ArrayRoundtrip {
+    @JS init() {}
+
+    // MARK: Primitive Arrays - Int
+
+    @JS func takeIntArray(_ values: [Int]) {}
+    @JS func makeIntArray() -> [Int] {
+        return Array(1...1000)
+    }
+    @JS func roundtripIntArray(_ values: [Int]) -> [Int] {
+        return values
+    }
+
+    @JS func makeIntArrayLarge() -> [Int] {
+        return Array(1...10000)
+    }
+
+    // MARK: Primitive Arrays - Double
+
+    @JS func takeDoubleArray(_ values: [Double]) {}
+    @JS func makeDoubleArray() -> [Double] {
+        return (1...1000).map { Double($0) * 1.1 }
+    }
+    @JS func roundtripDoubleArray(_ values: [Double]) -> [Double] {
+        return values
+    }
+
+    // MARK: Primitive Arrays - String
+
+    @JS func takeStringArray(_ values: [String]) {}
+    @JS func makeStringArray() -> [String] {
+        return ["one", "two", "three", "four", "five"]
+    }
+    @JS func roundtripStringArray(_ values: [String]) -> [String] {
+        return values
+    }
+
+    // MARK: Struct Arrays
+
+    @JS func takePointArray(_ points: [Point]) {}
+    @JS func makePointArray() -> [Point] {
+        return [
+            Point(x: 0.0, y: 0.0),
+            Point(x: 1.0, y: 1.0),
+            Point(x: 2.0, y: 2.0),
+            Point(x: 3.0, y: 3.0),
+            Point(x: 4.0, y: 4.0),
+        ]
+    }
+    @JS func roundtripPointArray(_ points: [Point]) -> [Point] {
+        return points
+    }
+
+    @JS func makePointArrayLarge() -> [Point] {
+        return (0..<50).map { Point(x: Double($0), y: Double($0)) }
+    }
+
+    // MARK: Nested Arrays
+
+    @JS func takeNestedIntArray(_ values: [[Int]]) {}
+    @JS func makeNestedIntArray() -> [[Int]] {
+        return [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ]
+    }
+    @JS func roundtripNestedIntArray(_ values: [[Int]]) -> [[Int]] {
+        return values
+    }
+
+    @JS func takeNestedPointArray(_ points: [[Point]]) {}
+    @JS func makeNestedPointArray() -> [[Point]] {
+        return [
+            [Point(x: 0.0, y: 0.0), Point(x: 1.0, y: 1.0)],
+            [Point(x: 2.0, y: 2.0), Point(x: 3.0, y: 3.0)],
+            [Point(x: 4.0, y: 4.0), Point(x: 5.0, y: 5.0)],
+        ]
+    }
+    @JS func roundtripNestedPointArray(_ points: [[Point]]) -> [[Point]] {
+        return points
+    }
+
+    // MARK: Optional Element Arrays
+
+    @JS func takeOptionalIntArray(_ values: [Int?]) {}
+    @JS func makeOptionalIntArray() -> [Int?] {
+        return [1, nil, 3, nil, 5, nil, 7, nil, 9, nil]
+    }
+    @JS func roundtripOptionalIntArray(_ values: [Int?]) -> [Int?] {
+        return values
+    }
+
+    @JS func takeOptionalPointArray(_ points: [Point?]) {}
+    @JS func makeOptionalPointArray() -> [Point?] {
+        return [
+            Point(x: 0.0, y: 0.0),
+            nil,
+            Point(x: 2.0, y: 2.0),
+            nil,
+            Point(x: 4.0, y: 4.0),
+        ]
+    }
+    @JS func roundtripOptionalPointArray(_ points: [Point?]) -> [Point?] {
+        return points
+    }
+
+    // MARK: Optional Arrays
+
+    @JS func takeOptionalArray(_ values: [Int]?) {}
+    @JS func makeOptionalArraySome() -> [Int]? {
+        return [1, 2, 3, 4, 5]
+    }
+    @JS func makeOptionalArrayNone() -> [Int]? {
+        return nil
+    }
+    @JS func roundtripOptionalArray(_ values: [Int]?) -> [Int]? {
+        return values
+    }
+}
+
 @JS func run() {
 
     let call = Benchmark("Call")
