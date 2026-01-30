@@ -108,10 +108,12 @@ Please run the following command to install it:
     page.on("console", (message) => {
         console.log(message.text());
     });
-    
+
+    let resolveExit = undefined;
     const onExit = new Promise((resolve) => {
-        page.exposeFunction("exitTest", resolve);
+        resolveExit = resolve;
     });
+    await page.exposeFunction("exitTest", resolveExit);
     await page.goto(`http://localhost:${address.port}/test.browser.html`);
     const exitCode = await onExit;
     await browser.close();

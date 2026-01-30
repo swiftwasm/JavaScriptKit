@@ -116,7 +116,7 @@ Hint: This typically means that a continuation leak occurred.
                         for (const [name, fn] of Object.entries(functions)) {
                             // Bind the page context to each function if needed
                             // The function can optionally use the page from its closure
-                            page.exposeFunction(name, fn);
+                            await page.exposeFunction(name, fn);
                         }
                     };
                 }
