@@ -77,6 +77,15 @@ private func invokeJSFunction(
     arguments: [ConvertibleToJSValue],
     this: JSObject?
 ) throws -> JSValue {
+    #if Tracing
+    let jsValues = arguments.map { $0.jsValue }
+    let traceEnd = JSTracingHooks.beginJSCall(
+        this.map {
+            .method(receiver: $0, methodName: nil, arguments: jsValues)
+        } ?? .function(function: jsFunc, arguments: jsValues)
+    )
+    defer { traceEnd?() }
+    #endif
     let id = jsFunc.id
     let (result, isException) = arguments.withRawJSValues { rawValues in
         rawValues.withUnsafeBufferPointer { bufferPointer -> (JSValue, Bool) in

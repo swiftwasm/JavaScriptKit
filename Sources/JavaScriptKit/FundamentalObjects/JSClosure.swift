@@ -18,7 +18,11 @@ public protocol JSClosureProtocol: JSValueCompatible {
 public class JSOneshotClosure: JSObject, JSClosureProtocol {
     private var hostFuncRef: JavaScriptHostFuncRef = 0
 
-    public init(file: String = #fileID, line: UInt32 = #line, _ body: @escaping (sending [JSValue]) -> JSValue) {
+    public init(
+        file: String = #fileID,
+        line: UInt32 = #line,
+        _ body: @escaping (sending [JSValue]) -> JSValue
+    ) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
         super.init(id: 0)
 
@@ -29,12 +33,14 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         }
 
         // 3. Retain the given body in static storage by `funcRef`.
-        JSClosure.sharedClosures.wrappedValue[hostFuncRef] = (
-            self,
-            {
+        JSClosure.sharedClosures.wrappedValue[hostFuncRef] = .init(
+            object: self,
+            body: {
                 defer { self.release() }
                 return body($0)
-            }
+            },
+            fileID: file,
+            line: line
         )
     }
 
@@ -114,14 +120,28 @@ public class JSClosure: JSObject, JSClosureProtocol {
         // `removeValue(forKey:)` on a dictionary with value type containing
         // `sending`. Wrap the value type with a struct to avoid the crash.
         struct Entry {
-            let item: (object: JSObject, body: (sending [JSValue]) -> JSValue)
+            let object: JSObject
+            let body: (sending [JSValue]) -> JSValue
+            #if Tracing
+            let fileID: String
+            let line: UInt32
+            #endif
+
+            init(object: JSObject, body: @escaping (sending [JSValue]) -> JSValue, fileID: String, line: UInt32) {
+                self.object = object
+                self.body = body
+                #if Tracing
+                self.fileID = fileID
+                self.line = line
+                #endif
+            }
         }
         private var storage: [JavaScriptHostFuncRef: Entry] = [:]
         init() {}
 
-        subscript(_ key: JavaScriptHostFuncRef) -> (object: JSObject, body: (sending [JSValue]) -> JSValue)? {
-            get { storage[key]?.item }
-            set { storage[key] = newValue.map { Entry(item: $0) } }
+        subscript(_ key: JavaScriptHostFuncRef) -> Entry? {
+            get { storage[key] }
+            set { storage[key] = newValue }
         }
     }
 
@@ -150,7 +170,11 @@ public class JSClosure: JSObject, JSClosureProtocol {
         })
     }
 
-    public init(file: String = #fileID, line: UInt32 = #line, _ body: @escaping (sending [JSValue]) -> JSValue) {
+    public init(
+        file: String = #fileID,
+        line: UInt32 = #line,
+        _ body: @escaping (sending [JSValue]) -> JSValue
+    ) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
         super.init(id: 0)
 
@@ -161,7 +185,12 @@ public class JSClosure: JSObject, JSClosureProtocol {
         }
 
         // 3. Retain the given body in static storage by `funcRef`.
-        Self.sharedClosures.wrappedValue[hostFuncRef] = (self, body)
+        Self.sharedClosures.wrappedValue[hostFuncRef] = .init(
+            object: self,
+            body: body,
+            fileID: file,
+            line: line
+        )
     }
 
     @available(*, unavailable, message: "JSClosure does not support dictionary literal initialization")
@@ -317,14 +346,22 @@ func _call_host_function_impl(
     _ argc: Int32,
     _ callbackFuncRef: JavaScriptObjectRef
 ) -> Bool {
-    guard let (_, hostFunc) = JSClosure.sharedClosures.wrappedValue[hostFuncRef] else {
+    guard let entry = JSClosure.sharedClosures.wrappedValue[hostFuncRef] else {
         return true
     }
+    #if Tracing
+    let traceEnd = JSTracingHooks.beginJSClosureCall(
+        JSTracing.JSClosureCallInfo(fileID: entry.fileID, line: UInt(entry.line))
+    )
+    #endif
     var arguments: [JSValue] = []
     for i in 0..<Int(argc) {
         arguments.append(argv[i].jsValue)
     }
-    let result = hostFunc(arguments)
+    #if Tracing
+    defer { traceEnd?() }
+    #endif
+    let result = entry.body(arguments)
     let callbackFuncRef = JSObject(id: callbackFuncRef)
     _ = callbackFuncRef(result)
     return false

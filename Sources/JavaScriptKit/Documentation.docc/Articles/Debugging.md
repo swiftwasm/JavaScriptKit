@@ -57,3 +57,25 @@ Alternatively, you can use the official [`C/C++ DevTools Support (DWARF)`](https
 ![Chrome DevTools](chrome-devtools.png)
 
 See [the DevTools team's official introduction](https://developer.chrome.com/blog/wasm-debugging-2020) for more details about the extension.
+
+## Bridge Call Tracing
+
+Enable the `Tracing` package trait to compile lightweight hook points for Swift <-> JavaScript calls. Tracing is off by default and adds no runtime overhead unless the trait is enabled:
+
+```bash
+swift build --traits Tracing
+```
+
+The hooks are invoked at the start and end of each bridge crossing without collecting data for you. For example:
+
+```swift
+let removeCallHook = JSTracing.default.addJSCallHook { info in
+    let started = Date()
+    return { print("JS call \(info) finished in \(Date().timeIntervalSince(started))s") }
+}
+
+let removeClosureHook = JSTracing.default.addJSClosureCallHook { info in
+    print("JSClosure created at \(info.fileID):\(info.line)")
+    return nil
+}
+```

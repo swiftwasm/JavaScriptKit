@@ -52,11 +52,16 @@ extension JSObject {
     /// - Parameter arguments: Arguments to be passed to this constructor function.
     /// - Returns: A new instance of this constructor.
     public func new(arguments: [ConvertibleToJSValue]) -> JSObject {
-        arguments.withRawJSValues { rawValues in
+        #if Tracing
+        let jsValues = arguments.map { $0.jsValue }
+        return new(arguments: jsValues)
+        #else
+        return arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 JSObject(id: swjs_call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
             }
         }
+        #endif
     }
 
     /// A variadic arguments version of `new`.
@@ -89,8 +94,22 @@ extension JSObject {
         invokeNonThrowingJSFunction(arguments: arguments).jsValue
     }
 
+    /// Instantiate an object from this function as a constructor.
+    ///
+    /// Guaranteed to return an object because either:
+    ///
+    /// - a. the constructor explicitly returns an object, or
+    /// - b. the constructor returns nothing, which causes JS to return the `this` value, or
+    /// - c. the constructor returns undefined, null or a non-object, in which case JS also returns `this`.
+    ///
+    /// - Parameter arguments: Arguments to be passed to this constructor function.
+    /// - Returns: A new instance of this constructor.
     public func new(arguments: [JSValue]) -> JSObject {
-        arguments.withRawJSValues { rawValues in
+        #if Tracing
+        let traceEnd = JSTracingHooks.beginJSCall(.function(function: self, arguments: arguments))
+        defer { traceEnd?() }
+        #endif
+        return arguments.withRawJSValues { rawValues in
             rawValues.withUnsafeBufferPointer { bufferPointer in
                 JSObject(id: swjs_call_new(self.id, bufferPointer.baseAddress!, Int32(bufferPointer.count)))
             }
@@ -103,21 +122,79 @@ extension JSObject {
     }
 
     final func invokeNonThrowingJSFunction(arguments: [JSValue]) -> RawJSValue {
-        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0) }
+        #if Tracing
+        let traceEnd = JSTracingHooks.beginJSCall(.function(function: self, arguments: arguments))
+        #endif
+        let result = arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0) }
+        #if Tracing
+        traceEnd?()
+        #endif
+        return result
     }
 
-    final func invokeNonThrowingJSFunction(arguments: [JSValue], this: JSObject) -> RawJSValue {
-        arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0, this: this) }
+    #if Tracing
+    final func invokeNonThrowingJSFunction(
+        arguments: [JSValue],
+        this: JSObject,
+        tracedMethodName: String? = nil
+    ) -> RawJSValue {
+        let traceEnd = JSTracingHooks.beginJSCall(
+            .method(receiver: this, methodName: tracedMethodName, arguments: arguments)
+        )
+        let result = arguments.withRawJSValues {
+            invokeNonThrowingJSFunction(
+                rawValues: $0,
+                this: this
+            )
+        }
+        traceEnd?()
+        return result
     }
+    #else
+    final func invokeNonThrowingJSFunction(
+        arguments: [JSValue],
+        this: JSObject
+    ) -> RawJSValue {
+        arguments.withRawJSValues {
+            invokeNonThrowingJSFunction(
+                rawValues: $0,
+                this: this
+            )
+        }
+    }
+    #endif
 
     #if !hasFeature(Embedded)
     final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue]) -> RawJSValue {
+        #if Tracing
+        let jsValues = arguments.map { $0.jsValue }
+        return invokeNonThrowingJSFunction(arguments: jsValues)
+        #else
         arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0) }
+        #endif
     }
 
-    final func invokeNonThrowingJSFunction(arguments: [ConvertibleToJSValue], this: JSObject) -> RawJSValue {
+    #if Tracing
+    final func invokeNonThrowingJSFunction(
+        arguments: [ConvertibleToJSValue],
+        this: JSObject,
+        tracedMethodName: String? = nil
+    ) -> RawJSValue {
+        let jsValues = arguments.map { $0.jsValue }
+        return invokeNonThrowingJSFunction(
+            arguments: jsValues,
+            this: this,
+            tracedMethodName: tracedMethodName
+        )
+    }
+    #else
+    final func invokeNonThrowingJSFunction(
+        arguments: [ConvertibleToJSValue],
+        this: JSObject
+    ) -> RawJSValue {
         arguments.withRawJSValues { invokeNonThrowingJSFunction(rawValues: $0, this: this) }
     }
+    #endif
     #endif
 
     final private func invokeNonThrowingJSFunction(rawValues: [RawJSValue]) -> RawJSValue {

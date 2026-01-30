@@ -1,4 +1,9 @@
 SWIFT_SDK_ID ?=
+ifeq ($(JAVASCRIPTKIT_DISABLE_TRACING_TRAIT),1)
+	TRACING_ARGS :=
+else
+	TRACING_ARGS := --traits Tracing
+endif
 
 .PHONY: bootstrap
 bootstrap:
@@ -12,6 +17,7 @@ unittest:
 		exit 2; \
 	}
 	env JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1 swift package --swift-sdk "$(SWIFT_SDK_ID)" \
+	    $(TRACING_ARGS) \
 	    --disable-sandbox \
 	    js test --prelude ./Tests/prelude.mjs -Xnode --expose-gc
 
