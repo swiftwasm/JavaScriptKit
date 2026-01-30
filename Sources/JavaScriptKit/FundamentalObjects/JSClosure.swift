@@ -122,8 +122,19 @@ public class JSClosure: JSObject, JSClosureProtocol {
         struct Entry {
             let object: JSObject
             let body: (sending [JSValue]) -> JSValue
+            #if Tracing
             let fileID: String
             let line: UInt32
+            #endif
+
+            init(object: JSObject, body: @escaping (sending [JSValue]) -> JSValue, fileID: String, line: UInt32) {
+                self.object = object
+                self.body = body
+                #if Tracing
+                self.fileID = fileID
+                self.line = line
+                #endif
+            }
         }
         private var storage: [JavaScriptHostFuncRef: Entry] = [:]
         init() {}
