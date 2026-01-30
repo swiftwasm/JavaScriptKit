@@ -94,11 +94,6 @@ public protocol _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
     consuming func bridgeJSLowerReturn() -> WasmCoreType
 }
 
-public protocol _BridgedStackABICompatibleType {
-    func bridgeJSPush()
-    static func bridgeJSPop() -> Self
-}
-
 extension Bool: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
     // MARK: ImportTS
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
@@ -113,15 +108,6 @@ extension Bool: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
     }
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
         self ? 1 : 0
-    }
-}
-
-extension Bool: _BridgedStackABICompatibleType {
-    @_spi(BridgeJS) public func bridgeJSPush() {
-        _swift_js_push_int(self ? 1 : 0)
-    }
-    @_spi(BridgeJS) public static func bridgeJSPop() -> Bool {
-        _swift_js_pop_param_int32() == 1
     }
 }
 

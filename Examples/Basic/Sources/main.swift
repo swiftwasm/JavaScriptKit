@@ -3,31 +3,23 @@ import JavaScriptEventLoop
 
 @JSFunction(from: .global) func alert(_ message: String) throws(JSException)
 
-@JSClass struct JSDocument {
+@JSClass(jsName: "Document", from: .global)
+struct JSDocument {
     @JSGetter var body: JSHTMLElement
     @JSFunction func createElement(_ tagName: String) throws(JSException) -> JSHTMLElement
 }
 
-@JSClass struct JSHTMLElement {
+@JSClass(jsName: "HTMLElement", from: .global)
+struct JSHTMLElement {
     @JSGetter var innerText: String
     @JSSetter func setInnerText(_ value: String) throws(JSException)
     @JSFunction func appendChild(_ element: JSHTMLElement) throws(JSException)
 }
 
-struct JSClosure<ClosureSignature> {
-    let jsObject: JSObject
-    init(unsafelyWrapping jsObject: JSObject) {
-        self.jsObject = jsObject
-    }
-
-    init(_ closure: ClosureSignature) {
-        fatalError()
-    }
-}
-
-@JSClass struct JSHTMLButtonElement {
+@JSClass(jsName: "HTMLButtonElement", from: .global)
+struct JSHTMLButtonElement {
     @JSGetter var onclick: () -> Void
-    @JSSetter func setOnclick(_ handler: JSClosure<() -> Void>) throws(JSException)
+    @JSSetter func setOnclick(_ handler: @escaping () -> Void) throws(JSException)
 }
 
 @JSGetter(from: .global) var document: JSDocument
