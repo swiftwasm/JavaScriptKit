@@ -800,7 +800,7 @@ struct StackCodegen {
         switch type {
         case .string:
             return "String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
-        case .int:
+        case .int, .uint:
             return "Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
         case .bool:
             return "Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
@@ -873,7 +873,7 @@ struct StackCodegen {
         case .string:
             return
                 "Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
-        case .int:
+        case .int, .uint:
             return "Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
         case .bool:
             return "Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
@@ -945,7 +945,7 @@ struct StackCodegen {
                 "var __bjs_\(raw: varPrefix) = \(raw: accessor)",
                 "__bjs_\(raw: varPrefix).withUTF8 { ptr in _swift_js_push_string(ptr.baseAddress, Int32(ptr.count)) }",
             ]
-        case .int:
+        case .int, .uint:
             return ["_swift_js_push_int(Int32(\(raw: accessor)))"]
         case .bool:
             return ["_swift_js_push_int(\(raw: accessor) ? 1 : 0)"]
@@ -1052,7 +1052,7 @@ struct StackCodegen {
                 "var __bjs_str_\(raw: varPrefix) = \(raw: unwrappedVar)",
                 "__bjs_str_\(raw: varPrefix).withUTF8 { ptr in _swift_js_push_string(ptr.baseAddress, Int32(ptr.count)) }",
             ]
-        case .int:
+        case .int, .uint:
             return ["_swift_js_push_int(Int32(\(raw: unwrappedVar)))"]
         case .bool:
             return ["_swift_js_push_int(\(raw: unwrappedVar) ? 1 : 0)"]
@@ -1643,6 +1643,7 @@ extension BridgeType {
         switch self {
         case .bool: return "Bool"
         case .int: return "Int"
+        case .uint: return "UInt"
         case .float: return "Float"
         case .double: return "Double"
         case .string: return "String"
@@ -1687,7 +1688,7 @@ extension BridgeType {
     func liftParameterInfo() throws -> LiftingIntrinsicInfo {
         switch self {
         case .bool: return .bool
-        case .int: return .int
+        case .int, .uint: return .int
         case .float: return .float
         case .double: return .double
         case .string: return .string
@@ -1739,7 +1740,7 @@ extension BridgeType {
     func loweringReturnInfo() throws -> LoweringIntrinsicInfo {
         switch self {
         case .bool: return .bool
-        case .int: return .int
+        case .int, .uint: return .int
         case .float: return .float
         case .double: return .double
         case .string: return .string

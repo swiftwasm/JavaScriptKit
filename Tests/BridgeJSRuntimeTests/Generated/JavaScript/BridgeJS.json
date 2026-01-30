@@ -4652,6 +4652,31 @@
         }
       },
       {
+        "abiName" : "bjs_roundTripUInt",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUInt",
+        "parameters" : [
+          {
+            "label" : "v",
+            "name" : "v",
+            "type" : {
+              "uint" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "uint" : {
+
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripFloat",
         "effects" : {
           "isAsync" : false,

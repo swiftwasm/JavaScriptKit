@@ -6,6 +6,7 @@
 
 export type Exports = {
     checkInt(): number;
+    checkUInt(): number;
     checkFloat(): number;
     checkDouble(): number;
     checkBool(): boolean;

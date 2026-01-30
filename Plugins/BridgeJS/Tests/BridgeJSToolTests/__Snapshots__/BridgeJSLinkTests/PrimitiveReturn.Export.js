@@ -226,6 +226,10 @@ export async function createInstantiator(options, swift) {
                     const ret = instance.exports.bjs_checkInt();
                     return ret;
                 },
+                checkUInt: function bjs_checkUInt() {
+                    const ret = instance.exports.bjs_checkUInt();
+                    return ret >>> 0;
+                },
                 checkFloat: function bjs_checkFloat() {
                     const ret = instance.exports.bjs_checkFloat();
                     return ret;

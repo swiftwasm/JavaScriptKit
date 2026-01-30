@@ -149,6 +149,15 @@ struct IntrinsicJSFragment: Sendable {
         }
     )
 
+    /// Convert signed Int32 to unsigned for UInt values
+    static let uintLiftReturn = IntrinsicJSFragment(
+        parameters: ["value"],
+        printCode: { arguments, scope, printer, cleanupCode in
+            return ["\(arguments[0]) >>> 0"]
+        }
+    )
+    static let uintLiftParameter = uintLiftReturn
+
     static let stringLowerParameter = IntrinsicJSFragment(
         parameters: ["value"],
         printCode: { arguments, scope, printer, cleanupCode in
@@ -519,7 +528,7 @@ struct IntrinsicJSFragment: Sendable {
                 case .bool:
                     printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalBool);")
                     printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalBool) = undefined;")
-                case .int:
+                case .int, .uint:
                     printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalInt);")
                     printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = undefined;")
                 case .float:
@@ -651,7 +660,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write(
                         "bjs[\"swift_js_return_optional_bool\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? (\(value) ? 1 : 0) : 0);"
                     )
-                case .int:
+                case .int, .uint:
                     printer.write(
                         "bjs[\"swift_js_return_optional_int\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? (\(value) | 0) : 0);"
                     )
@@ -937,7 +946,7 @@ struct IntrinsicJSFragment: Sendable {
                     )
                     printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(value));")
                     printer.write("\(targetVar) = String(\(objectLabel));")
-                case .int:
+                case .int, .uint:
                     printer.write("\(targetVar) = \(value) | 0;")
                 case .bool:
                     printer.write("\(targetVar) = \(value) !== 0;")
@@ -1121,7 +1130,7 @@ struct IntrinsicJSFragment: Sendable {
                 case .string:
                     printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(result);")
                     printer.write("return;")
-                case .int:
+                case .int, .uint:
                     printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = \(result);")
                     printer.write("return;")
                 case .bool:
@@ -1370,7 +1379,7 @@ struct IntrinsicJSFragment: Sendable {
     /// Returns a fragment that lowers a JS value to Wasm core values for parameters
     static func lowerParameter(type: BridgeType) throws -> IntrinsicJSFragment {
         switch type {
-        case .int, .float, .double, .bool, .unsafePointer: return .identity
+        case .int, .uint, .float, .double, .bool, .unsafePointer: return .identity
         case .string: return .stringLowerParameter
         case .jsObject: return .jsObjectLowerParameter
         case .swiftHeapObject:
@@ -1414,6 +1423,7 @@ struct IntrinsicJSFragment: Sendable {
     static func liftReturn(type: BridgeType) throws -> IntrinsicJSFragment {
         switch type {
         case .int, .float, .double: return .identity
+        case .uint: return .uintLiftReturn
         case .bool: return .boolLiftReturn
         case .string: return .stringLiftReturn
         case .jsObject: return .jsObjectLiftReturn
@@ -1460,6 +1470,7 @@ struct IntrinsicJSFragment: Sendable {
     static func liftParameter(type: BridgeType, context: BridgeContext = .importTS) throws -> IntrinsicJSFragment {
         switch type {
         case .int, .float, .double: return .identity
+        case .uint: return .uintLiftParameter
         case .bool: return .boolLiftParameter
         case .string: return .stringLiftParameter
         case .jsObject: return .jsObjectLiftParameter
@@ -1560,7 +1571,7 @@ struct IntrinsicJSFragment: Sendable {
     /// Returns a fragment that lowers a JS value to Wasm core values for return values
     static func lowerReturn(type: BridgeType, context: BridgeContext = .importTS) throws -> IntrinsicJSFragment {
         switch type {
-        case .int, .float, .double: return .identity
+        case .int, .uint, .float, .double: return .identity
         case .bool: return .boolLowerReturn
         case .string: return .stringLowerReturn
         case .jsObject: return .jsObjectLowerReturn
@@ -1909,7 +1920,7 @@ struct IntrinsicJSFragment: Sendable {
                     return []
                 }
             )
-        case .int:
+        case .int, .uint:
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, scope, printer, cleanup in
@@ -1967,7 +1978,7 @@ struct IntrinsicJSFragment: Sendable {
                             cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
                         }
                         cleanup.write("}")
-                    case .int:
+                    case .int, .uint:
                         printer.write(
                             "\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? (\(value) | 0) : 0);"
                         )
@@ -2024,7 +2035,7 @@ struct IntrinsicJSFragment: Sendable {
                     return [bVar]
                 }
             )
-        case .int:
+        case .int, .uint:
             return IntrinsicJSFragment(
                 parameters: [],
                 printCode: { arguments, scope, printer, cleanup in
@@ -2214,7 +2225,7 @@ struct IntrinsicJSFragment: Sendable {
                     return [bVar]
                 }
             )
-        case .int:
+        case .int, .uint:
             return IntrinsicJSFragment(
                 parameters: [],
                 printCode: { arguments, scope, printer, cleanup in
@@ -2363,7 +2374,7 @@ struct IntrinsicJSFragment: Sendable {
                     return []
                 }
             )
-        case .int:
+        case .int, .uint:
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, scope, printer, cleanup in
@@ -2779,7 +2790,7 @@ struct IntrinsicJSFragment: Sendable {
                     return []
                 }
             )
-        case .int:
+        case .int, .uint:
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, scope, printer, cleanup in
@@ -3009,7 +3020,7 @@ struct IntrinsicJSFragment: Sendable {
                     } else {
                         // Handle optional primitive types using helper
                         switch wrappedType {
-                        case .int:
+                        case .int, .uint:
                             pushOptionalPrimitive(
                                 value: value,
                                 isSomeVar: isSomeVar,
@@ -3260,7 +3271,7 @@ struct IntrinsicJSFragment: Sendable {
                     return [bVar]
                 }
             )
-        case .int:
+        case .int, .uint:
             return IntrinsicJSFragment(
                 parameters: [],
                 printCode: { arguments, scope, printer, cleanup in

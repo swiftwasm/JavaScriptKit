@@ -9,6 +9,17 @@ public func _bjs_checkInt() -> Int32 {
     #endif
 }
 
+@_expose(wasm, "bjs_checkUInt")
+@_cdecl("bjs_checkUInt")
+public func _bjs_checkUInt() -> Int32 {
+    #if arch(wasm32)
+    let ret = checkUInt()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_checkFloat")
 @_cdecl("bjs_checkFloat")
 public func _bjs_checkFloat() -> Float32 {

@@ -13,6 +13,9 @@ func runJsWorks() -> Void
 @JS func roundTripInt(v: Int) -> Int {
     return v
 }
+@JS func roundTripUInt(v: UInt) -> UInt {
+    return v
+}
 @JS func roundTripFloat(v: Float) -> Float {
     return v
 }

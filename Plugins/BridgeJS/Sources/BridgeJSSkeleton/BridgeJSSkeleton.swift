@@ -127,7 +127,7 @@ public struct UnsafePointerType: Codable, Equatable, Hashable, Sendable {
 }
 
 public enum BridgeType: Codable, Equatable, Hashable, Sendable {
-    case int, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
+    case int, uint, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
     case unsafePointer(UnsafePointerType)
     indirect case optional(BridgeType)
     indirect case array(BridgeType)
@@ -860,6 +860,8 @@ extension BridgeType {
         switch swiftType {
         case "Int":
             self = .int
+        case "UInt":
+            self = .uint
         case "Float":
             self = .float
         case "Double":
@@ -887,7 +889,7 @@ extension BridgeType {
         switch self {
         case .void: return nil
         case .bool: return .i32
-        case .int: return .i32
+        case .int, .uint: return .i32
         case .float: return .f32
         case .double: return .f64
         case .string: return nil
@@ -933,6 +935,7 @@ extension BridgeType {
     public var mangleTypeName: String {
         switch self {
         case .int: return "Si"
+        case .uint: return "Su"
         case .float: return "Sf"
         case .double: return "Sd"
         case .string: return "SS"

@@ -25,6 +25,23 @@
       }
     },
     {
+      "abiName" : "bjs_checkUInt",
+      "effects" : {
+        "isAsync" : false,
+        "isStatic" : false,
+        "isThrows" : false
+      },
+      "name" : "checkUInt",
+      "parameters" : [
+
+      ],
+      "returnType" : {
+        "uint" : {
+
+        }
+      }
+    },
+    {
       "abiName" : "bjs_checkFloat",
       "effects" : {
         "isAsync" : false,

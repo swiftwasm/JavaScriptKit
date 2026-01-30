@@ -5,7 +5,7 @@
 // `swift package bridge-js`.
 
 export type Exports = {
-    check(a: number, b: number, c: number, d: boolean): void;
+    check(a: number, b: number, c: number, d: number, e: boolean): void;
 }
 export type Imports = {
 }

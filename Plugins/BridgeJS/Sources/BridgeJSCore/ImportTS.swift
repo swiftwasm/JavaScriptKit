@@ -866,7 +866,7 @@ extension BridgeType {
     func loweringParameterInfo(context: BridgeContext = .importTS) throws -> LoweringParameterInfo {
         switch self {
         case .bool: return .bool
-        case .int: return .int
+        case .int, .uint: return .int
         case .float: return .float
         case .double: return .double
         case .string: return .string
@@ -960,7 +960,7 @@ extension BridgeType {
     ) throws -> LiftingReturnInfo {
         switch self {
         case .bool: return .bool
-        case .int: return .int
+        case .int, .uint: return .int
         case .float: return .float
         case .double: return .double
         case .string: return .string

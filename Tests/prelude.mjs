@@ -155,6 +155,9 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     for (const v of [0, 1, -1, 2147483647, -2147483648]) {
         assert.equal(exports.roundTripInt(v), v);
     }
+    for (const v of [0, 1, 2147483647, 4294967295]) {
+        assert.equal(exports.roundTripUInt(v), v);
+    }
     for (const v of [
         0.0, 1.0, -1.0,
         NaN,
