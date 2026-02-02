@@ -504,7 +504,6 @@ export async function createInstantiator(options, swift) {
     let tmpRetPointers = [];
     let tmpParamPointers = [];
     let tmpStructCleanups = [];
-    let tmpRetArrayLengths = [];
     const enumHelpers = {};
     const structHelpers = {};
     
@@ -576,9 +575,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_pointer"] = function() {
                 return tmpParamPointers.pop();
-            }
-            bjs["swift_js_push_array_length"] = function(len) {
-                tmpRetArrayLengths.push(len | 0);
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }

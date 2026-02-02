@@ -42,7 +42,6 @@ export async function createInstantiator(options, swift) {
     let tmpRetPointers = [];
     let tmpParamPointers = [];
     let tmpStructCleanups = [];
-    let tmpRetArrayLengths = [];
     const enumHelpers = {};
     const structHelpers = {};
     
@@ -128,9 +127,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_pointer"] = function() {
                 return tmpParamPointers.pop();
-            }
-            bjs["swift_js_push_array_length"] = function(len) {
-                tmpRetArrayLengths.push(len | 0);
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }
@@ -300,7 +296,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(values.length);
                     instance.exports.bjs_processIntArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const int = tmpRetInts.pop();
@@ -323,7 +319,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(values.length);
                     instance.exports.bjs_processStringArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const string = tmpRetStrings.pop();
@@ -340,7 +336,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(values.length);
                     instance.exports.bjs_processDoubleArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const f64 = tmpRetF64s.pop();
@@ -357,7 +353,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(values.length);
                     instance.exports.bjs_processBoolArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const bool = tmpRetInts.pop() !== 0;
@@ -377,7 +373,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(points.length);
                     instance.exports.bjs_processPointArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const struct = structHelpers.Point.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
@@ -394,7 +390,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(directions.length);
                     instance.exports.bjs_processDirectionArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const caseId = tmpRetInts.pop();
@@ -411,7 +407,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(statuses.length);
                     instance.exports.bjs_processStatusArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const rawValue = tmpRetInts.pop();
@@ -455,7 +451,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(values.length);
                     instance.exports.bjs_processUnsafeRawPointerArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const pointer = tmpRetPointers.pop();
@@ -472,7 +468,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(values.length);
                     instance.exports.bjs_processUnsafeMutableRawPointerArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const pointer = tmpRetPointers.pop();
@@ -489,7 +485,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(values.length);
                     instance.exports.bjs_processOpaquePointerArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const pointer = tmpRetPointers.pop();
@@ -512,7 +508,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(values.length);
                     instance.exports.bjs_processOptionalIntArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const isSome1 = tmpRetInts.pop();
@@ -547,7 +543,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(values.length);
                     instance.exports.bjs_processOptionalStringArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const isSome1 = tmpRetInts.pop();
@@ -579,7 +575,7 @@ export async function createInstantiator(options, swift) {
                     const isSome1 = tmpRetInts.pop();
                     let optResult;
                     if (isSome1) {
-                        const arrayLen = tmpRetArrayLengths.pop();
+                        const arrayLen = tmpRetInts.pop();
                         const arrayResult = [];
                         for (let i = 0; i < arrayLen; i++) {
                             const int = tmpRetInts.pop();
@@ -606,7 +602,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(points.length);
                     instance.exports.bjs_processOptionalPointArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const isSome1 = tmpRetInts.pop();
@@ -636,7 +632,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(directions.length);
                     instance.exports.bjs_processOptionalDirectionArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const isSome1 = tmpRetInts.pop();
@@ -666,7 +662,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(statuses.length);
                     instance.exports.bjs_processOptionalStatusArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const isSome1 = tmpRetInts.pop();
@@ -697,10 +693,10 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(values.length);
                     instance.exports.bjs_processNestedIntArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const arrayLen1 = tmpRetArrayLengths.pop();
+                        const arrayLen1 = tmpRetInts.pop();
                         const arrayResult1 = [];
                         for (let i1 = 0; i1 < arrayLen1; i1++) {
                             const int = tmpRetInts.pop();
@@ -733,10 +729,10 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(values.length);
                     instance.exports.bjs_processNestedStringArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const arrayLen1 = tmpRetArrayLengths.pop();
+                        const arrayLen1 = tmpRetInts.pop();
                         const arrayResult1 = [];
                         for (let i1 = 0; i1 < arrayLen1; i1++) {
                             const string = tmpRetStrings.pop();
@@ -766,10 +762,10 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(points.length);
                     instance.exports.bjs_processNestedPointArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const arrayLen1 = tmpRetArrayLengths.pop();
+                        const arrayLen1 = tmpRetInts.pop();
                         const arrayResult1 = [];
                         for (let i1 = 0; i1 < arrayLen1; i1++) {
                             const struct = structHelpers.Point.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
@@ -789,7 +785,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(items.length);
                     instance.exports.bjs_processItemArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const ptr = tmpRetPointers.pop();
@@ -814,10 +810,10 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(items.length);
                     instance.exports.bjs_processNestedItemArray();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const arrayLen1 = tmpRetArrayLengths.pop();
+                        const arrayLen1 = tmpRetInts.pop();
                         const arrayResult1 = [];
                         for (let i1 = 0; i1 < arrayLen1; i1++) {
                             const ptr = tmpRetPointers.pop();

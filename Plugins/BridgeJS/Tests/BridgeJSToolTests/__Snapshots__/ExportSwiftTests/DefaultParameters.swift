@@ -333,7 +333,7 @@ public func _bjs_testIntArrayDefault() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_int(Int32(__bjs_elem_ret))}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -358,7 +358,7 @@ public func _bjs_testStringArrayDefault() -> Void {
     __bjs_ret_elem.withUTF8 { ptr in
         _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
     }}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -380,7 +380,7 @@ public func _bjs_testDoubleArrayDefault() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_f64(__bjs_elem_ret)}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -402,7 +402,7 @@ public func _bjs_testBoolArrayDefault() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_int(__bjs_elem_ret ? 1 : 0)}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -424,7 +424,7 @@ public func _bjs_testEmptyArrayDefault() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_int(Int32(__bjs_elem_ret))}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif

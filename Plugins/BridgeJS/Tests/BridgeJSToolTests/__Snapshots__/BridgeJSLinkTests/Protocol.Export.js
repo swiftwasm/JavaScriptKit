@@ -93,7 +93,6 @@ export async function createInstantiator(options, swift) {
     let tmpRetPointers = [];
     let tmpParamPointers = [];
     let tmpStructCleanups = [];
-    let tmpRetArrayLengths = [];
     const enumHelpers = {};
     const structHelpers = {};
     
@@ -165,9 +164,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_pointer"] = function() {
                 return tmpParamPointers.pop();
-            }
-            bjs["swift_js_push_array_length"] = function(len) {
-                tmpRetArrayLengths.push(len | 0);
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }
@@ -709,7 +705,7 @@ export async function createInstantiator(options, swift) {
                 }
                 get delegates() {
                     instance.exports.bjs_DelegateManager_delegates_get(this.pointer);
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const objId = tmpRetInts.pop();
@@ -743,7 +739,7 @@ export async function createInstantiator(options, swift) {
                     }
                     tmpParamInts.push(delegates.length);
                     instance.exports.bjs_processDelegates();
-                    const arrayLen = tmpRetArrayLengths.pop();
+                    const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const objId1 = tmpRetInts.pop();

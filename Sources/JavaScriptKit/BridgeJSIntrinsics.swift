@@ -478,17 +478,6 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 }
 #endif
 
-// MARK: Array length operations
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_push_array_length")
-@_spi(BridgeJS) public func _swift_js_push_array_length(_ length: Int32)
-#else
-@_spi(BridgeJS) public func _swift_js_push_array_length(_ length: Int32) {
-    _onlyAvailableOnWasm()
-}
-#endif
-
 // MARK: Struct bridging helpers (JS-side lowering/raising)
 
 #if arch(wasm32)

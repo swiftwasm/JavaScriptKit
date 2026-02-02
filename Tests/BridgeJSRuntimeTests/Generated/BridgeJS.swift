@@ -4677,7 +4677,7 @@ public func _bjs_roundTripIntArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_int(Int32(__bjs_elem_ret))}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4702,7 +4702,7 @@ public func _bjs_roundTripStringArray() -> Void {
     __bjs_ret_elem.withUTF8 { ptr in
         _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
     }}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4724,7 +4724,7 @@ public func _bjs_roundTripDoubleArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_f64(__bjs_elem_ret)}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4746,7 +4746,7 @@ public func _bjs_roundTripBoolArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_int(__bjs_elem_ret ? 1 : 0)}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4768,7 +4768,7 @@ public func _bjs_roundTripDirectionArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_int(Int32(__bjs_elem_ret.bridgeJSLowerParameter()))}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4790,7 +4790,7 @@ public func _bjs_roundTripStatusArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_int(Int32(__bjs_elem_ret.bridgeJSLowerParameter()))}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4815,7 +4815,7 @@ public func _bjs_roundTripThemeArray() -> Void {
     __bjs_ret_elem.withUTF8 { ptr in
         _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
     }}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4837,7 +4837,7 @@ public func _bjs_roundTripHttpStatusArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_int(Int32(__bjs_elem_ret.bridgeJSLowerParameter()))}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4859,7 +4859,7 @@ public func _bjs_roundTripDataPointArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     __bjs_elem_ret.bridgeJSLowerReturn()}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4881,7 +4881,7 @@ public func _bjs_roundTripGreeterArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_pointer(__bjs_elem_ret.bridgeJSLowerReturn())}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4906,7 +4906,7 @@ public func _bjs_roundTripOptionalIntArray() -> Void {
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
     _swift_js_push_int(Int32(__bjs_unwrapped_ret_elem))}
     _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4934,7 +4934,7 @@ public func _bjs_roundTripOptionalStringArray() -> Void {
         _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
     }}
     _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4959,7 +4959,7 @@ public func _bjs_roundTripOptionalDataPointArray() -> Void {
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
     __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()}
     _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4984,7 +4984,7 @@ public func _bjs_roundTripOptionalDirectionArray() -> Void {
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
     _swift_js_push_int(__bjs_unwrapped_ret_elem.bridgeJSLowerParameter())}
     _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5009,7 +5009,7 @@ public func _bjs_roundTripOptionalStatusArray() -> Void {
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
     _swift_js_push_int(__bjs_unwrapped_ret_elem.bridgeJSLowerParameter())}
     _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5039,7 +5039,7 @@ public func _bjs_roundTripOptionalIntArrayType(_ values: Int32) -> Void {
     if let __bjs_unwrapped_ret = ret {
     for __bjs_elem_ret in __bjs_unwrapped_ret {
     _swift_js_push_int(Int32(__bjs_elem_ret))}
-    _swift_js_push_array_length(Int32(__bjs_unwrapped_ret.count))}
+    _swift_js_push_int(Int32(__bjs_unwrapped_ret.count))}
     _swift_js_push_int(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
@@ -5073,7 +5073,7 @@ public func _bjs_roundTripOptionalStringArrayType(_ values: Int32) -> Void {
     __bjs_ret_elem.withUTF8 { ptr in
         _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
     }}
-    _swift_js_push_array_length(Int32(__bjs_unwrapped_ret.count))}
+    _swift_js_push_int(Int32(__bjs_unwrapped_ret.count))}
     _swift_js_push_int(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
@@ -5104,7 +5104,7 @@ public func _bjs_roundTripOptionalGreeterArrayType(_ greeters: Int32) -> Void {
     if let __bjs_unwrapped_ret = ret {
     for __bjs_elem_ret in __bjs_unwrapped_ret {
     _swift_js_push_pointer(__bjs_elem_ret.bridgeJSLowerReturn())}
-    _swift_js_push_array_length(Int32(__bjs_unwrapped_ret.count))}
+    _swift_js_push_int(Int32(__bjs_unwrapped_ret.count))}
     _swift_js_push_int(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
@@ -5137,8 +5137,8 @@ public func _bjs_roundTripNestedIntArray() -> Void {
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
     _swift_js_push_int(Int32(__bjs_elem_ret_elem))}
-    _swift_js_push_array_length(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5173,8 +5173,8 @@ public func _bjs_roundTripNestedStringArray() -> Void {
     __bjs_ret_elem_elem.withUTF8 { ptr in
         _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
     }}
-    _swift_js_push_array_length(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5206,8 +5206,8 @@ public func _bjs_roundTripNestedDoubleArray() -> Void {
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
     _swift_js_push_f64(__bjs_elem_ret_elem)}
-    _swift_js_push_array_length(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5239,8 +5239,8 @@ public func _bjs_roundTripNestedBoolArray() -> Void {
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
     _swift_js_push_int(__bjs_elem_ret_elem ? 1 : 0)}
-    _swift_js_push_array_length(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5272,8 +5272,8 @@ public func _bjs_roundTripNestedDataPointArray() -> Void {
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
     __bjs_elem_ret_elem.bridgeJSLowerReturn()}
-    _swift_js_push_array_length(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5305,8 +5305,8 @@ public func _bjs_roundTripNestedDirectionArray() -> Void {
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
     _swift_js_push_int(Int32(__bjs_elem_ret_elem.bridgeJSLowerParameter()))}
-    _swift_js_push_array_length(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5338,8 +5338,8 @@ public func _bjs_roundTripNestedGreeterArray() -> Void {
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
     _swift_js_push_pointer(__bjs_elem_ret_elem.bridgeJSLowerReturn())}
-    _swift_js_push_array_length(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5361,7 +5361,7 @@ public func _bjs_roundTripUnsafeRawPointerArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_pointer(__bjs_elem_ret.bridgeJSLowerReturn())}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5383,7 +5383,7 @@ public func _bjs_roundTripUnsafeMutableRawPointerArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_pointer(__bjs_elem_ret.bridgeJSLowerReturn())}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5405,7 +5405,7 @@ public func _bjs_roundTripOpaquePointerArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_pointer(__bjs_elem_ret.bridgeJSLowerReturn())}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5447,7 +5447,7 @@ public func _bjs_roundTripDataProcessorArrayType() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_int((__bjs_elem_ret as! AnyDataProcessor).bridgeJSLowerReturn())}
-    _swift_js_push_array_length(Int32(ret.count))
+    _swift_js_push_int(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif

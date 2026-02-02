@@ -31,7 +31,6 @@ final class JSGlueVariableScope {
     static let reservedTmpRetPointers = "tmpRetPointers"
     static let reservedTmpParamPointers = "tmpParamPointers"
     static let reservedTmpStructCleanups = "tmpStructCleanups"
-    static let reservedTmpRetArrayLengths = "tmpRetArrayLengths"
     static let reservedEnumHelpers = "enumHelpers"
     static let reservedStructHelpers = "structHelpers"
 
@@ -61,7 +60,6 @@ final class JSGlueVariableScope {
         reservedTmpRetPointers,
         reservedTmpParamPointers,
         reservedTmpStructCleanups,
-        reservedTmpRetArrayLengths,
         reservedEnumHelpers,
         reservedStructHelpers,
     ]
@@ -2186,7 +2184,7 @@ struct IntrinsicJSFragment: Sendable {
                 let lenVar = scope.variable("arrayLen")
                 let iVar = scope.variable("i")
 
-                printer.write("const \(lenVar) = \(JSGlueVariableScope.reservedTmpRetArrayLengths).pop();")
+                printer.write("const \(lenVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
                 printer.write("const \(resultVar) = [];")
                 printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
                 printer.indent {

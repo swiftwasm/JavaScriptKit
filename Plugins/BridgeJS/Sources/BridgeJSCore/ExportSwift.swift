@@ -1014,7 +1014,7 @@ struct StackCodegen {
         }
 
         statements.append("}")
-        statements.append("_swift_js_push_array_length(Int32(\(raw: accessor).count))")
+        statements.append("_swift_js_push_int(Int32(\(raw: accessor).count))")
         return statements
     }
 
