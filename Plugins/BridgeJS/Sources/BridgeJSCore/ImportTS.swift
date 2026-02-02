@@ -760,10 +760,10 @@ enum SwiftCodePattern {
         return AttributeListSyntax {
             #if canImport(SwiftSyntax602)
             let exposeAttrArgs = AttributeSyntax.Arguments.argumentList(
-                [
-                    LabeledExprSyntax(label: nil, expression: DeclReferenceExprSyntax(baseName: "wasm")),
-                    LabeledExprSyntax(label: nil, expression: StringLiteralExprSyntax(content: abiName)),
-                ]
+                LabeledExprListSyntax {
+                    LabeledExprSyntax(expression: DeclReferenceExprSyntax(baseName: "wasm"))
+                    LabeledExprSyntax(expression: StringLiteralExprSyntax(content: abiName))
+                }
             )
             let cdeclAttrArgs = AttributeSyntax.Arguments.argumentList(
                 [
