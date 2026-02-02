@@ -1465,10 +1465,10 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
             }
             return Int32(0)
         case .failure(let param0):
-            _swift_js_push_int(Int32(param0))
+            _swift_js_push_i32(Int32(param0))
             return Int32(1)
         case .flag(let param0):
-            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_i32(param0 ? 1 : 0)
             return Int32(2)
         case .rate(let param0):
             _swift_js_push_f32(param0)
@@ -1501,10 +1501,10 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
             }
         case .failure(let param0):
             _swift_js_push_tag(Int32(1))
-            _swift_js_push_int(Int32(param0))
+            _swift_js_push_i32(Int32(param0))
         case .flag(let param0):
             _swift_js_push_tag(Int32(2))
-            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_i32(param0 ? 1 : 0)
         case .rate(let param0):
             _swift_js_push_tag(Int32(3))
             _swift_js_push_f32(param0)
@@ -1554,7 +1554,7 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
             return Int32(1)
         case .location(let param0, let param1, let param2):
             _swift_js_push_f64(param0)
@@ -1565,8 +1565,8 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             }
             return Int32(2)
         case .status(let param0, let param1, let param2):
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(Int32(param1))
             var __bjs_param2 = param2
             __bjs_param2.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
@@ -1578,10 +1578,10 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             _swift_js_push_f64(param2)
             return Int32(4)
         case .comprehensive(let param0, let param1, let param2, let param3, let param4, let param5, let param6, let param7, let param8):
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(param1 ? 1 : 0)
-            _swift_js_push_int(Int32(param2))
-            _swift_js_push_int(Int32(param3))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(param1 ? 1 : 0)
+            _swift_js_push_i32(Int32(param2))
+            _swift_js_push_i32(Int32(param3))
             _swift_js_push_f64(param4)
             _swift_js_push_f64(param5)
             var __bjs_param6 = param6
@@ -1626,7 +1626,7 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
         case .location(let param0, let param1, let param2):
             _swift_js_push_tag(Int32(2))
             _swift_js_push_f64(param0)
@@ -1637,8 +1637,8 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             }
         case .status(let param0, let param1, let param2):
             _swift_js_push_tag(Int32(3))
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(Int32(param1))
             var __bjs_param2 = param2
             __bjs_param2.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
@@ -1650,10 +1650,10 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             _swift_js_push_f64(param2)
         case .comprehensive(let param0, let param1, let param2, let param3, let param4, let param5, let param6, let param7, let param8):
             _swift_js_push_tag(Int32(5))
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(param1 ? 1 : 0)
-            _swift_js_push_int(Int32(param2))
-            _swift_js_push_int(Int32(param3))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(param1 ? 1 : 0)
+            _swift_js_push_i32(Int32(param2))
+            _swift_js_push_i32(Int32(param3))
             _swift_js_push_f64(param4)
             _swift_js_push_f64(param5)
             var __bjs_param6 = param6
@@ -1703,11 +1703,11 @@ extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
             return Int32(1)
         case .status(let param0, let param1, let param2):
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(Int32(param1))
             var __bjs_param2 = param2
             __bjs_param2.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
@@ -1740,11 +1740,11 @@ extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
         case .status(let param0, let param1, let param2):
             _swift_js_push_tag(Int32(2))
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(Int32(param1))
             var __bjs_param2 = param2
             __bjs_param2.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
@@ -1780,7 +1780,7 @@ extension API.NetworkingResult: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
             return Int32(1)
         }
     }
@@ -1809,7 +1809,7 @@ extension API.NetworkingResult: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
         }
     }
 }
@@ -1840,31 +1840,31 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
                     _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
                 }
             }
-            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(0)
         case .failure(let param0, let param1):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                _swift_js_push_int(Int32(__bjs_unwrapped_param0))
+                _swift_js_push_i32(Int32(__bjs_unwrapped_param0))
             }
-            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                _swift_js_push_int(__bjs_unwrapped_param1 ? 1 : 0)
+                _swift_js_push_i32(__bjs_unwrapped_param1 ? 1 : 0)
             }
-            _swift_js_push_int(__bjs_isSome_param1 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             return Int32(1)
         case .status(let param0, let param1, let param2):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                _swift_js_push_int(__bjs_unwrapped_param0 ? 1 : 0)
+                _swift_js_push_i32(__bjs_unwrapped_param0 ? 1 : 0)
             }
-            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                _swift_js_push_int(Int32(__bjs_unwrapped_param1))
+                _swift_js_push_i32(Int32(__bjs_unwrapped_param1))
             }
-            _swift_js_push_int(__bjs_isSome_param1 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             let __bjs_isSome_param2 = param2 != nil
             if let __bjs_unwrapped_param2 = param2 {
                 var __bjs_str_param2 = __bjs_unwrapped_param2
@@ -1872,7 +1872,7 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
                     _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
                 }
             }
-            _swift_js_push_int(__bjs_isSome_param2 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param2 ? 1 : 0)
             return Int32(2)
         }
     }
@@ -1898,31 +1898,31 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
                     _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
                 }
             }
-            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
         case .failure(let param0, let param1):
             _swift_js_push_tag(Int32(1))
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                _swift_js_push_int(Int32(__bjs_unwrapped_param0))
+                _swift_js_push_i32(Int32(__bjs_unwrapped_param0))
             }
-            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                _swift_js_push_int(__bjs_unwrapped_param1 ? 1 : 0)
+                _swift_js_push_i32(__bjs_unwrapped_param1 ? 1 : 0)
             }
-            _swift_js_push_int(__bjs_isSome_param1 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
         case .status(let param0, let param1, let param2):
             _swift_js_push_tag(Int32(2))
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                _swift_js_push_int(__bjs_unwrapped_param0 ? 1 : 0)
+                _swift_js_push_i32(__bjs_unwrapped_param0 ? 1 : 0)
             }
-            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                _swift_js_push_int(Int32(__bjs_unwrapped_param1))
+                _swift_js_push_i32(Int32(__bjs_unwrapped_param1))
             }
-            _swift_js_push_int(__bjs_isSome_param1 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             let __bjs_isSome_param2 = param2 != nil
             if let __bjs_unwrapped_param2 = param2 {
                 var __bjs_str_param2 = __bjs_unwrapped_param2
@@ -1930,7 +1930,7 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
                     _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
                 }
             }
-            _swift_js_push_int(__bjs_isSome_param2 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param2 ? 1 : 0)
         }
     }
 }
@@ -2226,8 +2226,8 @@ extension Point: _BridgedSwiftStruct {
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        _swift_js_push_int(Int32(self.x))
-        _swift_js_push_int(Int32(self.y))
+        _swift_js_push_i32(Int32(self.x))
+        _swift_js_push_i32(Int32(self.y))
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -2344,14 +2344,14 @@ extension DataPoint: _BridgedSwiftStruct {
         }
         let __bjs_isSome_optCount = self.optCount != nil
         if let __bjs_unwrapped_optCount = self.optCount {
-            _swift_js_push_int(Int32(__bjs_unwrapped_optCount))
+            _swift_js_push_i32(Int32(__bjs_unwrapped_optCount))
         }
-        _swift_js_push_int(__bjs_isSome_optCount ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_optCount ? 1 : 0)
         let __bjs_isSome_optFlag = self.optFlag != nil
         if let __bjs_unwrapped_optFlag = self.optFlag {
-            _swift_js_push_int(__bjs_unwrapped_optFlag ? 1 : 0)
+            _swift_js_push_i32(__bjs_unwrapped_optFlag ? 1 : 0)
         }
-        _swift_js_push_int(__bjs_isSome_optFlag ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_optFlag ? 1 : 0)
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -2417,9 +2417,9 @@ extension Address: _BridgedSwiftStruct {
         }
         let __bjs_isSome_zipCode = self.zipCode != nil
         if let __bjs_unwrapped_zipCode = self.zipCode {
-            _swift_js_push_int(Int32(__bjs_unwrapped_zipCode))
+            _swift_js_push_i32(Int32(__bjs_unwrapped_zipCode))
         }
-        _swift_js_push_int(__bjs_isSome_zipCode ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_zipCode ? 1 : 0)
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -2470,7 +2470,7 @@ extension Contact: _BridgedSwiftStruct {
         __bjs_name.withUTF8 { ptr in
             _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
         }
-        _swift_js_push_int(Int32(self.age))
+        _swift_js_push_i32(Int32(self.age))
         self.address.bridgeJSLowerReturn()
         let __bjs_isSome_email = self.email != nil
         if let __bjs_unwrapped_email = self.email {
@@ -2479,12 +2479,12 @@ extension Contact: _BridgedSwiftStruct {
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
         }
-        _swift_js_push_int(__bjs_isSome_email ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_email ? 1 : 0)
         let __bjs_isSome_secondaryAddress = self.secondaryAddress != nil
         if let __bjs_unwrapped_secondaryAddress = self.secondaryAddress {
             __bjs_unwrapped_secondaryAddress.bridgeJSLowerReturn()
         }
-        _swift_js_push_int(__bjs_isSome_secondaryAddress ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_secondaryAddress ? 1 : 0)
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -2541,13 +2541,13 @@ extension Config: _BridgedSwiftStruct {
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
         }
-        _swift_js_push_int(__bjs_isSome_theme ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_theme ? 1 : 0)
         let __bjs_isSome_direction = self.direction != nil
         if let __bjs_unwrapped_direction = self.direction {
-            _swift_js_push_int(__bjs_unwrapped_direction.bridgeJSLowerParameter())
+            _swift_js_push_i32(__bjs_unwrapped_direction.bridgeJSLowerParameter())
         }
-        _swift_js_push_int(__bjs_isSome_direction ? 1 : 0)
-        _swift_js_push_int(Int32(self.status.bridgeJSLowerParameter()))
+        _swift_js_push_i32(__bjs_isSome_direction ? 1 : 0)
+        _swift_js_push_i32(Int32(self.status.bridgeJSLowerParameter()))
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -2591,12 +2591,12 @@ extension SessionData: _BridgedSwiftStruct {
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        _swift_js_push_int(Int32(self.id))
+        _swift_js_push_i32(Int32(self.id))
         let __bjs_isSome_owner = self.owner != nil
         if let __bjs_unwrapped_owner = self.owner {
             _swift_js_push_pointer(__bjs_unwrapped_owner.bridgeJSLowerReturn())
         }
-        _swift_js_push_int(__bjs_isSome_owner ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_owner ? 1 : 0)
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -2642,18 +2642,18 @@ extension ValidationReport: _BridgedSwiftStruct {
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        _swift_js_push_int(Int32(self.id))
+        _swift_js_push_i32(Int32(self.id))
         self.result.bridgeJSLowerReturn()
         let __bjs_isSome_status = self.status != nil
         if let __bjs_unwrapped_status = self.status {
-            _swift_js_push_int(__bjs_unwrapped_status.bridgeJSLowerParameter())
+            _swift_js_push_i32(__bjs_unwrapped_status.bridgeJSLowerParameter())
         }
-        _swift_js_push_int(__bjs_isSome_status ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_status ? 1 : 0)
         let __bjs_isSome_outcome = self.outcome != nil
         if let __bjs_unwrapped_outcome = self.outcome {
-            _swift_js_push_int(__bjs_unwrapped_outcome.bridgeJSLowerParameter())
+            _swift_js_push_i32(__bjs_unwrapped_outcome.bridgeJSLowerParameter())
         }
-        _swift_js_push_int(__bjs_isSome_outcome ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_outcome ? 1 : 0)
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -2705,38 +2705,38 @@ extension AdvancedConfig: _BridgedSwiftStruct {
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        _swift_js_push_int(Int32(self.id))
+        _swift_js_push_i32(Int32(self.id))
         var __bjs_title = self.title
         __bjs_title.withUTF8 { ptr in
             _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
         }
-        _swift_js_push_int(self.enabled ? 1 : 0)
+        _swift_js_push_i32(self.enabled ? 1 : 0)
         var __bjs_theme = self.theme.rawValue
         __bjs_theme.withUTF8 { ptr in
             _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
         }
-        _swift_js_push_int(Int32(self.status.bridgeJSLowerParameter()))
+        _swift_js_push_i32(Int32(self.status.bridgeJSLowerParameter()))
         let __bjs_isSome_result = self.result != nil
         if let __bjs_unwrapped_result = self.result {
-            _swift_js_push_int(__bjs_unwrapped_result.bridgeJSLowerParameter())
+            _swift_js_push_i32(__bjs_unwrapped_result.bridgeJSLowerParameter())
         }
-        _swift_js_push_int(__bjs_isSome_result ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_result ? 1 : 0)
         let __bjs_isSome_metadata = self.metadata != nil
         if let __bjs_unwrapped_metadata = self.metadata {
-            _swift_js_push_int(__bjs_unwrapped_metadata.bridgeJSLowerReturn())
+            _swift_js_push_i32(__bjs_unwrapped_metadata.bridgeJSLowerReturn())
         }
-        _swift_js_push_int(__bjs_isSome_metadata ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_metadata ? 1 : 0)
         let __bjs_isSome_location = self.location != nil
         if let __bjs_unwrapped_location = self.location {
             __bjs_unwrapped_location.bridgeJSLowerReturn()
         }
-        _swift_js_push_int(__bjs_isSome_location ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_location ? 1 : 0)
         self.defaults.bridgeJSLowerReturn()
         let __bjs_isSome_overrideDefaults = self.overrideDefaults != nil
         if let __bjs_unwrapped_overrideDefaults = self.overrideDefaults {
             __bjs_unwrapped_overrideDefaults.bridgeJSLowerReturn()
         }
-        _swift_js_push_int(__bjs_isSome_overrideDefaults ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_overrideDefaults ? 1 : 0)
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -2788,12 +2788,12 @@ extension MeasurementConfig: _BridgedSwiftStruct {
         if let __bjs_unwrapped_optionalPrecision = self.optionalPrecision {
             _swift_js_push_f32(__bjs_unwrapped_optionalPrecision.bridgeJSLowerParameter())
         }
-        _swift_js_push_int(__bjs_isSome_optionalPrecision ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_optionalPrecision ? 1 : 0)
         let __bjs_isSome_optionalRatio = self.optionalRatio != nil
         if let __bjs_unwrapped_optionalRatio = self.optionalRatio {
             _swift_js_push_f64(__bjs_unwrapped_optionalRatio.bridgeJSLowerParameter())
         }
-        _swift_js_push_int(__bjs_isSome_optionalRatio ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_optionalRatio ? 1 : 0)
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -2924,7 +2924,7 @@ extension CopyableCart: _BridgedSwiftStruct {
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        _swift_js_push_int(Int32(self.x))
+        _swift_js_push_i32(Int32(self.x))
         let __bjs_isSome_note = self.note != nil
         if let __bjs_unwrapped_note = self.note {
             var __bjs_str_note = __bjs_unwrapped_note
@@ -2932,7 +2932,7 @@ extension CopyableCart: _BridgedSwiftStruct {
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
         }
-        _swift_js_push_int(__bjs_isSome_note ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_note ? 1 : 0)
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -2991,7 +2991,7 @@ extension CopyableCartItem: _BridgedSwiftStruct {
         __bjs_sku.withUTF8 { ptr in
             _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
         }
-        _swift_js_push_int(Int32(self.quantity))
+        _swift_js_push_i32(Int32(self.quantity))
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -3036,13 +3036,13 @@ extension CopyableNestedCart: _BridgedSwiftStruct {
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        _swift_js_push_int(Int32(self.id))
+        _swift_js_push_i32(Int32(self.id))
         self.item.bridgeJSLowerReturn()
         let __bjs_isSome_shippingAddress = self.shippingAddress != nil
         if let __bjs_unwrapped_shippingAddress = self.shippingAddress {
             __bjs_unwrapped_shippingAddress.bridgeJSLowerReturn()
         }
-        _swift_js_push_int(__bjs_isSome_shippingAddress ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_shippingAddress ? 1 : 0)
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -3101,7 +3101,7 @@ extension ConfigStruct: _BridgedSwiftStruct {
         __bjs_name.withUTF8 { ptr in
             _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
         }
-        _swift_js_push_int(Int32(self.value))
+        _swift_js_push_i32(Int32(self.value))
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -4676,8 +4676,8 @@ public func _bjs_roundTripIntArray() -> Void {
         return __result
         }())
     for __bjs_elem_ret in ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4702,7 +4702,7 @@ public func _bjs_roundTripStringArray() -> Void {
     __bjs_ret_elem.withUTF8 { ptr in
         _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
     }}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4724,7 +4724,7 @@ public func _bjs_roundTripDoubleArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_f64(__bjs_elem_ret)}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4745,8 +4745,8 @@ public func _bjs_roundTripBoolArray() -> Void {
         return __result
         }())
     for __bjs_elem_ret in ret {
-    _swift_js_push_int(__bjs_elem_ret ? 1 : 0)}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(__bjs_elem_ret ? 1 : 0)}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4767,8 +4767,8 @@ public func _bjs_roundTripDirectionArray() -> Void {
         return __result
         }())
     for __bjs_elem_ret in ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret.bridgeJSLowerParameter()))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret.bridgeJSLowerParameter()))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4789,8 +4789,8 @@ public func _bjs_roundTripStatusArray() -> Void {
         return __result
         }())
     for __bjs_elem_ret in ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret.bridgeJSLowerParameter()))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret.bridgeJSLowerParameter()))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4815,7 +4815,7 @@ public func _bjs_roundTripThemeArray() -> Void {
     __bjs_ret_elem.withUTF8 { ptr in
         _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
     }}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4836,8 +4836,8 @@ public func _bjs_roundTripHttpStatusArray() -> Void {
         return __result
         }())
     for __bjs_elem_ret in ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret.bridgeJSLowerParameter()))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret.bridgeJSLowerParameter()))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4859,7 +4859,7 @@ public func _bjs_roundTripDataPointArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     __bjs_elem_ret.bridgeJSLowerReturn()}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4881,7 +4881,7 @@ public func _bjs_roundTripGreeterArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_pointer(__bjs_elem_ret.bridgeJSLowerReturn())}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4904,9 +4904,9 @@ public func _bjs_roundTripOptionalIntArray() -> Void {
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    _swift_js_push_int(Int32(__bjs_unwrapped_ret_elem))}
-    _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_unwrapped_ret_elem))}
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4933,8 +4933,8 @@ public func _bjs_roundTripOptionalStringArray() -> Void {
     __bjs_str_ret_elem.withUTF8 { ptr in
         _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
     }}
-    _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4958,8 +4958,8 @@ public func _bjs_roundTripOptionalDataPointArray() -> Void {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
     __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()}
-    _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4982,9 +4982,9 @@ public func _bjs_roundTripOptionalDirectionArray() -> Void {
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    _swift_js_push_int(__bjs_unwrapped_ret_elem.bridgeJSLowerParameter())}
-    _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(__bjs_unwrapped_ret_elem.bridgeJSLowerParameter())}
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5007,9 +5007,9 @@ public func _bjs_roundTripOptionalStatusArray() -> Void {
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    _swift_js_push_int(__bjs_unwrapped_ret_elem.bridgeJSLowerParameter())}
-    _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(__bjs_unwrapped_ret_elem.bridgeJSLowerParameter())}
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5038,9 +5038,9 @@ public func _bjs_roundTripOptionalIntArrayType(_ values: Int32) -> Void {
     let __bjs_isSome_ret = ret != nil
     if let __bjs_unwrapped_ret = ret {
     for __bjs_elem_ret in __bjs_unwrapped_ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret))}
-    _swift_js_push_int(Int32(__bjs_unwrapped_ret.count))}
-    _swift_js_push_int(__bjs_isSome_ret ? 1 : 0)
+    _swift_js_push_i32(Int32(__bjs_elem_ret))}
+    _swift_js_push_i32(Int32(__bjs_unwrapped_ret.count))}
+    _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5073,8 +5073,8 @@ public func _bjs_roundTripOptionalStringArrayType(_ values: Int32) -> Void {
     __bjs_ret_elem.withUTF8 { ptr in
         _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
     }}
-    _swift_js_push_int(Int32(__bjs_unwrapped_ret.count))}
-    _swift_js_push_int(__bjs_isSome_ret ? 1 : 0)
+    _swift_js_push_i32(Int32(__bjs_unwrapped_ret.count))}
+    _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5104,8 +5104,8 @@ public func _bjs_roundTripOptionalGreeterArrayType(_ greeters: Int32) -> Void {
     if let __bjs_unwrapped_ret = ret {
     for __bjs_elem_ret in __bjs_unwrapped_ret {
     _swift_js_push_pointer(__bjs_elem_ret.bridgeJSLowerReturn())}
-    _swift_js_push_int(Int32(__bjs_unwrapped_ret.count))}
-    _swift_js_push_int(__bjs_isSome_ret ? 1 : 0)
+    _swift_js_push_i32(Int32(__bjs_unwrapped_ret.count))}
+    _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5136,9 +5136,9 @@ public func _bjs_roundTripNestedIntArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret_elem))}
-    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret_elem))}
+    _swift_js_push_i32(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5173,8 +5173,8 @@ public func _bjs_roundTripNestedStringArray() -> Void {
     __bjs_ret_elem_elem.withUTF8 { ptr in
         _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
     }}
-    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5206,8 +5206,8 @@ public func _bjs_roundTripNestedDoubleArray() -> Void {
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
     _swift_js_push_f64(__bjs_elem_ret_elem)}
-    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5238,9 +5238,9 @@ public func _bjs_roundTripNestedBoolArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
-    _swift_js_push_int(__bjs_elem_ret_elem ? 1 : 0)}
-    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(__bjs_elem_ret_elem ? 1 : 0)}
+    _swift_js_push_i32(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5272,8 +5272,8 @@ public func _bjs_roundTripNestedDataPointArray() -> Void {
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
     __bjs_elem_ret_elem.bridgeJSLowerReturn()}
-    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5304,9 +5304,9 @@ public func _bjs_roundTripNestedDirectionArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret_elem.bridgeJSLowerParameter()))}
-    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret_elem.bridgeJSLowerParameter()))}
+    _swift_js_push_i32(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5338,8 +5338,8 @@ public func _bjs_roundTripNestedGreeterArray() -> Void {
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
     _swift_js_push_pointer(__bjs_elem_ret_elem.bridgeJSLowerReturn())}
-    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5361,7 +5361,7 @@ public func _bjs_roundTripUnsafeRawPointerArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_pointer(__bjs_elem_ret.bridgeJSLowerReturn())}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5383,7 +5383,7 @@ public func _bjs_roundTripUnsafeMutableRawPointerArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_pointer(__bjs_elem_ret.bridgeJSLowerReturn())}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5405,7 +5405,7 @@ public func _bjs_roundTripOpaquePointerArray() -> Void {
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_pointer(__bjs_elem_ret.bridgeJSLowerReturn())}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5446,8 +5446,8 @@ public func _bjs_roundTripDataProcessorArrayType() -> Void {
         return __result
         }())
     for __bjs_elem_ret in ret {
-    _swift_js_push_int((__bjs_elem_ret as! AnyDataProcessor).bridgeJSLowerReturn())}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32((__bjs_elem_ret as! AnyDataProcessor).bridgeJSLowerReturn())}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif

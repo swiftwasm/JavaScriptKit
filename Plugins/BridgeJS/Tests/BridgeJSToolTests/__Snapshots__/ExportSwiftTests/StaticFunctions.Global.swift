@@ -67,7 +67,7 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
             }
             return Int32(0)
         case .failure(let param0):
-            _swift_js_push_int(Int32(param0))
+            _swift_js_push_i32(Int32(param0))
             return Int32(1)
         }
     }
@@ -92,7 +92,7 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
             }
         case .failure(let param0):
             _swift_js_push_tag(Int32(1))
-            _swift_js_push_int(Int32(param0))
+            _swift_js_push_i32(Int32(param0))
         }
     }
 }

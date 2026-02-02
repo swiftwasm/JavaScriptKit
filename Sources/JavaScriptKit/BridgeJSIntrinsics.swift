@@ -425,10 +425,10 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_push_int")
-@_spi(BridgeJS) public func _swift_js_push_int(_ value: Int32)
+@_extern(wasm, module: "bjs", name: "swift_js_push_i32")
+@_spi(BridgeJS) public func _swift_js_push_i32(_ value: Int32)
 #else
-@_spi(BridgeJS) public func _swift_js_push_int(_ value: Int32) {
+@_spi(BridgeJS) public func _swift_js_push_i32(_ value: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
@@ -1491,10 +1491,10 @@ extension Optional where Wrapped: _BridgedSwiftStruct {
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
         switch consume self {
         case .none:
-            _swift_js_push_int(0)  // Push only isSome=0 (no struct fields)
+            _swift_js_push_i32(0)  // Push only isSome=0 (no struct fields)
         case .some(let value):
             value.bridgeJSLowerReturn()  // Push all struct fields FIRST
-            _swift_js_push_int(1)  // Then push isSome=1 LAST (so it's popped FIRST by JS)
+            _swift_js_push_i32(1)  // Then push isSome=1 LAST (so it's popped FIRST by JS)
         }
     }
 }

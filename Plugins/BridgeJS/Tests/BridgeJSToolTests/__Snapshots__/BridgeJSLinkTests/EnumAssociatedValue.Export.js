@@ -547,7 +547,7 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_push_tag"] = function(tag) {
                 tmpRetTag = tag;
             }
-            bjs["swift_js_push_int"] = function(v) {
+            bjs["swift_js_push_i32"] = function(v) {
                 tmpRetInts.push(v | 0);
             }
             bjs["swift_js_push_f32"] = function(v) {

@@ -390,7 +390,7 @@ public struct BridgeJSLink {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetTag) = tag;")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_push_int\"] = function(v) {")
+                printer.write("bjs[\"swift_js_push_i32\"] = function(v) {")
                 printer.indent {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetInts).push(v | 0);")
                 }

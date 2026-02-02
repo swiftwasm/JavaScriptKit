@@ -704,10 +704,10 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
             }
             return Int32(0)
         case .failure(let param0):
-            _swift_js_push_int(Int32(param0))
+            _swift_js_push_i32(Int32(param0))
             return Int32(1)
         case .flag(let param0):
-            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_i32(param0 ? 1 : 0)
             return Int32(2)
         case .rate(let param0):
             _swift_js_push_f32(param0)
@@ -740,10 +740,10 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
             }
         case .failure(let param0):
             _swift_js_push_tag(Int32(1))
-            _swift_js_push_int(Int32(param0))
+            _swift_js_push_i32(Int32(param0))
         case .flag(let param0):
             _swift_js_push_tag(Int32(2))
-            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_i32(param0 ? 1 : 0)
         case .rate(let param0):
             _swift_js_push_tag(Int32(3))
             _swift_js_push_f32(param0)

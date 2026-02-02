@@ -385,7 +385,7 @@ extension Result: _BridgedSwiftAssociatedValueEnum {
             }
             return Int32(0)
         case .failure(let param0):
-            _swift_js_push_int(Int32(param0))
+            _swift_js_push_i32(Int32(param0))
             return Int32(1)
         }
     }
@@ -410,7 +410,7 @@ extension Result: _BridgedSwiftAssociatedValueEnum {
             }
         case .failure(let param0):
             _swift_js_push_tag(Int32(1))
-            _swift_js_push_int(Int32(param0))
+            _swift_js_push_i32(Int32(param0))
         }
     }
 }
@@ -433,8 +433,8 @@ public func _bjs_processDelegates() -> Void {
         return __result
         }())
     for __bjs_elem_ret in ret {
-    _swift_js_push_int((__bjs_elem_ret as! AnyMyViewControllerDelegate).bridgeJSLowerReturn())}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32((__bjs_elem_ret as! AnyMyViewControllerDelegate).bridgeJSLowerReturn())}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -685,8 +685,8 @@ public func _bjs_DelegateManager_delegates_get(_ _self: UnsafeMutableRawPointer)
     #if arch(wasm32)
     let ret = DelegateManager.bridgeJSLiftParameter(_self).delegates
     for __bjs_elem_ret in ret {
-    _swift_js_push_int((__bjs_elem_ret as! AnyMyViewControllerDelegate).bridgeJSLowerReturn())}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32((__bjs_elem_ret as! AnyMyViewControllerDelegate).bridgeJSLowerReturn())}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif

@@ -38,10 +38,10 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
             }
             return Int32(0)
         case .failure(let param0):
-            _swift_js_push_int(Int32(param0))
+            _swift_js_push_i32(Int32(param0))
             return Int32(1)
         case .flag(let param0):
-            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_i32(param0 ? 1 : 0)
             return Int32(2)
         case .rate(let param0):
             _swift_js_push_f32(param0)
@@ -74,10 +74,10 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
             }
         case .failure(let param0):
             _swift_js_push_tag(Int32(1))
-            _swift_js_push_int(Int32(param0))
+            _swift_js_push_i32(Int32(param0))
         case .flag(let param0):
             _swift_js_push_tag(Int32(2))
-            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_i32(param0 ? 1 : 0)
         case .rate(let param0):
             _swift_js_push_tag(Int32(3))
             _swift_js_push_f32(param0)
@@ -127,7 +127,7 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
             return Int32(1)
         case .location(let param0, let param1, let param2):
             _swift_js_push_f64(param0)
@@ -138,8 +138,8 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             }
             return Int32(2)
         case .status(let param0, let param1, let param2):
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(Int32(param1))
             var __bjs_param2 = param2
             __bjs_param2.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
@@ -151,10 +151,10 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             _swift_js_push_f64(param2)
             return Int32(4)
         case .comprehensive(let param0, let param1, let param2, let param3, let param4, let param5, let param6, let param7, let param8):
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(param1 ? 1 : 0)
-            _swift_js_push_int(Int32(param2))
-            _swift_js_push_int(Int32(param3))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(param1 ? 1 : 0)
+            _swift_js_push_i32(Int32(param2))
+            _swift_js_push_i32(Int32(param3))
             _swift_js_push_f64(param4)
             _swift_js_push_f64(param5)
             var __bjs_param6 = param6
@@ -199,7 +199,7 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
         case .location(let param0, let param1, let param2):
             _swift_js_push_tag(Int32(2))
             _swift_js_push_f64(param0)
@@ -210,8 +210,8 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             }
         case .status(let param0, let param1, let param2):
             _swift_js_push_tag(Int32(3))
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(Int32(param1))
             var __bjs_param2 = param2
             __bjs_param2.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
@@ -223,10 +223,10 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             _swift_js_push_f64(param2)
         case .comprehensive(let param0, let param1, let param2, let param3, let param4, let param5, let param6, let param7, let param8):
             _swift_js_push_tag(Int32(5))
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(param1 ? 1 : 0)
-            _swift_js_push_int(Int32(param2))
-            _swift_js_push_int(Int32(param3))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(param1 ? 1 : 0)
+            _swift_js_push_i32(Int32(param2))
+            _swift_js_push_i32(Int32(param3))
             _swift_js_push_f64(param4)
             _swift_js_push_f64(param5)
             var __bjs_param6 = param6
@@ -262,8 +262,8 @@ extension SimpleStruct: _BridgedSwiftStruct {
         __bjs_name.withUTF8 { ptr in
             _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
         }
-        _swift_js_push_int(Int32(self.count))
-        _swift_js_push_int(self.flag ? 1 : 0)
+        _swift_js_push_i32(Int32(self.count))
+        _swift_js_push_i32(self.flag ? 1 : 0)
         _swift_js_push_f32(self.rate)
         _swift_js_push_f64(self.precise)
     }
@@ -318,7 +318,7 @@ extension Address: _BridgedSwiftStruct {
         __bjs_city.withUTF8 { ptr in
             _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
         }
-        _swift_js_push_int(Int32(self.zipCode))
+        _swift_js_push_i32(Int32(self.zipCode))
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -368,7 +368,7 @@ extension Person: _BridgedSwiftStruct {
         __bjs_name.withUTF8 { ptr in
             _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
         }
-        _swift_js_push_int(Int32(self.age))
+        _swift_js_push_i32(Int32(self.age))
         self.address.bridgeJSLowerReturn()
         let __bjs_isSome_email = self.email != nil
         if let __bjs_unwrapped_email = self.email {
@@ -377,7 +377,7 @@ extension Person: _BridgedSwiftStruct {
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
         }
-        _swift_js_push_int(__bjs_isSome_email ? 1 : 0)
+        _swift_js_push_i32(__bjs_isSome_email ? 1 : 0)
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -425,12 +425,12 @@ extension ComplexStruct: _BridgedSwiftStruct {
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        _swift_js_push_int(Int32(self.id))
+        _swift_js_push_i32(Int32(self.id))
         var __bjs_title = self.title
         __bjs_title.withUTF8 { ptr in
             _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
         }
-        _swift_js_push_int(self.active ? 1 : 0)
+        _swift_js_push_i32(self.active ? 1 : 0)
         _swift_js_push_f64(self.score)
         var __bjs_tags = self.tags
         __bjs_tags.withUTF8 { ptr in
@@ -1508,8 +1508,8 @@ public func _bjs_ArrayRoundtrip_makeIntArray(_ _self: UnsafeMutableRawPointer) -
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeIntArray()
     for __bjs_elem_ret in ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1530,8 +1530,8 @@ public func _bjs_ArrayRoundtrip_roundtripIntArray(_ _self: UnsafeMutableRawPoint
         return __result
         }())
     for __bjs_elem_ret in ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1543,8 +1543,8 @@ public func _bjs_ArrayRoundtrip_makeIntArrayLarge(_ _self: UnsafeMutableRawPoint
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeIntArrayLarge()
     for __bjs_elem_ret in ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1576,7 +1576,7 @@ public func _bjs_ArrayRoundtrip_makeDoubleArray(_ _self: UnsafeMutableRawPointer
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeDoubleArray()
     for __bjs_elem_ret in ret {
     _swift_js_push_f64(__bjs_elem_ret)}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1598,7 +1598,7 @@ public func _bjs_ArrayRoundtrip_roundtripDoubleArray(_ _self: UnsafeMutableRawPo
         }())
     for __bjs_elem_ret in ret {
     _swift_js_push_f64(__bjs_elem_ret)}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1633,7 +1633,7 @@ public func _bjs_ArrayRoundtrip_makeStringArray(_ _self: UnsafeMutableRawPointer
     __bjs_ret_elem.withUTF8 { ptr in
         _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
     }}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1658,7 +1658,7 @@ public func _bjs_ArrayRoundtrip_roundtripStringArray(_ _self: UnsafeMutableRawPo
     __bjs_ret_elem.withUTF8 { ptr in
         _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
     }}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1690,7 +1690,7 @@ public func _bjs_ArrayRoundtrip_makePointArray(_ _self: UnsafeMutableRawPointer)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makePointArray()
     for __bjs_elem_ret in ret {
     __bjs_elem_ret.bridgeJSLowerReturn()}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1712,7 +1712,7 @@ public func _bjs_ArrayRoundtrip_roundtripPointArray(_ _self: UnsafeMutableRawPoi
         }())
     for __bjs_elem_ret in ret {
     __bjs_elem_ret.bridgeJSLowerReturn()}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1725,7 +1725,7 @@ public func _bjs_ArrayRoundtrip_makePointArrayLarge(_ _self: UnsafeMutableRawPoi
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makePointArrayLarge()
     for __bjs_elem_ret in ret {
     __bjs_elem_ret.bridgeJSLowerReturn()}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1766,9 +1766,9 @@ public func _bjs_ArrayRoundtrip_makeNestedIntArray(_ _self: UnsafeMutableRawPoin
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeNestedIntArray()
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret_elem))}
-    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret_elem))}
+    _swift_js_push_i32(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1799,9 +1799,9 @@ public func _bjs_ArrayRoundtrip_roundtripNestedIntArray(_ _self: UnsafeMutableRa
         }())
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret_elem))}
-    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret_elem))}
+    _swift_js_push_i32(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1843,8 +1843,8 @@ public func _bjs_ArrayRoundtrip_makeNestedPointArray(_ _self: UnsafeMutableRawPo
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
     __bjs_elem_ret_elem.bridgeJSLowerReturn()}
-    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1876,8 +1876,8 @@ public func _bjs_ArrayRoundtrip_roundtripNestedPointArray(_ _self: UnsafeMutable
     for __bjs_elem_ret in ret {
     for __bjs_elem_ret_elem in __bjs_elem_ret {
     __bjs_elem_ret_elem.bridgeJSLowerReturn()}
-    _swift_js_push_int(Int32(__bjs_elem_ret.count))}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_elem_ret.count))}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1910,9 +1910,9 @@ public func _bjs_ArrayRoundtrip_makeOptionalIntArray(_ _self: UnsafeMutableRawPo
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    _swift_js_push_int(Int32(__bjs_unwrapped_ret_elem))}
-    _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_unwrapped_ret_elem))}
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1935,9 +1935,9 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalIntArray(_ _self: UnsafeMutable
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    _swift_js_push_int(Int32(__bjs_unwrapped_ret_elem))}
-    _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(Int32(__bjs_unwrapped_ret_elem))}
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1971,8 +1971,8 @@ public func _bjs_ArrayRoundtrip_makeOptionalPointArray(_ _self: UnsafeMutableRaw
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
     __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()}
-    _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1996,8 +1996,8 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalPointArray(_ _self: UnsafeMutab
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
     __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()}
-    _swift_js_push_int(__bjs_isSome_ret_elem ? 1 : 0)}
-    _swift_js_push_int(Int32(ret.count))
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -2036,9 +2036,9 @@ public func _bjs_ArrayRoundtrip_makeOptionalArraySome(_ _self: UnsafeMutableRawP
     let __bjs_isSome_ret = ret != nil
     if let __bjs_unwrapped_ret = ret {
     for __bjs_elem_ret in __bjs_unwrapped_ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret))}
-    _swift_js_push_int(Int32(__bjs_unwrapped_ret.count))}
-    _swift_js_push_int(__bjs_isSome_ret ? 1 : 0)
+    _swift_js_push_i32(Int32(__bjs_elem_ret))}
+    _swift_js_push_i32(Int32(__bjs_unwrapped_ret.count))}
+    _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -2052,9 +2052,9 @@ public func _bjs_ArrayRoundtrip_makeOptionalArrayNone(_ _self: UnsafeMutableRawP
     let __bjs_isSome_ret = ret != nil
     if let __bjs_unwrapped_ret = ret {
     for __bjs_elem_ret in __bjs_unwrapped_ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret))}
-    _swift_js_push_int(Int32(__bjs_unwrapped_ret.count))}
-    _swift_js_push_int(__bjs_isSome_ret ? 1 : 0)
+    _swift_js_push_i32(Int32(__bjs_elem_ret))}
+    _swift_js_push_i32(Int32(__bjs_unwrapped_ret.count))}
+    _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -2083,9 +2083,9 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalArray(_ _self: UnsafeMutableRaw
     let __bjs_isSome_ret = ret != nil
     if let __bjs_unwrapped_ret = ret {
     for __bjs_elem_ret in __bjs_unwrapped_ret {
-    _swift_js_push_int(Int32(__bjs_elem_ret))}
-    _swift_js_push_int(Int32(__bjs_unwrapped_ret.count))}
-    _swift_js_push_int(__bjs_isSome_ret ? 1 : 0)
+    _swift_js_push_i32(Int32(__bjs_elem_ret))}
+    _swift_js_push_i32(Int32(__bjs_unwrapped_ret.count))}
+    _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
