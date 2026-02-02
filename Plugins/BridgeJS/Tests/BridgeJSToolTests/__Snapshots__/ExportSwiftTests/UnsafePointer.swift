@@ -1,10 +1,10 @@
 extension PointerFields: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> PointerFields {
-        let mutPtr = UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
-        let ptr = UnsafePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
-        let opaque = OpaquePointer.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
-        let mutRaw = UnsafeMutableRawPointer.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
-        let raw = UnsafeRawPointer.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
+        let mutPtr = UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_pointer())
+        let ptr = UnsafePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_pointer())
+        let opaque = OpaquePointer.bridgeJSLiftParameter(_swift_js_pop_pointer())
+        let mutRaw = UnsafeMutableRawPointer.bridgeJSLiftParameter(_swift_js_pop_pointer())
+        let raw = UnsafeRawPointer.bridgeJSLiftParameter(_swift_js_pop_pointer())
         return PointerFields(raw: raw, mutRaw: mutRaw, opaque: opaque, ptr: ptr, mutPtr: mutPtr)
     }
 

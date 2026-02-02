@@ -677,15 +677,15 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 2:
-            return .flag(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .flag(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 3:
-            return .rate(Float.bridgeJSLiftParameter(_swift_js_pop_param_f32()))
+            return .rate(Float.bridgeJSLiftParameter(_swift_js_pop_f32()))
         case 4:
-            return .precise(Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()))
+            return .precise(Double.bridgeJSLiftParameter(_swift_js_pop_f64()))
         case 5:
             return .info
         default:

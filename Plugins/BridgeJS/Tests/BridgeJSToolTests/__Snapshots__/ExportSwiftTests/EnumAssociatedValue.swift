@@ -2,15 +2,15 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 2:
-            return .flag(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .flag(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 3:
-            return .rate(Float.bridgeJSLiftParameter(_swift_js_pop_param_f32()))
+            return .rate(Float.bridgeJSLiftParameter(_swift_js_pop_f32()))
         case 4:
-            return .precise(Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()))
+            return .precise(Double.bridgeJSLiftParameter(_swift_js_pop_f64()))
         case 5:
             return .info
         default:
@@ -85,15 +85,15 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> ComplexResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .error(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .error(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 2:
-            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 3:
-            return .coordinates(Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()))
+            return .coordinates(Double.bridgeJSLiftParameter(_swift_js_pop_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_f64()))
         case 4:
-            return .comprehensive(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .comprehensive(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()), Bool.bridgeJSLiftParameter(_swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()), Double.bridgeJSLiftParameter(_swift_js_pop_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_f64()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 5:
             return .info
         default:
@@ -224,11 +224,11 @@ extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> Utilities.Result {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 2:
-            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         default:
             fatalError("Unknown Utilities.Result case ID: \(caseId)")
         }
@@ -303,9 +303,9 @@ extension NetworkingResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> NetworkingResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         default:
             fatalError("Unknown NetworkingResult case ID: \(caseId)")
         }
@@ -364,11 +364,11 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIOptionalResult {
         switch caseId {
         case 0:
-            return .success(Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(Optional<String>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .failure(Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 2:
-            return .status(Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .status(Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Optional<String>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32()))
         default:
             fatalError("Unknown APIOptionalResult case ID: \(caseId)")
         }

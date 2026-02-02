@@ -452,28 +452,28 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_pop_param_int32")
-@_spi(BridgeJS) public func _swift_js_pop_param_int32() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_pop_i32")
+@_spi(BridgeJS) public func _swift_js_pop_i32() -> Int32
 #else
-@_spi(BridgeJS) public func _swift_js_pop_param_int32() -> Int32 {
+@_spi(BridgeJS) public func _swift_js_pop_i32() -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_pop_param_f32")
-@_spi(BridgeJS) public func _swift_js_pop_param_f32() -> Float32
+@_extern(wasm, module: "bjs", name: "swift_js_pop_f32")
+@_spi(BridgeJS) public func _swift_js_pop_f32() -> Float32
 #else
-@_spi(BridgeJS) public func _swift_js_pop_param_f32() -> Float32 {
+@_spi(BridgeJS) public func _swift_js_pop_f32() -> Float32 {
     _onlyAvailableOnWasm()
 }
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_pop_param_f64")
-@_spi(BridgeJS) public func _swift_js_pop_param_f64() -> Float64
+@_extern(wasm, module: "bjs", name: "swift_js_pop_f64")
+@_spi(BridgeJS) public func _swift_js_pop_f64() -> Float64
 #else
-@_spi(BridgeJS) public func _swift_js_pop_param_f64() -> Float64 {
+@_spi(BridgeJS) public func _swift_js_pop_f64() -> Float64 {
     _onlyAvailableOnWasm()
 }
 #endif
@@ -490,10 +490,10 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_pop_param_array_length")
-@_spi(BridgeJS) public func _swift_js_pop_param_array_length() -> Int32
+@_extern(wasm, module: "bjs", name: "swift_js_pop_array_length")
+@_spi(BridgeJS) public func _swift_js_pop_array_length() -> Int32
 #else
-@_spi(BridgeJS) public func _swift_js_pop_param_array_length() -> Int32 {
+@_spi(BridgeJS) public func _swift_js_pop_array_length() -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
@@ -704,10 +704,10 @@ func _swift_js_return_optional_double(_ isSome: Int32, _ value: Float64) {
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_pop_param_pointer")
-@_spi(BridgeJS) public func _swift_js_pop_param_pointer() -> UnsafeMutableRawPointer
+@_extern(wasm, module: "bjs", name: "swift_js_pop_pointer")
+@_spi(BridgeJS) public func _swift_js_pop_pointer() -> UnsafeMutableRawPointer
 #else
-@_spi(BridgeJS) public func _swift_js_pop_param_pointer() -> UnsafeMutableRawPointer {
+@_spi(BridgeJS) public func _swift_js_pop_pointer() -> UnsafeMutableRawPointer {
     _onlyAvailableOnWasm()
 }
 #endif

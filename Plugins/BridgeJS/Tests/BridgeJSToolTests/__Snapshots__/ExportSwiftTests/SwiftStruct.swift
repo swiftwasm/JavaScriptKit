@@ -3,11 +3,11 @@ extension Precision: _BridgedSwiftEnumNoPayload {
 
 extension DataPoint: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> DataPoint {
-        let optFlag = Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let optCount = Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let label = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let y = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
-        let x = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
+        let optFlag = Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let optCount = Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let label = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let y = Double.bridgeJSLiftParameter(_swift_js_pop_f64())
+        let x = Double.bridgeJSLiftParameter(_swift_js_pop_f64())
         return DataPoint(x: x, y: y, label: label, optCount: optCount, optFlag: optFlag)
     }
 
@@ -76,9 +76,9 @@ public func _bjs_DataPoint_init(_ x: Float64, _ y: Float64, _ labelBytes: Int32,
 
 extension Address: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Address {
-        let zipCode = Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let city = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let street = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let zipCode = Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let city = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let street = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
         return Address(street: street, city: city, zipCode: zipCode)
     }
 
@@ -133,10 +133,10 @@ fileprivate func _bjs_struct_lift_Address() -> Int32 {
 
 extension Person: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Person {
-        let email = Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let email = Optional<String>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32())
         let address = Address.bridgeJSLiftParameter()
-        let age = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
-        let name = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let age = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let name = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
         return Person(name: name, age: age, address: address, email: email)
     }
 
@@ -192,8 +192,8 @@ fileprivate func _bjs_struct_lift_Person() -> Int32 {
 
 extension Session: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Session {
-        let owner = Greeter.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
-        let id = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let owner = Greeter.bridgeJSLiftParameter(_swift_js_pop_pointer())
+        let id = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
         return Session(id: id, owner: owner)
     }
 
@@ -237,9 +237,9 @@ fileprivate func _bjs_struct_lift_Session() -> Int32 {
 
 extension Measurement: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Measurement {
-        let optionalPrecision = Optional<Precision>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f32())
-        let precision = Precision.bridgeJSLiftParameter(_swift_js_pop_param_f32())
-        let value = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
+        let optionalPrecision = Optional<Precision>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_f32())
+        let precision = Precision.bridgeJSLiftParameter(_swift_js_pop_f32())
+        let value = Double.bridgeJSLiftParameter(_swift_js_pop_f64())
         return Measurement(value: value, precision: precision, optionalPrecision: optionalPrecision)
     }
 

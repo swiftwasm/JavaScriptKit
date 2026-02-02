@@ -366,9 +366,9 @@ extension Result: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> Result {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         default:
             fatalError("Unknown Result case ID: \(caseId)")
         }
@@ -423,11 +423,11 @@ extension Priority: _BridgedSwiftEnumNoPayload {
 public func _bjs_processDelegates() -> Void {
     #if arch(wasm32)
     let ret = processDelegates(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [AnyMyViewControllerDelegate] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(AnyMyViewControllerDelegate.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(AnyMyViewControllerDelegate.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -654,11 +654,11 @@ fileprivate func _bjs_MyViewController_wrap(_ pointer: UnsafeMutableRawPointer) 
 public func _bjs_DelegateManager_init() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = DelegateManager(delegates: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [AnyMyViewControllerDelegate] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(AnyMyViewControllerDelegate.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(AnyMyViewControllerDelegate.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -697,11 +697,11 @@ public func _bjs_DelegateManager_delegates_get(_ _self: UnsafeMutableRawPointer)
 public func _bjs_DelegateManager_delegates_set(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     DelegateManager.bridgeJSLiftParameter(_self).delegates = {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [AnyMyViewControllerDelegate] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(AnyMyViewControllerDelegate.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(AnyMyViewControllerDelegate.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result

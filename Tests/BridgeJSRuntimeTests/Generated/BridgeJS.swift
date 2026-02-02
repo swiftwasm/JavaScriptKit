@@ -1438,15 +1438,15 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 2:
-            return .flag(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .flag(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 3:
-            return .rate(Float.bridgeJSLiftParameter(_swift_js_pop_param_f32()))
+            return .rate(Float.bridgeJSLiftParameter(_swift_js_pop_f32()))
         case 4:
-            return .precise(Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()))
+            return .precise(Double.bridgeJSLiftParameter(_swift_js_pop_f64()))
         case 5:
             return .info
         default:
@@ -1521,17 +1521,17 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> ComplexResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .error(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .error(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 2:
-            return .location(Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .location(Double.bridgeJSLiftParameter(_swift_js_pop_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_f64()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 3:
-            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 4:
-            return .coordinates(Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()))
+            return .coordinates(Double.bridgeJSLiftParameter(_swift_js_pop_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_f64()))
         case 5:
-            return .comprehensive(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .comprehensive(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()), Bool.bridgeJSLiftParameter(_swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()), Double.bridgeJSLiftParameter(_swift_js_pop_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_f64()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 6:
             return .info
         default:
@@ -1678,11 +1678,11 @@ extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> Utilities.Result {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 2:
-            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         default:
             fatalError("Unknown Utilities.Result case ID: \(caseId)")
         }
@@ -1757,9 +1757,9 @@ extension API.NetworkingResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> API.NetworkingResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         default:
             fatalError("Unknown API.NetworkingResult case ID: \(caseId)")
         }
@@ -1818,11 +1818,11 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIOptionalResult {
         switch caseId {
         case 0:
-            return .success(Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(Optional<String>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .failure(Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 2:
-            return .status(Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .status(Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Optional<String>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32()))
         default:
             fatalError("Unknown APIOptionalResult case ID: \(caseId)")
         }
@@ -2220,8 +2220,8 @@ public func _bjs_StaticPropertyNamespace_NestedProperties_static_nestedDouble_se
 
 extension Point: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Point {
-        let y = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
-        let x = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let y = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let x = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
         return Point(x: x, y: y)
     }
 
@@ -2265,11 +2265,11 @@ fileprivate func _bjs_struct_lift_Point() -> Int32 {
 
 extension PointerFields: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> PointerFields {
-        let mutPtr = UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
-        let ptr = UnsafePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
-        let opaque = OpaquePointer.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
-        let mutRaw = UnsafeMutableRawPointer.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
-        let raw = UnsafeRawPointer.bridgeJSLiftParameter(_swift_js_pop_param_pointer())
+        let mutPtr = UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_pointer())
+        let ptr = UnsafePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_pointer())
+        let opaque = OpaquePointer.bridgeJSLiftParameter(_swift_js_pop_pointer())
+        let mutRaw = UnsafeMutableRawPointer.bridgeJSLiftParameter(_swift_js_pop_pointer())
+        let raw = UnsafeRawPointer.bridgeJSLiftParameter(_swift_js_pop_pointer())
         return PointerFields(raw: raw, mutRaw: mutRaw, opaque: opaque, ptr: ptr, mutPtr: mutPtr)
     }
 
@@ -2327,11 +2327,11 @@ public func _bjs_PointerFields_init(_ raw: UnsafeMutableRawPointer, _ mutRaw: Un
 
 extension DataPoint: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> DataPoint {
-        let optFlag = Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let optCount = Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let label = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let y = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
-        let x = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
+        let optFlag = Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let optCount = Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let label = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let y = Double.bridgeJSLiftParameter(_swift_js_pop_f64())
+        let x = Double.bridgeJSLiftParameter(_swift_js_pop_f64())
         return DataPoint(x: x, y: y, label: label, optCount: optCount, optFlag: optFlag)
     }
 
@@ -2400,9 +2400,9 @@ public func _bjs_DataPoint_init(_ x: Float64, _ y: Float64, _ labelBytes: Int32,
 
 extension Address: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Address {
-        let zipCode = Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let city = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let street = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let zipCode = Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let city = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let street = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
         return Address(street: street, city: city, zipCode: zipCode)
     }
 
@@ -2457,11 +2457,11 @@ fileprivate func _bjs_struct_lift_Address() -> Int32 {
 
 extension Contact: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Contact {
-        let secondaryAddress = Optional<Address>.bridgeJSLiftParameter(_swift_js_pop_param_int32())
-        let email = Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let secondaryAddress = Optional<Address>.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let email = Optional<String>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32())
         let address = Address.bridgeJSLiftParameter()
-        let age = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
-        let name = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let age = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let name = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
         return Contact(name: name, age: age, address: address, email: email, secondaryAddress: secondaryAddress)
     }
 
@@ -2522,10 +2522,10 @@ fileprivate func _bjs_struct_lift_Contact() -> Int32 {
 
 extension Config: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Config {
-        let status = Status.bridgeJSLiftParameter(_swift_js_pop_param_int32())
-        let direction = Optional<Direction>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let theme = Optional<Theme>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let name = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let status = Status.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let direction = Optional<Direction>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let theme = Optional<Theme>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32())
+        let name = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
         return Config(name: name, theme: theme, direction: direction, status: status)
     }
 
@@ -2585,8 +2585,8 @@ fileprivate func _bjs_struct_lift_Config() -> Int32 {
 
 extension SessionData: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> SessionData {
-        let owner = Optional<Greeter>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_pointer())
-        let id = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let owner = Optional<Greeter>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_pointer())
+        let id = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
         return SessionData(id: id, owner: owner)
     }
 
@@ -2634,10 +2634,10 @@ fileprivate func _bjs_struct_lift_SessionData() -> Int32 {
 
 extension ValidationReport: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> ValidationReport {
-        let outcome = Optional<APIResult>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let status = Optional<Status>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let result = APIResult.bridgeJSLiftParameter(_swift_js_pop_param_int32())
-        let id = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let outcome = Optional<APIResult>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let status = Optional<Status>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let result = APIResult.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let id = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
         return ValidationReport(id: id, result: result, status: status, outcome: outcome)
     }
 
@@ -2691,16 +2691,16 @@ fileprivate func _bjs_struct_lift_ValidationReport() -> Int32 {
 
 extension AdvancedConfig: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> AdvancedConfig {
-        let overrideDefaults = Optional<ConfigStruct>.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let overrideDefaults = Optional<ConfigStruct>.bridgeJSLiftParameter(_swift_js_pop_i32())
         let defaults = ConfigStruct.bridgeJSLiftParameter()
-        let location = Optional<DataPoint>.bridgeJSLiftParameter(_swift_js_pop_param_int32())
-        let metadata = Optional<JSObject>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let result = Optional<APIResult>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let status = Status.bridgeJSLiftParameter(_swift_js_pop_param_int32())
-        let theme = Theme.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let enabled = Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32())
-        let title = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let id = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let location = Optional<DataPoint>.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let metadata = Optional<JSObject>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let result = Optional<APIResult>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let status = Status.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let theme = Theme.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let enabled = Bool.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let title = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let id = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
         return AdvancedConfig(id: id, title: title, enabled: enabled, theme: theme, status: status, result: result, metadata: metadata, location: location, defaults: defaults, overrideDefaults: overrideDefaults)
     }
 
@@ -2774,10 +2774,10 @@ fileprivate func _bjs_struct_lift_AdvancedConfig() -> Int32 {
 
 extension MeasurementConfig: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> MeasurementConfig {
-        let optionalRatio = Optional<Ratio>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f64())
-        let optionalPrecision = Optional<Precision>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f32())
-        let ratio = Ratio.bridgeJSLiftParameter(_swift_js_pop_param_f64())
-        let precision = Precision.bridgeJSLiftParameter(_swift_js_pop_param_f32())
+        let optionalRatio = Optional<Ratio>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_f64())
+        let optionalPrecision = Optional<Precision>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_f32())
+        let ratio = Ratio.bridgeJSLiftParameter(_swift_js_pop_f64())
+        let precision = Precision.bridgeJSLiftParameter(_swift_js_pop_f32())
         return MeasurementConfig(precision: precision, ratio: ratio, optionalPrecision: optionalPrecision, optionalRatio: optionalRatio)
     }
 
@@ -2831,7 +2831,7 @@ fileprivate func _bjs_struct_lift_MeasurementConfig() -> Int32 {
 
 extension MathOperations: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> MathOperations {
-        let baseValue = Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())
+        let baseValue = Double.bridgeJSLiftParameter(_swift_js_pop_f64())
         return MathOperations(baseValue: baseValue)
     }
 
@@ -2918,8 +2918,8 @@ public func _bjs_MathOperations_static_subtract(_ a: Float64, _ b: Float64) -> F
 
 extension CopyableCart: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> CopyableCart {
-        let note = Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())
-        let x = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let note = Optional<String>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32())
+        let x = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
         return CopyableCart(x: x, note: note)
     }
 
@@ -2981,8 +2981,8 @@ public func _bjs_CopyableCart_static_fromJSObject(_ object: Int32) -> Void {
 
 extension CopyableCartItem: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> CopyableCartItem {
-        let quantity = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
-        let sku = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let quantity = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let sku = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
         return CopyableCartItem(sku: sku, quantity: quantity)
     }
 
@@ -3029,9 +3029,9 @@ fileprivate func _bjs_struct_lift_CopyableCartItem() -> Int32 {
 
 extension CopyableNestedCart: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> CopyableNestedCart {
-        let shippingAddress = Optional<Address>.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let shippingAddress = Optional<Address>.bridgeJSLiftParameter(_swift_js_pop_i32())
         let item = CopyableCartItem.bridgeJSLiftParameter()
-        let id = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
+        let id = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
         return CopyableNestedCart(id: id, item: item, shippingAddress: shippingAddress)
     }
 
@@ -3091,8 +3091,8 @@ public func _bjs_CopyableNestedCart_static_fromJSObject(_ object: Int32) -> Void
 
 extension ConfigStruct: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> ConfigStruct {
-        let value = Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())
-        let name = String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())
+        let value = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let name = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
         return ConfigStruct(name: name, value: value)
     }
 
@@ -4567,11 +4567,11 @@ public func _bjs_testEmptyInit(_ object: UnsafeMutableRawPointer) -> UnsafeMutab
 public func _bjs_arrayWithDefault() -> Int32 {
     #if arch(wasm32)
     let ret = arrayWithDefault(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4591,11 +4591,11 @@ public func _bjs_arrayWithOptionalDefault(_ values: Int32) -> Int32 {
             return Optional<[Int]>.none
         } else {
             return {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4613,11 +4613,11 @@ public func _bjs_arrayWithOptionalDefault(_ values: Int32) -> Int32 {
 public func _bjs_arrayMixedDefaults(_ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void {
     #if arch(wasm32)
     let ret = arrayMixedDefaults(prefix: String.bridgeJSLiftParameter(prefixBytes, prefixLength), values: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4666,11 +4666,11 @@ public func _bjs_makeAdder(_ base: Int32) -> UnsafeMutableRawPointer {
 public func _bjs_roundTripIntArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripIntArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4688,11 +4688,11 @@ public func _bjs_roundTripIntArray() -> Void {
 public func _bjs_roundTripStringArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripStringArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [String] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            __result.append(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4713,11 +4713,11 @@ public func _bjs_roundTripStringArray() -> Void {
 public func _bjs_roundTripDoubleArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripDoubleArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Double] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()))
+            __result.append(Double.bridgeJSLiftParameter(_swift_js_pop_f64()))
         }
         __result.reverse()
         return __result
@@ -4735,11 +4735,11 @@ public func _bjs_roundTripDoubleArray() -> Void {
 public func _bjs_roundTripBoolArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripBoolArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Bool] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4757,11 +4757,11 @@ public func _bjs_roundTripBoolArray() -> Void {
 public func _bjs_roundTripDirectionArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripDirectionArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Direction] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Direction.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(Direction.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4779,11 +4779,11 @@ public func _bjs_roundTripDirectionArray() -> Void {
 public func _bjs_roundTripStatusArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripStatusArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Status] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Status.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(Status.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4801,11 +4801,11 @@ public func _bjs_roundTripStatusArray() -> Void {
 public func _bjs_roundTripThemeArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripThemeArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Theme] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Theme.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            __result.append(Theme.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4826,11 +4826,11 @@ public func _bjs_roundTripThemeArray() -> Void {
 public func _bjs_roundTripHttpStatusArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripHttpStatusArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [HttpStatus] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(HttpStatus.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(HttpStatus.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4848,7 +4848,7 @@ public func _bjs_roundTripHttpStatusArray() -> Void {
 public func _bjs_roundTripDataPointArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripDataPointArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [DataPoint] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4870,11 +4870,11 @@ public func _bjs_roundTripDataPointArray() -> Void {
 public func _bjs_roundTripGreeterArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripGreeterArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Greeter] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Greeter.bridgeJSLiftParameter(_swift_js_pop_param_pointer()))
+            __result.append(Greeter.bridgeJSLiftParameter(_swift_js_pop_pointer()))
         }
         __result.reverse()
         return __result
@@ -4892,11 +4892,11 @@ public func _bjs_roundTripGreeterArray() -> Void {
 public func _bjs_roundTripOptionalIntArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalIntArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Optional<Int>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            __result.append(Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4917,11 +4917,11 @@ public func _bjs_roundTripOptionalIntArray() -> Void {
 public func _bjs_roundTripOptionalStringArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalStringArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Optional<String>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            __result.append(Optional<String>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4945,11 +4945,11 @@ public func _bjs_roundTripOptionalStringArray() -> Void {
 public func _bjs_roundTripOptionalDataPointArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalDataPointArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Optional<DataPoint>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Optional<DataPoint>.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(Optional<DataPoint>.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4970,11 +4970,11 @@ public func _bjs_roundTripOptionalDataPointArray() -> Void {
 public func _bjs_roundTripOptionalDirectionArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalDirectionArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Optional<Direction>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Optional<Direction>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            __result.append(Optional<Direction>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -4995,11 +4995,11 @@ public func _bjs_roundTripOptionalDirectionArray() -> Void {
 public func _bjs_roundTripOptionalStatusArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalStatusArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Optional<Status>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Optional<Status>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            __result.append(Optional<Status>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -5024,11 +5024,11 @@ public func _bjs_roundTripOptionalIntArrayType(_ values: Int32) -> Void {
             return Optional<[Int]>.none
         } else {
             return {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -5055,11 +5055,11 @@ public func _bjs_roundTripOptionalStringArrayType(_ values: Int32) -> Void {
             return Optional<[String]>.none
         } else {
             return {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [String] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            __result.append(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -5089,11 +5089,11 @@ public func _bjs_roundTripOptionalGreeterArrayType(_ greeters: Int32) -> Void {
             return Optional<[Greeter]>.none
         } else {
             return {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Greeter] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Greeter.bridgeJSLiftParameter(_swift_js_pop_param_pointer()))
+            __result.append(Greeter.bridgeJSLiftParameter(_swift_js_pop_pointer()))
         }
         __result.reverse()
         return __result
@@ -5116,16 +5116,16 @@ public func _bjs_roundTripOptionalGreeterArrayType(_ greeters: Int32) -> Void {
 public func _bjs_roundTripNestedIntArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedIntArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [[Int]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -5149,16 +5149,16 @@ public func _bjs_roundTripNestedIntArray() -> Void {
 public func _bjs_roundTripNestedStringArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedStringArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [[String]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [String] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            __result.append(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -5185,16 +5185,16 @@ public func _bjs_roundTripNestedStringArray() -> Void {
 public func _bjs_roundTripNestedDoubleArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedDoubleArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [[Double]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Double] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()))
+            __result.append(Double.bridgeJSLiftParameter(_swift_js_pop_f64()))
         }
         __result.reverse()
         return __result
@@ -5218,16 +5218,16 @@ public func _bjs_roundTripNestedDoubleArray() -> Void {
 public func _bjs_roundTripNestedBoolArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedBoolArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [[Bool]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Bool] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -5251,12 +5251,12 @@ public func _bjs_roundTripNestedBoolArray() -> Void {
 public func _bjs_roundTripNestedDataPointArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedDataPointArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [[DataPoint]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [DataPoint] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5284,16 +5284,16 @@ public func _bjs_roundTripNestedDataPointArray() -> Void {
 public func _bjs_roundTripNestedDirectionArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedDirectionArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [[Direction]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Direction] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Direction.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(Direction.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -5317,16 +5317,16 @@ public func _bjs_roundTripNestedDirectionArray() -> Void {
 public func _bjs_roundTripNestedGreeterArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedGreeterArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [[Greeter]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [Greeter] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(Greeter.bridgeJSLiftParameter(_swift_js_pop_param_pointer()))
+            __result.append(Greeter.bridgeJSLiftParameter(_swift_js_pop_pointer()))
         }
         __result.reverse()
         return __result
@@ -5350,11 +5350,11 @@ public func _bjs_roundTripNestedGreeterArray() -> Void {
 public func _bjs_roundTripUnsafeRawPointerArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripUnsafeRawPointerArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [UnsafeRawPointer] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(UnsafeRawPointer.bridgeJSLiftParameter(_swift_js_pop_param_pointer()))
+            __result.append(UnsafeRawPointer.bridgeJSLiftParameter(_swift_js_pop_pointer()))
         }
         __result.reverse()
         return __result
@@ -5372,11 +5372,11 @@ public func _bjs_roundTripUnsafeRawPointerArray() -> Void {
 public func _bjs_roundTripUnsafeMutableRawPointerArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripUnsafeMutableRawPointerArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [UnsafeMutableRawPointer] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(UnsafeMutableRawPointer.bridgeJSLiftParameter(_swift_js_pop_param_pointer()))
+            __result.append(UnsafeMutableRawPointer.bridgeJSLiftParameter(_swift_js_pop_pointer()))
         }
         __result.reverse()
         return __result
@@ -5394,11 +5394,11 @@ public func _bjs_roundTripUnsafeMutableRawPointerArray() -> Void {
 public func _bjs_roundTripOpaquePointerArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripOpaquePointerArray(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [OpaquePointer] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(OpaquePointer.bridgeJSLiftParameter(_swift_js_pop_param_pointer()))
+            __result.append(OpaquePointer.bridgeJSLiftParameter(_swift_js_pop_pointer()))
         }
         __result.reverse()
         return __result
@@ -5416,11 +5416,11 @@ public func _bjs_roundTripOpaquePointerArray() -> Void {
 public func _bjs_consumeDataProcessorArrayType() -> Int32 {
     #if arch(wasm32)
     let ret = consumeDataProcessorArrayType(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [AnyDataProcessor] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(AnyDataProcessor.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(AnyDataProcessor.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result
@@ -5436,11 +5436,11 @@ public func _bjs_consumeDataProcessorArrayType() -> Int32 {
 public func _bjs_roundTripDataProcessorArrayType() -> Void {
     #if arch(wasm32)
     let ret = roundTripDataProcessorArrayType(_: {
-        let __count = Int(_swift_js_pop_param_array_length())
+        let __count = Int(_swift_js_pop_array_length())
         var __result: [AnyDataProcessor] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
-            __result.append(AnyDataProcessor.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            __result.append(AnyDataProcessor.bridgeJSLiftParameter(_swift_js_pop_i32()))
         }
         __result.reverse()
         return __result

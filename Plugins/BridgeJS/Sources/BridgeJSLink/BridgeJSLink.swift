@@ -416,17 +416,17 @@ public struct BridgeJSLink {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetStrings).push(value);")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_pop_param_int32\"] = function() {")
+                printer.write("bjs[\"swift_js_pop_i32\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamInts).pop();")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_pop_param_f32\"] = function() {")
+                printer.write("bjs[\"swift_js_pop_f32\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamF32s).pop();")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_pop_param_f64\"] = function() {")
+                printer.write("bjs[\"swift_js_pop_f64\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamF64s).pop();")
                 }
@@ -436,7 +436,7 @@ public struct BridgeJSLink {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetPointers).push(pointer);")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_pop_param_pointer\"] = function() {")
+                printer.write("bjs[\"swift_js_pop_pointer\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamPointers).pop();")
                 }
@@ -446,7 +446,7 @@ public struct BridgeJSLink {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetArrayLengths).push(len | 0);")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_pop_param_array_length\"] = function() {")
+                printer.write("bjs[\"swift_js_pop_array_length\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamArrayLengths).pop();")
                 }
