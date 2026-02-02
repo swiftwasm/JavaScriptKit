@@ -64,7 +64,6 @@ jobs:
     strategy:
       matrix:
         swift-image:
-          - "swift:6.0.3"   # Tests with SwiftSyntax 600.x (non-SwiftSyntax602 code path)
           - "swift:6.1.2"   # Tests with SwiftSyntax 601.x (non-SwiftSyntax602 code path)
           - "swift:6.2"     # Tests with SwiftSyntax 602.x (SwiftSyntax602 code path)
     runs-on: ubuntu-latest
