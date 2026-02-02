@@ -113,6 +113,7 @@ import BridgeJSUtilities
             let bridgeJsGlobalDtsPath = targetDirectory.appending(path: "bridge-js.global.d.ts")
             let hasDts = FileManager.default.fileExists(atPath: bridgeJsDtsPath.path)
             let hasGlobalDts = FileManager.default.fileExists(atPath: bridgeJsGlobalDtsPath.path)
+            var generatedMacrosPath: String? = nil
             if hasDts || hasGlobalDts {
                 guard let tsconfigPath = doubleDashOptions["project"] else {
                     throw BridgeJSToolError("--project option is required when processing .d.ts files")
@@ -128,9 +129,19 @@ import BridgeJSUtilities
                     progress: progress,
                     outputPath: bridgeJSMacrosPath.path
                 )
+                generatedMacrosPath = bridgeJSMacrosPath.path
             }
 
-            let inputFiles = inputSwiftFiles(targetDirectory: targetDirectory, positionalArguments: positionalArguments)
+            var inputFiles = inputSwiftFiles(targetDirectory: targetDirectory, positionalArguments: positionalArguments)
+            // BridgeJS.Macros.swift contains imported declarations (@JSFunction, @JSClass, etc.) that need
+            // to be processed by SwiftToSkeleton to populate the imported skeleton. The command plugin
+            // filters out Generated/ files, so we explicitly add it here after generation.
+            if let macrosPath = generatedMacrosPath, FileManager.default.fileExists(atPath: macrosPath) {
+                // Only add if not already present (when running directly vs through plugin)
+                if !inputFiles.contains(macrosPath) {
+                    inputFiles.append(macrosPath)
+                }
+            }
             let swiftToSkeleton = SwiftToSkeleton(
                 progress: progress,
                 moduleName: moduleName,
