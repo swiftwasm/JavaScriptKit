@@ -1,37 +1,37 @@
-extension Theme: _BridgedSwiftEnumNoPayload {
+extension Theme: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension TSTheme: _BridgedSwiftEnumNoPayload {
+extension TSTheme: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension FeatureFlag: _BridgedSwiftEnumNoPayload {
+extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension HttpStatus: _BridgedSwiftEnumNoPayload {
+extension HttpStatus: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension TSHttpStatus: _BridgedSwiftEnumNoPayload {
+extension TSHttpStatus: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension Priority: _BridgedSwiftEnumNoPayload {
+extension Priority: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension FileSize: _BridgedSwiftEnumNoPayload {
+extension FileSize: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension UserId: _BridgedSwiftEnumNoPayload {
+extension UserId: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension TokenId: _BridgedSwiftEnumNoPayload {
+extension TokenId: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension SessionId: _BridgedSwiftEnumNoPayload {
+extension SessionId: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension Precision: _BridgedSwiftEnumNoPayload {
+extension Precision: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension Ratio: _BridgedSwiftEnumNoPayload {
+extension Ratio: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
 @_expose(wasm, "bjs_setTheme")

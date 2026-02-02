@@ -667,25 +667,25 @@ extension Direction: _BridgedSwiftCaseEnum {
     }
 }
 
-extension Theme: _BridgedSwiftEnumNoPayload {
+extension Theme: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension HttpStatus: _BridgedSwiftEnumNoPayload {
+extension HttpStatus: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
 extension APIResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
+            return .success(String.bridgeJSLiftParameter())
         case 1:
-            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
+            return .failure(Int.bridgeJSLiftParameter())
         case 2:
-            return .flag(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()))
+            return .flag(Bool.bridgeJSLiftParameter())
         case 3:
-            return .rate(Float.bridgeJSLiftParameter(_swift_js_pop_f32()))
+            return .rate(Float.bridgeJSLiftParameter())
         case 4:
-            return .precise(Double.bridgeJSLiftParameter(_swift_js_pop_f64()))
+            return .precise(Double.bridgeJSLiftParameter())
         case 5:
             return .info
         default:
@@ -698,22 +698,19 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         switch self {
         case .success(let param0):
-            var __bjs_param0 = param0
-            __bjs_param0.withUTF8 { ptr in
-                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
-            }
+            param0.bridgeJSLowerStackReturn()
             return Int32(0)
         case .failure(let param0):
-            _swift_js_push_i32(Int32(param0))
+            param0.bridgeJSLowerStackReturn()
             return Int32(1)
         case .flag(let param0):
-            _swift_js_push_i32(param0 ? 1 : 0)
+            param0.bridgeJSLowerStackReturn()
             return Int32(2)
         case .rate(let param0):
-            _swift_js_push_f32(param0)
+            param0.bridgeJSLowerStackReturn()
             return Int32(3)
         case .precise(let param0):
-            _swift_js_push_f64(param0)
+            param0.bridgeJSLowerStackReturn()
             return Int32(4)
         case .info:
             return Int32(5)
@@ -734,22 +731,19 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
         switch self {
         case .success(let param0):
             _swift_js_push_tag(Int32(0))
-            var __bjs_param0 = param0
-            __bjs_param0.withUTF8 { ptr in
-                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
-            }
+            param0.bridgeJSLowerStackReturn()
         case .failure(let param0):
             _swift_js_push_tag(Int32(1))
-            _swift_js_push_i32(Int32(param0))
+            param0.bridgeJSLowerStackReturn()
         case .flag(let param0):
             _swift_js_push_tag(Int32(2))
-            _swift_js_push_i32(param0 ? 1 : 0)
+            param0.bridgeJSLowerStackReturn()
         case .rate(let param0):
             _swift_js_push_tag(Int32(3))
-            _swift_js_push_f32(param0)
+            param0.bridgeJSLowerStackReturn()
         case .precise(let param0):
             _swift_js_push_tag(Int32(4))
-            _swift_js_push_f64(param0)
+            param0.bridgeJSLowerStackReturn()
         case .info:
             _swift_js_push_tag(Int32(5))
         }

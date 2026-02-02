@@ -9138,6 +9138,84 @@
         }
       },
       {
+        "abiName" : "bjs_roundTripUnsafePointerArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUnsafePointerArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "values",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "unsafePointer" : {
+                    "_0" : {
+                      "kind" : "unsafePointer",
+                      "pointee" : "UInt8"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafePointer",
+                  "pointee" : "UInt8"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripUnsafeMutablePointerArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUnsafeMutablePointerArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "values",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "unsafePointer" : {
+                    "_0" : {
+                      "kind" : "unsafeMutablePointer",
+                      "pointee" : "UInt8"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "unsafePointer" : {
+                "_0" : {
+                  "kind" : "unsafeMutablePointer",
+                  "pointee" : "UInt8"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
         "abiName" : "bjs_consumeDataProcessorArrayType",
         "effects" : {
           "isAsync" : false,

@@ -1407,6 +1407,12 @@ enum APIOptionalResult {
 @JS func roundTripOpaquePointerArray(_ values: [OpaquePointer]) -> [OpaquePointer] {
     return values
 }
+@JS func roundTripUnsafePointerArray(_ values: [UnsafePointer<UInt8>]) -> [UnsafePointer<UInt8>] {
+    return values
+}
+@JS func roundTripUnsafeMutablePointerArray(_ values: [UnsafeMutablePointer<UInt8>]) -> [UnsafeMutablePointer<UInt8>] {
+    return values
+}
 
 @JS func consumeDataProcessorArrayType(_ processors: [DataProcessor]) -> Int {
     return processors.count

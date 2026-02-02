@@ -4,13 +4,13 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-@_spi(Experimental) import JavaScriptKit
+@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
 enum FeatureFlag: String {
     case foo = "foo"
     case bar = "bar"
 }
-extension FeatureFlag: _BridgedSwiftEnumNoPayload {}
+extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
 
 @JSFunction func takesFeatureFlag(_ flag: FeatureFlag) throws (JSException) -> Void
 

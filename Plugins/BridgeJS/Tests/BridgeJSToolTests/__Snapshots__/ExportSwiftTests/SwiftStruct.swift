@@ -1,31 +1,28 @@
-extension Precision: _BridgedSwiftEnumNoPayload {
+extension Precision: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
 extension DataPoint: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> DataPoint {
-        let optFlag = Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
-        let optCount = Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
-        let label = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
-        let y = Double.bridgeJSLiftParameter(_swift_js_pop_f64())
-        let x = Double.bridgeJSLiftParameter(_swift_js_pop_f64())
+        let optFlag = Optional<Bool>.bridgeJSLiftParameter()
+        let optCount = Optional<Int>.bridgeJSLiftParameter()
+        let label = String.bridgeJSLiftParameter()
+        let y = Double.bridgeJSLiftParameter()
+        let x = Double.bridgeJSLiftParameter()
         return DataPoint(x: x, y: y, label: label, optCount: optCount, optFlag: optFlag)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        _swift_js_push_f64(self.x)
-        _swift_js_push_f64(self.y)
-        var __bjs_label = self.label
-        __bjs_label.withUTF8 { ptr in
-            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
-        }
+        self.x.bridgeJSLowerStackReturn()
+        self.y.bridgeJSLowerStackReturn()
+        self.label.bridgeJSLowerStackReturn()
         let __bjs_isSome_optCount = self.optCount != nil
         if let __bjs_unwrapped_optCount = self.optCount {
-            _swift_js_push_i32(Int32(__bjs_unwrapped_optCount))
+            __bjs_unwrapped_optCount.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optCount ? 1 : 0)
         let __bjs_isSome_optFlag = self.optFlag != nil
         if let __bjs_unwrapped_optFlag = self.optFlag {
-            _swift_js_push_i32(__bjs_unwrapped_optFlag ? 1 : 0)
+            __bjs_unwrapped_optFlag.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optFlag ? 1 : 0)
     }
@@ -76,24 +73,18 @@ public func _bjs_DataPoint_init(_ x: Float64, _ y: Float64, _ labelBytes: Int32,
 
 extension Address: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Address {
-        let zipCode = Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
-        let city = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
-        let street = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let zipCode = Optional<Int>.bridgeJSLiftParameter()
+        let city = String.bridgeJSLiftParameter()
+        let street = String.bridgeJSLiftParameter()
         return Address(street: street, city: city, zipCode: zipCode)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        var __bjs_street = self.street
-        __bjs_street.withUTF8 { ptr in
-            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
-        }
-        var __bjs_city = self.city
-        __bjs_city.withUTF8 { ptr in
-            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
-        }
+        self.street.bridgeJSLowerStackReturn()
+        self.city.bridgeJSLowerStackReturn()
         let __bjs_isSome_zipCode = self.zipCode != nil
         if let __bjs_unwrapped_zipCode = self.zipCode {
-            _swift_js_push_i32(Int32(__bjs_unwrapped_zipCode))
+            __bjs_unwrapped_zipCode.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_zipCode ? 1 : 0)
     }
@@ -133,26 +124,20 @@ fileprivate func _bjs_struct_lift_Address() -> Int32 {
 
 extension Person: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Person {
-        let email = Optional<String>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32())
+        let email = Optional<String>.bridgeJSLiftParameter()
         let address = Address.bridgeJSLiftParameter()
-        let age = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
-        let name = String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let age = Int.bridgeJSLiftParameter()
+        let name = String.bridgeJSLiftParameter()
         return Person(name: name, age: age, address: address, email: email)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        var __bjs_name = self.name
-        __bjs_name.withUTF8 { ptr in
-            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
-        }
-        _swift_js_push_i32(Int32(self.age))
+        self.name.bridgeJSLowerStackReturn()
+        self.age.bridgeJSLowerStackReturn()
         self.address.bridgeJSLowerReturn()
         let __bjs_isSome_email = self.email != nil
         if let __bjs_unwrapped_email = self.email {
-            var __bjs_str_email = __bjs_unwrapped_email
-            __bjs_str_email.withUTF8 { ptr in
-                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
-            }
+            __bjs_unwrapped_email.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_email ? 1 : 0)
     }
@@ -192,14 +177,14 @@ fileprivate func _bjs_struct_lift_Person() -> Int32 {
 
 extension Session: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Session {
-        let owner = Greeter.bridgeJSLiftParameter(_swift_js_pop_pointer())
-        let id = Int.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let owner = Greeter.bridgeJSLiftParameter()
+        let id = Int.bridgeJSLiftParameter()
         return Session(id: id, owner: owner)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        _swift_js_push_i32(Int32(self.id))
-        _swift_js_push_pointer(self.owner.bridgeJSLowerReturn())
+        self.id.bridgeJSLowerStackReturn()
+        self.owner.bridgeJSLowerStackReturn()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -237,18 +222,18 @@ fileprivate func _bjs_struct_lift_Session() -> Int32 {
 
 extension Measurement: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Measurement {
-        let optionalPrecision = Optional<Precision>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_f32())
+        let optionalPrecision = Optional<Precision>.bridgeJSLiftParameter()
         let precision = Precision.bridgeJSLiftParameter(_swift_js_pop_f32())
-        let value = Double.bridgeJSLiftParameter(_swift_js_pop_f64())
+        let value = Double.bridgeJSLiftParameter()
         return Measurement(value: value, precision: precision, optionalPrecision: optionalPrecision)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        _swift_js_push_f64(self.value)
-        _swift_js_push_f32(self.precision.bridgeJSLowerParameter())
+        self.value.bridgeJSLowerStackReturn()
+        self.precision.bridgeJSLowerStackReturn()
         let __bjs_isSome_optionalPrecision = self.optionalPrecision != nil
         if let __bjs_unwrapped_optionalPrecision = self.optionalPrecision {
-            _swift_js_push_f32(__bjs_unwrapped_optionalPrecision.bridgeJSLowerParameter())
+            __bjs_unwrapped_optionalPrecision.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optionalPrecision ? 1 : 0)
     }

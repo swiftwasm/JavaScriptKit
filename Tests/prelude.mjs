@@ -1385,6 +1385,8 @@ function testArraySupport(exports) {
     assert.deepEqual(exports.roundTripUnsafeRawPointerArray(pointerValues), pointerValues);
     assert.deepEqual(exports.roundTripUnsafeMutableRawPointerArray(pointerValues), pointerValues);
     assert.deepEqual(exports.roundTripOpaquePointerArray(pointerValues), pointerValues);
+    assert.deepEqual(exports.roundTripUnsafePointerArray(pointerValues), pointerValues);
+    assert.deepEqual(exports.roundTripUnsafeMutablePointerArray(pointerValues), pointerValues);
     assert.deepEqual(exports.roundTripUnsafeRawPointerArray([]), []);
 
     // Default values
