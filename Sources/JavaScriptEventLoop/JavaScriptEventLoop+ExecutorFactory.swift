@@ -4,7 +4,7 @@
 // See: https://github.com/swiftlang/swift/pull/80266
 // See: https://forums.swift.org/t/pitch-2-custom-main-and-global-executors/78437
 
-import _Concurrency
+@_spi(ExperimentalCustomExecutors) import _Concurrency
 import _CJavaScriptKit
 
 #if compiler(>=6.3)
@@ -12,6 +12,7 @@ import _CJavaScriptKit
 // MARK: - MainExecutor Implementation
 // MainExecutor is used by the main actor to execute tasks on the main thread
 @available(macOS 9999, iOS 9999, watchOS 9999, tvOS 9999, visionOS 9999, *)
+@_spi(ExperimentalCustomExecutors)
 extension JavaScriptEventLoop: MainExecutor {
     public func run() throws {
         // This method is called from `swift_task_asyncMainDrainQueueImpl`.
@@ -27,6 +28,7 @@ extension JavaScriptEventLoop: MainExecutor {
 extension JavaScriptEventLoop: TaskExecutor {}
 
 @available(macOS 9999, iOS 9999, watchOS 9999, tvOS 9999, visionOS 9999, *)
+@_spi(ExperimentalCustomExecutors)
 extension JavaScriptEventLoop: SchedulingExecutor {
     public func enqueue<C: Clock>(
         _ job: consuming ExecutorJob,
@@ -65,6 +67,7 @@ extension JavaScriptEventLoop: SchedulingExecutor {
 
 // MARK: - ExecutorFactory Implementation
 @available(macOS 9999, iOS 9999, watchOS 9999, tvOS 9999, visionOS 9999, *)
+@_spi(ExperimentalCustomExecutors)
 extension JavaScriptEventLoop: ExecutorFactory {
     // Forward all operations to the current thread's JavaScriptEventLoop instance
     final class CurrentThread: TaskExecutor, SchedulingExecutor, MainExecutor, SerialExecutor {
