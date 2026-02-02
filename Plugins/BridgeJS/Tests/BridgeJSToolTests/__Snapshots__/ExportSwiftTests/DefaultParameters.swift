@@ -322,7 +322,7 @@ public func _bjs_testOptionalStructWithValueDefault(_ point: Int32) -> Void {
 public func _bjs_testIntArrayDefault() -> Void {
     #if arch(wasm32)
     let ret = testIntArrayDefault(values: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -344,7 +344,7 @@ public func _bjs_testIntArrayDefault() -> Void {
 public func _bjs_testStringArrayDefault() -> Void {
     #if arch(wasm32)
     let ret = testStringArrayDefault(names: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [String] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -369,7 +369,7 @@ public func _bjs_testStringArrayDefault() -> Void {
 public func _bjs_testDoubleArrayDefault() -> Void {
     #if arch(wasm32)
     let ret = testDoubleArrayDefault(values: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Double] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -391,7 +391,7 @@ public func _bjs_testDoubleArrayDefault() -> Void {
 public func _bjs_testBoolArrayDefault() -> Void {
     #if arch(wasm32)
     let ret = testBoolArrayDefault(flags: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Bool] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -413,7 +413,7 @@ public func _bjs_testBoolArrayDefault() -> Void {
 public func _bjs_testEmptyArrayDefault() -> Void {
     #if arch(wasm32)
     let ret = testEmptyArrayDefault(items: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -435,7 +435,7 @@ public func _bjs_testEmptyArrayDefault() -> Void {
 public func _bjs_testMixedWithArrayDefault(_ nameBytes: Int32, _ nameLength: Int32, _ enabled: Int32) -> Void {
     #if arch(wasm32)
     let ret = testMixedWithArrayDefault(name: String.bridgeJSLiftParameter(nameBytes, nameLength), values: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {

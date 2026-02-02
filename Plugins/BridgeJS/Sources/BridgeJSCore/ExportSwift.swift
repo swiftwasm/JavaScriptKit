@@ -856,7 +856,7 @@ struct StackCodegen {
         let swiftTypeName = elementType.swiftType
         return """
             {
-                let __count = Int(_swift_js_pop_array_length())
+                let __count = Int(_swift_js_pop_i32())
                 var __result: [\(raw: swiftTypeName)] = []
                 __result.reserveCapacity(__count)
                 for _ in 0..<__count {

@@ -32,7 +32,6 @@ final class JSGlueVariableScope {
     static let reservedTmpParamPointers = "tmpParamPointers"
     static let reservedTmpStructCleanups = "tmpStructCleanups"
     static let reservedTmpRetArrayLengths = "tmpRetArrayLengths"
-    static let reservedTmpParamArrayLengths = "tmpParamArrayLengths"
     static let reservedEnumHelpers = "enumHelpers"
     static let reservedStructHelpers = "structHelpers"
 
@@ -63,7 +62,6 @@ final class JSGlueVariableScope {
         reservedTmpParamPointers,
         reservedTmpStructCleanups,
         reservedTmpRetArrayLengths,
-        reservedTmpParamArrayLengths,
         reservedEnumHelpers,
         reservedStructHelpers,
     ]
@@ -2172,7 +2170,7 @@ struct IntrinsicJSFragment: Sendable {
                     }
                 }
                 printer.write("}")
-                printer.write("\(JSGlueVariableScope.reservedTmpParamArrayLengths).push(\(arr).length);")
+                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(arr).length);")
                 cleanupCode.write("for (const cleanup of \(cleanupArrayVar)) { cleanup(); }")
                 return []
             }

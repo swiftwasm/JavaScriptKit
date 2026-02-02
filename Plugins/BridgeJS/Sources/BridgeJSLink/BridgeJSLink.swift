@@ -257,7 +257,6 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedTmpParamPointers) = [];",
             "let \(JSGlueVariableScope.reservedTmpStructCleanups) = [];",
             "let \(JSGlueVariableScope.reservedTmpRetArrayLengths) = [];",
-            "let \(JSGlueVariableScope.reservedTmpParamArrayLengths) = [];",
             "const \(JSGlueVariableScope.reservedEnumHelpers) = {};",
             "const \(JSGlueVariableScope.reservedStructHelpers) = {};",
             "",
@@ -444,11 +443,6 @@ public struct BridgeJSLink {
                 printer.write("bjs[\"swift_js_push_array_length\"] = function(len) {")
                 printer.indent {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetArrayLengths).push(len | 0);")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_pop_array_length\"] = function() {")
-                printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedTmpParamArrayLengths).pop();")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_struct_cleanup\"] = function(cleanupId) {")

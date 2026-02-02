@@ -1488,7 +1488,7 @@ public func _bjs_ArrayRoundtrip_init() -> UnsafeMutableRawPointer {
 public func _bjs_ArrayRoundtrip_takeIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     ArrayRoundtrip.bridgeJSLiftParameter(_self).takeIntArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1520,7 +1520,7 @@ public func _bjs_ArrayRoundtrip_makeIntArray(_ _self: UnsafeMutableRawPointer) -
 public func _bjs_ArrayRoundtrip_roundtripIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripIntArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1555,7 +1555,7 @@ public func _bjs_ArrayRoundtrip_makeIntArrayLarge(_ _self: UnsafeMutableRawPoint
 public func _bjs_ArrayRoundtrip_takeDoubleArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     ArrayRoundtrip.bridgeJSLiftParameter(_self).takeDoubleArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Double] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1587,7 +1587,7 @@ public func _bjs_ArrayRoundtrip_makeDoubleArray(_ _self: UnsafeMutableRawPointer
 public func _bjs_ArrayRoundtrip_roundtripDoubleArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripDoubleArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Double] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1609,7 +1609,7 @@ public func _bjs_ArrayRoundtrip_roundtripDoubleArray(_ _self: UnsafeMutableRawPo
 public func _bjs_ArrayRoundtrip_takeStringArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     ArrayRoundtrip.bridgeJSLiftParameter(_self).takeStringArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [String] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1644,7 +1644,7 @@ public func _bjs_ArrayRoundtrip_makeStringArray(_ _self: UnsafeMutableRawPointer
 public func _bjs_ArrayRoundtrip_roundtripStringArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripStringArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [String] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1669,7 +1669,7 @@ public func _bjs_ArrayRoundtrip_roundtripStringArray(_ _self: UnsafeMutableRawPo
 public func _bjs_ArrayRoundtrip_takePointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     ArrayRoundtrip.bridgeJSLiftParameter(_self).takePointArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Point] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1701,7 +1701,7 @@ public func _bjs_ArrayRoundtrip_makePointArray(_ _self: UnsafeMutableRawPointer)
 public func _bjs_ArrayRoundtrip_roundtripPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripPointArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Point] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1736,12 +1736,12 @@ public func _bjs_ArrayRoundtrip_makePointArrayLarge(_ _self: UnsafeMutableRawPoi
 public func _bjs_ArrayRoundtrip_takeNestedIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     ArrayRoundtrip.bridgeJSLiftParameter(_self).takeNestedIntArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [[Int]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1779,12 +1779,12 @@ public func _bjs_ArrayRoundtrip_makeNestedIntArray(_ _self: UnsafeMutableRawPoin
 public func _bjs_ArrayRoundtrip_roundtripNestedIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripNestedIntArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [[Int]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1812,12 +1812,12 @@ public func _bjs_ArrayRoundtrip_roundtripNestedIntArray(_ _self: UnsafeMutableRa
 public func _bjs_ArrayRoundtrip_takeNestedPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     ArrayRoundtrip.bridgeJSLiftParameter(_self).takeNestedPointArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [[Point]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Point] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1855,12 +1855,12 @@ public func _bjs_ArrayRoundtrip_makeNestedPointArray(_ _self: UnsafeMutableRawPo
 public func _bjs_ArrayRoundtrip_roundtripNestedPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripNestedPointArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [[Point]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Point] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1888,7 +1888,7 @@ public func _bjs_ArrayRoundtrip_roundtripNestedPointArray(_ _self: UnsafeMutable
 public func _bjs_ArrayRoundtrip_takeOptionalIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     ArrayRoundtrip.bridgeJSLiftParameter(_self).takeOptionalIntArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Int>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1923,7 +1923,7 @@ public func _bjs_ArrayRoundtrip_makeOptionalIntArray(_ _self: UnsafeMutableRawPo
 public func _bjs_ArrayRoundtrip_roundtripOptionalIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripOptionalIntArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Int>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1948,7 +1948,7 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalIntArray(_ _self: UnsafeMutable
 public func _bjs_ArrayRoundtrip_takeOptionalPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     ArrayRoundtrip.bridgeJSLiftParameter(_self).takeOptionalPointArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Point>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -1983,7 +1983,7 @@ public func _bjs_ArrayRoundtrip_makeOptionalPointArray(_ _self: UnsafeMutableRaw
 public func _bjs_ArrayRoundtrip_roundtripOptionalPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripOptionalPointArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Point>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -2012,7 +2012,7 @@ public func _bjs_ArrayRoundtrip_takeOptionalArray(_ _self: UnsafeMutableRawPoint
             return Optional<[Int]>.none
         } else {
             return {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -2069,7 +2069,7 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalArray(_ _self: UnsafeMutableRaw
             return Optional<[Int]>.none
         } else {
             return {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {

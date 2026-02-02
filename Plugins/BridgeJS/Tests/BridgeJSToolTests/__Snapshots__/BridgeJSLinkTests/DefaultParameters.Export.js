@@ -36,7 +36,6 @@ export async function createInstantiator(options, swift) {
     let tmpParamPointers = [];
     let tmpStructCleanups = [];
     let tmpRetArrayLengths = [];
-    let tmpParamArrayLengths = [];
     const enumHelpers = {};
     const structHelpers = {};
     
@@ -158,9 +157,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_push_array_length"] = function(len) {
                 tmpRetArrayLengths.push(len | 0);
-            }
-            bjs["swift_js_pop_array_length"] = function() {
-                return tmpParamArrayLengths.pop();
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }
@@ -566,7 +562,7 @@ export async function createInstantiator(options, swift) {
                     for (const elem of values) {
                         tmpParamInts.push((elem | 0));
                     }
-                    tmpParamArrayLengths.push(values.length);
+                    tmpParamInts.push(values.length);
                     instance.exports.bjs_testIntArrayDefault();
                     const arrayLen = tmpRetArrayLengths.pop();
                     const arrayResult = [];
@@ -589,7 +585,7 @@ export async function createInstantiator(options, swift) {
                             swift.memory.release(id);
                         });
                     }
-                    tmpParamArrayLengths.push(names.length);
+                    tmpParamInts.push(names.length);
                     instance.exports.bjs_testStringArrayDefault();
                     const arrayLen = tmpRetArrayLengths.pop();
                     const arrayResult = [];
@@ -606,7 +602,7 @@ export async function createInstantiator(options, swift) {
                     for (const elem of values) {
                         tmpParamF64s.push(elem);
                     }
-                    tmpParamArrayLengths.push(values.length);
+                    tmpParamInts.push(values.length);
                     instance.exports.bjs_testDoubleArrayDefault();
                     const arrayLen = tmpRetArrayLengths.pop();
                     const arrayResult = [];
@@ -623,7 +619,7 @@ export async function createInstantiator(options, swift) {
                     for (const elem of flags) {
                         tmpParamInts.push(elem ? 1 : 0);
                     }
-                    tmpParamArrayLengths.push(flags.length);
+                    tmpParamInts.push(flags.length);
                     instance.exports.bjs_testBoolArrayDefault();
                     const arrayLen = tmpRetArrayLengths.pop();
                     const arrayResult = [];
@@ -640,7 +636,7 @@ export async function createInstantiator(options, swift) {
                     for (const elem of items) {
                         tmpParamInts.push((elem | 0));
                     }
-                    tmpParamArrayLengths.push(items.length);
+                    tmpParamInts.push(items.length);
                     instance.exports.bjs_testEmptyArrayDefault();
                     const arrayLen = tmpRetArrayLengths.pop();
                     const arrayResult = [];
@@ -659,7 +655,7 @@ export async function createInstantiator(options, swift) {
                     for (const elem of values) {
                         tmpParamInts.push((elem | 0));
                     }
-                    tmpParamArrayLengths.push(values.length);
+                    tmpParamInts.push(values.length);
                     instance.exports.bjs_testMixedWithArrayDefault(nameId, nameBytes.length, enabled);
                     const ret = tmpRetString;
                     tmpRetString = undefined;

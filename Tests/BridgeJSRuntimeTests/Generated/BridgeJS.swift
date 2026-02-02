@@ -4567,7 +4567,7 @@ public func _bjs_testEmptyInit(_ object: UnsafeMutableRawPointer) -> UnsafeMutab
 public func _bjs_arrayWithDefault() -> Int32 {
     #if arch(wasm32)
     let ret = arrayWithDefault(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4591,7 +4591,7 @@ public func _bjs_arrayWithOptionalDefault(_ values: Int32) -> Int32 {
             return Optional<[Int]>.none
         } else {
             return {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4613,7 +4613,7 @@ public func _bjs_arrayWithOptionalDefault(_ values: Int32) -> Int32 {
 public func _bjs_arrayMixedDefaults(_ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void {
     #if arch(wasm32)
     let ret = arrayMixedDefaults(prefix: String.bridgeJSLiftParameter(prefixBytes, prefixLength), values: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4666,7 +4666,7 @@ public func _bjs_makeAdder(_ base: Int32) -> UnsafeMutableRawPointer {
 public func _bjs_roundTripIntArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripIntArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4688,7 +4688,7 @@ public func _bjs_roundTripIntArray() -> Void {
 public func _bjs_roundTripStringArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripStringArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [String] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4713,7 +4713,7 @@ public func _bjs_roundTripStringArray() -> Void {
 public func _bjs_roundTripDoubleArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripDoubleArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Double] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4735,7 +4735,7 @@ public func _bjs_roundTripDoubleArray() -> Void {
 public func _bjs_roundTripBoolArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripBoolArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Bool] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4757,7 +4757,7 @@ public func _bjs_roundTripBoolArray() -> Void {
 public func _bjs_roundTripDirectionArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripDirectionArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Direction] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4779,7 +4779,7 @@ public func _bjs_roundTripDirectionArray() -> Void {
 public func _bjs_roundTripStatusArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripStatusArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Status] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4801,7 +4801,7 @@ public func _bjs_roundTripStatusArray() -> Void {
 public func _bjs_roundTripThemeArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripThemeArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Theme] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4826,7 +4826,7 @@ public func _bjs_roundTripThemeArray() -> Void {
 public func _bjs_roundTripHttpStatusArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripHttpStatusArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [HttpStatus] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4848,7 +4848,7 @@ public func _bjs_roundTripHttpStatusArray() -> Void {
 public func _bjs_roundTripDataPointArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripDataPointArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [DataPoint] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4870,7 +4870,7 @@ public func _bjs_roundTripDataPointArray() -> Void {
 public func _bjs_roundTripGreeterArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripGreeterArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Greeter] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4892,7 +4892,7 @@ public func _bjs_roundTripGreeterArray() -> Void {
 public func _bjs_roundTripOptionalIntArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalIntArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Int>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4917,7 +4917,7 @@ public func _bjs_roundTripOptionalIntArray() -> Void {
 public func _bjs_roundTripOptionalStringArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalStringArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<String>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4945,7 +4945,7 @@ public func _bjs_roundTripOptionalStringArray() -> Void {
 public func _bjs_roundTripOptionalDataPointArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalDataPointArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<DataPoint>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4970,7 +4970,7 @@ public func _bjs_roundTripOptionalDataPointArray() -> Void {
 public func _bjs_roundTripOptionalDirectionArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalDirectionArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Direction>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -4995,7 +4995,7 @@ public func _bjs_roundTripOptionalDirectionArray() -> Void {
 public func _bjs_roundTripOptionalStatusArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalStatusArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Status>] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5024,7 +5024,7 @@ public func _bjs_roundTripOptionalIntArrayType(_ values: Int32) -> Void {
             return Optional<[Int]>.none
         } else {
             return {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5055,7 +5055,7 @@ public func _bjs_roundTripOptionalStringArrayType(_ values: Int32) -> Void {
             return Optional<[String]>.none
         } else {
             return {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [String] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5089,7 +5089,7 @@ public func _bjs_roundTripOptionalGreeterArrayType(_ greeters: Int32) -> Void {
             return Optional<[Greeter]>.none
         } else {
             return {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Greeter] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5116,12 +5116,12 @@ public func _bjs_roundTripOptionalGreeterArrayType(_ greeters: Int32) -> Void {
 public func _bjs_roundTripNestedIntArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedIntArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [[Int]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Int] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5149,12 +5149,12 @@ public func _bjs_roundTripNestedIntArray() -> Void {
 public func _bjs_roundTripNestedStringArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedStringArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [[String]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [String] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5185,12 +5185,12 @@ public func _bjs_roundTripNestedStringArray() -> Void {
 public func _bjs_roundTripNestedDoubleArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedDoubleArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [[Double]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Double] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5218,12 +5218,12 @@ public func _bjs_roundTripNestedDoubleArray() -> Void {
 public func _bjs_roundTripNestedBoolArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedBoolArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [[Bool]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Bool] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5251,12 +5251,12 @@ public func _bjs_roundTripNestedBoolArray() -> Void {
 public func _bjs_roundTripNestedDataPointArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedDataPointArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [[DataPoint]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [DataPoint] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5284,12 +5284,12 @@ public func _bjs_roundTripNestedDataPointArray() -> Void {
 public func _bjs_roundTripNestedDirectionArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedDirectionArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [[Direction]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Direction] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5317,12 +5317,12 @@ public func _bjs_roundTripNestedDirectionArray() -> Void {
 public func _bjs_roundTripNestedGreeterArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripNestedGreeterArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [[Greeter]] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
             __result.append({
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [Greeter] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5350,7 +5350,7 @@ public func _bjs_roundTripNestedGreeterArray() -> Void {
 public func _bjs_roundTripUnsafeRawPointerArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripUnsafeRawPointerArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [UnsafeRawPointer] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5372,7 +5372,7 @@ public func _bjs_roundTripUnsafeRawPointerArray() -> Void {
 public func _bjs_roundTripUnsafeMutableRawPointerArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripUnsafeMutableRawPointerArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [UnsafeMutableRawPointer] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5394,7 +5394,7 @@ public func _bjs_roundTripUnsafeMutableRawPointerArray() -> Void {
 public func _bjs_roundTripOpaquePointerArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripOpaquePointerArray(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [OpaquePointer] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5416,7 +5416,7 @@ public func _bjs_roundTripOpaquePointerArray() -> Void {
 public func _bjs_consumeDataProcessorArrayType() -> Int32 {
     #if arch(wasm32)
     let ret = consumeDataProcessorArrayType(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [AnyDataProcessor] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {
@@ -5436,7 +5436,7 @@ public func _bjs_consumeDataProcessorArrayType() -> Int32 {
 public func _bjs_roundTripDataProcessorArrayType() -> Void {
     #if arch(wasm32)
     let ret = roundTripDataProcessorArrayType(_: {
-        let __count = Int(_swift_js_pop_array_length())
+        let __count = Int(_swift_js_pop_i32())
         var __result: [AnyDataProcessor] = []
         __result.reserveCapacity(__count)
         for _ in 0 ..< __count {

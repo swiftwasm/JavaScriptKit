@@ -94,7 +94,6 @@ export async function createInstantiator(options, swift) {
     let tmpParamPointers = [];
     let tmpStructCleanups = [];
     let tmpRetArrayLengths = [];
-    let tmpParamArrayLengths = [];
     const enumHelpers = {};
     const structHelpers = {};
     
@@ -169,9 +168,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_push_array_length"] = function(len) {
                 tmpRetArrayLengths.push(len | 0);
-            }
-            bjs["swift_js_pop_array_length"] = function() {
-                return tmpParamArrayLengths.pop();
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }
@@ -703,7 +699,7 @@ export async function createInstantiator(options, swift) {
                         const objId = swift.memory.retain(elem);
                         tmpParamInts.push(objId);
                     }
-                    tmpParamArrayLengths.push(delegates.length);
+                    tmpParamInts.push(delegates.length);
                     const ret = instance.exports.bjs_DelegateManager_init();
                     for (const cleanup of arrayCleanups) { cleanup(); }
                     return DelegateManager.__construct(ret);
@@ -730,7 +726,7 @@ export async function createInstantiator(options, swift) {
                         const objId = swift.memory.retain(elem);
                         tmpParamInts.push(objId);
                     }
-                    tmpParamArrayLengths.push(value.length);
+                    tmpParamInts.push(value.length);
                     instance.exports.bjs_DelegateManager_delegates_set(this.pointer);
                     for (const cleanup of arrayCleanups) { cleanup(); }
                 }
@@ -745,7 +741,7 @@ export async function createInstantiator(options, swift) {
                         const objId = swift.memory.retain(elem);
                         tmpParamInts.push(objId);
                     }
-                    tmpParamArrayLengths.push(delegates.length);
+                    tmpParamInts.push(delegates.length);
                     instance.exports.bjs_processDelegates();
                     const arrayLen = tmpRetArrayLengths.pop();
                     const arrayResult = [];
