@@ -2,15 +2,15 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 2:
-            return .flag(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .flag(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 3:
-            return .rate(Float.bridgeJSLiftParameter(_swift_js_pop_param_f32()))
+            return .rate(Float.bridgeJSLiftParameter(_swift_js_pop_f32()))
         case 4:
-            return .precise(Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()))
+            return .precise(Double.bridgeJSLiftParameter(_swift_js_pop_f64()))
         case 5:
             return .info
         default:
@@ -29,10 +29,10 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
             }
             return Int32(0)
         case .failure(let param0):
-            _swift_js_push_int(Int32(param0))
+            _swift_js_push_i32(Int32(param0))
             return Int32(1)
         case .flag(let param0):
-            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_i32(param0 ? 1 : 0)
             return Int32(2)
         case .rate(let param0):
             _swift_js_push_f32(param0)
@@ -65,10 +65,10 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
             }
         case .failure(let param0):
             _swift_js_push_tag(Int32(1))
-            _swift_js_push_int(Int32(param0))
+            _swift_js_push_i32(Int32(param0))
         case .flag(let param0):
             _swift_js_push_tag(Int32(2))
-            _swift_js_push_int(param0 ? 1 : 0)
+            _swift_js_push_i32(param0 ? 1 : 0)
         case .rate(let param0):
             _swift_js_push_tag(Int32(3))
             _swift_js_push_f32(param0)
@@ -85,15 +85,15 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> ComplexResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .error(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .error(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 2:
-            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 3:
-            return .coordinates(Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()))
+            return .coordinates(Double.bridgeJSLiftParameter(_swift_js_pop_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_f64()))
         case 4:
-            return .comprehensive(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_param_f64()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .comprehensive(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()), Bool.bridgeJSLiftParameter(_swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()), Double.bridgeJSLiftParameter(_swift_js_pop_f64()), Double.bridgeJSLiftParameter(_swift_js_pop_f64()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 5:
             return .info
         default:
@@ -116,11 +116,11 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
             return Int32(1)
         case .status(let param0, let param1, let param2):
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(Int32(param1))
             var __bjs_param2 = param2
             __bjs_param2.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
@@ -132,10 +132,10 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             _swift_js_push_f64(param2)
             return Int32(3)
         case .comprehensive(let param0, let param1, let param2, let param3, let param4, let param5, let param6, let param7, let param8):
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(param1 ? 1 : 0)
-            _swift_js_push_int(Int32(param2))
-            _swift_js_push_int(Int32(param3))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(param1 ? 1 : 0)
+            _swift_js_push_i32(Int32(param2))
+            _swift_js_push_i32(Int32(param3))
             _swift_js_push_f64(param4)
             _swift_js_push_f64(param5)
             var __bjs_param6 = param6
@@ -180,11 +180,11 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
         case .status(let param0, let param1, let param2):
             _swift_js_push_tag(Int32(2))
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(Int32(param1))
             var __bjs_param2 = param2
             __bjs_param2.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
@@ -196,10 +196,10 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             _swift_js_push_f64(param2)
         case .comprehensive(let param0, let param1, let param2, let param3, let param4, let param5, let param6, let param7, let param8):
             _swift_js_push_tag(Int32(4))
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(param1 ? 1 : 0)
-            _swift_js_push_int(Int32(param2))
-            _swift_js_push_int(Int32(param3))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(param1 ? 1 : 0)
+            _swift_js_push_i32(Int32(param2))
+            _swift_js_push_i32(Int32(param3))
             _swift_js_push_f64(param4)
             _swift_js_push_f64(param5)
             var __bjs_param6 = param6
@@ -224,11 +224,11 @@ extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> Utilities.Result {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         case 2:
-            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()), String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .status(Bool.bridgeJSLiftParameter(_swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()), String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         default:
             fatalError("Unknown Utilities.Result case ID: \(caseId)")
         }
@@ -249,11 +249,11 @@ extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
             return Int32(1)
         case .status(let param0, let param1, let param2):
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(Int32(param1))
             var __bjs_param2 = param2
             __bjs_param2.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
@@ -286,11 +286,11 @@ extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
         case .status(let param0, let param1, let param2):
             _swift_js_push_tag(Int32(2))
-            _swift_js_push_int(param0 ? 1 : 0)
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(param0 ? 1 : 0)
+            _swift_js_push_i32(Int32(param1))
             var __bjs_param2 = param2
             __bjs_param2.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
@@ -303,9 +303,9 @@ extension NetworkingResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> NetworkingResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Int.bridgeJSLiftParameter(_swift_js_pop_param_int32()))
+            return .failure(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
         default:
             fatalError("Unknown NetworkingResult case ID: \(caseId)")
         }
@@ -326,7 +326,7 @@ extension NetworkingResult: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
             return Int32(1)
         }
     }
@@ -355,7 +355,7 @@ extension NetworkingResult: _BridgedSwiftAssociatedValueEnum {
             __bjs_param0.withUTF8 { ptr in
                 _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
             }
-            _swift_js_push_int(Int32(param1))
+            _swift_js_push_i32(Int32(param1))
         }
     }
 }
@@ -364,11 +364,11 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIOptionalResult {
         switch caseId {
         case 0:
-            return .success(Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .success(Optional<String>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32()))
         case 1:
-            return .failure(Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .failure(Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
         case 2:
-            return .status(Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32()), Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32()))
+            return .status(Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()), Optional<String>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32()))
         default:
             fatalError("Unknown APIOptionalResult case ID: \(caseId)")
         }
@@ -386,31 +386,31 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
                     _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
                 }
             }
-            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(0)
         case .failure(let param0, let param1):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                _swift_js_push_int(Int32(__bjs_unwrapped_param0))
+                _swift_js_push_i32(Int32(__bjs_unwrapped_param0))
             }
-            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                _swift_js_push_int(__bjs_unwrapped_param1 ? 1 : 0)
+                _swift_js_push_i32(__bjs_unwrapped_param1 ? 1 : 0)
             }
-            _swift_js_push_int(__bjs_isSome_param1 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             return Int32(1)
         case .status(let param0, let param1, let param2):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                _swift_js_push_int(__bjs_unwrapped_param0 ? 1 : 0)
+                _swift_js_push_i32(__bjs_unwrapped_param0 ? 1 : 0)
             }
-            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                _swift_js_push_int(Int32(__bjs_unwrapped_param1))
+                _swift_js_push_i32(Int32(__bjs_unwrapped_param1))
             }
-            _swift_js_push_int(__bjs_isSome_param1 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             let __bjs_isSome_param2 = param2 != nil
             if let __bjs_unwrapped_param2 = param2 {
                 var __bjs_str_param2 = __bjs_unwrapped_param2
@@ -418,7 +418,7 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
                     _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
                 }
             }
-            _swift_js_push_int(__bjs_isSome_param2 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param2 ? 1 : 0)
             return Int32(2)
         }
     }
@@ -444,31 +444,31 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
                     _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
                 }
             }
-            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
         case .failure(let param0, let param1):
             _swift_js_push_tag(Int32(1))
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                _swift_js_push_int(Int32(__bjs_unwrapped_param0))
+                _swift_js_push_i32(Int32(__bjs_unwrapped_param0))
             }
-            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                _swift_js_push_int(__bjs_unwrapped_param1 ? 1 : 0)
+                _swift_js_push_i32(__bjs_unwrapped_param1 ? 1 : 0)
             }
-            _swift_js_push_int(__bjs_isSome_param1 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
         case .status(let param0, let param1, let param2):
             _swift_js_push_tag(Int32(2))
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                _swift_js_push_int(__bjs_unwrapped_param0 ? 1 : 0)
+                _swift_js_push_i32(__bjs_unwrapped_param0 ? 1 : 0)
             }
-            _swift_js_push_int(__bjs_isSome_param0 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                _swift_js_push_int(Int32(__bjs_unwrapped_param1))
+                _swift_js_push_i32(Int32(__bjs_unwrapped_param1))
             }
-            _swift_js_push_int(__bjs_isSome_param1 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             let __bjs_isSome_param2 = param2 != nil
             if let __bjs_unwrapped_param2 = param2 {
                 var __bjs_str_param2 = __bjs_unwrapped_param2
@@ -476,7 +476,7 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
                     _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
                 }
             }
-            _swift_js_push_int(__bjs_isSome_param2 ? 1 : 0)
+            _swift_js_push_i32(__bjs_isSome_param2 ? 1 : 0)
         }
     }
 }

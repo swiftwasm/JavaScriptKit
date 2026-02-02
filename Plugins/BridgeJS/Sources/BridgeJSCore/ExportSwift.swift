@@ -799,41 +799,41 @@ struct StackCodegen {
     func liftExpression(for type: BridgeType) -> ExprSyntax {
         switch type {
         case .string:
-            return "String.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+            return "String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
         case .int, .uint:
-            return "Int.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            return "Int.bridgeJSLiftParameter(_swift_js_pop_i32())"
         case .bool:
-            return "Bool.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            return "Bool.bridgeJSLiftParameter(_swift_js_pop_i32())"
         case .float:
-            return "Float.bridgeJSLiftParameter(_swift_js_pop_param_f32())"
+            return "Float.bridgeJSLiftParameter(_swift_js_pop_f32())"
         case .double:
-            return "Double.bridgeJSLiftParameter(_swift_js_pop_param_f64())"
+            return "Double.bridgeJSLiftParameter(_swift_js_pop_f64())"
         case .jsObject:
-            return "JSObject.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            return "JSObject.bridgeJSLiftParameter(_swift_js_pop_i32())"
         case .swiftHeapObject(let className):
-            return "\(raw: className).bridgeJSLiftParameter(_swift_js_pop_param_pointer())"
+            return "\(raw: className).bridgeJSLiftParameter(_swift_js_pop_pointer())"
         case .unsafePointer:
-            return "\(raw: type.swiftType).bridgeJSLiftParameter(_swift_js_pop_param_pointer())"
+            return "\(raw: type.swiftType).bridgeJSLiftParameter(_swift_js_pop_pointer())"
         case .swiftProtocol(let protocolName):
             // Protocols use their Any wrapper type for lifting
             let wrapperName = "Any\(protocolName)"
-            return "\(raw: wrapperName).bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            return "\(raw: wrapperName).bridgeJSLiftParameter(_swift_js_pop_i32())"
         case .caseEnum(let enumName):
-            return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_i32())"
         case .rawValueEnum(let enumName, let rawType):
             switch rawType {
             case .string:
                 return
-                    "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+                    "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
             case .float:
-                return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_param_f32())"
+                return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_f32())"
             case .double:
-                return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_param_f64())"
+                return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_f64())"
             case .bool, .int, .int32, .int64, .uint, .uint32, .uint64:
-                return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+                return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_i32())"
             }
         case .associatedValueEnum(let enumName):
-            return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_i32())"
         case .swiftStruct(let structName):
             return "\(raw: structName).bridgeJSLiftParameter()"
         case .optional(let wrappedType):
@@ -845,7 +845,7 @@ struct StackCodegen {
             // Namespace enums are not passed as values
             return "()"
         case .closure:
-            return "JSObject.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            return "JSObject.bridgeJSLiftParameter(_swift_js_pop_i32())"
         case .array(let elementType):
             return liftArrayExpression(elementType: elementType)
         }
@@ -856,7 +856,7 @@ struct StackCodegen {
         let swiftTypeName = elementType.swiftType
         return """
             {
-                let __count = Int(_swift_js_pop_param_array_length())
+                let __count = Int(_swift_js_pop_i32())
                 var __result: [\(raw: swiftTypeName)] = []
                 __result.reserveCapacity(__count)
                 for _ in 0..<__count {
@@ -872,49 +872,49 @@ struct StackCodegen {
         switch wrappedType {
         case .string:
             return
-                "Optional<String>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+                "Optional<String>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32())"
         case .int, .uint:
-            return "Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+            return "Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
         case .bool:
-            return "Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+            return "Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
         case .float:
-            return "Optional<Float>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f32())"
+            return "Optional<Float>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_f32())"
         case .double:
-            return "Optional<Double>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f64())"
+            return "Optional<Double>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_f64())"
         case .caseEnum(let enumName):
             return
-                "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+                "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
         case .rawValueEnum(let enumName, let rawType):
             switch rawType {
             case .string:
                 return
-                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32())"
             case .float:
                 return
-                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f32())"
+                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_f32())"
             case .double:
                 return
-                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_f64())"
+                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_f64())"
             case .bool, .int, .int32, .int64, .uint, .uint32, .uint64:
                 return
-                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
             }
         case .swiftStruct(let nestedName):
-            return "Optional<\(raw: nestedName)>.bridgeJSLiftParameter(_swift_js_pop_param_int32())"
+            return "Optional<\(raw: nestedName)>.bridgeJSLiftParameter(_swift_js_pop_i32())"
         case .swiftHeapObject(let className):
             return
-                "Optional<\(raw: className)>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_pointer())"
+                "Optional<\(raw: className)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_pointer())"
         case .associatedValueEnum(let enumName):
             return
-                "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+                "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
         case .jsObject:
-            return "Optional<JSObject>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+            return "Optional<JSObject>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
         case .array(let elementType):
             let arrayLift = liftArrayExpression(elementType: elementType)
             let swiftTypeName = elementType.swiftType
             return """
                 {
-                    let __isSome = _swift_js_pop_param_int32()
+                    let __isSome = _swift_js_pop_i32()
                     if __isSome == 0 {
                         return Optional<[\(raw: swiftTypeName)]>.none
                     } else {
@@ -924,7 +924,7 @@ struct StackCodegen {
                 """
         default:
             // Fallback for other optional types
-            return "Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_param_int32(), _swift_js_pop_param_int32())"
+            return "Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
         }
     }
 
@@ -946,24 +946,24 @@ struct StackCodegen {
                 "__bjs_\(raw: varPrefix).withUTF8 { ptr in _swift_js_push_string(ptr.baseAddress, Int32(ptr.count)) }",
             ]
         case .int, .uint:
-            return ["_swift_js_push_int(Int32(\(raw: accessor)))"]
+            return ["_swift_js_push_i32(Int32(\(raw: accessor)))"]
         case .bool:
-            return ["_swift_js_push_int(\(raw: accessor) ? 1 : 0)"]
+            return ["_swift_js_push_i32(\(raw: accessor) ? 1 : 0)"]
         case .float:
             return ["_swift_js_push_f32(\(raw: accessor))"]
         case .double:
             return ["_swift_js_push_f64(\(raw: accessor))"]
         case .jsObject:
-            return ["_swift_js_push_int(\(raw: accessor).bridgeJSLowerReturn())"]
+            return ["_swift_js_push_i32(\(raw: accessor).bridgeJSLowerReturn())"]
         case .swiftHeapObject:
             return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
         case .unsafePointer:
             return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
         case .swiftProtocol(let protocolName):
             let wrapperName = "Any\(protocolName)"
-            return ["_swift_js_push_int((\(raw: accessor) as! \(raw: wrapperName)).bridgeJSLowerReturn())"]
+            return ["_swift_js_push_i32((\(raw: accessor) as! \(raw: wrapperName)).bridgeJSLowerReturn())"]
         case .caseEnum:
-            return ["_swift_js_push_int(Int32(\(raw: accessor).bridgeJSLowerParameter()))"]
+            return ["_swift_js_push_i32(Int32(\(raw: accessor).bridgeJSLowerParameter()))"]
         case .rawValueEnum(_, let rawType):
             switch rawType {
             case .string:
@@ -976,7 +976,7 @@ struct StackCodegen {
             case .double:
                 return ["_swift_js_push_f64(\(raw: accessor).bridgeJSLowerParameter())"]
             default:
-                return ["_swift_js_push_int(Int32(\(raw: accessor).bridgeJSLowerParameter()))"]
+                return ["_swift_js_push_i32(Int32(\(raw: accessor).bridgeJSLowerParameter()))"]
             }
         case .associatedValueEnum:
             return ["\(raw: accessor).bridgeJSLowerReturn()"]
@@ -1014,7 +1014,7 @@ struct StackCodegen {
         }
 
         statements.append("}")
-        statements.append("_swift_js_push_array_length(Int32(\(raw: accessor).count))")
+        statements.append("_swift_js_push_i32(Int32(\(raw: accessor).count))")
         return statements
     }
 
@@ -1037,7 +1037,7 @@ struct StackCodegen {
         }
 
         statements.append("}")
-        statements.append("_swift_js_push_int(__bjs_isSome_\(raw: varPrefix) ? 1 : 0)")
+        statements.append("_swift_js_push_i32(__bjs_isSome_\(raw: varPrefix) ? 1 : 0)")
         return statements
     }
 
@@ -1053,15 +1053,15 @@ struct StackCodegen {
                 "__bjs_str_\(raw: varPrefix).withUTF8 { ptr in _swift_js_push_string(ptr.baseAddress, Int32(ptr.count)) }",
             ]
         case .int, .uint:
-            return ["_swift_js_push_int(Int32(\(raw: unwrappedVar)))"]
+            return ["_swift_js_push_i32(Int32(\(raw: unwrappedVar)))"]
         case .bool:
-            return ["_swift_js_push_int(\(raw: unwrappedVar) ? 1 : 0)"]
+            return ["_swift_js_push_i32(\(raw: unwrappedVar) ? 1 : 0)"]
         case .float:
             return ["_swift_js_push_f32(\(raw: unwrappedVar))"]
         case .double:
             return ["_swift_js_push_f64(\(raw: unwrappedVar))"]
         case .caseEnum:
-            return ["_swift_js_push_int(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
+            return ["_swift_js_push_i32(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
         case .rawValueEnum(_, let rawType):
             switch rawType {
             case .string:
@@ -1074,16 +1074,16 @@ struct StackCodegen {
             case .double:
                 return ["_swift_js_push_f64(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
             default:
-                return ["_swift_js_push_int(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
+                return ["_swift_js_push_i32(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
             }
         case .swiftStruct:
             return ["\(raw: unwrappedVar).bridgeJSLowerReturn()"]
         case .swiftHeapObject:
             return ["_swift_js_push_pointer(\(raw: unwrappedVar).bridgeJSLowerReturn())"]
         case .associatedValueEnum:
-            return ["_swift_js_push_int(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
+            return ["_swift_js_push_i32(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
         case .jsObject:
-            return ["_swift_js_push_int(\(raw: unwrappedVar).bridgeJSLowerReturn())"]
+            return ["_swift_js_push_i32(\(raw: unwrappedVar).bridgeJSLowerReturn())"]
         case .array(let elementType):
             return lowerArrayStatements(elementType: elementType, accessor: unwrappedVar, varPrefix: varPrefix)
         default:

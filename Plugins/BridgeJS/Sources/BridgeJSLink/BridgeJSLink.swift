@@ -256,8 +256,6 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedTmpRetPointers) = [];",
             "let \(JSGlueVariableScope.reservedTmpParamPointers) = [];",
             "let \(JSGlueVariableScope.reservedTmpStructCleanups) = [];",
-            "let \(JSGlueVariableScope.reservedTmpRetArrayLengths) = [];",
-            "let \(JSGlueVariableScope.reservedTmpParamArrayLengths) = [];",
             "const \(JSGlueVariableScope.reservedEnumHelpers) = {};",
             "const \(JSGlueVariableScope.reservedStructHelpers) = {};",
             "",
@@ -392,7 +390,7 @@ public struct BridgeJSLink {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetTag) = tag;")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_push_int\"] = function(v) {")
+                printer.write("bjs[\"swift_js_push_i32\"] = function(v) {")
                 printer.indent {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetInts).push(v | 0);")
                 }
@@ -416,17 +414,17 @@ public struct BridgeJSLink {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetStrings).push(value);")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_pop_param_int32\"] = function() {")
+                printer.write("bjs[\"swift_js_pop_i32\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamInts).pop();")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_pop_param_f32\"] = function() {")
+                printer.write("bjs[\"swift_js_pop_f32\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamF32s).pop();")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_pop_param_f64\"] = function() {")
+                printer.write("bjs[\"swift_js_pop_f64\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamF64s).pop();")
                 }
@@ -436,19 +434,9 @@ public struct BridgeJSLink {
                     printer.write("\(JSGlueVariableScope.reservedTmpRetPointers).push(pointer);")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_pop_param_pointer\"] = function() {")
+                printer.write("bjs[\"swift_js_pop_pointer\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedTmpParamPointers).pop();")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_push_array_length\"] = function(len) {")
-                printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedTmpRetArrayLengths).push(len | 0);")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_pop_param_array_length\"] = function() {")
-                printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedTmpParamArrayLengths).pop();")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_struct_cleanup\"] = function(cleanupId) {")
