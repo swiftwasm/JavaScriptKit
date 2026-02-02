@@ -59,8 +59,8 @@ jobs:
       - run: swift test --package-path ./Plugins/PackageToJS
       - run: swift test --package-path ./Plugins/BridgeJS
 
-  bridgejs-test:
-    name: BridgeJS Tests
+  test-bridgejs-against-swift-versions:
+    name: Test BridgeJS against Swift versions
     strategy:
       matrix:
         include:
