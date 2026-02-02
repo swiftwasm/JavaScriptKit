@@ -59,6 +59,37 @@ jobs:
       - run: swift test --package-path ./Plugins/PackageToJS
       - run: swift test --package-path ./Plugins/BridgeJS
 
+  bridgejs-test:
+    name: BridgeJS Tests
+    strategy:
+      matrix:
+        include:
+          - swift-image: "swift:6.0.3"
+            swift-syntax-version: "600.0.1"
+          - swift-image: "swift:6.1.2"
+            swift-syntax-version: "601.0.1"
+          - swift-image: "swift:6.2"
+            swift-syntax-version: "602.0.0"
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.swift-image }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Pin swift-syntax to exact version
+        working-directory: Plugins/BridgeJS
+        run: |
+          # Use exact version constraint to pin swift-syntax
+          sed -i 's/from: "600.0.1"/exact: "${{ matrix.swift-syntax-version }}"/' Package.swift
+          cat Package.swift | grep swift-syntax | head -1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install TypeScript
+        run: npm install --prefix Plugins/BridgeJS/Sources/TS2Swift/JavaScript
+      - name: Run BridgeJS tests
+        run: swift test --package-path ./Plugins/BridgeJS
+
   native-build:
     # Check native build to make it easy to develop applications by Xcode
     name: Build for native target
