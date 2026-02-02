@@ -63,24 +63,15 @@ jobs:
     name: Test BridgeJS against Swift versions
     strategy:
       matrix:
-        include:
-          - swift-image: "swift:6.0.3"
-            swift-syntax-version: "600.0.1"
-          - swift-image: "swift:6.1.2"
-            swift-syntax-version: "601.0.1"
-          - swift-image: "swift:6.2"
-            swift-syntax-version: "602.0.0"
+        swift-image:
+          - "swift:6.0.3"   # Tests with SwiftSyntax 600.x (non-SwiftSyntax602 code path)
+          - "swift:6.1.2"   # Tests with SwiftSyntax 601.x (non-SwiftSyntax602 code path)
+          - "swift:6.2"     # Tests with SwiftSyntax 602.x (SwiftSyntax602 code path)
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.swift-image }}
     steps:
       - uses: actions/checkout@v6
-      - name: Pin swift-syntax to exact version
-        working-directory: Plugins/BridgeJS
-        run: |
-          # Use exact version constraint to pin swift-syntax
-          sed -i 's/from: "600.0.1"/exact: "${{ matrix.swift-syntax-version }}"/' Package.swift
-          cat Package.swift | grep swift-syntax | head -1
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
