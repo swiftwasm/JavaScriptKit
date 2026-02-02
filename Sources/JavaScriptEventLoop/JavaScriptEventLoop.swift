@@ -1,5 +1,5 @@
 import JavaScriptKit
-import _Concurrency
+@_spi(ExperimentalCustomExecutors) import _Concurrency
 import _CJavaScriptEventLoop
 import _CJavaScriptKit
 
