@@ -77,6 +77,14 @@ jobs:
           node-version: '20'
       - name: Install TypeScript
         run: npm install --prefix Plugins/BridgeJS/Sources/TS2Swift/JavaScript
+      - name: Force SwiftSyntax 602 for Swift 6.2
+        if: matrix.swift-image == 'swift:6.2'
+        working-directory: Plugins/BridgeJS
+        run: |
+          # Force SwiftSyntax 602.x to test the SwiftSyntax602 code path
+          sed -i 's/from: "600.0.1"/from: "602.0.0"/' Package.swift
+          # Clean any cached resolution
+          rm -rf .build Package.resolved
       - name: Run BridgeJS tests
         run: swift test --package-path ./Plugins/BridgeJS
 
