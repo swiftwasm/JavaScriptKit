@@ -9,11 +9,11 @@ exports[`ts2swift > snapshots Swift output for ArrayParameter.d.ts > ArrayParame
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func checkArray(_ a: JSObject) throws (JSException) -> Void
+@JSFunction func checkArray(_ a: JSObject) throws(JSException) -> Void
 
-@JSFunction func checkArrayWithLength(_ a: JSObject, _ b: Double) throws (JSException) -> Void
+@JSFunction func checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> Void
 
-@JSFunction func checkArray(_ a: JSObject) throws (JSException) -> Void
+@JSFunction func checkArray(_ a: JSObject) throws(JSException) -> Void
 "
 `;
 
@@ -26,19 +26,19 @@ exports[`ts2swift > snapshots Swift output for Async.d.ts > Async 1`] = `
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func asyncReturnVoid() throws (JSException) -> JSPromise
+@JSFunction func asyncReturnVoid() throws(JSException) -> JSPromise
 
-@JSFunction func asyncRoundTripInt(_ v: Double) throws (JSException) -> JSPromise
+@JSFunction func asyncRoundTripInt(_ v: Double) throws(JSException) -> JSPromise
 
-@JSFunction func asyncRoundTripString(_ v: String) throws (JSException) -> JSPromise
+@JSFunction func asyncRoundTripString(_ v: String) throws(JSException) -> JSPromise
 
-@JSFunction func asyncRoundTripBool(_ v: Bool) throws (JSException) -> JSPromise
+@JSFunction func asyncRoundTripBool(_ v: Bool) throws(JSException) -> JSPromise
 
-@JSFunction func asyncRoundTripFloat(_ v: Double) throws (JSException) -> JSPromise
+@JSFunction func asyncRoundTripFloat(_ v: Double) throws(JSException) -> JSPromise
 
-@JSFunction func asyncRoundTripDouble(_ v: Double) throws (JSException) -> JSPromise
+@JSFunction func asyncRoundTripDouble(_ v: Double) throws(JSException) -> JSPromise
 
-@JSFunction func asyncRoundTripJSObject(_ v: JSObject) throws (JSException) -> JSPromise
+@JSFunction func asyncRoundTripJSObject(_ v: JSObject) throws(JSException) -> JSPromise
 "
 `;
 
@@ -51,11 +51,11 @@ exports[`ts2swift > snapshots Swift output for Interface.d.ts > Interface 1`] = 
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func returnAnimatable() throws (JSException) -> Animatable
+@JSFunction func returnAnimatable() throws(JSException) -> Animatable
 
 @JSClass struct Animatable {
-    @JSFunction func animate(_ keyframes: JSObject, _ options: JSObject) throws (JSException) -> JSObject
-    @JSFunction func getAnimations(_ options: JSObject) throws (JSException) -> JSObject
+    @JSFunction func animate(_ keyframes: JSObject, _ options: JSObject) throws(JSException) -> JSObject
+    @JSFunction func getAnimations(_ options: JSObject) throws(JSException) -> JSObject
 }
 "
 `;
@@ -69,42 +69,42 @@ exports[`ts2swift > snapshots Swift output for InvalidPropertyNames.d.ts > Inval
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func createArrayBuffer() throws (JSException) -> ArrayBufferLike
+@JSFunction func createArrayBuffer() throws(JSException) -> ArrayBufferLike
 
 @JSClass struct ArrayBufferLike {
     @JSGetter var byteLength: Double
-    @JSFunction func slice(_ begin: Double, _ end: Double) throws (JSException) -> ArrayBufferLike
+    @JSFunction func slice(_ begin: Double, _ end: Double) throws(JSException) -> ArrayBufferLike
 }
 
-@JSFunction func createWeirdObject() throws (JSException) -> WeirdNaming
+@JSFunction func createWeirdObject() throws(JSException) -> WeirdNaming
 
 @JSClass struct WeirdNaming {
     @JSGetter var normalProperty: String
-    @JSSetter func setNormalProperty(_ value: String) throws (JSException)
+    @JSSetter func setNormalProperty(_ value: String) throws(JSException)
     @JSGetter(jsName: "property-with-dashes") var property_with_dashes: Double
-    @JSSetter(jsName: "property-with-dashes") func setProperty_with_dashes(_ value: Double) throws (JSException)
+    @JSSetter(jsName: "property-with-dashes") func setProperty_with_dashes(_ value: Double) throws(JSException)
     @JSGetter(jsName: "123invalidStart") var _123invalidStart: Bool
-    @JSSetter(jsName: "123invalidStart") func set_123invalidStart(_ value: Bool) throws (JSException)
+    @JSSetter(jsName: "123invalidStart") func set_123invalidStart(_ value: Bool) throws(JSException)
     @JSGetter(jsName: "property with spaces") var property_with_spaces: String
-    @JSSetter(jsName: "property with spaces") func setProperty_with_spaces(_ value: String) throws (JSException)
+    @JSSetter(jsName: "property with spaces") func setProperty_with_spaces(_ value: String) throws(JSException)
     @JSGetter(jsName: "@specialChar") var _specialChar: Double
-    @JSSetter(jsName: "@specialChar") func set_specialChar(_ value: Double) throws (JSException)
+    @JSSetter(jsName: "@specialChar") func set_specialChar(_ value: Double) throws(JSException)
     @JSGetter var constructor: String
-    @JSSetter func setConstructor(_ value: String) throws (JSException)
+    @JSSetter func setConstructor(_ value: String) throws(JSException)
     @JSGetter var \`for\`: String
-    @JSSetter func setFor(_ value: String) throws (JSException)
+    @JSSetter func setFor(_ value: String) throws(JSException)
     @JSGetter var \`Any\`: String
-    @JSSetter(jsName: "Any") func setAny(_ value: String) throws (JSException)
-    @JSFunction func \`as\`() throws (JSException) -> Void
-    @JSFunction func \`try\`() throws (JSException) -> Void
+    @JSSetter(jsName: "Any") func setAny(_ value: String) throws(JSException)
+    @JSFunction func \`as\`() throws(JSException) -> Void
+    @JSFunction func \`try\`() throws(JSException) -> Void
 }
 
 @JSClass(jsName: "$Weird") struct _Weird {
-    @JSFunction init() throws (JSException)
-    @JSFunction(jsName: "method-with-dashes") func method_with_dashes() throws (JSException) -> Void
+    @JSFunction init() throws(JSException)
+    @JSFunction(jsName: "method-with-dashes") func method_with_dashes() throws(JSException) -> Void
 }
 
-@JSFunction func createWeirdClass() throws (JSException) -> _Weird
+@JSFunction func createWeirdClass() throws(JSException) -> _Weird
 "
 `;
 
@@ -117,29 +117,29 @@ exports[`ts2swift > snapshots Swift output for MultipleImportedTypes.d.ts > Mult
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func createDatabaseConnection(_ config: JSObject) throws (JSException) -> DatabaseConnection
+@JSFunction func createDatabaseConnection(_ config: JSObject) throws(JSException) -> DatabaseConnection
 
 @JSClass struct DatabaseConnection {
-    @JSFunction func connect(_ url: String) throws (JSException) -> Void
-    @JSFunction func execute(_ query: String) throws (JSException) -> JSObject
+    @JSFunction func connect(_ url: String) throws(JSException) -> Void
+    @JSFunction func execute(_ query: String) throws(JSException) -> JSObject
     @JSGetter var isConnected: Bool
     @JSGetter var connectionTimeout: Double
-    @JSSetter func setConnectionTimeout(_ value: Double) throws (JSException)
+    @JSSetter func setConnectionTimeout(_ value: Double) throws(JSException)
 }
 
-@JSFunction func createLogger(_ level: String) throws (JSException) -> Logger
+@JSFunction func createLogger(_ level: String) throws(JSException) -> Logger
 
 @JSClass struct Logger {
-    @JSFunction func log(_ message: String) throws (JSException) -> Void
-    @JSFunction func error(_ message: String, _ error: JSObject) throws (JSException) -> Void
+    @JSFunction func log(_ message: String) throws(JSException) -> Void
+    @JSFunction func error(_ message: String, _ error: JSObject) throws(JSException) -> Void
     @JSGetter var level: String
 }
 
-@JSFunction func getConfigManager() throws (JSException) -> ConfigManager
+@JSFunction func getConfigManager() throws(JSException) -> ConfigManager
 
 @JSClass struct ConfigManager {
-    @JSFunction func get(_ key: String) throws (JSException) -> JSObject
-    @JSFunction func set(_ key: String, _ value: JSObject) throws (JSException) -> Void
+    @JSFunction func get(_ key: String) throws(JSException) -> JSObject
+    @JSFunction func set(_ key: String, _ value: JSObject) throws(JSException) -> Void
     @JSGetter var configPath: String
 }
 "
@@ -154,7 +154,7 @@ exports[`ts2swift > snapshots Swift output for PrimitiveParameters.d.ts > Primit
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func check(_ a: Double, _ b: Bool) throws (JSException) -> Void
+@JSFunction func check(_ a: Double, _ b: Bool) throws(JSException) -> Void
 "
 `;
 
@@ -167,9 +167,9 @@ exports[`ts2swift > snapshots Swift output for PrimitiveReturn.d.ts > PrimitiveR
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func checkNumber() throws (JSException) -> Double
+@JSFunction func checkNumber() throws(JSException) -> Double
 
-@JSFunction func checkBoolean() throws (JSException) -> Bool
+@JSFunction func checkBoolean() throws(JSException) -> Bool
 "
 `;
 
@@ -182,11 +182,11 @@ exports[`ts2swift > snapshots Swift output for ReExportFrom.d.ts > ReExportFrom 
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func jsRoundTripNumber(_ v: Double) throws (JSException) -> Double
+@JSFunction func jsRoundTripNumber(_ v: Double) throws(JSException) -> Double
 
 @JSClass struct JsGreeter {
-    @JSFunction init(_ name: String) throws (JSException)
-    @JSFunction func greet() throws (JSException) -> String
+    @JSFunction init(_ name: String) throws(JSException)
+    @JSFunction func greet() throws(JSException) -> String
 }
 "
 `;
@@ -206,9 +206,9 @@ enum FeatureFlag: String {
 }
 extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
 
-@JSFunction func takesFeatureFlag(_ flag: FeatureFlag) throws (JSException) -> Void
+@JSFunction func takesFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> Void
 
-@JSFunction func returnsFeatureFlag() throws (JSException) -> FeatureFlag
+@JSFunction func returnsFeatureFlag() throws(JSException) -> FeatureFlag
 "
 `;
 
@@ -221,9 +221,9 @@ exports[`ts2swift > snapshots Swift output for StringParameter.d.ts > StringPara
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func checkString(_ a: String) throws (JSException) -> Void
+@JSFunction func checkString(_ a: String) throws(JSException) -> Void
 
-@JSFunction func checkStringWithLength(_ a: String, _ b: Double) throws (JSException) -> Void
+@JSFunction func checkStringWithLength(_ a: String, _ b: Double) throws(JSException) -> Void
 "
 `;
 
@@ -236,7 +236,7 @@ exports[`ts2swift > snapshots Swift output for StringReturn.d.ts > StringReturn 
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func checkString() throws (JSException) -> String
+@JSFunction func checkString() throws(JSException) -> String
 "
 `;
 
@@ -249,18 +249,18 @@ exports[`ts2swift > snapshots Swift output for TS2SkeletonLike.d.ts > TS2Skeleto
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func createTS2Skeleton() throws (JSException) -> TypeScriptProcessor
+@JSFunction func createTS2Skeleton() throws(JSException) -> TypeScriptProcessor
 
 @JSClass struct TypeScriptProcessor {
-    @JSFunction func convert(_ ts: String) throws (JSException) -> String
-    @JSFunction func validate(_ ts: String) throws (JSException) -> Bool
+    @JSFunction func convert(_ ts: String) throws(JSException) -> String
+    @JSFunction func validate(_ ts: String) throws(JSException) -> Bool
     @JSGetter var version: String
 }
 
-@JSFunction func createCodeGenerator(_ format: String) throws (JSException) -> CodeGenerator
+@JSFunction func createCodeGenerator(_ format: String) throws(JSException) -> CodeGenerator
 
 @JSClass struct CodeGenerator {
-    @JSFunction func generate(_ input: JSObject) throws (JSException) -> String
+    @JSFunction func generate(_ input: JSObject) throws(JSException) -> String
     @JSGetter var outputFormat: String
 }
 "
@@ -275,7 +275,7 @@ exports[`ts2swift > snapshots Swift output for TypeAlias.d.ts > TypeAlias 1`] = 
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func checkSimple(_ a: Double) throws (JSException) -> Void
+@JSFunction func checkSimple(_ a: Double) throws(JSException) -> Void
 "
 `;
 
@@ -290,11 +290,11 @@ exports[`ts2swift > snapshots Swift output for TypeScriptClass.d.ts > TypeScript
 
 @JSClass struct Greeter {
     @JSGetter var name: String
-    @JSSetter func setName(_ value: String) throws (JSException)
+    @JSSetter func setName(_ value: String) throws(JSException)
     @JSGetter var age: Double
-    @JSFunction init(_ name: String) throws (JSException)
-    @JSFunction func greet() throws (JSException) -> String
-    @JSFunction func changeName(_ name: String) throws (JSException) -> Void
+    @JSFunction init(_ name: String) throws(JSException)
+    @JSFunction func greet() throws(JSException) -> String
+    @JSFunction func changeName(_ name: String) throws(JSException) -> Void
 }
 "
 `;
@@ -308,6 +308,6 @@ exports[`ts2swift > snapshots Swift output for VoidParameterVoidReturn.d.ts > Vo
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func check() throws (JSException) -> Void
+@JSFunction func check() throws(JSException) -> Void
 "
 `;

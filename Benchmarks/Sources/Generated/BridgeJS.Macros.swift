@@ -6,8 +6,8 @@
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func benchmarkHelperNoop() throws (JSException) -> Void
+@JSFunction func benchmarkHelperNoop() throws(JSException) -> Void
 
-@JSFunction func benchmarkHelperNoopWithNumber(_ n: Double) throws (JSException) -> Void
+@JSFunction func benchmarkHelperNoopWithNumber(_ n: Double) throws(JSException) -> Void
 
-@JSFunction func benchmarkRunner(_ name: String, _ body: JSObject) throws (JSException) -> Void
+@JSFunction func benchmarkRunner(_ name: String, _ body: JSObject) throws(JSException) -> Void

@@ -874,7 +874,7 @@ export class TypeProcessor {
         if (effects?.isAsync) {
             parts.push("async");
         }
-        parts.push("throws (JSException)");
+        parts.push("throws(JSException)");
         return parts.join(" ");
     }
 
