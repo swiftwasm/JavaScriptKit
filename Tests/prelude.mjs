@@ -25,6 +25,12 @@ export async function setupOptions(options, context) {
                 "jsRoundTripString": (v) => {
                     return v;
                 },
+                "jsRoundTripOptionalNumberNull": (v) => {
+                    return v ?? null;
+                },
+                "jsRoundTripOptionalNumberUndefined": (v) => {
+                    return v === undefined ? undefined : v;
+                },
                 "jsThrowOrVoid": (shouldThrow) => {
                     if (shouldThrow) {
                         throw new Error("TestError");
@@ -689,6 +695,26 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(optionalsHolder.optionalGreeter, null);
     testPropertyGreeter.release();
     optionalsHolder.release();
+
+    const optGreeter = new exports.Greeter("Optionaly");
+    assert.equal(exports.roundTripOptionalGreeter(null), null);
+    const optGreeterReturned = exports.roundTripOptionalGreeter(optGreeter);
+    assert.equal(optGreeterReturned.name, "Optionaly");
+    assert.equal(optGreeterReturned.greet(), "Hello, Optionaly!");
+
+    const appliedOptional = exports.applyOptionalGreeter(null, (g) => g ?? optGreeter);
+    assert.equal(appliedOptional.name, "Optionaly");
+
+    const holderOpt = exports.makeOptionalHolder(null, undefined);
+    assert.equal(holderOpt.nullableGreeter, null);
+    assert.equal(holderOpt.undefinedNumber, undefined);
+    holderOpt.nullableGreeter = optGreeter;
+    holderOpt.undefinedNumber = 123.5;
+    assert.equal(holderOpt.nullableGreeter.name, "Optionaly");
+    assert.equal(holderOpt.undefinedNumber, 123.5);
+    holderOpt.release();
+    optGreeterReturned.release();
+    optGreeter.release();
 
     const aor1 = { tag: APIOptionalResultValues.Tag.Success, param0: "hello world" };
     const aor2 = { tag: APIOptionalResultValues.Tag.Success, param0: null };

@@ -820,6 +820,8 @@ struct StackCodegen {
             return "\(raw: type.swiftType).bridgeJSLiftParameter(_swift_js_pop_i32())"
         case .optional(let wrappedType):
             return liftOptionalExpression(wrappedType: wrappedType)
+        case .undefinedOr(let wrappedType):
+            return liftUndefinedExpression(wrappedType: wrappedType)
         case .array(let elementType):
             return liftArrayExpression(elementType: elementType)
         case .closure:
@@ -839,7 +841,7 @@ struct StackCodegen {
             return liftArrayExpressionInline(elementType: elementType)
         case .swiftProtocol(let protocolName):
             return "[Any\(raw: protocolName)].bridgeJSLiftParameter()"
-        case .optional, .array, .closure:
+        case .optional, .undefinedOr, .array, .closure:
             return liftArrayExpressionInline(elementType: elementType)
         case .void, .namespaceEnum:
             fatalError("Invalid array element type: \(elementType)")
@@ -883,8 +885,31 @@ struct StackCodegen {
                     }
                 }()
                 """
-        case .void, .namespaceEnum, .closure, .optional, .unsafePointer, .swiftProtocol:
+        case .undefinedOr, .void, .namespaceEnum, .closure, .optional, .unsafePointer, .swiftProtocol:
             fatalError("Invalid optional wrapped type: \(wrappedType)")
+        }
+    }
+
+    private func liftUndefinedExpression(wrappedType: BridgeType) -> ExprSyntax {
+        switch wrappedType {
+        case .string, .int, .uint, .bool, .float, .double, .jsObject,
+            .swiftStruct, .swiftHeapObject, .caseEnum, .associatedValueEnum, .rawValueEnum:
+            return "JSUndefinedOr<\(raw: wrappedType.swiftType)>.bridgeJSLiftParameter()"
+        case .array(let elementType):
+            let arrayLift = liftArrayExpression(elementType: elementType)
+            let swiftTypeName = elementType.swiftType
+            return """
+                {
+                    let __isDefined = _swift_js_pop_i32()
+                    if __isDefined == 0 {
+                        return JSUndefinedOr<\(raw: swiftTypeName)>.undefined
+                    } else {
+                        return JSUndefinedOr<\(raw: swiftTypeName)>(optional: \(arrayLift))
+                    }
+                }()
+                """
+        case .void, .namespaceEnum, .closure, .optional, .undefinedOr, .unsafePointer, .swiftProtocol:
+            fatalError("Invalid undefinedOr wrapped type: \(wrappedType)")
         }
     }
 
@@ -917,6 +942,8 @@ struct StackCodegen {
             return ["\(raw: accessor).bridgeJSLowerReturn()"]
         case .optional(let wrappedType):
             return lowerOptionalStatements(wrappedType: wrappedType, accessor: accessor, varPrefix: varPrefix)
+        case .undefinedOr(let wrappedType):
+            return lowerOptionalStatements(wrappedType: wrappedType, accessor: accessor, varPrefix: varPrefix)
         case .void, .namespaceEnum:
             return []
         case .array(let elementType):
@@ -938,7 +965,7 @@ struct StackCodegen {
             return ["\(raw: accessor).map { $0.jsObject }.bridgeJSLowerReturn()"]
         case .swiftProtocol(let protocolName):
             return ["\(raw: accessor).map { $0 as! Any\(raw: protocolName) }.bridgeJSLowerReturn()"]
-        case .optional, .array, .closure:
+        case .optional, .undefinedOr, .array, .closure:
             return lowerArrayStatementsInline(
                 elementType: elementType,
                 accessor: accessor,
@@ -1597,6 +1624,7 @@ extension BridgeType {
         case .swiftProtocol(let name): return "Any\(name)"
         case .void: return "Void"
         case .optional(let wrappedType): return "Optional<\(wrappedType.swiftType)>"
+        case .undefinedOr(let wrappedType): return "JSUndefinedOr<\(wrappedType.swiftType)>"
         case .array(let elementType): return "[\(elementType.swiftType)]"
         case .caseEnum(let name): return name
         case .rawValueEnum(let name, _): return name
@@ -1644,6 +1672,10 @@ extension BridgeType {
             var optionalParams: [(name: String, type: WasmCoreType)] = [("isSome", .i32)]
             optionalParams.append(contentsOf: try wrappedType.liftParameterInfo().parameters)
             return LiftingIntrinsicInfo(parameters: optionalParams)
+        case .undefinedOr(let wrappedType):
+            var params: [(name: String, type: WasmCoreType)] = [("isDefined", .i32)]
+            params.append(contentsOf: try wrappedType.liftParameterInfo().parameters)
+            return LiftingIntrinsicInfo(parameters: params)
         case .caseEnum: return .caseEnum
         case .rawValueEnum(_, let rawType):
             return rawType.liftingIntrinsicInfo
@@ -1693,6 +1725,7 @@ extension BridgeType {
         case .swiftProtocol: return .jsObject
         case .void: return .void
         case .optional: return .optional
+        case .undefinedOr: return .optional
         case .caseEnum: return .caseEnum
         case .rawValueEnum(_, let rawType):
             return rawType.loweringIntrinsicInfo

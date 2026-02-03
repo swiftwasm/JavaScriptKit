@@ -1015,11 +1015,6 @@ extension UnsafeMutablePointer: _BridgedSwiftStackType {
 }
 
 extension Optional where Wrapped == Bool {
-    // MARK: ImportTS
-
-    @available(*, unavailable, message: "Optional Bool type is not supported to be passed to imported JS functions")
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Void {}
-
     // MARK: ExportSwift
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
@@ -1071,11 +1066,6 @@ extension Optional where Wrapped == Bool {
 }
 
 extension Optional where Wrapped == Int {
-    // MARK: ImportTS
-
-    @available(*, unavailable, message: "Optional Int type is not supported to be passed to imported JS functions")
-    @_spi(BridgeJS) public func bridgeJSLowerParameter() -> Void {}
-
     // MARK: ExportSwift
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
@@ -1123,14 +1113,7 @@ extension Optional where Wrapped == Int {
 }
 
 extension Optional where Wrapped == UInt {
-    // MARK: ImportTS
-
-    @available(*, unavailable, message: "Optional UInt type is not supported to be passed to imported JS functions")
-    @_spi(BridgeJS) public func bridgeJSLowerParameter() -> Void {}
-
-    // MARK: ExportSwift
-
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithPresence() -> (
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
         isSome: Int32, value: Int32
     ) {
         switch consume self {

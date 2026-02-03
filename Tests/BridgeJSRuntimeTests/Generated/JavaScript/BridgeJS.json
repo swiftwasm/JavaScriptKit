@@ -527,6 +527,79 @@
       },
       {
         "constructor" : {
+          "abiName" : "bjs_OptionalHolder_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "nullableGreeter",
+              "name" : "nullableGreeter",
+              "type" : {
+                "optional" : {
+                  "_0" : {
+                    "swiftHeapObject" : {
+                      "_0" : "Greeter"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "label" : "undefinedNumber",
+              "name" : "undefinedNumber",
+              "type" : {
+                "undefinedOr" : {
+                  "_0" : {
+                    "double" : {
+
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "OptionalHolder",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "nullableGreeter",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "undefinedNumber",
+            "type" : {
+              "undefinedOr" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "OptionalHolder"
+      },
+      {
+        "constructor" : {
           "abiName" : "bjs_OptionalPropertyHolder_init",
           "effects" : {
             "isAsync" : false,
@@ -7445,6 +7518,148 @@
         }
       },
       {
+        "abiName" : "bjs_roundTripOptionalGreeter",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripOptionalGreeter",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "swiftHeapObject" : {
+                "_0" : "Greeter"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_applyOptionalGreeter",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "applyOptionalGreeter",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "transform",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "optional" : {
+                        "_0" : {
+                          "swiftHeapObject" : {
+                            "_0" : "Greeter"
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "optional" : {
+                      "_0" : {
+                        "swiftHeapObject" : {
+                          "_0" : "Greeter"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "swiftHeapObject" : {
+                "_0" : "Greeter"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeOptionalHolder",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeOptionalHolder",
+        "parameters" : [
+          {
+            "label" : "nullableGreeter",
+            "name" : "nullableGreeter",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label" : "undefinedNumber",
+            "name" : "undefinedNumber",
+            "type" : {
+              "undefinedOr" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftHeapObject" : {
+            "_0" : "OptionalHolder"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripOptionalAPIOptionalResult",
         "effects" : {
           "isAsync" : false,
@@ -11736,6 +11951,58 @@
             "returnType" : {
               "string" : {
 
+              }
+            }
+          },
+          {
+            "name" : "jsRoundTripOptionalNumberNull",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "optional" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name" : "jsRoundTripOptionalNumberUndefined",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "undefinedOr" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "undefinedOr" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                }
               }
             }
           },

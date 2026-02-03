@@ -925,15 +925,15 @@ extension BridgeType {
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as parameters")
         case .optional(let wrappedType):
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
-            case .exportSwift:
-                let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
-                var params = [("isSome", WasmCoreType.i32)]
-                params.append(contentsOf: wrappedInfo.loweredParameters)
-                return LoweringParameterInfo(loweredParameters: params)
-            }
+            let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
+            var params = [("isSome", WasmCoreType.i32)]
+            params.append(contentsOf: wrappedInfo.loweredParameters)
+            return LoweringParameterInfo(loweredParameters: params)
+        case .undefinedOr(let wrappedType):
+            let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
+            var params = [("isDefined", WasmCoreType.i32)]
+            params.append(contentsOf: wrappedInfo.loweredParameters)
+            return LoweringParameterInfo(loweredParameters: params)
         case .array:
             switch context {
             case .importTS:
@@ -1019,13 +1019,11 @@ extension BridgeType {
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as return values")
         case .optional(let wrappedType):
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
-            case .exportSwift:
-                let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
-                return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
-            }
+            let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
+            return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
+        case .undefinedOr(let wrappedType):
+            let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
+            return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
         case .array:
             switch context {
             case .importTS:

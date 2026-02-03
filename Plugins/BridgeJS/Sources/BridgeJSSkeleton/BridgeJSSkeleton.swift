@@ -130,6 +130,7 @@ public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case int, uint, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
     case unsafePointer(UnsafePointerType)
     indirect case optional(BridgeType)
+    indirect case undefinedOr(BridgeType)
     indirect case array(BridgeType)
     case caseEnum(String)
     case rawValueEnum(String, SwiftEnumRawType)
@@ -895,7 +896,7 @@ extension BridgeType {
             return .pointer
         case .unsafePointer:
             return .pointer
-        case .optional(_):
+        case .optional(_), .undefinedOr(_):
             return nil
         case .caseEnum:
             return .i32
@@ -923,6 +924,7 @@ extension BridgeType {
     /// Returns true if this type is optional
     public var isOptional: Bool {
         if case .optional = self { return true }
+        if case .undefinedOr = self { return true }
         return false
     }
 
@@ -961,6 +963,8 @@ extension BridgeType {
             return kindCode
         case .optional(let wrapped):
             return "Sq\(wrapped.mangleTypeName)"
+        case .undefinedOr(let wrapped):
+            return "Su\(wrapped.mangleTypeName)"
         case .caseEnum(let name),
             .rawValueEnum(let name, _),
             .associatedValueEnum(let name),
@@ -987,7 +991,15 @@ extension BridgeType {
     /// Side channels are needed when the wrapped type cannot be directly returned via WASM,
     /// or when we need to distinguish null from absent value for certain primitives.
     public func usesSideChannelForOptionalReturn() -> Bool {
-        guard case .optional(let wrappedType) = self else { return false }
+        let wrappedType: BridgeType
+        switch self {
+        case .optional(let wrapped):
+            wrappedType = wrapped
+        case .undefinedOr(let wrapped):
+            wrappedType = wrapped
+        default:
+            return false
+        }
 
         switch wrappedType {
         case .string, .int, .float, .double, .jsObject, .swiftProtocol:

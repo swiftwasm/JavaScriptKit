@@ -3405,6 +3405,8 @@ extension BridgeType {
             return "number"
         case .optional(let wrappedType):
             return "\(wrappedType.tsType) | null"
+        case .undefinedOr(let wrappedType):
+            return "\(wrappedType.tsType) | undefined"
         case .caseEnum(let name):
             return "\(name)Tag"
         case .rawValueEnum(let name, _):

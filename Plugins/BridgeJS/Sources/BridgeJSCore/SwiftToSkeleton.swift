@@ -133,6 +133,30 @@ public final class SwiftToSkeleton {
                 return .optional(baseType)
             }
         }
+        // JSUndefinedOr<T>
+        if let identifierType = type.as(IdentifierTypeSyntax.self),
+            identifierType.name.text == "JSUndefinedOr",
+            let genericArgs = identifierType.genericArgumentClause?.arguments,
+            genericArgs.count == 1,
+            let argType = TypeSyntax(genericArgs.first?.argument)
+        {
+            if let baseType = lookupType(for: argType, errors: &errors) {
+                return .undefinedOr(baseType)
+            }
+        }
+        // JavaScriptKit.JSUndefinedOr<T>
+        if let memberType = type.as(MemberTypeSyntax.self),
+            let baseType = memberType.baseType.as(IdentifierTypeSyntax.self),
+            baseType.name.text == "JavaScriptKit",
+            memberType.name.text == "JSUndefinedOr",
+            let genericArgs = memberType.genericArgumentClause?.arguments,
+            genericArgs.count == 1,
+            let argType = TypeSyntax(genericArgs.first?.argument)
+        {
+            if let wrappedType = lookupType(for: argType, errors: &errors) {
+                return .undefinedOr(wrappedType)
+            }
+        }
         // Optional<T>
         if let identifierType = type.as(IdentifierTypeSyntax.self),
             identifierType.name.text == "Optional",

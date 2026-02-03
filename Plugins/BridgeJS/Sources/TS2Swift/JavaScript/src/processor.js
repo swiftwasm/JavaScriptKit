@@ -676,6 +676,30 @@ export class TypeProcessor {
          * @returns {string}
          */
         const convert = (type) => {
+            // Handle nullable/undefined unions (e.g. T | null, T | undefined)
+            const isUnionType = (type.flags & ts.TypeFlags.Union) !== 0;
+            if (isUnionType) {
+                /** @type {ts.UnionType} */
+                // @ts-ignore
+                const unionType = type;
+                const unionTypes = unionType.types;
+                const hasNull = unionTypes.some(t => (t.flags & ts.TypeFlags.Null) !== 0);
+                const hasUndefined = unionTypes.some(t => (t.flags & ts.TypeFlags.Undefined) !== 0);
+                const nonNullableTypes = unionTypes.filter(
+                    t => (t.flags & ts.TypeFlags.Null) === 0 && (t.flags & ts.TypeFlags.Undefined) === 0
+                );
+                if (nonNullableTypes.length === 1 && (hasNull || hasUndefined)) {
+                    const wrapped = this.visitType(nonNullableTypes[0], node);
+                    if (hasNull && hasUndefined) {
+                        return `JSUndefinedOr<Optional<${wrapped}>>`;
+                    }
+                    if (hasNull) {
+                        return `Optional<${wrapped}>`;
+                    }
+                    return `JSUndefinedOr<${wrapped}>`;
+                }
+            }
+
             /** @type {Record<string, string>} */
             const typeMap = {
                 "number": "Double",
