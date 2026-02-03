@@ -332,6 +332,30 @@ export async function createInstantiator(options, swift) {
                         },
                     },
                 },
+                Services: {
+                    Graph: {
+                        GraphOperations: {
+                            createGraph: function bjs_Services_Graph_GraphOperations_static_createGraph(rootId) {
+                                const ret = instance.exports.bjs_Services_Graph_GraphOperations_static_createGraph(rootId);
+                                return ret;
+                            },
+                            nodeCount: function bjs_Services_Graph_GraphOperations_static_nodeCount(graphId) {
+                                const ret = instance.exports.bjs_Services_Graph_GraphOperations_static_nodeCount(graphId);
+                                return ret;
+                            },
+                            validate: function bjs_Services_Graph_GraphOperations_static_validate(graphId) {
+                                const ret = instance.exports.bjs_Services_Graph_GraphOperations_static_validate(graphId);
+                                if (tmpRetException) {
+                                    const error = swift.memory.getObject(tmpRetException);
+                                    swift.memory.release(tmpRetException);
+                                    tmpRetException = undefined;
+                                    throw error;
+                                }
+                                return ret !== 0;
+                            },
+                        },
+                    },
+                },
                 Utils: {
                     Converter,
                 },

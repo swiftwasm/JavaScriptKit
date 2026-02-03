@@ -295,6 +295,16 @@ struct TestError: Error {
             return String(value)
         }
     }
+
+    @JS enum StringUtils {
+        @JS static func uppercase(_ text: String) -> String {
+            return text.uppercased()
+        }
+
+        @JS static func lowercase(_ text: String) -> String {
+            return text.lowercased()
+        }
+    }
 }
 
 @JS enum Networking {
@@ -785,6 +795,17 @@ enum APIOptionalResult {
         @JS static func roundtrip(_ value: String) -> String {
             return value
         }
+    }
+}
+
+@JS(namespace: "Services.Graph")
+enum GraphOperations {
+    @JS static func createGraph(rootId: Int) -> Int {
+        return rootId * 10
+    }
+
+    @JS static func nodeCount(graphId: Int) -> Int {
+        return graphId
     }
 }
 

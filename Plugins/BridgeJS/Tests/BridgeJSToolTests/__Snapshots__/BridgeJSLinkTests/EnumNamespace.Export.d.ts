@@ -84,6 +84,15 @@ export type Exports = {
             },
         },
     },
+    Services: {
+        Graph: {
+            GraphOperations: {
+                createGraph(rootId: number): number;
+                nodeCount(graphId: number): number;
+                validate(graphId: number): boolean;
+            },
+        },
+    },
     Utils: {
         Converter: {
             new(): Converter;

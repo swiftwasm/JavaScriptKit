@@ -242,7 +242,7 @@ public enum StaticContext: Codable, Equatable, Sendable {
     case className(String)
     case structName(String)
     case enumName(String)
-    case namespaceEnum
+    case namespaceEnum(String)
 }
 
 // MARK: - Struct Skeleton
@@ -533,13 +533,9 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
     public func callName(prefix: String? = nil) -> String {
         if let staticContext = staticContext {
             switch staticContext {
-            case .className(let baseName), .enumName(let baseName), .structName(let baseName):
+            case .className(let baseName), .enumName(let baseName), .structName(let baseName),
+                .namespaceEnum(let baseName):
                 return "\(baseName).\(name)"
-            case .namespaceEnum:
-                if let namespace = namespace, !namespace.isEmpty {
-                    let namespacePath = namespace.joined(separator: ".")
-                    return "\(namespacePath).\(name)"
-                }
             }
         }
         if let prefix = prefix {

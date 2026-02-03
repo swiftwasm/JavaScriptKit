@@ -349,6 +349,15 @@ export async function createInstantiator(options, swift) {
             if (typeof globalThis.Networking.APIV2.Internal === 'undefined') {
                 globalThis.Networking.APIV2.Internal = {};
             }
+            if (typeof globalThis.Services === 'undefined') {
+                globalThis.Services = {};
+            }
+            if (typeof globalThis.Services.Graph === 'undefined') {
+                globalThis.Services.Graph = {};
+            }
+            if (typeof globalThis.Services.Graph.GraphOperations === 'undefined') {
+                globalThis.Services.Graph.GraphOperations = {};
+            }
             if (typeof globalThis.Utils === 'undefined') {
                 globalThis.Utils = {};
             }
@@ -369,6 +378,30 @@ export async function createInstantiator(options, swift) {
                         },
                     },
                 },
+                Services: {
+                    Graph: {
+                        GraphOperations: {
+                            createGraph: function bjs_Services_Graph_GraphOperations_static_createGraph(rootId) {
+                                const ret = instance.exports.bjs_Services_Graph_GraphOperations_static_createGraph(rootId);
+                                return ret;
+                            },
+                            nodeCount: function bjs_Services_Graph_GraphOperations_static_nodeCount(graphId) {
+                                const ret = instance.exports.bjs_Services_Graph_GraphOperations_static_nodeCount(graphId);
+                                return ret;
+                            },
+                            validate: function bjs_Services_Graph_GraphOperations_static_validate(graphId) {
+                                const ret = instance.exports.bjs_Services_Graph_GraphOperations_static_validate(graphId);
+                                if (tmpRetException) {
+                                    const error = swift.memory.getObject(tmpRetException);
+                                    swift.memory.release(tmpRetException);
+                                    tmpRetException = undefined;
+                                    throw error;
+                                }
+                                return ret !== 0;
+                            },
+                        },
+                    },
+                },
                 Utils: {
                     Converter,
                 },
@@ -377,6 +410,9 @@ export async function createInstantiator(options, swift) {
             globalThis.Utils.Converter = exports.Utils.Converter;
             globalThis.Networking.API.HTTPServer = exports.Networking.API.HTTPServer;
             globalThis.Networking.APIV2.Internal.TestServer = exports.Networking.APIV2.Internal.TestServer;
+            globalThis.Services.Graph.GraphOperations.createGraph = exports.Services.Graph.GraphOperations.createGraph;
+            globalThis.Services.Graph.GraphOperations.nodeCount = exports.Services.Graph.GraphOperations.nodeCount;
+            globalThis.Services.Graph.GraphOperations.validate = exports.Services.Graph.GraphOperations.validate;
             return exports;
         },
     }

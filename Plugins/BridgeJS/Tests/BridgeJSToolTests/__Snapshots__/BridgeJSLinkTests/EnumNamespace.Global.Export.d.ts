@@ -58,6 +58,15 @@ declare global {
             }
         }
     }
+    namespace Services {
+        namespace Graph {
+            namespace GraphOperations {
+                createGraph(rootId: number): number;
+                nodeCount(graphId: number): number;
+                validate(graphId: number): boolean;
+            }
+        }
+    }
     namespace Utils {
         class Converter {
             constructor();
@@ -100,6 +109,15 @@ export type Exports = {
                     new(): TestServer;
                 }
                 SupportedMethod: SupportedMethodObject
+            },
+        },
+    },
+    Services: {
+        Graph: {
+            GraphOperations: {
+                createGraph(rootId: number): number;
+                nodeCount(graphId: number): number;
+                validate(graphId: number): boolean;
             },
         },
     },

@@ -220,7 +220,7 @@
           ],
           "staticContext" : {
             "namespaceEnum" : {
-
+              "_0" : "PropertyNamespace"
             }
           },
           "type" : {
@@ -238,7 +238,7 @@
           ],
           "staticContext" : {
             "namespaceEnum" : {
-
+              "_0" : "PropertyNamespace"
             }
           },
           "type" : {
@@ -274,7 +274,7 @@
           ],
           "staticContext" : {
             "namespaceEnum" : {
-
+              "_0" : "PropertyNamespace.Nested"
             }
           },
           "type" : {
@@ -293,7 +293,7 @@
           ],
           "staticContext" : {
             "namespaceEnum" : {
-
+              "_0" : "PropertyNamespace.Nested"
             }
           },
           "type" : {
@@ -312,7 +312,7 @@
           ],
           "staticContext" : {
             "namespaceEnum" : {
-
+              "_0" : "PropertyNamespace.Nested"
             }
           },
           "type" : {
