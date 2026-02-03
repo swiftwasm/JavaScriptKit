@@ -1,0 +1,110 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "applyInt",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "transform",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "10TestModuleSi_Si",
+                      "moduleName" : "TestModule",
+                      "parameters" : [
+                        {
+                          "int" : {
+
+                          }
+                        }
+                      ],
+                      "returnType" : {
+                        "int" : {
+
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "name" : "makeAdder",
+            "parameters" : [
+              {
+                "name" : "base",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "10TestModuleSi_Si",
+                  "moduleName" : "TestModule",
+                  "parameters" : [
+                    {
+                      "int" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "int" : {
+
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

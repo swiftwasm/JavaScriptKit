@@ -1,0 +1,65 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_makeFoo",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "makeFoo",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "jsObject" : {
+            "_0" : "Foo"
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "constructor" : {
+              "parameters" : [
+
+              ]
+            },
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "Foo",
+            "setters" : [
+
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

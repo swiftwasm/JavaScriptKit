@@ -1,0 +1,138 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_checkInt",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "checkInt",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "int" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_checkUInt",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "checkUInt",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "uint" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_checkFloat",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "checkFloat",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "float" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_checkDouble",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "checkDouble",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "double" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_checkBool",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "checkBool",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "bool" : {
+
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "checkNumber",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "name" : "checkBoolean",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "bool" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

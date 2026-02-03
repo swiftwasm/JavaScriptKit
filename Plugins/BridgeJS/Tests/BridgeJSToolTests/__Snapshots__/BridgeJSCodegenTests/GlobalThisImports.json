@@ -1,0 +1,126 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "from" : "global",
+            "jsName" : "parseInt",
+            "name" : "parseInt",
+            "parameters" : [
+              {
+                "name" : "string",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "double" : {
+
+              }
+            }
+          }
+        ],
+        "globalGetters" : [
+          {
+            "from" : "global",
+            "name" : "console",
+            "type" : {
+              "jsObject" : {
+                "_0" : "JSConsole"
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "name" : "log",
+                "parameters" : [
+                  {
+                    "name" : "message",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "JSConsole",
+            "setters" : [
+
+            ]
+          },
+          {
+            "constructor" : {
+              "parameters" : [
+                {
+                  "name" : "url",
+                  "type" : {
+                    "string" : {
+
+                    }
+                  }
+                }
+              ]
+            },
+            "from" : "global",
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "name" : "close",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "WebSocket",
+            "setters" : [
+
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

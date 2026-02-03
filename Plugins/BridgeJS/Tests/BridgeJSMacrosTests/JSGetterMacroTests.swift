@@ -270,7 +270,7 @@ import BridgeJSMacros
         )
     }
 
-    #if canImport(SwiftSyntax601)
+    #if canImport(SwiftSyntax602)
     // https://github.com/swiftlang/swift-syntax/pull/2722
     @Test func variableWithTrailingComment() {
         TestSupport.assertMacroExpansion(

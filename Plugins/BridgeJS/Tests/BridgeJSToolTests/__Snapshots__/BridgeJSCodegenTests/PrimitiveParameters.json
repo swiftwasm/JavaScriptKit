@@ -1,0 +1,118 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_check",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "check",
+        "parameters" : [
+          {
+            "label" : "a",
+            "name" : "a",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "label" : "b",
+            "name" : "b",
+            "type" : {
+              "uint" : {
+
+              }
+            }
+          },
+          {
+            "label" : "c",
+            "name" : "c",
+            "type" : {
+              "float" : {
+
+              }
+            }
+          },
+          {
+            "label" : "d",
+            "name" : "d",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "label" : "e",
+            "name" : "e",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "check",
+            "parameters" : [
+              {
+                "name" : "a",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "b",
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

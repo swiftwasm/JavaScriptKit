@@ -1,0 +1,702 @@
+{
+  "exported" : {
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Greeter_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "optional" : {
+                  "_0" : {
+                    "string" : {
+
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Greeter_greet",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "greet",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_Greeter_changeName",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "changeName",
+            "parameters" : [
+              {
+                "label" : "name",
+                "name" : "name",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Greeter",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "name",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Greeter"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_OptionalPropertyHolder_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "OptionalPropertyHolder",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "optionalName",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "optionalAge",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "optionalGreeter",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "OptionalPropertyHolder"
+      }
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_roundTripOptionalClass",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripOptionalClass",
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "swiftHeapObject" : {
+                "_0" : "Greeter"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_testOptionalPropertyRoundtrip",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "testOptionalPropertyRoundtrip",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "holder",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "OptionalPropertyHolder"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "swiftHeapObject" : {
+                "_0" : "OptionalPropertyHolder"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripString",
+        "parameters" : [
+          {
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "string" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripInt",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripInt",
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "int" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripBool",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripBool",
+        "parameters" : [
+          {
+            "label" : "flag",
+            "name" : "flag",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "bool" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripFloat",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripFloat",
+        "parameters" : [
+          {
+            "label" : "number",
+            "name" : "number",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "float" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "float" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripDouble",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripDouble",
+        "parameters" : [
+          {
+            "label" : "precision",
+            "name" : "precision",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "double" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripSyntax",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripSyntax",
+        "parameters" : [
+          {
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "string" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripMixSyntax",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripMixSyntax",
+        "parameters" : [
+          {
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "string" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripSwiftSyntax",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripSwiftSyntax",
+        "parameters" : [
+          {
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "string" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripMixedSwiftSyntax",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripMixedSwiftSyntax",
+        "parameters" : [
+          {
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "string" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripWithSpaces",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripWithSpaces",
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "double" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripAlias",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripAlias",
+        "parameters" : [
+          {
+            "label" : "age",
+            "name" : "age",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "int" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripOptionalAlias",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripOptionalAlias",
+        "parameters" : [
+          {
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "string" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_testMixedOptionals",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "testMixedOptionals",
+        "parameters" : [
+          {
+            "label" : "firstName",
+            "name" : "firstName",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label" : "lastName",
+            "name" : "lastName",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label" : "age",
+            "name" : "age",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label" : "active",
+            "name" : "active",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "optional" : {
+            "_0" : {
+              "string" : {
+
+              }
+            }
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule"
+}
