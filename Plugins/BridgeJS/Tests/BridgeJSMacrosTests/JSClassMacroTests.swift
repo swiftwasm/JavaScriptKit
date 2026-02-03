@@ -1,8 +1,7 @@
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacroExpansion
-import SwiftSyntaxMacros
-import SwiftSyntaxMacrosTestSupport
+import SwiftSyntaxMacrosGenericTestSupport
 import Testing
 import BridgeJSMacros
 
@@ -13,7 +12,7 @@ import BridgeJSMacros
     ]
 
     @Test func emptyStruct() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSClass
             struct MyClass {
@@ -21,6 +20,7 @@ import BridgeJSMacros
             """,
             expandedSource: """
                 struct MyClass {
+
                     let jsObject: JSObject
 
                     init(unsafelyWrapping jsObject: JSObject) {
@@ -32,12 +32,12 @@ import BridgeJSMacros
                 }
                 """,
             macroSpecs: macroSpecs,
-            indentationWidth: indentationWidth
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func structWithExistingJSObject() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSClass
             struct MyClass {
@@ -62,7 +62,7 @@ import BridgeJSMacros
     }
 
     @Test func structWithExistingInit() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSClass
             struct MyClass {
@@ -89,7 +89,7 @@ import BridgeJSMacros
     }
 
     @Test func structWithBothExisting() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSClass
             struct MyClass {
@@ -118,7 +118,7 @@ import BridgeJSMacros
     }
 
     @Test func structWithMembers() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSClass
             struct MyClass {
@@ -145,7 +145,7 @@ import BridgeJSMacros
     }
 
     @Test func _class() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSClass
             class MyClass {
@@ -168,7 +168,7 @@ import BridgeJSMacros
     }
 
     @Test func _enum() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSClass
             enum MyEnum {
@@ -191,7 +191,7 @@ import BridgeJSMacros
     }
 
     @Test func _actor() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSClass
             actor MyActor {
@@ -214,7 +214,7 @@ import BridgeJSMacros
     }
 
     @Test func structWithDifferentJSObjectName() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSClass
             struct MyClass {
@@ -241,7 +241,7 @@ import BridgeJSMacros
     }
 
     @Test func structWithDifferentInit() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSClass
             struct MyClass {
@@ -270,7 +270,7 @@ import BridgeJSMacros
     }
 
     @Test func structWithMultipleMembers() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSClass
             struct MyClass {
@@ -299,7 +299,7 @@ import BridgeJSMacros
     }
 
     @Test func structWithComment() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             /// Documentation comment
             @JSClass
@@ -325,7 +325,7 @@ import BridgeJSMacros
     }
 
     @Test func structAlreadyConforms() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSClass
             struct MyClass: _JSBridgedClass {

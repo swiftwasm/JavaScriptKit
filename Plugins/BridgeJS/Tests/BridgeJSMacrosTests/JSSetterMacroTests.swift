@@ -1,15 +1,18 @@
 import SwiftDiagnostics
 import SwiftSyntax
-import SwiftSyntaxMacros
-import SwiftSyntaxMacrosTestSupport
+import SwiftSyntaxMacroExpansion
+import SwiftSyntaxMacrosGenericTestSupport
 import Testing
 import BridgeJSMacros
 
 @Suite struct JSSetterMacroTests {
     private let indentationWidth: Trivia = .spaces(4)
+    private let macroSpecs: [String: MacroSpec] = [
+        "JSSetter": MacroSpec(type: JSSetterMacro.self)
+    ]
 
     @Test func topLevelSetter() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSSetter
             func setFoo(_ value: Foo) throws(JSException)
@@ -19,13 +22,13 @@ import BridgeJSMacros
                     try _$foo_set(value)
                 }
                 """,
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func topLevelSetterWithNamedParameter() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSSetter
             func setCount(count: Int) throws(JSException)
@@ -35,13 +38,13 @@ import BridgeJSMacros
                     try _$count_set(count)
                 }
                 """,
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func instanceSetter() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             struct MyClass {
                 @JSSetter
@@ -55,13 +58,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func staticSetter() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             struct MyClass {
                 @JSSetter
@@ -75,13 +78,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func classSetter() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             class MyClass {
                 @JSSetter
@@ -95,13 +98,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func enumSetter() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             enum MyEnum {
                 @JSSetter
@@ -115,13 +118,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func actorSetter() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             actor MyActor {
                 @JSSetter
@@ -135,13 +138,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func setterWithExistingBody() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSSetter
             func setFoo(_ value: Foo) throws(JSException) {
@@ -153,13 +156,13 @@ import BridgeJSMacros
                     try _$foo_set(value)
                 }
                 """,
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func invalidSetterName() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSSetter
             func updateFoo(_ value: Foo) throws(JSException)
@@ -175,13 +178,13 @@ import BridgeJSMacros
                     column: 1
                 )
             ],
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func setterNameTooShort() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSSetter
             func set(_ value: Foo) throws(JSException)
@@ -197,13 +200,13 @@ import BridgeJSMacros
                     column: 1
                 )
             ],
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func setterWithoutParameter() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSSetter
             func setFoo() throws(JSException)
@@ -218,13 +221,13 @@ import BridgeJSMacros
                     column: 1
                 )
             ],
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func unsupportedDeclaration() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSSetter
             var property: String
@@ -239,13 +242,13 @@ import BridgeJSMacros
                     column: 1
                 )
             ],
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func setterWithMultipleWords() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSSetter
             func setConnectionTimeout(_ timeout: Int) throws(JSException)
@@ -255,13 +258,13 @@ import BridgeJSMacros
                     try _$connectionTimeout_set(timeout)
                 }
                 """,
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func setterWithSingleLetterProperty() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSSetter
             func setX(_ x: Int) throws(JSException)
@@ -271,8 +274,8 @@ import BridgeJSMacros
                     try _$x_set(x)
                 }
                 """,
-            macros: ["JSSetter": JSSetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 }

@@ -1,15 +1,18 @@
 import SwiftDiagnostics
 import SwiftSyntax
-import SwiftSyntaxMacros
-import SwiftSyntaxMacrosTestSupport
+import SwiftSyntaxMacroExpansion
+import SwiftSyntaxMacrosGenericTestSupport
 import Testing
 import BridgeJSMacros
 
 @Suite struct JSFunctionMacroTests {
     private let indentationWidth: Trivia = .spaces(4)
+    private let macroSpecs: [String: MacroSpec] = [
+        "JSFunction": MacroSpec(type: JSFunctionMacro.self)
+    ]
 
     @Test func topLevelFunction() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSFunction
             func greet(name: String) -> String
@@ -19,13 +22,13 @@ import BridgeJSMacros
                     return _$greet(name)
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func topLevelFunctionVoidReturn() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSFunction
             func log(message: String)
@@ -35,13 +38,13 @@ import BridgeJSMacros
                     _$log(message)
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func topLevelFunctionWithExplicitVoidReturn() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSFunction
             func log(message: String) -> Void
@@ -51,13 +54,13 @@ import BridgeJSMacros
                     _$log(message)
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func topLevelFunctionWithEmptyTupleReturn() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSFunction
             func log(message: String) -> ()
@@ -67,13 +70,13 @@ import BridgeJSMacros
                     _$log(message)
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func topLevelFunctionThrows() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSFunction
             func parse(json: String) throws -> [String: Any]
@@ -83,13 +86,13 @@ import BridgeJSMacros
                     return try _$parse(json)
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func topLevelFunctionAsync() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSFunction
             func fetch(url: String) async -> String
@@ -99,13 +102,13 @@ import BridgeJSMacros
                     return await _$fetch(url)
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func topLevelFunctionAsyncThrows() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSFunction
             func fetch(url: String) async throws -> String
@@ -115,13 +118,13 @@ import BridgeJSMacros
                     return try await _$fetch(url)
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func topLevelFunctionWithUnderscoreParameter() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSFunction
             func process(_ value: Int) -> Int
@@ -131,13 +134,13 @@ import BridgeJSMacros
                     return _$process(value)
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func topLevelFunctionWithMultipleParameters() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSFunction
             func add(a: Int, b: Int) -> Int
@@ -147,13 +150,13 @@ import BridgeJSMacros
                     return _$add(a, b)
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func instanceMethod() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             struct MyClass {
                 @JSFunction
@@ -167,13 +170,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func staticMethod() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             struct MyClass {
                 @JSFunction
@@ -187,13 +190,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func classMethod() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             class MyClass {
                 @JSFunction
@@ -207,13 +210,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func initializer() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             struct MyClass {
                 @JSFunction
@@ -228,13 +231,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func initializerThrows() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             struct MyClass {
                 @JSFunction
@@ -249,13 +252,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func initializerAsyncThrows() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             struct MyClass {
                 @JSFunction
@@ -270,13 +273,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func initializerWithoutEnclosingType() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSFunction
             init()
@@ -291,13 +294,13 @@ import BridgeJSMacros
                     column: 1
                 )
             ],
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func unsupportedDeclaration() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSFunction
             var property: String
@@ -312,13 +315,13 @@ import BridgeJSMacros
                     column: 1
                 )
             ],
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func enumInstanceMethod() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             enum MyEnum {
                 @JSFunction
@@ -332,13 +335,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func actorInstanceMethod() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             actor MyActor {
                 @JSFunction
@@ -352,13 +355,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func functionWithExistingBody() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSFunction
             func greet(name: String) -> String {
@@ -370,8 +373,8 @@ import BridgeJSMacros
                     return _$greet(name)
                 }
                 """,
-            macros: ["JSFunction": JSFunctionMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 }

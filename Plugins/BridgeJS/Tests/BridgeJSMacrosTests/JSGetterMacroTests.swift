@@ -1,15 +1,18 @@
 import SwiftDiagnostics
 import SwiftSyntax
-import SwiftSyntaxMacros
-import SwiftSyntaxMacrosTestSupport
+import SwiftSyntaxMacroExpansion
+import SwiftSyntaxMacrosGenericTestSupport
 import Testing
 import BridgeJSMacros
 
 @Suite struct JSGetterMacroTests {
     private let indentationWidth: Trivia = .spaces(4)
+    private let macroSpecs: [String: MacroSpec] = [
+        "JSGetter": MacroSpec(type: JSGetterMacro.self)
+    ]
 
     @Test func topLevelVariable() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSGetter
             var count: Int
@@ -21,13 +24,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func topLevelLet() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSGetter
             let constant: String
@@ -39,13 +42,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func instanceProperty() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             struct MyClass {
                 @JSGetter
@@ -61,13 +64,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func instanceLetProperty() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             struct MyClass {
                 @JSGetter
@@ -83,13 +86,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func staticProperty() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             struct MyClass {
                 @JSGetter
@@ -105,13 +108,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func classProperty() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             class MyClass {
                 @JSGetter
@@ -127,13 +130,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func enumProperty() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             enum MyEnum {
                 @JSGetter
@@ -149,13 +152,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func actorProperty() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             actor MyActor {
                 @JSGetter
@@ -171,13 +174,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func variableWithExistingAccessor() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSGetter
             var count: Int {
@@ -194,13 +197,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func variableWithInitializer() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSGetter
             var count: Int = 0
@@ -212,13 +215,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func multipleBindings() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSGetter
             var x: Int, y: Int
@@ -234,13 +237,13 @@ import BridgeJSMacros
                     severity: .error
                 )
             ],
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func unsupportedDeclaration() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSGetter
             func test() {}
@@ -256,13 +259,13 @@ import BridgeJSMacros
                     severity: .error
                 )
             ],
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func variableWithTrailingComment() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSGetter
             var count: Int // comment
@@ -274,13 +277,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 
     @Test func variableWithUnderscoreName() {
-        assertMacroExpansion(
+        TestSupport.assertMacroExpansion(
             """
             @JSGetter
             var _internal: String
@@ -292,8 +295,8 @@ import BridgeJSMacros
                     }
                 }
                 """,
-            macros: ["JSGetter": JSGetterMacro.self],
-            indentationWidth: indentationWidth
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
         )
     }
 }
