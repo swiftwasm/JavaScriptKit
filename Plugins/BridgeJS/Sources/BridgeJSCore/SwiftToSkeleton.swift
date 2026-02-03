@@ -1856,6 +1856,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     private let inputFilePath: String
     private var jsClassNames: Set<String>
     private let parent: SwiftToSkeleton
+    private var staticMethodsByType: [String: [ImportedFunctionSkeleton]] = [:]
 
     // MARK: - State Management
 
@@ -1876,6 +1877,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         let from: JSImportFrom?
         var constructor: ImportedConstructorSkeleton?
         var methods: [ImportedFunctionSkeleton]
+        var staticMethods: [ImportedFunctionSkeleton]
         var getters: [ImportedGetterSkeleton]
         var setters: [ImportedSetterSkeleton]
     }
@@ -2094,6 +2096,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             from: nil,
             constructor: nil,
             methods: [],
+            staticMethods: [],
             getters: [],
             setters: []
         )
@@ -2107,6 +2110,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             from: from,
             constructor: nil,
             methods: [],
+            staticMethods: [],
             getters: [],
             setters: []
         )
@@ -2114,6 +2118,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     private func exitJSClass() {
         if case .jsClassBody(let typeName) = state, let type = currentType, type.name == typeName {
+            let externalStaticMethods = staticMethodsByType[type.name] ?? []
             importedTypes.append(
                 ImportedTypeSkeleton(
                     name: type.name,
@@ -2121,11 +2126,13 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                     from: type.from,
                     constructor: type.constructor,
                     methods: type.methods,
+                    staticMethods: type.staticMethods + externalStaticMethods,
                     getters: type.getters,
                     setters: type.setters,
                     documentation: nil
                 )
             )
+            staticMethodsByType[type.name] = nil
             currentType = nil
         }
         stateStack.removeLast()
@@ -2217,8 +2224,14 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     ) -> Bool {
         if let jsFunction = AttributeChecker.firstJSFunctionAttribute(node.attributes) {
             if isStaticMember {
-                parseFunction(jsFunction, node, enclosingTypeName: typeName, isStaticMember: true).map {
-                    importedFunctions.append($0)
+                parseFunction(
+                    jsFunction,
+                    node,
+                    enclosingTypeName: typeName,
+                    isStaticMember: true,
+                    includeTypeNameForStatic: false
+                ).map {
+                    type.staticMethods.append($0)
                 }
             } else {
                 parseFunction(jsFunction, node, enclosingTypeName: typeName, isStaticMember: false).map {
@@ -2319,9 +2332,34 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         for member in members {
             if let function = member.decl.as(FunctionDeclSyntax.self) {
                 if let jsFunction = AttributeChecker.firstJSFunctionAttribute(function.attributes),
-                    let parsed = parseFunction(jsFunction, function, enclosingTypeName: typeName, isStaticMember: true)
+                    let parsed = parseFunction(
+                        jsFunction,
+                        function,
+                        enclosingTypeName: typeName,
+                        isStaticMember: true,
+                        includeTypeNameForStatic: !jsClassNames.contains(typeName)
+                    )
                 {
-                    importedFunctions.append(parsed)
+                    if jsClassNames.contains(typeName) {
+                        if let index = importedTypes.firstIndex(where: { $0.name == typeName }) {
+                            let existing = importedTypes[index]
+                            importedTypes[index] = ImportedTypeSkeleton(
+                                name: existing.name,
+                                jsName: existing.jsName,
+                                from: existing.from,
+                                constructor: existing.constructor,
+                                methods: existing.methods,
+                                staticMethods: existing.staticMethods + [parsed],
+                                getters: existing.getters,
+                                setters: existing.setters,
+                                documentation: existing.documentation
+                            )
+                        } else {
+                            staticMethodsByType[typeName, default: []].append(parsed)
+                        }
+                    } else {
+                        importedFunctions.append(parsed)
+                    }
                 } else if AttributeChecker.hasJSSetterAttribute(function.attributes) {
                     errors.append(
                         DiagnosticError(
@@ -2366,7 +2404,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         _ jsFunction: AttributeSyntax,
         _ node: FunctionDeclSyntax,
         enclosingTypeName: String?,
-        isStaticMember: Bool
+        isStaticMember: Bool,
+        includeTypeNameForStatic: Bool = true
     ) -> ImportedFunctionSkeleton? {
         guard validateEffects(node.signature.effectSpecifiers, node: node, attributeName: "JSFunction") != nil
         else {
@@ -2377,7 +2416,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         let jsName = AttributeChecker.extractJSName(from: jsFunction)
         let from = AttributeChecker.extractJSImportFrom(from: jsFunction)
         let name: String
-        if isStaticMember, let enclosingTypeName {
+        if isStaticMember, includeTypeNameForStatic, let enclosingTypeName {
             name = "\(enclosingTypeName)_\(baseName)"
         } else {
             name = baseName

@@ -191,6 +191,9 @@
             "name" : "TS2Swift",
             "setters" : [
 
+            ],
+            "staticMethods" : [
+
             ]
           }
         ]

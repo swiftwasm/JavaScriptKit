@@ -107,6 +107,9 @@
                   }
                 }
               }
+            ],
+            "staticMethods" : [
+
             ]
           },
           {
@@ -161,6 +164,9 @@
             ],
             "name" : "Animatable",
             "setters" : [
+
+            ],
+            "staticMethods" : [
 
             ]
           }

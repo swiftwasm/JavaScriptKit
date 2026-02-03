@@ -9,6 +9,27 @@ export async function setupOptions(options, context) {
     Error.stackTraceLimit = 100;
     setupTestGlobals(globalThis);
 
+    class StaticBox {
+        constructor(value) {
+            this._value = value;
+        }
+        value() {
+            return this._value;
+        }
+        static create(value) {
+            return new StaticBox(value);
+        }
+        static value() {
+            return 99;
+        }
+        static makeDefault() {
+            return new StaticBox(0);
+        }
+        static ["with-dashes"]() {
+            return new StaticBox(7);
+        }
+    }
+
     return {
         ...options,
         getImports: (importsContext) => {
@@ -78,6 +99,7 @@ export async function setupOptions(options, context) {
                         return "ok";
                     }
                 },
+                StaticBox,
                 Foo: ImportedFoo,
                 runAsyncWorks: async () => {
                     const exports = importsContext.getExports();
