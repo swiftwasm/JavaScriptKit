@@ -74,7 +74,7 @@ import BridgeJSMacros
             expandedSource: """
                 struct MyClass {
                     static func setVersion(_ version: String) throws(JSException) {
-                        try _$version_set(version)
+                        try _$MyClass_version_set(version)
                     }
                 }
                 """,
@@ -94,7 +94,7 @@ import BridgeJSMacros
             expandedSource: """
                 class MyClass {
                     class func setConfig(_ config: Config) throws(JSException) {
-                        try _$config_set(config)
+                        try _$MyClass_config_set(config)
                     }
                 }
                 """,
@@ -168,7 +168,9 @@ import BridgeJSMacros
             func updateFoo(_ value: Foo) throws(JSException)
             """,
             expandedSource: """
-                func updateFoo(_ value: Foo) throws(JSException)
+                func updateFoo(_ value: Foo) throws(JSException) {
+                    fatalError("@JSSetter function name must start with 'set' followed by a property name")
+                }
                 """,
             diagnostics: [
                 DiagnosticSpec(
@@ -190,7 +192,9 @@ import BridgeJSMacros
             func set(_ value: Foo) throws(JSException)
             """,
             expandedSource: """
-                func set(_ value: Foo) throws(JSException)
+                func set(_ value: Foo) throws(JSException) {
+                    fatalError("@JSSetter function name must start with 'set' followed by a property name")
+                }
                 """,
             diagnostics: [
                 DiagnosticSpec(
@@ -212,7 +216,9 @@ import BridgeJSMacros
             func setFoo() throws(JSException)
             """,
             expandedSource: """
-                func setFoo() throws(JSException)
+                func setFoo() throws(JSException) {
+                    fatalError("@JSSetter function must have at least one parameter")
+                }
                 """,
             diagnostics: [
                 DiagnosticSpec(

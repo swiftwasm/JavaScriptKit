@@ -103,7 +103,7 @@ import BridgeJSMacros
                 struct MyClass {
                     static var version: String {
                         get throws(JSException) {
-                            return try _$version_get()
+                            return try _$MyClass_version_get()
                         }
                     }
                 }
@@ -125,7 +125,7 @@ import BridgeJSMacros
                 class MyClass {
                     class var version: String {
                         get throws(JSException) {
-                            return try _$version_get()
+                            return try _$MyClass_version_get()
                         }
                     }
                 }
@@ -231,11 +231,17 @@ import BridgeJSMacros
                 """,
             diagnostics: [
                 DiagnosticSpec(
-                    message: "@JSGetter can only be applied to single-variable declarations.",
+                    message: "accessor macro can only be applied to a single variable",
                     line: 1,
                     column: 1,
                     severity: .error
-                )
+                ),
+                DiagnosticSpec(
+                    message: "peer macro can only be applied to a single variable",
+                    line: 1,
+                    column: 1,
+                    severity: .error
+                ),
             ],
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth,
@@ -264,6 +270,8 @@ import BridgeJSMacros
         )
     }
 
+    #if canImport(SwiftSyntax601)
+    // https://github.com/swiftlang/swift-syntax/pull/2722
     @Test func variableWithTrailingComment() {
         TestSupport.assertMacroExpansion(
             """
@@ -281,6 +289,7 @@ import BridgeJSMacros
             indentationWidth: indentationWidth,
         )
     }
+    #endif
 
     @Test func variableWithUnderscoreName() {
         TestSupport.assertMacroExpansion(
@@ -291,7 +300,7 @@ import BridgeJSMacros
             expandedSource: """
                 var _internal: String {
                     get throws(JSException) {
-                        return try _$internal_get()
+                        return try _$_internal_get()
                     }
                 }
                 """,

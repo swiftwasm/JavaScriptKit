@@ -73,11 +73,11 @@ import BridgeJSMacros
             """,
             expandedSource: """
                 struct MyClass {
-                    let jsObject: JSObject
-
                     init(unsafelyWrapping jsObject: JSObject) {
                         self.jsObject = jsObject
                     }
+
+                    let jsObject: JSObject
                 }
 
                 extension MyClass: _JSBridgedClass {
@@ -127,9 +127,9 @@ import BridgeJSMacros
             """,
             expandedSource: """
                 struct MyClass {
-                    let jsObject: JSObject
-
                     var name: String
+
+                    let jsObject: JSObject
 
                     init(unsafelyWrapping jsObject: JSObject) {
                         self.jsObject = jsObject
@@ -223,9 +223,9 @@ import BridgeJSMacros
             """,
             expandedSource: """
                 struct MyClass {
-                    let jsObject: JSObject
-
                     var otherProperty: String
+
+                    let jsObject: JSObject
 
                     init(unsafelyWrapping jsObject: JSObject) {
                         self.jsObject = jsObject
@@ -251,10 +251,10 @@ import BridgeJSMacros
             """,
             expandedSource: """
                 struct MyClass {
-                    let jsObject: JSObject
-
                     init(name: String) {
                     }
+
+                    let jsObject: JSObject
 
                     init(unsafelyWrapping jsObject: JSObject) {
                         self.jsObject = jsObject
@@ -280,10 +280,10 @@ import BridgeJSMacros
             """,
             expandedSource: """
                 struct MyClass {
-                    let jsObject: JSObject
-
                     var name: String
                     var age: Int
+
+                    let jsObject: JSObject
 
                     init(unsafelyWrapping jsObject: JSObject) {
                         self.jsObject = jsObject
@@ -309,6 +309,7 @@ import BridgeJSMacros
             expandedSource: """
                 /// Documentation comment
                 struct MyClass {
+
                     let jsObject: JSObject
 
                     init(unsafelyWrapping jsObject: JSObject) {
@@ -333,6 +334,7 @@ import BridgeJSMacros
             """,
             expandedSource: """
                 struct MyClass: _JSBridgedClass {
+
                     let jsObject: JSObject
 
                     init(unsafelyWrapping jsObject: JSObject) {

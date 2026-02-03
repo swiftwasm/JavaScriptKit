@@ -186,7 +186,7 @@ import BridgeJSMacros
             expandedSource: """
                 struct MyClass {
                     static func create() -> MyClass {
-                        return _$create()
+                        return _$MyClass_create()
                     }
                 }
                 """,
@@ -206,7 +206,7 @@ import BridgeJSMacros
             expandedSource: """
                 class MyClass {
                     class func create() -> MyClass {
-                        return _$create()
+                        return _$MyClass_create()
                     }
                 }
                 """,
@@ -285,7 +285,9 @@ import BridgeJSMacros
             init()
             """,
             expandedSource: """
-                init()
+                init() {
+                    fatalError("@JSFunction init must be inside a type")
+                }
                 """,
             diagnostics: [
                 DiagnosticSpec(

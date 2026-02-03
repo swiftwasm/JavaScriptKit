@@ -25,13 +25,23 @@ extension JSSetterMacro: BodyMacro {
         let rawFunctionName = JSMacroHelper.stripBackticks(functionName)
         guard rawFunctionName.hasPrefix("set"), rawFunctionName.count > 3 else {
             context.diagnose(Diagnostic(node: Syntax(declaration), message: JSMacroMessage.invalidSetterName))
-            return []
+            return [
+                CodeBlockItemSyntax(
+                    stringLiteral:
+                        "fatalError(\"@JSSetter function name must start with 'set' followed by a property name\")"
+                )
+            ]
         }
 
         let propertyName = String(rawFunctionName.dropFirst(3))
         guard !propertyName.isEmpty else {
             context.diagnose(Diagnostic(node: Syntax(declaration), message: JSMacroMessage.invalidSetterName))
-            return []
+            return [
+                CodeBlockItemSyntax(
+                    stringLiteral:
+                        "fatalError(\"@JSSetter function name must start with 'set' followed by a property name\")"
+                )
+            ]
         }
 
         // Convert first character to lowercase (e.g., "Foo" -> "foo")
@@ -56,7 +66,11 @@ extension JSSetterMacro: BodyMacro {
         let parameters = functionDecl.signature.parameterClause.parameters
         guard let firstParam = parameters.first else {
             context.diagnose(Diagnostic(node: Syntax(declaration), message: JSMacroMessage.setterRequiresParameter))
-            return []
+            return [
+                CodeBlockItemSyntax(
+                    stringLiteral: "fatalError(\"@JSSetter function must have at least one parameter\")"
+                )
+            ]
         }
 
         let paramName = firstParam.secondName ?? firstParam.firstName
@@ -67,5 +81,23 @@ extension JSSetterMacro: BodyMacro {
 
         // Setters should throw JSException, so always use try
         return [CodeBlockItemSyntax(stringLiteral: "try \(call)")]
+    }
+}
+
+extension JSSetterMacro: PeerMacro {
+    /// Emits a diagnostic when @JSSetter is applied to a declaration that is not a function.
+    /// BodyMacro is only invoked for declarations with optional code blocks (e.g. functions).
+    public static func expansion(
+        of node: AttributeSyntax,
+        providingPeersOf declaration: some DeclSyntaxProtocol,
+        in context: some MacroExpansionContext
+    ) throws -> [DeclSyntax] {
+        guard declaration.is(FunctionDeclSyntax.self) else {
+            context.diagnose(
+                Diagnostic(node: Syntax(declaration), message: JSMacroMessage.unsupportedSetterDeclaration)
+            )
+            return []
+        }
+        return []
     }
 }
