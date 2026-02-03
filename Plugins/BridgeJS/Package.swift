@@ -72,7 +72,7 @@ let package = Package(
             name: "BridgeJSMacrosTests",
             dependencies: [
                 "BridgeJSMacros",
-                .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacrosGenericTestSupport", package: "swift-syntax"),
             ]
         ),
 

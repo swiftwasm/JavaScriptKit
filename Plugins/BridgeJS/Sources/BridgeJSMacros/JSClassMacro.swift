@@ -66,8 +66,15 @@ extension JSClassMacro: ExtensionMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
-        guard declaration.is(StructDeclSyntax.self) else { return [] }
+        guard let structDecl = declaration.as(StructDeclSyntax.self) else { return [] }
         guard !protocols.isEmpty else { return [] }
+
+        // Do not add extension if the struct already conforms to _JSBridgedClass
+        if let clause = structDecl.inheritanceClause,
+            clause.inheritedTypes.contains(where: { $0.type.trimmed.description == "_JSBridgedClass" })
+        {
+            return []
+        }
 
         let conformanceList = protocols.map { $0.trimmed.description }.joined(separator: ", ")
         return [

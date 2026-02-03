@@ -47,7 +47,7 @@ extension JSFunctionMacro: BodyMacro {
                 context.diagnose(
                     Diagnostic(node: Syntax(declaration), message: JSMacroMessage.unsupportedDeclaration)
                 )
-                return []
+                return [CodeBlockItemSyntax(stringLiteral: "fatalError(\"@JSFunction init must be inside a type\")")]
             }
 
             let glueName = JSMacroHelper.glueName(baseName: "init", enclosingTypeName: enclosingTypeName)
@@ -66,6 +66,22 @@ extension JSFunctionMacro: BodyMacro {
             ]
         }
 
+        context.diagnose(Diagnostic(node: Syntax(declaration), message: JSMacroMessage.unsupportedDeclaration))
+        return []
+    }
+}
+
+extension JSFunctionMacro: PeerMacro {
+    /// Emits a diagnostic when @JSFunction is applied to a declaration that is not a function or initializer.
+    /// BodyMacro is only invoked for declarations with optional code blocks (e.g. functions, initializers),
+    /// so for vars and other decls we need PeerMacro to run and diagnose.
+    public static func expansion(
+        of node: AttributeSyntax,
+        providingPeersOf declaration: some DeclSyntaxProtocol,
+        in context: some MacroExpansionContext
+    ) throws -> [DeclSyntax] {
+        if declaration.is(FunctionDeclSyntax.self) { return [] }
+        if declaration.is(InitializerDeclSyntax.self) { return [] }
         context.diagnose(Diagnostic(node: Syntax(declaration), message: JSMacroMessage.unsupportedDeclaration))
         return []
     }

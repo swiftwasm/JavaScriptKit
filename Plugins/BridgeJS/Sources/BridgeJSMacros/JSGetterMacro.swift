@@ -60,3 +60,20 @@ extension JSGetterMacro: AccessorMacro {
         ]
     }
 }
+
+extension JSGetterMacro: PeerMacro {
+    /// Emits a diagnostic when @JSGetter is applied to a declaration that is not a variable (e.g. a function).
+    /// AccessorMacro may not be invoked for non-property declarations. For variables with multiple
+    /// bindings, the compiler emits its own diagnostic; we only diagnose non-variable decls here.
+    public static func expansion(
+        of node: AttributeSyntax,
+        providingPeersOf declaration: some DeclSyntaxProtocol,
+        in context: some MacroExpansionContext
+    ) throws -> [DeclSyntax] {
+        guard declaration.is(VariableDeclSyntax.self) else {
+            context.diagnose(Diagnostic(node: Syntax(declaration), message: JSMacroMessage.unsupportedVariable))
+            return []
+        }
+        return []
+    }
+}
