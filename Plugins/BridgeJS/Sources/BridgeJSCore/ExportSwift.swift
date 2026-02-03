@@ -1346,7 +1346,7 @@ struct ProtocolCodegen {
             let builder = ImportTS.CallJSEmission(
                 moduleName: moduleName,
                 abiName: "_extern_\(method.name)",
-                context: .exportSwift
+                context: .exportSwiftProtocol
             )
             try builder.lowerParameter(param: Parameter(label: nil, name: "jsObject", type: .jsObject(nil)))
             for param in method.parameters {
@@ -1359,7 +1359,7 @@ struct ProtocolCodegen {
             let signature = SwiftSignatureBuilder.buildFunctionSignature(
                 parameters: method.parameters,
                 returnType: method.returnType,
-                effects: nil
+                effects: method.effects
             )
 
             // Build extern declaration using helper function
