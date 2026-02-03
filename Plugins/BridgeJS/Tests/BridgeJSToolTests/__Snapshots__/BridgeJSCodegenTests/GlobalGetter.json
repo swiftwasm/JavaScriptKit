@@ -1,0 +1,71 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+
+        ],
+        "globalGetters" : [
+          {
+            "name" : "console",
+            "type" : {
+              "jsObject" : {
+                "_0" : "JSConsole"
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "name" : "log",
+                "parameters" : [
+                  {
+                    "name" : "message",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "JSConsole",
+            "setters" : [
+
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

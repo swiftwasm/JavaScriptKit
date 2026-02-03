@@ -1,0 +1,172 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "returnAnimatable",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "jsObject" : {
+                "_0" : "Animatable"
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "constructor" : {
+              "parameters" : [
+                {
+                  "name" : "name",
+                  "type" : {
+                    "string" : {
+
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+              {
+                "name" : "name",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "age",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "methods" : [
+              {
+                "name" : "greet",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "changeName",
+                "parameters" : [
+                  {
+                    "name" : "name",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "Greeter",
+            "setters" : [
+              {
+                "functionName" : "name_set",
+                "name" : "name",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "name" : "animate",
+                "parameters" : [
+                  {
+                    "name" : "keyframes",
+                    "type" : {
+                      "jsObject" : {
+
+                      }
+                    }
+                  },
+                  {
+                    "name" : "options",
+                    "type" : {
+                      "jsObject" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "getAnimations",
+                "parameters" : [
+                  {
+                    "name" : "options",
+                    "type" : {
+                      "jsObject" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "Animatable",
+            "setters" : [
+
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

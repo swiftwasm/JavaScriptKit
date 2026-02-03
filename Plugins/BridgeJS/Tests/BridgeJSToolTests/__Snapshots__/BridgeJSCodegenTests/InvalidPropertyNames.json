@@ -1,0 +1,258 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "createWeirdObject",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "jsObject" : {
+                "_0" : "WeirdNaming"
+              }
+            }
+          },
+          {
+            "name" : "createWeirdClass",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "jsObject" : {
+                "_0" : "_Weird"
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "getters" : [
+              {
+                "name" : "normalProperty",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "jsName" : "property-with-dashes",
+                "name" : "property_with_dashes",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "jsName" : "123invalidStart",
+                "name" : "_123invalidStart",
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              },
+              {
+                "jsName" : "property with spaces",
+                "name" : "property_with_spaces",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "jsName" : "@specialChar",
+                "name" : "_specialChar",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "constructor",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "for",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "Any",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "methods" : [
+              {
+                "name" : "as",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "try",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "WeirdNaming",
+            "setters" : [
+              {
+                "functionName" : "normalProperty_set",
+                "name" : "normalProperty",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "functionName" : "property_with_dashes_set",
+                "jsName" : "property-with-dashes",
+                "name" : "property_with_dashes",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "functionName" : "_123invalidStart_set",
+                "jsName" : "123invalidStart",
+                "name" : "_123invalidStart",
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              },
+              {
+                "functionName" : "property_with_spaces_set",
+                "jsName" : "property with spaces",
+                "name" : "property_with_spaces",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "functionName" : "_specialChar_set",
+                "jsName" : "@specialChar",
+                "name" : "_specialChar",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "functionName" : "constructor_set",
+                "name" : "constructor",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "functionName" : "for_set",
+                "name" : "for",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "functionName" : "any_set",
+                "jsName" : "Any",
+                "name" : "any",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "constructor" : {
+              "parameters" : [
+
+              ]
+            },
+            "getters" : [
+
+            ],
+            "jsName" : "$Weird",
+            "methods" : [
+              {
+                "jsName" : "method-with-dashes",
+                "name" : "method_with_dashes",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "_Weird",
+            "setters" : [
+
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

@@ -1,0 +1,152 @@
+{
+  "exported" : {
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_FunctionB_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "FunctionB",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "value",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "FunctionB"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_FunctionA_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_FunctionA_processB",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "processB",
+            "parameters" : [
+              {
+                "label" : "b",
+                "name" : "b",
+                "type" : {
+                  "swiftHeapObject" : {
+                    "_0" : "FunctionB"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_FunctionA_createB",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "createB",
+            "parameters" : [
+              {
+                "label" : "value",
+                "name" : "value",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "FunctionB"
+              }
+            }
+          }
+        ],
+        "name" : "FunctionA",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "FunctionA"
+      }
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_standaloneFunction",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "standaloneFunction",
+        "parameters" : [
+          {
+            "label" : "b",
+            "name" : "b",
+            "type" : {
+              "swiftHeapObject" : {
+                "_0" : "FunctionB"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftHeapObject" : {
+            "_0" : "FunctionB"
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule"
+}

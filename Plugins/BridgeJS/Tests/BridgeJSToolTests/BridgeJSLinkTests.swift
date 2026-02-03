@@ -4,7 +4,6 @@ import SwiftParser
 import Testing
 @testable import BridgeJSLink
 @testable import BridgeJSCore
-@testable import TS2Swift
 @testable import BridgeJSSkeleton
 
 @Suite struct BridgeJSLinkTests {
@@ -36,10 +35,7 @@ import Testing
 
     static let inputsDirectory = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent(
         "Inputs"
-    )
-
-    static let importMacroInputsDirectory = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
-        .appendingPathComponent("ImportMacroInputs")
+    ).appendingPathComponent("MacroSwift")
 
     static func collectInputs(extension: String) -> [String] {
         let fileManager = FileManager.default
@@ -47,56 +43,9 @@ import Testing
         return inputs.filter { $0.hasSuffix(`extension`) }
     }
 
-    static func collectImportMacroInputs() -> [String] {
-        let fileManager = FileManager.default
-        let inputs = try! fileManager.contentsOfDirectory(atPath: Self.importMacroInputsDirectory.path)
-        return inputs.filter { $0.hasSuffix(".swift") }
-    }
-
     @Test(arguments: collectInputs(extension: ".swift"))
-    func snapshotExport(input: String) throws {
+    func snapshot(input: String) throws {
         let url = Self.inputsDirectory.appendingPathComponent(input)
-        let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
-        swiftAPI.addSourceFile(sourceFile, inputFilePath: input)
-        let name = url.deletingPathExtension().lastPathComponent
-
-        let outputSkeleton = try swiftAPI.finalize()
-        let bridgeJSLink: BridgeJSLink = BridgeJSLink(
-            skeletons: [outputSkeleton],
-            sharedMemory: false
-        )
-        try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Export")
-    }
-
-    @Test(arguments: collectInputs(extension: ".d.ts"))
-    func snapshotImport(input: String) throws {
-        let url = Self.inputsDirectory.appendingPathComponent(input)
-        let name = url.deletingPathExtension().deletingPathExtension().lastPathComponent
-        let tsconfigPath = url.deletingLastPathComponent().appendingPathComponent("tsconfig.json")
-
-        let nodePath = try #require(which("node"))
-        let swiftSource = try invokeTS2Swift(
-            dtsFile: url.path,
-            tsconfigPath: tsconfigPath.path,
-            nodePath: nodePath,
-            progress: .silent
-        )
-
-        let sourceFile = Parser.parse(source: swiftSource)
-        let importSwift = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
-        importSwift.addSourceFile(sourceFile, inputFilePath: "\(name).Macros.swift")
-        let skeleton = try importSwift.finalize()
-        let bridgeJSLink = BridgeJSLink(
-            skeletons: [skeleton],
-            sharedMemory: false
-        )
-        try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Import")
-    }
-
-    @Test(arguments: collectImportMacroInputs())
-    func snapshotImportMacroInput(input: String) throws {
-        let url = Self.importMacroInputsDirectory.appendingPathComponent(input)
         let name = url.deletingPathExtension().lastPathComponent
 
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
@@ -108,7 +57,7 @@ import Testing
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let unifiedData = try encoder.encode(importResult)
         try bridgeJSLink.addSkeletonFile(data: unifiedData)
-        try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".ImportMacros")
+        try snapshot(bridgeJSLink: bridgeJSLink, name: name)
     }
 
     @Test(arguments: [
@@ -130,7 +79,7 @@ import Testing
             ],
             sharedMemory: false
         )
-        try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Global.Export")
+        try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Global")
     }
 
     @Test
@@ -154,6 +103,6 @@ import Testing
             ],
             sharedMemory: false
         )
-        try snapshot(bridgeJSLink: bridgeJSLink, name: "MixedModules.Export")
+        try snapshot(bridgeJSLink: bridgeJSLink, name: "MixedModules")
     }
 }

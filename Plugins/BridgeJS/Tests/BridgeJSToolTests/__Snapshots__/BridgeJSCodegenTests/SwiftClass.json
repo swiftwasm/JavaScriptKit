@@ -1,0 +1,145 @@
+{
+  "exported" : {
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Greeter_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Greeter_greet",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "greet",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_Greeter_changeName",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "changeName",
+            "parameters" : [
+              {
+                "label" : "name",
+                "name" : "name",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Greeter",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Greeter"
+      },
+      {
+        "explicitAccessControl" : "public",
+        "methods" : [
+
+        ],
+        "name" : "PublicGreeter",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "PublicGreeter"
+      },
+      {
+        "explicitAccessControl" : "package",
+        "methods" : [
+
+        ],
+        "name" : "PackageGreeter",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "PackageGreeter"
+      }
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_takeGreeter",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "takeGreeter",
+        "parameters" : [
+          {
+            "label" : "greeter",
+            "name" : "greeter",
+            "type" : {
+              "swiftHeapObject" : {
+                "_0" : "Greeter"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule"
+}

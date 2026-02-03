@@ -1,0 +1,64 @@
+{
+  "exported" : {
+    "classes" : [
+      {
+        "methods" : [
+
+        ],
+        "name" : "ClassA",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "linkedB",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "ClassB"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "ClassA"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_ClassB_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "ClassB",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "ClassB"
+      }
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule"
+}

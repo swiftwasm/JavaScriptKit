@@ -77,12 +77,79 @@ function printUsage() {
 }
 
 /**
+ * Run ts2swift for a single input file (programmatic API, no process I/O).
+ * @param {string} filePath - Path to the .d.ts file
+ * @param {{ tsconfigPath: string, logLevel?: string, globalFiles?: string[] }} options
+ * @returns {string} Generated Swift source
+ * @throws {Error} on parse/type-check errors (diagnostics are included in the message)
+ */
+export function run(filePath, options) {
+    const { tsconfigPath, logLevel = 'info', globalFiles: globalFilesOpt = [] } = options;
+    const globalFiles = Array.isArray(globalFilesOpt) ? globalFilesOpt : (globalFilesOpt ? [globalFilesOpt] : []);
+
+    const diagnosticEngine = new DiagnosticEngine(logLevel);
+
+    const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
+    const configParseResult = ts.parseJsonConfigFileContent(
+        configFile.config,
+        ts.sys,
+        path.dirname(path.resolve(tsconfigPath))
+    );
+
+    if (configParseResult.errors.length > 0) {
+        const message = ts.formatDiagnosticsWithColorAndContext(configParseResult.errors, {
+            getCanonicalFileName: (fileName) => fileName,
+            getNewLine: () => ts.sys.newLine,
+            getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
+        });
+        throw new Error(`TypeScript config/parse errors:\n${message}`);
+    }
+
+    const program = TypeProcessor.createProgram([filePath, ...globalFiles], configParseResult.options);
+    const diagnostics = program.getSemanticDiagnostics();
+    if (diagnostics.length > 0) {
+        const message = ts.formatDiagnosticsWithColorAndContext(diagnostics, {
+            getCanonicalFileName: (fileName) => fileName,
+            getNewLine: () => ts.sys.newLine,
+            getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
+        });
+        throw new Error(`TypeScript semantic errors:\n${message}`);
+    }
+
+    const prelude = [
+        "// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,",
+        "// DO NOT EDIT.",
+        "//",
+        "// To update this file, just rebuild your project or run",
+        "// `swift package bridge-js`.",
+        "",
+        "@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit",
+        "",
+        "",
+    ].join("\n");
+
+    /** @type {string[]} */
+    const bodies = [];
+    const globalFileSet = new Set(globalFiles);
+    for (const inputPath of [filePath, ...globalFiles]) {
+        const processor = new TypeProcessor(program.getTypeChecker(), diagnosticEngine, {
+            defaultImportFromGlobal: globalFileSet.has(inputPath),
+        });
+        const result = processor.processTypeDeclarations(program, inputPath);
+        const body = result.content.trim();
+        if (body.length > 0) bodies.push(body);
+    }
+
+    const hasAny = bodies.length > 0;
+    return hasAny ? prelude + bodies.join("\n\n") + "\n" : "";
+}
+
+/**
  * Main function to run the CLI
  * @param {string[]} args - Command-line arguments
  * @returns {void}
  */
 export function main(args) {
-    // Parse command line arguments
     const options = parseArgs({
         args,
         options: {
@@ -118,64 +185,24 @@ export function main(args) {
     }
 
     const filePath = options.positionals[0];
-    const diagnosticEngine = new DiagnosticEngine(options.values["log-level"] || "info");
-
-    diagnosticEngine.print("verbose", `Processing ${filePath}...`);
-
-    // Create TypeScript program and process declarations
-    const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
-    const configParseResult = ts.parseJsonConfigFileContent(
-        configFile.config,
-        ts.sys,
-        path.dirname(path.resolve(tsconfigPath))
-    );
-
-    if (configParseResult.errors.length > 0) {
-        diagnosticEngine.tsDiagnose(configParseResult.errors);
-        process.exit(1);
-    }
-
+    const logLevel = options.values["log-level"] || "info";
     /** @type {string[]} */
     const globalFiles = Array.isArray(options.values.global)
         ? options.values.global
         : (options.values.global ? [options.values.global] : []);
 
-    const program = TypeProcessor.createProgram([filePath, ...globalFiles], configParseResult.options);
-    const diagnostics = program.getSemanticDiagnostics();
-    if (diagnostics.length > 0) {
-        diagnosticEngine.tsDiagnose(diagnostics);
+    const diagnosticEngine = new DiagnosticEngine(logLevel);
+    diagnosticEngine.print("verbose", `Processing ${filePath}...`);
+
+    let swiftOutput;
+    try {
+        swiftOutput = run(filePath, { tsconfigPath, logLevel, globalFiles });
+    } catch (err) {
+        console.error(err.message);
         process.exit(1);
     }
-
-    const prelude = [
-        "// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,",
-        "// DO NOT EDIT.",
-        "//",
-        "// To update this file, just rebuild your project or run",
-        "// `swift package bridge-js`.",
-        "",
-        "@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit",
-        "",
-        "",
-    ].join("\n");
-
-    /** @type {string[]} */
-    const bodies = [];
-    const globalFileSet = new Set(globalFiles);
-    for (const inputPath of [filePath, ...globalFiles]) {
-        const processor = new TypeProcessor(program.getTypeChecker(), diagnosticEngine, {
-            defaultImportFromGlobal: globalFileSet.has(inputPath),
-        });
-        const result = processor.processTypeDeclarations(program, inputPath);
-        const body = result.content.trim();
-        if (body.length > 0) bodies.push(body);
-    }
-
-    const hasAny = bodies.length > 0;
-    const swiftOutput = hasAny ? prelude + bodies.join("\n\n") + "\n" : "";
-
     if (options.values.output) {
-        if (hasAny) {
+        if (swiftOutput.length > 0) {
             fs.mkdirSync(path.dirname(options.values.output), { recursive: true });
             fs.writeFileSync(options.values.output, swiftOutput);
         }

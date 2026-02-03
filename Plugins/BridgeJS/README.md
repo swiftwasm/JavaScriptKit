@@ -100,7 +100,7 @@ graph LR
 | `Foundation.URL` | `string` | - | [#496](https://github.com/swiftwasm/JavaScriptKit/issues/496) |
 | Generics | - | - | [#398](https://github.com/swiftwasm/JavaScriptKit/issues/398) |
 
-### Import-specific (TypeScript → Swift)
+### Import-specific (TypeScript -> Swift)
 
 | TypeScript Type | Swift Type | Status |
 |:----------------|:-----------|:-------|
@@ -162,6 +162,12 @@ Return values use direct Wasm returns for primitives, and imported intrinsic fun
 - **Closures**: Boxed on source side, released when GC'd on either side.
 
 For detailed semantics, see the [How It Works sections](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/exporting-swift-class#How-It-Works) in the user documentation.
+
+## Testing
+
+- **Full BridgeJS tests** (Swift + TS2Swift Vitest): `swift test --package-path ./Plugins/BridgeJS`
+- **TS2Swift only** (fast iteration on `.d.ts` -> Swift): `npm -C Sources/TS2Swift/JavaScript test`
+- **Regenerate snapshot artifacts**: `UPDATE_SNAPSHOTS=1 swift test --package-path ./Plugins/BridgeJS`
 
 ## Debug utilities
 

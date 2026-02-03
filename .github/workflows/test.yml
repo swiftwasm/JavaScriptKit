@@ -86,7 +86,7 @@ jobs:
         with:
           node-version: '20'
       - name: Install TypeScript
-        run: npm install --prefix Plugins/BridgeJS/Sources/TS2Swift/JavaScript
+        run: npm install
       - name: Run BridgeJS tests
         # NOTE: Seems like the prebuilt SwiftSyntax binaries are not compatible with
         # non-macro dependents, so disable experimental prebuilts for now.

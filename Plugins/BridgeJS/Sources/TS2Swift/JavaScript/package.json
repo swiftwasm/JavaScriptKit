@@ -5,5 +5,8 @@
     },
     "bin": {
         "ts2swift": "./bin/ts2swift.js"
+    },
+    "scripts": {
+        "test": "vitest run"
     }
 }

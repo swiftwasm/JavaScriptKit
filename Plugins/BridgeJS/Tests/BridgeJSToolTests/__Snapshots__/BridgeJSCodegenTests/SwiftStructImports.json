@@ -1,0 +1,94 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+      {
+        "methods" : [
+
+        ],
+        "name" : "Point",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "x",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "y",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Point"
+      }
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "translate",
+            "parameters" : [
+              {
+                "name" : "point",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "Point"
+                  }
+                }
+              },
+              {
+                "name" : "dx",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "dy",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Point"
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

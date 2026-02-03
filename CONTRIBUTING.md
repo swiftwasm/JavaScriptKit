@@ -60,6 +60,12 @@ Tests for `BridgeJS` plugin:
 swift test --package-path ./Plugins/BridgeJS
 ```
 
+This runs both the TS2Swift Vitest suite (TypeScript `.d.ts` -> Swift macro output) and the Swift codegen/link tests. For fast iteration on the ts2swift tool only, run Vitest directly:
+
+```bash
+cd Plugins/BridgeJS/Sources/TS2Swift/JavaScript && npm test
+```
+
 To update snapshot test files when expected output changes:
 
 ```bash
