@@ -1608,6 +1608,15 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             return nil
         }
 
+        guard effects.isThrows else {
+            diagnose(
+                node: node,
+                message: "@JS protocol methods must be throws.",
+                hint: "Declare the method as 'throws(JSException)'."
+            )
+            return nil
+        }
+
         return ExportedFunction(
             name: name,
             abiName: abiName,

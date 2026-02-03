@@ -15,7 +15,7 @@ When you mark a protocol with `@JS`, BridgeJS generates:
 
 ## Example: Counter Protocol
 
-Mark a Swift protocol with `@JS` to expose it:
+Mark a Swift protocol with `@JS` to expose it. Protocol methods must declare `throws(JSException)` to align with the import side error handling:
 
 ```swift
 import JavaScriptKit
@@ -24,9 +24,9 @@ import JavaScriptKit
     var count: Int { get set }
     var name: String { get }
     var label: String? { get set }
-    func increment(by amount: Int)
-    func reset()
-    func getValue() -> Int
+    func increment(by amount: Int) throws(JSException)
+    func reset() throws(JSException)
+    func getValue() throws(JSException) -> Int
 }
 
 @JS class CounterManager {
@@ -122,24 +122,24 @@ You can also implement protocols in Swift and use them from JavaScript:
 @JS protocol Counter {
     var count: Int { get set }
     var name: String { get }
-    func increment(by amount: Int)
-    func reset()
-    func getValue() -> Int
+    func increment(by amount: Int) throws(JSException)
+    func reset() throws(JSException)
+    func getValue() throws(JSException) -> Int
 }
 
 final class SwiftCounter: Counter {
     var count = 0
     let name = "SwiftCounter"
-    
-    func increment(by amount: Int) {
+
+    func increment(by amount: Int) throws(JSException) {
         count += amount
     }
-    
-    func reset() {
+
+    func reset() throws(JSException) {
         count = 0
     }
-    
-    func getValue() -> Int {
+
+    func getValue() throws(JSException) -> Int {
         return count
     }
 }
@@ -195,7 +195,7 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
         }
     }
 
-    func increment(by amount: Int) {
+    func increment(by amount: Int) throws(JSException) {
         @_extern(wasm, module: "TestModule", name: "bjs_Counter_increment")
         func _extern_increment(this: Int32, amount: Int32)
         _extern_increment(
@@ -212,7 +212,7 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
 
 | Swift Feature | Status |
 |:--------------|:-------|
-| Method requirements: `func foo(_ param: String?) -> FooClass?` | ✅ |
+| Method requirements: `func foo(_ param: String?) throws(JSException) -> FooClass?` | ✅ |
 | Property requirements: `var property: Type { get }` / `var property: Type { get set }` | ✅ |
 | Optional parameters / return values in methods | ✅ |
 | Optional properties | ✅ |
