@@ -6583,6 +6583,211 @@ fileprivate func _bjs_StaticPropertyHolder_wrap(_ pointer: UnsafeMutableRawPoint
 }
 #endif
 
+@_expose(wasm, "bjs_DataProcessorManager_init")
+@_cdecl("bjs_DataProcessorManager_init")
+public func _bjs_DataProcessorManager_init(_ processor: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = DataProcessorManager(processor: DataProcessor.bridgeJSLiftParameter(processor))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_incrementByAmount")
+@_cdecl("bjs_DataProcessorManager_incrementByAmount")
+public func _bjs_DataProcessorManager_incrementByAmount(_ _self: UnsafeMutableRawPointer, _ amount: Int32) -> Void {
+    #if arch(wasm32)
+    DataProcessorManager.bridgeJSLiftParameter(_self).incrementByAmount(_: Int.bridgeJSLiftParameter(amount))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_setProcessorLabel")
+@_cdecl("bjs_DataProcessorManager_setProcessorLabel")
+public func _bjs_DataProcessorManager_setProcessorLabel(_ _self: UnsafeMutableRawPointer, _ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void {
+    #if arch(wasm32)
+    DataProcessorManager.bridgeJSLiftParameter(_self).setProcessorLabel(_: String.bridgeJSLiftParameter(prefixBytes, prefixLength), _: String.bridgeJSLiftParameter(suffixBytes, suffixLength))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_isProcessorEven")
+@_cdecl("bjs_DataProcessorManager_isProcessorEven")
+public func _bjs_DataProcessorManager_isProcessorEven(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).isProcessorEven()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_getProcessorLabel")
+@_cdecl("bjs_DataProcessorManager_getProcessorLabel")
+public func _bjs_DataProcessorManager_getProcessorLabel(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).getProcessorLabel()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_getCurrentValue")
+@_cdecl("bjs_DataProcessorManager_getCurrentValue")
+public func _bjs_DataProcessorManager_getCurrentValue(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).getCurrentValue()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_incrementBoth")
+@_cdecl("bjs_DataProcessorManager_incrementBoth")
+public func _bjs_DataProcessorManager_incrementBoth(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    DataProcessorManager.bridgeJSLiftParameter(_self).incrementBoth()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_getBackupValue")
+@_cdecl("bjs_DataProcessorManager_getBackupValue")
+public func _bjs_DataProcessorManager_getBackupValue(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).getBackupValue()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_hasBackup")
+@_cdecl("bjs_DataProcessorManager_hasBackup")
+public func _bjs_DataProcessorManager_hasBackup(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).hasBackup()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_getProcessorTag")
+@_cdecl("bjs_DataProcessorManager_getProcessorTag")
+public func _bjs_DataProcessorManager_getProcessorTag(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).getProcessorTag()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_setProcessorTag")
+@_cdecl("bjs_DataProcessorManager_setProcessorTag")
+public func _bjs_DataProcessorManager_setProcessorTag(_ _self: UnsafeMutableRawPointer, _ tagBytes: Int32, _ tagLength: Int32) -> Void {
+    #if arch(wasm32)
+    DataProcessorManager.bridgeJSLiftParameter(_self).setProcessorTag(_: String.bridgeJSLiftParameter(tagBytes, tagLength))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_getProcessorMessage")
+@_cdecl("bjs_DataProcessorManager_getProcessorMessage")
+public func _bjs_DataProcessorManager_getProcessorMessage(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).getProcessorMessage()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_setProcessorMessage")
+@_cdecl("bjs_DataProcessorManager_setProcessorMessage")
+public func _bjs_DataProcessorManager_setProcessorMessage(_ _self: UnsafeMutableRawPointer, _ messageBytes: Int32, _ messageLength: Int32) -> Void {
+    #if arch(wasm32)
+    DataProcessorManager.bridgeJSLiftParameter(_self).setProcessorMessage(_: String.bridgeJSLiftParameter(messageBytes, messageLength))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_processor_get")
+@_cdecl("bjs_DataProcessorManager_processor_get")
+public func _bjs_DataProcessorManager_processor_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).processor
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_processor_set")
+@_cdecl("bjs_DataProcessorManager_processor_set")
+public func _bjs_DataProcessorManager_processor_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
+    #if arch(wasm32)
+    DataProcessorManager.bridgeJSLiftParameter(_self).processor = DataProcessor.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_backupProcessor_get")
+@_cdecl("bjs_DataProcessorManager_backupProcessor_get")
+public func _bjs_DataProcessorManager_backupProcessor_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).backupProcessor
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_backupProcessor_set")
+@_cdecl("bjs_DataProcessorManager_backupProcessor_set")
+public func _bjs_DataProcessorManager_backupProcessor_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
+    #if arch(wasm32)
+    DataProcessorManager.bridgeJSLiftParameter(_self).backupProcessor = DataProcessor.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_deinit")
+@_cdecl("bjs_DataProcessorManager_deinit")
+public func _bjs_DataProcessorManager_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<DataProcessorManager>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension DataProcessorManager: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_DataProcessorManager_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessorManager_wrap")
+fileprivate func _bjs_DataProcessorManager_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_DataProcessorManager_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 @_expose(wasm, "bjs_TextProcessor_init")
 @_cdecl("bjs_TextProcessor_init")
 public func _bjs_TextProcessor_init(_ transform: Int32) -> UnsafeMutableRawPointer {
@@ -6953,6 +7158,243 @@ func _$Foo_value_get(_ self: JSObject) throws(JSException) -> String {
         throw error
     }
     return String.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_count_get")
+fileprivate func bjs_DataProcessor_count_get(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_count_get(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_name_get")
+fileprivate func bjs_DataProcessor_name_get(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_name_get(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_tag_get")
+fileprivate func bjs_DataProcessor_tag_get(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_tag_get(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_increment")
+fileprivate func bjs_DataProcessor_increment(_ self: Int32, _ amount: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_increment(_ self: Int32, _ amount: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_getValue")
+fileprivate func bjs_DataProcessor_getValue(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_getValue(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_setLabel")
+fileprivate func bjs_DataProcessor_setLabel(_ self: Int32, _ labelPrefix: Int32, _ labelSuffix: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_setLabel(_ self: Int32, _ labelPrefix: Int32, _ labelSuffix: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_getLabel")
+fileprivate func bjs_DataProcessor_getLabel(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_getLabel(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_isEven")
+fileprivate func bjs_DataProcessor_isEven(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_isEven(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_processNote")
+fileprivate func bjs_DataProcessor_processNote(_ self: Int32, _ note: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_processNote(_ self: Int32, _ note: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_createNote")
+fileprivate func bjs_DataProcessor_createNote(_ self: Int32, _ prefix: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_createNote(_ self: Int32, _ prefix: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_handleMessage")
+fileprivate func bjs_DataProcessor_handleMessage(_ self: Int32, _ message: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_handleMessage(_ self: Int32, _ message: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_getMessage")
+fileprivate func bjs_DataProcessor_getMessage(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_getMessage(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_setTag")
+fileprivate func bjs_DataProcessor_setTag(_ self: Int32, _ tag: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_setTag(_ self: Int32, _ tag: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$DataProcessor_count_get(_ self: JSObject) throws(JSException) -> Int {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_DataProcessor_count_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$DataProcessor_name_get(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_DataProcessor_name_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+func _$DataProcessor_tag_get(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_DataProcessor_tag_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+func _$DataProcessor_increment(_ self: JSObject, _ amount: Int) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let amountValue = amount.bridgeJSLowerParameter()
+    bjs_DataProcessor_increment(selfValue, amountValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$DataProcessor_getValue(_ self: JSObject) throws(JSException) -> Int {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_DataProcessor_getValue(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$DataProcessor_setLabel(_ self: JSObject, _ labelPrefix: String, _ labelSuffix: String) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let labelPrefixValue = labelPrefix.bridgeJSLowerParameter()
+    let labelSuffixValue = labelSuffix.bridgeJSLowerParameter()
+    bjs_DataProcessor_setLabel(selfValue, labelPrefixValue, labelSuffixValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$DataProcessor_getLabel(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_DataProcessor_getLabel(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+func _$DataProcessor_isEven(_ self: JSObject) throws(JSException) -> Bool {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_DataProcessor_isEven(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Bool.bridgeJSLiftReturn(ret)
+}
+
+func _$DataProcessor_processNote(_ self: JSObject, _ note: String) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let noteValue = note.bridgeJSLowerParameter()
+    let ret = bjs_DataProcessor_processNote(selfValue, noteValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+func _$DataProcessor_createNote(_ self: JSObject, _ prefix: String) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let prefixValue = prefix.bridgeJSLowerParameter()
+    let ret = bjs_DataProcessor_createNote(selfValue, prefixValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+func _$DataProcessor_handleMessage(_ self: JSObject, _ message: String) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let messageValue = message.bridgeJSLowerParameter()
+    bjs_DataProcessor_handleMessage(selfValue, messageValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$DataProcessor_getMessage(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_DataProcessor_getMessage(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+func _$DataProcessor_setTag(_ self: JSObject, _ tag: String) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let tagValue = tag.bridgeJSLowerParameter()
+    bjs_DataProcessor_setTag(selfValue, tagValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
 #if arch(wasm32)

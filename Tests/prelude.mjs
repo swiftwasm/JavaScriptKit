@@ -779,8 +779,106 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(cd5.describe(), "Test:99:false:loading:nil");
     cd5.release();
 
+    testJSClassInterfaceSupport(exports);
     testClosureSupport(exports);
     testArraySupport(exports);
+}
+
+/** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
+function testJSClassInterfaceSupport(exports) {
+    let processorValue = 0;
+    let processorLabel = "";
+    let lastMessage = "init";
+    const jsProcessor = {
+        count: 0,
+        name: "JSProcessor",
+        tag: "initial",
+        message: lastMessage,
+        increment(amount) { processorValue += amount; this.count += amount; },
+        getValue() { return processorValue; },
+        setLabel(labelPrefix, labelSuffix) { processorLabel = labelPrefix + labelSuffix; },
+        getLabel() { return processorLabel; },
+        isEven() { return processorValue % 2 === 0; },
+        processNote(note) { return `JSProcessor processed: ${note}`; },
+        createNote(prefix) { return `${prefix}-note`; },
+        handleMessage(message) { lastMessage = message; this.message = message; },
+        getMessage() { return lastMessage; },
+        setTag(tag) { this.tag = tag; }
+    };
+
+    const manager = new exports.DataProcessorManager(jsProcessor);
+
+    manager.incrementByAmount(4);
+    assert.equal(manager.getCurrentValue(), 4);
+    assert.equal(jsProcessor.count, 4);
+
+    manager.setProcessorLabel("Test", "Label");
+    assert.equal(manager.getProcessorLabel(), "TestLabel");
+
+    assert.equal(manager.isProcessorEven(), true);
+    manager.incrementByAmount(1);
+    assert.equal(manager.isProcessorEven(), false);
+
+    assert.equal(manager.getProcessorTag(), "initial");
+    manager.setProcessorTag("test-tag");
+    assert.equal(manager.getProcessorTag(), "test-tag");
+
+    jsProcessor.handleMessage("hello");
+    assert.equal(jsProcessor.getMessage(), "hello");
+    jsProcessor.handleMessage("bye");
+    assert.equal(manager.getProcessorMessage(), "bye");
+
+    let backupValue = 100;
+    const backupProcessor = {
+        count: 100,
+        name: "BackupProcessor",
+        tag: "backup",
+        message: "backup-msg",
+        increment(amount) { backupValue += amount; this.count += amount; },
+        getValue() { return backupValue; },
+        setLabel() { },
+        getLabel() { return "backup"; },
+        isEven() { return backupValue % 2 === 0; },
+        processNote(note) { return note.toUpperCase(); },
+        createNote(prefix) { return `${prefix}-backup`; },
+        handleMessage(message) { this.message = message; },
+        getMessage() { return this.message; },
+        setTag(tag) { this.tag = tag; }
+    };
+
+    let mainValue = 0;
+    const mainProcessor = {
+        count: 0,
+        name: "MainProcessor",
+        tag: "main",
+        message: "main-msg",
+        increment(amount) { mainValue += amount; this.count += amount; },
+        getValue() { return mainValue; },
+        setLabel() { },
+        getLabel() { return "main"; },
+        isEven() { return mainValue % 2 === 0; },
+        processNote(note) { return `${note}-handled`; },
+        createNote(prefix) { return `${prefix}-main`; },
+        handleMessage(message) { this.message = message; },
+        getMessage() { return this.message; },
+        setTag(tag) { this.tag = tag; }
+    };
+
+    const managerWithOptional = new exports.DataProcessorManager(mainProcessor);
+
+    managerWithOptional.backupProcessor = backupProcessor;
+    assert.equal(managerWithOptional.hasBackup(), true);
+
+    managerWithOptional.incrementBoth();
+    assert.equal(managerWithOptional.getCurrentValue(), 1);
+    assert.equal(managerWithOptional.getBackupValue(), 101);
+
+    managerWithOptional.incrementBoth();
+    assert.equal(managerWithOptional.getCurrentValue(), 2);
+    assert.equal(managerWithOptional.getBackupValue(), 102);
+
+    manager.release();
+    managerWithOptional.release();
 }
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 function testClosureSupport(exports) {

@@ -1341,6 +1341,298 @@
       },
       {
         "constructor" : {
+          "abiName" : "bjs_DataProcessorManager_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "processor",
+              "name" : "processor",
+              "type" : {
+                "jsObject" : {
+                  "_0" : "DataProcessor"
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_DataProcessorManager_incrementByAmount",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "incrementByAmount",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "amount",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_setProcessorLabel",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "setProcessorLabel",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "prefix",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "label" : "_",
+                "name" : "suffix",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_isProcessorEven",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "isProcessorEven",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_getProcessorLabel",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "getProcessorLabel",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_getCurrentValue",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "getCurrentValue",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_incrementBoth",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "incrementBoth",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_getBackupValue",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "getBackupValue",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_hasBackup",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "hasBackup",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_getProcessorTag",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "getProcessorTag",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_setProcessorTag",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "setProcessorTag",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "tag",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_getProcessorMessage",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "getProcessorMessage",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_setProcessorMessage",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "setProcessorMessage",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "message",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "DataProcessorManager",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "processor",
+            "type" : {
+              "jsObject" : {
+                "_0" : "DataProcessor"
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "backupProcessor",
+            "type" : {
+              "jsObject" : {
+                "_0" : "DataProcessor"
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "DataProcessorManager"
+      },
+      {
+        "constructor" : {
           "abiName" : "bjs_TextProcessor_init",
           "effects" : {
             "isAsync" : false,
@@ -9790,6 +10082,201 @@
 
             ],
             "name" : "Foo",
+            "setters" : [
+
+            ]
+          },
+          {
+            "getters" : [
+              {
+                "name" : "count",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "name",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "tag",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "methods" : [
+              {
+                "name" : "increment",
+                "parameters" : [
+                  {
+                    "label" : "by",
+                    "name" : "amount",
+                    "type" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "getValue",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "setLabel",
+                "parameters" : [
+                  {
+                    "name" : "labelPrefix",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  },
+                  {
+                    "name" : "labelSuffix",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "getLabel",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "isEven",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "bool" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "processNote",
+                "parameters" : [
+                  {
+                    "name" : "note",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "createNote",
+                "parameters" : [
+                  {
+                    "name" : "prefix",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "handleMessage",
+                "parameters" : [
+                  {
+                    "name" : "message",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "getMessage",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "setTag",
+                "parameters" : [
+                  {
+                    "name" : "tag",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "DataProcessor",
             "setters" : [
 
             ]

@@ -954,6 +954,86 @@ enum APIOptionalResult {
     }
 }
 
+// MARK: - JSClass Interface Tests
+
+@JSClass struct DataProcessor {
+    @JSGetter var count: Int
+    @JSGetter var name: String
+    @JSGetter var tag: String
+
+    @JSFunction func increment(by amount: Int) throws(JSException)
+    @JSFunction func getValue() throws(JSException) -> Int
+    @JSFunction func setLabel(_ labelPrefix: String, _ labelSuffix: String) throws(JSException)
+    @JSFunction func getLabel() throws(JSException) -> String
+    @JSFunction func isEven() throws(JSException) -> Bool
+    @JSFunction func processNote(_ note: String) throws(JSException) -> String
+    @JSFunction func createNote(_ prefix: String) throws(JSException) -> String
+    @JSFunction func handleMessage(_ message: String) throws(JSException)
+    @JSFunction func getMessage() throws(JSException) -> String
+
+    @JSFunction func setTag(_ tag: String) throws(JSException)
+}
+
+@JS class DataProcessorManager {
+
+    @JS var processor: DataProcessor
+    @JS var backupProcessor: DataProcessor
+
+    @JS init(processor: DataProcessor) {
+        self.processor = processor
+        self.backupProcessor = processor
+    }
+
+    @JS func incrementByAmount(_ amount: Int) {
+        try! processor.increment(by: amount)
+    }
+
+    @JS func setProcessorLabel(_ prefix: String, _ suffix: String) {
+        try! processor.setLabel(prefix, suffix)
+    }
+
+    @JS func isProcessorEven() -> Bool {
+        return try! processor.isEven()
+    }
+
+    @JS func getProcessorLabel() -> String {
+        return try! processor.getLabel()
+    }
+
+    @JS func getCurrentValue() -> Int {
+        return try! processor.getValue()
+    }
+
+    @JS func incrementBoth() {
+        try! processor.increment(by: 1)
+        try! backupProcessor.increment(by: 1)
+    }
+
+    @JS func getBackupValue() -> Int {
+        return try! backupProcessor.getValue()
+    }
+
+    @JS func hasBackup() -> Bool {
+        return true
+    }
+
+    @JS func getProcessorTag() -> String {
+        return try! processor.tag
+    }
+
+    @JS func setProcessorTag(_ tag: String) {
+        try! processor.setTag(tag)
+    }
+
+    @JS func getProcessorMessage() -> String {
+        return try! processor.getMessage()
+    }
+
+    @JS func setProcessorMessage(_ message: String) {
+        try! processor.handleMessage(message)
+    }
+}
+
 // MARK: - Closure Tests
 
 // @JS func makeFormatter(prefix: String) -> (String) -> String {
