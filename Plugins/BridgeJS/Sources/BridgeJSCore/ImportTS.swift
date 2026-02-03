@@ -187,8 +187,8 @@ public struct ImportTS {
                 body.append("let ret = \(raw: callExpr)")
             }
 
-            // Add exception check for contexts that call INTO JavaScript
-            if context == .importTS || context == .exportSwiftProtocol {
+            // Add exception check for ImportTS context
+            if context == .importTS {
                 body.append("if let error = _swift_js_take_exception() { throw error }")
             }
         }
@@ -887,7 +887,7 @@ extension BridgeType {
                     Swift classes can only be used in @JS protocols where Swift owns the instance.
                     """
                 )
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
             }
         case .swiftProtocol:
@@ -896,14 +896,14 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return LoweringParameterInfo(loweredParameters: [("value", .i32)])
             }
         case .rawValueEnum(_, let rawType):
             switch context {
             case .importTS:
                 return LoweringParameterInfo(loweredParameters: [("value", rawType.wasmCoreType ?? .i32)])
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 // For protocol export we return .i32 for String raw value type instead of nil
                 return LoweringParameterInfo(loweredParameters: [("value", rawType.wasmCoreType ?? .i32)])
             }
@@ -911,7 +911,7 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return LoweringParameterInfo(loweredParameters: [("caseId", .i32)])
             }
         case .swiftStruct:
@@ -919,7 +919,7 @@ extension BridgeType {
             case .importTS:
                 // Swift structs are bridged as JS objects (object IDs) in imported signatures.
                 return LoweringParameterInfo(loweredParameters: [("objectId", .i32)])
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return LoweringParameterInfo(loweredParameters: [])
             }
         case .namespaceEnum:
@@ -928,7 +928,7 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
                 var params = [("isSome", WasmCoreType.i32)]
                 params.append(contentsOf: wrappedInfo.loweredParameters)
@@ -938,7 +938,7 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Array types are not yet supported in TypeScript imports")
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return LoweringParameterInfo(loweredParameters: [])
             }
         }
@@ -981,7 +981,7 @@ extension BridgeType {
                     JavaScript cannot create Swift heap objects.
                     """
                 )
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return LiftingReturnInfo(valueToLift: .pointer)
             }
         case .swiftProtocol:
@@ -990,14 +990,14 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return LiftingReturnInfo(valueToLift: .i32)
             }
         case .rawValueEnum(_, let rawType):
             switch context {
             case .importTS:
                 return LiftingReturnInfo(valueToLift: rawType.wasmCoreType ?? .i32)
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 // For protocol export we return .i32 for String raw value type instead of nil
                 return LiftingReturnInfo(valueToLift: rawType.wasmCoreType ?? .i32)
             }
@@ -1005,7 +1005,7 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return LiftingReturnInfo(valueToLift: .i32)
             }
         case .swiftStruct:
@@ -1013,7 +1013,7 @@ extension BridgeType {
             case .importTS:
                 // Swift structs are bridged as JS objects (object IDs) in imported signatures.
                 return LiftingReturnInfo(valueToLift: .i32)
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return LiftingReturnInfo(valueToLift: nil)
             }
         case .namespaceEnum:
@@ -1022,7 +1022,7 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Optional types are not yet supported in TypeScript imports")
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
                 return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
             }
@@ -1030,7 +1030,7 @@ extension BridgeType {
             switch context {
             case .importTS:
                 throw BridgeJSCoreError("Array types are not yet supported in TypeScript imports")
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return LiftingReturnInfo(valueToLift: nil)
             }
         }

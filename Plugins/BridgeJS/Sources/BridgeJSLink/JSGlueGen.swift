@@ -1477,7 +1477,7 @@ struct IntrinsicJSFragment: Sendable {
                 throw BridgeJSLinkError(
                     message: "swiftHeapObject '\(name)' can only be used in protocol exports, not in \(context)"
                 )
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return .swiftHeapObjectLiftParameter(name)
             }
         case .swiftProtocol: return .jsObjectLiftParameter
@@ -1491,7 +1491,7 @@ struct IntrinsicJSFragment: Sendable {
                 throw BridgeJSLinkError(
                     message: "Optional types are not supported for imported JS functions: \(wrappedType)"
                 )
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return try .optionalLiftParameter(wrappedType: wrappedType)
             }
         case .caseEnum: return .identity
@@ -1508,7 +1508,7 @@ struct IntrinsicJSFragment: Sendable {
                     message:
                         "Associated value enums are not supported to be passed as parameters to imported JS functions: \(fullName)"
                 )
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 let base = fullName.components(separatedBy: ".").last ?? fullName
                 return IntrinsicJSFragment(
                     parameters: ["caseId"],
@@ -1526,7 +1526,7 @@ struct IntrinsicJSFragment: Sendable {
             switch context {
             case .importTS:
                 return .jsObjectLiftRetainedObjectId
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 let base = fullName.components(separatedBy: ".").last ?? fullName
                 return IntrinsicJSFragment(
                     parameters: [],
@@ -1558,7 +1558,7 @@ struct IntrinsicJSFragment: Sendable {
                 throw BridgeJSLinkError(
                     message: "Arrays are not yet supported to be passed as parameters to imported JS functions"
                 )
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return try arrayLift(elementType: elementType)
             }
         }
@@ -1578,7 +1578,7 @@ struct IntrinsicJSFragment: Sendable {
                 throw BridgeJSLinkError(
                     message: "swiftHeapObject '\(name)' can only be used in protocol exports, not in \(context)"
                 )
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return .swiftHeapObjectLowerReturn
             }
         case .swiftProtocol: return .jsObjectLowerReturn
@@ -1589,7 +1589,7 @@ struct IntrinsicJSFragment: Sendable {
                 throw BridgeJSLinkError(
                     message: "Optional types are not supported for imported JS functions: \(wrappedType)"
                 )
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return try .optionalLowerReturn(wrappedType: wrappedType)
             }
         case .caseEnum: return .identity
@@ -1606,7 +1606,7 @@ struct IntrinsicJSFragment: Sendable {
                     message:
                         "Associated value enums are not supported to be returned from imported JS functions: \(fullName)"
                 )
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return associatedValueLowerReturn(fullName: fullName)
             }
         case .swiftStruct(let fullName):
@@ -1614,7 +1614,7 @@ struct IntrinsicJSFragment: Sendable {
             case .importTS:
                 // ImportTS expects Swift structs to come back as a retained JS object ID.
                 return .jsObjectLowerReturn
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return swiftStructLowerReturn(fullName: fullName)
             }
         case .closure:
@@ -1640,7 +1640,7 @@ struct IntrinsicJSFragment: Sendable {
                 throw BridgeJSLinkError(
                     message: "Arrays are not yet supported to be returned from imported JS functions"
                 )
-            case .exportSwift, .exportSwiftProtocol:
+            case .exportSwift:
                 return try arrayLower(elementType: elementType)
             }
         }

@@ -988,17 +988,17 @@ enum GraphOperations {
     var apiResult: APIResult? { get set }
     var helper: Greeter { get set }
     var optionalHelper: Greeter? { get set }
-    func increment(by amount: Int) throws(JSException)
-    func getValue() throws(JSException) -> Int
-    func setLabelElements(_ labelPrefix: String, _ labelSuffix: String) throws(JSException)
-    func getLabel() throws(JSException) -> String
-    func isEven() throws(JSException) -> Bool
-    func processGreeter(_ greeter: Greeter) throws(JSException) -> String
-    func createGreeter() throws(JSException) -> Greeter
-    func processOptionalGreeter(_ greeter: Greeter?) throws(JSException) -> String
-    func createOptionalGreeter() throws(JSException) -> Greeter?
-    func handleAPIResult(_ result: APIResult?) throws(JSException)
-    func getAPIResult() throws(JSException) -> APIResult?
+    func increment(by amount: Int)
+    func getValue() -> Int
+    func setLabelElements(_ labelPrefix: String, _ labelSuffix: String)
+    func getLabel() -> String
+    func isEven() -> Bool
+    func processGreeter(_ greeter: Greeter) -> String
+    func createGreeter() -> Greeter
+    func processOptionalGreeter(_ greeter: Greeter?) -> String
+    func createOptionalGreeter() -> Greeter?
+    func handleAPIResult(_ result: APIResult?)
+    func getAPIResult() -> APIResult?
 }
 
 @JS class DataProcessorManager {
@@ -1011,33 +1011,33 @@ enum GraphOperations {
         self.backupProcessor = nil
     }
 
-    @JS func incrementByAmount(_ amount: Int) throws(JSException) {
-        try processor.increment(by: amount)
+    @JS func incrementByAmount(_ amount: Int) {
+        processor.increment(by: amount)
     }
 
-    @JS func setProcessorLabel(_ prefix: String, _ suffix: String) throws(JSException) {
-        try processor.setLabelElements(prefix, suffix)
+    @JS func setProcessorLabel(_ prefix: String, _ suffix: String) {
+        processor.setLabelElements(prefix, suffix)
     }
 
-    @JS func isProcessorEven() throws(JSException) -> Bool {
-        return try processor.isEven()
+    @JS func isProcessorEven() -> Bool {
+        return processor.isEven()
     }
 
-    @JS func getProcessorLabel() throws(JSException) -> String {
-        return try processor.getLabel()
+    @JS func getProcessorLabel() -> String {
+        return processor.getLabel()
     }
 
-    @JS func getCurrentValue() throws(JSException) -> Int {
-        return try processor.getValue()
+    @JS func getCurrentValue() -> Int {
+        return processor.getValue()
     }
 
-    @JS func incrementBoth() throws(JSException) {
-        try processor.increment(by: 1)
-        try backupProcessor?.increment(by: 1)
+    @JS func incrementBoth() {
+        processor.increment(by: 1)
+        backupProcessor?.increment(by: 1)
     }
 
-    @JS func getBackupValue() throws(JSException) -> Int? {
-        return try backupProcessor?.getValue()
+    @JS func getBackupValue() -> Int? {
+        return backupProcessor?.getValue()
     }
 
     @JS func hasBackup() -> Bool {
@@ -1084,12 +1084,12 @@ enum GraphOperations {
         processor.httpStatus = status
     }
 
-    @JS func getProcessorAPIResult() throws(JSException) -> APIResult? {
-        return try processor.getAPIResult()
+    @JS func getProcessorAPIResult() -> APIResult? {
+        return processor.getAPIResult()
     }
 
-    @JS func setProcessorAPIResult(_ apiResult: APIResult?) throws(JSException) {
-        try processor.handleAPIResult(apiResult)
+    @JS func setProcessorAPIResult(_ apiResult: APIResult?) {
+        processor.handleAPIResult(apiResult)
     }
 }
 

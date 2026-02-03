@@ -921,105 +921,72 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_S
 struct AnyDataProcessor: DataProcessor, _BridgedSwiftProtocolWrapper {
     let jsObject: JSObject
 
-    func increment(by amount: Int) throws(JSException) -> Void {
+    func increment(by amount: Int) -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let amountValue = amount.bridgeJSLowerParameter()
         _extern_increment(jsObjectValue, amountValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
     }
 
-    func getValue() throws(JSException) -> Int {
+    func getValue() -> Int {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let ret = _extern_getValue(jsObjectValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return Int.bridgeJSLiftReturn(ret)
     }
 
-    func setLabelElements(_ labelPrefix: String, _ labelSuffix: String) throws(JSException) -> Void {
+    func setLabelElements(_ labelPrefix: String, _ labelSuffix: String) -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let labelPrefixValue = labelPrefix.bridgeJSLowerParameter()
         let labelSuffixValue = labelSuffix.bridgeJSLowerParameter()
         _extern_setLabelElements(jsObjectValue, labelPrefixValue, labelSuffixValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
     }
 
-    func getLabel() throws(JSException) -> String {
+    func getLabel() -> String {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let ret = _extern_getLabel(jsObjectValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return String.bridgeJSLiftReturn(ret)
     }
 
-    func isEven() throws(JSException) -> Bool {
+    func isEven() -> Bool {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let ret = _extern_isEven(jsObjectValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return Bool.bridgeJSLiftReturn(ret)
     }
 
-    func processGreeter(_ greeter: Greeter) throws(JSException) -> String {
+    func processGreeter(_ greeter: Greeter) -> String {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let greeterPointer = greeter.bridgeJSLowerParameter()
         let ret = _extern_processGreeter(jsObjectValue, greeterPointer)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return String.bridgeJSLiftReturn(ret)
     }
 
-    func createGreeter() throws(JSException) -> Greeter {
+    func createGreeter() -> Greeter {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let ret = _extern_createGreeter(jsObjectValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return Greeter.bridgeJSLiftReturn(ret)
     }
 
-    func processOptionalGreeter(_ greeter: Optional<Greeter>) throws(JSException) -> String {
+    func processOptionalGreeter(_ greeter: Optional<Greeter>) -> String {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let (greeterIsSome, greeterPointer) = greeter.bridgeJSLowerParameter()
         let ret = _extern_processOptionalGreeter(jsObjectValue, greeterIsSome, greeterPointer)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return String.bridgeJSLiftReturn(ret)
     }
 
-    func createOptionalGreeter() throws(JSException) -> Optional<Greeter> {
+    func createOptionalGreeter() -> Optional<Greeter> {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let ret = _extern_createOptionalGreeter(jsObjectValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return Optional<Greeter>.bridgeJSLiftReturn(ret)
     }
 
-    func handleAPIResult(_ result: Optional<APIResult>) throws(JSException) -> Void {
+    func handleAPIResult(_ result: Optional<APIResult>) -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let (resultIsSome, resultCaseId) = result.bridgeJSLowerParameter()
         _extern_handleAPIResult(jsObjectValue, resultIsSome, resultCaseId)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
     }
 
-    func getAPIResult() throws(JSException) -> Optional<APIResult> {
+    func getAPIResult() -> Optional<APIResult> {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let ret = _extern_getAPIResult(jsObjectValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return Optional<APIResult>.bridgeJSLiftReturn(ret)
     }
 
@@ -6592,21 +6559,7 @@ public func _bjs_DataProcessorManager_init(_ processor: Int32) -> UnsafeMutableR
 @_cdecl("bjs_DataProcessorManager_incrementByAmount")
 public func _bjs_DataProcessorManager_incrementByAmount(_ _self: UnsafeMutableRawPointer, _ amount: Int32) -> Void {
     #if arch(wasm32)
-    do {
-        try DataProcessorManager.bridgeJSLiftParameter(_self).incrementByAmount(_: Int.bridgeJSLiftParameter(amount))
-    } catch let error {
-        if let error = error.thrownValue.object {
-            withExtendedLifetime(error) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        } else {
-            let jsError = JSError(message: String(describing: error))
-            withExtendedLifetime(jsError.jsObject) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        }
-        return
-    }
+    DataProcessorManager.bridgeJSLiftParameter(_self).incrementByAmount(_: Int.bridgeJSLiftParameter(amount))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6616,21 +6569,7 @@ public func _bjs_DataProcessorManager_incrementByAmount(_ _self: UnsafeMutableRa
 @_cdecl("bjs_DataProcessorManager_setProcessorLabel")
 public func _bjs_DataProcessorManager_setProcessorLabel(_ _self: UnsafeMutableRawPointer, _ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void {
     #if arch(wasm32)
-    do {
-        try DataProcessorManager.bridgeJSLiftParameter(_self).setProcessorLabel(_: String.bridgeJSLiftParameter(prefixBytes, prefixLength), _: String.bridgeJSLiftParameter(suffixBytes, suffixLength))
-    } catch let error {
-        if let error = error.thrownValue.object {
-            withExtendedLifetime(error) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        } else {
-            let jsError = JSError(message: String(describing: error))
-            withExtendedLifetime(jsError.jsObject) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        }
-        return
-    }
+    DataProcessorManager.bridgeJSLiftParameter(_self).setProcessorLabel(_: String.bridgeJSLiftParameter(prefixBytes, prefixLength), _: String.bridgeJSLiftParameter(suffixBytes, suffixLength))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6640,22 +6579,8 @@ public func _bjs_DataProcessorManager_setProcessorLabel(_ _self: UnsafeMutableRa
 @_cdecl("bjs_DataProcessorManager_isProcessorEven")
 public func _bjs_DataProcessorManager_isProcessorEven(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    do {
-        let ret = try DataProcessorManager.bridgeJSLiftParameter(_self).isProcessorEven()
-        return ret.bridgeJSLowerReturn()
-    } catch let error {
-        if let error = error.thrownValue.object {
-            withExtendedLifetime(error) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        } else {
-            let jsError = JSError(message: String(describing: error))
-            withExtendedLifetime(jsError.jsObject) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        }
-        return 0
-    }
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).isProcessorEven()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6665,22 +6590,8 @@ public func _bjs_DataProcessorManager_isProcessorEven(_ _self: UnsafeMutableRawP
 @_cdecl("bjs_DataProcessorManager_getProcessorLabel")
 public func _bjs_DataProcessorManager_getProcessorLabel(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    do {
-        let ret = try DataProcessorManager.bridgeJSLiftParameter(_self).getProcessorLabel()
-        return ret.bridgeJSLowerReturn()
-    } catch let error {
-        if let error = error.thrownValue.object {
-            withExtendedLifetime(error) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        } else {
-            let jsError = JSError(message: String(describing: error))
-            withExtendedLifetime(jsError.jsObject) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        }
-        return
-    }
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).getProcessorLabel()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6690,22 +6601,8 @@ public func _bjs_DataProcessorManager_getProcessorLabel(_ _self: UnsafeMutableRa
 @_cdecl("bjs_DataProcessorManager_getCurrentValue")
 public func _bjs_DataProcessorManager_getCurrentValue(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    do {
-        let ret = try DataProcessorManager.bridgeJSLiftParameter(_self).getCurrentValue()
-        return ret.bridgeJSLowerReturn()
-    } catch let error {
-        if let error = error.thrownValue.object {
-            withExtendedLifetime(error) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        } else {
-            let jsError = JSError(message: String(describing: error))
-            withExtendedLifetime(jsError.jsObject) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        }
-        return 0
-    }
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).getCurrentValue()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6715,21 +6612,7 @@ public func _bjs_DataProcessorManager_getCurrentValue(_ _self: UnsafeMutableRawP
 @_cdecl("bjs_DataProcessorManager_incrementBoth")
 public func _bjs_DataProcessorManager_incrementBoth(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    do {
-        try DataProcessorManager.bridgeJSLiftParameter(_self).incrementBoth()
-    } catch let error {
-        if let error = error.thrownValue.object {
-            withExtendedLifetime(error) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        } else {
-            let jsError = JSError(message: String(describing: error))
-            withExtendedLifetime(jsError.jsObject) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        }
-        return
-    }
+    DataProcessorManager.bridgeJSLiftParameter(_self).incrementBoth()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6739,22 +6622,8 @@ public func _bjs_DataProcessorManager_incrementBoth(_ _self: UnsafeMutableRawPoi
 @_cdecl("bjs_DataProcessorManager_getBackupValue")
 public func _bjs_DataProcessorManager_getBackupValue(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    do {
-        let ret = try DataProcessorManager.bridgeJSLiftParameter(_self).getBackupValue()
-        return ret.bridgeJSLowerReturn()
-    } catch let error {
-        if let error = error.thrownValue.object {
-            withExtendedLifetime(error) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        } else {
-            let jsError = JSError(message: String(describing: error))
-            withExtendedLifetime(jsError.jsObject) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        }
-        return
-    }
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).getBackupValue()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6880,22 +6749,8 @@ public func _bjs_DataProcessorManager_setProcessorHttpStatus(_ _self: UnsafeMuta
 @_cdecl("bjs_DataProcessorManager_getProcessorAPIResult")
 public func _bjs_DataProcessorManager_getProcessorAPIResult(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    do {
-        let ret = try DataProcessorManager.bridgeJSLiftParameter(_self).getProcessorAPIResult()
-        return ret.bridgeJSLowerReturn()
-    } catch let error {
-        if let error = error.thrownValue.object {
-            withExtendedLifetime(error) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        } else {
-            let jsError = JSError(message: String(describing: error))
-            withExtendedLifetime(jsError.jsObject) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        }
-        return
-    }
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).getProcessorAPIResult()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6905,21 +6760,7 @@ public func _bjs_DataProcessorManager_getProcessorAPIResult(_ _self: UnsafeMutab
 @_cdecl("bjs_DataProcessorManager_setProcessorAPIResult")
 public func _bjs_DataProcessorManager_setProcessorAPIResult(_ _self: UnsafeMutableRawPointer, _ apiResultIsSome: Int32, _ apiResultCaseId: Int32) -> Void {
     #if arch(wasm32)
-    do {
-        try DataProcessorManager.bridgeJSLiftParameter(_self).setProcessorAPIResult(_: Optional<APIResult>.bridgeJSLiftParameter(apiResultIsSome, apiResultCaseId))
-    } catch let error {
-        if let error = error.thrownValue.object {
-            withExtendedLifetime(error) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        } else {
-            let jsError = JSError(message: String(describing: error))
-            withExtendedLifetime(jsError.jsObject) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        }
-        return
-    }
+    DataProcessorManager.bridgeJSLiftParameter(_self).setProcessorAPIResult(_: Optional<APIResult>.bridgeJSLiftParameter(apiResultIsSome, apiResultCaseId))
     #else
     fatalError("Only available on WebAssembly")
     #endif
