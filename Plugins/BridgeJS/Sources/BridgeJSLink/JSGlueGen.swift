@@ -2474,7 +2474,6 @@ struct IntrinsicJSFragment: Sendable {
                     let idVar = scope.variable("objId")
                     printer.write("const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));")
                     printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(idVar));")
-                    cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
                     return []
                 }
             )

@@ -62,13 +62,15 @@ export type Exports = {
     processNestedPointArray(points: Point[][]): Point[][];
     processItemArray(items: Item[]): Item[];
     processNestedItemArray(items: Item[][]): Item[][];
+    processJSObjectArray(objects: any[]): any[];
+    processOptionalJSObjectArray(objects: (any | null)[]): (any | null)[];
+    processNestedJSObjectArray(objects: any[][]): any[][];
     Direction: DirectionObject
     Status: StatusObject
 }
 export type Imports = {
     checkArray(a: any): void;
     checkArrayWithLength(a: any, b: number): void;
-    checkArray(a: any): void;
 }
 export function createInstantiator(options: {
     imports: Imports;

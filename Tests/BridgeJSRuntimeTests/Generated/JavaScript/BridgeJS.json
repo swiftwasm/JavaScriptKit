@@ -9451,6 +9451,154 @@
         }
       },
       {
+        "abiName" : "bjs_roundTripJSObjectArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripJSObjectArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "objects",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "jsObject" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "jsObject" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripOptionalJSObjectArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripOptionalJSObjectArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "objects",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "optional" : {
+                    "_0" : {
+                      "jsObject" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "optional" : {
+                "_0" : {
+                  "jsObject" : {
+
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripFooArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripFooArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "foos",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "jsObject" : {
+                    "_0" : "Foo"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "jsObject" : {
+                "_0" : "Foo"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripOptionalFooArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripOptionalFooArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "foos",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "optional" : {
+                    "_0" : {
+                      "jsObject" : {
+                        "_0" : "Foo"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "optional" : {
+                "_0" : {
+                  "jsObject" : {
+                    "_0" : "Foo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripPointerFields",
         "effects" : {
           "isAsync" : false,
@@ -9832,6 +9980,56 @@
         "returnType" : {
           "swiftHeapObject" : {
             "_0" : "Container"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripJSObjectContainer",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripJSObjectContainer",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "container",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "JSObjectContainer"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "JSObjectContainer"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripFooContainer",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripFooContainer",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "container",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "FooContainer"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "FooContainer"
           }
         }
       }
@@ -11365,6 +11563,72 @@
           }
         ],
         "swiftCallName" : "ConfigStruct"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "JSObjectContainer",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "object",
+            "type" : {
+              "jsObject" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "optionalObject",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "jsObject" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "JSObjectContainer"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "FooContainer",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "foo",
+            "type" : {
+              "jsObject" : {
+                "_0" : "Foo"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "optionalFoo",
+            "type" : {
+              "optional" : {
+                "_0" : {
+                  "jsObject" : {
+                    "_0" : "Foo"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "FooContainer"
       }
     ]
   },

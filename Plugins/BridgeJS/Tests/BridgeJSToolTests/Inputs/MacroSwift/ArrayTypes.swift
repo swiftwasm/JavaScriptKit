@@ -55,6 +55,9 @@
 @JS func processItemArray(_ items: [Item]) -> [Item]
 @JS func processNestedItemArray(_ items: [[Item]]) -> [[Item]]
 
+@JS func processJSObjectArray(_ objects: [JSObject]) -> [JSObject]
+@JS func processOptionalJSObjectArray(_ objects: [JSObject?]) -> [JSObject?]
+@JS func processNestedJSObjectArray(_ objects: [[JSObject]]) -> [[JSObject]]
+
 @JSFunction func checkArray(_ a: JSObject) throws(JSException) -> Void
 @JSFunction func checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> Void
-@JSFunction func checkArray(_ a: JSObject) throws(JSException) -> Void

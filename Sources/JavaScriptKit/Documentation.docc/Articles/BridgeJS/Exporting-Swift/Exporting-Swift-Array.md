@@ -119,6 +119,8 @@ const result = exports.processNumbers(original);
 | Struct arrays: `[MyStruct]` | ✅ |
 | Class arrays: `[MyClass]` | ✅ |
 | Enum arrays (case, raw value, associated value) | ✅ |
+| `JSObject` arrays: `[JSObject]` | ✅ |
+| `@JSClass struct` arrays: `[Foo]` | ✅ |
 | Nested arrays: `[[Int]]` | ✅ |
 | Optional arrays: `[Int]?` | ✅ |
 | Arrays of optionals: `[Int?]` | ✅ |

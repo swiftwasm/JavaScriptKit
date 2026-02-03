@@ -160,6 +160,8 @@ This differs from classes, which use reference semantics and share state across 
 | Stored fields with supported types | ✅ |
 | Optional fields | ✅ |
 | Nested structs | ✅ |
+| `JSObject` fields | ✅ |
+| `@JSClass struct` fields | ✅ |
 | Instance methods | ✅ |
 | Static methods | ✅ |
 | Static properties | ✅ |

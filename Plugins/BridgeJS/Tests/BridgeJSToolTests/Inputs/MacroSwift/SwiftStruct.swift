@@ -53,3 +53,10 @@
     @JS static var computedSetting: String { "Config: \(defaultConfig)" }
     @JS static func update(_ timeout: Double) -> Double
 }
+
+@JS struct Container {
+    var object: JSObject
+    var optionalObject: JSObject?
+}
+
+@JS func roundtripContainer(_ container: Container) -> Container

@@ -945,6 +945,121 @@
             }
           }
         }
+      },
+      {
+        "abiName" : "bjs_processJSObjectArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "processJSObjectArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "objects",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "jsObject" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "jsObject" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_processOptionalJSObjectArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "processOptionalJSObjectArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "objects",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "optional" : {
+                    "_0" : {
+                      "jsObject" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "optional" : {
+                "_0" : {
+                  "jsObject" : {
+
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_processNestedJSObjectArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "processNestedJSObjectArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "objects",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "jsObject" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "array" : {
+                "_0" : {
+                  "jsObject" : {
+
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     ],
     "protocols" : [
@@ -1019,24 +1134,6 @@
                 "name" : "b",
                 "type" : {
                   "double" : {
-
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "void" : {
-
-              }
-            }
-          },
-          {
-            "name" : "checkArray",
-            "parameters" : [
-              {
-                "name" : "a",
-                "type" : {
-                  "jsObject" : {
 
                   }
                 }

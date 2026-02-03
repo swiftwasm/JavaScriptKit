@@ -465,6 +465,64 @@ public func _bjs_processNestedItemArray() -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_processJSObjectArray")
+@_cdecl("bjs_processJSObjectArray")
+public func _bjs_processJSObjectArray() -> Void {
+    #if arch(wasm32)
+    let ret = processJSObjectArray(_: [JSObject].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_processOptionalJSObjectArray")
+@_cdecl("bjs_processOptionalJSObjectArray")
+public func _bjs_processOptionalJSObjectArray() -> Void {
+    #if arch(wasm32)
+    let ret = processOptionalJSObjectArray(_: {
+        let __count = Int(_swift_js_pop_i32())
+        var __result: [Optional<JSObject>] = []
+        __result.reserveCapacity(__count)
+        for _ in 0 ..< __count {
+            __result.append(Optional<JSObject>.bridgeJSLiftParameter())
+        }
+        __result.reverse()
+        return __result
+        }())
+    for __bjs_elem_ret in ret {
+    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
+    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
+    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()}
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    _swift_js_push_i32(Int32(ret.count))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_processNestedJSObjectArray")
+@_cdecl("bjs_processNestedJSObjectArray")
+public func _bjs_processNestedJSObjectArray() -> Void {
+    #if arch(wasm32)
+    let ret = processNestedJSObjectArray(_: {
+        let __count = Int(_swift_js_pop_i32())
+        var __result: [[JSObject]] = []
+        __result.reserveCapacity(__count)
+        for _ in 0 ..< __count {
+            __result.append([JSObject].bridgeJSLiftParameter())
+        }
+        __result.reverse()
+        return __result
+        }())
+    for __bjs_elem_ret in ret {
+    __bjs_elem_ret.bridgeJSLowerReturn()}
+    _swift_js_push_i32(Int32(ret.count))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_Item_deinit")
 @_cdecl("bjs_Item_deinit")
 public func _bjs_Item_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
@@ -520,23 +578,6 @@ func _$checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> V
     let aValue = a.bridgeJSLowerParameter()
     let bValue = b.bridgeJSLowerParameter()
     bjs_checkArrayWithLength(aValue, bValue)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "TestModule", name: "bjs_checkArray")
-fileprivate func bjs_checkArray(_ a: Int32) -> Void
-#else
-fileprivate func bjs_checkArray(_ a: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-func _$checkArray(_ a: JSObject) throws(JSException) -> Void {
-    let aValue = a.bridgeJSLowerParameter()
-    bjs_checkArray(aValue)
     if let error = _swift_js_take_exception() {
         throw error
     }

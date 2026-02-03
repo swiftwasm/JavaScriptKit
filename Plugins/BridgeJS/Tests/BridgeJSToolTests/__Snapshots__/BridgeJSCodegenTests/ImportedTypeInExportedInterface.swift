@@ -1,3 +1,54 @@
+extension FooContainer: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> FooContainer {
+        let optionalFoo = Optional<JSObject>.bridgeJSLiftParameter().map {
+            Foo(unsafelyWrapping: $0)
+        }
+        let foo = Foo(unsafelyWrapping: JSObject.bridgeJSLiftParameter())
+        return FooContainer(foo: foo, optionalFoo: optionalFoo)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        self.foo.jsObject.bridgeJSLowerStackReturn()
+        let __bjs_isSome_optionalFoo = self.optionalFoo != nil
+        if let __bjs_unwrapped_optionalFoo = self.optionalFoo {
+            __bjs_unwrapped_optionalFoo.jsObject.bridgeJSLowerStackReturn()
+        }
+        _swift_js_push_i32(__bjs_isSome_optionalFoo ? 1 : 0)
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _bjs_struct_lower_FooContainer(jsObject.bridgeJSLowerParameter())
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_FooContainer()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_FooContainer")
+fileprivate func _bjs_struct_lower_FooContainer(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_FooContainer(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_FooContainer")
+fileprivate func _bjs_struct_lift_FooContainer() -> Int32
+#else
+fileprivate func _bjs_struct_lift_FooContainer() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 @_expose(wasm, "bjs_makeFoo")
 @_cdecl("bjs_makeFoo")
 public func _bjs_makeFoo() -> Int32 {
@@ -18,6 +69,66 @@ public func _bjs_makeFoo() -> Int32 {
         }
         return 0
     }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_processFooArray")
+@_cdecl("bjs_processFooArray")
+public func _bjs_processFooArray() -> Void {
+    #if arch(wasm32)
+    let ret = processFooArray(_: {
+        let __count = Int(_swift_js_pop_i32())
+        var __result: [Foo] = []
+        __result.reserveCapacity(__count)
+        for _ in 0 ..< __count {
+            __result.append(Foo(unsafelyWrapping: JSObject.bridgeJSLiftParameter()))
+        }
+        __result.reverse()
+        return __result
+        }())
+    ret.map {
+        $0.jsObject
+    } .bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_processOptionalFooArray")
+@_cdecl("bjs_processOptionalFooArray")
+public func _bjs_processOptionalFooArray() -> Void {
+    #if arch(wasm32)
+    let ret = processOptionalFooArray(_: {
+        let __count = Int(_swift_js_pop_i32())
+        var __result: [Optional<Foo>] = []
+        __result.reserveCapacity(__count)
+        for _ in 0 ..< __count {
+            __result.append(Optional<JSObject>.bridgeJSLiftParameter().map {
+                        Foo(unsafelyWrapping: $0)
+                    })
+        }
+        __result.reverse()
+        return __result
+        }())
+    for __bjs_elem_ret in ret {
+    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
+    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
+    __bjs_unwrapped_ret_elem.jsObject.bridgeJSLowerStackReturn()}
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    _swift_js_push_i32(Int32(ret.count))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundtripFooContainer")
+@_cdecl("bjs_roundtripFooContainer")
+public func _bjs_roundtripFooContainer() -> Void {
+    #if arch(wasm32)
+    let ret = roundtripFooContainer(_: FooContainer.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

@@ -1164,6 +1164,32 @@ function testStructSupport(exports) {
         optionalRatio: null
     };
     assert.deepEqual(exports.roundTripMeasurementConfig(mc2), mc2);
+
+    // Struct with JSObject field
+    const containerObj1 = { value: "hello", nested: { x: 1 } };
+    const containerObj2 = { items: [1, 2, 3] };
+    const container1 = { object: containerObj1, optionalObject: containerObj2 };
+    const containerResult1 = exports.roundTripJSObjectContainer(container1);
+    assert.equal(containerResult1.object, containerObj1);
+    assert.equal(containerResult1.optionalObject, containerObj2);
+
+    const container2 = { object: containerObj1, optionalObject: null };
+    const containerResult2 = exports.roundTripJSObjectContainer(container2);
+    assert.equal(containerResult2.object, containerObj1);
+    assert.equal(containerResult2.optionalObject, null);
+
+    // Struct with @JSClass field
+    const foo1 = new ImportedFoo("first");
+    const foo2 = new ImportedFoo("second");
+    const fooContainer1 = { foo: foo1, optionalFoo: foo2 };
+    const fooContainerResult1 = exports.roundTripFooContainer(fooContainer1);
+    assert.equal(fooContainerResult1.foo.value, "first");
+    assert.equal(fooContainerResult1.optionalFoo.value, "second");
+
+    const fooContainer2 = { foo: foo1, optionalFoo: null };
+    const fooContainerResult2 = exports.roundTripFooContainer(fooContainer2);
+    assert.equal(fooContainerResult2.foo.value, "first");
+    assert.equal(fooContainerResult2.optionalFoo, null);
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
@@ -1437,6 +1463,36 @@ function testArraySupport(exports) {
     assert.equal(result[0].count, 1);
 
     helper1.release();
+
+    // JSObject arrays
+    const jsObj1 = { a: 1, b: "hello" };
+    const jsObj2 = { x: [1, 2, 3], y: { nested: true } };
+    const jsObjResult = exports.roundTripJSObjectArray([jsObj1, jsObj2]);
+    assert.equal(jsObjResult.length, 2);
+    assert.equal(jsObjResult[0], jsObj1);
+    assert.equal(jsObjResult[1], jsObj2);
+    assert.deepEqual(exports.roundTripJSObjectArray([]), []);
+
+    const optJsResult = exports.roundTripOptionalJSObjectArray([jsObj1, null, jsObj2]);
+    assert.equal(optJsResult.length, 3);
+    assert.equal(optJsResult[0], jsObj1);
+    assert.equal(optJsResult[1], null);
+    assert.equal(optJsResult[2], jsObj2);
+
+    // @JSClass struct arrays
+    const foo1 = new ImportedFoo("first");
+    const foo2 = new ImportedFoo("second");
+    const fooResult = exports.roundTripFooArray([foo1, foo2]);
+    assert.equal(fooResult.length, 2);
+    assert.equal(fooResult[0].value, "first");
+    assert.equal(fooResult[1].value, "second");
+    assert.deepEqual(exports.roundTripFooArray([]), []);
+
+    const optFooResult = exports.roundTripOptionalFooArray([foo1, null, foo2]);
+    assert.equal(optFooResult.length, 3);
+    assert.equal(optFooResult[0].value, "first");
+    assert.equal(optFooResult[1], null);
+    assert.equal(optFooResult[2].value, "second");
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

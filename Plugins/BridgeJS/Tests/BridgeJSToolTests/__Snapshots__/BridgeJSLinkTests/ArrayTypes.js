@@ -263,13 +263,6 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_checkArray"] = function bjs_checkArray(a) {
-                try {
-                    imports.checkArray(swift.memory.getObject(a));
-                } catch (error) {
-                    setException(error);
-                }
-            }
         },
         setInstance: (i) => {
             instance = i;
@@ -841,6 +834,92 @@ export async function createInstantiator(options, swift) {
                         for (let i1 = 0; i1 < arrayLen1; i1++) {
                             const ptr = tmpRetPointers.pop();
                             const obj = Item.__construct(ptr);
+                            arrayResult1.push(obj);
+                        }
+                        arrayResult1.reverse();
+                        arrayResult.push(arrayResult1);
+                    }
+                    arrayResult.reverse();
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return arrayResult;
+                },
+                processJSObjectArray: function bjs_processJSObjectArray(objects) {
+                    const arrayCleanups = [];
+                    for (const elem of objects) {
+                        const objId = swift.memory.retain(elem);
+                        tmpParamInts.push(objId);
+                    }
+                    tmpParamInts.push(objects.length);
+                    instance.exports.bjs_processJSObjectArray();
+                    const arrayLen = tmpRetInts.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const objId1 = tmpRetInts.pop();
+                        const obj = swift.memory.getObject(objId1);
+                        swift.memory.release(objId1);
+                        arrayResult.push(obj);
+                    }
+                    arrayResult.reverse();
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return arrayResult;
+                },
+                processOptionalJSObjectArray: function bjs_processOptionalJSObjectArray(objects) {
+                    const arrayCleanups = [];
+                    for (const elem of objects) {
+                        const isSome = elem != null ? 1 : 0;
+                        if (isSome) {
+                            const objId = swift.memory.retain(elem);
+                            tmpParamInts.push(objId);
+                        } else {
+                            tmpParamInts.push(0);
+                        }
+                        tmpParamInts.push(isSome);
+                    }
+                    tmpParamInts.push(objects.length);
+                    instance.exports.bjs_processOptionalJSObjectArray();
+                    const arrayLen = tmpRetInts.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const isSome1 = tmpRetInts.pop();
+                        let optValue;
+                        if (isSome1 === 0) {
+                            optValue = null;
+                        } else {
+                            const objId1 = tmpRetInts.pop();
+                            const obj = swift.memory.getObject(objId1);
+                            swift.memory.release(objId1);
+                            optValue = obj;
+                        }
+                        arrayResult.push(optValue);
+                    }
+                    arrayResult.reverse();
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return arrayResult;
+                },
+                processNestedJSObjectArray: function bjs_processNestedJSObjectArray(objects) {
+                    const arrayCleanups = [];
+                    for (const elem of objects) {
+                        const arrayCleanups1 = [];
+                        for (const elem1 of elem) {
+                            const objId = swift.memory.retain(elem1);
+                            tmpParamInts.push(objId);
+                        }
+                        tmpParamInts.push(elem.length);
+                        arrayCleanups.push(() => {
+                            for (const cleanup of arrayCleanups1) { cleanup(); }
+                        });
+                    }
+                    tmpParamInts.push(objects.length);
+                    instance.exports.bjs_processNestedJSObjectArray();
+                    const arrayLen = tmpRetInts.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const arrayLen1 = tmpRetInts.pop();
+                        const arrayResult1 = [];
+                        for (let i1 = 0; i1 < arrayLen1; i1++) {
+                            const objId1 = tmpRetInts.pop();
+                            const obj = swift.memory.getObject(objId1);
+                            swift.memory.release(objId1);
                             arrayResult1.push(obj);
                         }
                         arrayResult1.reverse();

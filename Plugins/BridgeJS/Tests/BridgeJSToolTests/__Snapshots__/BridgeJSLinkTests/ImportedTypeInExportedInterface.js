@@ -34,6 +34,70 @@ export async function createInstantiator(options, swift) {
     
     let _exports = null;
     let bjs = null;
+    const __bjs_createFooContainerHelpers = () => {
+        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers) => ({
+            lower: (value) => {
+                let id;
+                if (value.foo != null) {
+                    id = swift.memory.retain(value.foo);
+                } else {
+                    id = undefined;
+                }
+                tmpParamInts.push(id !== undefined ? id : 0);
+                const isSome = value.optionalFoo != null;
+                let id1;
+                if (isSome) {
+                    id1 = swift.memory.retain(value.optionalFoo);
+                    tmpParamInts.push(id1);
+                } else {
+                    id1 = undefined;
+                    tmpParamInts.push(0);
+                }
+                tmpParamInts.push(isSome ? 1 : 0);
+                const cleanup = () => {
+                    if(id !== undefined && id !== 0) {
+                        try {
+                            swift.memory.getObject(id);
+                            swift.memory.release(id);
+                        } catch(e) {}
+                    }
+                    if(id1 !== undefined && id1 !== 0) {
+                        try {
+                            swift.memory.getObject(id1);
+                            swift.memory.release(id1);
+                        } catch(e) {}
+                    }
+                };
+                return { cleanup };
+            },
+            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+                const isSome = tmpRetInts.pop();
+                let optional;
+                if (isSome) {
+                    const objectId = tmpRetInts.pop();
+                    let value;
+                    if (objectId !== 0) {
+                        value = swift.memory.getObject(objectId);
+                        swift.memory.release(objectId);
+                    } else {
+                        value = null;
+                    }
+                    optional = value;
+                } else {
+                    optional = null;
+                }
+                const objectId1 = tmpRetInts.pop();
+                let value1;
+                if (objectId1 !== 0) {
+                    value1 = swift.memory.getObject(objectId1);
+                    swift.memory.release(objectId1);
+                } else {
+                    value1 = null;
+                }
+                return { foo: value1, optionalFoo: optional };
+            }
+        });
+    };
 
     return {
         /**
@@ -111,6 +175,17 @@ export async function createInstantiator(options, swift) {
                 while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
                     tmpStructCleanups.pop();
                 }
+            }
+            bjs["swift_js_struct_lower_FooContainer"] = function(objectId) {
+                const { cleanup: cleanup } = structHelpers.FooContainer.lower(swift.memory.getObject(objectId));
+                if (cleanup) {
+                    return tmpStructCleanups.push(cleanup);
+                }
+                return 0;
+            }
+            bjs["swift_js_struct_lift_FooContainer"] = function() {
+                const value = structHelpers.FooContainer.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -223,6 +298,9 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
+            const FooContainerHelpers = __bjs_createFooContainerHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
+            structHelpers.FooContainer = FooContainerHelpers;
+            
             const exports = {
                 makeFoo: function bjs_makeFoo() {
                     const ret = instance.exports.bjs_makeFoo();
@@ -235,6 +313,66 @@ export async function createInstantiator(options, swift) {
                         throw error;
                     }
                     return ret1;
+                },
+                processFooArray: function bjs_processFooArray(foos) {
+                    const arrayCleanups = [];
+                    for (const elem of foos) {
+                        const objId = swift.memory.retain(elem);
+                        tmpParamInts.push(objId);
+                    }
+                    tmpParamInts.push(foos.length);
+                    instance.exports.bjs_processFooArray();
+                    const arrayLen = tmpRetInts.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const objId1 = tmpRetInts.pop();
+                        const obj = swift.memory.getObject(objId1);
+                        swift.memory.release(objId1);
+                        arrayResult.push(obj);
+                    }
+                    arrayResult.reverse();
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return arrayResult;
+                },
+                processOptionalFooArray: function bjs_processOptionalFooArray(foos) {
+                    const arrayCleanups = [];
+                    for (const elem of foos) {
+                        const isSome = elem != null ? 1 : 0;
+                        if (isSome) {
+                            const objId = swift.memory.retain(elem);
+                            tmpParamInts.push(objId);
+                        } else {
+                            tmpParamInts.push(0);
+                        }
+                        tmpParamInts.push(isSome);
+                    }
+                    tmpParamInts.push(foos.length);
+                    instance.exports.bjs_processOptionalFooArray();
+                    const arrayLen = tmpRetInts.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const isSome1 = tmpRetInts.pop();
+                        let optValue;
+                        if (isSome1 === 0) {
+                            optValue = null;
+                        } else {
+                            const objId1 = tmpRetInts.pop();
+                            const obj = swift.memory.getObject(objId1);
+                            swift.memory.release(objId1);
+                            optValue = obj;
+                        }
+                        arrayResult.push(optValue);
+                    }
+                    arrayResult.reverse();
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return arrayResult;
+                },
+                roundtripFooContainer: function bjs_roundtripFooContainer(container) {
+                    const { cleanup: cleanup } = structHelpers.FooContainer.lower(container);
+                    instance.exports.bjs_roundtripFooContainer();
+                    const structValue = structHelpers.FooContainer.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    if (cleanup) { cleanup(); }
+                    return structValue;
                 },
             };
             _exports = exports;

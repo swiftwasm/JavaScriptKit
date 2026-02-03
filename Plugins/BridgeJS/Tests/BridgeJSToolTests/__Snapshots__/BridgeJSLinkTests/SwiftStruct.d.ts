@@ -39,6 +39,10 @@ export interface Measurement {
 }
 export interface ConfigStruct {
 }
+export interface Container {
+    object: any;
+    optionalObject: any | null;
+}
 export type PrecisionObject = typeof PrecisionValues;
 
 /// Represents a Swift heap object like a class instance or an actor instance.
@@ -57,6 +61,7 @@ export type Exports = {
         new(name: string): Greeter;
     }
     roundtrip(session: Person): Person;
+    roundtripContainer(container: Container): Container;
     Precision: PrecisionObject
     DataPoint: {
         init(x: number, y: number, label: string, optCount: number | null, optFlag: boolean | null): DataPoint;
