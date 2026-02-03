@@ -27,7 +27,11 @@ export class TypeProcessor {
     static createProgram(filePaths, options) {
         const host = ts.createCompilerHost(options);
         const roots = Array.isArray(filePaths) ? filePaths : [filePaths];
-        return ts.createProgram(roots, options, host);
+        return ts.createProgram(roots, {
+            ...options,
+            noCheck: true,
+            skipLibCheck: true,
+        }, host);
     }
 
     /**
