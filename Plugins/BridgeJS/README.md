@@ -89,7 +89,6 @@ graph LR
 | `@JS enum` (case) | const object + tag type | Copy (integer) | ✅ |
 | `@JS enum` (raw value) | const object + tag type | Copy (raw value) | ✅ |
 | `@JS enum` (associated) | discriminated union | Copy (fields via stacks) | ✅ |
-| `@JS protocol` | `interface` | Reference (wrapper) | ✅ |
 | `Optional<T>` | `T \| null` | Depends on T | ✅ |
 | `(T) -> U` | `(arg: T) => U` | Reference (boxed) | ✅ |
 | `JSObject` | `any` / `object` | Reference | ✅ |
@@ -111,19 +110,7 @@ graph LR
 ## Type Modeling
 
 TypeScript uses [structural subtyping](https://www.typescriptlang.org/docs/handbook/type-compatibility.html), but Swift doesn't directly offer it. We can't map every TypeScript type to Swift, so we made several give-ups and heuristics.
-
-### `interface`
-
-We intentionally don't simulate TS's `interface` with Swift's `protocol` even though they are quite similar for the following reasons:
-
-* Adding a protocol conformance for each `interface` implementation adds binary size cost in debug build because it's not easy to DCE.
-* No straightforward way to represent the use of `interface` type on the return type position of TS function. Which concrete type it should it be?
-* For Embedded Swift, we should avoid use of existential type as much as possible.
-
-Instead of simulating the subtyping-rule with Swift's `protocol`, we represent each `interface` with Swift's struct.
-In this way, we lose implicit type coercion but it makes things simpler and clear.
-
-TBD: Consider providing type-conversion methods to simulate subtyping rule like `func asIface()`
+Use `@JSClass` structs to model JavaScript interfaces that you want to consume from Swift.
 
 ### Anonymous type literals
 

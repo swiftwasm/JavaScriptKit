@@ -884,7 +884,7 @@ extension BridgeType {
                 throw BridgeJSCoreError(
                     """
                     swiftHeapObject '\(className)' is not supported in TypeScript imports.
-                    Swift classes can only be used in @JS protocols where Swift owns the instance.
+                    Pass Swift instances through exported @JS classes or structs instead.
                     """
                 )
             case .exportSwift:

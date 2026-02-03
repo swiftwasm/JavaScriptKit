@@ -1422,59 +1422,14 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
     }
 
     override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
-        guard let jsAttribute = node.attributes.firstJSAttribute else {
+        guard node.attributes.firstJSAttribute != nil else {
             return .skipChildren
         }
 
-        let name = node.name.text
-
-        let namespaceResult = resolveNamespace(from: jsAttribute, for: node, declarationType: "protocol")
-        guard namespaceResult.isValid else {
-            return .skipChildren
-        }
-        _ = computeExplicitAtLeastInternalAccessControl(
-            for: node,
-            message: "Protocol visibility must be at least internal"
+        diagnose(
+            node: node,
+            message: "@JS protocol has been removed. Use @JSClass struct to model JavaScript interfaces."
         )
-
-        let protocolUniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
-
-        exportedProtocolByName[protocolUniqueKey] = ExportedProtocol(
-            name: name,
-            methods: [],
-            properties: [],
-            namespace: namespaceResult.namespace
-        )
-
-        stateStack.push(state: .protocolBody(name: name, key: protocolUniqueKey))
-
-        var methods: [ExportedFunction] = []
-        for member in node.memberBlock.members {
-            if let funcDecl = member.decl.as(FunctionDeclSyntax.self) {
-                if let exportedFunction = visitProtocolMethod(
-                    node: funcDecl,
-                    protocolName: name,
-                    namespace: namespaceResult.namespace
-                ) {
-                    methods.append(exportedFunction)
-                }
-            } else if let varDecl = member.decl.as(VariableDeclSyntax.self) {
-                _ = visitProtocolProperty(node: varDecl, protocolName: name, protocolKey: protocolUniqueKey)
-            }
-        }
-
-        let exportedProtocol = ExportedProtocol(
-            name: name,
-            methods: methods,
-            properties: exportedProtocolByName[protocolUniqueKey]?.properties ?? [],
-            namespace: namespaceResult.namespace
-        )
-
-        exportedProtocolByName[protocolUniqueKey] = exportedProtocol
-        exportedProtocolNames.append(protocolUniqueKey)
-
-        stateStack.pop()
-
         return .skipChildren
     }
 
