@@ -86,7 +86,9 @@ jobs:
           # Clean any cached resolution
           rm -rf .build Package.resolved
       - name: Run BridgeJS tests
-        run: swift test --package-path ./Plugins/BridgeJS
+        # NOTE: Seems like the prebuilt SwiftSyntax binaries are not compatible with
+        # non-macro dependents, so disable experimental prebuilts for now.
+        run: swift test --disable-experimental-prebuilts --package-path ./Plugins/BridgeJS
 
   native-build:
     # Check native build to make it easy to develop applications by Xcode
