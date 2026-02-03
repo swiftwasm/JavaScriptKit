@@ -1,112 +1,76 @@
 struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProtocolWrapper {
     let jsObject: JSObject
 
-    func onSomethingHappened() throws(JSException) -> Void {
+    func onSomethingHappened() -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         _extern_onSomethingHappened(jsObjectValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
     }
 
-    func onValueChanged(_ value: String) throws(JSException) -> Void {
+    func onValueChanged(_ value: String) -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let valueValue = value.bridgeJSLowerParameter()
         _extern_onValueChanged(jsObjectValue, valueValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
     }
 
-    func onCountUpdated(count: Int) throws(JSException) -> Bool {
+    func onCountUpdated(count: Int) -> Bool {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let countValue = count.bridgeJSLowerParameter()
         let ret = _extern_onCountUpdated(jsObjectValue, countValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return Bool.bridgeJSLiftReturn(ret)
     }
 
-    func onLabelUpdated(_ prefix: String, _ suffix: String) throws(JSException) -> Void {
+    func onLabelUpdated(_ prefix: String, _ suffix: String) -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let prefixValue = prefix.bridgeJSLowerParameter()
         let suffixValue = suffix.bridgeJSLowerParameter()
         _extern_onLabelUpdated(jsObjectValue, prefixValue, suffixValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
     }
 
-    func isCountEven() throws(JSException) -> Bool {
+    func isCountEven() -> Bool {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let ret = _extern_isCountEven(jsObjectValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return Bool.bridgeJSLiftReturn(ret)
     }
 
-    func onHelperUpdated(_ helper: Helper) throws(JSException) -> Void {
+    func onHelperUpdated(_ helper: Helper) -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let helperPointer = helper.bridgeJSLowerParameter()
         _extern_onHelperUpdated(jsObjectValue, helperPointer)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
     }
 
-    func createHelper() throws(JSException) -> Helper {
+    func createHelper() -> Helper {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let ret = _extern_createHelper(jsObjectValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return Helper.bridgeJSLiftReturn(ret)
     }
 
-    func onOptionalHelperUpdated(_ helper: Optional<Helper>) throws(JSException) -> Void {
+    func onOptionalHelperUpdated(_ helper: Optional<Helper>) -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let (helperIsSome, helperPointer) = helper.bridgeJSLowerParameter()
         _extern_onOptionalHelperUpdated(jsObjectValue, helperIsSome, helperPointer)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
     }
 
-    func createOptionalHelper() throws(JSException) -> Optional<Helper> {
+    func createOptionalHelper() -> Optional<Helper> {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let ret = _extern_createOptionalHelper(jsObjectValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return Optional<Helper>.bridgeJSLiftReturn(ret)
     }
 
-    func createEnum() throws(JSException) -> ExampleEnum {
+    func createEnum() -> ExampleEnum {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let ret = _extern_createEnum(jsObjectValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return ExampleEnum.bridgeJSLiftReturn(ret)
     }
 
-    func handleResult(_ result: Result) throws(JSException) -> Void {
+    func handleResult(_ result: Result) -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let resultCaseId = result.bridgeJSLowerParameter()
         _extern_handleResult(jsObjectValue, resultCaseId)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
     }
 
-    func getResult() throws(JSException) -> Result {
+    func getResult() -> Result {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let ret = _extern_getResult(jsObjectValue)
-        if let error = _swift_js_take_exception() {
-            throw error
-        }
         return Result.bridgeJSLiftReturn(ret)
     }
 

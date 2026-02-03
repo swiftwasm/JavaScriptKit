@@ -71,7 +71,6 @@ public struct ABINameGenerator {
 public enum BridgeContext: Sendable {
     case importTS
     case exportSwift
-    case exportSwiftProtocol
 }
 
 public struct ClosureSignature: Codable, Equatable, Hashable, Sendable {

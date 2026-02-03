@@ -47,18 +47,18 @@ import JavaScriptKit
     var directionOptional: Direction? { get set }
     var priority: Priority { get set }
     var priorityOptional: Priority? { get set }
-    func onSomethingHappened() throws(JSException)
-    func onValueChanged(_ value: String) throws(JSException)
-    func onCountUpdated(count: Int) throws(JSException) -> Bool
-    func onLabelUpdated(_ prefix: String, _ suffix: String) throws(JSException)
-    func isCountEven() throws(JSException) -> Bool
-    func onHelperUpdated(_ helper: Helper) throws(JSException)
-    func createHelper() throws(JSException) -> Helper
-    func onOptionalHelperUpdated(_ helper: Helper?) throws(JSException)
-    func createOptionalHelper() throws(JSException) -> Helper?
-    func createEnum() throws(JSException) -> ExampleEnum
-    func handleResult(_ result: Result) throws(JSException)
-    func getResult() throws(JSException) -> Result
+    func onSomethingHappened()
+    func onValueChanged(_ value: String)
+    func onCountUpdated(count: Int) -> Bool
+    func onLabelUpdated(_ prefix: String, _ suffix: String)
+    func isCountEven() -> Bool
+    func onHelperUpdated(_ helper: Helper)
+    func createHelper() -> Helper
+    func onOptionalHelperUpdated(_ helper: Helper?)
+    func createOptionalHelper() -> Helper?
+    func createEnum() -> ExampleEnum
+    func handleResult(_ result: Result)
+    func getResult() -> Result
 }
 
 @JS class MyViewController {

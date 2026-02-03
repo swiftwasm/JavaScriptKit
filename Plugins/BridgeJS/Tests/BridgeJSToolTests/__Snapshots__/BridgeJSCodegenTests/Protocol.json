@@ -499,7 +499,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : true
+              "isThrows" : false
             },
             "name" : "onSomethingHappened",
             "parameters" : [
@@ -516,7 +516,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : true
+              "isThrows" : false
             },
             "name" : "onValueChanged",
             "parameters" : [
@@ -541,7 +541,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : true
+              "isThrows" : false
             },
             "name" : "onCountUpdated",
             "parameters" : [
@@ -566,7 +566,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : true
+              "isThrows" : false
             },
             "name" : "onLabelUpdated",
             "parameters" : [
@@ -600,7 +600,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : true
+              "isThrows" : false
             },
             "name" : "isCountEven",
             "parameters" : [
@@ -617,7 +617,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : true
+              "isThrows" : false
             },
             "name" : "onHelperUpdated",
             "parameters" : [
@@ -642,7 +642,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : true
+              "isThrows" : false
             },
             "name" : "createHelper",
             "parameters" : [
@@ -659,7 +659,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : true
+              "isThrows" : false
             },
             "name" : "onOptionalHelperUpdated",
             "parameters" : [
@@ -688,7 +688,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : true
+              "isThrows" : false
             },
             "name" : "createOptionalHelper",
             "parameters" : [
@@ -709,7 +709,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : true
+              "isThrows" : false
             },
             "name" : "createEnum",
             "parameters" : [
@@ -727,7 +727,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : true
+              "isThrows" : false
             },
             "name" : "handleResult",
             "parameters" : [
@@ -752,7 +752,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : true
+              "isThrows" : false
             },
             "name" : "getResult",
             "parameters" : [
