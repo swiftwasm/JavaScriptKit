@@ -83,6 +83,8 @@ public struct ImportTS {
         var abiReturnType: WasmCoreType?
         // Track destructured variable names for multiple lowered parameters
         var destructuredVarNames: [String] = []
+        // Stack-lowered parameters should be evaluated in reverse order to match LIFO stacks
+        var stackLoweringStmts: [CodeBlockItemSyntax] = []
 
         init(moduleName: String, abiName: String, context: BridgeContext = .importTS) {
             self.moduleName = moduleName
@@ -93,11 +95,6 @@ public struct ImportTS {
         func lowerParameter(param: Parameter) throws {
             let loweringInfo = try param.type.loweringParameterInfo(context: context)
 
-            // Generate destructured variable names for all lowered parameters
-            let destructuredNames = loweringInfo.loweredParameters.map {
-                "\(param.name)\($0.name.capitalizedFirstLetter)"
-            }
-
             let initializerExpr: ExprSyntax
             switch param.type {
             case .closure(let signature):
@@ -106,6 +103,34 @@ public struct ImportTS {
                 )
             default:
                 initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
+            }
+
+            if loweringInfo.loweredParameters.isEmpty {
+                let stmt = CodeBlockItemSyntax(
+                    item: .decl(
+                        DeclSyntax(
+                            VariableDeclSyntax(
+                                bindingSpecifier: .keyword(.let),
+                                bindings: PatternBindingListSyntax {
+                                    PatternBindingSyntax(
+                                        pattern: PatternSyntax(
+                                            IdentifierPatternSyntax(identifier: .wildcardToken())
+                                        ),
+                                        initializer: InitializerClauseSyntax(value: initializerExpr)
+                                    )
+                                }
+                            )
+                        )
+                    )
+                )
+                // Insert at the front so the last parameter ends up on the stack first
+                stackLoweringStmts.insert(stmt, at: 0)
+                return
+            }
+
+            // Generate destructured variable names for all lowered parameters
+            let destructuredNames = loweringInfo.loweredParameters.map {
+                "\(param.name)\($0.name.capitalizedFirstLetter)"
             }
 
             // Always add destructuring statement to body (unified for single and multiple)
@@ -166,6 +191,9 @@ public struct ImportTS {
         }
 
         func call(returnType: BridgeType) throws {
+            let liftingInfo = try returnType.liftingReturnInfo(context: context)
+            // Stack-based lowerings must run in reverse parameter order (already reversed)
+            body.append(contentsOf: stackLoweringStmts)
             // Build function call expression
             let callExpr = FunctionCallExprSyntax(
                 calledExpression: ExprSyntax("\(raw: abiName)"),
@@ -182,6 +210,9 @@ public struct ImportTS {
                 body.append(CodeBlockItemSyntax(item: .stmt(StmtSyntax(ExpressionStmtSyntax(expression: callExpr)))))
             } else if returnType.usesSideChannelForOptionalReturn() {
                 // Side channel returns don't need "let ret ="
+                body.append(CodeBlockItemSyntax(item: .stmt(StmtSyntax(ExpressionStmtSyntax(expression: callExpr)))))
+            } else if liftingInfo.valueToLift == nil {
+                // Value is returned via stacks, no direct ABI return
                 body.append(CodeBlockItemSyntax(item: .stmt(StmtSyntax(ExpressionStmtSyntax(expression: callExpr)))))
             } else {
                 body.append("let ret = \(raw: callExpr)")
@@ -922,13 +953,9 @@ extension BridgeType {
                 return LoweringParameterInfo(loweredParameters: [("value", .i32)])
             }
         case .rawValueEnum(_, let rawType):
-            switch context {
-            case .importTS:
-                return LoweringParameterInfo(loweredParameters: [("value", rawType.wasmCoreType ?? .i32)])
-            case .exportSwift:
-                // For protocol export we return .i32 for String raw value type instead of nil
-                return LoweringParameterInfo(loweredParameters: [("value", rawType.wasmCoreType ?? .i32)])
-            }
+            // Both importTS and exportSwift lower raw-value enums the same way
+            let wasmType = rawType.wasmCoreType ?? .i32
+            return LoweringParameterInfo(loweredParameters: [("value", wasmType)])
         case .associatedValueEnum:
             switch context {
             case .importTS:
@@ -952,12 +979,7 @@ extension BridgeType {
             params.append(contentsOf: wrappedInfo.loweredParameters)
             return LoweringParameterInfo(loweredParameters: params)
         case .array:
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError("Array types are not yet supported in TypeScript imports")
-            case .exportSwift:
-                return LoweringParameterInfo(loweredParameters: [])
-            }
+            return LoweringParameterInfo(loweredParameters: [])
         }
     }
 
@@ -1011,13 +1033,9 @@ extension BridgeType {
                 return LiftingReturnInfo(valueToLift: .i32)
             }
         case .rawValueEnum(_, let rawType):
-            switch context {
-            case .importTS:
-                return LiftingReturnInfo(valueToLift: rawType.wasmCoreType ?? .i32)
-            case .exportSwift:
-                // For protocol export we return .i32 for String raw value type instead of nil
-                return LiftingReturnInfo(valueToLift: rawType.wasmCoreType ?? .i32)
-            }
+            // Both importTS and exportSwift lift raw-value enums identically
+            let wasmType = rawType.wasmCoreType ?? .i32
+            return LiftingReturnInfo(valueToLift: wasmType)
         case .associatedValueEnum:
             switch context {
             case .importTS:
@@ -1039,12 +1057,7 @@ extension BridgeType {
             let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
             return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
         case .array:
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError("Array types are not yet supported in TypeScript imports")
-            case .exportSwift:
-                return LiftingReturnInfo(valueToLift: nil)
-            }
+            return LiftingReturnInfo(valueToLift: nil)
         }
     }
 }

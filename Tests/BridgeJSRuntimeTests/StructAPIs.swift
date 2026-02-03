@@ -234,3 +234,28 @@
 @JS func roundTripFooContainer(_ container: FooContainer) -> FooContainer {
     return container
 }
+
+@JS struct ArrayMembers {
+    var ints: [Int]
+    var optStrings: [String]?
+
+    @JS func sumValues(_ values: [Int]) -> Int {
+        values.reduce(0, +)
+    }
+
+    @JS func firstString(_ values: [String]) -> String? {
+        values.first
+    }
+}
+
+@JS func roundTripArrayMembers(_ value: ArrayMembers) -> ArrayMembers {
+    value
+}
+
+@JS func arrayMembersSum(_ value: ArrayMembers, _ values: [Int]) -> Int {
+    value.sumValues(values)
+}
+
+@JS func arrayMembersFirst(_ value: ArrayMembers, _ values: [String]) -> String? {
+    value.firstString(values)
+}

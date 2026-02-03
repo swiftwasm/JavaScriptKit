@@ -134,6 +134,40 @@ class ImportAPITests: XCTestCase {
         XCTAssertEqual(prefixer("world!"), "Hello, world!")
     }
 
+    func testRoundTripIntArray() throws {
+        let values = [1, 2, 3, 4, 5]
+        let result = try jsRoundTripIntArray(values)
+        XCTAssertEqual(result, values)
+        XCTAssertEqual(try jsArrayLength(values), values.count)
+        XCTAssertEqual(try jsRoundTripIntArray([]), [])
+    }
+
+    func testRoundTripStringArray() throws {
+        let values = ["", "Hello", "こんにちは", "emoji 👋"]
+        let result = try jsRoundTripStringArray(values)
+        XCTAssertEqual(result, values)
+        XCTAssertEqual(try jsRoundTripStringArray([]), [])
+    }
+
+    func testJSClassArrayMembers() throws {
+        let numbers = [1, 2, 3]
+        let labels = ["alpha", "beta"]
+        let host = try makeArrayHost(numbers, labels)
+
+        XCTAssertEqual(try host.numbers, numbers)
+        XCTAssertEqual(try host.labels, labels)
+
+        try host.setNumbers([10, 20])
+        try host.setLabels(["gamma"])
+        XCTAssertEqual(try host.numbers, [10, 20])
+        XCTAssertEqual(try host.labels, ["gamma"])
+
+        XCTAssertEqual(try host.concatNumbers([30, 40]), [10, 20, 30, 40])
+        XCTAssertEqual(try host.concatLabels(["delta", "epsilon"]), ["gamma", "delta", "epsilon"])
+        XCTAssertEqual(try host.firstLabel([]), "gamma")
+        XCTAssertEqual(try host.firstLabel(["zeta"]), "zeta")
+    }
+
     func testClosureParameterIntToVoid() throws {
         var total = 0
         let ret = try jsCallTwice(5) { total += $0 }

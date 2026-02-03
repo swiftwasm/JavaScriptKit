@@ -10375,6 +10375,112 @@
             "_0" : "FooContainer"
           }
         }
+      },
+      {
+        "abiName" : "bjs_roundTripArrayMembers",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripArrayMembers",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "ArrayMembers"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "ArrayMembers"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_arrayMembersSum",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "arrayMembersSum",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "ArrayMembers"
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "values",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "int" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_arrayMembersFirst",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "arrayMembersFirst",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "ArrayMembers"
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "values",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "string" : {
+
+              }
+            },
+            "_1" : "null"
+          }
+        }
       }
     ],
     "protocols" : [
@@ -12005,6 +12111,110 @@
           }
         ],
         "swiftCallName" : "FooContainer"
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_ArrayMembers_sumValues",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "sumValues",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayMembers_firstString",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "firstString",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "name" : "ArrayMembers",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "ints",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "optStrings",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "ArrayMembers"
       }
     ]
   },
@@ -12657,6 +12867,284 @@
         ],
         "types" : [
 
+        ]
+      },
+      {
+        "functions" : [
+          {
+            "name" : "jsRoundTripIntArray",
+            "parameters" : [
+              {
+                "name" : "items",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name" : "jsRoundTripStringArray",
+            "parameters" : [
+              {
+                "name" : "items",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name" : "jsArrayLength",
+            "parameters" : [
+              {
+                "name" : "items",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "name" : "makeArrayHost",
+            "parameters" : [
+              {
+                "name" : "numbers",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "labels",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "jsObject" : {
+                "_0" : "ArrayHost"
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "constructor" : {
+              "parameters" : [
+                {
+                  "name" : "numbers",
+                  "type" : {
+                    "array" : {
+                      "_0" : {
+                        "int" : {
+
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "name" : "labels",
+                  "type" : {
+                    "array" : {
+                      "_0" : {
+                        "string" : {
+
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+              {
+                "name" : "numbers",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "labels",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "methods" : [
+              {
+                "name" : "concatNumbers",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "concatLabels",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "firstLabel",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "ArrayHost",
+            "setters" : [
+              {
+                "functionName" : "numbers_set",
+                "name" : "numbers",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "functionName" : "labels_set",
+                "name" : "labels",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "staticMethods" : [
+
+            ]
+          }
         ]
       },
       {

@@ -33,6 +33,22 @@ export async function setupOptions(options, context) {
     return {
         ...options,
         getImports: (importsContext) => {
+            const ArrayHost = class {
+                constructor(numbers, labels) {
+                    this.numbers = numbers;
+                    this.labels = labels;
+                }
+                concatNumbers(values) {
+                    return [...this.numbers, ...values];
+                }
+                concatLabels(values) {
+                    return [...this.labels, ...values];
+                }
+                firstLabel(values) {
+                    const merged = [...values, ...this.labels];
+                    return merged.length > 0 ? merged[0] : "";
+                }
+            };
             return {
                 "jsRoundTripVoid": () => {
                     return;
@@ -51,6 +67,15 @@ export async function setupOptions(options, context) {
                 },
                 "jsRoundTripOptionalNumberUndefined": (v) => {
                     return v === undefined ? undefined : v;
+                },
+                "jsRoundTripIntArray": (items) => {
+                    return items;
+                },
+                "jsRoundTripStringArray": (items) => {
+                    return items;
+                },
+                "jsArrayLength": (items) => {
+                    return items.length;
                 },
                 "jsThrowOrVoid": (shouldThrow) => {
                     if (shouldThrow) {
@@ -80,6 +105,10 @@ export async function setupOptions(options, context) {
                 },
                 "$jsWeirdFunction": () => {
                     return 42;
+                },
+                ArrayHost,
+                makeArrayHost: (numbers, labels) => {
+                    return new ArrayHost(numbers, labels);
                 },
                 JsGreeter: class {
                     /**
@@ -134,6 +163,9 @@ export async function setupOptions(options, context) {
                 },
                 jsTranslatePoint: (point, dx, dy) => {
                     return { x: (point.x | 0) + (dx | 0), y: (point.y | 0) + (dy | 0) };
+                },
+                roundTripArrayMembers: (value) => {
+                    return value;
                 }
             };
         },
@@ -217,6 +249,12 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     ]) {
         assert.equal(exports.roundTripString(v), v);
     }
+    const arrayStruct = { ints: [1, 2, 3], optStrings: ["a", "b"] };
+    const arrayStructRoundTrip = exports.roundTripArrayMembers(arrayStruct);
+    assert.deepEqual(arrayStructRoundTrip.ints, [1, 2, 3]);
+    assert.deepEqual(arrayStructRoundTrip.optStrings, ["a", "b"]);
+    assert.equal(exports.arrayMembersSum(arrayStruct, [10, 20]), 30);
+    assert.equal(exports.arrayMembersFirst(arrayStruct, ["x", "y"]), "x");
 
     for (const p of [1, 4, 1024, 65536, 2147483647]) {
         assert.equal(exports.roundTripUnsafeRawPointer(p), p);
