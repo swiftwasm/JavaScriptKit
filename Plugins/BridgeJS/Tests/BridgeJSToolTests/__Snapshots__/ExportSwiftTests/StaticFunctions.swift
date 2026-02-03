@@ -48,9 +48,9 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
     private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32()))
+            return .success(String.bridgeJSLiftParameter())
         case 1:
-            return .failure(Int.bridgeJSLiftParameter(_swift_js_pop_i32()))
+            return .failure(Int.bridgeJSLiftParameter())
         default:
             fatalError("Unknown APIResult case ID: \(caseId)")
         }
@@ -61,13 +61,10 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         switch self {
         case .success(let param0):
-            var __bjs_param0 = param0
-            __bjs_param0.withUTF8 { ptr in
-                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
-            }
+            param0.bridgeJSLowerStackReturn()
             return Int32(0)
         case .failure(let param0):
-            _swift_js_push_i32(Int32(param0))
+            param0.bridgeJSLowerStackReturn()
             return Int32(1)
         }
     }
@@ -86,13 +83,10 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
         switch self {
         case .success(let param0):
             _swift_js_push_tag(Int32(0))
-            var __bjs_param0 = param0
-            __bjs_param0.withUTF8 { ptr in
-                _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
-            }
+            param0.bridgeJSLowerStackReturn()
         case .failure(let param0):
             _swift_js_push_tag(Int32(1))
-            _swift_js_push_i32(Int32(param0))
+            param0.bridgeJSLowerStackReturn()
         }
     }
 }

@@ -793,60 +793,56 @@ struct StackCodegen {
     /// - Returns: An ExprSyntax representing the lift expression
     func liftExpression(for type: BridgeType) -> ExprSyntax {
         switch type {
-        case .string:
-            return "String.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
-        case .int, .uint:
-            return "Int.bridgeJSLiftParameter(_swift_js_pop_i32())"
-        case .bool:
-            return "Bool.bridgeJSLiftParameter(_swift_js_pop_i32())"
-        case .float:
-            return "Float.bridgeJSLiftParameter(_swift_js_pop_f32())"
-        case .double:
-            return "Double.bridgeJSLiftParameter(_swift_js_pop_f64())"
-        case .jsObject:
-            return "JSObject.bridgeJSLiftParameter(_swift_js_pop_i32())"
-        case .swiftHeapObject(let className):
-            return "\(raw: className).bridgeJSLiftParameter(_swift_js_pop_pointer())"
+        case .string, .int, .uint, .bool, .float, .double,
+            .jsObject, .swiftStruct, .swiftHeapObject:
+            return "\(raw: type.swiftType).bridgeJSLiftParameter()"
         case .unsafePointer:
-            return "\(raw: type.swiftType).bridgeJSLiftParameter(_swift_js_pop_pointer())"
+            return "\(raw: type.swiftType).bridgeJSLiftParameter()"
         case .swiftProtocol(let protocolName):
-            // Protocols use their Any wrapper type for lifting
-            let wrapperName = "Any\(protocolName)"
-            return "\(raw: wrapperName).bridgeJSLiftParameter(_swift_js_pop_i32())"
-        case .caseEnum(let enumName):
-            return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_i32())"
-        case .rawValueEnum(let enumName, let rawType):
+            return "Any\(raw: protocolName).bridgeJSLiftParameter(_swift_js_pop_i32())"
+        case .caseEnum:
+            return "\(raw: type.swiftType).bridgeJSLiftParameter(_swift_js_pop_i32())"
+        case .rawValueEnum(_, let rawType):
             switch rawType {
             case .string:
                 return
-                    "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
+                    "\(raw: type.swiftType).bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
             case .float:
-                return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_f32())"
+                return "\(raw: type.swiftType).bridgeJSLiftParameter(_swift_js_pop_f32())"
             case .double:
-                return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_f64())"
+                return "\(raw: type.swiftType).bridgeJSLiftParameter(_swift_js_pop_f64())"
             case .bool, .int, .int32, .int64, .uint, .uint32, .uint64:
-                return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_i32())"
+                return "\(raw: type.swiftType).bridgeJSLiftParameter(_swift_js_pop_i32())"
             }
-        case .associatedValueEnum(let enumName):
-            return "\(raw: enumName).bridgeJSLiftParameter(_swift_js_pop_i32())"
-        case .swiftStruct(let structName):
-            return "\(raw: structName).bridgeJSLiftParameter()"
+        case .associatedValueEnum:
+            return "\(raw: type.swiftType).bridgeJSLiftParameter(_swift_js_pop_i32())"
         case .optional(let wrappedType):
             return liftOptionalExpression(wrappedType: wrappedType)
-        case .void:
-            // Void shouldn't be lifted, but return a placeholder
-            return "()"
-        case .namespaceEnum:
-            // Namespace enums are not passed as values
-            return "()"
-        case .closure:
-            return "JSObject.bridgeJSLiftParameter(_swift_js_pop_i32())"
         case .array(let elementType):
             return liftArrayExpression(elementType: elementType)
+        case .closure:
+            return "JSObject.bridgeJSLiftParameter()"
+        case .void, .namespaceEnum:
+            return "()"
         }
     }
 
     func liftArrayExpression(elementType: BridgeType) -> ExprSyntax {
+        switch elementType {
+        case .int, .uint, .float, .double, .string, .bool,
+            .jsObject, .swiftStruct, .caseEnum, .swiftHeapObject,
+            .unsafePointer, .rawValueEnum, .associatedValueEnum:
+            return "[\(raw: elementType.swiftType)].bridgeJSLiftParameter()"
+        case .swiftProtocol(let protocolName):
+            return "[Any\(raw: protocolName)].bridgeJSLiftParameter()"
+        case .optional, .array, .closure:
+            return liftArrayExpressionInline(elementType: elementType)
+        case .void, .namespaceEnum:
+            fatalError("Invalid array element type: \(elementType)")
+        }
+    }
+
+    private func liftArrayExpressionInline(elementType: BridgeType) -> ExprSyntax {
         let elementLift = liftExpression(for: elementType)
         let swiftTypeName = elementType.swiftType
         return """
@@ -865,45 +861,9 @@ struct StackCodegen {
 
     private func liftOptionalExpression(wrappedType: BridgeType) -> ExprSyntax {
         switch wrappedType {
-        case .string:
-            return
-                "Optional<String>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32())"
-        case .int, .uint:
-            return "Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
-        case .bool:
-            return "Optional<Bool>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
-        case .float:
-            return "Optional<Float>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_f32())"
-        case .double:
-            return "Optional<Double>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_f64())"
-        case .caseEnum(let enumName):
-            return
-                "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
-        case .rawValueEnum(let enumName, let rawType):
-            switch rawType {
-            case .string:
-                return
-                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32(), _swift_js_pop_i32())"
-            case .float:
-                return
-                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_f32())"
-            case .double:
-                return
-                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_f64())"
-            case .bool, .int, .int32, .int64, .uint, .uint32, .uint64:
-                return
-                    "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
-            }
-        case .swiftStruct(let nestedName):
-            return "Optional<\(raw: nestedName)>.bridgeJSLiftParameter(_swift_js_pop_i32())"
-        case .swiftHeapObject(let className):
-            return
-                "Optional<\(raw: className)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_pointer())"
-        case .associatedValueEnum(let enumName):
-            return
-                "Optional<\(raw: enumName)>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
-        case .jsObject:
-            return "Optional<JSObject>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
+        case .string, .int, .uint, .bool, .float, .double, .jsObject,
+            .swiftStruct, .swiftHeapObject, .caseEnum, .associatedValueEnum, .rawValueEnum:
+            return "Optional<\(raw: wrappedType.swiftType)>.bridgeJSLiftParameter()"
         case .array(let elementType):
             let arrayLift = liftArrayExpression(elementType: elementType)
             let swiftTypeName = elementType.swiftType
@@ -917,9 +877,8 @@ struct StackCodegen {
                     }
                 }()
                 """
-        default:
-            // Fallback for other optional types
-            return "Optional<Int>.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())"
+        case .void, .namespaceEnum, .closure, .optional, .unsafePointer, .swiftProtocol:
+            fatalError("Invalid optional wrapped type: \(wrappedType)")
         }
     }
 
@@ -935,62 +894,52 @@ struct StackCodegen {
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
         switch type {
-        case .string:
-            return [
-                "var __bjs_\(raw: varPrefix) = \(raw: accessor)",
-                "__bjs_\(raw: varPrefix).withUTF8 { ptr in _swift_js_push_string(ptr.baseAddress, Int32(ptr.count)) }",
-            ]
-        case .int, .uint:
-            return ["_swift_js_push_i32(Int32(\(raw: accessor)))"]
-        case .bool:
-            return ["_swift_js_push_i32(\(raw: accessor) ? 1 : 0)"]
-        case .float:
-            return ["_swift_js_push_f32(\(raw: accessor))"]
-        case .double:
-            return ["_swift_js_push_f64(\(raw: accessor))"]
+        case .string, .int, .uint, .bool, .float, .double:
+            return ["\(raw: accessor).bridgeJSLowerStackReturn()"]
         case .jsObject:
-            return ["_swift_js_push_i32(\(raw: accessor).bridgeJSLowerReturn())"]
-        case .swiftHeapObject:
-            return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
-        case .unsafePointer:
-            return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
+            return ["\(raw: accessor).bridgeJSLowerStackReturn()"]
+        case .swiftHeapObject, .unsafePointer, .closure:
+            return ["\(raw: accessor).bridgeJSLowerStackReturn()"]
         case .swiftProtocol(let protocolName):
             let wrapperName = "Any\(protocolName)"
-            return ["_swift_js_push_i32((\(raw: accessor) as! \(raw: wrapperName)).bridgeJSLowerReturn())"]
-        case .caseEnum:
-            return ["_swift_js_push_i32(Int32(\(raw: accessor).bridgeJSLowerParameter()))"]
-        case .rawValueEnum(_, let rawType):
-            switch rawType {
-            case .string:
-                return [
-                    "var __bjs_\(raw: varPrefix) = \(raw: accessor).rawValue",
-                    "__bjs_\(raw: varPrefix).withUTF8 { ptr in _swift_js_push_string(ptr.baseAddress, Int32(ptr.count)) }",
-                ]
-            case .float:
-                return ["_swift_js_push_f32(\(raw: accessor).bridgeJSLowerParameter())"]
-            case .double:
-                return ["_swift_js_push_f64(\(raw: accessor).bridgeJSLowerParameter())"]
-            default:
-                return ["_swift_js_push_i32(Int32(\(raw: accessor).bridgeJSLowerParameter()))"]
-            }
-        case .associatedValueEnum:
-            return ["\(raw: accessor).bridgeJSLowerReturn()"]
-        case .swiftStruct:
+            return ["(\(raw: accessor) as! \(raw: wrapperName)).bridgeJSLowerStackReturn()"]
+        case .caseEnum, .rawValueEnum:
+            return ["\(raw: accessor).bridgeJSLowerStackReturn()"]
+        case .associatedValueEnum, .swiftStruct:
             return ["\(raw: accessor).bridgeJSLowerReturn()"]
         case .optional(let wrappedType):
             return lowerOptionalStatements(wrappedType: wrappedType, accessor: accessor, varPrefix: varPrefix)
-        case .void:
+        case .void, .namespaceEnum:
             return []
-        case .namespaceEnum:
-            return []
-        case .closure:
-            return ["_swift_js_push_pointer(\(raw: accessor).bridgeJSLowerReturn())"]
         case .array(let elementType):
             return lowerArrayStatements(elementType: elementType, accessor: accessor, varPrefix: varPrefix)
         }
     }
 
     private func lowerArrayStatements(
+        elementType: BridgeType,
+        accessor: String,
+        varPrefix: String
+    ) -> [CodeBlockItemSyntax] {
+        switch elementType {
+        case .int, .uint, .float, .double, .string, .bool,
+            .jsObject, .swiftStruct, .caseEnum, .swiftHeapObject,
+            .unsafePointer, .rawValueEnum, .associatedValueEnum:
+            return ["\(raw: accessor).bridgeJSLowerReturn()"]
+        case .swiftProtocol(let protocolName):
+            return ["\(raw: accessor).map { $0 as! Any\(raw: protocolName) }.bridgeJSLowerReturn()"]
+        case .optional, .array, .closure:
+            return lowerArrayStatementsInline(
+                elementType: elementType,
+                accessor: accessor,
+                varPrefix: varPrefix
+            )
+        case .void, .namespaceEnum:
+            fatalError("Invalid array element type: \(elementType)")
+        }
+    }
+
+    private func lowerArrayStatementsInline(
         elementType: BridgeType,
         accessor: String,
         varPrefix: String
@@ -1042,43 +991,20 @@ struct StackCodegen {
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
         switch wrappedType {
-        case .string:
-            return [
-                "var __bjs_str_\(raw: varPrefix) = \(raw: unwrappedVar)",
-                "__bjs_str_\(raw: varPrefix).withUTF8 { ptr in _swift_js_push_string(ptr.baseAddress, Int32(ptr.count)) }",
-            ]
-        case .int, .uint:
-            return ["_swift_js_push_i32(Int32(\(raw: unwrappedVar)))"]
-        case .bool:
-            return ["_swift_js_push_i32(\(raw: unwrappedVar) ? 1 : 0)"]
-        case .float:
-            return ["_swift_js_push_f32(\(raw: unwrappedVar))"]
-        case .double:
-            return ["_swift_js_push_f64(\(raw: unwrappedVar))"]
-        case .caseEnum:
-            return ["_swift_js_push_i32(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
-        case .rawValueEnum(_, let rawType):
-            switch rawType {
-            case .string:
-                return [
-                    "var __bjs_str_\(raw: varPrefix) = \(raw: unwrappedVar).rawValue",
-                    "__bjs_str_\(raw: varPrefix).withUTF8 { ptr in _swift_js_push_string(ptr.baseAddress, Int32(ptr.count)) }",
-                ]
-            case .float:
-                return ["_swift_js_push_f32(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
-            case .double:
-                return ["_swift_js_push_f64(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
-            default:
-                return ["_swift_js_push_i32(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
-            }
+        case .string, .int, .uint, .bool, .float, .double:
+            return ["\(raw: unwrappedVar).bridgeJSLowerStackReturn()"]
+        case .caseEnum, .rawValueEnum:
+            // Enums conform to _BridgedSwiftStackType
+            return ["\(raw: unwrappedVar).bridgeJSLowerStackReturn()"]
         case .swiftStruct:
             return ["\(raw: unwrappedVar).bridgeJSLowerReturn()"]
         case .swiftHeapObject:
-            return ["_swift_js_push_pointer(\(raw: unwrappedVar).bridgeJSLowerReturn())"]
+            return ["\(raw: unwrappedVar).bridgeJSLowerStackReturn()"]
         case .associatedValueEnum:
+            // Push payloads via bridgeJSLowerParameter(), then push the returned case ID
             return ["_swift_js_push_i32(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
         case .jsObject:
-            return ["_swift_js_push_i32(\(raw: unwrappedVar).bridgeJSLowerReturn())"]
+            return ["\(raw: unwrappedVar).bridgeJSLowerStackReturn()"]
         case .array(let elementType):
             return lowerArrayStatements(elementType: elementType, accessor: unwrappedVar, varPrefix: varPrefix)
         default:
@@ -1145,7 +1071,17 @@ struct EnumCodegen {
     }
 
     private func renderRawValueEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
-        return "extension \(raw: enumDef.swiftCallName): _BridgedSwiftEnumNoPayload {}"
+        let typeName = enumDef.swiftCallName
+        guard enumDef.rawType != nil else {
+            return """
+                extension \(raw: typeName): _BridgedSwiftEnumNoPayload {}
+                """
+        }
+        // When rawType is present, conform to _BridgedSwiftRawValueEnum which provides
+        // default implementations for _BridgedSwiftStackType methods via protocol extension.
+        return """
+            extension \(raw: typeName): _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
+            """
     }
 
     private func renderAssociatedValueEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {

@@ -62,6 +62,9 @@ async function createInstantiator(options, swift) {
                 swift_js_get_optional_double_presence: unexpectedBjsCall,
                 swift_js_get_optional_double_value: unexpectedBjsCall,
                 swift_js_get_optional_heap_object_pointer: unexpectedBjsCall,
+                swift_js_push_pointer: unexpectedBjsCall,
+                swift_js_pop_pointer: unexpectedBjsCall,
+                swift_js_struct_cleanup: unexpectedBjsCall,
             }
         },
         /** @param {WebAssembly.Instance} instance */

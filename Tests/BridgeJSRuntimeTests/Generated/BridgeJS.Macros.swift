@@ -4,7 +4,7 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-@_spi(Experimental) import JavaScriptKit
+@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func jsRoundTripVoid() throws (JSException) -> Void
 
@@ -26,7 +26,7 @@ enum FeatureFlag: String {
     case foo = "foo"
     case bar = "bar"
 }
-extension FeatureFlag: _BridgedSwiftEnumNoPayload {}
+extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
 
 @JSFunction func jsRoundTripFeatureFlag(_ flag: FeatureFlag) throws (JSException) -> FeatureFlag
 

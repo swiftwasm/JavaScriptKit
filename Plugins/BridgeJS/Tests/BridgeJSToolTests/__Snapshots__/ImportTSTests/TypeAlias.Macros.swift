@@ -4,6 +4,6 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-@_spi(Experimental) import JavaScriptKit
+@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func checkSimple(_ a: Double) throws (JSException) -> Void

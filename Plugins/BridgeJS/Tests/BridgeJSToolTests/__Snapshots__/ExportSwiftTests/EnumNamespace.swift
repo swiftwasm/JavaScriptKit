@@ -41,10 +41,10 @@ extension Networking.API.Method: _BridgedSwiftCaseEnum {
     }
 }
 
-extension Configuration.LogLevel: _BridgedSwiftEnumNoPayload {
+extension Configuration.LogLevel: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension Configuration.Port: _BridgedSwiftEnumNoPayload {
+extension Configuration.Port: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
 extension Internal.SupportedMethod: _BridgedSwiftCaseEnum {

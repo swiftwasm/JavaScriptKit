@@ -399,7 +399,7 @@ export class TypeProcessor {
                 this.swiftLines.push(`    case ${this.renderIdentifier(name)} = "${raw.replaceAll("\"", "\\\\\"")}"`);
             }
             this.swiftLines.push("}");
-            this.swiftLines.push(`extension ${swiftEnumName}: _BridgedSwiftEnumNoPayload {}`);
+            this.swiftLines.push(`extension ${swiftEnumName}: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}`);
             this.swiftLines.push("");
             return;
         }
@@ -410,7 +410,7 @@ export class TypeProcessor {
                 this.swiftLines.push(`    case ${this.renderIdentifier(name)} = ${raw}`);
             }
             this.swiftLines.push("}");
-            this.swiftLines.push(`extension ${swiftEnumName}: _BridgedSwiftEnumNoPayload {}`);
+            this.swiftLines.push(`extension ${swiftEnumName}: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}`);
             this.swiftLines.push("");
             return;
         }

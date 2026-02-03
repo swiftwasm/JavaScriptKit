@@ -50,10 +50,10 @@ extension GlobalNetworking.API.CallMethod: _BridgedSwiftCaseEnum {
     }
 }
 
-extension GlobalConfiguration.PublicLogLevel: _BridgedSwiftEnumNoPayload {
+extension GlobalConfiguration.PublicLogLevel: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
-extension GlobalConfiguration.AvailablePort: _BridgedSwiftEnumNoPayload {
+extension GlobalConfiguration.AvailablePort: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
 extension Internal.SupportedServerMethod: _BridgedSwiftCaseEnum {

@@ -1,19 +1,19 @@
 extension PointerFields: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> PointerFields {
-        let mutPtr = UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_pointer())
-        let ptr = UnsafePointer<UInt8>.bridgeJSLiftParameter(_swift_js_pop_pointer())
-        let opaque = OpaquePointer.bridgeJSLiftParameter(_swift_js_pop_pointer())
-        let mutRaw = UnsafeMutableRawPointer.bridgeJSLiftParameter(_swift_js_pop_pointer())
-        let raw = UnsafeRawPointer.bridgeJSLiftParameter(_swift_js_pop_pointer())
+        let mutPtr = UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter()
+        let ptr = UnsafePointer<UInt8>.bridgeJSLiftParameter()
+        let opaque = OpaquePointer.bridgeJSLiftParameter()
+        let mutRaw = UnsafeMutableRawPointer.bridgeJSLiftParameter()
+        let raw = UnsafeRawPointer.bridgeJSLiftParameter()
         return PointerFields(raw: raw, mutRaw: mutRaw, opaque: opaque, ptr: ptr, mutPtr: mutPtr)
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        _swift_js_push_pointer(self.raw.bridgeJSLowerReturn())
-        _swift_js_push_pointer(self.mutRaw.bridgeJSLowerReturn())
-        _swift_js_push_pointer(self.opaque.bridgeJSLowerReturn())
-        _swift_js_push_pointer(self.ptr.bridgeJSLowerReturn())
-        _swift_js_push_pointer(self.mutPtr.bridgeJSLowerReturn())
+        self.raw.bridgeJSLowerStackReturn()
+        self.mutRaw.bridgeJSLowerStackReturn()
+        self.opaque.bridgeJSLowerStackReturn()
+        self.ptr.bridgeJSLowerStackReturn()
+        self.mutPtr.bridgeJSLowerStackReturn()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
