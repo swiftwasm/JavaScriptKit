@@ -63,12 +63,14 @@ jobs:
     name: Test BridgeJS against Swift versions
     strategy:
       matrix:
-        swift-image:
-          - "swift:6.1.2"   # Tests with SwiftSyntax 601.x (non-SwiftSyntax602 code path)
-          - "swift:6.2"     # Tests with SwiftSyntax 602.x (SwiftSyntax602 code path)
+        entry:
+          - image: "swift:6.1.2"
+            swift-syntax-version: "601.0.0"
+          - image: "swift:6.2"
+            swift-syntax-version: "602.0.0"
     runs-on: ubuntu-latest
     container:
-      image: ${{ matrix.swift-image }}
+      image: ${{ matrix.entry.image }}
     steps:
       - uses: actions/checkout@v6
       - name: Setup Node.js
@@ -77,18 +79,12 @@ jobs:
           node-version: '20'
       - name: Install TypeScript
         run: npm install --prefix Plugins/BridgeJS/Sources/TS2Swift/JavaScript
-      - name: Force SwiftSyntax 602 for Swift 6.2
-        if: matrix.swift-image == 'swift:6.2'
-        working-directory: Plugins/BridgeJS
-        run: |
-          # Force SwiftSyntax 602.x to test the SwiftSyntax602 code path
-          sed -i 's/from: "600.0.1"/from: "602.0.0"/' Package.swift
-          # Clean any cached resolution
-          rm -rf .build Package.resolved
       - name: Run BridgeJS tests
         # NOTE: Seems like the prebuilt SwiftSyntax binaries are not compatible with
         # non-macro dependents, so disable experimental prebuilts for now.
         run: swift test --disable-experimental-prebuilts --package-path ./Plugins/BridgeJS
+        env:
+          BRIDGEJS_OVERRIDE_SWIFT_SYNTAX_VERSION: ${{ matrix.entry.swift-syntax-version }}
 
   native-build:
     # Check native build to make it easy to develop applications by Xcode

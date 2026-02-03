@@ -3,11 +3,13 @@
 import CompilerPluginSupport
 import PackageDescription
 
+let swiftSyntaxVersion = Context.environment["BRIDGEJS_OVERRIDE_SWIFT_SYNTAX_VERSION"] ?? "600.0.1"
+
 let package = Package(
     name: "BridgeJS",
     platforms: [.macOS(.v13)],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1"),
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: Version(swiftSyntaxVersion)!),
         // Development dependencies
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.7.0"),
     ],
