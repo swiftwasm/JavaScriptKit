@@ -238,6 +238,232 @@ struct IntrinsicJSFragment: Sendable {
         }
     )
 
+    static let jsValueLower = IntrinsicJSFragment(
+        parameters: ["value"],
+        printCode: { arguments, scope, printer, cleanupCode in
+            let value = arguments[0]
+            let kindVar = scope.variable("\(value)Kind")
+            let payload1Var = scope.variable("\(value)Payload1")
+            let payload2Var = scope.variable("\(value)Payload2")
+            printer.write("let \(kindVar);")
+            printer.write("let \(payload1Var);")
+            printer.write("let \(payload2Var);")
+            printer.write("if (\(value) === null) {")
+            printer.indent {
+                printer.write("\(kindVar) = 4;")
+                printer.write("\(payload1Var) = 0;")
+                printer.write("\(payload2Var) = 0;")
+            }
+            printer.write("} else {")
+            printer.indent {
+                printer.write("switch (typeof \(value)) {")
+                printer.indent {
+                    printer.write("case \"boolean\":")
+                    printer.indent {
+                        printer.write("\(kindVar) = 0;")
+                        printer.write("\(payload1Var) = \(value) ? 1 : 0;")
+                        printer.write("\(payload2Var) = 0;")
+                        printer.write("break;")
+                    }
+                    printer.write("case \"number\":")
+                    printer.indent {
+                        printer.write("\(kindVar) = 2;")
+                        printer.write("\(payload1Var) = 0;")
+                        printer.write("\(payload2Var) = \(value);")
+                        printer.write("break;")
+                    }
+                    printer.write("case \"string\":")
+                    printer.indent {
+                        printer.write("\(kindVar) = 1;")
+                        printer.write("\(payload1Var) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));")
+                        printer.write("\(payload2Var) = 0;")
+                        printer.write("break;")
+                    }
+                    printer.write("case \"undefined\":")
+                    printer.indent {
+                        printer.write("\(kindVar) = 5;")
+                        printer.write("\(payload1Var) = 0;")
+                        printer.write("\(payload2Var) = 0;")
+                        printer.write("break;")
+                    }
+                    printer.write("case \"object\":")
+                    printer.indent {
+                        printer.write("\(kindVar) = 3;")
+                        printer.write("\(payload1Var) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));")
+                        printer.write("\(payload2Var) = 0;")
+                        printer.write("break;")
+                    }
+                    printer.write("case \"function\":")
+                    printer.indent {
+                        printer.write("\(kindVar) = 3;")
+                        printer.write("\(payload1Var) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));")
+                        printer.write("\(payload2Var) = 0;")
+                        printer.write("break;")
+                    }
+                    printer.write("case \"symbol\":")
+                    printer.indent {
+                        printer.write("\(kindVar) = 7;")
+                        printer.write("\(payload1Var) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));")
+                        printer.write("\(payload2Var) = 0;")
+                        printer.write("break;")
+                    }
+                    printer.write("case \"bigint\":")
+                    printer.indent {
+                        printer.write("\(kindVar) = 8;")
+                        printer.write("\(payload1Var) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));")
+                        printer.write("\(payload2Var) = 0;")
+                        printer.write("break;")
+                    }
+                    printer.write("default:")
+                    printer.indent {
+                        printer.write("throw new TypeError(\"Unsupported JSValue type\");")
+                    }
+                }
+                printer.write("}")
+            }
+            printer.write("}")
+            return [kindVar, payload1Var, payload2Var]
+        }
+    )
+
+    private static func emitJSValueConstruction(
+        kind: String,
+        payload1: String,
+        payload2: String,
+        scope: JSGlueVariableScope,
+        printer: CodeFragmentPrinter
+    ) -> String {
+        let resultVar = scope.variable("jsValue")
+        printer.write("let \(resultVar);")
+        printer.write("switch (\(kind)) {")
+        printer.indent {
+            printer.write("case 0:")
+            printer.indent {
+                printer.write("\(resultVar) = \(payload1) !== 0;")
+                printer.write("break;")
+            }
+            printer.write("case 1:")
+            printer.indent {
+                printer.write(
+                    "\(resultVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(payload1));"
+                )
+                printer.write("break;")
+            }
+            printer.write("case 2:")
+            printer.indent {
+                printer.write("\(resultVar) = \(payload2);")
+                printer.write("break;")
+            }
+            printer.write("case 3:")
+            printer.indent {
+                printer.write(
+                    "\(resultVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(payload1));"
+                )
+                printer.write("break;")
+            }
+            printer.write("case 4:")
+            printer.indent {
+                printer.write("\(resultVar) = null;")
+                printer.write("break;")
+            }
+            printer.write("case 5:")
+            printer.indent {
+                printer.write("\(resultVar) = undefined;")
+                printer.write("break;")
+            }
+            printer.write("case 7:")
+            printer.indent {
+                printer.write(
+                    "\(resultVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(payload1));"
+                )
+                printer.write("break;")
+            }
+            printer.write("case 8:")
+            printer.indent {
+                printer.write(
+                    "\(resultVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(payload1));"
+                )
+                printer.write("break;")
+            }
+            printer.write("default:")
+            printer.indent {
+                printer.write("throw new TypeError(\"Unsupported JSValue kind \" + \(kind));")
+            }
+        }
+        printer.write("}")
+        return resultVar
+    }
+
+    static func jsValueLowerReturn(context: BridgeContext) -> IntrinsicJSFragment {
+        switch context {
+        case .importTS:
+            // Return values from imported JS functions should be delivered to the Swift side
+            // via the parameter stacks that `_swift_js_pop_*` read from.
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanupCode in
+                    let lowered = jsValueLower.printCode(arguments, scope, printer, cleanupCode)
+                    let kindVar = lowered[0]
+                    let payload1Var = lowered[1]
+                    let payload2Var = lowered[2]
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(kindVar));")
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(payload1Var));")
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamF64s).push(\(payload2Var));")
+                    return []
+                }
+            )
+        case .exportSwift:
+            // Kept for symmetry, though JSValue return for export currently relies on Swift pushing
+            // to tmpRet stacks directly.
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanupCode in
+                    let lowered = jsValueLower.printCode(arguments, scope, printer, cleanupCode)
+                    let kindVar = lowered[0]
+                    let payload1Var = lowered[1]
+                    let payload2Var = lowered[2]
+                    printer.write("\(JSGlueVariableScope.reservedTmpRetInts).push(\(kindVar));")
+                    printer.write("\(JSGlueVariableScope.reservedTmpRetInts).push(\(payload1Var));")
+                    printer.write("\(JSGlueVariableScope.reservedTmpRetF64s).push(\(payload2Var));")
+                    return []
+                }
+            )
+        }
+    }
+
+    static let jsValueLift = IntrinsicJSFragment(
+        parameters: [],
+        printCode: { _, scope, printer, cleanupCode in
+            let payload2 = scope.variable("jsValuePayload2")
+            let payload1 = scope.variable("jsValuePayload1")
+            let kind = scope.variable("jsValueKind")
+            printer.write("const \(payload2) = \(JSGlueVariableScope.reservedTmpRetF64s).pop();")
+            printer.write("const \(payload1) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+            printer.write("const \(kind) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+            let resultVar = emitJSValueConstruction(
+                kind: kind,
+                payload1: payload1,
+                payload2: payload2,
+                scope: scope,
+                printer: printer
+            )
+            return [resultVar]
+        }
+    )
+    static let jsValueLiftParameter = IntrinsicJSFragment(
+        parameters: ["kind", "payload1", "payload2"],
+        printCode: { arguments, scope, printer, cleanupCode in
+            let resultVar = emitJSValueConstruction(
+                kind: arguments[0],
+                payload1: arguments[1],
+                payload2: arguments[2],
+                scope: scope,
+                printer: printer
+            )
+            return [resultVar]
+        }
+    )
+
     static let swiftHeapObjectLowerParameter = IntrinsicJSFragment(
         parameters: ["value"],
         printCode: { arguments, scope, printer, cleanupCode in
@@ -296,10 +522,24 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
-    static func optionalLiftParameter(
-        wrappedType: BridgeType,
-        kind: JSOptionalKind
-    ) throws -> IntrinsicJSFragment {
+    static func optionalLiftParameter(wrappedType: BridgeType, kind: JSOptionalKind) throws -> IntrinsicJSFragment {
+        if case .jsValue = wrappedType {
+            return IntrinsicJSFragment(
+                parameters: ["isSome", "kind", "payload1", "payload2"],
+                printCode: { arguments, scope, printer, cleanupCode in
+                    let isSome = arguments[0]
+                    let lifted = jsValueLiftParameter.printCode(
+                        [arguments[1], arguments[2], arguments[3]],
+                        scope,
+                        printer,
+                        cleanupCode
+                    )
+                    let valueExpr = lifted.first ?? "undefined"
+                    return ["\(isSome) ? \(valueExpr) : null"]
+                }
+            )
+        }
+
         return IntrinsicJSFragment(
             parameters: ["isSome", "wrappedValue"],
             printCode: { arguments, scope, printer, cleanupCode in
@@ -446,6 +686,9 @@ struct IntrinsicJSFragment: Sendable {
                     cleanupCode.write("}")
 
                     return ["+\(isSomeVar)", "\(isSomeVar) ? \(idVar) : 0", "\(isSomeVar) ? \(bytesVar).length : 0"]
+                case .jsValue:
+                    let lowered = jsValueLower.printCode([value], scope, printer, cleanupCode)
+                    return ["+\(isSomeVar)"] + lowered
                 case .associatedValueEnum(let fullName):
                     let base = fullName.components(separatedBy: ".").last ?? fullName
                     let caseIdVar = scope.variable("\(value)CaseId")
@@ -634,6 +877,22 @@ struct IntrinsicJSFragment: Sendable {
                         printer.write("\(resultVar) = \(absenceLiteral);")
                     }
                     printer.write("}")
+                case .jsValue:
+                    let isSomeVar = scope.variable("isSome")
+                    printer.write("const \(isSomeVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    printer.write("let \(resultVar);")
+                    printer.write("if (\(isSomeVar)) {")
+                    printer.indent {
+                        let lifted = jsValueLift.printCode([], scope, printer, cleanupCode)
+                        if let liftedValue = lifted.first {
+                            printer.write("\(resultVar) = \(liftedValue);")
+                        }
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("\(resultVar) = null;")
+                    }
+                    printer.write("}")
                 default:
                     printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnString);")
                     printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
@@ -702,6 +961,17 @@ struct IntrinsicJSFragment: Sendable {
                     }
                     printer.write("}")
                     printer.write("bjs[\"swift_js_return_optional_object\"](\(isSomeVar) ? 1 : 0, \(idVar));")
+                case .jsValue:
+                    if value != "undefined" {
+                        let lowered = jsValueLower.printCode([value], scope, printer, cleanupCode)
+                        let kindVar = lowered[0]
+                        let payload1Var = lowered[1]
+                        let payload2Var = lowered[2]
+                        printer.write("\(JSGlueVariableScope.reservedTmpRetInts).push(\(kindVar));")
+                        printer.write("\(JSGlueVariableScope.reservedTmpRetInts).push(\(payload1Var));")
+                        printer.write("\(JSGlueVariableScope.reservedTmpRetF64s).push(\(payload2Var));")
+                    }
+                    printer.write("\(JSGlueVariableScope.reservedTmpRetInts).push(\(isSomeVar) ? 1 : 0);")
                 case .rawValueEnum(_, let rawType):
                     switch rawType {
                     case .string:
@@ -1396,6 +1666,7 @@ struct IntrinsicJSFragment: Sendable {
         case .int, .uint, .float, .double, .bool, .unsafePointer: return .identity
         case .string: return .stringLowerParameter
         case .jsObject: return .jsObjectLowerParameter
+        case .jsValue: return .jsValueLower
         case .swiftHeapObject:
             return .swiftHeapObjectLowerParameter
         case .swiftProtocol: return .jsObjectLowerParameter
@@ -1441,6 +1712,7 @@ struct IntrinsicJSFragment: Sendable {
         case .bool: return .boolLiftReturn
         case .string: return .stringLiftReturn
         case .jsObject: return .jsObjectLiftReturn
+        case .jsValue: return .jsValueLift
         case .swiftHeapObject(let name): return .swiftHeapObjectLiftReturn(name)
         case .unsafePointer: return .identity
         case .swiftProtocol: return .jsObjectLiftReturn
@@ -1489,6 +1761,7 @@ struct IntrinsicJSFragment: Sendable {
         case .bool: return .boolLiftParameter
         case .string: return .stringLiftParameter
         case .jsObject: return .jsObjectLiftParameter
+        case .jsValue: return .jsValueLiftParameter
         case .unsafePointer: return .identity
         case .swiftHeapObject(let name):
             switch context {
@@ -1583,6 +1856,7 @@ struct IntrinsicJSFragment: Sendable {
         case .bool: return .boolLowerReturn
         case .string: return .stringLowerReturn
         case .jsObject: return .jsObjectLowerReturn
+        case .jsValue: return .jsValueLowerReturn(context: context)
         case .unsafePointer: return .identity
         case .swiftHeapObject(let name):
             switch context {
@@ -2208,6 +2482,8 @@ struct IntrinsicJSFragment: Sendable {
 
     private static func arrayElementRaiseFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
         switch elementType {
+        case .jsValue:
+            throw BridgeJSLinkError(message: "Array of JSValue is not supported yet")
         case .string:
             return IntrinsicJSFragment(
                 parameters: [],
@@ -2352,6 +2628,8 @@ struct IntrinsicJSFragment: Sendable {
 
     private static func arrayElementLowerFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
         switch elementType {
+        case .jsValue:
+            throw BridgeJSLinkError(message: "Array of JSValue is not supported yet")
         case .string:
             return IntrinsicJSFragment(
                 parameters: ["value"],
@@ -2778,6 +3056,8 @@ struct IntrinsicJSFragment: Sendable {
         allStructs: [ExportedStruct]
     ) -> IntrinsicJSFragment {
         switch field.type {
+        case .jsValue:
+            preconditionFailure("Struct field of JSValue is not supported yet")
         case .string:
             return IntrinsicJSFragment(
                 parameters: ["value"],
@@ -3264,6 +3544,8 @@ struct IntrinsicJSFragment: Sendable {
         allStructs: [ExportedStruct]
     ) -> IntrinsicJSFragment {
         switch field.type {
+        case .jsValue:
+            preconditionFailure("Struct field of JSValue is not supported yet")
         case .string:
             return IntrinsicJSFragment(
                 parameters: [],

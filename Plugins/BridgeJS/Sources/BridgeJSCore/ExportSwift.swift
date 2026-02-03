@@ -804,7 +804,7 @@ struct StackCodegen {
     func liftExpression(for type: BridgeType) -> ExprSyntax {
         switch type {
         case .string, .int, .uint, .bool, .float, .double,
-            .jsObject(nil), .swiftStruct, .swiftHeapObject:
+            .jsObject(nil), .jsValue, .swiftStruct, .swiftHeapObject:
             return "\(raw: type.swiftType).bridgeJSLiftParameter()"
         case .jsObject(let className?):
             return "\(raw: className)(unsafelyWrapping: JSObject.bridgeJSLiftParameter())"
@@ -841,7 +841,7 @@ struct StackCodegen {
 
     func liftArrayExpression(elementType: BridgeType) -> ExprSyntax {
         switch elementType {
-        case .int, .uint, .float, .double, .string, .bool,
+        case .int, .uint, .float, .double, .string, .bool, .jsValue,
             .jsObject(nil), .swiftStruct, .caseEnum, .swiftHeapObject,
             .unsafePointer, .rawValueEnum, .associatedValueEnum:
             return "[\(raw: elementType.swiftType)].bridgeJSLiftParameter()"
@@ -876,7 +876,7 @@ struct StackCodegen {
     private func liftNullableExpression(wrappedType: BridgeType, kind: JSOptionalKind) -> ExprSyntax {
         let typeName = kind == .null ? "Optional" : "JSUndefinedOr"
         switch wrappedType {
-        case .string, .int, .uint, .bool, .float, .double, .jsObject(nil),
+        case .string, .int, .uint, .bool, .float, .double, .jsObject(nil), .jsValue,
             .swiftStruct, .swiftHeapObject, .caseEnum, .associatedValueEnum, .rawValueEnum:
             return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSLiftParameter()"
         case .jsObject(let className?):
@@ -914,7 +914,7 @@ struct StackCodegen {
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
         switch type {
-        case .string, .int, .uint, .bool, .float, .double:
+        case .string, .int, .uint, .bool, .float, .double, .jsValue:
             return ["\(raw: accessor).bridgeJSLowerStackReturn()"]
         case .jsObject(nil):
             return ["\(raw: accessor).bridgeJSLowerStackReturn()"]
@@ -944,7 +944,7 @@ struct StackCodegen {
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
         switch elementType {
-        case .int, .uint, .float, .double, .string, .bool,
+        case .int, .uint, .float, .double, .string, .bool, .jsValue,
             .jsObject(nil), .swiftStruct, .caseEnum, .swiftHeapObject,
             .unsafePointer, .rawValueEnum, .associatedValueEnum:
             return ["\(raw: accessor).bridgeJSLowerReturn()"]
@@ -1015,7 +1015,7 @@ struct StackCodegen {
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
         switch wrappedType {
-        case .string, .int, .uint, .bool, .float, .double:
+        case .string, .int, .uint, .bool, .float, .double, .jsValue:
             return ["\(raw: unwrappedVar).bridgeJSLowerStackReturn()"]
         case .caseEnum, .rawValueEnum:
             // Enums conform to _BridgedSwiftStackType
@@ -1604,6 +1604,7 @@ extension BridgeType {
         case .float: return "Float"
         case .double: return "Double"
         case .string: return "String"
+        case .jsValue: return "JSValue"
         case .jsObject(nil): return "JSObject"
         case .jsObject(let name?): return name
         case .swiftHeapObject(let name): return name
@@ -1634,6 +1635,7 @@ extension BridgeType {
         static let double = LiftingIntrinsicInfo(parameters: [("value", .f64)])
         static let string = LiftingIntrinsicInfo(parameters: [("bytes", .i32), ("length", .i32)])
         static let jsObject = LiftingIntrinsicInfo(parameters: [("value", .i32)])
+        static let jsValue = LiftingIntrinsicInfo(parameters: [("kind", .i32), ("payload1", .i32), ("payload2", .f64)])
         static let swiftHeapObject = LiftingIntrinsicInfo(parameters: [("value", .pointer)])
         static let unsafePointer = LiftingIntrinsicInfo(parameters: [("pointer", .pointer)])
         static let void = LiftingIntrinsicInfo(parameters: [])
@@ -1651,6 +1653,7 @@ extension BridgeType {
         case .double: return .double
         case .string: return .string
         case .jsObject: return .jsObject
+        case .jsValue: return .jsValue
         case .swiftHeapObject: return .swiftHeapObject
         case .unsafePointer: return .unsafePointer
         case .swiftProtocol: return .jsObject
@@ -1684,6 +1687,7 @@ extension BridgeType {
         static let double = LoweringIntrinsicInfo(returnType: .f64)
         static let string = LoweringIntrinsicInfo(returnType: nil)
         static let jsObject = LoweringIntrinsicInfo(returnType: .i32)
+        static let jsValue = LoweringIntrinsicInfo(returnType: nil)
         static let swiftHeapObject = LoweringIntrinsicInfo(returnType: .pointer)
         static let unsafePointer = LoweringIntrinsicInfo(returnType: .pointer)
         static let void = LoweringIntrinsicInfo(returnType: nil)
@@ -1703,6 +1707,7 @@ extension BridgeType {
         case .double: return .double
         case .string: return .string
         case .jsObject: return .jsObject
+        case .jsValue: return .jsValue
         case .swiftHeapObject: return .swiftHeapObject
         case .unsafePointer: return .unsafePointer
         case .swiftProtocol: return .jsObject

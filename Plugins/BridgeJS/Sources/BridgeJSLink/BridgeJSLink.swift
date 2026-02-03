@@ -3447,6 +3447,8 @@ extension BridgeType {
             return "boolean"
         case .jsObject(let name):
             return name ?? "any"
+        case .jsValue:
+            return "any"
         case .swiftHeapObject(let name):
             return name
         case .unsafePointer:

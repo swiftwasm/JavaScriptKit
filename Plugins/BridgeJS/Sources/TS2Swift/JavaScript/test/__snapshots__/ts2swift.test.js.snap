@@ -38,7 +38,7 @@ exports[`ts2swift > snapshots Swift output for Async.d.ts > Async 1`] = `
 
 @JSFunction func asyncRoundTripDouble(_ v: Double) throws(JSException) -> JSPromise
 
-@JSFunction func asyncRoundTripJSObject(_ v: JSObject) throws(JSException) -> JSPromise
+@JSFunction func asyncRoundTripJSObject(_ v: JSValue) throws(JSException) -> JSPromise
 "
 `;
 
@@ -54,8 +54,8 @@ exports[`ts2swift > snapshots Swift output for Interface.d.ts > Interface 1`] = 
 @JSFunction func returnAnimatable() throws(JSException) -> Animatable
 
 @JSClass struct Animatable {
-    @JSFunction func animate(_ keyframes: JSObject, _ options: JSObject) throws(JSException) -> JSObject
-    @JSFunction func getAnimations(_ options: JSObject) throws(JSException) -> JSObject
+    @JSFunction func animate(_ keyframes: JSValue, _ options: JSValue) throws(JSException) -> JSValue
+    @JSFunction func getAnimations(_ options: JSValue) throws(JSException) -> JSValue
 }
 "
 `;
@@ -117,11 +117,11 @@ exports[`ts2swift > snapshots Swift output for MultipleImportedTypes.d.ts > Mult
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func createDatabaseConnection(_ config: JSObject) throws(JSException) -> DatabaseConnection
+@JSFunction func createDatabaseConnection(_ config: JSValue) throws(JSException) -> DatabaseConnection
 
 @JSClass struct DatabaseConnection {
     @JSFunction func connect(_ url: String) throws(JSException) -> Void
-    @JSFunction func execute(_ query: String) throws(JSException) -> JSObject
+    @JSFunction func execute(_ query: String) throws(JSException) -> JSValue
     @JSGetter var isConnected: Bool
     @JSGetter var connectionTimeout: Double
     @JSSetter func setConnectionTimeout(_ value: Double) throws(JSException)
@@ -131,15 +131,15 @@ exports[`ts2swift > snapshots Swift output for MultipleImportedTypes.d.ts > Mult
 
 @JSClass struct Logger {
     @JSFunction func log(_ message: String) throws(JSException) -> Void
-    @JSFunction func error(_ message: String, _ error: JSObject) throws(JSException) -> Void
+    @JSFunction func error(_ message: String, _ error: JSValue) throws(JSException) -> Void
     @JSGetter var level: String
 }
 
 @JSFunction func getConfigManager() throws(JSException) -> ConfigManager
 
 @JSClass struct ConfigManager {
-    @JSFunction func get(_ key: String) throws(JSException) -> JSObject
-    @JSFunction func set(_ key: String, _ value: JSObject) throws(JSException) -> Void
+    @JSFunction func get(_ key: String) throws(JSException) -> JSValue
+    @JSFunction func set(_ key: String, _ value: JSValue) throws(JSException) -> Void
     @JSGetter var configPath: String
 }
 "
@@ -301,7 +301,7 @@ exports[`ts2swift > snapshots Swift output for TS2SkeletonLike.d.ts > TS2Skeleto
 @JSFunction func createCodeGenerator(_ format: String) throws(JSException) -> CodeGenerator
 
 @JSClass struct CodeGenerator {
-    @JSFunction func generate(_ input: JSObject) throws(JSException) -> String
+    @JSFunction func generate(_ input: JSValue) throws(JSException) -> String
     @JSGetter var outputFormat: String
 }
 "

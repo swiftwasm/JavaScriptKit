@@ -883,6 +883,11 @@ extension BridgeType {
         static let double = LoweringParameterInfo(loweredParameters: [("value", .f64)])
         static let string = LoweringParameterInfo(loweredParameters: [("value", .i32)])
         static let jsObject = LoweringParameterInfo(loweredParameters: [("value", .i32)])
+        static let jsValue = LoweringParameterInfo(loweredParameters: [
+            ("kind", .i32),
+            ("payload1", .i32),
+            ("payload2", .f64),
+        ])
         static let void = LoweringParameterInfo(loweredParameters: [])
     }
 
@@ -894,6 +899,7 @@ extension BridgeType {
         case .double: return .double
         case .string: return .string
         case .jsObject: return .jsObject
+        case .jsValue: return .jsValue
         case .void: return .void
         case .closure:
             // Swift closure is boxed and passed to JS as a pointer.
@@ -970,6 +976,7 @@ extension BridgeType {
         static let double = LiftingReturnInfo(valueToLift: .f64)
         static let string = LiftingReturnInfo(valueToLift: .i32)
         static let jsObject = LiftingReturnInfo(valueToLift: .i32)
+        static let jsValue = LiftingReturnInfo(valueToLift: nil)
         static let void = LiftingReturnInfo(valueToLift: nil)
     }
 
@@ -983,6 +990,7 @@ extension BridgeType {
         case .double: return .double
         case .string: return .string
         case .jsObject: return .jsObject
+        case .jsValue: return .jsValue
         case .void: return .void
         case .closure:
             // JS returns a callback ID for closures, which Swift lifts to a typed closure.
