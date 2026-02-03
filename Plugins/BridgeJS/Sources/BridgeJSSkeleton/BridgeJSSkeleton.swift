@@ -406,15 +406,18 @@ public struct ExportedProtocolProperty: Codable, Equatable, Sendable {
     public let name: String
     public let type: BridgeType
     public let isReadonly: Bool
+    public let effects: Effects
 
     public init(
         name: String,
         type: BridgeType,
-        isReadonly: Bool
+        isReadonly: Bool,
+        effects: Effects
     ) {
         self.name = name
         self.type = type
         self.isReadonly = isReadonly
+        self.effects = effects
     }
 }
 

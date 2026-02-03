@@ -1057,6 +1057,29 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         return Effects(isAsync: isAsync, isThrows: isThrows, isStatic: isStatic)
     }
 
+    private func collectEffectsFromAccessor(_ accessor: AccessorDeclSyntax) -> Effects? {
+        let isAsync = accessor.effectSpecifiers?.asyncSpecifier != nil
+        var isThrows = false
+        if let throwsClause = accessor.effectSpecifiers?.throwsClause {
+            guard let thrownType = throwsClause.type else {
+                diagnose(
+                    node: throwsClause,
+                    message: "Thrown type is not specified, only JSException is supported for now"
+                )
+                return nil
+            }
+            guard thrownType.trimmedDescription == "JSException" else {
+                diagnose(
+                    node: throwsClause,
+                    message: "Only JSException is supported for thrown type, got \(thrownType.trimmedDescription)"
+                )
+                return nil
+            }
+            isThrows = true
+        }
+        return Effects(isAsync: isAsync, isThrows: isThrows, isStatic: false)
+    }
+
     private func extractNamespace(
         from jsAttribute: AttributeSyntax
     ) -> [String]? {
@@ -1654,18 +1677,62 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             guard let accessorBlock = binding.accessorBlock else {
                 diagnose(
                     node: binding,
-                    message: "Protocol property must specify { get } or { get set }",
-                    hint: "Add { get } for readonly or { get set } for readwrite property"
+                    message: "Protocol property must specify { get throws(JSException) }",
+                    hint: "Add { get throws(JSException) } for the property accessor"
                 )
                 continue
             }
 
-            let isReadonly = hasOnlyGetter(accessorBlock)
+            // Find the getter accessor
+            let getterAccessor: AccessorDeclSyntax?
+            switch accessorBlock.accessors {
+            case .accessors(let accessors):
+                getterAccessor = accessors.first { $0.accessorSpecifier.tokenKind == .keyword(.get) }
+            case .getter:
+                diagnose(
+                    node: accessorBlock,
+                    message: "@JS protocol property getter must declare throws(JSException)",
+                    hint: "Use { get throws(JSException) } syntax"
+                )
+                continue
+            }
+
+            guard let getter = getterAccessor else {
+                diagnose(node: accessorBlock, message: "Protocol property must have a getter")
+                continue
+            }
+
+            // Check for setter - not allowed with throwing getter
+            if case .accessors(let accessors) = accessorBlock.accessors {
+                if accessors.contains(where: { $0.accessorSpecifier.tokenKind == .keyword(.set) }) {
+                    diagnose(
+                        node: accessorBlock,
+                        message: "@JS protocol cannot have { get set } properties",
+                        hint:
+                            "Use readonly property with setter method: var \(propertyName): \(typeAnnotation.type.trimmedDescription) { get throws(JSException) } and func set\(propertyName.capitalized)(_ value: \(typeAnnotation.type.trimmedDescription)) throws(JSException)"
+                    )
+                    continue
+                }
+            }
+
+            guard let effects = collectEffectsFromAccessor(getter) else {
+                continue
+            }
+
+            guard effects.isThrows else {
+                diagnose(
+                    node: getter,
+                    message: "@JS protocol property getter must be throws",
+                    hint: "Declare the getter as 'get throws(JSException)'"
+                )
+                continue
+            }
 
             let exportedProperty = ExportedProtocolProperty(
                 name: propertyName,
                 type: propertyType,
-                isReadonly: isReadonly
+                isReadonly: true,  // Always readonly since { get set } with throws is not allowed
+                effects: effects
             )
 
             if var currentProtocol = exportedProtocolByName[protocolKey] {

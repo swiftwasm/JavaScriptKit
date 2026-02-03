@@ -61,6 +61,11 @@ public struct ClosureCodegen {
 
         // Generate the call and return value lifting
         try builder.call(returnType: signature.returnType)
+
+        if signature.isThrows {
+            builder.body.append("if let error = _swift_js_take_exception() { throw error }")
+        }
+
         try builder.liftReturnValue(returnType: signature.returnType)
 
         // Get the body code

@@ -1447,7 +1447,7 @@ struct ProtocolCodegen {
         let getterBuilder = ImportTS.CallJSEmission(
             moduleName: moduleName,
             abiName: getterAbiName,
-            context: .exportSwift
+            context: property.effects.isThrows ? .exportSwiftProtocol : .exportSwift
         )
         try getterBuilder.lowerParameter(param: Parameter(label: nil, name: "jsObject", type: .jsObject(nil)))
         try getterBuilder.call(returnType: property.type)
@@ -1466,6 +1466,12 @@ struct ProtocolCodegen {
         )
 
         if property.isReadonly {
+            // Build effect specifiers for getter if property throws
+            let getterEffects =
+                property.effects.isThrows || property.effects.isAsync
+                ? ImportTS.buildAccessorEffect(throws: property.effects.isThrows, async: property.effects.isAsync)
+                : nil
+
             let propertyDecl = VariableDeclSyntax(
                 bindingSpecifier: .keyword(.var),
                 bindings: PatternBindingListSyntax {
@@ -1479,6 +1485,7 @@ struct ProtocolCodegen {
                                 AccessorDeclListSyntax {
                                     AccessorDeclSyntax(
                                         accessorSpecifier: .keyword(.get),
+                                        effectSpecifiers: getterEffects,
                                         body: getterBuilder.getBody()
                                     )
                                 }

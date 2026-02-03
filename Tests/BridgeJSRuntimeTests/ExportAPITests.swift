@@ -978,16 +978,25 @@ enum GraphOperations {
 // MARK: - Protocol Tests
 
 @JS protocol DataProcessor {
-    var count: Int { get set }
-    var name: String { get }
-    var optionalTag: String? { get set }
-    var optionalCount: Int? { get set }
-    var direction: Direction? { get set }
-    var optionalTheme: Theme? { get set }
-    var httpStatus: HttpStatus? { get set }
-    var apiResult: APIResult? { get set }
-    var helper: Greeter { get set }
-    var optionalHelper: Greeter? { get set }
+    var count: Int { get throws(JSException) }
+    var name: String { get throws(JSException) }
+    var optionalTag: String? { get throws(JSException) }
+    var optionalCount: Int? { get throws(JSException) }
+    var direction: Direction? { get throws(JSException) }
+    var optionalTheme: Theme? { get throws(JSException) }
+    var httpStatus: HttpStatus? { get throws(JSException) }
+    var apiResult: APIResult? { get throws(JSException) }
+    var helper: Greeter { get throws(JSException) }
+    var optionalHelper: Greeter? { get throws(JSException) }
+    func setCount(_ value: Int) throws(JSException)
+    func setOptionalTag(_ value: String?) throws(JSException)
+    func setOptionalCount(_ value: Int?) throws(JSException)
+    func setDirection(_ value: Direction?) throws(JSException)
+    func setOptionalTheme(_ value: Theme?) throws(JSException)
+    func setHttpStatus(_ value: HttpStatus?) throws(JSException)
+    func setApiResult(_ value: APIResult?) throws(JSException)
+    func setHelper(_ value: Greeter) throws(JSException)
+    func setOptionalHelper(_ value: Greeter?) throws(JSException)
     func increment(by amount: Int) throws(JSException)
     func getValue() throws(JSException) -> Int
     func setLabelElements(_ labelPrefix: String, _ labelSuffix: String) throws(JSException)
@@ -1044,44 +1053,44 @@ enum GraphOperations {
         return backupProcessor != nil
     }
 
-    @JS func getProcessorOptionalTag() -> String? {
-        return processor.optionalTag
+    @JS func getProcessorOptionalTag() throws(JSException) -> String? {
+        return try processor.optionalTag
     }
 
-    @JS func setProcessorOptionalTag(_ tag: String?) {
-        processor.optionalTag = tag
+    @JS func setProcessorOptionalTag(_ tag: String?) throws(JSException) {
+        try processor.setOptionalTag(tag)
     }
 
-    @JS func getProcessorOptionalCount() -> Int? {
-        return processor.optionalCount
+    @JS func getProcessorOptionalCount() throws(JSException) -> Int? {
+        return try processor.optionalCount
     }
 
-    @JS func setProcessorOptionalCount(_ count: Int?) {
-        processor.optionalCount = count
+    @JS func setProcessorOptionalCount(_ count: Int?) throws(JSException) {
+        try processor.setOptionalCount(count)
     }
 
-    @JS func getProcessorDirection() -> Direction? {
-        return processor.direction
+    @JS func getProcessorDirection() throws(JSException) -> Direction? {
+        return try processor.direction
     }
 
-    @JS func setProcessorDirection(_ direction: Direction?) {
-        processor.direction = direction
+    @JS func setProcessorDirection(_ direction: Direction?) throws(JSException) {
+        try processor.setDirection(direction)
     }
 
-    @JS func getProcessorTheme() -> Theme? {
-        return processor.optionalTheme
+    @JS func getProcessorTheme() throws(JSException) -> Theme? {
+        return try processor.optionalTheme
     }
 
-    @JS func setProcessorTheme(_ theme: Theme?) {
-        processor.optionalTheme = theme
+    @JS func setProcessorTheme(_ theme: Theme?) throws(JSException) {
+        try processor.setOptionalTheme(theme)
     }
 
-    @JS func getProcessorHttpStatus() -> HttpStatus? {
-        return processor.httpStatus
+    @JS func getProcessorHttpStatus() throws(JSException) -> HttpStatus? {
+        return try processor.httpStatus
     }
 
-    @JS func setProcessorHttpStatus(_ status: HttpStatus?) {
-        processor.httpStatus = status
+    @JS func setProcessorHttpStatus(_ status: HttpStatus?) throws(JSException) {
+        try processor.setHttpStatus(status)
     }
 
     @JS func getProcessorAPIResult() throws(JSException) -> APIResult? {
@@ -1107,6 +1116,42 @@ enum GraphOperations {
     private var label: String = ""
 
     @JS init() {}
+
+    @JS func setCount(_ value: Int) {
+        count = value
+    }
+
+    @JS func setOptionalTag(_ value: String?) {
+        optionalTag = value
+    }
+
+    @JS func setOptionalCount(_ value: Int?) {
+        optionalCount = value
+    }
+
+    @JS func setDirection(_ value: Direction?) {
+        direction = value
+    }
+
+    @JS func setOptionalTheme(_ value: Theme?) {
+        optionalTheme = value
+    }
+
+    @JS func setHttpStatus(_ value: HttpStatus?) {
+        httpStatus = value
+    }
+
+    @JS func setApiResult(_ value: APIResult?) {
+        apiResult = value
+    }
+
+    @JS func setHelper(_ value: Greeter) {
+        helper = value
+    }
+
+    @JS func setOptionalHelper(_ value: Greeter?) {
+        optionalHelper = value
+    }
 
     @JS func increment(by amount: Int) {
         count += amount

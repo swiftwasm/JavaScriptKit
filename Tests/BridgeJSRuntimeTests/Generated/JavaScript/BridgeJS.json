@@ -1530,7 +1530,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : false
+              "isThrows" : true
             },
             "name" : "getProcessorOptionalTag",
             "parameters" : [
@@ -1551,7 +1551,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : false
+              "isThrows" : true
             },
             "name" : "setProcessorOptionalTag",
             "parameters" : [
@@ -1580,7 +1580,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : false
+              "isThrows" : true
             },
             "name" : "getProcessorOptionalCount",
             "parameters" : [
@@ -1601,7 +1601,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : false
+              "isThrows" : true
             },
             "name" : "setProcessorOptionalCount",
             "parameters" : [
@@ -1630,7 +1630,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : false
+              "isThrows" : true
             },
             "name" : "getProcessorDirection",
             "parameters" : [
@@ -1651,7 +1651,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : false
+              "isThrows" : true
             },
             "name" : "setProcessorDirection",
             "parameters" : [
@@ -1680,7 +1680,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : false
+              "isThrows" : true
             },
             "name" : "getProcessorTheme",
             "parameters" : [
@@ -1702,7 +1702,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : false
+              "isThrows" : true
             },
             "name" : "setProcessorTheme",
             "parameters" : [
@@ -1732,7 +1732,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : false
+              "isThrows" : true
             },
             "name" : "getProcessorHttpStatus",
             "parameters" : [
@@ -1754,7 +1754,7 @@
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
-              "isThrows" : false
+              "isThrows" : true
             },
             "name" : "setProcessorHttpStatus",
             "parameters" : [
@@ -1872,6 +1872,261 @@
           ]
         },
         "methods" : [
+          {
+            "abiName" : "bjs_SwiftDataProcessor_setCount",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "setCount",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_SwiftDataProcessor_setOptionalTag",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "setOptionalTag",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_SwiftDataProcessor_setOptionalCount",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "setOptionalCount",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_SwiftDataProcessor_setDirection",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "setDirection",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "caseEnum" : {
+                        "_0" : "Direction"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_SwiftDataProcessor_setOptionalTheme",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "setOptionalTheme",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "Theme",
+                        "_1" : "String"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_SwiftDataProcessor_setHttpStatus",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "setHttpStatus",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "HttpStatus",
+                        "_1" : "Int"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_SwiftDataProcessor_setApiResult",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "setApiResult",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "APIResult"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_SwiftDataProcessor_setHelper",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "setHelper",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_SwiftDataProcessor_setOptionalHelper",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "setOptionalHelper",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "swiftHeapObject" : {
+                        "_0" : "Greeter"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
           {
             "abiName" : "bjs_SwiftDataProcessor_increment",
             "effects" : {
@@ -9840,6 +10095,261 @@
       {
         "methods" : [
           {
+            "abiName" : "bjs_DataProcessor_setCount",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setCount",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessor_setOptionalTag",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setOptionalTag",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessor_setOptionalCount",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setOptionalCount",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessor_setDirection",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setDirection",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "caseEnum" : {
+                        "_0" : "Direction"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessor_setOptionalTheme",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setOptionalTheme",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "Theme",
+                        "_1" : "String"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessor_setHttpStatus",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setHttpStatus",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "HttpStatus",
+                        "_1" : "Int"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessor_setApiResult",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setApiResult",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "APIResult"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessor_setHelper",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setHelper",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessor_setOptionalHelper",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setOptionalHelper",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "swiftHeapObject" : {
+                        "_0" : "Greeter"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
             "abiName" : "bjs_DataProcessor_increment",
             "effects" : {
               "isAsync" : false,
@@ -10095,7 +10605,12 @@
         "name" : "DataProcessor",
         "properties" : [
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "count",
             "type" : {
               "int" : {
@@ -10104,6 +10619,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "isReadonly" : true,
             "name" : "name",
             "type" : {
@@ -10113,7 +10633,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "optionalTag",
             "type" : {
               "optional" : {
@@ -10126,7 +10651,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "optionalCount",
             "type" : {
               "optional" : {
@@ -10139,7 +10669,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "direction",
             "type" : {
               "optional" : {
@@ -10152,7 +10687,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "optionalTheme",
             "type" : {
               "optional" : {
@@ -10166,7 +10706,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "httpStatus",
             "type" : {
               "optional" : {
@@ -10180,7 +10725,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "apiResult",
             "type" : {
               "optional" : {
@@ -10193,7 +10743,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "helper",
             "type" : {
               "swiftHeapObject" : {
@@ -10202,7 +10757,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "optionalHelper",
             "type" : {
               "optional" : {

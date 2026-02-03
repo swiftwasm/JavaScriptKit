@@ -291,13 +291,6 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_eventCount_set"] = function bjs_MyViewControllerDelegate_eventCount_set(self, value) {
-                try {
-                    swift.memory.getObject(self).eventCount = value;
-                } catch (error) {
-                    setException(error);
-                }
-            }
             TestModule["bjs_MyViewControllerDelegate_delegateName_get"] = function bjs_MyViewControllerDelegate_delegateName_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).delegateName;
@@ -315,34 +308,10 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_optionalName_set"] = function bjs_MyViewControllerDelegate_optionalName_set(self, valueIsSome, valueWrappedValue) {
-                try {
-                    let obj;
-                    if (valueIsSome) {
-                        obj = swift.memory.getObject(valueWrappedValue);
-                        swift.memory.release(valueWrappedValue);
-                    }
-                    swift.memory.getObject(self).optionalName = valueIsSome ? obj : null;
-                } catch (error) {
-                    setException(error);
-                }
-            }
             TestModule["bjs_MyViewControllerDelegate_optionalRawEnum_get"] = function bjs_MyViewControllerDelegate_optionalRawEnum_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).optionalRawEnum;
                     tmpRetString = ret;
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_MyViewControllerDelegate_optionalRawEnum_set"] = function bjs_MyViewControllerDelegate_optionalRawEnum_set(self, valueIsSome, valueWrappedValue) {
-                try {
-                    let obj;
-                    if (valueIsSome) {
-                        obj = swift.memory.getObject(valueWrappedValue);
-                        swift.memory.release(valueWrappedValue);
-                    }
-                    swift.memory.getObject(self).optionalRawEnum = valueIsSome ? obj : null;
                 } catch (error) {
                     setException(error);
                 }
@@ -356,28 +325,11 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_rawStringEnum_set"] = function bjs_MyViewControllerDelegate_rawStringEnum_set(self, value) {
-                try {
-                    const valueObject = swift.memory.getObject(value);
-                    swift.memory.release(value);
-                    swift.memory.getObject(self).rawStringEnum = valueObject;
-                } catch (error) {
-                    setException(error);
-                }
-            }
             TestModule["bjs_MyViewControllerDelegate_result_get"] = function bjs_MyViewControllerDelegate_result_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).result;
                     const { caseId: caseId, cleanup: cleanup } = enumHelpers.Result.lower(ret);
                     return caseId;
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_MyViewControllerDelegate_result_set"] = function bjs_MyViewControllerDelegate_result_set(self, value) {
-                try {
-                    const enumValue = enumHelpers.Result.lift(value, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
-                    swift.memory.getObject(self).result = enumValue;
                 } catch (error) {
                     setException(error);
                 }
@@ -396,17 +348,6 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_optionalResult_set"] = function bjs_MyViewControllerDelegate_optionalResult_set(self, valueIsSome, valueWrappedValue) {
-                try {
-                    let enumValue;
-                    if (valueIsSome) {
-                        enumValue = enumHelpers.Result.lift(valueWrappedValue, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
-                    }
-                    swift.memory.getObject(self).optionalResult = valueIsSome ? enumValue : null;
-                } catch (error) {
-                    setException(error);
-                }
-            }
             TestModule["bjs_MyViewControllerDelegate_direction_get"] = function bjs_MyViewControllerDelegate_direction_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).direction;
@@ -416,25 +357,11 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_direction_set"] = function bjs_MyViewControllerDelegate_direction_set(self, value) {
-                try {
-                    swift.memory.getObject(self).direction = value;
-                } catch (error) {
-                    setException(error);
-                }
-            }
             TestModule["bjs_MyViewControllerDelegate_directionOptional_get"] = function bjs_MyViewControllerDelegate_directionOptional_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).directionOptional;
                     const isSome = ret != null;
                     return isSome ? (ret | 0) : -1;
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_MyViewControllerDelegate_directionOptional_set"] = function bjs_MyViewControllerDelegate_directionOptional_set(self, valueIsSome, valueWrappedValue) {
-                try {
-                    swift.memory.getObject(self).directionOptional = valueIsSome ? valueWrappedValue : null;
                 } catch (error) {
                     setException(error);
                 }
@@ -448,13 +375,6 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_priority_set"] = function bjs_MyViewControllerDelegate_priority_set(self, value) {
-                try {
-                    swift.memory.getObject(self).priority = value;
-                } catch (error) {
-                    setException(error);
-                }
-            }
             TestModule["bjs_MyViewControllerDelegate_priorityOptional_get"] = function bjs_MyViewControllerDelegate_priorityOptional_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).priorityOptional;
@@ -463,7 +383,87 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_priorityOptional_set"] = function bjs_MyViewControllerDelegate_priorityOptional_set(self, valueIsSome, valueWrappedValue) {
+            TestModule["bjs_MyViewControllerDelegate_setEventCount"] = function bjs_MyViewControllerDelegate_setEventCount(self, value) {
+                try {
+                    swift.memory.getObject(self).eventCount = value;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_setOptionalName"] = function bjs_MyViewControllerDelegate_setOptionalName(self, valueIsSome, valueWrappedValue) {
+                try {
+                    let obj;
+                    if (valueIsSome) {
+                        obj = swift.memory.getObject(valueWrappedValue);
+                        swift.memory.release(valueWrappedValue);
+                    }
+                    swift.memory.getObject(self).optionalName = valueIsSome ? obj : null;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_setOptionalRawEnum"] = function bjs_MyViewControllerDelegate_setOptionalRawEnum(self, valueIsSome, valueWrappedValue) {
+                try {
+                    let obj;
+                    if (valueIsSome) {
+                        obj = swift.memory.getObject(valueWrappedValue);
+                        swift.memory.release(valueWrappedValue);
+                    }
+                    swift.memory.getObject(self).optionalRawEnum = valueIsSome ? obj : null;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_setRawStringEnum"] = function bjs_MyViewControllerDelegate_setRawStringEnum(self, value) {
+                try {
+                    const valueObject = swift.memory.getObject(value);
+                    swift.memory.release(value);
+                    swift.memory.getObject(self).rawStringEnum = valueObject;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_setResult"] = function bjs_MyViewControllerDelegate_setResult(self, value) {
+                try {
+                    const enumValue = enumHelpers.Result.lift(value, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    swift.memory.getObject(self).result = enumValue;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_setOptionalResult"] = function bjs_MyViewControllerDelegate_setOptionalResult(self, valueIsSome, valueWrappedValue) {
+                try {
+                    let enumValue;
+                    if (valueIsSome) {
+                        enumValue = enumHelpers.Result.lift(valueWrappedValue, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    }
+                    swift.memory.getObject(self).optionalResult = valueIsSome ? enumValue : null;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_setDirection"] = function bjs_MyViewControllerDelegate_setDirection(self, value) {
+                try {
+                    swift.memory.getObject(self).direction = value;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_setDirectionOptional"] = function bjs_MyViewControllerDelegate_setDirectionOptional(self, valueIsSome, valueWrappedValue) {
+                try {
+                    swift.memory.getObject(self).directionOptional = valueIsSome ? valueWrappedValue : null;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_setPriority"] = function bjs_MyViewControllerDelegate_setPriority(self, value) {
+                try {
+                    swift.memory.getObject(self).priority = value;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_setPriorityOptional"] = function bjs_MyViewControllerDelegate_setPriorityOptional(self, valueIsSome, valueWrappedValue) {
                 try {
                     swift.memory.getObject(self).priorityOptional = valueIsSome ? valueWrappedValue : null;
                 } catch (error) {

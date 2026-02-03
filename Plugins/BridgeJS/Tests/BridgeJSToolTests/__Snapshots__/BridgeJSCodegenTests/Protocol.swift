@@ -1,6 +1,96 @@
 struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProtocolWrapper {
     let jsObject: JSObject
 
+    func setEventCount(_ value: Int) throws(JSException) -> Void {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let valueValue = value.bridgeJSLowerParameter()
+        _extern_setEventCount(jsObjectValue, valueValue)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
+    }
+
+    func setOptionalName(_ value: Optional<String>) throws(JSException) -> Void {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+        _extern_setOptionalName(jsObjectValue, valueIsSome, valueValue)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
+    }
+
+    func setOptionalRawEnum(_ value: Optional<ExampleEnum>) throws(JSException) -> Void {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+        _extern_setOptionalRawEnum(jsObjectValue, valueIsSome, valueValue)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
+    }
+
+    func setRawStringEnum(_ value: ExampleEnum) throws(JSException) -> Void {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let valueValue = value.bridgeJSLowerParameter()
+        _extern_setRawStringEnum(jsObjectValue, valueValue)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
+    }
+
+    func setResult(_ value: Result) throws(JSException) -> Void {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let valueCaseId = value.bridgeJSLowerParameter()
+        _extern_setResult(jsObjectValue, valueCaseId)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
+    }
+
+    func setOptionalResult(_ value: Optional<Result>) throws(JSException) -> Void {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let (valueIsSome, valueCaseId) = value.bridgeJSLowerParameter()
+        _extern_setOptionalResult(jsObjectValue, valueIsSome, valueCaseId)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
+    }
+
+    func setDirection(_ value: Direction) throws(JSException) -> Void {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let valueValue = value.bridgeJSLowerParameter()
+        _extern_setDirection(jsObjectValue, valueValue)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
+    }
+
+    func setDirectionOptional(_ value: Optional<Direction>) throws(JSException) -> Void {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+        _extern_setDirectionOptional(jsObjectValue, valueIsSome, valueValue)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
+    }
+
+    func setPriority(_ value: Priority) throws(JSException) -> Void {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let valueValue = value.bridgeJSLowerParameter()
+        _extern_setPriority(jsObjectValue, valueValue)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
+    }
+
+    func setPriorityOptional(_ value: Optional<Priority>) throws(JSException) -> Void {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+        _extern_setPriorityOptional(jsObjectValue, valueIsSome, valueValue)
+        if let error = _swift_js_take_exception() {
+            throw error
+        }
+    }
+
     func onSomethingHappened() throws(JSException) -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
         _extern_onSomethingHappened(jsObjectValue)
@@ -111,140 +201,123 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
     }
 
     var eventCount: Int {
-        get {
+        get throws(JSException) {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let ret = bjs_MyViewControllerDelegate_eventCount_get(jsObjectValue)
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return Int.bridgeJSLiftReturn(ret)
-        }
-        set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            let newValueValue = newValue.bridgeJSLowerParameter()
-            bjs_MyViewControllerDelegate_eventCount_set(jsObjectValue, newValueValue)
         }
     }
 
     var delegateName: String {
-        get {
+        get throws(JSException) {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let ret = bjs_MyViewControllerDelegate_delegateName_get(jsObjectValue)
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return String.bridgeJSLiftReturn(ret)
         }
     }
 
     var optionalName: Optional<String> {
-        get {
+        get throws(JSException) {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
             bjs_MyViewControllerDelegate_optionalName_get(jsObjectValue)
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return Optional<String>.bridgeJSLiftReturnFromSideChannel()
-        }
-        set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
-            bjs_MyViewControllerDelegate_optionalName_set(jsObjectValue, newValueIsSome, newValueValue)
         }
     }
 
     var optionalRawEnum: Optional<ExampleEnum> {
-        get {
+        get throws(JSException) {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
             bjs_MyViewControllerDelegate_optionalRawEnum_get(jsObjectValue)
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return Optional<ExampleEnum>.bridgeJSLiftReturnFromSideChannel()
-        }
-        set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
-            bjs_MyViewControllerDelegate_optionalRawEnum_set(jsObjectValue, newValueIsSome, newValueValue)
         }
     }
 
     var rawStringEnum: ExampleEnum {
-        get {
+        get throws(JSException) {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let ret = bjs_MyViewControllerDelegate_rawStringEnum_get(jsObjectValue)
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return ExampleEnum.bridgeJSLiftReturn(ret)
-        }
-        set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            let newValueValue = newValue.bridgeJSLowerParameter()
-            bjs_MyViewControllerDelegate_rawStringEnum_set(jsObjectValue, newValueValue)
         }
     }
 
     var result: Result {
-        get {
+        get throws(JSException) {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let ret = bjs_MyViewControllerDelegate_result_get(jsObjectValue)
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return Result.bridgeJSLiftReturn(ret)
-        }
-        set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            let newValueCaseId = newValue.bridgeJSLowerParameter()
-            bjs_MyViewControllerDelegate_result_set(jsObjectValue, newValueCaseId)
         }
     }
 
     var optionalResult: Optional<Result> {
-        get {
+        get throws(JSException) {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let ret = bjs_MyViewControllerDelegate_optionalResult_get(jsObjectValue)
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return Optional<Result>.bridgeJSLiftReturn(ret)
-        }
-        set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            let (newValueIsSome, newValueCaseId) = newValue.bridgeJSLowerParameter()
-            bjs_MyViewControllerDelegate_optionalResult_set(jsObjectValue, newValueIsSome, newValueCaseId)
         }
     }
 
     var direction: Direction {
-        get {
+        get throws(JSException) {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let ret = bjs_MyViewControllerDelegate_direction_get(jsObjectValue)
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return Direction.bridgeJSLiftReturn(ret)
-        }
-        set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            let newValueValue = newValue.bridgeJSLowerParameter()
-            bjs_MyViewControllerDelegate_direction_set(jsObjectValue, newValueValue)
         }
     }
 
     var directionOptional: Optional<Direction> {
-        get {
+        get throws(JSException) {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let ret = bjs_MyViewControllerDelegate_directionOptional_get(jsObjectValue)
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return Optional<Direction>.bridgeJSLiftReturn(ret)
-        }
-        set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
-            bjs_MyViewControllerDelegate_directionOptional_set(jsObjectValue, newValueIsSome, newValueValue)
         }
     }
 
     var priority: Priority {
-        get {
+        get throws(JSException) {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let ret = bjs_MyViewControllerDelegate_priority_get(jsObjectValue)
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return Priority.bridgeJSLiftReturn(ret)
-        }
-        set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            let newValueValue = newValue.bridgeJSLowerParameter()
-            bjs_MyViewControllerDelegate_priority_set(jsObjectValue, newValueValue)
         }
     }
 
     var priorityOptional: Optional<Priority> {
-        get {
+        get throws(JSException) {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
             bjs_MyViewControllerDelegate_priorityOptional_get(jsObjectValue)
+            if let error = _swift_js_take_exception() {
+                throw error
+            }
             return Optional<Priority>.bridgeJSLiftReturnFromSideChannel()
-        }
-        set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
-            bjs_MyViewControllerDelegate_priorityOptional_set(jsObjectValue, newValueIsSome, newValueValue)
         }
     }
 
@@ -252,6 +325,36 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
         return AnyMyViewControllerDelegate(jsObject: JSObject(id: UInt32(bitPattern: value)))
     }
 }
+
+@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_setEventCount")
+fileprivate func _extern_setEventCount(_ jsObject: Int32, _ value: Int32) -> Void
+
+@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_setOptionalName")
+fileprivate func _extern_setOptionalName(_ jsObject: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
+
+@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_setOptionalRawEnum")
+fileprivate func _extern_setOptionalRawEnum(_ jsObject: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
+
+@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_setRawStringEnum")
+fileprivate func _extern_setRawStringEnum(_ jsObject: Int32, _ value: Int32) -> Void
+
+@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_setResult")
+fileprivate func _extern_setResult(_ jsObject: Int32, _ value: Int32) -> Void
+
+@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_setOptionalResult")
+fileprivate func _extern_setOptionalResult(_ jsObject: Int32, _ valueIsSome: Int32, _ valueCaseId: Int32) -> Void
+
+@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_setDirection")
+fileprivate func _extern_setDirection(_ jsObject: Int32, _ value: Int32) -> Void
+
+@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_setDirectionOptional")
+fileprivate func _extern_setDirectionOptional(_ jsObject: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
+
+@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_setPriority")
+fileprivate func _extern_setPriority(_ jsObject: Int32, _ value: Int32) -> Void
+
+@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_setPriorityOptional")
+fileprivate func _extern_setPriorityOptional(_ jsObject: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
 
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onSomethingHappened")
 fileprivate func _extern_onSomethingHappened(_ jsObject: Int32) -> Void
@@ -292,65 +395,35 @@ fileprivate func _extern_getResult(_ jsObject: Int32) -> Int32
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_eventCount_get")
 fileprivate func bjs_MyViewControllerDelegate_eventCount_get(_ jsObject: Int32) -> Int32
 
-@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_eventCount_set")
-fileprivate func bjs_MyViewControllerDelegate_eventCount_set(_ jsObject: Int32, _ newValue: Int32) -> Void
-
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_delegateName_get")
 fileprivate func bjs_MyViewControllerDelegate_delegateName_get(_ jsObject: Int32) -> Int32
 
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalName_get")
 fileprivate func bjs_MyViewControllerDelegate_optionalName_get(_ jsObject: Int32) -> Void
 
-@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalName_set")
-fileprivate func bjs_MyViewControllerDelegate_optionalName_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
-
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalRawEnum_get")
 fileprivate func bjs_MyViewControllerDelegate_optionalRawEnum_get(_ jsObject: Int32) -> Void
-
-@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalRawEnum_set")
-fileprivate func bjs_MyViewControllerDelegate_optionalRawEnum_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
 
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_rawStringEnum_get")
 fileprivate func bjs_MyViewControllerDelegate_rawStringEnum_get(_ jsObject: Int32) -> Int32
 
-@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_rawStringEnum_set")
-fileprivate func bjs_MyViewControllerDelegate_rawStringEnum_set(_ jsObject: Int32, _ newValue: Int32) -> Void
-
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_result_get")
 fileprivate func bjs_MyViewControllerDelegate_result_get(_ jsObject: Int32) -> Int32
-
-@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_result_set")
-fileprivate func bjs_MyViewControllerDelegate_result_set(_ jsObject: Int32, _ newValue: Int32) -> Void
 
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalResult_get")
 fileprivate func bjs_MyViewControllerDelegate_optionalResult_get(_ jsObject: Int32) -> Int32
 
-@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalResult_set")
-fileprivate func bjs_MyViewControllerDelegate_optionalResult_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueCaseId: Int32) -> Void
-
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_direction_get")
 fileprivate func bjs_MyViewControllerDelegate_direction_get(_ jsObject: Int32) -> Int32
-
-@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_direction_set")
-fileprivate func bjs_MyViewControllerDelegate_direction_set(_ jsObject: Int32, _ newValue: Int32) -> Void
 
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_directionOptional_get")
 fileprivate func bjs_MyViewControllerDelegate_directionOptional_get(_ jsObject: Int32) -> Int32
 
-@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_directionOptional_set")
-fileprivate func bjs_MyViewControllerDelegate_directionOptional_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
-
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_priority_get")
 fileprivate func bjs_MyViewControllerDelegate_priority_get(_ jsObject: Int32) -> Int32
 
-@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_priority_set")
-fileprivate func bjs_MyViewControllerDelegate_priority_set(_ jsObject: Int32, _ newValue: Int32) -> Void
-
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_priorityOptional_get")
 fileprivate func bjs_MyViewControllerDelegate_priorityOptional_get(_ jsObject: Int32) -> Void
-
-@_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_priorityOptional_set")
-fileprivate func bjs_MyViewControllerDelegate_priorityOptional_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
 
 extension Direction: _BridgedSwiftCaseEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {

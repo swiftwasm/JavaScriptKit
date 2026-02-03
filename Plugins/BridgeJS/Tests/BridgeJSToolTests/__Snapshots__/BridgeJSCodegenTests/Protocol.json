@@ -495,6 +495,280 @@
       {
         "methods" : [
           {
+            "abiName" : "bjs_MyViewControllerDelegate_setEventCount",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setEventCount",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewControllerDelegate_setOptionalName",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setOptionalName",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewControllerDelegate_setOptionalRawEnum",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setOptionalRawEnum",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "ExampleEnum",
+                        "_1" : "String"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewControllerDelegate_setRawStringEnum",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setRawStringEnum",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "rawValueEnum" : {
+                    "_0" : "ExampleEnum",
+                    "_1" : "String"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewControllerDelegate_setResult",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setResult",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "associatedValueEnum" : {
+                    "_0" : "Result"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewControllerDelegate_setOptionalResult",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setOptionalResult",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "Result"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewControllerDelegate_setDirection",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setDirection",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "caseEnum" : {
+                    "_0" : "Direction"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewControllerDelegate_setDirectionOptional",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setDirectionOptional",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "caseEnum" : {
+                        "_0" : "Direction"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewControllerDelegate_setPriority",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setPriority",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "rawValueEnum" : {
+                    "_0" : "Priority",
+                    "_1" : "Int"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewControllerDelegate_setPriorityOptional",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "setPriorityOptional",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "optional" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "Priority",
+                        "_1" : "Int"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
             "abiName" : "bjs_MyViewControllerDelegate_onSomethingHappened",
             "effects" : {
               "isAsync" : false,
@@ -768,7 +1042,12 @@
         "name" : "MyViewControllerDelegate",
         "properties" : [
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "eventCount",
             "type" : {
               "int" : {
@@ -777,6 +1056,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "isReadonly" : true,
             "name" : "delegateName",
             "type" : {
@@ -786,7 +1070,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "optionalName",
             "type" : {
               "optional" : {
@@ -799,7 +1088,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "optionalRawEnum",
             "type" : {
               "optional" : {
@@ -813,7 +1107,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "rawStringEnum",
             "type" : {
               "rawValueEnum" : {
@@ -823,7 +1122,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "result",
             "type" : {
               "associatedValueEnum" : {
@@ -832,7 +1136,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "optionalResult",
             "type" : {
               "optional" : {
@@ -845,7 +1154,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "direction",
             "type" : {
               "caseEnum" : {
@@ -854,7 +1168,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "directionOptional",
             "type" : {
               "optional" : {
@@ -867,7 +1186,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "priority",
             "type" : {
               "rawValueEnum" : {
@@ -877,7 +1201,12 @@
             }
           },
           {
-            "isReadonly" : false,
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "isReadonly" : true,
             "name" : "priorityOptional",
             "type" : {
               "optional" : {

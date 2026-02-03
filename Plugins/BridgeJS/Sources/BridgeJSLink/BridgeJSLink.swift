@@ -3281,13 +3281,39 @@ extension BridgeJSLink {
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
-        let returnExpr = try thunkBuilder.callMethod(name: method.name, returnType: method.returnType)
+
+        // Check if this is a setter method (setFoo pattern with single parameter and void return)
+        // If so, convert to property assignment for JavaScript compatibility
+        let returnExpr: String?
+        if let propertyName = extractSetterPropertyName(from: method.name),
+            method.parameters.count == 1,
+            method.returnType == .void
+        {
+            thunkBuilder.callPropertySetter(name: propertyName, returnType: method.returnType)
+            returnExpr = nil
+        } else {
+            returnExpr = try thunkBuilder.callMethod(name: method.name, returnType: method.returnType)
+        }
+
         let funcLines = thunkBuilder.renderFunction(
             name: method.abiName,
             returnExpr: returnExpr,
             returnType: method.returnType
         )
         importObjectBuilder.assignToImportObject(name: method.abiName, function: funcLines)
+    }
+
+    /// Extracts property name from a setter method name (e.g., "setFoo" -> "foo")
+    /// Returns nil if the method name doesn't match the setter pattern
+    private func extractSetterPropertyName(from methodName: String) -> String? {
+        guard methodName.hasPrefix("set"), methodName.count > 3 else {
+            return nil
+        }
+        let propertyName = String(methodName.dropFirst(3))
+        guard !propertyName.isEmpty else {
+            return nil
+        }
+        return propertyName.prefix(1).lowercased() + propertyName.dropFirst()
     }
 }
 

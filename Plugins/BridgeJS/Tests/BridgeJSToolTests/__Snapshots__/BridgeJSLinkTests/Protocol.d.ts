@@ -5,6 +5,16 @@
 // `swift package bridge-js`.
 
 export interface MyViewControllerDelegate {
+    setEventCount(value: number): void;
+    setOptionalName(value: string | null): void;
+    setOptionalRawEnum(value: ExampleEnumTag | null): void;
+    setRawStringEnum(value: ExampleEnumTag): void;
+    setResult(value: ResultTag): void;
+    setOptionalResult(value: ResultTag | null): void;
+    setDirection(value: DirectionTag): void;
+    setDirectionOptional(value: DirectionTag | null): void;
+    setPriority(value: PriorityTag): void;
+    setPriorityOptional(value: PriorityTag | null): void;
     onSomethingHappened(): void;
     onValueChanged(value: string): void;
     onCountUpdated(count: number): boolean;
@@ -17,17 +27,17 @@ export interface MyViewControllerDelegate {
     createEnum(): ExampleEnumTag;
     handleResult(result: ResultTag): void;
     getResult(): ResultTag;
-    eventCount: number;
+    readonly eventCount: number;
     readonly delegateName: string;
-    optionalName: string | null;
-    optionalRawEnum: ExampleEnumTag | null;
-    rawStringEnum: ExampleEnumTag;
-    result: ResultTag;
-    optionalResult: ResultTag | null;
-    direction: DirectionTag;
-    directionOptional: DirectionTag | null;
-    priority: PriorityTag;
-    priorityOptional: PriorityTag | null;
+    readonly optionalName: string | null;
+    readonly optionalRawEnum: ExampleEnumTag | null;
+    readonly rawStringEnum: ExampleEnumTag;
+    readonly result: ResultTag;
+    readonly optionalResult: ResultTag | null;
+    readonly direction: DirectionTag;
+    readonly directionOptional: DirectionTag | null;
+    readonly priority: PriorityTag;
+    readonly priorityOptional: PriorityTag | null;
 }
 
 export const DirectionValues: {

@@ -36,17 +36,27 @@ import JavaScriptKit
 }
 
 @JS protocol MyViewControllerDelegate {
-    var eventCount: Int { get set }
-    var delegateName: String { get }
-    var optionalName: String? { get set }
-    var optionalRawEnum: ExampleEnum? { get set }
-    var rawStringEnum: ExampleEnum { get set }
-    var result: Result { get set }
-    var optionalResult: Result? { get set }
-    var direction: Direction { get set }
-    var directionOptional: Direction? { get set }
-    var priority: Priority { get set }
-    var priorityOptional: Priority? { get set }
+    var eventCount: Int { get throws(JSException) }
+    var delegateName: String { get throws(JSException) }
+    var optionalName: String? { get throws(JSException) }
+    var optionalRawEnum: ExampleEnum? { get throws(JSException) }
+    var rawStringEnum: ExampleEnum { get throws(JSException) }
+    var result: Result { get throws(JSException) }
+    var optionalResult: Result? { get throws(JSException) }
+    var direction: Direction { get throws(JSException) }
+    var directionOptional: Direction? { get throws(JSException) }
+    var priority: Priority { get throws(JSException) }
+    var priorityOptional: Priority? { get throws(JSException) }
+    func setEventCount(_ value: Int) throws(JSException)
+    func setOptionalName(_ value: String?) throws(JSException)
+    func setOptionalRawEnum(_ value: ExampleEnum?) throws(JSException)
+    func setRawStringEnum(_ value: ExampleEnum) throws(JSException)
+    func setResult(_ value: Result) throws(JSException)
+    func setOptionalResult(_ value: Result?) throws(JSException)
+    func setDirection(_ value: Direction) throws(JSException)
+    func setDirectionOptional(_ value: Direction?) throws(JSException)
+    func setPriority(_ value: Priority) throws(JSException)
+    func setPriorityOptional(_ value: Priority?) throws(JSException)
     func onSomethingHappened() throws(JSException)
     func onValueChanged(_ value: String) throws(JSException)
     func onCountUpdated(count: Int) throws(JSException) -> Bool
