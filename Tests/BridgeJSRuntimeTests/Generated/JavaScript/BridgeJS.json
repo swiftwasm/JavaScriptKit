@@ -3502,6 +3502,91 @@
 
         ],
         "emitStyle" : "const",
+        "name" : "StringUtils",
+        "namespace" : [
+          "Utils"
+        ],
+        "staticMethods" : [
+          {
+            "abiName" : "bjs_Utils_StringUtils_static_uppercase",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "uppercase",
+            "namespace" : [
+              "Utils",
+              "StringUtils"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "text",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "Utils.StringUtils"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_Utils_StringUtils_static_lowercase",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "lowercase",
+            "namespace" : [
+              "Utils",
+              "StringUtils"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "text",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "Utils.StringUtils"
+              }
+            }
+          }
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Utils.StringUtils",
+        "tsFullPath" : "Utils.StringUtils"
+      },
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
         "name" : "Networking",
         "staticMethods" : [
 
@@ -4356,7 +4441,7 @@
             },
             "staticContext" : {
               "namespaceEnum" : {
-
+                "_0" : "StaticUtils.Nested"
               }
             }
           }
@@ -4366,6 +4451,94 @@
         ],
         "swiftCallName" : "StaticUtils.Nested",
         "tsFullPath" : "StaticUtils.Nested"
+      },
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "GraphOperations",
+        "namespace" : [
+          "Services",
+          "Graph"
+        ],
+        "staticMethods" : [
+          {
+            "abiName" : "bjs_Services_Graph_GraphOperations_static_createGraph",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "createGraph",
+            "namespace" : [
+              "Services",
+              "Graph",
+              "GraphOperations"
+            ],
+            "parameters" : [
+              {
+                "label" : "rootId",
+                "name" : "rootId",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "GraphOperations"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_Services_Graph_GraphOperations_static_nodeCount",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "nodeCount",
+            "namespace" : [
+              "Services",
+              "Graph",
+              "GraphOperations"
+            ],
+            "parameters" : [
+              {
+                "label" : "graphId",
+                "name" : "graphId",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "GraphOperations"
+              }
+            }
+          }
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "GraphOperations",
+        "tsFullPath" : "Services.Graph.GraphOperations"
       },
       {
         "cases" : [
@@ -4501,7 +4674,7 @@
             ],
             "staticContext" : {
               "namespaceEnum" : {
-
+                "_0" : "StaticPropertyNamespace"
               }
             },
             "type" : {
@@ -4519,7 +4692,7 @@
             ],
             "staticContext" : {
               "namespaceEnum" : {
-
+                "_0" : "StaticPropertyNamespace"
               }
             },
             "type" : {
@@ -4555,7 +4728,7 @@
             ],
             "staticContext" : {
               "namespaceEnum" : {
-
+                "_0" : "StaticPropertyNamespace.NestedProperties"
               }
             },
             "type" : {
@@ -4574,7 +4747,7 @@
             ],
             "staticContext" : {
               "namespaceEnum" : {
-
+                "_0" : "StaticPropertyNamespace.NestedProperties"
               }
             },
             "type" : {
@@ -4593,7 +4766,7 @@
             ],
             "staticContext" : {
               "namespaceEnum" : {
-
+                "_0" : "StaticPropertyNamespace.NestedProperties"
               }
             },
             "type" : {

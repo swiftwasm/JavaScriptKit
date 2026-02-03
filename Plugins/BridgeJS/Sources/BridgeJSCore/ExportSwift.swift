@@ -533,14 +533,9 @@ public class ExportSwift {
         if function.effects.isStatic, let staticContext = function.staticContext {
             let callName: String
             switch staticContext {
-            case .className(let baseName), .enumName(let baseName), .structName(let baseName):
+            case .className(let baseName), .enumName(let baseName), .structName(let baseName),
+                .namespaceEnum(let baseName):
                 callName = "\(baseName).\(function.name)"
-            case .namespaceEnum:
-                if let namespace = function.namespace, !namespace.isEmpty {
-                    callName = "\(namespace.joined(separator: ".")).\(function.name)"
-                } else {
-                    callName = function.name
-                }
             }
             builder.call(name: callName, returnType: function.returnType)
         } else {

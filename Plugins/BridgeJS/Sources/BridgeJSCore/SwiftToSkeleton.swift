@@ -990,7 +990,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             }
 
             let isNamespaceEnum = exportedEnumByName[enumKey]?.cases.isEmpty ?? true
-            staticContext = isNamespaceEnum ? .namespaceEnum : .enumName(enumName)
+            let swiftCallName = exportedEnumByName[enumKey]?.swiftCallName ?? enumName
+            staticContext = isNamespaceEnum ? .namespaceEnum(swiftCallName) : .enumName(enumName)
         case .protocolBody(_, _):
             return nil
         case .structBody(let structName, _):
@@ -1187,7 +1188,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 return .skipChildren
             }
             let isNamespaceEnum = exportedEnumByName[enumKey]?.cases.isEmpty ?? true
-            staticContext = isStatic ? (isNamespaceEnum ? .namespaceEnum : .enumName(enumName)) : nil
+            // Use swiftCallName for the full Swift call path (handles nested enums correctly)
+            let swiftCallName = exportedEnumByName[enumKey]?.swiftCallName ?? enumName
+            staticContext =
+                isStatic ? (isNamespaceEnum ? .namespaceEnum(swiftCallName) : .enumName(swiftCallName)) : nil
         case .topLevel:
             diagnose(node: node, message: "@JS var must be inside a @JS class or enum")
             return .skipChildren

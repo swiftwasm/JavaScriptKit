@@ -1350,6 +1350,28 @@ extension TSDirection: _BridgedSwiftCaseEnum {
 extension TSTheme: _BridgedSwiftEnumNoPayload {
 }
 
+@_expose(wasm, "bjs_Utils_StringUtils_static_uppercase")
+@_cdecl("bjs_Utils_StringUtils_static_uppercase")
+public func _bjs_Utils_StringUtils_static_uppercase(_ textBytes: Int32, _ textLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = Utils.StringUtils.uppercase(_: String.bridgeJSLiftParameter(textBytes, textLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Utils_StringUtils_static_lowercase")
+@_cdecl("bjs_Utils_StringUtils_static_lowercase")
+public func _bjs_Utils_StringUtils_static_lowercase(_ textBytes: Int32, _ textLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = Utils.StringUtils.lowercase(_: String.bridgeJSLiftParameter(textBytes, textLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 extension Networking.API.Method: _BridgedSwiftCaseEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         return bridgeJSRawValue
@@ -1986,6 +2008,28 @@ public func _bjs_StaticCalculator_static_roundtrip(_ value: Int32) -> Int32 {
 public func _bjs_StaticUtils_Nested_static_roundtrip(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
     let ret = StaticUtils.Nested.roundtrip(_: String.bridgeJSLiftParameter(valueBytes, valueLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Services_Graph_GraphOperations_static_createGraph")
+@_cdecl("bjs_Services_Graph_GraphOperations_static_createGraph")
+public func _bjs_Services_Graph_GraphOperations_static_createGraph(_ rootId: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = GraphOperations.createGraph(rootId: Int.bridgeJSLiftParameter(rootId))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Services_Graph_GraphOperations_static_nodeCount")
+@_cdecl("bjs_Services_Graph_GraphOperations_static_nodeCount")
+public func _bjs_Services_Graph_GraphOperations_static_nodeCount(_ graphId: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = GraphOperations.nodeCount(graphId: Int.bridgeJSLiftParameter(graphId))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

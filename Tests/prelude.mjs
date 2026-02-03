@@ -527,6 +527,11 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(converter.toString(123), "123");
     converter.release();
 
+    assert.equal(exports.Utils.StringUtils.uppercase("hello"), "HELLO");
+    assert.equal(exports.Utils.StringUtils.uppercase(""), "");
+    assert.equal(exports.Utils.StringUtils.lowercase("WORLD"), "world");
+    assert.equal(exports.Utils.StringUtils.lowercase("HeLLo"), "hello");
+
     const httpServer = new exports.Networking.API.HTTPServer();
     httpServer.call(exports.Networking.API.Method.Get);
     httpServer.call(exports.Networking.API.Method.Post);
@@ -716,6 +721,11 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(StaticCalculatorValues.Basic, exports.StaticCalculator.Basic);
     assert.equal(exports.StaticUtils.Nested.roundtrip("hello world"), "hello world");
     assert.equal(exports.StaticUtils.Nested.roundtrip("test"), "test");
+
+    assert.equal(exports.Services.Graph.GraphOperations.createGraph(5), 50);
+    assert.equal(exports.Services.Graph.GraphOperations.createGraph(0), 0);
+    assert.equal(exports.Services.Graph.GraphOperations.nodeCount(42), 42);
+    assert.equal(exports.Services.Graph.GraphOperations.nodeCount(0), 0);
 
     // Test default parameters
     assert.equal(exports.testStringDefault(), "Hello World");

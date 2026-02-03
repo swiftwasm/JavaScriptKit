@@ -406,7 +406,7 @@
             ],
             "staticContext" : {
               "namespaceEnum" : {
-
+                "_0" : "GlobalStaticPropertyNamespace"
               }
             },
             "type" : {
@@ -424,7 +424,7 @@
             ],
             "staticContext" : {
               "namespaceEnum" : {
-
+                "_0" : "GlobalStaticPropertyNamespace"
               }
             },
             "type" : {
@@ -460,7 +460,7 @@
             ],
             "staticContext" : {
               "namespaceEnum" : {
-
+                "_0" : "GlobalStaticPropertyNamespace.NestedProperties"
               }
             },
             "type" : {
@@ -479,7 +479,7 @@
             ],
             "staticContext" : {
               "namespaceEnum" : {
-
+                "_0" : "GlobalStaticPropertyNamespace.NestedProperties"
               }
             },
             "type" : {
@@ -498,7 +498,7 @@
             ],
             "staticContext" : {
               "namespaceEnum" : {
-
+                "_0" : "GlobalStaticPropertyNamespace.NestedProperties"
               }
             },
             "type" : {

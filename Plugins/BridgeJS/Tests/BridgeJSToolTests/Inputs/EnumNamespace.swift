@@ -53,4 +53,17 @@ enum Internal {
     }
 }
 
-// TODO: Add namespace enum with static functions when supported
+@JS(namespace: "Services.Graph")
+enum GraphOperations {
+    @JS static func createGraph(rootId: Int) -> Int {
+        return rootId * 10
+    }
+
+    @JS static func nodeCount(graphId: Int) -> Int {
+        return graphId
+    }
+
+    @JS static func validate(graphId: Int) throws(JSException) -> Bool {
+        return graphId > 0
+    }
+}

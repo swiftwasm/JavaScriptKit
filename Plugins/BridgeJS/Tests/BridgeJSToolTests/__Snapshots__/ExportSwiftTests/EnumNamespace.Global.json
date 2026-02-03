@@ -400,6 +400,129 @@
       ],
       "swiftCallName" : "Internal.SupportedMethod",
       "tsFullPath" : "Networking.APIV2.Internal.SupportedMethod"
+    },
+    {
+      "cases" : [
+
+      ],
+      "emitStyle" : "const",
+      "name" : "GraphOperations",
+      "namespace" : [
+        "Services",
+        "Graph"
+      ],
+      "staticMethods" : [
+        {
+          "abiName" : "bjs_Services_Graph_GraphOperations_static_createGraph",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "createGraph",
+          "namespace" : [
+            "Services",
+            "Graph",
+            "GraphOperations"
+          ],
+          "parameters" : [
+            {
+              "label" : "rootId",
+              "name" : "rootId",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          },
+          "staticContext" : {
+            "namespaceEnum" : {
+              "_0" : "GraphOperations"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Services_Graph_GraphOperations_static_nodeCount",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : false
+          },
+          "name" : "nodeCount",
+          "namespace" : [
+            "Services",
+            "Graph",
+            "GraphOperations"
+          ],
+          "parameters" : [
+            {
+              "label" : "graphId",
+              "name" : "graphId",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "int" : {
+
+            }
+          },
+          "staticContext" : {
+            "namespaceEnum" : {
+              "_0" : "GraphOperations"
+            }
+          }
+        },
+        {
+          "abiName" : "bjs_Services_Graph_GraphOperations_static_validate",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : true,
+            "isThrows" : true
+          },
+          "name" : "validate",
+          "namespace" : [
+            "Services",
+            "Graph",
+            "GraphOperations"
+          ],
+          "parameters" : [
+            {
+              "label" : "graphId",
+              "name" : "graphId",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ],
+          "returnType" : {
+            "bool" : {
+
+            }
+          },
+          "staticContext" : {
+            "namespaceEnum" : {
+              "_0" : "GraphOperations"
+            }
+          }
+        }
+      ],
+      "staticProperties" : [
+
+      ],
+      "swiftCallName" : "GraphOperations",
+      "tsFullPath" : "Services.Graph.GraphOperations"
     }
   ],
   "exposeToGlobal" : true,

@@ -82,6 +82,53 @@ extension Internal.SupportedMethod: _BridgedSwiftCaseEnum {
     }
 }
 
+@_expose(wasm, "bjs_Services_Graph_GraphOperations_static_createGraph")
+@_cdecl("bjs_Services_Graph_GraphOperations_static_createGraph")
+public func _bjs_Services_Graph_GraphOperations_static_createGraph(_ rootId: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = GraphOperations.createGraph(rootId: Int.bridgeJSLiftParameter(rootId))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Services_Graph_GraphOperations_static_nodeCount")
+@_cdecl("bjs_Services_Graph_GraphOperations_static_nodeCount")
+public func _bjs_Services_Graph_GraphOperations_static_nodeCount(_ graphId: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = GraphOperations.nodeCount(graphId: Int.bridgeJSLiftParameter(graphId))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Services_Graph_GraphOperations_static_validate")
+@_cdecl("bjs_Services_Graph_GraphOperations_static_validate")
+public func _bjs_Services_Graph_GraphOperations_static_validate(_ graphId: Int32) -> Int32 {
+    #if arch(wasm32)
+    do {
+        let ret = try GraphOperations.validate(graphId: Int.bridgeJSLiftParameter(graphId))
+        return ret.bridgeJSLowerReturn()
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: String(describing: error))
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return 0
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_Converter_init")
 @_cdecl("bjs_Converter_init")
 public func _bjs_Converter_init() -> UnsafeMutableRawPointer {
