@@ -3156,7 +3156,8 @@ extension BridgeJSLink {
                 }
                 for method in type.staticMethods {
                     let methodName = method.jsName ?? method.name
-                    let signature = "\(renderTSPropertyName(methodName))\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: Effects(isAsync: false, isThrows: false)));"
+                    let signature =
+                        "\(renderTSPropertyName(methodName))\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: Effects(isAsync: false, isThrows: false)));"
                     dtsPrinter.write(signature)
                 }
             }
