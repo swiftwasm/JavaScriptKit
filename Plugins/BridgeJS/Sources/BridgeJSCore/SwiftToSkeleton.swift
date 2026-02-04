@@ -66,13 +66,14 @@ public final class SwiftToSkeleton {
                 )
             }
 
-            importedFiles.append(
-                ImportedFileSkeleton(
-                    functions: importCollector.importedFunctions,
-                    types: importCollector.importedTypes,
-                    globalGetters: importCollector.importedGlobalGetters
-                )
+            let importedFile = ImportedFileSkeleton(
+                functions: importCollector.importedFunctions,
+                types: importCollector.importedTypes,
+                globalGetters: importCollector.importedGlobalGetters
             )
+            if !importedFile.isEmpty {
+                importedFiles.append(importedFile)
+            }
             exportCollector.finalize(&exported)
         }
 
@@ -90,7 +91,8 @@ public final class SwiftToSkeleton {
             return module
         }()
 
-        return BridgeJSSkeleton(moduleName: moduleName, exported: exported, imported: importedSkeleton)
+        let exportedSkeleton: ExportedSkeleton? = exported.isEmpty ? nil : exported
+        return BridgeJSSkeleton(moduleName: moduleName, exported: exportedSkeleton, imported: importedSkeleton)
     }
 
     func lookupType(for type: TypeSyntax, errors: inout [DiagnosticError]) -> BridgeType? {

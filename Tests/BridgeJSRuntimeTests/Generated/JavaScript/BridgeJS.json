@@ -12645,22 +12645,6 @@
       },
       {
         "functions" : [
-
-        ],
-        "types" : [
-
-        ]
-      },
-      {
-        "functions" : [
-
-        ],
-        "types" : [
-
-        ]
-      },
-      {
-        "functions" : [
           {
             "name" : "jsApplyInt",
             "parameters" : [
@@ -12901,22 +12885,6 @@
               }
             }
           }
-        ],
-        "types" : [
-
-        ]
-      },
-      {
-        "functions" : [
-
-        ],
-        "types" : [
-
-        ]
-      },
-      {
-        "functions" : [
-
         ],
         "types" : [
 

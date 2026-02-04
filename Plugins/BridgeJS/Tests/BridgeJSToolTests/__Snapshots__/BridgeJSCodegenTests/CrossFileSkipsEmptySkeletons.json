@@ -1,0 +1,25 @@
+{
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "fetchNumber",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}
