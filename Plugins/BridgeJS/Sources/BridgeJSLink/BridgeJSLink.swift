@@ -11,6 +11,7 @@ public struct BridgeJSLink {
     var skeletons: [BridgeJSSkeleton] = []
     let sharedMemory: Bool
     private let namespaceBuilder = NamespaceBuilder()
+    private let intrinsicRegistry = JSIntrinsicRegistry()
 
     public init(
         skeletons: [BridgeJSSkeleton] = [],
@@ -758,7 +759,7 @@ public struct BridgeJSLink {
         functionName: String
     ) -> [String] {
         let printer = CodeFragmentPrinter()
-        let scope = JSGlueVariableScope()
+        let scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
         let cleanupCode = CodeFragmentPrinter()
 
         // Build parameter list for invoke function
@@ -827,7 +828,7 @@ public struct BridgeJSLink {
         functionName: String
     ) -> [String] {
         let printer = CodeFragmentPrinter()
-        let scope = JSGlueVariableScope()
+        let scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
         let cleanupCode = CodeFragmentPrinter()
 
         printer.nextLine()
@@ -1036,23 +1037,37 @@ public struct BridgeJSLink {
         )
         printer.write(lines: topLevelNamespaceCode)
 
+        let propertyAssignments = try generateNamespacePropertyAssignments(
+            data: data,
+            exportedSkeletons: exportedSkeletons,
+            namespaceBuilder: namespaceBuilder
+        )
+
         // Main function declaration
         printer.write("export async function createInstantiator(options, \(JSGlueVariableScope.reservedSwift)) {")
 
         printer.indent {
             printer.write(lines: generateVariableDeclarations())
 
+            let bodyPrinter = CodeFragmentPrinter()
             let allStructs = exportedSkeletons.flatMap { $0.structs }
             for structDef in allStructs {
                 let structPrinter = CodeFragmentPrinter()
-                let structScope = JSGlueVariableScope()
+                let structScope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
                 let structCleanup = CodeFragmentPrinter()
                 let fragment = IntrinsicJSFragment.structHelper(structDefinition: structDef, allStructs: allStructs)
                 _ = fragment.printCode([structDef.name], structScope, structPrinter, structCleanup)
-                printer.write(lines: structPrinter.lines)
+                bodyPrinter.write(lines: structPrinter.lines)
             }
-            printer.nextLine()
-            printer.write(contentsOf: generateAddImports(needsImportsObject: data.needsImportsObject))
+            bodyPrinter.nextLine()
+            bodyPrinter.write(contentsOf: generateAddImports(needsImportsObject: data.needsImportsObject))
+
+            if !intrinsicRegistry.isEmpty {
+                printer.write(lines: intrinsicRegistry.emitLines())
+                printer.nextLine()
+            }
+
+            printer.write(lines: bodyPrinter.lines)
         }
         printer.indent()
 
@@ -1111,11 +1126,6 @@ public struct BridgeJSLink {
                 )
                 printer.write(lines: namespaceInitCode)
 
-                let propertyAssignments = try generateNamespacePropertyAssignments(
-                    data: data,
-                    exportedSkeletons: exportedSkeletons,
-                    namespaceBuilder: namespaceBuilder
-                )
                 printer.write(lines: propertyAssignments)
             }
             printer.write("},")
@@ -1128,6 +1138,7 @@ public struct BridgeJSLink {
     }
 
     public func link() throws -> (outputJs: String, outputDts: String) {
+        intrinsicRegistry.reset()
         let data = try collectLinkData()
         let outputJs = try generateJavaScript(data: data)
         let outputDts = generateTypeScript(data: data)
@@ -1222,6 +1233,7 @@ public struct BridgeJSLink {
 
             let hierarchicalLines = try namespaceBuilder.buildHierarchicalExportsObject(
                 exportedSkeletons: exportedSkeletons,
+                intrinsicRegistry: intrinsicRegistry,
                 renderFunctionImpl: { function in
                     let (js, _) = try self.renderExportedFunction(function: function)
                     return js
@@ -1293,9 +1305,9 @@ public struct BridgeJSLink {
         let effects: Effects
         let scope: JSGlueVariableScope
 
-        init(effects: Effects) {
+        init(effects: Effects, intrinsicRegistry: JSIntrinsicRegistry) {
             self.effects = effects
-            self.scope = JSGlueVariableScope()
+            self.scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
             self.body = CodeFragmentPrinter()
             self.cleanupCode = CodeFragmentPrinter()
         }
@@ -1516,7 +1528,10 @@ public struct BridgeJSLink {
         try jsPrinter.indent {
             // Constructor as 'init' function
             if let constructor = structDefinition.constructor {
-                let thunkBuilder = ExportedThunkBuilder(effects: constructor.effects)
+                let thunkBuilder = ExportedThunkBuilder(
+                    effects: constructor.effects,
+                    intrinsicRegistry: intrinsicRegistry
+                )
                 for param in constructor.parameters {
                     try thunkBuilder.lowerParameter(param: param)
                 }
@@ -1752,12 +1767,17 @@ public struct BridgeJSLink {
 
 extension BridgeJSLink {
 
-    func renderExportedFunction(function: ExportedFunction) throws -> (js: [String], dts: [String]) {
+    func renderExportedFunction(
+        function: ExportedFunction
+    ) throws -> (js: [String], dts: [String]) {
         if function.effects.isStatic, let staticContext = function.staticContext {
             return try renderStaticFunction(function: function, staticContext: staticContext)
         }
 
-        let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
+        let thunkBuilder = ExportedThunkBuilder(
+            effects: function.effects,
+            intrinsicRegistry: intrinsicRegistry
+        )
         for param in function.parameters {
             try thunkBuilder.lowerParameter(param: param)
         }
@@ -1790,7 +1810,10 @@ extension BridgeJSLink {
             return try renderEnumStaticFunction(function: function, enumName: enumName)
         case .namespaceEnum:
             if let namespace = function.namespace, !namespace.isEmpty {
-                return try renderNamespaceFunction(function: function, namespace: namespace.joined(separator: "."))
+                return try renderNamespaceFunction(
+                    function: function,
+                    namespace: namespace.joined(separator: ".")
+                )
             } else {
                 return try renderExportedFunction(function: function)
             }
@@ -1801,7 +1824,10 @@ extension BridgeJSLink {
         function: ExportedFunction,
         className: String
     ) throws -> (js: [String], dts: [String]) {
-        let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
+        let thunkBuilder = ExportedThunkBuilder(
+            effects: function.effects,
+            intrinsicRegistry: intrinsicRegistry
+        )
         for param in function.parameters {
             try thunkBuilder.lowerParameter(param: param)
         }
@@ -1829,7 +1855,10 @@ extension BridgeJSLink {
         function: ExportedFunction,
         enumName: String
     ) throws -> (js: [String], dts: [String]) {
-        let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
+        let thunkBuilder = ExportedThunkBuilder(
+            effects: function.effects,
+            intrinsicRegistry: intrinsicRegistry
+        )
         for param in function.parameters {
             try thunkBuilder.lowerParameter(param: param)
         }
@@ -1857,7 +1886,10 @@ extension BridgeJSLink {
         function: ExportedFunction,
         namespace: String
     ) throws -> (js: [String], dts: [String]) {
-        let thunkBuilder = ExportedThunkBuilder(effects: function.effects)
+        let thunkBuilder = ExportedThunkBuilder(
+            effects: function.effects,
+            intrinsicRegistry: intrinsicRegistry
+        )
         for param in function.parameters {
             try thunkBuilder.lowerParameter(param: param)
         }
@@ -1879,7 +1911,10 @@ extension BridgeJSLink {
     private func renderStaticMethodForExportObject(
         method: ExportedFunction
     ) throws -> [String] {
-        let thunkBuilder = ExportedThunkBuilder(effects: method.effects)
+        let thunkBuilder = ExportedThunkBuilder(
+            effects: method.effects,
+            intrinsicRegistry: intrinsicRegistry
+        )
         for param in method.parameters {
             try thunkBuilder.lowerParameter(param: param)
         }
@@ -1904,7 +1939,10 @@ extension BridgeJSLink {
         let propertyPrinter = CodeFragmentPrinter()
 
         // Generate getter
-        let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+        let getterThunkBuilder = ExportedThunkBuilder(
+            effects: Effects(isAsync: false, isThrows: false),
+            intrinsicRegistry: intrinsicRegistry
+        )
         let getterReturnExpr = try getterThunkBuilder.call(
             abiName: className != nil
                 ? property.getterAbiName(className: className!)
@@ -1921,7 +1959,8 @@ extension BridgeJSLink {
         // Generate setter if not readonly
         if !property.isReadonly {
             let setterThunkBuilder = ExportedThunkBuilder(
-                effects: Effects(isAsync: false, isThrows: false)
+                effects: Effects(isAsync: false, isThrows: false),
+                intrinsicRegistry: intrinsicRegistry
             )
             try setterThunkBuilder.lowerParameter(
                 param: Parameter(label: "value", name: "value", type: property.type)
@@ -1967,7 +2006,10 @@ extension BridgeJSLink {
         }
 
         if let constructor: ExportedConstructor = klass.constructor {
-            let thunkBuilder = ExportedThunkBuilder(effects: constructor.effects)
+            let thunkBuilder = ExportedThunkBuilder(
+                effects: constructor.effects,
+                intrinsicRegistry: intrinsicRegistry
+            )
             for param in constructor.parameters {
                 try thunkBuilder.lowerParameter(param: param)
             }
@@ -1999,7 +2041,10 @@ extension BridgeJSLink {
 
         for method in klass.methods {
             if method.effects.isStatic {
-                let thunkBuilder = ExportedThunkBuilder(effects: method.effects)
+                let thunkBuilder = ExportedThunkBuilder(
+                    effects: method.effects,
+                    intrinsicRegistry: intrinsicRegistry
+                )
                 for param in method.parameters {
                     try thunkBuilder.lowerParameter(param: param)
                 }
@@ -2022,7 +2067,10 @@ extension BridgeJSLink {
                     )
                 }
             } else {
-                let thunkBuilder = ExportedThunkBuilder(effects: method.effects)
+                let thunkBuilder = ExportedThunkBuilder(
+                    effects: method.effects,
+                    intrinsicRegistry: intrinsicRegistry
+                )
                 thunkBuilder.lowerSelf()
                 for param in method.parameters {
                     try thunkBuilder.lowerParameter(param: param)
@@ -2073,7 +2121,10 @@ extension BridgeJSLink {
         jsPrinter: CodeFragmentPrinter,
         dtsPrinter: CodeFragmentPrinter
     ) throws {
-        let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+        let getterThunkBuilder = ExportedThunkBuilder(
+            effects: Effects(isAsync: false, isThrows: false),
+            intrinsicRegistry: intrinsicRegistry
+        )
         if !isStatic {
             getterThunkBuilder.lowerSelf()
         }
@@ -2095,7 +2146,10 @@ extension BridgeJSLink {
 
         // Generate setter if not readonly
         if !property.isReadonly {
-            let setterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+            let setterThunkBuilder = ExportedThunkBuilder(
+                effects: Effects(isAsync: false, isThrows: false),
+                intrinsicRegistry: intrinsicRegistry
+            )
             if !isStatic {
                 setterThunkBuilder.lowerSelf()
             }
@@ -2134,9 +2188,9 @@ extension BridgeJSLink {
         var parameterNames: [String] = []
         var parameterForwardings: [String] = []
 
-        init(context: BridgeContext = .importTS) {
+        init(context: BridgeContext = .importTS, intrinsicRegistry: JSIntrinsicRegistry) {
             self.body = CodeFragmentPrinter()
-            self.scope = JSGlueVariableScope()
+            self.scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
             self.cleanupCode = CodeFragmentPrinter()
             self.context = context
         }
@@ -2622,6 +2676,7 @@ extension BridgeJSLink {
 
         fileprivate func buildHierarchicalExportsObject(
             exportedSkeletons: [ExportedSkeleton],
+            intrinsicRegistry: JSIntrinsicRegistry,
             renderFunctionImpl: (ExportedFunction) throws -> [String]
         ) throws -> [String] {
             let printer = CodeFragmentPrinter()
@@ -2631,7 +2686,10 @@ extension BridgeJSLink {
 
             try populateJavaScriptExportLines(node: rootNode, renderFunctionImpl: renderFunctionImpl)
 
-            try populatePropertyImplementations(node: rootNode)
+            try populatePropertyImplementations(
+                node: rootNode,
+                intrinsicRegistry: intrinsicRegistry
+            )
 
             printExportsObjectHierarchy(node: rootNode, printer: printer, currentPath: [])
 
@@ -2652,10 +2710,16 @@ extension BridgeJSLink {
             }
         }
 
-        private func populatePropertyImplementations(node: NamespaceNode) throws {
+        private func populatePropertyImplementations(
+            node: NamespaceNode,
+            intrinsicRegistry: JSIntrinsicRegistry
+        ) throws {
             for property in node.content.staticProperties {
                 // Generate getter
-                let getterThunkBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false))
+                let getterThunkBuilder = ExportedThunkBuilder(
+                    effects: Effects(isAsync: false, isThrows: false),
+                    intrinsicRegistry: intrinsicRegistry
+                )
                 let getterReturnExpr = try getterThunkBuilder.call(
                     abiName: property.getterAbiName(),
                     returnType: property.type
@@ -2678,14 +2742,15 @@ extension BridgeJSLink {
                 // Generate setter if not readonly
                 if !property.isReadonly {
                     let setterThunkBuilder = ExportedThunkBuilder(
-                        effects: Effects(isAsync: false, isThrows: false)
+                        effects: Effects(isAsync: false, isThrows: false),
+                        intrinsicRegistry: intrinsicRegistry
                     )
                     try setterThunkBuilder.lowerParameter(
                         param: Parameter(label: "value", name: "value", type: property.type)
                     )
                     _ = try setterThunkBuilder.call(
                         abiName: property.setterAbiName(),
-                        returnType: .void
+                        returnType: BridgeType.void
                     )
 
                     let setterPrinter = CodeFragmentPrinter()
@@ -2705,7 +2770,10 @@ extension BridgeJSLink {
 
             // Recursively process child nodes
             for (_, childNode) in node.children {
-                try populatePropertyImplementations(node: childNode)
+                try populatePropertyImplementations(
+                    node: childNode,
+                    intrinsicRegistry: intrinsicRegistry
+                )
             }
         }
 
@@ -3045,7 +3113,7 @@ extension BridgeJSLink {
         importObjectBuilder: ImportObjectBuilder,
         function: ImportedFunctionSkeleton
     ) throws {
-        let thunkBuilder = ImportedThunkBuilder()
+        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
         for param in function.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
@@ -3076,7 +3144,7 @@ extension BridgeJSLink {
         importObjectBuilder: ImportObjectBuilder,
         getter: ImportedGetterSkeleton
     ) throws {
-        let thunkBuilder = ImportedThunkBuilder()
+        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
         let jsName = getter.jsName ?? getter.name
         let importRootExpr = getter.from == .global ? "globalThis" : "imports"
         let returnExpr = try thunkBuilder.getImportProperty(
@@ -3177,7 +3245,7 @@ extension BridgeJSLink {
         type: ImportedTypeSkeleton,
         constructor: ImportedConstructorSkeleton
     ) throws {
-        let thunkBuilder = ImportedThunkBuilder()
+        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
         for param in constructor.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
@@ -3202,7 +3270,7 @@ extension BridgeJSLink {
         abiName: String,
         emitCall: (ImportedThunkBuilder) throws -> String?
     ) throws -> (js: [String], dts: [String]) {
-        let thunkBuilder = ImportedThunkBuilder()
+        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
         thunkBuilder.liftSelf()
         let returnExpr = try emitCall(thunkBuilder)
         let funcLines = thunkBuilder.renderFunction(
@@ -3218,7 +3286,7 @@ extension BridgeJSLink {
         abiName: String,
         emitCall: (ImportedThunkBuilder) throws -> String?
     ) throws -> (js: [String], dts: [String]) {
-        let thunkBuilder = ImportedThunkBuilder()
+        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
         thunkBuilder.liftSelf()
         let returnExpr = try emitCall(thunkBuilder)
         let funcLines = thunkBuilder.renderFunction(
@@ -3233,7 +3301,7 @@ extension BridgeJSLink {
         context: ImportedTypeSkeleton,
         method: ImportedFunctionSkeleton
     ) throws -> (js: [String], dts: [String]) {
-        let thunkBuilder = ImportedThunkBuilder()
+        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
@@ -3259,7 +3327,7 @@ extension BridgeJSLink {
         context: ImportedTypeSkeleton,
         method: ImportedFunctionSkeleton
     ) throws -> (js: [String], dts: [String]) {
-        let thunkBuilder = ImportedThunkBuilder()
+        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
         thunkBuilder.liftSelf()
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)
@@ -3286,7 +3354,10 @@ extension BridgeJSLink {
             className: `protocol`.name
         )
 
-        let getterThunkBuilder = ImportedThunkBuilder(context: .exportSwift)
+        let getterThunkBuilder = ImportedThunkBuilder(
+            context: .exportSwift,
+            intrinsicRegistry: intrinsicRegistry
+        )
         getterThunkBuilder.liftSelf()
         let returnExpr = try getterThunkBuilder.callPropertyGetter(name: property.name, returnType: property.type)
         let getterLines = getterThunkBuilder.renderFunction(
@@ -3304,7 +3375,10 @@ extension BridgeJSLink {
                 operation: "set",
                 className: `protocol`.name
             )
-            let setterThunkBuilder = ImportedThunkBuilder(context: .exportSwift)
+            let setterThunkBuilder = ImportedThunkBuilder(
+                context: .exportSwift,
+                intrinsicRegistry: intrinsicRegistry
+            )
             setterThunkBuilder.liftSelf()
             try setterThunkBuilder.liftParameter(
                 param: Parameter(label: nil, name: "value", type: property.type)
@@ -3324,7 +3398,10 @@ extension BridgeJSLink {
         protocol: ExportedProtocol,
         method: ExportedFunction
     ) throws {
-        let thunkBuilder = ImportedThunkBuilder(context: .exportSwift)
+        let thunkBuilder = ImportedThunkBuilder(
+            context: .exportSwift,
+            intrinsicRegistry: intrinsicRegistry
+        )
         thunkBuilder.liftSelf()
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)
