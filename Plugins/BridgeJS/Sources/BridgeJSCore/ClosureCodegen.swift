@@ -22,7 +22,7 @@ public struct ClosureCodegen {
                 collectClosureSignatures(from: paramType, into: &signatures)
             }
             collectClosureSignatures(from: signature.returnType, into: &signatures)
-        case .optional(let wrapped):
+        case .nullable(let wrapped, _):
             collectClosureSignatures(from: wrapped, into: &signatures)
         default:
             break

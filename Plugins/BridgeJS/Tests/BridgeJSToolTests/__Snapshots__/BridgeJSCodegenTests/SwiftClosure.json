@@ -202,30 +202,33 @@
                       "moduleName" : "TestModule",
                       "parameters" : [
                         {
-                          "optional" : {
+                          "nullable" : {
                             "_0" : {
                               "swiftHeapObject" : {
                                 "_0" : "Person"
                               }
-                            }
+                            },
+                            "_1" : "null"
                           }
                         },
                         {
-                          "optional" : {
+                          "nullable" : {
                             "_0" : {
                               "string" : {
 
                               }
-                            }
+                            },
+                            "_1" : "null"
                           }
                         },
                         {
-                          "optional" : {
+                          "nullable" : {
                             "_0" : {
                               "double" : {
 
                               }
-                            }
+                            },
+                            "_1" : "null"
                           }
                         }
                       ],
@@ -325,12 +328,13 @@
                       "moduleName" : "TestModule",
                       "parameters" : [
                         {
-                          "optional" : {
+                          "nullable" : {
                             "_0" : {
                               "swiftHeapObject" : {
                                 "_0" : "Person"
                               }
-                            }
+                            },
+                            "_1" : "null"
                           }
                         }
                       ],
@@ -353,12 +357,13 @@
                   "moduleName" : "TestModule",
                   "parameters" : [
                     {
-                      "optional" : {
+                      "nullable" : {
                         "_0" : {
                           "swiftHeapObject" : {
                             "_0" : "Person"
                           }
-                        }
+                        },
+                        "_1" : "null"
                       }
                     }
                   ],
@@ -700,12 +705,13 @@
                       "moduleName" : "TestModule",
                       "parameters" : [
                         {
-                          "optional" : {
+                          "nullable" : {
                             "_0" : {
                               "caseEnum" : {
                                 "_0" : "Direction"
                               }
-                            }
+                            },
+                            "_1" : "null"
                           }
                         }
                       ],
@@ -746,13 +752,14 @@
                       "moduleName" : "TestModule",
                       "parameters" : [
                         {
-                          "optional" : {
+                          "nullable" : {
                             "_0" : {
                               "rawValueEnum" : {
                                 "_0" : "Theme",
                                 "_1" : "String"
                               }
-                            }
+                            },
+                            "_1" : "null"
                           }
                         }
                       ],
@@ -793,12 +800,13 @@
                       "moduleName" : "TestModule",
                       "parameters" : [
                         {
-                          "optional" : {
+                          "nullable" : {
                             "_0" : {
                               "associatedValueEnum" : {
                                 "_0" : "APIResult"
                               }
-                            }
+                            },
+                            "_1" : "null"
                           }
                         }
                       ],
@@ -838,12 +846,13 @@
                   "moduleName" : "TestModule",
                   "parameters" : [
                     {
-                      "optional" : {
+                      "nullable" : {
                         "_0" : {
                           "caseEnum" : {
                             "_0" : "Direction"
                           }
-                        }
+                        },
+                        "_1" : "null"
                       }
                     }
                   ],

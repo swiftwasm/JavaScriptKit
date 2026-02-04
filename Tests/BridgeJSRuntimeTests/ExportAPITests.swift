@@ -611,6 +611,29 @@ typealias OptionalAge = Int?
 @JS func roundTripOptionalClass(value: Greeter?) -> Greeter? {
     return value
 }
+
+@JS func roundTripOptionalGreeter(_ value: Greeter?) -> Greeter? {
+    value
+}
+
+@JS func applyOptionalGreeter(_ value: Greeter?, _ transform: (Greeter?) -> Greeter?) -> Greeter? {
+    transform(value)
+}
+
+@JS class OptionalHolder {
+    @JS var nullableGreeter: Greeter?
+    @JS var undefinedNumber: JSUndefinedOr<Double>
+
+    @JS init(nullableGreeter: Greeter?, undefinedNumber: JSUndefinedOr<Double>) {
+        self.nullableGreeter = nullableGreeter
+        self.undefinedNumber = undefinedNumber
+    }
+}
+
+@JS func makeOptionalHolder(nullableGreeter: Greeter?, undefinedNumber: JSUndefinedOr<Double>) -> OptionalHolder {
+    OptionalHolder(nullableGreeter: nullableGreeter, undefinedNumber: undefinedNumber)
+}
+
 @JS class OptionalPropertyHolder {
     @JS var optionalName: String?
     @JS var optionalAge: Int? = nil

@@ -680,6 +680,54 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC(_ callback: Int32, _ param0IsSome: Int32, _ param0Pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC(_ callback: Int32, _ param0IsSome: Int32, _ param0Pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC: _BridgedSwiftClosureBox {
+    let closure: (Optional<Greeter>) -> Optional<Greeter>
+    init(_ closure: @escaping (Optional<Greeter>) -> Optional<Greeter>) {
+        self.closure = closure
+    }
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC {
+    static func bridgeJSLower(_ closure: @escaping (Optional<Greeter>) -> Optional<Greeter>) -> UnsafeMutableRawPointer {
+        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC(closure)
+        return Unmanaged.passRetained(box).toOpaque()
+    }
+    static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Greeter>) -> Optional<Greeter> {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let (param0IsSome, param0Pointer) = param0.bridgeJSLowerParameter()
+            let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC(callbackValue, param0IsSome, param0Pointer)
+            return Optional<Greeter>.bridgeJSLiftReturn(ret)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC>.fromOpaque(boxPtr).takeUnretainedValue()
+    let result = box.closure(Optional<Greeter>.bridgeJSLiftParameter(param0IsSome, param0Value))
+    return result.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9APIResultO_SS")
 fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9APIResultO_SS(_ callback: Int32, _ param0IsSome: Int32, _ param0CaseId: Int32) -> Int32
 #else
@@ -4416,6 +4464,39 @@ public func _bjs_roundTripOptionalClass(_ valueIsSome: Int32, _ valueValue: Unsa
     #endif
 }
 
+@_expose(wasm, "bjs_roundTripOptionalGreeter")
+@_cdecl("bjs_roundTripOptionalGreeter")
+public func _bjs_roundTripOptionalGreeter(_ valueIsSome: Int32, _ valueValue: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripOptionalGreeter(_: Optional<Greeter>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_applyOptionalGreeter")
+@_cdecl("bjs_applyOptionalGreeter")
+public func _bjs_applyOptionalGreeter(_ valueIsSome: Int32, _ valueValue: UnsafeMutableRawPointer, _ transform: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = applyOptionalGreeter(_: Optional<Greeter>.bridgeJSLiftParameter(valueIsSome, valueValue), _: _BJS_Closure_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC.bridgeJSLift(transform))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeOptionalHolder")
+@_cdecl("bjs_makeOptionalHolder")
+public func _bjs_makeOptionalHolder(_ nullableGreeterIsSome: Int32, _ nullableGreeterValue: UnsafeMutableRawPointer, _ undefinedNumberIsSome: Int32, _ undefinedNumberValue: Float64) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = makeOptionalHolder(nullableGreeter: Optional<Greeter>.bridgeJSLiftParameter(nullableGreeterIsSome, nullableGreeterValue), undefinedNumber: JSUndefinedOr<Double>.bridgeJSLiftParameter(undefinedNumberIsSome, undefinedNumberValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundTripOptionalAPIOptionalResult")
 @_cdecl("bjs_roundTripOptionalAPIOptionalResult")
 public func _bjs_roundTripOptionalAPIOptionalResult(_ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
@@ -5822,6 +5903,84 @@ extension Internal.TestServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 fileprivate func _bjs_TestServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
 fileprivate func _bjs_TestServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+@_expose(wasm, "bjs_OptionalHolder_init")
+@_cdecl("bjs_OptionalHolder_init")
+public func _bjs_OptionalHolder_init(_ nullableGreeterIsSome: Int32, _ nullableGreeterValue: UnsafeMutableRawPointer, _ undefinedNumberIsSome: Int32, _ undefinedNumberValue: Float64) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = OptionalHolder(nullableGreeter: Optional<Greeter>.bridgeJSLiftParameter(nullableGreeterIsSome, nullableGreeterValue), undefinedNumber: JSUndefinedOr<Double>.bridgeJSLiftParameter(undefinedNumberIsSome, undefinedNumberValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalHolder_nullableGreeter_get")
+@_cdecl("bjs_OptionalHolder_nullableGreeter_get")
+public func _bjs_OptionalHolder_nullableGreeter_get(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalHolder.bridgeJSLiftParameter(_self).nullableGreeter
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalHolder_nullableGreeter_set")
+@_cdecl("bjs_OptionalHolder_nullableGreeter_set")
+public func _bjs_OptionalHolder_nullableGreeter_set(_ _self: UnsafeMutableRawPointer, _ valueIsSome: Int32, _ valueValue: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    OptionalHolder.bridgeJSLiftParameter(_self).nullableGreeter = Optional<Greeter>.bridgeJSLiftParameter(valueIsSome, valueValue)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalHolder_undefinedNumber_get")
+@_cdecl("bjs_OptionalHolder_undefinedNumber_get")
+public func _bjs_OptionalHolder_undefinedNumber_get(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalHolder.bridgeJSLiftParameter(_self).undefinedNumber
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalHolder_undefinedNumber_set")
+@_cdecl("bjs_OptionalHolder_undefinedNumber_set")
+public func _bjs_OptionalHolder_undefinedNumber_set(_ _self: UnsafeMutableRawPointer, _ valueIsSome: Int32, _ valueValue: Float64) -> Void {
+    #if arch(wasm32)
+    OptionalHolder.bridgeJSLiftParameter(_self).undefinedNumber = JSUndefinedOr<Double>.bridgeJSLiftParameter(valueIsSome, valueValue)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalHolder_deinit")
+@_cdecl("bjs_OptionalHolder_deinit")
+public func _bjs_OptionalHolder_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<OptionalHolder>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension OptionalHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_OptionalHolder_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalHolder_wrap")
+fileprivate func _bjs_OptionalHolder_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_OptionalHolder_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -7853,6 +8012,42 @@ func _$jsRoundTripString(_ v: String) throws(JSException) -> String {
         throw error
     }
     return String.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripOptionalNumberNull")
+fileprivate func bjs_jsRoundTripOptionalNumberNull(_ vIsSome: Int32, _ vValue: Float64) -> Void
+#else
+fileprivate func bjs_jsRoundTripOptionalNumberNull(_ vIsSome: Int32, _ vValue: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsRoundTripOptionalNumberNull(_ v: Optional<Double>) throws(JSException) -> Optional<Double> {
+    let (vIsSome, vValue) = v.bridgeJSLowerParameter()
+    bjs_jsRoundTripOptionalNumberNull(vIsSome, vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<Double>.bridgeJSLiftReturnFromSideChannel()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripOptionalNumberUndefined")
+fileprivate func bjs_jsRoundTripOptionalNumberUndefined(_ vIsSome: Int32, _ vValue: Float64) -> Void
+#else
+fileprivate func bjs_jsRoundTripOptionalNumberUndefined(_ vIsSome: Int32, _ vValue: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsRoundTripOptionalNumberUndefined(_ v: JSUndefinedOr<Double>) throws(JSException) -> JSUndefinedOr<Double> {
+    let (vIsSome, vValue) = v.bridgeJSLowerParameter()
+    bjs_jsRoundTripOptionalNumberUndefined(vIsSome, vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUndefinedOr<Double>.bridgeJSLiftReturnFromSideChannel()
 }
 
 #if arch(wasm32)

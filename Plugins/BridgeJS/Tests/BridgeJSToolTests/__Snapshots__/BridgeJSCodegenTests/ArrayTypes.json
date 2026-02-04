@@ -516,12 +516,13 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "int" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -531,12 +532,13 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -557,12 +559,13 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "string" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -572,12 +575,13 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -596,7 +600,7 @@
             "label" : "_",
             "name" : "values",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "array" : {
                     "_0" : {
@@ -605,13 +609,14 @@
                       }
                     }
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "array" : {
                 "_0" : {
@@ -620,7 +625,8 @@
                   }
                 }
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -639,12 +645,13 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "swiftStruct" : {
                         "_0" : "Point"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -654,12 +661,13 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftStruct" : {
                     "_0" : "Point"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -680,12 +688,13 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "caseEnum" : {
                         "_0" : "Direction"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -695,12 +704,13 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "Direction"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -721,13 +731,14 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "rawValueEnum" : {
                         "_0" : "Status",
                         "_1" : "Int"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -737,13 +748,14 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Status",
                     "_1" : "Int"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -994,12 +1006,13 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "jsObject" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -1009,12 +1022,13 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "jsObject" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }

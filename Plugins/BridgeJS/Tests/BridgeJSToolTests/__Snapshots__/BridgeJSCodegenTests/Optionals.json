@@ -14,12 +14,13 @@
               "label" : "name",
               "name" : "name",
               "type" : {
-                "optional" : {
+                "nullable" : {
                   "_0" : {
                     "string" : {
 
                     }
-                  }
+                  },
+                  "_1" : "null"
                 }
               }
             }
@@ -56,12 +57,13 @@
                 "label" : "name",
                 "name" : "name",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "string" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -80,12 +82,13 @@
             "isStatic" : false,
             "name" : "name",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -114,12 +117,13 @@
             "isStatic" : false,
             "name" : "optionalName",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -128,12 +132,13 @@
             "isStatic" : false,
             "name" : "optionalAge",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -142,12 +147,13 @@
             "isStatic" : false,
             "name" : "optionalGreeter",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftHeapObject" : {
                     "_0" : "Greeter"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -173,23 +179,25 @@
             "label" : "value",
             "name" : "value",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftHeapObject" : {
                     "_0" : "Greeter"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "swiftHeapObject" : {
                 "_0" : "Greeter"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -206,23 +214,25 @@
             "label" : "_",
             "name" : "holder",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftHeapObject" : {
                     "_0" : "OptionalPropertyHolder"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "swiftHeapObject" : {
                 "_0" : "OptionalPropertyHolder"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -239,23 +249,25 @@
             "label" : "name",
             "name" : "name",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -272,23 +284,25 @@
             "label" : "value",
             "name" : "value",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "int" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -305,23 +319,25 @@
             "label" : "flag",
             "name" : "flag",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "bool" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "bool" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -338,23 +354,25 @@
             "label" : "number",
             "name" : "number",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "float" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "float" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -371,23 +389,25 @@
             "label" : "precision",
             "name" : "precision",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "double" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "double" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -404,23 +424,25 @@
             "label" : "name",
             "name" : "name",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -437,23 +459,25 @@
             "label" : "name",
             "name" : "name",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -470,23 +494,25 @@
             "label" : "name",
             "name" : "name",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -503,23 +529,25 @@
             "label" : "name",
             "name" : "name",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -536,23 +564,25 @@
             "label" : "value",
             "name" : "value",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "double" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "double" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -569,23 +599,25 @@
             "label" : "age",
             "name" : "age",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "int" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -602,23 +634,25 @@
             "label" : "name",
             "name" : "name",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -635,12 +669,13 @@
             "label" : "firstName",
             "name" : "firstName",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -648,12 +683,13 @@
             "label" : "lastName",
             "name" : "lastName",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -661,12 +697,13 @@
             "label" : "age",
             "name" : "age",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -681,12 +718,13 @@
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       }
@@ -696,6 +734,496 @@
     ],
     "structs" : [
 
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "constructor" : {
+              "parameters" : [
+                {
+                  "name" : "valueOrNull",
+                  "type" : {
+                    "nullable" : {
+                      "_0" : {
+                        "string" : {
+
+                        }
+                      },
+                      "_1" : "null"
+                    }
+                  }
+                },
+                {
+                  "name" : "valueOrUndefined",
+                  "type" : {
+                    "nullable" : {
+                      "_0" : {
+                        "string" : {
+
+                        }
+                      },
+                      "_1" : "undefined"
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+              {
+                "name" : "stringOrNull",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "name" : "stringOrUndefined",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              },
+              {
+                "name" : "doubleOrNull",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "name" : "doubleOrUndefined",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              },
+              {
+                "name" : "boolOrNull",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "bool" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "name" : "boolOrUndefined",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "bool" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              },
+              {
+                "name" : "intOrNull",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "name" : "intOrUndefined",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              }
+            ],
+            "methods" : [
+              {
+                "name" : "roundTripStringOrNull",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "name" : "roundTripStringOrUndefined",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        },
+                        "_1" : "undefined"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              },
+              {
+                "name" : "roundTripDoubleOrNull",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "double" : {
+
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "name" : "roundTripDoubleOrUndefined",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "double" : {
+
+                          }
+                        },
+                        "_1" : "undefined"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              },
+              {
+                "name" : "roundTripBoolOrNull",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "bool" : {
+
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "bool" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "name" : "roundTripBoolOrUndefined",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "bool" : {
+
+                          }
+                        },
+                        "_1" : "undefined"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "bool" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              },
+              {
+                "name" : "roundTripIntOrNull",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "name" : "roundTripIntOrUndefined",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        },
+                        "_1" : "undefined"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              }
+            ],
+            "name" : "WithOptionalJSClass",
+            "setters" : [
+              {
+                "functionName" : "stringOrNull_set",
+                "name" : "stringOrNull",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "functionName" : "stringOrUndefined_set",
+                "name" : "stringOrUndefined",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              },
+              {
+                "functionName" : "doubleOrNull_set",
+                "name" : "doubleOrNull",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "functionName" : "doubleOrUndefined_set",
+                "name" : "doubleOrUndefined",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              },
+              {
+                "functionName" : "boolOrNull_set",
+                "name" : "boolOrNull",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "bool" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "functionName" : "boolOrUndefined_set",
+                "name" : "boolOrUndefined",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "bool" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              },
+              {
+                "functionName" : "intOrNull_set",
+                "name" : "intOrNull",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "functionName" : "intOrUndefined_set",
+                "name" : "intOrUndefined",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
     ]
   },
   "moduleName" : "TestModule"

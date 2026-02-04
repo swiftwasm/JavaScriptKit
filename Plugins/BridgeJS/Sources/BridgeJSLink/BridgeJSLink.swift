@@ -297,7 +297,7 @@ public struct BridgeJSLink {
         switch type {
         case .closure:
             return true
-        case .optional(let wrapped):
+        case .nullable(let wrapped, _):
             return containsClosureType(in: wrapped)
         default:
             return false
@@ -746,7 +746,7 @@ public struct BridgeJSLink {
                 collectClosureSignatures(from: paramType, into: &signatures)
             }
             collectClosureSignatures(from: signature.returnType, into: &signatures)
-        case .optional(let wrapped):
+        case .nullable(let wrapped, _):
             collectClosureSignatures(from: wrapped, into: &signatures)
         default:
             break
@@ -764,7 +764,7 @@ public struct BridgeJSLink {
         // Build parameter list for invoke function
         var invokeParams: [String] = ["callbackId"]
         for (index, paramType) in signature.parameters.enumerated() {
-            if case .optional = paramType {
+            if case .nullable = paramType {
                 invokeParams.append("param\(index)IsSome")
                 invokeParams.append("param\(index)Value")
             } else {
@@ -782,7 +782,7 @@ public struct BridgeJSLink {
                 for (index, paramType) in signature.parameters.enumerated() {
                     let fragment = try! IntrinsicJSFragment.closureLiftParameter(type: paramType)
                     let args: [String]
-                    if case .optional = paramType {
+                    if case .nullable = paramType {
                         args = ["param\(index)IsSome", "param\(index)Value", "param\(index)"]
                     } else {
                         args = ["param\(index)Id", "param\(index)"]
@@ -1428,8 +1428,9 @@ public struct BridgeJSLink {
             return type.tsType
         case .swiftStruct(let name):
             return name.components(separatedBy: ".").last ?? name
-        case .optional(let wrapped):
-            return "\(resolveTypeScriptType(wrapped, exportedSkeletons: exportedSkeletons)) | null"
+        case .nullable(let wrapped, let kind):
+            let base = resolveTypeScriptType(wrapped, exportedSkeletons: exportedSkeletons)
+            return "\(base) | \(kind.absenceLiteral)"
         case .array(let elementType):
             let elementTypeStr = resolveTypeScriptType(elementType, exportedSkeletons: exportedSkeletons)
             // Parenthesize compound types so `[]` binds correctly in TypeScript
@@ -2258,7 +2259,7 @@ extension BridgeJSLink {
             let objectExpr = "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)"
             let accessExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
             if context == .exportSwift, returnType.usesSideChannelForOptionalReturn() {
-                guard case .optional(let wrappedType) = returnType else {
+                guard case .nullable(let wrappedType, _) = returnType else {
                     fatalError("usesSideChannelForOptionalReturn returned true for non-optional type")
                 }
 
@@ -3450,8 +3451,8 @@ extension BridgeType {
             return name
         case .unsafePointer:
             return "number"
-        case .optional(let wrappedType):
-            return "\(wrappedType.tsType) | null"
+        case .nullable(let wrappedType, let kind):
+            return "\(wrappedType.tsType) | \(kind.absenceLiteral)"
         case .caseEnum(let name):
             return "\(name)Tag"
         case .rawValueEnum(let name, _):

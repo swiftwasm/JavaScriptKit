@@ -527,6 +527,83 @@
       },
       {
         "constructor" : {
+          "abiName" : "bjs_OptionalHolder_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "nullableGreeter",
+              "name" : "nullableGreeter",
+              "type" : {
+                "nullable" : {
+                  "_0" : {
+                    "swiftHeapObject" : {
+                      "_0" : "Greeter"
+                    }
+                  },
+                  "_1" : "null"
+                }
+              }
+            },
+            {
+              "label" : "undefinedNumber",
+              "name" : "undefinedNumber",
+              "type" : {
+                "nullable" : {
+                  "_0" : {
+                    "double" : {
+
+                    }
+                  },
+                  "_1" : "undefined"
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "OptionalHolder",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "nullableGreeter",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "undefinedNumber",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                },
+                "_1" : "undefined"
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "OptionalHolder"
+      },
+      {
+        "constructor" : {
           "abiName" : "bjs_OptionalPropertyHolder_init",
           "effects" : {
             "isAsync" : false,
@@ -538,12 +615,13 @@
               "label" : "optionalName",
               "name" : "optionalName",
               "type" : {
-                "optional" : {
+                "nullable" : {
                   "_0" : {
                     "string" : {
 
                     }
-                  }
+                  },
+                  "_1" : "null"
                 }
               }
             }
@@ -559,12 +637,13 @@
             "isStatic" : false,
             "name" : "optionalName",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -573,12 +652,13 @@
             "isStatic" : false,
             "name" : "optionalAge",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -587,12 +667,13 @@
             "isStatic" : false,
             "name" : "optionalGreeter",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftHeapObject" : {
                     "_0" : "Greeter"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -1057,12 +1138,13 @@
               "label" : "tag",
               "name" : "tag",
               "type" : {
-                "optional" : {
+                "nullable" : {
                   "_0" : {
                     "string" : {
 
                     }
-                  }
+                  },
+                  "_1" : "null"
                 }
               }
             }
@@ -1134,12 +1216,13 @@
             "isStatic" : false,
             "name" : "tag",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -1293,12 +1376,13 @@
               }
             },
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -1312,12 +1396,13 @@
               }
             },
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -1499,12 +1584,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -1537,12 +1623,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -1559,12 +1646,13 @@
                 "label" : "_",
                 "name" : "tag",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "string" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -1587,12 +1675,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -1609,12 +1698,13 @@
                 "label" : "_",
                 "name" : "count",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "int" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -1637,12 +1727,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "Direction"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -1659,12 +1750,13 @@
                 "label" : "_",
                 "name" : "direction",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "caseEnum" : {
                         "_0" : "Direction"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -1687,13 +1779,14 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Theme",
                     "_1" : "String"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -1710,13 +1803,14 @@
                 "label" : "_",
                 "name" : "theme",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "rawValueEnum" : {
                         "_0" : "Theme",
                         "_1" : "String"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -1739,13 +1833,14 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "HttpStatus",
                     "_1" : "Int"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -1762,13 +1857,14 @@
                 "label" : "_",
                 "name" : "status",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "rawValueEnum" : {
                         "_0" : "HttpStatus",
                         "_1" : "Int"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -1791,12 +1887,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -1813,12 +1910,13 @@
                 "label" : "_",
                 "name" : "apiResult",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "associatedValueEnum" : {
                         "_0" : "APIResult"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -1847,12 +1945,13 @@
             "isStatic" : false,
             "name" : "backupProcessor",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftProtocol" : {
                     "_0" : "DataProcessor"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -2037,12 +2136,13 @@
                 "label" : "_",
                 "name" : "greeter",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "swiftHeapObject" : {
                         "_0" : "Greeter"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -2065,12 +2165,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftHeapObject" : {
                     "_0" : "Greeter"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -2087,12 +2188,13 @@
                 "label" : "_",
                 "name" : "result",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "associatedValueEnum" : {
                         "_0" : "APIResult"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -2115,12 +2217,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -2152,12 +2255,13 @@
             "isStatic" : false,
             "name" : "optionalTag",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -2166,12 +2270,13 @@
             "isStatic" : false,
             "name" : "optionalCount",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -2180,12 +2285,13 @@
             "isStatic" : false,
             "name" : "direction",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "Direction"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -2194,13 +2300,14 @@
             "isStatic" : false,
             "name" : "optionalTheme",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Theme",
                     "_1" : "String"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -2209,13 +2316,14 @@
             "isStatic" : false,
             "name" : "httpStatus",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "HttpStatus",
                     "_1" : "Int"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -2224,12 +2332,13 @@
             "isStatic" : false,
             "name" : "apiResult",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -2248,12 +2357,13 @@
             "isStatic" : false,
             "name" : "optionalHelper",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftHeapObject" : {
                     "_0" : "Greeter"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -2439,12 +2549,13 @@
                       "moduleName" : "BridgeJSRuntimeTests",
                       "parameters" : [
                         {
-                          "optional" : {
+                          "nullable" : {
                             "_0" : {
                               "string" : {
 
                               }
-                            }
+                            },
+                            "_1" : "null"
                           }
                         }
                       ],
@@ -2485,12 +2596,13 @@
                       "moduleName" : "BridgeJSRuntimeTests",
                       "parameters" : [
                         {
-                          "optional" : {
+                          "nullable" : {
                             "_0" : {
                               "int" : {
 
                               }
-                            }
+                            },
+                            "_1" : "null"
                           }
                         }
                       ],
@@ -2531,12 +2643,13 @@
                       "moduleName" : "BridgeJSRuntimeTests",
                       "parameters" : [
                         {
-                          "optional" : {
+                          "nullable" : {
                             "_0" : {
                               "swiftHeapObject" : {
                                 "_0" : "Greeter"
                               }
-                            }
+                            },
+                            "_1" : "null"
                           }
                         }
                       ],
@@ -2576,12 +2689,13 @@
                   "moduleName" : "BridgeJSRuntimeTests",
                   "parameters" : [
                     {
-                      "optional" : {
+                      "nullable" : {
                         "_0" : {
                           "string" : {
 
                           }
-                        }
+                        },
+                        "_1" : "null"
                       }
                     }
                   ],
@@ -2616,12 +2730,13 @@
 
                   ],
                   "returnType" : {
-                    "optional" : {
+                    "nullable" : {
                       "_0" : {
                         "swiftHeapObject" : {
                           "_0" : "Greeter"
                         }
-                      }
+                      },
+                      "_1" : "null"
                     }
                   }
                 }
@@ -2957,12 +3072,13 @@
                       "moduleName" : "BridgeJSRuntimeTests",
                       "parameters" : [
                         {
-                          "optional" : {
+                          "nullable" : {
                             "_0" : {
                               "caseEnum" : {
                                 "_0" : "Direction"
                               }
-                            }
+                            },
+                            "_1" : "null"
                           }
                         }
                       ],
@@ -3003,13 +3119,14 @@
                       "moduleName" : "BridgeJSRuntimeTests",
                       "parameters" : [
                         {
-                          "optional" : {
+                          "nullable" : {
                             "_0" : {
                               "rawValueEnum" : {
                                 "_0" : "Theme",
                                 "_1" : "String"
                               }
-                            }
+                            },
+                            "_1" : "null"
                           }
                         }
                       ],
@@ -3050,12 +3167,13 @@
                       "moduleName" : "BridgeJSRuntimeTests",
                       "parameters" : [
                         {
-                          "optional" : {
+                          "nullable" : {
                             "_0" : {
                               "associatedValueEnum" : {
                                 "_0" : "APIResult"
                               }
-                            }
+                            },
+                            "_1" : "null"
                           }
                         }
                       ],
@@ -3095,12 +3213,13 @@
                   "moduleName" : "BridgeJSRuntimeTests",
                   "parameters" : [
                     {
-                      "optional" : {
+                      "nullable" : {
                         "_0" : {
                           "caseEnum" : {
                             "_0" : "Direction"
                           }
-                        }
+                        },
+                        "_1" : "null"
                       }
                     }
                   ],
@@ -3142,12 +3261,13 @@
               "label" : "config",
               "name" : "config",
               "type" : {
-                "optional" : {
+                "nullable" : {
                   "_0" : {
                     "swiftStruct" : {
                       "_0" : "Config"
                     }
-                  }
+                  },
+                  "_1" : "null"
                 }
               }
             }
@@ -3173,12 +3293,13 @@
             "isStatic" : false,
             "name" : "config",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftStruct" : {
                     "_0" : "Config"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -4242,12 +4363,13 @@
             "associatedValues" : [
               {
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "string" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -4258,23 +4380,25 @@
             "associatedValues" : [
               {
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "int" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               },
               {
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "bool" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -4285,34 +4409,37 @@
             "associatedValues" : [
               {
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "bool" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               },
               {
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "int" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               },
               {
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "string" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -6782,23 +6909,25 @@
             "label" : "name",
             "name" : "name",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -6815,23 +6944,25 @@
             "label" : "value",
             "name" : "value",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "int" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -6848,23 +6979,25 @@
             "label" : "flag",
             "name" : "flag",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "bool" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "bool" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -6881,23 +7014,25 @@
             "label" : "number",
             "name" : "number",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "float" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "float" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -6914,23 +7049,25 @@
             "label" : "precision",
             "name" : "precision",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "double" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "double" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -6947,23 +7084,25 @@
             "label" : "name",
             "name" : "name",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -6980,23 +7119,25 @@
             "label" : "name",
             "name" : "name",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -7013,23 +7154,25 @@
             "label" : "name",
             "name" : "name",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -7046,23 +7189,25 @@
             "label" : "value",
             "name" : "value",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "double" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "double" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -7079,23 +7224,25 @@
             "label" : "age",
             "name" : "age",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "int" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -7112,23 +7259,25 @@
             "label" : "value",
             "name" : "value",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "Status"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "caseEnum" : {
                 "_0" : "Status"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -7145,25 +7294,27 @@
             "label" : "value",
             "name" : "value",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Theme",
                     "_1" : "String"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "Theme",
                 "_1" : "String"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -7180,25 +7331,27 @@
             "label" : "value",
             "name" : "value",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "HttpStatus",
                     "_1" : "Int"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "HttpStatus",
                 "_1" : "Int"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -7215,23 +7368,25 @@
             "label" : "value",
             "name" : "value",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "TSDirection"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "caseEnum" : {
                 "_0" : "TSDirection"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -7248,25 +7403,27 @@
             "label" : "value",
             "name" : "value",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "TSTheme",
                     "_1" : "String"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "TSTheme",
                 "_1" : "String"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -7283,23 +7440,25 @@
             "label" : "_",
             "name" : "method",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "Networking.API.Method"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "caseEnum" : {
                 "_0" : "Networking.API.Method"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -7316,23 +7475,25 @@
             "label" : "value",
             "name" : "value",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "associatedValueEnum" : {
                 "_0" : "APIResult"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -7349,12 +7510,13 @@
             "label" : "_",
             "name" : "r1",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -7362,12 +7524,13 @@
             "label" : "_",
             "name" : "r2",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -7391,23 +7554,25 @@
             "label" : "_",
             "name" : "result",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "ComplexResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "associatedValueEnum" : {
                 "_0" : "ComplexResult"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -7424,10 +7589,117 @@
             "label" : "value",
             "name" : "value",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftHeapObject" : {
                     "_0" : "Greeter"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "swiftHeapObject" : {
+                "_0" : "Greeter"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripOptionalGreeter",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripOptionalGreeter",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "swiftHeapObject" : {
+                "_0" : "Greeter"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_applyOptionalGreeter",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "applyOptionalGreeter",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "transform",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "nullable" : {
+                        "_0" : {
+                          "swiftHeapObject" : {
+                            "_0" : "Greeter"
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "nullable" : {
+                      "_0" : {
+                        "swiftHeapObject" : {
+                          "_0" : "Greeter"
+                        }
+                      },
+                      "_1" : "null"
+                    }
                   }
                 }
               }
@@ -7435,12 +7707,57 @@
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "swiftHeapObject" : {
                 "_0" : "Greeter"
               }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeOptionalHolder",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeOptionalHolder",
+        "parameters" : [
+          {
+            "label" : "nullableGreeter",
+            "name" : "nullableGreeter",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                },
+                "_1" : "null"
+              }
             }
+          },
+          {
+            "label" : "undefinedNumber",
+            "name" : "undefinedNumber",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                },
+                "_1" : "undefined"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftHeapObject" : {
+            "_0" : "OptionalHolder"
           }
         }
       },
@@ -7457,23 +7774,25 @@
             "label" : "result",
             "name" : "result",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIOptionalResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "associatedValueEnum" : {
                 "_0" : "APIOptionalResult"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -7714,23 +8033,25 @@
             "label" : "name",
             "name" : "name",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -8022,7 +8343,7 @@
             "label" : "_",
             "name" : "values",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "array" : {
                     "_0" : {
@@ -8031,7 +8352,8 @@
                       }
                     }
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -8599,12 +8921,13 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "int" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -8614,12 +8937,13 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -8640,12 +8964,13 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "string" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -8655,12 +8980,13 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -8681,12 +9007,13 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "swiftStruct" : {
                         "_0" : "DataPoint"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -8696,12 +9023,13 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftStruct" : {
                     "_0" : "DataPoint"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -8722,12 +9050,13 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "caseEnum" : {
                         "_0" : "Direction"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -8737,12 +9066,13 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "Direction"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -8763,12 +9093,13 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "caseEnum" : {
                         "_0" : "Status"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -8778,12 +9109,13 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "Status"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -8802,7 +9134,7 @@
             "label" : "_",
             "name" : "values",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "array" : {
                     "_0" : {
@@ -8811,13 +9143,14 @@
                       }
                     }
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "array" : {
                 "_0" : {
@@ -8826,7 +9159,8 @@
                   }
                 }
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -8843,7 +9177,7 @@
             "label" : "_",
             "name" : "values",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "array" : {
                     "_0" : {
@@ -8852,13 +9186,14 @@
                       }
                     }
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "array" : {
                 "_0" : {
@@ -8867,7 +9202,8 @@
                   }
                 }
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -8884,7 +9220,7 @@
             "label" : "_",
             "name" : "greeters",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "array" : {
                     "_0" : {
@@ -8893,13 +9229,14 @@
                       }
                     }
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "array" : {
                 "_0" : {
@@ -8908,7 +9245,8 @@
                   }
                 }
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -9498,12 +9836,13 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "jsObject" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -9513,12 +9852,13 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "jsObject" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -9572,12 +9912,13 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "jsObject" : {
                         "_0" : "Foo"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -9587,12 +9928,13 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "jsObject" : {
                     "_0" : "Foo"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -9933,12 +10275,13 @@
             "label" : "_",
             "name" : "newResult",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -10202,12 +10545,13 @@
                 "label" : "_",
                 "name" : "greeter",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "swiftHeapObject" : {
                         "_0" : "Greeter"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -10230,12 +10574,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftHeapObject" : {
                     "_0" : "Greeter"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -10252,12 +10597,13 @@
                 "label" : "_",
                 "name" : "result",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "associatedValueEnum" : {
                         "_0" : "APIResult"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -10280,12 +10626,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -10314,12 +10661,13 @@
             "isReadonly" : false,
             "name" : "optionalTag",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -10327,12 +10675,13 @@
             "isReadonly" : false,
             "name" : "optionalCount",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -10340,12 +10689,13 @@
             "isReadonly" : false,
             "name" : "direction",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "Direction"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -10353,13 +10703,14 @@
             "isReadonly" : false,
             "name" : "optionalTheme",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Theme",
                     "_1" : "String"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -10367,13 +10718,14 @@
             "isReadonly" : false,
             "name" : "httpStatus",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "HttpStatus",
                     "_1" : "Int"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -10381,12 +10733,13 @@
             "isReadonly" : false,
             "name" : "apiResult",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -10403,12 +10756,13 @@
             "isReadonly" : false,
             "name" : "optionalHelper",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftHeapObject" : {
                     "_0" : "Greeter"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -10623,12 +10977,13 @@
               "label" : "optCount",
               "name" : "optCount",
               "type" : {
-                "optional" : {
+                "nullable" : {
                   "_0" : {
                     "int" : {
 
                     }
-                  }
+                  },
+                  "_1" : "null"
                 }
               }
             },
@@ -10636,12 +10991,13 @@
               "label" : "optFlag",
               "name" : "optFlag",
               "type" : {
-                "optional" : {
+                "nullable" : {
                   "_0" : {
                     "bool" : {
 
                     }
-                  }
+                  },
+                  "_1" : "null"
                 }
               }
             }
@@ -10687,12 +11043,13 @@
             "isStatic" : false,
             "name" : "optCount",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -10701,12 +11058,13 @@
             "isStatic" : false,
             "name" : "optFlag",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "bool" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -10744,12 +11102,13 @@
             "isStatic" : false,
             "name" : "zipCode",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -10797,12 +11156,13 @@
             "isStatic" : false,
             "name" : "email",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -10811,12 +11171,13 @@
             "isStatic" : false,
             "name" : "secondaryAddress",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftStruct" : {
                     "_0" : "Address"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -10844,13 +11205,14 @@
             "isStatic" : false,
             "name" : "theme",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Theme",
                     "_1" : "String"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -10859,12 +11221,13 @@
             "isStatic" : false,
             "name" : "direction",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "Direction"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -10902,12 +11265,13 @@
             "isStatic" : false,
             "name" : "owner",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftHeapObject" : {
                     "_0" : "Greeter"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -10945,12 +11309,13 @@
             "isStatic" : false,
             "name" : "status",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "Status"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -10959,12 +11324,13 @@
             "isStatic" : false,
             "name" : "outcome",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -11033,12 +11399,13 @@
             "isStatic" : false,
             "name" : "result",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -11047,12 +11414,13 @@
             "isStatic" : false,
             "name" : "metadata",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "jsObject" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -11061,12 +11429,13 @@
             "isStatic" : false,
             "name" : "location",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftStruct" : {
                     "_0" : "DataPoint"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -11085,12 +11454,13 @@
             "isStatic" : false,
             "name" : "overrideDefaults",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftStruct" : {
                     "_0" : "ConfigStruct"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -11130,13 +11500,14 @@
             "isStatic" : false,
             "name" : "optionalPrecision",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Precision",
                     "_1" : "Float"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -11145,13 +11516,14 @@
             "isStatic" : false,
             "name" : "optionalRatio",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Ratio",
                     "_1" : "Double"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -11362,12 +11734,13 @@
             "isStatic" : false,
             "name" : "note",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -11463,12 +11836,13 @@
             "isStatic" : false,
             "name" : "shippingAddress",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftStruct" : {
                     "_0" : "Address"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -11585,12 +11959,13 @@
             "isStatic" : false,
             "name" : "optionalObject",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "jsObject" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -11618,12 +11993,13 @@
             "isStatic" : false,
             "name" : "optionalFoo",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "jsObject" : {
                     "_0" : "Foo"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -11739,6 +12115,62 @@
             "returnType" : {
               "string" : {
 
+              }
+            }
+          },
+          {
+            "name" : "jsRoundTripOptionalNumberNull",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          },
+          {
+            "name" : "jsRoundTripOptionalNumberUndefined",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                },
+                "_1" : "undefined"
               }
             }
           },

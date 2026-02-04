@@ -449,12 +449,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -470,12 +471,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -491,12 +493,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "bool" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -512,12 +515,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "bool" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -533,12 +537,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "double" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -554,12 +559,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "double" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -575,12 +581,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -596,12 +603,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -1844,12 +1852,13 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "optional" : {
+                      "nullable" : {
                         "_0" : {
                           "int" : {
 
                           }
-                        }
+                        },
+                        "_1" : "null"
                       }
                     }
                   }
@@ -1876,12 +1885,13 @@
             "returnType" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "int" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -1902,12 +1912,13 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "optional" : {
+                      "nullable" : {
                         "_0" : {
                           "int" : {
 
                           }
-                        }
+                        },
+                        "_1" : "null"
                       }
                     }
                   }
@@ -1917,12 +1928,13 @@
             "returnType" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "int" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -1943,12 +1955,13 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "optional" : {
+                      "nullable" : {
                         "_0" : {
                           "swiftStruct" : {
                             "_0" : "Point"
                           }
-                        }
+                        },
+                        "_1" : "null"
                       }
                     }
                   }
@@ -1975,12 +1988,13 @@
             "returnType" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "swiftStruct" : {
                         "_0" : "Point"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -2001,12 +2015,13 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "optional" : {
+                      "nullable" : {
                         "_0" : {
                           "swiftStruct" : {
                             "_0" : "Point"
                           }
-                        }
+                        },
+                        "_1" : "null"
                       }
                     }
                   }
@@ -2016,12 +2031,13 @@
             "returnType" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "swiftStruct" : {
                         "_0" : "Point"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -2040,7 +2056,7 @@
                 "label" : "_",
                 "name" : "values",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "array" : {
                         "_0" : {
@@ -2049,7 +2065,8 @@
                           }
                         }
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -2072,7 +2089,7 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "array" : {
                     "_0" : {
@@ -2081,7 +2098,8 @@
                       }
                     }
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -2097,7 +2115,7 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "array" : {
                     "_0" : {
@@ -2106,7 +2124,8 @@
                       }
                     }
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -2123,7 +2142,7 @@
                 "label" : "_",
                 "name" : "values",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "array" : {
                         "_0" : {
@@ -2132,13 +2151,14 @@
                           }
                         }
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "array" : {
                     "_0" : {
@@ -2147,7 +2167,8 @@
                       }
                     }
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -2601,12 +2622,13 @@
             "isStatic" : false,
             "name" : "email",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }

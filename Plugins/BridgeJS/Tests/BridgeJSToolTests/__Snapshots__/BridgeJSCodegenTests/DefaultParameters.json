@@ -135,12 +135,13 @@
               "label" : "tag",
               "name" : "tag",
               "type" : {
-                "optional" : {
+                "nullable" : {
                   "_0" : {
                     "string" : {
 
                     }
-                  }
+                  },
+                  "_1" : "null"
                 }
               }
             }
@@ -196,12 +197,13 @@
             "isStatic" : false,
             "name" : "tag",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -414,23 +416,25 @@
             "label" : "name",
             "name" : "name",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -452,23 +456,25 @@
             "label" : "greeting",
             "name" : "greeting",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "string" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -646,23 +652,25 @@
             "label" : "point",
             "name" : "point",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftStruct" : {
                     "_0" : "Config"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "swiftStruct" : {
                 "_0" : "Config"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -710,23 +718,25 @@
             "label" : "point",
             "name" : "point",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftStruct" : {
                     "_0" : "Config"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "swiftStruct" : {
                 "_0" : "Config"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },

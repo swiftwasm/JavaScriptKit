@@ -42,6 +42,7 @@ export async function createInstantiator(options, swift) {
         addImports: (importObject, importsContext) => {
             bjs = {};
             importObject["bjs"] = bjs;
+            const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 tmpRetString = textDecoder.decode(bytes);
@@ -213,6 +214,273 @@ export async function createInstantiator(options, swift) {
                 const obj = OptionalPropertyHolder.__construct(pointer);
                 return swift.memory.retain(obj);
             };
+            const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
+            TestModule["bjs_WithOptionalJSClass_init"] = function bjs_WithOptionalJSClass_init(valueOrNullIsSome, valueOrNullWrappedValue, valueOrUndefinedIsSome, valueOrUndefinedWrappedValue) {
+                try {
+                    let obj;
+                    if (valueOrNullIsSome) {
+                        obj = swift.memory.getObject(valueOrNullWrappedValue);
+                        swift.memory.release(valueOrNullWrappedValue);
+                    }
+                    let obj1;
+                    if (valueOrUndefinedIsSome) {
+                        obj1 = swift.memory.getObject(valueOrUndefinedWrappedValue);
+                        swift.memory.release(valueOrUndefinedWrappedValue);
+                    }
+                    return swift.memory.retain(new imports.WithOptionalJSClass(valueOrNullIsSome ? obj : null, valueOrUndefinedIsSome ? obj1 : undefined));
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_stringOrNull_get"] = function bjs_WithOptionalJSClass_stringOrNull_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).stringOrNull;
+                    const isSome = ret != null;
+                    if (isSome) {
+                        const bytes = textEncoder.encode(ret);
+                        bjs["swift_js_return_optional_string"](1, bytes, bytes.length);
+                        return bytes.length;
+                    } else {
+                        bjs["swift_js_return_optional_string"](0, 0, 0);
+                        return -1;
+                    }
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_stringOrUndefined_get"] = function bjs_WithOptionalJSClass_stringOrUndefined_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).stringOrUndefined;
+                    const isSome = ret !== undefined;
+                    if (isSome) {
+                        const bytes = textEncoder.encode(ret);
+                        bjs["swift_js_return_optional_string"](1, bytes, bytes.length);
+                        return bytes.length;
+                    } else {
+                        bjs["swift_js_return_optional_string"](0, 0, 0);
+                        return -1;
+                    }
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_doubleOrNull_get"] = function bjs_WithOptionalJSClass_doubleOrNull_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).doubleOrNull;
+                    const isSome = ret != null;
+                    bjs["swift_js_return_optional_double"](isSome ? 1 : 0, isSome ? ret : 0.0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_doubleOrUndefined_get"] = function bjs_WithOptionalJSClass_doubleOrUndefined_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).doubleOrUndefined;
+                    const isSome = ret !== undefined;
+                    bjs["swift_js_return_optional_double"](isSome ? 1 : 0, isSome ? ret : 0.0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_boolOrNull_get"] = function bjs_WithOptionalJSClass_boolOrNull_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).boolOrNull;
+                    const isSome = ret != null;
+                    bjs["swift_js_return_optional_bool"](isSome ? 1 : 0, isSome ? (ret ? 1 : 0) : 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_boolOrUndefined_get"] = function bjs_WithOptionalJSClass_boolOrUndefined_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).boolOrUndefined;
+                    const isSome = ret !== undefined;
+                    bjs["swift_js_return_optional_bool"](isSome ? 1 : 0, isSome ? (ret ? 1 : 0) : 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_intOrNull_get"] = function bjs_WithOptionalJSClass_intOrNull_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).intOrNull;
+                    const isSome = ret != null;
+                    bjs["swift_js_return_optional_int"](isSome ? 1 : 0, isSome ? (ret | 0) : 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_intOrUndefined_get"] = function bjs_WithOptionalJSClass_intOrUndefined_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).intOrUndefined;
+                    const isSome = ret !== undefined;
+                    bjs["swift_js_return_optional_int"](isSome ? 1 : 0, isSome ? (ret | 0) : 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_stringOrNull_set"] = function bjs_WithOptionalJSClass_stringOrNull_set(self, newValueIsSome, newValueWrappedValue) {
+                try {
+                    let obj;
+                    if (newValueIsSome) {
+                        obj = swift.memory.getObject(newValueWrappedValue);
+                        swift.memory.release(newValueWrappedValue);
+                    }
+                    swift.memory.getObject(self).stringOrNull = newValueIsSome ? obj : null;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_stringOrUndefined_set"] = function bjs_WithOptionalJSClass_stringOrUndefined_set(self, newValueIsSome, newValueWrappedValue) {
+                try {
+                    let obj;
+                    if (newValueIsSome) {
+                        obj = swift.memory.getObject(newValueWrappedValue);
+                        swift.memory.release(newValueWrappedValue);
+                    }
+                    swift.memory.getObject(self).stringOrUndefined = newValueIsSome ? obj : undefined;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_doubleOrNull_set"] = function bjs_WithOptionalJSClass_doubleOrNull_set(self, newValueIsSome, newValueWrappedValue) {
+                try {
+                    swift.memory.getObject(self).doubleOrNull = newValueIsSome ? newValueWrappedValue : null;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_doubleOrUndefined_set"] = function bjs_WithOptionalJSClass_doubleOrUndefined_set(self, newValueIsSome, newValueWrappedValue) {
+                try {
+                    swift.memory.getObject(self).doubleOrUndefined = newValueIsSome ? newValueWrappedValue : undefined;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_boolOrNull_set"] = function bjs_WithOptionalJSClass_boolOrNull_set(self, newValueIsSome, newValueWrappedValue) {
+                try {
+                    swift.memory.getObject(self).boolOrNull = newValueIsSome ? newValueWrappedValue !== 0 : null;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_boolOrUndefined_set"] = function bjs_WithOptionalJSClass_boolOrUndefined_set(self, newValueIsSome, newValueWrappedValue) {
+                try {
+                    swift.memory.getObject(self).boolOrUndefined = newValueIsSome ? newValueWrappedValue !== 0 : undefined;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_intOrNull_set"] = function bjs_WithOptionalJSClass_intOrNull_set(self, newValueIsSome, newValueWrappedValue) {
+                try {
+                    swift.memory.getObject(self).intOrNull = newValueIsSome ? newValueWrappedValue : null;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_intOrUndefined_set"] = function bjs_WithOptionalJSClass_intOrUndefined_set(self, newValueIsSome, newValueWrappedValue) {
+                try {
+                    swift.memory.getObject(self).intOrUndefined = newValueIsSome ? newValueWrappedValue : undefined;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_roundTripStringOrNull"] = function bjs_WithOptionalJSClass_roundTripStringOrNull(self, valueIsSome, valueWrappedValue) {
+                try {
+                    let obj;
+                    if (valueIsSome) {
+                        obj = swift.memory.getObject(valueWrappedValue);
+                        swift.memory.release(valueWrappedValue);
+                    }
+                    let ret = swift.memory.getObject(self).roundTripStringOrNull(valueIsSome ? obj : null);
+                    const isSome = ret != null;
+                    if (isSome) {
+                        const bytes = textEncoder.encode(ret);
+                        bjs["swift_js_return_optional_string"](1, bytes, bytes.length);
+                        return bytes.length;
+                    } else {
+                        bjs["swift_js_return_optional_string"](0, 0, 0);
+                        return -1;
+                    }
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_roundTripStringOrUndefined"] = function bjs_WithOptionalJSClass_roundTripStringOrUndefined(self, valueIsSome, valueWrappedValue) {
+                try {
+                    let obj;
+                    if (valueIsSome) {
+                        obj = swift.memory.getObject(valueWrappedValue);
+                        swift.memory.release(valueWrappedValue);
+                    }
+                    let ret = swift.memory.getObject(self).roundTripStringOrUndefined(valueIsSome ? obj : undefined);
+                    const isSome = ret !== undefined;
+                    if (isSome) {
+                        const bytes = textEncoder.encode(ret);
+                        bjs["swift_js_return_optional_string"](1, bytes, bytes.length);
+                        return bytes.length;
+                    } else {
+                        bjs["swift_js_return_optional_string"](0, 0, 0);
+                        return -1;
+                    }
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_roundTripDoubleOrNull"] = function bjs_WithOptionalJSClass_roundTripDoubleOrNull(self, valueIsSome, valueWrappedValue) {
+                try {
+                    let ret = swift.memory.getObject(self).roundTripDoubleOrNull(valueIsSome ? valueWrappedValue : null);
+                    const isSome = ret != null;
+                    bjs["swift_js_return_optional_double"](isSome ? 1 : 0, isSome ? ret : 0.0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_roundTripDoubleOrUndefined"] = function bjs_WithOptionalJSClass_roundTripDoubleOrUndefined(self, valueIsSome, valueWrappedValue) {
+                try {
+                    let ret = swift.memory.getObject(self).roundTripDoubleOrUndefined(valueIsSome ? valueWrappedValue : undefined);
+                    const isSome = ret !== undefined;
+                    bjs["swift_js_return_optional_double"](isSome ? 1 : 0, isSome ? ret : 0.0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_roundTripBoolOrNull"] = function bjs_WithOptionalJSClass_roundTripBoolOrNull(self, valueIsSome, valueWrappedValue) {
+                try {
+                    let ret = swift.memory.getObject(self).roundTripBoolOrNull(valueIsSome ? valueWrappedValue !== 0 : null);
+                    const isSome = ret != null;
+                    bjs["swift_js_return_optional_bool"](isSome ? 1 : 0, isSome ? (ret ? 1 : 0) : 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_roundTripBoolOrUndefined"] = function bjs_WithOptionalJSClass_roundTripBoolOrUndefined(self, valueIsSome, valueWrappedValue) {
+                try {
+                    let ret = swift.memory.getObject(self).roundTripBoolOrUndefined(valueIsSome ? valueWrappedValue !== 0 : undefined);
+                    const isSome = ret !== undefined;
+                    bjs["swift_js_return_optional_bool"](isSome ? 1 : 0, isSome ? (ret ? 1 : 0) : 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_roundTripIntOrNull"] = function bjs_WithOptionalJSClass_roundTripIntOrNull(self, valueIsSome, valueWrappedValue) {
+                try {
+                    let ret = swift.memory.getObject(self).roundTripIntOrNull(valueIsSome ? valueWrappedValue : null);
+                    const isSome = ret != null;
+                    bjs["swift_js_return_optional_int"](isSome ? 1 : 0, isSome ? (ret | 0) : 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_roundTripIntOrUndefined"] = function bjs_WithOptionalJSClass_roundTripIntOrUndefined(self, valueIsSome, valueWrappedValue) {
+                try {
+                    let ret = swift.memory.getObject(self).roundTripIntOrUndefined(valueIsSome ? valueWrappedValue : undefined);
+                    const isSome = ret !== undefined;
+                    bjs["swift_js_return_optional_int"](isSome ? 1 : 0, isSome ? (ret | 0) : 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;
