@@ -295,6 +295,7 @@ exports[`ts2swift > snapshots Swift output for TypeScriptClass.d.ts > TypeScript
     @JSFunction init(_ name: String) throws(JSException)
     @JSFunction func greet() throws(JSException) -> String
     @JSFunction func changeName(_ name: String) throws(JSException) -> Void
+    @JSFunction static func staticMethod(_ p1: Double, _ p2: String) throws(JSException) -> String
 }
 "
 `;
