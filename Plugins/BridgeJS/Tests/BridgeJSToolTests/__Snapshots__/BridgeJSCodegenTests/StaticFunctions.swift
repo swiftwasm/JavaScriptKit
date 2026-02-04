@@ -82,11 +82,11 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
         switch self {
         case .success(let param0):
+            param0.bridgeJSLowerStackReturn()
             _swift_js_push_tag(Int32(0))
-            param0.bridgeJSLowerStackReturn()
         case .failure(let param0):
-            _swift_js_push_tag(Int32(1))
             param0.bridgeJSLowerStackReturn()
+            _swift_js_push_tag(Int32(1))
         }
     }
 }

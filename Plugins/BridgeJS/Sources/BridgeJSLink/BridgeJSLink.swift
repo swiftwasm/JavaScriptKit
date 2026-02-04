@@ -246,7 +246,7 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);",
             "let \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);",
             "let \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);",
-            "let \(JSGlueVariableScope.reservedTmpRetTag);",
+            "let \(JSGlueVariableScope.reservedTmpRetTag) = [];",
             "let \(JSGlueVariableScope.reservedTmpRetStrings) = [];",
             "let \(JSGlueVariableScope.reservedTmpRetInts) = [];",
             "let \(JSGlueVariableScope.reservedTmpRetF32s) = [];",
@@ -388,7 +388,7 @@ public struct BridgeJSLink {
                 printer.write("}")
                 printer.write("bjs[\"swift_js_push_tag\"] = function(tag) {")
                 printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedTmpRetTag) = tag;")
+                    printer.write("\(JSGlueVariableScope.reservedTmpRetTag).push(tag);")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_push_i32\"] = function(v) {")
@@ -1059,6 +1059,18 @@ public struct BridgeJSLink {
                 _ = fragment.printCode([structDef.name], structScope, structPrinter, structCleanup)
                 bodyPrinter.write(lines: structPrinter.lines)
             }
+
+            let allAssocEnums = exportedSkeletons.flatMap {
+                $0.enums.filter { $0.enumType == .associatedValue }
+            }
+            for enumDef in allAssocEnums {
+                let enumPrinter = CodeFragmentPrinter()
+                let enumScope = JSGlueVariableScope()
+                let enumCleanup = CodeFragmentPrinter()
+                let fragment = IntrinsicJSFragment.associatedValueEnumHelperFactory(enumDefinition: enumDef)
+                _ = fragment.printCode([enumDef.valuesName], enumScope, enumPrinter, enumCleanup)
+                bodyPrinter.write(lines: enumPrinter.lines)
+            }
             bodyPrinter.nextLine()
             bodyPrinter.write(contentsOf: generateAddImports(needsImportsObject: data.needsImportsObject))
 
@@ -1094,8 +1106,6 @@ public struct BridgeJSLink {
                     "\(JSGlueVariableScope.reservedMemory) = \(JSGlueVariableScope.reservedInstance).exports.memory;",
                 ])
                 printer.nextLine()
-                // Enum helpers section
-                printer.write(contentsOf: enumHelperAssignments())
                 // Error handling
                 printer.write("\(JSGlueVariableScope.reservedSetException) = (error) => {")
                 printer.indent {
@@ -1109,18 +1119,19 @@ public struct BridgeJSLink {
         }
 
         // createExports method
-        try printer.indent {
+        printer.indent {
             printer.write(lines: [
                 "/** @param {WebAssembly.Instance} instance */",
                 "createExports: (instance) => {",
             ])
-            try printer.indent {
+            printer.indent {
                 printer.write("const js = \(JSGlueVariableScope.reservedSwift).memory.heap;")
 
                 printer.write(lines: data.classLines)
 
-                // Struct helpers must be initialized AFTER classes are defined (to allow _exports access)
+                // Struct and enum helpers must be initialized AFTER classes are defined (to allow _exports access)
                 printer.write(contentsOf: structHelperAssignments())
+                printer.write(contentsOf: enumHelperAssignments())
                 let namespaceInitCode = namespaceBuilder.buildNamespaceInitialization(
                     exportedSkeletons: exportedSkeletons
                 )
@@ -1151,7 +1162,7 @@ public struct BridgeJSLink {
         for skeleton in skeletons.compactMap(\.exported) {
             for enumDef in skeleton.enums where enumDef.enumType == .associatedValue {
                 printer.write(
-                    "const \(enumDef.name)Helpers = __bjs_create\(enumDef.valuesName)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift));"
+                    "const \(enumDef.name)Helpers = __bjs_create\(enumDef.valuesName)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTmpParamPointers), \(JSGlueVariableScope.reservedTmpRetPointers), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift), \(JSGlueVariableScope.reservedStructHelpers), \(JSGlueVariableScope.reservedEnumHelpers));"
                 )
                 printer.write("\(JSGlueVariableScope.reservedEnumHelpers).\(enumDef.name) = \(enumDef.name)Helpers;")
                 printer.nextLine()
@@ -1616,7 +1627,7 @@ public struct BridgeJSLink {
             _ = fragment.printCode([enumValuesName], scope, printer, cleanup)
             jsTopLevelLines.append(contentsOf: printer.lines)
         case .associatedValue:
-            let fragment = IntrinsicJSFragment.associatedValueEnumHelper(enumDefinition: enumDefinition)
+            let fragment = IntrinsicJSFragment.associatedValueEnumValues(enumDefinition: enumDefinition)
             _ = fragment.printCode([enumValuesName], scope, printer, cleanup)
             jsTopLevelLines.append(contentsOf: printer.lines)
         case .namespace:

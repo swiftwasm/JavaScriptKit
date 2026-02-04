@@ -22,46 +22,6 @@ export const ResultValues = {
         Failure: 1,
     },
 };
-
-const __bjs_createResultValuesHelpers = () => {
-    return (tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift) => ({
-        lower: (value) => {
-            const enumTag = value.tag;
-            switch (enumTag) {
-                case ResultValues.Tag.Success: {
-                    const bytes = textEncoder.encode(value.param0);
-                    const id = swift.memory.retain(bytes);
-                    tmpParamInts.push(bytes.length);
-                    tmpParamInts.push(id);
-                    const cleanup = () => {
-                        swift.memory.release(id);
-                    };
-                    return { caseId: ResultValues.Tag.Success, cleanup };
-                }
-                case ResultValues.Tag.Failure: {
-                    tmpParamInts.push((value.param0 | 0));
-                    const cleanup = undefined;
-                    return { caseId: ResultValues.Tag.Failure, cleanup };
-                }
-                default: throw new Error("Unknown ResultValues tag: " + String(enumTag));
-            }
-        },
-        lift: (tmpRetTag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s) => {
-            const tag = tmpRetTag | 0;
-            switch (tag) {
-                case ResultValues.Tag.Success: {
-                    const string = tmpRetStrings.pop();
-                    return { tag: ResultValues.Tag.Success, param0: string };
-                }
-                case ResultValues.Tag.Failure: {
-                    const int = tmpRetInts.pop();
-                    return { tag: ResultValues.Tag.Failure, param0: int };
-                }
-                default: throw new Error("Unknown ResultValues tag returned from Swift: " + String(tag));
-            }
-        }
-    });
-};
 export const PriorityValues = {
     Low: -1,
     Medium: 0,
@@ -82,7 +42,7 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tmpRetTag;
+    let tmpRetTag = [];
     let tmpRetStrings = [];
     let tmpRetInts = [];
     let tmpRetF32s = [];
@@ -98,6 +58,45 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
+    const __bjs_createResultValuesHelpers = () => {
+        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers) => ({
+            lower: (value) => {
+                const enumTag = value.tag;
+                switch (enumTag) {
+                    case ResultValues.Tag.Success: {
+                        const bytes = textEncoder.encode(value.param0);
+                        const id = swift.memory.retain(bytes);
+                        tmpParamInts.push(bytes.length);
+                        tmpParamInts.push(id);
+                        const cleanup = () => {
+                            swift.memory.release(id);
+                        };
+                        return { caseId: ResultValues.Tag.Success, cleanup };
+                    }
+                    case ResultValues.Tag.Failure: {
+                        tmpParamInts.push((value.param0 | 0));
+                        const cleanup = undefined;
+                        return { caseId: ResultValues.Tag.Failure, cleanup };
+                    }
+                    default: throw new Error("Unknown ResultValues tag: " + String(enumTag));
+                }
+            },
+            lift: (tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+                tag = tag | 0;
+                switch (tag) {
+                    case ResultValues.Tag.Success: {
+                        const string = tmpRetStrings.pop();
+                        return { tag: ResultValues.Tag.Success, param0: string };
+                    }
+                    case ResultValues.Tag.Failure: {
+                        const int = tmpRetInts.pop();
+                        return { tag: ResultValues.Tag.Failure, param0: int };
+                    }
+                    default: throw new Error("Unknown ResultValues tag returned from Swift: " + String(tag));
+                }
+            }
+        });
+    };
 
     return {
         /**
@@ -134,7 +133,7 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
             bjs["swift_js_push_tag"] = function(tag) {
-                tmpRetTag = tag;
+                tmpRetTag.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
                 tmpRetInts.push(v | 0);
@@ -376,7 +375,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_MyViewControllerDelegate_result_set"] = function bjs_MyViewControllerDelegate_result_set(self, value) {
                 try {
-                    const enumValue = enumHelpers.Result.lift(value, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    const enumValue = enumHelpers.Result.lift(value, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                     swift.memory.getObject(self).result = enumValue;
                 } catch (error) {
                     setException(error);
@@ -400,7 +399,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     let enumValue;
                     if (valueIsSome) {
-                        enumValue = enumHelpers.Result.lift(valueWrappedValue, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                        enumValue = enumHelpers.Result.lift(valueWrappedValue, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                     }
                     swift.memory.getObject(self).optionalResult = valueIsSome ? enumValue : null;
                 } catch (error) {
@@ -557,7 +556,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_MyViewControllerDelegate_handleResult"] = function bjs_MyViewControllerDelegate_handleResult(self, result) {
                 try {
-                    const enumValue = enumHelpers.Result.lift(result, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s);
+                    const enumValue = enumHelpers.Result.lift(result, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
                     swift.memory.getObject(self).handleResult(enumValue);
                 } catch (error) {
                     setException(error);
@@ -576,9 +575,6 @@ export async function createInstantiator(options, swift) {
         setInstance: (i) => {
             instance = i;
             memory = instance.exports.memory;
-
-            const ResultHelpers = __bjs_createResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift);
-            enumHelpers.Result = ResultHelpers;
 
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
@@ -727,6 +723,9 @@ export async function createInstantiator(options, swift) {
                     for (const cleanup of arrayCleanups) { cleanup(); }
                 }
             }
+            const ResultHelpers = __bjs_createResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers);
+            enumHelpers.Result = ResultHelpers;
+
             const exports = {
                 Helper,
                 MyViewController,

@@ -1221,9 +1221,11 @@ struct EnumCodegen {
                     .map { index, associatedValue in "let \(associatedValue.label ?? "param\(index)")" }
                     .joined(separator: ", ")
                 cases.append("case .\(enumCase.name)(\(pattern)):")
-                cases.append("_swift_js_push_tag(Int32(\(caseIndex)))")
                 let payloadCode = generatePayloadPushingCode(associatedValues: enumCase.associatedValues)
                 cases.append(contentsOf: payloadCode)
+                // Push tag AFTER payloads so it's popped first (LIFO) by the JS lift function.
+                // This ensures nested enum tags don't overwrite the outer tag.
+                cases.append("_swift_js_push_tag(Int32(\(caseIndex)))")
             }
         }
         return cases

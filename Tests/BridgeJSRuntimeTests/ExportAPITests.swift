@@ -586,6 +586,22 @@ typealias OptionalAge = Int?
     return value
 }
 
+@JS enum TypedPayloadResult {
+    case precision(Precision)
+    case direction(Direction)
+    case optPrecision(Precision?)
+    case optDirection(Direction?)
+    case empty
+}
+
+@JS func roundTripTypedPayloadResult(_ result: TypedPayloadResult) -> TypedPayloadResult {
+    return result
+}
+
+@JS func roundTripOptionalTypedPayloadResult(_ result: TypedPayloadResult?) -> TypedPayloadResult? {
+    return result
+}
+
 @JS func compareAPIResults(_ r1: APIResult?, _ r2: APIResult?) -> String {
     let r1Str: String
     switch r1 {
@@ -613,6 +629,44 @@ typealias OptionalAge = Int?
 }
 
 @JS func roundTripOptionalComplexResult(_ result: ComplexResult?) -> ComplexResult? {
+    return result
+}
+
+@JS
+enum AllTypesResult {
+    case structPayload(Address)
+    case classPayload(Greeter)
+    case jsObjectPayload(JSObject)
+    case nestedEnum(APIResult)
+    case arrayPayload([Int])
+    case jsClassPayload(Foo)
+    case empty
+}
+
+@JS func roundTripAllTypesResult(_ result: AllTypesResult) -> AllTypesResult {
+    return result
+}
+
+@JS func roundTripOptionalAllTypesResult(_ result: AllTypesResult?) -> AllTypesResult? {
+    return result
+}
+
+@JS
+enum OptionalAllTypesResult {
+    case optStruct(Address?)
+    case optClass(Greeter?)
+    case optJSObject(JSObject?)
+    case optNestedEnum(APIResult?)
+    case optArray([Int]?)
+    case optJsClass(Foo?)
+    case empty
+}
+
+@JS func roundTripOptionalPayloadResult(_ result: OptionalAllTypesResult) -> OptionalAllTypesResult {
+    return result
+}
+
+@JS func roundTripOptionalPayloadResultOpt(_ result: OptionalAllTypesResult?) -> OptionalAllTypesResult? {
     return result
 }
 

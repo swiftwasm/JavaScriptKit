@@ -730,20 +730,20 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
         switch self {
         case .success(let param0):
+            param0.bridgeJSLowerStackReturn()
             _swift_js_push_tag(Int32(0))
-            param0.bridgeJSLowerStackReturn()
         case .failure(let param0):
+            param0.bridgeJSLowerStackReturn()
             _swift_js_push_tag(Int32(1))
-            param0.bridgeJSLowerStackReturn()
         case .flag(let param0):
+            param0.bridgeJSLowerStackReturn()
             _swift_js_push_tag(Int32(2))
-            param0.bridgeJSLowerStackReturn()
         case .rate(let param0):
+            param0.bridgeJSLowerStackReturn()
             _swift_js_push_tag(Int32(3))
-            param0.bridgeJSLowerStackReturn()
         case .precise(let param0):
-            _swift_js_push_tag(Int32(4))
             param0.bridgeJSLowerStackReturn()
+            _swift_js_push_tag(Int32(4))
         case .info:
             _swift_js_push_tag(Int32(5))
         }

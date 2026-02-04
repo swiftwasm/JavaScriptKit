@@ -24,7 +24,7 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tmpRetTag;
+    let tmpRetTag = [];
     let tmpRetStrings = [];
     let tmpRetInts = [];
     let tmpRetF32s = [];
@@ -123,7 +123,7 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
             bjs["swift_js_push_tag"] = function(tag) {
-                tmpRetTag = tag;
+                tmpRetTag.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
                 tmpRetInts.push(v | 0);
