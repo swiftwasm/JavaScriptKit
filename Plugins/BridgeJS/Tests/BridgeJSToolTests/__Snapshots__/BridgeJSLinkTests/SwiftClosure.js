@@ -133,7 +133,7 @@ export async function createInstantiator(options, swift) {
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
-    
+
     let _exports = null;
     let bjs = null;
 
@@ -303,7 +303,7 @@ export async function createInstantiator(options, swift) {
                 tmpRetOptionalHeapObject = undefined;
                 return pointer || 0;
             }
-            
+
             bjs["invoke_js_callback_TestModule_10TestModule10HttpStatusO_Si"] = function(callbackId, param0Id) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -315,7 +315,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModule10HttpStatusO_Si"] = function(closurePtr) {
                 return function(param0) {
                     try {
@@ -326,7 +326,7 @@ export async function createInstantiator(options, swift) {
                     }
                 };
             };
-            
+
             bjs["invoke_js_callback_TestModule_10TestModule5ThemeO_SS"] = function(callbackId, param0Id) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -345,7 +345,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModule5ThemeO_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
@@ -361,7 +361,7 @@ export async function createInstantiator(options, swift) {
                     }
                 };
             };
-            
+
             bjs["invoke_js_callback_TestModule_10TestModule5ThemeO_Sb"] = function(callbackId, param0Id) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -375,7 +375,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModule5ThemeO_Sb"] = function(closurePtr) {
                 return function(param0) {
                     try {
@@ -388,7 +388,7 @@ export async function createInstantiator(options, swift) {
                     }
                 };
             };
-            
+
             bjs["invoke_js_callback_TestModule_10TestModule6PersonC_SS"] = function(callbackId, param0Id) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -405,7 +405,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModule6PersonC_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
@@ -419,7 +419,7 @@ export async function createInstantiator(options, swift) {
                     }
                 };
             };
-            
+
             bjs["invoke_js_callback_TestModule_10TestModule9APIResultO_SS"] = function(callbackId, param0Id) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -436,7 +436,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModule9APIResultO_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
@@ -451,7 +451,7 @@ export async function createInstantiator(options, swift) {
                     }
                 };
             };
-            
+
             bjs["invoke_js_callback_TestModule_10TestModule9DirectionO_SS"] = function(callbackId, param0Id) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -468,7 +468,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModule9DirectionO_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
@@ -482,7 +482,7 @@ export async function createInstantiator(options, swift) {
                     }
                 };
             };
-            
+
             bjs["invoke_js_callback_TestModule_10TestModule9DirectionO_Sb"] = function(callbackId, param0Id) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -494,7 +494,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModule9DirectionO_Sb"] = function(closurePtr) {
                 return function(param0) {
                     try {
@@ -505,7 +505,7 @@ export async function createInstantiator(options, swift) {
                     }
                 };
             };
-            
+
             bjs["invoke_js_callback_TestModule_10TestModuleSS_SS"] = function(callbackId, param0Id) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -524,7 +524,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModuleSS_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
@@ -540,7 +540,7 @@ export async function createInstantiator(options, swift) {
                     }
                 };
             };
-            
+
             bjs["invoke_js_callback_TestModule_10TestModuleSq5ThemeO_SS"] = function(callbackId, param0IsSome, param0Value) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -564,7 +564,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModuleSq5ThemeO_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
@@ -584,7 +584,7 @@ export async function createInstantiator(options, swift) {
                     }
                 };
             };
-            
+
             bjs["invoke_js_callback_TestModule_10TestModuleSq6PersonCSqSSSqSd_SS"] = function(callbackId, param0IsSome, param0Value, param1IsSome, param1Value, param2IsSome, param2Value) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -620,7 +620,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModuleSq6PersonCSqSSSqSd_SS"] = function(closurePtr) {
                 return function(param0, param1, param2) {
                     try {
@@ -642,7 +642,7 @@ export async function createInstantiator(options, swift) {
                     }
                 };
             };
-            
+
             bjs["invoke_js_callback_TestModule_10TestModuleSq6PersonC_SS"] = function(callbackId, param0IsSome, param0Value) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -664,7 +664,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModuleSq6PersonC_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
@@ -679,7 +679,7 @@ export async function createInstantiator(options, swift) {
                     }
                 };
             };
-            
+
             bjs["invoke_js_callback_TestModule_10TestModuleSq9APIResultO_SS"] = function(callbackId, param0IsSome, param0Value) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -701,7 +701,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModuleSq9APIResultO_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
@@ -722,7 +722,7 @@ export async function createInstantiator(options, swift) {
                     }
                 };
             };
-            
+
             bjs["invoke_js_callback_TestModule_10TestModuleSq9DirectionO_SS"] = function(callbackId, param0IsSome, param0Value) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -744,7 +744,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModuleSq9DirectionO_SS"] = function(closurePtr) {
                 return function(param0) {
                     try {
@@ -778,7 +778,7 @@ export async function createInstantiator(options, swift) {
 
             const APIResultHelpers = __bjs_createAPIResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift);
             enumHelpers.APIResult = APIResultHelpers;
-            
+
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
             }
@@ -799,7 +799,7 @@ export async function createInstantiator(options, swift) {
                     obj.registry.register(this, obj.pointer);
                     return obj;
                 }
-            
+
                 release() {
                     this.registry.unregister(this);
                     this.deinit(this.pointer);
@@ -809,7 +809,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Person_deinit, Person.prototype);
                 }
-            
+
                 constructor(name) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
@@ -822,7 +822,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_TestProcessor_deinit, TestProcessor.prototype);
                 }
-            
+
                 constructor(transform) {
                     const callbackId = swift.memory.retain(transform);
                     const ret = instance.exports.bjs_TestProcessor_init(callbackId);

@@ -95,7 +95,7 @@ export async function createInstantiator(options, swift) {
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
-    
+
     let _exports = null;
     let bjs = null;
 
@@ -579,7 +579,7 @@ export async function createInstantiator(options, swift) {
 
             const ResultHelpers = __bjs_createResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, textEncoder, swift);
             enumHelpers.Result = ResultHelpers;
-            
+
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
             }
@@ -600,7 +600,7 @@ export async function createInstantiator(options, swift) {
                     obj.registry.register(this, obj.pointer);
                     return obj;
                 }
-            
+
                 release() {
                     this.registry.unregister(this);
                     this.deinit(this.pointer);
@@ -610,7 +610,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Helper_deinit, Helper.prototype);
                 }
-            
+
                 constructor(value) {
                     const ret = instance.exports.bjs_Helper_init(value);
                     return Helper.__construct(ret);
@@ -630,7 +630,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_MyViewController_deinit, MyViewController.prototype);
                 }
-            
+
                 constructor(delegate) {
                     const ret = instance.exports.bjs_MyViewController_init(swift.memory.retain(delegate));
                     return MyViewController.__construct(ret);
@@ -688,7 +688,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_DelegateManager_deinit, DelegateManager.prototype);
                 }
-            
+
                 constructor(delegates) {
                     const arrayCleanups = [];
                     for (const elem of delegates) {

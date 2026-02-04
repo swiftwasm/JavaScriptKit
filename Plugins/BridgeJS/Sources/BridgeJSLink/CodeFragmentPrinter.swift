@@ -12,6 +12,11 @@ final class CodeFragmentPrinter {
     }
 
     func write<S: StringProtocol>(_ line: S) {
+        if line.isEmpty {
+            // Empty lines should not have trailing spaces
+            lines.append("")
+            return
+        }
         lines.append(String(repeating: " ", count: indentLevel * 4) + String(line))
     }
 

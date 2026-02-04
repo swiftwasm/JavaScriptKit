@@ -31,7 +31,7 @@ export async function createInstantiator(options, swift) {
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
-    
+
     let _exports = null;
     let bjs = null;
 
@@ -202,7 +202,7 @@ export async function createInstantiator(options, swift) {
                 tmpRetOptionalHeapObject = undefined;
                 return pointer || 0;
             }
-            
+
             bjs["invoke_js_callback_TestModule_10TestModuleSi_Si"] = function(callbackId, param0Id) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
@@ -214,7 +214,7 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-            
+
             bjs["lower_closure_TestModule_10TestModuleSi_Si"] = function(closurePtr) {
                 return function(param0) {
                     try {

@@ -31,7 +31,7 @@ export async function createInstantiator(options, swift) {
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
-    
+
     let _exports = null;
     let bjs = null;
     const __bjs_createFooContainerHelpers = () => {
@@ -300,7 +300,7 @@ export async function createInstantiator(options, swift) {
             const js = swift.memory.heap;
             const FooContainerHelpers = __bjs_createFooContainerHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.FooContainer = FooContainerHelpers;
-            
+
             const exports = {
                 makeFoo: function bjs_makeFoo() {
                     const ret = instance.exports.bjs_makeFoo();

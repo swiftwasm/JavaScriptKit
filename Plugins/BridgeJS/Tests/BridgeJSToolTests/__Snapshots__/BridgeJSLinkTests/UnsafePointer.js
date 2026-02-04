@@ -31,7 +31,7 @@ export async function createInstantiator(options, swift) {
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
-    
+
     let _exports = null;
     let bjs = null;
     const __bjs_createPointerFieldsHelpers = () => {
@@ -246,7 +246,7 @@ export async function createInstantiator(options, swift) {
             const js = swift.memory.heap;
             const PointerFieldsHelpers = __bjs_createPointerFieldsHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.PointerFields = PointerFieldsHelpers;
-            
+
             const exports = {
                 takeUnsafeRawPointer: function bjs_takeUnsafeRawPointer(p) {
                     instance.exports.bjs_takeUnsafeRawPointer(p);

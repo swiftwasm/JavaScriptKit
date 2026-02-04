@@ -31,7 +31,7 @@ export async function createInstantiator(options, swift) {
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
-    
+
     let _exports = null;
     let bjs = null;
     const __bjs_createPointHelpers = () => {
@@ -252,7 +252,7 @@ export async function createInstantiator(options, swift) {
             const js = swift.memory.heap;
             const PointHelpers = __bjs_createPointHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.Point = PointHelpers;
-            
+
             const exports = {
             };
             _exports = exports;

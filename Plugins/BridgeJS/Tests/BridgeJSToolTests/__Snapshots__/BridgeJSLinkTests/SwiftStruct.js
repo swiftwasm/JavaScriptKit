@@ -36,7 +36,7 @@ export async function createInstantiator(options, swift) {
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
-    
+
     let _exports = null;
     let bjs = null;
     const __bjs_createDataPointHelpers = () => {
@@ -569,7 +569,7 @@ export async function createInstantiator(options, swift) {
                     obj.registry.register(this, obj.pointer);
                     return obj;
                 }
-            
+
                 release() {
                     this.registry.unregister(this);
                     this.deinit(this.pointer);
@@ -579,7 +579,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Greeter_deinit, Greeter.prototype);
                 }
-            
+
                 constructor(name) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
@@ -608,25 +608,25 @@ export async function createInstantiator(options, swift) {
             }
             const DataPointHelpers = __bjs_createDataPointHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.DataPoint = DataPointHelpers;
-            
+
             const AddressHelpers = __bjs_createAddressHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.Address = AddressHelpers;
-            
+
             const PersonHelpers = __bjs_createPersonHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.Person = PersonHelpers;
-            
+
             const SessionHelpers = __bjs_createSessionHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.Session = SessionHelpers;
-            
+
             const MeasurementHelpers = __bjs_createMeasurementHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.Measurement = MeasurementHelpers;
-            
+
             const ConfigStructHelpers = __bjs_createConfigStructHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.ConfigStruct = ConfigStructHelpers;
-            
+
             const ContainerHelpers = __bjs_createContainerHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.Container = ContainerHelpers;
-            
+
             const exports = {
                 Greeter,
                 roundtrip: function bjs_roundtrip(session) {

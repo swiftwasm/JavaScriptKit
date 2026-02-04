@@ -37,7 +37,7 @@ export async function createInstantiator(options, swift) {
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
-    
+
     let _exports = null;
     let bjs = null;
     const __bjs_createConfigHelpers = () => {
@@ -317,7 +317,7 @@ export async function createInstantiator(options, swift) {
                     obj.registry.register(this, obj.pointer);
                     return obj;
                 }
-            
+
                 release() {
                     this.registry.unregister(this);
                     this.deinit(this.pointer);
@@ -327,7 +327,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_DefaultGreeter_deinit, DefaultGreeter.prototype);
                 }
-            
+
                 constructor(name) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
@@ -352,7 +352,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_EmptyGreeter_deinit, EmptyGreeter.prototype);
                 }
-            
+
                 constructor() {
                     const ret = instance.exports.bjs_EmptyGreeter_init();
                     return EmptyGreeter.__construct(ret);
@@ -362,7 +362,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_ConstructorDefaults_deinit, ConstructorDefaults.prototype);
                 }
-            
+
                 constructor(name = "Default", count = 42, enabled = true, status = StatusValues.Active, tag = null) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
@@ -433,10 +433,10 @@ export async function createInstantiator(options, swift) {
             }
             const ConfigHelpers = __bjs_createConfigHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.Config = ConfigHelpers;
-            
+
             const MathOperationsHelpers = __bjs_createMathOperationsHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
             structHelpers.MathOperations = MathOperationsHelpers;
-            
+
             const exports = {
                 DefaultGreeter,
                 EmptyGreeter,

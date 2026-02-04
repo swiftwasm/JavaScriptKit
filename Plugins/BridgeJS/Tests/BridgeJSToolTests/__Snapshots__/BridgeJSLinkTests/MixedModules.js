@@ -31,7 +31,7 @@ export async function createInstantiator(options, swift) {
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
-    
+
     let _exports = null;
     let bjs = null;
 
@@ -242,7 +242,7 @@ export async function createInstantiator(options, swift) {
                     obj.registry.register(this, obj.pointer);
                     return obj;
                 }
-            
+
                 release() {
                     this.registry.unregister(this);
                     this.deinit(this.pointer);
@@ -252,7 +252,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_GlobalClass_deinit, GlobalClass.prototype);
                 }
-            
+
                 constructor() {
                     const ret = instance.exports.bjs_GlobalClass_init();
                     return GlobalClass.__construct(ret);
@@ -268,7 +268,7 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PrivateClass_deinit, PrivateClass.prototype);
                 }
-            
+
                 constructor() {
                     const ret = instance.exports.bjs_PrivateClass_init();
                     return PrivateClass.__construct(ret);
