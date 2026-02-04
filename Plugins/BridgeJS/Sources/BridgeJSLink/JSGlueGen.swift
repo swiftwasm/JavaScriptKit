@@ -1895,14 +1895,7 @@ struct IntrinsicJSFragment: Sendable {
                     "Namespace enums are not supported to be passed as parameters to imported JS functions: \(string)"
             )
         case .array(let elementType):
-            switch context {
-            case .importTS:
-                throw BridgeJSLinkError(
-                    message: "Arrays are not yet supported to be passed as parameters to imported JS functions"
-                )
-            case .exportSwift:
-                return try arrayLift(elementType: elementType)
-            }
+            return try arrayLift(elementType: elementType)
         }
     }
 
@@ -1971,14 +1964,7 @@ struct IntrinsicJSFragment: Sendable {
                 message: "Namespace enums are not supported to be returned from imported JS functions: \(string)"
             )
         case .array(let elementType):
-            switch context {
-            case .importTS:
-                throw BridgeJSLinkError(
-                    message: "Arrays are not yet supported to be returned from imported JS functions"
-                )
-            case .exportSwift:
-                return try arrayLower(elementType: elementType)
-            }
+            return try arrayLower(elementType: elementType)
         }
     }
 
@@ -3215,11 +3201,10 @@ struct IntrinsicJSFragment: Sendable {
                     // Lift return value if needed
                     if method.returnType != .void {
                         let liftFragment = try! IntrinsicJSFragment.liftReturn(type: method.returnType)
-                        if !liftFragment.parameters.isEmpty {
-                            let lifted = liftFragment.printCode(["ret"], methodScope, printer, methodCleanup)
-                            if let liftedValue = lifted.first {
-                                printer.write("return \(liftedValue);")
-                            }
+                        let liftArgs = liftFragment.parameters.isEmpty ? [] : ["ret"]
+                        let lifted = liftFragment.printCode(liftArgs, methodScope, printer, methodCleanup)
+                        if let liftedValue = lifted.first {
+                            printer.write("return \(liftedValue);")
                         }
                     }
                 }
@@ -3508,9 +3493,36 @@ struct IntrinsicJSFragment: Sendable {
                                 ),
                                 allStructs: allStructs
                             )
+                            let guardedPrinter = CodeFragmentPrinter()
+                            let guardedCleanup = CodeFragmentPrinter()
+                            _ = wrappedFragment.printCode([value], scope, guardedPrinter, guardedCleanup)
+                            var loweredLines = guardedPrinter.lines
+                            var hoistedCleanupVar: String?
+                            if let first = loweredLines.first {
+                                let trimmed = first.trimmingCharacters(in: .whitespaces)
+                                if trimmed.hasPrefix("const "),
+                                    let namePart = trimmed.split(separator: " ").dropFirst().first,
+                                    trimmed.contains("= []")
+                                {
+                                    hoistedCleanupVar = String(namePart)
+                                    loweredLines[0] = "\(hoistedCleanupVar!) = [];"
+                                }
+                            }
+                            if let hoistedName = hoistedCleanupVar {
+                                printer.write("let \(hoistedName);")
+                            }
                             printer.write("if (\(isSomeVar)) {")
                             printer.indent {
-                                _ = wrappedFragment.printCode([value], scope, printer, cleanup)
+                                for line in loweredLines {
+                                    printer.write(line)
+                                }
+                                if !guardedCleanup.lines.isEmpty {
+                                    cleanup.write("if (\(isSomeVar)) {")
+                                    cleanup.indent {
+                                        cleanup.write(contentsOf: guardedCleanup)
+                                    }
+                                    cleanup.write("}")
+                                }
                             }
                             printer.write("}")
                             printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")

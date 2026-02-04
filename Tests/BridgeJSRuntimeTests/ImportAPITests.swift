@@ -152,6 +152,33 @@ class ImportAPITests: XCTestCase {
         XCTAssertEqual(prefixer("world!"), "Hello, world!")
     }
 
+    func testRoundTripIntArray() throws {
+        let values = [1, 2, 3, 4, 5]
+        let result = try jsRoundTripIntArray(values)
+        XCTAssertEqual(result, values)
+        XCTAssertEqual(try jsArrayLength(values), values.count)
+        XCTAssertEqual(try jsRoundTripIntArray([]), [])
+    }
+
+    func testJSClassArrayMembers() throws {
+        let numbers = [1, 2, 3]
+        let labels = ["alpha", "beta"]
+        let host = try makeArrayHost(numbers, labels)
+
+        XCTAssertEqual(try host.numbers, numbers)
+        XCTAssertEqual(try host.labels, labels)
+
+        try host.setNumbers([10, 20])
+        try host.setLabels(["gamma"])
+        XCTAssertEqual(try host.numbers, [10, 20])
+        XCTAssertEqual(try host.labels, ["gamma"])
+
+        XCTAssertEqual(try host.concatNumbers([30, 40]), [10, 20, 30, 40])
+        XCTAssertEqual(try host.concatLabels(["delta", "epsilon"]), ["gamma", "delta", "epsilon"])
+        XCTAssertEqual(try host.firstLabel([]), "gamma")
+        XCTAssertEqual(try host.firstLabel(["zeta"]), "zeta")
+    }
+
     func testClosureParameterIntToVoid() throws {
         var total = 0
         let ret = try jsCallTwice(5) { total += $0 }
@@ -177,5 +204,39 @@ class ImportAPITests: XCTestCase {
 
         let dashed = try StaticBox.with_dashes()
         XCTAssertEqual(try dashed.value(), 7)
+    }
+
+    func testRoundTripNumberArray() throws {
+        let input: [Double] = [1.0, 2.5, 3.0, -4.5]
+        let result = try jsRoundTripNumberArray(input)
+        XCTAssertEqual(result, input)
+        XCTAssertEqual(try jsRoundTripNumberArray([]), [])
+        XCTAssertEqual(try jsRoundTripNumberArray([42.0]), [42.0])
+    }
+
+    func testRoundTripStringArray() throws {
+        let input = ["Hello", "World", "🎉"]
+        let result = try jsRoundTripStringArray(input)
+        XCTAssertEqual(result, input)
+        XCTAssertEqual(try jsRoundTripStringArray([]), [])
+        XCTAssertEqual(try jsRoundTripStringArray(["", "a", ""]), ["", "a", ""])
+    }
+
+    func testRoundTripBoolArray() throws {
+        let input = [true, false, true, false]
+        let result = try jsRoundTripBoolArray(input)
+        XCTAssertEqual(result, input)
+        XCTAssertEqual(try jsRoundTripBoolArray([]), [])
+    }
+
+    func testSumNumberArray() throws {
+        XCTAssertEqual(try jsSumNumberArray([1.0, 2.0, 3.0, 4.0]), 10.0)
+        XCTAssertEqual(try jsSumNumberArray([]), 0.0)
+        XCTAssertEqual(try jsSumNumberArray([42.0]), 42.0)
+    }
+
+    func testCreateNumberArray() throws {
+        let result = try jsCreateNumberArray()
+        XCTAssertEqual(result, [1.0, 2.0, 3.0, 4.0, 5.0])
     }
 }

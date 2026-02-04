@@ -663,6 +663,15 @@ export class TypeProcessor {
      * @private
      */
     visitType(type, node) {
+        if (this.checker.isArrayType(type)) {
+            const typeArgs = this.checker.getTypeArguments(type);
+            if (typeArgs && typeArgs.length > 0) {
+                const elementType = this.visitType(typeArgs[0], node);
+                return `[${elementType}]`;
+            }
+            return "[JSObject]";
+        }
+
         // Treat A<B> and A<C> as the same type
         if (isTypeReference(type)) {
             type = type.target;
@@ -727,7 +736,7 @@ export class TypeProcessor {
                 return this.renderTypeIdentifier(typeName);
             }
 
-            if (this.checker.isArrayType(type) || this.checker.isTupleType(type) || type.getCallSignatures().length > 0) {
+            if (this.checker.isTupleType(type) || type.getCallSignatures().length > 0) {
                 return "JSObject";
             }
             // "a" | "b" -> string

@@ -9,11 +9,17 @@ exports[`ts2swift > snapshots Swift output for ArrayParameter.d.ts > ArrayParame
 
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func checkArray(_ a: JSObject) throws(JSException) -> Void
+@JSFunction func processNumbers(_ values: [Double]) throws(JSException) -> Void
 
-@JSFunction func checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> Void
+@JSFunction func getNumbers() throws(JSException) -> [Double]
 
-@JSFunction func checkArray(_ a: JSObject) throws(JSException) -> Void
+@JSFunction func transformNumbers(_ values: [Double]) throws(JSException) -> [Double]
+
+@JSFunction func processStrings(_ values: [String]) throws(JSException) -> [String]
+
+@JSFunction func processBooleans(_ values: [Bool]) throws(JSException) -> [Bool]
+
+@JSFunction func processArraySyntax(_ values: [Double]) throws(JSException) -> [Double]
 "
 `;
 

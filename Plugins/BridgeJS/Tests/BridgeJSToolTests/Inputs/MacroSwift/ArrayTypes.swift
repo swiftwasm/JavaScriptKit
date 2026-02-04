@@ -61,3 +61,9 @@
 
 @JSFunction func checkArray(_ a: JSObject) throws(JSException) -> Void
 @JSFunction func checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> Void
+
+@JSFunction func importProcessNumbers(_ values: [Double]) throws(JSException) -> Void
+@JSFunction func importGetNumbers() throws(JSException) -> [Double]
+@JSFunction func importTransformNumbers(_ values: [Double]) throws(JSException) -> [Double]
+@JSFunction func importProcessStrings(_ values: [String]) throws(JSException) -> [String]
+@JSFunction func importProcessBooleans(_ values: [Bool]) throws(JSException) -> [Bool]

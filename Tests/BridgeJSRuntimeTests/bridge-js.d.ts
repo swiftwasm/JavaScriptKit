@@ -44,3 +44,9 @@ export class StaticBox {
     static makeDefault(): StaticBox;
     static "with-dashes"(): StaticBox;
 }
+
+export function jsRoundTripNumberArray(values: number[]): number[];
+export function jsRoundTripStringArray(values: string[]): string[];
+export function jsRoundTripBoolArray(values: boolean[]): boolean[];
+export function jsSumNumberArray(values: number[]): number;
+export function jsCreateNumberArray(): number[];

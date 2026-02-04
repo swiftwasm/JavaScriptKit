@@ -2297,7 +2297,9 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftStruct {
 
 // MARK: - Array Support
 
-extension Array where Element: _BridgedSwiftStackType, Element.StackLiftResult == Element {
+extension Array: _BridgedSwiftStackType where Element: _BridgedSwiftStackType, Element.StackLiftResult == Element {
+    public typealias StackLiftResult = [Element]
+
     @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> [Element] {
         let count = Int(_swift_js_pop_i32())
         var result: [Element] = []
@@ -2309,10 +2311,23 @@ extension Array where Element: _BridgedSwiftStackType, Element.StackLiftResult =
         return result
     }
 
-    @_spi(BridgeJS) public func bridgeJSLowerReturn() {
-        for elem in self {
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> [Element] {
+        bridgeJSLiftParameter()
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerStackReturn() {
+        bridgeJSLowerReturn()
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() {
+        let array = self
+        for elem in array {
             elem.bridgeJSLowerStackReturn()
         }
-        _swift_js_push_i32(Int32(self.count))
+        _swift_js_push_i32(Int32(array.count))
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() {
+        bridgeJSLowerReturn()
     }
 }
