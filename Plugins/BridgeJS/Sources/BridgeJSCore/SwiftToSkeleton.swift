@@ -1856,8 +1856,6 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     private let inputFilePath: String
     private var jsClassNames: Set<String>
     private let parent: SwiftToSkeleton
-    private var staticMethodsByType: [String: [ImportedFunctionSkeleton]] = [:]
-
     // MARK: - State Management
 
     enum State {
@@ -2118,7 +2116,6 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     private func exitJSClass() {
         if case .jsClassBody(let typeName) = state, let type = currentType, type.name == typeName {
-            let externalStaticMethods = staticMethodsByType[type.name] ?? []
             importedTypes.append(
                 ImportedTypeSkeleton(
                     name: type.name,
@@ -2126,13 +2123,12 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                     from: type.from,
                     constructor: type.constructor,
                     methods: type.methods,
-                    staticMethods: type.staticMethods + externalStaticMethods,
+                    staticMethods: type.staticMethods,
                     getters: type.getters,
                     setters: type.setters,
                     documentation: nil
                 )
             )
-            staticMethodsByType[type.name] = nil
             currentType = nil
         }
         stateStack.removeLast()
@@ -2171,12 +2167,6 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     }
 
     // MARK: - Visitor Methods
-
-    override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
-        let typeName = node.extendedType.trimmedDescription
-        collectStaticMembers(in: node.memberBlock.members, typeName: typeName)
-        return .skipChildren
-    }
 
     override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
         switch state {
@@ -2315,45 +2305,6 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                 currentType = type
             }
             return .skipChildren
-        }
-    }
-
-    // MARK: - Member Collection
-
-    private func collectStaticMembers(in members: MemberBlockItemListSyntax, typeName: String) {
-        for member in members {
-            if let function = member.decl.as(FunctionDeclSyntax.self) {
-                if let jsFunction = AttributeChecker.firstJSFunctionAttribute(function.attributes),
-                    let parsed = parseFunction(jsFunction, function) {
-                    if jsClassNames.contains(typeName) {
-                        if let index = importedTypes.firstIndex(where: { $0.name == typeName }) {
-                            importedTypes[index].staticMethods.append(parsed)
-                        } else {
-                            importedTypes.append(ImportedTypeSkeleton(name: typeName, staticMethods: [parsed]))
-                        }
-                    } else {
-                        importedFunctions.append(parsed)
-                    }
-                } else if AttributeChecker.hasJSSetterAttribute(function.attributes) {
-                    errors.append(
-                        DiagnosticError(
-                            node: function,
-                            message:
-                                "@JSSetter is not supported for static members. Use it only for instance members in @JSClass types."
-                        )
-                    )
-                }
-            } else if let variable = member.decl.as(VariableDeclSyntax.self),
-                AttributeChecker.hasJSGetterAttribute(variable.attributes)
-            {
-                errors.append(
-                    DiagnosticError(
-                        node: variable,
-                        message:
-                            "@JSGetter is not supported for static members. Use it only for instance members in @JSClass types."
-                    )
-                )
-            }
         }
     }
 

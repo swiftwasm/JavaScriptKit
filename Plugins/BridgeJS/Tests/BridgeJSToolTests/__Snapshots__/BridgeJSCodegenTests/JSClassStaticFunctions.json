@@ -29,43 +29,6 @@
 
             ],
             "methods" : [
-
-            ],
-            "name" : "StaticBox",
-            "setters" : [
-
-            ],
-            "staticMethods" : [
-              {
-                "name" : "makeDefault",
-                "parameters" : [
-
-                ],
-                "returnType" : {
-                  "jsObject" : {
-                    "_0" : "StaticBox"
-                  }
-                }
-              },
-              {
-                "jsName" : "with-dashes",
-                "name" : "dashed",
-                "parameters" : [
-
-                ],
-                "returnType" : {
-                  "jsObject" : {
-                    "_0" : "StaticBox"
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "getters" : [
-
-            ],
-            "methods" : [
               {
                 "name" : "value",
                 "parameters" : [
@@ -109,6 +72,29 @@
                 "returnType" : {
                   "double" : {
 
+                  }
+                }
+              },
+              {
+                "name" : "makeDefault",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "StaticBox"
+                  }
+                }
+              },
+              {
+                "jsName" : "with-dashes",
+                "name" : "dashed",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "StaticBox"
                   }
                 }
               }

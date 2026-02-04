@@ -1,38 +1,4 @@
 #if arch(wasm32)
-@_extern(wasm, module: "TestModule", name: "bjs_StaticBox_makeDefault_static")
-fileprivate func bjs_StaticBox_makeDefault_static() -> Int32
-#else
-fileprivate func bjs_StaticBox_makeDefault_static() -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-#if arch(wasm32)
-@_extern(wasm, module: "TestModule", name: "bjs_StaticBox_dashed_static")
-fileprivate func bjs_StaticBox_dashed_static() -> Int32
-#else
-fileprivate func bjs_StaticBox_dashed_static() -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-func _$StaticBox_makeDefault() throws(JSException) -> StaticBox {
-    let ret = bjs_StaticBox_makeDefault_static()
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return StaticBox.bridgeJSLiftReturn(ret)
-}
-
-func _$StaticBox_dashed() throws(JSException) -> StaticBox {
-    let ret = bjs_StaticBox_dashed_static()
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return StaticBox.bridgeJSLiftReturn(ret)
-}
-
-#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_StaticBox_create_static")
 fileprivate func bjs_StaticBox_create_static(_ value: Float64) -> Int32
 #else
@@ -46,6 +12,24 @@ fileprivate func bjs_StaticBox_create_static(_ value: Float64) -> Int32 {
 fileprivate func bjs_StaticBox_value_static() -> Float64
 #else
 fileprivate func bjs_StaticBox_value_static() -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_StaticBox_makeDefault_static")
+fileprivate func bjs_StaticBox_makeDefault_static() -> Int32
+#else
+fileprivate func bjs_StaticBox_makeDefault_static() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_StaticBox_dashed_static")
+fileprivate func bjs_StaticBox_dashed_static() -> Int32
+#else
+fileprivate func bjs_StaticBox_dashed_static() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -74,6 +58,22 @@ func _$StaticBox_value() throws(JSException) -> Double {
         throw error
     }
     return Double.bridgeJSLiftReturn(ret)
+}
+
+func _$StaticBox_makeDefault() throws(JSException) -> StaticBox {
+    let ret = bjs_StaticBox_makeDefault_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return StaticBox.bridgeJSLiftReturn(ret)
+}
+
+func _$StaticBox_dashed() throws(JSException) -> StaticBox {
+    let ret = bjs_StaticBox_dashed_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return StaticBox.bridgeJSLiftReturn(ret)
 }
 
 func _$StaticBox_value(_ self: JSObject) throws(JSException) -> Double {

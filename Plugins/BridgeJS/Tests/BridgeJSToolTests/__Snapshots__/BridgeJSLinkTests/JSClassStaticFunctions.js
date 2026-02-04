@@ -203,24 +203,6 @@ export async function createInstantiator(options, swift) {
                 return pointer || 0;
             }
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
-            TestModule["bjs_StaticBox_makeDefault_static"] = function bjs_StaticBox_makeDefault_static() {
-                try {
-                    let ret = imports.StaticBox.makeDefault();
-                    return swift.memory.retain(ret);
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
-            }
-            TestModule["bjs_StaticBox_dashed_static"] = function bjs_StaticBox_dashed_static() {
-                try {
-                    let ret = imports.StaticBox["with-dashes"]();
-                    return swift.memory.retain(ret);
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
-            }
             TestModule["bjs_StaticBox_create_static"] = function bjs_StaticBox_create_static(value) {
                 try {
                     let ret = imports.StaticBox.create(value);
@@ -234,6 +216,24 @@ export async function createInstantiator(options, swift) {
                 try {
                     let ret = imports.StaticBox.value();
                     return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_StaticBox_makeDefault_static"] = function bjs_StaticBox_makeDefault_static() {
+                try {
+                    let ret = imports.StaticBox.makeDefault();
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_StaticBox_dashed_static"] = function bjs_StaticBox_dashed_static() {
+                try {
+                    let ret = imports.StaticBox["with-dashes"]();
+                    return swift.memory.retain(ret);
                 } catch (error) {
                     setException(error);
                     return 0
