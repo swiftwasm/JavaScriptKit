@@ -84,3 +84,39 @@ func _$StaticBox_value(_ self: JSObject) throws(JSException) -> Double {
     }
     return Double.bridgeJSLiftReturn(ret)
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithCtor_init")
+fileprivate func bjs_WithCtor_init(_ value: Float64) -> Int32
+#else
+fileprivate func bjs_WithCtor_init(_ value: Float64) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithCtor_create_static")
+fileprivate func bjs_WithCtor_create_static(_ value: Float64) -> Int32
+#else
+fileprivate func bjs_WithCtor_create_static(_ value: Float64) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$WithCtor_init(_ value: Double) throws(JSException) -> JSObject {
+    let valueValue = value.bridgeJSLowerParameter()
+    let ret = bjs_WithCtor_init(valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$WithCtor_create(_ value: Double) throws(JSException) -> WithCtor {
+    let valueValue = value.bridgeJSLowerParameter()
+    let ret = bjs_WithCtor_create_static(valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return WithCtor.bridgeJSLiftReturn(ret)
+}

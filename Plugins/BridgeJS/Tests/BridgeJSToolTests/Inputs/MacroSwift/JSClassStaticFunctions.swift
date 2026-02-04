@@ -11,3 +11,8 @@ extension StaticBox {
 extension StaticBox {
     @JSFunction(jsName: "with-dashes") static func dashed() throws(JSException) -> StaticBox
 }
+
+@JSClass struct WithCtor {
+    @JSFunction init(_ value: Double) throws(JSException)
+    @JSFunction static func create(_ value: Double) throws(JSException) -> WithCtor
+}

@@ -99,6 +99,50 @@
                 }
               }
             ]
+          },
+          {
+            "constructor" : {
+              "parameters" : [
+                {
+                  "name" : "value",
+                  "type" : {
+                    "double" : {
+
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "WithCtor",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "name" : "create",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "WithCtor"
+                  }
+                }
+              }
+            ]
           }
         ]
       }

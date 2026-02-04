@@ -3144,6 +3144,25 @@ extension BridgeJSLink {
             importObjectBuilder.assignToImportObject(name: abiName, function: js)
             importObjectBuilder.appendDts(dts)
         }
+        if type.from == nil, type.constructor != nil || !type.staticMethods.isEmpty {
+            let dtsPrinter = CodeFragmentPrinter()
+            dtsPrinter.write("\(type.name): {")
+            dtsPrinter.indent {
+                if let constructor = type.constructor {
+                    let returnType = BridgeType.jsObject(type.name)
+                    dtsPrinter.write(
+                        "new\(renderTSSignature(parameters: constructor.parameters, returnType: returnType, effects: Effects(isAsync: false, isThrows: false)));"
+                    )
+                }
+                for method in type.staticMethods {
+                    let methodName = method.jsName ?? method.name
+                    let signature = "\(renderTSPropertyName(methodName))\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: Effects(isAsync: false, isThrows: false)));"
+                    dtsPrinter.write(signature)
+                }
+            }
+            dtsPrinter.write("}")
+            importObjectBuilder.appendDts(dtsPrinter.lines)
+        }
         for method in type.methods {
             let (js, dts) = try renderImportedMethod(context: type, method: method)
             importObjectBuilder.assignToImportObject(name: method.abiName(context: type), function: js)
@@ -3174,19 +3193,6 @@ extension BridgeJSLink {
             returnType: returnType
         )
         importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
-
-        if type.from == nil {
-            let dtsPrinter = CodeFragmentPrinter()
-            dtsPrinter.write("\(type.name): {")
-            dtsPrinter.indent {
-                dtsPrinter.write(
-                    "new\(renderTSSignature(parameters: constructor.parameters, returnType: returnType, effects: Effects(isAsync: false, isThrows: false)));"
-                )
-            }
-            dtsPrinter.write("}")
-
-            importObjectBuilder.appendDts(dtsPrinter.lines)
-        }
     }
 
     func renderImportedGetter(
