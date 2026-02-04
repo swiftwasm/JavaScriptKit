@@ -691,7 +691,7 @@ export class TypeProcessor {
                 if (nonNullableTypes.length === 1 && (hasNull || hasUndefined)) {
                     const wrapped = this.visitType(nonNullableTypes[0], node);
                     if (hasNull && hasUndefined) {
-                        return `JSUndefinedOr<Optional<${wrapped}>>`;
+                        return "JSObject";
                     }
                     if (hasNull) {
                         return `Optional<${wrapped}>`;

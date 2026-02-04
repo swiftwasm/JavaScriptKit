@@ -145,6 +145,47 @@ exports[`ts2swift > snapshots Swift output for MultipleImportedTypes.d.ts > Mult
 "
 `;
 
+exports[`ts2swift > snapshots Swift output for OptionalNullUndefined.d.ts > OptionalNullUndefined 1`] = `
+"// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
+// DO NOT EDIT.
+//
+// To update this file, just rebuild your project or run
+// \`swift package bridge-js\`.
+
+@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+
+@JSFunction func roundTripNumberNull(_ value: Optional<Double>) throws(JSException) -> Optional<Double>
+
+@JSFunction func roundTripNumberUndefined(_ value: JSUndefinedOr<Double>) throws(JSException) -> JSUndefinedOr<Double>
+
+@JSFunction func roundTripStringNull(_ value: Optional<String>) throws(JSException) -> Optional<String>
+
+@JSFunction func roundTripStringUndefined(_ value: JSUndefinedOr<String>) throws(JSException) -> JSUndefinedOr<String>
+
+@JSFunction func roundTripBooleanNull(_ value: JSObject) throws(JSException) -> JSObject
+
+@JSFunction func roundTripBooleanUndefined(_ value: JSObject) throws(JSException) -> JSObject
+
+@JSFunction func optionalNumberParamNull(_ x: Double, _ maybe: Optional<Double>) throws(JSException) -> Double
+
+@JSFunction func optionalNumberParamUndefined(_ x: Double, _ maybe: JSUndefinedOr<Double>) throws(JSException) -> Double
+
+@JSFunction func roundTripMyInterfaceNull(_ value: Optional<MyInterface>) throws(JSException) -> Optional<MyInterface>
+
+@JSClass struct MyInterface {
+}
+
+@JSFunction func roundTripMyInterfaceUndefined(_ value: JSUndefinedOr<MyInterface>) throws(JSException) -> JSUndefinedOr<MyInterface>
+
+@JSClass struct WithOptionalFields {
+    @JSGetter var valueOrNull: Optional<MyInterface>
+    @JSSetter func setValueOrNull(_ value: Optional<MyInterface>) throws(JSException)
+    @JSGetter var valueOrUndefined: JSUndefinedOr<MyInterface>
+    @JSSetter func setValueOrUndefined(_ value: JSUndefinedOr<MyInterface>) throws(JSException)
+}
+"
+`;
+
 exports[`ts2swift > snapshots Swift output for PrimitiveParameters.d.ts > PrimitiveParameters 1`] = `
 "// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
 // DO NOT EDIT.
