@@ -31,9 +31,98 @@ export async function createInstantiator(options, swift) {
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
-    
+
     let _exports = null;
     let bjs = null;
+    function __bjs_jsValueLower(value) {
+        let kind;
+        let payload1;
+        let payload2;
+        if (value === null) {
+            kind = 4;
+            payload1 = 0;
+            payload2 = 0;
+        } else {
+            switch (typeof value) {
+                case "boolean":
+                    kind = 0;
+                    payload1 = value ? 1 : 0;
+                    payload2 = 0;
+                    break;
+                case "number":
+                    kind = 2;
+                    payload1 = 0;
+                    payload2 = value;
+                    break;
+                case "string":
+                    kind = 1;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "undefined":
+                    kind = 5;
+                    payload1 = 0;
+                    payload2 = 0;
+                    break;
+                case "object":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "function":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "symbol":
+                    kind = 7;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "bigint":
+                    kind = 8;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                default:
+                    throw new TypeError("Unsupported JSValue type");
+            }
+        }
+        return [kind, payload1, payload2];
+    }
+    function __bjs_jsValueLift(kind, payload1, payload2) {
+        let jsValue;
+        switch (kind) {
+            case 0:
+                jsValue = payload1 !== 0;
+                break;
+            case 1:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 2:
+                jsValue = payload2;
+                break;
+            case 3:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 4:
+                jsValue = null;
+                break;
+            case 5:
+                jsValue = undefined;
+                break;
+            case 7:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 8:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            default:
+                throw new TypeError("Unsupported JSValue kind " + kind);
+        }
+        return jsValue;
+    }
+
 
     return {
         /**
@@ -213,89 +302,9 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_jsEchoJSValue"] = function bjs_jsEchoJSValue(valueKind, valuePayload1, valuePayload2) {
                 try {
-                    let jsValue;
-                    switch (valueKind) {
-                        case 0:
-                            jsValue = valuePayload1 !== 0;
-                            break;
-                        case 1:
-                            jsValue = swift.memory.getObject(valuePayload1);
-                            break;
-                        case 2:
-                            jsValue = valuePayload2;
-                            break;
-                        case 3:
-                            jsValue = swift.memory.getObject(valuePayload1);
-                            break;
-                        case 4:
-                            jsValue = null;
-                            break;
-                        case 5:
-                            jsValue = undefined;
-                            break;
-                        case 7:
-                            jsValue = swift.memory.getObject(valuePayload1);
-                            break;
-                        case 8:
-                            jsValue = swift.memory.getObject(valuePayload1);
-                            break;
-                        default:
-                            throw new TypeError("Unsupported JSValue kind " + valueKind);
-                    }
+                    const jsValue = __bjs_jsValueLift(valueKind, valuePayload1, valuePayload2);
                     let ret = imports.jsEchoJSValue(jsValue);
-                    let retKind;
-                    let retPayload1;
-                    let retPayload2;
-                    if (ret === null) {
-                        retKind = 4;
-                        retPayload1 = 0;
-                        retPayload2 = 0;
-                    } else {
-                        switch (typeof ret) {
-                            case "boolean":
-                                retKind = 0;
-                                retPayload1 = ret ? 1 : 0;
-                                retPayload2 = 0;
-                                break;
-                            case "number":
-                                retKind = 2;
-                                retPayload1 = 0;
-                                retPayload2 = ret;
-                                break;
-                            case "string":
-                                retKind = 1;
-                                retPayload1 = swift.memory.retain(ret);
-                                retPayload2 = 0;
-                                break;
-                            case "undefined":
-                                retKind = 5;
-                                retPayload1 = 0;
-                                retPayload2 = 0;
-                                break;
-                            case "object":
-                                retKind = 3;
-                                retPayload1 = swift.memory.retain(ret);
-                                retPayload2 = 0;
-                                break;
-                            case "function":
-                                retKind = 3;
-                                retPayload1 = swift.memory.retain(ret);
-                                retPayload2 = 0;
-                                break;
-                            case "symbol":
-                                retKind = 7;
-                                retPayload1 = swift.memory.retain(ret);
-                                retPayload2 = 0;
-                                break;
-                            case "bigint":
-                                retKind = 8;
-                                retPayload1 = swift.memory.retain(ret);
-                                retPayload2 = 0;
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue type");
-                        }
-                    }
+                    const [retKind, retPayload1, retPayload2] = __bjs_jsValueLower(ret);
                     tmpParamInts.push(retKind);
                     tmpParamInts.push(retPayload1);
                     tmpParamF64s.push(retPayload2);
@@ -328,7 +337,7 @@ export async function createInstantiator(options, swift) {
                     obj.registry.register(this, obj.pointer);
                     return obj;
                 }
-            
+
                 release() {
                     this.registry.unregister(this);
                     this.deinit(this.pointer);
@@ -338,372 +347,32 @@ export async function createInstantiator(options, swift) {
                 static __construct(ptr) {
                     return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_JSValueHolder_deinit, JSValueHolder.prototype);
                 }
-            
+
                 constructor(value, optionalValue) {
-                    let valueKind;
-                    let valuePayload1;
-                    let valuePayload2;
-                    if (value === null) {
-                        valueKind = 4;
-                        valuePayload1 = 0;
-                        valuePayload2 = 0;
-                    } else {
-                        switch (typeof value) {
-                            case "boolean":
-                                valueKind = 0;
-                                valuePayload1 = value ? 1 : 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "number":
-                                valueKind = 2;
-                                valuePayload1 = 0;
-                                valuePayload2 = value;
-                                break;
-                            case "string":
-                                valueKind = 1;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "undefined":
-                                valueKind = 5;
-                                valuePayload1 = 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "object":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "function":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "symbol":
-                                valueKind = 7;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "bigint":
-                                valueKind = 8;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue type");
-                        }
-                    }
+                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     const isSome = optionalValue != null;
-                    let optionalValueKind;
-                    let optionalValuePayload1;
-                    let optionalValuePayload2;
-                    if (optionalValue === null) {
-                        optionalValueKind = 4;
-                        optionalValuePayload1 = 0;
-                        optionalValuePayload2 = 0;
-                    } else {
-                        switch (typeof optionalValue) {
-                            case "boolean":
-                                optionalValueKind = 0;
-                                optionalValuePayload1 = optionalValue ? 1 : 0;
-                                optionalValuePayload2 = 0;
-                                break;
-                            case "number":
-                                optionalValueKind = 2;
-                                optionalValuePayload1 = 0;
-                                optionalValuePayload2 = optionalValue;
-                                break;
-                            case "string":
-                                optionalValueKind = 1;
-                                optionalValuePayload1 = swift.memory.retain(optionalValue);
-                                optionalValuePayload2 = 0;
-                                break;
-                            case "undefined":
-                                optionalValueKind = 5;
-                                optionalValuePayload1 = 0;
-                                optionalValuePayload2 = 0;
-                                break;
-                            case "object":
-                                optionalValueKind = 3;
-                                optionalValuePayload1 = swift.memory.retain(optionalValue);
-                                optionalValuePayload2 = 0;
-                                break;
-                            case "function":
-                                optionalValueKind = 3;
-                                optionalValuePayload1 = swift.memory.retain(optionalValue);
-                                optionalValuePayload2 = 0;
-                                break;
-                            case "symbol":
-                                optionalValueKind = 7;
-                                optionalValuePayload1 = swift.memory.retain(optionalValue);
-                                optionalValuePayload2 = 0;
-                                break;
-                            case "bigint":
-                                optionalValueKind = 8;
-                                optionalValuePayload1 = swift.memory.retain(optionalValue);
-                                optionalValuePayload2 = 0;
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue type");
-                        }
-                    }
+                    const [optionalValueKind, optionalValuePayload1, optionalValuePayload2] = __bjs_jsValueLower(optionalValue);
                     const ret = instance.exports.bjs_JSValueHolder_init(valueKind, valuePayload1, valuePayload2, +isSome, optionalValueKind, optionalValuePayload1, optionalValuePayload2);
                     return JSValueHolder.__construct(ret);
                 }
                 update(value, optionalValue) {
-                    let valueKind;
-                    let valuePayload1;
-                    let valuePayload2;
-                    if (value === null) {
-                        valueKind = 4;
-                        valuePayload1 = 0;
-                        valuePayload2 = 0;
-                    } else {
-                        switch (typeof value) {
-                            case "boolean":
-                                valueKind = 0;
-                                valuePayload1 = value ? 1 : 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "number":
-                                valueKind = 2;
-                                valuePayload1 = 0;
-                                valuePayload2 = value;
-                                break;
-                            case "string":
-                                valueKind = 1;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "undefined":
-                                valueKind = 5;
-                                valuePayload1 = 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "object":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "function":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "symbol":
-                                valueKind = 7;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "bigint":
-                                valueKind = 8;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue type");
-                        }
-                    }
+                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     const isSome = optionalValue != null;
-                    let optionalValueKind;
-                    let optionalValuePayload1;
-                    let optionalValuePayload2;
-                    if (optionalValue === null) {
-                        optionalValueKind = 4;
-                        optionalValuePayload1 = 0;
-                        optionalValuePayload2 = 0;
-                    } else {
-                        switch (typeof optionalValue) {
-                            case "boolean":
-                                optionalValueKind = 0;
-                                optionalValuePayload1 = optionalValue ? 1 : 0;
-                                optionalValuePayload2 = 0;
-                                break;
-                            case "number":
-                                optionalValueKind = 2;
-                                optionalValuePayload1 = 0;
-                                optionalValuePayload2 = optionalValue;
-                                break;
-                            case "string":
-                                optionalValueKind = 1;
-                                optionalValuePayload1 = swift.memory.retain(optionalValue);
-                                optionalValuePayload2 = 0;
-                                break;
-                            case "undefined":
-                                optionalValueKind = 5;
-                                optionalValuePayload1 = 0;
-                                optionalValuePayload2 = 0;
-                                break;
-                            case "object":
-                                optionalValueKind = 3;
-                                optionalValuePayload1 = swift.memory.retain(optionalValue);
-                                optionalValuePayload2 = 0;
-                                break;
-                            case "function":
-                                optionalValueKind = 3;
-                                optionalValuePayload1 = swift.memory.retain(optionalValue);
-                                optionalValuePayload2 = 0;
-                                break;
-                            case "symbol":
-                                optionalValueKind = 7;
-                                optionalValuePayload1 = swift.memory.retain(optionalValue);
-                                optionalValuePayload2 = 0;
-                                break;
-                            case "bigint":
-                                optionalValueKind = 8;
-                                optionalValuePayload1 = swift.memory.retain(optionalValue);
-                                optionalValuePayload2 = 0;
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue type");
-                        }
-                    }
+                    const [optionalValueKind, optionalValuePayload1, optionalValuePayload2] = __bjs_jsValueLower(optionalValue);
                     instance.exports.bjs_JSValueHolder_update(this.pointer, valueKind, valuePayload1, valuePayload2, +isSome, optionalValueKind, optionalValuePayload1, optionalValuePayload2);
                 }
                 echo(value) {
-                    let valueKind;
-                    let valuePayload1;
-                    let valuePayload2;
-                    if (value === null) {
-                        valueKind = 4;
-                        valuePayload1 = 0;
-                        valuePayload2 = 0;
-                    } else {
-                        switch (typeof value) {
-                            case "boolean":
-                                valueKind = 0;
-                                valuePayload1 = value ? 1 : 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "number":
-                                valueKind = 2;
-                                valuePayload1 = 0;
-                                valuePayload2 = value;
-                                break;
-                            case "string":
-                                valueKind = 1;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "undefined":
-                                valueKind = 5;
-                                valuePayload1 = 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "object":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "function":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "symbol":
-                                valueKind = 7;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "bigint":
-                                valueKind = 8;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue type");
-                        }
-                    }
+                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     instance.exports.bjs_JSValueHolder_echo(this.pointer, valueKind, valuePayload1, valuePayload2);
                     const jsValuePayload2 = tmpRetF64s.pop();
                     const jsValuePayload1 = tmpRetInts.pop();
                     const jsValueKind = tmpRetInts.pop();
-                    let jsValue;
-                    switch (jsValueKind) {
-                        case 0:
-                            jsValue = jsValuePayload1 !== 0;
-                            break;
-                        case 1:
-                            jsValue = swift.memory.getObject(jsValuePayload1);
-                            break;
-                        case 2:
-                            jsValue = jsValuePayload2;
-                            break;
-                        case 3:
-                            jsValue = swift.memory.getObject(jsValuePayload1);
-                            break;
-                        case 4:
-                            jsValue = null;
-                            break;
-                        case 5:
-                            jsValue = undefined;
-                            break;
-                        case 7:
-                            jsValue = swift.memory.getObject(jsValuePayload1);
-                            break;
-                        case 8:
-                            jsValue = swift.memory.getObject(jsValuePayload1);
-                            break;
-                        default:
-                            throw new TypeError("Unsupported JSValue kind " + jsValueKind);
-                    }
+                    const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                     return jsValue;
                 }
                 echoOptional(value) {
                     const isSome = value != null;
-                    let valueKind;
-                    let valuePayload1;
-                    let valuePayload2;
-                    if (value === null) {
-                        valueKind = 4;
-                        valuePayload1 = 0;
-                        valuePayload2 = 0;
-                    } else {
-                        switch (typeof value) {
-                            case "boolean":
-                                valueKind = 0;
-                                valuePayload1 = value ? 1 : 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "number":
-                                valueKind = 2;
-                                valuePayload1 = 0;
-                                valuePayload2 = value;
-                                break;
-                            case "string":
-                                valueKind = 1;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "undefined":
-                                valueKind = 5;
-                                valuePayload1 = 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "object":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "function":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "symbol":
-                                valueKind = 7;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "bigint":
-                                valueKind = 8;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue type");
-                        }
-                    }
+                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     instance.exports.bjs_JSValueHolder_echoOptional(this.pointer, +isSome, valueKind, valuePayload1, valuePayload2);
                     const isSome1 = tmpRetInts.pop();
                     let optResult;
@@ -711,35 +380,7 @@ export async function createInstantiator(options, swift) {
                         const jsValuePayload2 = tmpRetF64s.pop();
                         const jsValuePayload1 = tmpRetInts.pop();
                         const jsValueKind = tmpRetInts.pop();
-                        let jsValue;
-                        switch (jsValueKind) {
-                            case 0:
-                                jsValue = jsValuePayload1 !== 0;
-                                break;
-                            case 1:
-                                jsValue = swift.memory.getObject(jsValuePayload1);
-                                break;
-                            case 2:
-                                jsValue = jsValuePayload2;
-                                break;
-                            case 3:
-                                jsValue = swift.memory.getObject(jsValuePayload1);
-                                break;
-                            case 4:
-                                jsValue = null;
-                                break;
-                            case 5:
-                                jsValue = undefined;
-                                break;
-                            case 7:
-                                jsValue = swift.memory.getObject(jsValuePayload1);
-                                break;
-                            case 8:
-                                jsValue = swift.memory.getObject(jsValuePayload1);
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue kind " + jsValueKind);
-                        }
+                        const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                         optResult = jsValue;
                     } else {
                         optResult = null;
@@ -751,91 +392,11 @@ export async function createInstantiator(options, swift) {
                     const jsValuePayload2 = tmpRetF64s.pop();
                     const jsValuePayload1 = tmpRetInts.pop();
                     const jsValueKind = tmpRetInts.pop();
-                    let jsValue;
-                    switch (jsValueKind) {
-                        case 0:
-                            jsValue = jsValuePayload1 !== 0;
-                            break;
-                        case 1:
-                            jsValue = swift.memory.getObject(jsValuePayload1);
-                            break;
-                        case 2:
-                            jsValue = jsValuePayload2;
-                            break;
-                        case 3:
-                            jsValue = swift.memory.getObject(jsValuePayload1);
-                            break;
-                        case 4:
-                            jsValue = null;
-                            break;
-                        case 5:
-                            jsValue = undefined;
-                            break;
-                        case 7:
-                            jsValue = swift.memory.getObject(jsValuePayload1);
-                            break;
-                        case 8:
-                            jsValue = swift.memory.getObject(jsValuePayload1);
-                            break;
-                        default:
-                            throw new TypeError("Unsupported JSValue kind " + jsValueKind);
-                    }
+                    const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                     return jsValue;
                 }
                 set value(value) {
-                    let valueKind;
-                    let valuePayload1;
-                    let valuePayload2;
-                    if (value === null) {
-                        valueKind = 4;
-                        valuePayload1 = 0;
-                        valuePayload2 = 0;
-                    } else {
-                        switch (typeof value) {
-                            case "boolean":
-                                valueKind = 0;
-                                valuePayload1 = value ? 1 : 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "number":
-                                valueKind = 2;
-                                valuePayload1 = 0;
-                                valuePayload2 = value;
-                                break;
-                            case "string":
-                                valueKind = 1;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "undefined":
-                                valueKind = 5;
-                                valuePayload1 = 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "object":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "function":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "symbol":
-                                valueKind = 7;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "bigint":
-                                valueKind = 8;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue type");
-                        }
-                    }
+                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     instance.exports.bjs_JSValueHolder_value_set(this.pointer, valueKind, valuePayload1, valuePayload2);
                 }
                 get optionalValue() {
@@ -846,35 +407,7 @@ export async function createInstantiator(options, swift) {
                         const jsValuePayload2 = tmpRetF64s.pop();
                         const jsValuePayload1 = tmpRetInts.pop();
                         const jsValueKind = tmpRetInts.pop();
-                        let jsValue;
-                        switch (jsValueKind) {
-                            case 0:
-                                jsValue = jsValuePayload1 !== 0;
-                                break;
-                            case 1:
-                                jsValue = swift.memory.getObject(jsValuePayload1);
-                                break;
-                            case 2:
-                                jsValue = jsValuePayload2;
-                                break;
-                            case 3:
-                                jsValue = swift.memory.getObject(jsValuePayload1);
-                                break;
-                            case 4:
-                                jsValue = null;
-                                break;
-                            case 5:
-                                jsValue = undefined;
-                                break;
-                            case 7:
-                                jsValue = swift.memory.getObject(jsValuePayload1);
-                                break;
-                            case 8:
-                                jsValue = swift.memory.getObject(jsValuePayload1);
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue kind " + jsValueKind);
-                        }
+                        const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                         optResult = jsValue;
                     } else {
                         optResult = null;
@@ -883,208 +416,24 @@ export async function createInstantiator(options, swift) {
                 }
                 set optionalValue(value) {
                     const isSome = value != null;
-                    let valueKind;
-                    let valuePayload1;
-                    let valuePayload2;
-                    if (value === null) {
-                        valueKind = 4;
-                        valuePayload1 = 0;
-                        valuePayload2 = 0;
-                    } else {
-                        switch (typeof value) {
-                            case "boolean":
-                                valueKind = 0;
-                                valuePayload1 = value ? 1 : 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "number":
-                                valueKind = 2;
-                                valuePayload1 = 0;
-                                valuePayload2 = value;
-                                break;
-                            case "string":
-                                valueKind = 1;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "undefined":
-                                valueKind = 5;
-                                valuePayload1 = 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "object":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "function":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "symbol":
-                                valueKind = 7;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "bigint":
-                                valueKind = 8;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue type");
-                        }
-                    }
+                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     instance.exports.bjs_JSValueHolder_optionalValue_set(this.pointer, +isSome, valueKind, valuePayload1, valuePayload2);
                 }
             }
             const exports = {
                 JSValueHolder,
                 roundTripJSValue: function bjs_roundTripJSValue(value) {
-                    let valueKind;
-                    let valuePayload1;
-                    let valuePayload2;
-                    if (value === null) {
-                        valueKind = 4;
-                        valuePayload1 = 0;
-                        valuePayload2 = 0;
-                    } else {
-                        switch (typeof value) {
-                            case "boolean":
-                                valueKind = 0;
-                                valuePayload1 = value ? 1 : 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "number":
-                                valueKind = 2;
-                                valuePayload1 = 0;
-                                valuePayload2 = value;
-                                break;
-                            case "string":
-                                valueKind = 1;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "undefined":
-                                valueKind = 5;
-                                valuePayload1 = 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "object":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "function":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "symbol":
-                                valueKind = 7;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "bigint":
-                                valueKind = 8;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue type");
-                        }
-                    }
+                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     instance.exports.bjs_roundTripJSValue(valueKind, valuePayload1, valuePayload2);
                     const jsValuePayload2 = tmpRetF64s.pop();
                     const jsValuePayload1 = tmpRetInts.pop();
                     const jsValueKind = tmpRetInts.pop();
-                    let jsValue;
-                    switch (jsValueKind) {
-                        case 0:
-                            jsValue = jsValuePayload1 !== 0;
-                            break;
-                        case 1:
-                            jsValue = swift.memory.getObject(jsValuePayload1);
-                            break;
-                        case 2:
-                            jsValue = jsValuePayload2;
-                            break;
-                        case 3:
-                            jsValue = swift.memory.getObject(jsValuePayload1);
-                            break;
-                        case 4:
-                            jsValue = null;
-                            break;
-                        case 5:
-                            jsValue = undefined;
-                            break;
-                        case 7:
-                            jsValue = swift.memory.getObject(jsValuePayload1);
-                            break;
-                        case 8:
-                            jsValue = swift.memory.getObject(jsValuePayload1);
-                            break;
-                        default:
-                            throw new TypeError("Unsupported JSValue kind " + jsValueKind);
-                    }
+                    const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                     return jsValue;
                 },
                 roundTripOptionalJSValue: function bjs_roundTripOptionalJSValue(value) {
                     const isSome = value != null;
-                    let valueKind;
-                    let valuePayload1;
-                    let valuePayload2;
-                    if (value === null) {
-                        valueKind = 4;
-                        valuePayload1 = 0;
-                        valuePayload2 = 0;
-                    } else {
-                        switch (typeof value) {
-                            case "boolean":
-                                valueKind = 0;
-                                valuePayload1 = value ? 1 : 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "number":
-                                valueKind = 2;
-                                valuePayload1 = 0;
-                                valuePayload2 = value;
-                                break;
-                            case "string":
-                                valueKind = 1;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "undefined":
-                                valueKind = 5;
-                                valuePayload1 = 0;
-                                valuePayload2 = 0;
-                                break;
-                            case "object":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "function":
-                                valueKind = 3;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "symbol":
-                                valueKind = 7;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            case "bigint":
-                                valueKind = 8;
-                                valuePayload1 = swift.memory.retain(value);
-                                valuePayload2 = 0;
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue type");
-                        }
-                    }
+                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     instance.exports.bjs_roundTripOptionalJSValue(+isSome, valueKind, valuePayload1, valuePayload2);
                     const isSome1 = tmpRetInts.pop();
                     let optResult;
@@ -1092,35 +441,7 @@ export async function createInstantiator(options, swift) {
                         const jsValuePayload2 = tmpRetF64s.pop();
                         const jsValuePayload1 = tmpRetInts.pop();
                         const jsValueKind = tmpRetInts.pop();
-                        let jsValue;
-                        switch (jsValueKind) {
-                            case 0:
-                                jsValue = jsValuePayload1 !== 0;
-                                break;
-                            case 1:
-                                jsValue = swift.memory.getObject(jsValuePayload1);
-                                break;
-                            case 2:
-                                jsValue = jsValuePayload2;
-                                break;
-                            case 3:
-                                jsValue = swift.memory.getObject(jsValuePayload1);
-                                break;
-                            case 4:
-                                jsValue = null;
-                                break;
-                            case 5:
-                                jsValue = undefined;
-                                break;
-                            case 7:
-                                jsValue = swift.memory.getObject(jsValuePayload1);
-                                break;
-                            case 8:
-                                jsValue = swift.memory.getObject(jsValuePayload1);
-                                break;
-                            default:
-                                throw new TypeError("Unsupported JSValue kind " + jsValueKind);
-                        }
+                        const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                         optResult = jsValue;
                     } else {
                         optResult = null;
