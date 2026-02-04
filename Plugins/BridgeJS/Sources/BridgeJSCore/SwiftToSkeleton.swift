@@ -394,22 +394,28 @@ private enum ExportSwiftConstants {
     static let supportedRawTypes = SwiftEnumRawType.allCases.map { $0.rawValue }
 }
 
+extension AttributeSyntax {
+    /// The attribute name as text when it is a simple identifier (e.g. "JS", "JSFunction").
+    /// Prefer this over `attributeName.trimmedDescription` for name checks to avoid unnecessary string work.
+    fileprivate var attributeNameText: String? {
+        attributeName.as(IdentifierTypeSyntax.self)?.name.text
+    }
+}
+
 extension AttributeListSyntax {
     func hasJSAttribute() -> Bool {
         firstJSAttribute != nil
     }
 
     var firstJSAttribute: AttributeSyntax? {
-        first(where: {
-            $0.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "JS"
-        })?.as(AttributeSyntax.self)
+        first(where: { $0.as(AttributeSyntax.self)?.attributeNameText == "JS" })?.as(AttributeSyntax.self)
     }
 
     /// Returns true if any attribute has the given name (e.g. "JSClass").
     func hasAttribute(name: String) -> Bool {
         contains { attribute in
             guard let syntax = attribute.as(AttributeSyntax.self) else { return false }
-            return syntax.attributeName.trimmedDescription == name
+            return syntax.attributeNameText == name
         }
     }
 }
@@ -1916,9 +1922,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
 
         static func firstJSFunctionAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
-            attributes?.first { attribute in
-                attribute.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "JSFunction"
-            }?.as(AttributeSyntax.self)
+            firstAttribute(attributes, named: "JSFunction")
         }
 
         static func hasJSGetterAttribute(_ attributes: AttributeListSyntax?) -> Bool {
@@ -1926,9 +1930,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
 
         static func firstJSGetterAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
-            attributes?.first { attribute in
-                attribute.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "JSGetter"
-            }?.as(AttributeSyntax.self)
+            firstAttribute(attributes, named: "JSGetter")
         }
 
         static func hasJSSetterAttribute(_ attributes: AttributeListSyntax?) -> Bool {
@@ -1936,9 +1938,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
 
         static func firstJSSetterAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
-            attributes?.first { attribute in
-                attribute.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "JSSetter"
-            }?.as(AttributeSyntax.self)
+            firstAttribute(attributes, named: "JSSetter")
         }
 
         static func hasJSClassAttribute(_ attributes: AttributeListSyntax?) -> Bool {
@@ -1946,16 +1946,18 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
 
         static func firstJSClassAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
-            attributes?.first { attribute in
-                attribute.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "JSClass"
-            }?.as(AttributeSyntax.self)
+            firstAttribute(attributes, named: "JSClass")
+        }
+
+        static func firstAttribute(_ attributes: AttributeListSyntax?, named name: String) -> AttributeSyntax? {
+            attributes?.first { $0.as(AttributeSyntax.self)?.attributeNameText == name }?.as(AttributeSyntax.self)
         }
 
         static func hasAttribute(_ attributes: AttributeListSyntax?, name: String) -> Bool {
             guard let attributes else { return false }
             return attributes.contains { attribute in
                 guard let syntax = attribute.as(AttributeSyntax.self) else { return false }
-                return syntax.attributeName.trimmedDescription == name
+                return syntax.attributeNameText == name
             }
         }
 
