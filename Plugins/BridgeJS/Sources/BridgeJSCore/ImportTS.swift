@@ -398,6 +398,24 @@ public struct ImportTS {
             ]
         }
 
+        func renderStaticMethod(method: ImportedFunctionSkeleton) throws -> [DeclSyntax] {
+            let abiName = method.abiName(context: type, operation: "static")
+            let builder = CallJSEmission(moduleName: moduleName, abiName: abiName)
+            for param in method.parameters {
+                try builder.lowerParameter(param: param)
+            }
+            try builder.call(returnType: method.returnType)
+            try builder.liftReturnValue(returnType: method.returnType)
+            topLevelDecls.append(builder.renderImportDecl())
+            return [
+                builder.renderThunkDecl(
+                    name: Self.thunkName(type: type, method: method),
+                    parameters: method.parameters,
+                    returnType: method.returnType
+                )
+            ]
+        }
+
         func renderConstructorDecl(constructor: ImportedConstructorSkeleton) throws -> [DeclSyntax] {
             let builder = CallJSEmission(moduleName: moduleName, abiName: constructor.abiName(context: type))
             for param in constructor.parameters {
@@ -460,6 +478,10 @@ public struct ImportTS {
         }
         if let constructor = type.constructor {
             decls.append(contentsOf: try renderConstructorDecl(constructor: constructor))
+        }
+
+        for method in type.staticMethods {
+            decls.append(contentsOf: try renderStaticMethod(method: method))
         }
 
         for getter in type.getters {

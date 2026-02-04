@@ -11668,6 +11668,9 @@
             "name" : "Foo",
             "setters" : [
 
+            ],
+            "staticMethods" : [
+
             ]
           }
         ]
@@ -11967,6 +11970,9 @@
                   }
                 }
               }
+            ],
+            "staticMethods" : [
+
             ]
           },
           {
@@ -11996,6 +12002,97 @@
             "name" : "_WeirdClass",
             "setters" : [
 
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "constructor" : {
+              "parameters" : [
+                {
+                  "name" : "value",
+                  "type" : {
+                    "double" : {
+
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "name" : "value",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "StaticBox",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "name" : "create",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "StaticBox"
+                  }
+                }
+              },
+              {
+                "name" : "value",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "makeDefault",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "StaticBox"
+                  }
+                }
+              },
+              {
+                "jsName" : "with-dashes",
+                "name" : "with_dashes",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "StaticBox"
+                  }
+                }
+              }
             ]
           },
           {
@@ -12107,6 +12204,9 @@
                   }
                 }
               }
+            ],
+            "staticMethods" : [
+
             ]
           }
         ]

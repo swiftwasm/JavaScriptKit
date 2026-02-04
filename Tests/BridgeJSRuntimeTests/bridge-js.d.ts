@@ -31,3 +31,12 @@ export class $WeirdClass {
     constructor();
     "method-with-dashes"(): string;
 }
+
+export class StaticBox {
+    constructor(value: number);
+    value(): number;
+    static create(value: number): StaticBox;
+    static value(): number;
+    static makeDefault(): StaticBox;
+    static "with-dashes"(): StaticBox;
+}

@@ -219,6 +219,9 @@
                   }
                 }
               }
+            ],
+            "staticMethods" : [
+
             ]
           },
           {
@@ -247,6 +250,9 @@
             ],
             "name" : "_Weird",
             "setters" : [
+
+            ],
+            "staticMethods" : [
 
             ]
           }

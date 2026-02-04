@@ -821,8 +821,12 @@ export class TypeProcessor {
         const returnType = this.visitType(signature.getReturnType(), node);
         const effects = this.renderEffects({ isAsync: false });
         const swiftMethodName = this.renderIdentifier(swiftName);
+        const isStatic = node.modifiers?.some(
+            (modifier) => modifier.kind === ts.SyntaxKind.StaticKeyword
+        ) ?? false;
+        const staticKeyword = isStatic ? "static " : "";
 
-        this.swiftLines.push(`    ${annotation} func ${swiftMethodName}(${params}) ${effects} -> ${returnType}`);
+        this.swiftLines.push(`    ${annotation} ${staticKeyword}func ${swiftMethodName}(${params}) ${effects} -> ${returnType}`);
     }
 
     /**

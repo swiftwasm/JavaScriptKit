@@ -1856,7 +1856,6 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     private let inputFilePath: String
     private var jsClassNames: Set<String>
     private let parent: SwiftToSkeleton
-
     // MARK: - State Management
 
     enum State {
@@ -1876,6 +1875,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         let from: JSImportFrom?
         var constructor: ImportedConstructorSkeleton?
         var methods: [ImportedFunctionSkeleton]
+        var staticMethods: [ImportedFunctionSkeleton]
         var getters: [ImportedGetterSkeleton]
         var setters: [ImportedSetterSkeleton]
     }
@@ -2094,6 +2094,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             from: nil,
             constructor: nil,
             methods: [],
+            staticMethods: [],
             getters: [],
             setters: []
         )
@@ -2107,6 +2108,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             from: from,
             constructor: nil,
             methods: [],
+            staticMethods: [],
             getters: [],
             setters: []
         )
@@ -2121,6 +2123,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                     from: type.from,
                     constructor: type.constructor,
                     methods: type.methods,
+                    staticMethods: type.staticMethods,
                     getters: type.getters,
                     setters: type.setters,
                     documentation: nil
@@ -2165,12 +2168,6 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     // MARK: - Visitor Methods
 
-    override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
-        let typeName = node.extendedType.trimmedDescription
-        collectStaticMembers(in: node.memberBlock.members, typeName: typeName)
-        return .skipChildren
-    }
-
     override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
         switch state {
         case .topLevel:
@@ -2191,7 +2188,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     private func handleTopLevelFunction(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
         if let jsFunction = AttributeChecker.firstJSFunctionAttribute(node.attributes),
-            let function = parseFunction(jsFunction, node, enclosingTypeName: nil, isStaticMember: true)
+            let function = parseFunction(jsFunction, node)
         {
             importedFunctions.append(function)
             return .skipChildren
@@ -2216,13 +2213,11 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         type: inout CurrentType
     ) -> Bool {
         if let jsFunction = AttributeChecker.firstJSFunctionAttribute(node.attributes) {
-            if isStaticMember {
-                parseFunction(jsFunction, node, enclosingTypeName: typeName, isStaticMember: true).map {
-                    importedFunctions.append($0)
-                }
-            } else {
-                parseFunction(jsFunction, node, enclosingTypeName: typeName, isStaticMember: false).map {
-                    type.methods.append($0)
+            if let method = parseFunction(jsFunction, node) {
+                if isStaticMember {
+                    type.staticMethods.append(method)
+                } else {
+                    type.methods.append(method)
                 }
             }
             return true
@@ -2313,38 +2308,6 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
     }
 
-    // MARK: - Member Collection
-
-    private func collectStaticMembers(in members: MemberBlockItemListSyntax, typeName: String) {
-        for member in members {
-            if let function = member.decl.as(FunctionDeclSyntax.self) {
-                if let jsFunction = AttributeChecker.firstJSFunctionAttribute(function.attributes),
-                    let parsed = parseFunction(jsFunction, function, enclosingTypeName: typeName, isStaticMember: true)
-                {
-                    importedFunctions.append(parsed)
-                } else if AttributeChecker.hasJSSetterAttribute(function.attributes) {
-                    errors.append(
-                        DiagnosticError(
-                            node: function,
-                            message:
-                                "@JSSetter is not supported for static members. Use it only for instance members in @JSClass types."
-                        )
-                    )
-                }
-            } else if let variable = member.decl.as(VariableDeclSyntax.self),
-                AttributeChecker.hasJSGetterAttribute(variable.attributes)
-            {
-                errors.append(
-                    DiagnosticError(
-                        node: variable,
-                        message:
-                            "@JSGetter is not supported for static members. Use it only for instance members in @JSClass types."
-                    )
-                )
-            }
-        }
-    }
-
     // MARK: - Parsing Methods
 
     private func parseConstructor(
@@ -2365,8 +2328,6 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     private func parseFunction(
         _ jsFunction: AttributeSyntax,
         _ node: FunctionDeclSyntax,
-        enclosingTypeName: String?,
-        isStaticMember: Bool
     ) -> ImportedFunctionSkeleton? {
         guard validateEffects(node.signature.effectSpecifiers, node: node, attributeName: "JSFunction") != nil
         else {
@@ -2376,12 +2337,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         let baseName = SwiftToSkeleton.normalizeIdentifier(node.name.text)
         let jsName = AttributeChecker.extractJSName(from: jsFunction)
         let from = AttributeChecker.extractJSImportFrom(from: jsFunction)
-        let name: String
-        if isStaticMember, let enclosingTypeName {
-            name = "\(enclosingTypeName)_\(baseName)"
-        } else {
-            name = baseName
-        }
+        let name = baseName
 
         let parameters = parseParameters(from: node.signature.parameterClause)
         let returnType: BridgeType

@@ -127,4 +127,17 @@ class ImportAPITests: XCTestCase {
         let obj = try _WeirdClass()
         XCTAssertEqual(try obj.method_with_dashes(), "ok")
     }
+
+    func testJSClassStaticFunctions() throws {
+        let created = try StaticBox.create(10)
+        XCTAssertEqual(try created.value(), 10)
+
+        let defaultBox = try StaticBox.makeDefault()
+        XCTAssertEqual(try defaultBox.value(), 0)
+
+        XCTAssertEqual(try StaticBox.value(), 99)
+
+        let dashed = try StaticBox.with_dashes()
+        XCTAssertEqual(try dashed.value(), 7)
+    }
 }

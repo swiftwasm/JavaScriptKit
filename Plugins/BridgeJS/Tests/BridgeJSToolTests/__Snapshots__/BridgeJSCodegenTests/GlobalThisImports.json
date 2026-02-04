@@ -81,6 +81,9 @@
             "name" : "JSConsole",
             "setters" : [
 
+            ],
+            "staticMethods" : [
+
             ]
           },
           {
@@ -115,6 +118,9 @@
             ],
             "name" : "WebSocket",
             "setters" : [
+
+            ],
+            "staticMethods" : [
 
             ]
           }

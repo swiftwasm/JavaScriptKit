@@ -186,6 +186,9 @@
             "name" : "Foo",
             "setters" : [
 
+            ],
+            "staticMethods" : [
+
             ]
           }
         ]

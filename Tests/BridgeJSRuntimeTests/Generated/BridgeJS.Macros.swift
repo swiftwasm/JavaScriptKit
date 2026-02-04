@@ -48,6 +48,15 @@ extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
     @JSFunction(jsName: "method-with-dashes") func method_with_dashes() throws(JSException) -> String
 }
 
+@JSClass struct StaticBox {
+    @JSFunction init(_ value: Double) throws(JSException)
+    @JSFunction func value() throws(JSException) -> Double
+    @JSFunction static func create(_ value: Double) throws(JSException) -> StaticBox
+    @JSFunction static func value() throws(JSException) -> Double
+    @JSFunction static func makeDefault() throws(JSException) -> StaticBox
+    @JSFunction(jsName: "with-dashes") static func with_dashes() throws(JSException) -> StaticBox
+}
+
 @JSFunction(from: .global) func parseInt(_ string: String) throws(JSException) -> Double
 
 @JSClass(from: .global) struct Animal {

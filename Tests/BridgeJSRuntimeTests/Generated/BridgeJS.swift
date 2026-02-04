@@ -8141,6 +8141,111 @@ func _$_WeirdClass_method_with_dashes(_ self: JSObject) throws(JSException) -> S
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_StaticBox_init")
+fileprivate func bjs_StaticBox_init(_ value: Float64) -> Int32
+#else
+fileprivate func bjs_StaticBox_init(_ value: Float64) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_StaticBox_create_static")
+fileprivate func bjs_StaticBox_create_static(_ value: Float64) -> Int32
+#else
+fileprivate func bjs_StaticBox_create_static(_ value: Float64) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_StaticBox_value_static")
+fileprivate func bjs_StaticBox_value_static() -> Float64
+#else
+fileprivate func bjs_StaticBox_value_static() -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_StaticBox_makeDefault_static")
+fileprivate func bjs_StaticBox_makeDefault_static() -> Int32
+#else
+fileprivate func bjs_StaticBox_makeDefault_static() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_StaticBox_with_dashes_static")
+fileprivate func bjs_StaticBox_with_dashes_static() -> Int32
+#else
+fileprivate func bjs_StaticBox_with_dashes_static() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_StaticBox_value")
+fileprivate func bjs_StaticBox_value(_ self: Int32) -> Float64
+#else
+fileprivate func bjs_StaticBox_value(_ self: Int32) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$StaticBox_init(_ value: Double) throws(JSException) -> JSObject {
+    let valueValue = value.bridgeJSLowerParameter()
+    let ret = bjs_StaticBox_init(valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$StaticBox_create(_ value: Double) throws(JSException) -> StaticBox {
+    let valueValue = value.bridgeJSLowerParameter()
+    let ret = bjs_StaticBox_create_static(valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return StaticBox.bridgeJSLiftReturn(ret)
+}
+
+func _$StaticBox_value() throws(JSException) -> Double {
+    let ret = bjs_StaticBox_value_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+func _$StaticBox_makeDefault() throws(JSException) -> StaticBox {
+    let ret = bjs_StaticBox_makeDefault_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return StaticBox.bridgeJSLiftReturn(ret)
+}
+
+func _$StaticBox_with_dashes() throws(JSException) -> StaticBox {
+    let ret = bjs_StaticBox_with_dashes_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return StaticBox.bridgeJSLiftReturn(ret)
+}
+
+func _$StaticBox_value(_ self: JSObject) throws(JSException) -> Double {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_StaticBox_value(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Animal_init")
 fileprivate func bjs_Animal_init(_ name: Int32, _ age: Float64, _ isCat: Int32) -> Int32
 #else

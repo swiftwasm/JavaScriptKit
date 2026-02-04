@@ -2246,6 +2246,14 @@ extension BridgeJSLink {
             )
         }
 
+        func callStaticMethod(on objectExpr: String, name: String, returnType: BridgeType) throws -> String? {
+            let calleeExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
+            return try call(
+                calleeExpr: calleeExpr,
+                returnType: returnType
+            )
+        }
+
         func callPropertyGetter(name: String, returnType: BridgeType) throws -> String? {
             let objectExpr = "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)"
             let accessExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
@@ -2318,7 +2326,7 @@ extension BridgeJSLink {
             return loweredValues.first
         }
 
-        private static func propertyAccessExpr(objectExpr: String, propertyName: String) -> String {
+        static func propertyAccessExpr(objectExpr: String, propertyName: String) -> String {
             if propertyName.range(of: #"^[$A-Z_][0-9A-Z_$]*$"#, options: [.regularExpression, .caseInsensitive]) != nil
             {
                 return "\(objectExpr).\(propertyName)"
@@ -3130,6 +3138,32 @@ extension BridgeJSLink {
             importObjectBuilder.assignToImportObject(name: setterAbiName, function: js)
             importObjectBuilder.appendDts(dts)
         }
+        for method in type.staticMethods {
+            let abiName = method.abiName(context: type, operation: "static")
+            let (js, dts) = try renderImportedStaticMethod(context: type, method: method)
+            importObjectBuilder.assignToImportObject(name: abiName, function: js)
+            importObjectBuilder.appendDts(dts)
+        }
+        if type.from == nil, type.constructor != nil || !type.staticMethods.isEmpty {
+            let dtsPrinter = CodeFragmentPrinter()
+            dtsPrinter.write("\(type.name): {")
+            dtsPrinter.indent {
+                if let constructor = type.constructor {
+                    let returnType = BridgeType.jsObject(type.name)
+                    dtsPrinter.write(
+                        "new\(renderTSSignature(parameters: constructor.parameters, returnType: returnType, effects: Effects(isAsync: false, isThrows: false)));"
+                    )
+                }
+                for method in type.staticMethods {
+                    let methodName = method.jsName ?? method.name
+                    let signature =
+                        "\(renderTSPropertyName(methodName))\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: Effects(isAsync: false, isThrows: false)));"
+                    dtsPrinter.write(signature)
+                }
+            }
+            dtsPrinter.write("}")
+            importObjectBuilder.appendDts(dtsPrinter.lines)
+        }
         for method in type.methods {
             let (js, dts) = try renderImportedMethod(context: type, method: method)
             importObjectBuilder.assignToImportObject(name: method.abiName(context: type), function: js)
@@ -3160,19 +3194,6 @@ extension BridgeJSLink {
             returnType: returnType
         )
         importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
-
-        if type.from == nil {
-            let dtsPrinter = CodeFragmentPrinter()
-            dtsPrinter.write("\(type.name): {")
-            dtsPrinter.indent {
-                dtsPrinter.write(
-                    "new\(renderTSSignature(parameters: constructor.parameters, returnType: returnType, effects: Effects(isAsync: false, isThrows: false)));"
-                )
-            }
-            dtsPrinter.write("}")
-
-            importObjectBuilder.appendDts(dtsPrinter.lines)
-        }
     }
 
     func renderImportedGetter(
@@ -3203,6 +3224,32 @@ extension BridgeJSLink {
             name: abiName,
             returnExpr: returnExpr,
             returnType: .void
+        )
+        return (funcLines, [])
+    }
+
+    func renderImportedStaticMethod(
+        context: ImportedTypeSkeleton,
+        method: ImportedFunctionSkeleton
+    ) throws -> (js: [String], dts: [String]) {
+        let thunkBuilder = ImportedThunkBuilder()
+        for param in method.parameters {
+            try thunkBuilder.liftParameter(param: param)
+        }
+        let importRootExpr = context.from == .global ? "globalThis" : "imports"
+        let constructorExpr = ImportedThunkBuilder.propertyAccessExpr(
+            objectExpr: importRootExpr,
+            propertyName: context.jsName ?? context.name
+        )
+        let returnExpr = try thunkBuilder.callStaticMethod(
+            on: constructorExpr,
+            name: method.jsName ?? method.name,
+            returnType: method.returnType
+        )
+        let funcLines = thunkBuilder.renderFunction(
+            name: method.abiName(context: context, operation: "static"),
+            returnExpr: returnExpr,
+            returnType: method.returnType
         )
         return (funcLines, [])
     }
