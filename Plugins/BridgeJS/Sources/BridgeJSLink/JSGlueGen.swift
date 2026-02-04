@@ -643,10 +643,7 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
-    static func optionalLowerReturn(
-        wrappedType: BridgeType,
-        presenceCheck: (@Sendable (String) -> String)? = nil
-    ) throws -> IntrinsicJSFragment {
+    static func optionalLowerReturn(wrappedType: BridgeType, kind: JSOptionalKind) throws -> IntrinsicJSFragment {
         switch wrappedType {
         case .void, .nullable, .namespaceEnum, .closure:
             throw BridgeJSLinkError(message: "Unsupported optional wrapped type for protocol export: \(wrappedType)")
@@ -658,7 +655,7 @@ struct IntrinsicJSFragment: Sendable {
             printCode: { arguments, scope, printer, cleanupCode in
                 let value = arguments[0]
                 let isSomeVar = scope.variable("isSome")
-                let presenceExpr = presenceCheck?(value) ?? "\(value) != null"
+                let presenceExpr = kind.presenceCheck(value: value)
                 printer.write("const \(isSomeVar) = \(presenceExpr);")
 
                 switch wrappedType {
@@ -1599,10 +1596,7 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftProtocol: return .jsObjectLowerReturn
         case .void: return .void
         case .nullable(let wrappedType, let kind):
-            return try .optionalLowerReturn(
-                wrappedType: wrappedType,
-                presenceCheck: { value in kind.presenceCheck(value: value) }
-            )
+            return try .optionalLowerReturn(wrappedType: wrappedType, kind: kind)
         case .caseEnum: return .identity
         case .rawValueEnum(_, let rawType):
             switch rawType {
@@ -2493,7 +2487,7 @@ struct IntrinsicJSFragment: Sendable {
         case .nullable(let wrappedType, let kind):
             return try optionalElementLowerFragment(
                 wrappedType: wrappedType,
-                presenceCheck: { kind.presenceCheck(value: $0) }
+                kind: kind
             )
         case .swiftProtocol:
             // Same as jsObject but no cleanup — Swift's AnyProtocol wrapper releases via deinit
@@ -2556,7 +2550,7 @@ struct IntrinsicJSFragment: Sendable {
 
     private static func optionalElementLowerFragment(
         wrappedType: BridgeType,
-        presenceCheck: (@Sendable (String) -> String)? = nil
+        kind: JSOptionalKind
     ) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["value"],
@@ -2564,7 +2558,7 @@ struct IntrinsicJSFragment: Sendable {
                 let value = arguments[0]
                 let isSomeVar = scope.variable("isSome")
 
-                let presenceExpr = presenceCheck?(value) ?? "\(value) != null"
+                let presenceExpr = kind.presenceCheck(value: value)
                 printer.write("const \(isSomeVar) = \(presenceExpr) ? 1 : 0;")
                 // Cleanup is written inside the if block so retained id is in scope
                 let localCleanupWriter = CodeFragmentPrinter()
