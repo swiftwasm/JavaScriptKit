@@ -4,6 +4,8 @@ export function jsRoundTripBool(v: boolean): boolean
 export function jsRoundTripString(v: string): string
 export function jsRoundTripOptionalNumberNull(v: number | null): number | null
 export function jsRoundTripOptionalNumberUndefined(v: number | undefined): number | undefined
+export type JSValue = any
+export function jsRoundTripJSValue(v: JSValue): JSValue
 export function jsThrowOrVoid(shouldThrow: boolean): void
 export function jsThrowOrNumber(shouldThrow: boolean): number
 export function jsThrowOrBool(shouldThrow: boolean): boolean

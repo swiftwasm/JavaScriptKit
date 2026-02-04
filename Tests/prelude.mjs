@@ -52,6 +52,9 @@ export async function setupOptions(options, context) {
                 "jsRoundTripOptionalNumberUndefined": (v) => {
                     return v === undefined ? undefined : v;
                 },
+                "jsRoundTripJSValue": (v) => {
+                    return v;
+                },
                 "jsThrowOrVoid": (shouldThrow) => {
                     if (shouldThrow) {
                         throw new Error("TestError");
@@ -77,6 +80,9 @@ export async function setupOptions(options, context) {
                 },
                 "jsRoundTripFeatureFlag": (flag) => {
                     return flag;
+                },
+                "jsEchoJSValue": (v) => {
+                    return v;
                 },
                 "$jsWeirdFunction": () => {
                     return 42;
@@ -463,6 +469,20 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
 
     const anyObject = {};
     assert.equal(exports.roundTripJSObject(anyObject), anyObject);
+
+    const symbolValue = Symbol("roundTrip");
+    const bigIntValue = 12345678901234567890n;
+    const objectValue = { nested: true };
+    const jsValues = [true, 42, "hello", objectValue, null, undefined, symbolValue, bigIntValue];
+    for (const value of jsValues) {
+        const result = exports.roundTripJSValue(value);
+        assert.strictEqual(result, value);
+    }
+
+    assert.strictEqual(exports.roundTripOptionalJSValue(null), null);
+    assert.strictEqual(exports.roundTripOptionalJSValue(undefined), null);
+    assert.strictEqual(exports.roundTripOptionalJSValue(objectValue), objectValue);
+    assert.strictEqual(exports.roundTripOptionalJSValue(symbolValue), symbolValue);
 
     try {
         exports.throwsSwiftError(true);

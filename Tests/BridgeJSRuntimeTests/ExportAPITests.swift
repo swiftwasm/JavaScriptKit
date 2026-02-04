@@ -52,6 +52,14 @@ func runJsWorks() -> Void
     return v
 }
 
+@JS func roundTripJSValue(v: JSValue) -> JSValue {
+    return v
+}
+
+@JS func roundTripOptionalJSValue(v: JSValue?) -> JSValue? {
+    return v
+}
+
 @JSClass struct Foo {
     @JSGetter var value: String
     @JSFunction init(_ value: String) throws(JSException)

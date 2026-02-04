@@ -706,8 +706,8 @@ export class TypeProcessor {
                 "string": "String",
                 "boolean": "Bool",
                 "void": "Void",
-                "any": "JSObject",
-                "unknown": "JSObject",
+                "any": "JSValue",
+                "unknown": "JSValue",
                 "null": "Void",
                 "undefined": "Void",
                 "bigint": "Int",
@@ -716,12 +716,11 @@ export class TypeProcessor {
                 "never": "Void",
                 "Promise": "JSPromise",
             };
-            const typeString = type.getSymbol()?.name ?? this.checker.typeToString(type);
+            const symbol = type.getSymbol() ?? type.aliasSymbol;
+            const typeString = symbol?.name ?? this.checker.typeToString(type);
             if (typeMap[typeString]) {
                 return typeMap[typeString];
             }
-
-            const symbol = type.getSymbol() ?? type.aliasSymbol;
             if (symbol && (symbol.flags & ts.SymbolFlags.Enum) !== 0) {
                 const typeName = symbol.name;
                 this.seenTypes.set(type, node);

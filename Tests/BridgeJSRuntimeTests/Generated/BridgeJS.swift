@@ -3420,6 +3420,28 @@ public func _bjs_roundTripJSObject(_ v: Int32) -> Int32 {
     #endif
 }
 
+@_expose(wasm, "bjs_roundTripJSValue")
+@_cdecl("bjs_roundTripJSValue")
+public func _bjs_roundTripJSValue(_ vKind: Int32, _ vPayload1: Int32, _ vPayload2: Float64) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripJSValue(v: JSValue.bridgeJSLiftParameter(vKind, vPayload1, vPayload2))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripOptionalJSValue")
+@_cdecl("bjs_roundTripOptionalJSValue")
+public func _bjs_roundTripOptionalJSValue(_ vIsSome: Int32, _ vKind: Int32, _ vPayload1: Int32, _ vPayload2: Float64) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripOptionalJSValue(v: Optional<JSValue>.bridgeJSLiftParameter(vIsSome, vKind, vPayload1, vPayload2))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_makeImportedFoo")
 @_cdecl("bjs_makeImportedFoo")
 public func _bjs_makeImportedFoo(_ valueBytes: Int32, _ valueLength: Int32) -> Int32 {
@@ -7929,19 +7951,19 @@ func _$Foo_value_get(_ self: JSObject) throws(JSException) -> String {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_globalObject1_get")
-fileprivate func bjs_globalObject1_get() -> Int32
+fileprivate func bjs_globalObject1_get() -> Void
 #else
-fileprivate func bjs_globalObject1_get() -> Int32 {
+fileprivate func bjs_globalObject1_get() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
-func _$globalObject1_get() throws(JSException) -> JSObject {
-    let ret = bjs_globalObject1_get()
+func _$globalObject1_get() throws(JSException) -> JSValue {
+    bjs_globalObject1_get()
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return JSObject.bridgeJSLiftReturn(ret)
+    return JSValue.bridgeJSLiftReturn()
 }
 
 #if arch(wasm32)
@@ -8048,6 +8070,24 @@ func _$jsRoundTripOptionalNumberUndefined(_ v: JSUndefinedOr<Double>) throws(JSE
         throw error
     }
     return JSUndefinedOr<Double>.bridgeJSLiftReturnFromSideChannel()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripJSValue")
+fileprivate func bjs_jsRoundTripJSValue(_ vKind: Int32, _ vPayload1: Int32, _ vPayload2: Float64) -> Void
+#else
+fileprivate func bjs_jsRoundTripJSValue(_ vKind: Int32, _ vPayload1: Int32, _ vPayload2: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsRoundTripJSValue(_ v: JSValue) throws(JSException) -> JSValue {
+    let (vKind, vPayload1, vPayload2) = v.bridgeJSLowerParameter()
+    bjs_jsRoundTripJSValue(vKind, vPayload1, vPayload2)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSValue.bridgeJSLiftReturn()
 }
 
 #if arch(wasm32)

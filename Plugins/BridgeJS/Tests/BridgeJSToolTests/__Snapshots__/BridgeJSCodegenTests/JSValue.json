@@ -1,0 +1,273 @@
+{
+  "exported" : {
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_JSValueHolder_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "jsValue" : {
+
+                }
+              }
+            },
+            {
+              "label" : "optionalValue",
+              "name" : "optionalValue",
+              "type" : {
+                "nullable" : {
+                  "_0" : {
+                    "jsValue" : {
+
+                    }
+                  },
+                  "_1" : "null"
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_JSValueHolder_update",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "update",
+            "parameters" : [
+              {
+                "label" : "value",
+                "name" : "value",
+                "type" : {
+                  "jsValue" : {
+
+                  }
+                }
+              },
+              {
+                "label" : "optionalValue",
+                "name" : "optionalValue",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsValue" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_JSValueHolder_echo",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "echo",
+            "parameters" : [
+              {
+                "label" : "value",
+                "name" : "value",
+                "type" : {
+                  "jsValue" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "jsValue" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_JSValueHolder_echoOptional",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "echoOptional",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsValue" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "jsValue" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "name" : "JSValueHolder",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "value",
+            "type" : {
+              "jsValue" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "optionalValue",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "jsValue" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "JSValueHolder"
+      }
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_roundTripJSValue",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripJSValue",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "jsValue" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "jsValue" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripOptionalJSValue",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripOptionalJSValue",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "jsValue" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "jsValue" : {
+
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "jsEchoJSValue",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "jsValue" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "jsValue" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

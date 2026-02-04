@@ -349,6 +349,92 @@ extension JSObject: _BridgedSwiftStackType {
     }
 }
 
+extension JSValue: _BridgedSwiftStackType {
+    public typealias StackLiftResult = JSValue
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (kind: Int32, payload1: Int32, payload2: Double) {
+        return withRawJSValue { raw in
+            (
+                kind: Int32(raw.kind.rawValue),
+                payload1: Int32(bitPattern: raw.payload1),
+                payload2: raw.payload2
+            )
+        }
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(
+        _ kind: Int32,
+        _ payload1: Int32,
+        _ payload2: Double
+    ) -> JSValue {
+        return bridgeJSLiftParameter(kind, payload1, payload2)
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(
+        _ kind: Int32,
+        _ payload1: Int32,
+        _ payload2: Double
+    ) -> JSValue {
+        let retainedPayload1: Int32
+        if let kindEnum = JavaScriptValueKind(rawValue: UInt32(kind)) {
+            switch kindEnum {
+            case .string, .object, .symbol, .bigInt:
+                retainedPayload1 = _swift_js_retain(payload1)
+            default:
+                retainedPayload1 = payload1
+            }
+        } else {
+            retainedPayload1 = payload1
+        }
+
+        guard let kindEnum = JavaScriptValueKind(rawValue: UInt32(kind)) else {
+            fatalError("Invalid JSValue kind: \(kind)")
+        }
+        let rawValue = RawJSValue(
+            kind: kindEnum,
+            payload1: JavaScriptPayload1(UInt32(bitPattern: retainedPayload1)),
+            payload2: payload2
+        )
+        return rawValue.jsValue
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> JSValue {
+        let payload2 = _swift_js_pop_f64()
+        let payload1 = _swift_js_pop_i32()
+        let kind = _swift_js_pop_i32()
+        return bridgeJSLiftParameter(kind, payload1, payload2)
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> JSValue {
+        let payload2 = _swift_js_pop_f64()
+        let payload1 = _swift_js_pop_i32()
+        let kind = _swift_js_pop_i32()
+        return bridgeJSLiftParameter(kind, payload1, payload2)
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        let lowered = bridgeJSLowerParameter()
+        let retainedPayload1: Int32
+        if let kind = JavaScriptValueKind(rawValue: UInt32(lowered.kind)) {
+            switch kind {
+            case .string, .object, .symbol, .bigInt:
+                retainedPayload1 = _swift_js_retain(lowered.payload1)
+            default:
+                retainedPayload1 = lowered.payload1
+            }
+        } else {
+            retainedPayload1 = lowered.payload1
+        }
+        _swift_js_push_i32(lowered.kind)
+        _swift_js_push_i32(retainedPayload1)
+        _swift_js_push_f64(lowered.payload2)
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerStackReturn() {
+        bridgeJSLowerReturn()
+    }
+}
+
 /// A protocol that Swift heap objects exposed to JavaScript via `@JS class` must conform to.
 ///
 /// The conformance is automatically synthesized by the BridgeJS code generator.
@@ -1249,6 +1335,61 @@ extension Optional where Wrapped == JSObject {
         case .some(let value):
             let retainedId = value.bridgeJSLowerReturn()
             _swift_js_return_optional_object(1, retainedId)
+        }
+    }
+}
+
+extension Optional where Wrapped == JSValue {
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
+        isSome: Int32, kind: Int32, payload1: Int32, payload2: Double
+    ) {
+        switch consume self {
+        case .none:
+            return (isSome: 0, kind: 0, payload1: 0, payload2: 0)
+        case .some(let wrapped):
+            let lowered = wrapped.bridgeJSLowerParameter()
+            return (
+                isSome: 1,
+                kind: lowered.kind,
+                payload1: lowered.payload1,
+                payload2: lowered.payload2
+            )
+        }
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(
+        _ isSome: Int32,
+        _ kind: Int32,
+        _ payload1: Int32,
+        _ payload2: Double
+    ) -> JSValue? {
+        if isSome == 0 {
+            return nil
+        } else {
+            return JSValue.bridgeJSLiftParameter(kind, payload1, payload2)
+        }
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> JSValue? {
+        let isSome = _swift_js_pop_i32()
+        if isSome == 0 {
+            return nil
+        }
+        let payload2 = _swift_js_pop_f64()
+        let payload1 = _swift_js_pop_i32()
+        let kind = _swift_js_pop_i32()
+        return JSValue.bridgeJSLiftParameter(kind, payload1, payload2)
+    }
+
+    @_spi(BridgeJS) public func bridgeJSLowerReturn() -> Void {
+        switch self {
+        case .none:
+            _swift_js_push_i32(0)
+        case .some(let value):
+            value.bridgeJSLowerReturn()
+            _swift_js_push_i32(1)
         }
     }
 }

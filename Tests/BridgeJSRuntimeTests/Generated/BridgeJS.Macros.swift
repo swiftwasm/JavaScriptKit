@@ -18,6 +18,8 @@
 
 @JSFunction func jsRoundTripOptionalNumberUndefined(_ v: JSUndefinedOr<Double>) throws(JSException) -> JSUndefinedOr<Double>
 
+@JSFunction func jsRoundTripJSValue(_ v: JSValue) throws(JSException) -> JSValue
+
 @JSFunction func jsThrowOrVoid(_ shouldThrow: Bool) throws(JSException) -> Void
 
 @JSFunction func jsThrowOrNumber(_ shouldThrow: Bool) throws(JSException) -> Double
@@ -75,4 +77,4 @@ extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
     @JSFunction func getIsCat() throws(JSException) -> Bool
 }
 
-@JSGetter(from: .global) var globalObject1: JSObject
+@JSGetter(from: .global) var globalObject1: JSValue

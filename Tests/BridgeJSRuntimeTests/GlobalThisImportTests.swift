@@ -13,7 +13,11 @@ final class GlobalThisImportTests: XCTestCase {
     }
 
     func testGlobalGetterImport() throws {
-        let value = try globalObject1["prop_2"].number
+        guard let object = try globalObject1.object else {
+            XCTFail("globalObject1 was not an object")
+            return
+        }
+        let value = object[dynamicMember: "prop_2"].number
         XCTAssertEqual(value, 2)
     }
 }
