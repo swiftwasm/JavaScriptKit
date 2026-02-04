@@ -716,12 +716,14 @@ export class TypeProcessor {
                 "never": "Void",
                 "Promise": "JSPromise",
             };
-            const typeString = type.getSymbol()?.name ?? this.checker.typeToString(type);
+            const symbol = type.getSymbol() ?? type.aliasSymbol;
+            const typeString = symbol?.name ?? this.checker.typeToString(type);
             if (typeMap[typeString]) {
                 return typeMap[typeString];
             }
-
-            const symbol = type.getSymbol() ?? type.aliasSymbol;
+            if (isObjectType(type) && isTypeScriptLibSymbol(symbol)) {
+                return "JSObject";
+            }
             if (symbol && (symbol.flags & ts.SymbolFlags.Enum) !== 0) {
                 const typeName = symbol.name;
                 this.seenTypes.set(type, node);
@@ -948,6 +950,17 @@ function isSwiftKeyword(name) {
 function isObjectType(type) {
     // @ts-ignore
     return typeof type.objectFlags === "number";
+}
+
+/**
+ * @param {ts.Symbol | undefined} symbol
+ * @returns {boolean}
+ */
+function isTypeScriptLibSymbol(symbol) {
+    if (!symbol) return false;
+    const declarations = symbol.getDeclarations() ?? [];
+    if (!declarations.length) return false;
+    return declarations.every(decl => decl.getSourceFile().fileName.includes("node_modules/typescript/lib"));
 }
 
 /**
