@@ -71,6 +71,11 @@ export type Exports = {
 export type Imports = {
     checkArray(a: any): void;
     checkArrayWithLength(a: any, b: number): void;
+    importProcessNumbers(values: number[]): void;
+    importGetNumbers(): number[];
+    importTransformNumbers(values: number[]): number[];
+    importProcessStrings(values: string[]): string[];
+    importProcessBooleans(values: boolean[]): boolean[];
 }
 export function createInstantiator(options: {
     imports: Imports;

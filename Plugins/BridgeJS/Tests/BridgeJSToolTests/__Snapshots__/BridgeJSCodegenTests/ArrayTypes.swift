@@ -582,3 +582,91 @@ func _$checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> V
         throw error
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_importProcessNumbers")
+fileprivate func bjs_importProcessNumbers() -> Void
+#else
+fileprivate func bjs_importProcessNumbers() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$importProcessNumbers(_ values: [Double]) throws(JSException) -> Void {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_importProcessNumbers()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_importGetNumbers")
+fileprivate func bjs_importGetNumbers() -> Void
+#else
+fileprivate func bjs_importGetNumbers() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$importGetNumbers() throws(JSException) -> [Double] {
+    bjs_importGetNumbers()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Double].bridgeJSLiftReturn()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_importTransformNumbers")
+fileprivate func bjs_importTransformNumbers() -> Void
+#else
+fileprivate func bjs_importTransformNumbers() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$importTransformNumbers(_ values: [Double]) throws(JSException) -> [Double] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_importTransformNumbers()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Double].bridgeJSLiftReturn()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_importProcessStrings")
+fileprivate func bjs_importProcessStrings() -> Void
+#else
+fileprivate func bjs_importProcessStrings() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$importProcessStrings(_ values: [String]) throws(JSException) -> [String] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_importProcessStrings()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [String].bridgeJSLiftReturn()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_importProcessBooleans")
+fileprivate func bjs_importProcessBooleans() -> Void
+#else
+fileprivate func bjs_importProcessBooleans() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$importProcessBooleans(_ values: [Bool]) throws(JSException) -> [Bool] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_importProcessBooleans()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Bool].bridgeJSLiftReturn()
+}

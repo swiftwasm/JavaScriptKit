@@ -263,6 +263,95 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
+            TestModule["bjs_importProcessNumbers"] = function bjs_importProcessNumbers() {
+                try {
+                    const arrayLen = tmpRetInts.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const f64 = tmpRetF64s.pop();
+                        arrayResult.push(f64);
+                    }
+                    arrayResult.reverse();
+                    imports.importProcessNumbers(arrayResult);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_importGetNumbers"] = function bjs_importGetNumbers() {
+                try {
+                    let ret = imports.importGetNumbers();
+                    const arrayCleanups = [];
+                    for (const elem of ret) {
+                        tmpParamF64s.push(elem);
+                    }
+                    tmpParamInts.push(ret.length);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_importTransformNumbers"] = function bjs_importTransformNumbers() {
+                try {
+                    const arrayLen = tmpRetInts.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const f64 = tmpRetF64s.pop();
+                        arrayResult.push(f64);
+                    }
+                    arrayResult.reverse();
+                    let ret = imports.importTransformNumbers(arrayResult);
+                    const arrayCleanups = [];
+                    for (const elem of ret) {
+                        tmpParamF64s.push(elem);
+                    }
+                    tmpParamInts.push(ret.length);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_importProcessStrings"] = function bjs_importProcessStrings() {
+                try {
+                    const arrayLen = tmpRetInts.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const string = tmpRetStrings.pop();
+                        arrayResult.push(string);
+                    }
+                    arrayResult.reverse();
+                    let ret = imports.importProcessStrings(arrayResult);
+                    const arrayCleanups = [];
+                    for (const elem of ret) {
+                        const bytes = textEncoder.encode(elem);
+                        const id = swift.memory.retain(bytes);
+                        tmpParamInts.push(bytes.length);
+                        tmpParamInts.push(id);
+                        arrayCleanups.push(() => {
+                            swift.memory.release(id);
+                        });
+                    }
+                    tmpParamInts.push(ret.length);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_importProcessBooleans"] = function bjs_importProcessBooleans() {
+                try {
+                    const arrayLen = tmpRetInts.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const bool = tmpRetInts.pop() !== 0;
+                        arrayResult.push(bool);
+                    }
+                    arrayResult.reverse();
+                    let ret = imports.importProcessBooleans(arrayResult);
+                    const arrayCleanups = [];
+                    for (const elem of ret) {
+                        tmpParamInts.push(elem ? 1 : 0);
+                    }
+                    tmpParamInts.push(ret.length);
+                } catch (error) {
+                    setException(error);
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;

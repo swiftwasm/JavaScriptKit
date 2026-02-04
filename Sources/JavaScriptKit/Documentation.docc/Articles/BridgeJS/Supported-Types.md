@@ -9,7 +9,7 @@ Use this page as a quick reference for how common TypeScript types appear in Swi
 | `number` | `Double` |
 | `string` | `String` |
 | `boolean` | `Bool` |
-| TODO | `Array<T>` |
+| `T[]` | `[T]` |
 | TODO | `Dictionary<K, V>` |
 | `T \| undefined` | TODO |
 | `T \| null` | `Optional<T>` |

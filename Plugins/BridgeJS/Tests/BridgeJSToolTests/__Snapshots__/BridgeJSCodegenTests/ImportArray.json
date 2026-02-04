@@ -1,0 +1,62 @@
+{
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "roundtrip",
+            "parameters" : [
+              {
+                "name" : "items",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name" : "logStrings",
+            "parameters" : [
+              {
+                "name" : "items",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

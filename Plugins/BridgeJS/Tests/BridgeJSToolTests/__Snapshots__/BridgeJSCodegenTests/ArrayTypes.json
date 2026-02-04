@@ -1158,6 +1158,121 @@
 
               }
             }
+          },
+          {
+            "name" : "importProcessNumbers",
+            "parameters" : [
+              {
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "name" : "importGetNumbers",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name" : "importTransformNumbers",
+            "parameters" : [
+              {
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name" : "importProcessStrings",
+            "parameters" : [
+              {
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name" : "importProcessBooleans",
+            "parameters" : [
+              {
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "bool" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            }
           }
         ],
         "types" : [

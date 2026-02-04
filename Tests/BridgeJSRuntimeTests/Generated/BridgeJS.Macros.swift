@@ -63,6 +63,16 @@ extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
     @JSFunction(jsName: "with-dashes") static func with_dashes() throws(JSException) -> StaticBox
 }
 
+@JSFunction func jsRoundTripNumberArray(_ values: [Double]) throws(JSException) -> [Double]
+
+@JSFunction func jsRoundTripStringArray(_ values: [String]) throws(JSException) -> [String]
+
+@JSFunction func jsRoundTripBoolArray(_ values: [Bool]) throws(JSException) -> [Bool]
+
+@JSFunction func jsSumNumberArray(_ values: [Double]) throws(JSException) -> Double
+
+@JSFunction func jsCreateNumberArray() throws(JSException) -> [Double]
+
 @JSFunction(from: .global) func parseInt(_ string: String) throws(JSException) -> Double
 
 @JSClass(from: .global) struct Animal {

@@ -2212,12 +2212,10 @@ extension BridgeJSLink {
 
         func liftParameter(param: Parameter) throws {
             let liftingFragment = try IntrinsicJSFragment.liftParameter(type: param.type, context: context)
-            assert(
-                liftingFragment.parameters.count >= 1,
-                "Lifting fragment should have at least one parameter to lift"
-            )
             let valuesToLift: [String]
-            if liftingFragment.parameters.count == 1 {
+            if liftingFragment.parameters.count == 0 {
+                valuesToLift = []
+            } else if liftingFragment.parameters.count == 1 {
                 parameterNames.append(param.name)
                 valuesToLift = [scope.variable(param.name)]
             } else {
