@@ -16,12 +16,15 @@ let tracingTrait = Trait(
 )
 
 let testingLinkerFlags: [LinkerSetting] = [
-    .unsafeFlags([
-        "-Xlinker", "--stack-first",
-        "-Xlinker", "--global-base=524288",
-        "-Xlinker", "-z",
-        "-Xlinker", "stack-size=524288",
-    ])
+    .unsafeFlags(
+        [
+            "-Xlinker", "--stack-first",
+            "-Xlinker", "--global-base=524288",
+            "-Xlinker", "-z",
+            "-Xlinker", "stack-size=524288",
+        ],
+        .when(platforms: [.wasi])
+    )
 ]
 
 let package = Package(

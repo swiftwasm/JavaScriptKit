@@ -100,6 +100,17 @@ public final class SwiftToSkeleton {
             return lookupType(for: attributedType.baseType, errors: &errors)
         }
 
+        if let identifierType = type.as(IdentifierTypeSyntax.self),
+            identifierType.name.text == "JSTypedClosure",
+            let genericArgs = identifierType.genericArgumentClause?.arguments,
+            genericArgs.count == 1,
+            let argument = genericArgs.firstAsTypeSyntax,
+            let signatureType = lookupType(for: argument, errors: &errors),
+            case .closure(let signature, false) = signatureType
+        {
+            return .closure(signature, useJSTypedClosure: true)
+        }
+
         // (T1, T2, ...) -> R
         if let functionType = type.as(FunctionTypeSyntax.self) {
             var parameters: [BridgeType] = []
@@ -124,7 +135,8 @@ public final class SwiftToSkeleton {
                     moduleName: moduleName,
                     isAsync: isAsync,
                     isThrows: isThrows
-                )
+                ),
+                useJSTypedClosure: false
             )
         }
 
@@ -889,7 +901,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             guard let type = resolvedType else {
                 continue  // Skip unsupported types
             }
-            if case .closure(let signature) = type {
+            if case .closure(let signature, _) = type {
                 if signature.isAsync {
                     diagnose(
                         node: param.type,
@@ -2535,5 +2547,20 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         return modifiers.contains { modifier in
             modifier.name.tokenKind == .keyword(.static) || modifier.name.tokenKind == .keyword(.class)
         }
+    }
+}
+
+extension GenericArgumentListSyntax {
+    /// Compatibility helper for accessing the first argument as a TypeSyntax
+    ///
+    /// Note: SwiftSyntax 601 and later support InlineArrayTypeSyntax and
+    /// ``GenericArgumentSyntax/argument`` is now a ``TypeSyntax`` or ``ExprSyntax``.
+    fileprivate var firstAsTypeSyntax: TypeSyntax? {
+        guard let first = self.first else { return nil }
+        #if canImport(SwiftSyntax601)
+        return first.argument.as(TypeSyntax.self)
+        #else
+        return TypeSyntax(first.argument)
+        #endif
     }
 }

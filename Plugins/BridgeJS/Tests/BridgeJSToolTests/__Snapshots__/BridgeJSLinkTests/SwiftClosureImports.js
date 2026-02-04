@@ -30,6 +30,31 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
+    const swiftClosureRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
+        if (state.unregistered) { return; }
+        instance?.exports?.bjs_release_swift_closure(state.pointer);
+    });
+    const makeClosure = (pointer, file, line, func) => {
+        const state = { pointer, file, line, unregistered: false };
+        const real = (...args) => {
+            if (state.unregistered) {
+                const bytes = new Uint8Array(memory.buffer, state.file);
+                let length = 0;
+                while (bytes[length] !== 0) { length += 1; }
+                const fileID = textDecoder.decode(bytes.subarray(0, length));
+                throw new Error(`Attempted to call a released JSTypedClosure created at ${fileID}:${state.line}`);
+            }
+            return func(...args);
+        };
+        real.__unregister = () => {
+            if (state.unregistered) { return; }
+            state.unregistered = true;
+            swiftClosureRegistry.unregister(state);
+        };
+        swiftClosureRegistry.register(real, state, state);
+        return swift.memory.retain(real);
+    };
+
 
     return {
         /**
@@ -198,6 +223,10 @@ export async function createInstantiator(options, swift) {
                 tmpRetOptionalHeapObject = undefined;
                 return pointer || 0;
             }
+            bjs["swift_js_closure_unregister"] = function(funcRef) {
+                const func = swift.memory.getObject(funcRef);
+                func.__unregister();
+            }
 
             bjs["invoke_js_callback_TestModule_10TestModuleSi_Si"] = function(callbackId, param0Id) {
                 try {
@@ -210,21 +239,23 @@ export async function createInstantiator(options, swift) {
                     return 0;
                 }
             };
-
-            bjs["lower_closure_TestModule_10TestModuleSi_Si"] = function(closurePtr) {
-                return function(param0) {
-                    try {
-                        return instance.exports.invoke_swift_closure_TestModule_10TestModuleSi_Si(closurePtr, param0) | 0;
-                    } catch (error) {
-                        setException?.(error);
+            bjs["make_swift_closure_TestModule_10TestModuleSi_Si"] = function(boxPtr, file, line) {
+                const lower_closure_TestModule_10TestModuleSi_Si = function(param0) {
+                    const invokeResult = instance.exports.invoke_swift_closure_TestModule_10TestModuleSi_Si(boxPtr, param0);
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
                         throw error;
                     }
+                    return invokeResult | 0;
                 };
-            };
+                return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuleSi_Si);
+            }
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_applyInt"] = function bjs_applyInt(value, transform) {
                 try {
-                    let ret = imports.applyInt(value, bjs["lower_closure_TestModule_10TestModuleSi_Si"](transform));
+                    let ret = imports.applyInt(value, swift.memory.getObject(transform));
                     return ret;
                 } catch (error) {
                     setException(error);

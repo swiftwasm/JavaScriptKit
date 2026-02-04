@@ -261,46 +261,6 @@ public struct BridgeJSLink {
         ]
     }
 
-    /// Checks if a skeleton contains any closure types
-    private func hasClosureTypes(in skeleton: ExportedSkeleton) -> Bool {
-        for function in skeleton.functions {
-            if containsClosureType(in: function.parameters) || containsClosureType(in: function.returnType) {
-                return true
-            }
-        }
-        for klass in skeleton.classes {
-            if let constructor = klass.constructor, containsClosureType(in: constructor.parameters) {
-                return true
-            }
-            for method in klass.methods {
-                if containsClosureType(in: method.parameters) || containsClosureType(in: method.returnType) {
-                    return true
-                }
-            }
-            for property in klass.properties {
-                if containsClosureType(in: property.type) {
-                    return true
-                }
-            }
-        }
-        return false
-    }
-
-    private func containsClosureType(in parameters: [Parameter]) -> Bool {
-        parameters.contains { containsClosureType(in: $0.type) }
-    }
-
-    private func containsClosureType(in type: BridgeType) -> Bool {
-        switch type {
-        case .closure:
-            return true
-        case .nullable(let wrapped, _):
-            return containsClosureType(in: wrapped)
-        default:
-            return false
-        }
-    }
-
     private func generateAddImports(needsImportsObject: Bool) -> CodeFragmentPrinter {
         let printer = CodeFragmentPrinter()
         let allStructs = skeletons.compactMap { $0.exported?.structs }.flatMap { $0 }
@@ -655,6 +615,71 @@ public struct BridgeJSLink {
 
                     guard !closureSignatures.isEmpty else { continue }
 
+                    intrinsicRegistry.register(name: "swiftClosureHelpers") { helperPrinter in
+                        helperPrinter.write(
+                            "const \(JSGlueVariableScope.reservedSwiftClosureRegistry) = (typeof FinalizationRegistry === \"undefined\") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {"
+                        )
+                        helperPrinter.indent {
+                            helperPrinter.write("if (state.unregistered) { return; }")
+                            helperPrinter.write(
+                                "\(JSGlueVariableScope.reservedInstance)?.exports?.bjs_release_swift_closure(state.pointer);"
+                            )
+                        }
+                        helperPrinter.write("});")
+                        helperPrinter.write(
+                            "const \(JSGlueVariableScope.reservedMakeSwiftClosure) = (pointer, file, line, func) => {"
+                        )
+                        helperPrinter.indent {
+                            helperPrinter.write(
+                                "const state = { pointer, file, line, unregistered: false };"
+                            )
+                            helperPrinter.write("const real = (...args) => {")
+                            helperPrinter.indent {
+                                helperPrinter.write("if (state.unregistered) {")
+                                helperPrinter.indent {
+                                    helperPrinter.write(
+                                        "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, state.file);"
+                                    )
+                                    helperPrinter.write("let length = 0;")
+                                    helperPrinter.write("while (bytes[length] !== 0) { length += 1; }")
+                                    helperPrinter.write(
+                                        "const fileID = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes.subarray(0, length));"
+                                    )
+                                    helperPrinter.write(
+                                        "throw new Error(`Attempted to call a released JSTypedClosure created at ${fileID}:${state.line}`);"
+                                    )
+                                }
+                                helperPrinter.write("}")
+                                helperPrinter.write("return func(...args);")
+                            }
+                            helperPrinter.write("};")
+                            helperPrinter.write(
+                                "real.__unregister = () => {"
+                            )
+                            helperPrinter.indent {
+                                helperPrinter.write(
+                                    "if (state.unregistered) { return; }"
+                                )
+                                helperPrinter.write("state.unregistered = true;")
+                                helperPrinter.write(
+                                    "\(JSGlueVariableScope.reservedSwiftClosureRegistry).unregister(state);"
+                                )
+                            }
+                            helperPrinter.write("};")
+                            helperPrinter.write(
+                                "\(JSGlueVariableScope.reservedSwiftClosureRegistry).register(real, state, state);"
+                            )
+                            helperPrinter.write("return \(JSGlueVariableScope.reservedSwift).memory.retain(real);")
+                        }
+                        helperPrinter.write("};")
+                    }
+                    printer.write("bjs[\"swift_js_closure_unregister\"] = function(funcRef) {")
+                    printer.indent {
+                        printer.write("const func = \(JSGlueVariableScope.reservedSwift).memory.getObject(funcRef);")
+                        printer.write("func.__unregister();")
+                    }
+                    printer.write("}")
+
                     for signature in closureSignatures.sorted(by: { $0.mangleName < $1.mangleName }) {
                         let invokeFuncName = "invoke_js_callback_\(moduleName)_\(signature.mangleName)"
                         printer.write(
@@ -665,12 +690,17 @@ public struct BridgeJSLink {
                         )
 
                         let lowerFuncName = "lower_closure_\(moduleName)_\(signature.mangleName)"
-                        printer.write(
-                            lines: generateLowerClosureFunction(
-                                signature: signature,
-                                functionName: lowerFuncName
+                        let makeFuncName = "make_swift_closure_\(moduleName)_\(signature.mangleName)"
+                        printer.write("bjs[\"\(makeFuncName)\"] = function(boxPtr, file, line) {")
+                        printer.indent {
+                            printer.write(
+                                lines: generateLowerClosureFunction(signature: signature, functionName: lowerFuncName)
                             )
-                        )
+                            printer.write(
+                                "return \(JSGlueVariableScope.reservedMakeSwiftClosure)(boxPtr, file, line, \(lowerFuncName));"
+                            )
+                        }
+                        printer.write("}")
                     }
                 }
             }
@@ -721,7 +751,7 @@ public struct BridgeJSLink {
                 for setter in type.setters {
                     collectClosureSignatures(from: setter.type, into: &signatures)
                 }
-                for method in type.methods {
+                for method in type.methods + type.staticMethods {
                     collectClosureSignatures(from: method.parameters, into: &signatures)
                     collectClosureSignatures(from: method.returnType, into: &signatures)
                 }
@@ -737,7 +767,7 @@ public struct BridgeJSLink {
 
     private func collectClosureSignatures(from type: BridgeType, into signatures: inout Set<ClosureSignature>) {
         switch type {
-        case .closure(let signature):
+        case .closure(let signature, _):
             signatures.insert(signature)
             for paramType in signature.parameters {
                 collectClosureSignatures(from: paramType, into: &signatures)
@@ -827,44 +857,40 @@ public struct BridgeJSLink {
         let scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
         let cleanupCode = CodeFragmentPrinter()
 
-        printer.nextLine()
-        printer.write("bjs[\"\(functionName)\"] = function(closurePtr) {")
+        printer.write(
+            "const \(functionName) = function(\(signature.parameters.indices.map { "param\($0)" }.joined(separator: ", "))) {"
+        )
         printer.indent {
-            printer.write(
-                "return function(\(signature.parameters.indices.map { "param\($0)" }.joined(separator: ", "))) {"
-            )
-            printer.indent {
-                printer.write("try {")
-                printer.indent {
-                    var invokeArgs: [String] = ["closurePtr"]
+            var invokeArgs: [String] = ["boxPtr"]
 
-                    for (index, paramType) in signature.parameters.enumerated() {
-                        let paramName = "param\(index)"
-                        let fragment = try! IntrinsicJSFragment.lowerParameter(type: paramType)
-                        let lowered = fragment.printCode([paramName], scope, printer, cleanupCode)
-                        invokeArgs.append(contentsOf: lowered)
-                    }
-
-                    // Call the Swift invoke function
-                    let invokeCall =
-                        "\(JSGlueVariableScope.reservedInstance).exports.invoke_swift_closure_\(signature.moduleName)_\(signature.mangleName)(\(invokeArgs.joined(separator: ", ")))"
-
-                    let returnFragment = try! IntrinsicJSFragment.closureLiftReturn(type: signature.returnType)
-                    _ = returnFragment.printCode([invokeCall], scope, printer, cleanupCode)
-                }
-                printer.write("} catch (error) {")
-                printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedSetException)?.(error);")
-                    switch signature.returnType {
-                    case .void:
-                        printer.write("return;")
-                    default:
-                        printer.write("throw error;")
-                    }
-                }
-                printer.write("}")
+            for (index, paramType) in signature.parameters.enumerated() {
+                let paramName = "param\(index)"
+                let fragment = try! IntrinsicJSFragment.lowerParameter(type: paramType)
+                let lowered = fragment.printCode([paramName], scope, printer, cleanupCode)
+                invokeArgs.append(contentsOf: lowered)
             }
-            printer.write("};")
+
+            // Call the Swift invoke function
+            let invokeCall =
+                "\(JSGlueVariableScope.reservedInstance).exports.invoke_swift_closure_\(signature.moduleName)_\(signature.mangleName)(\(invokeArgs.joined(separator: ", ")))"
+            let invokeResultName = "invokeResult"
+            printer.write("const \(invokeResultName) = \(invokeCall);")
+
+            printer.write("if (\(JSGlueVariableScope.reservedStorageToReturnException)) {")
+            printer.indent {
+                printer.write(
+                    "const error = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(JSGlueVariableScope.reservedStorageToReturnException));"
+                )
+                printer.write(
+                    "\(JSGlueVariableScope.reservedSwift).memory.release(\(JSGlueVariableScope.reservedStorageToReturnException));"
+                )
+                printer.write("\(JSGlueVariableScope.reservedStorageToReturnException) = undefined;")
+                printer.write("throw error;")
+            }
+            printer.write("}")
+
+            let returnFragment = try! IntrinsicJSFragment.closureLiftReturn(type: signature.returnType)
+            _ = returnFragment.printCode([invokeResultName], scope, printer, cleanupCode)
         }
         printer.write("};")
 
@@ -3552,7 +3578,7 @@ extension BridgeType {
             return name
         case .swiftProtocol(let name):
             return name
-        case .closure(let signature):
+        case .closure(let signature, _):
             let paramTypes = signature.parameters.enumerated().map { index, param in
                 "arg\(index): \(param.tsType)"
             }.joined(separator: ", ")

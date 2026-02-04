@@ -124,7 +124,7 @@ public class ExportSwift {
             let liftingExpr: ExprSyntax
 
             switch param.type {
-            case .closure(let signature):
+            case .closure(let signature, _):
                 typeNameForIntrinsic = param.type.swiftType
                 liftingExpr = ExprSyntax("_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(\(raw: param.name))")
             case .swiftStruct(let structName):
@@ -364,8 +364,8 @@ public class ExportSwift {
             }
 
             switch returnType {
-            case .closure(let signature):
-                append("return _BJS_Closure_\(raw: signature.mangleName).bridgeJSLower(ret)")
+            case .closure(_, useJSTypedClosure: false):
+                append("return JSTypedClosure(ret).bridgeJSLowerReturn()")
             case .array, .nullable(.array, _):
                 let stackCodegen = StackCodegen()
                 for stmt in stackCodegen.lowerStatements(for: returnType, accessor: "ret", varPrefix: "ret") {
@@ -423,14 +423,7 @@ public class ExportSwift {
         }
 
         private func returnPlaceholderStmt() -> String {
-            switch abiReturnType {
-            case .i32: return "return 0"
-            case .i64: return "return 0"
-            case .f32: return "return 0.0"
-            case .f64: return "return 0.0"
-            case .pointer: return "return UnsafeMutableRawPointer(bitPattern: -1).unsafelyUnwrapped"
-            case .none: return "return"
-            }
+            return abiReturnType?.swiftReturnPlaceholderStmt ?? "return"
         }
     }
 
@@ -1749,11 +1742,17 @@ extension BridgeType {
         case .associatedValueEnum(let name): return name
         case .swiftStruct(let name): return name
         case .namespaceEnum(let name): return name
-        case .closure(let signature):
+        case .closure(let signature, let useJSTypedClosure):
             let paramTypes = signature.parameters.map { $0.swiftType }.joined(separator: ", ")
             let effectsStr = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
-            return "(\(paramTypes))\(effectsStr) -> \(signature.returnType.swiftType)"
+            let closureType = "(\(paramTypes))\(effectsStr) -> \(signature.returnType.swiftType)"
+            return useJSTypedClosure ? "JSTypedClosure<\(closureType)>" : closureType
         }
+    }
+
+    var isClosureType: Bool {
+        if case .closure = self { return true }
+        return false
     }
 
     struct LiftingIntrinsicInfo: Sendable {
@@ -1853,7 +1852,7 @@ extension BridgeType {
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
         case .closure:
-            return .swiftHeapObject
+            return .jsObject
         case .array, .dictionary:
             return .array
         }

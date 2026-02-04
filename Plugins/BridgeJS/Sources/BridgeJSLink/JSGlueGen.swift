@@ -29,6 +29,8 @@ final class JSGlueVariableScope {
     static let reservedTmpStructCleanups = "tmpStructCleanups"
     static let reservedEnumHelpers = "enumHelpers"
     static let reservedStructHelpers = "structHelpers"
+    static let reservedSwiftClosureRegistry = "swiftClosureRegistry"
+    static let reservedMakeSwiftClosure = "makeClosure"
 
     private let intrinsicRegistry: JSIntrinsicRegistry
 
@@ -56,6 +58,8 @@ final class JSGlueVariableScope {
         reservedTmpStructCleanups,
         reservedEnumHelpers,
         reservedStructHelpers,
+        reservedSwiftClosureRegistry,
+        reservedMakeSwiftClosure,
     ]
 
     init(intrinsicRegistry: JSIntrinsicRegistry) {
@@ -660,6 +664,9 @@ struct IntrinsicJSFragment: Sendable {
                     }
                     printer.write("}")
                     resultExpr = "\(isSome) ? \(objectLabel) : \(absenceLiteral)"
+                case .closure:
+                    resultExpr =
+                        "\(isSome) ? \(JSGlueVariableScope.reservedSwift).memory.getObject(\(wrappedValue)) : \(absenceLiteral)"
                 case .swiftHeapObject(let name):
                     resultExpr = "\(isSome) ? \(name).__construct(\(wrappedValue)) : \(absenceLiteral)"
                 case .jsObject:
@@ -1392,7 +1399,7 @@ struct IntrinsicJSFragment: Sendable {
         let absenceLiteral = kind.absenceLiteral
         switch wrappedType {
         case .string, .rawValueEnum, .int, .bool, .double, .float, .jsObject, .swiftHeapObject, .caseEnum,
-            .associatedValueEnum:
+            .associatedValueEnum, .closure:
             break
         default:
             throw BridgeJSLinkError(
@@ -1445,6 +1452,9 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write(
                         "\(targetVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(value));"
                     )
+                case .closure:
+                    printer.write("\(targetVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(value));")
+                    printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(value));")
                 default:
                     fatalError("Unsupported optional wrapped type in closure parameter lifting: \(wrappedType)")
                 }
@@ -1731,6 +1741,20 @@ struct IntrinsicJSFragment: Sendable {
                     return []
                 }
             )
+        case .closure:
+            return IntrinsicJSFragment(
+                parameters: ["invokeCall"],
+                printCode: { arguments, scope, printer, cleanupCode in
+                    let funcRefVar = scope.variable("swiftClosureFuncRef")
+                    printer.write("const \(funcRefVar) = \(arguments[0]);")
+                    printer.write(
+                        "const funcObj = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(funcRefVar));"
+                    )
+                    printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(funcRefVar));")
+                    printer.write("return funcObj;")
+                    return []
+                }
+            )
         case .rawValueEnum(_, let rawType):
             switch rawType {
             case .string:
@@ -1929,14 +1953,12 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftStruct(let fullName):
             let base = fullName.components(separatedBy: ".").last ?? fullName
             return swiftStructLiftReturn(structBase: base)
-        case .closure(let signature):
-            let lowerFuncName = "lower_closure_\(signature.moduleName)_\(signature.mangleName)"
+        case .closure:
             return IntrinsicJSFragment(
-                parameters: ["boxPtr"],
+                parameters: ["funcRef"],
                 printCode: { arguments, scope, printer, cleanupCode in
-                    let boxPtr = arguments[0]
-                    printer.write("return bjs[\"\(lowerFuncName)\"](\(boxPtr));")
-                    return []
+                    let funcRef = arguments[0]
+                    return ["\(JSGlueVariableScope.reservedSwift).memory.getObject(\(funcRef))"]
                 }
             )
         case .namespaceEnum(let string):
@@ -2023,12 +2045,12 @@ struct IntrinsicJSFragment: Sendable {
                     }
                 )
             }
-        case .closure(let signature):
-            let lowerFuncName = "lower_closure_\(signature.moduleName)_\(signature.mangleName)"
+        case .closure:
             return IntrinsicJSFragment(
-                parameters: ["boxPtr"],
+                parameters: ["funcRef"],
                 printCode: { arguments, scope, printer, cleanupCode in
-                    return ["bjs[\"\(lowerFuncName)\"](\(arguments[0]))"]
+                    let funcRef = arguments[0]
+                    return ["\(JSGlueVariableScope.reservedSwift).memory.getObject(\(funcRef))"]
                 }
             )
         case .namespaceEnum(let string):

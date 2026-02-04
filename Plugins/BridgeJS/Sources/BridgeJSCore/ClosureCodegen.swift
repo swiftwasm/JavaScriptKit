@@ -16,7 +16,7 @@ public struct ClosureCodegen {
 
     func collectClosureSignatures(from type: BridgeType, into signatures: inout Set<ClosureSignature>) {
         switch type {
-        case .closure(let signature):
+        case .closure(let signature, _):
             signatures.insert(signature)
             for paramType in signature.parameters {
                 collectClosureSignatures(from: paramType, into: &signatures)
@@ -32,7 +32,6 @@ public struct ClosureCodegen {
     func renderClosureHelpers(_ signature: ClosureSignature) throws -> [DeclSyntax] {
         let mangledName = signature.mangleName
         let helperName = "_BJS_Closure_\(mangledName)"
-        let boxClassName = "_BJS_ClosureBox_\(mangledName)"
 
         let closureParams = signature.parameters.enumerated().map { _, type in
             "\(type.swiftType)"
@@ -40,7 +39,7 @@ public struct ClosureCodegen {
 
         let swiftEffects = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
         let swiftReturnType = signature.returnType.swiftType
-        let closureType = "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
+        let swiftClosureType = "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
 
         let externName = "invoke_js_callback_\(signature.moduleName)_\(mangledName)"
 
@@ -69,13 +68,15 @@ public struct ClosureCodegen {
         // Generate extern declaration using CallJSEmission
         let externDecl = builder.renderImportDecl()
 
-        let boxClassDecl: DeclSyntax = """
-            private final class \(raw: boxClassName): _BridgedSwiftClosureBox {
-                let closure: \(raw: closureType)
-                init(_ closure: @escaping \(raw: closureType)) {
-                    self.closure = closure
-                }
+        let makeClosureExternDecl: DeclSyntax = """
+            #if arch(wasm32)
+            @_extern(wasm, module: "bjs", name: "make_swift_closure_\(raw: signature.moduleName)_\(raw: signature.mangleName)")
+            fileprivate func make_swift_closure_\(raw: signature.moduleName)_\(raw: signature.mangleName)(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+            #else
+            fileprivate func make_swift_closure_\(raw: signature.moduleName)_\(raw: signature.mangleName)(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+                fatalError("Only available on WebAssembly")
             }
+            #endif
             """
 
         let helperEnumDecl = EnumDeclSyntax(
@@ -84,33 +85,6 @@ public struct ClosureCodegen {
             },
             name: .identifier(helperName),
             memberBlockBuilder: {
-                DeclSyntax(
-                    FunctionDeclSyntax(
-                        modifiers: DeclModifierListSyntax {
-                            DeclModifierSyntax(name: .keyword(.static))
-                        },
-                        name: .identifier("bridgeJSLower"),
-                        signature: FunctionSignatureSyntax(
-                            parameterClause: FunctionParameterClauseSyntax {
-                                FunctionParameterSyntax(
-                                    firstName: .wildcardToken(),
-                                    secondName: .identifier("closure"),
-                                    colon: .colonToken(),
-                                    type: TypeSyntax("@escaping \(raw: closureType)")
-                                )
-                            },
-                            returnClause: ReturnClauseSyntax(
-                                arrow: .arrowToken(),
-                                type: IdentifierTypeSyntax(name: .identifier("UnsafeMutableRawPointer"))
-                            )
-                        ),
-                        body: CodeBlockSyntax {
-                            "let box = \(raw: boxClassName)(closure)"
-                            "return Unmanaged.passRetained(box).toOpaque()"
-                        }
-                    )
-                )
-
                 DeclSyntax(
                     FunctionDeclSyntax(
                         modifiers: DeclModifierListSyntax {
@@ -128,7 +102,7 @@ public struct ClosureCodegen {
                             },
                             returnClause: ReturnClauseSyntax(
                                 arrow: .arrowToken(),
-                                type: IdentifierTypeSyntax(name: .identifier(closureType))
+                                type: IdentifierTypeSyntax(name: .identifier(swiftClosureType))
                             )
                         ),
                         body: CodeBlockSyntax {
@@ -178,11 +152,32 @@ public struct ClosureCodegen {
                 )
             }
         )
-        return [externDecl, boxClassDecl, DeclSyntax(helperEnumDecl)]
+        let typedClosureExtension: DeclSyntax = """
+            extension JSTypedClosure where Signature == \(raw: swiftClosureType) {
+                init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping \(raw: swiftClosureType)) {
+                    self.init(
+                        makeClosure: make_swift_closure_\(raw: signature.moduleName)_\(raw: signature.mangleName),
+                        body: body,
+                        fileID: fileID,
+                        line: line
+                    )
+                }
+            }
+            """
+
+        return [
+            externDecl, makeClosureExternDecl, DeclSyntax(helperEnumDecl), typedClosureExtension,
+        ]
     }
 
     func renderClosureInvokeHandler(_ signature: ClosureSignature) throws -> DeclSyntax {
-        let boxClassName = "_BJS_ClosureBox_\(signature.mangleName)"
+        let closureParams = signature.parameters.enumerated().map { _, type in
+            "\(type.swiftType)"
+        }.joined(separator: ", ")
+        let swiftEffects = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
+        let swiftReturnType = signature.returnType.swiftType
+        let swiftClosureType = "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
+        let boxType = "_BridgeJSTypedClosureBox<\(swiftClosureType)>"
         let abiName = "invoke_swift_closure_\(signature.moduleName)_\(signature.mangleName)"
 
         // Build ABI parameters directly with WasmCoreType (no string conversion needed)
@@ -205,7 +200,7 @@ public struct ClosureCodegen {
             liftedParams.append("\(paramType.swiftType).bridgeJSLiftParameter(\(argNames.joined(separator: ", ")))")
         }
 
-        let closureCallExpr = ExprSyntax("box.closure(\(raw: liftedParams.joined(separator: ", ")))")
+        let closureCallExpr = ExprSyntax("closure(\(raw: liftedParams.joined(separator: ", ")))")
 
         // Determine return type
         let abiReturnWasmType: WasmCoreType?
@@ -217,6 +212,8 @@ public struct ClosureCodegen {
             abiReturnWasmType = nil
         }
 
+        let throwReturn = abiReturnWasmType?.swiftReturnPlaceholderStmt ?? "return"
+
         // Build signature using SwiftSignatureBuilder
         let funcSignature = SwiftSignatureBuilder.buildABIFunctionSignature(
             abiParameters: abiParams,
@@ -225,7 +222,7 @@ public struct ClosureCodegen {
 
         // Build body
         let body = CodeBlockItemListSyntax {
-            "let box = Unmanaged<\(raw: boxClassName)>.fromOpaque(boxPtr).takeUnretainedValue()"
+            "let closure = Unmanaged<\(raw: boxType)>.fromOpaque(boxPtr).takeUnretainedValue().closure"
             if signature.returnType == .void {
                 closureCallExpr
             } else {
@@ -315,7 +312,7 @@ public struct ClosureCodegen {
                     for setter in type.setters {
                         collectClosureSignatures(from: setter.type, into: &closureSignatures)
                     }
-                    for method in type.methods {
+                    for method in type.methods + type.staticMethods {
                         collectClosureSignatures(from: method.parameters, into: &closureSignatures)
                         collectClosureSignatures(from: method.returnType, into: &closureSignatures)
                     }

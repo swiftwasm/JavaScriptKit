@@ -160,7 +160,7 @@ public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case namespaceEnum(String)
     case swiftProtocol(String)
     case swiftStruct(String)
-    indirect case closure(ClosureSignature)
+    indirect case closure(ClosureSignature, useJSTypedClosure: Bool)
 }
 
 public enum WasmCoreType: String, Codable, Sendable {
@@ -1019,12 +1019,12 @@ extension BridgeType {
             return "\(name.count)\(name)P"
         case .swiftStruct(let name):
             return "\(name.count)\(name)V"
-        case .closure(let signature):
+        case .closure(let signature, let useJSTypedClosure):
             let params =
                 signature.parameters.isEmpty
                 ? "y"
                 : signature.parameters.map { $0.mangleTypeName }.joined()
-            return "K\(params)_\(signature.returnType.mangleTypeName)"
+            return "K\(params)_\(signature.returnType.mangleTypeName)\(useJSTypedClosure ? "J" : "")"
         case .array(let elementType):
             // Array mangling: "Sa" prefix followed by element type
             return "Sa\(elementType.mangleTypeName)"
@@ -1057,6 +1057,19 @@ extension BridgeType {
             return false
         default:
             return false
+        }
+    }
+}
+
+extension WasmCoreType {
+    /// Returns a Swift statement that returns a placeholder value for this Wasm core type.
+    public var swiftReturnPlaceholderStmt: String {
+        switch self {
+        case .i32: return "return 0"
+        case .i64: return "return 0"
+        case .f32: return "return 0.0"
+        case .f64: return "return 0.0"
+        case .pointer: return "return UnsafeMutableRawPointer(bitPattern: -1).unsafelyUnwrapped"
         }
     }
 }
