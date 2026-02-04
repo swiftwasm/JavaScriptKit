@@ -624,6 +624,10 @@ public struct ExportedSkeleton: Codable {
         self.protocols.append(contentsOf: other.protocols)
         assert(self.exposeToGlobal == other.exposeToGlobal)
     }
+
+    public var isEmpty: Bool {
+        functions.isEmpty && classes.isEmpty && enums.isEmpty && structs.isEmpty && protocols.isEmpty
+    }
 }
 
 // MARK: - Imported Skeleton
@@ -853,6 +857,10 @@ public struct ImportedFileSkeleton: Codable {
         if !globalSetters.isEmpty {
             try container.encode(globalSetters, forKey: .globalSetters)
         }
+    }
+
+    public var isEmpty: Bool {
+        functions.isEmpty && types.isEmpty && globalGetters.isEmpty && globalSetters.isEmpty
     }
 }
 

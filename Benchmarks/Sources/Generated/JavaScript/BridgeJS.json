@@ -2739,14 +2739,6 @@
     "children" : [
       {
         "functions" : [
-
-        ],
-        "types" : [
-
-        ]
-      },
-      {
-        "functions" : [
           {
             "name" : "benchmarkHelperNoop",
             "parameters" : [

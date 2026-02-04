@@ -1,22 +1,4 @@
 {
-  "exported" : {
-    "classes" : [
-
-    ],
-    "enums" : [
-
-    ],
-    "exposeToGlobal" : false,
-    "functions" : [
-
-    ],
-    "protocols" : [
-
-    ],
-    "structs" : [
-
-    ]
-  },
   "imported" : {
     "children" : [
       {

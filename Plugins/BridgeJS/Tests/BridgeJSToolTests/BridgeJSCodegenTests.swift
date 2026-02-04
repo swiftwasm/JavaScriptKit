@@ -166,4 +166,22 @@ import Testing
         let skeleton = try swiftAPI.finalize()
         try snapshotCodegen(skeleton: skeleton, name: "CrossFileFunctionTypes.ReverseOrder")
     }
+
+    @Test
+    func codegenSkipsEmptySkeletons() throws {
+        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let importedURL = Self.multifileInputsDirectory.appendingPathComponent("ImportedFunctions.swift")
+        swiftAPI.addSourceFile(
+            Parser.parse(source: try String(contentsOf: importedURL, encoding: .utf8)),
+            inputFilePath: "ImportedFunctions.swift"
+        )
+        let exportedOnlyURL = Self.multifileInputsDirectory.appendingPathComponent("ExportedOnly.swift")
+        swiftAPI.addSourceFile(
+            Parser.parse(source: try String(contentsOf: exportedOnlyURL, encoding: .utf8)),
+            inputFilePath: "ExportedOnly.swift"
+        )
+        let skeleton = try swiftAPI.finalize()
+        #expect(skeleton.exported == nil, "Empty exported skeleton should be omitted")
+        try snapshotCodegen(skeleton: skeleton, name: "CrossFileSkipsEmptySkeletons")
+    }
 }
