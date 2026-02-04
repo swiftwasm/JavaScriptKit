@@ -99,14 +99,18 @@ func testMixedOptionals(firstName: String?, lastName: String?, age: Int?, active
     @JSGetter var stringOrUndefined: JSUndefinedOr<String>
     @JSSetter func setStringOrUndefined(_ value: JSUndefinedOr<String>) throws(JSException)
     @JSFunction func roundTripStringOrNull(value: String?) throws(JSException) -> String?
-    @JSFunction func roundTripStringOrUndefined(value: JSUndefinedOr<String>) throws(JSException) -> JSUndefinedOr<String>
+    @JSFunction func roundTripStringOrUndefined(
+        value: JSUndefinedOr<String>
+    ) throws(JSException) -> JSUndefinedOr<String>
 
     @JSGetter var doubleOrNull: Double?
     @JSSetter func setDoubleOrNull(_ value: Double?) throws(JSException)
     @JSGetter var doubleOrUndefined: JSUndefinedOr<Double>
     @JSSetter func setDoubleOrUndefined(_ value: JSUndefinedOr<Double>) throws(JSException)
     @JSFunction func roundTripDoubleOrNull(value: Double?) throws(JSException) -> Double?
-    @JSFunction func roundTripDoubleOrUndefined(value: JSUndefinedOr<Double>) throws(JSException) -> JSUndefinedOr<Double>
+    @JSFunction func roundTripDoubleOrUndefined(
+        value: JSUndefinedOr<Double>
+    ) throws(JSException) -> JSUndefinedOr<Double>
 
     @JSGetter var boolOrNull: Bool?
     @JSSetter func setBoolOrNull(_ value: Bool?) throws(JSException)
