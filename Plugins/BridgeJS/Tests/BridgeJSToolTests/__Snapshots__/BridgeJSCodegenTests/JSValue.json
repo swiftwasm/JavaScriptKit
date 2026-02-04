@@ -23,12 +23,13 @@
               "label" : "optionalValue",
               "name" : "optionalValue",
               "type" : {
-                "optional" : {
+                "nullable" : {
                   "_0" : {
                     "jsValue" : {
 
                     }
-                  }
+                  },
+                  "_1" : "null"
                 }
               }
             }
@@ -57,12 +58,13 @@
                 "label" : "optionalValue",
                 "name" : "optionalValue",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "jsValue" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -111,23 +113,25 @@
                 "label" : "_",
                 "name" : "value",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "jsValue" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "jsValue" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -149,12 +153,13 @@
             "isStatic" : false,
             "name" : "optionalValue",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "jsValue" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -205,23 +210,25 @@
             "label" : "_",
             "name" : "value",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "jsValue" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "jsValue" : {
 
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       }
