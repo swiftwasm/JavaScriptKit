@@ -155,24 +155,6 @@ exports[`ts2swift > snapshots Swift output for ObjectLikeTypes.d.ts > ObjectLike
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func acceptObject(_ v: JSObject) throws(JSException) -> Void
-
-@JSFunction func acceptFunction(_ v: JSObject) throws(JSException) -> Void
-
-@JSFunction func acceptDate(_ v: JSObject) throws(JSException) -> JSObject
-
-@JSFunction func acceptRegExp(_ v: JSObject) throws(JSException) -> JSObject
-
-@JSFunction func acceptMap(_ v: JSObject) throws(JSException) -> JSObject
-
-@JSFunction func acceptSet(_ v: JSObject) throws(JSException) -> JSObject
-
-@JSFunction func acceptPromiseLike(_ v: JSObject) throws(JSException) -> JSObject
-
-@JSFunction func acceptArrayBuffer(_ v: JSObject) throws(JSException) -> JSObject
-
-@JSFunction func acceptArrayLike(_ v: JSObject) throws(JSException) -> JSObject
-
-@JSFunction func acceptIterable(_ v: JSObject) throws(JSException) -> JSObject
 "
 `;
 

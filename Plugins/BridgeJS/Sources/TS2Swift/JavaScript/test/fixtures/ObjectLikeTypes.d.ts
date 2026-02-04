@@ -1,10 +1,1 @@
 export function acceptObject(v: object): void;
-export function acceptFunction(v: Function): void;
-export function acceptDate(v: Date): Date;
-export function acceptRegExp(v: RegExp): RegExp;
-export function acceptMap(v: Map<string, number>): Map<string, number>;
-export function acceptSet(v: Set<string>): Set<string>;
-export function acceptPromiseLike(v: PromiseLike<string>): PromiseLike<string>;
-export function acceptArrayBuffer(v: ArrayBuffer): ArrayBuffer;
-export function acceptArrayLike(v: ArrayLike<string>): ArrayLike<string>;
-export function acceptIterable(v: Iterable<string>): Iterable<string>;
