@@ -7959,7 +7959,7 @@ fileprivate func bjs_globalObject1_get() -> Void {
 #endif
 
 func _$globalObject1_get() throws(JSException) -> JSValue {
-    let ret = bjs_globalObject1_get()
+    bjs_globalObject1_get()
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -8083,7 +8083,7 @@ fileprivate func bjs_jsRoundTripJSValue(_ vKind: Int32, _ vPayload1: Int32, _ vP
 
 func _$jsRoundTripJSValue(_ v: JSValue) throws(JSException) -> JSValue {
     let (vKind, vPayload1, vPayload2) = v.bridgeJSLowerParameter()
-    let ret = bjs_jsRoundTripJSValue(vKind, vPayload1, vPayload2)
+    bjs_jsRoundTripJSValue(vKind, vPayload1, vPayload2)
     if let error = _swift_js_take_exception() {
         throw error
     }

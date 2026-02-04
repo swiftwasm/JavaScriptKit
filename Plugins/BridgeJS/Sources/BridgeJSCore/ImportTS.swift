@@ -178,13 +178,19 @@ public struct ImportTS {
                 rightParen: .rightParenToken()
             )
 
-            if returnType == .void {
-                body.append(CodeBlockItemSyntax(item: .stmt(StmtSyntax(ExpressionStmtSyntax(expression: callExpr)))))
-            } else if returnType.usesSideChannelForOptionalReturn() {
-                // Side channel returns don't need "let ret ="
-                body.append(CodeBlockItemSyntax(item: .stmt(StmtSyntax(ExpressionStmtSyntax(expression: callExpr)))))
+            let needsRetBinding: Bool
+            let liftingInfo = try returnType.liftingReturnInfo(context: context)
+            if liftingInfo.valueToLift == nil || returnType.usesSideChannelForOptionalReturn() {
+                // Void and side-channel returns don't need "let ret ="
+                needsRetBinding = false
             } else {
+                needsRetBinding = true
+            }
+
+            if needsRetBinding {
                 body.append("let ret = \(raw: callExpr)")
+            } else {
+                body.append(CodeBlockItemSyntax(item: .stmt(StmtSyntax(ExpressionStmtSyntax(expression: callExpr)))))
             }
 
             // Add exception check for ImportTS context

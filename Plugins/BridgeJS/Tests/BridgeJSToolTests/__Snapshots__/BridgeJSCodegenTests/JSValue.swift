@@ -141,7 +141,7 @@ fileprivate func bjs_jsEchoJSValue(_ valueKind: Int32, _ valuePayload1: Int32, _
 
 func _$jsEchoJSValue(_ value: JSValue) throws(JSException) -> JSValue {
     let (valueKind, valuePayload1, valuePayload2) = value.bridgeJSLowerParameter()
-    let ret = bjs_jsEchoJSValue(valueKind, valuePayload1, valuePayload2)
+    bjs_jsEchoJSValue(valueKind, valuePayload1, valuePayload2)
     if let error = _swift_js_take_exception() {
         throw error
     }
