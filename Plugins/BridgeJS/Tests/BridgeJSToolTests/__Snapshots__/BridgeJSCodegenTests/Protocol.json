@@ -237,12 +237,13 @@
             "isStatic" : false,
             "name" : "secondDelegate",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftProtocol" : {
                     "_0" : "MyViewControllerDelegate"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -667,12 +668,13 @@
                 "label" : "_",
                 "name" : "helper",
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "swiftHeapObject" : {
                         "_0" : "Helper"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -695,12 +697,13 @@
 
             ],
             "returnType" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftHeapObject" : {
                     "_0" : "Helper"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -789,12 +792,13 @@
             "isReadonly" : false,
             "name" : "optionalName",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -802,13 +806,14 @@
             "isReadonly" : false,
             "name" : "optionalRawEnum",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "ExampleEnum",
                     "_1" : "String"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -835,12 +840,13 @@
             "isReadonly" : false,
             "name" : "optionalResult",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "Result"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -857,12 +863,13 @@
             "isReadonly" : false,
             "name" : "directionOptional",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "Direction"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -880,13 +887,14 @@
             "isReadonly" : false,
             "name" : "priorityOptional",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Priority",
                     "_1" : "Int"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }

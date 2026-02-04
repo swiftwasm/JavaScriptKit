@@ -126,11 +126,32 @@ public struct UnsafePointerType: Codable, Equatable, Hashable, Sendable {
     }
 }
 
+/// JS semantics for optional/nullable types: which value represents "absent".
+public enum JSOptionalKind: String, Codable, Equatable, Hashable, Sendable {
+    case null
+    case undefined
+
+    /// The JS literal for absence (e.g. in generated glue).
+    public var absenceLiteral: String {
+        switch self {
+        case .null: return "null"
+        case .undefined: return "undefined"
+        }
+    }
+
+    /// JS expression that is true when the value is present. `value` is the variable name.
+    public func presenceCheck(value: String) -> String {
+        switch self {
+        case .null: return "\(value) != null"
+        case .undefined: return "\(value) !== undefined"
+        }
+    }
+}
+
 public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case int, uint, float, double, string, bool, jsObject(String?), swiftHeapObject(String), void
     case unsafePointer(UnsafePointerType)
-    indirect case optional(BridgeType)
-    indirect case undefinedOr(BridgeType)
+    indirect case nullable(BridgeType, JSOptionalKind)
     indirect case array(BridgeType)
     case caseEnum(String)
     case rawValueEnum(String, SwiftEnumRawType)
@@ -896,7 +917,7 @@ extension BridgeType {
             return .pointer
         case .unsafePointer:
             return .pointer
-        case .optional(_), .undefinedOr(_):
+        case .nullable:
             return nil
         case .caseEnum:
             return .i32
@@ -921,10 +942,9 @@ extension BridgeType {
         }
     }
 
-    /// Returns true if this type is optional
+    /// Returns true if this type is optional (nullable with null or undefined).
     public var isOptional: Bool {
-        if case .optional = self { return true }
-        if case .undefinedOr = self { return true }
+        if case .nullable = self { return true }
         return false
     }
 
@@ -961,10 +981,9 @@ extension BridgeType {
                 return "\(kindCode)\(p.count)\(p)"
             }
             return kindCode
-        case .optional(let wrapped):
-            return "Sq\(wrapped.mangleTypeName)"
-        case .undefinedOr(let wrapped):
-            return "Su\(wrapped.mangleTypeName)"
+        case .nullable(let wrapped, let kind):
+            let prefix = kind == .null ? "Sq" : "Su"
+            return "\(prefix)\(wrapped.mangleTypeName)"
         case .caseEnum(let name),
             .rawValueEnum(let name, _),
             .associatedValueEnum(let name),
@@ -991,13 +1010,7 @@ extension BridgeType {
     /// Side channels are needed when the wrapped type cannot be directly returned via WASM,
     /// or when we need to distinguish null from absent value for certain primitives.
     public func usesSideChannelForOptionalReturn() -> Bool {
-        let wrappedType: BridgeType
-        switch self {
-        case .optional(let wrapped):
-            wrappedType = wrapped
-        case .undefinedOr(let wrapped):
-            wrappedType = wrapped
-        default:
+        guard case .nullable(let wrappedType, _) = self else {
             return false
         }
 

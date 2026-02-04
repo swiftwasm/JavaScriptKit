@@ -517,25 +517,27 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Theme",
                     "_1" : "String"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "Theme",
                 "_1" : "String"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -596,25 +598,27 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "TSTheme",
                     "_1" : "String"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "TSTheme",
                 "_1" : "String"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -675,25 +679,27 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "FeatureFlag",
                     "_1" : "String"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "FeatureFlag",
                 "_1" : "String"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -754,25 +760,27 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "HttpStatus",
                     "_1" : "Int"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "HttpStatus",
                 "_1" : "Int"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -833,25 +841,27 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "TSHttpStatus",
                     "_1" : "Int"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "TSHttpStatus",
                 "_1" : "Int"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -912,25 +922,27 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Priority",
                     "_1" : "Int32"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "Priority",
                 "_1" : "Int32"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -991,25 +1003,27 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "FileSize",
                     "_1" : "Int64"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "FileSize",
                 "_1" : "Int64"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -1070,25 +1084,27 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "UserId",
                     "_1" : "UInt"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "UserId",
                 "_1" : "UInt"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -1149,25 +1165,27 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "TokenId",
                     "_1" : "UInt32"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "TokenId",
                 "_1" : "UInt32"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -1228,25 +1246,27 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "SessionId",
                     "_1" : "UInt64"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "SessionId",
                 "_1" : "UInt64"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -1307,25 +1327,27 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Precision",
                     "_1" : "Float"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "Precision",
                 "_1" : "Float"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -1386,25 +1408,27 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Ratio",
                     "_1" : "Double"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "Ratio",
                 "_1" : "Double"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },

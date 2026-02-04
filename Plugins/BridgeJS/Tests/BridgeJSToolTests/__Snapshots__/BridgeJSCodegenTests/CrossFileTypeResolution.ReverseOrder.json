@@ -12,12 +12,13 @@
             "isStatic" : false,
             "name" : "linkedB",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "swiftHeapObject" : {
                     "_0" : "ClassB"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }

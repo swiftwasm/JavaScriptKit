@@ -130,7 +130,7 @@ public final class SwiftToSkeleton {
         if let optionalType = type.as(OptionalTypeSyntax.self) {
             let wrappedType = optionalType.wrappedType
             if let baseType = lookupType(for: wrappedType, errors: &errors) {
-                return .optional(baseType)
+                return .nullable(baseType, .null)
             }
         }
         // JSUndefinedOr<T>
@@ -141,7 +141,7 @@ public final class SwiftToSkeleton {
             let argType = TypeSyntax(genericArgs.first?.argument)
         {
             if let baseType = lookupType(for: argType, errors: &errors) {
-                return .undefinedOr(baseType)
+                return .nullable(baseType, .undefined)
             }
         }
         // JavaScriptKit.JSUndefinedOr<T>
@@ -154,7 +154,7 @@ public final class SwiftToSkeleton {
             let argType = TypeSyntax(genericArgs.first?.argument)
         {
             if let wrappedType = lookupType(for: argType, errors: &errors) {
-                return .undefinedOr(wrappedType)
+                return .nullable(wrappedType, .undefined)
             }
         }
         // Optional<T>
@@ -165,7 +165,7 @@ public final class SwiftToSkeleton {
             let argType = TypeSyntax(genericArgs.first?.argument)
         {
             if let baseType = lookupType(for: argType, errors: &errors) {
-                return .optional(baseType)
+                return .nullable(baseType, .null)
             }
         }
         // Swift.Optional<T>
@@ -178,7 +178,7 @@ public final class SwiftToSkeleton {
             let argType = TypeSyntax(genericArgs.first?.argument)
         {
             if let wrappedType = lookupType(for: argType, errors: &errors) {
-                return .optional(wrappedType)
+                return .nullable(wrappedType, .null)
             }
         }
         // [T]
@@ -559,7 +559,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         switch type {
         case .caseEnum(let name), .rawValueEnum(let name, _), .associatedValueEnum(let name):
             enumName = name
-        case .optional(let wrappedType):
+        case .nullable(let wrappedType, _):
             switch wrappedType {
             case .caseEnum(let name), .rawValueEnum(let name, _), .associatedValueEnum(let name):
                 enumName = name
@@ -608,7 +608,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         let expr = defaultClause.value
 
         if expr.is(NilLiteralExprSyntax.self) {
-            guard case .optional(_) = type else {
+            guard case .nullable = type else {
                 diagnose(
                     node: expr,
                     message: "nil is only valid for optional parameters",
@@ -664,10 +664,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         let isStructType: Bool
         let expectedTypeName: String?
         switch type {
-        case .swiftStruct(let name), .optional(.swiftStruct(let name)):
+        case .swiftStruct(let name), .nullable(.swiftStruct(let name), _):
             isStructType = true
             expectedTypeName = name.split(separator: ".").last.map(String.init)
-        case .swiftHeapObject(let name), .optional(.swiftHeapObject(let name)):
+        case .swiftHeapObject(let name), .nullable(.swiftHeapObject(let name), _):
             isStructType = false
             expectedTypeName = name.split(separator: ".").last.map(String.init)
         default:
@@ -803,7 +803,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         switch type {
         case .array(let element):
             elementType = element
-        case .optional(.array(let element)):
+        case .nullable(.array(let element), _):
             elementType = element
         default:
             diagnose(
@@ -858,11 +858,11 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                     continue
                 }
             }
-            if case .optional(let wrappedType) = type, wrappedType.isOptional {
+            if case .nullable(let wrappedType, _) = type, wrappedType.isOptional {
                 diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)
                 continue
             }
-            if case .optional(let wrappedType) = type, wrappedType.isOptional {
+            if case .nullable(let wrappedType, _) = type, wrappedType.isOptional {
                 diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)
                 continue
             }
@@ -984,7 +984,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         if let returnClause = node.signature.returnClause {
             let resolvedType = withLookupErrors { self.parent.lookupType(for: returnClause.type, errors: &$0) }
 
-            if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
+            if let type = resolvedType, case .nullable(let wrappedType, _) = type, wrappedType.isOptional {
                 diagnoseNestedOptional(node: returnClause.type, type: returnClause.type.trimmedDescription)
                 return nil
             }
@@ -1422,7 +1422,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                     switch associatedValue.type {
                     case .string, .int, .float, .double, .bool:
                         break
-                    case .optional(let wrappedType):
+                    case .nullable(let wrappedType, _):
                         switch wrappedType {
                         case .string, .int, .float, .double, .bool:
                             break
@@ -1611,7 +1611,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         if let returnClause = node.signature.returnClause {
             let resolvedType = withLookupErrors { self.parent.lookupType(for: returnClause.type, errors: &$0) }
 
-            if let type = resolvedType, case .optional(let wrappedType) = type, wrappedType.isOptional {
+            if let type = resolvedType, case .nullable(let wrappedType, _) = type, wrappedType.isOptional {
                 diagnoseNestedOptional(node: returnClause.type, type: returnClause.type.trimmedDescription)
                 return nil
             }
@@ -1836,7 +1836,7 @@ fileprivate extension BridgeType {
         switch (self, expectedType) {
         case let (lhs, rhs) where lhs == rhs:
             return true
-        case (.optional(let wrapped), expectedType):
+        case (.nullable(let wrapped, _), expectedType):
             return wrapped == expectedType
         default:
             return false

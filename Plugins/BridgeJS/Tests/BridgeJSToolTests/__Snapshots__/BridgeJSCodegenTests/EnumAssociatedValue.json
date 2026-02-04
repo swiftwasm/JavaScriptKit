@@ -398,12 +398,13 @@
             "associatedValues" : [
               {
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "string" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -414,23 +415,25 @@
             "associatedValues" : [
               {
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "int" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               },
               {
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "bool" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -441,34 +444,37 @@
             "associatedValues" : [
               {
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "bool" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               },
               {
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "int" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               },
               {
                 "type" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "string" : {
 
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -570,23 +576,25 @@
             "label" : "result",
             "name" : "result",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "associatedValueEnum" : {
                 "_0" : "APIResult"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -670,23 +678,25 @@
             "label" : "result",
             "name" : "result",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "ComplexResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "associatedValueEnum" : {
                 "_0" : "ComplexResult"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -703,23 +713,25 @@
             "label" : "result",
             "name" : "result",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "Utilities.Result"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "associatedValueEnum" : {
                 "_0" : "Utilities.Result"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -736,23 +748,25 @@
             "label" : "result",
             "name" : "result",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "NetworkingResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "associatedValueEnum" : {
                 "_0" : "NetworkingResult"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -769,23 +783,25 @@
             "label" : "result",
             "name" : "result",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIOptionalResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "associatedValueEnum" : {
                 "_0" : "APIOptionalResult"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -802,12 +818,13 @@
             "label" : "result1",
             "name" : "result1",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIOptionalResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -815,23 +832,25 @@
             "label" : "result2",
             "name" : "result2",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "associatedValueEnum" : {
                     "_0" : "APIOptionalResult"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "associatedValueEnum" : {
                 "_0" : "APIOptionalResult"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       }

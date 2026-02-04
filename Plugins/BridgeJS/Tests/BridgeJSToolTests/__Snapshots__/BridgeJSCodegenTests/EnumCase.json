@@ -216,23 +216,25 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "Direction"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "caseEnum" : {
                 "_0" : "Direction"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       },
@@ -291,23 +293,25 @@
             "label" : "_",
             "name" : "input",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "caseEnum" : {
                     "_0" : "TSDirection"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
         ],
         "returnType" : {
-          "optional" : {
+          "nullable" : {
             "_0" : {
               "caseEnum" : {
                 "_0" : "TSDirection"
               }
-            }
+            },
+            "_1" : "null"
           }
         }
       }

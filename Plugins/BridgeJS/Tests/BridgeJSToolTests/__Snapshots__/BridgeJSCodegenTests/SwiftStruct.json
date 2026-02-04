@@ -184,12 +184,13 @@
               "label" : "optCount",
               "name" : "optCount",
               "type" : {
-                "optional" : {
+                "nullable" : {
                   "_0" : {
                     "int" : {
 
                     }
-                  }
+                  },
+                  "_1" : "null"
                 }
               }
             },
@@ -197,12 +198,13 @@
               "label" : "optFlag",
               "name" : "optFlag",
               "type" : {
-                "optional" : {
+                "nullable" : {
                   "_0" : {
                     "bool" : {
 
                     }
-                  }
+                  },
+                  "_1" : "null"
                 }
               }
             }
@@ -248,12 +250,13 @@
             "isStatic" : false,
             "name" : "optCount",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           },
@@ -262,12 +265,13 @@
             "isStatic" : false,
             "name" : "optFlag",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "bool" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -305,12 +309,13 @@
             "isStatic" : false,
             "name" : "zipCode",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "int" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -358,12 +363,13 @@
             "isStatic" : false,
             "name" : "email",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "string" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -431,13 +437,14 @@
             "isStatic" : false,
             "name" : "optionalPrecision",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "Precision",
                     "_1" : "Float"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -563,12 +570,13 @@
             "isStatic" : false,
             "name" : "optionalObject",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "jsObject" : {
 
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }

@@ -924,14 +924,9 @@ extension BridgeType {
             }
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as parameters")
-        case .optional(let wrappedType):
+        case .nullable(let wrappedType, _):
             let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
             var params = [("isSome", WasmCoreType.i32)]
-            params.append(contentsOf: wrappedInfo.loweredParameters)
-            return LoweringParameterInfo(loweredParameters: params)
-        case .undefinedOr(let wrappedType):
-            let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
-            var params = [("isDefined", WasmCoreType.i32)]
             params.append(contentsOf: wrappedInfo.loweredParameters)
             return LoweringParameterInfo(loweredParameters: params)
         case .array:
@@ -1018,10 +1013,7 @@ extension BridgeType {
             }
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as return values")
-        case .optional(let wrappedType):
-            let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
-            return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
-        case .undefinedOr(let wrappedType):
+        case .nullable(let wrappedType, _):
             let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
             return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
         case .array:

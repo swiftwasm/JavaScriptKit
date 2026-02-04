@@ -73,12 +73,13 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "optional" : {
+                  "nullable" : {
                     "_0" : {
                       "jsObject" : {
                         "_0" : "Foo"
                       }
-                    }
+                    },
+                    "_1" : "null"
                   }
                 }
               }
@@ -88,12 +89,13 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "jsObject" : {
                     "_0" : "Foo"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }
@@ -150,12 +152,13 @@
             "isStatic" : false,
             "name" : "optionalFoo",
             "type" : {
-              "optional" : {
+              "nullable" : {
                 "_0" : {
                   "jsObject" : {
                     "_0" : "Foo"
                   }
-                }
+                },
+                "_1" : "null"
               }
             }
           }

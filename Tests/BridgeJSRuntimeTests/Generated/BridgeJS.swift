@@ -4488,9 +4488,9 @@ public func _bjs_applyOptionalGreeter(_ valueIsSome: Int32, _ valueValue: Unsafe
 
 @_expose(wasm, "bjs_makeOptionalHolder")
 @_cdecl("bjs_makeOptionalHolder")
-public func _bjs_makeOptionalHolder(_ nullableGreeterIsSome: Int32, _ nullableGreeterValue: UnsafeMutableRawPointer, _ undefinedNumberIsDefined: Int32, _ undefinedNumberValue: Float64) -> UnsafeMutableRawPointer {
+public func _bjs_makeOptionalHolder(_ nullableGreeterIsSome: Int32, _ nullableGreeterValue: UnsafeMutableRawPointer, _ undefinedNumberIsSome: Int32, _ undefinedNumberValue: Float64) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = makeOptionalHolder(nullableGreeter: Optional<Greeter>.bridgeJSLiftParameter(nullableGreeterIsSome, nullableGreeterValue), undefinedNumber: JSUndefinedOr<Double>.bridgeJSLiftParameter(undefinedNumberIsDefined, undefinedNumberValue))
+    let ret = makeOptionalHolder(nullableGreeter: Optional<Greeter>.bridgeJSLiftParameter(nullableGreeterIsSome, nullableGreeterValue), undefinedNumber: JSUndefinedOr<Double>.bridgeJSLiftParameter(undefinedNumberIsSome, undefinedNumberValue))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -5909,9 +5909,9 @@ fileprivate func _bjs_TestServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int
 
 @_expose(wasm, "bjs_OptionalHolder_init")
 @_cdecl("bjs_OptionalHolder_init")
-public func _bjs_OptionalHolder_init(_ nullableGreeterIsSome: Int32, _ nullableGreeterValue: UnsafeMutableRawPointer, _ undefinedNumberIsDefined: Int32, _ undefinedNumberValue: Float64) -> UnsafeMutableRawPointer {
+public func _bjs_OptionalHolder_init(_ nullableGreeterIsSome: Int32, _ nullableGreeterValue: UnsafeMutableRawPointer, _ undefinedNumberIsSome: Int32, _ undefinedNumberValue: Float64) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = OptionalHolder(nullableGreeter: Optional<Greeter>.bridgeJSLiftParameter(nullableGreeterIsSome, nullableGreeterValue), undefinedNumber: JSUndefinedOr<Double>.bridgeJSLiftParameter(undefinedNumberIsDefined, undefinedNumberValue))
+    let ret = OptionalHolder(nullableGreeter: Optional<Greeter>.bridgeJSLiftParameter(nullableGreeterIsSome, nullableGreeterValue), undefinedNumber: JSUndefinedOr<Double>.bridgeJSLiftParameter(undefinedNumberIsSome, undefinedNumberValue))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -5952,9 +5952,9 @@ public func _bjs_OptionalHolder_undefinedNumber_get(_ _self: UnsafeMutableRawPoi
 
 @_expose(wasm, "bjs_OptionalHolder_undefinedNumber_set")
 @_cdecl("bjs_OptionalHolder_undefinedNumber_set")
-public func _bjs_OptionalHolder_undefinedNumber_set(_ _self: UnsafeMutableRawPointer, _ valueIsDefined: Int32, _ valueValue: Float64) -> Void {
+public func _bjs_OptionalHolder_undefinedNumber_set(_ _self: UnsafeMutableRawPointer, _ valueIsSome: Int32, _ valueValue: Float64) -> Void {
     #if arch(wasm32)
-    OptionalHolder.bridgeJSLiftParameter(_self).undefinedNumber = JSUndefinedOr<Double>.bridgeJSLiftParameter(valueIsDefined, valueValue)
+    OptionalHolder.bridgeJSLiftParameter(_self).undefinedNumber = JSUndefinedOr<Double>.bridgeJSLiftParameter(valueIsSome, valueValue)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -8034,16 +8034,16 @@ func _$jsRoundTripOptionalNumberNull(_ v: Optional<Double>) throws(JSException) 
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripOptionalNumberUndefined")
-fileprivate func bjs_jsRoundTripOptionalNumberUndefined(_ vIsDefined: Int32, _ vValue: Float64) -> Void
+fileprivate func bjs_jsRoundTripOptionalNumberUndefined(_ vIsSome: Int32, _ vValue: Float64) -> Void
 #else
-fileprivate func bjs_jsRoundTripOptionalNumberUndefined(_ vIsDefined: Int32, _ vValue: Float64) -> Void {
+fileprivate func bjs_jsRoundTripOptionalNumberUndefined(_ vIsSome: Int32, _ vValue: Float64) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
 func _$jsRoundTripOptionalNumberUndefined(_ v: JSUndefinedOr<Double>) throws(JSException) -> JSUndefinedOr<Double> {
-    let (vIsDefined, vValue) = v.bridgeJSLowerParameter()
-    bjs_jsRoundTripOptionalNumberUndefined(vIsDefined, vValue)
+    let (vIsSome, vValue) = v.bridgeJSLowerParameter()
+    bjs_jsRoundTripOptionalNumberUndefined(vIsSome, vValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
