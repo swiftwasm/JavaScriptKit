@@ -90,3 +90,35 @@ typealias OptionalNameAlias = Optional<String>
 func testMixedOptionals(firstName: String?, lastName: String?, age: Int?, active: Bool) -> String? {
     return nil
 }
+
+@JSClass struct WithOptionalJSClass {
+    @JSFunction init(valueOrNull: String?, valueOrUndefined: JSUndefinedOr<String>) throws(JSException)
+
+    @JSGetter var stringOrNull: String?
+    @JSSetter func setStringOrNull(_ value: String?) throws(JSException)
+    @JSGetter var stringOrUndefined: JSUndefinedOr<String>
+    @JSSetter func setStringOrUndefined(_ value: JSUndefinedOr<String>) throws(JSException)
+    @JSFunction func roundTripStringOrNull(value: String?) throws(JSException) -> String?
+    @JSFunction func roundTripStringOrUndefined(value: JSUndefinedOr<String>) throws(JSException) -> JSUndefinedOr<String>
+
+    @JSGetter var doubleOrNull: Double?
+    @JSSetter func setDoubleOrNull(_ value: Double?) throws(JSException)
+    @JSGetter var doubleOrUndefined: JSUndefinedOr<Double>
+    @JSSetter func setDoubleOrUndefined(_ value: JSUndefinedOr<Double>) throws(JSException)
+    @JSFunction func roundTripDoubleOrNull(value: Double?) throws(JSException) -> Double?
+    @JSFunction func roundTripDoubleOrUndefined(value: JSUndefinedOr<Double>) throws(JSException) -> JSUndefinedOr<Double>
+
+    @JSGetter var boolOrNull: Bool?
+    @JSSetter func setBoolOrNull(_ value: Bool?) throws(JSException)
+    @JSGetter var boolOrUndefined: JSUndefinedOr<Bool>
+    @JSSetter func setBoolOrUndefined(_ value: JSUndefinedOr<Bool>) throws(JSException)
+    @JSFunction func roundTripBoolOrNull(value: Bool?) throws(JSException) -> Bool?
+    @JSFunction func roundTripBoolOrUndefined(value: JSUndefinedOr<Bool>) throws(JSException) -> JSUndefinedOr<Bool>
+
+    @JSGetter var intOrNull: Int?
+    @JSSetter func setIntOrNull(_ value: Int?) throws(JSException)
+    @JSGetter var intOrUndefined: JSUndefinedOr<Int>
+    @JSSetter func setIntOrUndefined(_ value: JSUndefinedOr<Int>) throws(JSException)
+    @JSFunction func roundTripIntOrNull(value: Int?) throws(JSException) -> Int?
+    @JSFunction func roundTripIntOrUndefined(value: JSUndefinedOr<Int>) throws(JSException) -> JSUndefinedOr<Int>
+}

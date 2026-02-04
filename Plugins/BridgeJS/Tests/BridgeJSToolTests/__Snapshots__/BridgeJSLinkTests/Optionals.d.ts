@@ -21,6 +21,24 @@ export interface OptionalPropertyHolder extends SwiftHeapObject {
     optionalAge: number | null;
     optionalGreeter: Greeter | null;
 }
+export interface WithOptionalJSClass {
+    roundTripStringOrNull(value: string | null): string | null;
+    roundTripStringOrUndefined(value: string | undefined): string | undefined;
+    roundTripDoubleOrNull(value: number | null): number | null;
+    roundTripDoubleOrUndefined(value: number | undefined): number | undefined;
+    roundTripBoolOrNull(value: boolean | null): boolean | null;
+    roundTripBoolOrUndefined(value: boolean | undefined): boolean | undefined;
+    roundTripIntOrNull(value: number | null): number | null;
+    roundTripIntOrUndefined(value: number | undefined): number | undefined;
+    stringOrNull: string | null;
+    stringOrUndefined: string | undefined;
+    doubleOrNull: number | null;
+    doubleOrUndefined: number | undefined;
+    boolOrNull: boolean | null;
+    boolOrUndefined: boolean | undefined;
+    intOrNull: number | null;
+    intOrUndefined: number | undefined;
+}
 export type Exports = {
     Greeter: {
         new(name: string | null): Greeter;
@@ -45,6 +63,9 @@ export type Exports = {
     testMixedOptionals(firstName: string | null, lastName: string | null, age: number | null, active: boolean): string | null;
 }
 export type Imports = {
+    WithOptionalJSClass: {
+        new(valueOrNull: string | null, valueOrUndefined: string | undefined): WithOptionalJSClass;
+    }
 }
 export function createInstantiator(options: {
     imports: Imports;

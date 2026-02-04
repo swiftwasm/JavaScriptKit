@@ -339,3 +339,462 @@ fileprivate func _bjs_OptionalPropertyHolder_wrap(_ pointer: UnsafeMutableRawPoi
     fatalError("Only available on WebAssembly")
 }
 #endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_init")
+fileprivate func bjs_WithOptionalJSClass_init(_ valueOrNullIsSome: Int32, _ valueOrNullValue: Int32, _ valueOrUndefinedIsSome: Int32, _ valueOrUndefinedValue: Int32) -> Int32
+#else
+fileprivate func bjs_WithOptionalJSClass_init(_ valueOrNullIsSome: Int32, _ valueOrNullValue: Int32, _ valueOrUndefinedIsSome: Int32, _ valueOrUndefinedValue: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_stringOrNull_get")
+fileprivate func bjs_WithOptionalJSClass_stringOrNull_get(_ self: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_stringOrNull_get(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_stringOrUndefined_get")
+fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_get(_ self: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_get(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_doubleOrNull_get")
+fileprivate func bjs_WithOptionalJSClass_doubleOrNull_get(_ self: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_doubleOrNull_get(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_doubleOrUndefined_get")
+fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_get(_ self: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_get(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_boolOrNull_get")
+fileprivate func bjs_WithOptionalJSClass_boolOrNull_get(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_WithOptionalJSClass_boolOrNull_get(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_boolOrUndefined_get")
+fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_get(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_get(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_intOrNull_get")
+fileprivate func bjs_WithOptionalJSClass_intOrNull_get(_ self: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_intOrNull_get(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_intOrUndefined_get")
+fileprivate func bjs_WithOptionalJSClass_intOrUndefined_get(_ self: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_intOrUndefined_get(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_stringOrNull_set")
+fileprivate func bjs_WithOptionalJSClass_stringOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_stringOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_stringOrUndefined_set")
+fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_doubleOrNull_set")
+fileprivate func bjs_WithOptionalJSClass_doubleOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_doubleOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_doubleOrUndefined_set")
+fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_boolOrNull_set")
+fileprivate func bjs_WithOptionalJSClass_boolOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_boolOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_boolOrUndefined_set")
+fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_intOrNull_set")
+fileprivate func bjs_WithOptionalJSClass_intOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_intOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_intOrUndefined_set")
+fileprivate func bjs_WithOptionalJSClass_intOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_intOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripStringOrNull")
+fileprivate func bjs_WithOptionalJSClass_roundTripStringOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_roundTripStringOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripStringOrUndefined")
+fileprivate func bjs_WithOptionalJSClass_roundTripStringOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_roundTripStringOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripDoubleOrNull")
+fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripDoubleOrUndefined")
+fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripBoolOrNull")
+fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32
+#else
+fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripBoolOrUndefined")
+fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32
+#else
+fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripIntOrNull")
+fileprivate func bjs_WithOptionalJSClass_roundTripIntOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_roundTripIntOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripIntOrUndefined")
+fileprivate func bjs_WithOptionalJSClass_roundTripIntOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
+#else
+fileprivate func bjs_WithOptionalJSClass_roundTripIntOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$WithOptionalJSClass_init(_ valueOrNull: Optional<String>, _ valueOrUndefined: JSUndefinedOr<String>) throws(JSException) -> JSObject {
+    let (valueOrNullIsSome, valueOrNullValue) = valueOrNull.bridgeJSLowerParameter()
+    let (valueOrUndefinedIsSome, valueOrUndefinedValue) = valueOrUndefined.bridgeJSLowerParameter()
+    let ret = bjs_WithOptionalJSClass_init(valueOrNullIsSome, valueOrNullValue, valueOrUndefinedIsSome, valueOrUndefinedValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$WithOptionalJSClass_stringOrNull_get(_ self: JSObject) throws(JSException) -> Optional<String> {
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_stringOrNull_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<String>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$WithOptionalJSClass_stringOrUndefined_get(_ self: JSObject) throws(JSException) -> JSUndefinedOr<String> {
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_stringOrUndefined_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUndefinedOr<String>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$WithOptionalJSClass_doubleOrNull_get(_ self: JSObject) throws(JSException) -> Optional<Double> {
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_doubleOrNull_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<Double>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$WithOptionalJSClass_doubleOrUndefined_get(_ self: JSObject) throws(JSException) -> JSUndefinedOr<Double> {
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_doubleOrUndefined_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUndefinedOr<Double>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$WithOptionalJSClass_boolOrNull_get(_ self: JSObject) throws(JSException) -> Optional<Bool> {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_WithOptionalJSClass_boolOrNull_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<Bool>.bridgeJSLiftReturn(ret)
+}
+
+func _$WithOptionalJSClass_boolOrUndefined_get(_ self: JSObject) throws(JSException) -> JSUndefinedOr<Bool> {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_WithOptionalJSClass_boolOrUndefined_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUndefinedOr<Bool>.bridgeJSLiftReturn(ret)
+}
+
+func _$WithOptionalJSClass_intOrNull_get(_ self: JSObject) throws(JSException) -> Optional<Int> {
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_intOrNull_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<Int>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$WithOptionalJSClass_intOrUndefined_get(_ self: JSObject) throws(JSException) -> JSUndefinedOr<Int> {
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_intOrUndefined_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUndefinedOr<Int>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$WithOptionalJSClass_stringOrNull_set(_ self: JSObject, _ newValue: Optional<String>) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_stringOrNull_set(selfValue, newValueIsSome, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$WithOptionalJSClass_stringOrUndefined_set(_ self: JSObject, _ newValue: JSUndefinedOr<String>) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_stringOrUndefined_set(selfValue, newValueIsSome, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$WithOptionalJSClass_doubleOrNull_set(_ self: JSObject, _ newValue: Optional<Double>) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_doubleOrNull_set(selfValue, newValueIsSome, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$WithOptionalJSClass_doubleOrUndefined_set(_ self: JSObject, _ newValue: JSUndefinedOr<Double>) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_doubleOrUndefined_set(selfValue, newValueIsSome, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$WithOptionalJSClass_boolOrNull_set(_ self: JSObject, _ newValue: Optional<Bool>) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_boolOrNull_set(selfValue, newValueIsSome, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$WithOptionalJSClass_boolOrUndefined_set(_ self: JSObject, _ newValue: JSUndefinedOr<Bool>) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_boolOrUndefined_set(selfValue, newValueIsSome, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$WithOptionalJSClass_intOrNull_set(_ self: JSObject, _ newValue: Optional<Int>) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_intOrNull_set(selfValue, newValueIsSome, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$WithOptionalJSClass_intOrUndefined_set(_ self: JSObject, _ newValue: JSUndefinedOr<Int>) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_intOrUndefined_set(selfValue, newValueIsSome, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$WithOptionalJSClass_roundTripStringOrNull(_ self: JSObject, _ value: Optional<String>) throws(JSException) -> Optional<String> {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_roundTripStringOrNull(selfValue, valueIsSome, valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<String>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$WithOptionalJSClass_roundTripStringOrUndefined(_ self: JSObject, _ value: JSUndefinedOr<String>) throws(JSException) -> JSUndefinedOr<String> {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_roundTripStringOrUndefined(selfValue, valueIsSome, valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUndefinedOr<String>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$WithOptionalJSClass_roundTripDoubleOrNull(_ self: JSObject, _ value: Optional<Double>) throws(JSException) -> Optional<Double> {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_roundTripDoubleOrNull(selfValue, valueIsSome, valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<Double>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$WithOptionalJSClass_roundTripDoubleOrUndefined(_ self: JSObject, _ value: JSUndefinedOr<Double>) throws(JSException) -> JSUndefinedOr<Double> {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_roundTripDoubleOrUndefined(selfValue, valueIsSome, valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUndefinedOr<Double>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$WithOptionalJSClass_roundTripBoolOrNull(_ self: JSObject, _ value: Optional<Bool>) throws(JSException) -> Optional<Bool> {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    let ret = bjs_WithOptionalJSClass_roundTripBoolOrNull(selfValue, valueIsSome, valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<Bool>.bridgeJSLiftReturn(ret)
+}
+
+func _$WithOptionalJSClass_roundTripBoolOrUndefined(_ self: JSObject, _ value: JSUndefinedOr<Bool>) throws(JSException) -> JSUndefinedOr<Bool> {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    let ret = bjs_WithOptionalJSClass_roundTripBoolOrUndefined(selfValue, valueIsSome, valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUndefinedOr<Bool>.bridgeJSLiftReturn(ret)
+}
+
+func _$WithOptionalJSClass_roundTripIntOrNull(_ self: JSObject, _ value: Optional<Int>) throws(JSException) -> Optional<Int> {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_roundTripIntOrNull(selfValue, valueIsSome, valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<Int>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$WithOptionalJSClass_roundTripIntOrUndefined(_ self: JSObject, _ value: JSUndefinedOr<Int>) throws(JSException) -> JSUndefinedOr<Int> {
+    let selfValue = self.bridgeJSLowerParameter()
+    let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    bjs_WithOptionalJSClass_roundTripIntOrUndefined(selfValue, valueIsSome, valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUndefinedOr<Int>.bridgeJSLiftReturnFromSideChannel()
+}
