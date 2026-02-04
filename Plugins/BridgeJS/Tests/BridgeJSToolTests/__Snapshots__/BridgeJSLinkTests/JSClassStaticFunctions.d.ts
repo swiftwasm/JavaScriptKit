@@ -5,6 +5,8 @@
 // `swift package bridge-js`.
 
 export interface StaticBox {
+}
+export interface StaticBox {
     value(): number;
 }
 export interface WithCtor {
@@ -13,10 +15,12 @@ export type Exports = {
 }
 export type Imports = {
     StaticBox: {
-        create(value: number): StaticBox;
-        value(): number;
         makeDefault(): StaticBox;
         "with-dashes"(): StaticBox;
+    }
+    StaticBox: {
+        create(value: number): StaticBox;
+        value(): number;
     }
     WithCtor: {
         new(value: number): WithCtor;

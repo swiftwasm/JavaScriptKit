@@ -758,7 +758,7 @@ public struct ImportedTypeSkeleton: Codable {
     public let constructor: ImportedConstructorSkeleton?
     public let methods: [ImportedFunctionSkeleton]
     /// Static methods available on the JavaScript constructor.
-    public var staticMethods: [ImportedFunctionSkeleton] = []
+    public var staticMethods: [ImportedFunctionSkeleton]
     public let getters: [ImportedGetterSkeleton]
     public let setters: [ImportedSetterSkeleton]
     public let documentation: String?
@@ -768,7 +768,7 @@ public struct ImportedTypeSkeleton: Codable {
         jsName: String? = nil,
         from: JSImportFrom? = nil,
         constructor: ImportedConstructorSkeleton? = nil,
-        methods: [ImportedFunctionSkeleton],
+        methods: [ImportedFunctionSkeleton] = [],
         staticMethods: [ImportedFunctionSkeleton] = [],
         getters: [ImportedGetterSkeleton] = [],
         setters: [ImportedSetterSkeleton] = [],
