@@ -1065,7 +1065,7 @@ public struct BridgeJSLink {
             }
             for enumDef in allAssocEnums {
                 let enumPrinter = CodeFragmentPrinter()
-                let enumScope = JSGlueVariableScope()
+                let enumScope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
                 let enumCleanup = CodeFragmentPrinter()
                 let fragment = IntrinsicJSFragment.associatedValueEnumHelperFactory(enumDefinition: enumDef)
                 _ = fragment.printCode([enumDef.valuesName], enumScope, enumPrinter, enumCleanup)
@@ -1608,7 +1608,7 @@ public struct BridgeJSLink {
     ) throws -> (jsTopLevel: [String], jsExportEntry: [String], dtsType: [String], dtsExportEntry: [String]) {
         var jsTopLevelLines: [String] = []
         var dtsTypeLines: [String] = []
-        let scope = JSGlueVariableScope()
+        let scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
         let cleanup = CodeFragmentPrinter()
         let printer = CodeFragmentPrinter()
         let enumValuesName = enumDefinition.valuesName
