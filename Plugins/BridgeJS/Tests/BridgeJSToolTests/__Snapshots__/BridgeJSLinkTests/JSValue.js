@@ -312,6 +312,31 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
+            TestModule["bjs_jsEchoJSValueArray"] = function bjs_jsEchoJSValueArray() {
+                try {
+                    const arrayLen = tmpRetInts.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const jsValuePayload2 = tmpRetF64s.pop();
+                        const jsValuePayload1 = tmpRetInts.pop();
+                        const jsValueKind = tmpRetInts.pop();
+                        const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
+                        arrayResult.push(jsValue);
+                    }
+                    arrayResult.reverse();
+                    let ret = imports.jsEchoJSValueArray(arrayResult);
+                    const arrayCleanups = [];
+                    for (const elem of ret) {
+                        const [elemKind, elemPayload1, elemPayload2] = __bjs_jsValueLower(elem);
+                        tmpParamInts.push(elemKind);
+                        tmpParamInts.push(elemPayload1);
+                        tmpParamF64s.push(elemPayload2);
+                    }
+                    tmpParamInts.push(ret.length);
+                } catch (error) {
+                    setException(error);
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;
@@ -446,6 +471,64 @@ export async function createInstantiator(options, swift) {
                     } else {
                         optResult = null;
                     }
+                    return optResult;
+                },
+                roundTripJSValueArray: function bjs_roundTripJSValueArray(values) {
+                    const arrayCleanups = [];
+                    for (const elem of values) {
+                        const [elemKind, elemPayload1, elemPayload2] = __bjs_jsValueLower(elem);
+                        tmpParamInts.push(elemKind);
+                        tmpParamInts.push(elemPayload1);
+                        tmpParamF64s.push(elemPayload2);
+                    }
+                    tmpParamInts.push(values.length);
+                    instance.exports.bjs_roundTripJSValueArray();
+                    const arrayLen = tmpRetInts.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const jsValuePayload2 = tmpRetF64s.pop();
+                        const jsValuePayload1 = tmpRetInts.pop();
+                        const jsValueKind = tmpRetInts.pop();
+                        const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
+                        arrayResult.push(jsValue);
+                    }
+                    arrayResult.reverse();
+                    for (const cleanup of arrayCleanups) { cleanup(); }
+                    return arrayResult;
+                },
+                roundTripOptionalJSValueArray: function bjs_roundTripOptionalJSValueArray(values) {
+                    const isSome = values != null;
+                    const valuesCleanups = [];
+                    if (isSome) {
+                        const arrayCleanups = [];
+                        for (const elem of values) {
+                            const [elemKind, elemPayload1, elemPayload2] = __bjs_jsValueLower(elem);
+                            tmpParamInts.push(elemKind);
+                            tmpParamInts.push(elemPayload1);
+                            tmpParamF64s.push(elemPayload2);
+                        }
+                        tmpParamInts.push(values.length);
+                        valuesCleanups.push(() => { for (const cleanup of arrayCleanups) { cleanup(); } });
+                    }
+                    instance.exports.bjs_roundTripOptionalJSValueArray(+isSome);
+                    const isSome1 = tmpRetInts.pop();
+                    let optResult;
+                    if (isSome1) {
+                        const arrayLen = tmpRetInts.pop();
+                        const arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const jsValuePayload2 = tmpRetF64s.pop();
+                            const jsValuePayload1 = tmpRetInts.pop();
+                            const jsValueKind = tmpRetInts.pop();
+                            const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
+                            arrayResult.push(jsValue);
+                        }
+                        arrayResult.reverse();
+                        optResult = arrayResult;
+                    } else {
+                        optResult = null;
+                    }
+                    for (const cleanup of valuesCleanups) { cleanup(); }
                     return optResult;
                 },
             };

@@ -16,6 +16,10 @@
 
 @JSFunction func jsRoundTripJSValue(_ v: JSValue) throws(JSException) -> JSValue
 
+@JSFunction func jsRoundTripJSValueArray(_ v: [JSValue]) throws(JSException) -> [JSValue]
+
+@JSFunction func jsRoundTripOptionalJSValueArray(_ v: Optional<[JSValue]>) throws(JSException) -> Optional<[JSValue]>
+
 @JSFunction func jsThrowOrVoid(_ shouldThrow: Bool) throws(JSException) -> Void
 
 @JSFunction func jsThrowOrNumber(_ shouldThrow: Bool) throws(JSException) -> Double

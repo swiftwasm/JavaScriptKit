@@ -79,6 +79,12 @@ export async function setupOptions(options, context) {
                 "jsRoundTripJSValue": (v) => {
                     return v;
                 },
+                "jsRoundTripJSValueArray": (values) => {
+                    return values;
+                },
+                "jsRoundTripOptionalJSValueArray": (values) => {
+                    return values ?? null;
+                },
                 "jsRoundTripIntArray": (items) => {
                     return items;
                 },
@@ -279,6 +285,10 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.deepEqual(arrayStructRoundTrip.optStrings, ["a", "b"]);
     assert.equal(exports.arrayMembersSum(arrayStruct, [10, 20]), 30);
     assert.equal(exports.arrayMembersFirst(arrayStruct, ["x", "y"]), "x");
+    const jsValueArray = [true, 42, "ok", { nested: 1 }, null, undefined];
+    assert.deepEqual(exports.roundTripJSValueArray(jsValueArray), jsValueArray);
+    assert.deepEqual(exports.roundTripOptionalJSValueArray(jsValueArray), jsValueArray);
+    assert.equal(exports.roundTripOptionalJSValueArray(null), null);
 
     for (const p of [1, 4, 1024, 65536, 2147483647]) {
         assert.equal(exports.roundTripUnsafeRawPointer(p), p);

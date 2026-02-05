@@ -1023,6 +1023,20 @@ struct IntrinsicJSFragment: Sendable {
                         printer.write("\(JSGlueVariableScope.reservedTmpRetF64s).push(\(payload2Var));")
                     }
                     printer.write("\(JSGlueVariableScope.reservedTmpRetInts).push(\(isSomeVar) ? 1 : 0);")
+                case .array(let elementType):
+                    printer.write("if (\(isSomeVar)) {")
+                    printer.indent {
+                        let arrayLowerFragment = try! arrayLower(elementType: elementType)
+                        let arrayCleanup = CodeFragmentPrinter()
+                        let _ = arrayLowerFragment.printCode([value], scope, printer, arrayCleanup)
+                        if !arrayCleanup.lines.isEmpty {
+                            for line in arrayCleanup.lines {
+                                printer.write(line)
+                            }
+                        }
+                    }
+                    printer.write("}")
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
                 case .rawValueEnum(_, let rawType):
                     switch rawType {
                     case .string:
@@ -2601,7 +2615,23 @@ struct IntrinsicJSFragment: Sendable {
     private static func stackLiftFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
         switch elementType {
         case .jsValue:
-            throw BridgeJSLinkError(message: "Array of JSValue is not supported yet")
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { _, scope, printer, cleanup in
+                    registerJSValueHelpers(scope: scope)
+                    let payload2Var = scope.variable("jsValuePayload2")
+                    let payload1Var = scope.variable("jsValuePayload1")
+                    let kindVar = scope.variable("jsValueKind")
+                    printer.write("const \(payload2Var) = \(JSGlueVariableScope.reservedTmpRetF64s).pop();")
+                    printer.write("const \(payload1Var) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    printer.write("const \(kindVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    let resultVar = scope.variable("jsValue")
+                    printer.write(
+                        "const \(resultVar) = \(jsValueLiftHelperName)(\(kindVar), \(payload1Var), \(payload2Var));"
+                    )
+                    return [resultVar]
+                }
+            )
         case .string:
             return IntrinsicJSFragment(
                 parameters: [],
@@ -2763,7 +2793,20 @@ struct IntrinsicJSFragment: Sendable {
     private static func stackLowerFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
         switch elementType {
         case .jsValue:
-            throw BridgeJSLinkError(message: "Array of JSValue is not supported yet")
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, scope, printer, cleanup in
+                    registerJSValueHelpers(scope: scope)
+                    let lowered = jsValueLower.printCode([arguments[0]], scope, printer, cleanup)
+                    let kindVar = lowered[0]
+                    let payload1Var = lowered[1]
+                    let payload2Var = lowered[2]
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(kindVar));")
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(payload1Var));")
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamF64s).push(\(payload2Var));")
+                    return []
+                }
+            )
         case .string:
             return IntrinsicJSFragment(
                 parameters: ["value"],
