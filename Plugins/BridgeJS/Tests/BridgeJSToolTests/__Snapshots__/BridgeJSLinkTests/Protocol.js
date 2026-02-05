@@ -59,7 +59,7 @@ export async function createInstantiator(options, swift) {
     let _exports = null;
     let bjs = null;
     const __bjs_createResultValuesHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 const enumTag = value.tag;
                 switch (enumTag) {
@@ -723,7 +723,7 @@ export async function createInstantiator(options, swift) {
                     for (const cleanup of arrayCleanups) { cleanup(); }
                 }
             }
-            const ResultHelpers = __bjs_createResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers);
+            const ResultHelpers = __bjs_createResultValuesHelpers()();
             enumHelpers.Result = ResultHelpers;
 
             const exports = {

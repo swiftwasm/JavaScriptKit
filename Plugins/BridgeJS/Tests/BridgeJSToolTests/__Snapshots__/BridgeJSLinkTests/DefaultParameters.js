@@ -41,7 +41,7 @@ export async function createInstantiator(options, swift) {
     let _exports = null;
     let bjs = null;
     const __bjs_createConfigHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 const bytes = textEncoder.encode(value.name);
                 const id = swift.memory.retain(bytes);
@@ -63,7 +63,7 @@ export async function createInstantiator(options, swift) {
         });
     };
     const __bjs_createMathOperationsHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 tmpParamF64s.push(value.baseValue);
                 return { cleanup: undefined };
@@ -172,7 +172,7 @@ export async function createInstantiator(options, swift) {
                 return 0;
             }
             bjs["swift_js_struct_lift_Config"] = function() {
-                const value = structHelpers.Config.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                const value = structHelpers.Config.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_MathOperations"] = function(objectId) {
@@ -183,7 +183,7 @@ export async function createInstantiator(options, swift) {
                 return 0;
             }
             bjs["swift_js_struct_lift_MathOperations"] = function() {
-                const value = structHelpers.MathOperations.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                const value = structHelpers.MathOperations.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
@@ -431,10 +431,10 @@ export async function createInstantiator(options, swift) {
                     }
                 }
             }
-            const ConfigHelpers = __bjs_createConfigHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
+            const ConfigHelpers = __bjs_createConfigHelpers()();
             structHelpers.Config = ConfigHelpers;
 
-            const MathOperationsHelpers = __bjs_createMathOperationsHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
+            const MathOperationsHelpers = __bjs_createMathOperationsHelpers()();
             structHelpers.MathOperations = MathOperationsHelpers;
 
             const exports = {

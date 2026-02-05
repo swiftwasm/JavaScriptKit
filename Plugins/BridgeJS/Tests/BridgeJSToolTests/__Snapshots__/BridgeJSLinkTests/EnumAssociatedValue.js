@@ -116,7 +116,7 @@ export async function createInstantiator(options, swift) {
     let _exports = null;
     let bjs = null;
     const __bjs_createPointHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 tmpParamF64s.push(value.x);
                 tmpParamF64s.push(value.y);
@@ -130,7 +130,7 @@ export async function createInstantiator(options, swift) {
         });
     };
     const __bjs_createAPIResultValuesHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 const enumTag = value.tag;
                 switch (enumTag) {
@@ -201,7 +201,7 @@ export async function createInstantiator(options, swift) {
         });
     };
     const __bjs_createComplexResultValuesHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 const enumTag = value.tag;
                 switch (enumTag) {
@@ -321,7 +321,7 @@ export async function createInstantiator(options, swift) {
         });
     };
     const __bjs_createResultValuesHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 const enumTag = value.tag;
                 switch (enumTag) {
@@ -385,7 +385,7 @@ export async function createInstantiator(options, swift) {
         });
     };
     const __bjs_createNetworkingResultValuesHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 const enumTag = value.tag;
                 switch (enumTag) {
@@ -431,7 +431,7 @@ export async function createInstantiator(options, swift) {
         });
     };
     const __bjs_createAPIOptionalResultValuesHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 const enumTag = value.tag;
                 switch (enumTag) {
@@ -560,7 +560,7 @@ export async function createInstantiator(options, swift) {
         });
     };
     const __bjs_createTypedPayloadResultValuesHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 const enumTag = value.tag;
                 switch (enumTag) {
@@ -635,7 +635,7 @@ export async function createInstantiator(options, swift) {
         });
     };
     const __bjs_createAllTypesResultValuesHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 const enumTag = value.tag;
                 switch (enumTag) {
@@ -722,7 +722,7 @@ export async function createInstantiator(options, swift) {
         });
     };
     const __bjs_createOptionalAllTypesResultValuesHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 const enumTag = value.tag;
                 switch (enumTag) {
@@ -965,7 +965,7 @@ export async function createInstantiator(options, swift) {
                 return 0;
             }
             bjs["swift_js_struct_lift_Point"] = function() {
-                const value = structHelpers.Point.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                const value = structHelpers.Point.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
@@ -1103,31 +1103,31 @@ export async function createInstantiator(options, swift) {
                 }
 
             }
-            const PointHelpers = __bjs_createPointHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
+            const PointHelpers = __bjs_createPointHelpers()();
             structHelpers.Point = PointHelpers;
 
-            const APIResultHelpers = __bjs_createAPIResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers);
+            const APIResultHelpers = __bjs_createAPIResultValuesHelpers()();
             enumHelpers.APIResult = APIResultHelpers;
 
-            const ComplexResultHelpers = __bjs_createComplexResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers);
+            const ComplexResultHelpers = __bjs_createComplexResultValuesHelpers()();
             enumHelpers.ComplexResult = ComplexResultHelpers;
 
-            const ResultHelpers = __bjs_createResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers);
+            const ResultHelpers = __bjs_createResultValuesHelpers()();
             enumHelpers.Result = ResultHelpers;
 
-            const NetworkingResultHelpers = __bjs_createNetworkingResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers);
+            const NetworkingResultHelpers = __bjs_createNetworkingResultValuesHelpers()();
             enumHelpers.NetworkingResult = NetworkingResultHelpers;
 
-            const APIOptionalResultHelpers = __bjs_createAPIOptionalResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers);
+            const APIOptionalResultHelpers = __bjs_createAPIOptionalResultValuesHelpers()();
             enumHelpers.APIOptionalResult = APIOptionalResultHelpers;
 
-            const TypedPayloadResultHelpers = __bjs_createTypedPayloadResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers);
+            const TypedPayloadResultHelpers = __bjs_createTypedPayloadResultValuesHelpers()();
             enumHelpers.TypedPayloadResult = TypedPayloadResultHelpers;
 
-            const AllTypesResultHelpers = __bjs_createAllTypesResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers);
+            const AllTypesResultHelpers = __bjs_createAllTypesResultValuesHelpers()();
             enumHelpers.AllTypesResult = AllTypesResultHelpers;
 
-            const OptionalAllTypesResultHelpers = __bjs_createOptionalAllTypesResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers);
+            const OptionalAllTypesResultHelpers = __bjs_createOptionalAllTypesResultValuesHelpers()();
             enumHelpers.OptionalAllTypesResult = OptionalAllTypesResultHelpers;
 
             const exports = {

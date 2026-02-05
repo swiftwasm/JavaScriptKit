@@ -35,7 +35,7 @@ export async function createInstantiator(options, swift) {
     let _exports = null;
     let bjs = null;
     const __bjs_createPointHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 tmpParamInts.push((value.x | 0));
                 tmpParamInts.push((value.y | 0));
@@ -134,7 +134,7 @@ export async function createInstantiator(options, swift) {
                 return 0;
             }
             bjs["swift_js_struct_lift_Point"] = function() {
-                const value = structHelpers.Point.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                const value = structHelpers.Point.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
@@ -250,7 +250,7 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const PointHelpers = __bjs_createPointHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
+            const PointHelpers = __bjs_createPointHelpers()();
             structHelpers.Point = PointHelpers;
 
             const exports = {

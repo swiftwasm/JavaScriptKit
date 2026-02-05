@@ -35,7 +35,7 @@ export async function createInstantiator(options, swift) {
     let _exports = null;
     let bjs = null;
     const __bjs_createFooContainerHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 let id;
                 if (value.foo != null) {
@@ -184,7 +184,7 @@ export async function createInstantiator(options, swift) {
                 return 0;
             }
             bjs["swift_js_struct_lift_FooContainer"] = function() {
-                const value = structHelpers.FooContainer.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                const value = structHelpers.FooContainer.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
@@ -298,7 +298,7 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const FooContainerHelpers = __bjs_createFooContainerHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
+            const FooContainerHelpers = __bjs_createFooContainerHelpers()();
             structHelpers.FooContainer = FooContainerHelpers;
 
             const exports = {

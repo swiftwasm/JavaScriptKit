@@ -478,7 +478,7 @@ public struct BridgeJSLink {
                         printer.write("bjs[\"swift_js_struct_lift_\(structDef.name)\"] = function() {")
                         printer.indent {
                             printer.write(
-                                "const value = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lift(\(JSGlueVariableScope.reservedTmpRetStrings), \(JSGlueVariableScope.reservedTmpRetInts), \(JSGlueVariableScope.reservedTmpRetF32s), \(JSGlueVariableScope.reservedTmpRetF64s), \(JSGlueVariableScope.reservedTmpRetPointers));"
+                                "const value = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lift();"
                             )
                             printer.write("return \(JSGlueVariableScope.reservedSwift).memory.retain(value);")
                         }
@@ -1162,7 +1162,7 @@ public struct BridgeJSLink {
         for skeleton in skeletons.compactMap(\.exported) {
             for enumDef in skeleton.enums where enumDef.enumType == .associatedValue {
                 printer.write(
-                    "const \(enumDef.name)Helpers = __bjs_create\(enumDef.valuesName)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTmpParamPointers), \(JSGlueVariableScope.reservedTmpRetPointers), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift), \(JSGlueVariableScope.reservedStructHelpers), \(JSGlueVariableScope.reservedEnumHelpers));"
+                    "const \(enumDef.name)Helpers = __bjs_create\(enumDef.valuesName)Helpers()();"
                 )
                 printer.write("\(JSGlueVariableScope.reservedEnumHelpers).\(enumDef.name) = \(enumDef.name)Helpers;")
                 printer.nextLine()
@@ -1178,7 +1178,7 @@ public struct BridgeJSLink {
         for skeleton in skeletons.compactMap(\.exported) {
             for structDef in skeleton.structs {
                 printer.write(
-                    "const \(structDef.name)Helpers = __bjs_create\(structDef.name)Helpers()(\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTmpParamPointers), \(JSGlueVariableScope.reservedTmpRetPointers), \(JSGlueVariableScope.reservedTextEncoder), \(JSGlueVariableScope.reservedSwift), \(JSGlueVariableScope.reservedEnumHelpers));"
+                    "const \(structDef.name)Helpers = __bjs_create\(structDef.name)Helpers()();"
                 )
                 printer.write(
                     "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.name) = \(structDef.name)Helpers;"

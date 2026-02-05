@@ -65,7 +65,7 @@ export async function createInstantiator(options, swift) {
     let _exports = null;
     let bjs = null;
     const __bjs_createAPIResultValuesHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 const enumTag = value.tag;
                 switch (enumTag) {
@@ -926,7 +926,7 @@ export async function createInstantiator(options, swift) {
                     return bjs["lower_closure_TestModule_10TestModuleSq9DirectionO_SS"](ret);
                 }
             }
-            const APIResultHelpers = __bjs_createAPIResultValuesHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, structHelpers, enumHelpers);
+            const APIResultHelpers = __bjs_createAPIResultValuesHelpers()();
             enumHelpers.APIResult = APIResultHelpers;
 
             const exports = {
