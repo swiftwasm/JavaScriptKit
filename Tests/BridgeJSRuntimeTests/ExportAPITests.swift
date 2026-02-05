@@ -52,6 +52,14 @@ func runJsWorks() -> Void
     return v
 }
 
+@JS func roundTripDictionaryExport(v: [String: Int]) -> [String: Int] {
+    return v
+}
+
+@JS func roundTripOptionalDictionaryExport(v: [String: String]?) -> [String: String]? {
+    return v
+}
+
 @JS func roundTripJSValue(v: JSValue) -> JSValue {
     return v
 }

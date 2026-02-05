@@ -64,6 +64,30 @@ export async function setupOptions(options, context) {
                 "jsRoundTripString": (v) => {
                     return v;
                 },
+                "jsRoundTripDictionary": (dict) => {
+                    return { ...dict };
+                },
+                "jsRoundTripDictionaryBool": (dict) => {
+                    return { ...dict };
+                },
+                "jsRoundTripDictionaryDouble": (dict) => {
+                    return { ...dict };
+                },
+                "jsRoundTripDictionaryJSObject": (dict) => {
+                    return dict;
+                },
+                "jsRoundTripDictionaryJSValue": (dict) => {
+                    return dict;
+                },
+                "jsRoundTripNestedDictionary": (dict) => {
+                    return Object.fromEntries(Object.entries(dict).map(([k, v]) => [k, [...v]]));
+                },
+                "jsRoundTripOptionalDictionary": (dict) => {
+                    return dict ?? null;
+                },
+                "jsRoundTripUndefinedDictionary": (dict) => {
+                    return dict;
+                },
                 "jsRoundTripOptionalNumberNull": (v) => {
                     return v ?? null;
                 },
@@ -279,6 +303,11 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     ]) {
         assert.equal(exports.roundTripString(v), v);
     }
+    const dict = { a: 1, b: 2 };
+    assert.deepEqual(exports.roundTripDictionaryExport(dict), dict);
+    const optDict = { hello: "world" };
+    assert.deepEqual(exports.roundTripOptionalDictionaryExport(optDict), optDict);
+    assert.equal(exports.roundTripOptionalDictionaryExport(null), null);
     const arrayStruct = { ints: [1, 2, 3], optStrings: ["a", "b"] };
     const arrayStructRoundTrip = exports.roundTripArrayMembers(arrayStruct);
     assert.deepEqual(arrayStructRoundTrip.ints, [1, 2, 3]);

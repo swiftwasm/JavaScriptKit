@@ -2375,3 +2375,122 @@ extension Array: _BridgedSwiftStackType where Element: _BridgedSwiftStackType, E
         bridgeJSLowerReturn()
     }
 }
+
+// MARK: - Dictionary Support
+
+public protocol _BridgedSwiftDictionaryStackType: _BridgedSwiftTypeLoweredIntoVoidType {
+    associatedtype DictionaryValue: _BridgedSwiftStackType
+    where DictionaryValue.StackLiftResult == DictionaryValue
+}
+
+extension Dictionary: _BridgedSwiftStackType
+where Key == String, Value: _BridgedSwiftStackType, Value.StackLiftResult == Value {
+    public typealias StackLiftResult = [String: Value]
+    // Lowering/return use stack-based encoding, so dictionary also behaves like a void-lowered type.
+    // Optional/JSUndefinedOr wrappers rely on this conformance to push an isSome flag and
+    // then delegate to the stack-based lowering defined below.
+    // swiftlint:disable:next type_name
+}
+
+extension Dictionary: _BridgedSwiftTypeLoweredIntoVoidType, _BridgedSwiftDictionaryStackType
+where Key == String, Value: _BridgedSwiftStackType, Value.StackLiftResult == Value {
+    public typealias DictionaryValue = Value
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> [String: Value] {
+        let count = Int(_swift_js_pop_i32())
+        var result: [String: Value] = [:]
+        result.reserveCapacity(count)
+        for _ in 0..<count {
+            let value = Value.bridgeJSLiftParameter()
+            let key = String.bridgeJSLiftParameter()
+            result[key] = value
+        }
+        return result
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> [String: Value] {
+        bridgeJSLiftParameter()
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerStackReturn() {
+        bridgeJSLowerReturn()
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() {
+        let count = Int32(self.count)
+        for (key, value) in self {
+            key.bridgeJSLowerStackReturn()
+            value.bridgeJSLowerStackReturn()
+        }
+        _swift_js_push_i32(count)
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() {
+        bridgeJSLowerReturn()
+    }
+}
+
+extension Optional where Wrapped: _BridgedSwiftDictionaryStackType {
+    typealias DictionaryValue = Wrapped.DictionaryValue
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch consume self {
+        case .none:
+            return 0
+        case .some(let dict):
+            dict.bridgeJSLowerReturn()
+            return 1
+        }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() {
+        switch consume self {
+        case .none:
+            _swift_js_push_i32(0)
+        case .some(let dict):
+            dict.bridgeJSLowerReturn()
+            _swift_js_push_i32(1)
+        }
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32) -> [String: Wrapped.DictionaryValue]? {
+        if isSome == 0 {
+            return nil
+        }
+        return Dictionary<String, Wrapped.DictionaryValue>.bridgeJSLiftParameter()
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> [String: Wrapped.DictionaryValue]? {
+        bridgeJSLiftParameter(_swift_js_pop_i32())
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> [String: Wrapped.DictionaryValue]? {
+        let isSome = _swift_js_pop_i32()
+        if isSome == 0 {
+            return nil
+        }
+        return Dictionary<String, Wrapped.DictionaryValue>.bridgeJSLiftParameter()
+    }
+}
+
+extension _BridgedAsOptional where Wrapped: _BridgedSwiftDictionaryStackType {
+    typealias DictionaryValue = Wrapped.DictionaryValue
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+        let opt = optionalRepresentation
+        if let dict = opt {
+            dict.bridgeJSLowerReturn()
+            return 1
+        }
+        return 0
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> Self {
+        let isSome = _swift_js_pop_i32()
+        if isSome == 0 {
+            return Self(optional: nil)
+        }
+        let value = Dictionary<String, Wrapped.DictionaryValue>.bridgeJSLiftParameter() as! Wrapped
+        return Self(optional: value)
+    }
+}

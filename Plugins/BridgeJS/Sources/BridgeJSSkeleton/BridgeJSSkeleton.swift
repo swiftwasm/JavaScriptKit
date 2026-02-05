@@ -153,6 +153,7 @@ public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case unsafePointer(UnsafePointerType)
     indirect case nullable(BridgeType, JSOptionalKind)
     indirect case array(BridgeType)
+    indirect case dictionary(BridgeType)
     case caseEnum(String)
     case rawValueEnum(String, SwiftEnumRawType)
     case associatedValueEnum(String)
@@ -959,6 +960,9 @@ extension BridgeType {
         case .array:
             // Arrays use stack-based return with length prefix (no direct WASM return type)
             return nil
+        case .dictionary:
+            // Dictionaries use stack-based return with entry count (no direct WASM return type)
+            return nil
         }
     }
 
@@ -1024,6 +1028,9 @@ extension BridgeType {
         case .array(let elementType):
             // Array mangling: "Sa" prefix followed by element type
             return "Sa\(elementType.mangleTypeName)"
+        case .dictionary(let valueType):
+            // Dictionary mangling: "SD" prefix followed by value type (key is always String)
+            return "SD\(valueType.mangleTypeName)"
         }
     }
 
