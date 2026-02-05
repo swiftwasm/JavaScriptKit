@@ -46,6 +46,28 @@ import BridgeJSMacros
     @Test func instanceSetter() {
         TestSupport.assertMacroExpansion(
             """
+            @JSClass
+            struct MyClass {
+                @JSSetter
+                func setName(_ name: String) throws(JSException)
+            }
+            """,
+            expandedSource: """
+                @JSClass
+                struct MyClass {
+                    func setName(_ name: String) throws(JSException) {
+                        try _$MyClass_name_set(self.jsObject, name)
+                    }
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
+
+    @Test func instanceSetterRequiresJSClass() {
+        TestSupport.assertMacroExpansion(
+            """
             struct MyClass {
                 @JSSetter
                 func setName(_ name: String) throws(JSException)
@@ -58,6 +80,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "JavaScript members must be declared inside a @JSClass struct.",
+                    line: 2,
+                    column: 5
+                )
+            ],
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth,
         )
@@ -78,6 +107,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "JavaScript members must be declared inside a @JSClass struct.",
+                    line: 2,
+                    column: 5
+                )
+            ],
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth,
         )
@@ -98,6 +134,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "JavaScript members must be declared inside a @JSClass struct.",
+                    line: 2,
+                    column: 5
+                )
+            ],
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth,
         )
@@ -106,12 +149,14 @@ import BridgeJSMacros
     @Test func enumSetter() {
         TestSupport.assertMacroExpansion(
             """
+            @JSClass
             enum MyEnum {
                 @JSSetter
                 func setValue(_ value: Int) throws(JSException)
             }
             """,
             expandedSource: """
+                @JSClass
                 enum MyEnum {
                     func setValue(_ value: Int) throws(JSException) {
                         try _$MyEnum_value_set(self.jsObject, value)
@@ -126,12 +171,14 @@ import BridgeJSMacros
     @Test func actorSetter() {
         TestSupport.assertMacroExpansion(
             """
+            @JSClass
             actor MyActor {
                 @JSSetter
                 func setState(_ state: String) throws(JSException)
             }
             """,
             expandedSource: """
+                @JSClass
                 actor MyActor {
                     func setState(_ state: String) throws(JSException) {
                         try _$MyActor_state_set(self.jsObject, state)
@@ -177,7 +224,17 @@ import BridgeJSMacros
                     message:
                         "@JSSetter function name must start with 'set' followed by a property name (e.g., 'setFoo').",
                     line: 1,
-                    column: 1
+                    column: 1,
+                    notes: [
+                        NoteSpec(
+                            message: "Setter names must start with 'set' followed by the property name.",
+                            line: 2,
+                            column: 6
+                        )
+                    ],
+                    fixIts: [
+                        FixItSpec(message: "Rename setter to 'setFoo'")
+                    ]
                 )
             ],
             macroSpecs: macroSpecs,
@@ -201,7 +258,17 @@ import BridgeJSMacros
                     message:
                         "@JSSetter function name must start with 'set' followed by a property name (e.g., 'setFoo').",
                     line: 1,
-                    column: 1
+                    column: 1,
+                    notes: [
+                        NoteSpec(
+                            message: "Setter names must start with 'set' followed by the property name.",
+                            line: 2,
+                            column: 6
+                        )
+                    ],
+                    fixIts: [
+                        FixItSpec(message: "Rename setter to 'setFoo'")
+                    ]
                 )
             ],
             macroSpecs: macroSpecs,
@@ -224,9 +291,116 @@ import BridgeJSMacros
                 DiagnosticSpec(
                     message: "@JSSetter function must have at least one parameter.",
                     line: 1,
-                    column: 1
+                    column: 1,
+                    notes: [
+                        NoteSpec(
+                            message: "@JSSetter needs a parameter for the value being assigned.",
+                            line: 1,
+                            column: 1
+                        )
+                    ],
+                    fixIts: [
+                        FixItSpec(message: "Add a value parameter to the setter")
+                    ]
                 )
             ],
+            macroSpecs: macroSpecs,
+            applyFixIts: ["Add a value parameter to the setter"],
+            fixedSource: """
+                @JSSetter
+                func setFoo(_ value: <#Type#>) throws(JSException)
+                """,
+            indentationWidth: indentationWidth,
+        )
+    }
+
+    @Test func setterMissingThrows() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSSetter
+            func setFoo(_ value: Foo)
+            """,
+            expandedSource: """
+                func setFoo(_ value: Foo) {
+                    try _$foo_set(value)
+                }
+                """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "@JSSetter function must declare throws(JSException).",
+                    line: 1,
+                    column: 1,
+                    notes: [
+                        NoteSpec(
+                            message: "@JSSetter must propagate JavaScript errors as JSException.",
+                            line: 1,
+                            column: 1
+                        )
+                    ],
+                    fixIts: [
+                        FixItSpec(message: "Declare throws(JSException)")
+                    ]
+                )
+            ],
+            macroSpecs: macroSpecs,
+            applyFixIts: ["Declare throws(JSException)"],
+            fixedSource: """
+                @JSSetter
+                func setFoo(_ value: Foo) throws(JSException)
+                """,
+            indentationWidth: indentationWidth,
+        )
+    }
+
+    @Test func setterThrowsWrongType() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSSetter
+            func setFoo(_ value: Foo) throws(CustomError)
+            """,
+            expandedSource: """
+                func setFoo(_ value: Foo) throws(CustomError) {
+                    try _$foo_set(value)
+                }
+                """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "@JSSetter function must declare throws(JSException).",
+                    line: 1,
+                    column: 1,
+                    notes: [
+                        NoteSpec(
+                            message: "@JSSetter must propagate JavaScript errors as JSException.",
+                            line: 1,
+                            column: 1
+                        )
+                    ],
+                    fixIts: [
+                        FixItSpec(message: "Declare throws(JSException)")
+                    ]
+                )
+            ],
+            macroSpecs: macroSpecs,
+            applyFixIts: ["Declare throws(JSException)"],
+            fixedSource: """
+                @JSSetter
+                func setFoo(_ value: Foo) throws(JSException)
+                """,
+            indentationWidth: indentationWidth,
+        )
+    }
+
+    @Test func setterThrowsErrorAccepted() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSSetter
+            func setFoo(_ value: Foo) throws(Error)
+            """,
+            expandedSource: """
+                func setFoo(_ value: Foo) throws(Error) {
+                    try _$foo_set(value)
+                }
+                """,
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth,
         )
@@ -245,7 +419,14 @@ import BridgeJSMacros
                 DiagnosticSpec(
                     message: "@JSSetter can only be applied to functions.",
                     line: 1,
-                    column: 1
+                    column: 1,
+                    notes: [
+                        NoteSpec(
+                            message: "@JSSetter should be attached to a method that writes a JavaScript property.",
+                            line: 1,
+                            column: 1
+                        )
+                    ]
                 )
             ],
             macroSpecs: macroSpecs,

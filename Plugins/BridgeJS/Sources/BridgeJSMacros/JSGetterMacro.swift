@@ -15,13 +15,30 @@ extension JSGetterMacro: AccessorMacro {
             let binding = variableDecl.bindings.first,
             let identifier = binding.pattern.as(IdentifierPatternSyntax.self)
         else {
-            context.diagnose(Diagnostic(node: Syntax(declaration), message: JSMacroMessage.unsupportedVariable))
+            context.diagnose(
+                Diagnostic(
+                    node: Syntax(declaration),
+                    message: JSMacroMessage.unsupportedVariable,
+                    notes: [
+                        Note(
+                            node: Syntax(declaration),
+                            message: JSMacroNoteMessage(
+                                message: "@JSGetter must be attached to a single stored or computed property."
+                            )
+                        )
+                    ]
+                )
+            )
             return []
         }
 
         let enclosingTypeName = JSMacroHelper.enclosingTypeName(from: context)
         let isStatic = JSMacroHelper.isStatic(variableDecl.modifiers)
-        let isInstanceMember = enclosingTypeName != nil && !isStatic
+        let isTopLevel = enclosingTypeName == nil
+        let isInstanceMember = !isTopLevel && !isStatic
+        if !isTopLevel {
+            JSMacroHelper.diagnoseMissingJSClass(node: node, for: "JSGetter", in: context)
+        }
 
         // Strip backticks from property name (e.g., "`prefix`" -> "prefix")
         // Backticks are only needed for Swift identifiers, not function names
@@ -71,7 +88,20 @@ extension JSGetterMacro: PeerMacro {
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
         guard declaration.is(VariableDeclSyntax.self) else {
-            context.diagnose(Diagnostic(node: Syntax(declaration), message: JSMacroMessage.unsupportedVariable))
+            context.diagnose(
+                Diagnostic(
+                    node: Syntax(declaration),
+                    message: JSMacroMessage.unsupportedVariable,
+                    notes: [
+                        Note(
+                            node: Syntax(declaration),
+                            message: JSMacroNoteMessage(
+                                message: "@JSGetter must be attached to a single stored or computed property."
+                            )
+                        )
+                    ]
+                )
+            )
             return []
         }
         return []

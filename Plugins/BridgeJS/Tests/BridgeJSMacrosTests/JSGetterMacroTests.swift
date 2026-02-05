@@ -50,6 +50,30 @@ import BridgeJSMacros
     @Test func instanceProperty() {
         TestSupport.assertMacroExpansion(
             """
+            @JSClass
+            struct MyClass {
+                @JSGetter
+                var name: String
+            }
+            """,
+            expandedSource: """
+                @JSClass
+                struct MyClass {
+                    var name: String {
+                        get throws(JSException) {
+                            return try _$MyClass_name_get(self.jsObject)
+                        }
+                    }
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
+
+    @Test func instancePropertyRequiresJSClass() {
+        TestSupport.assertMacroExpansion(
+            """
             struct MyClass {
                 @JSGetter
                 var name: String
@@ -64,6 +88,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "JavaScript members must be declared inside a @JSClass struct.",
+                    line: 2,
+                    column: 5
+                )
+            ],
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth,
         )
@@ -72,12 +103,14 @@ import BridgeJSMacros
     @Test func instanceLetProperty() {
         TestSupport.assertMacroExpansion(
             """
+            @JSClass
             struct MyClass {
                 @JSGetter
                 let id: Int
             }
             """,
             expandedSource: """
+                @JSClass
                 struct MyClass {
                     let id: Int {
                         get throws(JSException) {
@@ -108,6 +141,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "JavaScript members must be declared inside a @JSClass struct.",
+                    line: 2,
+                    column: 5
+                )
+            ],
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth,
         )
@@ -130,6 +170,13 @@ import BridgeJSMacros
                     }
                 }
                 """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "JavaScript members must be declared inside a @JSClass struct.",
+                    line: 2,
+                    column: 5
+                )
+            ],
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth,
         )
@@ -138,12 +185,14 @@ import BridgeJSMacros
     @Test func enumProperty() {
         TestSupport.assertMacroExpansion(
             """
+            @JSClass
             enum MyEnum {
                 @JSGetter
                 var value: Int
             }
             """,
             expandedSource: """
+                @JSClass
                 enum MyEnum {
                     var value: Int {
                         get throws(JSException) {
@@ -160,12 +209,14 @@ import BridgeJSMacros
     @Test func actorProperty() {
         TestSupport.assertMacroExpansion(
             """
+            @JSClass
             actor MyActor {
                 @JSGetter
                 var state: String
             }
             """,
             expandedSource: """
+                @JSClass
                 actor MyActor {
                     var state: String {
                         get throws(JSException) {
@@ -262,7 +313,14 @@ import BridgeJSMacros
                     message: "@JSGetter can only be applied to single-variable declarations.",
                     line: 1,
                     column: 1,
-                    severity: .error
+                    severity: .error,
+                    notes: [
+                        NoteSpec(
+                            message: "@JSGetter must be attached to a single stored or computed property.",
+                            line: 1,
+                            column: 1
+                        )
+                    ]
                 )
             ],
             macroSpecs: macroSpecs,

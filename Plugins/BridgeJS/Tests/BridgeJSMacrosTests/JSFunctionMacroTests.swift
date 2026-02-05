@@ -15,13 +15,40 @@ import BridgeJSMacros
         TestSupport.assertMacroExpansion(
             """
             @JSFunction
-            func greet(name: String) -> String
+            func greet(name: String) throws(JSException) -> String
             """,
             expandedSource: """
-                func greet(name: String) -> String {
-                    return _$greet(name)
+                func greet(name: String) throws(JSException) -> String {
+                    return try _$greet(name)
                 }
                 """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
+
+    @Test func instanceMethodRequiresJSClass() {
+        TestSupport.assertMacroExpansion(
+            """
+            struct MyClass {
+                @JSFunction
+                func getName() throws(JSException) -> String
+            }
+            """,
+            expandedSource: """
+                struct MyClass {
+                    func getName() throws(JSException) -> String {
+                        return try _$MyClass_getName(self.jsObject)
+                    }
+                }
+                """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "JavaScript members must be declared inside a @JSClass struct.",
+                    line: 2,
+                    column: 5
+                )
+            ],
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth,
         )
@@ -31,11 +58,11 @@ import BridgeJSMacros
         TestSupport.assertMacroExpansion(
             """
             @JSFunction
-            func log(message: String)
+            func log(message: String) throws(JSException)
             """,
             expandedSource: """
-                func log(message: String) {
-                    _$log(message)
+                func log(message: String) throws(JSException) {
+                    try _$log(message)
                 }
                 """,
             macroSpecs: macroSpecs,
@@ -47,11 +74,11 @@ import BridgeJSMacros
         TestSupport.assertMacroExpansion(
             """
             @JSFunction
-            func log(message: String) -> Void
+            func log(message: String) throws(JSException) -> Void
             """,
             expandedSource: """
-                func log(message: String) -> Void {
-                    _$log(message)
+                func log(message: String) throws(JSException) -> Void {
+                    try _$log(message)
                 }
                 """,
             macroSpecs: macroSpecs,
@@ -63,11 +90,11 @@ import BridgeJSMacros
         TestSupport.assertMacroExpansion(
             """
             @JSFunction
-            func log(message: String) -> ()
+            func log(message: String) throws(JSException) -> ()
             """,
             expandedSource: """
-                func log(message: String) -> () {
-                    _$log(message)
+                func log(message: String) throws(JSException) -> () {
+                    try _$log(message)
                 }
                 """,
             macroSpecs: macroSpecs,
@@ -76,6 +103,22 @@ import BridgeJSMacros
     }
 
     @Test func topLevelFunctionThrows() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSFunction
+            func parse(json: String) throws(JSException) -> [String: Any]
+            """,
+            expandedSource: """
+                func parse(json: String) throws(JSException) -> [String: Any] {
+                    return try _$parse(json)
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
+
+    @Test func topLevelFunctionThrowsMissingType() {
         TestSupport.assertMacroExpansion(
             """
             @JSFunction
@@ -91,15 +134,92 @@ import BridgeJSMacros
         )
     }
 
+    @Test func topLevelFunctionThrowsWrongType() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSFunction
+            func parse(json: String) throws(CustomError) -> [String: Any]
+            """,
+            expandedSource: """
+                func parse(json: String) throws(CustomError) -> [String: Any] {
+                    return try _$parse(json)
+                }
+                """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "@JSFunction throws must be declared as throws(JSException).",
+                    line: 1,
+                    column: 1,
+                    severity: .error,
+                    notes: [
+                        NoteSpec(
+                            message: "@JSFunction must propagate JavaScript errors as JSException.",
+                            line: 1,
+                            column: 1
+                        )
+                    ],
+                    fixIts: [
+                        FixItSpec(message: "Declare throws(JSException)")
+                    ]
+                )
+            ],
+            macroSpecs: macroSpecs,
+            applyFixIts: ["Declare throws(JSException)"],
+            fixedSource: """
+                @JSFunction
+                func parse(json: String) throws(JSException) -> [String: Any]
+                """,
+            indentationWidth: indentationWidth,
+        )
+    }
+
+    @Test func topLevelFunctionMissingThrowsClause() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSFunction
+            func greet(name: String) -> String
+            """,
+            expandedSource: """
+                func greet(name: String) -> String {
+                    return try _$greet(name)
+                }
+                """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "@JSFunction throws must be declared as throws(JSException).",
+                    line: 1,
+                    column: 1,
+                    notes: [
+                        NoteSpec(
+                            message: "@JSFunction must propagate JavaScript errors as JSException.",
+                            line: 1,
+                            column: 1
+                        )
+                    ],
+                    fixIts: [
+                        FixItSpec(message: "Declare throws(JSException)")
+                    ]
+                )
+            ],
+            macroSpecs: macroSpecs,
+            applyFixIts: ["Declare throws(JSException)"],
+            fixedSource: """
+                @JSFunction
+                func greet(name: String) throws(JSException) -> String
+                """,
+            indentationWidth: indentationWidth,
+        )
+    }
+
     @Test func topLevelFunctionAsync() {
         TestSupport.assertMacroExpansion(
             """
             @JSFunction
-            func fetch(url: String) async -> String
+            func fetch(url: String) async throws(JSException) -> String
             """,
             expandedSource: """
-                func fetch(url: String) async -> String {
-                    return await _$fetch(url)
+                func fetch(url: String) async throws(JSException) -> String {
+                    return try await _$fetch(url)
                 }
                 """,
             macroSpecs: macroSpecs,
@@ -111,10 +231,10 @@ import BridgeJSMacros
         TestSupport.assertMacroExpansion(
             """
             @JSFunction
-            func fetch(url: String) async throws -> String
+            func fetch(url: String) async throws(JSException) -> String
             """,
             expandedSource: """
-                func fetch(url: String) async throws -> String {
+                func fetch(url: String) async throws(JSException) -> String {
                     return try await _$fetch(url)
                 }
                 """,
@@ -127,11 +247,11 @@ import BridgeJSMacros
         TestSupport.assertMacroExpansion(
             """
             @JSFunction
-            func process(_ value: Int) -> Int
+            func process(_ value: Int) throws(JSException) -> Int
             """,
             expandedSource: """
-                func process(_ value: Int) -> Int {
-                    return _$process(value)
+                func process(_ value: Int) throws(JSException) -> Int {
+                    return try _$process(value)
                 }
                 """,
             macroSpecs: macroSpecs,
@@ -143,11 +263,11 @@ import BridgeJSMacros
         TestSupport.assertMacroExpansion(
             """
             @JSFunction
-            func add(a: Int, b: Int) -> Int
+            func add(a: Int, b: Int) throws(JSException) -> Int
             """,
             expandedSource: """
-                func add(a: Int, b: Int) -> Int {
-                    return _$add(a, b)
+                func add(a: Int, b: Int) throws(JSException) -> Int {
+                    return try _$add(a, b)
                 }
                 """,
             macroSpecs: macroSpecs,
@@ -158,15 +278,17 @@ import BridgeJSMacros
     @Test func instanceMethod() {
         TestSupport.assertMacroExpansion(
             """
+            @JSClass
             struct MyClass {
                 @JSFunction
-                func getName() -> String
+                func getName() throws(JSException) -> String
             }
             """,
             expandedSource: """
+                @JSClass
                 struct MyClass {
-                    func getName() -> String {
-                        return _$MyClass_getName(self.jsObject)
+                    func getName() throws(JSException) -> String {
+                        return try _$MyClass_getName(self.jsObject)
                     }
                 }
                 """,
@@ -180,16 +302,23 @@ import BridgeJSMacros
             """
             struct MyClass {
                 @JSFunction
-                static func create() -> MyClass
+                static func create() throws(JSException) -> MyClass
             }
             """,
             expandedSource: """
                 struct MyClass {
-                    static func create() -> MyClass {
-                        return _$MyClass_create()
+                    static func create() throws(JSException) -> MyClass {
+                        return try _$MyClass_create()
                     }
                 }
                 """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "JavaScript members must be declared inside a @JSClass struct.",
+                    line: 2,
+                    column: 5
+                )
+            ],
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth,
         )
@@ -200,16 +329,23 @@ import BridgeJSMacros
             """
             class MyClass {
                 @JSFunction
-                class func create() -> MyClass
+                class func create() throws(JSException) -> MyClass
             }
             """,
             expandedSource: """
                 class MyClass {
-                    class func create() -> MyClass {
-                        return _$MyClass_create()
+                    class func create() throws(JSException) -> MyClass {
+                        return try _$MyClass_create()
                     }
                 }
                 """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "JavaScript members must be declared inside a @JSClass struct.",
+                    line: 2,
+                    column: 5
+                )
+            ],
             macroSpecs: macroSpecs,
             indentationWidth: indentationWidth,
         )
@@ -218,15 +354,17 @@ import BridgeJSMacros
     @Test func initializer() {
         TestSupport.assertMacroExpansion(
             """
+            @JSClass
             struct MyClass {
                 @JSFunction
-                init(name: String)
+                init(name: String) throws(JSException)
             }
             """,
             expandedSource: """
+                @JSClass
                 struct MyClass {
-                    init(name: String) {
-                        let jsObject = _$MyClass_init(name)
+                    init(name: String) throws(JSException) {
+                        let jsObject = try _$MyClass_init(name)
                         self.init(unsafelyWrapping: jsObject)
                     }
                 }
@@ -239,14 +377,16 @@ import BridgeJSMacros
     @Test func initializerThrows() {
         TestSupport.assertMacroExpansion(
             """
+            @JSClass
             struct MyClass {
                 @JSFunction
-                init(name: String) throws
+                init(name: String) throws(JSException)
             }
             """,
             expandedSource: """
+                @JSClass
                 struct MyClass {
-                    init(name: String) throws {
+                    init(name: String) throws(JSException) {
                         let jsObject = try _$MyClass_init(name)
                         self.init(unsafelyWrapping: jsObject)
                     }
@@ -260,14 +400,16 @@ import BridgeJSMacros
     @Test func initializerAsyncThrows() {
         TestSupport.assertMacroExpansion(
             """
+            @JSClass
             struct MyClass {
                 @JSFunction
-                init(name: String) async throws
+                init(name: String) async throws(JSException)
             }
             """,
             expandedSource: """
+                @JSClass
                 struct MyClass {
-                    init(name: String) async throws {
+                    init(name: String) async throws(JSException) {
                         let jsObject = try await _$MyClass_init(name)
                         self.init(unsafelyWrapping: jsObject)
                     }
@@ -293,7 +435,14 @@ import BridgeJSMacros
                 DiagnosticSpec(
                     message: "@JSFunction can only be applied to functions or initializers.",
                     line: 1,
-                    column: 1
+                    column: 1,
+                    notes: [
+                        NoteSpec(
+                            message: "Move this initializer inside a JS wrapper type annotated with @JSClass.",
+                            line: 1,
+                            column: 1
+                        )
+                    ]
                 )
             ],
             macroSpecs: macroSpecs,
@@ -314,7 +463,15 @@ import BridgeJSMacros
                 DiagnosticSpec(
                     message: "@JSFunction can only be applied to functions or initializers.",
                     line: 1,
-                    column: 1
+                    column: 1,
+                    notes: [
+                        NoteSpec(
+                            message:
+                                "Place @JSFunction on a function or initializer; use @JSGetter/@JSSetter for properties.",
+                            line: 1,
+                            column: 1
+                        )
+                    ]
                 )
             ],
             macroSpecs: macroSpecs,
@@ -325,15 +482,17 @@ import BridgeJSMacros
     @Test func enumInstanceMethod() {
         TestSupport.assertMacroExpansion(
             """
+            @JSClass
             enum MyEnum {
                 @JSFunction
-                func getValue() -> Int
+                func getValue() throws(JSException) -> Int
             }
             """,
             expandedSource: """
+                @JSClass
                 enum MyEnum {
-                    func getValue() -> Int {
-                        return _$MyEnum_getValue(self.jsObject)
+                    func getValue() throws(JSException) -> Int {
+                        return try _$MyEnum_getValue(self.jsObject)
                     }
                 }
                 """,
@@ -345,15 +504,17 @@ import BridgeJSMacros
     @Test func actorInstanceMethod() {
         TestSupport.assertMacroExpansion(
             """
+            @JSClass
             actor MyActor {
                 @JSFunction
-                func getValue() -> Int
+                func getValue() throws(JSException) -> Int
             }
             """,
             expandedSource: """
+                @JSClass
                 actor MyActor {
-                    func getValue() -> Int {
-                        return _$MyActor_getValue(self.jsObject)
+                    func getValue() throws(JSException) -> Int {
+                        return try _$MyActor_getValue(self.jsObject)
                     }
                 }
                 """,
@@ -366,13 +527,13 @@ import BridgeJSMacros
         TestSupport.assertMacroExpansion(
             """
             @JSFunction
-            func greet(name: String) -> String {
+            func greet(name: String) throws(JSException) -> String {
                 return "Hello, \\(name)"
             }
             """,
             expandedSource: """
-                func greet(name: String) -> String {
-                    return _$greet(name)
+                func greet(name: String) throws(JSException) -> String {
+                    return try _$greet(name)
                 }
                 """,
             macroSpecs: macroSpecs,
