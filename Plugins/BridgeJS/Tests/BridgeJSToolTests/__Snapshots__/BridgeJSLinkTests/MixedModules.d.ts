@@ -12,7 +12,7 @@ declare global {
             constructor();
             greet(): string;
         }
-        globalFunction(): string;
+        function globalFunction(): string;
     }
 }
 

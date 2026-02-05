@@ -3094,7 +3094,7 @@ extension BridgeJSLink {
                         let sortedFunctions = childNode.content.functions.sorted { $0.name < $1.name }
                         for function in sortedFunctions {
                             let signature =
-                                "\(function.name)\(renderTSSignatureCallback(function.parameters, function.returnType, function.effects));"
+                                "function \(function.name)\(renderTSSignatureCallback(function.parameters, function.returnType, function.effects));"
                             printer.write(signature)
                         }
                         let sortedProperties = childNode.content.staticProperties.sorted { $0.name < $1.name }

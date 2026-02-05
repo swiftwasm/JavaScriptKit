@@ -140,7 +140,7 @@ Generated TypeScript definitions:
 declare global {
     namespace Utils {
         namespace String {
-            uppercase(text: string): string;
+            function uppercase(text: string): string;
         }
     }
 }
