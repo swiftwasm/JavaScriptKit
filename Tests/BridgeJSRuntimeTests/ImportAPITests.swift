@@ -73,6 +73,32 @@ class ImportAPITests: XCTestCase {
         }
     }
 
+    func testRoundTripJSValueArray() throws {
+        let object = JSObject.global
+        let symbol = JSSymbol("array")
+        let bigInt = JSBigInt(_slowBridge: Int64(42))
+        let values: [JSValue] = [
+            .boolean(false),
+            .number(123.5),
+            .string(JSString("hello")),
+            .object(object),
+            .null,
+            .undefined,
+            .symbol(symbol),
+            .bigInt(bigInt),
+        ]
+        let roundTripped = try jsRoundTripJSValueArray(values)
+        XCTAssertEqual(roundTripped, values)
+        XCTAssertEqual(try jsRoundTripJSValueArray([]), [])
+    }
+
+    func testRoundTripOptionalJSValueArray() throws {
+        XCTAssertNil(try jsRoundTripOptionalJSValueArray(nil))
+        let values: [JSValue] = [.number(1), .undefined, .null]
+        let result = try jsRoundTripOptionalJSValueArray(values)
+        XCTAssertEqual(result, values)
+    }
+
     func testRoundTripFeatureFlag() throws {
         for v in [FeatureFlag.foo, .bar] {
             try XCTAssertEqual(jsRoundTripFeatureFlag(v), v)

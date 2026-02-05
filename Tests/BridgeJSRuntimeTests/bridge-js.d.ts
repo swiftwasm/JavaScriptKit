@@ -6,6 +6,8 @@ export function jsRoundTripOptionalNumberNull(v: number | null): number | null
 export function jsRoundTripOptionalNumberUndefined(v: number | undefined): number | undefined
 export type JSValue = any
 export function jsRoundTripJSValue(v: JSValue): JSValue
+export function jsRoundTripJSValueArray(v: JSValue[]): JSValue[]
+export function jsRoundTripOptionalJSValueArray(v: JSValue[] | null): JSValue[] | null
 export function jsThrowOrVoid(shouldThrow: boolean): void
 export function jsThrowOrNumber(shouldThrow: boolean): number
 export function jsThrowOrBool(shouldThrow: boolean): boolean

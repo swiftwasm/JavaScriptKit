@@ -1029,6 +1029,20 @@ struct IntrinsicJSFragment: Sendable {
                         printer.write("\(JSGlueVariableScope.reservedTmpRetF64s).push(\(payload2Var));")
                     }
                     printer.write("\(JSGlueVariableScope.reservedTmpRetInts).push(\(isSomeVar) ? 1 : 0);")
+                case .array(let elementType):
+                    printer.write("if (\(isSomeVar)) {")
+                    printer.indent {
+                        let arrayLowerFragment = try! arrayLower(elementType: elementType)
+                        let arrayCleanup = CodeFragmentPrinter()
+                        let _ = arrayLowerFragment.printCode([value], scope, printer, arrayCleanup)
+                        if !arrayCleanup.lines.isEmpty {
+                            for line in arrayCleanup.lines {
+                                printer.write(line)
+                            }
+                        }
+                    }
+                    printer.write("}")
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
                 case .rawValueEnum(_, let rawType):
                     switch rawType {
                     case .string:

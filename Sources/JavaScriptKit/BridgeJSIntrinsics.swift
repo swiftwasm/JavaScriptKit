@@ -1394,6 +1394,50 @@ extension Optional where Wrapped == JSValue {
     }
 }
 
+extension Optional where Wrapped == [JSValue] {
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        switch consume self {
+        case .none:
+            return 0
+        case .some(let array):
+            array.bridgeJSLowerReturn()
+            return 1
+        }
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32) -> [JSValue]? {
+        if isSome == 0 {
+            return nil
+        }
+        return [JSValue].bridgeJSLiftParameter()
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> [JSValue]? {
+        let isSome = _swift_js_pop_i32()
+        return bridgeJSLiftParameter(isSome)
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> [JSValue]? {
+        let isSome = _swift_js_pop_i32()
+        if isSome == 0 {
+            return nil
+        }
+        return [JSValue].bridgeJSLiftReturn()
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        switch consume self {
+        case .none:
+            _swift_js_push_i32(0)
+        case .some(let array):
+            array.bridgeJSLowerReturn()
+            _swift_js_push_i32(1)
+        }
+    }
+}
+
 extension Optional where Wrapped: _BridgedSwiftProtocolWrapper {
     // MARK: ExportSwift
 
