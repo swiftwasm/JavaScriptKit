@@ -29,16 +29,12 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tmpRetTag = [];
-    let tmpRetStrings = [];
-    let tmpRetInts = [];
-    let tmpRetF32s = [];
-    let tmpRetF64s = [];
-    let tmpParamInts = [];
-    let tmpParamF32s = [];
-    let tmpParamF64s = [];
-    let tmpRetPointers = [];
-    let tmpParamPointers = [];
+    let tagStack = [];
+    let strStack = [];
+    let i32Stack = [];
+    let f32Stack = [];
+    let f64Stack = [];
+    let ptrStack = [];
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
@@ -53,15 +49,15 @@ export async function createInstantiator(options, swift) {
                     case APIResultValues.Tag.Success: {
                         const bytes = textEncoder.encode(value.param0);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         const cleanup = () => {
                             swift.memory.release(id);
                         };
                         return { caseId: APIResultValues.Tag.Success, cleanup };
                     }
                     case APIResultValues.Tag.Failure: {
-                        tmpParamInts.push((value.param0 | 0));
+                        i32Stack.push((value.param0 | 0));
                         const cleanup = undefined;
                         return { caseId: APIResultValues.Tag.Failure, cleanup };
                     }
@@ -72,11 +68,11 @@ export async function createInstantiator(options, swift) {
                 tag = tag | 0;
                 switch (tag) {
                     case APIResultValues.Tag.Success: {
-                        const string = tmpRetStrings.pop();
+                        const string = strStack.pop();
                         return { tag: APIResultValues.Tag.Success, param0: string };
                     }
                     case APIResultValues.Tag.Failure: {
-                        const int = tmpRetInts.pop();
+                        const int = i32Stack.pop();
                         return { tag: APIResultValues.Tag.Failure, param0: int };
                     }
                     default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
@@ -120,36 +116,36 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
             bjs["swift_js_push_tag"] = function(tag) {
-                tmpRetTag.push(tag);
+                tagStack.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
-                tmpRetInts.push(v | 0);
+                i32Stack.push(v | 0);
             }
             bjs["swift_js_push_f32"] = function(v) {
-                tmpRetF32s.push(Math.fround(v));
+                f32Stack.push(Math.fround(v));
             }
             bjs["swift_js_push_f64"] = function(v) {
-                tmpRetF64s.push(v);
+                f64Stack.push(v);
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 const value = textDecoder.decode(bytes);
-                tmpRetStrings.push(value);
+                strStack.push(value);
             }
             bjs["swift_js_pop_i32"] = function() {
-                return tmpParamInts.pop();
+                return i32Stack.pop();
             }
             bjs["swift_js_pop_f32"] = function() {
-                return tmpParamF32s.pop();
+                return f32Stack.pop();
             }
             bjs["swift_js_pop_f64"] = function() {
-                return tmpParamF64s.pop();
+                return f64Stack.pop();
             }
             bjs["swift_js_push_pointer"] = function(pointer) {
-                tmpRetPointers.push(pointer);
+                ptrStack.push(pointer);
             }
             bjs["swift_js_pop_pointer"] = function() {
-                return tmpParamPointers.pop();
+                return ptrStack.pop();
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }
@@ -329,7 +325,7 @@ export async function createInstantiator(options, swift) {
                     roundtrip: function(value) {
                         const { caseId: valueCaseId, cleanup: valueCleanup } = enumHelpers.APIResult.lower(value);
                         instance.exports.bjs_APIResult_static_roundtrip(valueCaseId);
-                        const ret = enumHelpers.APIResult.lift(tmpRetTag.pop());
+                        const ret = enumHelpers.APIResult.lift(tagStack.pop());
                         if (valueCleanup) { valueCleanup(); }
                         return ret;
                     }

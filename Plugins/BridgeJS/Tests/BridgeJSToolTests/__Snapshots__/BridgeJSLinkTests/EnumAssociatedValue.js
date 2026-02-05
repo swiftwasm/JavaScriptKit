@@ -99,16 +99,12 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tmpRetTag = [];
-    let tmpRetStrings = [];
-    let tmpRetInts = [];
-    let tmpRetF32s = [];
-    let tmpRetF64s = [];
-    let tmpParamInts = [];
-    let tmpParamF32s = [];
-    let tmpParamF64s = [];
-    let tmpRetPointers = [];
-    let tmpParamPointers = [];
+    let tagStack = [];
+    let strStack = [];
+    let i32Stack = [];
+    let f32Stack = [];
+    let f64Stack = [];
+    let ptrStack = [];
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
@@ -118,13 +114,13 @@ export async function createInstantiator(options, swift) {
     const __bjs_createPointHelpers = () => {
         return () => ({
             lower: (value) => {
-                tmpParamF64s.push(value.x);
-                tmpParamF64s.push(value.y);
+                f64Stack.push(value.x);
+                f64Stack.push(value.y);
                 return { cleanup: undefined };
             },
             lift: () => {
-                const f64 = tmpRetF64s.pop();
-                const f641 = tmpRetF64s.pop();
+                const f64 = f64Stack.pop();
+                const f641 = f64Stack.pop();
                 return { x: f641, y: f64 };
             }
         });
@@ -137,30 +133,30 @@ export async function createInstantiator(options, swift) {
                     case APIResultValues.Tag.Success: {
                         const bytes = textEncoder.encode(value.param0);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         const cleanup = () => {
                             swift.memory.release(id);
                         };
                         return { caseId: APIResultValues.Tag.Success, cleanup };
                     }
                     case APIResultValues.Tag.Failure: {
-                        tmpParamInts.push((value.param0 | 0));
+                        i32Stack.push((value.param0 | 0));
                         const cleanup = undefined;
                         return { caseId: APIResultValues.Tag.Failure, cleanup };
                     }
                     case APIResultValues.Tag.Flag: {
-                        tmpParamInts.push(value.param0 ? 1 : 0);
+                        i32Stack.push(value.param0 ? 1 : 0);
                         const cleanup = undefined;
                         return { caseId: APIResultValues.Tag.Flag, cleanup };
                     }
                     case APIResultValues.Tag.Rate: {
-                        tmpParamF32s.push(Math.fround(value.param0));
+                        f32Stack.push(Math.fround(value.param0));
                         const cleanup = undefined;
                         return { caseId: APIResultValues.Tag.Rate, cleanup };
                     }
                     case APIResultValues.Tag.Precise: {
-                        tmpParamF64s.push(value.param0);
+                        f64Stack.push(value.param0);
                         const cleanup = undefined;
                         return { caseId: APIResultValues.Tag.Precise, cleanup };
                     }
@@ -175,23 +171,23 @@ export async function createInstantiator(options, swift) {
                 tag = tag | 0;
                 switch (tag) {
                     case APIResultValues.Tag.Success: {
-                        const string = tmpRetStrings.pop();
+                        const string = strStack.pop();
                         return { tag: APIResultValues.Tag.Success, param0: string };
                     }
                     case APIResultValues.Tag.Failure: {
-                        const int = tmpRetInts.pop();
+                        const int = i32Stack.pop();
                         return { tag: APIResultValues.Tag.Failure, param0: int };
                     }
                     case APIResultValues.Tag.Flag: {
-                        const bool = tmpRetInts.pop() !== 0;
+                        const bool = i32Stack.pop() !== 0;
                         return { tag: APIResultValues.Tag.Flag, param0: bool };
                     }
                     case APIResultValues.Tag.Rate: {
-                        const f32 = tmpRetF32s.pop();
+                        const f32 = f32Stack.pop();
                         return { tag: APIResultValues.Tag.Rate, param0: f32 };
                     }
                     case APIResultValues.Tag.Precise: {
-                        const f64 = tmpRetF64s.pop();
+                        const f64 = f64Stack.pop();
                         return { tag: APIResultValues.Tag.Precise, param0: f64 };
                     }
                     case APIResultValues.Tag.Info: return { tag: APIResultValues.Tag.Info };
@@ -208,19 +204,19 @@ export async function createInstantiator(options, swift) {
                     case ComplexResultValues.Tag.Success: {
                         const bytes = textEncoder.encode(value.param0);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         const cleanup = () => {
                             swift.memory.release(id);
                         };
                         return { caseId: ComplexResultValues.Tag.Success, cleanup };
                     }
                     case ComplexResultValues.Tag.Error: {
-                        tmpParamInts.push((value.param1 | 0));
+                        i32Stack.push((value.param1 | 0));
                         const bytes = textEncoder.encode(value.param0);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         const cleanup = () => {
                             swift.memory.release(id);
                         };
@@ -229,41 +225,41 @@ export async function createInstantiator(options, swift) {
                     case ComplexResultValues.Tag.Status: {
                         const bytes = textEncoder.encode(value.param2);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
-                        tmpParamInts.push((value.param1 | 0));
-                        tmpParamInts.push(value.param0 ? 1 : 0);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
+                        i32Stack.push((value.param1 | 0));
+                        i32Stack.push(value.param0 ? 1 : 0);
                         const cleanup = () => {
                             swift.memory.release(id);
                         };
                         return { caseId: ComplexResultValues.Tag.Status, cleanup };
                     }
                     case ComplexResultValues.Tag.Coordinates: {
-                        tmpParamF64s.push(value.param2);
-                        tmpParamF64s.push(value.param1);
-                        tmpParamF64s.push(value.param0);
+                        f64Stack.push(value.param2);
+                        f64Stack.push(value.param1);
+                        f64Stack.push(value.param0);
                         const cleanup = undefined;
                         return { caseId: ComplexResultValues.Tag.Coordinates, cleanup };
                     }
                     case ComplexResultValues.Tag.Comprehensive: {
                         const bytes = textEncoder.encode(value.param8);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         const bytes1 = textEncoder.encode(value.param7);
                         const id1 = swift.memory.retain(bytes1);
-                        tmpParamInts.push(bytes1.length);
-                        tmpParamInts.push(id1);
+                        i32Stack.push(bytes1.length);
+                        i32Stack.push(id1);
                         const bytes2 = textEncoder.encode(value.param6);
                         const id2 = swift.memory.retain(bytes2);
-                        tmpParamInts.push(bytes2.length);
-                        tmpParamInts.push(id2);
-                        tmpParamF64s.push(value.param5);
-                        tmpParamF64s.push(value.param4);
-                        tmpParamInts.push((value.param3 | 0));
-                        tmpParamInts.push((value.param2 | 0));
-                        tmpParamInts.push(value.param1 ? 1 : 0);
-                        tmpParamInts.push(value.param0 ? 1 : 0);
+                        i32Stack.push(bytes2.length);
+                        i32Stack.push(id2);
+                        f64Stack.push(value.param5);
+                        f64Stack.push(value.param4);
+                        i32Stack.push((value.param3 | 0));
+                        i32Stack.push((value.param2 | 0));
+                        i32Stack.push(value.param1 ? 1 : 0);
+                        i32Stack.push(value.param0 ? 1 : 0);
                         const cleanup = () => {
                             swift.memory.release(id);
                             swift.memory.release(id1);
@@ -282,36 +278,36 @@ export async function createInstantiator(options, swift) {
                 tag = tag | 0;
                 switch (tag) {
                     case ComplexResultValues.Tag.Success: {
-                        const string = tmpRetStrings.pop();
+                        const string = strStack.pop();
                         return { tag: ComplexResultValues.Tag.Success, param0: string };
                     }
                     case ComplexResultValues.Tag.Error: {
-                        const int = tmpRetInts.pop();
-                        const string = tmpRetStrings.pop();
+                        const int = i32Stack.pop();
+                        const string = strStack.pop();
                         return { tag: ComplexResultValues.Tag.Error, param0: string, param1: int };
                     }
                     case ComplexResultValues.Tag.Status: {
-                        const string = tmpRetStrings.pop();
-                        const int = tmpRetInts.pop();
-                        const bool = tmpRetInts.pop() !== 0;
+                        const string = strStack.pop();
+                        const int = i32Stack.pop();
+                        const bool = i32Stack.pop() !== 0;
                         return { tag: ComplexResultValues.Tag.Status, param0: bool, param1: int, param2: string };
                     }
                     case ComplexResultValues.Tag.Coordinates: {
-                        const f64 = tmpRetF64s.pop();
-                        const f641 = tmpRetF64s.pop();
-                        const f642 = tmpRetF64s.pop();
+                        const f64 = f64Stack.pop();
+                        const f641 = f64Stack.pop();
+                        const f642 = f64Stack.pop();
                         return { tag: ComplexResultValues.Tag.Coordinates, param0: f642, param1: f641, param2: f64 };
                     }
                     case ComplexResultValues.Tag.Comprehensive: {
-                        const string = tmpRetStrings.pop();
-                        const string1 = tmpRetStrings.pop();
-                        const string2 = tmpRetStrings.pop();
-                        const f64 = tmpRetF64s.pop();
-                        const f641 = tmpRetF64s.pop();
-                        const int = tmpRetInts.pop();
-                        const int1 = tmpRetInts.pop();
-                        const bool = tmpRetInts.pop() !== 0;
-                        const bool1 = tmpRetInts.pop() !== 0;
+                        const string = strStack.pop();
+                        const string1 = strStack.pop();
+                        const string2 = strStack.pop();
+                        const f64 = f64Stack.pop();
+                        const f641 = f64Stack.pop();
+                        const int = i32Stack.pop();
+                        const int1 = i32Stack.pop();
+                        const bool = i32Stack.pop() !== 0;
+                        const bool1 = i32Stack.pop() !== 0;
                         return { tag: ComplexResultValues.Tag.Comprehensive, param0: bool1, param1: bool, param2: int1, param3: int, param4: f641, param5: f64, param6: string2, param7: string1, param8: string };
                     }
                     case ComplexResultValues.Tag.Info: return { tag: ComplexResultValues.Tag.Info };
@@ -328,19 +324,19 @@ export async function createInstantiator(options, swift) {
                     case ResultValues.Tag.Success: {
                         const bytes = textEncoder.encode(value.param0);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         const cleanup = () => {
                             swift.memory.release(id);
                         };
                         return { caseId: ResultValues.Tag.Success, cleanup };
                     }
                     case ResultValues.Tag.Failure: {
-                        tmpParamInts.push((value.param1 | 0));
+                        i32Stack.push((value.param1 | 0));
                         const bytes = textEncoder.encode(value.param0);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         const cleanup = () => {
                             swift.memory.release(id);
                         };
@@ -349,10 +345,10 @@ export async function createInstantiator(options, swift) {
                     case ResultValues.Tag.Status: {
                         const bytes = textEncoder.encode(value.param2);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
-                        tmpParamInts.push((value.param1 | 0));
-                        tmpParamInts.push(value.param0 ? 1 : 0);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
+                        i32Stack.push((value.param1 | 0));
+                        i32Stack.push(value.param0 ? 1 : 0);
                         const cleanup = () => {
                             swift.memory.release(id);
                         };
@@ -365,18 +361,18 @@ export async function createInstantiator(options, swift) {
                 tag = tag | 0;
                 switch (tag) {
                     case ResultValues.Tag.Success: {
-                        const string = tmpRetStrings.pop();
+                        const string = strStack.pop();
                         return { tag: ResultValues.Tag.Success, param0: string };
                     }
                     case ResultValues.Tag.Failure: {
-                        const int = tmpRetInts.pop();
-                        const string = tmpRetStrings.pop();
+                        const int = i32Stack.pop();
+                        const string = strStack.pop();
                         return { tag: ResultValues.Tag.Failure, param0: string, param1: int };
                     }
                     case ResultValues.Tag.Status: {
-                        const string = tmpRetStrings.pop();
-                        const int = tmpRetInts.pop();
-                        const bool = tmpRetInts.pop() !== 0;
+                        const string = strStack.pop();
+                        const int = i32Stack.pop();
+                        const bool = i32Stack.pop() !== 0;
                         return { tag: ResultValues.Tag.Status, param0: bool, param1: int, param2: string };
                     }
                     default: throw new Error("Unknown ResultValues tag returned from Swift: " + String(tag));
@@ -392,19 +388,19 @@ export async function createInstantiator(options, swift) {
                     case NetworkingResultValues.Tag.Success: {
                         const bytes = textEncoder.encode(value.param0);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         const cleanup = () => {
                             swift.memory.release(id);
                         };
                         return { caseId: NetworkingResultValues.Tag.Success, cleanup };
                     }
                     case NetworkingResultValues.Tag.Failure: {
-                        tmpParamInts.push((value.param1 | 0));
+                        i32Stack.push((value.param1 | 0));
                         const bytes = textEncoder.encode(value.param0);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         const cleanup = () => {
                             swift.memory.release(id);
                         };
@@ -417,12 +413,12 @@ export async function createInstantiator(options, swift) {
                 tag = tag | 0;
                 switch (tag) {
                     case NetworkingResultValues.Tag.Success: {
-                        const string = tmpRetStrings.pop();
+                        const string = strStack.pop();
                         return { tag: NetworkingResultValues.Tag.Success, param0: string };
                     }
                     case NetworkingResultValues.Tag.Failure: {
-                        const int = tmpRetInts.pop();
-                        const string = tmpRetStrings.pop();
+                        const int = i32Stack.pop();
+                        const string = strStack.pop();
                         return { tag: NetworkingResultValues.Tag.Failure, param0: string, param1: int };
                     }
                     default: throw new Error("Unknown NetworkingResultValues tag returned from Swift: " + String(tag));
@@ -441,13 +437,13 @@ export async function createInstantiator(options, swift) {
                         if (isSome) {
                             let bytes = textEncoder.encode(value.param0);
                             id = swift.memory.retain(bytes);
-                            tmpParamInts.push(bytes.length);
-                            tmpParamInts.push(id);
+                            i32Stack.push(bytes.length);
+                            i32Stack.push(id);
                         } else {
-                            tmpParamInts.push(0);
-                            tmpParamInts.push(0);
+                            i32Stack.push(0);
+                            i32Stack.push(0);
                         }
-                        tmpParamInts.push(isSome ? 1 : 0);
+                        i32Stack.push(isSome ? 1 : 0);
                         const cleanup = () => {
                             if(id) {
                                 swift.memory.release(id);
@@ -457,11 +453,11 @@ export async function createInstantiator(options, swift) {
                     }
                     case APIOptionalResultValues.Tag.Failure: {
                         const isSome = value.param1 != null;
-                        tmpParamInts.push(isSome ? (value.param1 ? 1 : 0) : 0);
-                        tmpParamInts.push(isSome ? 1 : 0);
+                        i32Stack.push(isSome ? (value.param1 ? 1 : 0) : 0);
+                        i32Stack.push(isSome ? 1 : 0);
                         const isSome1 = value.param0 != null;
-                        tmpParamInts.push(isSome1 ? (value.param0 | 0) : 0);
-                        tmpParamInts.push(isSome1 ? 1 : 0);
+                        i32Stack.push(isSome1 ? (value.param0 | 0) : 0);
+                        i32Stack.push(isSome1 ? 1 : 0);
                         const cleanup = undefined;
                         return { caseId: APIOptionalResultValues.Tag.Failure, cleanup };
                     }
@@ -471,19 +467,19 @@ export async function createInstantiator(options, swift) {
                         if (isSome) {
                             let bytes = textEncoder.encode(value.param2);
                             id = swift.memory.retain(bytes);
-                            tmpParamInts.push(bytes.length);
-                            tmpParamInts.push(id);
+                            i32Stack.push(bytes.length);
+                            i32Stack.push(id);
                         } else {
-                            tmpParamInts.push(0);
-                            tmpParamInts.push(0);
+                            i32Stack.push(0);
+                            i32Stack.push(0);
                         }
-                        tmpParamInts.push(isSome ? 1 : 0);
+                        i32Stack.push(isSome ? 1 : 0);
                         const isSome1 = value.param1 != null;
-                        tmpParamInts.push(isSome1 ? (value.param1 | 0) : 0);
-                        tmpParamInts.push(isSome1 ? 1 : 0);
+                        i32Stack.push(isSome1 ? (value.param1 | 0) : 0);
+                        i32Stack.push(isSome1 ? 1 : 0);
                         const isSome2 = value.param0 != null;
-                        tmpParamInts.push(isSome2 ? (value.param0 ? 1 : 0) : 0);
-                        tmpParamInts.push(isSome2 ? 1 : 0);
+                        i32Stack.push(isSome2 ? (value.param0 ? 1 : 0) : 0);
+                        i32Stack.push(isSome2 ? 1 : 0);
                         const cleanup = () => {
                             if(id) {
                                 swift.memory.release(id);
@@ -498,10 +494,10 @@ export async function createInstantiator(options, swift) {
                 tag = tag | 0;
                 switch (tag) {
                     case APIOptionalResultValues.Tag.Success: {
-                        const isSome = tmpRetInts.pop();
+                        const isSome = i32Stack.pop();
                         let optional;
                         if (isSome) {
-                            const string = tmpRetStrings.pop();
+                            const string = strStack.pop();
                             optional = string;
                         } else {
                             optional = null;
@@ -509,18 +505,18 @@ export async function createInstantiator(options, swift) {
                         return { tag: APIOptionalResultValues.Tag.Success, param0: optional };
                     }
                     case APIOptionalResultValues.Tag.Failure: {
-                        const isSome = tmpRetInts.pop();
+                        const isSome = i32Stack.pop();
                         let optional;
                         if (isSome) {
-                            const bool = tmpRetInts.pop() !== 0;
+                            const bool = i32Stack.pop() !== 0;
                             optional = bool;
                         } else {
                             optional = null;
                         }
-                        const isSome1 = tmpRetInts.pop();
+                        const isSome1 = i32Stack.pop();
                         let optional1;
                         if (isSome1) {
-                            const int = tmpRetInts.pop();
+                            const int = i32Stack.pop();
                             optional1 = int;
                         } else {
                             optional1 = null;
@@ -528,26 +524,26 @@ export async function createInstantiator(options, swift) {
                         return { tag: APIOptionalResultValues.Tag.Failure, param0: optional1, param1: optional };
                     }
                     case APIOptionalResultValues.Tag.Status: {
-                        const isSome = tmpRetInts.pop();
+                        const isSome = i32Stack.pop();
                         let optional;
                         if (isSome) {
-                            const string = tmpRetStrings.pop();
+                            const string = strStack.pop();
                             optional = string;
                         } else {
                             optional = null;
                         }
-                        const isSome1 = tmpRetInts.pop();
+                        const isSome1 = i32Stack.pop();
                         let optional1;
                         if (isSome1) {
-                            const int = tmpRetInts.pop();
+                            const int = i32Stack.pop();
                             optional1 = int;
                         } else {
                             optional1 = null;
                         }
-                        const isSome2 = tmpRetInts.pop();
+                        const isSome2 = i32Stack.pop();
                         let optional2;
                         if (isSome2) {
-                            const bool = tmpRetInts.pop() !== 0;
+                            const bool = i32Stack.pop() !== 0;
                             optional2 = bool;
                         } else {
                             optional2 = null;
@@ -565,26 +561,26 @@ export async function createInstantiator(options, swift) {
                 const enumTag = value.tag;
                 switch (enumTag) {
                     case TypedPayloadResultValues.Tag.Precision: {
-                        tmpParamF32s.push(Math.fround(value.param0));
+                        f32Stack.push(Math.fround(value.param0));
                         const cleanup = undefined;
                         return { caseId: TypedPayloadResultValues.Tag.Precision, cleanup };
                     }
                     case TypedPayloadResultValues.Tag.Direction: {
-                        tmpParamInts.push((value.param0 | 0));
+                        i32Stack.push((value.param0 | 0));
                         const cleanup = undefined;
                         return { caseId: TypedPayloadResultValues.Tag.Direction, cleanup };
                     }
                     case TypedPayloadResultValues.Tag.OptPrecision: {
                         const isSome = value.param0 != null;
-                        tmpParamF32s.push(isSome ? Math.fround(value.param0) : 0.0);
-                        tmpParamInts.push(isSome ? 1 : 0);
+                        f32Stack.push(isSome ? Math.fround(value.param0) : 0.0);
+                        i32Stack.push(isSome ? 1 : 0);
                         const cleanup = undefined;
                         return { caseId: TypedPayloadResultValues.Tag.OptPrecision, cleanup };
                     }
                     case TypedPayloadResultValues.Tag.OptDirection: {
                         const isSome = value.param0 != null;
-                        tmpParamInts.push(isSome ? (value.param0 | 0) : 0);
-                        tmpParamInts.push(isSome ? 1 : 0);
+                        i32Stack.push(isSome ? (value.param0 | 0) : 0);
+                        i32Stack.push(isSome ? 1 : 0);
                         const cleanup = undefined;
                         return { caseId: TypedPayloadResultValues.Tag.OptDirection, cleanup };
                     }
@@ -599,18 +595,18 @@ export async function createInstantiator(options, swift) {
                 tag = tag | 0;
                 switch (tag) {
                     case TypedPayloadResultValues.Tag.Precision: {
-                        const rawValue = tmpRetF32s.pop();
+                        const rawValue = f32Stack.pop();
                         return { tag: TypedPayloadResultValues.Tag.Precision, param0: rawValue };
                     }
                     case TypedPayloadResultValues.Tag.Direction: {
-                        const caseId = tmpRetInts.pop();
+                        const caseId = i32Stack.pop();
                         return { tag: TypedPayloadResultValues.Tag.Direction, param0: caseId };
                     }
                     case TypedPayloadResultValues.Tag.OptPrecision: {
-                        const isSome = tmpRetInts.pop();
+                        const isSome = i32Stack.pop();
                         let optional;
                         if (isSome) {
-                            const rawValue = tmpRetF32s.pop();
+                            const rawValue = f32Stack.pop();
                             optional = rawValue;
                         } else {
                             optional = null;
@@ -618,10 +614,10 @@ export async function createInstantiator(options, swift) {
                         return { tag: TypedPayloadResultValues.Tag.OptPrecision, param0: optional };
                     }
                     case TypedPayloadResultValues.Tag.OptDirection: {
-                        const isSome = tmpRetInts.pop();
+                        const isSome = i32Stack.pop();
                         let optional;
                         if (isSome) {
-                            const caseId = tmpRetInts.pop();
+                            const caseId = i32Stack.pop();
                             optional = caseId;
                         } else {
                             optional = null;
@@ -647,19 +643,19 @@ export async function createInstantiator(options, swift) {
                         return { caseId: AllTypesResultValues.Tag.StructPayload, cleanup };
                     }
                     case AllTypesResultValues.Tag.ClassPayload: {
-                        tmpParamPointers.push(value.param0.pointer);
+                        ptrStack.push(value.param0.pointer);
                         const cleanup = undefined;
                         return { caseId: AllTypesResultValues.Tag.ClassPayload, cleanup };
                     }
                     case AllTypesResultValues.Tag.JsObjectPayload: {
                         const objId = swift.memory.retain(value.param0);
-                        tmpParamInts.push(objId);
+                        i32Stack.push(objId);
                         const cleanup = undefined;
                         return { caseId: AllTypesResultValues.Tag.JsObjectPayload, cleanup };
                     }
                     case AllTypesResultValues.Tag.NestedEnum: {
                         const { caseId: caseId, cleanup: enumCleanup } = enumHelpers.APIResult.lower(value.param0);
-                        tmpParamInts.push(caseId);
+                        i32Stack.push(caseId);
                         const cleanup = () => {
                             if (enumCleanup) { enumCleanup(); }
                         };
@@ -668,9 +664,9 @@ export async function createInstantiator(options, swift) {
                     case AllTypesResultValues.Tag.ArrayPayload: {
                         const arrayCleanups = [];
                         for (const elem of value.param0) {
-                            tmpParamInts.push((elem | 0));
+                            i32Stack.push((elem | 0));
                         }
-                        tmpParamInts.push(value.param0.length);
+                        i32Stack.push(value.param0.length);
                         const cleanup = () => {
                             for (const cleanup of arrayCleanups) { cleanup(); }
                         };
@@ -691,25 +687,25 @@ export async function createInstantiator(options, swift) {
                         return { tag: AllTypesResultValues.Tag.StructPayload, param0: struct };
                     }
                     case AllTypesResultValues.Tag.ClassPayload: {
-                        const ptr = tmpRetPointers.pop();
+                        const ptr = ptrStack.pop();
                         const obj = _exports['User'].__construct(ptr);
                         return { tag: AllTypesResultValues.Tag.ClassPayload, param0: obj };
                     }
                     case AllTypesResultValues.Tag.JsObjectPayload: {
-                        const objId = tmpRetInts.pop();
+                        const objId = i32Stack.pop();
                         const obj = swift.memory.getObject(objId);
                         swift.memory.release(objId);
                         return { tag: AllTypesResultValues.Tag.JsObjectPayload, param0: obj };
                     }
                     case AllTypesResultValues.Tag.NestedEnum: {
-                        const enumValue = enumHelpers.APIResult.lift(tmpRetTag.pop(), );
+                        const enumValue = enumHelpers.APIResult.lift(tagStack.pop(), );
                         return { tag: AllTypesResultValues.Tag.NestedEnum, param0: enumValue };
                     }
                     case AllTypesResultValues.Tag.ArrayPayload: {
-                        const arrayLen = tmpRetInts.pop();
+                        const arrayLen = i32Stack.pop();
                         const arrayResult = [];
                         for (let i = 0; i < arrayLen; i++) {
-                            const int = tmpRetInts.pop();
+                            const int = i32Stack.pop();
                             arrayResult.push(int);
                         }
                         arrayResult.reverse();
@@ -733,7 +729,7 @@ export async function createInstantiator(options, swift) {
                             const structResult = structHelpers.Point.lower(value.param0);
                             nestedCleanup = structResult.cleanup;
                         }
-                        tmpParamInts.push(isSome ? 1 : 0);
+                        i32Stack.push(isSome ? 1 : 0);
                         const cleanup = () => {
                             if (nestedCleanup) { nestedCleanup(); }
                         };
@@ -742,11 +738,11 @@ export async function createInstantiator(options, swift) {
                     case OptionalAllTypesResultValues.Tag.OptClass: {
                         const isSome = value.param0 != null;
                         if (isSome) {
-                            tmpParamPointers.push(value.param0.pointer);
+                            ptrStack.push(value.param0.pointer);
                         } else {
-                            tmpParamPointers.push(0);
+                            ptrStack.push(0);
                         }
-                        tmpParamInts.push(isSome ? 1 : 0);
+                        i32Stack.push(isSome ? 1 : 0);
                         const cleanup = undefined;
                         return { caseId: OptionalAllTypesResultValues.Tag.OptClass, cleanup };
                     }
@@ -755,12 +751,12 @@ export async function createInstantiator(options, swift) {
                         let id;
                         if (isSome) {
                             id = swift.memory.retain(value.param0);
-                            tmpParamInts.push(id);
+                            i32Stack.push(id);
                         } else {
                             id = undefined;
-                            tmpParamInts.push(0);
+                            i32Stack.push(0);
                         }
-                        tmpParamInts.push(isSome ? 1 : 0);
+                        i32Stack.push(isSome ? 1 : 0);
                         const cleanup = undefined;
                         return { caseId: OptionalAllTypesResultValues.Tag.OptJSObject, cleanup };
                     }
@@ -771,11 +767,11 @@ export async function createInstantiator(options, swift) {
                             const enumResult = enumHelpers.APIResult.lower(value.param0);
                             enumCaseId = enumResult.caseId;
                             enumCleanup = enumResult.cleanup;
-                            tmpParamInts.push(enumCaseId);
+                            i32Stack.push(enumCaseId);
                         } else {
-                            tmpParamInts.push(0);
+                            i32Stack.push(0);
                         }
-                        tmpParamInts.push(isSome ? 1 : 0);
+                        i32Stack.push(isSome ? 1 : 0);
                         const cleanup = () => {
                             if (enumCleanup) { enumCleanup(); }
                         };
@@ -787,14 +783,14 @@ export async function createInstantiator(options, swift) {
                         if (isSome) {
                             const arrayCleanups = [];
                             for (const elem of value.param0) {
-                                tmpParamInts.push((elem | 0));
+                                i32Stack.push((elem | 0));
                             }
-                            tmpParamInts.push(value.param0.length);
+                            i32Stack.push(value.param0.length);
                             arrCleanup = () => {
                                 for (const cleanup of arrayCleanups) { cleanup(); }
                             };
                         }
-                        tmpParamInts.push(isSome ? 1 : 0);
+                        i32Stack.push(isSome ? 1 : 0);
                         const cleanup = () => {
                             if (arrCleanup) { arrCleanup(); }
                         };
@@ -811,7 +807,7 @@ export async function createInstantiator(options, swift) {
                 tag = tag | 0;
                 switch (tag) {
                     case OptionalAllTypesResultValues.Tag.OptStruct: {
-                        const isSome = tmpRetInts.pop();
+                        const isSome = i32Stack.pop();
                         let optional;
                         if (isSome) {
                             const struct = structHelpers.Point.lift();
@@ -822,10 +818,10 @@ export async function createInstantiator(options, swift) {
                         return { tag: OptionalAllTypesResultValues.Tag.OptStruct, param0: optional };
                     }
                     case OptionalAllTypesResultValues.Tag.OptClass: {
-                        const isSome = tmpRetInts.pop();
+                        const isSome = i32Stack.pop();
                         let optional;
                         if (isSome) {
-                            const ptr = tmpRetPointers.pop();
+                            const ptr = ptrStack.pop();
                             const obj = _exports['User'].__construct(ptr);
                             optional = obj;
                         } else {
@@ -834,10 +830,10 @@ export async function createInstantiator(options, swift) {
                         return { tag: OptionalAllTypesResultValues.Tag.OptClass, param0: optional };
                     }
                     case OptionalAllTypesResultValues.Tag.OptJSObject: {
-                        const isSome = tmpRetInts.pop();
+                        const isSome = i32Stack.pop();
                         let optional;
                         if (isSome) {
-                            const objId = tmpRetInts.pop();
+                            const objId = i32Stack.pop();
                             const obj = swift.memory.getObject(objId);
                             swift.memory.release(objId);
                             optional = obj;
@@ -847,10 +843,10 @@ export async function createInstantiator(options, swift) {
                         return { tag: OptionalAllTypesResultValues.Tag.OptJSObject, param0: optional };
                     }
                     case OptionalAllTypesResultValues.Tag.OptNestedEnum: {
-                        const isSome = tmpRetInts.pop();
+                        const isSome = i32Stack.pop();
                         let optional;
                         if (isSome) {
-                            const caseId = tmpRetInts.pop();
+                            const caseId = i32Stack.pop();
                             optional = enumHelpers.APIResult.lift(caseId);
                         } else {
                             optional = null;
@@ -858,13 +854,13 @@ export async function createInstantiator(options, swift) {
                         return { tag: OptionalAllTypesResultValues.Tag.OptNestedEnum, param0: optional };
                     }
                     case OptionalAllTypesResultValues.Tag.OptArray: {
-                        const isSome = tmpRetInts.pop();
+                        const isSome = i32Stack.pop();
                         let optional;
                         if (isSome) {
-                            const arrayLen = tmpRetInts.pop();
+                            const arrayLen = i32Stack.pop();
                             const arrayResult = [];
                             for (let i = 0; i < arrayLen; i++) {
-                                const int = tmpRetInts.pop();
+                                const int = i32Stack.pop();
                                 arrayResult.push(int);
                             }
                             arrayResult.reverse();
@@ -916,36 +912,36 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
             bjs["swift_js_push_tag"] = function(tag) {
-                tmpRetTag.push(tag);
+                tagStack.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
-                tmpRetInts.push(v | 0);
+                i32Stack.push(v | 0);
             }
             bjs["swift_js_push_f32"] = function(v) {
-                tmpRetF32s.push(Math.fround(v));
+                f32Stack.push(Math.fround(v));
             }
             bjs["swift_js_push_f64"] = function(v) {
-                tmpRetF64s.push(v);
+                f64Stack.push(v);
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 const value = textDecoder.decode(bytes);
-                tmpRetStrings.push(value);
+                strStack.push(value);
             }
             bjs["swift_js_pop_i32"] = function() {
-                return tmpParamInts.pop();
+                return i32Stack.pop();
             }
             bjs["swift_js_pop_f32"] = function() {
-                return tmpParamF32s.pop();
+                return f32Stack.pop();
             }
             bjs["swift_js_pop_f64"] = function() {
-                return tmpParamF64s.pop();
+                return f64Stack.pop();
             }
             bjs["swift_js_push_pointer"] = function(pointer) {
-                tmpRetPointers.push(pointer);
+                ptrStack.push(pointer);
             }
             bjs["swift_js_pop_pointer"] = function() {
-                return tmpParamPointers.pop();
+                return ptrStack.pop();
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }
@@ -1139,13 +1135,13 @@ export async function createInstantiator(options, swift) {
                 },
                 getResult: function bjs_getResult() {
                     instance.exports.bjs_getResult();
-                    const ret = enumHelpers.APIResult.lift(tmpRetTag.pop());
+                    const ret = enumHelpers.APIResult.lift(tagStack.pop());
                     return ret;
                 },
                 roundtripAPIResult: function bjs_roundtripAPIResult(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.APIResult.lower(result);
                     instance.exports.bjs_roundtripAPIResult(resultCaseId);
-                    const ret = enumHelpers.APIResult.lift(tmpRetTag.pop());
+                    const ret = enumHelpers.APIResult.lift(tagStack.pop());
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
@@ -1158,7 +1154,7 @@ export async function createInstantiator(options, swift) {
                         resultCleanup = enumResult.cleanup;
                     }
                     instance.exports.bjs_roundTripOptionalAPIResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = tmpRetTag.pop();
+                    const tag = tagStack.pop();
                     const isNull = (tag === -1);
                     let optResult;
                     if (isNull) {
@@ -1176,13 +1172,13 @@ export async function createInstantiator(options, swift) {
                 },
                 getComplexResult: function bjs_getComplexResult() {
                     instance.exports.bjs_getComplexResult();
-                    const ret = enumHelpers.ComplexResult.lift(tmpRetTag.pop());
+                    const ret = enumHelpers.ComplexResult.lift(tagStack.pop());
                     return ret;
                 },
                 roundtripComplexResult: function bjs_roundtripComplexResult(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.ComplexResult.lower(result);
                     instance.exports.bjs_roundtripComplexResult(resultCaseId);
-                    const ret = enumHelpers.ComplexResult.lift(tmpRetTag.pop());
+                    const ret = enumHelpers.ComplexResult.lift(tagStack.pop());
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
@@ -1195,7 +1191,7 @@ export async function createInstantiator(options, swift) {
                         resultCleanup = enumResult.cleanup;
                     }
                     instance.exports.bjs_roundTripOptionalComplexResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = tmpRetTag.pop();
+                    const tag = tagStack.pop();
                     const isNull = (tag === -1);
                     let optResult;
                     if (isNull) {
@@ -1215,7 +1211,7 @@ export async function createInstantiator(options, swift) {
                         resultCleanup = enumResult.cleanup;
                     }
                     instance.exports.bjs_roundTripOptionalUtilitiesResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = tmpRetTag.pop();
+                    const tag = tagStack.pop();
                     const isNull = (tag === -1);
                     let optResult;
                     if (isNull) {
@@ -1235,7 +1231,7 @@ export async function createInstantiator(options, swift) {
                         resultCleanup = enumResult.cleanup;
                     }
                     instance.exports.bjs_roundTripOptionalNetworkingResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = tmpRetTag.pop();
+                    const tag = tagStack.pop();
                     const isNull = (tag === -1);
                     let optResult;
                     if (isNull) {
@@ -1255,7 +1251,7 @@ export async function createInstantiator(options, swift) {
                         resultCleanup = enumResult.cleanup;
                     }
                     instance.exports.bjs_roundTripOptionalAPIOptionalResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = tmpRetTag.pop();
+                    const tag = tagStack.pop();
                     const isNull = (tag === -1);
                     let optResult;
                     if (isNull) {
@@ -1282,7 +1278,7 @@ export async function createInstantiator(options, swift) {
                         result2Cleanup = enumResult1.cleanup;
                     }
                     instance.exports.bjs_compareAPIResults(+isSome, isSome ? result1CaseId : 0, +isSome1, isSome1 ? result2CaseId : 0);
-                    const tag = tmpRetTag.pop();
+                    const tag = tagStack.pop();
                     const isNull = (tag === -1);
                     let optResult;
                     if (isNull) {
@@ -1297,7 +1293,7 @@ export async function createInstantiator(options, swift) {
                 roundTripTypedPayloadResult: function bjs_roundTripTypedPayloadResult(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.TypedPayloadResult.lower(result);
                     instance.exports.bjs_roundTripTypedPayloadResult(resultCaseId);
-                    const ret = enumHelpers.TypedPayloadResult.lift(tmpRetTag.pop());
+                    const ret = enumHelpers.TypedPayloadResult.lift(tagStack.pop());
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
@@ -1310,7 +1306,7 @@ export async function createInstantiator(options, swift) {
                         resultCleanup = enumResult.cleanup;
                     }
                     instance.exports.bjs_roundTripOptionalTypedPayloadResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = tmpRetTag.pop();
+                    const tag = tagStack.pop();
                     const isNull = (tag === -1);
                     let optResult;
                     if (isNull) {
@@ -1324,7 +1320,7 @@ export async function createInstantiator(options, swift) {
                 roundTripAllTypesResult: function bjs_roundTripAllTypesResult(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.AllTypesResult.lower(result);
                     instance.exports.bjs_roundTripAllTypesResult(resultCaseId);
-                    const ret = enumHelpers.AllTypesResult.lift(tmpRetTag.pop());
+                    const ret = enumHelpers.AllTypesResult.lift(tagStack.pop());
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
@@ -1337,7 +1333,7 @@ export async function createInstantiator(options, swift) {
                         resultCleanup = enumResult.cleanup;
                     }
                     instance.exports.bjs_roundTripOptionalAllTypesResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = tmpRetTag.pop();
+                    const tag = tagStack.pop();
                     const isNull = (tag === -1);
                     let optResult;
                     if (isNull) {
@@ -1351,7 +1347,7 @@ export async function createInstantiator(options, swift) {
                 roundTripOptionalPayloadResult: function bjs_roundTripOptionalPayloadResult(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.OptionalAllTypesResult.lower(result);
                     instance.exports.bjs_roundTripOptionalPayloadResult(resultCaseId);
-                    const ret = enumHelpers.OptionalAllTypesResult.lift(tmpRetTag.pop());
+                    const ret = enumHelpers.OptionalAllTypesResult.lift(tagStack.pop());
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
@@ -1364,7 +1360,7 @@ export async function createInstantiator(options, swift) {
                         resultCleanup = enumResult.cleanup;
                     }
                     instance.exports.bjs_roundTripOptionalPayloadResultOpt(+isSome, isSome ? resultCaseId : 0);
-                    const tag = tmpRetTag.pop();
+                    const tag = tagStack.pop();
                     const isNull = (tag === -1);
                     let optResult;
                     if (isNull) {

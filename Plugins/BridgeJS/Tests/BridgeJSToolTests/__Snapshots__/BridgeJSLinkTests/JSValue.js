@@ -18,16 +18,12 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tmpRetTag = [];
-    let tmpRetStrings = [];
-    let tmpRetInts = [];
-    let tmpRetF32s = [];
-    let tmpRetF64s = [];
-    let tmpParamInts = [];
-    let tmpParamF32s = [];
-    let tmpParamF64s = [];
-    let tmpRetPointers = [];
-    let tmpParamPointers = [];
+    let tagStack = [];
+    let strStack = [];
+    let i32Stack = [];
+    let f32Stack = [];
+    let f64Stack = [];
+    let ptrStack = [];
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
@@ -160,36 +156,36 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
             bjs["swift_js_push_tag"] = function(tag) {
-                tmpRetTag.push(tag);
+                tagStack.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
-                tmpRetInts.push(v | 0);
+                i32Stack.push(v | 0);
             }
             bjs["swift_js_push_f32"] = function(v) {
-                tmpRetF32s.push(Math.fround(v));
+                f32Stack.push(Math.fround(v));
             }
             bjs["swift_js_push_f64"] = function(v) {
-                tmpRetF64s.push(v);
+                f64Stack.push(v);
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 const value = textDecoder.decode(bytes);
-                tmpRetStrings.push(value);
+                strStack.push(value);
             }
             bjs["swift_js_pop_i32"] = function() {
-                return tmpParamInts.pop();
+                return i32Stack.pop();
             }
             bjs["swift_js_pop_f32"] = function() {
-                return tmpParamF32s.pop();
+                return f32Stack.pop();
             }
             bjs["swift_js_pop_f64"] = function() {
-                return tmpParamF64s.pop();
+                return f64Stack.pop();
             }
             bjs["swift_js_push_pointer"] = function(pointer) {
-                tmpRetPointers.push(pointer);
+                ptrStack.push(pointer);
             }
             bjs["swift_js_pop_pointer"] = function() {
-                return tmpParamPointers.pop();
+                return ptrStack.pop();
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }
@@ -305,21 +301,21 @@ export async function createInstantiator(options, swift) {
                     const jsValue = __bjs_jsValueLift(valueKind, valuePayload1, valuePayload2);
                     let ret = imports.jsEchoJSValue(jsValue);
                     const [retKind, retPayload1, retPayload2] = __bjs_jsValueLower(ret);
-                    tmpParamInts.push(retKind);
-                    tmpParamInts.push(retPayload1);
-                    tmpParamF64s.push(retPayload2);
+                    i32Stack.push(retKind);
+                    i32Stack.push(retPayload1);
+                    f64Stack.push(retPayload2);
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_jsEchoJSValueArray"] = function bjs_jsEchoJSValueArray() {
                 try {
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const jsValuePayload2 = tmpRetF64s.pop();
-                        const jsValuePayload1 = tmpRetInts.pop();
-                        const jsValueKind = tmpRetInts.pop();
+                        const jsValuePayload2 = f64Stack.pop();
+                        const jsValuePayload1 = i32Stack.pop();
+                        const jsValueKind = i32Stack.pop();
                         const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                         arrayResult.push(jsValue);
                     }
@@ -328,11 +324,11 @@ export async function createInstantiator(options, swift) {
                     const arrayCleanups = [];
                     for (const elem of ret) {
                         const [elemKind, elemPayload1, elemPayload2] = __bjs_jsValueLower(elem);
-                        tmpParamInts.push(elemKind);
-                        tmpParamInts.push(elemPayload1);
-                        tmpParamF64s.push(elemPayload2);
+                        i32Stack.push(elemKind);
+                        i32Stack.push(elemPayload1);
+                        f64Stack.push(elemPayload2);
                     }
-                    tmpParamInts.push(ret.length);
+                    i32Stack.push(ret.length);
                 } catch (error) {
                     setException(error);
                 }
@@ -389,9 +385,9 @@ export async function createInstantiator(options, swift) {
                 echo(value) {
                     const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     instance.exports.bjs_JSValueHolder_echo(this.pointer, valueKind, valuePayload1, valuePayload2);
-                    const jsValuePayload2 = tmpRetF64s.pop();
-                    const jsValuePayload1 = tmpRetInts.pop();
-                    const jsValueKind = tmpRetInts.pop();
+                    const jsValuePayload2 = f64Stack.pop();
+                    const jsValuePayload1 = i32Stack.pop();
+                    const jsValueKind = i32Stack.pop();
                     const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                     return jsValue;
                 }
@@ -399,12 +395,12 @@ export async function createInstantiator(options, swift) {
                     const isSome = value != null;
                     const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     instance.exports.bjs_JSValueHolder_echoOptional(this.pointer, +isSome, valueKind, valuePayload1, valuePayload2);
-                    const isSome1 = tmpRetInts.pop();
+                    const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {
-                        const jsValuePayload2 = tmpRetF64s.pop();
-                        const jsValuePayload1 = tmpRetInts.pop();
-                        const jsValueKind = tmpRetInts.pop();
+                        const jsValuePayload2 = f64Stack.pop();
+                        const jsValuePayload1 = i32Stack.pop();
+                        const jsValueKind = i32Stack.pop();
                         const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                         optResult = jsValue;
                     } else {
@@ -414,9 +410,9 @@ export async function createInstantiator(options, swift) {
                 }
                 get value() {
                     instance.exports.bjs_JSValueHolder_value_get(this.pointer);
-                    const jsValuePayload2 = tmpRetF64s.pop();
-                    const jsValuePayload1 = tmpRetInts.pop();
-                    const jsValueKind = tmpRetInts.pop();
+                    const jsValuePayload2 = f64Stack.pop();
+                    const jsValuePayload1 = i32Stack.pop();
+                    const jsValueKind = i32Stack.pop();
                     const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                     return jsValue;
                 }
@@ -426,12 +422,12 @@ export async function createInstantiator(options, swift) {
                 }
                 get optionalValue() {
                     instance.exports.bjs_JSValueHolder_optionalValue_get(this.pointer);
-                    const isSome = tmpRetInts.pop();
+                    const isSome = i32Stack.pop();
                     let optResult;
                     if (isSome) {
-                        const jsValuePayload2 = tmpRetF64s.pop();
-                        const jsValuePayload1 = tmpRetInts.pop();
-                        const jsValueKind = tmpRetInts.pop();
+                        const jsValuePayload2 = f64Stack.pop();
+                        const jsValuePayload1 = i32Stack.pop();
+                        const jsValueKind = i32Stack.pop();
                         const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                         optResult = jsValue;
                     } else {
@@ -450,9 +446,9 @@ export async function createInstantiator(options, swift) {
                 roundTripJSValue: function bjs_roundTripJSValue(value) {
                     const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     instance.exports.bjs_roundTripJSValue(valueKind, valuePayload1, valuePayload2);
-                    const jsValuePayload2 = tmpRetF64s.pop();
-                    const jsValuePayload1 = tmpRetInts.pop();
-                    const jsValueKind = tmpRetInts.pop();
+                    const jsValuePayload2 = f64Stack.pop();
+                    const jsValuePayload1 = i32Stack.pop();
+                    const jsValueKind = i32Stack.pop();
                     const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                     return jsValue;
                 },
@@ -460,12 +456,12 @@ export async function createInstantiator(options, swift) {
                     const isSome = value != null;
                     const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     instance.exports.bjs_roundTripOptionalJSValue(+isSome, valueKind, valuePayload1, valuePayload2);
-                    const isSome1 = tmpRetInts.pop();
+                    const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {
-                        const jsValuePayload2 = tmpRetF64s.pop();
-                        const jsValuePayload1 = tmpRetInts.pop();
-                        const jsValueKind = tmpRetInts.pop();
+                        const jsValuePayload2 = f64Stack.pop();
+                        const jsValuePayload1 = i32Stack.pop();
+                        const jsValueKind = i32Stack.pop();
                         const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                         optResult = jsValue;
                     } else {
@@ -477,18 +473,18 @@ export async function createInstantiator(options, swift) {
                     const arrayCleanups = [];
                     for (const elem of values) {
                         const [elemKind, elemPayload1, elemPayload2] = __bjs_jsValueLower(elem);
-                        tmpParamInts.push(elemKind);
-                        tmpParamInts.push(elemPayload1);
-                        tmpParamF64s.push(elemPayload2);
+                        i32Stack.push(elemKind);
+                        i32Stack.push(elemPayload1);
+                        f64Stack.push(elemPayload2);
                     }
-                    tmpParamInts.push(values.length);
+                    i32Stack.push(values.length);
                     instance.exports.bjs_roundTripJSValueArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const jsValuePayload2 = tmpRetF64s.pop();
-                        const jsValuePayload1 = tmpRetInts.pop();
-                        const jsValueKind = tmpRetInts.pop();
+                        const jsValuePayload2 = f64Stack.pop();
+                        const jsValuePayload1 = i32Stack.pop();
+                        const jsValueKind = i32Stack.pop();
                         const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                         arrayResult.push(jsValue);
                     }
@@ -503,23 +499,23 @@ export async function createInstantiator(options, swift) {
                         const arrayCleanups = [];
                         for (const elem of values) {
                             const [elemKind, elemPayload1, elemPayload2] = __bjs_jsValueLower(elem);
-                            tmpParamInts.push(elemKind);
-                            tmpParamInts.push(elemPayload1);
-                            tmpParamF64s.push(elemPayload2);
+                            i32Stack.push(elemKind);
+                            i32Stack.push(elemPayload1);
+                            f64Stack.push(elemPayload2);
                         }
-                        tmpParamInts.push(values.length);
+                        i32Stack.push(values.length);
                         valuesCleanups.push(() => { for (const cleanup of arrayCleanups) { cleanup(); } });
                     }
                     instance.exports.bjs_roundTripOptionalJSValueArray(+isSome);
-                    const isSome1 = tmpRetInts.pop();
+                    const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {
-                        const arrayLen = tmpRetInts.pop();
+                        const arrayLen = i32Stack.pop();
                         const arrayResult = [];
                         for (let i = 0; i < arrayLen; i++) {
-                            const jsValuePayload2 = tmpRetF64s.pop();
-                            const jsValuePayload1 = tmpRetInts.pop();
-                            const jsValueKind = tmpRetInts.pop();
+                            const jsValuePayload2 = f64Stack.pop();
+                            const jsValuePayload1 = i32Stack.pop();
+                            const jsValueKind = i32Stack.pop();
                             const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
                             arrayResult.push(jsValue);
                         }
