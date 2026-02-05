@@ -35,7 +35,7 @@ export async function createInstantiator(options, swift) {
     let _exports = null;
     let bjs = null;
     const __bjs_createPointerFieldsHelpers = () => {
-        return (tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers) => ({
+        return () => ({
             lower: (value) => {
                 tmpParamPointers.push((value.raw | 0));
                 tmpParamPointers.push((value.mutRaw | 0));
@@ -139,7 +139,7 @@ export async function createInstantiator(options, swift) {
                 return 0;
             }
             bjs["swift_js_struct_lift_PointerFields"] = function() {
-                const value = structHelpers.PointerFields.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                const value = structHelpers.PointerFields.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
@@ -244,7 +244,7 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const PointerFieldsHelpers = __bjs_createPointerFieldsHelpers()(tmpParamInts, tmpParamF32s, tmpParamF64s, tmpParamPointers, tmpRetPointers, textEncoder, swift, enumHelpers);
+            const PointerFieldsHelpers = __bjs_createPointerFieldsHelpers()();
             structHelpers.PointerFields = PointerFieldsHelpers;
 
             const exports = {

@@ -2180,7 +2180,7 @@ struct IntrinsicJSFragment: Sendable {
                 printer.write("const __bjs_create\(enumName)Helpers = () => {")
                 printer.indent()
                 printer.write(
-                    "return (\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTmpParamPointers), \(JSGlueVariableScope.reservedTmpRetPointers), textEncoder, \(JSGlueVariableScope.reservedSwift), \(JSGlueVariableScope.reservedStructHelpers), \(JSGlueVariableScope.reservedEnumHelpers)) => ({"
+                    "return () => ({"
                 )
                 printer.indent()
 
@@ -3297,7 +3297,7 @@ struct IntrinsicJSFragment: Sendable {
                 printer.write("const __bjs_create\(structName)Helpers = () => {")
                 printer.indent()
                 printer.write(
-                    "return (\(JSGlueVariableScope.reservedTmpParamInts), \(JSGlueVariableScope.reservedTmpParamF32s), \(JSGlueVariableScope.reservedTmpParamF64s), \(JSGlueVariableScope.reservedTmpParamPointers), \(JSGlueVariableScope.reservedTmpRetPointers), textEncoder, \(JSGlueVariableScope.reservedSwift), \(JSGlueVariableScope.reservedEnumHelpers)) => ({"
+                    "return () => ({"
                 )
                 printer.indent()
 
