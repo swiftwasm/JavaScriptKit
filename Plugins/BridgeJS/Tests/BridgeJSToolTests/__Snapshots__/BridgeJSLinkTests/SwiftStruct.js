@@ -67,7 +67,7 @@ export async function createInstantiator(options, swift) {
                 };
                 return { cleanup };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 const isSome = tmpRetInts.pop();
                 let optional;
                 if (isSome) {
@@ -115,7 +115,7 @@ export async function createInstantiator(options, swift) {
                 };
                 return { cleanup };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 const isSome = tmpRetInts.pop();
                 let optional;
                 if (isSome) {
@@ -158,7 +158,7 @@ export async function createInstantiator(options, swift) {
                 };
                 return { cleanup };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 const isSome = tmpRetInts.pop();
                 let optional;
                 if (isSome) {
@@ -167,7 +167,7 @@ export async function createInstantiator(options, swift) {
                 } else {
                     optional = null;
                 }
-                const struct = structHelpers.Address.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                const struct = structHelpers.Address.lift();
                 const int = tmpRetInts.pop();
                 const string1 = tmpRetStrings.pop();
                 return { name: string1, age: int, address: struct, email: optional };
@@ -181,7 +181,7 @@ export async function createInstantiator(options, swift) {
                 tmpParamPointers.push(value.owner.pointer);
                 return { cleanup: undefined };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 const ptr = tmpRetPointers.pop();
                 const obj = _exports['Greeter'].__construct(ptr);
                 const int = tmpRetInts.pop();
@@ -203,7 +203,7 @@ export async function createInstantiator(options, swift) {
                 tmpParamInts.push(isSome ? 1 : 0);
                 return { cleanup: undefined };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 const isSome = tmpRetInts.pop();
                 let optional;
                 if (isSome) {
@@ -223,7 +223,7 @@ export async function createInstantiator(options, swift) {
             lower: (value) => {
                 return { cleanup: undefined };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 return {  };
             }
         });
@@ -264,7 +264,7 @@ export async function createInstantiator(options, swift) {
                 };
                 return { cleanup };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 const isSome = tmpRetInts.pop();
                 let optional;
                 if (isSome) {
@@ -632,14 +632,14 @@ export async function createInstantiator(options, swift) {
                 roundtrip: function bjs_roundtrip(session) {
                     const { cleanup: cleanup } = structHelpers.Person.lower(session);
                     instance.exports.bjs_roundtrip();
-                    const structValue = structHelpers.Person.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const structValue = structHelpers.Person.lift();
                     if (cleanup) { cleanup(); }
                     return structValue;
                 },
                 roundtripContainer: function bjs_roundtripContainer(container) {
                     const { cleanup: cleanup } = structHelpers.Container.lower(container);
                     instance.exports.bjs_roundtripContainer();
-                    const structValue = structHelpers.Container.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const structValue = structHelpers.Container.lift();
                     if (cleanup) { cleanup(); }
                     return structValue;
                 },
@@ -651,7 +651,7 @@ export async function createInstantiator(options, swift) {
                         const isSome = optCount != null;
                         const isSome1 = optFlag != null;
                         instance.exports.bjs_DataPoint_init(x, y, labelId, labelBytes.length, +isSome, isSome ? optCount : 0, +isSome1, isSome1 ? optFlag : 0);
-                        const structValue = structHelpers.DataPoint.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        const structValue = structHelpers.DataPoint.lift();
                         swift.memory.release(labelId);
                         return structValue;
                     },

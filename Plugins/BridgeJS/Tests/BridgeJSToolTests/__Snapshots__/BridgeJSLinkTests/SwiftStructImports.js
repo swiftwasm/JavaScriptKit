@@ -41,7 +41,7 @@ export async function createInstantiator(options, swift) {
                 tmpParamInts.push((value.y | 0));
                 return { cleanup: undefined };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 const int = tmpRetInts.pop();
                 const int1 = tmpRetInts.pop();
                 return { x: int1, y: int };

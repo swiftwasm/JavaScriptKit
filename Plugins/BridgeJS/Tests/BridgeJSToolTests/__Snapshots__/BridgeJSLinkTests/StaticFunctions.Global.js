@@ -68,7 +68,7 @@ export async function createInstantiator(options, swift) {
                     default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
                 }
             },
-            lift: (tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tag) => {
                 tag = tag | 0;
                 switch (tag) {
                     case APIResultValues.Tag.Success: {
@@ -335,7 +335,7 @@ export async function createInstantiator(options, swift) {
                     roundtrip: function(value) {
                         const { caseId: valueCaseId, cleanup: valueCleanup } = enumHelpers.APIResult.lower(value);
                         instance.exports.bjs_APIResult_static_roundtrip(valueCaseId);
-                        const ret = enumHelpers.APIResult.lift(tmpRetTag.pop(), tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        const ret = enumHelpers.APIResult.lift(tmpRetTag.pop());
                         if (valueCleanup) { valueCleanup(); }
                         return ret;
                     }

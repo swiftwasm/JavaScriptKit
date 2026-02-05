@@ -44,7 +44,7 @@ export async function createInstantiator(options, swift) {
                 tmpParamPointers.push((value.mutPtr | 0));
                 return { cleanup: undefined };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 const pointer = tmpRetPointers.pop();
                 const pointer1 = tmpRetPointers.pop();
                 const pointer2 = tmpRetPointers.pop();
@@ -286,14 +286,14 @@ export async function createInstantiator(options, swift) {
                 roundTripPointerFields: function bjs_roundTripPointerFields(value) {
                     const { cleanup: cleanup } = structHelpers.PointerFields.lower(value);
                     instance.exports.bjs_roundTripPointerFields();
-                    const structValue = structHelpers.PointerFields.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const structValue = structHelpers.PointerFields.lift();
                     if (cleanup) { cleanup(); }
                     return structValue;
                 },
                 PointerFields: {
                     init: function(raw, mutRaw, opaque, ptr, mutPtr) {
                         instance.exports.bjs_PointerFields_init(raw, mutRaw, opaque, ptr, mutPtr);
-                        const structValue = structHelpers.PointerFields.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        const structValue = structHelpers.PointerFields.lift();
                         return structValue;
                     },
                 },

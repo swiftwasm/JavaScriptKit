@@ -54,7 +54,7 @@ export async function createInstantiator(options, swift) {
                 tmpParamF64s.push(value.y);
                 return { cleanup: undefined };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 const f64 = tmpRetF64s.pop();
                 const f641 = tmpRetF64s.pop();
                 return { x: f641, y: f64 };
@@ -481,7 +481,7 @@ export async function createInstantiator(options, swift) {
                     const arrayLen = tmpRetInts.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const struct = structHelpers.Point.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        const struct = structHelpers.Point.lift();
                         arrayResult.push(struct);
                     }
                     arrayResult.reverse();
@@ -544,7 +544,7 @@ export async function createInstantiator(options, swift) {
                     const matchingBytes = textEncoder.encode(matching);
                     const matchingId = swift.memory.retain(matchingBytes);
                     instance.exports.bjs_findFirstPoint(matchingId, matchingBytes.length);
-                    const structValue = structHelpers.Point.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const structValue = structHelpers.Point.lift();
                     for (const cleanup of arrayCleanups) { cleanup(); }
                     swift.memory.release(matchingId);
                     return structValue;
@@ -715,7 +715,7 @@ export async function createInstantiator(options, swift) {
                         if (isSome1 === 0) {
                             optValue = null;
                         } else {
-                            const struct = structHelpers.Point.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                            const struct = structHelpers.Point.lift();
                             optValue = struct;
                         }
                         arrayResult.push(optValue);
@@ -873,7 +873,7 @@ export async function createInstantiator(options, swift) {
                         const arrayLen1 = tmpRetInts.pop();
                         const arrayResult1 = [];
                         for (let i1 = 0; i1 < arrayLen1; i1++) {
-                            const struct = structHelpers.Point.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                            const struct = structHelpers.Point.lift();
                             arrayResult1.push(struct);
                         }
                         arrayResult1.reverse();
