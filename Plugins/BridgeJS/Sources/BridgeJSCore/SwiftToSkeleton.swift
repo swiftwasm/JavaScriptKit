@@ -2017,7 +2017,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                 DiagnosticError(
                     node: node,
                     message: "@\(attributeName) declarations must be throws.",
-                    hint: "Declare the function as 'throws (JSException)'."
+                    hint: "Declare the function as 'throws(JSException)'."
                 )
             )
             return nil
