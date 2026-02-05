@@ -9,26 +9,25 @@ final class OptionalSupportTests: XCTestCase {
         try runJsOptionalSupportTests()
     }
 
-    // FIXME: Optional<String> return type on imported function is broken
-    // func testRoundTripOptionalStringNull() throws {
-    //     try XCTAssertEqual(jsRoundTripOptionalStringNull("hello"), "hello")
-    //     try XCTAssertNil(jsRoundTripOptionalStringNull(nil))
-    // }
+    func testRoundTripOptionalStringNull() throws {
+        try XCTAssertEqual(jsRoundTripOptionalStringNull("hello"), "hello")
+        try XCTAssertNil(jsRoundTripOptionalStringNull(nil))
+    }
 
-    // func testRoundTripOptionalStringUndefined() throws {
-    //     let some = try jsRoundTripOptionalStringUndefined(.value("hi"))
-    //     switch some {
-    //     case .value(let value):
-    //         XCTAssertEqual(value, "hi")
-    //     case .undefined:
-    //         XCTFail("Expected defined value")
-    //     }
+    func testRoundTripOptionalStringUndefined() throws {
+        let some = try jsRoundTripOptionalStringUndefined(.value("hi"))
+        switch some {
+        case .value(let value):
+            XCTAssertEqual(value, "hi")
+        case .undefined:
+            XCTFail("Expected defined value")
+        }
 
-    //     let undefined = try jsRoundTripOptionalStringUndefined(.undefinedValue)
-    //     if case .value = undefined {
-    //         XCTFail("Expected undefined")
-    //     }
-    // }
+        let undefined = try jsRoundTripOptionalStringUndefined(.undefinedValue)
+        if case .value = undefined {
+            XCTFail("Expected undefined")
+        }
+    }
 
     func testRoundTripOptionalNumberNull() throws {
         try XCTAssertEqual(jsRoundTripOptionalNumberNull(42), 42)

@@ -994,19 +994,13 @@ struct IntrinsicJSFragment: Sendable {
                         "bjs[\"swift_js_return_optional_double\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? \(value) : 0.0);"
                     )
                 case .string:
-                    let bytesVar = scope.variable("bytes")
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
-                        printer.write(
-                            "const \(bytesVar) = \(JSGlueVariableScope.reservedTextEncoder).encode(\(value));"
-                        )
-                        printer.write("bjs[\"swift_js_return_optional_string\"](1, \(bytesVar), \(bytesVar).length);")
-                        printer.write("return \(bytesVar).length;")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(value);")
                     }
                     printer.write("} else {")
                     printer.indent {
-                        printer.write("bjs[\"swift_js_return_optional_string\"](0, 0, 0);")
-                        printer.write("return -1;")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = null;")
                     }
                     printer.write("}")
                 case .jsObject, .swiftProtocol:
@@ -1032,19 +1026,13 @@ struct IntrinsicJSFragment: Sendable {
                 case .rawValueEnum(_, let rawType):
                     switch rawType {
                     case .string:
-                        let bytesVar = scope.variable("bytes")
                         printer.write("if (\(isSomeVar)) {")
                         printer.indent {
-                            printer.write(
-                                "const \(bytesVar) = \(JSGlueVariableScope.reservedTextEncoder).encode(\(value));"
-                            )
-                            printer.write(
-                                "bjs[\"swift_js_return_optional_string\"](1, \(bytesVar), \(bytesVar).length);"
-                            )
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(value);")
                         }
                         printer.write("} else {")
                         printer.indent {
-                            printer.write("bjs[\"swift_js_return_optional_string\"](0, 0, 0);")
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = null;")
                         }
                         printer.write("}")
                     default:
