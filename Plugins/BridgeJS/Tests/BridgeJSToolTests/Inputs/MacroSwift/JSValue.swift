@@ -6,6 +6,14 @@
     return value
 }
 
+@JS func roundTripJSValueArray(_ values: [JSValue]) -> [JSValue] {
+    return values
+}
+
+@JS func roundTripOptionalJSValueArray(_ values: [JSValue]?) -> [JSValue]? {
+    return values
+}
+
 @JS class JSValueHolder {
     @JS var value: JSValue
     @JS var optionalValue: JSValue?
@@ -30,3 +38,4 @@
 }
 
 @JSFunction func jsEchoJSValue(_ value: JSValue) throws(JSException) -> JSValue
+@JSFunction func jsEchoJSValueArray(_ values: [JSValue]) throws(JSException) -> [JSValue]

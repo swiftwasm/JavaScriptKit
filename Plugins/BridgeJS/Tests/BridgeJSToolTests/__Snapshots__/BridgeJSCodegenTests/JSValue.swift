@@ -20,6 +20,37 @@ public func _bjs_roundTripOptionalJSValue(_ valueIsSome: Int32, _ valueKind: Int
     #endif
 }
 
+@_expose(wasm, "bjs_roundTripJSValueArray")
+@_cdecl("bjs_roundTripJSValueArray")
+public func _bjs_roundTripJSValueArray() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripJSValueArray(_: [JSValue].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripOptionalJSValueArray")
+@_cdecl("bjs_roundTripOptionalJSValueArray")
+public func _bjs_roundTripOptionalJSValueArray(_ values: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripOptionalJSValueArray(_: {
+        if values == 0 {
+            return Optional<[JSValue]>.none
+        } else {
+            return [JSValue].bridgeJSLiftParameter()
+        }
+        }())
+    let __bjs_isSome_ret = ret != nil
+    if let __bjs_unwrapped_ret = ret {
+    __bjs_unwrapped_ret.bridgeJSLowerReturn()}
+    _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_JSValueHolder_init")
 @_cdecl("bjs_JSValueHolder_init")
 public func _bjs_JSValueHolder_init(_ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64, _ optionalValueIsSome: Int32, _ optionalValueKind: Int32, _ optionalValuePayload1: Int32, _ optionalValuePayload2: Float64) -> UnsafeMutableRawPointer {
@@ -146,4 +177,22 @@ func _$jsEchoJSValue(_ value: JSValue) throws(JSException) -> JSValue {
         throw error
     }
     return JSValue.bridgeJSLiftReturn()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_jsEchoJSValueArray")
+fileprivate func bjs_jsEchoJSValueArray() -> Void
+#else
+fileprivate func bjs_jsEchoJSValueArray() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsEchoJSValueArray(_ values: [JSValue]) throws(JSException) -> [JSValue] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_jsEchoJSValueArray()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [JSValue].bridgeJSLiftReturn()
 }

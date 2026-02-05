@@ -24,9 +24,12 @@ export type Exports = {
     }
     roundTripJSValue(value: any): any;
     roundTripOptionalJSValue(value: any | null): any | null;
+    roundTripJSValueArray(values: any[]): any[];
+    roundTripOptionalJSValueArray(values: any[] | null): any[] | null;
 }
 export type Imports = {
     jsEchoJSValue(value: any): any;
+    jsEchoJSValueArray(values: any[]): any[];
 }
 export function createInstantiator(options: {
     imports: Imports;
