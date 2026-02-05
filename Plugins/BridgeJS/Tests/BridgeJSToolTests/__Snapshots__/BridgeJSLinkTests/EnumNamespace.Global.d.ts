@@ -61,9 +61,9 @@ declare global {
     namespace Services {
         namespace Graph {
             namespace GraphOperations {
-                createGraph(rootId: number): number;
-                nodeCount(graphId: number): number;
-                validate(graphId: number): boolean;
+                function createGraph(rootId: number): number;
+                function nodeCount(graphId: number): number;
+                function validate(graphId: number): boolean;
             }
         }
     }

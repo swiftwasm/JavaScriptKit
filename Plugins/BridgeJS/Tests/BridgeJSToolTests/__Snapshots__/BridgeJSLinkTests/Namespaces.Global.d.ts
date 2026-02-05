@@ -9,7 +9,7 @@ export {};
 declare global {
     namespace MyModule {
         namespace Utils {
-            namespacedFunction(): string;
+            function namespacedFunction(): string;
         }
     }
     namespace Utils {
