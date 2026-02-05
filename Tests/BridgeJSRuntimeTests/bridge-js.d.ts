@@ -2,8 +2,6 @@ export function jsRoundTripVoid(): void
 export function jsRoundTripNumber(v: number): number
 export function jsRoundTripBool(v: boolean): boolean
 export function jsRoundTripString(v: string): string
-export function jsRoundTripOptionalNumberNull(v: number | null): number | null
-export function jsRoundTripOptionalNumberUndefined(v: number | undefined): number | undefined
 export type JSValue = any
 export function jsRoundTripJSValue(v: JSValue): JSValue
 export function jsThrowOrVoid(shouldThrow: boolean): void

@@ -14,10 +14,6 @@
 
 @JSFunction func jsRoundTripString(_ v: String) throws(JSException) -> String
 
-@JSFunction func jsRoundTripOptionalNumberNull(_ v: Optional<Double>) throws(JSException) -> Optional<Double>
-
-@JSFunction func jsRoundTripOptionalNumberUndefined(_ v: JSUndefinedOr<Double>) throws(JSException) -> JSUndefinedOr<Double>
-
 @JSFunction func jsRoundTripJSValue(_ v: JSValue) throws(JSException) -> JSValue
 
 @JSFunction func jsThrowOrVoid(_ shouldThrow: Bool) throws(JSException) -> Void
