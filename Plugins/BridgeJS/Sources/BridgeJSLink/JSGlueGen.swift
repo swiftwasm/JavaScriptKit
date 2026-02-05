@@ -737,6 +737,23 @@ struct IntrinsicJSFragment: Sendable {
                     }
                     printer.write("}")
                     resultExpr = arrayVar
+                case .dictionary(let valueType):
+                    let dictVar = scope.variable("dictValue")
+                    printer.write("let \(dictVar);")
+                    printer.write("if (\(isSome)) {")
+                    printer.indent {
+                        let dictLiftFragment = try! dictionaryLift(valueType: valueType)
+                        let liftResults = dictLiftFragment.printCode([], scope, printer, cleanupCode)
+                        if let liftResult = liftResults.first {
+                            printer.write("\(dictVar) = \(liftResult);")
+                        }
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("\(dictVar) = \(absenceLiteral);")
+                    }
+                    printer.write("}")
+                    resultExpr = dictVar
                 default:
                     resultExpr = "\(isSome) ? \(wrappedValue) : \(absenceLiteral)"
                 }
@@ -823,6 +840,23 @@ struct IntrinsicJSFragment: Sendable {
                         let _ = arrayLowerFragment.printCode([value], scope, printer, arrayCleanup)
                         if !arrayCleanup.lines.isEmpty {
                             for line in arrayCleanup.lines {
+                                printer.write("\(cleanupArrayVar).push(() => { \(line) });")
+                            }
+                        }
+                    }
+                    printer.write("}")
+                    cleanupCode.write("for (const cleanup of \(cleanupArrayVar)) { cleanup(); }")
+                    return ["+\(isSomeVar)"]
+                case .dictionary(let valueType):
+                    let cleanupArrayVar = scope.variable("\(value)Cleanups")
+                    printer.write("const \(cleanupArrayVar) = [];")
+                    printer.write("if (\(isSomeVar)) {")
+                    printer.indent {
+                        let dictLowerFragment = try! dictionaryLower(valueType: valueType)
+                        let dictCleanup = CodeFragmentPrinter()
+                        let _ = dictLowerFragment.printCode([value], scope, printer, dictCleanup)
+                        if !dictCleanup.lines.isEmpty {
+                            for line in dictCleanup.lines {
                                 printer.write("\(cleanupArrayVar).push(() => { \(line) });")
                             }
                         }
@@ -972,6 +1006,23 @@ struct IntrinsicJSFragment: Sendable {
                     printer.indent {
                         let arrayLiftFragment = try! arrayLift(elementType: elementType)
                         let liftResults = arrayLiftFragment.printCode([], scope, printer, cleanupCode)
+                        if let liftResult = liftResults.first {
+                            printer.write("\(resultVar) = \(liftResult);")
+                        }
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("\(resultVar) = \(absenceLiteral);")
+                    }
+                    printer.write("}")
+                case .dictionary(let valueType):
+                    let isSomeVar = scope.variable("isSome")
+                    printer.write("const \(isSomeVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    printer.write("let \(resultVar);")
+                    printer.write("if (\(isSomeVar)) {")
+                    printer.indent {
+                        let dictLiftFragment = try! dictionaryLift(valueType: valueType)
+                        let liftResults = dictLiftFragment.printCode([], scope, printer, cleanupCode)
                         if let liftResult = liftResults.first {
                             printer.write("\(resultVar) = \(liftResult);")
                         }
@@ -1133,6 +1184,52 @@ struct IntrinsicJSFragment: Sendable {
                     }
                     printer.write("}")
                     cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
+                case .dictionary(let valueType):
+                    printer.write("if (\(isSomeVar)) {")
+                    printer.indent {
+                        let cleanupArrayVar = scope.variable("arrayCleanups")
+                        let entriesVar = scope.variable("entries")
+                        let entryVar = scope.variable("entry")
+                        printer.write("const \(cleanupArrayVar) = [];")
+                        printer.write("const \(entriesVar) = Object.entries(\(value));")
+                        printer.write("for (const \(entryVar) of \(entriesVar)) {")
+                        printer.indent {
+                            let keyVar = scope.variable("key")
+                            let valueVar = scope.variable("value")
+                            printer.write("const [\(keyVar), \(valueVar)] = \(entryVar);")
+
+                            let keyFragment = try! stackLowerFragment(elementType: .string)
+                            let keyCleanup = CodeFragmentPrinter()
+                            let _ = keyFragment.printCode([keyVar], scope, printer, keyCleanup)
+                            if !keyCleanup.lines.isEmpty {
+                                printer.write("\(cleanupArrayVar).push(() => {")
+                                printer.indent {
+                                    for line in keyCleanup.lines {
+                                        printer.write(line)
+                                    }
+                                }
+                                printer.write("});")
+                            }
+
+                            let valueFragment = try! stackLowerFragment(elementType: valueType)
+                            let valueCleanup = CodeFragmentPrinter()
+                            let _ = valueFragment.printCode([valueVar], scope, printer, valueCleanup)
+                            if !valueCleanup.lines.isEmpty {
+                                printer.write("\(cleanupArrayVar).push(() => {")
+                                printer.indent {
+                                    for line in valueCleanup.lines {
+                                        printer.write(line)
+                                    }
+                                }
+                                printer.write("});")
+                            }
+                        }
+                        printer.write("}")
+                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(entriesVar).length);")
+                        cleanupCode.write("for (const cleanup of \(cleanupArrayVar)) { cleanup(); }")
+                    }
+                    printer.write("}")
+                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
                 default:
                     ()
                 }
@@ -1807,6 +1904,8 @@ struct IntrinsicJSFragment: Sendable {
             throw BridgeJSLinkError(message: "Namespace enums are not supported to be passed as parameters: \(string)")
         case .array(let elementType):
             return try arrayLower(elementType: elementType)
+        case .dictionary(let valueType):
+            return try dictionaryLower(valueType: valueType)
         }
     }
 
@@ -1854,6 +1953,8 @@ struct IntrinsicJSFragment: Sendable {
             )
         case .array(let elementType):
             return try arrayLift(elementType: elementType)
+        case .dictionary(let valueType):
+            return try dictionaryLift(valueType: valueType)
         }
     }
 
@@ -1945,6 +2046,8 @@ struct IntrinsicJSFragment: Sendable {
             )
         case .array(let elementType):
             return try arrayLift(elementType: elementType)
+        case .dictionary(let valueType):
+            return try dictionaryLift(valueType: valueType)
         }
     }
 
@@ -2014,6 +2117,8 @@ struct IntrinsicJSFragment: Sendable {
             )
         case .array(let elementType):
             return try arrayLower(elementType: elementType)
+        case .dictionary(let valueType):
+            return try dictionaryLower(valueType: valueType)
         }
     }
 
@@ -2607,6 +2712,58 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
+    /// Lowers a dictionary from JS to Swift by iterating entries and pushing to stacks
+    static func dictionaryLower(valueType: BridgeType) throws -> IntrinsicJSFragment {
+        return IntrinsicJSFragment(
+            parameters: ["dict"],
+            printCode: { arguments, scope, printer, cleanupCode in
+                let dict = arguments[0]
+                let cleanupArrayVar = scope.variable("arrayCleanups")
+
+                printer.write("const \(cleanupArrayVar) = [];")
+                let entriesVar = scope.variable("entries")
+                let entryVar = scope.variable("entry")
+                printer.write("const \(entriesVar) = Object.entries(\(dict));")
+                printer.write("for (const \(entryVar) of \(entriesVar)) {")
+                printer.indent {
+                    let keyVar = scope.variable("key")
+                    let valueVar = scope.variable("value")
+                    printer.write("const [\(keyVar), \(valueVar)] = \(entryVar);")
+
+                    let keyFragment = try! stackLowerFragment(elementType: .string)
+                    let keyCleanup = CodeFragmentPrinter()
+                    let _ = keyFragment.printCode([keyVar], scope, printer, keyCleanup)
+                    if !keyCleanup.lines.isEmpty {
+                        printer.write("\(cleanupArrayVar).push(() => {")
+                        printer.indent {
+                            for line in keyCleanup.lines {
+                                printer.write(line)
+                            }
+                        }
+                        printer.write("});")
+                    }
+
+                    let valueFragment = try! stackLowerFragment(elementType: valueType)
+                    let valueCleanup = CodeFragmentPrinter()
+                    let _ = valueFragment.printCode([valueVar], scope, printer, valueCleanup)
+                    if !valueCleanup.lines.isEmpty {
+                        printer.write("\(cleanupArrayVar).push(() => {")
+                        printer.indent {
+                            for line in valueCleanup.lines {
+                                printer.write(line)
+                            }
+                        }
+                        printer.write("});")
+                    }
+                }
+                printer.write("}")
+                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(entriesVar).length);")
+                cleanupCode.write("for (const cleanup of \(cleanupArrayVar)) { cleanup(); }")
+                return []
+            }
+        )
+    }
+
     /// Lifts an array from Swift to JS by popping elements from stacks
     static func arrayLift(elementType: BridgeType) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
@@ -2633,13 +2790,39 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
+    /// Lifts a dictionary from Swift to JS by popping key/value pairs from stacks
+    static func dictionaryLift(valueType: BridgeType) throws -> IntrinsicJSFragment {
+        return IntrinsicJSFragment(
+            parameters: [],
+            printCode: { arguments, scope, printer, cleanupCode in
+                let resultVar = scope.variable("dictResult")
+                let lenVar = scope.variable("dictLen")
+                let iVar = scope.variable("i")
+
+                printer.write("const \(lenVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                printer.write("const \(resultVar) = {};")
+                printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
+                printer.indent {
+                    let valueFragment = try! stackLiftFragment(elementType: valueType)
+                    let valueResults = valueFragment.printCode([], scope, printer, cleanupCode)
+                    let keyFragment = try! stackLiftFragment(elementType: .string)
+                    let keyResults = keyFragment.printCode([], scope, printer, cleanupCode)
+                    if let keyExpr = keyResults.first, let valueExpr = valueResults.first {
+                        printer.write("\(resultVar)[\(keyExpr)] = \(valueExpr);")
+                    }
+                }
+                printer.write("}")
+                return [resultVar]
+            }
+        )
+    }
+
     private static func stackLiftFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
         switch elementType {
         case .jsValue:
             return IntrinsicJSFragment(
                 parameters: [],
                 printCode: { _, scope, printer, cleanup in
-                    registerJSValueHelpers(scope: scope)
                     let payload2Var = scope.variable("jsValuePayload2")
                     let payload1Var = scope.variable("jsValuePayload1")
                     let kindVar = scope.variable("jsValueKind")
@@ -2647,6 +2830,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("const \(payload1Var) = \(scope.popI32Return());")
                     printer.write("const \(kindVar) = \(scope.popI32Return());")
                     let resultVar = scope.variable("jsValue")
+                    registerJSValueHelpers(scope: scope)
                     printer.write(
                         "const \(resultVar) = \(jsValueLiftHelperName)(\(kindVar), \(payload1Var), \(payload2Var));"
                     )
@@ -2795,6 +2979,8 @@ struct IntrinsicJSFragment: Sendable {
             )
         case .array(let innerElementType):
             return try! arrayLift(elementType: innerElementType)
+        case .dictionary(let valueType):
+            return try! dictionaryLift(valueType: valueType)
         case .nullable(let wrappedType, let kind):
             return try optionalElementRaiseFragment(wrappedType: wrappedType, kind: kind)
         case .unsafePointer:
@@ -2980,6 +3166,8 @@ struct IntrinsicJSFragment: Sendable {
             )
         case .array(let innerElementType):
             return try! arrayLower(elementType: innerElementType)
+        case .dictionary(let valueType):
+            return try! dictionaryLower(valueType: valueType)
         case .nullable(let wrappedType, let kind):
             return try optionalElementLowerFragment(
                 wrappedType: wrappedType,

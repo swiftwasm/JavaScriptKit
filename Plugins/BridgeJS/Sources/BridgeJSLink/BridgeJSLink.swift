@@ -1462,6 +1462,9 @@ public struct BridgeJSLink {
                 return "(\(elementTypeStr))[]"
             }
             return "\(elementTypeStr)[]"
+        case .dictionary(let valueType):
+            let valueTypeStr = resolveTypeScriptType(valueType, exportedSkeletons: exportedSkeletons)
+            return "Record<string, \(valueTypeStr)>"
         default:
             return type.tsType
         }
@@ -3564,6 +3567,8 @@ extension BridgeType {
                 return "(\(inner))[]"
             }
             return "\(inner)[]"
+        case .dictionary(let valueType):
+            return "Record<string, \(valueType.tsType)>"
         }
     }
 }

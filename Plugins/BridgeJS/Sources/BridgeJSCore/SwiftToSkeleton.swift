@@ -213,6 +213,45 @@ public final class SwiftToSkeleton {
                 return .array(elementType)
             }
         }
+        // [String: T]
+        if let dictType = type.as(DictionaryTypeSyntax.self) {
+            if let keyType = lookupType(for: dictType.key, errors: &errors),
+                keyType == .string,
+                let valueType = lookupType(for: dictType.value, errors: &errors)
+            {
+                return .dictionary(valueType)
+            }
+        }
+        // Dictionary<String, T>
+        if let identifierType = type.as(IdentifierTypeSyntax.self),
+            identifierType.name.text == "Dictionary",
+            let genericArgs = identifierType.genericArgumentClause?.arguments,
+            genericArgs.count == 2,
+            let keyArg = TypeSyntax(genericArgs.first?.argument),
+            let valueArg = TypeSyntax(genericArgs.last?.argument),
+            let keyType = lookupType(for: keyArg, errors: &errors),
+            keyType == .string
+        {
+            if let valueType = lookupType(for: valueArg, errors: &errors) {
+                return .dictionary(valueType)
+            }
+        }
+        // Swift.Dictionary<String, T>
+        if let memberType = type.as(MemberTypeSyntax.self),
+            let baseType = memberType.baseType.as(IdentifierTypeSyntax.self),
+            baseType.name.text == "Swift",
+            memberType.name.text == "Dictionary",
+            let genericArgs = memberType.genericArgumentClause?.arguments,
+            genericArgs.count == 2,
+            let keyArg = TypeSyntax(genericArgs.first?.argument),
+            let valueArg = TypeSyntax(genericArgs.last?.argument),
+            let keyType = lookupType(for: keyArg, errors: &errors),
+            keyType == .string
+        {
+            if let valueType = lookupType(for: valueArg, errors: &errors) {
+                return .dictionary(valueType)
+            }
+        }
         if let aliasDecl = typeDeclResolver.resolveTypeAlias(type) {
             if let resolvedType = lookupType(for: aliasDecl.initializer.value, errors: &errors) {
                 return resolvedType

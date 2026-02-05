@@ -980,7 +980,7 @@ extension BridgeType {
             var params = [("isSome", WasmCoreType.i32)]
             params.append(contentsOf: wrappedInfo.loweredParameters)
             return LoweringParameterInfo(loweredParameters: params)
-        case .array:
+        case .array, .dictionary:
             return LoweringParameterInfo(loweredParameters: [])
         }
     }
@@ -1059,7 +1059,7 @@ extension BridgeType {
         case .nullable(let wrappedType, _):
             let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
             return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
-        case .array:
+        case .array, .dictionary:
             return LiftingReturnInfo(valueToLift: nil)
         }
     }
