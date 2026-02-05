@@ -148,7 +148,13 @@ import BridgeJSUtilities
                 exposeToGlobal: config.exposeToGlobal
             )
             for inputFile in inputFiles.sorted() {
-                let content = try String(contentsOf: URL(fileURLWithPath: inputFile), encoding: .utf8)
+                let inputURL = URL(fileURLWithPath: inputFile)
+                // Skip directories (e.g. .docc catalogs included in target.sourceFiles)
+                var isDirectory: ObjCBool = false
+                if FileManager.default.fileExists(atPath: inputFile, isDirectory: &isDirectory), isDirectory.boolValue {
+                    continue
+                }
+                let content = try String(contentsOf: inputURL, encoding: .utf8)
                 if hasBridgeJSSkipComment(content) {
                     continue
                 }
