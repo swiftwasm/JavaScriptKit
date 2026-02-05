@@ -663,6 +663,7 @@ export class TypeProcessor {
      * @private
      */
     visitType(type, node) {
+        const typeArguments = this.getTypeArguments(type);
         if (this.checker.isArrayType(type)) {
             const typeArgs = this.checker.getTypeArguments(type);
             if (typeArgs && typeArgs.length > 0) {
@@ -670,6 +671,11 @@ export class TypeProcessor {
                 return `[${elementType}]`;
             }
             return "[JSObject]";
+        }
+
+        const recordType = this.convertRecordType(type, typeArguments, node);
+        if (recordType) {
+            return recordType;
         }
 
         // Treat A<B> and A<C> as the same type
@@ -758,6 +764,54 @@ export class TypeProcessor {
         const swiftType = convert(type);
         this.processedTypes.set(type, swiftType);
         return swiftType;
+    }
+
+    /**
+     * Convert a `Record<string, T>` TypeScript type into a Swift dictionary type.
+     * Falls back to `JSObject` when keys are not string-compatible or type arguments are missing.
+     * @param {ts.Type} type
+     * @param {ts.Type[]} typeArguments
+     * @param {ts.Node} node
+     * @returns {string | null}
+     * @private
+     */
+    convertRecordType(type, typeArguments, node) {
+        const symbol = type.aliasSymbol ?? type.getSymbol();
+        if (!symbol || symbol.name !== "Record") {
+            return null;
+        }
+        if (typeArguments.length !== 2) {
+            this.diagnosticEngine.print("warning", "Record expects two type arguments", node);
+            return "JSObject";
+        }
+        const [keyType, valueType] = typeArguments;
+        const stringType = this.checker.getStringType();
+        if (!this.checker.isTypeAssignableTo(keyType, stringType)) {
+            this.diagnosticEngine.print(
+                "warning",
+                `Record key type must be assignable to string: ${this.checker.typeToString(keyType)}`,
+                node
+            );
+            return "JSObject";
+        }
+
+        const valueSwiftType = this.visitType(valueType, node);
+        return `[String: ${valueSwiftType}]`;
+    }
+
+    /**
+     * Retrieve type arguments for a given type, including type alias instantiations.
+     * @param {ts.Type} type
+     * @returns {ts.Type[]}
+     * @private
+     */
+    getTypeArguments(type) {
+        if (isTypeReference(type)) {
+            return this.checker.getTypeArguments(type);
+        }
+        // Non-TypeReference alias instantiations store type arguments separately.
+        // @ts-ignore: `aliasTypeArguments` is intentionally accessed for alias instantiations.
+        return type.aliasTypeArguments ?? [];
     }
 
     /**
