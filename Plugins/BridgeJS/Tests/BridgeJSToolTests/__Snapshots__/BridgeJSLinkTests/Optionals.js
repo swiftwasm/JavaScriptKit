@@ -238,12 +238,9 @@ export async function createInstantiator(options, swift) {
                     let ret = swift.memory.getObject(self).stringOrNull;
                     const isSome = ret != null;
                     if (isSome) {
-                        const bytes = textEncoder.encode(ret);
-                        bjs["swift_js_return_optional_string"](1, bytes, bytes.length);
-                        return bytes.length;
+                        tmpRetString = ret;
                     } else {
-                        bjs["swift_js_return_optional_string"](0, 0, 0);
-                        return -1;
+                        tmpRetString = null;
                     }
                 } catch (error) {
                     setException(error);
@@ -254,12 +251,9 @@ export async function createInstantiator(options, swift) {
                     let ret = swift.memory.getObject(self).stringOrUndefined;
                     const isSome = ret !== undefined;
                     if (isSome) {
-                        const bytes = textEncoder.encode(ret);
-                        bjs["swift_js_return_optional_string"](1, bytes, bytes.length);
-                        return bytes.length;
+                        tmpRetString = ret;
                     } else {
-                        bjs["swift_js_return_optional_string"](0, 0, 0);
-                        return -1;
+                        tmpRetString = null;
                     }
                 } catch (error) {
                     setException(error);
@@ -395,12 +389,9 @@ export async function createInstantiator(options, swift) {
                     let ret = swift.memory.getObject(self).roundTripStringOrNull(valueIsSome ? obj : null);
                     const isSome = ret != null;
                     if (isSome) {
-                        const bytes = textEncoder.encode(ret);
-                        bjs["swift_js_return_optional_string"](1, bytes, bytes.length);
-                        return bytes.length;
+                        tmpRetString = ret;
                     } else {
-                        bjs["swift_js_return_optional_string"](0, 0, 0);
-                        return -1;
+                        tmpRetString = null;
                     }
                 } catch (error) {
                     setException(error);
@@ -416,12 +407,9 @@ export async function createInstantiator(options, swift) {
                     let ret = swift.memory.getObject(self).roundTripStringOrUndefined(valueIsSome ? obj : undefined);
                     const isSome = ret !== undefined;
                     if (isSome) {
-                        const bytes = textEncoder.encode(ret);
-                        bjs["swift_js_return_optional_string"](1, bytes, bytes.length);
-                        return bytes.length;
+                        tmpRetString = ret;
                     } else {
-                        bjs["swift_js_return_optional_string"](0, 0, 0);
-                        return -1;
+                        tmpRetString = null;
                     }
                 } catch (error) {
                     setException(error);
