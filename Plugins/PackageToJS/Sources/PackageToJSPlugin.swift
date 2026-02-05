@@ -751,9 +751,9 @@ class SkeletonCollector {
             let directories = [
                 target.directoryURL.appending(path: "Generated/JavaScript"),
                 // context.pluginWorkDirectoryURL: ".build/plugins/PackageToJS/outputs/"
-                // .build/plugins/outputs/exportswift/MyApp/destination/BridgeJS/BridgeJS.ExportSwift.json
+                // .build/plugins/outputs/[package]/[target]/destination/BridgeJS/JavaScript/BridgeJS.json
                 context.pluginWorkDirectoryURL.deletingLastPathComponent().deletingLastPathComponent()
-                    .appending(path: "outputs/\(package.id)/\(target.name)/destination/BridgeJS"),
+                    .appending(path: "outputs/\(package.id)/\(target.name)/destination/BridgeJS/JavaScript"),
             ]
             for directory in directories {
                 let skeletonURL = directory.appending(path: skeletonFile)
