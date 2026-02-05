@@ -35,26 +35,6 @@ class ImportAPITests: XCTestCase {
         }
     }
 
-    func testRoundTripOptionalNumberNull() throws {
-        try XCTAssertEqual(jsRoundTripOptionalNumberNull(42), 42)
-        try XCTAssertNil(jsRoundTripOptionalNumberNull(nil))
-    }
-
-    func testRoundTripOptionalNumberUndefined() throws {
-        let some = try jsRoundTripOptionalNumberUndefined(.value(42))
-        switch some {
-        case .value(let value):
-            XCTAssertEqual(value, 42)
-        case .undefined:
-            XCTFail("Expected defined value")
-        }
-
-        let undefined = try jsRoundTripOptionalNumberUndefined(.undefinedValue)
-        if case .value = undefined {
-            XCTFail("Expected undefined")
-        }
-    }
-
     func testRoundTripJSValue() throws {
         let symbol = JSSymbol("roundTrip")
         let bigInt = JSBigInt(_slowBridge: Int64(123456789))

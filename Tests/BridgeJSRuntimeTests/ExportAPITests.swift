@@ -515,123 +515,6 @@ enum ComplexResult {
     return result
 }
 
-// MARK: - Optionals
-
-@JS func roundTripOptionalString(name: String?) -> String? {
-    return name
-}
-
-@JS func roundTripOptionalInt(value: Int?) -> Int? {
-    return value
-}
-
-@JS func roundTripOptionalBool(flag: Bool?) -> Bool? {
-    return flag
-}
-
-@JS func roundTripOptionalFloat(number: Float?) -> Float? {
-    return number
-}
-
-@JS func roundTripOptionalDouble(precision: Double?) -> Double? {
-    return precision
-}
-
-@JS func roundTripOptionalSyntax(name: Optional<String>) -> Optional<String> {
-    return name
-}
-
-@JS func roundTripOptionalMixSyntax(name: String?) -> Optional<String> {
-    return name
-}
-
-@JS func roundTripOptionalSwiftSyntax(name: Swift.Optional<String>) -> Swift.Optional<String> {
-    return name
-}
-
-@JS func roundTripOptionalWithSpaces(value: Optional<Double>) -> Optional<Double> {
-    return value
-}
-
-typealias OptionalAge = Int?
-@JS func roundTripOptionalTypeAlias(age: OptionalAge) -> OptionalAge {
-    return age
-}
-
-@JS func roundTripOptionalStatus(value: Status?) -> Status? {
-    return value
-}
-
-@JS func roundTripOptionalTheme(value: Theme?) -> Theme? {
-    return value
-}
-
-@JS func roundTripOptionalHttpStatus(value: HttpStatus?) -> HttpStatus? {
-    return value
-}
-
-@JS func roundTripOptionalTSDirection(value: TSDirection?) -> TSDirection? {
-    return value
-}
-
-@JS func roundTripOptionalTSTheme(value: TSTheme?) -> TSTheme? {
-    return value
-}
-
-@JS func roundTripOptionalNetworkingAPIMethod(_ method: Networking.API.Method?) -> Networking.API.Method? {
-    return method
-}
-
-@JS func roundTripOptionalAPIResult(value: APIResult?) -> APIResult? {
-    return value
-}
-
-@JS enum TypedPayloadResult {
-    case precision(Precision)
-    case direction(Direction)
-    case optPrecision(Precision?)
-    case optDirection(Direction?)
-    case empty
-}
-
-@JS func roundTripTypedPayloadResult(_ result: TypedPayloadResult) -> TypedPayloadResult {
-    return result
-}
-
-@JS func roundTripOptionalTypedPayloadResult(_ result: TypedPayloadResult?) -> TypedPayloadResult? {
-    return result
-}
-
-@JS func compareAPIResults(_ r1: APIResult?, _ r2: APIResult?) -> String {
-    let r1Str: String
-    switch r1 {
-    case .none: r1Str = "nil"
-    case .some(.success(let msg)): r1Str = "success:\(msg)"
-    case .some(.failure(let code)): r1Str = "failure:\(code)"
-    case .some(.info): r1Str = "info"
-    case .some(.flag(let b)): r1Str = "flag:\(b)"
-    case .some(.rate(let r)): r1Str = "rate:\(r)"
-    case .some(.precise(let p)): r1Str = "precise:\(p)"
-    }
-
-    let r2Str: String
-    switch r2 {
-    case .none: r2Str = "nil"
-    case .some(.success(let msg)): r2Str = "success:\(msg)"
-    case .some(.failure(let code)): r2Str = "failure:\(code)"
-    case .some(.info): r2Str = "info"
-    case .some(.flag(let b)): r2Str = "flag:\(b)"
-    case .some(.rate(let r)): r2Str = "rate:\(r)"
-    case .some(.precise(let p)): r2Str = "precise:\(p)"
-    }
-
-    return "r1:\(r1Str),r2:\(r2Str)"
-}
-
-@JS func roundTripOptionalComplexResult(_ result: ComplexResult?) -> ComplexResult? {
-    return result
-}
-
 @JS
 enum AllTypesResult {
     case structPayload(Address)
@@ -644,76 +527,19 @@ enum AllTypesResult {
 }
 
 @JS func roundTripAllTypesResult(_ result: AllTypesResult) -> AllTypesResult {
-    return result
+    result
 }
 
-@JS func roundTripOptionalAllTypesResult(_ result: AllTypesResult?) -> AllTypesResult? {
-    return result
-}
-
-@JS
-enum OptionalAllTypesResult {
-    case optStruct(Address?)
-    case optClass(Greeter?)
-    case optJSObject(JSObject?)
-    case optNestedEnum(APIResult?)
-    case optArray([Int]?)
-    case optJsClass(Foo?)
+@JS enum TypedPayloadResult {
+    case precision(Precision)
+    case direction(Direction)
+    case optPrecision(Precision?)
+    case optDirection(Direction?)
     case empty
 }
 
-@JS func roundTripOptionalPayloadResult(_ result: OptionalAllTypesResult) -> OptionalAllTypesResult {
-    return result
-}
-
-@JS func roundTripOptionalPayloadResultOpt(_ result: OptionalAllTypesResult?) -> OptionalAllTypesResult? {
-    return result
-}
-
-@JS func roundTripOptionalClass(value: Greeter?) -> Greeter? {
-    return value
-}
-
-@JS func roundTripOptionalGreeter(_ value: Greeter?) -> Greeter? {
-    value
-}
-
-@JS func applyOptionalGreeter(_ value: Greeter?, _ transform: (Greeter?) -> Greeter?) -> Greeter? {
-    transform(value)
-}
-
-@JS class OptionalHolder {
-    @JS var nullableGreeter: Greeter?
-    @JS var undefinedNumber: JSUndefinedOr<Double>
-
-    @JS init(nullableGreeter: Greeter?, undefinedNumber: JSUndefinedOr<Double>) {
-        self.nullableGreeter = nullableGreeter
-        self.undefinedNumber = undefinedNumber
-    }
-}
-
-@JS func makeOptionalHolder(nullableGreeter: Greeter?, undefinedNumber: JSUndefinedOr<Double>) -> OptionalHolder {
-    OptionalHolder(nullableGreeter: nullableGreeter, undefinedNumber: undefinedNumber)
-}
-
-@JS class OptionalPropertyHolder {
-    @JS var optionalName: String?
-    @JS var optionalAge: Int? = nil
-    @JS var optionalGreeter: Greeter? = nil
-
-    @JS init(optionalName: String?) {
-        self.optionalName = optionalName
-    }
-}
-
-@JS
-enum APIOptionalResult {
-    case success(String?)
-    case failure(Int?, Bool?)
-    case status(Bool?, Int?, String?)
-}
-@JS func roundTripOptionalAPIOptionalResult(result: APIOptionalResult?) -> APIOptionalResult? {
-    return result
+@JS func roundTripTypedPayloadResult(_ result: TypedPayloadResult) -> TypedPayloadResult {
+    result
 }
 
 // MARK: - Property Tests
