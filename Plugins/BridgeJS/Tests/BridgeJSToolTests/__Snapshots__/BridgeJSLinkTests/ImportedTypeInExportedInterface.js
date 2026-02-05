@@ -70,7 +70,7 @@ export async function createInstantiator(options, swift) {
                 };
                 return { cleanup };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 const isSome = tmpRetInts.pop();
                 let optional;
                 if (isSome) {
@@ -370,7 +370,7 @@ export async function createInstantiator(options, swift) {
                 roundtripFooContainer: function bjs_roundtripFooContainer(container) {
                     const { cleanup: cleanup } = structHelpers.FooContainer.lower(container);
                     instance.exports.bjs_roundtripFooContainer();
-                    const structValue = structHelpers.FooContainer.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const structValue = structHelpers.FooContainer.lift();
                     if (cleanup) { cleanup(); }
                     return structValue;
                 },

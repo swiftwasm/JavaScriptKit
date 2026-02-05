@@ -122,7 +122,7 @@ export async function createInstantiator(options, swift) {
                 tmpParamF64s.push(value.y);
                 return { cleanup: undefined };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 const f64 = tmpRetF64s.pop();
                 const f641 = tmpRetF64s.pop();
                 return { x: f641, y: f64 };
@@ -171,7 +171,7 @@ export async function createInstantiator(options, swift) {
                     default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
                 }
             },
-            lift: (tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tag) => {
                 tag = tag | 0;
                 switch (tag) {
                     case APIResultValues.Tag.Success: {
@@ -278,7 +278,7 @@ export async function createInstantiator(options, swift) {
                     default: throw new Error("Unknown ComplexResultValues tag: " + String(enumTag));
                 }
             },
-            lift: (tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tag) => {
                 tag = tag | 0;
                 switch (tag) {
                     case ComplexResultValues.Tag.Success: {
@@ -361,7 +361,7 @@ export async function createInstantiator(options, swift) {
                     default: throw new Error("Unknown ResultValues tag: " + String(enumTag));
                 }
             },
-            lift: (tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tag) => {
                 tag = tag | 0;
                 switch (tag) {
                     case ResultValues.Tag.Success: {
@@ -413,7 +413,7 @@ export async function createInstantiator(options, swift) {
                     default: throw new Error("Unknown NetworkingResultValues tag: " + String(enumTag));
                 }
             },
-            lift: (tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tag) => {
                 tag = tag | 0;
                 switch (tag) {
                     case NetworkingResultValues.Tag.Success: {
@@ -494,7 +494,7 @@ export async function createInstantiator(options, swift) {
                     default: throw new Error("Unknown APIOptionalResultValues tag: " + String(enumTag));
                 }
             },
-            lift: (tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tag) => {
                 tag = tag | 0;
                 switch (tag) {
                     case APIOptionalResultValues.Tag.Success: {
@@ -595,7 +595,7 @@ export async function createInstantiator(options, swift) {
                     default: throw new Error("Unknown TypedPayloadResultValues tag: " + String(enumTag));
                 }
             },
-            lift: (tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tag) => {
                 tag = tag | 0;
                 switch (tag) {
                     case TypedPayloadResultValues.Tag.Precision: {
@@ -683,11 +683,11 @@ export async function createInstantiator(options, swift) {
                     default: throw new Error("Unknown AllTypesResultValues tag: " + String(enumTag));
                 }
             },
-            lift: (tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tag) => {
                 tag = tag | 0;
                 switch (tag) {
                     case AllTypesResultValues.Tag.StructPayload: {
-                        const struct = structHelpers.Point.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        const struct = structHelpers.Point.lift();
                         return { tag: AllTypesResultValues.Tag.StructPayload, param0: struct };
                     }
                     case AllTypesResultValues.Tag.ClassPayload: {
@@ -702,7 +702,7 @@ export async function createInstantiator(options, swift) {
                         return { tag: AllTypesResultValues.Tag.JsObjectPayload, param0: obj };
                     }
                     case AllTypesResultValues.Tag.NestedEnum: {
-                        const enumValue = enumHelpers.APIResult.lift(tmpRetTag.pop(), tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        const enumValue = enumHelpers.APIResult.lift(tmpRetTag.pop(), );
                         return { tag: AllTypesResultValues.Tag.NestedEnum, param0: enumValue };
                     }
                     case AllTypesResultValues.Tag.ArrayPayload: {
@@ -807,14 +807,14 @@ export async function createInstantiator(options, swift) {
                     default: throw new Error("Unknown OptionalAllTypesResultValues tag: " + String(enumTag));
                 }
             },
-            lift: (tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tag) => {
                 tag = tag | 0;
                 switch (tag) {
                     case OptionalAllTypesResultValues.Tag.OptStruct: {
                         const isSome = tmpRetInts.pop();
                         let optional;
                         if (isSome) {
-                            const struct = structHelpers.Point.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                            const struct = structHelpers.Point.lift();
                             optional = struct;
                         } else {
                             optional = null;
@@ -851,7 +851,7 @@ export async function createInstantiator(options, swift) {
                         let optional;
                         if (isSome) {
                             const caseId = tmpRetInts.pop();
-                            optional = enumHelpers.APIResult.lift(caseId, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                            optional = enumHelpers.APIResult.lift(caseId);
                         } else {
                             optional = null;
                         }
@@ -1139,13 +1139,13 @@ export async function createInstantiator(options, swift) {
                 },
                 getResult: function bjs_getResult() {
                     instance.exports.bjs_getResult();
-                    const ret = enumHelpers.APIResult.lift(tmpRetTag.pop(), tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const ret = enumHelpers.APIResult.lift(tmpRetTag.pop());
                     return ret;
                 },
                 roundtripAPIResult: function bjs_roundtripAPIResult(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.APIResult.lower(result);
                     instance.exports.bjs_roundtripAPIResult(resultCaseId);
-                    const ret = enumHelpers.APIResult.lift(tmpRetTag.pop(), tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const ret = enumHelpers.APIResult.lift(tmpRetTag.pop());
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
@@ -1164,7 +1164,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.APIResult.lift(tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        optResult = enumHelpers.APIResult.lift(tag);
                     }
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;
@@ -1176,13 +1176,13 @@ export async function createInstantiator(options, swift) {
                 },
                 getComplexResult: function bjs_getComplexResult() {
                     instance.exports.bjs_getComplexResult();
-                    const ret = enumHelpers.ComplexResult.lift(tmpRetTag.pop(), tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const ret = enumHelpers.ComplexResult.lift(tmpRetTag.pop());
                     return ret;
                 },
                 roundtripComplexResult: function bjs_roundtripComplexResult(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.ComplexResult.lower(result);
                     instance.exports.bjs_roundtripComplexResult(resultCaseId);
-                    const ret = enumHelpers.ComplexResult.lift(tmpRetTag.pop(), tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const ret = enumHelpers.ComplexResult.lift(tmpRetTag.pop());
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
@@ -1201,7 +1201,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.ComplexResult.lift(tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        optResult = enumHelpers.ComplexResult.lift(tag);
                     }
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;
@@ -1221,7 +1221,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.Result.lift(tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        optResult = enumHelpers.Result.lift(tag);
                     }
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;
@@ -1241,7 +1241,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.NetworkingResult.lift(tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        optResult = enumHelpers.NetworkingResult.lift(tag);
                     }
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;
@@ -1261,7 +1261,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.APIOptionalResult.lift(tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        optResult = enumHelpers.APIOptionalResult.lift(tag);
                     }
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;
@@ -1288,7 +1288,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.APIOptionalResult.lift(tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        optResult = enumHelpers.APIOptionalResult.lift(tag);
                     }
                     if (result1Cleanup) { result1Cleanup(); }
                     if (result2Cleanup) { result2Cleanup(); }
@@ -1297,7 +1297,7 @@ export async function createInstantiator(options, swift) {
                 roundTripTypedPayloadResult: function bjs_roundTripTypedPayloadResult(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.TypedPayloadResult.lower(result);
                     instance.exports.bjs_roundTripTypedPayloadResult(resultCaseId);
-                    const ret = enumHelpers.TypedPayloadResult.lift(tmpRetTag.pop(), tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const ret = enumHelpers.TypedPayloadResult.lift(tmpRetTag.pop());
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
@@ -1316,7 +1316,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.TypedPayloadResult.lift(tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        optResult = enumHelpers.TypedPayloadResult.lift(tag);
                     }
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;
@@ -1324,7 +1324,7 @@ export async function createInstantiator(options, swift) {
                 roundTripAllTypesResult: function bjs_roundTripAllTypesResult(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.AllTypesResult.lower(result);
                     instance.exports.bjs_roundTripAllTypesResult(resultCaseId);
-                    const ret = enumHelpers.AllTypesResult.lift(tmpRetTag.pop(), tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const ret = enumHelpers.AllTypesResult.lift(tmpRetTag.pop());
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
@@ -1343,7 +1343,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.AllTypesResult.lift(tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        optResult = enumHelpers.AllTypesResult.lift(tag);
                     }
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;
@@ -1351,7 +1351,7 @@ export async function createInstantiator(options, swift) {
                 roundTripOptionalPayloadResult: function bjs_roundTripOptionalPayloadResult(result) {
                     const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.OptionalAllTypesResult.lower(result);
                     instance.exports.bjs_roundTripOptionalPayloadResult(resultCaseId);
-                    const ret = enumHelpers.OptionalAllTypesResult.lift(tmpRetTag.pop(), tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const ret = enumHelpers.OptionalAllTypesResult.lift(tmpRetTag.pop());
                     if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
@@ -1370,7 +1370,7 @@ export async function createInstantiator(options, swift) {
                     if (isNull) {
                         optResult = null;
                     } else {
-                        optResult = enumHelpers.OptionalAllTypesResult.lift(tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        optResult = enumHelpers.OptionalAllTypesResult.lift(tag);
                     }
                     if (resultCleanup) { resultCleanup(); }
                     return optResult;

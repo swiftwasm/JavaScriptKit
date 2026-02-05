@@ -81,7 +81,7 @@ export async function createInstantiator(options, swift) {
                     default: throw new Error("Unknown ResultValues tag: " + String(enumTag));
                 }
             },
-            lift: (tag, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: (tag) => {
                 tag = tag | 0;
                 switch (tag) {
                     case ResultValues.Tag.Success: {
@@ -375,7 +375,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_MyViewControllerDelegate_result_set"] = function bjs_MyViewControllerDelegate_result_set(self, value) {
                 try {
-                    const enumValue = enumHelpers.Result.lift(value, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const enumValue = enumHelpers.Result.lift(value);
                     swift.memory.getObject(self).result = enumValue;
                 } catch (error) {
                     setException(error);
@@ -399,7 +399,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     let enumValue;
                     if (valueIsSome) {
-                        enumValue = enumHelpers.Result.lift(valueWrappedValue, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        enumValue = enumHelpers.Result.lift(valueWrappedValue);
                     }
                     swift.memory.getObject(self).optionalResult = valueIsSome ? enumValue : null;
                 } catch (error) {
@@ -556,7 +556,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_MyViewControllerDelegate_handleResult"] = function bjs_MyViewControllerDelegate_handleResult(self, result) {
                 try {
-                    const enumValue = enumHelpers.Result.lift(result, tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                    const enumValue = enumHelpers.Result.lift(result);
                     swift.memory.getObject(self).handleResult(enumValue);
                 } catch (error) {
                     setException(error);

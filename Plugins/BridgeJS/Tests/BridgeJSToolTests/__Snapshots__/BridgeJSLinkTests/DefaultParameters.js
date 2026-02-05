@@ -54,7 +54,7 @@ export async function createInstantiator(options, swift) {
                 };
                 return { cleanup };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 const bool = tmpRetInts.pop() !== 0;
                 const int = tmpRetInts.pop();
                 const string = tmpRetStrings.pop();
@@ -68,7 +68,7 @@ export async function createInstantiator(options, swift) {
                 tmpParamF64s.push(value.baseValue);
                 return { cleanup: undefined };
             },
-            lift: (tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers) => {
+            lift: () => {
                 const f64 = tmpRetF64s.pop();
                 const instance1 = { baseValue: f64 };
                 instance1.add = function(a, b = 10.0) {
@@ -528,7 +528,7 @@ export async function createInstantiator(options, swift) {
                     const isSome1 = tmpRetInts.pop();
                     let optResult;
                     if (isSome1) {
-                        optResult = structHelpers.Config.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        optResult = structHelpers.Config.lift();
                     } else {
                         optResult = null;
                     }
@@ -546,7 +546,7 @@ export async function createInstantiator(options, swift) {
                     const isSome1 = tmpRetInts.pop();
                     let optResult;
                     if (isSome1) {
-                        optResult = structHelpers.Config.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        optResult = structHelpers.Config.lift();
                     } else {
                         optResult = null;
                     }
@@ -663,7 +663,7 @@ export async function createInstantiator(options, swift) {
                 MathOperations: {
                     init: function(baseValue = 0.0) {
                         instance.exports.bjs_MathOperations_init(baseValue);
-                        const structValue = structHelpers.MathOperations.lift(tmpRetStrings, tmpRetInts, tmpRetF32s, tmpRetF64s, tmpRetPointers);
+                        const structValue = structHelpers.MathOperations.lift();
                         return structValue;
                     },
                     subtract: function(a, b) {
