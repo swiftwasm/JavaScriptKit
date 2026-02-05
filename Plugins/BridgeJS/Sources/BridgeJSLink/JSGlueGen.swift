@@ -20,16 +20,12 @@ final class JSGlueVariableScope {
     static let reservedStorageToReturnOptionalHeapObject = "tmpRetOptionalHeapObject"
     static let reservedTextEncoder = "textEncoder"
     static let reservedTextDecoder = "textDecoder"
-    static let reservedTmpRetTag = "tmpRetTag"
-    static let reservedTmpRetStrings = "tmpRetStrings"
-    static let reservedTmpRetInts = "tmpRetInts"
-    static let reservedTmpRetF32s = "tmpRetF32s"
-    static let reservedTmpRetF64s = "tmpRetF64s"
-    static let reservedTmpParamInts = "tmpParamInts"
-    static let reservedTmpParamF32s = "tmpParamF32s"
-    static let reservedTmpParamF64s = "tmpParamF64s"
-    static let reservedTmpRetPointers = "tmpRetPointers"
-    static let reservedTmpParamPointers = "tmpParamPointers"
+    static let reservedTagStack = "tagStack"
+    static let reservedStringStack = "strStack"
+    static let reservedI32Stack = "i32Stack"
+    static let reservedF32Stack = "f32Stack"
+    static let reservedF64Stack = "f64Stack"
+    static let reservedPointerStack = "ptrStack"
     static let reservedTmpStructCleanups = "tmpStructCleanups"
     static let reservedEnumHelpers = "enumHelpers"
     static let reservedStructHelpers = "structHelpers"
@@ -51,16 +47,12 @@ final class JSGlueVariableScope {
         reservedStorageToReturnOptionalHeapObject,
         reservedTextEncoder,
         reservedTextDecoder,
-        reservedTmpRetTag,
-        reservedTmpRetStrings,
-        reservedTmpRetInts,
-        reservedTmpRetF32s,
-        reservedTmpRetF64s,
-        reservedTmpParamInts,
-        reservedTmpParamF32s,
-        reservedTmpParamF64s,
-        reservedTmpRetPointers,
-        reservedTmpParamPointers,
+        reservedTagStack,
+        reservedStringStack,
+        reservedI32Stack,
+        reservedF32Stack,
+        reservedF64Stack,
+        reservedPointerStack,
         reservedTmpStructCleanups,
         reservedEnumHelpers,
         reservedStructHelpers,
@@ -100,46 +92,46 @@ extension JSGlueVariableScope {
     // MARK: Parameter
 
     func emitPushI32Parameter(_ value: String, printer: CodeFragmentPrinter) {
-        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(value));")
+        printer.write("\(JSGlueVariableScope.reservedI32Stack).push(\(value));")
     }
     func emitPushF64Parameter(_ value: String, printer: CodeFragmentPrinter) {
-        printer.write("\(JSGlueVariableScope.reservedTmpParamF64s).push(\(value));")
+        printer.write("\(JSGlueVariableScope.reservedF64Stack).push(\(value));")
     }
     func emitPushF32Parameter(_ value: String, printer: CodeFragmentPrinter) {
-        printer.write("\(JSGlueVariableScope.reservedTmpParamF32s).push(\(value));")
+        printer.write("\(JSGlueVariableScope.reservedF32Stack).push(\(value));")
     }
     func emitPushPointerParameter(_ value: String, printer: CodeFragmentPrinter) {
-        printer.write("\(JSGlueVariableScope.reservedTmpParamPointers).push(\(value));")
+        printer.write("\(JSGlueVariableScope.reservedPointerStack).push(\(value));")
     }
 
     // MARK: Return
 
     func emitPushI32Return(_ value: String, printer: CodeFragmentPrinter) {
-        printer.write("\(JSGlueVariableScope.reservedTmpRetInts).push(\(value));")
+        printer.write("\(JSGlueVariableScope.reservedI32Stack).push(\(value));")
     }
     func emitPushF64Return(_ value: String, printer: CodeFragmentPrinter) {
-        printer.write("\(JSGlueVariableScope.reservedTmpRetF64s).push(\(value));")
+        printer.write("\(JSGlueVariableScope.reservedF64Stack).push(\(value));")
     }
     func emitPushPointerReturn(_ value: String, printer: CodeFragmentPrinter) {
-        printer.write("\(JSGlueVariableScope.reservedTmpRetPointers).push(\(value));")
+        printer.write("\(JSGlueVariableScope.reservedPointerStack).push(\(value));")
     }
-    func popTagReturn() -> String {
-        return "\(JSGlueVariableScope.reservedTmpRetTag).pop()"
+    func popTag() -> String {
+        return "\(JSGlueVariableScope.reservedTagStack).pop()"
     }
-    func popStringReturn() -> String {
-        return "\(JSGlueVariableScope.reservedTmpRetStrings).pop()"
+    func popString() -> String {
+        return "\(JSGlueVariableScope.reservedStringStack).pop()"
     }
-    func popI32Return() -> String {
-        return "\(JSGlueVariableScope.reservedTmpRetInts).pop()"
+    func popI32() -> String {
+        return "\(JSGlueVariableScope.reservedI32Stack).pop()"
     }
-    func popF64Return() -> String {
-        return "\(JSGlueVariableScope.reservedTmpRetF64s).pop()"
+    func popF64() -> String {
+        return "\(JSGlueVariableScope.reservedF64Stack).pop()"
     }
-    func popF32Return() -> String {
-        return "\(JSGlueVariableScope.reservedTmpRetF32s).pop()"
+    func popF32() -> String {
+        return "\(JSGlueVariableScope.reservedF32Stack).pop()"
     }
-    func popPointerReturn() -> String {
-        return "\(JSGlueVariableScope.reservedTmpRetPointers).pop()"
+    func popPointer() -> String {
+        return "\(JSGlueVariableScope.reservedPointerStack).pop()"
     }
 }
 
@@ -544,9 +536,9 @@ struct IntrinsicJSFragment: Sendable {
             let payload2 = scope.variable("jsValuePayload2")
             let payload1 = scope.variable("jsValuePayload1")
             let kind = scope.variable("jsValueKind")
-            printer.write("const \(payload2) = \(scope.popF64Return());")
-            printer.write("const \(payload1) = \(scope.popI32Return());")
-            printer.write("const \(kind) = \(scope.popI32Return());")
+            printer.write("const \(payload2) = \(scope.popF64());")
+            printer.write("const \(payload1) = \(scope.popI32());")
+            printer.write("const \(kind) = \(scope.popI32());")
             let resultVar = scope.variable("jsValue")
             registerJSValueHelpers(scope: scope)
             printer.write(
@@ -618,7 +610,7 @@ struct IntrinsicJSFragment: Sendable {
             printCode: { _, scope, printer, _ in
                 let retName = scope.variable("ret")
                 printer.write(
-                    "const \(retName) = \(JSGlueVariableScope.reservedEnumHelpers).\(enumBase).lift(\(scope.popTagReturn()));"
+                    "const \(retName) = \(JSGlueVariableScope.reservedEnumHelpers).\(enumBase).lift(\(scope.popTag()));"
                 )
                 return [retName]
             }
@@ -967,7 +959,7 @@ struct IntrinsicJSFragment: Sendable {
                 case .associatedValueEnum(let fullName):
                     let base = fullName.components(separatedBy: ".").last ?? fullName
                     let tagVar = scope.variable("tag")
-                    printer.write("const \(tagVar) = \(scope.popTagReturn());")
+                    printer.write("const \(tagVar) = \(scope.popTag());")
                     let isNullVar = scope.variable("isNull")
                     printer.write("const \(isNullVar) = (\(tagVar) === -1);")
                     printer.write("let \(resultVar);")
@@ -985,7 +977,7 @@ struct IntrinsicJSFragment: Sendable {
                 case .swiftStruct(let fullName):
                     let base = fullName.components(separatedBy: ".").last ?? fullName
                     let isSomeVar = scope.variable("isSome")
-                    printer.write("const \(isSomeVar) = \(scope.popI32Return());")
+                    printer.write("const \(isSomeVar) = \(scope.popI32());")
                     printer.write("let \(resultVar);")
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
@@ -1000,7 +992,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("}")
                 case .array(let elementType):
                     let isSomeVar = scope.variable("isSome")
-                    printer.write("const \(isSomeVar) = \(scope.popI32Return());")
+                    printer.write("const \(isSomeVar) = \(scope.popI32());")
                     printer.write("let \(resultVar);")
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
@@ -1034,7 +1026,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("}")
                 case .jsValue:
                     let isSomeVar = scope.variable("isSome")
-                    printer.write("const \(isSomeVar) = \(scope.popI32Return());")
+                    printer.write("const \(isSomeVar) = \(scope.popI32());")
                     printer.write("let \(resultVar);")
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
@@ -1779,7 +1771,7 @@ struct IntrinsicJSFragment: Sendable {
                     let base = fullName.components(separatedBy: ".").last ?? fullName
                     let resultVar = scope.variable("result")
                     printer.write(
-                        "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(scope.popTagReturn()));"
+                        "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(scope.popTag()));"
                     )
                     printer.write("return \(resultVar);")
                     return []
@@ -2599,16 +2591,16 @@ struct IntrinsicJSFragment: Sendable {
                 let optVar = scope.variable("optional")
                 let isSomeVar = scope.variable("isSome")
 
-                printer.write("const \(isSomeVar) = \(scope.popI32Return());")
+                printer.write("const \(isSomeVar) = \(scope.popI32());")
                 printer.write("let \(optVar);")
                 printer.write("if (\(isSomeVar)) {")
                 printer.indent {
                     // For optional associated value enums, Swift uses bridgeJSLowerParameter()
-                    // which pushes caseId to tmpRetInts (not tmpRetTag like bridgeJSLowerReturn()).
+                    // which pushes caseId to i32Stack (not tagStack like bridgeJSLowerReturn()).
                     if case .associatedValueEnum(let fullName) = wrappedType {
                         let base = fullName.components(separatedBy: ".").last ?? fullName
                         let caseIdVar = scope.variable("caseId")
-                        printer.write("const \(caseIdVar) = \(scope.popI32Return());")
+                        printer.write("const \(caseIdVar) = \(scope.popI32());")
                         printer.write(
                             "\(optVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(caseIdVar));"
                         )
@@ -2773,7 +2765,7 @@ struct IntrinsicJSFragment: Sendable {
                 let lenVar = scope.variable("arrayLen")
                 let iVar = scope.variable("i")
 
-                printer.write("const \(lenVar) = \(scope.popI32Return());")
+                printer.write("const \(lenVar) = \(scope.popI32());")
                 printer.write("const \(resultVar) = [];")
                 printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
                 printer.indent {
@@ -2826,9 +2818,9 @@ struct IntrinsicJSFragment: Sendable {
                     let payload2Var = scope.variable("jsValuePayload2")
                     let payload1Var = scope.variable("jsValuePayload1")
                     let kindVar = scope.variable("jsValueKind")
-                    printer.write("const \(payload2Var) = \(scope.popF64Return());")
-                    printer.write("const \(payload1Var) = \(scope.popI32Return());")
-                    printer.write("const \(kindVar) = \(scope.popI32Return());")
+                    printer.write("const \(payload2Var) = \(scope.popF64());")
+                    printer.write("const \(payload1Var) = \(scope.popI32());")
+                    printer.write("const \(kindVar) = \(scope.popI32());")
                     let resultVar = scope.variable("jsValue")
                     registerJSValueHelpers(scope: scope)
                     printer.write(
@@ -2842,7 +2834,7 @@ struct IntrinsicJSFragment: Sendable {
                 parameters: [],
                 printCode: { arguments, scope, printer, cleanup in
                     let strVar = scope.variable("string")
-                    printer.write("const \(strVar) = \(scope.popStringReturn());")
+                    printer.write("const \(strVar) = \(scope.popString());")
                     return [strVar]
                 }
             )
@@ -2851,7 +2843,7 @@ struct IntrinsicJSFragment: Sendable {
                 parameters: [],
                 printCode: { arguments, scope, printer, cleanup in
                     let bVar = scope.variable("bool")
-                    printer.write("const \(bVar) = \(scope.popI32Return()) !== 0;")
+                    printer.write("const \(bVar) = \(scope.popI32()) !== 0;")
                     return [bVar]
                 }
             )
@@ -2860,7 +2852,7 @@ struct IntrinsicJSFragment: Sendable {
                 parameters: [],
                 printCode: { arguments, scope, printer, cleanup in
                     let iVar = scope.variable("int")
-                    printer.write("const \(iVar) = \(scope.popI32Return());")
+                    printer.write("const \(iVar) = \(scope.popI32());")
                     return [iVar]
                 }
             )
@@ -2869,7 +2861,7 @@ struct IntrinsicJSFragment: Sendable {
                 parameters: [],
                 printCode: { arguments, scope, printer, cleanup in
                     let fVar = scope.variable("f32")
-                    printer.write("const \(fVar) = \(scope.popF32Return());")
+                    printer.write("const \(fVar) = \(scope.popF32());")
                     return [fVar]
                 }
             )
@@ -2878,7 +2870,7 @@ struct IntrinsicJSFragment: Sendable {
                 parameters: [],
                 printCode: { arguments, scope, printer, cleanup in
                     let dVar = scope.variable("f64")
-                    printer.write("const \(dVar) = \(scope.popF64Return());")
+                    printer.write("const \(dVar) = \(scope.popF64());")
                     return [dVar]
                 }
             )
@@ -2899,7 +2891,7 @@ struct IntrinsicJSFragment: Sendable {
                 parameters: [],
                 printCode: { arguments, scope, printer, cleanup in
                     let varName = scope.variable("caseId")
-                    printer.write("const \(varName) = \(scope.popI32Return());")
+                    printer.write("const \(varName) = \(scope.popI32());")
                     return [varName]
                 }
             )
@@ -2910,7 +2902,7 @@ struct IntrinsicJSFragment: Sendable {
                     parameters: [],
                     printCode: { arguments, scope, printer, cleanup in
                         let varName = scope.variable("rawValue")
-                        printer.write("const \(varName) = \(scope.popStringReturn());")
+                        printer.write("const \(varName) = \(scope.popString());")
                         return [varName]
                     }
                 )
@@ -2919,7 +2911,7 @@ struct IntrinsicJSFragment: Sendable {
                     parameters: [],
                     printCode: { arguments, scope, printer, cleanup in
                         let varName = scope.variable("rawValue")
-                        printer.write("const \(varName) = \(scope.popF32Return());")
+                        printer.write("const \(varName) = \(scope.popF32());")
                         return [varName]
                     }
                 )
@@ -2928,7 +2920,7 @@ struct IntrinsicJSFragment: Sendable {
                     parameters: [],
                     printCode: { arguments, scope, printer, cleanup in
                         let varName = scope.variable("rawValue")
-                        printer.write("const \(varName) = \(scope.popF64Return());")
+                        printer.write("const \(varName) = \(scope.popF64());")
                         return [varName]
                     }
                 )
@@ -2937,7 +2929,7 @@ struct IntrinsicJSFragment: Sendable {
                     parameters: [],
                     printCode: { arguments, scope, printer, cleanup in
                         let varName = scope.variable("rawValue")
-                        printer.write("const \(varName) = \(scope.popI32Return());")
+                        printer.write("const \(varName) = \(scope.popI32());")
                         return [varName]
                     }
                 )
@@ -2949,7 +2941,7 @@ struct IntrinsicJSFragment: Sendable {
                 printCode: { arguments, scope, printer, cleanup in
                     let resultVar = scope.variable("enumValue")
                     printer.write(
-                        "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(scope.popTagReturn()), );"
+                        "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(scope.popTag()), );"
                     )
                     return [resultVar]
                 }
@@ -2960,7 +2952,7 @@ struct IntrinsicJSFragment: Sendable {
                 printCode: { arguments, scope, printer, cleanup in
                     let ptrVar = scope.variable("ptr")
                     let objVar = scope.variable("obj")
-                    printer.write("const \(ptrVar) = \(scope.popPointerReturn());")
+                    printer.write("const \(ptrVar) = \(scope.popPointer());")
                     printer.write("const \(objVar) = _exports['\(className)'].__construct(\(ptrVar));")
                     return [objVar]
                 }
@@ -2971,7 +2963,7 @@ struct IntrinsicJSFragment: Sendable {
                 printCode: { arguments, scope, printer, cleanup in
                     let idVar = scope.variable("objId")
                     let objVar = scope.variable("obj")
-                    printer.write("const \(idVar) = \(scope.popI32Return());")
+                    printer.write("const \(idVar) = \(scope.popI32());")
                     printer.write("const \(objVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(idVar));")
                     printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
                     return [objVar]
@@ -2988,7 +2980,7 @@ struct IntrinsicJSFragment: Sendable {
                 parameters: [],
                 printCode: { arguments, scope, printer, cleanup in
                     let pVar = scope.variable("pointer")
-                    printer.write("const \(pVar) = \(scope.popPointerReturn());")
+                    printer.write("const \(pVar) = \(scope.popPointer());")
                     return [pVar]
                 }
             )
@@ -3209,7 +3201,7 @@ struct IntrinsicJSFragment: Sendable {
                 let isSomeVar = scope.variable("isSome")
                 let resultVar = scope.variable("optValue")
 
-                printer.write("const \(isSomeVar) = \(scope.popI32Return());")
+                printer.write("const \(isSomeVar) = \(scope.popI32());")
                 printer.write("let \(resultVar);")
                 printer.write("if (\(isSomeVar) === 0) {")
                 printer.indent {
@@ -3665,7 +3657,7 @@ struct IntrinsicJSFragment: Sendable {
                             pushOptionalPrimitive(
                                 value: value,
                                 isSomeVar: isSomeVar,
-                                stack: .tmpParamInts,
+                                stack: .i32Stack,
                                 convert: "| 0",
                                 zeroValue: "0",
                                 printer: printer,
@@ -3675,7 +3667,7 @@ struct IntrinsicJSFragment: Sendable {
                             pushOptionalPrimitive(
                                 value: value,
                                 isSomeVar: isSomeVar,
-                                stack: .tmpParamInts,
+                                stack: .i32Stack,
                                 convert: "? 1 : 0",
                                 zeroValue: "0",
                                 printer: printer,
@@ -3685,7 +3677,7 @@ struct IntrinsicJSFragment: Sendable {
                             pushOptionalPrimitive(
                                 value: value,
                                 isSomeVar: isSomeVar,
-                                stack: .tmpParamF32s,
+                                stack: .f32Stack,
                                 convert: "Math.fround",
                                 zeroValue: "0.0",
                                 printer: printer,
@@ -3695,7 +3687,7 @@ struct IntrinsicJSFragment: Sendable {
                             pushOptionalPrimitive(
                                 value: value,
                                 isSomeVar: isSomeVar,
-                                stack: .tmpParamF64s,
+                                stack: .f64Stack,
                                 convert: nil,
                                 zeroValue: "0.0",
                                 printer: printer,
@@ -3810,9 +3802,9 @@ struct IntrinsicJSFragment: Sendable {
     ) {
         let stackName: String
         switch stack {
-        case .tmpParamInts: stackName = JSGlueVariableScope.reservedTmpParamInts
-        case .tmpParamF32s: stackName = JSGlueVariableScope.reservedTmpParamF32s
-        case .tmpParamF64s: stackName = JSGlueVariableScope.reservedTmpParamF64s
+        case .i32Stack: stackName = JSGlueVariableScope.reservedI32Stack
+        case .f32Stack: stackName = JSGlueVariableScope.reservedF32Stack
+        case .f64Stack: stackName = JSGlueVariableScope.reservedF64Stack
         }
 
         printer.write("if (\(isSomeVar)) {")
@@ -3838,9 +3830,9 @@ struct IntrinsicJSFragment: Sendable {
     }
 
     private enum StackType {
-        case tmpParamInts
-        case tmpParamF32s
-        case tmpParamF64s
+        case i32Stack
+        case f32Stack
+        case f64Stack
     }
 
     private static func structFieldLiftFragment(
@@ -3856,15 +3848,15 @@ struct IntrinsicJSFragment: Sendable {
                 printCode: { arguments, scope, printer, cleanup in
                     let isSomeVar = scope.variable("isSome")
                     let optVar = scope.variable("optional")
-                    printer.write("const \(isSomeVar) = \(scope.popI32Return());")
+                    printer.write("const \(isSomeVar) = \(scope.popI32());")
                     printer.write("let \(optVar);")
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
-                        // Special handling for associated value enum - in struct fields, case ID is pushed to tmpRetInts
+                        // Special handling for associated value enum - in struct fields, case ID is pushed to i32Stack
                         if case .associatedValueEnum(let enumName) = wrappedType {
                             let base = enumName.components(separatedBy: ".").last ?? enumName
                             let caseIdVar = scope.variable("enumCaseId")
-                            printer.write("const \(caseIdVar) = \(scope.popI32Return());")
+                            printer.write("const \(caseIdVar) = \(scope.popI32());")
                             printer.write(
                                 "\(optVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(caseIdVar), );"
                             )
@@ -3911,7 +3903,7 @@ struct IntrinsicJSFragment: Sendable {
                 printCode: { arguments, scope, printer, cleanup in
                     let objectIdVar = scope.variable("objectId")
                     let varName = scope.variable("value")
-                    printer.write("const \(objectIdVar) = \(scope.popI32Return());")
+                    printer.write("const \(objectIdVar) = \(scope.popI32());")
                     printer.write("let \(varName);")
                     printer.write("if (\(objectIdVar) !== 0) {")
                     printer.indent {

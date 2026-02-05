@@ -18,16 +18,12 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tmpRetTag = [];
-    let tmpRetStrings = [];
-    let tmpRetInts = [];
-    let tmpRetF32s = [];
-    let tmpRetF64s = [];
-    let tmpParamInts = [];
-    let tmpParamF32s = [];
-    let tmpParamF64s = [];
-    let tmpRetPointers = [];
-    let tmpParamPointers = [];
+    let tagStack = [];
+    let strStack = [];
+    let i32Stack = [];
+    let f32Stack = [];
+    let f64Stack = [];
+    let ptrStack = [];
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
@@ -37,19 +33,19 @@ export async function createInstantiator(options, swift) {
     const __bjs_createPointerFieldsHelpers = () => {
         return () => ({
             lower: (value) => {
-                tmpParamPointers.push((value.raw | 0));
-                tmpParamPointers.push((value.mutRaw | 0));
-                tmpParamPointers.push((value.opaque | 0));
-                tmpParamPointers.push((value.ptr | 0));
-                tmpParamPointers.push((value.mutPtr | 0));
+                ptrStack.push((value.raw | 0));
+                ptrStack.push((value.mutRaw | 0));
+                ptrStack.push((value.opaque | 0));
+                ptrStack.push((value.ptr | 0));
+                ptrStack.push((value.mutPtr | 0));
                 return { cleanup: undefined };
             },
             lift: () => {
-                const pointer = tmpRetPointers.pop();
-                const pointer1 = tmpRetPointers.pop();
-                const pointer2 = tmpRetPointers.pop();
-                const pointer3 = tmpRetPointers.pop();
-                const pointer4 = tmpRetPointers.pop();
+                const pointer = ptrStack.pop();
+                const pointer1 = ptrStack.pop();
+                const pointer2 = ptrStack.pop();
+                const pointer3 = ptrStack.pop();
+                const pointer4 = ptrStack.pop();
                 return { raw: pointer4, mutRaw: pointer3, opaque: pointer2, ptr: pointer1, mutPtr: pointer };
             }
         });
@@ -90,36 +86,36 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
             bjs["swift_js_push_tag"] = function(tag) {
-                tmpRetTag.push(tag);
+                tagStack.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
-                tmpRetInts.push(v | 0);
+                i32Stack.push(v | 0);
             }
             bjs["swift_js_push_f32"] = function(v) {
-                tmpRetF32s.push(Math.fround(v));
+                f32Stack.push(Math.fround(v));
             }
             bjs["swift_js_push_f64"] = function(v) {
-                tmpRetF64s.push(v);
+                f64Stack.push(v);
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 const value = textDecoder.decode(bytes);
-                tmpRetStrings.push(value);
+                strStack.push(value);
             }
             bjs["swift_js_pop_i32"] = function() {
-                return tmpParamInts.pop();
+                return i32Stack.pop();
             }
             bjs["swift_js_pop_f32"] = function() {
-                return tmpParamF32s.pop();
+                return f32Stack.pop();
             }
             bjs["swift_js_pop_f64"] = function() {
-                return tmpParamF64s.pop();
+                return f64Stack.pop();
             }
             bjs["swift_js_push_pointer"] = function(pointer) {
-                tmpRetPointers.push(pointer);
+                ptrStack.push(pointer);
             }
             bjs["swift_js_pop_pointer"] = function() {
-                return tmpParamPointers.pop();
+                return ptrStack.pop();
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }

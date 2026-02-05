@@ -31,16 +31,12 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tmpRetTag = [];
-    let tmpRetStrings = [];
-    let tmpRetInts = [];
-    let tmpRetF32s = [];
-    let tmpRetF64s = [];
-    let tmpParamInts = [];
-    let tmpParamF32s = [];
-    let tmpParamF64s = [];
-    let tmpRetPointers = [];
-    let tmpParamPointers = [];
+    let tagStack = [];
+    let strStack = [];
+    let i32Stack = [];
+    let f32Stack = [];
+    let f64Stack = [];
+    let ptrStack = [];
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
@@ -50,13 +46,13 @@ export async function createInstantiator(options, swift) {
     const __bjs_createPointHelpers = () => {
         return () => ({
             lower: (value) => {
-                tmpParamF64s.push(value.x);
-                tmpParamF64s.push(value.y);
+                f64Stack.push(value.x);
+                f64Stack.push(value.y);
                 return { cleanup: undefined };
             },
             lift: () => {
-                const f64 = tmpRetF64s.pop();
-                const f641 = tmpRetF64s.pop();
+                const f64 = f64Stack.pop();
+                const f641 = f64Stack.pop();
                 return { x: f641, y: f64 };
             }
         });
@@ -98,36 +94,36 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
             bjs["swift_js_push_tag"] = function(tag) {
-                tmpRetTag.push(tag);
+                tagStack.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
-                tmpRetInts.push(v | 0);
+                i32Stack.push(v | 0);
             }
             bjs["swift_js_push_f32"] = function(v) {
-                tmpRetF32s.push(Math.fround(v));
+                f32Stack.push(Math.fround(v));
             }
             bjs["swift_js_push_f64"] = function(v) {
-                tmpRetF64s.push(v);
+                f64Stack.push(v);
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 const value = textDecoder.decode(bytes);
-                tmpRetStrings.push(value);
+                strStack.push(value);
             }
             bjs["swift_js_pop_i32"] = function() {
-                return tmpParamInts.pop();
+                return i32Stack.pop();
             }
             bjs["swift_js_pop_f32"] = function() {
-                return tmpParamF32s.pop();
+                return f32Stack.pop();
             }
             bjs["swift_js_pop_f64"] = function() {
-                return tmpParamF64s.pop();
+                return f64Stack.pop();
             }
             bjs["swift_js_push_pointer"] = function(pointer) {
-                tmpRetPointers.push(pointer);
+                ptrStack.push(pointer);
             }
             bjs["swift_js_pop_pointer"] = function() {
-                return tmpParamPointers.pop();
+                return ptrStack.pop();
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }
@@ -265,10 +261,10 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_importProcessNumbers"] = function bjs_importProcessNumbers() {
                 try {
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const f64 = tmpRetF64s.pop();
+                        const f64 = f64Stack.pop();
                         arrayResult.push(f64);
                     }
                     arrayResult.reverse();
@@ -282,38 +278,38 @@ export async function createInstantiator(options, swift) {
                     let ret = imports.importGetNumbers();
                     const arrayCleanups = [];
                     for (const elem of ret) {
-                        tmpParamF64s.push(elem);
+                        f64Stack.push(elem);
                     }
-                    tmpParamInts.push(ret.length);
+                    i32Stack.push(ret.length);
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_importTransformNumbers"] = function bjs_importTransformNumbers() {
                 try {
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const f64 = tmpRetF64s.pop();
+                        const f64 = f64Stack.pop();
                         arrayResult.push(f64);
                     }
                     arrayResult.reverse();
                     let ret = imports.importTransformNumbers(arrayResult);
                     const arrayCleanups = [];
                     for (const elem of ret) {
-                        tmpParamF64s.push(elem);
+                        f64Stack.push(elem);
                     }
-                    tmpParamInts.push(ret.length);
+                    i32Stack.push(ret.length);
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_importProcessStrings"] = function bjs_importProcessStrings() {
                 try {
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const string = tmpRetStrings.pop();
+                        const string = strStack.pop();
                         arrayResult.push(string);
                     }
                     arrayResult.reverse();
@@ -322,32 +318,32 @@ export async function createInstantiator(options, swift) {
                     for (const elem of ret) {
                         const bytes = textEncoder.encode(elem);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         arrayCleanups.push(() => {
                             swift.memory.release(id);
                         });
                     }
-                    tmpParamInts.push(ret.length);
+                    i32Stack.push(ret.length);
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_importProcessBooleans"] = function bjs_importProcessBooleans() {
                 try {
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const bool = tmpRetInts.pop() !== 0;
+                        const bool = i32Stack.pop() !== 0;
                         arrayResult.push(bool);
                     }
                     arrayResult.reverse();
                     let ret = imports.importProcessBooleans(arrayResult);
                     const arrayCleanups = [];
                     for (const elem of ret) {
-                        tmpParamInts.push(elem ? 1 : 0);
+                        i32Stack.push(elem ? 1 : 0);
                     }
-                    tmpParamInts.push(ret.length);
+                    i32Stack.push(ret.length);
                 } catch (error) {
                     setException(error);
                 }
@@ -397,14 +393,14 @@ export async function createInstantiator(options, swift) {
                 processIntArray: function bjs_processIntArray(values) {
                     const arrayCleanups = [];
                     for (const elem of values) {
-                        tmpParamInts.push((elem | 0));
+                        i32Stack.push((elem | 0));
                     }
-                    tmpParamInts.push(values.length);
+                    i32Stack.push(values.length);
                     instance.exports.bjs_processIntArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const int = tmpRetInts.pop();
+                        const int = i32Stack.pop();
                         arrayResult.push(int);
                     }
                     arrayResult.reverse();
@@ -416,18 +412,18 @@ export async function createInstantiator(options, swift) {
                     for (const elem of values) {
                         const bytes = textEncoder.encode(elem);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         arrayCleanups.push(() => {
                             swift.memory.release(id);
                         });
                     }
-                    tmpParamInts.push(values.length);
+                    i32Stack.push(values.length);
                     instance.exports.bjs_processStringArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const string = tmpRetStrings.pop();
+                        const string = strStack.pop();
                         arrayResult.push(string);
                     }
                     arrayResult.reverse();
@@ -437,14 +433,14 @@ export async function createInstantiator(options, swift) {
                 processDoubleArray: function bjs_processDoubleArray(values) {
                     const arrayCleanups = [];
                     for (const elem of values) {
-                        tmpParamF64s.push(elem);
+                        f64Stack.push(elem);
                     }
-                    tmpParamInts.push(values.length);
+                    i32Stack.push(values.length);
                     instance.exports.bjs_processDoubleArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const f64 = tmpRetF64s.pop();
+                        const f64 = f64Stack.pop();
                         arrayResult.push(f64);
                     }
                     arrayResult.reverse();
@@ -454,14 +450,14 @@ export async function createInstantiator(options, swift) {
                 processBoolArray: function bjs_processBoolArray(values) {
                     const arrayCleanups = [];
                     for (const elem of values) {
-                        tmpParamInts.push(elem ? 1 : 0);
+                        i32Stack.push(elem ? 1 : 0);
                     }
-                    tmpParamInts.push(values.length);
+                    i32Stack.push(values.length);
                     instance.exports.bjs_processBoolArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const bool = tmpRetInts.pop() !== 0;
+                        const bool = i32Stack.pop() !== 0;
                         arrayResult.push(bool);
                     }
                     arrayResult.reverse();
@@ -476,9 +472,9 @@ export async function createInstantiator(options, swift) {
                             if (structCleanup) { structCleanup(); }
                         });
                     }
-                    tmpParamInts.push(points.length);
+                    i32Stack.push(points.length);
                     instance.exports.bjs_processPointArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const struct = structHelpers.Point.lift();
@@ -491,14 +487,14 @@ export async function createInstantiator(options, swift) {
                 processDirectionArray: function bjs_processDirectionArray(directions) {
                     const arrayCleanups = [];
                     for (const elem of directions) {
-                        tmpParamInts.push((elem | 0));
+                        i32Stack.push((elem | 0));
                     }
-                    tmpParamInts.push(directions.length);
+                    i32Stack.push(directions.length);
                     instance.exports.bjs_processDirectionArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const caseId = tmpRetInts.pop();
+                        const caseId = i32Stack.pop();
                         arrayResult.push(caseId);
                     }
                     arrayResult.reverse();
@@ -508,14 +504,14 @@ export async function createInstantiator(options, swift) {
                 processStatusArray: function bjs_processStatusArray(statuses) {
                     const arrayCleanups = [];
                     for (const elem of statuses) {
-                        tmpParamInts.push((elem | 0));
+                        i32Stack.push((elem | 0));
                     }
-                    tmpParamInts.push(statuses.length);
+                    i32Stack.push(statuses.length);
                     instance.exports.bjs_processStatusArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const rawValue = tmpRetInts.pop();
+                        const rawValue = i32Stack.pop();
                         arrayResult.push(rawValue);
                     }
                     arrayResult.reverse();
@@ -525,9 +521,9 @@ export async function createInstantiator(options, swift) {
                 sumIntArray: function bjs_sumIntArray(values) {
                     const arrayCleanups = [];
                     for (const elem of values) {
-                        tmpParamInts.push((elem | 0));
+                        i32Stack.push((elem | 0));
                     }
-                    tmpParamInts.push(values.length);
+                    i32Stack.push(values.length);
                     const ret = instance.exports.bjs_sumIntArray();
                     for (const cleanup of arrayCleanups) { cleanup(); }
                     return ret;
@@ -540,7 +536,7 @@ export async function createInstantiator(options, swift) {
                             if (structCleanup) { structCleanup(); }
                         });
                     }
-                    tmpParamInts.push(points.length);
+                    i32Stack.push(points.length);
                     const matchingBytes = textEncoder.encode(matching);
                     const matchingId = swift.memory.retain(matchingBytes);
                     instance.exports.bjs_findFirstPoint(matchingId, matchingBytes.length);
@@ -552,14 +548,14 @@ export async function createInstantiator(options, swift) {
                 processUnsafeRawPointerArray: function bjs_processUnsafeRawPointerArray(values) {
                     const arrayCleanups = [];
                     for (const elem of values) {
-                        tmpParamPointers.push((elem | 0));
+                        ptrStack.push((elem | 0));
                     }
-                    tmpParamInts.push(values.length);
+                    i32Stack.push(values.length);
                     instance.exports.bjs_processUnsafeRawPointerArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const pointer = tmpRetPointers.pop();
+                        const pointer = ptrStack.pop();
                         arrayResult.push(pointer);
                     }
                     arrayResult.reverse();
@@ -569,14 +565,14 @@ export async function createInstantiator(options, swift) {
                 processUnsafeMutableRawPointerArray: function bjs_processUnsafeMutableRawPointerArray(values) {
                     const arrayCleanups = [];
                     for (const elem of values) {
-                        tmpParamPointers.push((elem | 0));
+                        ptrStack.push((elem | 0));
                     }
-                    tmpParamInts.push(values.length);
+                    i32Stack.push(values.length);
                     instance.exports.bjs_processUnsafeMutableRawPointerArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const pointer = tmpRetPointers.pop();
+                        const pointer = ptrStack.pop();
                         arrayResult.push(pointer);
                     }
                     arrayResult.reverse();
@@ -586,14 +582,14 @@ export async function createInstantiator(options, swift) {
                 processOpaquePointerArray: function bjs_processOpaquePointerArray(values) {
                     const arrayCleanups = [];
                     for (const elem of values) {
-                        tmpParamPointers.push((elem | 0));
+                        ptrStack.push((elem | 0));
                     }
-                    tmpParamInts.push(values.length);
+                    i32Stack.push(values.length);
                     instance.exports.bjs_processOpaquePointerArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const pointer = tmpRetPointers.pop();
+                        const pointer = ptrStack.pop();
                         arrayResult.push(pointer);
                     }
                     arrayResult.reverse();
@@ -605,23 +601,23 @@ export async function createInstantiator(options, swift) {
                     for (const elem of values) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
-                            tmpParamInts.push((elem | 0));
+                            i32Stack.push((elem | 0));
                         } else {
-                            tmpParamInts.push(0);
+                            i32Stack.push(0);
                         }
-                        tmpParamInts.push(isSome);
+                        i32Stack.push(isSome);
                     }
-                    tmpParamInts.push(values.length);
+                    i32Stack.push(values.length);
                     instance.exports.bjs_processOptionalIntArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const isSome1 = tmpRetInts.pop();
+                        const isSome1 = i32Stack.pop();
                         let optValue;
                         if (isSome1 === 0) {
                             optValue = null;
                         } else {
-                            const int = tmpRetInts.pop();
+                            const int = i32Stack.pop();
                             optValue = int;
                         }
                         arrayResult.push(optValue);
@@ -637,26 +633,26 @@ export async function createInstantiator(options, swift) {
                         if (isSome) {
                             const bytes = textEncoder.encode(elem);
                             const id = swift.memory.retain(bytes);
-                            tmpParamInts.push(bytes.length);
-                            tmpParamInts.push(id);
+                            i32Stack.push(bytes.length);
+                            i32Stack.push(id);
                             arrayCleanups.push(() => { swift.memory.release(id); });
                         } else {
-                            tmpParamInts.push(0);
-                            tmpParamInts.push(0);
+                            i32Stack.push(0);
+                            i32Stack.push(0);
                         }
-                        tmpParamInts.push(isSome);
+                        i32Stack.push(isSome);
                     }
-                    tmpParamInts.push(values.length);
+                    i32Stack.push(values.length);
                     instance.exports.bjs_processOptionalStringArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const isSome1 = tmpRetInts.pop();
+                        const isSome1 = i32Stack.pop();
                         let optValue;
                         if (isSome1 === 0) {
                             optValue = null;
                         } else {
-                            const string = tmpRetStrings.pop();
+                            const string = strStack.pop();
                             optValue = string;
                         }
                         arrayResult.push(optValue);
@@ -671,19 +667,19 @@ export async function createInstantiator(options, swift) {
                     if (isSome) {
                         const arrayCleanups = [];
                         for (const elem of values) {
-                            tmpParamInts.push((elem | 0));
+                            i32Stack.push((elem | 0));
                         }
-                        tmpParamInts.push(values.length);
+                        i32Stack.push(values.length);
                         valuesCleanups.push(() => { for (const cleanup of arrayCleanups) { cleanup(); } });
                     }
                     instance.exports.bjs_processOptionalArray(+isSome);
-                    const isSome1 = tmpRetInts.pop();
+                    const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {
-                        const arrayLen = tmpRetInts.pop();
+                        const arrayLen = i32Stack.pop();
                         const arrayResult = [];
                         for (let i = 0; i < arrayLen; i++) {
-                            const int = tmpRetInts.pop();
+                            const int = i32Stack.pop();
                             arrayResult.push(int);
                         }
                         arrayResult.reverse();
@@ -703,14 +699,14 @@ export async function createInstantiator(options, swift) {
                             arrayCleanups.push(() => { if (structCleanup) { structCleanup(); } });
                         } else {
                         }
-                        tmpParamInts.push(isSome);
+                        i32Stack.push(isSome);
                     }
-                    tmpParamInts.push(points.length);
+                    i32Stack.push(points.length);
                     instance.exports.bjs_processOptionalPointArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const isSome1 = tmpRetInts.pop();
+                        const isSome1 = i32Stack.pop();
                         let optValue;
                         if (isSome1 === 0) {
                             optValue = null;
@@ -729,23 +725,23 @@ export async function createInstantiator(options, swift) {
                     for (const elem of directions) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
-                            tmpParamInts.push((elem | 0));
+                            i32Stack.push((elem | 0));
                         } else {
-                            tmpParamInts.push(0);
+                            i32Stack.push(0);
                         }
-                        tmpParamInts.push(isSome);
+                        i32Stack.push(isSome);
                     }
-                    tmpParamInts.push(directions.length);
+                    i32Stack.push(directions.length);
                     instance.exports.bjs_processOptionalDirectionArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const isSome1 = tmpRetInts.pop();
+                        const isSome1 = i32Stack.pop();
                         let optValue;
                         if (isSome1 === 0) {
                             optValue = null;
                         } else {
-                            const caseId = tmpRetInts.pop();
+                            const caseId = i32Stack.pop();
                             optValue = caseId;
                         }
                         arrayResult.push(optValue);
@@ -759,23 +755,23 @@ export async function createInstantiator(options, swift) {
                     for (const elem of statuses) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
-                            tmpParamInts.push((elem | 0));
+                            i32Stack.push((elem | 0));
                         } else {
-                            tmpParamInts.push(0);
+                            i32Stack.push(0);
                         }
-                        tmpParamInts.push(isSome);
+                        i32Stack.push(isSome);
                     }
-                    tmpParamInts.push(statuses.length);
+                    i32Stack.push(statuses.length);
                     instance.exports.bjs_processOptionalStatusArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const isSome1 = tmpRetInts.pop();
+                        const isSome1 = i32Stack.pop();
                         let optValue;
                         if (isSome1 === 0) {
                             optValue = null;
                         } else {
-                            const rawValue = tmpRetInts.pop();
+                            const rawValue = i32Stack.pop();
                             optValue = rawValue;
                         }
                         arrayResult.push(optValue);
@@ -789,22 +785,22 @@ export async function createInstantiator(options, swift) {
                     for (const elem of values) {
                         const arrayCleanups1 = [];
                         for (const elem1 of elem) {
-                            tmpParamInts.push((elem1 | 0));
+                            i32Stack.push((elem1 | 0));
                         }
-                        tmpParamInts.push(elem.length);
+                        i32Stack.push(elem.length);
                         arrayCleanups.push(() => {
                             for (const cleanup of arrayCleanups1) { cleanup(); }
                         });
                     }
-                    tmpParamInts.push(values.length);
+                    i32Stack.push(values.length);
                     instance.exports.bjs_processNestedIntArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const arrayLen1 = tmpRetInts.pop();
+                        const arrayLen1 = i32Stack.pop();
                         const arrayResult1 = [];
                         for (let i1 = 0; i1 < arrayLen1; i1++) {
-                            const int = tmpRetInts.pop();
+                            const int = i32Stack.pop();
                             arrayResult1.push(int);
                         }
                         arrayResult1.reverse();
@@ -821,26 +817,26 @@ export async function createInstantiator(options, swift) {
                         for (const elem1 of elem) {
                             const bytes = textEncoder.encode(elem1);
                             const id = swift.memory.retain(bytes);
-                            tmpParamInts.push(bytes.length);
-                            tmpParamInts.push(id);
+                            i32Stack.push(bytes.length);
+                            i32Stack.push(id);
                             arrayCleanups1.push(() => {
                                 swift.memory.release(id);
                             });
                         }
-                        tmpParamInts.push(elem.length);
+                        i32Stack.push(elem.length);
                         arrayCleanups.push(() => {
                             for (const cleanup of arrayCleanups1) { cleanup(); }
                         });
                     }
-                    tmpParamInts.push(values.length);
+                    i32Stack.push(values.length);
                     instance.exports.bjs_processNestedStringArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const arrayLen1 = tmpRetInts.pop();
+                        const arrayLen1 = i32Stack.pop();
                         const arrayResult1 = [];
                         for (let i1 = 0; i1 < arrayLen1; i1++) {
-                            const string = tmpRetStrings.pop();
+                            const string = strStack.pop();
                             arrayResult1.push(string);
                         }
                         arrayResult1.reverse();
@@ -860,17 +856,17 @@ export async function createInstantiator(options, swift) {
                                 if (structCleanup) { structCleanup(); }
                             });
                         }
-                        tmpParamInts.push(elem.length);
+                        i32Stack.push(elem.length);
                         arrayCleanups.push(() => {
                             for (const cleanup of arrayCleanups1) { cleanup(); }
                         });
                     }
-                    tmpParamInts.push(points.length);
+                    i32Stack.push(points.length);
                     instance.exports.bjs_processNestedPointArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const arrayLen1 = tmpRetInts.pop();
+                        const arrayLen1 = i32Stack.pop();
                         const arrayResult1 = [];
                         for (let i1 = 0; i1 < arrayLen1; i1++) {
                             const struct = structHelpers.Point.lift();
@@ -886,14 +882,14 @@ export async function createInstantiator(options, swift) {
                 processItemArray: function bjs_processItemArray(items) {
                     const arrayCleanups = [];
                     for (const elem of items) {
-                        tmpParamPointers.push(elem.pointer);
+                        ptrStack.push(elem.pointer);
                     }
-                    tmpParamInts.push(items.length);
+                    i32Stack.push(items.length);
                     instance.exports.bjs_processItemArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const ptr = tmpRetPointers.pop();
+                        const ptr = ptrStack.pop();
                         const obj = _exports['Item'].__construct(ptr);
                         arrayResult.push(obj);
                     }
@@ -906,22 +902,22 @@ export async function createInstantiator(options, swift) {
                     for (const elem of items) {
                         const arrayCleanups1 = [];
                         for (const elem1 of elem) {
-                            tmpParamPointers.push(elem1.pointer);
+                            ptrStack.push(elem1.pointer);
                         }
-                        tmpParamInts.push(elem.length);
+                        i32Stack.push(elem.length);
                         arrayCleanups.push(() => {
                             for (const cleanup of arrayCleanups1) { cleanup(); }
                         });
                     }
-                    tmpParamInts.push(items.length);
+                    i32Stack.push(items.length);
                     instance.exports.bjs_processNestedItemArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const arrayLen1 = tmpRetInts.pop();
+                        const arrayLen1 = i32Stack.pop();
                         const arrayResult1 = [];
                         for (let i1 = 0; i1 < arrayLen1; i1++) {
-                            const ptr = tmpRetPointers.pop();
+                            const ptr = ptrStack.pop();
                             const obj = _exports['Item'].__construct(ptr);
                             arrayResult1.push(obj);
                         }
@@ -936,14 +932,14 @@ export async function createInstantiator(options, swift) {
                     const arrayCleanups = [];
                     for (const elem of objects) {
                         const objId = swift.memory.retain(elem);
-                        tmpParamInts.push(objId);
+                        i32Stack.push(objId);
                     }
-                    tmpParamInts.push(objects.length);
+                    i32Stack.push(objects.length);
                     instance.exports.bjs_processJSObjectArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const objId1 = tmpRetInts.pop();
+                        const objId1 = i32Stack.pop();
                         const obj = swift.memory.getObject(objId1);
                         swift.memory.release(objId1);
                         arrayResult.push(obj);
@@ -958,23 +954,23 @@ export async function createInstantiator(options, swift) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
                             const objId = swift.memory.retain(elem);
-                            tmpParamInts.push(objId);
+                            i32Stack.push(objId);
                         } else {
-                            tmpParamInts.push(0);
+                            i32Stack.push(0);
                         }
-                        tmpParamInts.push(isSome);
+                        i32Stack.push(isSome);
                     }
-                    tmpParamInts.push(objects.length);
+                    i32Stack.push(objects.length);
                     instance.exports.bjs_processOptionalJSObjectArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const isSome1 = tmpRetInts.pop();
+                        const isSome1 = i32Stack.pop();
                         let optValue;
                         if (isSome1 === 0) {
                             optValue = null;
                         } else {
-                            const objId1 = tmpRetInts.pop();
+                            const objId1 = i32Stack.pop();
                             const obj = swift.memory.getObject(objId1);
                             swift.memory.release(objId1);
                             optValue = obj;
@@ -991,22 +987,22 @@ export async function createInstantiator(options, swift) {
                         const arrayCleanups1 = [];
                         for (const elem1 of elem) {
                             const objId = swift.memory.retain(elem1);
-                            tmpParamInts.push(objId);
+                            i32Stack.push(objId);
                         }
-                        tmpParamInts.push(elem.length);
+                        i32Stack.push(elem.length);
                         arrayCleanups.push(() => {
                             for (const cleanup of arrayCleanups1) { cleanup(); }
                         });
                     }
-                    tmpParamInts.push(objects.length);
+                    i32Stack.push(objects.length);
                     instance.exports.bjs_processNestedJSObjectArray();
-                    const arrayLen = tmpRetInts.pop();
+                    const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
-                        const arrayLen1 = tmpRetInts.pop();
+                        const arrayLen1 = i32Stack.pop();
                         const arrayResult1 = [];
                         for (let i1 = 0; i1 < arrayLen1; i1++) {
-                            const objId1 = tmpRetInts.pop();
+                            const objId1 = i32Stack.pop();
                             const obj = swift.memory.getObject(objId1);
                             swift.memory.release(objId1);
                             arrayResult1.push(obj);

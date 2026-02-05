@@ -48,16 +48,12 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tmpRetTag = [];
-    let tmpRetStrings = [];
-    let tmpRetInts = [];
-    let tmpRetF32s = [];
-    let tmpRetF64s = [];
-    let tmpParamInts = [];
-    let tmpParamF32s = [];
-    let tmpParamF64s = [];
-    let tmpRetPointers = [];
-    let tmpParamPointers = [];
+    let tagStack = [];
+    let strStack = [];
+    let i32Stack = [];
+    let f32Stack = [];
+    let f64Stack = [];
+    let ptrStack = [];
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
@@ -72,30 +68,30 @@ export async function createInstantiator(options, swift) {
                     case APIResultValues.Tag.Success: {
                         const bytes = textEncoder.encode(value.param0);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         const cleanup = () => {
                             swift.memory.release(id);
                         };
                         return { caseId: APIResultValues.Tag.Success, cleanup };
                     }
                     case APIResultValues.Tag.Failure: {
-                        tmpParamInts.push((value.param0 | 0));
+                        i32Stack.push((value.param0 | 0));
                         const cleanup = undefined;
                         return { caseId: APIResultValues.Tag.Failure, cleanup };
                     }
                     case APIResultValues.Tag.Flag: {
-                        tmpParamInts.push(value.param0 ? 1 : 0);
+                        i32Stack.push(value.param0 ? 1 : 0);
                         const cleanup = undefined;
                         return { caseId: APIResultValues.Tag.Flag, cleanup };
                     }
                     case APIResultValues.Tag.Rate: {
-                        tmpParamF32s.push(Math.fround(value.param0));
+                        f32Stack.push(Math.fround(value.param0));
                         const cleanup = undefined;
                         return { caseId: APIResultValues.Tag.Rate, cleanup };
                     }
                     case APIResultValues.Tag.Precise: {
-                        tmpParamF64s.push(value.param0);
+                        f64Stack.push(value.param0);
                         const cleanup = undefined;
                         return { caseId: APIResultValues.Tag.Precise, cleanup };
                     }
@@ -110,23 +106,23 @@ export async function createInstantiator(options, swift) {
                 tag = tag | 0;
                 switch (tag) {
                     case APIResultValues.Tag.Success: {
-                        const string = tmpRetStrings.pop();
+                        const string = strStack.pop();
                         return { tag: APIResultValues.Tag.Success, param0: string };
                     }
                     case APIResultValues.Tag.Failure: {
-                        const int = tmpRetInts.pop();
+                        const int = i32Stack.pop();
                         return { tag: APIResultValues.Tag.Failure, param0: int };
                     }
                     case APIResultValues.Tag.Flag: {
-                        const bool = tmpRetInts.pop() !== 0;
+                        const bool = i32Stack.pop() !== 0;
                         return { tag: APIResultValues.Tag.Flag, param0: bool };
                     }
                     case APIResultValues.Tag.Rate: {
-                        const f32 = tmpRetF32s.pop();
+                        const f32 = f32Stack.pop();
                         return { tag: APIResultValues.Tag.Rate, param0: f32 };
                     }
                     case APIResultValues.Tag.Precise: {
-                        const f64 = tmpRetF64s.pop();
+                        const f64 = f64Stack.pop();
                         return { tag: APIResultValues.Tag.Precise, param0: f64 };
                     }
                     case APIResultValues.Tag.Info: return { tag: APIResultValues.Tag.Info };
@@ -171,36 +167,36 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
             bjs["swift_js_push_tag"] = function(tag) {
-                tmpRetTag.push(tag);
+                tagStack.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
-                tmpRetInts.push(v | 0);
+                i32Stack.push(v | 0);
             }
             bjs["swift_js_push_f32"] = function(v) {
-                tmpRetF32s.push(Math.fround(v));
+                f32Stack.push(Math.fround(v));
             }
             bjs["swift_js_push_f64"] = function(v) {
-                tmpRetF64s.push(v);
+                f64Stack.push(v);
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 const value = textDecoder.decode(bytes);
-                tmpRetStrings.push(value);
+                strStack.push(value);
             }
             bjs["swift_js_pop_i32"] = function() {
-                return tmpParamInts.pop();
+                return i32Stack.pop();
             }
             bjs["swift_js_pop_f32"] = function() {
-                return tmpParamF32s.pop();
+                return f32Stack.pop();
             }
             bjs["swift_js_pop_f64"] = function() {
-                return tmpParamF64s.pop();
+                return f64Stack.pop();
             }
             bjs["swift_js_push_pointer"] = function(pointer) {
-                tmpRetPointers.push(pointer);
+                ptrStack.push(pointer);
             }
             bjs["swift_js_pop_pointer"] = function() {
-                return tmpParamPointers.pop();
+                return ptrStack.pop();
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }

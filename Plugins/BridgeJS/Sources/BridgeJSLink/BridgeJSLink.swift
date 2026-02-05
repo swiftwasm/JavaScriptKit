@@ -246,16 +246,12 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);",
             "let \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);",
             "let \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);",
-            "let \(JSGlueVariableScope.reservedTmpRetTag) = [];",
-            "let \(JSGlueVariableScope.reservedTmpRetStrings) = [];",
-            "let \(JSGlueVariableScope.reservedTmpRetInts) = [];",
-            "let \(JSGlueVariableScope.reservedTmpRetF32s) = [];",
-            "let \(JSGlueVariableScope.reservedTmpRetF64s) = [];",
-            "let \(JSGlueVariableScope.reservedTmpParamInts) = [];",
-            "let \(JSGlueVariableScope.reservedTmpParamF32s) = [];",
-            "let \(JSGlueVariableScope.reservedTmpParamF64s) = [];",
-            "let \(JSGlueVariableScope.reservedTmpRetPointers) = [];",
-            "let \(JSGlueVariableScope.reservedTmpParamPointers) = [];",
+            "let \(JSGlueVariableScope.reservedTagStack) = [];",
+            "let \(JSGlueVariableScope.reservedStringStack) = [];",
+            "let \(JSGlueVariableScope.reservedI32Stack) = [];",
+            "let \(JSGlueVariableScope.reservedF32Stack) = [];",
+            "let \(JSGlueVariableScope.reservedF64Stack) = [];",
+            "let \(JSGlueVariableScope.reservedPointerStack) = [];",
             "let \(JSGlueVariableScope.reservedTmpStructCleanups) = [];",
             "const \(JSGlueVariableScope.reservedEnumHelpers) = {};",
             "const \(JSGlueVariableScope.reservedStructHelpers) = {};",
@@ -388,22 +384,22 @@ public struct BridgeJSLink {
                 printer.write("}")
                 printer.write("bjs[\"swift_js_push_tag\"] = function(tag) {")
                 printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedTmpRetTag).push(tag);")
+                    printer.write("\(JSGlueVariableScope.reservedTagStack).push(tag);")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_push_i32\"] = function(v) {")
                 printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedTmpRetInts).push(v | 0);")
+                    printer.write("\(JSGlueVariableScope.reservedI32Stack).push(v | 0);")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_push_f32\"] = function(v) {")
                 printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedTmpRetF32s).push(Math.fround(v));")
+                    printer.write("\(JSGlueVariableScope.reservedF32Stack).push(Math.fround(v));")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_push_f64\"] = function(v) {")
                 printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedTmpRetF64s).push(v);")
+                    printer.write("\(JSGlueVariableScope.reservedF64Stack).push(v);")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_push_string\"] = function(ptr, len) {")
@@ -412,32 +408,32 @@ public struct BridgeJSLink {
                         "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len)\(sharedMemory ? ".slice()" : "");"
                     )
                     printer.write("const value = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);")
-                    printer.write("\(JSGlueVariableScope.reservedTmpRetStrings).push(value);")
+                    printer.write("\(JSGlueVariableScope.reservedStringStack).push(value);")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_pop_i32\"] = function() {")
                 printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedTmpParamInts).pop();")
+                    printer.write("return \(JSGlueVariableScope.reservedI32Stack).pop();")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_pop_f32\"] = function() {")
                 printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedTmpParamF32s).pop();")
+                    printer.write("return \(JSGlueVariableScope.reservedF32Stack).pop();")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_pop_f64\"] = function() {")
                 printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedTmpParamF64s).pop();")
+                    printer.write("return \(JSGlueVariableScope.reservedF64Stack).pop();")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_push_pointer\"] = function(pointer) {")
                 printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedTmpRetPointers).push(pointer);")
+                    printer.write("\(JSGlueVariableScope.reservedPointerStack).push(pointer);")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_pop_pointer\"] = function() {")
                 printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedTmpParamPointers).pop();")
+                    printer.write("return \(JSGlueVariableScope.reservedPointerStack).pop();")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_struct_cleanup\"] = function(cleanupId) {")
