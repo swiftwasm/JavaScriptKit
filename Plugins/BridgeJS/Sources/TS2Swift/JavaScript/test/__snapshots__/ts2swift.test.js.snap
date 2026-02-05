@@ -251,6 +251,36 @@ exports[`ts2swift > snapshots Swift output for ReExportFrom.d.ts > ReExportFrom 
 "
 `;
 
+exports[`ts2swift > snapshots Swift output for RecordDictionary.d.ts > RecordDictionary 1`] = `
+"// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
+// DO NOT EDIT.
+//
+// To update this file, just rebuild your project or run
+// \`swift package bridge-js\`.
+
+@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+
+@JSFunction func takeRecord(_ value: [String: Double]) throws(JSException) -> Void
+
+@JSFunction func returnRecord() throws(JSException) -> [String: String]
+
+@JSFunction func optionalRecord(_ value: Optional<[String: Bool]>) throws(JSException) -> Optional<[String: Bool]>
+
+@JSFunction func nestedRecord(_ value: [String: [String: Double]]) throws(JSException) -> [String: [String: Double]]
+
+@JSFunction func recordWithArrayValues(_ values: [String: [Double]]) throws(JSException) -> [String: [Double]]
+
+@JSFunction func recordWithObjects(_ values: [String: Optional<Box>]) throws(JSException) -> [String: Optional<Box>]
+
+@JSClass struct Box {
+    @JSGetter var value: Double
+    @JSSetter func setValue(_ value: Double) throws(JSException)
+}
+
+@JSFunction func unsupportedKeyRecord(_ values: JSObject) throws(JSException) -> Void
+"
+`;
+
 exports[`ts2swift > snapshots Swift output for StringEnum.d.ts > StringEnum 1`] = `
 "// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
 // DO NOT EDIT.
