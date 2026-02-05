@@ -18,16 +18,12 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tmpRetTag = [];
-    let tmpRetStrings = [];
-    let tmpRetInts = [];
-    let tmpRetF32s = [];
-    let tmpRetF64s = [];
-    let tmpParamInts = [];
-    let tmpParamF32s = [];
-    let tmpParamF64s = [];
-    let tmpRetPointers = [];
-    let tmpParamPointers = [];
+    let tagStack = [];
+    let strStack = [];
+    let i32Stack = [];
+    let f32Stack = [];
+    let f64Stack = [];
+    let ptrStack = [];
     let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
@@ -71,36 +67,36 @@ export async function createInstantiator(options, swift) {
                 swift.memory.release(id);
             }
             bjs["swift_js_push_tag"] = function(tag) {
-                tmpRetTag.push(tag);
+                tagStack.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
-                tmpRetInts.push(v | 0);
+                i32Stack.push(v | 0);
             }
             bjs["swift_js_push_f32"] = function(v) {
-                tmpRetF32s.push(Math.fround(v));
+                f32Stack.push(Math.fround(v));
             }
             bjs["swift_js_push_f64"] = function(v) {
-                tmpRetF64s.push(v);
+                f64Stack.push(v);
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 const value = textDecoder.decode(bytes);
-                tmpRetStrings.push(value);
+                strStack.push(value);
             }
             bjs["swift_js_pop_i32"] = function() {
-                return tmpParamInts.pop();
+                return i32Stack.pop();
             }
             bjs["swift_js_pop_f32"] = function() {
-                return tmpParamF32s.pop();
+                return f32Stack.pop();
             }
             bjs["swift_js_pop_f64"] = function() {
-                return tmpParamF64s.pop();
+                return f64Stack.pop();
             }
             bjs["swift_js_push_pointer"] = function(pointer) {
-                tmpRetPointers.push(pointer);
+                ptrStack.push(pointer);
             }
             bjs["swift_js_pop_pointer"] = function() {
-                return tmpParamPointers.pop();
+                return ptrStack.pop();
             }
             bjs["swift_js_struct_cleanup"] = function(cleanupId) {
                 if (cleanupId === 0) { return; }
@@ -213,11 +209,11 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_importMirrorDictionary"] = function bjs_importMirrorDictionary() {
                 try {
-                    const dictLen = tmpRetInts.pop();
+                    const dictLen = i32Stack.pop();
                     const dictResult = {};
                     for (let i = 0; i < dictLen; i++) {
-                        const f64 = tmpRetF64s.pop();
-                        const string = tmpRetStrings.pop();
+                        const f64 = f64Stack.pop();
+                        const string = strStack.pop();
                         dictResult[string] = f64;
                     }
                     let ret = imports.importMirrorDictionary(dictResult);
@@ -227,14 +223,14 @@ export async function createInstantiator(options, swift) {
                         const [key, value] = entry;
                         const bytes = textEncoder.encode(key);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         arrayCleanups.push(() => {
                             swift.memory.release(id);
                         });
-                        tmpParamF64s.push(value);
+                        f64Stack.push(value);
                     }
-                    tmpParamInts.push(entries.length);
+                    i32Stack.push(entries.length);
                 } catch (error) {
                     setException(error);
                 }
@@ -285,20 +281,20 @@ export async function createInstantiator(options, swift) {
                         const [key, value] = entry;
                         const bytes = textEncoder.encode(key);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         arrayCleanups.push(() => {
                             swift.memory.release(id);
                         });
-                        tmpParamInts.push((value | 0));
+                        i32Stack.push((value | 0));
                     }
-                    tmpParamInts.push(entries.length);
+                    i32Stack.push(entries.length);
                     instance.exports.bjs_mirrorDictionary();
-                    const dictLen = tmpRetInts.pop();
+                    const dictLen = i32Stack.pop();
                     const dictResult = {};
                     for (let i = 0; i < dictLen; i++) {
-                        const int = tmpRetInts.pop();
-                        const string = tmpRetStrings.pop();
+                        const int = i32Stack.pop();
+                        const string = strStack.pop();
                         dictResult[string] = int;
                     }
                     for (const cleanup of arrayCleanups) { cleanup(); }
@@ -314,31 +310,31 @@ export async function createInstantiator(options, swift) {
                             const [key, value] = entry;
                             const bytes = textEncoder.encode(key);
                             const id = swift.memory.retain(bytes);
-                            tmpParamInts.push(bytes.length);
-                            tmpParamInts.push(id);
+                            i32Stack.push(bytes.length);
+                            i32Stack.push(id);
                             arrayCleanups.push(() => {
                                 swift.memory.release(id);
                             });
                             const bytes1 = textEncoder.encode(value);
                             const id1 = swift.memory.retain(bytes1);
-                            tmpParamInts.push(bytes1.length);
-                            tmpParamInts.push(id1);
+                            i32Stack.push(bytes1.length);
+                            i32Stack.push(id1);
                             arrayCleanups.push(() => {
                                 swift.memory.release(id1);
                             });
                         }
-                        tmpParamInts.push(entries.length);
+                        i32Stack.push(entries.length);
                         valuesCleanups.push(() => { for (const cleanup of arrayCleanups) { cleanup(); } });
                     }
                     instance.exports.bjs_optionalDictionary(+isSome);
-                    const isSome1 = tmpRetInts.pop();
+                    const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {
-                        const dictLen = tmpRetInts.pop();
+                        const dictLen = i32Stack.pop();
                         const dictResult = {};
                         for (let i = 0; i < dictLen; i++) {
-                            const string = tmpRetStrings.pop();
-                            const string1 = tmpRetStrings.pop();
+                            const string = strStack.pop();
+                            const string1 = strStack.pop();
                             dictResult[string1] = string;
                         }
                         optResult = dictResult;
@@ -355,33 +351,33 @@ export async function createInstantiator(options, swift) {
                         const [key, value] = entry;
                         const bytes = textEncoder.encode(key);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         arrayCleanups.push(() => {
                             swift.memory.release(id);
                         });
                         const arrayCleanups1 = [];
                         for (const elem of value) {
-                            tmpParamInts.push((elem | 0));
+                            i32Stack.push((elem | 0));
                         }
-                        tmpParamInts.push(value.length);
+                        i32Stack.push(value.length);
                         arrayCleanups.push(() => {
                             for (const cleanup of arrayCleanups1) { cleanup(); }
                         });
                     }
-                    tmpParamInts.push(entries.length);
+                    i32Stack.push(entries.length);
                     instance.exports.bjs_nestedDictionary();
-                    const dictLen = tmpRetInts.pop();
+                    const dictLen = i32Stack.pop();
                     const dictResult = {};
                     for (let i = 0; i < dictLen; i++) {
-                        const arrayLen = tmpRetInts.pop();
+                        const arrayLen = i32Stack.pop();
                         const arrayResult = [];
                         for (let i1 = 0; i1 < arrayLen; i1++) {
-                            const int = tmpRetInts.pop();
+                            const int = i32Stack.pop();
                             arrayResult.push(int);
                         }
                         arrayResult.reverse();
-                        const string = tmpRetStrings.pop();
+                        const string = strStack.pop();
                         dictResult[string] = arrayResult;
                     }
                     for (const cleanup of arrayCleanups) { cleanup(); }
@@ -394,21 +390,21 @@ export async function createInstantiator(options, swift) {
                         const [key, value] = entry;
                         const bytes = textEncoder.encode(key);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         arrayCleanups.push(() => {
                             swift.memory.release(id);
                         });
-                        tmpParamPointers.push(value.pointer);
+                        ptrStack.push(value.pointer);
                     }
-                    tmpParamInts.push(entries.length);
+                    i32Stack.push(entries.length);
                     instance.exports.bjs_boxDictionary();
-                    const dictLen = tmpRetInts.pop();
+                    const dictLen = i32Stack.pop();
                     const dictResult = {};
                     for (let i = 0; i < dictLen; i++) {
-                        const ptr = tmpRetPointers.pop();
+                        const ptr = ptrStack.pop();
                         const obj = _exports['Box'].__construct(ptr);
-                        const string = tmpRetStrings.pop();
+                        const string = strStack.pop();
                         dictResult[string] = obj;
                     }
                     for (const cleanup of arrayCleanups) { cleanup(); }
@@ -421,34 +417,34 @@ export async function createInstantiator(options, swift) {
                         const [key, value] = entry;
                         const bytes = textEncoder.encode(key);
                         const id = swift.memory.retain(bytes);
-                        tmpParamInts.push(bytes.length);
-                        tmpParamInts.push(id);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
                         arrayCleanups.push(() => {
                             swift.memory.release(id);
                         });
                         const isSome = value != null ? 1 : 0;
                         if (isSome) {
-                            tmpParamPointers.push(value.pointer);
+                            ptrStack.push(value.pointer);
                         } else {
-                            tmpParamPointers.push(0);
+                            ptrStack.push(0);
                         }
-                        tmpParamInts.push(isSome);
+                        i32Stack.push(isSome);
                     }
-                    tmpParamInts.push(entries.length);
+                    i32Stack.push(entries.length);
                     instance.exports.bjs_optionalBoxDictionary();
-                    const dictLen = tmpRetInts.pop();
+                    const dictLen = i32Stack.pop();
                     const dictResult = {};
                     for (let i = 0; i < dictLen; i++) {
-                        const isSome1 = tmpRetInts.pop();
+                        const isSome1 = i32Stack.pop();
                         let optValue;
                         if (isSome1 === 0) {
                             optValue = null;
                         } else {
-                            const ptr = tmpRetPointers.pop();
+                            const ptr = ptrStack.pop();
                             const obj = _exports['Box'].__construct(ptr);
                             optValue = obj;
                         }
-                        const string = tmpRetStrings.pop();
+                        const string = strStack.pop();
                         dictResult[string] = optValue;
                     }
                     for (const cleanup of arrayCleanups) { cleanup(); }

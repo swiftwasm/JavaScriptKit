@@ -1009,7 +1009,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("}")
                 case .dictionary(let valueType):
                     let isSomeVar = scope.variable("isSome")
-                    printer.write("const \(isSomeVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                    printer.write("const \(isSomeVar) = \(scope.popI32());")
                     printer.write("let \(resultVar);")
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
@@ -1217,11 +1217,11 @@ struct IntrinsicJSFragment: Sendable {
                             }
                         }
                         printer.write("}")
-                        printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(entriesVar).length);")
+                        scope.emitPushI32Parameter("\(entriesVar).length", printer: printer)
                         cleanupCode.write("for (const cleanup of \(cleanupArrayVar)) { cleanup(); }")
                     }
                     printer.write("}")
-                    printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(isSomeVar) ? 1 : 0);")
+                    scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
                 default:
                     ()
                 }
@@ -2749,7 +2749,7 @@ struct IntrinsicJSFragment: Sendable {
                     }
                 }
                 printer.write("}")
-                printer.write("\(JSGlueVariableScope.reservedTmpParamInts).push(\(entriesVar).length);")
+                scope.emitPushI32Parameter("\(entriesVar).length", printer: printer)
                 cleanupCode.write("for (const cleanup of \(cleanupArrayVar)) { cleanup(); }")
                 return []
             }
@@ -2791,7 +2791,7 @@ struct IntrinsicJSFragment: Sendable {
                 let lenVar = scope.variable("dictLen")
                 let iVar = scope.variable("i")
 
-                printer.write("const \(lenVar) = \(JSGlueVariableScope.reservedTmpRetInts).pop();")
+                printer.write("const \(lenVar) = \(scope.popI32());")
                 printer.write("const \(resultVar) = {};")
                 printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
                 printer.indent {
